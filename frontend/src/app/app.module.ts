@@ -8,6 +8,12 @@ import { HttpModule } from '@angular/http';
 import { MdButtonModule } from '@angular2-material/button';
 import { MdCardModule } from '@angular2-material/card';
 
+// ngrx
+import { StoreModule } from '@ngrx/store';
+
+// our reducers
+import { CounterReducer } from './reducers/counter.reducer';
+
 // our components
 import { AppComponent } from './app.component';
 
@@ -19,6 +25,7 @@ import { AppComponent } from './app.component';
     BrowserModule,
     FormsModule,
     HttpModule,
+    StoreModule.provideStore({ counter: CounterReducer }),
     MdButtonModule.forRoot(),
     MdCardModule.forRoot()
   ],
