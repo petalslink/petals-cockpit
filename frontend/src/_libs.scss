@@ -1,0 +1,10 @@
+// @import '~material-design-icons/iconfont/material-icons';
+
+// the import is not working here because webpack cannot find fonts
+// TODO : replace the following lines by the import when we find why it's not working
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Material Icons'), local('MaterialIcons-Regular'), url(https://fonts.gstatic.com/s/materialicons/v17/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2) format('woff2');
+}

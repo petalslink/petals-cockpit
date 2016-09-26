@@ -1,3 +1,19 @@
-<h1>
-  {{title}}
-</h1>
+<md-sidenav-layout>
+    <md-sidenav #sidenav mode="side" opened="true" class="app-sidenav">
+        Sidenav
+    </md-sidenav>
+    <md-toolbar color="primary">
+        Petals-Cockpit
+    </md-toolbar>
+    <div class="app-content">
+        <md-card>
+          <div>
+            <i class="material-icons app-input-icon">android</i> <a href="https://design.google.com/icons/" target="_blank">Material icons</a> are working !
+          </div>
+
+          <button md-raised-button color="accent" (click)="decrement()">Decrement</button>
+          counter: {{ counter | async }}
+          <button md-raised-button color="primary" (click)="increment()">Increment</button>
+        </md-card>
+    </div>
+</md-sidenav-layout>
