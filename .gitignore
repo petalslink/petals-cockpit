@@ -4,7 +4,15 @@
 #              GLOBAL
 # ------------------------------------
 npm-debug.log
-node_modules
+node_modules/
+
+# IDEs and editors
+.idea
+.project
+.classpath
+*.launch
+.settings/
+target/
 
 # ------------------------------------
 #              BACKEND
@@ -18,15 +26,7 @@ node_modules
 /frontend/tmp
 
 # dependencies
-/frontend/node_modules
 /frontend/bower_components
-
-# IDEs and editors
-/frontend/.idea
-/frontend/.project
-/frontend/.classpath
-/frontend/*.launch
-/frontend/.settings/
 
 # misc
 /frontend/.sass-cache
