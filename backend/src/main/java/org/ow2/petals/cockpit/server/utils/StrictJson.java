@@ -48,5 +48,4 @@ public class StrictJson {
         final StrictJsonSerializationVisitor visitor = new StrictJsonSerializationVisitor(sink, true);
         document.asDocument().accept(visitor);
     }
-
 }
