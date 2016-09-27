@@ -17,8 +17,20 @@
  */
 package org.ow2.petals.cockpit.server.utils;
 
+import java.io.IOException;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+
 import com.allanbank.mongodb.bson.DocumentAssignable;
+import com.allanbank.mongodb.bson.json.Json;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 public class DocumentAssignableModule extends SimpleModule {
 
@@ -27,5 +39,41 @@ public class DocumentAssignableModule extends SimpleModule {
     public DocumentAssignableModule() {
         addSerializer(DocumentAssignable.class, new DocumentAssignableSerializer());
         addDeserializer(DocumentAssignable.class, new DocumentAssignableDeserializer());
+    }
+}
+
+class DocumentAssignableDeserializer extends StdDeserializer<DocumentAssignable> {
+
+    private static final long serialVersionUID = -3793512274350222890L;
+
+    public DocumentAssignableDeserializer() {
+        super(DocumentAssignable.class);
+    }
+
+    @Override
+    public @NonNull DocumentAssignable deserialize(@Nullable JsonParser p, @Nullable DeserializationContext ctxt)
+            throws IOException {
+        assert p != null;
+        assert ctxt != null;
+
+        return Json.parse(p.readValueAsTree().toString());
+    }
+}
+
+class DocumentAssignableSerializer extends StdSerializer<DocumentAssignable> {
+
+    private static final long serialVersionUID = 6274585714855435189L;
+
+    public DocumentAssignableSerializer() {
+        super(DocumentAssignable.class);
+    }
+
+    @Override
+    public void serialize(DocumentAssignable value, @Nullable JsonGenerator gen, @Nullable SerializerProvider provider)
+            throws IOException {
+        assert gen != null;
+        assert provider != null;
+
+        gen.writeRawValue(StrictJson.serialize(value));
     }
 }

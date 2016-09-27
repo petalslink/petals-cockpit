@@ -43,7 +43,7 @@ public class DocumentAssignableWriter implements MessageBodyWriter<DocumentAssig
         return DocumentAssignable.class.isAssignableFrom(type);
     }
 
-    // Jersey ignores this
+    // Jersey ignores this but it's needed
     @Override
     public long getSize(DocumentAssignable t, Class<?> type, Type genericType, Annotation[] annotations,
             MediaType mediaType) {

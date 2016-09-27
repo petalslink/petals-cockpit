@@ -62,5 +62,4 @@ public class StrictJsonSerializationVisitor extends JsonSerializationVisitor {
         mySink.write(string == null ? null : string.replaceAll("\"", "\\\\\""));
         mySink.write('"');
     }
-
 }
