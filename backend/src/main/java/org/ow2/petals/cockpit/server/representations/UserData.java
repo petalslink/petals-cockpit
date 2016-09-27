@@ -1,0 +1,44 @@
+/**
+ * Copyright (c) 2016 Linagora
+ * 
+ * This program/library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 2.1 of the License, or (at your
+ * option) any later version.
+ * 
+ * This program/library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program/library; If not, see http://www.gnu.org/licenses/
+ * for the GNU Lesser General Public License version 2.1.
+ */
+package org.ow2.petals.cockpit.server.representations;
+
+import org.hibernate.validator.constraints.NotEmpty;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class UserData {
+
+    private final String username;
+
+    private final String name;
+
+    public UserData(@NotEmpty @JsonProperty("username") String username, @NotEmpty @JsonProperty("name") String name) {
+        this.username = username;
+        this.name = name;
+    }
+
+    @JsonProperty
+    public String getUsername() {
+        return username;
+    }
+
+    @JsonProperty
+    public String getName() {
+        return name;
+    }
+}
