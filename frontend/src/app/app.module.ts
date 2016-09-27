@@ -25,16 +25,27 @@ import { CounterReducer } from './reducers/counter.reducer';
 
 // our components
 import { AppComponent } from './app.component';
+import { LoginComponent } from './login/login.component';
+import { PetalsCockpitComponent } from './petals-cockpit/petals-cockpit.component';
+
+// our routes
+import { appRoutes } from './app.routes';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    LoginComponent,
+    PetalsCockpitComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule,
+    // routes
+    appRoutes,
+    // redux store
     StoreModule.provideStore({ counter: CounterReducer }),
+    // material design
     MdButtonModule,
     MdButtonToggleModule,
     MdSidenavModule,
