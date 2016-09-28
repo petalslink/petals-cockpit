@@ -38,7 +38,7 @@ import { LoginComponent } from './login/login.component';
 import { PetalsCockpitComponent } from './petals-cockpit/petals-cockpit.component';
 
 // our routes
-import { appRoutes } from './app.routes';
+import { PetalsCockpitRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [
@@ -57,7 +57,7 @@ import { appRoutes } from './app.routes';
       deps: [Http]
     }),
     // routes
-    appRoutes,
+    PetalsCockpitRoutingModule,
     // ngrx - store
     StoreModule.provideStore({
       counter: CounterReducer,
