@@ -25,9 +25,9 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.glassfish.grizzly.http.server.util.Globals;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -43,11 +43,13 @@ import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
-import org.pac4j.jax.rs.features.jersey.Pac4JProfileValueFactoryProvider;
+import org.pac4j.jax.rs.features.jersey.Pac4JValueFactoryProvider;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 
 public class UserSessionTest {
+
+    private static final String SESSION_COOKIE_NAME = Globals.SESSION_COOKIE_NAME;
 
     static final UserData ADMIN = new UserData("admin", "Administrator");
 
@@ -75,7 +77,7 @@ public class UserSessionTest {
             public boolean configure(@Nullable FeatureContext context) {
                 assert context != null;
                 context.register(new Pac4JSecurityFeature(config));
-                context.register(new Pac4JProfileValueFactoryProvider.Binder(config));
+                context.register(new Pac4JValueFactoryProvider.Binder(config));
                 return true;
             }
         };
@@ -90,7 +92,7 @@ public class UserSessionTest {
         final Response login = request().post(Entity.json(new Authentication("admin", "admin")));
 
         assertThat(login.getStatus()).isEqualTo(200);
-        assertThat(login.getCookies().get("JSESSIONID")).isNotNull();
+        assertThat(login.getCookies().get(SESSION_COOKIE_NAME)).isNotNull();
         assertThat(login.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
     }
 
@@ -99,14 +101,14 @@ public class UserSessionTest {
         final Response login = request().post(Entity.json(new Authentication("wrong", "admin")));
 
         assertThat(login.getStatus()).isEqualTo(401);
-        assertThat(login.getCookies().get("JSESSIONID")).isNotNull();
+        assertThat(login.getCookies().get(SESSION_COOKIE_NAME)).isNotNull();
     }
 
     @Test
     public void testGetNoSession() {
         final Response get = request().get();
 
-        assertThat(get.getStatus()).isEqualTo(Status.UNAUTHORIZED.getStatusCode());
+        assertThat(get.getStatus()).isEqualTo(401);
     }
 
     @Test
@@ -116,9 +118,13 @@ public class UserSessionTest {
         assertThat(login.getStatus()).isEqualTo(200);
         assertThat(login.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
 
-        final NewCookie cookie = login.getCookies().get("JSESSIONID");
+        final NewCookie cookie = login.getCookies().get(SESSION_COOKIE_NAME);
+        assertThat(cookie).isNotNull();
 
-        assertThat(request().cookie(cookie).get(UserData.class)).isEqualToComparingFieldByField(ADMIN);
+        final Response get = request().cookie(cookie).get();
+
+        assertThat(get.getStatus()).isEqualTo(200);
+        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
     }
 
     @Test
@@ -128,10 +134,11 @@ public class UserSessionTest {
         assertThat(login.getStatus()).isEqualTo(200);
         assertThat(login.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
 
-        final NewCookie cookie = login.getCookies().get("JSESSIONID");
+        final NewCookie cookie = login.getCookies().get(SESSION_COOKIE_NAME);
+        assertThat(cookie).isNotNull();
 
         final Response get = request().cookie(cookie).get();
-        assertThat(login.getStatus()).isEqualTo(200);
+        assertThat(get.getStatus()).isEqualTo(200);
         assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
 
         final Response logout = request().cookie(cookie).delete();

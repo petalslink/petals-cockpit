@@ -30,7 +30,7 @@ import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.credentials.password.JBCryptPasswordEncoder;
 import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
-import org.pac4j.jax.rs.features.jersey.Pac4JProfileValueFactoryProvider;
+import org.pac4j.jax.rs.features.jersey.Pac4JValueFactoryProvider;
 
 import com.allanbank.mongodb.MongoClient;
 import com.allanbank.mongodb.MongoDatabase;
@@ -95,7 +95,7 @@ public class CockpitApplication extends Application<CockpitConfiguration> {
         });
 
         environment.jersey().register(new Pac4JSecurityFeature(pac4jConfig));
-        environment.jersey().register(new Pac4JProfileValueFactoryProvider.Binder(pac4jConfig));
+        environment.jersey().register(new Pac4JValueFactoryProvider.Binder(pac4jConfig));
 
         environment.jersey().register(UserSession.class);
     }

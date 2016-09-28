@@ -67,7 +67,7 @@ public class UserSession {
     @Path("/session")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Pac4JCallback
+    @Pac4JCallback(skipResponse = true, renewSession = false)
     public UserData login(@Nullable @Pac4JProfile CommonProfile profile) {
         if (profile != null) {
             LOG.debug("Logging in for {}", profile.getId());
@@ -79,7 +79,7 @@ public class UserSession {
 
     @DELETE
     @Path("/session")
-    @Pac4JLogout
+    @Pac4JLogout(skipResponse = true)
     public void logout() {
         // TODO it would be nicer if we could get the id of the logging out user... but because of the logout, I can't
         // inject CommonProfile in the method parameters...
