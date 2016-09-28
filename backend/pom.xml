@@ -321,6 +321,83 @@
     </pluginManagement>
   </build>
 
+  <profiles>
+    <profile>
+      <!-- Continuous integration profile -->
+      <id>jacoco</id>
+      <properties>
+        <!-- These are properties that could be changed by the CI if needed -->
+        <jacoco-plugin.version>0.7.7.201606060606</jacoco-plugin.version>
+        <jacoco-listeners.version>3.14</jacoco-listeners.version>
+      </properties>
+      <dependencies>
+        <dependency>
+          <!-- Provides the JUnitListener used by surefire below -->
+          <groupId>org.sonarsource.java</groupId>
+          <artifactId>sonar-jacoco-listeners</artifactId>
+          <version>${jacoco-listeners.version}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <!-- Let's activate jacoco for unit test coverage -->
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco-plugin.version}</version>
+            <executions>
+              <execution>
+                <!-- This activates the use of jacoco for recording unit test coverage -->
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+              <execution>
+                <!-- This activates the use of jacoco for recording integration test coverage -->
+                <id>prepare-agent-integration</id>
+                <goals>
+                  <goal>prepare-agent-integration</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <properties>
+                  <property>
+                    <!-- Have jacoco record per-test coverage (on top of default per-file coverage) -->
+                    <name>listener</name>
+                    <value>org.sonar.java.jacoco.JUnitListener</value>
+                  </property>
+                </properties>
+              </configuration>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <properties>
+                  <property>
+                    <!-- Have jacoco record per-test coverage (on top of default per-file coverage) -->
+                    <name>listener</name>
+                    <value>org.sonar.java.jacoco.JUnitListener</value>
+                  </property>
+                </properties>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+
   <repositories>
     <repository>
       <releases>

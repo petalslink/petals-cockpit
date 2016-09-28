@@ -2,7 +2,7 @@ stages:
   - build
 
 variables:
-  MVN: "mvn -B -U -Dmaven.repo.local=m2cache"
+  MVN: "mvn -B -U -Dmaven.repo.local=m2cache -Pjacoco"
 
 .mvn-java-8: &mvn-java-8
   image: maven:3.3-jdk-8-alpine
