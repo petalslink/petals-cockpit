@@ -1,16 +1,25 @@
-<form #formLogin="ngForm" (ngSubmit)="connectUser(formLogin.value)">
-  <p>
-    <md-input placeholder="Username" name="name" [(ngModel)]="name" type="Text"></md-input>
-  </p>
+<md-card>
+  <md-toolbar color="primary">Petals Cockpit</md-toolbar>
+
+  <md-card-content>
+    <form #formLogin="ngForm" (ngSubmit)="connectUser(formLogin.value)">
+      <p>
+        <md-input placeholder="Username" name="name" [(ngModel)]="name" type="Text"></md-input>
+      </p>
+
+      <p>
+        <md-input placeholder="Password" name="password" [(ngModel)]="password" type="password"></md-input>
+      </p>
+
+      <button type="submit" color="primary" md-button>{{ 'LOG_ME' | translate }}</button>
+    </form>
+  </md-card-content>
 
   <p>
-    <md-input placeholder="Password" name="password" [(ngModel)]="password" type="password"></md-input>
+    Debug info :
+    <span class="connecting" *ngIf="(user$ | async).isConnecting">Connecting ...</span>
+    <span class="connected" *ngIf="(user$ | async).isConnected">Is connected !</span>
+    <span class="not-connected" *ngIf="!(user$ | async).isConnected && !(user$ | async).isConnecting">Is NOT connected !</span>
+    <span class="connection-failed" *ngIf="(user$ | async).connectionFailed">Connection failed !</span>
   </p>
-
-  <button type="submit" md-button>{{ 'LOG_ME' | translate }}</button>
-</form>
-
-<div class="connecting" *ngIf="(user$ | async).isConnecting">Is connecting !</div>
-<div class="connected" *ngIf="(user$ | async).isConnected">Is connected !</div>
-<div class="not-connected" *ngIf="!(user$ | async).isConnected">Is NOT connected !</div>
-<div class="connection-failed" *ngIf="(user$ | async).connectionFailed">Connection failed !</div>
+</md-card>

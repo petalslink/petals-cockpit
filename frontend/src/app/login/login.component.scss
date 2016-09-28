@@ -13,3 +13,7 @@
 .connection-failed {
   @extend .not-connected;
 }
+
+md-input {
+  width: 100%;
+}
