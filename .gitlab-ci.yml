@@ -1,0 +1,24 @@
+stages:
+  - build
+
+variables:
+  MVN: "mvn -B -U -Dmaven.repo.local=m2cache"
+
+.mvn-java-8: &mvn-java-8
+  image: maven:3.3-jdk-8-alpine
+  tags:
+    - docker
+  cache:
+    key: "mvn-java-8"
+    paths:
+      - m2cache
+
+build-java:
+  <<: *mvn-java-8
+  stage: build
+  script:
+    - "apk update && apk add git"
+    - "git clone --depth 1 https://github.com/victornoel/jersey-pac4j"
+    - "$MVN -f jersey-pac4j install"
+    - "$MVN -f backend verify"
+
