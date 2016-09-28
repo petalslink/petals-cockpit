@@ -1,4 +1,14 @@
-<a (click)="connectUser()" md-button>{{ 'LOG_ME' | translate }}</a>
+<form #formLogin="ngForm" (ngSubmit)="connectUser(formLogin.value)">
+  <p>
+    <md-input placeholder="Username" name="name" [(ngModel)]="name" type="Text"></md-input>
+  </p>
+
+  <p>
+    <md-input placeholder="Password" name="password" [(ngModel)]="password" type="password"></md-input>
+  </p>
+
+  <button type="submit" md-button>{{ 'LOG_ME' | translate }}</button>
+</form>
 
 <div class="connecting" *ngIf="(user$ | async).isConnecting">Is connecting !</div>
 <div class="connected" *ngIf="(user$ | async).isConnected">Is connected !</div>

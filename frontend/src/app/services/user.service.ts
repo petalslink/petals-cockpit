@@ -8,6 +8,8 @@ import { Actions, Effect, mergeEffects } from '@ngrx/effects';
 
 import { AppState } from '../app.state';
 
+import { IUser } from '../interfaces/user.interface';
+
 import {
   USR_IS_CONNECTING,
   USR_IS_CONNECTED,
@@ -36,7 +38,7 @@ export class UserService implements OnDestroy {
 
   @Effect({dispatch: true}) usr_connect$ = this.actions$
     .ofType(USR_IS_CONNECTING)
-    .switchMap(() => {return this.usrConnect()})
+    .switchMap(action => {return this.usrConnect(<IUser>action.payload)})
     .map((res: any) => {
       // TODO : check HTTP header here instead of checking for properties
       if (typeof res.data.username === 'undefined') {
@@ -51,8 +53,8 @@ export class UserService implements OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  private usrConnect() {
-    console.log('trying to connect ...');
+  private usrConnect(user: IUser) {
+    console.log(`trying to connect ""${user.username}"" with password "${user.password}" ...`);
 
     return Observable.create(observer => {
       setTimeout(() => {
