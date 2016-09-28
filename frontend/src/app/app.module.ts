@@ -20,11 +20,17 @@ import { MdInputModule } from '@angular2-material/input';
 import { MdProgressBarModule } from '@angular2-material/progress-bar';
 import { MdTabsModule } from '@angular2-material/tabs';
 
-// ngrx
+// ngrx - store
 import { StoreModule } from '@ngrx/store';
+// ngrx - effects
+import { EffectsModule } from '@ngrx/effects';
 
 // our reducers
 import { CounterReducer } from './reducers/counter.reducer';
+import { UserReducer } from './reducers/user.reducer';
+
+// our services
+import { UserService } from './services/user.service'
 
 // our components
 import { AppComponent } from './app.component';
@@ -52,8 +58,13 @@ import { appRoutes } from './app.routes';
     }),
     // routes
     appRoutes,
-    // redux store
-    StoreModule.provideStore({ counter: CounterReducer }),
+    // ngrx - store
+    StoreModule.provideStore({
+      counter: CounterReducer,
+      user: UserReducer
+    }),
+    //ngrx - effects
+    EffectsModule,
     // material design
     MdButtonModule,
     MdButtonToggleModule,
@@ -67,7 +78,9 @@ import { appRoutes } from './app.routes';
     MdProgressBarModule,
     MdTabsModule
   ],
-  providers: [],
+  providers: [
+    UserService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,1 +1,6 @@
-<a [routerLink]="['/petals-cockpit']" md-button>{{ 'LOG_ME' | translate }}</a>
+<a (click)="connectUser()" md-button>{{ 'LOG_ME' | translate }}</a>
+
+<div class="connecting" *ngIf="(user$ | async).isConnecting">Is connecting !</div>
+<div class="connected" *ngIf="(user$ | async).isConnected">Is connected !</div>
+<div class="not-connected" *ngIf="!(user$ | async).isConnected">Is NOT connected !</div>
+<div class="connection-failed" *ngIf="(user$ | async).connectionFailed">Connection failed !</div>

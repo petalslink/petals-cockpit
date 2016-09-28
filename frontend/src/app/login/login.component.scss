@@ -1,0 +1,15 @@
+.connecting {
+  color: orange;
+}
+
+.connected {
+  color: green;
+}
+
+.not-connected {
+  color: red;
+}
+
+.connection-failed {
+  @extend .not-connected;
+}
