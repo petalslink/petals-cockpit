@@ -13,3 +13,18 @@
 .connection-failed {
   @extend .not-connected;
 }
+
+md-input {
+  width: 100%;
+}
+
+md-progress-circle {
+  width: 10px;
+  height: 10px;
+  line-height: 10px;
+  display: inline-block;
+}
+
+form > * {
+  margin: 16px;
+}

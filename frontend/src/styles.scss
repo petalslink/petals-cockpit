@@ -1,5 +1,9 @@
 @import './libs';
 
+// angular-material now uses themes and we do have to load one if we want colors and others like
+// primary, accent, etc
+@import '~@angular/material/core/theming/prebuilt/indigo-pink.css';
+
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;

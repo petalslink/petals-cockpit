@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { USR_IS_CONNECTING } from '../reducers/user.reducer';
 import { AppState } from '../app.state';
 import { UserState } from '../reducers/user.state';
+import { IUser } from '../interfaces/user.interface';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,7 @@ export class LoginComponent {
     this.user$ = <Observable<UserState>>store.select('user');
   }
 
-  connectUser() {
-    this.store.dispatch({type: USR_IS_CONNECTING});
+  connectUser(user: IUser) {
+    this.store.dispatch({ type: USR_IS_CONNECTING, payload: user });
   }
 }

@@ -1,11 +1,12 @@
 import { TypedRecord, makeTypedFactory } from 'typed-immutable-record';
 import { List, Map } from 'immutable';
 
+import { IUser } from '../interfaces/user.interface';
+
 // the typeScript interface that defines the application state's properties
 // this is to be imported wherever a reference to a user is used
 // (reducers, components, services...)
-export interface UserState {
-    name?: string,
+export interface UserState extends IUser {
     isConnecting: boolean,
     isDisconnecting: boolean,
     isConnected: boolean,

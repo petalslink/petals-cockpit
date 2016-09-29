@@ -8,17 +8,7 @@ import { HttpModule, Http } from '@angular/http';
 import { TranslateModule, TranslateStaticLoader, TranslateLoader } from 'ng2-translate/ng2-translate';
 
 // angular-material2 modules
-import { MdCardModule } from '@angular2-material/card';
-import { MdButtonToggleModule } from '@angular2-material/button-toggle';
-import { MdButtonModule } from '@angular2-material/button';
-import { MdSidenavModule } from '@angular2-material/sidenav';
-import { MdToolbarModule } from '@angular2-material/toolbar';
-import { MdIconModule } from '@angular2-material/icon';
-import { MdCheckboxModule } from '@angular2-material/checkbox';
-import { MdRadioModule } from '@angular2-material/radio';
-import { MdInputModule } from '@angular2-material/input';
-import { MdProgressBarModule } from '@angular2-material/progress-bar';
-import { MdTabsModule } from '@angular2-material/tabs';
+import { MaterialModule } from '@angular/material';
 
 // ngrx - store
 import { StoreModule } from '@ngrx/store';
@@ -29,8 +19,14 @@ import { EffectsModule } from '@ngrx/effects';
 import { CounterReducer } from './reducers/counter.reducer';
 import { UserReducer } from './reducers/user.reducer';
 
+// our effects
+import { UserEffects } from './effects/user.effects';
+
 // our services
-import { UserService } from './services/user.service'
+import { UserService } from './services/user.service';
+
+// our mocks
+import { UserMockService } from './mocks/user-mock.service';
 
 // our components
 import { AppComponent } from './app.component';
@@ -66,20 +62,11 @@ import { PetalsCockpitRoutingModule } from './app-routing.module';
     //ngrx - effects
     EffectsModule,
     // material design
-    MdButtonModule,
-    MdButtonToggleModule,
-    MdSidenavModule,
-    MdToolbarModule,
-    MdIconModule,
-    MdCardModule,
-    MdCheckboxModule,
-    MdRadioModule,
-    MdInputModule,
-    MdProgressBarModule,
-    MdTabsModule
+    MaterialModule.forRoot()
   ],
   providers: [
-    UserService
+    UserEffects,
+    { provide: UserService, useClass: UserMockService }
   ],
   bootstrap: [AppComponent]
 })

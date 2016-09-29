@@ -1,71 +1,21 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
-import { Http } from '@angular/http';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
-import { Store } from '@ngrx/store';
-import { Actions, Effect, mergeEffects } from '@ngrx/effects';
-
-import { AppState } from '../app.state';
-
-import {
-  USR_IS_CONNECTING,
-  USR_IS_CONNECTED,
-  USR_IS_DISCONNECTING,
-  USR_IS_DISCONNECTED,
-  USR_CONNECTION_FAILED
-} from '../reducers/user.reducer';
-
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/withLatestFrom';
+import { Injectable } from '@angular/core';
+import { Http, Response } from '@angular/http';
+import { IUser } from '../interfaces/user.interface';
 
 @Injectable()
-export class UserService implements OnDestroy {
-  // our subscription(s) to @ngrx/effects
-  private subscription: Subscription;
+export class UserService {
+  constructor(private http: Http) { }
 
-  constructor(
-    private router: Router,
-    private http: Http,
-    private actions$: Actions,
-    private store$: Store<AppState>
-  ) {
-    this.subscription = mergeEffects(this).subscribe(store$);
+  private extractData(res: Response) {
+    let body = res.json();
+    return body.data || { };
   }
 
-  @Effect({dispatch: true}) usr_connect$ = this.actions$
-    .ofType(USR_IS_CONNECTING)
-    .switchMap(() => {return this.usrConnect()})
-    .map((res: any) => {
-      // TODO : check HTTP header here instead of checking for properties
-      if (typeof res.data.username === 'undefined') {
-        return { type: USR_CONNECTION_FAILED };
-      }
+  public connectUser(user: IUser) {
+    console.log(`trying to connect user "${user.username}" with password "${user.password}" ...`);
 
-      this.router.navigate(['/petals-cockpit']);
-      return { type: USR_IS_CONNECTED };
-    });
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
-
-  private usrConnect() {
-    console.log('trying to connect ...');
-
-    return Observable.create(observer => {
-      setTimeout(() => {
-        console.log('connected !');
-
-        observer.next({
-          data: {
-            'username': 'user1',
-            'name': 'John User'
-          }
-        });
-        observer.complete();
-      }, 2000);
-    });
+    return this.http
+                .post('http://serveur.com/api/user/session', user)
+                .map(this.extractData);
   }
 }
