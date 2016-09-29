@@ -29,7 +29,9 @@ import org.ow2.petals.cockpit.server.utils.DocumentAssignableWriter;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.credentials.password.JBCryptPasswordEncoder;
+import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
+import org.pac4j.jax.rs.features.Pac4JSecurityFilterFeature;
 import org.pac4j.jax.rs.features.jersey.Pac4JValueFactoryProvider;
 
 import com.allanbank.mongodb.MongoClient;
@@ -94,6 +96,9 @@ public class CockpitApplication extends Application<CockpitConfiguration> {
             }
         });
 
+        // by default everything is protected, except user session that handles things by itself
+        environment.jersey().register(
+                new Pac4JSecurityFilterFeature(pac4jConfig, null, "isAuthenticated", null, "excludeUserSession", null));
         environment.jersey().register(new Pac4JSecurityFeature(pac4jConfig));
         environment.jersey().register(new Pac4JValueFactoryProvider.Binder(pac4jConfig));
 
@@ -113,6 +118,9 @@ class Pac4jConfig extends Config {
 
         final CockpitAuthClient cac = new CockpitAuthClient();
         cac.setAuthenticator(auth);
+
+        // Ignores /user/session URLs (defined in UserSession)
+        addMatcher("excludeUserSession", new ExcludedPathMatcher("^/user/session$"));
 
         final Clients clients = new Clients(cac);
         // it seems needed for it to be used by the callback filter (because it does not have a
