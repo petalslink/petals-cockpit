@@ -11,7 +11,10 @@
         <md-input placeholder="Password" name="password" [(ngModel)]="password" type="password"></md-input>
       </p>
 
-      <button type="submit" color="primary" md-button>{{ 'LOG_ME' | translate }}</button>
+      <button type="submit" color="primary" [disabled]="(user$ | async).isConnecting" md-button>
+        <span>{{ 'LOG_ME' | translate }}</span>
+        <md-progress-circle *ngIf="(user$ | async).isConnecting" mode="indeterminate"></md-progress-circle>
+      </button>
     </form>
   </md-card-content>
 

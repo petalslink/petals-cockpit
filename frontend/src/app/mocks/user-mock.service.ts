@@ -21,7 +21,7 @@ export class UserMockService {
           }
         });
         observer.complete();
-      }, 1000);
+      }, 2000);
     });
   }
 }
