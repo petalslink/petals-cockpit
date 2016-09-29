@@ -1,5 +1,4 @@
 import { TypedRecord, makeTypedFactory } from 'typed-immutable-record';
-import { List, Map } from 'immutable';
 
 import { IUser } from '../interfaces/user.interface';
 
@@ -7,10 +6,10 @@ import { IUser } from '../interfaces/user.interface';
 // this is to be imported wherever a reference to a user is used
 // (reducers, components, services...)
 export interface UserState extends IUser {
-    isConnecting: boolean,
-    isDisconnecting: boolean,
-    isConnected: boolean,
-    connectionFailed: boolean
+    isConnecting: boolean;
+    isDisconnecting: boolean;
+    isConnected: boolean;
+    connectionFailed: boolean;
 };
 
 // an Immutable.js Record implementation of the UserState interface.

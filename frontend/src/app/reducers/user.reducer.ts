@@ -1,5 +1,4 @@
 import { ActionReducer, Action } from '@ngrx/store';
-import { Map, fromJS } from 'immutable';
 import { UserStateRecord, userStateFactory } from './user.state';
 
 // actions
