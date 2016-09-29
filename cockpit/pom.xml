@@ -63,7 +63,6 @@
         <groupId>org.codehaus.mojo</groupId>
         <!-- Run with "mvn compile dependency:properties exec:exec" -->
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.5.0</version>
         <configuration>
           <executable>${java.home}/bin/java</executable>
           <arguments>
