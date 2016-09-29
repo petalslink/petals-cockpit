@@ -41,6 +41,7 @@ import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.exception.HttpAction;
+import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
 import org.pac4j.jax.rs.features.jersey.Pac4JValueFactoryProvider;
@@ -69,8 +70,10 @@ public class UserSessionTest {
         // but for now we must give a value for pac4j to be happy
         clients.setCallbackUrl("/user/session");
 
+
         final Config config = new Config();
         config.setClients(clients);
+        config.addMatcher("excludeUserSession", new ExcludedPathMatcher("^/user.*$"));
 
         return new Feature() {
             @Override

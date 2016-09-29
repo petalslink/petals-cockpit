@@ -38,6 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * The URL /user/session is protected via annotations, but /user itself is protected using the global filter (which
+ * ignores /user/session)
+ * 
  * @author vnoel
  */
 @Path("/user")
@@ -45,9 +48,11 @@ public class UserSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserSession.class);
 
+    /**
+     * Note: Security is covered by the global filter
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Pac4JSecurity(authorizers = "isAuthenticated")
     public UserData getUserData(@Pac4JProfile CommonProfile profile) {
         LOG.debug("Returning infos for {}", profile.getId());
 

@@ -18,4 +18,5 @@ mongo:
 logging:
   level: INFO
   loggers:
+    org.pac4j: DEBUG
     org.ow2.petals.cockpit: DEBUG
