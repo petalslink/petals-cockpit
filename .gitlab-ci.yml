@@ -1,8 +1,10 @@
 stages:
   - build
+  - test
 
 variables:
   MVN: "mvn -B -U -Dmaven.repo.local=m2cache -Pjacoco"
+  NG: "node_modules/angular-cli/bin/ng"
 
 .mvn-java-8: &mvn-java-8
   image: maven:3.3-jdk-8-alpine
@@ -13,7 +15,16 @@ variables:
     paths:
       - m2cache
 
-build-java:
+.node-6: &node-6
+  image: node:6
+  tags:
+    - docker
+  cache:
+    key: "node-6"
+    paths:
+      - frontend/node_modules/
+
+build-backend:
   <<: *mvn-java-8
   stage: build
   script:
@@ -21,4 +32,31 @@ build-java:
     - "git clone --depth 1 https://github.com/victornoel/jersey-pac4j"
     - "$MVN -f jersey-pac4j install"
     - "$MVN -f backend verify"
+
+build-frontend:
+  <<: *node-6
+  stage: build
+  script:
+    - "cd frontend"
+    - "npm set progress=false"
+    - "npm install"
+    - "$NG build"
+
+test-frontend:
+  <<: *node-6
+  stage: test
+  script:
+    - "cd frontend"
+    - "npm set progress=false"
+    - "npm install"
+    - "$NG test --watch false"
+
+lint-fronted:
+  <<: *node-6
+  stage: test
+  script:
+    - "cd frontend"
+    - "npm set progress=false"
+    - "npm install"
+    - "$NG lint"
 
