@@ -30,17 +30,15 @@ import org.glassfish.grizzly.http.server.util.Globals;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.representations.Authentication;
 import org.ow2.petals.cockpit.server.representations.UserData;
-import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
-import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.exception.HttpAction;
-import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
 import org.pac4j.jax.rs.features.jersey.Pac4JValueFactoryProvider;
@@ -59,20 +57,8 @@ public class UserSessionTest {
             .addProvider(pac4jFeature()).build();
 
     private static Feature pac4jFeature() {
-        final CockpitAuthClient cac = new CockpitAuthClient();
-        cac.setAuthenticator(new MockAuthenticator());
-        final Clients clients = new Clients(cac);
-        // it seems needed for it to be used by the callback filter (because it does not have a
-        // client name passed as parameter)
-        clients.setDefaultClient(cac);
-        // this will be used by SSO-type authenticators (appended with client name as parameter),
-        // but for now we must give a value for pac4j to be happy
-        clients.setCallbackUrl("/user/session");
-
-
         final Config config = new Config();
-        config.setClients(clients);
-        config.addMatcher("excludeUserSession", new ExcludedPathMatcher("^/user.*$"));
+        CockpitApplication.setupPac4J(config, new MockAuthenticator());
 
         return new Feature() {
             @Override

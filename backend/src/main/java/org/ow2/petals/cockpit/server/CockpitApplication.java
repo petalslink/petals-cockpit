@@ -27,11 +27,14 @@ import org.ow2.petals.cockpit.server.utils.DocumentAssignableModule;
 import org.ow2.petals.cockpit.server.utils.DocumentAssignableWriter;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.config.ConfigSingleton;
+import org.pac4j.core.credentials.UsernamePasswordCredentials;
+import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.credentials.password.JBCryptPasswordEncoder;
 import org.pac4j.core.matching.ExcludedPathMatcher;
-import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
+import org.pac4j.dropwizard.Pac4jBundle;
+import org.pac4j.dropwizard.Pac4jFactory;
 import org.pac4j.jax.rs.features.Pac4JSecurityFilterFeature;
-import org.pac4j.jax.rs.features.jersey.Pac4JValueFactoryProvider;
 
 import com.allanbank.mongodb.MongoClient;
 import com.allanbank.mongodb.MongoDatabase;
@@ -62,6 +65,13 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
     @Override
     public void initialize(@Nullable Bootstrap<C> bootstrap) {
         assert bootstrap != null;
+
+        bootstrap.addBundle(new Pac4jBundle<CockpitConfiguration>() {
+            @Override
+            public Pac4jFactory getPac4jFactory(CockpitConfiguration configuration) {
+                return configuration.getPac4jFactory();
+            }
+        });
     }
 
     @Override
@@ -83,43 +93,46 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         // activate session management in jetty
         environment.servlets().setSessionHandler(new SessionHandler());
 
-        final Config pac4jConfig = new Pac4jConfig(client, configuration);
-
         environment.jersey().register(new AbstractBinder() {
             @Override
             protected void configure() {
                 bind(configuration).to(CockpitConfiguration.class);
                 bind(client).to(MongoClient.class);
                 bind(db).to(MongoDatabase.class);
-                bind(pac4jConfig).to(Config.class);
             }
         });
 
+        setupPac4J(ConfigSingleton.getConfig(), client, configuration);
+
+        // let's enforce the filter programmatically instead of by config
         // by default everything is protected, except user session that handles things by itself
-        environment.jersey().register(
-                new Pac4JSecurityFilterFeature(pac4jConfig, null, "isAuthenticated", null, "excludeUserSession", null));
-        environment.jersey().register(new Pac4JSecurityFeature(pac4jConfig));
-        environment.jersey().register(new Pac4JValueFactoryProvider.Binder(pac4jConfig));
+        final Pac4JSecurityFilterFeature globalFilter = new Pac4JSecurityFilterFeature(ConfigSingleton.getConfig(),
+                null, "isAuthenticated", null, "excludeUserSession", null);
+
+        environment.jersey().register(globalFilter);
 
         environment.jersey().register(UserSession.class);
     }
-}
 
-class Pac4jConfig extends Config {
-
-    public Pac4jConfig(MongoClient client, CockpitConfiguration configuration) {
-
+    /**
+     * public for tests
+     */
+    private static void setupPac4J(Config config, MongoClient client, CockpitConfiguration configuration) {
         final MongoAllanbankAuthenticator auth = new MongoAllanbankAuthenticator(client);
         auth.setUsersDatabase(configuration.getDatabaseFactory().getDatabase());
         auth.setUsersCollection("users");
         auth.setAttributes("display_name");
         auth.setPasswordEncoder(new JBCryptPasswordEncoder());
 
+        setupPac4J(config, auth);
+    }
+
+    public static void setupPac4J(Config config, final Authenticator<@Nullable UsernamePasswordCredentials> auth) {
         final CockpitAuthClient cac = new CockpitAuthClient();
         cac.setAuthenticator(auth);
 
         // Ignores /user/session URLs (defined in UserSession)
-        addMatcher("excludeUserSession", new ExcludedPathMatcher("^/user/session$"));
+        config.addMatcher("excludeUserSession", new ExcludedPathMatcher("^/user/session$"));
 
         final Clients clients = new Clients(cac);
         // it seems needed for it to be used by the callback filter (because it does not have a
@@ -129,7 +142,7 @@ class Pac4jConfig extends Config {
         // but for now we must give a value for pac4j to be happy
         clients.setCallbackUrl("/user/session");
 
-        setClients(clients);
+        config.setClients(clients);
     }
 }
 
