@@ -29,8 +29,14 @@ import { EffectsModule } from '@ngrx/effects';
 import { CounterReducer } from './reducers/counter.reducer';
 import { UserReducer } from './reducers/user.reducer';
 
+// our effects
+import { UserEffects } from './effects/user.effects';
+
 // our services
-import { UserService } from './services/user.service'
+import { UserService } from './services/user.service';
+
+// our mocks
+import { UserMockService } from './mocks/user-mock.service';
 
 // our components
 import { AppComponent } from './app.component';
@@ -79,7 +85,8 @@ import { PetalsCockpitRoutingModule } from './app-routing.module';
     MdTabsModule
   ],
   providers: [
-    UserService
+    UserEffects,
+    { provide: UserService, useClass: UserMockService }
   ],
   bootstrap: [AppComponent]
 })

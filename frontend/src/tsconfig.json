@@ -1,31 +1,36 @@
 {
+  "compileOnSave": false,
+  "buildOnSave": false,
   "compilerOptions": {
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "lib": ["es6", "dom"],
+    "lib": [
+      "es6",
+      "dom"
+    ],
     "mapRoot": "./",
     "module": "es6",
     "moduleResolution": "node",
     "outDir": "../dist/out-tsc",
     "sourceMap": true,
     "target": "es5",
+    "noEmitOnError": true,
+    "noImplicitAny": false,
     "typeRoots": [
       "../node_modules/@types"
-    ]
+    ],
+    "inlineSources": true
   },
+  "filesGlob": [
+    "!node_modules",
+    "node_modules/@types/**/*.d.ts",
+    "src/**/*.d.ts",
+    "src/**/*.ts"
+  ],
   "exclude": [
-    "../node_modules",
-    "typings/main",
-    "typings/main.d.ts",
-    "../dist",
-    "../tmp",
-    "../../backend",
     "node_modules",
-    "typings/main",
-    "typings/main.d.ts",
     "dist",
-    "tmp",
-    "backend"
+    "coverage"
   ]
 }
