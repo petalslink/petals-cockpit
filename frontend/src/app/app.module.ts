@@ -59,7 +59,7 @@ import { PetalsCockpitRoutingModule } from './app-routing.module';
       counter: CounterReducer,
       user: UserReducer
     }),
-    //ngrx - effects
+    // ngrx - effects
     EffectsModule,
     // material design
     MaterialModule.forRoot()

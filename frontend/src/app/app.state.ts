@@ -1,5 +1,4 @@
 import { TypedRecord, makeTypedFactory } from 'typed-immutable-record';
-import { List, Map } from 'immutable';
 
 // user
 import { UserStateRecord, userStateFactory } from './reducers/user.state';
@@ -8,7 +7,7 @@ import { UserStateRecord, userStateFactory } from './reducers/user.state';
 // this is to be imported wherever a reference to the app state is used
 // (reducers, components, services...)
 export interface AppState {
-  user: UserStateRecord
+  user: UserStateRecord;
 };
 
 // an Immutable.js Record implementation of the AppState interface.

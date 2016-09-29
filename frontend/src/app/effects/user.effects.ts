@@ -13,8 +13,6 @@ import { UserService } from '../services/user.service';
 import {
   USR_IS_CONNECTING,
   USR_IS_CONNECTED,
-  USR_IS_DISCONNECTING,
-  USR_IS_DISCONNECTED,
   USR_CONNECTION_FAILED
 } from '../reducers/user.reducer';
 
@@ -37,7 +35,12 @@ export class UserEffects implements OnDestroy {
     this.subscription = mergeEffects(this).subscribe(store$);
   }
 
-  @Effect({dispatch: true}) usr_connect$ = this.actions$
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: true}) usr_connect$: Observable<{ type: string }> = this.actions$
     .ofType(USR_IS_CONNECTING)
     .switchMap(action => this.userService.connectUser(action.payload))
     .map((res: any) => {
@@ -49,9 +52,4 @@ export class UserEffects implements OnDestroy {
       this.router.navigate(['/petals-cockpit']);
       return { type: USR_IS_CONNECTED };
     });
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
-
 }
