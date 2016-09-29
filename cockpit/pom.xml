@@ -25,44 +25,22 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>cockpit-server</artifactId>
-  <packaging>takari-jar</packaging>
+  <artifactId>petals-cockpit</artifactId>
+  <packaging>jar</packaging>
 
   <properties>
-    <cockpit.exec.command>server</cockpit.exec.command>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-core</artifactId>
+      <groupId>org.ow2.petals</groupId>
+      <artifactId>cockpit-server</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.allanbank</groupId>
-      <artifactId>mongodb-async-driver</artifactId>
-      <version>2.0.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.pac4j</groupId>
-      <artifactId>jax-rs-pac4j</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <!-- Needed for pac4j's password encoder -->
-      <groupId>de.svenkubiak</groupId>
-      <artifactId>jBCrypt</artifactId>
-      <version>0.4.1</version>
-    </dependency>
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-testing</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.test-framework.providers</groupId>
-      <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
-      <scope>test</scope>
+      <groupId>io.dropwizard-bundles</groupId>
+      <artifactId>dropwizard-configurable-assets-bundle</artifactId>
+      <version>1.0.0</version>
     </dependency>
     <!-- Code quality dependencies -->
     <dependency>
@@ -74,10 +52,12 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>io.takari.maven.plugins</groupId>
-        <artifactId>takari-lifecycle-plugin</artifactId>
-        <version>1.12.1</version>
-        <extensions>true</extensions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <!-- For now let's skip this because the frontend does not have the required copyrights -->
+          <skip>true</skip>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -105,6 +85,30 @@
             <argument>${cockpit.exec.command}</argument>
             <argument>default.yml</argument>
           </arguments>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>sg.enixsoft</groupId>
+        <artifactId>capsule-maven-plugin</artifactId>
+        <version>1.3.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build</goal>
+            </goals>
+            <configuration>
+              <appClass>org.ow2.petals.cockpit.server.CockpitApplication</appClass>
+              <type>fat</type>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <manifest>
+            <entry>
+              <key>Min-Java-Version</key>
+              <value>${java-version}</value>
+            </entry>
+          </manifest>
         </configuration>
       </plugin>
     </plugins>
