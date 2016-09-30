@@ -28,9 +28,6 @@ build-backend:
   <<: *mvn-java-8
   stage: build
   script:
-    - "apk update && apk add git"
-    - "git clone --depth 1 https://github.com/victornoel/jersey-pac4j"
-    - "$MVN -f jersey-pac4j install"
     - "$MVN -f backend verify"
 
 build-frontend:
