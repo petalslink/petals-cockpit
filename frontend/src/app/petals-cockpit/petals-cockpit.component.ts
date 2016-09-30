@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import {Component, ChangeDetectionStrategy, ViewContainerRef} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { INCREMENT, DECREMENT, RESET } from '../reducers/counter.reducer';
+import { Router } from '@angular/router';
 
 interface AppState {
   counter: number;
@@ -14,10 +15,29 @@ interface AppState {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PetalsCockpitComponent {
+  title = 'Petals Cockpit';
+  isCockpitTheme = false;
+
   private counter: Observable<number>;
 
-  constructor(public store: Store<AppState>) {
+  tabs: Array < { title: string, url: string } >;
+
+  constructor(public store: Store<AppState>, private router: Router, private vcr: ViewContainerRef) {
     this.counter = store.select('counter');
+    this.tabs = [
+      {
+        title: 'Petals',
+        url: 'petals-cockpit'
+      },
+      {
+        title: 'Service',
+        url: 'petals-cockpit'
+      },
+      {
+        title: 'API',
+        url: 'petals-cockpit'
+      }
+    ];
   }
 
   increment() {
@@ -30,5 +50,9 @@ export class PetalsCockpitComponent {
 
   reset() {
     this.store.dispatch({type: RESET});
+  }
+
+  openTab(index) {
+    this.router.navigate(['/', this.tabs[index].url]);
   }
 }
