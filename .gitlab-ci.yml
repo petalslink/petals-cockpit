@@ -48,7 +48,7 @@ build-frontend:
     - "npm set progress=false"
     - "npm install"
     - "printenv NG"
-    - "$NG build"
+    - "$NG build --prod"
     - "$NG lint"
     - "$NG test --watch false"
   artifacts:
@@ -63,9 +63,7 @@ build-product:
     - build-frontend
   script:
     - "import-staging"
-    - "mkdir -p cockpit/src/main/resources/assets/"
-    - "cp -a frontend/dist/* cockpit/src/main/resources/assets/"
-    - "maven-build -f cockpit package"
+    - "maven -f cockpit package"
   artifacts:
     paths:
       - cockpit/target/petals-cockpit-*-capsule.jar
