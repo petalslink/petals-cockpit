@@ -21,17 +21,44 @@
     </md-sidenav>
 
     <md-toolbar color="primary">
-        Petals-Cockpit
-    </md-toolbar>
-    <div class="app-content">
-        <md-card>
-          <div>
-            <md-icon>android</md-icon> <a href="https://design.google.com/icons/" target="_blank">Material icons</a> are working !
-          </div>
+      <span>
+        {{title}}
+      </span>
 
-          <button md-raised-button color="accent" (click)="decrement()">Decrement</button>
-          counter: {{ counter | async }}
-          <button md-raised-button color="primary" (click)="increment()">Increment</button>
-        </md-card>
-    </div>
-</md-sidenav-layout>
+      <span class="flex-space"></span>
+
+      <button md-icon-button (click)="isCockpitTheme=!isCockpitTheme">
+        <md-icon>touch_app</md-icon>
+      </button>
+
+      <button md-icon-button [md-menu-trigger-for]="menu">
+        <md-icon>more_vert</md-icon>
+      </button>
+
+      <md-menu x-position="before" #menu="mdMenu">
+        <button md-menu-item>
+          Overview
+        </button>
+        <button md-menu-item>
+          Operation
+        </button>
+        <button md-menu-item>
+          Config
+        </button>
+        <button md-menu-item>
+          Flow
+        </button>
+        <button md-menu-item>
+          Monitor
+        </button>
+        <button md-menu-item>
+          Log
+        </button>
+        <button md-menu-item>
+          User
+        </button>
+      </md-menu>
+    </md-toolbar>
+
+  </md-sidenav-layout>
+</div>
