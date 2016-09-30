@@ -12,6 +12,12 @@
         </md-card-title-group>
       </md-card>
 
+      <md-tab-group #tabGroup (selectChange)="openTab(tabGroup.selectedIndex)">
+        <md-tab *ngFor="let tab of tabs">
+          <template md-tab-label>{{tab.title}}</template>
+        </md-tab>
+      </md-tab-group>
+
     </md-sidenav>
 
     <md-toolbar color="primary">
