@@ -8,6 +8,7 @@ import { MaterialModule } from '@angular/material';
 import { PetalsComponent } from './petals.component';
 import { PetalsSidenavMenuComponent } from './petals-sidenav-menu/petals-sidenav-menu.component';
 import { BusMenuComponent } from './bus-menu/bus-menu.component';
+import { BusesMenuComponent } from './buses-menu/buses-menu.component';
 
 @NgModule({
   imports: [
@@ -21,7 +22,8 @@ import { BusMenuComponent } from './bus-menu/bus-menu.component';
   declarations: [
     PetalsComponent,
     PetalsSidenavMenuComponent,
-    BusMenuComponent
+    BusMenuComponent,
+    BusesMenuComponent
   ],
   bootstrap: [PetalsComponent]
 })

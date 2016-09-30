@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { IBus } from '../../interfaces/petals.interface';
 
 @Component({
@@ -7,7 +7,7 @@ import { IBus } from '../../interfaces/petals.interface';
   styleUrls: ['./bus-menu.component.scss']
 })
 export class BusMenuComponent {
-  @Input() buses: Array<IBus>;
+  @Input() bus: IBus;
 
   constructor() {
 
