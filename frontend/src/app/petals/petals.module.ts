@@ -13,6 +13,8 @@ import { ContainerMenuComponent } from './container-menu/container-menu.componen
 import { ContainersMenuComponent } from './containers-menu/containers-menu.component';
 import { ComponentsMenuComponent } from './components-menu/components-menu.component';
 import { ComponentMenuComponent } from './component-menu/component-menu.component';
+import { ServiceUnitsMenuComponent } from './service-units-menu/service-units-menu.component';
+import { ServiceUnitMenuComponent } from './service-unit-menu/service-unit-menu.component';
 
 @NgModule({
   imports: [
@@ -31,7 +33,9 @@ import { ComponentMenuComponent } from './component-menu/component-menu.componen
     ContainerMenuComponent,
     ContainersMenuComponent,
     ComponentsMenuComponent,
-    ComponentMenuComponent
+    ComponentMenuComponent,
+    ServiceUnitsMenuComponent,
+    ServiceUnitMenuComponent
   ],
   bootstrap: [PetalsComponent]
 })
