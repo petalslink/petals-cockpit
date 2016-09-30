@@ -11,6 +11,8 @@ import { BusMenuComponent } from './bus-menu/bus-menu.component';
 import { BusesMenuComponent } from './buses-menu/buses-menu.component';
 import { ContainerMenuComponent } from './container-menu/container-menu.component';
 import { ContainersMenuComponent } from './containers-menu/containers-menu.component';
+import { ComponentsMenuComponent } from './components-menu/components-menu.component';
+import { ComponentMenuComponent } from './component-menu/component-menu.component';
 
 @NgModule({
   imports: [
@@ -27,7 +29,9 @@ import { ContainersMenuComponent } from './containers-menu/containers-menu.compo
     BusMenuComponent,
     BusesMenuComponent,
     ContainerMenuComponent,
-    ContainersMenuComponent
+    ContainersMenuComponent,
+    ComponentsMenuComponent,
+    ComponentMenuComponent
   ],
   bootstrap: [PetalsComponent]
 })
