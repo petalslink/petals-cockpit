@@ -1,7 +1,19 @@
-<md-sidenav-layout fullscreen>
-    <md-sidenav #sidenav mode="side" opened="true" class="app-sidenav">
-        Sidenav
+<div [class.cockpit-theme]="isCockpitTheme">
+  <md-sidenav-layout fullscreen>
+    <md-sidenav #sidenav align="start" mode="side" opened="true">
+
+      <md-card id="header-sidenav">
+        <img class="logo-petals" src="../../assets/img/logo_petalscockpit.png">
+        <md-card-title-group>
+          <p>Bertrand Escudie</p>
+          <button md-icon-button class="icon-power">
+            <md-icon>power</md-icon>
+          </button>
+        </md-card-title-group>
+      </md-card>
+
     </md-sidenav>
+
     <md-toolbar color="primary">
         Petals-Cockpit
     </md-toolbar>
