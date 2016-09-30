@@ -1,10 +1,16 @@
 stages:
   - build
   - test
+  - package
 
 variables:
-  MVN: "mvn -B -U -Dmaven.repo.local=m2cache -Pjacoco"
+  M2_STAGING_DIRECTORY: staging
+  M2_CACHED_REPOSITORY: m2cache
   NG: "node_modules/angular-cli/bin/ng"
+
+
+before_script:
+  - "source ci/helpers.sh"
 
 .mvn-java-8: &mvn-java-8
   image: maven:3.3-jdk-8-alpine
@@ -13,7 +19,7 @@ variables:
   cache:
     key: "mvn-java-8"
     paths:
-      - m2cache
+      - $M2_CACHED_REPOSITORY
 
 .node-6: &node-6
   image: node:6
@@ -28,10 +34,11 @@ build-backend:
   <<: *mvn-java-8
   stage: build
   script:
-    - "apk update && apk add git"
-    - "git clone --depth 1 https://github.com/victornoel/jersey-pac4j"
-    - "$MVN -f jersey-pac4j install"
-    - "$MVN -f backend verify"
+    - "maven-build deploy"
+    - "maven-build -f backend deploy"
+  artifacts:
+    paths:
+      - $M2_STAGING_DIRECTORY
 
 build-frontend:
   <<: *node-6
@@ -40,23 +47,25 @@ build-frontend:
     - "cd frontend"
     - "npm set progress=false"
     - "npm install"
+    - "printenv NG"
     - "$NG build"
-
-test-frontend:
-  <<: *node-6
-  stage: test
-  script:
-    - "cd frontend"
-    - "npm set progress=false"
-    - "npm install"
-    - "$NG test --watch false"
-
-lint-fronted:
-  <<: *node-6
-  stage: test
-  script:
-    - "cd frontend"
-    - "npm set progress=false"
-    - "npm install"
     - "$NG lint"
+    - "$NG test --watch false"
+  artifacts:
+    paths:
+      - frontend/dist
 
+build-product:
+  <<: *mvn-java-8
+  stage: package
+  dependencies:
+    - build-backend
+    - build-frontend
+  script:
+    - "import-staging"
+    - "mkdir -p cockpit/src/main/resources/assets/"
+    - "cp -a frontend/dist/* cockpit/src/main/resources/assets/"
+    - "maven-build -f cockpit package"
+  artifacts:
+    paths:
+      - cockpit/target/petals-cockpit-*-capsule.jar

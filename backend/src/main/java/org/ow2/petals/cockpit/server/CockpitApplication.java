@@ -49,10 +49,10 @@ import io.dropwizard.setup.Environment;
  * @author vnoel
  *
  */
-public class CockpitApplication extends Application<CockpitConfiguration> {
+public class CockpitApplication<C extends CockpitConfiguration> extends Application<C> {
 
     public static void main(String[] args) throws Exception {
-        new CockpitApplication().run(args);
+        new CockpitApplication<>().run(args);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class CockpitApplication extends Application<CockpitConfiguration> {
     }
 
     @Override
-    public void initialize(@Nullable Bootstrap<CockpitConfiguration> bootstrap) {
+    public void initialize(@Nullable Bootstrap<C> bootstrap) {
         assert bootstrap != null;
     }
 
