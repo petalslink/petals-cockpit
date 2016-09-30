@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import {IComponent} from "../../interfaces/petals.interface";
+import { IComponent } from '../../interfaces/petals.interface';
 
 @Component({
   selector: 'app-component-menu',
