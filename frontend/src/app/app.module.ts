@@ -28,6 +28,11 @@ import { UserService } from './services/user.service';
 // our mocks
 import { UserMockService } from './mocks/user-mock.service';
 
+// our modules
+import { PetalsModule } from './petals/petals.module';
+import { ServiceModule } from './service/service.module';
+import { ApiModule } from './api/api.module';
+
 // our components
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -62,7 +67,11 @@ import { PetalsCockpitRoutingModule } from './app-routing.module';
     // ngrx - effects
     EffectsModule,
     // material design
-    MaterialModule.forRoot()
+    MaterialModule.forRoot(),
+    // our modules
+    PetalsModule,
+    ServiceModule,
+    ApiModule
   ],
   providers: [
     UserEffects,
