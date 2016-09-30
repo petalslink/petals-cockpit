@@ -60,5 +60,39 @@
       </md-menu>
     </md-toolbar>
 
+    <md-card id="card-full-size">
+      <md-card-content>
+        <md-card-title align="center">
+          <b>Console</b>
+          - Onglets
+        </md-card-title>
+      </md-card-content>
+
+    <md-card>
+      <md-card-content>
+
+        <md-card-title align="center">
+          <b>Home</b>
+          - Default Page
+        </md-card-title>
+
+        <table align="center" cellspacing="0">
+          <tr>
+            <td>
+              <button md-raised-button color="accent" (click)="decrement()">Decrement</button>
+            </td>
+            <td>
+              <p>counter: {{ counter | async }}</p>
+            </td>
+            <td>
+              <button md-raised-button color="primary" (click)="increment()">Increment</button>
+            </td>
+          </tr>
+        </table>
+
+      </md-card-content>
+    </md-card>
+    </md-card>
+
   </md-sidenav-layout>
 </div>
