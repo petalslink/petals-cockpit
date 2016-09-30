@@ -16,13 +16,13 @@
         <md-progress-circle *ngIf="(user$ | async).isConnecting" mode="indeterminate"></md-progress-circle>
       </button>
     </form>
-  </md-card-content>
 
-  <p>
-    Debug info :
-    <span class="connecting" *ngIf="(user$ | async).isConnecting">Connecting ...</span>
-    <span class="connected" *ngIf="(user$ | async).isConnected">Is connected !</span>
-    <span class="not-connected" *ngIf="!(user$ | async).isConnected && !(user$ | async).isConnecting">Is NOT connected !</span>
-    <span class="connection-failed" *ngIf="(user$ | async).connectionFailed">Connection failed !</span>
-  </p>
+    <p>
+      Debug info :
+      <span class="connecting" *ngIf="(user$ | async).isConnecting">Connecting ...</span>
+      <span class="connected" *ngIf="(user$ | async).isConnected">Is connected !</span>
+      <span class="not-connected" *ngIf="!(user$ | async).isConnected && !(user$ | async).isConnecting">Is NOT connected !</span>
+      <span class="connection-failed" *ngIf="(user$ | async).connectionFailed">Connection failed !</span>
+    </p>
+  </md-card-content>
 </md-card>

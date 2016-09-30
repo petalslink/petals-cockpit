@@ -25,6 +25,11 @@ md-progress-circle {
   display: inline-block;
 }
 
-form > * {
+md-card-content > * {
   margin: 16px;
+}
+
+md-card {
+  max-width: 350px;
+  margin: auto;
 }
