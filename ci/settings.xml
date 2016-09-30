@@ -8,12 +8,10 @@
       </activation>
       <repositories>
         <repository>
-          <releases>
-            <updatePolicy>always</updatePolicy>
-          </releases>
           <id>allanbank</id>
           <name>Allanbank Releases</name>
           <url>http://www.allanbank.com/repo/</url>
+          <releases><updatePolicy>always</updatePolicy></releases>
         </repository>
         <repository>
           <id>oss-sonatype-snapshot</id>
@@ -28,6 +26,20 @@
           <snapshots><enabled>true</enabled></snapshots>
         </repository>
       </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>oss-sonatype-snapshot</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </pluginRepository>
+        <pluginRepository>
+          <id>ow2-snapshot</id>
+          <url>http://repository.ow2.org/nexus/content/repositories/snapshots/</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </pluginRepository>
+      </pluginRepositories>
     </profile>
   </profiles>
 </settings>
