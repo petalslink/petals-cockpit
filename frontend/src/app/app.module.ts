@@ -30,6 +30,7 @@ import { UserMockService } from './mocks/user-mock.service';
 
 // our modules
 import { PetalsModule } from './petals/petals.module';
+import { ServiceModule } from './service/service.module';
 
 // our components
 import { AppComponent } from './app.component';
@@ -67,7 +68,8 @@ import { PetalsCockpitRoutingModule } from './app-routing.module';
     // material design
     MaterialModule.forRoot(),
     // our modules
-    PetalsModule
+    PetalsModule,
+    ServiceModule
   ],
   providers: [
     UserEffects,
