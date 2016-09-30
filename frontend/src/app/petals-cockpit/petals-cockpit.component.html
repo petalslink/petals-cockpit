@@ -15,9 +15,11 @@
       <md-tab-group #tabGroup (selectChange)="openTab(tabGroup.selectedIndex)">
         <md-tab *ngFor="let tab of tabs">
           <template md-tab-label>{{tab.title}}</template>
+          <template md-tab-content>
+            <app-petals></app-petals>
+          </template>
         </md-tab>
       </md-tab-group>
-
     </md-sidenav>
 
     <md-toolbar color="primary">
