@@ -11,10 +11,49 @@ export class PetalsSidenavMenuComponent {
 
   constructor() {
     this.buses = [
-      {name: 'Bus 1'},
-      {name: 'Bus 2'},
-      {name: 'Bus 3'},
-      {name: 'Bus 4'}
+      {
+        name: 'Bus 1',
+        containers: [
+          {
+            name: 'Container 1',
+            components: [
+              {
+                name: 'Component 1',
+                serviceUnits: [
+                  {name: 'SU 1'},
+                  {name: 'SU 2'}
+                ]
+              },
+              {
+                name: 'Component 2',
+                serviceUnits: [
+                  {name: 'SU 3'},
+                  {name: 'SU 4'},
+                  {name: 'SU 5'}
+                ]
+              }
+            ]
+          },
+          {
+            name: 'Container 2',
+            components: [
+              {
+                name: 'Component 3',
+                serviceUnits: [
+                  {name: 'SU 6'}
+                ]
+              },
+              {
+                name: 'Component 4',
+                serviceUnits: [
+                  {name: 'SU 7'},
+                  {name: 'SU 8'}
+                ]
+              }
+            ]
+          }
+        ]
+      }
     ];
   }
 }

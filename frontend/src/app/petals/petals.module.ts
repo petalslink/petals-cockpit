@@ -9,6 +9,8 @@ import { PetalsComponent } from './petals.component';
 import { PetalsSidenavMenuComponent } from './petals-sidenav-menu/petals-sidenav-menu.component';
 import { BusMenuComponent } from './bus-menu/bus-menu.component';
 import { BusesMenuComponent } from './buses-menu/buses-menu.component';
+import { ContainerMenuComponent } from './container-menu/container-menu.component';
+import { ContainersMenuComponent } from './containers-menu/containers-menu.component';
 
 @NgModule({
   imports: [
@@ -23,7 +25,9 @@ import { BusesMenuComponent } from './buses-menu/buses-menu.component';
     PetalsComponent,
     PetalsSidenavMenuComponent,
     BusMenuComponent,
-    BusesMenuComponent
+    BusesMenuComponent,
+    ContainerMenuComponent,
+    ContainersMenuComponent
   ],
   bootstrap: [PetalsComponent]
 })
