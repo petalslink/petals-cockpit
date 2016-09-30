@@ -34,7 +34,7 @@
   <dependencies>
     <dependency>
       <groupId>org.ow2.petals</groupId>
-      <artifactId>cockpit-server</artifactId>
+      <artifactId>petals-cockpit-server</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

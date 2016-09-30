@@ -25,7 +25,7 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>cockpit-server</artifactId>
+  <artifactId>petals-cockpit-server</artifactId>
   <packaging>takari-jar</packaging>
 
   <properties>

@@ -17,5 +17,5 @@ function maven-build() {
 
 function import-staging() {
   local version=$(get-project-version)
-  maven dependency:get -Dartifact=org.ow2.petals:cockpit-server:$version -DremoteRepositories=$M2_STAGING_REPOSITORY
+  maven dependency:get -Dartifact=org.ow2.petals:petals-cockpit-server:$version -DremoteRepositories=$M2_STAGING_REPOSITORY
 }
