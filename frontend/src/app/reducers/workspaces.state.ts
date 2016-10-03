@@ -6,7 +6,9 @@ import { IBus } from '../interfaces/petals.interface';
 // the typeScript interface that defines the application state's properties
 // this is to be imported wherever a reference to a workspace is used
 // (reducers, components, services...)
-export interface WorkspacesState extends IWorkspaces {};
+export interface WorkspacesState extends IWorkspaces {
+  selectedWorkspaceId: number
+};
 
 // an Immutable.js Record implementation of the WorkspacesState interface.
 // this only needs to be imported by reducers, since they produce new versions
@@ -65,6 +67,7 @@ const buses: Array<IBus> = [
 
 // an Immutable.js record factory for the record
 export const workspacesStateFactory = makeTypedFactory<WorkspacesState, WorkspacesStateRecord>({
+    selectedWorkspaceId: 0,
     workspaces: [
       {
         id: 0,

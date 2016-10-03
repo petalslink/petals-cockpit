@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 // angular-material2 modules
 import { MaterialModule } from '@angular/material';
@@ -19,6 +20,7 @@ import { ServiceUnitMenuComponent } from './service-unit-menu/service-unit-menu.
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
     MaterialModule
   ],
   exports: [
