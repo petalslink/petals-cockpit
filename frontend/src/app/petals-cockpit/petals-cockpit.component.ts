@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { INCREMENT, DECREMENT, RESET } from '../reducers/counter.reducer';
 import { Router } from '@angular/router';
+import { USR_IS_DISCONNECTING } from '../reducers/user.reducer';
 
 interface AppState {
   counter: number;
@@ -54,5 +55,10 @@ export class PetalsCockpitComponent {
 
   openTab(index) {
     this.router.navigate(['/', this.tabs[index].url]);
+  }
+
+  disconnectUser() {
+    this.store.dispatch({ type: USR_IS_DISCONNECTING });
+    this.router.navigate(['/login']);
   }
 }
