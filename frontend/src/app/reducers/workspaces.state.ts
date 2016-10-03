@@ -18,6 +18,7 @@ export interface WorkspacesStateRecord extends TypedRecord<WorkspacesState>, Wor
 export const workspacesStateFactory = makeTypedFactory<WorkspacesState, WorkspacesStateRecord>({
     workspaces: [
       {
+        id: 0,
         name: 'Default workspace',
         buses: []
       }
