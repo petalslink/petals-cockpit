@@ -6,8 +6,10 @@
         <img class="logo-petals" src="../../assets/img/logo_petalscockpit.png">
         <md-card-title-group>
           <p>Bertrand Escudie</p>
-          <button md-icon-button class="icon-power" (click)="disconnectUser()">
-            <md-icon>power_settings_new</md-icon>
+
+          <button md-icon-button [disabled]="(user$ | async).isDisconnecting" class="icon-power" (click)="disconnectUser()">
+            <md-icon *ngIf="!(user$ | async).isDisconnecting">power_settings_new</md-icon>
+            <md-progress-circle *ngIf="(user$ | async).isDisconnecting" mode="indeterminate"></md-progress-circle>
           </button>
         </md-card-title-group>
       </md-card>
