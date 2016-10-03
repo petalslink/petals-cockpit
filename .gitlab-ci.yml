@@ -34,8 +34,7 @@ build-backend:
   <<: *mvn-java-8
   stage: build
   script:
-    - "maven-build deploy"
-    - "maven-build -f backend deploy"
+    - "maven-build -pl backend -am deploy"
   artifacts:
     paths:
       - $M2_STAGING_DIRECTORY
@@ -63,7 +62,7 @@ build-product:
     - build-frontend
   script:
     - "import-staging"
-    - "maven -f cockpit package"
+    - "maven -pl cockpit package"
   artifacts:
     paths:
       - cockpit/target/petals-cockpit-*-capsule.jar

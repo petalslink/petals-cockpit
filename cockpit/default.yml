@@ -2,11 +2,15 @@
 ---
 server:
   type: simple
-  applicationContextPath: /api
+  # the backend will be served via /api
+  rootPath: /api
+  # the frontend will be served via /
+  applicationContextPath: /
+  # the admin console is served via /admin (note: do not do this in production)
   adminContextPath: /admin
   connector:
     type: http
-    port: 7203
+    port: 8080
 
 # configuration to connect to mongo
 mongo:
@@ -17,3 +21,4 @@ mongo:
 
 logging:
   level: INFO
+

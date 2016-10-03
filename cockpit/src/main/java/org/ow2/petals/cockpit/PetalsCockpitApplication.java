@@ -33,6 +33,10 @@ import io.dropwizard.setup.Bootstrap;
 
 public class PetalsCockpitApplication extends CockpitApplication<PetalsCockpitConfiguration> {
 
+    public static void main(String[] args) throws Exception {
+        new PetalsCockpitApplication().run(args);
+    }
+
     @Override
     public void initialize(@Nullable Bootstrap<PetalsCockpitConfiguration> bootstrap) {
         assert bootstrap != null;
