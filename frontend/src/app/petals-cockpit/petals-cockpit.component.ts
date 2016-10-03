@@ -5,6 +5,7 @@ import { AppState } from '../app.state';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { ConfigState } from '../reducers/config.state';
+import { UserState } from '../reducers/user.state';
 
 @Component({
   selector: 'app-petals-cockpit',
@@ -13,10 +14,12 @@ import { ConfigState } from '../reducers/config.state';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PetalsCockpitComponent {
+  private user$: Observable<UserState>;
   private config$: Observable<ConfigState>;
   private tabs: Array < { title: string, url: string } >;
 
   constructor(private store: Store<AppState>, private router: Router) {
+    this.user$ = <Observable<UserState>>store.select('user');
     this.config$ = <Observable<ConfigState>>store.select('config');
 
     this.tabs = [
