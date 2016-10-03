@@ -13,7 +13,9 @@ import { UserService } from '../services/user.service';
 import {
   USR_IS_CONNECTING,
   USR_IS_CONNECTED,
-  USR_CONNECTION_FAILED
+  USR_CONNECTION_FAILED,
+  USR_IS_DISCONNECTING,
+  USR_IS_DISCONNECTED
 } from '../reducers/user.reducer';
 
 import 'rxjs/add/operator/map';
@@ -51,5 +53,16 @@ export class UserEffects implements OnDestroy {
 
       this.router.navigate(['/petals-cockpit']);
       return { type: USR_IS_CONNECTED };
+    });
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: true}) usr_disconnect$: Observable<{ type: string }> = this.actions$
+    .ofType(USR_IS_DISCONNECTING)
+    .switchMap(() => this.userService.disconnectUser())
+    .map((res: any) => {
+      // TODO : check HTTP header here and check there's no errors
+      // otherwise, create a new action type to handle this error
+      this.router.navigate(['/login']);
+      return { type: USR_IS_DISCONNECTED };
     });
 }

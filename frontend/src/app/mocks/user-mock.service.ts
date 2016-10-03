@@ -19,4 +19,13 @@ export class UserMockService {
       }, 2000);
     });
   }
+
+  public disconnectUser() {
+    return Observable.create(observer => {
+      setTimeout(() => {
+        observer.next();
+        observer.complete();
+      }, 2000);
+    });
+  }
 }

@@ -41,6 +41,5 @@ export class PetalsCockpitComponent {
 
   disconnectUser() {
     this.store.dispatch({ type: USR_IS_DISCONNECTING });
-    this.router.navigate(['/login']);
   }
 }
