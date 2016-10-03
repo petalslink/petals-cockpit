@@ -2,11 +2,12 @@
 ---
 server:
   type: simple
+  rootPath: /api
   applicationContextPath: /
   adminContextPath: /admin
   connector:
     type: http
-    port: 7203
+    port: 8080
 
 # configuration to connect to mongo
 mongo:
