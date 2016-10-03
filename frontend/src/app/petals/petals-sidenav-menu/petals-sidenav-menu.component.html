@@ -5,5 +5,5 @@
     </span>
   </md-input>
 
-  <app-buses-menu [buses]="buses"></app-buses-menu>
+  <app-buses-menu [buses]="(buses$ | async).workspaces[0].buses"></app-buses-menu>
 </div>
