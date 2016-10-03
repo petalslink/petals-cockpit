@@ -19,7 +19,7 @@ export interface WorkspacesStateRecord extends TypedRecord<WorkspacesStateRecord
 
 // buses for debug purpose
 // TODO : Remove this and fetch it from server
-const buses: Array<IBus> = [
+const busesWs1: Array<IBus> = [
   {
     name: 'Bus 1',
     containers: [
@@ -65,6 +65,50 @@ const buses: Array<IBus> = [
   }
 ];
 
+const busesWs2: Array<IBus> = [
+  {
+    name: 'Bus 2',
+    containers: [
+      {
+        name: 'Container 3',
+        components: [
+          {
+            name: 'Component 5',
+            serviceUnits: [
+              {name: 'SU 9'}
+            ]
+          },
+          {
+            name: 'Component 6',
+            serviceUnits: [
+              {name: 'SU 10'},
+              {name: 'SU 11'}
+            ]
+          }
+        ]
+      },
+      {
+        name: 'Container 4',
+        components: [
+          {
+            name: 'Component 7',
+            serviceUnits: [
+              {name: 'SU 12'}
+            ]
+          },
+          {
+            name: 'Component 8',
+            serviceUnits: [
+              {name: 'SU 13'},
+              {name: 'SU 14'}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+];
+
 // an Immutable.js record factory for the record
 export const workspacesStateFactory = makeTypedFactory<WorkspacesState, WorkspacesStateRecord>({
     selectedWorkspaceId: null,
@@ -72,7 +116,12 @@ export const workspacesStateFactory = makeTypedFactory<WorkspacesState, Workspac
       {
         id: 0,
         name: 'Workspace 1',
-        buses
+        buses: busesWs1
+      },
+      {
+        id: 1,
+        name: 'Workspace 2',
+        buses: busesWs2
       }
     ]
 });
