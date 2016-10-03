@@ -12,8 +12,6 @@ export class UserService {
   }
 
   public connectUser(user: IUser) {
-    console.log(`trying to connect user "${user.username}" with password "${user.password}" ...`);
-
     return this.http
                 .post('http://serveur.com/api/user/session', user)
                 .map(this.extractData);

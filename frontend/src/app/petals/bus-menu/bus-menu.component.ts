@@ -1,10 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 import { IBus } from '../../interfaces/petals.interface';
 
 @Component({
   selector: 'app-bus-menu',
   templateUrl: './bus-menu.component.html',
-  styleUrls: ['./bus-menu.component.scss']
+  styleUrls: ['./bus-menu.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BusMenuComponent {
   @Input() bus: IBus;

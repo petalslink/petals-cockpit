@@ -7,12 +7,8 @@ export class UserMockService {
   constructor() { }
 
   public connectUser(user: IUser) {
-    console.log(`trying to connect user "${user.username}" with password "${user.password}" ...`);
-
     return Observable.create(observer => {
       setTimeout(() => {
-        console.log('connected !');
-
         observer.next({
           data: {
             'username': 'user1',
