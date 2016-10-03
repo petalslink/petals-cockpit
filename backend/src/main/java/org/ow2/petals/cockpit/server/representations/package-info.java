@@ -14,31 +14,5 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@org.eclipse.jdt.annotation.NonNullByDefault
 package org.ow2.petals.cockpit.server.representations;
-
-import org.hibernate.validator.constraints.NotEmpty;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class Authentication {
-
-    private final String username;
-
-    private final String password;
-
-    public Authentication(@NotEmpty @JsonProperty("username") String username,
-            @NotEmpty @JsonProperty("password") String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    @JsonProperty
-    public String getUsername() {
-        return username;
-    }
-
-    @JsonProperty
-    public String getPassword() {
-        return password;
-    }
-}
