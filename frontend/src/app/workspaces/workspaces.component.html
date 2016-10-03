@@ -1,0 +1,49 @@
+<md-toolbar color="primary">
+  <span>
+    Workspaces
+  </span>
+
+  <span class="flex-space"></span>
+
+  <app-toggle-theme></app-toggle-theme>
+
+  <button md-icon-button [md-menu-trigger-for]="menu">
+    <md-icon>more_vert</md-icon>
+  </button>
+
+  <md-menu x-position="before" #menu="mdMenu">
+    <button md-menu-item>
+      Overview
+    </button>
+    <button md-menu-item>
+      Operation
+    </button>
+    <button md-menu-item>
+      Config
+    </button>
+    <button md-menu-item>
+      Flow
+    </button>
+    <button md-menu-item>
+      Monitor
+    </button>
+    <button md-menu-item>
+      Log
+    </button>
+    <button md-menu-item>
+      User
+    </button>
+  </md-menu>
+</md-toolbar>
+
+<md-card>
+  <md-card-content>
+    <md-card-title align="center">
+      Workspaces works
+    </md-card-title>
+
+    <select [(ngModel)]="selectedWorkspaceId" (ngModelChange)="selectWorkspace(selectedWorkspaceId)">
+      <option [value]="workspace.id" *ngFor="let workspace of (workspaces$ | async).workspaces">{{ workspace.name }}</option>
+    </select>
+  </md-card-content>
+</md-card>

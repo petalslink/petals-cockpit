@@ -5,5 +5,8 @@
     </span>
   </md-input>
 
-  <app-buses-menu [buses]="buses"></app-buses-menu>
+  <app-buses-menu
+    *ngIf="(workspaces$ | async).selectedWorkspaceId"
+    [buses]="(workspaces$ | async).workspaces[(workspaces$ | async).selectedWorkspaceId].buses">
+  </app-buses-menu>
 </div>

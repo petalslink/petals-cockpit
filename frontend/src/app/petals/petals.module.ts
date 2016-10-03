@@ -1,8 +1,13 @@
 import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 // angular-material2 modules
 import { MaterialModule } from '@angular/material';
+
+// our modules
+import { SharedModule } from '../shared/shared.module';
 
 // our components
 import { PetalsComponent } from './petals.component';
@@ -15,11 +20,15 @@ import { ComponentsMenuComponent } from './components-menu/components-menu.compo
 import { ComponentMenuComponent } from './component-menu/component-menu.component';
 import { ServiceUnitsMenuComponent } from './service-units-menu/service-units-menu.component';
 import { ServiceUnitMenuComponent } from './service-unit-menu/service-unit-menu.component';
+import { PetalsMenuToolbarComponent } from './petals-content/petals-content.component';
 
 @NgModule({
   imports: [
     CommonModule,
-    MaterialModule
+    FormsModule,
+    MaterialModule,
+    RouterModule,
+    SharedModule
   ],
   exports: [
     PetalsComponent,
@@ -35,7 +44,8 @@ import { ServiceUnitMenuComponent } from './service-unit-menu/service-unit-menu.
     ComponentsMenuComponent,
     ComponentMenuComponent,
     ServiceUnitsMenuComponent,
-    ServiceUnitMenuComponent
+    ServiceUnitMenuComponent,
+    PetalsMenuToolbarComponent
   ],
   bootstrap: [PetalsComponent]
 })

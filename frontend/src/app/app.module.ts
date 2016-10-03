@@ -16,8 +16,9 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
 // our reducers
-import { CounterReducer } from './reducers/counter.reducer';
 import { UserReducer } from './reducers/user.reducer';
+import { WorkspacesReducer } from './reducers/workspaces.reducer';
+import { ConfigReducer } from './reducers/config.reducer';
 
 // our effects
 import { UserEffects } from './effects/user.effects';
@@ -32,6 +33,8 @@ import { UserMockService } from './mocks/user-mock.service';
 import { PetalsModule } from './petals/petals.module';
 import { ServiceModule } from './service/service.module';
 import { ApiModule } from './api/api.module';
+import { WorkspacesModule } from './workspaces/workspaces.module';
+import { SharedModule } from './shared/shared.module';
 
 // our components
 import { AppComponent } from './app.component';
@@ -61,17 +64,20 @@ import { PetalsCockpitRoutingModule } from './app-routing.module';
     PetalsCockpitRoutingModule,
     // ngrx - store
     StoreModule.provideStore({
-      counter: CounterReducer,
-      user: UserReducer
+      config: ConfigReducer,
+      user: UserReducer,
+      workspaces: WorkspacesReducer
     }),
     // ngrx - effects
     EffectsModule,
     // material design
     MaterialModule.forRoot(),
     // our modules
+    WorkspacesModule,
     PetalsModule,
     ServiceModule,
-    ApiModule
+    ApiModule,
+    SharedModule
   ],
   providers: [
     UserEffects,

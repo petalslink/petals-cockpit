@@ -11,6 +11,7 @@ md-sidenav {
   background-size: cover;
   text-align: center;
   color: white;
+  border-radius: 0;
 }
 .logo-petals {
   flex: 1 1 auto;
@@ -25,10 +26,9 @@ md-sidenav {
   width: 100% !important;
 }
 
-/* Toolbar */
-
-.flex-space {
-  flex: 1 1 auto;
+.change-workspace {
+  width: 100%;
+  border-radius: 0;
 }
 
 /* Content */
@@ -37,4 +37,3 @@ md-sidenav {
   justify-content: space-between;
   background-color: #c2c2c2;
 }
-
