@@ -1,6 +1,10 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { USR_IS_DISCONNECTING } from '../reducers/user.reducer';
+import { AppState } from '../app.state';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { ConfigState } from '../reducers/config.state';
 
 @Component({
   selector: 'app-petals-cockpit',
@@ -9,9 +13,12 @@ import { USR_IS_DISCONNECTING } from '../reducers/user.reducer';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PetalsCockpitComponent {
-  tabs: Array < { title: string, url: string } >;
+  private config$: Observable<ConfigState>;
+  private tabs: Array < { title: string, url: string } >;
 
-  constructor(private router: Router) {
+  constructor(private store: Store<AppState>, private router: Router) {
+    this.config$ = <Observable<ConfigState>>store.select('config');
+
     this.tabs = [
       {
         title: 'Petals',

@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { WorkspacesComponent } from './workspaces.component';
 import { MaterialModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
     MaterialModule,
-    FormsModule
+    FormsModule,
+    SharedModule
   ],
   declarations: [WorkspacesComponent]
 })

@@ -5,9 +5,7 @@
 
   <span class="flex-space"></span>
 
-  <button md-icon-button (click)="isCockpitTheme=!isCockpitTheme">
-    <md-icon>touch_app</md-icon>
-  </button>
+  <app-toggle-theme></app-toggle-theme>
 
   <button md-icon-button [md-menu-trigger-for]="menu">
     <md-icon>more_vert</md-icon>
@@ -37,7 +35,6 @@
     </button>
   </md-menu>
 </md-toolbar>
-
 
 <md-card>
   <md-card-content>

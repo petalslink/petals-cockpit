@@ -6,6 +6,9 @@ import { FormsModule } from '@angular/forms';
 // angular-material2 modules
 import { MaterialModule } from '@angular/material';
 
+// our modules
+import { SharedModule } from '../shared/shared.module';
+
 // our components
 import { PetalsComponent } from './petals.component';
 import { PetalsSidenavMenuComponent } from './petals-sidenav-menu/petals-sidenav-menu.component';
@@ -24,7 +27,8 @@ import { PetalsMenuToolbarComponent } from './petals-content/petals-content.comp
     CommonModule,
     FormsModule,
     MaterialModule,
-    RouterModule
+    RouterModule,
+    SharedModule
   ],
   exports: [
     PetalsComponent,
