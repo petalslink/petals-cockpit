@@ -7,7 +7,7 @@ import { IBus } from '../interfaces/petals.interface';
 // this is to be imported wherever a reference to a workspace is used
 // (reducers, components, services...)
 export interface WorkspacesState extends IWorkspaces {
-  selectedWorkspaceId: number
+  selectedWorkspaceId: number;
 };
 
 // an Immutable.js Record implementation of the WorkspacesState interface.
@@ -67,7 +67,7 @@ const buses: Array<IBus> = [
 
 // an Immutable.js record factory for the record
 export const workspacesStateFactory = makeTypedFactory<WorkspacesState, WorkspacesStateRecord>({
-    selectedWorkspaceId: 0,
+    selectedWorkspaceId: null,
     workspaces: [
       {
         id: 0,
