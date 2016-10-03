@@ -16,7 +16,6 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
 // our reducers
-import { CounterReducer } from './reducers/counter.reducer';
 import { UserReducer } from './reducers/user.reducer';
 import { WorkspacesReducer } from './reducers/workspaces.reducer';
 
@@ -63,7 +62,6 @@ import { PetalsCockpitRoutingModule } from './app-routing.module';
     PetalsCockpitRoutingModule,
     // ngrx - store
     StoreModule.provideStore({
-      counter: CounterReducer,
       user: UserReducer,
       workspaces: WorkspacesReducer
     }),

@@ -1,13 +1,6 @@
-import {Component, ChangeDetectionStrategy, ViewContainerRef} from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { INCREMENT, DECREMENT, RESET } from '../reducers/counter.reducer';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { USR_IS_DISCONNECTING } from '../reducers/user.reducer';
-
-interface AppState {
-  counter: number;
-}
 
 @Component({
   selector: 'app-petals-cockpit',
@@ -16,12 +9,9 @@ interface AppState {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PetalsCockpitComponent {
-  private counter: Observable<number>;
-
   tabs: Array < { title: string, url: string } >;
 
-  constructor(public store: Store<AppState>, private router: Router, private vcr: ViewContainerRef) {
-    this.counter = store.select('counter');
+  constructor(private router: Router) {
     this.tabs = [
       {
         title: 'Petals',
@@ -36,18 +26,6 @@ export class PetalsCockpitComponent {
         url: 'petals-cockpit'
       }
     ];
-  }
-
-  increment() {
-    this.store.dispatch({type: INCREMENT});
-  }
-
-  decrement() {
-    this.store.dispatch({type: DECREMENT});
-  }
-
-  reset() {
-    this.store.dispatch({type: RESET});
   }
 
   openTab(index) {
