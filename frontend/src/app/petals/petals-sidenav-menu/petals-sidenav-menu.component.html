@@ -5,10 +5,6 @@
     </span>
   </md-input>
 
-  <select [(ngModel)]="selectedWorkspaceId" (ngModelChange)="selectWorkspace(selectedWorkspaceId)">
-    <option [value]="workspace.id" *ngFor="let workspace of (workspaces$ | async).workspaces">{{ workspace.name }}</option>
-  </select>
-
   <app-buses-menu
     *ngIf="(workspaces$ | async).selectedWorkspaceId"
     [buses]="(workspaces$ | async).workspaces[(workspaces$ | async).selectedWorkspaceId].buses">

@@ -1,0 +1,71 @@
+<md-toolbar color="primary">
+  <span>
+    {{title}}
+  </span>
+
+  <span class="flex-space"></span>
+
+  <button md-icon-button (click)="isCockpitTheme=!isCockpitTheme">
+    <md-icon>touch_app</md-icon>
+  </button>
+
+  <button md-icon-button [md-menu-trigger-for]="menu">
+    <md-icon>more_vert</md-icon>
+  </button>
+
+  <md-menu x-position="before" #menu="mdMenu">
+    <button md-menu-item>
+      Overview
+    </button>
+    <button md-menu-item>
+      Operation
+    </button>
+    <button md-menu-item>
+      Config
+    </button>
+    <button md-menu-item>
+      Flow
+    </button>
+    <button md-menu-item>
+      Monitor
+    </button>
+    <button md-menu-item>
+      Log
+    </button>
+    <button md-menu-item>
+      User
+    </button>
+  </md-menu>
+</md-toolbar>
+
+<md-card id="card-full-size">
+  <md-card-content>
+    <md-card-title align="center">
+      <b>Console</b> - Onglets
+    </md-card-title>
+  </md-card-content>
+
+  <md-card>
+    <md-card-content>
+
+    <md-card-title align="center">
+      <b>Home</b> - Default Page
+    </md-card-title>
+
+    <table align="center" cellspacing="0">
+      <tr>
+        <td>
+          <button md-raised-button color="accent" (click)="decrement()">Decrement</button>
+        </td>
+        <td>
+          <p>counter: {{ counter | async }}</p>
+        </td>
+        <td>
+          <button md-raised-button color="primary" (click)="increment()">Increment</button>
+        </td>
+      </tr>
+    </table>
+
+    </md-card-content>
+  </md-card>
+</md-card>

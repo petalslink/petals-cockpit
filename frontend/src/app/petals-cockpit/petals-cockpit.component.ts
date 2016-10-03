@@ -16,9 +16,6 @@ interface AppState {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PetalsCockpitComponent {
-  title = 'Petals Cockpit';
-  isCockpitTheme = false;
-
   private counter: Observable<number>;
 
   tabs: Array < { title: string, url: string } >;

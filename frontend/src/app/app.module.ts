@@ -33,6 +33,7 @@ import { UserMockService } from './mocks/user-mock.service';
 import { PetalsModule } from './petals/petals.module';
 import { ServiceModule } from './service/service.module';
 import { ApiModule } from './api/api.module';
+import { WorkspacesModule } from './workspaces/workspaces.module';
 
 // our components
 import { AppComponent } from './app.component';
@@ -71,6 +72,7 @@ import { PetalsCockpitRoutingModule } from './app-routing.module';
     // material design
     MaterialModule.forRoot(),
     // our modules
+    WorkspacesModule,
     PetalsModule,
     ServiceModule,
     ApiModule

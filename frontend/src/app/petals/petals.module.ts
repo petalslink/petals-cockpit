@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -16,12 +17,14 @@ import { ComponentsMenuComponent } from './components-menu/components-menu.compo
 import { ComponentMenuComponent } from './component-menu/component-menu.component';
 import { ServiceUnitsMenuComponent } from './service-units-menu/service-units-menu.component';
 import { ServiceUnitMenuComponent } from './service-unit-menu/service-unit-menu.component';
+import { PetalsMenuToolbarComponent } from './petals-content/petals-content.component';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    MaterialModule
+    MaterialModule,
+    RouterModule
   ],
   exports: [
     PetalsComponent,
@@ -37,7 +40,8 @@ import { ServiceUnitMenuComponent } from './service-unit-menu/service-unit-menu.
     ComponentsMenuComponent,
     ComponentMenuComponent,
     ServiceUnitsMenuComponent,
-    ServiceUnitMenuComponent
+    ServiceUnitMenuComponent,
+    PetalsMenuToolbarComponent
   ],
   bootstrap: [PetalsComponent]
 })
