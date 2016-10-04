@@ -26,6 +26,7 @@ import javax.validation.constraints.NotNull;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.pac4j.dropwizard.Pac4jFactory;
 
 import com.allanbank.mongodb.MongoClient;
 import com.allanbank.mongodb.MongoClientConfiguration;
@@ -43,6 +44,15 @@ import io.dropwizard.setup.Environment;
  *
  */
 public class CockpitConfiguration extends Configuration {
+
+    @Valid
+    @NotNull
+    @JsonProperty("pac4j")
+    final Pac4jFactory pac4jFactory = new Pac4jFactory();
+
+    public Pac4jFactory getPac4jFactory() {
+        return pac4jFactory;
+    }
 
     @Valid
     @NotNull
