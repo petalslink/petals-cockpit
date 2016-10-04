@@ -10,7 +10,7 @@ $ cd frontend && ng build && cd ..
 ```
 - Build Petals Cockpit (it will also build the backend)
 ```
-$ mvn clean package
+$ mvn -s ci/settings.xml clean package
 ```
 - Execute Petals Cockpit
 ```
