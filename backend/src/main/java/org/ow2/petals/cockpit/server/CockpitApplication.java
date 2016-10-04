@@ -19,6 +19,7 @@ package org.ow2.petals.cockpit.server;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.resources.UserSession;
 import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
@@ -72,6 +73,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 return configuration.getPac4jFactory();
             }
         });
+        bootstrap.addCommand(new AddUserCommand());
     }
 
     @Override
