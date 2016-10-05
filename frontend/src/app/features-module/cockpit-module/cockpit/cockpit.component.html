@@ -1,0 +1,32 @@
+cockpit
+<div [class.cockpit-theme]="(config$ | async).isDarkTheme">
+  <md-sidenav-layout fullscreen>
+    <md-sidenav #sidenav align="start" mode="side" opened="true">
+
+      <md-card id="header-sidenav">
+        <img class="logo-petals" src="/assets/img/logo_petalscockpit.png">
+        <md-card-title-group>
+          <p>Bertrand Escudie</p>
+
+          <button md-icon-button [disabled]="(user$ | async).isDisconnecting" class="icon-power" (click)="disconnectUser()">
+            <md-icon *ngIf="!(user$ | async).isDisconnecting">power_settings_new</md-icon>
+            <md-progress-circle *ngIf="(user$ | async).isDisconnecting" mode="indeterminate"></md-progress-circle>
+          </button>
+        </md-card-title-group>
+      </md-card>
+
+      <button class="change-workspace" md-raised-button color="accent" routerLink="./workspaces">Change workspace</button>
+
+      <md-tab-group #tabGroup (selectChange)="openTab(tabGroup.selectedIndex)">
+        <md-tab *ngFor="let tab of tabs">
+          <template md-tab-label>{{tab.title}}</template>
+          <template md-tab-content>
+            <app-petals-menu-module></app-petals-menu-module>
+          </template>
+        </md-tab>
+      </md-tab-group>
+    </md-sidenav>
+
+    <router-outlet></router-outlet>
+  </md-sidenav-layout>
+</div>

@@ -1,7 +1,7 @@
 import { TypedRecord, makeTypedFactory } from 'typed-immutable-record';
 
 // user
-import { UserStateRecord, userStateFactory } from './reducers/user.state';
+import { UserStateRecord, userStateFactory } from './shared-module/reducers/user.state';
 
 // the typeScript interface that defines the application state's properties
 // this is to be imported wherever a reference to the app state is used
