@@ -14,7 +14,12 @@
         </md-card-title-group>
       </md-card>
 
-      <button class="change-workspace" md-raised-button color="accent" routerLink="./workspaces">Change workspace</button>
+      <button
+        class="change-workspace"
+        md-raised-button
+        color="accent"
+        [routerLink]="['workspaces', (workspaces$ | async).selectedWorkspaceId]"
+      >Change workspace</button>
 
       <md-tab-group #tabGroup (selectChange)="openTab(tabGroup.selectedIndex)">
         <md-tab *ngFor="let tab of tabs">

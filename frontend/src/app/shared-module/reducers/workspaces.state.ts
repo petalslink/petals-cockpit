@@ -115,12 +115,12 @@ export const workspacesStateFactory = makeTypedFactory<WorkspacesState, Workspac
     workspaces: [
       {
         id: 0,
-        name: 'Workspace 1',
+        name: 'Workspace 0',
         buses: busesWs1
       },
       {
         id: 1,
-        name: 'Workspace 2',
+        name: 'Workspace 1',
         buses: busesWs2
       }
     ]
