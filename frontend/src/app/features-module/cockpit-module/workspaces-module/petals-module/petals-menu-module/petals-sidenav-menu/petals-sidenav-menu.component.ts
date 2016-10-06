@@ -1,8 +1,15 @@
+// angular modules
 import { Component, ChangeDetectionStrategy } from '@angular/core';
+
+// rxjs
 import { Observable } from 'rxjs/Observable';
+
+// ngrx
 import { Store } from '@ngrx/store';
-import {WorkspacesState} from "../../../../../../shared-module/reducers/workspaces.state";
-import {AppState} from "../../../../../../app.state";
+
+// our states
+import { AppState } from '../../../../../../app.state';
+import { WorkspacesState } from '../../../../../../shared-module/reducers/workspaces.state';
 
 @Component({
   selector: 'app-petals-sidenav-menu',

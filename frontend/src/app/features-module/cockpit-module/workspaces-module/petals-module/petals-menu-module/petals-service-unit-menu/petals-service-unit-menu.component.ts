@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
-import {IServiceUnit} from "../../../../../../shared-module/interfaces/petals.interface";
+import { IServiceUnit } from '../../../../../../shared-module/interfaces/petals.interface';
 
 @Component({
   selector: 'app-service-unit-menu',

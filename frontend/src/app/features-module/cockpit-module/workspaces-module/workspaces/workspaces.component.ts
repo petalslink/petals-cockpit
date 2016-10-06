@@ -1,10 +1,19 @@
-import {Component, OnInit} from '@angular/core';
+// angular module
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+
+// rxjs
 import { Observable } from 'rxjs/Observable';
+
+// ngrx - store
 import { Store } from '@ngrx/store';
+
+// our states
 import { AppState } from '../../../../app.state';
 import { WorkspacesState } from '../../../../shared-module/reducers/workspaces.state';
+
+// our actions
 import { CHANGE_SELECTED_WORKSPACE } from '../../../../shared-module/reducers/workspaces.reducer';
-import {Router, ActivatedRoute} from "@angular/router";
 
 // import
 @Component({

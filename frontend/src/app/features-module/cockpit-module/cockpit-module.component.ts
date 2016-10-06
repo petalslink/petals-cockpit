@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-cockpit-module',
@@ -8,11 +7,7 @@ import {ActivatedRoute} from "@angular/router";
 })
 export class CockpitModuleComponent implements OnInit {
 
-  constructor(private activatedRoutes: ActivatedRoute) {
-    this.activatedRoutes.params.subscribe(params => {
-      console.log(params);
-    });
-  }
+  constructor() { }
 
   ngOnInit() {
   }

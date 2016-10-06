@@ -1,18 +1,18 @@
 // angular modules
-import { NgModule, ModuleWithProviders } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-// our components
-import { ToggleThemeComponent } from './toggle-theme/toggle-theme.component';
-import {MaterialModule} from "@angular/material";
-import {FormsModule} from "@angular/forms";
-import {HttpModule} from "@angular/http";
 
 // ngrx - store
 import { StoreModule } from '@ngrx/store';
 // ngrx - effects
 import { EffectsModule } from '@ngrx/effects';
-import {TranslateModule} from "ng2-translate";
+import { TranslateModule } from 'ng2-translate';
+
+// our components
+import { ToggleThemeComponent } from './toggle-theme/toggle-theme.component';
+import { MaterialModule } from '@angular/material';
+import { FormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
 
 const SHARED_COMPONENTS = [
   ToggleThemeComponent

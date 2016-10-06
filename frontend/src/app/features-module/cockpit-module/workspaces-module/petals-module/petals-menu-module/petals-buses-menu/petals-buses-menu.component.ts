@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
-import {IBus} from "../../../../../../shared-module/interfaces/petals.interface";
+import { IBus } from '../../../../../../shared-module/interfaces/petals.interface';
 
 @Component({
   selector: 'app-buses-menu',

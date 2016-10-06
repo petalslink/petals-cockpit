@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
-import {IComponent} from "../../../../../../shared-module/interfaces/petals.interface";
+import { IComponent } from '../../../../../../shared-module/interfaces/petals.interface';
 
 @Component({
   selector: 'app-components-menu',
