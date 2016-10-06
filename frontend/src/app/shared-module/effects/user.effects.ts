@@ -77,7 +77,7 @@ export class UserEffects implements OnDestroy {
           return { type: USR_IS_DISCONNECTED };
         }
 
-        Observable.throw(new Error('Error while disconnecting user'));
+        throw new Error('Error while disconnecting user');
       })
       .catch((err) => {
         if (environment.debug) {
