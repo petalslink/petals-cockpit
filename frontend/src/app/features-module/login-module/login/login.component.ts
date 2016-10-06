@@ -22,5 +22,4 @@ export class LoginComponent {
   connectUser(user: IUser) {
     this.store.dispatch({ type: USR_IS_CONNECTING, payload: user });
   }
-
 }

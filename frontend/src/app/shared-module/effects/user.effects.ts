@@ -1,26 +1,34 @@
+// angular modules
 import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { Http } from '@angular/http';
+import { Http, Response } from '@angular/http';
+
+// rxjs
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
+
+// store
 import { Store } from '@ngrx/store';
 import { Actions, Effect, mergeEffects } from '@ngrx/effects';
 
+// our environment
+import {environment} from '../../../environments/environment';
+
+// our states
 import { AppState } from '../../app.state';
 
+// our services
 import { UserService } from '../services/user.service';
 
+// our actions
 import {
   USR_IS_CONNECTING,
   USR_IS_CONNECTED,
   USR_CONNECTION_FAILED,
   USR_IS_DISCONNECTING,
-  USR_IS_DISCONNECTED
+  USR_IS_DISCONNECTED,
+  USR_DISCONNECTION_FAILED
 } from '../reducers/user.reducer';
-
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/withLatestFrom';
 
 @Injectable()
 export class UserEffects implements OnDestroy {
@@ -44,25 +52,39 @@ export class UserEffects implements OnDestroy {
   // tslint:disable-next-line:member-ordering
   @Effect({dispatch: true}) usr_connect$: Observable<{ type: string }> = this.actions$
     .ofType(USR_IS_CONNECTING)
-    .switchMap(action => this.userService.connectUser(action.payload))
-    .map((res: any) => {
-      // TODO : check HTTP header here instead of checking for properties
-      if (typeof res.data.username === 'undefined') {
-        return { type: USR_CONNECTION_FAILED };
-      }
+    .switchMap(action => this.userService.connectUser(action.payload)
+      .map((res: any) => {
+        this.router.navigate(['/cockpit']);
+        return { type: USR_IS_CONNECTED, payload: res };
+      })
+      .catch((err) => {
+        if (environment.debug) {
+          console.error(err);
+        }
 
-      this.router.navigate(['/cockpit']);
-      return { type: USR_IS_CONNECTED };
-    });
+        return Observable.of({ type: USR_CONNECTION_FAILED });
+      })
+    );
 
   // tslint:disable-next-line:member-ordering
   @Effect({dispatch: true}) usr_disconnect$: Observable<{ type: string }> = this.actions$
     .ofType(USR_IS_DISCONNECTING)
-    .switchMap(() => this.userService.disconnectUser())
-    .map((res: any) => {
-      // TODO : check HTTP header here and check there's no errors
-      // otherwise, create a new action type to handle this error
-      this.router.navigate(['/login']);
-      return { type: USR_IS_DISCONNECTED };
-    });
+    .switchMap(() => this.userService.disconnectUser()
+      .map((res: Response) => {
+        if (res.status === 204) {
+          this.router.navigate(['/login']);
+          // TODO : clear user data once disconnected !
+          return { type: USR_IS_DISCONNECTED };
+        }
+
+        Observable.throw(new Error('Error while disconnecting user'));
+      })
+      .catch((err) => {
+        if (environment.debug) {
+          console.error(err);
+        }
+
+        return Observable.of({ type: USR_DISCONNECTION_FAILED });
+      })
+    );
 }

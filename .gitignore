@@ -5,6 +5,7 @@
 # ------------------------------------
 npm-debug.log
 node_modules/
+data-mongodb
 
 # IDEs and editors
 .idea

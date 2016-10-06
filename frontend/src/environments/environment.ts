@@ -5,5 +5,7 @@
 
 export const environment = {
   production: false,
-  mock: true
+  mock: false,
+  urlBackend: '/api',
+  debug: true
 };
