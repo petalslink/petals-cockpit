@@ -13,14 +13,14 @@ export class UserService {
 
   public connectUser(user: IUser) {
     return this.http
-                .post('http://serveur.com/api/user/session', user)
-                .map(this.extractData);
+      .post('/user/session', user)
+      .map(this.extractData);
   }
 
   // TODO
   public disconnectUser() {
     return this.http
-                .post('http://serveur.com/api/user/session/disconnect', {})
-                .map(this.extractData);
+      .post('/user/session/disconnect', {})
+      .map(this.extractData);
   }
 }

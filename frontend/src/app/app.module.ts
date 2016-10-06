@@ -4,7 +4,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { Http } from '@angular/http';
 
-// angular-material module
+// environments for our app
+import { environment } from '../environments/environment';
+
+// angular-material2 modules
 import { MaterialModule } from '@angular/material';
 
 // angular-translate
@@ -67,7 +70,7 @@ import { SharedModule } from './shared-module/shared-module.module';
     UserEffects,
     {
       provide: UserService,
-      useClass: UserMockService
+      useClass: (environment.mock ? UserMockService : UserService)
     }
   ],
   bootstrap: [
