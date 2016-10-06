@@ -28,6 +28,8 @@ import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.pac4j.JaxRsContext;
 
+import com.google.common.base.Strings;
+
 public class CockpitAuthClient extends IndirectClientV2<@Nullable UsernamePasswordCredentials, CommonProfile> {
 
     @Override
@@ -64,6 +66,11 @@ class CockpitExtractor implements CredentialsExtractor<@Nullable UsernamePasswor
             // Note: careful, because it means that the request can't be read again then in the resource method! (but it
             // should be ok, since we don't need to read it, and we shouldn't anyway)
             final Authentication auth = request.readEntity(Authentication.class);
+
+            if (auth == null || Strings.isNullOrEmpty(auth.getUsername())
+                    || Strings.isNullOrEmpty(auth.getPassword())) {
+                return null;
+            }
 
             return new UsernamePasswordCredentials(auth.getUsername(), auth.getPassword(), clientName);
         } else {

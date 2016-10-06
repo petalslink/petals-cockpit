@@ -142,7 +142,7 @@
                    - Keystores, certificate, keys
                    - Images
                -->
-              <resourceExcludes>**/*.jar,**/*.class,**/*.zip,**/*.bin,**/LICENSE.txt,**/NOTE,**/*.log,**/*_provideFlowStepBegin.xml,**/*_provideFlowStepEnd.xml,**/*_provideFlowStepFailure.xml,**/man1/*.1,**/man5/*.5,**/man7/*.7,**/*.jks,**/id_rsa*,**/known_hosts,**/*.jpg,**/*.png,**/*.crt,**/*.pem,META-INF/**,**/*.json</resourceExcludes>
+              <resourceExcludes>**/*.jar,**/*.class,**/*.zip,**/*.bin,**/LICENSE.txt,**/NOTE,**/*.log,**/*_provideFlowStepBegin.xml,**/*_provideFlowStepEnd.xml,**/*_provideFlowStepFailure.xml,**/man1/*.1,**/man5/*.5,**/man7/*.7,**/*.jks,**/id_rsa*,**/known_hosts,**/*.jpg,**/*.png,**/*.crt,**/*.pem,META-INF/**,**/*.json,**/*.yml,**/*.yaml</resourceExcludes>
             </configuration>
           </execution>
           <execution>

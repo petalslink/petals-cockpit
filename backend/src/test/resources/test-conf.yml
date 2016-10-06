@@ -1,18 +1,16 @@
 # configuration for dropwizard
 ---
 server:
+  # only http on 8080
+  type: simple
   # the backend will be served via /api on 8080
   rootPath: /api
-  # the frontend will be served via / on 8080
   applicationContextPath: /
-  applicationConnectors:
-    - type: http
-      port: 8080
-  # the admin console will be served via / on 8082
-  adminContextPath: /
-  adminConnectors:
-    - type: http
-      port: 8082
+  # the admin console is served via /admin on 8080 (do not do this in production!)
+  adminContextPath: /admin
+  connector:
+    type: http
+    port: 8080
 
 pac4j:
   filters:
@@ -28,7 +26,9 @@ pac4j:
   # for now, we still need to give a value in order for pac4j to be happy
   callbackUrl: /user/session
   clients:
-    - org.ow2.petals.cockpit.server.security.CockpitAuthClient: {}
+    - org.ow2.petals.cockpit.server.security.CockpitAuthClient:
+        authenticator:
+          class: org.ow2.petals.cockpit.server.resources.MockAuthenticator
 
 # configuration to connect to mongo
 mongo:
@@ -39,5 +39,6 @@ mongo:
 
 logging:
   level: INFO
-
-pac4j:
+  loggers:
+    org.pac4j: DEBUG
+    org.ow2.petals.cockpit: DEBUG
