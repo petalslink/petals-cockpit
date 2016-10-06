@@ -12,6 +12,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from '../../../app.state';
 import { ConfigState } from '../../../shared-module/reducers/config.state';
 import { UserState } from '../../../shared-module/reducers/user.state';
+import { WorkspacesState } from '../../../shared-module/reducers/workspaces.state';
 
 // our actions
 import { USR_IS_DISCONNECTING } from '../../../shared-module/reducers/user.reducer';
@@ -25,11 +26,14 @@ import { USR_IS_DISCONNECTING } from '../../../shared-module/reducers/user.reduc
 export class CockpitComponent {
   private user$: Observable<UserState>;
   private config$: Observable<ConfigState>;
+  private workspaces$: Observable<WorkspacesState>;
+
   private tabs: Array<{ title: string, url: string }>;
 
   constructor(private store: Store<AppState>, private router: Router) {
     this.user$ = <Observable<UserState>>store.select('user');
     this.config$ = <Observable<ConfigState>>store.select('config');
+    this.workspaces$ = <Observable<WorkspacesState>>store.select('workspaces');
 
     this.tabs = [
       {
