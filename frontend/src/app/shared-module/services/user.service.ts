@@ -1,26 +1,21 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Http } from '@angular/http';
 import { IUser } from '../interfaces/user.interface';
+
+// environments for our app
+import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class UserService {
   constructor(private http: Http) { }
 
-  private extractData(res: Response) {
-    let body = res.json();
-    return body.data || { };
-  }
-
   public connectUser(user: IUser) {
     return this.http
-      .post('/user/session', user)
-      .map(this.extractData);
+      .post(`${environment.urlBackend}/user/session`, user);
   }
 
-  // TODO
   public disconnectUser() {
     return this.http
-      .post('/user/session/disconnect', {})
-      .map(this.extractData);
+      .delete(`${environment.urlBackend}/user/session`, {});
   }
 }
