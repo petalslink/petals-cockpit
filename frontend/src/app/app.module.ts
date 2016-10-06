@@ -1,88 +1,80 @@
 // angular modules
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { HttpModule, Http } from '@angular/http';
+import { Http } from '@angular/http';
 
-// ng2-translate
-import { TranslateModule, TranslateStaticLoader, TranslateLoader } from 'ng2-translate/ng2-translate';
+// environments for our app
+import { environment } from '../environments/environment';
 
 // angular-material2 modules
 import { MaterialModule } from '@angular/material';
 
+// angular-translate
+import { TranslateStaticLoader, TranslateLoader, TranslateModule } from 'ng2-translate';
+
 // ngrx - store
 import { StoreModule } from '@ngrx/store';
-// ngrx - effects
-import { EffectsModule } from '@ngrx/effects';
-
-// our reducers
-import { UserReducer } from './reducers/user.reducer';
-import { WorkspacesReducer } from './reducers/workspaces.reducer';
-import { ConfigReducer } from './reducers/config.reducer';
-
 // our effects
-import { UserEffects } from './effects/user.effects';
+import { UserEffects } from './shared-module/effects/user.effects';
+// our reducers
+import { UserReducer } from './shared-module/reducers/user.reducer';
+import { WorkspacesReducer } from './shared-module/reducers/workspaces.reducer';
+import { ConfigReducer } from './shared-module/reducers/config.reducer';
 
 // our services
-import { UserService } from './services/user.service';
+import { UserService } from './shared-module/services/user.service';
 
 // our mocks
-import { UserMockService } from './mocks/user-mock.service';
-
-// our modules
-import { PetalsModule } from './petals/petals.module';
-import { ServiceModule } from './service/service.module';
-import { ApiModule } from './api/api.module';
-import { WorkspacesModule } from './workspaces/workspaces.module';
-import { SharedModule } from './shared/shared.module';
+import { UserMockService } from './shared-module/mocks/user-mock.service';
 
 // our components
 import { AppComponent } from './app.component';
-import { LoginComponent } from './login/login.component';
-import { PetalsCockpitComponent } from './petals-cockpit/petals-cockpit.component';
 
-// our routes
-import { PetalsCockpitRoutingModule } from './app-routing.module';
+// features module
+import { FeatureModule } from './features-module/features-module.module';
+
+// shared module
+import { SharedModule } from './shared-module/shared-module.module';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    LoginComponent,
-    PetalsCockpitComponent
+    AppComponent
   ],
   imports: [
+    // angular
+    // import browser module only once, then import CommonModule : https://goo.gl/Z05nac
     BrowserModule,
+    SharedModule,
+    FeatureModule,
     FormsModule,
-    HttpModule,
-    // translate
-    TranslateModule.forRoot({
-      provide: TranslateLoader,
-      useFactory: (http: Http) => new TranslateStaticLoader(http, '/assets/i18n', '.json'),
-      deps: [Http]
-    }),
-    // routes
-    PetalsCockpitRoutingModule,
+
     // ngrx - store
     StoreModule.provideStore({
       config: ConfigReducer,
       user: UserReducer,
       workspaces: WorkspacesReducer
     }),
-    // ngrx - effects
-    EffectsModule,
+
+    // translate
+    TranslateModule.forRoot({
+      provide: TranslateLoader,
+      useFactory: (http: Http) => new TranslateStaticLoader(http, '/assets/i18n', '.json'),
+      deps: [Http]
+    }),
+
     // material design
     MaterialModule.forRoot(),
-    // our modules
-    WorkspacesModule,
-    PetalsModule,
-    ServiceModule,
-    ApiModule,
-    SharedModule
   ],
   providers: [
     UserEffects,
-    { provide: UserService, useClass: UserMockService }
+    {
+      provide: UserService,
+      useClass: (environment.mock ? UserMockService : UserService)
+    }
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [
+    AppComponent
+  ]
 })
 export class AppModule { }
