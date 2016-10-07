@@ -21,7 +21,7 @@
         [routerLink]="['workspaces', selectedWorkspaceId]"
       >Change workspace</button>
 
-      <md-tab-group #tabGroup (selectChange)="openTab(tabGroup.selectedIndex)">
+      <md-tab-group #tabGroup (selectChange)="openTab(tabGroup.selectedIndex)" *ngIf="selectedWorkspaceId">
         <md-tab *ngFor="let tab of tabs">
           <template md-tab-label>{{tab.title}}</template>
           <template md-tab-content>
