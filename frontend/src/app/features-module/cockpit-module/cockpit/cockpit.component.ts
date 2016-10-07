@@ -38,7 +38,6 @@ export class CockpitComponent {
     this.workspaces$ = <Observable<WorkspacesStateRecord>>store.select('workspaces');
 
     this.workspaces$.subscribe((workspaces: WorkspacesStateRecord) => {
-      console.log(workspaces.toJS().selectedWorkspaceId);
       this.selectedWorkspaceId = workspaces.toJS().selectedWorkspaceId;
     });
 

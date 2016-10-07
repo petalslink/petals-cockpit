@@ -1,5 +1,3 @@
-<div class="service-units-menu-component">
-  <div *ngFor="let serviceUnit of serviceUnits">
-    <app-service-unit-menu [serviceUnit]="serviceUnit"></app-service-unit-menu>
-  </div>
-</div>
+<md-nav-list class="service-units-menu-component" *ngFor="let serviceUnit of serviceUnits">
+  <a md-list-item class="service-unit">{{serviceUnit.name}}</a>
+</md-nav-list>
