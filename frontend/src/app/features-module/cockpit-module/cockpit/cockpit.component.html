@@ -22,10 +22,24 @@
       >Change workspace</button>
 
       <md-tab-group #tabGroup (selectChange)="openTab(tabGroup.selectedIndex)" *ngIf="selectedWorkspaceId">
-        <md-tab *ngFor="let tab of tabs">
-          <template md-tab-label>{{tab.title}}</template>
+        <md-tab>
+          <template md-tab-label>Petals</template>
           <template md-tab-content>
             <app-petals-menu-module></app-petals-menu-module>
+          </template>
+        </md-tab>
+
+        <md-tab>
+          <template md-tab-label>Service</template>
+          <template md-tab-content>
+            <app-service-menu-module></app-service-menu-module>
+          </template>
+        </md-tab>
+
+        <md-tab>
+          <template md-tab-label>API</template>
+          <template md-tab-content>
+            <app-api-menu-module></app-api-menu-module>
           </template>
         </md-tab>
       </md-tab-group>
