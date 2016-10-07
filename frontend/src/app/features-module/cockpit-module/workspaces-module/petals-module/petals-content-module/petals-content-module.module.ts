@@ -1,11 +1,14 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { PetalsContentModuleComponent } from './petals-content-module.component';
+import { SharedModule } from '../../../../../shared-module/shared-module.module';
 
 @NgModule({
   imports: [
-    CommonModule
+    SharedModule
   ],
-  declarations: [PetalsContentModuleComponent]
+  declarations: [PetalsContentModuleComponent],
+  exports: [
+    PetalsContentModuleComponent
+  ]
 })
 export class PetalsContentModule { }

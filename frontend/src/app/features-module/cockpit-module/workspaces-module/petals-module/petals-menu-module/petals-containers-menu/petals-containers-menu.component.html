@@ -1,5 +1,5 @@
-<div class="containers-menu-component">
-  <div *ngFor="let container of containers">
-    <app-container-menu [container]="container"></app-container-menu>
-  </div>
-</div>
+<md-nav-list class="containers-menu-component" *ngFor="let container of containers">
+  <a md-list-item class="container">{{container.name}}</a>
+
+  <app-components-menu [components]="container.components"></app-components-menu>
+</md-nav-list>
