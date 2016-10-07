@@ -1,14 +1,20 @@
 // angular modules
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
+// our modules
+import { SharedModule } from '../../../../shared-module/shared-module.module';
 
 // our components
 import { ApiModuleComponent } from './api-module.component';
+import { ApiComponent } from './api/api.component';
 
 @NgModule({
   imports: [
-    CommonModule
+    SharedModule
   ],
-  declarations: [ApiModuleComponent]
+  declarations: [
+    ApiModuleComponent,
+    ApiComponent
+  ]
 })
 export class ApiModule { }
