@@ -4,10 +4,13 @@ import { CommonModule } from '@angular/common';
 
 // our components
 import { PetalsModuleComponent } from './petals-module.component';
+import { SharedModule } from '../../../../shared-module/shared-module.module';
+import { PetalsContentModule } from './petals-content-module/petals-content-module.module';
 
 @NgModule({
   imports: [
-    CommonModule
+    SharedModule,
+    PetalsContentModule
   ],
   declarations: [
     PetalsModuleComponent
