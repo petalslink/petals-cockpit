@@ -13,8 +13,10 @@ import { MaterialModule } from '@angular/material';
 // angular-translate
 import { TranslateStaticLoader, TranslateLoader, TranslateModule } from 'ng2-translate';
 
-// ngrx - store
+// ngrx
 import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { StoreLogMonitorModule, useLogMonitor } from '@ngrx/store-log-monitor';
 // our effects
 import { UserEffects } from './shared-module/effects/user.effects';
 // our reducers
@@ -48,6 +50,15 @@ import { SharedModule } from './shared-module/shared-module.module';
     SharedModule,
     FeatureModule,
     FormsModule,
+
+      // ngrx
+    StoreDevtoolsModule.instrumentStore({
+      monitor: useLogMonitor({
+        visible: false,
+        position: 'right'
+      })
+    }),
+    StoreLogMonitorModule,
 
     // ngrx - store
     StoreModule.provideStore({
