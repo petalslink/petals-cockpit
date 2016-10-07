@@ -18,7 +18,7 @@
         class="change-workspace"
         md-raised-button
         color="accent"
-        [routerLink]="['workspaces', (workspaces$ | async).selectedWorkspaceId]"
+        [routerLink]="['workspaces', selectedWorkspaceId]"
       >Change workspace</button>
 
       <md-tab-group #tabGroup (selectChange)="openTab(tabGroup.selectedIndex)">
