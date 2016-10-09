@@ -39,6 +39,10 @@ import { FeatureModule } from './features-module/features-module.module';
 // shared module
 import { SharedModule } from './shared-module/shared-module.module';
 
+export function createTranslateLoader(http: Http) {
+  return new TranslateStaticLoader(http, './assets/i18n', '.json');
+}
+
 @NgModule({
   declarations: [
     AppComponent
@@ -51,14 +55,14 @@ import { SharedModule } from './shared-module/shared-module.module';
     FeatureModule,
     FormsModule,
 
-      // ngrx
-    StoreDevtoolsModule.instrumentStore({
-      monitor: useLogMonitor({
-        visible: false,
-        position: 'right'
-      })
-    }),
-    StoreLogMonitorModule,
+    // ngrx
+    // StoreDevtoolsModule.instrumentStore({
+    //   monitor: useLogMonitor({
+    //     visible: false,
+    //     position: 'right'
+    //   })
+    // }),
+    // StoreLogMonitorModule,
 
     // ngrx - store
     StoreModule.provideStore({
@@ -70,7 +74,7 @@ import { SharedModule } from './shared-module/shared-module.module';
     // translate
     TranslateModule.forRoot({
       provide: TranslateLoader,
-      useFactory: (http: Http) => new TranslateStaticLoader(http, '/assets/i18n', '.json'),
+      useFactory: createTranslateLoader,
       deps: [Http]
     }),
 

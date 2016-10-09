@@ -4,8 +4,8 @@ import { WorkspacesStateRecord, workspacesStateFactory } from './workspaces.stat
 // actions
 export const CHANGE_SELECTED_WORKSPACE = 'CHANGE_SELECTED_WORKSPACE';
 
-export const WorkspacesReducer: ActionReducer<WorkspacesStateRecord> =
-  (workspacesState: WorkspacesStateRecord = workspacesStateFactory(), action: Action) => {
+
+export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord = workspacesStateFactory(), action: Action) {
   switch (action.type) {
     case CHANGE_SELECTED_WORKSPACE:
       return workspacesState.setIn(['selectedWorkspaceId'], action.payload);
@@ -14,3 +14,6 @@ export const WorkspacesReducer: ActionReducer<WorkspacesStateRecord> =
       return workspacesState;
   }
 };
+
+export const WorkspacesReducer: ActionReducer<WorkspacesStateRecord> = createWorkspacesReducer;
+

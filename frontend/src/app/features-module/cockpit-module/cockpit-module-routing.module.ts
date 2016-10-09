@@ -8,7 +8,11 @@ import { WorkspacesRoutingModule } from './workspaces-module/workspaces-module-r
 // our components
 import { CockpitComponent } from './cockpit/cockpit.component';
 
-const routes: Routes = [
+export function routeWorkspacesRoutingModule() {
+  return WorkspacesRoutingModule;
+};
+
+export const routes: Routes = [
   {
     path: '',
     component: CockpitComponent,
@@ -20,7 +24,7 @@ const routes: Routes = [
       },
       {
         path: 'workspaces',
-        loadChildren: () => WorkspacesRoutingModule
+        loadChildren: routeWorkspacesRoutingModule
       }
     ]
   }
