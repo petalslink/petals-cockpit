@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.grizzly.http.server.util.Globals;
+import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -47,9 +48,9 @@ import io.dropwizard.testing.junit.ResourceTestRule;
 
 public class UserSessionTest {
 
-    private static final String SESSION_COOKIE_NAME = Globals.SESSION_COOKIE_NAME;
+    public static final String SESSION_COOKIE_NAME = Globals.SESSION_COOKIE_NAME;
 
-    static final UserData ADMIN = new UserData("admin", "Administrator");
+    public static final UserData ADMIN = new UserData("admin", "Administrator");
 
     @ClassRule
     public static final ResourceTestRule resources = ResourceTestRule.builder()
@@ -72,24 +73,35 @@ public class UserSessionTest {
     }
 
     private static Builder request() {
-        return resources.getJerseyTest().target("/user/session").request();
+        // jersey client does not keep cookies in redirect...
+        return resources.getJerseyTest().target("/user/session").property(ClientProperties.FOLLOW_REDIRECTS, false)
+                .request();
     }
 
     @Test
     public void testCorrectLogin() {
         final Response login = request().post(Entity.json(new Authentication("admin", "admin")));
 
-        assertThat(login.getStatus()).isEqualTo(200);
-        assertThat(login.getCookies().get(SESSION_COOKIE_NAME)).isNotNull();
-        assertThat(login.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
+        assertThat(login.getStatus()).isEqualTo(302);
+        final NewCookie cookie = login.getCookies().get(SESSION_COOKIE_NAME);
+        assertThat(cookie).isNotNull();
+
+        final Response get = request().cookie(cookie).get();
+        assertThat(get.getStatus()).isEqualTo(200);
+        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
     }
 
     @Test
     public void testWrongLogin() {
         final Response login = request().post(Entity.json(new Authentication("wrong", "admin")));
 
-        assertThat(login.getStatus()).isEqualTo(401);
-        assertThat(login.getCookies().get(SESSION_COOKIE_NAME)).isNotNull();
+        assertThat(login.getStatus()).isEqualTo(302);
+        final NewCookie cookie = login.getCookies().get(SESSION_COOKIE_NAME);
+        // even in case of failure, pac4j registers a session!
+        assertThat(cookie).isNotNull();
+
+        final Response get = request().cookie(cookie).get();
+        assertThat(get.getStatus()).isEqualTo(401);
     }
 
     @Test
@@ -100,28 +112,10 @@ public class UserSessionTest {
     }
 
     @Test
-    public void testGetOkSession() {
-        final Response login = request().post(Entity.json(new Authentication("admin", "admin")));
-
-        assertThat(login.getStatus()).isEqualTo(200);
-        assertThat(login.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
-
-        final NewCookie cookie = login.getCookies().get(SESSION_COOKIE_NAME);
-        assertThat(cookie).isNotNull();
-
-        final Response get = request().cookie(cookie).get();
-
-        assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
-    }
-
-    @Test
     public void testLogout() {
         final Response login = request().post(Entity.json(new Authentication("admin", "admin")));
 
-        assertThat(login.getStatus()).isEqualTo(200);
-        assertThat(login.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
-
+        assertThat(login.getStatus()).isEqualTo(302);
         final NewCookie cookie = login.getCookies().get(SESSION_COOKIE_NAME);
         assertThat(cookie).isNotNull();
 
@@ -130,7 +124,8 @@ public class UserSessionTest {
         assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
 
         final Response logout = request().cookie(cookie).delete();
-        assertThat(logout.getStatus()).isEqualTo(204);
+        // TODO should be 204: https://github.com/pac4j/pac4j/issues/701
+        assertThat(logout.getStatus()).isEqualTo(200);
 
         final Response getWrong = request().cookie(cookie).get();
         assertThat(getWrong.getStatus()).isEqualTo(401);
