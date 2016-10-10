@@ -1,11 +1,14 @@
+import { List, Map } from 'immutable';
+
+// our interfaces
 import { IBus } from './petals.interface';
 
-export interface IWorkspace {
+export interface IWorkspace extends Map<any, any> {
   id: number;
   name: string;
-  buses: Array<IBus>;
+  buses: List<IBus>;
 }
 
 export interface IWorkspaces {
-  workspaces: Array<IWorkspace>;
+  workspaces: List<IWorkspace>;
 }

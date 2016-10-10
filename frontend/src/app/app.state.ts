@@ -2,12 +2,16 @@ import { TypedRecord, makeTypedFactory } from 'typed-immutable-record';
 
 // user
 import { UserStateRecord, userStateFactory } from './shared-module/reducers/user.state';
+import { ConfigStateRecord, configStateFactory } from './shared-module/reducers/config.state';
+import { WorkspacesStateRecord, workspacesStateFactory } from './shared-module/reducers/workspaces.state';
 
 // the typeScript interface that defines the application state's properties
 // this is to be imported wherever a reference to the app state is used
 // (reducers, components, services...)
 export interface AppState {
+  config: ConfigStateRecord;
   user: UserStateRecord;
+  workspaces: WorkspacesStateRecord;
 };
 
 // an Immutable.js Record implementation of the AppState interface.
@@ -19,5 +23,7 @@ export interface AppStateRecord extends TypedRecord<AppStateRecord>, AppState {}
 
 // an Immutable.js record factory for the record
 export const appStateFactory = makeTypedFactory<AppState, AppStateRecord>({
-    user: <UserStateRecord>userStateFactory()
+  config: <ConfigStateRecord>configStateFactory(),
+  user: <UserStateRecord>userStateFactory(),
+  workspaces: <WorkspacesStateRecord>workspacesStateFactory()
 });
