@@ -9,7 +9,7 @@ export const USR_IS_DISCONNECTED = 'USR_IS_DISCONNECTED';
 export const USR_CONNECTION_FAILED = 'USR_CONNECTION_FAILED';
 export const USR_DISCONNECTION_FAILED = 'USR_DISCONNECTION_FAILED';
 
-export const UserReducer: ActionReducer<UserStateRecord> = (userState: UserStateRecord = userStateFactory(), action: Action) => {
+export function createUserReducer (userState: UserStateRecord = userStateFactory(), action: Action) {
   switch (action.type) {
     case USR_IS_CONNECTING:
       return userState
@@ -57,3 +57,5 @@ export const UserReducer: ActionReducer<UserStateRecord> = (userState: UserState
       return userState;
   }
 };
+
+export const UserReducer: ActionReducer<UserStateRecord> = createUserReducer;

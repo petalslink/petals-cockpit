@@ -4,7 +4,7 @@ import { ConfigStateRecord, configStateFactory } from './config.state';
 // actions
 export const TOGGLE_THEME = 'TOGGLE_THEME ';
 
-export const ConfigReducer: ActionReducer<ConfigStateRecord> = (configState: ConfigStateRecord = configStateFactory(), action: Action) => {
+export function createConfigReducer(configState: ConfigStateRecord = configStateFactory(), action: Action) {
   switch (action.type) {
     case TOGGLE_THEME:
       return configState.setIn(['isDarkTheme'], !configState.isDarkTheme);
@@ -13,3 +13,5 @@ export const ConfigReducer: ActionReducer<ConfigStateRecord> = (configState: Con
       return configState;
   }
 };
+
+export const ConfigReducer: ActionReducer<ConfigStateRecord> = createConfigReducer;

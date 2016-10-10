@@ -9,7 +9,13 @@ import { Store } from '@ngrx/store';
 
 // our states
 import { AppState } from '../../../../../../app.state';
-import { WorkspacesState } from '../../../../../../shared-module/reducers/workspaces.state';
+import { WorkspacesState, WorkspacesStateRecord } from '../../../../../../shared-module/reducers/workspaces.state';
+
+// our selectors
+import { getSearchedWorkspace } from '../../../../../../shared-module/reducers/workspaces.reducer';
+
+// our actions
+import { EDIT_PETALS_SEARCH } from '../../../../../../shared-module/reducers/workspaces.reducer';
 
 @Component({
   selector: 'app-petals-sidenav-menu',
@@ -21,6 +27,10 @@ export class PetalsSidenavMenuComponent {
   private workspaces$: Observable<WorkspacesState>;
 
   constructor(private store: Store<AppState>) {
-    this.workspaces$ = <Observable<WorkspacesState>>store.select('workspaces');
+    this.workspaces$ = store.let(getSearchedWorkspace()).map((workspaces: WorkspacesStateRecord) => workspaces.toJS());
+  }
+
+  search(textSearch) {
+    this.store.dispatch({ type: EDIT_PETALS_SEARCH, payload: textSearch });
   }
 }

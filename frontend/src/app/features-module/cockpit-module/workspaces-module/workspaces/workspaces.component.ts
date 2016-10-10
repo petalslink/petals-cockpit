@@ -10,7 +10,7 @@ import { Store } from '@ngrx/store';
 
 // our states
 import { AppState } from '../../../../app.state';
-import { WorkspacesState } from '../../../../shared-module/reducers/workspaces.state';
+import { WorkspacesState, WorkspacesStateRecord } from '../../../../shared-module/reducers/workspaces.state';
 
 // our actions
 import { CHANGE_SELECTED_WORKSPACE } from '../../../../shared-module/reducers/workspaces.reducer';
@@ -26,7 +26,8 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
   private selectedWorkspaceId: number;
 
   constructor(private store: Store<AppState>, private router: Router, private route: ActivatedRoute) {
-    this.workspaces$ = <Observable<WorkspacesState>>store.select('workspaces');
+    this.workspaces$ = <Observable<WorkspacesState>>store.select('workspaces')
+      .map((workspaces: WorkspacesStateRecord) => workspaces.toJS());
   }
 
   selectWorkspace(workspaceId: number) {

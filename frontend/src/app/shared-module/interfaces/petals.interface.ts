@@ -1,18 +1,20 @@
-export interface IServiceUnit {
+import { List, Map } from 'immutable';
+
+export interface IServiceUnit extends Map<any, any> {
   name: string;
 }
 
-export interface IComponent {
+export interface IComponent extends Map<any, any> {
   name: string;
-  serviceUnits?: Array<IServiceUnit>;
+  serviceUnits: List<IServiceUnit>;
 }
 
-export interface IContainer {
+export interface IContainer extends Map<any, any> {
   name: string;
-  components?: Array<IComponent>;
+  components: List<IComponent>;
 }
 
-export interface IBus {
+export interface IBus extends Map<any, any> {
   name: string;
-  containers?: Array<IContainer>;
+  containers: List<IContainer>;
 }

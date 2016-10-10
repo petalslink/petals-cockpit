@@ -8,6 +8,10 @@ import { CockpitRoutingModule } from './cockpit-module/cockpit-module-routing.mo
 // our components
 import { LoginComponent } from './login-module/login/login.component';
 
+export function routeCockpitRoutingModule() {
+  return CockpitRoutingModule;
+};
+
 const routes: Routes = [
   {
     path: 'login',
@@ -15,7 +19,7 @@ const routes: Routes = [
   },
   {
     path: 'cockpit',
-    loadChildren: () => CockpitRoutingModule
+    loadChildren: routeCockpitRoutingModule
   }
 ];
 

@@ -10,13 +10,17 @@ import { CockpitRoutingModule } from './cockpit-module-routing.module';
 
 // our components
 import { CockpitComponent } from './cockpit/cockpit.component';
+import { ServiceMenuModule } from './workspaces-module/service-module/service-menu-module/service-menu-module.module';
+import { ApiMenuModule } from './workspaces-module/api-module/api-menu-module/api-menu-module.module';
 
 @NgModule({
   imports: [
     SharedModule,
     CockpitRoutingModule,
     WorkspacesModule,
-    PetalsMenuModule
+    PetalsMenuModule,
+    ServiceMenuModule,
+    ApiMenuModule
   ],
   declarations: [
     CockpitModuleComponent,

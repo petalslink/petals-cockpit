@@ -1,13 +1,17 @@
+// immutable
+import { List, Map, fromJS } from 'immutable';
 import { TypedRecord, makeTypedFactory } from 'typed-immutable-record';
 
-import { IWorkspaces } from '../interfaces/workspace.interface';
+// our interfaces
 import { IBus } from '../interfaces/petals.interface';
+import { IWorkspaces, IWorkspace } from '../interfaces/workspace.interface';
 
 // the typeScript interface that defines the application state's properties
 // this is to be imported wherever a reference to a workspace is used
 // (reducers, components, services...)
 export interface WorkspacesState extends IWorkspaces {
   selectedWorkspaceId: number;
+  searchPetals: string;
 };
 
 // an Immutable.js Record implementation of the WorkspacesState interface.
@@ -15,11 +19,11 @@ export interface WorkspacesState extends IWorkspaces {
 // of the state
 // components should only ever read the state, never change it,
 // so they should only need the interface, not the record
-export interface WorkspacesStateRecord extends TypedRecord<WorkspacesStateRecord>, WorkspacesState  {};
+export interface WorkspacesStateRecord extends TypedRecord<WorkspacesStateRecord>, WorkspacesState {};
 
 // buses for debug purpose
 // TODO : Remove this and fetch it from server
-const busesWs1: Array<IBus> = [
+const busesWs1: List<IBus> = fromJS([
   {
     name: 'Bus 1',
     containers: [
@@ -63,9 +67,9 @@ const busesWs1: Array<IBus> = [
       }
     ]
   }
-];
+]);
 
-const busesWs2: Array<IBus> = [
+const busesWs2: List<IBus> = fromJS([
   {
     name: 'Bus 2',
     containers: [
@@ -107,21 +111,22 @@ const busesWs2: Array<IBus> = [
       }
     ]
   }
-];
+]);
 
 // an Immutable.js record factory for the record
 export const workspacesStateFactory = makeTypedFactory<WorkspacesState, WorkspacesStateRecord>({
     selectedWorkspaceId: null,
-    workspaces: [
-      {
+    searchPetals: '',
+    workspaces: List<IWorkspace>([
+      Map({
         id: 0,
         name: 'Workspace 0',
         buses: busesWs1
-      },
-      {
+      }),
+      Map({
         id: 1,
         name: 'Workspace 1',
         buses: busesWs2
-      }
-    ]
+      })
+    ])
 });
