@@ -36,6 +36,7 @@ import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
 import org.pac4j.jax.rs.features.Pac4JSecurityFilterFeature;
+import org.pac4j.jax.rs.filter.JaxRsCallbackUrlResolver;
 
 import com.allanbank.mongodb.MongoClient;
 import com.allanbank.mongodb.MongoDatabase;
@@ -137,6 +138,8 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         config.addMatcher("excludeUserSession", new ExcludedPathMatcher("^/user/session$"));
 
         final Clients clients = new Clients(cac);
+        // so that the callback url is properly prefixed as it should in the container
+        clients.setCallbackUrlResolver(new JaxRsCallbackUrlResolver());
         // it seems needed for it to be used by the callback filter (because it does not have a
         // client name passed as parameter)
         clients.setDefaultClient(cac);
