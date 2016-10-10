@@ -2,15 +2,13 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-// our modules
-import { CockpitRoutingModule } from './cockpit-module/cockpit-module-routing.module';
-
 // our components
 import { LoginComponent } from './login-module/login/login.component';
-
-export function routeCockpitRoutingModule() {
-  return CockpitRoutingModule;
-};
+import { CockpitComponent } from './cockpit-module/cockpit/cockpit.component';
+import { WorkspacesComponent } from './cockpit-module/workspaces-module/workspaces/workspaces.component';
+import { PetalsModuleComponent } from './cockpit-module/workspaces-module/petals-module/petals-module.component';
+import { ServiceModuleComponent } from './cockpit-module/workspaces-module/service-module/service-module.component';
+import { ApiModuleComponent } from './cockpit-module/workspaces-module/api-module/api-module.component';
 
 const routes: Routes = [
   {
@@ -19,7 +17,45 @@ const routes: Routes = [
   },
   {
     path: 'cockpit',
-    loadChildren: routeCockpitRoutingModule
+    children: [
+      {
+        path: '',
+        component: CockpitComponent,
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            redirectTo: 'workspaces'
+          },
+          {
+            path: 'workspaces',
+            children: [
+              {
+                path: '',
+                component: WorkspacesComponent
+              },
+              {
+                path: ':idWorkspace',
+                component: WorkspacesComponent,
+                pathMatch: 'full',
+              },
+              {
+                path: ':idWorkspace/petals',
+                component: PetalsModuleComponent
+              },
+              {
+                path: ':idWorkspace/service',
+                component: ServiceModuleComponent
+              },
+              {
+                path: ':idWorkspace/api',
+                component: ApiModuleComponent
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ];
 

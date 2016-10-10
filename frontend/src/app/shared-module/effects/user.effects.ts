@@ -12,7 +12,7 @@ import { Store } from '@ngrx/store';
 import { Actions, Effect, mergeEffects } from '@ngrx/effects';
 
 // our environment
-import {environment} from '../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 // our states
 import { AppState } from '../../app.state';

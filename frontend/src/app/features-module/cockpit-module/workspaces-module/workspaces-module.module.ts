@@ -7,7 +7,6 @@ import { WorkspacesComponent } from './workspaces/workspaces.component';
 
 // our modules
 import { SharedModule } from '../../../shared-module/shared-module.module';
-import { WorkspacesRoutingModule } from './workspaces-module-routing.module';
 import { PetalsModule } from './petals-module/petals-module.module';
 import { ServiceModule } from './service-module/service-module.module';
 import { ApiModule } from './api-module/api-module.module';
@@ -17,8 +16,7 @@ import { ApiModule } from './api-module/api-module.module';
     SharedModule,
     PetalsModule,
     ServiceModule,
-    ApiModule,
-    WorkspacesRoutingModule
+    ApiModule
   ],
   declarations: [
     WorkspacesModuleComponent,
