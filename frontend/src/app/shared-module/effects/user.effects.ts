@@ -8,11 +8,14 @@ import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 
 // store
-import { Store } from '@ngrx/store';
+import { Store, Action } from '@ngrx/store';
 import { Actions, Effect, mergeEffects } from '@ngrx/effects';
 
 // our environment
 import { environment } from '../../../environments/environment';
+
+// our interfaces
+import { IUser } from '../interfaces/user.interface';
 
 // our states
 import { AppState } from '../../app.state';
@@ -50,12 +53,15 @@ export class UserEffects implements OnDestroy {
   }
 
   // tslint:disable-next-line:member-ordering
-  @Effect({dispatch: true}) usr_connect$: Observable<{ type: string }> = this.actions$
+  @Effect({dispatch: true}) usr_connect$: Observable<Action> = this.actions$
     .ofType(USR_IS_CONNECTING)
     .switchMap(action => this.userService.connectUser(action.payload)
       .map((res: any) => {
+        let user: IUser = res.data;
+
         this.router.navigate(['/cockpit']);
-        return { type: USR_IS_CONNECTED, payload: res };
+
+        return { type: USR_IS_CONNECTED, payload: user };
       })
       .catch((err) => {
         if (environment.debug) {
@@ -67,7 +73,7 @@ export class UserEffects implements OnDestroy {
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({dispatch: true}) usr_disconnect$: Observable<{ type: string }> = this.actions$
+  @Effect({dispatch: true}) usr_disconnect$: Observable<Action> = this.actions$
     .ofType(USR_IS_DISCONNECTING)
     .switchMap(() => this.userService.disconnectUser()
       .map((res: Response) => {

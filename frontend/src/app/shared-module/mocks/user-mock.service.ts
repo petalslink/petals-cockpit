@@ -11,8 +11,8 @@ export class UserMockService {
   public connectUser(user: IUser) {
     return Observable.of({
       data: {
-        'username': 'user1',
-        'name': 'John User'
+        'username': user.username,
+        'name': 'Bertrand ESCUDIE'
       }
     })
     .delay(TIMEOUT);

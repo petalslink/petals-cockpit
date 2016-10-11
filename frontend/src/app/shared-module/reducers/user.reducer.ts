@@ -20,6 +20,8 @@ export function createUserReducer (userState: UserStateRecord = userStateFactory
 
     case USR_IS_CONNECTED:
       return userState
+              .setIn(['name'], action.payload.name)
+              .setIn(['username'], action.payload.username)
               .setIn(['isConnected'], true)
               .setIn(['isConnecting'], false)
               .setIn(['isDisconnecting'], false)
@@ -34,6 +36,8 @@ export function createUserReducer (userState: UserStateRecord = userStateFactory
 
     case USR_IS_DISCONNECTED:
       return userState
+              .setIn(['name'], null)
+              .setIn(['username'], null)
               .setIn(['isConnected'], false)
               .setIn(['isConnecting'], false)
               .setIn(['isDisconnecting'], false)

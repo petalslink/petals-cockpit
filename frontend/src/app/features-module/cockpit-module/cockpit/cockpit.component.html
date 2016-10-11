@@ -5,7 +5,7 @@
       <md-card id="header-sidenav">
         <img class="logo-petals" src="/assets/img/logo_petalscockpit.png">
         <md-card-title-group>
-          <p>Bertrand Escudie</p>
+          <p>{{ (user$ | async).name }}</p>
 
           <button md-icon-button [disabled]="(user$ | async).isDisconnecting" class="icon-power" (click)="disconnectUser()">
             <md-icon *ngIf="!(user$ | async).isDisconnecting">power_settings_new</md-icon>

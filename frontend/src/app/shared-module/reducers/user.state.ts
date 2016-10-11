@@ -21,6 +21,8 @@ export interface UserStateRecord extends TypedRecord<UserStateRecord>, UserState
 
 // an Immutable.js record factory for the record
 export const userStateFactory = makeTypedFactory<UserState, UserStateRecord>({
+    name: 'Bertrand ESCUDIE',
+    username: 'bescudie',
     isConnecting: false,
     isDisconnecting: false,
     isConnected: false,
