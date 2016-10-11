@@ -23,7 +23,12 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.palantir.indexpage.IndexPageBundle;
+import com.palantir.indexpage.IndexPageConfigurable;
 
 import io.dropwizard.bundles.assets.AssetsBundleConfiguration;
 import io.dropwizard.bundles.assets.AssetsConfiguration;
@@ -42,11 +47,17 @@ public class PetalsCockpitApplication extends CockpitApplication<PetalsCockpitCo
 
         super.initialize(bootstrap);
 
-        bootstrap.addBundle(new ConfiguredAssetsBundle("/assets/", "/"));
+        bootstrap.addBundle(new ConfiguredAssetsBundle(ImmutableMap.of("/frontend/", "/")));
+        // TODO this is not the best because every new prefix must be added... if not, the static asset servlet will
+        // take over instead of returning index.html
+        // Improve when https://github.com/palantir/dropwizard-index-page/issues/38 is fixed
+        bootstrap.addBundle(
+                new IndexPageBundle("frontend/index.html", ImmutableSet.of("/login", "/cockpit", "/cockpit/*")));
     }
 }
 
-class PetalsCockpitConfiguration extends CockpitConfiguration implements AssetsBundleConfiguration {
+class PetalsCockpitConfiguration extends CockpitConfiguration
+        implements AssetsBundleConfiguration, IndexPageConfigurable {
 
     @Valid
     @NotNull
@@ -56,6 +67,14 @@ class PetalsCockpitConfiguration extends CockpitConfiguration implements AssetsB
     @Override
     public AssetsConfiguration getAssetsConfiguration() {
         return assets;
+    }
+    
+    @JsonIgnore
+    @Nullable
+    @Override
+    public String getIndexPagePath() {
+        // TODO remove that when https://github.com/palantir/dropwizard-index-page/issues/37 is fixed
+        return null;
     }
 
 }

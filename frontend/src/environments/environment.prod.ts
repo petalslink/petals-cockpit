@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  mock: true,
-  urlBackend: 'http://localhost:8080/',
+  mock: false,
+  urlBackend: '/api',
   debug: false
 };
