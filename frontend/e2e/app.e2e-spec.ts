@@ -7,8 +7,8 @@ describe('petals-cockpit App', function() {
     page = new PetalsCockpitPage();
   });
 
-  it('should display message saying app works', () => {
+  it('should display message saying workspaces works', () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('app works!');
+    expect(page.getParagraphText()).toEqual('Workspaces works');
   });
 });

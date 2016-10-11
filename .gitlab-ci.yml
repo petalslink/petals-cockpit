@@ -1,7 +1,7 @@
 stages:
   - build
-  - test
   - package
+  - test
 
 variables:
   M2_STAGING_DIRECTORY: staging
@@ -71,3 +71,24 @@ build-product:
   artifacts:
     paths:
       - cockpit/target/petals-cockpit-*-capsule.jar
+
+e2e-product-tests:
+  <<: *node-6
+  stage: test
+  dependencies:
+    - build-product
+  variables:
+    DISPLAY: ":99"
+    CHROME_BIN: "/usr/bin/chromium"
+    COCKPIT: "java -Ddw.mongo.servers[0].host=mongo -jar cockpit/target/petals-cockpit-*-capsule.jar"
+  services:
+    - mongo:3
+  script:
+    - 'echo "deb http://httpredir.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/jessie-backports.list'
+    - "apt-get update"
+    - "apt-get install -y xvfb chromium openjdk-8-jre-headless"
+    - "$COCKPIT add-user -u admin -p admin -n Administrator cockpit/default.yml"
+    - "nohup $COCKPIT server cockpit/default.yml &"
+    - "nohup Xvfb :99 -ac -screen 0 1280x720x16 -nolisten tcp &"
+    - "cd frontend"
+    - "$NG e2e"
