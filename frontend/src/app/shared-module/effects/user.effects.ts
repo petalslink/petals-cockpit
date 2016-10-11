@@ -57,7 +57,11 @@ export class UserEffects implements OnDestroy {
     .ofType(USR_IS_CONNECTING)
     .switchMap(action => this.userService.connectUser(action.payload)
       .map((res: any) => {
-        let user: IUser = res.data;
+        if (!res.ok) {
+          throw new Error('Error while connecting user');
+        }
+
+        let user: IUser = res.json();
 
         this.router.navigate(['/cockpit']);
 
@@ -77,13 +81,14 @@ export class UserEffects implements OnDestroy {
     .ofType(USR_IS_DISCONNECTING)
     .switchMap(() => this.userService.disconnectUser()
       .map((res: Response) => {
-        if (res.status === 204) {
-          this.router.navigate(['/login']);
-          // TODO : clear user data once disconnected !
-          return { type: USR_IS_DISCONNECTED };
+        if (!res.ok) {
+          throw new Error('Error while disconnecting user');
         }
 
-        throw new Error('Error while disconnecting user');
+        this.router.navigate(['/login']);
+
+        // TODO : clear user data once disconnected !
+        return { type: USR_IS_DISCONNECTED };
       })
       .catch((err) => {
         if (environment.debug) {
