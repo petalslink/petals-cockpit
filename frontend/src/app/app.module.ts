@@ -4,6 +4,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { Http } from '@angular/http';
 
+// http interceptor
+import { provideInterceptorService } from 'ng2-interceptors';
+
 // environments for our app
 import { environment } from '../environments/environment';
 
@@ -27,6 +30,7 @@ import { ConfigReducer } from './shared-module/reducers/config.reducer';
 
 // our services
 import { UserService } from './shared-module/services/user.service';
+import { HttpResponseInterceptor } from './shared-module/services/http-response-interceptor.service';
 
 // our mocks
 import { UserMockService } from './shared-module/mocks/user-mock.service';
@@ -83,6 +87,10 @@ export function createTranslateLoader(http: Http) {
     MaterialModule.forRoot(),
   ],
   providers: [
+    HttpResponseInterceptor,
+    provideInterceptorService([
+      HttpResponseInterceptor
+    ]),
     UserEffects,
     {
       provide: UserService,
