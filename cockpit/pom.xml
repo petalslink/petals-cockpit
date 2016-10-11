@@ -38,6 +38,11 @@
       <artifactId>dropwizard-configurable-assets-bundle</artifactId>
       <version>1.0.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.palantir.indexpage</groupId>
+      <artifactId>dropwizard-index-page</artifactId>
+      <version>1.0.0</version>
+    </dependency>
     <!-- Code quality dependencies -->
     <dependency>
       <groupId>org.eclipse.jdt</groupId>
@@ -60,8 +65,8 @@
             </goals>
             <configuration>
               <target name="copy frontend dist to cockpit resources">
-                <copy todir="${project.build.directory}/classes/assets/">
-                  <fileset dir="${project.basedir}/../frontend/dist/"/>
+                <copy todir="${project.build.directory}/classes/frontend/">
+                  <fileset dir="${project.basedir}/../frontend/dist/" />
                 </copy>
               </target>
             </configuration>

@@ -25,7 +25,7 @@
   </parent>
 
   <artifactId>petals-cockpit-server</artifactId>
-  <packaging>takari-jar</packaging>
+  <packaging>jar</packaging>
 
   <properties>
     <cockpit.exec.command>server</cockpit.exec.command>
@@ -77,12 +77,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>io.takari.maven.plugins</groupId>
-        <artifactId>takari-lifecycle-plugin</artifactId>
-        <version>1.12.1</version>
-        <extensions>true</extensions>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <!-- Run with "mvn compile dependency:properties exec:exec" -->
