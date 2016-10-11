@@ -8,12 +8,10 @@ variables:
   M2_CACHED_REPOSITORY: m2cache
   NG: "node_modules/angular-cli/bin/ng"
 
-
-before_script:
-  - "source ci/helpers.sh"
-
 .mvn-java-8: &mvn-java-8
   image: maven:3.3-jdk-8-alpine
+  before_script:
+    - "source ci/mvn-helpers.sh"
   tags:
     - docker
   cache:
@@ -23,6 +21,13 @@ before_script:
 
 .node-6: &node-6
   image: node:6
+  before_script:
+    - "npm set -g progress=false"
+    - "cd frontend"
+    - "npm install"
+    - "printenv NG"
+    - "$NG -v"
+    - "cd .."
   tags:
     - docker
   cache:
@@ -34,7 +39,7 @@ build-backend:
   <<: *mvn-java-8
   stage: build
   script:
-    - "maven-build -pl backend -am deploy"
+    - "maven_build -pl backend -am deploy"
   artifacts:
     paths:
       - $M2_STAGING_DIRECTORY
@@ -44,9 +49,6 @@ build-frontend:
   stage: build
   script:
     - "cd frontend"
-    - "npm set progress=false"
-    - "npm install"
-    - "printenv NG"
     - "$NG build --prod"
     - "$NG lint"
     - "$NG test --watch false"
@@ -61,7 +63,7 @@ build-product:
     - build-backend
     - build-frontend
   script:
-    - "import-staging"
+    - "import_staging"
     - "maven -pl cockpit package"
   artifacts:
     paths:
