@@ -12,6 +12,11 @@ import { ApiModuleComponent } from './cockpit-module/workspaces-module/api-modul
 
 const routes: Routes = [
   {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: '/cockpit/workspaces'
+  },
+  {
     path: 'login',
     component: LoginComponent
   },
