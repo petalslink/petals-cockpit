@@ -1,16 +1,15 @@
 # configuration for dropwizard
 ---
 server:
-  type: simple
-  # the backend will be served via /api
+  # the backend will be served via /api on 8080
   rootPath: /api
-  # the frontend will be served via /
+  # the frontend will be served via / on 8080
   applicationContextPath: /
-  # the admin console is served via /admin (note: do not do this in production)
-  adminContextPath: /admin
-  connector:
-    type: http
-    port: 8080
+  # the admin console is served via / on 8082
+  adminContextPath: /
+  adminConnectors:
+    - type: http
+      port: 8082
 
 # configuration to connect to mongo
 mongo:
