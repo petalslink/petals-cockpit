@@ -1,7 +1,7 @@
 // angular modules
 import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { Http, Response } from '@angular/http';
+import { Response } from '@angular/http';
 
 // rxjs
 import { Subscription } from 'rxjs/Subscription';
@@ -40,7 +40,6 @@ export class UserEffects implements OnDestroy {
 
   constructor(
     private router: Router,
-    private http: Http,
     private actions$: Actions,
     private store$: Store<AppState>,
     private userService: UserService
