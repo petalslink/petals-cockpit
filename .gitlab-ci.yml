@@ -12,6 +12,9 @@ variables:
   image: maven:3.3-jdk-8-alpine
   before_script:
     - "source ci/mvn-helpers.sh"
+  after_script:
+    - "source ci/mvn-helpers.sh"
+    - "maven ch.ringler.tools:m2cachecleanup:1.0.4:cleanup-cache"
   tags:
     - docker
   cache:
