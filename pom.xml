@@ -334,15 +334,4 @@
       </build>
     </profile>
   </profiles>
-
-  <repositories>
-    <repository>
-      <releases>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <id>allanbank</id>
-      <name>Allanbank Releases</name>
-      <url>http://www.allanbank.com/repo/</url>
-    </repository>
-  </repositories>
 </project>
