@@ -1,3 +1,45 @@
-<p>
-  petals-component-content works!
-</p>
+<md-toolbar color="primary">
+  <span>
+    Petals
+  </span>
+
+  <span class="flex-space"></span>
+
+  <app-toggle-theme></app-toggle-theme>
+
+  <button md-icon-button [md-menu-trigger-for]="menu">
+    <md-icon>more_vert</md-icon>
+  </button>
+
+  <md-menu x-position="before" #menu="mdMenu">
+    <button md-menu-item>
+      Overview
+    </button>
+    <button md-menu-item>
+      Operation
+    </button>
+    <button md-menu-item>
+      Config
+    </button>
+    <button md-menu-item>
+      Flow
+    </button>
+    <button md-menu-item>
+      Monitor
+    </button>
+    <button md-menu-item>
+      Log
+    </button>
+    <button md-menu-item>
+      User
+    </button>
+  </md-menu>
+</md-toolbar>
+
+<md-card class="central-content">
+  <md-card-content>
+    <md-card-title align="center">
+      Petals component content works
+    </md-card-title>
+  </md-card-content>
+</md-card>
