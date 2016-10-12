@@ -1,19 +1,20 @@
 stages:
   - build
-  - test
   - package
+  - test
 
 variables:
   M2_STAGING_DIRECTORY: staging
   M2_CACHED_REPOSITORY: m2cache
   NG: "node_modules/angular-cli/bin/ng"
 
-
-before_script:
-  - "source ci/helpers.sh"
-
 .mvn-java-8: &mvn-java-8
   image: maven:3.3-jdk-8-alpine
+  before_script:
+    - "source ci/mvn-helpers.sh"
+  after_script:
+    - "source ci/mvn-helpers.sh"
+    - "maven ch.ringler.tools:m2cachecleanup:1.0.4:cleanup-cache"
   tags:
     - docker
   cache:
@@ -23,6 +24,13 @@ before_script:
 
 .node-6: &node-6
   image: node:6
+  before_script:
+    - "npm set -g progress=false"
+    - "cd frontend"
+    - "npm install"
+    - "printenv NG"
+    - "$NG -v"
+    - "cd .."
   tags:
     - docker
   cache:
@@ -34,7 +42,7 @@ build-backend:
   <<: *mvn-java-8
   stage: build
   script:
-    - "maven-build -pl backend -am deploy"
+    - "maven_build -pl backend -am deploy"
   artifacts:
     paths:
       - $M2_STAGING_DIRECTORY
@@ -44,9 +52,6 @@ build-frontend:
   stage: build
   script:
     - "cd frontend"
-    - "npm set progress=false"
-    - "npm install"
-    - "printenv NG"
     - "$NG build --prod"
     - "$NG lint"
     - "$NG test --watch false"
@@ -61,8 +66,29 @@ build-product:
     - build-backend
     - build-frontend
   script:
-    - "import-staging"
+    - "import_staging"
     - "maven -pl cockpit package"
   artifacts:
     paths:
       - cockpit/target/petals-cockpit-*-capsule.jar
+
+e2e-product-tests:
+  <<: *node-6
+  stage: test
+  dependencies:
+    - build-product
+  variables:
+    DISPLAY: ":99"
+    CHROME_BIN: "/usr/bin/chromium"
+    COCKPIT: "java -Ddw.mongo.servers[0].host=mongo -jar cockpit/target/petals-cockpit-*-capsule.jar"
+  services:
+    - mongo:3
+  script:
+    - 'echo "deb http://httpredir.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/jessie-backports.list'
+    - "apt-get update"
+    - "apt-get install -y xvfb chromium openjdk-8-jre-headless"
+    - "$COCKPIT add-user -u admin -p admin -n Administrator cockpit/default.yml"
+    - "nohup $COCKPIT server cockpit/default.yml &"
+    - "nohup Xvfb :99 -ac -screen 0 1280x720x16 -nolisten tcp &"
+    - "cd frontend"
+    - "$NG e2e"
