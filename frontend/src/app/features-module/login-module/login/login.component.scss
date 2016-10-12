@@ -43,6 +43,12 @@ md-card-content > * {
 .logo-petals-auth {
   max-width: 70px;
 }
+md-toolbar {
+  img {
+    padding-right: 30px;
+  }
+}
+
 @media screen and (max-width: 600px)
 {
   .background-auth {

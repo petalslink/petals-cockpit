@@ -1,5 +1,18 @@
+// angular modules
 import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+
+// ngrx
+import { Store } from '@ngrx/store';
+
+// rxjs
+import { Observable } from 'rxjs';
+
+// our interfaces
 import { IContainer } from '../../../../../../shared-module/interfaces/petals.interface';
+
+// our states
+import { AppState } from '../../../../../../app.state';
+import { WorkspacesState, WorkspacesStateRecord } from '../../../../../../shared-module/reducers/workspaces.state';
 
 @Component({
   selector: 'app-containers-menu',
@@ -8,7 +21,13 @@ import { IContainer } from '../../../../../../shared-module/interfaces/petals.in
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContainersMenuComponent {
-  @Input() containers: Array<IContainer>;
+  private workspaces$: Observable<WorkspacesState>;
 
-  constructor() { }
+  @Input() containers: Array<IContainer>;
+  @Input() idWorkspace: number;
+  @Input() idBus: number;
+
+  constructor(private store: Store<AppState>) {
+    this.workspaces$ = <Observable<WorkspacesStateRecord>>store.select('workspaces');
+  }
 }

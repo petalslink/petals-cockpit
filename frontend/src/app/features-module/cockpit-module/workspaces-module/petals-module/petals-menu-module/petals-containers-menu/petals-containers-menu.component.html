@@ -1,5 +1,11 @@
 <md-nav-list class="containers-menu-component" *ngFor="let container of containers">
-  <a md-list-item class="container">{{container.name}}</a>
 
-  <app-components-menu [components]="container.components"></app-components-menu>
+  <a md-list-item
+     [routerLink]="['/', 'cockpit',
+       'workspaces', idWorkspace,
+       'petals', 'bus', idBus,
+       'container', container.id]"
+     class="container">{{container.name}}</a>
+
+  <app-components-menu [components]="container.components" [idWorkspace]="idWorkspace" [idBus]="idBus" [idContainer]="container.id"></app-components-menu>
 </md-nav-list>

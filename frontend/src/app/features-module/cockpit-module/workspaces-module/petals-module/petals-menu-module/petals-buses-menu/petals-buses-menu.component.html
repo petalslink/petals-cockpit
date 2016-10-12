@@ -1,7 +1,9 @@
 <md-nav-list dense *ngFor="let bus of buses; let last=last">
-  <a md-list-item class="bus">{{bus.name}}</a>
+  <a md-list-item
+     [routerLink]="['/', 'cockpit', 'workspaces', idWorkspace, 'petals', 'bus', bus.id]"
+     class="bus">{{bus.name}}</a>
 
-  <app-containers-menu [containers]="bus.containers"></app-containers-menu>
+  <app-containers-menu [containers]="bus.containers" [idWorkspace]="idWorkspace" [idBus]="bus.id"></app-containers-menu>
 
   <md-divider *ngIf="!last"></md-divider>
 </md-nav-list>

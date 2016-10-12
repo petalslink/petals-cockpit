@@ -7,6 +7,7 @@
 
   <app-buses-menu
     *ngIf="(workspaces$ | async).selectedWorkspaceId"
+    [idWorkspace]="(workspaces$ | async).selectedWorkspaceId"
     [buses]="(workspaces$ | async).workspaces[(workspaces$ | async).selectedWorkspaceId].buses">
   </app-buses-menu>
 </div>

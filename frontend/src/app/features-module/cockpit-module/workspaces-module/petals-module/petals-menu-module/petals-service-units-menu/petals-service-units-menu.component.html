@@ -1,3 +1,7 @@
 <md-nav-list class="service-units-menu-component" *ngFor="let serviceUnit of serviceUnits">
-  <a md-list-item class="service-unit">{{serviceUnit.name}}</a>
+
+  <a md-list-item
+     [routerLink]="generateLink(serviceUnit.id)"
+     class="service-unit">{{serviceUnit.name}}</a>
+
 </md-nav-list>
