@@ -67,7 +67,7 @@ const routes: Routes = [
                 component: PetalsComponentContentComponent
               },
               {
-                path: `:idWorkspace/petals/bus/:idBus/container/:idContainer/component/:idComponent/serviceUnit/:idServiceUnit`,
+                path: ':idWorkspace/petals/bus/:idBus/container/:idContainer/component/:idComponent/serviceUnit/:idServiceUnit',
                 component: PetalsServiceUnitContentComponent
               },
               {

@@ -21,7 +21,11 @@
         [routerLink]="['workspaces', selectedWorkspaceId]"
       >Change workspace</button>
 
-      <md-tab-group #tabGroup (selectChange)="openTab(tabGroup.selectedIndex)" *ngIf="selectedWorkspaceId">
+      <md-tab-group
+        #tabGroup
+        [selectedIndex]="tabSelectedIndex"
+        (selectChange)="openTab(tabGroup.selectedIndex)"
+        *ngIf="selectedWorkspaceId && tabSelectedIndex !== -1">
         <md-tab>
           <template md-tab-label>Petals</template>
           <template md-tab-content>
