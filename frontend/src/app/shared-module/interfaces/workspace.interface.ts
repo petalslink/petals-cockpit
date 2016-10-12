@@ -7,6 +7,7 @@ export interface IWorkspace extends Map<any, any> {
   id: number;
   name: string;
   buses: List<IBus>;
+  selectedBusId: number;
 }
 
 export interface IWorkspaces {

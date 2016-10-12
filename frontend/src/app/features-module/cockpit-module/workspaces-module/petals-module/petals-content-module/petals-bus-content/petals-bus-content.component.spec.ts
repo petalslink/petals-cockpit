@@ -1,11 +1,11 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed, async } from '@angular/core/testing';
-import { BusesMenuComponent } from './petals-buses-menu.component';
+import { PetalsBusContentComponent } from './petals-bus-content.component';
 
-describe('Component: BusesMenu', () => {
+describe('Component: PetalsBusContent', () => {
   // it('should create an instance', () => {
-  //   let component = new BusesMenuComponent();
+  //   let component = new PetalsBusContentComponent();
   //   expect(component).toBeTruthy();
   // });
 });

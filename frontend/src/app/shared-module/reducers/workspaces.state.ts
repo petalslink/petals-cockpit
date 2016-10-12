@@ -25,42 +25,69 @@ export interface WorkspacesStateRecord extends TypedRecord<WorkspacesStateRecord
 // TODO : Remove this and fetch it from server
 const busesWs1: List<IBus> = fromJS([
   {
-    name: 'Bus 1',
+    id: 0,
+    name: 'Bus 0',
     containers: [
       {
-        name: 'Container 1',
+        id: 0,
+        name: 'Container 0',
         components: [
           {
-            name: 'Component 1',
+            id: 0,
+            name: 'Component 0',
             serviceUnits: [
-              {name: 'SU 1'},
-              {name: 'SU 2'}
+              {
+                id: 0,
+                name: 'SU 0'
+              },
+              {
+                id: 1,
+                name: 'SU 1'
+              }
             ]
           },
           {
-            name: 'Component 2',
+            id: 1,
+            name: 'Component 1',
             serviceUnits: [
-              {name: 'SU 3'},
-              {name: 'SU 4'},
-              {name: 'SU 5'}
+              {
+                id: 2,
+                name: 'SU 2'
+              },
+              {
+                id: 3,
+                name: 'SU 3'
+              }
             ]
           }
         ]
       },
       {
-        name: 'Container 2',
+        id: 1,
+        name: 'Container 1',
         components: [
           {
-            name: 'Component 3',
+            id: 2,
+            name: 'Component 2',
             serviceUnits: [
-              {name: 'SU 6'}
+              {
+                id: 4,
+                name: 'SU 4'
+              }
             ]
           },
           {
-            name: 'Component 4',
+            id: 3,
+            name: 'Component 3',
             serviceUnits: [
-              {name: 'SU 7'},
-              {name: 'SU 8'}
+              {
+                id: 5,
+                name: 'SU 5'
+              },
+              {
+                id: 6,
+                name: 'SU 6'
+              }
             ]
           }
         ]
@@ -71,40 +98,65 @@ const busesWs1: List<IBus> = fromJS([
 
 const busesWs2: List<IBus> = fromJS([
   {
-    name: 'Bus 2',
+    id: 1,
+    name: 'Bus 1',
     containers: [
       {
-        name: 'Container 3',
+        id: 2,
+        name: 'Container 2',
         components: [
           {
-            name: 'Component 5',
+            id: 4,
+            name: 'Component 4',
             serviceUnits: [
-              {name: 'SU 9'}
+              {
+                id: 7,
+                name: 'SU 7'
+              }
             ]
           },
           {
-            name: 'Component 6',
+            id: 5,
+            name: 'Component 5',
             serviceUnits: [
-              {name: 'SU 10'},
-              {name: 'SU 11'}
+              {
+                id: 8,
+                name: 'SU 8'
+              },
+              {
+                id: 9,
+                name: 'SU 9'
+              }
             ]
           }
         ]
       },
       {
-        name: 'Container 4',
+        id: 3,
+        name: 'Container 3',
         components: [
           {
-            name: 'Component 7',
+            id: 6,
+            name: 'Component 6',
             serviceUnits: [
-              {name: 'SU 12'}
+              {
+                id: 10,
+                name: 'SU 10'
+              }
             ]
           },
           {
-            name: 'Component 8',
+            id: 7,
+            name: 'Component 7',
             serviceUnits: [
-              {name: 'SU 13'},
-              {name: 'SU 14'}
+              {
+                id: 11,
+                name: 'SU 11'
+              },
+              {
+                id: 12,
+                name: 'SU 12'
+              }
             ]
           }
         ]
