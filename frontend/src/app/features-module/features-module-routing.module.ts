@@ -18,6 +18,7 @@ import { PetalsServiceUnitContentComponent } from './cockpit-module/workspaces-m
 
 // our guards
 import { AuthGuardService } from '../shared-module/services/auth-guard.service';
+import { AlreadyLoggedGuardService } from '../shared-module/services/already-logged-guard.service';
 
 const routes: Routes = [
   {
@@ -27,6 +28,7 @@ const routes: Routes = [
   },
   {
     path: 'login',
+    canActivate: [AlreadyLoggedGuardService],
     component: LoginComponent
   },
   {

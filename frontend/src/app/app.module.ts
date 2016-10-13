@@ -34,6 +34,7 @@ import { HttpResponseInterceptor } from './shared-module/services/http-response-
 
 // our guards
 import { AuthGuardService } from './shared-module/services/auth-guard.service';
+import { AlreadyLoggedGuardService } from './shared-module/services/already-logged-guard.service';
 
 // our mocks
 import { UserMockService } from './shared-module/mocks/user-mock.service';
@@ -101,6 +102,7 @@ export function createTranslateLoader(http: Http) {
 
     // guards
     AuthGuardService,
+    AlreadyLoggedGuardService,
 
     // services
     {

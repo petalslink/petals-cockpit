@@ -11,26 +11,41 @@ import { IUser } from '../interfaces/user.interface';
 // const to mock response time
 const TIMEOUT = 500;
 
+const adminUser = {
+  'username': 'admin',
+  'name': 'Administrator'
+};
+
 @Injectable()
 export class UserMockService {
+  private userIsConnected: boolean = true;
+
   constructor() { }
 
   public connectUser(user: IUser) {
-    let response: Response = <Response>{
-      ok: true,
-      json: function () {
-        return JSON.stringify({
-          'username': user.username,
-          'name': 'Bertrand ESCUDIE'
-        });
-      }
-    };
+    let response: Response;
+
+    // if user's already logged OR if user's informations are wrong
+    if (this.userIsConnected || (user.username !== 'admin' || user.password !== 'admin')) {
+      response = <Response>{ ok: false };
+    } else {
+      this.userIsConnected = true;
+
+      response = <Response>{
+        ok: true,
+        json: function () {
+          return JSON.stringify(adminUser);
+        }
+      };
+    }
 
     return Observable.of(response)
       .delay(TIMEOUT);
   }
 
   public disconnectUser() {
+    this.userIsConnected = false;
+
     let response: Response = <Response>{
       ok: true
     };
@@ -40,15 +55,18 @@ export class UserMockService {
   }
 
   public getUserInformations() {
-    let response: Response = <Response>{
-      ok: true,
-      json: function () {
-        return JSON.stringify({
-          'username': 'B-Escudie',
-          'name': 'Bertrand ESCUDIE'
-        });
-      }
-    };
+    let response: Response;
+
+    if (this.userIsConnected) {
+      response = <Response>{
+        ok: true,
+        json: function () {
+          return JSON.stringify(adminUser);
+        }
+      };
+    } else {
+      response = <Response>{ ok: false };
+    }
 
     return Observable.of(response)
       .delay(TIMEOUT);
