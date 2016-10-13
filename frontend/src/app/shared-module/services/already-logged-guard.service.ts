@@ -17,22 +17,28 @@ export class AlreadyLoggedGuardService implements CanActivate {
   constructor(private user: UserService, private router: Router) { }
 
   canActivate() {
-    return this.user.getUserInformations()
+    return this.user.getUserInformations(true)
       .map((res: Response) => {
         // if already logged
-        if (!res.ok) {
-          return true;
+        if (res.ok) {
+          this.router.navigate(['/cockpit']);
+          return false;
         }
 
-        throw new Error(`Already connected, can't access login page again`);
+        // when using mocked services, http 401 are not catched
+        // so return true as if we were catching the error
+        return true;
       })
       .catch((err) => {
         if (environment.debug) {
           console.error(err);
         }
 
-        this.router.navigate(['/cockpit']);
-        return Observable.of(true);
+        // 401 --> unauthorized
+        if (err.status === 401) {
+          // user is not logged
+          return Observable.of(true);
+        }
       });
   }
 }
