@@ -1,14 +1,40 @@
 import { PetalsCockpitPage } from './app.po';
+import { browser } from 'protractor';
 
 describe('petals-cockpit App', function() {
-  let page: PetalsCockpitPage;
+  let p: PetalsCockpitPage;
 
   beforeEach(() => {
-    page = new PetalsCockpitPage();
+    p = new PetalsCockpitPage();
   });
 
-  it('should display message saying workspaces works', () => {
-    page.navigateTo();
-    expect(page.getParagraphText()).toEqual('Workspaces works');
+  it('should be redirected to login if a user is trying to access a protected route without being logged', () => {
+    p.navigateTo('/cockpit');
+
+    expect(browser.getCurrentUrl()).toMatch('/login');
+  });
+
+  it('should not login if user/pwd not match', () => {
+    p.navigateTo('/login');
+
+    expect(p.getText('.page-login button')).toMatch('Log in');
+
+    p.fillInput('md-input input[name="username"]', 'admin');
+    p.fillInput('md-input input[name="password"]', 'randomPasswordNotWorking');
+
+    p.click('.page-login button');
+
+    expect(browser.getCurrentUrl()).toMatch('/login');
+  });
+
+  it('should login if user/pwd match', () => {
+    p.navigateTo('/login');
+
+    p.fillInput('md-input input[name="username"]', 'admin');
+    p.fillInput('md-input input[name="password"]', 'admin');
+
+    p.click('.page-login button');
+
+    expect(browser.getCurrentUrl()).toMatch('/cockpit/workspaces');
   });
 });
