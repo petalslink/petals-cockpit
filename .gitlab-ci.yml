@@ -80,7 +80,7 @@ e2e-product-tests:
   variables:
     DISPLAY: ":99"
     CHROME_BIN: "/usr/bin/chromium"
-    COCKPIT: "java -Ddw.mongo.servers[0].host=mongo -jar cockpit/target/petals-cockpit-*-capsule.jar"
+    COCKPIT: "java -Ddw.mongo.servers[0].host=mongo -Ddw.server.applicationConnectors[0].port=4200 -jar cockpit/target/petals-cockpit-*-capsule.jar"
   services:
     - mongo:3
   script:
