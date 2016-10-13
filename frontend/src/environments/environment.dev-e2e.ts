@@ -10,5 +10,5 @@ export const environment = {
   debug: true,
   // auto log user or not
   // useful for dev env to avoid being redirected to /login every time the page is reloaded
-  alreadyConnected: true
+  alreadyConnected: false
 };

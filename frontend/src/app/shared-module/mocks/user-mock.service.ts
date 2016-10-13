@@ -5,6 +5,9 @@ import { Response } from '@angular/http';
 // rxjs
 import { Observable } from 'rxjs/Observable';
 
+// our environment
+import { environment } from '../../../environments/environment';
+
 // our interfaces
 import { IUser } from '../interfaces/user.interface';
 
@@ -18,7 +21,7 @@ const adminUser = {
 
 @Injectable()
 export class UserMockService {
-  private userIsConnected: boolean = true;
+  private userIsConnected: boolean = environment.alreadyConnected;
 
   constructor() { }
 
