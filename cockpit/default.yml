@@ -5,7 +5,10 @@ server:
   rootPath: /api
   # the frontend will be served via / on 8080
   applicationContextPath: /
-  # the admin console is served via / on 8082
+  applicationconnectors:
+    - type: http
+      port: 8080
+  # the admin console will be served via / on 8082
   adminContextPath: /
   adminConnectors:
     - type: http
