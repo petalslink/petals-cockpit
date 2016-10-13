@@ -35,7 +35,7 @@ export class UserService {
   // if we can access this route but we have a 401 so we get redirected again and again
   // pass true as angularHttpService parameter to use the real angular http service FROM THE GUARD ONLY
   // otherwise to get getUserInformations just call the function without passing any argument
-  public getUserInformations(angularHttpService: boolean = false) {
+  public getUserInformations(angularHttpService = false) {
     let httpService: Http;
 
     httpService = this.http;
