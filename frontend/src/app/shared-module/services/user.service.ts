@@ -27,4 +27,9 @@ export class UserService {
     return this.http
       .delete(`${environment.urlBackend}/user/session`, {});
   }
+
+  public getUserInformations() {
+    return this.http
+      .get(`${environment.urlBackend}/user/session`);
+  }
 }

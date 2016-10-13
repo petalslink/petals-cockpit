@@ -1,11 +1,20 @@
 import { browser, element, by } from 'protractor';
 
 export class PetalsCockpitPage {
-  navigateTo() {
-    return browser.get('/');
+  navigateTo(url: string = '/') {
+    return browser.get(url);
   }
 
-  getParagraphText() {
-    return element(by.css('md-card-title')).getText();
+  getText(cssSelector: string) {
+    return element(by.css(cssSelector)).getText();
+  }
+
+  click(cssSelector: string) {
+    element(by.css(cssSelector)).click();
+  }
+
+  fillInput(cssSelector: string, text: string) {
+    element(by.css(cssSelector)).clear();
+    element(by.css(cssSelector)).sendKeys(text);
   }
 }

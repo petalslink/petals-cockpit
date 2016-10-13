@@ -27,7 +27,7 @@ export class UserMockService {
     };
 
     return Observable.of(response)
-    .delay(TIMEOUT);
+      .delay(TIMEOUT);
   }
 
   public disconnectUser() {
@@ -36,6 +36,21 @@ export class UserMockService {
     };
 
     return Observable.of(response)
-    .delay(TIMEOUT);
+      .delay(TIMEOUT);
+  }
+
+  public getUserInformations() {
+    let response: Response = <Response>{
+      ok: true,
+      json: function () {
+        return JSON.stringify({
+          'username': 'B-Escudie',
+          'name': 'Bertrand ESCUDIE'
+        });
+      }
+    };
+
+    return Observable.of(response)
+      .delay(TIMEOUT);
   }
 }
