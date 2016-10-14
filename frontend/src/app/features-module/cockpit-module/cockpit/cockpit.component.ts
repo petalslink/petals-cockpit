@@ -16,7 +16,7 @@ import { WorkspacesState, WorkspacesStateRecord } from '../../../shared-module/r
 
 // our actions
 import { USR_IS_DISCONNECTING } from '../../../shared-module/reducers/user.reducer';
-import { CHANGE_SELECTED_WORKSPACE } from '../../../shared-module/reducers/workspaces.reducer';
+import { CHANGE_SELECTED_WORKSPACE, FETCHING_WORKSPACES } from '../../../shared-module/reducers/workspaces.reducer';
 
 @Component({
   selector: 'app-petals-cockpit',
@@ -55,6 +55,9 @@ export class CockpitComponent implements OnInit {
   }
 
   ngOnInit() {
+    // fetch workspaces once logged
+    this.store.dispatch({ type: FETCHING_WORKSPACES });
+
     this.user$ = <Observable<UserState>>this.store.select('user');
     this.config$ = <Observable<ConfigState>>this.store.select('config');
     this.workspaces$ = <Observable<WorkspacesStateRecord>>this.store.select('workspaces');

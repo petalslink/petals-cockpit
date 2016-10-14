@@ -25,7 +25,11 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
   private workspaces$: Observable<WorkspacesState>;
   private selectedWorkspaceId: number;
 
-  constructor(private store: Store<AppState>, private router: Router, private route: ActivatedRoute) {
+  constructor(
+    private store: Store<AppState>,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     this.workspaces$ = <Observable<WorkspacesState>>store.select('workspaces')
       .map((workspaces: WorkspacesStateRecord) => workspaces.toJS());
   }

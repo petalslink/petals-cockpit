@@ -52,7 +52,7 @@ export class UserEffects implements OnDestroy {
   }
 
   // tslint:disable-next-line:member-ordering
-  @Effect({dispatch: true}) usr_connect$: Observable<Action> = this.actions$
+  @Effect({dispatch: true}) usrConnect$: Observable<Action> = this.actions$
     .ofType(USR_IS_CONNECTING)
     .switchMap(action => this.userService.connectUser(action.payload)
       .map((res: any) => {
@@ -76,7 +76,7 @@ export class UserEffects implements OnDestroy {
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({dispatch: true}) usr_disconnect$: Observable<Action> = this.actions$
+  @Effect({dispatch: true}) usrDisconnect$: Observable<Action> = this.actions$
     .ofType(USR_IS_DISCONNECTING)
     .switchMap(() => this.userService.disconnectUser()
       .map((res: Response) => {

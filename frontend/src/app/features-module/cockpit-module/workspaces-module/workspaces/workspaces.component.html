@@ -42,7 +42,11 @@
       Workspaces works
     </md-card-title>
 
-    <select [(ngModel)]="selectedWorkspaceId" (ngModelChange)="selectWorkspace(selectedWorkspaceId)">
+    <select
+      *ngIf="(workspaces$ | async).workspaces"
+      [(ngModel)]="selectedWorkspaceId"
+      (ngModelChange)="selectWorkspace(selectedWorkspaceId)"
+    >
       <option [value]="workspace.id" *ngFor="let workspace of (workspaces$ | async).workspaces">{{ workspace.name }}</option>
     </select>
   </md-card-content>
