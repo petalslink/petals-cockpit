@@ -8,6 +8,7 @@
       "root": "src",
       "outDir": "dist",
       "assets": "assets",
+      "mocks-json": "mocks-json",
       "index": "index.html",
       "main": "main.ts",
       "test": "test.ts",
