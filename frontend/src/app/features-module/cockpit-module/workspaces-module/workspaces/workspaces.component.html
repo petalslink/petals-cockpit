@@ -37,9 +37,14 @@
 </md-toolbar>
 
 <md-card class="central-content">
-  <md-card-content>
-    <md-card-title align="center">Workspaces</md-card-title>
+   <md-card-header>
+      <md-card-title>Workspaces</md-card-title>
+      <md-card-subtitle>Select the workspace you want to work with</md-card-subtitle>
+   </md-card-header>
 
+  <img md-card-image src="/assets/img/workspace.png">
+
+  <md-card-content>
     <md-nav-list *ngIf="(workspaces$ | async).workspaces">
       <md-list-item
         *ngFor="let workspace of (workspaces$ | async).workspaces"
