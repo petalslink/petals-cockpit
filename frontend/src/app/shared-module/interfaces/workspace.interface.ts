@@ -6,6 +6,7 @@ import { IBus } from './petals.interface';
 export interface IWorkspace extends Map<any, any> {
   id: number;
   name: string;
+  usedBy: string;
   buses: List<IBus>;
   selectedBusId: number;
 }

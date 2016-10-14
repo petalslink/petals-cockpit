@@ -2,6 +2,7 @@
   {
     "id": 0,
     "name": "Workspace 0",
+    "usedBy": "You're the only one to use this workspace",
     "buses": [
       {
         "id": 0,
@@ -78,6 +79,7 @@
   {
     "id": 1,
     "name": "Workspace 1",
+    "usedBy": "Workspace also used by Victor NOEL, Christophe CHEVALIER and Maxime ROBERT",
     "buses": [
       {
         "id": 1,
