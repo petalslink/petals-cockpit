@@ -1,5 +1,5 @@
 // angular modules
-import { Component, ChangeDetectionStrategy, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
 // rxjs
@@ -21,8 +21,7 @@ import { CHANGE_SELECTED_WORKSPACE, FETCHING_WORKSPACES } from '../../../shared-
 @Component({
   selector: 'app-petals-cockpit',
   templateUrl: 'cockpit.component.html',
-  styleUrls: ['cockpit.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['cockpit.component.scss']
 })
 export class CockpitComponent implements OnInit {
   private user$: Observable<UserState>;

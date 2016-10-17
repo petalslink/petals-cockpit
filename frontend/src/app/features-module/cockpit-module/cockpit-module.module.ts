@@ -11,6 +11,7 @@ import { PetalsMenuModule } from './workspaces-module/petals-module/petals-menu-
 import { CockpitComponent } from './cockpit/cockpit.component';
 import { ServiceMenuModule } from './workspaces-module/service-module/service-menu-module/service-menu-module.module';
 import { ApiMenuModule } from './workspaces-module/api-module/api-menu-module/api-menu-module.module';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
   imports: [
@@ -22,11 +23,13 @@ import { ApiMenuModule } from './workspaces-module/api-module/api-menu-module/ap
   ],
   declarations: [
     CockpitModuleComponent,
-    CockpitComponent
+    CockpitComponent,
+    SettingsComponent
   ],
   exports: [
     CockpitModuleComponent,
-    CockpitComponent
+    CockpitComponent,
+    SettingsComponent
   ]
 })
 export class CockpitModule { }
