@@ -34,7 +34,7 @@ export class UserMockService {
       response = <Response>{
         ok: true,
         json: function () {
-          return JSON.stringify(adminUser);
+          return adminUser;
         }
       };
     }
@@ -63,7 +63,7 @@ export class UserMockService {
       response = <Response>{
         ok: true,
         json: function () {
-          return JSON.stringify(adminUser);
+          return adminUser;
         }
       };
     } else {
