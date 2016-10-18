@@ -65,15 +65,23 @@ body {
 .searched {
   background-color: md-color($accent);
 }
+
+/* Petals Components Overview, Config */
+
 .list-subheader {
   color: rgba(0, 0, 0, 0.54);
 }
 
 .list-row {
-/*  display:flex;*/
   flex-wrap: wrap;
-  justify-content: space-between ;
-  align-items : center ;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .list-title {
@@ -88,7 +96,14 @@ body {
     color: #AFAFAF;
     margin-top: 5px;
   }
+  .custom-divider-config {
+    margin: 20px !important;
+    border-style: solid;
+  }
   .md-list-item {
     height: 40px !important;
+  }
+  md-input {
+    width: 350px;
   }
 }

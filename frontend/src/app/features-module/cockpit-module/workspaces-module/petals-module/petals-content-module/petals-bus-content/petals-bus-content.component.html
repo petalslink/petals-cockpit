@@ -243,13 +243,6 @@
                   <span class="list-subheader">org.ow2.petals.microkernel.registry.overlay.RegistryOverlayImpl</span>
                 </p>
               </md-list-item>
-
-              <md-list-item>
-                <h4 md-line>Registry_configuration</h4>
-                <p md-line>
-                  <span class="list-subheader">static</span>
-                </p>
-              </md-list-item>
             </div>
 
             <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry > Configuration</h3>
@@ -270,7 +263,8 @@
               </md-list-item>
             </div>
 
-            <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry > Configuration > Overlay Members</h3>
+            <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry > Configuration >
+              Overlay Members</h3>
 
             <!-- Example Overlay Members 1-->
             <div class="list-row">
@@ -319,11 +313,98 @@
     <template md-tab-label>Config</template>
     <template md-tab-content>
 
-      <md-card class="central-content">
+      <md-card class="central-content list-element">
         <md-card-content>
           <md-card-title align="center">
-            Petals bus config
+            Petals Bus Config
           </md-card-title>
+
+          <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
+
+          <div class="input-row">
+            <md-input placeholder="Title" data-value="Bus 1" dividerColor="primary"></md-input>
+            <md-input placeholder="State" data-value="UNDEPLOYED" dividerColor="primary"></md-input>
+          </div>
+
+          <h3 md-subheader align="start" class="color-primary list-title">Component Type</h3>
+
+          <div class="input-row">
+            <md-input placeholder="Name" data-value="BUS" dividerColor="primary"></md-input>
+            <md-input placeholder="Version" data-value="5-0" dividerColor="primary"></md-input>
+          </div>
+
+          <h3 md-subheader align="start" class="color-primary list-title">Topology > Domain</h3>
+
+          <div class="input-row">
+            <md-input placeholder="Name" data-value="domain_0" dividerColor="primary"></md-input>
+            <md-input placeholder="Mode" data-value="static" dividerColor="primary"></md-input>
+            <md-input placeholder="Description" data-value="A sample dommain configuration"
+                      dividerColor="primary"></md-input>
+          </div>
+
+          <h3 md-subheader align="start" class="color-primary list-title">Topology > Containers</h3>
+
+          <div class="input-row">
+            <md-input placeholder="Id" data-value="2" dividerColor="primary"></md-input>
+            <md-input placeholder="Name" data-value="Container 2" dividerColor="primary"></md-input>
+            <md-input placeholder="Description" data-value="Description of the container 2"
+                      dividerColor="primary"></md-input>
+            <md-input placeholder="Host" data-value="192.18.1.002" dividerColor="primary"></md-input>
+            <md-input placeholder="User" data-value="petals" dividerColor="primary"></md-input>
+            <md-input placeholder="Password" data-type="password" data-value="petals"
+                      dividerColor="primary"></md-input>
+            <md-input placeholder="Jmx_port" data-value="7701" dividerColor="primary"></md-input>
+            <md-input placeholder="Transport_port" data-value="7801" dividerColor="primary"></md-input>
+          </div>
+
+          <md-divider class="color-accent custom-divider-config"></md-divider>
+
+          <div class="input-row">
+            <md-input placeholder="Id" data-value="3" dividerColor="primary"></md-input>
+            <md-input placeholder="Name" data-value="Container 3" dividerColor="primary"></md-input>
+            <md-input placeholder="Description" data-value="Description of the container 3"
+                      dividerColor="primary"></md-input>
+            <md-input placeholder="Host" data-value="192.18.1.003" dividerColor="primary"></md-input>
+            <md-input placeholder="User" data-value="petals" dividerColor="primary"></md-input>
+            <md-input placeholder="Password" data-type="password" data-value="petals"
+                      dividerColor="primary"></md-input>
+            <md-input placeholder="Jmx_port" data-value="7701" dividerColor="primary"></md-input>
+            <md-input placeholder="Transport_port" data-value="7801" dividerColor="primary"></md-input>
+          </div>
+
+          <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry</h3>
+
+          <div class="input-row">
+            <md-input placeholder="Registry_implementation"
+                      data-value="org.ow2.petals.microkernel.registry.overlay.RegistryOverlayImpl"
+                      dividerColor="primary">
+            </md-input>
+          </div>
+
+          <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry > Configuration</h3>
+
+          <div class="input-row">
+            <md-input placeholder="Group_name" data-value="default-sample" dividerColor="primary"></md-input>
+            <md-input placeholder="Group_password" data-type="password" data-value="s3cr3t"
+                      dividerColor="primary"></md-input>
+          </div>
+
+          <h3 md-subheader align="start" class="color-primary list-title">
+            Topology > Registry > Configuration > Overlay Members
+          </h3>
+
+          <div class="input-row">
+            <md-input placeholder="Host_name" data-value="192.18.1.002" dividerColor="primary"></md-input>
+            <md-input placeholder="Port" data-value="7901" dividerColor="primary"></md-input>
+          </div>
+
+          <md-divider class="color-accent custom-divider-config"></md-divider>
+
+          <div class="input-row">
+            <md-input placeholder="Host_name" data-value="192.18.1.003" dividerColor="primary"></md-input>
+            <md-input placeholder="Port" data-value="7901" dividerColor="primary"></md-input>
+          </div>
+
         </md-card-content>
       </md-card>
 
