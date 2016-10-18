@@ -23,6 +23,7 @@ import { StoreModule } from '@ngrx/store';
 
 // our effects
 import { UserEffects } from './shared-module/effects/user.effects';
+import { WorkspaceEffects } from './shared-module/effects/workspace.effects';
 // our reducers
 import { UserReducer } from './shared-module/reducers/user.reducer';
 import { WorkspacesReducer } from './shared-module/reducers/workspaces.reducer';
@@ -31,6 +32,8 @@ import { ConfigReducer } from './shared-module/reducers/config.reducer';
 // our services
 import { UserService } from './shared-module/services/user.service';
 import { HttpResponseInterceptor } from './shared-module/services/http-response-interceptor.service';
+import { WorkspaceService } from './shared-module/services/workspace.service';
+import { WorkspaceMockService } from './shared-module/mocks/workspace-mock.service';
 
 // our guards
 import { AuthGuardService } from './shared-module/services/auth-guard.service';
@@ -99,6 +102,7 @@ export function createTranslateLoader(http: Http) {
 
     // effects
     UserEffects,
+    WorkspaceEffects,
 
     // guards
     AuthGuardService,
@@ -108,6 +112,10 @@ export function createTranslateLoader(http: Http) {
     {
       provide: UserService,
       useClass: (environment.mock ? UserMockService : UserService)
+    },
+    {
+      provide: WorkspaceService,
+      useClass: (environment.mock ? WorkspaceMockService : WorkspaceService)
     }
   ],
   bootstrap: [

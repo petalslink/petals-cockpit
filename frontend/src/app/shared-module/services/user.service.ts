@@ -8,24 +8,22 @@ import { InterceptorService } from 'ng2-interceptors';
 // rxjs
 import { Observable } from 'rxjs/Observable';
 
+// our environment
+import { environment } from '../../../environments/environment';
+
 // our interfaces
 import { IUser } from '../interfaces/user.interface';
-
-// environments for our app
-import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class UserService {
   constructor(private httpAngular: Http, private http: InterceptorService) { }
 
   public connectUser(user: IUser): Observable<Response> {
-    return this.http
-      .post(`${environment.urlBackend}/user/session`, <any>user);
+    return this.http.post(`${environment.urlBackend}/user/session`, <any>user);
   }
 
   public disconnectUser(): Observable<Response> {
-    return this.http
-      .delete(`${environment.urlBackend}/user/session`, {});
+    return this.http.delete(`${environment.urlBackend}/user/session`, {});
   }
 
   // this method can be used by guards when we start the application
@@ -44,7 +42,6 @@ export class UserService {
        httpService = this.httpAngular;
     }
 
-    return httpService
-      .get(`${environment.urlBackend}/user/session`);
+    return httpService.get(`${environment.urlBackend}/user/session`);
   }
 }

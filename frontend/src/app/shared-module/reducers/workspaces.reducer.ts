@@ -2,7 +2,7 @@
 import { Observable } from 'rxjs/Observable';
 
 // immutable
-import { List, Map } from 'immutable';
+import { List, Map, fromJS } from 'immutable';
 
 // ngrx
 import { ActionReducer, Action } from '@ngrx/store';
@@ -15,12 +15,28 @@ import { WorkspacesStateRecord, workspacesStateFactory, WorkspacesState } from '
 import { IWorkspace } from '../interfaces/workspace.interface';
 
 // actions
+export const FETCHING_WORKSPACES = 'FETCHING_WORKSPACES';
+export const WORKSPACES_FETCHED = 'WORKSPACES_FETCHED';
+export const FETCHING_WORKSPACES_FAILED = 'FETCHING_WORKSPACES_FAILED';
 export const CHANGE_SELECTED_WORKSPACE = 'CHANGE_SELECTED_WORKSPACE';
 export const EDIT_PETALS_SEARCH = 'EDIT_PETALS_SEARCH';
 export const DELETE_PETALS_SEARCH = 'DELETE_PETALS_SEARCH';
 
 export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord = workspacesStateFactory(), action: Action) {
   switch (action.type) {
+    case FETCHING_WORKSPACES:
+      return workspacesState.setIn(['fetchingWorkspaces'], true);
+
+    case FETCHING_WORKSPACES_FAILED:
+      return workspacesState.setIn(['fetchingWorkspaces'], false);
+
+    // when we reload all the workspaces
+    // the payload is plain javascript object
+    case WORKSPACES_FETCHED:
+      return workspacesState
+        .setIn(['fetchingWorkspaces'], false)
+        .setIn(['workspaces'], fromJS(action.payload));
+
     case CHANGE_SELECTED_WORKSPACE:
       return workspacesState.setIn(['selectedWorkspaceId'], action.payload);
 

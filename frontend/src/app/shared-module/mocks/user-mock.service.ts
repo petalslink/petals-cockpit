@@ -11,9 +11,6 @@ import { environment } from '../../../environments/environment';
 // our interfaces
 import { IUser } from '../interfaces/user.interface';
 
-// const to mock response time
-const TIMEOUT = 500;
-
 const adminUser = {
   'username': 'admin',
   'name': 'Administrator'
@@ -42,8 +39,9 @@ export class UserMockService {
       };
     }
 
-    return Observable.of(response)
-      .delay(TIMEOUT);
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
   }
 
   public disconnectUser() {
@@ -53,8 +51,9 @@ export class UserMockService {
       ok: true
     };
 
-    return Observable.of(response)
-      .delay(TIMEOUT);
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
   }
 
   public getUserInformations() {
@@ -71,7 +70,8 @@ export class UserMockService {
       response = <Response>{ ok: false };
     }
 
-    return Observable.of(response)
-      .delay(TIMEOUT);
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
   }
 }

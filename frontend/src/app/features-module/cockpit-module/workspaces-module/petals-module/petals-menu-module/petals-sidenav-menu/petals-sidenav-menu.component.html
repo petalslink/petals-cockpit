@@ -6,7 +6,7 @@
   </md-input>
 
   <app-buses-menu
-    *ngIf="(workspaces$ | async).selectedWorkspaceId"
+    *ngIf="(workspaces$ | async).selectedWorkspaceId && (workspaces$ | async).workspaces"
     [idWorkspace]="(workspaces$ | async).selectedWorkspaceId"
     [buses]="(workspaces$ | async).workspaces[(workspaces$ | async).selectedWorkspaceId].buses">
   </app-buses-menu>
