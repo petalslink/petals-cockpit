@@ -18,18 +18,13 @@
         </md-card-title-group>
       </md-card>
 
-      <button
-        class="change-workspace"
-        md-raised-button
-        color="accent"
-        [routerLink]="['workspaces', (selectedWorkspaceId ? selectedWorkspaceId : '' )]"
-      >{{ 'CHANGE_WORKSPACE' | translate }}</button>
+      <button class="change-workspace" md-raised-button color="accent"
+              [routerLink]="['workspaces', (selectedWorkspaceId ? selectedWorkspaceId : '' )]">
+        {{ 'CHANGE_WORKSPACE' | translate }}
+      </button>
 
-      <md-tab-group
-        #tabGroup
-        [selectedIndex]="tabSelectedIndex"
-        (selectChange)="openTab(tabGroup.selectedIndex)"
-        *ngIf="selectedWorkspaceId && tabSelectedIndex !== -1">
+      <md-tab-group #tabGroup [selectedIndex]="tabSelectedIndex" (selectChange)="openTab(tabGroup.selectedIndex)"
+                    *ngIf="selectedWorkspaceId && tabSelectedIndex !== -1">
         <md-tab>
           <template md-tab-label>Petals</template>
           <template md-tab-content>

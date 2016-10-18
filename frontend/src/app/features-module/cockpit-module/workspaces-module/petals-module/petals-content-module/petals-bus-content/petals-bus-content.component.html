@@ -34,10 +34,300 @@
   </md-menu>
 </md-toolbar>
 
-<md-card class="central-content">
-  <md-card-content>
-    <md-card-title align="center">
-      Petals bus content works
-    </md-card-title>
-  </md-card-content>
-</md-card>
+<md-tab-group>
+  <md-tab>
+    <template md-tab-label>Overview</template>
+    <template md-tab-content>
+
+      <md-card class="central-content list-element">
+        <md-card-content>
+          <md-card-title align="center">
+            Petals Bus Overview
+          </md-card-title>
+          <md-list dense>
+            <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
+
+            <div class="list-row">
+              <md-list-item>
+                <h4 md-line>Title</h4>
+                <p md-line>
+                  <span class="list-subheader">Bus 1</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>State</h4>
+                <p md-line>
+                  <span class="list-subheader">UNDEPLOYED</span>
+                </p>
+              </md-list-item>
+            </div>
+
+            <md-divider></md-divider>
+            <h3 md-subheader align="start" class="color-primary list-title">Component Type</h3>
+
+            <div class="list-row">
+              <md-list-item>
+                <h4 md-line>Name</h4>
+                <p md-line>
+                  <span class="list-subheader">BUS</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Version</h4>
+                <p md-line>
+                  <span class="list-subheader">5-0</span>
+                </p>
+              </md-list-item>
+            </div>
+
+            <md-divider></md-divider>
+            <h3 md-subheader align="start" class="color-primary list-title">Topology > Domain</h3>
+
+            <div class="list-row">
+              <md-list-item>
+                <h4 md-line>Name</h4>
+                <p md-line>
+                  <span class="list-subheader">domain_0</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Mode</h4>
+                <p md-line>
+                  <span class="list-subheader">static</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Description</h4>
+                <p md-line>
+                  <span class="list-subheader">A sample domain configuration</span>
+                </p>
+              </md-list-item>
+            </div>
+
+            <md-divider></md-divider>
+            <h3 md-subheader align="start" class="color-primary list-title">Topology > Containers</h3>
+
+            <!-- Example container 2 -->
+            <div class="list-row">
+              <md-list-item>
+                <h4 md-line>Id</h4>
+                <p md-line>
+                  <span class="list-subheader">2</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Name</h4>
+                <p md-line>
+                  <span class="list-subheader">Container 2</span>
+                </p>
+              </md-list-item>
+            </div>
+
+            <div class="list-row">
+              <md-list-item>
+                <h4 md-line>Description</h4>
+                <p md-line>
+                  <span class="list-subheader">Description of the container 2</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Host</h4>
+                <p md-line>
+                  <span class="list-subheader">192.18.1.002</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>User</h4>
+                <p md-line>
+                  <span class="list-subheader">petals</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Password</h4>
+                <p md-line>
+                  <span class="list-subheader">petals</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Jmx_port</h4>
+                <p md-line>
+                  <span class="list-subheader">7701</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Transport_port</h4>
+                <p md-line>
+                  <span class="list-subheader">7801</span>
+                </p>
+              </md-list-item>
+            </div>
+
+            <md-divider></md-divider>
+
+            <!-- Example container 3 -->
+            <div class="list-row">
+              <md-list-item>
+                <h4 md-line>Id</h4>
+                <p md-line>
+                  <span class="list-subheader">3</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Name</h4>
+                <p md-line>
+                  <span class="list-subheader">Container 3</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Description</h4>
+                <p md-line>
+                  <span class="list-subheader">Description of the container 3</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Host</h4>
+                <p md-line>
+                  <span class="list-subheader">192.18.1.003</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>User</h4>
+                <p md-line>
+                  <span class="list-subheader">petals</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Password</h4>
+                <p md-line>
+                  <span class="list-subheader">petals</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Jmx_port</h4>
+                <p md-line>
+                  <span class="list-subheader">7701</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Transport_port</h4>
+                <p md-line>
+                  <span class="list-subheader">7801</span>
+                </p>
+              </md-list-item>
+            </div>
+
+            <md-divider></md-divider>
+            <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry</h3>
+
+            <div class="list-row">
+              <md-list-item>
+                <h4 md-line>Registry_implementation</h4>
+                <p md-line>
+                  <span class="list-subheader">org.ow2.petals.microkernel.registry.overlay.RegistryOverlayImpl</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Registry_configuration</h4>
+                <p md-line>
+                  <span class="list-subheader">static</span>
+                </p>
+              </md-list-item>
+            </div>
+
+            <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry > Configuration</h3>
+
+            <div class="list-row">
+              <md-list-item>
+                <h4 md-line>Group_name</h4>
+                <p md-line>
+                  <span class="list-subheader">default-sample</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Group_password</h4>
+                <p md-line>
+                  <span class="list-subheader">s3cr3t</span>
+                </p>
+              </md-list-item>
+            </div>
+
+            <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry > Configuration > Overlay Members</h3>
+
+            <!-- Example Overlay Members 1-->
+            <div class="list-row">
+              <md-list-item>
+                <h4 md-line>Host_name</h4>
+                <p md-line>
+                  <span class="list-subheader">192.18.1.002</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Port</h4>
+                <p md-line>
+                  <span class="list-subheader">7901</span>
+                </p>
+              </md-list-item>
+            </div>
+
+            <md-divider></md-divider>
+
+            <!-- Example Overlay Members 1-->
+            <div class="list-row">
+              <md-list-item>
+                <h4 md-line>Host_name</h4>
+                <p md-line>
+                  <span class="list-subheader">192.18.1.003</span>
+                </p>
+              </md-list-item>
+
+              <md-list-item>
+                <h4 md-line>Port</h4>
+                <p md-line>
+                  <span class="list-subheader">7901</span>
+                </p>
+              </md-list-item>
+            </div>
+
+          </md-list>
+        </md-card-content>
+      </md-card>
+
+    </template>
+  </md-tab>
+
+  <md-tab>
+    <template md-tab-label>Config</template>
+    <template md-tab-content>
+
+      <md-card class="central-content">
+        <md-card-content>
+          <md-card-title align="center">
+            Petals bus config
+          </md-card-title>
+        </md-card-content>
+      </md-card>
+
+    </template>
+  </md-tab>
+</md-tab-group>
+

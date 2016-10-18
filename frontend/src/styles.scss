@@ -1,10 +1,16 @@
 @import './libs';
-
+@import './custom-theme.scss';
 // angular-material now uses themes and we do have to load one if we want colors and others like
 // primary, accent, etc
 @import '~@angular/material/core/theming/prebuilt/indigo-pink.css';
 
-@import './custom-theme';
+.color-primary {
+  color: md-color($primary) !important;
+}
+
+.color-accent {
+  color: md-color($accent) !important;
+}
 
 .material-icons {
   font-family: 'Material Icons';
@@ -58,4 +64,31 @@ body {
 
 .searched {
   background-color: md-color($accent);
+}
+.list-subheader {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.list-row {
+/*  display:flex;*/
+  flex-wrap: wrap;
+  justify-content: space-between ;
+  align-items : center ;
+}
+
+.list-title {
+  font-weight: bold !important;
+}
+
+.list-element {
+  .list-title {
+    font-weight: bold !important;
+  }
+  md-divider {
+    color: #AFAFAF;
+    margin-top: 5px;
+  }
+  .md-list-item {
+    height: 40px !important;
+  }
 }
