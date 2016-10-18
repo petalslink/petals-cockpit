@@ -4,7 +4,7 @@ import { List, Map } from 'immutable';
 import { IBus } from './petals.interface';
 
 export interface IWorkspace extends Map<any, any> {
-  id: number;
+  id: string;
   name: string;
   usedBy: string;
   buses: List<IBus>;

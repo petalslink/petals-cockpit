@@ -1,5 +1,8 @@
 // angular modules
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+
+// immutable
+import { List } from 'immutable';
 
 // rxjs
 import { Observable } from 'rxjs/Observable';
@@ -11,6 +14,9 @@ import { Store } from '@ngrx/store';
 import { AppState } from '../../../../../../app.state';
 import { WorkspacesState, WorkspacesStateRecord } from '../../../../../../shared-module/reducers/workspaces.state';
 
+// our interfaces
+import { IBus } from '../../../../../../shared-module/interfaces/petals.interface';
+
 // our selectors
 import { getSearchedWorkspace } from '../../../../../../shared-module/reducers/workspaces.reducer';
 
@@ -20,14 +26,31 @@ import { EDIT_PETALS_SEARCH } from '../../../../../../shared-module/reducers/wor
 @Component({
   selector: 'app-petals-sidenav-menu',
   templateUrl: 'petals-sidenav-menu.component.html',
-  styleUrls: ['petals-sidenav-menu.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['petals-sidenav-menu.component.scss']
 })
-export class PetalsSidenavMenuComponent {
+export class PetalsSidenavMenuComponent implements OnInit {
   private workspaces$: Observable<WorkspacesState>;
+  private workspaces: WorkspacesState;
+  private buses: List<IBus>;
+  private selectedWorkspaceId: string;
 
   constructor(private store: Store<AppState>) {
     this.workspaces$ = store.let(getSearchedWorkspace()).map((workspaces: WorkspacesStateRecord) => workspaces.toJS());
+  }
+
+  ngOnInit() {
+    this.workspaces$.subscribe((workspaces: WorkspacesState) => {
+      if (
+        typeof workspaces.selectedWorkspaceId !== 'undefined' &&
+        workspaces.selectedWorkspaceId !== null &&
+        typeof workspaces.workspaces !== 'undefined' &&
+        workspaces.workspaces !== null
+      ) {
+        this.workspaces = workspaces;
+        this.selectedWorkspaceId = workspaces.selectedWorkspaceId;
+        this.buses = workspaces.workspaces.find(w => w.id === workspaces.selectedWorkspaceId).buses;
+      }
+    });
   }
 
   search(textSearch) {

@@ -2,6 +2,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
+// immutable
+import { List } from 'immutable';
+
 // rxjs
 import { Observable } from 'rxjs/Observable';
 
@@ -11,6 +14,9 @@ import { Store } from '@ngrx/store';
 // our states
 import { AppState } from '../../../../app.state';
 import { WorkspacesState, WorkspacesStateRecord } from '../../../../shared-module/reducers/workspaces.state';
+
+// our interfaces
+import { IBus } from '../../../../shared-module/interfaces/petals.interface';
 
 // our actions
 import { CHANGE_SELECTED_WORKSPACE } from '../../../../shared-module/reducers/workspaces.reducer';
@@ -23,7 +29,8 @@ import { CHANGE_SELECTED_WORKSPACE } from '../../../../shared-module/reducers/wo
 })
 export class WorkspacesComponent implements OnInit, OnDestroy {
   private workspaces$: Observable<WorkspacesState>;
-  private selectedWorkspaceId: number;
+  private buses: List<IBus>;
+  private selectedWorkspaceId: string;
 
   constructor(
     private store: Store<AppState>,
@@ -34,14 +41,23 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
       .map((workspaces: WorkspacesStateRecord) => workspaces.toJS());
   }
 
-  selectWorkspace(workspaceId: number) {
+  selectWorkspace(workspaceId: string) {
     this.store.dispatch({ type: CHANGE_SELECTED_WORKSPACE, payload: workspaceId });
     this.router.navigate(['./', workspaceId], {relativeTo: this.route.parent});
   }
 
   ngOnInit(): void {
-    this.workspaces$.subscribe(workspaces => {
-      this.selectedWorkspaceId = workspaces.selectedWorkspaceId;
+    this.workspaces$.subscribe(workspace => {
+      this.selectedWorkspaceId = workspace.selectedWorkspaceId;
+
+      if (
+        typeof this.selectedWorkspaceId !== 'undefined' &&
+        this.selectedWorkspaceId !== null &&
+        typeof workspace.workspaces !== 'undefined' &&
+        workspace.workspaces !== null
+      ) {
+        this.buses = workspace.workspaces.find(w => w.id === this.selectedWorkspaceId).buses;
+      }
     });
   }
 

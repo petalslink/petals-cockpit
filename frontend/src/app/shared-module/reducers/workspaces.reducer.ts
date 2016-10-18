@@ -106,15 +106,22 @@ export function getSearchedWorkspace() {
           return workspaces;
         }
 
-        let ws: IWorkspace = workspaces.getIn(['workspaces', workspaces.get('selectedWorkspaceId')]);
+        let ws: IWorkspace = workspaces
+          .get('workspaces')
+          .filter(w => w.get('id') === workspaces.get('selectedWorkspaceId'))
+          .get(0);
 
         let nb = ws
           .get('buses')
           .map(e => filterElement(workspaces.get('searchPetals'), e))
-          .filterNot(e => (e == null))
+          .filterNot(e => (e === null))
           .toList();
 
-        return workspaces.setIn(['workspaces', workspaces.get('selectedWorkspaceId'), 'buses'], nb);
+        let indexUpdate = workspaces
+          .get('workspaces')
+          .findIndex(w => w.get('id') === workspaces.get('selectedWorkspaceId'));
+
+        return workspaces.setIn(['workspaces', indexUpdate, 'buses'], nb);
       });
   };
 }

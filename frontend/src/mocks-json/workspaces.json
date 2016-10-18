@@ -1,41 +1,41 @@
 [
   {
-    "id": 0,
+    "id": "559b4c47-5026-435c-bd6e-a47a903a7ba5",
     "name": "Workspace 0",
     "usedBy": "You're the only one to use this workspace",
     "buses": [
       {
-        "id": 0,
+        "id": "ebda5972-c57f-4e35-963d-88bf342d6bd5",
         "name": "Bus 0",
         "containers": [
           {
-            "id": 0,
+            "id": "5881267a-4370-4a6e-98bc-713dce0b4a7a",
             "name": "Container 0",
             "components": [
               {
-                "id": 0,
+                "id": "e723bc67-2a5c-4f0c-b370-6e41d52b8dec",
                 "name": "Component 0",
                 "serviceUnits": [
                   {
-                    "id": 0,
+                    "id": "3a957ca3-1a72-4930-8284-bcb2db0b2d6d",
                     "name": "SU 0"
                   },
                   {
-                    "id": 1,
+                    "id": "b8978c6f-3903-4044-add9-1322f504b073",
                     "name": "SU 1"
                   }
                 ]
               },
               {
-                "id": 1,
+                "id": "89f768ad-670b-4d2c-9d82-7d06589704a8",
                 "name": "Component 1",
                 "serviceUnits": [
                   {
-                    "id": 2,
+                    "id": "431f429a-014d-494a-a5c9-fcf1e1cb9ea4",
                     "name": "SU 2"
                   },
                   {
-                    "id": 3,
+                    "id": "31c90fa5-44a0-4b2a-b525-c80fee60b32a",
                     "name": "SU 3"
                   }
                 ]
@@ -43,29 +43,29 @@
             ]
           },
           {
-            "id": 1,
+            "id": "12134f05-2860-43a1-ad86-83b484745e33",
             "name": "Container 1",
             "components": [
               {
-                "id": 2,
+                "id": "533152d2-d189-4e1e-985d-a6b64239ce78",
                 "name": "Component 2",
                 "serviceUnits": [
                   {
-                    "id": 4,
+                    "id": "79d66b53-455b-4ecd-b767-257bdacda8a6",
                     "name": "SU 4"
                   }
                 ]
               },
               {
-                "id": 3,
+                "id": "77e7e53b-b945-499c-b3f2-085c97ee237b",
                 "name": "Component 3",
                 "serviceUnits": [
                   {
-                    "id": 5,
+                    "id": "32f556c8-9fe2-4bdf-8f33-97aff8e60ed7",
                     "name": "SU 5"
                   },
                   {
-                    "id": 6,
+                    "id": "c65c96c1-3a5a-48c8-9d83-6bf8e637f490",
                     "name": "SU 6"
                   }
                 ]
@@ -77,38 +77,38 @@
     ]
   },
   {
-    "id": 1,
+    "id": "08dc0669-f7ca-4221-bf24-d59e07f5c1ed",
     "name": "Workspace 1",
     "usedBy": "Workspace also used by Victor NOEL, Christophe CHEVALIER and Maxime ROBERT",
     "buses": [
       {
-        "id": 1,
+        "id": "85fd4ddf-bbd4-4562-99cc-62e7fb7d698b",
         "name": "Bus 1",
         "containers": [
           {
-            "id": 2,
+            "id": "0e167608-8c98-45e7-a89e-64d93df6e2bc",
             "name": "Container 2",
             "components": [
               {
-                "id": 4,
+                "id": "53f67d40-025e-4088-acc3-d03125127177",
                 "name": "Component 4",
                 "serviceUnits": [
                   {
-                    "id": 7,
+                    "id": "ba95dd26-956e-4ca3-a6f8-435ee050c8a3",
                     "name": "SU 7"
                   }
                 ]
               },
               {
-                "id": 5,
+                "id": "53e208cd-50f3-42aa-925e-5e53913ca0fd",
                 "name": "Component 5",
                 "serviceUnits": [
                   {
-                    "id": 8,
+                    "id": "d71151bc-56e6-4d40-b021-c0a779de8672",
                     "name": "SU 8"
                   },
                   {
-                    "id": 9,
+                    "id": "6898c078-60da-4f42-a30e-99cf5cd883b2",
                     "name": "SU 9"
                   }
                 ]
@@ -116,29 +116,29 @@
             ]
           },
           {
-            "id": 3,
+            "id": "25dbde93-a507-4aa1-a98b-fc81d5e28b48",
             "name": "Container 3",
             "components": [
               {
-                "id": 6,
+                "id": "548902d6-33b8-478b-9bcd-c1a440f22002",
                 "name": "Component 6",
                 "serviceUnits": [
                   {
-                    "id": 10,
+                    "id": "6b92189a-7b74-4e8d-bff5-2377c0b6da83",
                     "name": "SU 10"
                   }
                 ]
               },
               {
-                "id": 7,
+                "id": "beeeb403-7a4f-4b79-a1be-b304bfc6590c",
                 "name": "Component 7",
                 "serviceUnits": [
                   {
-                    "id": 11,
+                    "id": "c997f09d-afb0-42fd-b77a-387b9f94d86c",
                     "name": "SU 11"
                   },
                   {
-                    "id": 12,
+                    "id": "1bcc10ae-083c-48c0-b3cb-e1ad482bf97e",
                     "name": "SU 12"
                   }
                 ]
