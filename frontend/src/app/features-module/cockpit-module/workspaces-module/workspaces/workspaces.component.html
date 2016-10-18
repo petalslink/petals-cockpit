@@ -37,17 +37,24 @@
 </md-toolbar>
 
 <md-card class="central-content">
-  <md-card-content>
-    <md-card-title align="center">
-      Workspaces works
-    </md-card-title>
+   <md-card-header>
+      <md-card-title>Workspaces</md-card-title>
+      <md-card-subtitle>Select the workspace you want to work with</md-card-subtitle>
+   </md-card-header>
 
-    <select
-      *ngIf="(workspaces$ | async).workspaces"
-      [(ngModel)]="selectedWorkspaceId"
-      (ngModelChange)="selectWorkspace(selectedWorkspaceId)"
-    >
-      <option [value]="workspace.id" *ngFor="let workspace of (workspaces$ | async).workspaces">{{ workspace.name }}</option>
-    </select>
+  <img md-card-image src="/assets/img/workspace.png">
+
+  <md-card-content>
+    <md-nav-list *ngIf="(workspaces$ | async).workspaces">
+      <md-list-item
+        *ngFor="let workspace of (workspaces$ | async).workspaces"
+        (click)="selectWorkspace(workspace.id)"
+      >
+        <h3 md-line>{{workspace.name}}</h3>
+        <p md-line>
+          <span class="workspace-used-by">{{workspace.usedBy}}</span>
+        </p>
+      </md-list-item>
+    </md-nav-list>
   </md-card-content>
 </md-card>
