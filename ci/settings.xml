@@ -26,6 +26,12 @@
           <snapshots><enabled>true</enabled></snapshots>
         </repository>
         <repository>
+          <id>staging</id>
+          <url>file:staging</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+        <repository>
           <id>bintray-palantir-maven</id>
           <url>http://palantir.bintray.com/releases</url>
           <snapshots><enabled>false</enabled></snapshots>

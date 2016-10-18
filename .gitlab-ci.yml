@@ -1,12 +1,15 @@
 stages:
   - build
   - package
-  - test
+  - integration
 
 variables:
+  # it is also referenced in ci/settings.xml
   M2_STAGING_DIRECTORY: staging
   M2_CACHED_REPOSITORY: m2cache
   NG: "node_modules/angular-cli/bin/ng"
+  DISPLAY: ":99"
+  XVFB: "Xvfb $DISPLAY -ac -screen 0 1280x720x16 -nolisten tcp"
 
 .mvn-java-8: &mvn-java-8
   image: maven:3.3-jdk-8-alpine
@@ -15,24 +18,19 @@ variables:
   after_script:
     - "source ci/mvn-helpers.sh"
     - "maven ch.ringler.tools:m2cachecleanup:1.0.4:cleanup-cache"
-  tags:
-    - docker
   cache:
     key: "mvn-java-8"
     paths:
       - $M2_CACHED_REPOSITORY
 
 .node-6: &node-6
-  image: node:6
+  image: registry.gitlab.com/victornoel/petals-cockpit
   before_script:
-    - "npm set -g progress=false"
     - "cd frontend"
     - "npm install"
-    - "printenv NG"
+    - "npm prune"
     - "$NG -v"
     - "cd .."
-  tags:
-    - docker
   cache:
     key: "node-6"
     paths:
@@ -42,6 +40,9 @@ build-backend:
   <<: *mvn-java-8
   stage: build
   script:
+      # let's lock the version used for SNAPSHOT dependencies to
+      # ensure they are the same in the other jobs
+    - "maven -pl backend -am versions:lock-snapshots"
     - "maven_build -pl backend -am deploy"
   artifacts:
     paths:
@@ -54,7 +55,10 @@ build-frontend:
     - "cd frontend"
     - "$NG build --prod"
     - "$NG lint"
+    - "nohup $XVFB &"
     - "$NG test --watch false"
+    - "nohup $NG serve -e=prod-e2e &"
+    - "$NG e2e"
   artifacts:
     paths:
       - frontend/dist
@@ -66,29 +70,24 @@ build-product:
     - build-backend
     - build-frontend
   script:
-    - "import_staging"
+    - 'maven dependency:purge-local-repository --non-recursive -DmanualInclude="org.ow2.petals:petals-cockpit-server,org.ow2.petals:petals-cockpit-parent" -DreResolve=false -DsnapshotsOnly=true'
     - "maven -pl cockpit package"
   artifacts:
     paths:
       - cockpit/target/petals-cockpit-*-capsule.jar
 
-e2e-product-tests:
+e2e-product:
   <<: *node-6
-  stage: test
+  stage: integration
   dependencies:
     - build-product
   variables:
-    DISPLAY: ":99"
-    CHROME_BIN: "/usr/bin/chromium"
     COCKPIT: "java -Ddw.mongo.servers[0].host=mongo -Ddw.server.applicationConnectors[0].port=4200 -jar cockpit/target/petals-cockpit-*-capsule.jar"
   services:
     - mongo:3
   script:
-    - 'echo "deb http://httpredir.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/jessie-backports.list'
-    - "apt-get update"
-    - "apt-get install -y xvfb chromium openjdk-8-jre-headless"
     - "$COCKPIT add-user -u admin -p admin -n Administrator cockpit/default.yml"
     - "nohup $COCKPIT server cockpit/default.yml &"
-    - "nohup Xvfb :99 -ac -screen 0 1280x720x16 -nolisten tcp &"
+    - "nohup $XVFB &"
     - "cd frontend"
     - "$NG e2e"
