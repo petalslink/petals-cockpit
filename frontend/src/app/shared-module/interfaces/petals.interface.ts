@@ -25,3 +25,11 @@ export interface IBus extends Map<any, any> {
   containers: List<IContainer>;
   selectedContainerId: number;
 }
+
+// used when we add (import) a bus
+export interface INewBus extends Map<any, any> {
+  ip: string;
+  port: number;
+  login: string;
+  password: string;
+}

@@ -9,13 +9,23 @@
     <md-card-title align="center">
 
       <form>
-        <md-input placeholder="IP" value="192.168.1.x"></md-input>
-        <md-input placeholder="Port" value="8000"></md-input>
-        <md-input placeholder="Login" value="admin"></md-input>
-        <md-input placeholder="Password" type="password" value="admin"></md-input>
+        <md-input placeholder="IP" value="192.168.1.x" [disabled]="(workspaces$ | async).importingBus"></md-input>
+        <md-input placeholder="Port" value="8000" [disabled]="(workspaces$ | async).importingBus"></md-input>
+        <md-input placeholder="Login" value="admin" [disabled]="(workspaces$ | async).importingBus"></md-input>
+        <md-input placeholder="Password" type="password" value="adminpwd" [disabled]="(workspaces$ | async).importingBus"></md-input>
         <br>
 
-        <button md-raised-button color="accent">Import bus</button>
+        <button
+          md-raised-button
+          color="accent"
+          (click)="importBus({ip: '192.168.1.x', port: 8000, login: 'admin', password: 'adminpwd'})"
+          [disabled]="(workspaces$ | async).importingBus"
+        >
+          <span *ngIf="!(workspaces$ | async).importingBus">Import bus</span>
+          <span *ngIf="(workspaces$ | async).importingBus">
+            Importing bus <md-progress-circle *ngIf="(workspaces$ | async).importingBus" mode="indeterminate"></md-progress-circle>
+          </span>
+        </button>
       </form>
 
     </md-card-title>

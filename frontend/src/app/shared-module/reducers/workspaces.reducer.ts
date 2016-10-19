@@ -21,6 +21,9 @@ export const FETCHING_WORKSPACES_FAILED = 'FETCHING_WORKSPACES_FAILED';
 export const CHANGE_SELECTED_WORKSPACE = 'CHANGE_SELECTED_WORKSPACE';
 export const EDIT_PETALS_SEARCH = 'EDIT_PETALS_SEARCH';
 export const DELETE_PETALS_SEARCH = 'DELETE_PETALS_SEARCH';
+export const IMPORTING_BUS = 'IMPORTING_BUS';
+export const BUS_IMPORTED = 'BUS_IMPORTED';
+export const IMPORTING_BUS_FAILED = 'IMPORTING_BUS_FAILED';
 
 export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord = workspacesStateFactory(), action: Action) {
   switch (action.type) {
@@ -45,6 +48,15 @@ export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord =
 
     case DELETE_PETALS_SEARCH:
       return workspacesState.setIn(['searchPetals'], '');
+
+    case IMPORTING_BUS:
+      return workspacesState.setIn(['importingBus'], true);
+
+    case BUS_IMPORTED:
+      return workspacesState.setIn(['importingBus'], false);
+
+    case IMPORTING_BUS_FAILED:
+      return workspacesState.setIn(['importingBus'], false);
 
     default:
       return workspacesState;
