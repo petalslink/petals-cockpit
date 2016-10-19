@@ -62,7 +62,7 @@ export class CockpitComponent implements OnInit {
     this.workspaces$ = <Observable<WorkspacesStateRecord>>this.store.select('workspaces');
 
     this.workspaces$.subscribe((workspaces: WorkspacesStateRecord) => {
-      this.selectedWorkspaceId = workspaces.toJS().selectedWorkspaceId;
+      this.selectedWorkspaceId = workspaces.get('selectedWorkspaceId');
     });
 
     this.route.firstChild.firstChild.params

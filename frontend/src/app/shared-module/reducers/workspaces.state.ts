@@ -8,7 +8,7 @@ import { IWorkspaces } from '../interfaces/workspace.interface';
 // this is to be imported wherever a reference to a workspace is used
 // (reducers, components, services...)
 export interface WorkspacesState extends IWorkspaces {
-  selectedWorkspaceId: number;
+  selectedWorkspaceId: string;
   searchPetals: string;
   fetchingWorkspaces: boolean;
 };
