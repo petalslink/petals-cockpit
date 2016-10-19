@@ -26,7 +26,7 @@ import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.extractor.CredentialsExtractor;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.jax.rs.filter.JaxRsContext;
+import org.pac4j.jax.rs.pac4j.JaxRsContext;
 
 public class CockpitAuthClient extends IndirectClientV2<@Nullable UsernamePasswordCredentials, CommonProfile> {
 

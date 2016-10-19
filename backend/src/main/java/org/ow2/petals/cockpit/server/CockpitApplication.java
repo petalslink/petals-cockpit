@@ -36,7 +36,7 @@ import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
 import org.pac4j.jax.rs.features.Pac4JSecurityFilterFeature;
-import org.pac4j.jax.rs.filter.JaxRsCallbackUrlResolver;
+import org.pac4j.jax.rs.pac4j.JaxRsCallbackUrlResolver;
 
 import com.allanbank.mongodb.MongoClient;
 import com.allanbank.mongodb.MongoDatabase;

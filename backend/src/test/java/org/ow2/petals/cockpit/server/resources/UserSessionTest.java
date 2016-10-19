@@ -42,7 +42,8 @@ import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
-import org.pac4j.jax.rs.features.jersey.Pac4JValueFactoryProvider;
+import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
+import org.pac4j.jax.rs.servlet.features.ServletJaxRsContextFactoryProvider;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 
@@ -65,8 +66,9 @@ public class UserSessionTest {
             @Override
             public boolean configure(@Nullable FeatureContext context) {
                 assert context != null;
+                context.register(new ServletJaxRsContextFactoryProvider(config));
                 context.register(new Pac4JSecurityFeature(config));
-                context.register(new Pac4JValueFactoryProvider.Binder(config));
+                context.register(new Pac4JValueFactoryProvider.Binder());
                 return true;
             }
         };
