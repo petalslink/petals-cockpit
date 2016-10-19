@@ -7,6 +7,8 @@
       {
         "id": "ebda5972-c57f-4e35-963d-88bf342d6bd5",
         "name": "Bus 0",
+        "state": "UNDEPLOYED",
+        "config": null,
         "containers": [
           {
             "id": "5881267a-4370-4a6e-98bc-713dce0b4a7a",
@@ -84,6 +86,7 @@
       {
         "id": "85fd4ddf-bbd4-4562-99cc-62e7fb7d698b",
         "name": "Bus 1",
+        "state": "UNDEPLOYED",
         "containers": [
           {
             "id": "0e167608-8c98-45e7-a89e-64d93df6e2bc",

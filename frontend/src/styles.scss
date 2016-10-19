@@ -12,6 +12,12 @@
   color: md-color($accent) !important;
 }
 
+.bkg-primary-card {
+  background: linear-gradient(rgb(99, 108, 161), rgb(179, 157, 219)) no-repeat 0 0;
+  background-size: 100% 144px; // width: 100% height: 192px
+  padding-top: 44px;
+}
+
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;
@@ -53,7 +59,13 @@ body {
   width: 80%;
   max-width: 800px;
   margin: auto;
-  margin-top: 20px;
+}
+
+.test .md-fab-bottom-right {
+  right: 20px;
+  bottom: 20px;
+  position: fixed !important;
+  margin: 0;
 }
 
 .sidenav-menu {
@@ -107,3 +119,17 @@ body {
     width: 350px;
   }
 }
+
+.md-fab-top-right {
+  right: 20px;
+  top: 228px;
+  position: fixed !important;
+  margin: 0;
+}
+
+.error{
+  padding: 12px;
+  background-color: rgba(255, 0, 0, 0.2);
+  color: red;
+}
+

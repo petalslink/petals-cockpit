@@ -1,4 +1,5 @@
 import { List, Map } from 'immutable';
+import { IBusConfig } from './bus-config.interface';
 
 export interface IServiceUnit extends Map<any, any> {
   id: string;
@@ -22,6 +23,8 @@ export interface IContainer extends Map<any, any> {
 export interface IBus extends Map<any, any> {
   id: string;
   name: string;
+  state: string;
+  config: IBusConfig;
   containers: List<IContainer>;
   selectedContainerId: number;
 }

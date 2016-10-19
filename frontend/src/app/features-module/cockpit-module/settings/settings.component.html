@@ -6,28 +6,29 @@
   <span class="flex-space"></span>
 </md-toolbar>
 
-<md-card class="central-content">
-  <md-card-content>
-    <md-nav-list>
-      <h3 md-subheader>Theme</h3>
-      <md-list-item (click)="toggleTheme()">
-        <md-slide-toggle [checked]="isDarkTheme" disabled>
-          Night mode
-        </md-slide-toggle>
-      </md-list-item>
-
-      <h3 md-subheader>Language</h3>
-
-      <md-radio-group [(ngModel)]="lang" (ngModelChange)="changeLanguageTo()">
-        <md-list-item>
-          <md-radio-button value="fr">French</md-radio-button>
+<div class="bkg-primary-card">
+  <md-card class="central-content">
+    <md-card-content>
+      <md-nav-list>
+        <h3 md-subheader>Theme</h3>
+        <md-list-item (click)="toggleTheme()">
+          <md-slide-toggle [checked]="isDarkTheme" disabled>
+            Night mode
+          </md-slide-toggle>
         </md-list-item>
 
-        <md-list-item>
-            <md-radio-button value="en">English</md-radio-button>
-        </md-list-item>
-      </md-radio-group>
-    </md-nav-list>
-  </md-card-content>
-</md-card>
+        <h3 md-subheader>Language</h3>
 
+        <md-radio-group [(ngModel)]="lang" (ngModelChange)="changeLanguageTo()">
+          <md-list-item>
+            <md-radio-button value="fr">French</md-radio-button>
+          </md-list-item>
+
+          <md-list-item>
+              <md-radio-button value="en">English</md-radio-button>
+          </md-list-item>
+        </md-radio-group>
+      </md-nav-list>
+    </md-card-content>
+  </md-card>
+</div>

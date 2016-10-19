@@ -1,0 +1,104 @@
+<div class="bkg-primary-card">
+  <md-card class="central-content list-element">
+    <md-card-content>
+      <md-card-title align="center">
+        Petals Bus Config
+      </md-card-title>
+
+      <form #busConfigForm="ngForm" (ngSubmit)="saveBusConfig()">
+
+        <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
+
+        <div class="input-row">
+          <md-input type="text" [(ngModel)]="bus.name" name="name" placeholder="Title" dividerColor="primary"></md-input>
+          <md-input type="text" [(ngModel)]="bus.state" name="state" placeholder="State" dividerColor="primary"></md-input>
+        </div>
+
+        <h3 md-subheader align="start" class="color-primary list-title">Component Type</h3>
+
+<!--        <div class="input-row">
+          <md-input type="text" [(ngModel)]="bus.componentType.name" name="name" placeholder="Name" data-value="BUS" dividerColor="primary"></md-input>
+          <md-input type="text" [(ngModel)]="bus.componentType.version" name="version" placeholder="Version" data-value="5-0" dividerColor="primary"></md-input>
+        </div>
+
+        <h3 md-subheader align="start" class="color-primary list-title">Topology > Domain</h3>
+
+        <div class="input-row">
+          <md-input type="text" [(ngModel)]="bus.topology.domain.name" name="name" placeholder="Name" data-value="domain_0" dividerColor="primary"></md-input>
+          <md-input type="text" [(ngModel)]="bus.topology.domain.mode" name="mode" placeholder="Mode" data-value="static" dividerColor="primary"></md-input>
+          <md-input type="text" [(ngModel)]="bus.topology.domain.description" name="description" placeholder="Description" data-value="A sample dommain configuration"
+                    dividerColor="primary"></md-input>
+        </div>-->
+
+<!--        <h3 md-subheader align="start" class="color-primary list-title">Topology > Containers</h3>
+
+        <div class="input-row">
+          <md-input type="text" name="id" placeholder="Id" data-value="2" dividerColor="primary"></md-input>
+          <md-input type="text" name="name" placeholder="Name" data-value="Container 2" dividerColor="primary"></md-input>
+          <md-input type="text" name="description" placeholder="Description" data-value="Description of the container 2"
+                    dividerColor="primary"></md-input>
+          <md-input type="text" name="host" placeholder="Host" data-value="192.18.1.002" dividerColor="primary"></md-input>
+          <md-input type="text" name="user" placeholder="User" data-value="petals" dividerColor="primary"></md-input>
+          <md-input type="password" name="password" placeholder="Password" data-value="petals"
+                    dividerColor="primary"></md-input>
+          <md-input type="text" name="jmx_port" placeholder="Jmx_port" data-value="7701" dividerColor="primary"></md-input>
+          <md-input type="text" name="transport_port" placeholder="Transport_port" data-value="7801" dividerColor="primary"></md-input>
+        </div>
+
+        <md-divider class="color-accent custom-divider-config"></md-divider>
+
+        <div class="input-row">
+          <md-input type="text" name="id" placeholder="Id" data-value="3" dividerColor="primary"></md-input>
+          <md-input type="text" name="name" placeholder="Name" data-value="Container 3" dividerColor="primary"></md-input>
+          <md-input type="text" name="description" placeholder="Description" data-value="Description of the container 3"
+                    dividerColor="primary"></md-input>
+          <md-input type="text" name="host" placeholder="Host" data-value="192.18.1.003" dividerColor="primary"></md-input>
+          <md-input type="text" name="user" placeholder="User" data-value="petals" dividerColor="primary"></md-input>
+          <md-input type="text" name="password" placeholder="Password" data-type="password" data-value="petals"
+                    dividerColor="primary"></md-input>
+          <md-input type="text" name="jmx_port" placeholder="Jmx_port" data-value="7701" dividerColor="primary"></md-input>
+          <md-input type="text" name="transport_port" placeholder="Transport_port" data-value="7801" dividerColor="primary"></md-input>
+        </div>
+
+        <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry</h3>
+
+        <div class="input-row">
+          <md-input placeholder="Registry_implementation"
+                    data-value="org.ow2.petals.microkernel.registry.overlay.RegistryOverlayImpl"
+                    dividerColor="primary">
+          </md-input>
+        </div>
+
+        <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry > Configuration</h3>
+
+        <div class="input-row">
+          <md-input placeholder="Group_name" data-value="default-sample" dividerColor="primary"></md-input>
+          <md-input placeholder="Group_password" data-type="password" data-value="s3cr3t"
+                    dividerColor="primary"></md-input>
+        </div>
+
+        <h3 md-subheader align="start" class="color-primary list-title">
+          Topology > Registry > Configuration > Overlay Members
+        </h3>
+
+        <div class="input-row">
+          <md-input placeholder="Host_name" data-value="192.18.1.002" dividerColor="primary"></md-input>
+          <md-input placeholder="Port" data-value="7901" dividerColor="primary"></md-input>
+        </div>
+
+        <md-divider class="color-accent custom-divider-config"></md-divider>
+
+        <div class="input-row">
+          <md-input placeholder="Host_name" data-value="192.18.1.003" dividerColor="primary"></md-input>
+          <md-input placeholder="Port" data-value="7901" dividerColor="primary"></md-input>
+        </div>-->
+
+        <button type="submit" md-fab class="md-fab-top-right" [disabled]="!busConfigForm.form.valid">
+          <md-icon>check</md-icon>
+        </button>
+
+      </form>
+
+    </md-card-content>
+  </md-card>
+</div>
