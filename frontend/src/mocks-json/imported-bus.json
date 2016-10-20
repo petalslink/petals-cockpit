@@ -1,0 +1,70 @@
+{
+  "id": null,
+  "name": "Bus",
+  "containers": [
+    {
+      "id": null,
+      "name": "Container",
+      "components": [
+        {
+          "id": null,
+          "name": "Component",
+          "serviceUnits": [
+            {
+              "id": null,
+              "name": "SU"
+            },
+            {
+              "id": null,
+              "name": "SU"
+            }
+          ]
+        },
+        {
+          "id": null,
+          "name": "Component",
+          "serviceUnits": [
+            {
+              "id": null,
+              "name": "SU"
+            },
+            {
+              "id": null,
+              "name": "SU"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "Container",
+      "components": [
+        {
+          "id": null,
+          "name": "Component",
+          "serviceUnits": [
+            {
+              "id": null,
+              "name": "SU"
+            }
+          ]
+        },
+        {
+          "id": null,
+          "name": "Component",
+          "serviceUnits": [
+            {
+              "id": null,
+              "name": "SU"
+            },
+            {
+              "id": null,
+              "name": "SU"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

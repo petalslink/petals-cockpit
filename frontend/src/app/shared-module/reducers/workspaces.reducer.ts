@@ -24,6 +24,7 @@ export const DELETE_PETALS_SEARCH = 'DELETE_PETALS_SEARCH';
 export const IMPORTING_BUS = 'IMPORTING_BUS';
 export const BUS_IMPORTED = 'BUS_IMPORTED';
 export const IMPORTING_BUS_FAILED = 'IMPORTING_BUS_FAILED';
+export const ADD_BUS = 'ADD_BUS';
 
 export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord = workspacesStateFactory(), action: Action) {
   switch (action.type) {
@@ -57,6 +58,20 @@ export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord =
 
     case IMPORTING_BUS_FAILED:
       return workspacesState.setIn(['importingBus'], false);
+
+    case ADD_BUS:
+      let selectedWorkspaceId = workspacesState.get('selectedWorkspaceId');
+
+      let indexUpdate = workspacesState
+        .get('workspaces')
+        .findIndex(w => w.get('id') === selectedWorkspaceId);
+
+      let workspacesStateTmp =  workspacesState.setIn(['importingBus'], false);
+
+      let buses = workspacesStateTmp.getIn(['workspaces', indexUpdate, 'buses']);
+      buses = buses.push(fromJS(action.payload));
+
+      return workspacesStateTmp.setIn(['workspaces', indexUpdate, 'buses'], buses);
 
     default:
       return workspacesState;
@@ -112,9 +127,9 @@ export function getSearchedWorkspace() {
     return state$
       .map((state: AppState) => state.workspaces)
       .map((workspaces: WorkspacesStateRecord) => {
-        let f: String = workspaces.get('searchPetals');
+        let f: string = workspaces.get('searchPetals');
 
-        if (f.trim() === '') {
+        if (typeof f === 'undefined' || f.trim() === '') {
           return workspaces;
         }
 

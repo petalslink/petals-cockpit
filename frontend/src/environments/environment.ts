@@ -7,10 +7,13 @@ export const environment = {
   production: false,
   mock: true,
   urlBackend: '/api',
+  urlBackendSse: '/sse',
   debug: true,
   // auto log user or not
   // useful for dev env to avoid being redirected to /login every time the page is reloaded
   alreadyConnected: true,
   // delay for each http request (used if mock is set to true)
-  httpDelay: 500
+  httpDelay: 500,
+  // delay for sse events
+  sseDelay: 3000
 };
