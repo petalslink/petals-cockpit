@@ -5,6 +5,7 @@ import { PetalsBusContentComponent } from './petals-bus-content/petals-bus-conte
 import { PetalsContainerContentComponent } from './petals-container-content/petals-container-content.component';
 import { PetalsComponentContentComponent } from './petals-component-content/petals-component-content.component';
 import { PetalsServiceUnitContentComponent } from './petals-service-unit-content/petals-service-unit-content.component';
+import { PetalsBusImportComponent } from './petals-bus-content/petals-bus-import/petals-bus-import.component';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { PetalsServiceUnitContentComponent } from './petals-service-unit-content
     PetalsBusContentComponent,
     PetalsContainerContentComponent,
     PetalsComponentContentComponent,
-    PetalsServiceUnitContentComponent
+    PetalsServiceUnitContentComponent,
+    PetalsBusImportComponent
   ],
   exports: [
     PetalsContentModuleComponent

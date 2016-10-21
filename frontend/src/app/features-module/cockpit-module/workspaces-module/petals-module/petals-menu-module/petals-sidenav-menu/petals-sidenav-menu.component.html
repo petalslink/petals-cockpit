@@ -1,5 +1,17 @@
 <div class="petals-component">
-  <md-input placeholder="Search" [(ngModel)]="textSearch" (ngModelChange)="search(textSearch)">
+
+  <button
+    md-mini-fab
+    class="import-bus"
+    color="primary"
+    md-tooltip="Import a bus"
+    tooltip-position="below"
+    [routerLink]="['/cockpit', 'workspaces', selectedWorkspaceId, 'petals', 'bus', 'import']"
+  >
+    <md-icon class="md-24">add</md-icon>
+  </button>
+
+  <md-input class="search" placeholder="Search" [(ngModel)]="textSearch" (ngModelChange)="search(textSearch)">
     <span md-suffix>
       <md-icon>search</md-icon>
     </span>

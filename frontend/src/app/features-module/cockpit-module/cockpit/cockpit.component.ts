@@ -16,7 +16,14 @@ import { WorkspacesState, WorkspacesStateRecord } from '../../../shared-module/r
 
 // our actions
 import { USR_IS_DISCONNECTING } from '../../../shared-module/reducers/user.reducer';
-import { CHANGE_SELECTED_WORKSPACE, FETCHING_WORKSPACES } from '../../../shared-module/reducers/workspaces.reducer';
+import {
+  CHANGE_SELECTED_WORKSPACE,
+  FETCHING_WORKSPACES,
+  ADD_BUS
+} from '../../../shared-module/reducers/workspaces.reducer';
+
+// our services
+import { SseService } from '../../../shared-module/services/sse.service';
 
 @Component({
   selector: 'app-petals-cockpit',
@@ -35,7 +42,8 @@ export class CockpitComponent implements OnInit {
     private store: Store<AppState>,
     private router: Router,
     private route: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private sseService: SseService
   ) {
     this.tabs = [
       {
@@ -69,6 +77,13 @@ export class CockpitComponent implements OnInit {
       .map(params => params['idWorkspace'])
       .subscribe((idWorkspace: number) => {
         this.store.dispatch({ type: CHANGE_SELECTED_WORKSPACE, payload: idWorkspace });
+      });
+
+    this.sseService.subscribeToMessage('test')
+      .subscribe(msg => {
+        if (msg.event === 'BUS_IMPORTED') {
+          this.store.dispatch({ type: ADD_BUS, payload: msg.data });
+        }
       });
 
     const rePetals = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals/;

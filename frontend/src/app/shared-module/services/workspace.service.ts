@@ -10,6 +10,7 @@ import { InterceptorService } from 'ng2-interceptors';
 
 // our environment
 import { environment } from '../../../environments/environment';
+import { INewBus } from '../interfaces/petals.interface';
 
 @Injectable()
 export class WorkspaceService {
@@ -17,5 +18,9 @@ export class WorkspaceService {
 
   updateWorkspaces(): Observable<Response> {
     return this.http.get(`${environment.urlBackend}/workspaces`);
+  }
+
+  importBus(newBus: INewBus) {
+    return this.http.post(`${environment.urlBackend}/workspaces/buses`, <any>newBus);
   }
 }

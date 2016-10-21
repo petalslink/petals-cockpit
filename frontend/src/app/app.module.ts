@@ -50,6 +50,8 @@ import { FeatureModule } from './features-module/features-module.module';
 
 // shared module
 import { SharedModule } from './shared-module/shared-module.module';
+import { SseService } from './shared-module/services/sse.service';
+import { SseMockService } from './shared-module/mocks/sse-mock.service';
 
 export function createTranslateLoader(http: Http) {
   return new TranslateStaticLoader(http, './assets/i18n', '.json');
@@ -109,6 +111,10 @@ export function createTranslateLoader(http: Http) {
     AlreadyLoggedGuardService,
 
     // services
+    {
+      provide: SseService,
+      useClass: (environment.mock ? SseMockService : SseService)
+    },
     {
       provide: UserService,
       useClass: (environment.mock ? UserMockService : UserService)

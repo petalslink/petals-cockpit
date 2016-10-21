@@ -15,6 +15,7 @@ import { PetalsBusContentComponent } from './cockpit-module/workspaces-module/pe
 import { PetalsContainerContentComponent } from './cockpit-module/workspaces-module/petals-module/petals-content-module/petals-container-content/petals-container-content.component';
 import { PetalsComponentContentComponent } from './cockpit-module/workspaces-module/petals-module/petals-content-module/petals-component-content/petals-component-content.component';
 import { PetalsServiceUnitContentComponent } from './cockpit-module/workspaces-module/petals-module/petals-content-module/petals-service-unit-content/petals-service-unit-content.component';
+import { PetalsBusImportComponent } from './cockpit-module/workspaces-module/petals-module/petals-content-module/petals-bus-content/petals-bus-import/petals-bus-import.component';
 /* tslint:enable:max-line-length */
 
 // our guards
@@ -64,6 +65,10 @@ const routes: Routes = [
               {
                 path: ':idWorkspace/petals',
                 component: PetalsModuleComponent
+              },
+              {
+                path: ':idWorkspace/petals/bus/import',
+                component: PetalsBusImportComponent
               },
               {
                 path: ':idWorkspace/petals/bus/:idBus',
