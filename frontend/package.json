@@ -12,15 +12,15 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/common": "2.1.0",
-    "@angular/compiler": "2.1.0",
-    "@angular/core": "2.1.0",
-    "@angular/forms": "2.1.0",
-    "@angular/http": "2.1.0",
+    "@angular/common": "2.1.1",
+    "@angular/compiler": "2.1.1",
+    "@angular/core": "2.1.1",
+    "@angular/forms": "2.1.1",
+    "@angular/http": "2.1.1",
     "@angular/material": "2.0.0-alpha.9-3",
-    "@angular/platform-browser": "2.1.0",
-    "@angular/platform-browser-dynamic": "2.1.0",
-    "@angular/router": "3.1.0",
+    "@angular/platform-browser": "2.1.1",
+    "@angular/platform-browser-dynamic": "2.1.1",
+    "@angular/router": "3.1.1",
     "@ngrx/core": "1.2.0",
     "@ngrx/effects": "2.0.0",
     "@ngrx/store": "2.2.1",
@@ -36,7 +36,7 @@
     "rxjs": "5.0.0-rc.1",
     "ts-helpers": "1.1.2",
     "typed-immutable-record": "0.0.6",
-    "zone.js": "0.6.25"
+    "zone.js": "0.6.26"
   },
   "devDependencies": {
     "@types/jasmine": "2.5.35",
