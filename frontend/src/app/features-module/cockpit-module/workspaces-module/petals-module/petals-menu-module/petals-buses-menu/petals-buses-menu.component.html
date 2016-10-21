@@ -1,9 +1,18 @@
 <md-nav-list dense *ngFor="let bus of buses; let last=last">
-  <a md-list-item
-     [routerLink]="['/', 'cockpit', 'workspaces', idWorkspace, 'petals', 'bus', bus.id]"
-     class="bus">{{bus.name}}</a>
+  <a
+    md-list-item
+    [routerLink]="['/', 'cockpit', 'workspaces', idWorkspace, 'petals', 'bus', bus.id]"
+    class="bus"
+  >
+    <span appColorSearchedLetters [search]="search" [text]="bus.name" classToApply="searched"></span>
+  </a>
 
-  <app-containers-menu [containers]="bus.containers" [idWorkspace]="idWorkspace" [idBus]="bus.id"></app-containers-menu>
+  <app-containers-menu
+    [containers]="bus.containers"
+    [idWorkspace]="idWorkspace"
+    [idBus]="bus.id"
+    [search]="search"
+  ></app-containers-menu>
 
   <md-divider *ngIf="!last"></md-divider>
 </md-nav-list>

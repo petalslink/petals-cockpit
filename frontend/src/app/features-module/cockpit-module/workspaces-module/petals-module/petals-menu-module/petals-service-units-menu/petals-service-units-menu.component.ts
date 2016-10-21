@@ -16,6 +16,7 @@ export class ServiceUnitsMenuComponent {
   @Input() idBus: number;
   @Input() idContainer: number;
   @Input() idComponent: number;
+  @Input() search: string;
 
   constructor() { }
 
