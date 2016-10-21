@@ -26,6 +26,7 @@ export class WorkspaceService {
   getBusConfig() {
     let wid = '08dc0669-f7ca-4221-bf24-d59e07f5c1ed';
     let bid = '85fd4ddf-bbd4-4562-99cc-62e7fb7d698b';
+    // TODO: Get real IDs to do not forget
     return this.http.get(`${environment.urlBackend}/workspaces/${wid}/bus/${bid}`);
   }
 }

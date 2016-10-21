@@ -102,7 +102,7 @@ export class WorkspaceEffects implements OnDestroy {
     .switchMap(action => this.workspaceService.getBusConfig()
       .map((res: Response) => {
         if (!res.ok) {
-          throw new Error('Error while get the bus');
+          throw new Error('Error while getting the bus');
         }
 
         let config: any = res.json();
