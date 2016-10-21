@@ -39,6 +39,8 @@ variables:
 build-backend:
   <<: *mvn-java-8
   stage: build
+  except:
+    - /^front\/.*$/
   script:
       # let's lock the version used for SNAPSHOT dependencies to
       # ensure they are the same in the other jobs
@@ -51,6 +53,8 @@ build-backend:
 build-frontend:
   <<: *node-6
   stage: build
+  except:
+    - /^back\/.*$/
   script:
     - "cd frontend"
     - "$NG build --prod"
@@ -66,6 +70,9 @@ build-frontend:
 build-product:
   <<: *mvn-java-8
   stage: package
+  except:
+    - /^front\/.*$/
+    - /^back\/.*$/
   dependencies:
     - build-backend
     - build-frontend
@@ -79,6 +86,12 @@ build-product:
 e2e-product:
   <<: *node-6
   stage: integration
+  except:
+    - /^front\/.*$/
+    - /^back\/.*$/
+  only:
+    - master
+    - integration
   dependencies:
     - build-product
   variables:
