@@ -33,6 +33,9 @@ export const FETCHING_BUS_CONFIG_SUCCESS = 'FETCHING_BUS_CONFIG_SUCCESS';
 export const FETCHING_BUS_CONFIG_FAILED = 'FETCHING_BUS_CONFIG_FAILED';
 
 export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord = workspacesStateFactory(), action: Action) {
+  let selectedWorkspaceId;
+  let workspacesStateTmp;
+
   switch (action.type) {
     case FETCHING_WORKSPACES:
       return workspacesState.setIn(['fetchingWorkspaces'], true);
@@ -67,13 +70,13 @@ export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord =
 
     /* ADD_BUS */
     case ADD_BUS:
-      let selectedWorkspaceId = workspacesState.get('selectedWorkspaceId');
+      selectedWorkspaceId = workspacesState.get('selectedWorkspaceId');
 
       let indexUpdate = workspacesState
         .get('workspaces')
         .findIndex((w: WorkspacesStateRecord) => w.get('id') === selectedWorkspaceId);
 
-      let workspacesStateTmp =  workspacesState.setIn(['importingBus'], false);
+      workspacesStateTmp =  workspacesState.setIn(['importingBus'], false);
 
       let buses = workspacesStateTmp.getIn(['workspaces', indexUpdate, 'buses']);
       buses = buses.push(fromJS(action.payload));
@@ -85,7 +88,7 @@ export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord =
       return workspacesState.setIn(['gettingBusConfig'], true);
 
     case FETCHING_BUS_CONFIG_SUCCESS:
-      let selectedWorkspaceId = workspacesState.get('selectedWorkspaceId');
+      selectedWorkspaceId = workspacesState.get('selectedWorkspaceId');
 
       let indexWorkspaceUpdate = workspacesState
         .get('workspaces')
@@ -95,7 +98,7 @@ export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord =
         .getIn(['workspaces', indexWorkspaceUpdate, 'buses'])
         .findIndex((buses: WorkspacesStateRecord) => buses.get('id') === action.payload.idBus);
 
-      let workspacesStateTmp =  workspacesState.setIn(['gettingBusConfig'], false);
+      workspacesStateTmp =  workspacesState.setIn(['gettingBusConfig'], false);
 
       let bus = workspacesStateTmp.getIn(['workspaces', indexWorkspaceUpdate, 'buses', indexBusUpdate]);
       bus = bus.set('config', fromJS(action.payload.config));
