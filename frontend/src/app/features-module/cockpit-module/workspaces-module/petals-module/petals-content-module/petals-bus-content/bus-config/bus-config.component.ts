@@ -43,11 +43,11 @@ export class BusConfigComponent implements OnInit {
       if (typeof this.idBus !== 'undefined') {
         let indexWorkspace = this.workspaces
           .get('workspaces')
-          .findIndex(w => w.get('id') === this.idSelectedWorkspace);
+          .findIndex((workspaces: WorkspacesStateRecord) => workspaces.get('id') === this.idSelectedWorkspace);
 
         let indexBus = this.workspaces
           .getIn(['workspaces', indexWorkspace, 'buses'])
-          .findIndex(b => b.get('id') === this.idBus);
+          .findIndex((buses: WorkspacesStateRecord) => buses.get('id') === this.idBus);
 
         this.bus = workspaces.getIn(['workspaces', indexWorkspace, 'buses', indexBus]).toJS();
       }
@@ -61,11 +61,11 @@ export class BusConfigComponent implements OnInit {
         this.idBus = idBus;
         let indexWorkspace = this.workspaces
           .get('workspaces')
-          .findIndex(w => w.get('id') === this.idSelectedWorkspace);
+          .findIndex((workspaces: WorkspacesStateRecord) => workspaces.get('id') === this.idSelectedWorkspace);
 
         let indexBus = this.workspaces
           .getIn(['workspaces', indexWorkspace, 'buses'])
-          .findIndex(b => b.get('id') === idBus);
+          .findIndex((buses: WorkspacesStateRecord) => buses.get('id') === idBus);
 
         this.bus = this.workspaces.getIn(['workspaces', indexWorkspace, 'buses', indexBus]).toJS();
         console.log(this.bus);

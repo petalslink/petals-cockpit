@@ -100,10 +100,10 @@
 
         <div class="input-row"
              *ngFor="let member of bus.config.topology.registry.registry_configuration.overlay_members; let i = index;">
-          <md-input type="text" name="{{'host_name'+i}}" [(ngModel)]="member.host_name" placeholder="Host_name"
+          <md-input type="text" [name]="'host_name'+i" [(ngModel)]="member.host_name" placeholder="Host_name"
                     dividerColor="primary">
           </md-input>
-          <md-input type="text" name="{{'port'+i}}" [(ngModel)]="member.port" placeholder="Port" dividerColor="primary">
+          <md-input type="text" [name]="'port'+i" [(ngModel)]="member.port" placeholder="Port" dividerColor="primary">
           </md-input>
           <md-divider class="color-accent custom-divider-config-repeat"></md-divider>
         </div>
