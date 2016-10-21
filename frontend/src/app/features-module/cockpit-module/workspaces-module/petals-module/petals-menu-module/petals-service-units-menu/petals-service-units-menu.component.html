@@ -2,6 +2,9 @@
 
   <a md-list-item
      [routerLink]="generateLink(serviceUnit.id)"
-     class="service-unit">{{serviceUnit.name}}</a>
+     class="service-unit"
+  >
+    <span appColorSearchedLetters [search]="search" [text]="serviceUnit.name" classToApply="searched"></span>
+  </a>
 
 </md-nav-list>

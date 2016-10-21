@@ -15,6 +15,7 @@ export class ComponentsMenuComponent {
   @Input() idWorkspace: number;
   @Input() idBus: number;
   @Input() idContainer: number;
+  @Input() search: string;
 
   constructor() { }
 }

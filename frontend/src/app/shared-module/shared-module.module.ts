@@ -16,9 +16,11 @@ import { TranslateModule } from 'ng2-translate';
 
 // our components
 import { ToggleThemeComponent } from './toggle-theme/toggle-theme.component';
+import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
 
 const SHARED_COMPONENTS = [
-  ToggleThemeComponent
+  ToggleThemeComponent,
+  ColorSearchedLettersDirective
 ];
 
 const SHARED_MODULES = [

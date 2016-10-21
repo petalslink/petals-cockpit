@@ -6,12 +6,17 @@
        'petals', 'bus', idBus,
        'container', idContainer,
        'component', component.id]"
-     class="component">{{component.name}}</a>
+     class="component"
+  >
+    <span appColorSearchedLetters [search]="search" [text]="component.name" classToApply="searched"></span>
+  </a>
 
   <app-service-units-menu
     [serviceUnits]="component.serviceUnits"
     [idWorkspace]="idWorkspace"
     [idBus]="idBus"
     [idContainer]="idContainer"
-    [idComponent]="component.id"></app-service-units-menu>
+    [idComponent]="component.id"
+    [search]="search"
+  ></app-service-units-menu>
 </md-nav-list>

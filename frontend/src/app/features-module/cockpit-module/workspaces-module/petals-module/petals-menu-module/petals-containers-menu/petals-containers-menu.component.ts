@@ -26,6 +26,7 @@ export class ContainersMenuComponent {
   @Input() containers: Array<IContainer>;
   @Input() idWorkspace: number;
   @Input() idBus: number;
+  @Input() search: string;
 
   constructor(private store: Store<AppState>) {
     this.workspaces$ = <Observable<WorkspacesStateRecord>>store.select('workspaces');

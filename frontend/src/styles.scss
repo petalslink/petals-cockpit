@@ -4,6 +4,8 @@
 // primary, accent, etc
 @import '~@angular/material/core/theming/prebuilt/indigo-pink.css';
 
+@import './custom-theme';
+
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;
@@ -52,4 +54,8 @@ body {
   md-card-title-group div {
     display: none;
   }
+}
+
+.searched {
+  background-color: md-color($accent);
 }

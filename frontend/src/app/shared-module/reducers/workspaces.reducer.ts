@@ -14,6 +14,9 @@ import { WorkspacesStateRecord, workspacesStateFactory, WorkspacesState } from '
 // our interfaces
 import { IWorkspace } from '../interfaces/workspace.interface';
 
+// our helpers
+import { escapeStringRegexp } from '../helpers/helper';
+
 // actions
 export const FETCHING_WORKSPACES = 'FETCHING_WORKSPACES';
 export const WORKSPACES_FETCHED = 'WORKSPACES_FETCHED';
@@ -64,7 +67,7 @@ export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord =
 
       let indexUpdate = workspacesState
         .get('workspaces')
-        .findIndex(w => w.get('id') === selectedWorkspaceId);
+        .findIndex((w: WorkspacesStateRecord) => w.get('id') === selectedWorkspaceId);
 
       let workspacesStateTmp =  workspacesState.setIn(['importingBus'], false);
 
@@ -127,11 +130,13 @@ export function getSearchedWorkspace() {
     return state$
       .map((state: AppState) => state.workspaces)
       .map((workspaces: WorkspacesStateRecord) => {
-        let f: string = workspaces.get('searchPetals');
+        let searchPetals: string = workspaces.get('searchPetals');
 
-        if (typeof f === 'undefined' || f.trim() === '') {
+        if (typeof searchPetals === 'undefined' || searchPetals.trim() === '') {
           return workspaces;
         }
+
+        searchPetals = escapeStringRegexp(searchPetals);
 
         let ws: IWorkspace = workspaces
           .get('workspaces')
@@ -140,7 +145,7 @@ export function getSearchedWorkspace() {
 
         let nb = ws
           .get('buses')
-          .map(e => filterElement(workspaces.get('searchPetals'), e))
+          .map(e => filterElement(searchPetals, e))
           .filterNot(e => (e === null))
           .toList();
 
