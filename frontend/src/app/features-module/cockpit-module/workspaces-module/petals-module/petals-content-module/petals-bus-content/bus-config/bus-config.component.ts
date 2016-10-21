@@ -1,11 +1,24 @@
-import { List } from 'immutable';
+// angular modules
 import { Component, OnInit } from '@angular/core';
-import { IBus } from '../../../../../../../shared-module/interfaces/petals.interface'
-import { ActivatedRoute } from '@angular/router';
-import { AppState } from '../../../../../../../app.state';
-import { Store } from '@ngrx/store';
+
+// rxjs
 import { Observable } from 'rxjs/Rx';
+
+// ngrx
+import { Store } from '@ngrx/store';
+
+// our states
+import { AppState } from '../../../../../../../app.state';
 import { WorkspacesStateRecord, WorkspacesState } from '../../../../../../../shared-module/reducers/workspaces.state';
+
+// our interfaces
+import { IBus } from '../../../../../../../shared-module/interfaces/petals.interface';
+
+// our routes
+import { ActivatedRoute } from '@angular/router';
+
+// our reducers
+import { FETCHING_BUS_CONFIG } from '../../../../../../../shared-module/reducers/workspaces.reducer';
 
 @Component({
   selector: 'app-bus-config',
@@ -18,6 +31,7 @@ export class BusConfigComponent implements OnInit {
   private workspaces: WorkspacesStateRecord;
   private idSelectedWorkspace: number;
   private bus: IBus;
+  private idBus: number;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>) {
     this.workspaces$ = <Observable<WorkspacesStateRecord>>this.store.select('workspaces');
@@ -25,6 +39,18 @@ export class BusConfigComponent implements OnInit {
     this.workspaces$.subscribe((workspaces: WorkspacesStateRecord) => {
       this.workspaces = workspaces;
       this.idSelectedWorkspace = workspaces.get('selectedWorkspaceId');
+
+      if (typeof this.idBus !== 'undefined') {
+        let indexWorkspace = this.workspaces
+          .get('workspaces')
+          .findIndex(w => w.get('id') === this.idSelectedWorkspace);
+
+        let indexBus = this.workspaces
+          .getIn(['workspaces', indexWorkspace, 'buses'])
+          .findIndex(b => b.get('id') === this.idBus);
+
+        this.bus = workspaces.getIn(['workspaces', indexWorkspace, 'buses', indexBus]).toJS();
+      }
     });
   };
 
@@ -32,6 +58,7 @@ export class BusConfigComponent implements OnInit {
     this.route.params
       .map(params => params['idBus'])
       .subscribe(idBus => {
+        this.idBus = idBus;
         let indexWorkspace = this.workspaces
           .get('workspaces')
           .findIndex(w => w.get('id') === this.idSelectedWorkspace);
@@ -42,11 +69,12 @@ export class BusConfigComponent implements OnInit {
 
         this.bus = this.workspaces.getIn(['workspaces', indexWorkspace, 'buses', indexBus]).toJS();
         console.log(this.bus);
+
+        this.store.dispatch({ type: FETCHING_BUS_CONFIG, payload: idBus });
       });
   }
 
-  saveBusConfig(){
-    //alert(`saved!!! ${JSON.stringify('this.bus')}`);
+  saveBusConfig() {
+    alert(`Bus Config Saved !!! ${JSON.stringify(this.bus)}`);
   };
-
 }

@@ -1,42 +1,30 @@
-[
-  {
-    "componentType": [
-      {
-        "name": "BUS",
-        "version": "5-0"
-      }
-    ],
-    "topology": [
-      {
-        "domain": [
+{
+  "componentType": {
+    "name": "BUS",
+    "version": "5-0"
+  },
+  "topology": {
+    "domain": {
+      "name": "domain_0",
+      "mode": "static",
+      "description": "A sample dommain configuration"
+    },
+    "registry": {
+      "registry_implementation": "org.ow2.petals.microkernel.registry.overlay.RegistryOverlayImpl",
+      "registry_configuration": {
+        "group_name": "default-sample",
+        "group_password": "s3cr3t",
+        "overlay_members": [
           {
-            "name": "domain_0",
-            "mode": "static",
-            "description": "A sample dommain configuration"
-          }
-        ],
-        "registry": [
+            "host_name": "192.18.1.002",
+            "port": "7901"
+          },
           {
-            "registry_implementation": "org.ow2.petals.microkernel.registry.overlay.RegistryOverlayImpl",
-            "registry_configuration": [
-              {
-                "group_name": "default-sample",
-                "group_password": "s3cr3t",
-                "overlay_members": [
-                  {
-                    "host_name": "192.18.1.002",
-                    "port": "7901"
-                  },
-                  {
-                    "host_name": "192.18.1.003",
-                    "port": "7901"
-                  }
-                ]
-              }
-            ]
+            "host_name": "192.18.1.003",
+            "port": "7901"
           }
         ]
       }
-    ]
+    }
   }
-]
+}

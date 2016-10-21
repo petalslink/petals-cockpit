@@ -12,6 +12,7 @@ export interface WorkspacesState extends IWorkspaces {
   searchPetals: string;
   fetchingWorkspaces: boolean;
   importingBus: boolean;
+  gettingBusConfig: boolean;
 };
 
 // an Immutable.js Record implementation of the WorkspacesState interface.
@@ -23,9 +24,10 @@ export interface WorkspacesStateRecord extends TypedRecord<WorkspacesStateRecord
 
 // an Immutable.js record factory for the record
 export const workspacesStateFactory = makeTypedFactory<WorkspacesState, WorkspacesStateRecord>({
-    selectedWorkspaceId: null,
-    searchPetals: '',
-    workspaces: null,
-    fetchingWorkspaces: false,
-    importingBus: false
+  selectedWorkspaceId: null,
+  searchPetals: '',
+  workspaces: null,
+  fetchingWorkspaces: false,
+  gettingBusConfig: false,
+  importingBus: false
 });
