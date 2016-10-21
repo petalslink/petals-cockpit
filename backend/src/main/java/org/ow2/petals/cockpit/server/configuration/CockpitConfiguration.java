@@ -46,9 +46,11 @@ import io.dropwizard.setup.Environment;
 public class CockpitConfiguration extends Configuration {
 
     @Valid
+    @Nullable
     @JsonProperty("pac4j")
-    final Pac4jFactory pac4jFactory = new Pac4jFactory();
+    final Pac4jFactory pac4jFactory = null;
 
+    @Nullable
     public Pac4jFactory getPac4jFactory() {
         return pac4jFactory;
     }

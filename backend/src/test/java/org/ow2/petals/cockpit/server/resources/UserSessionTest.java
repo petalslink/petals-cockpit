@@ -18,34 +18,32 @@ package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.grizzly.http.server.util.Globals;
 import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.CockpitApplication;
+import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.representations.Authentication;
 import org.ow2.petals.cockpit.server.representations.UserData;
-import org.pac4j.core.config.Config;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.jax.rs.features.Pac4JSecurityFeature;
-import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
-import org.pac4j.jax.rs.servlet.features.ServletJaxRsContextFactoryProvider;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
+import io.dropwizard.client.JerseyClientBuilder;
+import io.dropwizard.testing.ResourceHelpers;
+import io.dropwizard.testing.junit.DropwizardAppRule;
 
 public class UserSessionTest {
 
@@ -53,31 +51,55 @@ public class UserSessionTest {
 
     public static final UserData ADMIN = new UserData("admin", "Administrator");
 
+    public static class App extends CockpitApplication<CockpitConfiguration> {
+
+    }
+
     @ClassRule
-    public static final ResourceTestRule resources = ResourceTestRule.builder()
-            .setTestContainerFactory(new GrizzlyWebTestContainerFactory()).addResource(new UserSession())
-            .addProvider(pac4jFeature()).build();
+    public static final DropwizardAppRule<CockpitConfiguration> RULE = new DropwizardAppRule<>(App.class,
+            ResourceHelpers.resourceFilePath("test-conf.yml"));
 
-    private static Feature pac4jFeature() {
-        final Config config = new Config();
-        CockpitApplication.setupPac4J(config, new MockAuthenticator());
+    @Nullable
+    private static Client client;
 
-        return new Feature() {
-            @Override
-            public boolean configure(@Nullable FeatureContext context) {
-                assert context != null;
-                context.register(new ServletJaxRsContextFactoryProvider(config));
-                context.register(new Pac4JSecurityFeature(config));
-                context.register(new Pac4JValueFactoryProvider.Binder());
-                return true;
-            }
-        };
+    @BeforeClass
+    public static void setUpClient() {
+        client = new JerseyClientBuilder(RULE.getEnvironment()).build("test client");
+    }
+
+    public static Client client() {
+        assert client != null;
+        return client;
     }
 
     private static Builder request() {
         // jersey client does not keep cookies in redirect...
-        return resources.getJerseyTest().target("/user/session").property(ClientProperties.FOLLOW_REDIRECTS, false)
-                .request();
+        return client().target(url("user/session"))
+                .property(ClientProperties.FOLLOW_REDIRECTS, false).request();
+    }
+
+    private static String url(String url) {
+        return String.format("http://localhost:%d/api/%s", RULE.getLocalPort(), url);
+    }
+
+    @Test
+    public void testProtectedUserFail() {
+        Response get = client().target(url("user")).request().get();
+
+        assertThat(get.getStatus()).isEqualTo(401);
+    }
+
+    @Test
+    public void testProtectedUserSucceedAfterLogin() {
+        final Response login = request().post(Entity.json(new Authentication("admin", "admin")));
+
+        assertThat(login.getStatus()).isEqualTo(302);
+        final NewCookie cookie = login.getCookies().get(SESSION_COOKIE_NAME);
+        assertThat(cookie).isNotNull();
+
+        Response get = client().target(url("user")).request().cookie(cookie).get();
+        assertThat(get.getStatus()).isEqualTo(200);
+        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
     }
 
     @Test
