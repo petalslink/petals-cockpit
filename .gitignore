@@ -9,6 +9,7 @@ data-mongodb
 
 # IDEs and editors
 .idea
+.vscode
 .project
 .classpath
 *.launch
