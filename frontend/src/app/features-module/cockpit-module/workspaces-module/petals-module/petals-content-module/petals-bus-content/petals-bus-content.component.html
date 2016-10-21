@@ -34,10 +34,18 @@
   </md-menu>
 </md-toolbar>
 
-<md-card class="central-content">
-  <md-card-content>
-    <md-card-title align="center">
-      Petals bus content works
-    </md-card-title>
-  </md-card-content>
-</md-card>
+<md-tab-group>
+  <md-tab>
+    <template md-tab-label>Overview</template>
+    <template md-tab-content>
+      <app-bus-overview></app-bus-overview>
+    </template>
+  </md-tab>
+
+  <md-tab>
+    <template md-tab-label>Config</template>
+    <template md-tab-content>
+      <app-bus-config></app-bus-config>
+    </template>
+  </md-tab>
+</md-tab-group>

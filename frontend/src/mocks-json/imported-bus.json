@@ -1,6 +1,7 @@
 {
   "id": null,
   "name": "Bus",
+  "state": "UNDEPLOYED",
   "containers": [
     {
       "id": null,

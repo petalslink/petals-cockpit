@@ -49,4 +49,18 @@ export class WorkspaceMockService {
       .of(response)
       .delay(environment.httpDelay);
   }
+
+  getBusConfig(): Observable<Response> {
+    return this.http.get('/mocks-json/bus0-demo.json')
+      .map((res: Response) => res.json())
+      .delay(environment.httpDelay)
+      .map(config => {
+        return <Response> {
+          ok: true,
+          json: function () {
+            return config;
+          }
+        };
+      });
+  }
 }

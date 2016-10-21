@@ -1,25 +1,21 @@
 @import './libs';
-
+@import './custom-theme.scss';
 // angular-material now uses themes and we do have to load one if we want colors and others like
 // primary, accent, etc
 @import '~@angular/material/core/theming/prebuilt/indigo-pink.css';
 
-@import './custom-theme';
+.color-primary {
+  color: md-color($primary) !important;
+}
 
-.material-icons {
-  font-family: 'Material Icons';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  -webkit-font-feature-settings: 'liga';
-  -webkit-font-smoothing: antialiased;
+.color-accent {
+  color: md-color($accent) !important;
+}
+
+.bkg-primary-card {
+  background: linear-gradient(rgb(99, 108, 161), rgb(179, 157, 219)) no-repeat 0 0;
+  background-size: 100% 144px; // width: 100% height: 192px
+  padding-top: 44px;
 }
 
 body {
@@ -47,7 +43,13 @@ body {
   width: 80%;
   max-width: 800px;
   margin: auto;
-  margin-top: 20px;
+}
+
+.test .md-fab-bottom-right {
+  right: 20px;
+  bottom: 20px;
+  position: fixed !important;
+  margin: 0;
 }
 
 .sidenav-menu {
@@ -59,3 +61,65 @@ body {
 .searched {
   background-color: md-color($accent);
 }
+
+/* Petals Components Overview, Config */
+
+.list-subheader {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.list-row {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.list-title {
+  font-weight: bold !important;
+}
+
+.list-element {
+  .list-title {
+    font-weight: bold !important;
+  }
+  md-divider {
+    color: #AFAFAF;
+    margin-top: 5px;
+  }
+  .custom-divider-config {
+    margin: 20px !important;
+    border-style: solid;
+  }
+  .custom-divider-config-repeat {
+    padding: 0;
+    margin: 20px !important;
+    width: 95%;
+    border-style: solid;
+  }
+  .md-list-item {
+    height: 40px !important;
+  }
+  md-input {
+    width: 350px;
+  }
+}
+
+.md-fab-top-right {
+  right: 20px;
+  top: 228px;
+  position: fixed !important;
+  margin: 0;
+}
+
+.error{
+  padding: 12px;
+  background-color: rgba(255, 0, 0, 0.2);
+  color: red;
+}
+
