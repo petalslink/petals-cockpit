@@ -39,5 +39,3 @@ mongo:
 
 logging:
   level: INFO
-
-pac4j:
