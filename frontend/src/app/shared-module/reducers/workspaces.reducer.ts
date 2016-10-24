@@ -25,6 +25,10 @@ export const CHANGE_SELECTED_WORKSPACE = 'CHANGE_SELECTED_WORKSPACE';
 export const EDIT_PETALS_SEARCH = 'EDIT_PETALS_SEARCH';
 export const DELETE_PETALS_SEARCH = 'DELETE_PETALS_SEARCH';
 export const IMPORTING_BUS = 'IMPORTING_BUS';
+// once the http request is launched to import a bus,
+// the server returns us an id (bus id) so we can display at least the name (that we already have)
+// and update the object later according to the id
+export const IMPORTING_BUS_MINIMAL_CONFIG = 'IMPORTING_BUS_MINIMAL_CONFIG';
 export const BUS_IMPORTED = 'BUS_IMPORTED';
 export const IMPORTING_BUS_FAILED = 'IMPORTING_BUS_FAILED';
 export const ADD_BUS = 'ADD_BUS';
@@ -33,83 +37,111 @@ export const FETCHING_BUS_CONFIG_SUCCESS = 'FETCHING_BUS_CONFIG_SUCCESS';
 export const FETCHING_BUS_CONFIG_FAILED = 'FETCHING_BUS_CONFIG_FAILED';
 
 export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord = workspacesStateFactory(), action: Action) {
-  let selectedWorkspaceId;
-  let workspacesStateTmp;
-
-  switch (action.type) {
-    case FETCHING_WORKSPACES:
-      return workspacesState.setIn(['fetchingWorkspaces'], true);
-
-    case FETCHING_WORKSPACES_FAILED:
-      return workspacesState.setIn(['fetchingWorkspaces'], false);
-
-    // when we reload all the workspaces
-    // the payload is plain javascript object
-    case WORKSPACES_FETCHED:
-      return workspacesState
-        .setIn(['fetchingWorkspaces'], false)
-        .setIn(['workspaces'], fromJS(action.payload));
-
-    case CHANGE_SELECTED_WORKSPACE:
-      return workspacesState.setIn(['selectedWorkspaceId'], action.payload);
-
-    case EDIT_PETALS_SEARCH:
-      return workspacesState.setIn(['searchPetals'], action.payload);
-
-    case DELETE_PETALS_SEARCH:
-      return workspacesState.setIn(['searchPetals'], '');
-
-    case IMPORTING_BUS:
-      return workspacesState.setIn(['importingBus'], true);
-
-    case BUS_IMPORTED:
-      return workspacesState.setIn(['importingBus'], false);
-
-    case IMPORTING_BUS_FAILED:
-      return workspacesState.setIn(['importingBus'], false);
-
-    /* ADD_BUS */
-    case ADD_BUS:
-      selectedWorkspaceId = workspacesState.get('selectedWorkspaceId');
-
-      let indexUpdate = workspacesState
-        .get('workspaces')
-        .findIndex((w: WorkspacesStateRecord) => w.get('id') === selectedWorkspaceId);
-
-      workspacesStateTmp =  workspacesState.setIn(['importingBus'], false);
-
-      let buses = workspacesStateTmp.getIn(['workspaces', indexUpdate, 'buses']);
-      buses = buses.push(fromJS(action.payload));
-
-      return workspacesStateTmp.setIn(['workspaces', indexUpdate, 'buses'], buses);
-
-    /* FETCHING_BUS_CONFIG */
-    case FETCHING_BUS_CONFIG:
-      return workspacesState.setIn(['gettingBusConfig'], true);
-
-    case FETCHING_BUS_CONFIG_SUCCESS:
-      selectedWorkspaceId = workspacesState.get('selectedWorkspaceId');
-
-      let indexWorkspaceUpdate = workspacesState
-        .get('workspaces')
-        .findIndex((workspaces: WorkspacesStateRecord) => workspaces.get('id') === selectedWorkspaceId);
-
-      let indexBusUpdate = workspacesState
-        .getIn(['workspaces', indexWorkspaceUpdate, 'buses'])
-        .findIndex((buses: WorkspacesStateRecord) => buses.get('id') === action.payload.idBus);
-
-      workspacesStateTmp =  workspacesState.setIn(['gettingBusConfig'], false);
-
-      let bus = workspacesStateTmp.getIn(['workspaces', indexWorkspaceUpdate, 'buses', indexBusUpdate]);
-      bus = bus.set('config', fromJS(action.payload.config));
-      return workspacesStateTmp.setIn(['workspaces', indexWorkspaceUpdate, 'buses', indexBusUpdate], bus);
-
-    case FETCHING_BUS_CONFIG_FAILED:
-      return workspacesState.setIn(['gettingBusConfig'], false);
-
-    default:
-      return workspacesState;
+  if (action.type === FETCHING_WORKSPACES) {
+    return workspacesState.setIn(['fetchingWorkspaces'], true);
   }
+
+  else if (action.type ===  FETCHING_WORKSPACES_FAILED) {
+    return workspacesState.setIn(['fetchingWorkspaces'], false);
+  }
+
+  // when we reload all the workspaces
+  // the payload is plain javascript object
+  else if (action.type === WORKSPACES_FETCHED) {
+    return workspacesState
+      .setIn(['fetchingWorkspaces'], false)
+      .setIn(['workspaces'], fromJS(action.payload));
+  }
+
+  else if (action.type === CHANGE_SELECTED_WORKSPACE) {
+    return workspacesState.setIn(['selectedWorkspaceId'], action.payload);
+  }
+
+  else if (action.type === EDIT_PETALS_SEARCH) {
+    return workspacesState.setIn(['searchPetals'], action.payload);
+  }
+
+  else if (action.type === DELETE_PETALS_SEARCH) {
+    return workspacesState.setIn(['searchPetals'], '');
+  }
+
+  else if (action.type === IMPORTING_BUS) {
+    return workspacesState.setIn(['importingBus'], true);
+  }
+
+  else if (action.type === BUS_IMPORTED) {
+    // once the bus is imported, move it from workspaces
+    return workspacesState.setIn(['importingBus'], false);
+  }
+
+  else if (action.type === IMPORTING_BUS_FAILED) {
+    return workspacesState.setIn(['importingBus'], false);
+  }
+
+  else if (action.type === IMPORTING_BUS_MINIMAL_CONFIG) {
+    let selectedWorkspaceId = workspacesState.get('selectedWorkspaceId');
+
+    let indexUpdate = workspacesState
+      .get('workspaces')
+      .findIndex((w: WorkspacesStateRecord) => w.get('id') === selectedWorkspaceId);
+
+    return workspacesState.setIn(['importingBus'], false)
+      .setIn(['workspaces', indexUpdate, 'busesInProgress'],
+        workspacesState.getIn(['workspaces', indexUpdate, 'busesInProgress']).push(fromJS(action.payload))
+      );
+  }
+
+  /* ADD_BUS */
+  else if (action.type === ADD_BUS) {
+    let selectedWorkspaceId = workspacesState.get('selectedWorkspaceId');
+
+    let indexUpdate = workspacesState
+      .get('workspaces')
+      .findIndex((w: WorkspacesStateRecord) => w.get('id') === selectedWorkspaceId);
+
+    let buses = workspacesState.getIn(['workspaces', indexUpdate, 'buses']);
+    buses = buses.push(fromJS(action.payload));
+
+    let workspacesStateTmp = workspacesState.setIn(['workspaces', indexUpdate, 'buses'], buses);
+
+    let busesInProgressTmp = workspacesStateTmp
+      .getIn(['workspaces', indexUpdate, 'busesInProgress'])
+      .filter(bus => bus.get('id') !== action.payload.id);
+
+    workspacesStateTmp = workspacesStateTmp.setIn(['workspaces', indexUpdate, 'busesInProgress'], busesInProgressTmp);
+
+    return workspacesStateTmp;
+  }
+
+  /* FETCHING_BUS_CONFIG */
+  else if (action.type === FETCHING_BUS_CONFIG) {
+    return workspacesState.setIn(['gettingBusConfig'], true);
+  }
+
+  else if (action.type === FETCHING_BUS_CONFIG_SUCCESS) {
+    let selectedWorkspaceId = workspacesState.get('selectedWorkspaceId');
+
+    let indexWorkspaceUpdate = workspacesState
+      .get('workspaces')
+      .findIndex((workspaces: WorkspacesStateRecord) => workspaces.get('id') === selectedWorkspaceId);
+
+    let indexBusUpdate = workspacesState
+      .getIn(['workspaces', indexWorkspaceUpdate, 'buses'])
+      .findIndex((buses: WorkspacesStateRecord) => buses.get('id') === action.payload.idBus);
+
+    let workspacesStateTmp = workspacesState.setIn(['gettingBusConfig'], false);
+
+    let bus = workspacesStateTmp.getIn(['workspaces', indexWorkspaceUpdate, 'buses', indexBusUpdate]);
+    bus = bus.set('config', fromJS(action.payload.config));
+
+    return workspacesStateTmp.setIn(['workspaces', indexWorkspaceUpdate, 'buses', indexBusUpdate], bus);
+  }
+
+  else if (action.type === FETCHING_BUS_CONFIG_FAILED) {
+    return workspacesState.setIn(['gettingBusConfig'], false);
+  }
+
+  return workspacesState;
 };
 
 export const WorkspacesReducer: ActionReducer<WorkspacesStateRecord> = createWorkspacesReducer;

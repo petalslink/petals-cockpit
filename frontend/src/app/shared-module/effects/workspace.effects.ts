@@ -82,10 +82,9 @@ export class WorkspaceEffects implements OnDestroy {
           throw new Error('Error while importing the bus');
         }
 
-        // we can not know if the bus is imported yet
-        // we just know so far that the request has been sent to the server
-        // we need to use sse to be warned as soon as the bus has been imported
-        return { type: '' };
+        // at this point, the server has only returned an ID + the previous information
+        // sent to create the bus. Save it so we can display the bus into importing list
+        return { type: 'IMPORTING_BUS_MINIMAL_CONFIG', payload: res.json() };
 
       })
       .catch((err) => {
@@ -95,7 +94,6 @@ export class WorkspaceEffects implements OnDestroy {
         return Observable.of({ type: IMPORTING_BUS_FAILED });
       })
     );
-
 
   @Effect({dispatch: true}) fetchingBusConfig$: Observable<Action> = this.actions$
     .ofType(FETCHING_BUS_CONFIG)

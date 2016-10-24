@@ -7,6 +7,9 @@ import { Observable } from 'rxjs';
 // our environment
 import { environment } from '../../../environments/environment';
 
+// our interfaces
+import { IBus } from '../interfaces/petals.interface';
+
 @Injectable()
 export class SseService {
   constructor() { }
@@ -34,7 +37,7 @@ export class SseService {
   // only used for mock !
   // but we do have to put it here otherwise we'd have to import the mock
   // and it would also be in prod
-  triggerSse(timer: number) {
+  triggerSse(bus: IBus) {
 
   }
 }

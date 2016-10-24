@@ -14,6 +14,11 @@ export const environment = {
   alreadyConnected: true,
   // delay for each http request (used if mock is set to true)
   httpDelay: 500,
-  // delay for sse events
-  sseDelay: 3000
+  // delay for sse events (between 15 and 30s)
+  get sseDelay(): number {
+    // return 2000;
+    let rand = (Math.floor(Math.random() * (1 + 30 - 15)) + 15) * 1000;
+    console.debug(`sse random timer : ${rand}`);
+    return rand;
+  }
 };
