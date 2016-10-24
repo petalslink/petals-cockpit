@@ -1,6 +1,7 @@
 // angular modules
 import { Injectable, OnDestroy } from '@angular/core';
 import { Response } from '@angular/http';
+import { Router } from '@angular/router';
 
 // rxjs
 import { Subscription } from 'rxjs/Subscription';
@@ -15,6 +16,7 @@ import { environment } from '../../../environments/environment';
 
 // our states
 import { AppState } from '../../app.state';
+import { WorkspacesStateRecord, WorkspacesState } from '../reducers/workspaces.state';
 
 // our services
 import { WorkspaceService } from '../services/workspace.service';
@@ -31,20 +33,24 @@ import {
   IMPORTING_BUS_FAILED,
   FETCHING_BUS_CONFIG_SUCCESS,
   FETCHING_BUS_CONFIG,
-  FETCHING_BUS_CONFIG_FAILED
+  FETCHING_BUS_CONFIG_FAILED,
+  IMPORTING_BUS_MINIMAL_CONFIG
 } from '../reducers/workspaces.reducer';
 
 @Injectable()
 export class WorkspaceEffects implements OnDestroy {
   // our subscription(s) to @ngrx/effects
   private subscription: Subscription;
+  private workspaces$: Observable<WorkspacesState>;
 
   constructor(
     private actions$: Actions,
     private store$: Store<AppState>,
-    private workspaceService: WorkspaceService
+    private workspaceService: WorkspaceService,
+    private router: Router
   ) {
     this.subscription = mergeEffects(this).subscribe(store$);
+    this.workspaces$ = <Observable<WorkspacesStateRecord>>this.store$.select('workspaces');
   }
 
   ngOnDestroy() {
@@ -94,6 +100,24 @@ export class WorkspaceEffects implements OnDestroy {
         return Observable.of({ type: IMPORTING_BUS_FAILED });
       })
     );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: false}) importingBusMinimalConfig$ = this.actions$
+    .ofType(IMPORTING_BUS_MINIMAL_CONFIG)
+    .map((action: Action) => {
+      this.workspaces$.subscribe((workspaces: WorkspacesStateRecord) => {
+        let selectedWorkspaceId = workspaces.get('selectedWorkspaceId');
+
+        this.router.navigate([
+          '/cockpit',
+          'workspaces',
+          selectedWorkspaceId,
+          'petals',
+          'bus',
+          action.payload.id
+        ]);
+      });
+    });
 
   @Effect({dispatch: true}) fetchingBusConfig$: Observable<Action> = this.actions$
     .ofType(FETCHING_BUS_CONFIG)

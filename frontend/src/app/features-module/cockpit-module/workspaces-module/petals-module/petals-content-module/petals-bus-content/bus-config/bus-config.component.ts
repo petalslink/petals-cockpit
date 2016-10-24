@@ -26,7 +26,6 @@ import { FETCHING_BUS_CONFIG } from '../../../../../../../shared-module/reducers
   styleUrls: ['./bus-config.component.scss']
 })
 export class BusConfigComponent implements OnInit {
-
   private workspaces$: Observable<WorkspacesState>;
   private workspaces: WorkspacesStateRecord;
   private idSelectedWorkspace: number;
