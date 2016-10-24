@@ -22,6 +22,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.resources.UserSession;
+import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
 import org.ow2.petals.cockpit.server.security.mongo.MongoAllanbankAuthenticator;
 import org.ow2.petals.cockpit.server.utils.DocumentAssignableModule;
@@ -105,6 +106,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         setupPac4J(configuration, client);
 
         environment.jersey().register(UserSession.class);
+        environment.jersey().register(WorkspacesResource.class);
     }
 
     /**
