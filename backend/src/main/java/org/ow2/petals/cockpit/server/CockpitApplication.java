@@ -146,7 +146,7 @@ class MongoHealthCheck extends HealthCheck {
 
     @Override
     protected Result check() throws Exception {
-        // if this does not fail, it's ok
+        // if this does not fail, it means the connection is working
         client.listDatabaseNames();
 
         return Result.healthy();
