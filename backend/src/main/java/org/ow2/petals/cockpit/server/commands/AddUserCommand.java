@@ -26,6 +26,7 @@ import com.allanbank.mongodb.MongoDatabase;
 import com.allanbank.mongodb.bson.Document;
 import com.allanbank.mongodb.bson.builder.BuilderFactory;
 import com.allanbank.mongodb.bson.builder.DocumentBuilder;
+import com.allanbank.mongodb.builder.Index;
 import com.allanbank.mongodb.builder.QueryBuilder;
 
 import io.dropwizard.cli.ConfiguredCommand;
@@ -69,6 +70,9 @@ public class AddUserCommand extends ConfiguredCommand<CockpitConfiguration> {
     private void addUser(MongoDatabase db, Namespace namespace) {
         final String username = namespace.getString("username");
         final MongoCollection users = db.getCollection("users");
+        // TODO move that in a command to initialize the db
+        // TODO check it is the correct way to create the index (because text is maybe not...)
+        users.createIndex(Index.text("username"));
         final Document user = users.findOne(QueryBuilder.where("username").equals(username));
         if (user == null) {
             final DocumentBuilder builder = BuilderFactory.start();
