@@ -5,57 +5,78 @@ import { Http } from '@angular/http';
 // rxjs
 import { Observable, Observer } from 'rxjs';
 
-// generate a UUID
-/* tslint:disable */
-let generateUuidV4 = a => a?(a^Math.random()*16>>a/4)
-  .toString(16):(<any>[1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,generateUuidV4);
-/* tslint:enable */
+// our environment
+import { environment } from '../../../environments/environment';
 
-// replace IDs in the json received
-// by generated UUID
-let replaceIds = obj => {
-  if (typeof obj.id !== 'undefined') {
-    obj.id = generateUuidV4(null);
-  }
+// our helpers
+import { replaceIds } from '../helpers/helper';
 
-  for (let i in obj) {
-    if (typeof obj[i] === 'object') {
-      replaceIds(obj[i]);
-    }
-  }
-};
+// our interfaces
+import { IBus } from '../interfaces/petals.interface';
 
 @Injectable()
 export class SseMockService {
   private observer: Observer<any>;
+  private timeoutSse: Array<any> = [];
 
   constructor(private http: Http) { }
 
-  subscribeToMessage(url) {
+  subscribeToMessage(idWorkspace) {
+    // if user changes workspace, this method is called
+    // if we were already listening on an sse connection ...
+    if (typeof this.observer !== 'undefined' && this.observer !== null) {
+      if (environment.debug) {
+        console.debug('closing previous sse connection');
+      }
+
+      this.observer.complete();
+
+      let i = this.timeoutSse.length - 1;
+
+      while (this.timeoutSse.length > 0) {
+        // cancel every timeout of the mock ...
+        clearTimeout(this.timeoutSse[i]);
+
+        // and clean the timeout array
+        this.timeoutSse.pop();
+        i--;
+      }
+    }
+
     return Observable.create(observer => {
+      if (environment.debug) {
+        console.debug('subscribing to a new sse connection');
+      }
+
       this.observer = observer;
 
       return () => {
         // unsubscribe
+        this.observer.complete();
       };
     });
   }
 
   // used only for the mock
-  triggerSse(timer: number) {
-    this.http.get('./mocks-json/imported-bus.json')
-      .map(data => data.json())
-      .subscribe(newBus => {
-        // replace every ID by a generated UUID
-        replaceIds(newBus);
+  triggerSse(bus: IBus) {
+    // wait before simulating an sse response
+    let timeoutSseTmp = setTimeout(() => {
+      this.http.get('./mocks-json/imported-bus.json')
+        .map(data => data.json())
+        .subscribe((newBus: IBus) => {
+          // replace every ID by a generated UUID
+          replaceIds(newBus);
 
-        // wait before simulating an sse response
-        setTimeout(() => {
+          // ... but keep the original bus ID
+          newBus.id = bus.id;
+
           this.observer.next({
-            event: 'BUS_IMPORTED',
+            event: 'BUS_IMPORT_OK',
             data: newBus
           });
-        }, timer);
-      });
+        });
+    }, environment.sseDelay);
+
+    this.timeoutSse.push(timeoutSseTmp);
   }
 }

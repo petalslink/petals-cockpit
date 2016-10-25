@@ -3,6 +3,7 @@
     "id": "559b4c47-5026-435c-bd6e-a47a903a7ba5",
     "name": "Workspace 0",
     "usedBy": "You're the only one to use this workspace",
+    "busesInProgress": [],
     "buses": [
       {
         "id": "ebda5972-c57f-4e35-963d-88bf342d6bd5",
@@ -82,6 +83,7 @@
     "id": "08dc0669-f7ca-4221-bf24-d59e07f5c1ed",
     "name": "Workspace 1",
     "usedBy": "Workspace also used by Victor NOEL, Christophe CHEVALIER and Maxime ROBERT",
+    "busesInProgress": [],
     "buses": [
       {
         "id": "85fd4ddf-bbd4-4562-99cc-62e7fb7d698b",

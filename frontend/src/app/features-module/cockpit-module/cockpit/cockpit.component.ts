@@ -18,8 +18,7 @@ import { WorkspacesState, WorkspacesStateRecord } from '../../../shared-module/r
 import { USR_IS_DISCONNECTING } from '../../../shared-module/reducers/user.reducer';
 import {
   CHANGE_SELECTED_WORKSPACE,
-  FETCHING_WORKSPACES,
-  ADD_BUS
+  FETCHING_WORKSPACES
 } from '../../../shared-module/reducers/workspaces.reducer';
 
 // our services
@@ -79,35 +78,30 @@ export class CockpitComponent implements OnInit {
         this.store.dispatch({ type: CHANGE_SELECTED_WORKSPACE, payload: idWorkspace });
       });
 
-    this.sseService.subscribeToMessage('test')
-      .subscribe(msg => {
-        if (msg.event === 'BUS_IMPORTED') {
-          this.store.dispatch({ type: ADD_BUS, payload: msg.data });
-        }
-      });
-
     const rePetals = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals/;
     const reService = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/service/;
     const reApi = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/api/;
 
-    this.router.events.subscribe((eventUrl: any) => {
-      const url = eventUrl.urlAfterRedirects;
+    this.router.events
+      .throttle(val => Observable.interval(500))
+      .subscribe((eventUrl: any) => {
+        const url = eventUrl.urlAfterRedirects;
 
-      if (typeof url === 'undefined') {
-        this.tabSelectedIndex = 0;
-      } else if (url.match(rePetals)) {
-        this.tabSelectedIndex = 0;
-      } else if (url.match(reService)) {
-        this.tabSelectedIndex = 1;
-      } else if (url.match(reApi)) {
-        this.tabSelectedIndex = 2;
-      } else {
-        this.tabSelectedIndex = 0;
-      }
+        if (typeof url === 'undefined') {
+          this.tabSelectedIndex = 0;
+        } else if (url.match(rePetals)) {
+          this.tabSelectedIndex = 0;
+        } else if (url.match(reService)) {
+          this.tabSelectedIndex = 1;
+        } else if (url.match(reApi)) {
+          this.tabSelectedIndex = 2;
+        } else {
+          this.tabSelectedIndex = 0;
+        }
 
-      // as the component is set to OnPush
-      this.changeDetectorRef.markForCheck();
-    });
+        // as the component is set to OnPush
+        this.changeDetectorRef.markForCheck();
+      });
   }
 
   openTab(index) {

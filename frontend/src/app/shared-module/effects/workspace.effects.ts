@@ -1,6 +1,7 @@
 // angular modules
 import { Injectable, OnDestroy } from '@angular/core';
 import { Response } from '@angular/http';
+import { Router } from '@angular/router';
 
 // rxjs
 import { Subscription } from 'rxjs/Subscription';
@@ -15,9 +16,11 @@ import { environment } from '../../../environments/environment';
 
 // our states
 import { AppState } from '../../app.state';
+import { WorkspacesStateRecord, WorkspacesState } from '../reducers/workspaces.state';
 
 // our services
 import { WorkspaceService } from '../services/workspace.service';
+import { SseService } from '../services/sse.service';
 
 // our interfaces
 import { IWorkspace } from '../interfaces/workspace.interface';
@@ -31,25 +34,52 @@ import {
   IMPORTING_BUS_FAILED,
   FETCHING_BUS_CONFIG_SUCCESS,
   FETCHING_BUS_CONFIG,
-  FETCHING_BUS_CONFIG_FAILED
+  FETCHING_BUS_CONFIG_FAILED,
+  IMPORTING_BUS_MINIMAL_CONFIG,
+  CHANGE_SELECTED_WORKSPACE,
+  ADD_BUS
 } from '../reducers/workspaces.reducer';
 
 @Injectable()
 export class WorkspaceEffects implements OnDestroy {
   // our subscription(s) to @ngrx/effects
   private subscription: Subscription;
+  private workspaces$: Observable<WorkspacesState>;
 
   constructor(
     private actions$: Actions,
     private store$: Store<AppState>,
-    private workspaceService: WorkspaceService
+    private workspaceService: WorkspaceService,
+    private router: Router,
+    private sseService: SseService
   ) {
     this.subscription = mergeEffects(this).subscribe(store$);
+    this.workspaces$ = <Observable<WorkspacesStateRecord>>this.store$.select('workspaces');
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: true}) changeSelectedWorkspace$: Observable<Action> = this.actions$
+    .ofType(CHANGE_SELECTED_WORKSPACE)
+    .filter(action => typeof action.payload !== 'undefined')
+    .switchMap(action =>
+        this.sseService.subscribeToMessage(action.payload)
+        .map(msg => {
+          if (msg.event === 'BUS_IMPORT_OK') {
+            return { type: ADD_BUS, payload: msg.data };
+          }
+          else if (msg.event === 'BUS_IMPORT_ERROR') {
+            // TODO
+            return { type: '', payload: null };
+          }
+          else {
+            return { type: '', payload: null };
+          }
+        })
+    );
 
   // tslint:disable-next-line:member-ordering
   @Effect({dispatch: true}) fetchingWorkspaces$: Observable<Action> = this.actions$
@@ -82,10 +112,9 @@ export class WorkspaceEffects implements OnDestroy {
           throw new Error('Error while importing the bus');
         }
 
-        // we can not know if the bus is imported yet
-        // we just know so far that the request has been sent to the server
-        // we need to use sse to be warned as soon as the bus has been imported
-        return { type: '' };
+        // at this point, the server has only returned an ID + the previous information
+        // sent to create the bus. Save it so we can display the bus into importing list
+        return { type: 'IMPORTING_BUS_MINIMAL_CONFIG', payload: res.json() };
 
       })
       .catch((err) => {
@@ -96,6 +125,23 @@ export class WorkspaceEffects implements OnDestroy {
       })
     );
 
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: false}) importingBusMinimalConfig$ = this.actions$
+    .ofType(IMPORTING_BUS_MINIMAL_CONFIG)
+    .map((action: Action) => {
+      this.workspaces$.subscribe((workspaces: WorkspacesStateRecord) => {
+        let selectedWorkspaceId = workspaces.get('selectedWorkspaceId');
+
+        this.router.navigate([
+          '/cockpit',
+          'workspaces',
+          selectedWorkspaceId,
+          'petals',
+          'bus',
+          action.payload.id
+        ]);
+      });
+    });
 
   @Effect({dispatch: true}) fetchingBusConfig$: Observable<Action> = this.actions$
     .ofType(FETCHING_BUS_CONFIG)

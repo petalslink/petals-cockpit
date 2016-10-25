@@ -1,4 +1,4 @@
-<md-toolbar color="primary">
+<md-toolbar color="primary" *ngIf="!importing">
   <span>
     Petals - Import a bus
   </span>
@@ -8,22 +8,22 @@
   <md-card-content>
     <md-card-title align="center">
 
-      <form>
-        <md-input placeholder="IP" value="192.168.1.x" [disabled]="(workspaces$ | async).importingBus"></md-input>
-        <md-input placeholder="Port" value="8000" [disabled]="(workspaces$ | async).importingBus"></md-input>
-        <md-input placeholder="Login" value="admin" [disabled]="(workspaces$ | async).importingBus"></md-input>
-        <md-input placeholder="Password" type="password" value="adminpwd" [disabled]="(workspaces$ | async).importingBus"></md-input>
+      <form #formImportBus="ngForm" (ngSubmit)="importBus(formImportBus.value)">
+        <md-input [(ngModel)]="newBus.ip" name="ip" placeholder="IP" [disabled]="(workspaces$ | async).importingBus || importing"></md-input>
+        <md-input [(ngModel)]="newBus.port" name="port" placeholder="Port" [disabled]="(workspaces$ | async).importingBus || importing"></md-input>
+        <md-input [(ngModel)]="newBus.login" name="login" placeholder="Login" [disabled]="(workspaces$ | async).importingBus || importing"></md-input>
+        <md-input [(ngModel)]="newBus.password" name="password" placeholder="Password" type="password" [disabled]="(workspaces$ | async).importingBus || importing"></md-input>
         <br>
 
         <button
           md-raised-button
           color="accent"
-          (click)="importBus({ip: '192.168.1.x', port: 8000, login: 'admin', password: 'adminpwd'})"
-          [disabled]="(workspaces$ | async).importingBus"
+          type="submit"
+          [disabled]="(workspaces$ | async).importingBus || importing"
         >
-          <span *ngIf="!(workspaces$ | async).importingBus">Import bus</span>
-          <span *ngIf="(workspaces$ | async).importingBus">
-            Importing bus <md-progress-circle *ngIf="(workspaces$ | async).importingBus" mode="indeterminate"></md-progress-circle>
+          <span *ngIf="!(workspaces$ | async).importingBus && !importing">Import bus</span>
+          <span *ngIf="(workspaces$ | async).importingBus || importing">
+            Importing bus <md-progress-circle mode="indeterminate"></md-progress-circle>
           </span>
         </button>
       </form>

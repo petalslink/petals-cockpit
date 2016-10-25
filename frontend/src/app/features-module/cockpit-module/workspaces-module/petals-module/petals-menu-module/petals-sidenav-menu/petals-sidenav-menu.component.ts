@@ -16,6 +16,7 @@ import { WorkspacesState, WorkspacesStateRecord } from '../../../../../../shared
 
 // our interfaces
 import { IBus } from '../../../../../../shared-module/interfaces/petals.interface';
+import { IWorkspace } from '../../../../../../shared-module/interfaces/workspace.interface';
 
 // our selectors
 import { getSearchedWorkspace } from '../../../../../../shared-module/reducers/workspaces.reducer';
@@ -33,9 +34,11 @@ export class PetalsSidenavMenuComponent implements OnInit {
   private workspaces: WorkspacesState;
   private buses: List<IBus>;
   private selectedWorkspaceId: string;
+  private selectedWorkspace: IWorkspace;
 
   constructor(private store: Store<AppState>) {
-    this.workspaces$ = store.let(getSearchedWorkspace()).map((workspaces: WorkspacesStateRecord) => workspaces.toJS());
+    this.workspaces$ = store.let(getSearchedWorkspace())
+      .map((workspaces: WorkspacesStateRecord) => workspaces.toJS());
   }
 
   ngOnInit() {
@@ -48,6 +51,7 @@ export class PetalsSidenavMenuComponent implements OnInit {
       ) {
         this.workspaces = workspaces;
         this.selectedWorkspaceId = workspaces.selectedWorkspaceId;
+        this.selectedWorkspace = workspaces.workspaces.find(w => w.id === workspaces.selectedWorkspaceId);
         this.buses = workspaces.workspaces.find(w => w.id === workspaces.selectedWorkspaceId).buses;
       }
     });

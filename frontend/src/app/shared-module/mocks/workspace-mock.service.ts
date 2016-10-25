@@ -8,6 +8,9 @@ import { Observable } from 'rxjs';
 // our environment
 import { environment } from '../../../environments/environment';
 
+// our helpers
+import { generateUuidV4 } from '../helpers/helper';
+
 // our interfaces
 import { INewBus } from '../interfaces/petals.interface';
 
@@ -35,15 +38,17 @@ export class WorkspaceMockService {
   importBus(newBus: INewBus) {
     let response = <Response>{
       ok: true,
-      json: function () {
+      json: () => {
         // no need to return the newbus as we'll have to listen on sse
         // because it can be quite a long task to import a bus
-        return {};
+        let bus: any = Object.assign({ id: generateUuidV4() }, newBus);
+
+        // trigger a fake sse response
+        this.sseService.triggerSse(bus);
+
+        return bus;
       }
     };
-
-    // trigger a fake sse response after 3s
-    this.sseService.triggerSse(3000);
 
     return Observable
       .of(response)

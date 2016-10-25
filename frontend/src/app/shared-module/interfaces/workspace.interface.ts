@@ -8,6 +8,7 @@ export interface IWorkspace extends Map<any, any> {
   name: string;
   usedBy: string;
   buses: List<IBus>;
+  busesInProgress: List<IBus>;
   selectedBusId: number;
 }
 

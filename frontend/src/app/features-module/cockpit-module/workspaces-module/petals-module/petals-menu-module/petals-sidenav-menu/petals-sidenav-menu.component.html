@@ -17,9 +17,21 @@
     </span>
   </md-input>
 
+  <md-nav-list dense *ngIf="workspaces && selectedWorkspace.busesInProgress.length > 0">
+    <h3 md-subheader>In progress</h3>
+    <a
+      md-list-item
+      *ngFor="let bus of selectedWorkspace.busesInProgress"
+      [routerLink]="['/', 'cockpit', 'workspaces', selectedWorkspaceId, 'petals', 'bus', bus.id]"
+    >
+      {{bus.ip}}
+    </a>
+  </md-nav-list>
+
   <app-buses-menu
     *ngIf="selectedWorkspaceId && workspaces"
     [idWorkspace]="selectedWorkspaceId"
+    [workspace]="selectedWorkspace"
     [buses]="buses"
     [search]="textSearch">
   </app-buses-menu>
