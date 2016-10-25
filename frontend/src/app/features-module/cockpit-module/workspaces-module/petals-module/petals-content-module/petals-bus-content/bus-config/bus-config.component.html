@@ -5,7 +5,7 @@
         Petals Bus Config
       </md-card-title>
 
-      <form #busConfigForm="ngForm" (ngSubmit)="onUpdate()" *ngIf="bus.config">
+      <form #busConfigForm="ngForm" (ngSubmit)="onUpdate()" *ngIf="bus && bus.config">
 
         <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
 

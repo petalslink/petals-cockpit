@@ -10,6 +10,7 @@ import { Store } from '@ngrx/store';
 
 // our interfaces
 import { IBus } from '../../../../../../shared-module/interfaces/petals.interface';
+import { IWorkspaces } from '../../../../../../shared-module/interfaces/workspace.interface';
 
 // our states
 import { AppState } from '../../../../../../app.state';
@@ -26,43 +27,55 @@ import { FETCHING_BUS_CONFIG } from '../../../../../../shared-module/reducers/wo
 export class PetalsBusContentComponent implements OnInit {
   private bus: IBus;
   private workspaces$: Observable<WorkspacesState>;
-  private workspaces: WorkspacesStateRecord;
+  private workspaces: IWorkspaces;
   private idSelectedWorkspace: string;
   private idBus: string;
 
   // is the bus being imported ?
   private busInImport: boolean;
 
+  private shouldFetchBus = false;
+
   constructor(private store: Store<AppState>, private route: ActivatedRoute) {
-    this.workspaces$ = <Observable<WorkspacesStateRecord>>this.store.select('workspaces');
+    this.workspaces$ = <Observable<WorkspacesStateRecord>>this.store.select('workspaces')
+      .map((workspaces: WorkspacesStateRecord) => workspaces.toJS());
   }
 
   ngOnInit() {
-    let params$ = this.route.params;
+    this.route.params.subscribe(params => {
+      this.shouldFetchBus = true;
+    });
 
-    this.workspaces$.combineLatest(params$, (workspaces: WorkspacesStateRecord, params) => {
-      this.workspaces = workspaces.toJS();
-      this.idSelectedWorkspace = workspaces.selectedWorkspaceId;
+    this.workspaces$.combineLatest(this.route.params, (workspaces: WorkspacesState, params) => {
       this.idBus = params.idBus;
+      this.workspaces = workspaces;
+      this.idSelectedWorkspace = workspaces.selectedWorkspaceId;
 
-      if (typeof workspaces.workspaces === 'undefined' || workspaces.workspaces === null) {
-        return;
-      }
-
-      let workspaceIndex = workspaces.workspaces.findIndex(w => w.id === params['idWorkspace']);
-
-      this.busInImport = workspaces.workspaces[workspaceIndex].busesInProgress.filter(bus => bus.id === params['idBus']).length > 0;
-
-      if (this.busInImport) {
-        this.bus = workspaces.workspaces[workspaceIndex].busesInProgress.filter(bus => bus.id === params['idBus'])[0];
-      }
-
-      else {
-        this.bus = workspaces.workspaces[workspaceIndex].buses.filter(bus => bus.id === params['idBus'])[0];
-
-        this.store.dispatch({type: FETCHING_BUS_CONFIG, payload: this.idBus});
-      }
+      this.updateBus();
     })
     .subscribe();
+  }
+
+  updateBus() {
+    if (typeof this.workspaces.workspaces === 'undefined' || this.workspaces.workspaces === null) {
+      return;
+    }
+
+    let workspaceIndex = this.workspaces.workspaces.findIndex(w => w.id === this.idSelectedWorkspace);
+
+    this.busInImport = this.workspaces.workspaces[workspaceIndex].busesInProgress.filter(bus => bus.id === this.idBus).length > 0;
+
+    if (this.busInImport) {
+      this.bus = this.workspaces.workspaces[workspaceIndex].busesInProgress.filter(bus => bus.id === this.idBus)[0];
+    }
+
+    else {
+      this.bus = this.workspaces.workspaces[workspaceIndex].buses.filter(bus => bus.id === this.idBus)[0];
+
+      if (this.shouldFetchBus) {
+        this.store.dispatch({type: FETCHING_BUS_CONFIG, payload: this.idBus});
+        this.shouldFetchBus = false;
+      }
+    }
   }
 }

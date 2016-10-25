@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 // our interfaces
 import { IBus } from '../../../../../../../shared-module/interfaces/petals.interface';
-import { Response } from '@angular/http';
+
 import { WorkspaceService } from '../../../../../../../shared-module/services/workspace.service';
 
 @Component({
@@ -17,14 +17,14 @@ export class BusConfigComponent {
   constructor(private workspaceService: WorkspaceService) { }
 
   updateBusConfig() {
-/*    this.onUpdate.next();
-    console.log('Update Bus ...');
-    alert(`Config Bus Saved works ! ${JSON.stringify(this.bus)}`);*/
     this.onUpdate.next();
-    this.workspaceService
-      .saveBusConfig(this.bus)
-      .subscribe(
-        (r: Response) => {console.log('success');}
-      );
+
+    // TODO: Do not use service directly from a component
+    // use effects from ngrx
+    // this.workspaceService
+    //   .saveBusConfig(this.bus)
+    //   .subscribe(
+    //     (r: Response) => {console.log('success');}
+    //   );
   }
 }

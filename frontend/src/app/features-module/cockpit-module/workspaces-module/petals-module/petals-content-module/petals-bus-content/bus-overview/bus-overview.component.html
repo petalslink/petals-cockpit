@@ -6,7 +6,7 @@
       </md-card-title>
 
       <md-list dense>
-        <form #busOverviewForm="ngForm" *ngIf="bus.config">
+        <form #busOverviewForm="ngForm" *ngIf="bus && bus.config">
 
           <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
 

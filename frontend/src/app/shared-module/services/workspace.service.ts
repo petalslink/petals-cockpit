@@ -30,7 +30,7 @@ export class WorkspaceService {
     return this.http.get(`${environment.urlBackend}/workspaces/${wid}/bus/${bid}`);
   }
 
-  saveBusConfig(bus: IBus){
+  saveBusConfig(bus: IBus) {
     let wid = '08dc0669-f7ca-4221-bf24-d59e07f5c1ed';
     let bid = '85fd4ddf-bbd4-4562-99cc-62e7fb7d698b';
     return this.http.put(`${environment.urlBackend}/workspaces/${wid}/bus/${bid}`, <any>bus);
