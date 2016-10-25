@@ -9,7 +9,7 @@ import { InterceptorService } from 'ng2-interceptors';
 
 // our environment
 import { environment } from '../../../environments/environment';
-import { INewBus } from '../interfaces/petals.interface';
+import { INewBus, IBus } from '../interfaces/petals.interface';
 
 @Injectable()
 export class WorkspaceService {
@@ -28,5 +28,11 @@ export class WorkspaceService {
     let bid = '85fd4ddf-bbd4-4562-99cc-62e7fb7d698b';
     // TODO: Get real IDs to do not forget
     return this.http.get(`${environment.urlBackend}/workspaces/${wid}/bus/${bid}`);
+  }
+
+  saveBusConfig(bus: IBus) {
+    let wid = '08dc0669-f7ca-4221-bf24-d59e07f5c1ed';
+    let bid = '85fd4ddf-bbd4-4562-99cc-62e7fb7d698b';
+    return this.http.put(`${environment.urlBackend}/workspaces/${wid}/bus/${bid}`, <any>bus);
   }
 }
