@@ -12,7 +12,7 @@
     <md-card-content>
       <form #formLogin="ngForm" (ngSubmit)="connectUser(formLogin.value)">
         <div align="center">
-          <md-input placeholder="Username" name="username" [(ngModel)]="username" type="Text">
+          <md-input #nameInput placeholder="Username" name="username" [(ngModel)]="username" type="Text">
             <span md-prefix>
               <md-icon>person</md-icon>
             </span>
