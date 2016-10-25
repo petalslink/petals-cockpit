@@ -4,30 +4,35 @@
   </span>
 </md-toolbar>
 
-<md-card class="central-content">
-  <md-card-content>
-    <md-card-title align="center">
+<div class="bkg-primary-card">
+  <md-card class="central-content list-element">
+    <md-card-content>
 
       <form #formImportBus="ngForm" (ngSubmit)="importBus(formImportBus.value)">
-        <md-input [(ngModel)]="newBus.ip" name="ip" placeholder="IP" [disabled]="(workspaces$ | async).importingBus || importing"></md-input>
-        <md-input [(ngModel)]="newBus.port" name="port" placeholder="Port" [disabled]="(workspaces$ | async).importingBus || importing"></md-input>
-        <md-input [(ngModel)]="newBus.login" name="login" placeholder="Login" [disabled]="(workspaces$ | async).importingBus || importing"></md-input>
-        <md-input [(ngModel)]="newBus.password" name="password" placeholder="Password" type="password" [disabled]="(workspaces$ | async).importingBus || importing"></md-input>
-        <br>
+        <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
 
-        <button
-          md-raised-button
-          color="accent"
-          type="submit"
-          [disabled]="(workspaces$ | async).importingBus || importing"
-        >
-          <span *ngIf="!(workspaces$ | async).importingBus && !importing">Import bus</span>
-          <span *ngIf="(workspaces$ | async).importingBus || importing">
-            Importing bus <md-progress-circle mode="indeterminate"></md-progress-circle>
-          </span>
-        </button>
+        <div class="input-row">
+          <md-input type="text" [(ngModel)]="newBus.ip" name="ip" placeholder="IP" [disabled]="(workspaces$ | async).importingBus || importing"></md-input>
+          <md-input type="text" [(ngModel)]="newBus.port" name="port" placeholder="Port" [disabled]="(workspaces$ | async).importingBus || importing"></md-input>
+          <md-input type="text" [(ngModel)]="newBus.login" name="login" placeholder="Login" [disabled]="(workspaces$ | async).importingBus || importing"></md-input>
+          <md-input type="password" [(ngModel)]="newBus.password" name="password" placeholder="Password" [disabled]="(workspaces$ | async).importingBus || importing"></md-input>
+        </div>
+
+        <div align="end" class="pnl-btn-import">
+          <button
+            md-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="(workspaces$ | async).importingBus || importing"
+          >
+            <span *ngIf="!(workspaces$ | async).importingBus && !importing">Import bus</span>
+            <span *ngIf="(workspaces$ | async).importingBus || importing">
+              Importing bus <md-progress-circle mode="indeterminate"></md-progress-circle>
+            </span>
+          </button>
+        </div>
       </form>
 
-    </md-card-title>
-  </md-card-content>
-</md-card>
+    </md-card-content>
+  </md-card>
+</div>
