@@ -9,7 +9,7 @@
     <md-icon>more_vert</md-icon>
   </button>
 
-  <md-menu x-position="before" #menu="mdMenu">
+  <md-menu x-position="before" #menu="mdMenu" >
     <button md-menu-item>
       Overview
     </button>
@@ -42,14 +42,14 @@
   <md-tab>
     <template md-tab-label>Overview</template>
     <template md-tab-content>
-      <app-bus-overview></app-bus-overview>
+      <app-bus-overview [bus]="bus" (OnInit)="bus"></app-bus-overview>
     </template>
   </md-tab>
 
   <md-tab>
     <template md-tab-label>Config</template>
     <template md-tab-content>
-      <app-bus-config></app-bus-config>
+      <app-bus-config [bus]="bus" (OnInit)="bus"></app-bus-config>
     </template>
   </md-tab>
 </md-tab-group>
