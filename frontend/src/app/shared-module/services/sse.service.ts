@@ -12,12 +12,28 @@ import { IBus } from '../interfaces/petals.interface';
 
 @Injectable()
 export class SseService {
+  private currentSse;
+
   constructor() { }
 
-  subscribeToMessage(url) {
+  subscribeToMessage(idWorkspace) {
+    if (typeof this.currentSse !== 'undefined' && this.currentSse !== null) {
+      if (environment.debug) {
+        console.debug('closing previous sse connection');
+      }
+
+      this.currentSse.close();
+    }
+
     return Observable.create(observer => {
+      if (environment.debug) {
+        console.debug('subscribing to a new sse connection');
+      }
+
       // creates event object
-      let eventSource = new EventSource(`${environment.urlBackendSse}/${url}`);
+      let eventSource = new EventSource(`${environment.urlBackendSse}/workspaces/${idWorkspace}`);
+
+      this.currentSse = eventSource;
 
       // listing server messages
       eventSource.onmessage = (evt) => {

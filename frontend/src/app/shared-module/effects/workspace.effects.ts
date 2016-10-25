@@ -20,6 +20,7 @@ import { WorkspacesStateRecord, WorkspacesState } from '../reducers/workspaces.s
 
 // our services
 import { WorkspaceService } from '../services/workspace.service';
+import { SseService } from '../services/sse.service';
 
 // our interfaces
 import { IWorkspace } from '../interfaces/workspace.interface';
@@ -34,7 +35,9 @@ import {
   FETCHING_BUS_CONFIG_SUCCESS,
   FETCHING_BUS_CONFIG,
   FETCHING_BUS_CONFIG_FAILED,
-  IMPORTING_BUS_MINIMAL_CONFIG
+  IMPORTING_BUS_MINIMAL_CONFIG,
+  CHANGE_SELECTED_WORKSPACE,
+  ADD_BUS
 } from '../reducers/workspaces.reducer';
 
 @Injectable()
@@ -47,7 +50,8 @@ export class WorkspaceEffects implements OnDestroy {
     private actions$: Actions,
     private store$: Store<AppState>,
     private workspaceService: WorkspaceService,
-    private router: Router
+    private router: Router,
+    private sseService: SseService
   ) {
     this.subscription = mergeEffects(this).subscribe(store$);
     this.workspaces$ = <Observable<WorkspacesStateRecord>>this.store$.select('workspaces');
@@ -56,6 +60,26 @@ export class WorkspaceEffects implements OnDestroy {
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: true}) changeSelectedWorkspace$: Observable<Action> = this.actions$
+    .ofType(CHANGE_SELECTED_WORKSPACE)
+    .filter(action => typeof action.payload !== 'undefined')
+    .switchMap(action =>
+        this.sseService.subscribeToMessage(action.payload)
+        .map(msg => {
+          if (msg.event === 'BUS_IMPORT_OK') {
+            return { type: ADD_BUS, payload: msg.data };
+          }
+          else if (msg.event === 'BUS_IMPORT_ERROR') {
+            // TODO
+            return { type: '', payload: null };
+          }
+          else {
+            return { type: '', payload: null };
+          }
+        })
+    );
 
   // tslint:disable-next-line:member-ordering
   @Effect({dispatch: true}) fetchingWorkspaces$: Observable<Action> = this.actions$
