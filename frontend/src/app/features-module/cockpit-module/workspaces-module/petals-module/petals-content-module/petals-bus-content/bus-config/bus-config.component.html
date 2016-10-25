@@ -5,7 +5,7 @@
         Petals Bus Config
       </md-card-title>
 
-      <form #busConfigForm="ngForm" (ngSubmit)="saveBusConfig()" *ngIf="bus.config">
+      <form #busConfigForm="ngForm" (ngSubmit)="onUpdate()" *ngIf="bus.config">
 
         <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
 
@@ -108,7 +108,7 @@
           <md-divider class="color-accent custom-divider-config-repeat"></md-divider>
         </div>
 
-        <button type="submit" md-fab class="md-fab-top-right">
+        <button type="submit" md-fab class="md-fab-top-right" (onUpdate)="updateBusConfig(bus)">
           <md-icon>check</md-icon>
         </button>
 
