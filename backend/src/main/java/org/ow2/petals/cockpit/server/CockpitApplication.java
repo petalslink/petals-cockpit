@@ -29,9 +29,10 @@ import org.ow2.petals.cockpit.server.utils.DocumentAssignableModule;
 import org.ow2.petals.cockpit.server.utils.DocumentAssignableWriter;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.config.ConfigSingleton;
-import org.pac4j.core.credentials.password.JBCryptPasswordEncoder;
+import org.pac4j.core.credentials.password.SpringSecurityPasswordEncoder;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.allanbank.mongodb.MongoClient;
 import com.allanbank.mongodb.MongoDatabase;
@@ -131,7 +132,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 auth.setUsersDatabase(configuration.getDatabaseFactory().getDatabase());
                 auth.setUsersCollection("users");
                 auth.setAttributes("display_name");
-                auth.setPasswordEncoder(new JBCryptPasswordEncoder());
+                auth.setPasswordEncoder(new SpringSecurityPasswordEncoder(new BCryptPasswordEncoder()));
                 cac.setAuthenticator(auth);
             }
         }

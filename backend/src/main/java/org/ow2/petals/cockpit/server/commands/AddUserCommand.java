@@ -17,8 +17,9 @@
 package org.ow2.petals.cockpit.server.commands;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.mindrot.jbcrypt.BCrypt;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.allanbank.mongodb.MongoClient;
 import com.allanbank.mongodb.MongoCollection;
@@ -41,6 +42,8 @@ import net.sourceforge.argparse4j.inf.Subparser;
  *
  */
 public class AddUserCommand extends ConfiguredCommand<CockpitConfiguration> {
+
+    private static final PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
 
     public AddUserCommand() {
         super("add-user", "Add a user to the database");
@@ -77,7 +80,7 @@ public class AddUserCommand extends ConfiguredCommand<CockpitConfiguration> {
         if (user == null) {
             final DocumentBuilder builder = BuilderFactory.start();
             builder.add("username", username);
-            builder.add("password", BCrypt.hashpw(namespace.getString("password"), BCrypt.gensalt()));
+            builder.add("password", pwEncoder.encode(namespace.getString("password")));
             builder.add("display_name", namespace.getString("name"));
             users.insert(builder.build());
             System.out.println("Added user " + username);
