@@ -17,6 +17,9 @@
 package org.ow2.petals.cockpit.server;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
@@ -31,6 +34,8 @@ import org.pac4j.core.config.Config;
 import org.pac4j.core.credentials.password.SpringSecurityPasswordEncoder;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.allanbank.mongodb.MongoClient;
@@ -39,6 +44,8 @@ import com.codahale.metrics.health.HealthCheck;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 
 import io.dropwizard.Application;
+import io.dropwizard.jetty.BiDiGzipHandler;
+import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -49,6 +56,8 @@ import io.dropwizard.setup.Environment;
  *
  */
 public class CockpitApplication<C extends CockpitConfiguration> extends Application<C> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CockpitApplication.class);
 
     private final Pac4jBundle<CockpitConfiguration> pac4j = new Pac4jBundle<CockpitConfiguration>() {
         @Nullable
@@ -109,6 +118,23 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
         environment.jersey().register(UserSession.class);
         environment.jersey().register(WorkspacesResource.class);
+
+        // This is needed for SSE to work correctly!
+        // See https://github.com/dropwizard/dropwizard/issues/1673
+        environment.lifecycle().addServerLifecycleListener(new ServerLifecycleListener() {
+            @Override
+            public void serverStarted(@Nullable Server server) {
+                assert server != null;
+                Handler handler = server.getHandler();
+                while (handler instanceof HandlerWrapper) {
+                    handler = ((HandlerWrapper) handler).getHandler();
+                    if (handler instanceof BiDiGzipHandler) {
+                        LOG.info("Setting sync flush on gzip compression handler");
+                        ((BiDiGzipHandler) handler).setSyncFlush(true);
+                    }
+                }
+            }
+        });
     }
 
     /**

@@ -30,6 +30,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.media.sse.EventOutput;
+import org.glassfish.jersey.media.sse.SseFeature;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
@@ -87,6 +89,15 @@ public class WorkspacesResource {
         public WorkspaceTree get(@PathParam("wsId") String wsId) {
             // TODO
             return new WorkspaceTree();
+        }
+
+        @GET
+        @Path("/events")
+        @Produces(SseFeature.SERVER_SENT_EVENTS)
+        public EventOutput sse(@PathParam("wsId") String wsId) {
+            final EventOutput eventOutput = new EventOutput();
+            // TODO
+            return eventOutput;
         }
     }
 
