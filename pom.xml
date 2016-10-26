@@ -29,7 +29,12 @@
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+    <!-- Provided by dependency:properties -->
+    <quasar.path>${co.paralleluniverse:quasar-core:jar:jdk8}</quasar.path>
+
     <dropwizard.version>1.0.2</dropwizard.version>
+    <quasar.version>0.7.6</quasar.version>
+    <comsat.version>0.7.0</comsat.version>
   </properties>
 
   <modules>
@@ -52,6 +57,35 @@
         <version>2.0.0</version>
         <!-- Prevent the dependency from being included in distributions -->
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>co.paralleluniverse</groupId>
+        <artifactId>quasar-actors</artifactId>
+        <version>${quasar.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>co.paralleluniverse</groupId>
+        <artifactId>quasar-core</artifactId>
+        <version>${quasar.version}</version>
+        <classifier>jdk8</classifier>
+      </dependency>
+      <dependency>
+        <!-- force version because of quasar-core -->
+        <groupId>org.hdrhistogram</groupId>
+        <artifactId>HdrHistogram</artifactId>
+        <version>2.1.9</version>
+      </dependency>
+      <dependency>
+        <!-- force version because of quasar-core -->
+        <groupId>com.esotericsoftware</groupId>
+        <artifactId>kryo</artifactId>
+        <version>4.0.0</version>
+      </dependency>
+      <dependency>
+        <!-- force version because of quasar-core and dropwizard-testing -->
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy</artifactId>
+        <version>1.4.16</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -104,6 +138,8 @@
         <executions>
           <execution>
             <goals>
+              <!-- Needed for surefire -->
+              <goal>properties</goal>
               <!-- Only for information -->
               <goal>analyze-only</goal>
             </goals>
@@ -187,11 +223,17 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.19.1</version>
+          <configuration>
+            <argLine>@{argLine} -javaagent:${quasar.path}</argLine>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>2.19.1</version>
+          <configuration>
+            <argLine>@{argLine} -javaagent:${quasar.path}</argLine>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
