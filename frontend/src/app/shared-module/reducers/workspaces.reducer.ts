@@ -18,42 +18,67 @@ import { IWorkspace } from '../interfaces/workspace.interface';
 import { escapeStringRegexp } from '../helpers/helper';
 
 // actions
-export const FETCHING_WORKSPACES = 'FETCHING_WORKSPACES';
-export const WORKSPACES_FETCHED = 'WORKSPACES_FETCHED';
-export const FETCHING_WORKSPACES_FAILED = 'FETCHING_WORKSPACES_FAILED';
-export const CHANGE_SELECTED_WORKSPACE = 'CHANGE_SELECTED_WORKSPACE';
+export const FETCH_WORKSPACES = 'FETCH_WORKSPACES';
+export const FETCH_WORKSPACES_SUCCESS = 'FETCH_WORKSPACES_SUCCESS';
+export const FETCH_WORKSPACES_FAILED = 'FETCH_WORKSPACES_FAILED';
+export const FETCH_WORKSPACE = 'FETCH_WORKSPACE';
+export const FETCH_WORKSPACE_SUCCESS = 'FETCH_WORKSPACE_SUCCESS';
+export const FETCH_WORKSPACE_FAILED = 'FETCH_WORKSPACE_FAILED';
+export const CHANGE_WORKSPACE = 'CHANGE_WORKSPACE';
 export const EDIT_PETALS_SEARCH = 'EDIT_PETALS_SEARCH';
 export const DELETE_PETALS_SEARCH = 'DELETE_PETALS_SEARCH';
-export const IMPORTING_BUS = 'IMPORTING_BUS';
+export const IMPORT_BUS = 'IMPORT_BUS';
 // once the http request is launched to import a bus,
 // the server returns us an id (bus id) so we can display at least the name (that we already have)
 // and update the object later according to the id
-export const IMPORTING_BUS_MINIMAL_CONFIG = 'IMPORTING_BUS_MINIMAL_CONFIG';
-export const BUS_IMPORTED = 'BUS_IMPORTED';
-export const IMPORTING_BUS_FAILED = 'IMPORTING_BUS_FAILED';
+export const IMPORT_BUS_SUCCESS = 'IMPORT_BUS_SUCCESS';
+export const IMPORT_BUS_FAILED = 'IMPORT_BUS_FAILED';
+export const IMPORT_BUS_MINIMAL_CONFIG = 'IMPORT_BUS_MINIMAL_CONFIG';
 export const ADD_BUS = 'ADD_BUS';
-export const FETCHING_BUS_CONFIG = 'FETCHING_BUS_CONFIG';
-export const FETCHING_BUS_CONFIG_SUCCESS = 'FETCHING_BUS_CONFIG_SUCCESS';
-export const FETCHING_BUS_CONFIG_FAILED = 'FETCHING_BUS_CONFIG_FAILED';
+export const FETCH_BUS_CONFIG = 'FETCH_BUS_CONFIG';
+export const FETCH_BUS_CONFIG_SUCCESS = 'FETCH_BUS_CONFIG_SUCCESS';
+export const FETCH_BUS_CONFIG_FAILED = 'FETCH_BUS_CONFIG_FAILED';
 
 export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord = workspacesStateFactory(), action: Action) {
-  if (action.type === FETCHING_WORKSPACES) {
+  if (action.type === FETCH_WORKSPACES) {
     return workspacesState.setIn(['fetchingWorkspaces'], true);
   }
 
-  else if (action.type ===  FETCHING_WORKSPACES_FAILED) {
+  else if (action.type ===  FETCH_WORKSPACES_FAILED) {
     return workspacesState.setIn(['fetchingWorkspaces'], false);
   }
 
-  // when we reload all the workspaces
-  // the payload is plain javascript object
-  else if (action.type === WORKSPACES_FETCHED) {
+  else if (action.type === FETCH_WORKSPACES_SUCCESS) {
     return workspacesState
       .setIn(['fetchingWorkspaces'], false)
+      // when we reload all the workspaces
+      // the payload is plain javascript object
       .setIn(['workspaces'], fromJS(action.payload));
   }
 
-  else if (action.type === CHANGE_SELECTED_WORKSPACE) {
+  else if (action.type === FETCH_WORKSPACE) {
+    return workspacesState.setIn(['fetchingWorkspace'], true);
+  }
+
+  else if (action.type === FETCH_WORKSPACE_FAILED) {
+    return workspacesState.setIn(['fetchingWorkspace'], false);
+  }
+
+  else if (action.type === FETCH_WORKSPACE_SUCCESS) {
+    let indexUpdate = workspacesState
+      .get('workspaces')
+      .findIndex((w: WorkspacesStateRecord) => w.get('id') === action);
+
+    // the payload.data contains the busesInProgress and buses of the current workspace
+    // { busesInProgress: [...], buses: [...] }
+    return workspacesState
+      .set('fetchingWorkspace', false)
+      .setIn(['workspaces', indexUpdate],
+        workspacesState.getIn(['workspaces', indexUpdate]).mergeDeep(fromJS(action.payload.data))
+      );
+  }
+
+  else if (action.type === CHANGE_WORKSPACE) {
     return workspacesState.setIn(['selectedWorkspaceId'], action.payload);
   }
 
@@ -65,20 +90,20 @@ export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord =
     return workspacesState.setIn(['searchPetals'], '');
   }
 
-  else if (action.type === IMPORTING_BUS) {
+  else if (action.type === IMPORT_BUS) {
     return workspacesState.setIn(['importingBus'], true);
   }
 
-  else if (action.type === BUS_IMPORTED) {
+  else if (action.type === IMPORT_BUS_SUCCESS) {
     // once the bus is imported, move it from workspaces
     return workspacesState.setIn(['importingBus'], false);
   }
 
-  else if (action.type === IMPORTING_BUS_FAILED) {
+  else if (action.type === IMPORT_BUS_FAILED) {
     return workspacesState.setIn(['importingBus'], false);
   }
 
-  else if (action.type === IMPORTING_BUS_MINIMAL_CONFIG) {
+  else if (action.type === IMPORT_BUS_MINIMAL_CONFIG) {
     let selectedWorkspaceId = workspacesState.get('selectedWorkspaceId');
 
     let indexUpdate = workspacesState
@@ -113,12 +138,12 @@ export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord =
     return workspacesStateTmp;
   }
 
-  /* FETCHING_BUS_CONFIG */
-  else if (action.type === FETCHING_BUS_CONFIG) {
+  /* FETCH_BUS_CONFIG */
+  else if (action.type === FETCH_BUS_CONFIG) {
     return workspacesState.setIn(['gettingBusConfig'], true);
   }
 
-  else if (action.type === FETCHING_BUS_CONFIG_SUCCESS) {
+  else if (action.type === FETCH_BUS_CONFIG_SUCCESS) {
     let selectedWorkspaceId = workspacesState.get('selectedWorkspaceId');
 
     let indexWorkspaceUpdate = workspacesState
@@ -137,7 +162,7 @@ export function createWorkspacesReducer(workspacesState: WorkspacesStateRecord =
     return workspacesStateTmp.setIn(['workspaces', indexWorkspaceUpdate, 'buses', indexBusUpdate], bus);
   }
 
-  else if (action.type === FETCHING_BUS_CONFIG_FAILED) {
+  else if (action.type === FETCH_BUS_CONFIG_FAILED) {
     return workspacesState.setIn(['gettingBusConfig'], false);
   }
 

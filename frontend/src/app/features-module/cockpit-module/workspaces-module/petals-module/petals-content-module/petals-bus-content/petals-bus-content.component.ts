@@ -17,7 +17,7 @@ import { AppState } from '../../../../../../app.state';
 import { WorkspacesStateRecord, WorkspacesState } from '../../../../../../shared-module/reducers/workspaces.state';
 
 // our reducers
-import { FETCHING_BUS_CONFIG } from '../../../../../../shared-module/reducers/workspaces.reducer';
+import { FETCH_BUS_CONFIG } from '../../../../../../shared-module/reducers/workspaces.reducer';
 
 @Component({
   selector: 'app-petals-bus-content',
@@ -73,7 +73,7 @@ export class PetalsBusContentComponent implements OnInit {
       this.bus = this.workspaces.workspaces[workspaceIndex].buses.filter(bus => bus.id === this.idBus)[0];
 
       if (this.shouldFetchBus) {
-        this.store.dispatch({type: FETCHING_BUS_CONFIG, payload: this.idBus});
+        this.store.dispatch({ type: FETCH_BUS_CONFIG, payload: this.idBus });
         this.shouldFetchBus = false;
       }
     }

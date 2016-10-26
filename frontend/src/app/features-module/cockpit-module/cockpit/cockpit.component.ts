@@ -16,13 +16,7 @@ import { WorkspacesState, WorkspacesStateRecord } from '../../../shared-module/r
 
 // our actions
 import { USR_IS_DISCONNECTING } from '../../../shared-module/reducers/user.reducer';
-import {
-  CHANGE_SELECTED_WORKSPACE,
-  FETCHING_WORKSPACES
-} from '../../../shared-module/reducers/workspaces.reducer';
-
-// our services
-import { SseService } from '../../../shared-module/services/sse.service';
+import { FETCH_WORKSPACES } from '../../../shared-module/reducers/workspaces.reducer';
 
 @Component({
   selector: 'app-petals-cockpit',
@@ -41,8 +35,7 @@ export class CockpitComponent implements OnInit {
     private store: Store<AppState>,
     private router: Router,
     private route: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef,
-    private sseService: SseService
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     this.tabs = [
       {
@@ -61,9 +54,6 @@ export class CockpitComponent implements OnInit {
   }
 
   ngOnInit() {
-    // fetch workspaces once logged
-    this.store.dispatch({ type: FETCHING_WORKSPACES });
-
     this.user$ = <Observable<UserState>>this.store.select('user');
     this.config$ = <Observable<ConfigState>>this.store.select('config');
     this.workspaces$ = <Observable<WorkspacesStateRecord>>this.store.select('workspaces');
@@ -72,11 +62,22 @@ export class CockpitComponent implements OnInit {
       this.selectedWorkspaceId = workspaces.get('selectedWorkspaceId');
     });
 
-    this.route.firstChild.firstChild.params
-      .map(params => params['idWorkspace'])
-      .subscribe((idWorkspace: number) => {
-        this.store.dispatch({ type: CHANGE_SELECTED_WORKSPACE, payload: idWorkspace });
-      });
+    this.store.dispatch({ type: FETCH_WORKSPACES });
+
+    this.route.firstChild.firstChild.params.map(params => params['idWorkspace'])
+      .filter(idWorkspace => typeof idWorkspace !== 'undefined')
+      // take(1) because cockpitComponent is loaded once by the app
+      // and we won't change workspace without passing through workspacesComponent
+      // (which trigger a CHANGE_WORKSPACE too)
+      // this avoid to call change workspace twice in some cases
+      .take(1)
+      .map((idWorkspace: string) => {
+        // this.store.dispatch({ type: CHANGE_WORKSPACE, payload: idWorkspace });
+      }).subscribe();
+
+      // .subscribe((idWorkspace: number) => {
+      //   this.store.dispatch({ type: CHANGE_WORKSPACE, payload: idWorkspace });
+      // });
 
     const rePetals = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals/;
     const reService = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/service/;

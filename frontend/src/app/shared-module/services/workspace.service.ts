@@ -19,6 +19,10 @@ export class WorkspaceService {
     return this.http.get(`${environment.urlBackend}/workspaces`);
   }
 
+  updateWorkspace(idWorkspace: string): Observable<Response> {
+    return this.http.get(`${environment.urlBackend}/workspaces/${idWorkspace}`);
+  }
+
   importBus(newBus: INewBus) {
     return this.http.post(`${environment.urlBackend}/workspaces/buses`, <any>newBus);
   }

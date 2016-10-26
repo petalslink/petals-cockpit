@@ -15,7 +15,7 @@ import { WorkspacesState, WorkspacesStateRecord } from '../../../../../../../sha
 import { INewBus } from '../../../../../../../shared-module/interfaces/petals.interface';
 
 // our actions
-import { IMPORTING_BUS } from '../../../../../../../shared-module/reducers/workspaces.reducer';
+import { IMPORT_BUS } from '../../../../../../../shared-module/reducers/workspaces.reducer';
 
 @Component({
   selector: 'app-petals-bus-import',
@@ -43,6 +43,6 @@ export class PetalsBusImportComponent implements OnInit {
   }
 
   importBus(newBus: INewBus) {
-    this.store.dispatch({ type: IMPORTING_BUS, payload: newBus });
+    this.store.dispatch({ type: IMPORT_BUS, payload: newBus });
   }
 }

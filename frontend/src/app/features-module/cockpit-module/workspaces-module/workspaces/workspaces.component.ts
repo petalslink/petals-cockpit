@@ -19,7 +19,7 @@ import { WorkspacesState, WorkspacesStateRecord } from '../../../../shared-modul
 import { IBus } from '../../../../shared-module/interfaces/petals.interface';
 
 // our actions
-import { CHANGE_SELECTED_WORKSPACE } from '../../../../shared-module/reducers/workspaces.reducer';
+import { CHANGE_WORKSPACE } from '../../../../shared-module/reducers/workspaces.reducer';
 
 // import
 @Component({
@@ -42,8 +42,8 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
   }
 
   selectWorkspace(workspaceId: string) {
-    this.store.dispatch({ type: CHANGE_SELECTED_WORKSPACE, payload: workspaceId });
-    this.router.navigate(['./', workspaceId], {relativeTo: this.route.parent});
+    this.store.dispatch({ type: CHANGE_WORKSPACE, payload: workspaceId });
+    this.router.navigate(['./', workspaceId], { relativeTo: this.route.parent });
   }
 
   ngOnInit(): void {

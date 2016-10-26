@@ -1,0 +1,77 @@
+{
+  "busesInProgress": [],
+  "buses": [
+    {
+      "id": "ebda5972-c57f-4e35-963d-88bf342d6bd5",
+      "name": "Bus 0",
+      "state": "UNDEPLOYED",
+      "config": null,
+      "containers": [
+        {
+          "id": "5881267a-4370-4a6e-98bc-713dce0b4a7a",
+          "name": "Container 0",
+          "components": [
+            {
+              "id": "e723bc67-2a5c-4f0c-b370-6e41d52b8dec",
+              "name": "Component 0",
+              "serviceUnits": [
+                {
+                  "id": "3a957ca3-1a72-4930-8284-bcb2db0b2d6d",
+                  "name": "SU 0"
+                },
+                {
+                  "id": "b8978c6f-3903-4044-add9-1322f504b073",
+                  "name": "SU 1"
+                }
+              ]
+            },
+            {
+              "id": "89f768ad-670b-4d2c-9d82-7d06589704a8",
+              "name": "Component 1",
+              "serviceUnits": [
+                {
+                  "id": "431f429a-014d-494a-a5c9-fcf1e1cb9ea4",
+                  "name": "SU 2"
+                },
+                {
+                  "id": "31c90fa5-44a0-4b2a-b525-c80fee60b32a",
+                  "name": "SU 3"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "12134f05-2860-43a1-ad86-83b484745e33",
+          "name": "Container 1",
+          "components": [
+            {
+              "id": "533152d2-d189-4e1e-985d-a6b64239ce78",
+              "name": "Component 2",
+              "serviceUnits": [
+                {
+                  "id": "79d66b53-455b-4ecd-b767-257bdacda8a6",
+                  "name": "SU 4"
+                }
+              ]
+            },
+            {
+              "id": "77e7e53b-b945-499c-b3f2-085c97ee237b",
+              "name": "Component 3",
+              "serviceUnits": [
+                {
+                  "id": "32f556c8-9fe2-4bdf-8f33-97aff8e60ed7",
+                  "name": "SU 5"
+                },
+                {
+                  "id": "c65c96c1-3a5a-48c8-9d83-6bf8e637f490",
+                  "name": "SU 6"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

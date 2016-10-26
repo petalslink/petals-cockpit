@@ -35,6 +35,20 @@ export class WorkspaceMockService {
       });
   }
 
+  updateWorkspace(idWorkspace: string): Observable<Response> {
+    return this.http.get(`/mocks-json/ws-${idWorkspace}.json`)
+      .map((res: Response) => res.json())
+      .delay(environment.httpDelay)
+      .map(workspace => {
+        return <Response> {
+          ok: true,
+          json: function () {
+            return workspace;
+          }
+        };
+      });
+  }
+
   importBus(newBus: INewBus) {
     let response = <Response>{
       ok: true,

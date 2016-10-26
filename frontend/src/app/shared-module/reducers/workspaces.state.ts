@@ -11,6 +11,7 @@ export interface WorkspacesState extends IWorkspaces {
   selectedWorkspaceId: string;
   searchPetals: string;
   fetchingWorkspaces: boolean;
+  fetchingWorkspace: boolean;
   // importing bus is just here to block the import bus button during
   // the http request. It won't wait for sse
   importingBus: boolean;
@@ -30,6 +31,7 @@ export const workspacesStateFactory = makeTypedFactory<WorkspacesState, Workspac
   searchPetals: '',
   workspaces: null,
   fetchingWorkspaces: false,
+  fetchingWorkspace: false,
   gettingBusConfig: false,
   importingBus: false
 });
