@@ -1,5 +1,5 @@
 // angular modules
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ViewChild } from '@angular/core';
 
 // rxjs
 import { Subscription } from 'rxjs';
@@ -19,6 +19,8 @@ import {
 // our actions
 import { IMPORT_BUS } from '../../../../../../../shared-module/reducers/workspace.reducer';
 
+import { MdInput } from '@angular/material';
+
 @Component({
   selector: 'app-petals-bus-import',
   templateUrl: './petals-bus-import.component.html',
@@ -27,6 +29,7 @@ import { IMPORT_BUS } from '../../../../../../../shared-module/reducers/workspac
 export class PetalsBusImportComponent implements OnInit, OnDestroy {
   @Input() importing = false;
   @Input() newBus?: any;
+  @ViewChild('ipInput') ipInput: MdInput;
 
   private workspace: IWorkspace;
   private workspaceSub: Subscription;
@@ -63,6 +66,8 @@ export class PetalsBusImportComponent implements OnInit, OnDestroy {
         }
       };
     }
+
+    this.ipInput.focus();
   }
 
   importBus(newBus: INewBus) {
