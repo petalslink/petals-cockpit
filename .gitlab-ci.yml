@@ -86,12 +86,10 @@ build-product:
 e2e-product:
   <<: *node-6
   stage: integration
-  except:
-    - /^front\/.*$/
-    - /^back\/.*$/
   only:
     - master
     - integration
+    - /^product\/.*$/
   dependencies:
     - build-product
   variables:
