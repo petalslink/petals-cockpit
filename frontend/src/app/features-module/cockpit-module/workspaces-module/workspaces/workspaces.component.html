@@ -13,102 +13,102 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-toolbar color="primary">
-  <span>
-    Workspaces
-  </span>
+<div class="page-workspaces">
+  <md-toolbar color="primary">
+    <span>Workspaces</span>
 
-  <span class="flex-space"></span>
+    <span class="flex-space"></span>
 
-  <button md-icon-button [md-menu-trigger-for]="menu">
-    <md-icon>more_vert</md-icon>
-  </button>
+    <button md-icon-button [md-menu-trigger-for]="menu">
+      <md-icon>more_vert</md-icon>
+    </button>
 
-  <md-menu x-position="before" #menu="mdMenu">
-    <button md-menu-item [routerLink]="['/cockpit', '404']">
-      Overview
-    </button>
-    <button md-menu-item>
-      Operation
-    </button>
-    <button md-menu-item>
-      Config
-    </button>
-    <button md-menu-item>
-      Flow
-    </button>
-    <button md-menu-item>
-      Monitor
-    </button>
-    <button md-menu-item>
-      Log
-    </button>
-    <button md-menu-item>
-      User
-    </button>
-  </md-menu>
-</md-toolbar>
+    <md-menu x-position="before" #menu="mdMenu">
+      <button md-menu-item [routerLink]="['/cockpit', '404']">
+        Overview
+      </button>
+      <button md-menu-item>
+        Operation
+      </button>
+      <button md-menu-item>
+        Config
+      </button>
+      <button md-menu-item>
+        Flow
+      </button>
+      <button md-menu-item>
+        Monitor
+      </button>
+      <button md-menu-item>
+        Log
+      </button>
+      <button md-menu-item>
+        User
+      </button>
+    </md-menu>
+  </md-toolbar>
 
-<div class="bkg-primary-card">
-  <md-card class="central-content">
-     <md-card-header>
+  <div class="bkg-primary-card">
+    <md-card class="central-content">
+      <md-card-header>
         <md-card-title>
           Workspaces
-
           <md-progress-circle *ngIf="minimalWorkspaces.fetchingWorkspaces" mode="indeterminate"></md-progress-circle>
         </md-card-title>
+
         <md-card-subtitle>Select the workspace you want to work with</md-card-subtitle>
-     </md-card-header>
+      </md-card-header>
 
-    <img md-card-image src="assets/img/workspace.png">
+      <img md-card-image src="assets/img/workspace.png">
 
-    <button
-      md-mini-fab
-      class="btn-show-panel-add-workspace"
-      *ngIf="minimalWorkspaces && minimalWorkspaces.minimalWorkspaces.length > 0"
-      (click)="toggleAddPanel()"
-    >
-      <md-icon class="md-24" *ngIf="!addingWorkspace">add</md-icon>
-      <md-icon class="md-24" *ngIf="addingWorkspace">clear</md-icon>
-    </button>
-
-    <md-card-content *ngIf="minimalWorkspaces">
-      <p *ngIf="!minimalWorkspaces.fetchingWorkspaces && minimalWorkspaces.minimalWorkspaces.length === 0">
-        You don't have any workspace.
-      </p>
-
-      <form
-        [hidden]="minimalWorkspaces.fetchingWorkspaces || (!addingWorkspace && minimalWorkspaces.minimalWorkspaces.length !== 0)"
-        #addWorkspaceForm="ngForm"
-        (ngSubmit)="addWorkspace(addWorkspaceForm.value.name)"
+      <button
+        md-mini-fab
+        class="btn-show-panel-add-workspace"
+        *ngIf="minimalWorkspaces && minimalWorkspaces.minimalWorkspaces.length > 0"
+        (click)="toggleAddPanel()"
       >
-        <p>
-          <md-input #nameInput [(ngModel)]="name" name="name" placeholder="Workspace's name" [disabled]="minimalWorkspaces.addingWorkspace"></md-input>
+        <md-icon class="md-24" *ngIf="!addingWorkspace">add</md-icon>
+        <md-icon class="md-24" *ngIf="addingWorkspace">clear</md-icon>
+      </button>
 
-          <button md-raised-button type="submit" [disabled]="minimalWorkspaces.addingWorkspace">
-            Add workspace
-
-            <md-progress-circle *ngIf="minimalWorkspaces.addingWorkspace" mode="indeterminate"></md-progress-circle>
-          </button>
+      <md-card-content *ngIf="minimalWorkspaces">
+        <p *ngIf="!minimalWorkspaces.fetchingWorkspaces && minimalWorkspaces.minimalWorkspaces.length === 0">
+          You don't have any workspace.
         </p>
-      </form>
 
-      <md-nav-list>
-        <md-list-item *ngFor="let minimalWorkspace of minimalWorkspaces.minimalWorkspaces" (click)="selectWorkspace(minimalWorkspace.id)">
-          <h3 md-line [class.color-primary-bold]="workspace.id === minimalWorkspace.id">
-            {{ minimalWorkspace.name }}
+        <form
+          [hidden]="minimalWorkspaces.fetchingWorkspaces || (!addingWorkspace && minimalWorkspaces.minimalWorkspaces.length !== 0)"
+          #addWorkspaceForm="ngForm"
+          (ngSubmit)="addWorkspace(addWorkspaceForm.value.name)"
+        >
+          <p>
+            <md-input #nameInput [(ngModel)]="name" name="name" placeholder="Workspace's name" [disabled]="minimalWorkspaces.addingWorkspace"></md-input>
 
-            <md-progress-circle
-              *ngIf="minimalWorkspaces.fetchingWorkspaceWithId === minimalWorkspace.id"
-              mode="indeterminate">
-            </md-progress-circle>
-          </h3>
+            <button md-raised-button type="submit" [disabled]="minimalWorkspaces.addingWorkspace">
+              Add workspace
 
-          <p md-line>
-            <span class="workspace-used-by">{{ minimalWorkspace.usedBy }}</span>
+              <md-progress-circle *ngIf="minimalWorkspaces.addingWorkspace" mode="indeterminate"></md-progress-circle>
+            </button>
           </p>
-        </md-list-item>
-      </md-nav-list>
-    </md-card-content>
-  </md-card>
+        </form>
+
+        <md-nav-list>
+          <md-list-item *ngFor="let minimalWorkspace of minimalWorkspaces.minimalWorkspaces" (click)="selectWorkspace(minimalWorkspace.id)">
+            <h3 md-line [class.color-primary-bold]="workspace.id === minimalWorkspace.id">
+              {{ minimalWorkspace.name }}
+
+              <md-progress-circle
+                *ngIf="minimalWorkspaces.fetchingWorkspaceWithId === minimalWorkspace.id"
+                mode="indeterminate">
+              </md-progress-circle>
+            </h3>
+
+            <p md-line>
+              <span class="workspace-used-by">{{ minimalWorkspace.usedBy }}</span>
+            </p>
+          </md-list-item>
+        </md-nav-list>
+      </md-card-content>
+    </md-card>
+  </div>
 </div>

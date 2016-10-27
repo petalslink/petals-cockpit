@@ -19,18 +19,27 @@ import { browser, element, by } from 'protractor';
 
 export class PetalsCockpitPage {
   navigateTo(url: string = '/') {
+    browser.sleep(800);
     return browser.get(url);
   }
 
   getText(cssSelector: string) {
+    browser.sleep(800);
     return element(by.css(cssSelector)).getText();
   }
 
-  click(cssSelector: string) {
-    element(by.css(cssSelector)).click();
+  click(cssSelector: string, index = -1) {
+    if(index === -1) {
+      browser.sleep(800);
+      element(by.css(cssSelector)).click();
+    } else {
+      browser.sleep(800);
+      element.all(by.css(cssSelector)).click();
+    }
   }
 
   fillInput(cssSelector: string, text: string) {
+    browser.sleep(800);
     element(by.css(cssSelector)).clear();
     element(by.css(cssSelector)).sendKeys(text);
   }
