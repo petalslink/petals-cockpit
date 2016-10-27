@@ -25,9 +25,9 @@
           </md-input>
         </div>
         <div align="end" class="pnl-btn-connect">
-          <button type="submit" md-raised-button color="primary" [disabled]="(user$ | async).isConnecting">
+          <button type="submit" md-raised-button color="primary" [disabled]="user?.isConnecting">
             <span>{{ 'LOG_ME' | translate }}</span>
-            <md-progress-circle *ngIf="(user$ | async).isConnecting" mode="indeterminate"></md-progress-circle>
+            <md-progress-circle *ngIf="user?.isConnecting" mode="indeterminate"></md-progress-circle>
           </button>
         </div>
       </form>
@@ -38,10 +38,10 @@
             <md-icon>info</md-icon>
           </button>
           <span>Debug :</span>
-          <span class="connecting" *ngIf="(user$ | async).isConnecting">Connecting ...</span>
-          <span class="connected" *ngIf="(user$ | async).isConnected">Is connected !</span>
-          <span class="not-connected" *ngIf="!(user$ | async).isConnected && !(user$ | async).isConnecting">Is NOT connected !</span>
-          <span class="connection-failed" *ngIf="(user$ | async).connectionFailed">Connection failed !</span>
+          <span class="connecting" *ngIf="user.isConnecting">Connecting ...</span>
+          <span class="connected" *ngIf="user.isConnected">Is connected !</span>
+          <span class="not-connected" *ngIf="!user.isConnected && !user.isConnecting">Is NOT connected !</span>
+          <span class="connection-failed" *ngIf="user.connectionFailed">Connection failed !</span>
         </p>
       </div>
 

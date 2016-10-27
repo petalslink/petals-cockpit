@@ -1,4 +1,4 @@
-<div class="sidenav-menu" [class.cockpit-theme]="(config$ | async).isDarkTheme">
+<div class="sidenav-menu" [class.cockpit-theme]="config?.isDarkTheme">
   <md-sidenav-layout fullscreen>
     <md-sidenav #sidenav align="start" mode="side" opened="true">
 
@@ -9,25 +9,27 @@
             <md-icon>settings</md-icon>
           </button>
 
-          <p>{{ (user$ | async).name }}</p>
+          <p>{{ user.name }}</p>
 
-          <button md-icon-button [disabled]="(user$ | async).isDisconnecting" class="icon-power" (click)="disconnectUser()">
-            <md-icon *ngIf="!(user$ | async).isDisconnecting">power_settings_new</md-icon>
-            <md-progress-circle *ngIf="(user$ | async).isDisconnecting" mode="indeterminate"></md-progress-circle>
+          <button md-icon-button [disabled]="user.isDisconnecting" class="icon-power" (click)="disconnectUser()">
+            <md-icon *ngIf="!user.isDisconnecting">power_settings_new</md-icon>
+            <md-progress-circle *ngIf="user.isDisconnecting" mode="indeterminate"></md-progress-circle>
           </button>
         </md-card-title-group>
       </md-card>
 
-      <button class="change-workspace" md-raised-button color="accent"
-              [routerLink]="['workspaces', (selectedWorkspaceId ? selectedWorkspaceId : '' )]">
+      <button
+        class="change-workspace" md-raised-button color="accent"
+        [routerLink]="['workspaces', (workspace && workspace.id ? workspace.id : '' )]"
+      >
         {{ 'CHANGE_WORKSPACE' | translate }}
       </button>
 
       <md-tab-group
         #tabGroup
+        *ngIf="workspace.id && tabSelectedIndex !== -1"
         [selectedIndex]="tabSelectedIndex"
         (selectChange)="openTab(tabGroup.selectedIndex)"
-        *ngIf="selectedWorkspaceId && tabSelectedIndex !== -1"
       >
         <md-tab>
           <template md-tab-label>Petals</template>

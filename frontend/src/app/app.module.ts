@@ -18,22 +18,27 @@ import { TranslateStaticLoader, TranslateLoader, TranslateModule } from 'ng2-tra
 
 // ngrx
 import { StoreModule } from '@ngrx/store';
-// import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-// import { StoreLogMonitorModule, useLogMonitor } from '@ngrx/store-log-monitor';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+
+// our reducers
+import { ConfigReducer } from './shared-module/reducers/config.reducer';
+import { UserReducer } from './shared-module/reducers/user.reducer';
+import { MinimalWorkspacesReducer } from './shared-module/reducers/minimal-workspaces.reducer';
+import { WorkspaceReducer } from './shared-module/reducers/workspace.reducer';
 
 // our effects
 import { UserEffects } from './shared-module/effects/user.effects';
 import { WorkspaceEffects } from './shared-module/effects/workspace.effects';
-// our reducers
-import { UserReducer } from './shared-module/reducers/user.reducer';
-import { WorkspacesReducer } from './shared-module/reducers/workspaces.reducer';
-import { ConfigReducer } from './shared-module/reducers/config.reducer';
+import { MinimalWorkspacesEffects } from './shared-module/effects/minimal-workspaces.effects';
 
 // our services
 import { UserService } from './shared-module/services/user.service';
 import { HttpResponseInterceptor } from './shared-module/services/http-response-interceptor.service';
 import { WorkspaceService } from './shared-module/services/workspace.service';
 import { WorkspaceMockService } from './shared-module/mocks/workspace-mock.service';
+import { SseService } from './shared-module/services/sse.service';
+import { SseMockService } from './shared-module/mocks/sse-mock.service';
 
 // our guards
 import { AuthGuardService } from './shared-module/services/auth-guard.service';
@@ -50,8 +55,6 @@ import { FeatureModule } from './features-module/features-module.module';
 
 // shared module
 import { SharedModule } from './shared-module/shared-module.module';
-import { SseService } from './shared-module/services/sse.service';
-import { SseMockService } from './shared-module/mocks/sse-mock.service';
 
 export function createTranslateLoader(http: Http) {
   return new TranslateStaticLoader(http, './assets/i18n', '.json');
@@ -69,21 +72,21 @@ export function createTranslateLoader(http: Http) {
     FeatureModule,
     FormsModule,
 
-    // ngrx
-    // StoreDevtoolsModule.instrumentStore({
-    //   monitor: useLogMonitor({
-    //     visible: false,
-    //     position: 'right'
-    //   })
-    // }),
-    // StoreLogMonitorModule,
-
     // ngrx - store
     StoreModule.provideStore({
       config: ConfigReducer,
       user: UserReducer,
-      workspaces: WorkspacesReducer
+      minimalWorkspaces: MinimalWorkspacesReducer,
+      workspace: WorkspaceReducer
     }),
+
+    // ngrx
+    StoreDevtoolsModule.instrumentOnlyWithExtension(),
+
+    // effects
+    EffectsModule.runAfterBootstrap(UserEffects),
+    EffectsModule.runAfterBootstrap(MinimalWorkspacesEffects),
+    EffectsModule.runAfterBootstrap(WorkspaceEffects),
 
     // translate
     TranslateModule.forRoot({
@@ -101,10 +104,6 @@ export function createTranslateLoader(http: Http) {
     provideInterceptorService([
       HttpResponseInterceptor
     ]),
-
-    // effects
-    UserEffects,
-    WorkspaceEffects,
 
     // guards
     AuthGuardService,

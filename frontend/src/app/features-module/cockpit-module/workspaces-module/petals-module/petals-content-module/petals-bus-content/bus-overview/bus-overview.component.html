@@ -1,4 +1,4 @@
-<div class="bkg-primary-card">
+<div class="bkg-primary-card" *ngIf="bus && bus.config">
   <md-card class="central-content list-element">
     <md-card-content>
       <md-card-title align="center">
@@ -6,7 +6,7 @@
       </md-card-title>
 
       <md-list dense>
-        <form #busOverviewForm="ngForm" *ngIf="bus && bus.config">
+        <form #busOverviewForm="ngForm">
 
           <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
 
@@ -199,54 +199,56 @@
           <md-divider></md-divider>
           <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry</h3>
 
-          <div class="list-row">
-            <md-list-item>
-              <h4 md-line>Registry_implementation</h4>
-              <p md-line>
-                <span class="list-subheader">{{bus.config.topology.registry.registry_implementation}}</span>
-              </p>
-            </md-list-item>
-          </div>
+          <div *ngIf="bus.config.topology">
+            <div class="list-row">
+              <md-list-item>
+                <h4 md-line>Registry_implementation</h4>
+                <p md-line>
+                  <span class="list-subheader">{{bus.config.topology.registry.registry_implementation}}</span>
+                </p>
+              </md-list-item>
+            </div>
 
-          <md-divider></md-divider>
-          <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry > Configuration</h3>
+            <md-divider></md-divider>
+            <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry > Configuration</h3>
 
-          <div class="list-row">
-            <md-list-item>
-              <h4 md-line>Group_name</h4>
-              <p md-line>
-                <span class="list-subheader">{{bus.config.topology.registry.registry_configuration.group_name}}</span>
-              </p>
-            </md-list-item>
+            <div class="list-row">
+              <md-list-item>
+                <h4 md-line>Group_name</h4>
+                <p md-line>
+                  <span class="list-subheader">{{bus.config.topology.registry.registry_configuration.group_name}}</span>
+                </p>
+              </md-list-item>
 
-            <md-list-item>
-              <h4 md-line>Group_password</h4>
-              <p md-line>
-                <span class="list-subheader">{{bus.config.topology.registry.registry_configuration.group_password}}</span>
-              </p>
-            </md-list-item>
-          </div>
+              <md-list-item>
+                <h4 md-line>Group_password</h4>
+                <p md-line>
+                  <span class="list-subheader">{{bus.config.topology.registry.registry_configuration.group_password}}</span>
+                </p>
+              </md-list-item>
+            </div>
 
-          <md-divider></md-divider>
-          <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry > Configuration >
-            Overlay Members</h3>
+            <md-divider></md-divider>
+            <h3 md-subheader align="start" class="color-primary list-title">Topology > Registry > Configuration >
+              Overlay Members</h3>
 
-          <!-- Example Overlay Members 1-->
-          <div class="list-row" *ngFor="let member of bus.config.topology.registry.registry_configuration.overlay_members; let i = index;">
-            <md-list-item>
-              <h4 md-line>Host_name</h4>
-              <p md-line>
-                <span class="list-subheader">{{member.host_name}}</span>
-              </p>
-            </md-list-item>
+            <!-- Example Overlay Members 1-->
+            <div class="list-row" *ngFor="let member of bus.config.topology.registry.registry_configuration.overlay_members; let i = index;">
+              <md-list-item>
+                <h4 md-line>Host_name</h4>
+                <p md-line>
+                  <span class="list-subheader">{{member.host_name}}</span>
+                </p>
+              </md-list-item>
 
-            <md-list-item>
-              <h4 md-line>Port</h4>
-              <p md-line>
-                <span class="list-subheader">{{member.port}}</span>
-              </p>
-            </md-list-item>
-            <md-divider class="color-accent custom-divider-config-repeat"></md-divider>
+              <md-list-item>
+                <h4 md-line>Port</h4>
+                <p md-line>
+                  <span class="list-subheader">{{member.port}}</span>
+                </p>
+              </md-list-item>
+              <md-divider class="color-accent custom-divider-config-repeat"></md-divider>
+            </div>
           </div>
 
         </form>

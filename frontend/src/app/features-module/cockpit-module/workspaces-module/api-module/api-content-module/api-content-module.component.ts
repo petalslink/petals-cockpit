@@ -1,15 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-api-content-module',
   templateUrl: './api-content-module.component.html',
   styleUrls: ['./api-content-module.component.scss']
 })
-export class ApiContentModuleComponent implements OnInit {
-
+export class ApiContentModuleComponent {
   constructor() { }
-
-  ngOnInit() {
-  }
-
 }

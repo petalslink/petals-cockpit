@@ -15,18 +15,16 @@ import { environment } from '../../../environments/environment';
 // our services
 import { UserService } from './user.service';
 
-// our states
-import { AppState } from '../../app.state';
-
 // our actions
 import { USR_IS_CONNECTED } from '../reducers/user.reducer';
 
 // our interfaces
+import { IStore } from '../interfaces/store.interface';
 import { IUser } from '../interfaces/user.interface';
 
 @Injectable()
 export class AlreadyLoggedGuardService implements CanActivate {
-  constructor(private store: Store<AppState>, private user: UserService, private router: Router) { }
+  constructor(private store: Store<IStore>, private user: UserService, private router: Router) { }
 
   canActivate() {
     return this.user.getUserInformations(true)

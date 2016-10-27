@@ -1,6 +1,11 @@
+// angular modules
 import { NgModule } from '@angular/core';
-import { PetalsContentModuleComponent } from './petals-content-module.component';
+
+// our modules
 import { SharedModule } from '../../../../../shared-module/shared-module.module';
+
+// our components
+import { PetalsContentModuleComponent } from './petals-content-module.component';
 import { PetalsBusContentComponent } from './petals-bus-content/petals-bus-content.component';
 import { PetalsContainerContentComponent } from './petals-container-content/petals-container-content.component';
 import { PetalsComponentContentComponent } from './petals-component-content/petals-component-content.component';

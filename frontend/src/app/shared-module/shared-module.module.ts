@@ -10,6 +10,7 @@ import { MaterialModule } from '@angular/material';
 
 // ngrx - store
 import { StoreModule } from '@ngrx/store';
+
 // ngrx - effects
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateModule } from 'ng2-translate';

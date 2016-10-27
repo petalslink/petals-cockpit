@@ -1,4 +1,7 @@
+// angular modules
 import { Directive, ElementRef, Renderer, Input, OnInit } from '@angular/core';
+
+// our helpers
 import { escapeStringRegexp } from '../helpers/helper';
 
 @Directive({

@@ -1,34 +1,55 @@
 // angular modules
-import { Component, Input, OnInit } from '@angular/core';
+import {Component, Input, OnInit, OnDestroy} from '@angular/core';
 
 // rxjs
-import { Observable } from 'rxjs';
+import {Subscription} from 'rxjs';
 
 // ngrx
 import { Store } from '@ngrx/store';
 
-// our states
-import { AppState } from '../../../../../../../app.state';
-import { WorkspacesState, WorkspacesStateRecord } from '../../../../../../../shared-module/reducers/workspaces.state';
-
 // our interfaces
 import { INewBus } from '../../../../../../../shared-module/interfaces/petals.interface';
+import { IStore } from '../../../../../../../shared-module/interfaces/store.interface';
+import { IWorkspaceRecord, IWorkspace } from '../../../../../../../shared-module/interfaces/workspace.interface';
+import {
+  IMinimalWorkspaces,
+  IMinimalWorkspacesRecord
+} from '../../../../../../../shared-module/interfaces/minimal-workspaces.interface';
 
 // our actions
-import { IMPORT_BUS } from '../../../../../../../shared-module/reducers/workspaces.reducer';
+import { IMPORT_BUS } from '../../../../../../../shared-module/reducers/workspace.reducer';
 
 @Component({
   selector: 'app-petals-bus-import',
   templateUrl: './petals-bus-import.component.html',
   styleUrls: ['./petals-bus-import.component.scss']
 })
-export class PetalsBusImportComponent implements OnInit {
+export class PetalsBusImportComponent implements OnInit, OnDestroy {
   @Input() importing = false;
   @Input() newBus?: any;
-  private workspaces$: Observable<WorkspacesState>;
 
-  constructor(private store: Store<AppState>) {
-    this.workspaces$ = <Observable<WorkspacesStateRecord>>store.select('workspaces');
+  private workspace: IWorkspace;
+  private workspaceSubscription: Subscription;
+
+  private minimalWorkspaces: IMinimalWorkspaces;
+  private minimalWorkspacesSubscription: Subscription;
+
+  constructor(private store$: Store<IStore>) {
+    this.minimalWorkspacesSubscription =
+      store$.select('minimalWorkspaces')
+        .map((minimalWorkspacesR: IMinimalWorkspacesRecord) => minimalWorkspacesR.toJS())
+        .subscribe((minimalWorkspaces: IMinimalWorkspaces) => this.minimalWorkspaces = minimalWorkspaces);
+
+
+    this.workspaceSubscription =
+      store$.select('workspace')
+        .map((workspaceR: IWorkspaceRecord) => workspaceR.toJS())
+        .subscribe((workspace: IWorkspace) => this.workspace = workspace);
+  }
+
+  ngOnDestroy() {
+    this.minimalWorkspacesSubscription.unsubscribe();
+    this.workspaceSubscription.unsubscribe();
   }
 
   ngOnInit() {
@@ -43,6 +64,6 @@ export class PetalsBusImportComponent implements OnInit {
   }
 
   importBus(newBus: INewBus) {
-    this.store.dispatch({ type: IMPORT_BUS, payload: newBus });
+    this.store$.dispatch({ type: IMPORT_BUS, payload: newBus });
   }
 }

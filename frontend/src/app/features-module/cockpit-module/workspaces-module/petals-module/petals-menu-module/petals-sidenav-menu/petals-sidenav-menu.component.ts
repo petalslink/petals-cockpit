@@ -1,63 +1,40 @@
 // angular modules
-import { Component, OnInit } from '@angular/core';
-
-// immutable
-import { List } from 'immutable';
+import { Component, OnDestroy } from '@angular/core';
 
 // rxjs
-import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs';
 
 // ngrx
 import { Store } from '@ngrx/store';
 
-// our states
-import { AppState } from '../../../../../../app.state';
-import { WorkspacesState, WorkspacesStateRecord } from '../../../../../../shared-module/reducers/workspaces.state';
-
 // our interfaces
-import { IBus } from '../../../../../../shared-module/interfaces/petals.interface';
-import { IWorkspace } from '../../../../../../shared-module/interfaces/workspace.interface';
-
-// our selectors
-import { getSearchedWorkspace } from '../../../../../../shared-module/reducers/workspaces.reducer';
+import { IStore } from '../../../../../../shared-module/interfaces/store.interface';
+import { IWorkspaceRecord, IWorkspace } from '../../../../../../shared-module/interfaces/workspace.interface';
 
 // our actions
-import { EDIT_PETALS_SEARCH } from '../../../../../../shared-module/reducers/workspaces.reducer';
+import { EDIT_PETALS_SEARCH, getSearchedWorkspace } from '../../../../../../shared-module/reducers/workspace.reducer';
 
 @Component({
   selector: 'app-petals-sidenav-menu',
   templateUrl: 'petals-sidenav-menu.component.html',
   styleUrls: ['petals-sidenav-menu.component.scss']
 })
-export class PetalsSidenavMenuComponent implements OnInit {
-  private workspaces$: Observable<WorkspacesState>;
-  private workspaces: WorkspacesState;
-  private buses: List<IBus>;
-  private selectedWorkspaceId: string;
-  private selectedWorkspace: IWorkspace;
+export class PetalsSidenavMenuComponent implements OnDestroy {
+  private workspace: IWorkspace;
+  private workspaceSubscription: Subscription;
 
-  constructor(private store: Store<AppState>) {
-    this.workspaces$ = store.let(getSearchedWorkspace())
-      .map((workspaces: WorkspacesStateRecord) => workspaces.toJS());
+  constructor(private store$: Store<IStore>) {
+    this.workspaceSubscription =
+      store$.let(getSearchedWorkspace())
+        .map((workspaceR: IWorkspaceRecord) => workspaceR.toJS())
+        .subscribe((workspace: IWorkspace) => this.workspace = workspace);
   }
 
-  ngOnInit() {
-    this.workspaces$.subscribe((workspaces: WorkspacesState) => {
-      if (
-        typeof workspaces.selectedWorkspaceId !== 'undefined' &&
-        workspaces.selectedWorkspaceId !== null &&
-        typeof workspaces.workspaces !== 'undefined' &&
-        workspaces.workspaces !== null
-      ) {
-        this.workspaces = workspaces;
-        this.selectedWorkspaceId = workspaces.selectedWorkspaceId;
-        this.selectedWorkspace = workspaces.workspaces.find(w => w.id === workspaces.selectedWorkspaceId);
-        this.buses = workspaces.workspaces.find(w => w.id === workspaces.selectedWorkspaceId).buses;
-      }
-    });
+  ngOnDestroy() {
+    this.workspaceSubscription.unsubscribe();
   }
 
   search(textSearch) {
-    this.store.dispatch({ type: EDIT_PETALS_SEARCH, payload: textSearch });
+    this.store$.dispatch({ type: EDIT_PETALS_SEARCH, payload: textSearch });
   }
 }

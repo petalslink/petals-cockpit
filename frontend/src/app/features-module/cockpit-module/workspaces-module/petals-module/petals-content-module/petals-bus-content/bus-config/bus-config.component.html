@@ -1,11 +1,11 @@
-<div class="bkg-primary-card">
+<div class="bkg-primary-card" *ngIf="bus && bus.config">
   <md-card class="central-content list-element">
     <md-card-content>
       <md-card-title align="center">
         Petals Bus Config
       </md-card-title>
 
-      <form #busConfigForm="ngForm" (ngSubmit)="onUpdate()" *ngIf="bus && bus.config">
+      <form #busConfigForm="ngForm" (ngSubmit)="onUpdate()">
 
         <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
 

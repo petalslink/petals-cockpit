@@ -4,6 +4,10 @@
 
 declare var System: any;
 
+declare interface ObjectConstructor {
+  assign(...objects: Object[]): Object;
+}
+
 // Type definitions for Server-Sent Events
 // Specification: http://dev.w3.org/html5/eventsource/
 // Definitions by: Yannik Hampe <https://github.com/yankee42>
@@ -51,6 +55,7 @@ declare module sse {
   }
 
   interface IOnMessageEvent {
+    event: string;
     data: string;
   }
 }

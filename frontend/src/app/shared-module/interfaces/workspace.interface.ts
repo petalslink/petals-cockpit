@@ -1,17 +1,21 @@
-import { List, Map } from 'immutable';
+// typed-record
+import { TypedRecord } from 'typed-immutable-record';
 
 // our interfaces
 import { IBus } from './petals.interface';
+import { IMinimalWorkspace } from './minimal-workspaces.interface';
 
-export interface IWorkspace extends Map<any, any> {
-  id: string;
-  name: string;
-  usedBy: string;
-  buses: List<IBus>;
-  busesInProgress: List<IBus>;
-  selectedBusId: number;
+// the current/selected workspace
+export interface IWorkspace extends IMinimalWorkspace {
+  // from server
+  buses: Array<IBus>;
+  busesInProgress: Array<IBus>;
+
+  // for UI
+  searchPetals: string;
+  fetchingWorkspace: boolean;
+  importingBus: boolean;
+  gettingBusConfig: boolean;
 }
 
-export interface IWorkspaces {
-  workspaces: List<IWorkspace>;
-}
+export interface IWorkspaceRecord extends TypedRecord<IWorkspaceRecord>, IWorkspace { };

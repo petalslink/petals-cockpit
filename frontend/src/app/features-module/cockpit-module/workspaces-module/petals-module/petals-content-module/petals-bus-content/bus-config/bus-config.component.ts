@@ -1,8 +1,10 @@
+// angular modules
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 // our interfaces
 import { IBus } from '../../../../../../../shared-module/interfaces/petals.interface';
 
+// our services
 import { WorkspaceService } from '../../../../../../../shared-module/services/workspace.service';
 
 @Component({

@@ -17,16 +17,14 @@ import { UserService } from './user.service';
 
 // our interfaces
 import { IUser } from '../interfaces/user.interface';
+import { IStore } from '../interfaces/store.interface';
 
 // our actions
 import { USR_IS_CONNECTED } from '../reducers/user.reducer';
 
-// our states
-import { AppState } from '../../app.state';
-
 @Injectable()
 export class AuthGuardService implements CanActivate {
-  constructor(private store: Store<AppState>, private user: UserService, private router: Router) { }
+  constructor(private store: Store<IStore>, private user: UserService, private router: Router) { }
 
   canActivate() {
     return this.user.getUserInformations(true)
