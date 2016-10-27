@@ -31,6 +31,7 @@
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts",
         "dev-e2e": "environments/environment.dev-e2e.ts",
+        "dev-nomock": "environments/environment.dev-nomock.ts",
         "prod-e2e": "environments/environment.prod-e2e.ts"
       }
     }

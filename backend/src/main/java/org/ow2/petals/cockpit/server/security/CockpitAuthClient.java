@@ -17,18 +17,11 @@
 package org.ow2.petals.cockpit.server.security;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.glassfish.jersey.server.ContainerRequest;
-import org.ow2.petals.cockpit.server.representations.Authentication;
 import org.pac4j.core.client.IndirectClientV2;
 import org.pac4j.core.client.RedirectAction;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
-import org.pac4j.core.credentials.extractor.CredentialsExtractor;
-import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.jax.rs.pac4j.JaxRsContext;
-
-import com.google.common.base.Strings;
 
 public class CockpitAuthClient extends IndirectClientV2<@Nullable UsernamePasswordCredentials, CommonProfile> {
 
@@ -42,39 +35,4 @@ public class CockpitAuthClient extends IndirectClientV2<@Nullable UsernamePasswo
         super.internalInit(context);
     }
 
-}
-
-class CockpitExtractor implements CredentialsExtractor<@Nullable UsernamePasswordCredentials> {
-
-    private final String clientName;
-
-    public CockpitExtractor(String clientName) {
-        this.clientName = clientName;
-    }
-
-    @Nullable
-    @Override
-    public UsernamePasswordCredentials extract(@Nullable WebContext context) throws HttpAction {
-        assert context != null;
-
-        if (context instanceof JaxRsContext) {
-            final JaxRsContext cContext = (JaxRsContext) context;
-
-            // We do know we are in Jersey
-            final ContainerRequest request = (ContainerRequest) cContext.getRequestContext();
-
-            // Note: careful, because it means that the request can't be read again then in the resource method! (but it
-            // should be ok, since we don't need to read it, and we shouldn't anyway)
-            final Authentication auth = request.readEntity(Authentication.class);
-
-            if (auth == null || Strings.isNullOrEmpty(auth.getUsername())
-                    || Strings.isNullOrEmpty(auth.getPassword())) {
-                return null;
-            }
-
-            return new UsernamePasswordCredentials(auth.getUsername(), auth.getPassword(), clientName);
-        } else {
-            return null;
-        }
-    }
 }

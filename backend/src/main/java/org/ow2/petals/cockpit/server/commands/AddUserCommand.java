@@ -17,8 +17,9 @@
 package org.ow2.petals.cockpit.server.commands;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.mindrot.jbcrypt.BCrypt;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.allanbank.mongodb.MongoClient;
 import com.allanbank.mongodb.MongoCollection;
@@ -26,6 +27,7 @@ import com.allanbank.mongodb.MongoDatabase;
 import com.allanbank.mongodb.bson.Document;
 import com.allanbank.mongodb.bson.builder.BuilderFactory;
 import com.allanbank.mongodb.bson.builder.DocumentBuilder;
+import com.allanbank.mongodb.builder.Index;
 import com.allanbank.mongodb.builder.QueryBuilder;
 
 import io.dropwizard.cli.ConfiguredCommand;
@@ -40,6 +42,8 @@ import net.sourceforge.argparse4j.inf.Subparser;
  *
  */
 public class AddUserCommand extends ConfiguredCommand<CockpitConfiguration> {
+
+    private static final PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
 
     public AddUserCommand() {
         super("add-user", "Add a user to the database");
@@ -69,11 +73,14 @@ public class AddUserCommand extends ConfiguredCommand<CockpitConfiguration> {
     private void addUser(MongoDatabase db, Namespace namespace) {
         final String username = namespace.getString("username");
         final MongoCollection users = db.getCollection("users");
+        // TODO move that in a command to initialize the db
+        // TODO check it is the correct way to create the index (because text is maybe not...)
+        users.createIndex(Index.text("username"));
         final Document user = users.findOne(QueryBuilder.where("username").equals(username));
         if (user == null) {
             final DocumentBuilder builder = BuilderFactory.start();
             builder.add("username", username);
-            builder.add("password", BCrypt.hashpw(namespace.getString("password"), BCrypt.gensalt()));
+            builder.add("password", pwEncoder.encode(namespace.getString("password")));
             builder.add("display_name", namespace.getString("name"));
             users.insert(builder.build());
             System.out.println("Added user " + username);

@@ -23,7 +23,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.ow2.petals.cockpit.server.representations.UserData;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JCallback;
 import org.pac4j.jax.rs.annotations.Pac4JLogout;
@@ -31,6 +31,8 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The URL /user/session is protected via annotations, but /user itself is protected using the global filter (which
@@ -72,5 +74,28 @@ public class UserSession {
     @Path("/session")
     @Pac4JLogout
     public void logout() {
+    }
+
+    public static class UserData {
+
+        private final String username;
+
+        private final String name;
+
+        public UserData(@NotEmpty @JsonProperty("username") String username,
+                @NotEmpty @JsonProperty("name") String name) {
+            this.username = username;
+            this.name = name;
+        }
+
+        @JsonProperty
+        public String getUsername() {
+            return username;
+        }
+
+        @JsonProperty
+        public String getName() {
+            return name;
+        }
     }
 }

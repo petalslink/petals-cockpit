@@ -22,15 +22,17 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.resources.UserSession;
+import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
 import org.ow2.petals.cockpit.server.security.mongo.MongoAllanbankAuthenticator;
 import org.ow2.petals.cockpit.server.utils.DocumentAssignableModule;
 import org.ow2.petals.cockpit.server.utils.DocumentAssignableWriter;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.config.ConfigSingleton;
-import org.pac4j.core.credentials.password.JBCryptPasswordEncoder;
+import org.pac4j.core.credentials.password.SpringSecurityPasswordEncoder;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.allanbank.mongodb.MongoClient;
 import com.allanbank.mongodb.MongoDatabase;
@@ -105,6 +107,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         setupPac4J(configuration, client);
 
         environment.jersey().register(UserSession.class);
+        environment.jersey().register(WorkspacesResource.class);
     }
 
     /**
@@ -129,7 +132,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 auth.setUsersDatabase(configuration.getDatabaseFactory().getDatabase());
                 auth.setUsersCollection("users");
                 auth.setAttributes("display_name");
-                auth.setPasswordEncoder(new JBCryptPasswordEncoder());
+                auth.setPasswordEncoder(new SpringSecurityPasswordEncoder(new BCryptPasswordEncoder()));
                 cac.setAuthenticator(auth);
             }
         }
@@ -146,7 +149,7 @@ class MongoHealthCheck extends HealthCheck {
 
     @Override
     protected Result check() throws Exception {
-        // if this does not fail, it's ok
+        // if this does not fail, it means the connection is working
         client.listDatabaseNames();
 
         return Result.healthy();
