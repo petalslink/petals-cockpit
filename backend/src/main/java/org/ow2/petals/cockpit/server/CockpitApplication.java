@@ -28,7 +28,6 @@ import org.ow2.petals.cockpit.server.security.mongo.MongoAllanbankAuthenticator;
 import org.ow2.petals.cockpit.server.utils.DocumentAssignableModule;
 import org.ow2.petals.cockpit.server.utils.DocumentAssignableWriter;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.config.ConfigSingleton;
 import org.pac4j.core.credentials.password.SpringSecurityPasswordEncoder;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
@@ -51,6 +50,14 @@ import io.dropwizard.setup.Environment;
  */
 public class CockpitApplication<C extends CockpitConfiguration> extends Application<C> {
 
+    private final Pac4jBundle<CockpitConfiguration> pac4j = new Pac4jBundle<CockpitConfiguration>() {
+        @Nullable
+        @Override
+        public Pac4jFactory getPac4jFactory(CockpitConfiguration configuration) {
+            return configuration.getPac4jFactory();
+        }
+    };
+
     public static void main(String[] args) throws Exception {
         new CockpitApplication<>().run(args);
     }
@@ -64,13 +71,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
     public void initialize(@Nullable Bootstrap<C> bootstrap) {
         assert bootstrap != null;
 
-        bootstrap.addBundle(new Pac4jBundle<CockpitConfiguration>() {
-            @Nullable
-            @Override
-            public Pac4jFactory getPac4jFactory(CockpitConfiguration configuration) {
-                return configuration.getPac4jFactory();
-            }
-        });
+        bootstrap.addBundle(pac4j);
         bootstrap.addCommand(new AddUserCommand());
     }
 
@@ -113,9 +114,9 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
     /**
      * public for tests
      */
-    private static void setupPac4J(CockpitConfiguration configuration, MongoClient client) {
+    private void setupPac4J(CockpitConfiguration configuration, MongoClient client) {
 
-        Config conf = ConfigSingleton.getConfig();
+        Config conf = pac4j.getConfig();
 
         if (conf != null) {
             CockpitAuthClient cac = conf.getClients().findClient(CockpitAuthClient.class);
