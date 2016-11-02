@@ -9,5 +9,6 @@ export const minimalWorkspacesFactory = makeTypedFactory<IMinimalWorkspaces, IMi
   minimalWorkspaces: [],
 
   // for UI
+  addingWorkspace: false,
   fetchingWorkspaces: false
 });

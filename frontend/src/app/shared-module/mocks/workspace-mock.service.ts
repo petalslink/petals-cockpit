@@ -49,6 +49,23 @@ export class WorkspaceMockService {
       });
   }
 
+  addWorkspace(name: string) {
+    let response = <Response>{
+      ok: true,
+      json: () => {
+        return {
+          id: generateUuidV4(),
+          name,
+          usedBy: `You're the only one to use this workspace`
+        };
+      }
+    };
+
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
+  }
+
   importBus(newBus: INewBus) {
     let response = <Response>{
       ok: true,
