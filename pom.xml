@@ -31,6 +31,8 @@
 
     <!-- Provided by dependency:properties -->
     <quasar.path>${co.paralleluniverse:quasar-core:jar:jdk8}</quasar.path>
+    <!-- empty by default (if not, @{argLine} is not replaced in surefire and failsafe -->
+    <argLine></argLine>
 
     <dropwizard.version>1.0.3</dropwizard.version>
     <quasar.version>0.7.6</quasar.version>
