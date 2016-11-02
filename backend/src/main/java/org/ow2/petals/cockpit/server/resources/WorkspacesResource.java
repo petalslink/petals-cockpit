@@ -30,7 +30,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.media.sse.EventOutput;
+import org.glassfish.jersey.media.sse.SseFeature;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
+import org.ow2.petals.cockpit.server.resources.BusesResource.BusTree;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -84,9 +88,24 @@ public class WorkspacesResource {
     public static class WorkspaceResource {
 
         @GET
+        @Produces(MediaType.APPLICATION_JSON)
         public WorkspaceTree get(@PathParam("wsId") String wsId) {
             // TODO
             return new WorkspaceTree();
+        }
+
+        @GET
+        @Path("/events")
+        @Produces(SseFeature.SERVER_SENT_EVENTS)
+        public EventOutput sse(@PathParam("wsId") String wsId) {
+            final EventOutput eventOutput = new EventOutput();
+            WorkspaceActor.send(wsId, new WorkspaceActor.NewClient(eventOutput));
+            return eventOutput;
+        }
+
+        @Path("/buses")
+        public Class<BusesResource> getBuses() {
+            return BusesResource.class;
         }
     }
 
@@ -137,5 +156,27 @@ public class WorkspacesResource {
 
     public static class WorkspaceTree {
 
+        private final BusTree[] busesInProgress;
+
+        private final BusTree[] buses;
+
+        public WorkspaceTree() {
+            this(new BusTree[] {}, new BusTree[] {});
+        }
+
+        public WorkspaceTree(BusTree[] buses, BusTree[] busesInProgress) {
+            this.buses = buses;
+            this.busesInProgress = busesInProgress;
+        }
+
+        @JsonProperty
+        public BusTree[] getBuses() {
+            return buses;
+        }
+
+        @JsonProperty
+        public BusTree[] getBusesInProgress() {
+            return busesInProgress;
+        }
     }
 }

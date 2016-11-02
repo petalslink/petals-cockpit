@@ -94,6 +94,10 @@
               <key>Min-Java-Version</key>
               <value>${java-version}</value>
             </entry>
+            <entry>
+              <key>Java-Agents</key>
+              <value>co.paralleluniverse:quasar-core:${quasar.version}:jdk8</value>
+            </entry>
           </manifest>
         </configuration>
       </plugin>

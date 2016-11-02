@@ -35,7 +35,7 @@ export class SseService {
       }
 
       // creates event object
-      let eventSource = new EventSource(`${environment.urlBackendSse}/workspaces/${idWorkspace}`);
+      let eventSource = new EventSource(`${environment.urlBackend}/workspaces/${idWorkspace}/events`);
 
       this.currentSse = eventSource;
 
