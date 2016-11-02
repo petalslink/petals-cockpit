@@ -28,8 +28,8 @@ export class WorkspaceService {
     return this.http.post(`${environment.urlBackend}/workspaces`, {name});
   }
 
-  importBus(newBus: INewBus) {
-    return this.http.post(`${environment.urlBackend}/workspaces/buses`, <any>newBus);
+  importBus(idWorkspace: string, newBus: INewBus) {
+    return this.http.post(`${environment.urlBackend}/workspaces/${idWorkspace}/buses`, <any>newBus);
   }
 
   getBusConfig() {

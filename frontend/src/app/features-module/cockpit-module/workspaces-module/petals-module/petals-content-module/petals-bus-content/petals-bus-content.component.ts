@@ -13,9 +13,6 @@ import { IBus } from '../../../../../../shared-module/interfaces/petals.interfac
 import { IStore } from '../../../../../../shared-module/interfaces/store.interface';
 import { IWorkspace, IWorkspaceRecord } from '../../../../../../shared-module/interfaces/workspace.interface';
 
-// our actions
-import { FETCH_BUS_CONFIG } from '../../../../../../shared-module/reducers/workspace.reducer';
-
 @Component({
   selector: 'app-petals-bus-content',
   templateUrl: './petals-bus-content.component.html',
@@ -67,14 +64,13 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
       this.route.params.combineLatest(this.workspace$WithBus,
         (params: Params) => {
           this.updateBus(params['idBus'], false);
-        }).subscribe();
+        }
+      ).subscribe();
   }
 
   updateBus(idBus: string, reloadConfig: boolean) {
     // try to find the bus in buses in progress
     let busInProgressFiltered = this.workspace.busesInProgress.filter((b: IBus) => b.id === idBus);
-
-    let busInImportPreviousStatus = this.busInImport;
 
     // if importing bus
     if (busInProgressFiltered.length > 0) {
@@ -88,8 +84,9 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
     }
 
     // reload if asked OR if bus status change from importing to imported
-    if (reloadConfig || busInImportPreviousStatus !== this.busInImport) {
-      this.store$.dispatch({ type: FETCH_BUS_CONFIG, payload: idBus });
-    }
+    // if (reloadConfig || busInImportPreviousStatus !== this.busInImport) {
+    //   console.log(FETCH_BUS_CONFIG);
+    //   this.store$.dispatch({ type: FETCH_BUS_CONFIG, payload: idBus });
+    // }
   }
 }

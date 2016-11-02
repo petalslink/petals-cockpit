@@ -40,12 +40,23 @@ export class SseService {
       this.currentSse = eventSource;
 
       // listing server messages
-      eventSource.onmessage = (evt) => {
-        observer.next(evt.data);
+      eventSource.addEventListener('WORKSPACE_CHANGE', (e: any) => {
+        e = JSON.parse(e.data);
+
+        observer.next({ event: e.event, data: e.data });
+      });
+
+      eventSource.onerror = err => {
+        console.error(`Error on SSE stream for workspace ${idWorkspace}`, err);
+        observer.error('Event source failed');
       };
 
-      eventSource.onerror = () => {
-        observer.error('Event source failed');
+      eventSource.onmessage = event => {
+        console.warn(`Unexpected event on SSE stream for workspace ${idWorkspace}`, event);
+      };
+
+      eventSource.onopen = event => {
+        console.info(`SSE stream opened for workspace ${idWorkspace}`, event);
       };
 
       return () => {
