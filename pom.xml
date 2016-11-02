@@ -32,7 +32,7 @@
     <!-- Provided by dependency:properties -->
     <quasar.path>${co.paralleluniverse:quasar-core:jar:jdk8}</quasar.path>
 
-    <dropwizard.version>1.0.2</dropwizard.version>
+    <dropwizard.version>1.0.3</dropwizard.version>
     <quasar.version>0.7.6</quasar.version>
     <comsat.version>0.7.0</comsat.version>
   </properties>
