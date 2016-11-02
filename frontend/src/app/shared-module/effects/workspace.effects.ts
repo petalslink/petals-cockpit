@@ -83,6 +83,8 @@ export class WorkspaceEffects {
         this.sseServiceSub.unsubscribe();
       }
 
+      this.router.navigate(['/cockpit', 'workspaces', action.payload.id]);
+
       let sseServiceObs: Observable<Action> =
         this.sseService.subscribeToMessage(action.payload)
           .map((msg: IOnMessageEvent) => {
