@@ -53,12 +53,14 @@ export class PetalsBusImportComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    if (typeof this.newBus === 'undefined') {
+    if (typeof this.newBus === 'undefined' || typeof this.newBus.config === 'undefined') {
       this.newBus = {
-        ip: '',
-        port: '',
-        login: '',
-        password: ''
+        config: {
+          ip: null,
+          port: null,
+          login: null,
+          password: null
+        }
       };
     }
   }

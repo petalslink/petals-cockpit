@@ -50,7 +50,6 @@ export class WorkspaceMockService {
   }
 
   importBus(newBus: INewBus) {
-    console.log('importBus function called');
     let response = <Response>{
       ok: true,
       json: () => {

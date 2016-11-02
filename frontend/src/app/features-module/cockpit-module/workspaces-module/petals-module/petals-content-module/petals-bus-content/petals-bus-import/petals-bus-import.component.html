@@ -12,10 +12,10 @@
         <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
 
         <div class="input-row">
-          <md-input type="text" [(ngModel)]="newBus.ip" name="ip" placeholder="IP" [disabled]="workspace.importingBus || importing"></md-input>
-          <md-input type="text" [(ngModel)]="newBus.port" name="port" placeholder="Port" [disabled]="workspace.importingBus || importing"></md-input>
-          <md-input type="text" [(ngModel)]="newBus.login" name="login" placeholder="Login" [disabled]="workspace.importingBus || importing"></md-input>
-          <md-input type="password" [(ngModel)]="newBus.password" name="password" placeholder="Password" [disabled]="workspace.importingBus || importing"></md-input>
+          <md-input type="text" [(ngModel)]="newBus.config.ip" name="ip" placeholder="IP" [disabled]="workspace.importingBus || importing"></md-input>
+          <md-input type="number" [(ngModel)]="newBus.config.port" name="port" placeholder="Port" [disabled]="workspace.importingBus || importing"></md-input>
+          <md-input type="text" [(ngModel)]="newBus.config.login" name="login" placeholder="Login" [disabled]="workspace.importingBus || importing"></md-input>
+          <md-input type="password" [(ngModel)]="newBus.config.password" name="password" placeholder="Password" [disabled]="workspace.importingBus || importing"></md-input>
         </div>
 
         <div align="end" class="pnl-btn-import">
