@@ -1,81 +1,95 @@
 // angular modules
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
 
 // rxjs
-import { Observable } from 'rxjs/Rx';
+import { Subscription, Observable } from 'rxjs/Rx';
 
 // ngrx
 import { Store } from '@ngrx/store';
 
 // our interfaces
 import { IBus } from '../../../../../../shared-module/interfaces/petals.interface';
-import { IWorkspaces } from '../../../../../../shared-module/interfaces/workspace.interface';
+import { IStore } from '../../../../../../shared-module/interfaces/store.interface';
+import { IWorkspace, IWorkspaceRecord } from '../../../../../../shared-module/interfaces/workspace.interface';
 
-// our states
-import { AppState } from '../../../../../../app.state';
-import { WorkspacesStateRecord, WorkspacesState } from '../../../../../../shared-module/reducers/workspaces.state';
-
-// our reducers
-import { FETCHING_BUS_CONFIG } from '../../../../../../shared-module/reducers/workspaces.reducer';
+// our actions
+import { FETCH_BUS_CONFIG } from '../../../../../../shared-module/reducers/workspace.reducer';
 
 @Component({
   selector: 'app-petals-bus-content',
   templateUrl: './petals-bus-content.component.html',
   styleUrls: ['./petals-bus-content.component.scss']
 })
-export class PetalsBusContentComponent implements OnInit {
-  private bus: IBus;
-  private workspaces$: Observable<WorkspacesState>;
-  private workspaces: IWorkspaces;
-  private idSelectedWorkspace: string;
-  private idBus: string;
+export class PetalsBusContentComponent implements OnInit, OnDestroy {
+  private workspace$: Observable<IWorkspaceRecord>;
 
-  // is the bus being imported ?
+  private workspace$WithBus: Observable<IWorkspaceRecord>;
+  private workspace$WithBusSub: Subscription;
+
+  private workspace: IWorkspace;
+  private workspaceSub: Subscription;
+
+  private routeSub: Subscription;
+
+  private bus: IBus;
   private busInImport: boolean;
 
-  private shouldFetchBus = false;
+  constructor(private store$: Store<IStore>, private route: ActivatedRoute) {
+    this.workspace$ = store$.select('workspace');
 
-  constructor(private store: Store<AppState>, private route: ActivatedRoute) {
-    this.workspaces$ = <Observable<WorkspacesStateRecord>>this.store.select('workspaces')
-      .map((workspaces: WorkspacesStateRecord) => workspaces.toJS());
+    this.workspaceSub = this.workspace$
+        .map((workspaceR: IWorkspaceRecord) => workspaceR.toJS())
+        .subscribe((workspace: IWorkspace) => this.workspace = workspace);
+  }
+
+  ngOnDestroy() {
+    this.workspaceSub.unsubscribe();
+    this.routeSub.unsubscribe();
+    this.workspace$WithBusSub.unsubscribe();
   }
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.shouldFetchBus = true;
-    });
+    // get the current workspace (once) only if
+    // it has an array of buses with at least one value
+    this.workspace$WithBus = this.workspace$
+      .filter((workspaceR: IWorkspaceRecord) => workspaceR.get('buses').size > 0);
 
-    this.workspaces$.combineLatest(this.route.params, (workspaces: WorkspacesState, params) => {
-      this.idBus = params.idBus;
-      this.workspaces = workspaces;
-      this.idSelectedWorkspace = workspaces.selectedWorkspaceId;
+    // update the current bus IF
+    // it's ID is in the URL AND the current workspace has at least one bus
+    this.routeSub =
+      this.route.params.combineLatest(this.workspace$WithBus.take(1),
+        (params: Params) => {
+          this.updateBus(params['idBus'], true);
+        }).subscribe();
 
-      this.updateBus();
-    })
-    .subscribe();
+    this.workspace$WithBusSub =
+      this.route.params.combineLatest(this.workspace$WithBus,
+        (params: Params) => {
+          this.updateBus(params['idBus'], false);
+        }).subscribe();
   }
 
-  updateBus() {
-    if (typeof this.workspaces.workspaces === 'undefined' || this.workspaces.workspaces === null) {
-      return;
-    }
+  updateBus(idBus: string, reloadConfig: boolean) {
+    // try to find the bus in buses in progress
+    let busInProgressFiltered = this.workspace.busesInProgress.filter((b: IBus) => b.id === idBus);
 
-    let workspaceIndex = this.workspaces.workspaces.findIndex(w => w.id === this.idSelectedWorkspace);
+    let busInImportPreviousStatus = this.busInImport;
 
-    this.busInImport = this.workspaces.workspaces[workspaceIndex].busesInProgress.filter(bus => bus.id === this.idBus).length > 0;
-
-    if (this.busInImport) {
-      this.bus = this.workspaces.workspaces[workspaceIndex].busesInProgress.filter(bus => bus.id === this.idBus)[0];
+    // if importing bus
+    if (busInProgressFiltered.length > 0) {
+      this.bus = busInProgressFiltered[0];
+      this.busInImport = true;
     }
 
     else {
-      this.bus = this.workspaces.workspaces[workspaceIndex].buses.filter(bus => bus.id === this.idBus)[0];
+      this.bus = this.workspace.buses.filter((b: IBus) => b.id === idBus)[0];
+      this.busInImport = false;
+    }
 
-      if (this.shouldFetchBus) {
-        this.store.dispatch({type: FETCHING_BUS_CONFIG, payload: this.idBus});
-        this.shouldFetchBus = false;
-      }
+    // reload if asked OR if bus status change from importing to imported
+    if (reloadConfig || busInImportPreviousStatus !== this.busInImport) {
+      this.store$.dispatch({ type: FETCH_BUS_CONFIG, payload: idBus });
     }
   }
 }

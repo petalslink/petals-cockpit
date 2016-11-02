@@ -1,111 +1,112 @@
 // angular modules
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Router } from '@angular/router';
 
 // rxjs
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subscription } from 'rxjs';
 
-// store
+// ngrx
 import { Store, Action } from '@ngrx/store';
-import { Actions, Effect, mergeEffects } from '@ngrx/effects';
+import { Actions, Effect } from '@ngrx/effects';
+
+// sse
+import IOnMessageEvent = sse.IOnMessageEvent;
 
 // our environment
 import { environment } from '../../../environments/environment';
-
-// our states
-import { AppState } from '../../app.state';
-import { WorkspacesStateRecord, WorkspacesState } from '../reducers/workspaces.state';
 
 // our services
 import { WorkspaceService } from '../services/workspace.service';
 import { SseService } from '../services/sse.service';
 
 // our interfaces
-import { IWorkspace } from '../interfaces/workspace.interface';
+import { IStore } from '../interfaces/store.interface';
+import { IWorkspaceRecord } from '../interfaces/workspace.interface';
 
 // our actions
 import {
-  FETCHING_WORKSPACES,
-  FETCHING_WORKSPACES_FAILED,
-  WORKSPACES_FETCHED,
-  IMPORTING_BUS,
-  IMPORTING_BUS_FAILED,
-  FETCHING_BUS_CONFIG_SUCCESS,
-  FETCHING_BUS_CONFIG,
-  FETCHING_BUS_CONFIG_FAILED,
-  IMPORTING_BUS_MINIMAL_CONFIG,
-  CHANGE_SELECTED_WORKSPACE,
-  ADD_BUS
-} from '../reducers/workspaces.reducer';
+  FETCH_WORKSPACE,
+  FETCH_WORKSPACE_SUCCESS,
+  FETCH_WORKSPACE_FAILED,
+  IMPORT_BUS,
+  IMPORT_BUS_FAILED,
+  IMPORT_BUS_MINIMAL_CONFIG,
+  FETCH_BUS_CONFIG,
+  FETCH_BUS_CONFIG_SUCCESS,
+  FETCH_BUS_CONFIG_FAILED, ADD_BUS
+} from '../reducers/workspace.reducer';
 
 @Injectable()
-export class WorkspaceEffects implements OnDestroy {
-  // our subscription(s) to @ngrx/effects
-  private subscription: Subscription;
-  private workspaces$: Observable<WorkspacesState>;
+export class WorkspaceEffects {
+  private sseServiceSub: Subscription;
 
   constructor(
     private actions$: Actions,
-    private store$: Store<AppState>,
+    private store$: Store<IStore>,
     private workspaceService: WorkspaceService,
     private router: Router,
     private sseService: SseService
-  ) {
-    this.subscription = mergeEffects(this).subscribe(store$);
-    this.workspaces$ = <Observable<WorkspacesStateRecord>>this.store$.select('workspaces');
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
+  ) { }
 
   // tslint:disable-next-line:member-ordering
-  @Effect({dispatch: true}) changeSelectedWorkspace$: Observable<Action> = this.actions$
-    .ofType(CHANGE_SELECTED_WORKSPACE)
-    .filter(action => typeof action.payload !== 'undefined')
-    .switchMap(action =>
-        this.sseService.subscribeToMessage(action.payload)
-        .map(msg => {
-          if (msg.event === 'BUS_IMPORT_OK') {
-            return { type: ADD_BUS, payload: msg.data };
-          }
-          else if (msg.event === 'BUS_IMPORT_ERROR') {
-            // TODO
-            return { type: '', payload: null };
-          }
-          else {
-            return { type: '', payload: null };
-          }
-        })
-    );
-
-  // tslint:disable-next-line:member-ordering
-  @Effect({dispatch: true}) fetchingWorkspaces$: Observable<Action> = this.actions$
-    .ofType(FETCHING_WORKSPACES)
-    .switchMap(action => this.workspaceService.updateWorkspaces()
+  @Effect({dispatch: true}) fetchWorkspace$: Observable<Action> = this.actions$
+    .ofType(FETCH_WORKSPACE)
+    .switchMap((action: Action) => this.workspaceService.updateWorkspace(action.payload)
       .map((res: Response) => {
         if (!res.ok) {
-          throw new Error('Error while fetching workspaces');
+          throw new Error(`Error while fetching workspace with ID : ${action.payload}`);
         }
 
-        let workspaces: Array<IWorkspace> = res.json();
-
-        return { type: WORKSPACES_FETCHED, payload: workspaces };
+        return {
+          type: FETCH_WORKSPACE_SUCCESS,
+          payload: {
+            id: action.payload,
+            data: res.json()
+          }
+        };
       })
       .catch((err) => {
         if (environment.debug) {
           console.error(err);
         }
 
-        return Observable.of({ type: FETCHING_WORKSPACES_FAILED });
+        return Observable.of({ type: FETCH_WORKSPACE_FAILED });
       })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({dispatch: true}) importingBus$: Observable<Action> = this.actions$
-    .ofType(IMPORTING_BUS)
+  @Effect({dispatch: true}) fetchWorkspaceSuccess$: Observable<Action> = this.actions$
+    .ofType(FETCH_WORKSPACE_SUCCESS)
+    .switchMap((action: Action) => {
+      if (typeof this.sseServiceSub !== 'undefined') {
+        this.sseServiceSub.unsubscribe();
+      }
+
+      this.router.navigate(['/cockpit', 'workspaces', action.payload.id]);
+
+      let sseServiceObs: Observable<Action> =
+        this.sseService.subscribeToMessage(action.payload)
+          .map((msg: IOnMessageEvent) => {
+            if (msg.event === 'BUS_IMPORT_OK') {
+              return { type: ADD_BUS, payload: msg.data };
+            }
+            else if (msg.event === 'BUS_IMPORT_ERROR') {
+              // TODO
+              return { type: '', payload: null };
+            }
+            else {
+              return { type: '', payload: null };
+            }
+          });
+
+      return sseServiceObs;
+    });
+
+  // tslint:disable-next-line:member-ordering
+  // TODO: This effect needs a review
+  @Effect({dispatch: true}) importBus$: Observable<Action> = this.actions$
+    .ofType(IMPORT_BUS)
     .switchMap(action => this.workspaceService.importBus(action.payload)
       .map((res: Response) => {
         if (!res.ok) {
@@ -114,37 +115,36 @@ export class WorkspaceEffects implements OnDestroy {
 
         // at this point, the server has only returned an ID + the previous information
         // sent to create the bus. Save it so we can display the bus into importing list
-        return { type: 'IMPORTING_BUS_MINIMAL_CONFIG', payload: res.json() };
-
+        return { type: IMPORT_BUS_MINIMAL_CONFIG, payload: res.json() };
       })
       .catch((err) => {
         if (environment.debug) {
           console.error(err);
         }
-        return Observable.of({ type: IMPORTING_BUS_FAILED });
+        return Observable.of({ type: IMPORT_BUS_FAILED });
       })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({dispatch: false}) importingBusMinimalConfig$ = this.actions$
-    .ofType(IMPORTING_BUS_MINIMAL_CONFIG)
-    .map((action: Action) => {
-      this.workspaces$.subscribe((workspaces: WorkspacesStateRecord) => {
-        let selectedWorkspaceId = workspaces.get('selectedWorkspaceId');
-
-        this.router.navigate([
-          '/cockpit',
-          'workspaces',
-          selectedWorkspaceId,
-          'petals',
-          'bus',
-          action.payload.id
-        ]);
-      });
+  // TODO: This effect needs a review
+  @Effect({dispatch: false}) importBusMinimalConfig$ = this.actions$
+    .ofType(IMPORT_BUS_MINIMAL_CONFIG)
+    .withLatestFrom(this.store$.select('workspace'))
+    .map(([action, workspaceR]: [Action, IWorkspaceRecord]) => {
+      this.router.navigate([
+        '/cockpit',
+        'workspaces',
+        workspaceR.get('id'),
+        'petals',
+        'bus',
+        action.payload.id
+      ]);
     });
 
-  @Effect({dispatch: true}) fetchingBusConfig$: Observable<Action> = this.actions$
-    .ofType(FETCHING_BUS_CONFIG)
+  // tslint:disable-next-line:member-ordering
+  // TODO: This effect needs a review
+  @Effect({dispatch: true}) fetchBusConfig$: Observable<Action> = this.actions$
+    .ofType(FETCH_BUS_CONFIG)
     .switchMap(action => this.workspaceService.getBusConfig()
       .map((res: Response) => {
         if (!res.ok) {
@@ -153,13 +153,13 @@ export class WorkspaceEffects implements OnDestroy {
 
         let config: any = res.json();
 
-        return { type: FETCHING_BUS_CONFIG_SUCCESS, payload: { idBus: action.payload, config } };
+        return { type: FETCH_BUS_CONFIG_SUCCESS, payload: { idBus: action.payload, config } };
       })
       .catch((err) => {
         if (environment.debug) {
           console.error(err);
         }
-        return Observable.of({ type: FETCHING_BUS_CONFIG_FAILED });
+        return Observable.of({ type: FETCH_BUS_CONFIG_FAILED });
       })
     );
 }

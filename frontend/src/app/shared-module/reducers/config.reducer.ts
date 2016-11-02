@@ -1,17 +1,21 @@
+// ngrx
 import { ActionReducer, Action } from '@ngrx/store';
-import { ConfigStateRecord, configStateFactory } from './config.state';
+
+// our interfaces
+import { IConfigRecord } from '../interfaces/config.interface';
+import { configFactory } from './config.state';
 
 // actions
 export const TOGGLE_THEME = 'TOGGLE_THEME ';
 
-export function createConfigReducer(configState: ConfigStateRecord = configStateFactory(), action: Action) {
+function createConfigReducer(configR: IConfigRecord = configFactory(), action: Action) {
   switch (action.type) {
     case TOGGLE_THEME:
-      return configState.setIn(['isDarkTheme'], !configState.isDarkTheme);
+      return configR.setIn(['isDarkTheme'], !configR.isDarkTheme);
 
     default:
-      return configState;
+      return configR;
   }
 };
 
-export const ConfigReducer: ActionReducer<ConfigStateRecord> = createConfigReducer;
+export const ConfigReducer: ActionReducer<IConfigRecord> = createConfigReducer;

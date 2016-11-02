@@ -1,38 +1,49 @@
-import { List, Map } from 'immutable';
+import { TypedRecord } from 'typed-immutable-record';
+
 import { IBusConfig } from './bus-config.interface';
 
-export interface IServiceUnit extends Map<any, any> {
+export interface IServiceUnit {
   id: string;
   name: string;
 }
 
-export interface IComponent extends Map<any, any> {
+export interface IServiceUnitRecord extends TypedRecord<IServiceUnitRecord>, IServiceUnit { };
+
+export interface IComponent {
   id: string;
   name: string;
-  serviceUnits: List<IServiceUnit>;
+  serviceUnits: Array<IServiceUnit>;
   selectedServiceUnitId: number;
 }
 
-export interface IContainer extends Map<any, any> {
+export interface IComponentRecord extends TypedRecord<IComponentRecord>, IComponent { };
+
+export interface IContainer {
   id: string;
   name: string;
-  components: List<IComponent>;
+  components: Array<IComponent>;
   selectedComponentId: number;
 }
 
-export interface IBus extends Map<any, any> {
+export interface IContainerRecord extends TypedRecord<IContainerRecord>, IContainer { };
+
+export interface IBus {
   id: string;
   name: string;
   state: string;
   config: IBusConfig;
-  containers: List<IContainer>;
+  containers: Array<IContainer>;
   selectedContainerId: number;
 }
 
+export interface IBusRecord extends TypedRecord<IBusRecord>, IBus { };
+
 // used when we add (import) a bus
-export interface INewBus extends Map<any, any> {
+export interface INewBus {
   ip: string;
   port: number;
   login: string;
   password: string;
 }
+
+export interface INewBusRecord extends TypedRecord<INewBusRecord>, INewBus { };

@@ -1,4 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
+// angular modules
+import { Component, Input } from '@angular/core';
 
 // our interfaces
 import { IBus } from '../../../../../../../shared-module/interfaces/petals.interface';
@@ -8,13 +9,8 @@ import { IBus } from '../../../../../../../shared-module/interfaces/petals.inter
   templateUrl: './bus-overview.component.html',
   styleUrls: ['./bus-overview.component.scss']
 })
-export class BusOverviewComponent implements OnInit {
-
+export class BusOverviewComponent {
   @Input() bus: IBus;
 
   constructor() { }
-
-  ngOnInit() {
-  }
-
 }

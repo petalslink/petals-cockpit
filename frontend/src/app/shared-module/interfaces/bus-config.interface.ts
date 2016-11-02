@@ -1,6 +1,11 @@
-import { Map } from 'immutable';
+// typed-record
+import { TypedRecord } from 'typed-immutable-record';
 
-export interface IBusConfig extends Map<any, any> {
+export interface IBusConfig {
+  ip: string;
+  port: number;
+  login: string;
+  password: string;
   componentType: [{
     name: string;
     version: string;
@@ -24,3 +29,5 @@ export interface IBusConfig extends Map<any, any> {
     }]
   }];
 }
+
+export interface IBusConfigRecord extends TypedRecord<IBusConfigRecord>, IBusConfig { };

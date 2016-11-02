@@ -1,5 +1,5 @@
 // angular modules
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 
 // ngrx
 import { Store } from '@ngrx/store';
@@ -8,48 +8,39 @@ import { Store } from '@ngrx/store';
 import { TranslateService } from 'ng2-translate';
 
 // rxjs
-import { Observable, Subscription } from 'rxjs';
-
-// our states
-import { AppState } from '../../../app.state';
-import { ConfigStateRecord } from '../../../shared-module/reducers/config.state';
+import { Subscription } from 'rxjs';
 
 // our actions
 import { TOGGLE_THEME } from '../../../shared-module/reducers/config.reducer';
 
+// our interfaces
+import { IConfigRecord, IConfig } from '../../../shared-module/interfaces/config.interface';
+import { IStore } from '../../../shared-module/interfaces/store.interface';
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']
 })
-export class SettingsComponent implements OnInit, OnDestroy {
-  private config$: Observable<ConfigStateRecord>;
-  private isDarkTheme = true;
+export class SettingsComponent implements OnDestroy {
+  private config: IConfig;
+  private configSub: Subscription;
+
   private lang: string;
 
-  private configUnsubscribe$: Subscription;
-
-  constructor(private store: Store<AppState>, private translate: TranslateService) {
-    this.config$ = <Observable<ConfigStateRecord>>store.select('config');
-
-    this.lang = translate.currentLang;
-  }
-
-  ngOnInit() {
-    this.configUnsubscribe$ = this.config$
-      .map(config => config.toJS())
-      .map(config => {
-        this.isDarkTheme = config.isDarkTheme;
-      }).subscribe();
+  constructor(private store$: Store<IStore>, private translate: TranslateService) {
+    this.configSub =
+      store$.select('config')
+        .map((configR: IConfigRecord) => configR.toJS())
+        .subscribe((config: IConfig) => this.config = config);
   }
 
   ngOnDestroy() {
-    this.configUnsubscribe$.unsubscribe();
+    this.configSub.unsubscribe();
   }
 
   toggleTheme() {
-    this.store.dispatch({ type: TOGGLE_THEME });
+    this.store$.dispatch({ type: TOGGLE_THEME });
   }
 
   changeLanguageTo() {

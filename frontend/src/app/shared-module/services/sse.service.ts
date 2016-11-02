@@ -4,6 +4,10 @@ import { Injectable } from '@angular/core';
 // rxjs
 import { Observable } from 'rxjs';
 
+// sse
+import IEventSourceStatic = sse.IEventSourceStatic;
+import IOnMessageEvent = sse.IOnMessageEvent;
+
 // our environment
 import { environment } from '../../../environments/environment';
 
@@ -12,11 +16,11 @@ import { IBus } from '../interfaces/petals.interface';
 
 @Injectable()
 export class SseService {
-  private currentSse;
+  private currentSse: IEventSourceStatic;
 
   constructor() { }
 
-  subscribeToMessage(idWorkspace) {
+  subscribeToMessage(idWorkspace): Observable<IOnMessageEvent> {
     if (typeof this.currentSse !== 'undefined' && this.currentSse !== null) {
       if (environment.debug) {
         console.debug('closing previous sse connection');

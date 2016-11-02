@@ -1,24 +1,20 @@
 // angular modules
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Response } from '@angular/http';
 
 // rxjs
-import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 
 // store
-import { Store, Action } from '@ngrx/store';
-import { Actions, Effect, mergeEffects } from '@ngrx/effects';
+import { Action } from '@ngrx/store';
+import { Actions, Effect } from '@ngrx/effects';
 
 // our environment
 import { environment } from '../../../environments/environment';
 
 // our interfaces
 import { IUser } from '../interfaces/user.interface';
-
-// our states
-import { AppState } from '../../app.state';
 
 // our services
 import { UserService } from '../services/user.service';
@@ -34,27 +30,17 @@ import {
 } from '../reducers/user.reducer';
 
 @Injectable()
-export class UserEffects implements OnDestroy {
-  // our subscription(s) to @ngrx/effects
-  private subscription: Subscription;
-
+export class UserEffects {
   constructor(
     private router: Router,
     private actions$: Actions,
-    private store$: Store<AppState>,
     private userService: UserService
-  ) {
-    this.subscription = mergeEffects(this).subscribe(store$);
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
+  ) { }
 
   // tslint:disable-next-line:member-ordering
   @Effect({dispatch: true}) usrConnect$: Observable<Action> = this.actions$
     .ofType(USR_IS_CONNECTING)
-    .switchMap(action => this.userService.connectUser(action.payload)
+    .switchMap((action: Action) => this.userService.connectUser(action.payload)
       .map((res: any) => {
         if (!res.ok) {
           throw new Error('Error while connecting user');

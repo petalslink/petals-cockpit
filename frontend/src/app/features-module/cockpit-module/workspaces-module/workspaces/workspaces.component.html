@@ -43,12 +43,12 @@
 
     <img md-card-image src="/assets/img/workspace.png">
 
-    <md-card-content>
-      <md-nav-list *ngIf="(workspaces$ | async).workspaces">
-        <md-list-item *ngFor="let workspace of (workspaces$ | async).workspaces" (click)="selectWorkspace(workspace.id)">
-          <h3 md-line>{{workspace.name}}</h3>
+    <md-card-content *ngIf="minimalWorkspaces">
+      <md-nav-list>
+        <md-list-item *ngFor="let minimalWorkspace of minimalWorkspaces.minimalWorkspaces" (click)="selectWorkspace(minimalWorkspace.id)">
+          <h3 md-line>{{minimalWorkspace.name}}</h3>
           <p md-line>
-            <span class="workspace-used-by">{{workspace.usedBy}}</span>
+            <span class="workspace-used-by">{{minimalWorkspace.usedBy}}</span>
           </p>
         </md-list-item>
       </md-nav-list>

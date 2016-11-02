@@ -1,25 +1,21 @@
 // angular module
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-
-// immutable
-import { List } from 'immutable';
+import { Component, OnDestroy } from '@angular/core';
 
 // rxjs
-import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs';
 
 // ngrx - store
 import { Store } from '@ngrx/store';
 
-// our states
-import { AppState } from '../../../../app.state';
-import { WorkspacesState, WorkspacesStateRecord } from '../../../../shared-module/reducers/workspaces.state';
-
 // our interfaces
-import { IBus } from '../../../../shared-module/interfaces/petals.interface';
+import { IStore } from '../../../../shared-module/interfaces/store.interface';
+import {
+  IMinimalWorkspaces,
+  IMinimalWorkspacesRecord
+} from '../../../../shared-module/interfaces/minimal-workspaces.interface';
 
 // our actions
-import { CHANGE_SELECTED_WORKSPACE } from '../../../../shared-module/reducers/workspaces.reducer';
+import { FETCH_WORKSPACE } from '../../../../shared-module/reducers/workspace.reducer';
 
 // import
 @Component({
@@ -27,40 +23,24 @@ import { CHANGE_SELECTED_WORKSPACE } from '../../../../shared-module/reducers/wo
   templateUrl: 'workspaces.component.html',
   styleUrls: ['workspaces.component.scss']
 })
-export class WorkspacesComponent implements OnInit, OnDestroy {
-  private workspaces$: Observable<WorkspacesState>;
-  private buses: List<IBus>;
-  private selectedWorkspaceId: string;
+export class WorkspacesComponent implements OnDestroy {
+  private minimalWorkspaces: IMinimalWorkspaces;
+  private minimalWorkspacesSub: Subscription;
 
   constructor(
-    private store: Store<AppState>,
-    private router: Router,
-    private route: ActivatedRoute
+    private store$: Store<IStore>
   ) {
-    this.workspaces$ = <Observable<WorkspacesState>>store.select('workspaces')
-      .map((workspaces: WorkspacesStateRecord) => workspaces.toJS());
-  }
-
-  selectWorkspace(workspaceId: string) {
-    this.store.dispatch({ type: CHANGE_SELECTED_WORKSPACE, payload: workspaceId });
-    this.router.navigate(['./', workspaceId], {relativeTo: this.route.parent});
-  }
-
-  ngOnInit(): void {
-    this.workspaces$.subscribe(workspace => {
-      this.selectedWorkspaceId = workspace.selectedWorkspaceId;
-
-      if (
-        typeof this.selectedWorkspaceId !== 'undefined' &&
-        this.selectedWorkspaceId !== null &&
-        typeof workspace.workspaces !== 'undefined' &&
-        workspace.workspaces !== null
-      ) {
-        this.buses = workspace.workspaces.find(w => w.id === this.selectedWorkspaceId).buses;
-      }
-    });
+    this.minimalWorkspacesSub =
+      store$.select('minimalWorkspaces')
+      .map((minimalWorkspacesR: IMinimalWorkspacesRecord) => minimalWorkspacesR.toJS())
+      .subscribe((minimalWorkspaces: IMinimalWorkspaces) => this.minimalWorkspaces = minimalWorkspaces);
   }
 
   ngOnDestroy() {
+    this.minimalWorkspacesSub.unsubscribe();
+  }
+
+  selectWorkspace(workspaceId: string) {
+    this.store$.dispatch({ type: FETCH_WORKSPACE, payload: workspaceId });
   }
 }

@@ -6,7 +6,7 @@
     color="primary"
     md-tooltip="Import a bus"
     tooltip-position="below"
-    [routerLink]="['/cockpit', 'workspaces', selectedWorkspaceId, 'petals', 'bus', 'import']"
+    [routerLink]="['/cockpit', 'workspaces', workspace.id, 'petals', 'bus', 'import']"
   >
     <md-icon class="md-24">add</md-icon>
   </button>
@@ -17,22 +17,22 @@
     </span>
   </md-input>
 
-  <md-nav-list dense *ngIf="workspaces && selectedWorkspace.busesInProgress.length > 0">
+  <md-nav-list dense *ngIf="workspace && workspace.busesInProgress && workspace.busesInProgress.length > 0">
     <h3 md-subheader>In progress</h3>
     <a
       md-list-item
-      *ngFor="let bus of selectedWorkspace.busesInProgress"
-      [routerLink]="['/', 'cockpit', 'workspaces', selectedWorkspaceId, 'petals', 'bus', bus.id]"
+      *ngFor="let bus of workspace.busesInProgress"
+      [routerLink]="['/', 'cockpit', 'workspaces', workspace.id, 'petals', 'bus', bus.id]"
     >
-      {{bus.ip}}
+      {{ bus.config.ip }}
     </a>
   </md-nav-list>
 
   <app-buses-menu
-    *ngIf="selectedWorkspaceId && workspaces"
-    [idWorkspace]="selectedWorkspaceId"
-    [workspace]="selectedWorkspace"
-    [buses]="buses"
-    [search]="textSearch">
+    *ngIf="workspace && workspace.buses"
+    [idWorkspace]="workspace.id"
+    [workspace]="workspace"
+    [buses]="workspace.buses"
+    [search]="workspace.searchPetals">
   </app-buses-menu>
 </div>

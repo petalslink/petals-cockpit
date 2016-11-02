@@ -1,3 +1,4 @@
+// angular modules
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 
@@ -17,6 +18,10 @@ export class WorkspaceService {
 
   updateWorkspaces(): Observable<Response> {
     return this.http.get(`${environment.urlBackend}/workspaces`);
+  }
+
+  updateWorkspace(idWorkspace: string): Observable<Response> {
+    return this.http.get(`${environment.urlBackend}/workspaces/${idWorkspace}`);
   }
 
   importBus(newBus: INewBus) {

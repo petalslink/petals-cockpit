@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-api',
@@ -6,11 +6,6 @@ import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
   styleUrls: ['./api.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ApiComponent implements OnInit {
-
+export class ApiComponent {
   constructor() { }
-
-  ngOnInit() {
-  }
-
 }
