@@ -1,8 +1,8 @@
 // angular modules
-import {Component, Input, OnInit, OnDestroy} from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 
 // rxjs
-import {Subscription} from 'rxjs';
+import { Subscription } from 'rxjs';
 
 // ngrx
 import { Store } from '@ngrx/store';
@@ -29,27 +29,27 @@ export class PetalsBusImportComponent implements OnInit, OnDestroy {
   @Input() newBus?: any;
 
   private workspace: IWorkspace;
-  private workspaceSubscription: Subscription;
+  private workspaceSub: Subscription;
 
   private minimalWorkspaces: IMinimalWorkspaces;
-  private minimalWorkspacesSubscription: Subscription;
+  private minimalWorkspacesSub: Subscription;
 
   constructor(private store$: Store<IStore>) {
-    this.minimalWorkspacesSubscription =
+    this.minimalWorkspacesSub =
       store$.select('minimalWorkspaces')
         .map((minimalWorkspacesR: IMinimalWorkspacesRecord) => minimalWorkspacesR.toJS())
         .subscribe((minimalWorkspaces: IMinimalWorkspaces) => this.minimalWorkspaces = minimalWorkspaces);
 
 
-    this.workspaceSubscription =
+    this.workspaceSub =
       store$.select('workspace')
         .map((workspaceR: IWorkspaceRecord) => workspaceR.toJS())
         .subscribe((workspace: IWorkspace) => this.workspace = workspace);
   }
 
   ngOnDestroy() {
-    this.minimalWorkspacesSubscription.unsubscribe();
-    this.workspaceSubscription.unsubscribe();
+    this.minimalWorkspacesSub.unsubscribe();
+    this.workspaceSub.unsubscribe();
   }
 
   ngOnInit() {

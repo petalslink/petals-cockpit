@@ -25,12 +25,12 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
   private workspace$: Observable<IWorkspaceRecord>;
 
   private workspace$WithBus: Observable<IWorkspaceRecord>;
-  private workspace$WithBusSubscription: Subscription;
+  private workspace$WithBusSub: Subscription;
 
   private workspace: IWorkspace;
-  private workspaceSubscription: Subscription;
+  private workspaceSub: Subscription;
 
-  private routeSubscription: Subscription;
+  private routeSub: Subscription;
 
   private bus: IBus;
   private busInImport: boolean;
@@ -38,15 +38,15 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) {
     this.workspace$ = store$.select('workspace');
 
-    this.workspaceSubscription = this.workspace$
+    this.workspaceSub = this.workspace$
         .map((workspaceR: IWorkspaceRecord) => workspaceR.toJS())
         .subscribe((workspace: IWorkspace) => this.workspace = workspace);
   }
 
   ngOnDestroy() {
-    this.workspaceSubscription.unsubscribe();
-    this.routeSubscription.unsubscribe();
-    this.workspace$WithBusSubscription.unsubscribe();
+    this.workspaceSub.unsubscribe();
+    this.routeSub.unsubscribe();
+    this.workspace$WithBusSub.unsubscribe();
   }
 
   ngOnInit() {
@@ -57,13 +57,13 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
 
     // update the current bus IF
     // it's ID is in the URL AND the current workspace has at least one bus
-    this.routeSubscription =
+    this.routeSub =
       this.route.params.combineLatest(this.workspace$WithBus.take(1),
         (params: Params) => {
           this.updateBus(params['idBus'], true);
         }).subscribe();
 
-    this.workspace$WithBusSubscription =
+    this.workspace$WithBusSub =
       this.route.params.combineLatest(this.workspace$WithBus,
         (params: Params) => {
           this.updateBus(params['idBus'], false);
@@ -89,7 +89,7 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
 
     // reload if asked OR if bus status change from importing to imported
     if (reloadConfig || busInImportPreviousStatus !== this.busInImport) {
-      this.store$.dispatch({type: FETCH_BUS_CONFIG, payload: idBus});
+      this.store$.dispatch({ type: FETCH_BUS_CONFIG, payload: idBus });
     }
   }
 }

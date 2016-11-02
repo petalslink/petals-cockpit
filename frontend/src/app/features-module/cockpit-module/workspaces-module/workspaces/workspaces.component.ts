@@ -2,20 +2,20 @@
 import { Component, OnDestroy } from '@angular/core';
 
 // rxjs
-import {Subscription} from 'rxjs';
+import { Subscription } from 'rxjs';
 
 // ngrx - store
 import { Store } from '@ngrx/store';
 
 // our interfaces
-import {IStore} from '../../../../shared-module/interfaces/store.interface';
+import { IStore } from '../../../../shared-module/interfaces/store.interface';
 import {
   IMinimalWorkspaces,
   IMinimalWorkspacesRecord
 } from '../../../../shared-module/interfaces/minimal-workspaces.interface';
 
 // our actions
-import {FETCH_WORKSPACE} from '../../../../shared-module/reducers/workspace.reducer';
+import { FETCH_WORKSPACE } from '../../../../shared-module/reducers/workspace.reducer';
 
 // import
 @Component({
@@ -25,19 +25,19 @@ import {FETCH_WORKSPACE} from '../../../../shared-module/reducers/workspace.redu
 })
 export class WorkspacesComponent implements OnDestroy {
   private minimalWorkspaces: IMinimalWorkspaces;
-  private minimalWorkspacesSubscription: Subscription;
+  private minimalWorkspacesSub: Subscription;
 
   constructor(
     private store$: Store<IStore>
   ) {
-    this.minimalWorkspacesSubscription =
+    this.minimalWorkspacesSub =
       store$.select('minimalWorkspaces')
       .map((minimalWorkspacesR: IMinimalWorkspacesRecord) => minimalWorkspacesR.toJS())
       .subscribe((minimalWorkspaces: IMinimalWorkspaces) => this.minimalWorkspaces = minimalWorkspaces);
   }
 
   ngOnDestroy() {
-    this.minimalWorkspacesSubscription.unsubscribe();
+    this.minimalWorkspacesSub.unsubscribe();
   }
 
   selectWorkspace(workspaceId: string) {

@@ -21,17 +21,17 @@ import { EDIT_PETALS_SEARCH, getSearchedWorkspace } from '../../../../../../shar
 })
 export class PetalsSidenavMenuComponent implements OnDestroy {
   private workspace: IWorkspace;
-  private workspaceSubscription: Subscription;
+  private workspaceSub: Subscription;
 
   constructor(private store$: Store<IStore>) {
-    this.workspaceSubscription =
+    this.workspaceSub =
       store$.let(getSearchedWorkspace())
         .map((workspaceR: IWorkspaceRecord) => workspaceR.toJS())
         .subscribe((workspace: IWorkspace) => this.workspace = workspace);
   }
 
   ngOnDestroy() {
-    this.workspaceSubscription.unsubscribe();
+    this.workspaceSub.unsubscribe();
   }
 
   search(textSearch) {

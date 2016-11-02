@@ -45,13 +45,13 @@ const tabs = [{
 })
 export class CockpitComponent implements OnInit, OnDestroy {
   private config: IConfig;
-  private configSubscription: Subscription;
+  private configSub: Subscription;
   private user: IUser;
-  private userSubscription: Subscription;
+  private userSub: Subscription;
   private minimalWorkspaces: IMinimalWorkspaces;
-  private minimalWorkspacesSubscription: Subscription;
+  private minimalWorkspacesSub: Subscription;
   private workspace: IWorkspace;
-  private workspaceSubscription: Subscription;
+  private workspaceSub: Subscription;
 
   private tabSelectedIndex: number = -1;
   private tabs: ITabs;
@@ -62,22 +62,22 @@ export class CockpitComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef
   ) {
-    this.configSubscription =
+    this.configSub =
       store$.select('config')
         .map((configR: IConfigRecord) => configR.toJS())
         .subscribe((config: IConfig) => this.config = config);
 
-    this.userSubscription =
+    this.userSub =
       store$.select('user')
         .map((userR: IUserRecord) => userR.toJS())
         .subscribe((user: IUser) => this.user = user);
 
-    this.minimalWorkspacesSubscription =
+    this.minimalWorkspacesSub =
       store$.select('minimalWorkspaces')
         .map((minimalWorkspacesR: IMinimalWorkspacesRecord) => minimalWorkspacesR.toJS())
         .subscribe((minimalWorkspaces: IMinimalWorkspaces) => this.minimalWorkspaces = minimalWorkspaces);
 
-    this.workspaceSubscription =
+    this.workspaceSub =
       store$.select('workspace')
         .map((workspaceR: IWorkspaceRecord) => workspaceR.toJS())
         .subscribe((workspace: IWorkspace) => this.workspace = workspace);
@@ -86,10 +86,10 @@ export class CockpitComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.configSubscription.unsubscribe();
-    this.userSubscription.unsubscribe();
-    this.minimalWorkspacesSubscription.unsubscribe();
-    this.workspaceSubscription.unsubscribe();
+    this.configSub.unsubscribe();
+    this.userSub.unsubscribe();
+    this.minimalWorkspacesSub.unsubscribe();
+    this.workspaceSub.unsubscribe();
   }
 
   ngOnInit() {

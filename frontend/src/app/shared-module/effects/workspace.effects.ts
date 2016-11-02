@@ -39,7 +39,7 @@ import {
 
 @Injectable()
 export class WorkspaceEffects {
-  private sseServiceSubscription: Subscription;
+  private sseServiceSub: Subscription;
 
   constructor(
     private actions$: Actions,
@@ -79,8 +79,8 @@ export class WorkspaceEffects {
   @Effect({dispatch: true}) fetchWorkspaceSuccess$: Observable<Action> = this.actions$
     .ofType(FETCH_WORKSPACE_SUCCESS)
     .switchMap((action: Action) => {
-      if (typeof this.sseServiceSubscription !== 'undefined') {
-        this.sseServiceSubscription.unsubscribe();
+      if (typeof this.sseServiceSub !== 'undefined') {
+        this.sseServiceSub.unsubscribe();
       }
 
       let sseServiceObs: Observable<Action> =

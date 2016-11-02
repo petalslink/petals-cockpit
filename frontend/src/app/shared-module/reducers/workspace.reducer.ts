@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 
 // our interfaces
 import { IStore } from '../interfaces/store.interface';
-import { IWorkspaceRecord} from '../interfaces/workspace.interface';
+import { IWorkspaceRecord } from '../interfaces/workspace.interface';
 import { workspaceFactory } from './workspace.state';
 
 // our helpers

@@ -15,7 +15,7 @@ import { TOGGLE_THEME } from '../../../shared-module/reducers/config.reducer';
 
 // our interfaces
 import { IConfigRecord, IConfig } from '../../../shared-module/interfaces/config.interface';
-import {IStore} from '../../../shared-module/interfaces/store.interface';
+import { IStore } from '../../../shared-module/interfaces/store.interface';
 
 @Component({
   selector: 'app-settings',
@@ -24,19 +24,19 @@ import {IStore} from '../../../shared-module/interfaces/store.interface';
 })
 export class SettingsComponent implements OnDestroy {
   private config: IConfig;
-  private configSubscription: Subscription;
+  private configSub: Subscription;
 
   private lang: string;
 
   constructor(private store$: Store<IStore>, private translate: TranslateService) {
-    this.configSubscription =
+    this.configSub =
       store$.select('config')
         .map((configR: IConfigRecord) => configR.toJS())
         .subscribe((config: IConfig) => this.config = config);
   }
 
   ngOnDestroy() {
-    this.configSubscription.unsubscribe();
+    this.configSub.unsubscribe();
   }
 
   toggleTheme() {

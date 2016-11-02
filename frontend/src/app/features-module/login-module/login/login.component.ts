@@ -25,13 +25,13 @@ import { IUser, IUserRecord } from '../../../shared-module/interfaces/user.inter
 })
 export class LoginComponent implements OnInit, OnDestroy {
   private user: IUser;
-  private userSubscription: Subscription;
+  private userSub: Subscription;
 
   // TODO: Review needed, isn't there a directive for that ?
   @ViewChild('nameInput') nameInput: MdInput;
 
   constructor(private store$: Store<IStore>) {
-    this.userSubscription =
+    this.userSub =
       store$.select('user')
         .map((userR: IUserRecord) => userR.toJS())
         .subscribe((user: IUser) => this.user = user);
@@ -42,7 +42,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.userSubscription.unsubscribe();
+    this.userSub.unsubscribe();
   }
 
   connectUser(user: IUser) {
