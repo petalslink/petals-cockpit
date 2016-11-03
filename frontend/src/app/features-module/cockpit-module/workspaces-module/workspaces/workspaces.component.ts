@@ -16,6 +16,7 @@ import {
 
 // our actions
 import { FETCH_WORKSPACE } from '../../../../shared-module/reducers/workspace.reducer';
+import { ADD_WORKSPACE } from '../../../../shared-module/reducers/minimal-workspaces.reducer';
 
 // import
 @Component({
@@ -27,6 +28,8 @@ export class WorkspacesComponent implements OnDestroy {
   private minimalWorkspaces: IMinimalWorkspaces;
   private minimalWorkspacesSub: Subscription;
 
+  private name: string;
+
   constructor(
     private store$: Store<IStore>
   ) {
@@ -34,6 +37,16 @@ export class WorkspacesComponent implements OnDestroy {
       store$.select('minimalWorkspaces')
       .map((minimalWorkspacesR: IMinimalWorkspacesRecord) => minimalWorkspacesR.toJS())
       .subscribe((minimalWorkspaces: IMinimalWorkspaces) => this.minimalWorkspaces = minimalWorkspaces);
+
+    // TODO: find a way to let the workspace's name if error
+    // when the addingWorkspace value from store is toggled, clean workspace's name
+    store$.select('minimalWorkspaces')
+      .map((minimalWorkspacesR: IMinimalWorkspacesRecord) => minimalWorkspacesR.get('addingWorkspace'))
+      .distinctUntilChanged()
+      .filter((addingWorkspace: boolean) => !addingWorkspace)
+      .subscribe(() => {
+        this.name = '';
+      });
   }
 
   ngOnDestroy() {
@@ -42,5 +55,9 @@ export class WorkspacesComponent implements OnDestroy {
 
   selectWorkspace(workspaceId: string) {
     this.store$.dispatch({ type: FETCH_WORKSPACE, payload: workspaceId });
+  }
+
+  addWorkspace(name: string) {
+    this.store$.dispatch({ type: ADD_WORKSPACE, payload: name });
   }
 }

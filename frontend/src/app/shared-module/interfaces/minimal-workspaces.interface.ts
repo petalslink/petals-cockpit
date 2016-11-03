@@ -18,6 +18,7 @@ export interface IMinimalWorkspaces {
   minimalWorkspaces: Array<IMinimalWorkspace>;
 
   // for UI
+  addingWorkspace: boolean;
   fetchingWorkspaces: boolean;
 }
 
