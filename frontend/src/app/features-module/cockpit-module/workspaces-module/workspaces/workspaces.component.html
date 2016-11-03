@@ -80,7 +80,7 @@
 
       <md-nav-list>
         <md-list-item *ngFor="let minimalWorkspace of minimalWorkspaces.minimalWorkspaces" (click)="selectWorkspace(minimalWorkspace.id)">
-          <h3 md-line [class.color-primary]="workspace.id === minimalWorkspace.id">
+          <h3 md-line [class.color-primary-bold]="workspace.id === minimalWorkspace.id">
             {{ minimalWorkspace.name }}
 
             <md-progress-circle

@@ -38,10 +38,7 @@ export const FETCH_BUS_CONFIG = 'FETCH_BUS_CONFIG';
 export const FETCH_BUS_CONFIG_SUCCESS = 'FETCH_BUS_CONFIG_SUCCESS';
 export const FETCH_BUS_CONFIG_FAILED = 'FETCH_BUS_CONFIG_FAILED';
 
-export const SET_BUS_ID = 'SET_BUS_ID';
-export const SET_CONTAINER_ID = 'SET_CONTAINER_ID';
-export const SET_COMPONENT_ID = 'SET_COMPONENT_ID';
-export const SET_SERVICE_UNIT_ID = 'SET_SERVICE_UNIT_ID';
+export const SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT = 'SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT';
 
 function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(), action: Action) {
   if (action.type === FETCH_WORKSPACE) {
@@ -145,20 +142,12 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
     return workspaceR.set('gettingBusConfig', false);
   }
 
-  else if (action.type === SET_BUS_ID) {
-    return workspaceR.set('selectedBusId', action.payload);
-  }
-
-  else if (action.type === SET_CONTAINER_ID) {
-    return workspaceR.set('selectedContainerId', action.payload);
-  }
-
-  else if (action.type === SET_COMPONENT_ID) {
-    return workspaceR.set('selectedComponentId', action.payload);
-  }
-
-  else if (action.type === SET_SERVICE_UNIT_ID) {
-    return workspaceR.set('selectedServiceUnitId', action.payload);
+  else if (action.type === SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT) {
+    return workspaceR
+      .set('selectedBusId', action.payload.selectedBusId)
+      .set('selectedContainerId', action.payload.selectedContainerId)
+      .set('selectedComponentId', action.payload.selectedComponentId)
+      .set('selectedServiceUnitId', action.payload.selectedServiceUnitId);
   }
 
   return workspaceR;

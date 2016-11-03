@@ -24,8 +24,8 @@ import { IWorkspaceRecord, IWorkspace } from '../../../shared-module/interfaces/
 // our actions
 import { FETCH_WORKSPACES } from '../../../shared-module/reducers/minimal-workspaces.reducer';
 import {
-  FETCH_WORKSPACE, SET_BUS_ID, SET_SERVICE_UNIT_ID,
-  SET_CONTAINER_ID, SET_COMPONENT_ID
+  FETCH_WORKSPACE,
+  SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT
 } from '../../../shared-module/reducers/workspace.reducer';
 
 interface ITabs extends Array<{ title: string, url: string }> {};
@@ -114,10 +114,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
     const reApi = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/api/;
 
     /* tslint:disable:max-line-length */
-    const rePetalsBusContCompSu = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals\/bus\/([0-9a-zA-Z-_]+)\/container\/([0-9a-zA-Z-_]+)\/component\/([0-9a-zA-Z-_]+)\/serviceUnit\/([0-9a-zA-Z-_]+)/;
-    const rePetalsBusContComp = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals\/bus\/([0-9a-zA-Z-_]+)\/container\/([0-9a-zA-Z-_]+)\/component\/([0-9a-zA-Z-_]+)/;
-    const rePetalsBusCont = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals\/bus\/([0-9a-zA-Z-_]+)\/container\/([0-9a-zA-Z-_]+)/;
-    const rePetalsBus = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals\/bus\/([0-9a-zA-Z-_]+)/;
+    const rePetalsBusContCompSu = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals(?:\/bus\/([0-9a-zA-Z-_]+)(?:\/container\/([0-9a-zA-Z-_]+)(?:\/component\/([0-9a-zA-Z-_]+)(?:\/serviceUnit\/([0-9a-zA-Z-_]+))?)?)?)?/;
     /* tslint:enable:max-line-length */
 
     this.router.events
@@ -139,38 +136,17 @@ export class CockpitComponent implements OnInit, OnDestroy {
         }
 
         // check selected bus/container/component/su
-        let rePetalsBusContCompSuRslt = rePetalsBusContCompSu.exec(url);
-        let rePetalsBusContCompRslt = rePetalsBusContComp.exec(url);
-        let rePetalsBusContRslt = rePetalsBusCont.exec(url);
-        let rePetalsBusRslt = rePetalsBus.exec(url);
+        let reRslt = rePetalsBusContCompSu.exec(url);
 
-        if (rePetalsBusContCompSuRslt !== null) {
-          this.store$.dispatch({ type: SET_BUS_ID, payload: rePetalsBusContCompSuRslt[1] });
-          this.store$.dispatch({ type: SET_CONTAINER_ID, payload: rePetalsBusContCompSuRslt[2] });
-          this.store$.dispatch({ type: SET_COMPONENT_ID, payload: rePetalsBusContCompSuRslt[3] });
-          this.store$.dispatch({ type: SET_SERVICE_UNIT_ID, payload: rePetalsBusContCompSuRslt[4] });
-        }
-
-        else if (rePetalsBusContCompRslt !== null) {
-          this.store$.dispatch({ type: SET_BUS_ID, payload: rePetalsBusContCompRslt[1] });
-          this.store$.dispatch({ type: SET_CONTAINER_ID, payload: rePetalsBusContCompRslt[2] });
-          this.store$.dispatch({ type: SET_COMPONENT_ID, payload: rePetalsBusContCompRslt[3] });
-          this.store$.dispatch({ type: SET_SERVICE_UNIT_ID, payload: null });
-        }
-
-        else if (rePetalsBusContRslt !== null) {
-          this.store$.dispatch({ type: SET_BUS_ID, payload: rePetalsBusContRslt[1] });
-          this.store$.dispatch({ type: SET_CONTAINER_ID, payload: rePetalsBusContRslt[2] });
-          this.store$.dispatch({ type: SET_COMPONENT_ID, payload: null });
-          this.store$.dispatch({ type: SET_SERVICE_UNIT_ID, payload: null });
-        }
-
-        else if (rePetalsBusRslt !== null) {
-          this.store$.dispatch({ type: SET_BUS_ID, payload: rePetalsBusRslt[1] });
-          this.store$.dispatch({ type: SET_CONTAINER_ID, payload: null });
-          this.store$.dispatch({ type: SET_COMPONENT_ID, payload: null });
-          this.store$.dispatch({ type: SET_SERVICE_UNIT_ID, payload: null });
-        }
+        this.store$.dispatch({
+            type: SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT,
+            payload: {
+              selectedBusId: (reRslt !== null && typeof reRslt[1] !== 'undefined' ? reRslt[1] : null),
+              selectedContainerId: (reRslt !== null && typeof reRslt[2] !== 'undefined' ? reRslt[2] : null),
+              selectedComponentId: (reRslt !== null && typeof reRslt[3] !== 'undefined' ? reRslt[3] : null),
+              selectedServiceUnitId: (reRslt !== null && typeof reRslt[4] !== 'undefined' ? reRslt[4] : null)
+            }
+        });
 
         // as the component is set to OnPush
         this.changeDetectorRef.markForCheck();
