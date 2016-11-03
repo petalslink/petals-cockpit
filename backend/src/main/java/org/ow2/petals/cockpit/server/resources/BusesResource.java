@@ -80,13 +80,17 @@ public class BusesResource {
 
         private final String password;
 
+        private final String passphrase;
+
         public NewBus(@NotEmpty @JsonProperty("ip") String ip, @NotEmpty @JsonProperty("port") int port,
                 @NotEmpty @JsonProperty("username") String username,
-                @NotEmpty @JsonProperty("password") String password) {
+                @NotEmpty @JsonProperty("password") String password,
+                @NotEmpty @JsonProperty("passphrase") String passphrase) {
             this.ip = ip;
             this.port = port;
             this.username = username;
             this.password = password;
+            this.passphrase = passphrase;
         }
 
         public String getIp() {
@@ -103,6 +107,10 @@ public class BusesResource {
 
         public String getPassword() {
             return password;
+        }
+
+        public String getPassphrase() {
+            return passphrase;
         }
     }
 
