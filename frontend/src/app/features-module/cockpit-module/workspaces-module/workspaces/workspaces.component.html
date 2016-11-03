@@ -37,7 +37,11 @@
 <div class="bkg-primary-card">
   <md-card class="central-content">
      <md-card-header>
-        <md-card-title>Workspaces</md-card-title>
+        <md-card-title>
+          Workspaces
+
+          <md-progress-circle *ngIf="minimalWorkspaces.fetchingWorkspaces" mode="indeterminate"></md-progress-circle>
+        </md-card-title>
         <md-card-subtitle>Select the workspace you want to work with</md-card-subtitle>
      </md-card-header>
 
@@ -47,24 +51,24 @@
       md-mini-fab
       class="btn-show-panel-add-workspace"
       *ngIf="minimalWorkspaces && minimalWorkspaces.minimalWorkspaces.length > 0"
-      (click)="addingWorkspace = !addingWorkspace"
+      (click)="toggleAddPanel()"
     >
       <md-icon class="md-24" *ngIf="!addingWorkspace">add</md-icon>
       <md-icon class="md-24" *ngIf="addingWorkspace">clear</md-icon>
     </button>
 
     <md-card-content *ngIf="minimalWorkspaces">
-      <p *ngIf="minimalWorkspaces.minimalWorkspaces.length === 0">
+      <p *ngIf="!minimalWorkspaces.fetchingWorkspaces && minimalWorkspaces.minimalWorkspaces.length === 0">
         You don't have any workspace.
       </p>
 
       <form
-        *ngIf="addingWorkspace || minimalWorkspaces.minimalWorkspaces.length === 0"
+        [hidden]="minimalWorkspaces.fetchingWorkspaces || (!addingWorkspace && minimalWorkspaces.minimalWorkspaces.length !== 0)"
         #addWorkspaceForm="ngForm"
         (ngSubmit)="addWorkspace(addWorkspaceForm.value.name)"
       >
         <p>
-          <md-input [(ngModel)]="name" name="name" placeholder="Workspace's name" [disabled]="minimalWorkspaces.addingWorkspace"></md-input>
+          <md-input #nameInput [(ngModel)]="name" name="name" placeholder="Workspace's name" [disabled]="minimalWorkspaces.addingWorkspace"></md-input>
 
           <button md-raised-button type="submit" [disabled]="minimalWorkspaces.addingWorkspace">
             Add workspace
@@ -76,9 +80,17 @@
 
       <md-nav-list>
         <md-list-item *ngFor="let minimalWorkspace of minimalWorkspaces.minimalWorkspaces" (click)="selectWorkspace(minimalWorkspace.id)">
-          <h3 md-line>{{ minimalWorkspace.name }}</h3>
+          <h3 md-line [class.color-primary]="workspace.id === minimalWorkspace.id">
+            {{ minimalWorkspace.name }}
+
+            <md-progress-circle
+              *ngIf="minimalWorkspaces.fetchingWorkspaceWithId === minimalWorkspace.id"
+              mode="indeterminate">
+            </md-progress-circle>
+          </h3>
+
           <p md-line>
-            <span class="workspace-used-by">{{minimalWorkspace.usedBy}}</span>
+            <span class="workspace-used-by">{{ minimalWorkspace.usedBy }}</span>
           </p>
         </md-list-item>
       </md-nav-list>

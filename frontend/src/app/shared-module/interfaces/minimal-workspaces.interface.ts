@@ -20,6 +20,7 @@ export interface IMinimalWorkspaces {
   // for UI
   addingWorkspace: boolean;
   fetchingWorkspaces: boolean;
+  fetchingWorkspaceWithId: string;
 }
 
 export interface IMinimalWorkspacesRecord extends TypedRecord<IMinimalWorkspacesRecord>, IMinimalWorkspaces { };

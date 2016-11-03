@@ -7,6 +7,7 @@ import { ActionReducer, Action } from '@ngrx/store';
 // our interfaces
 import { IMinimalWorkspacesRecord, IMinimalWorkspace } from '../interfaces/minimal-workspaces.interface';
 import { minimalWorkspacesFactory } from './minimal-workspaces.state';
+import { FETCH_WORKSPACE, FETCH_WORKSPACE_FAILED, FETCH_WORKSPACE_SUCCESS } from './workspace.reducer';
 
 // actions
 export const FETCH_WORKSPACES = 'FETCH_WORKSPACES';
@@ -34,6 +35,22 @@ function createMinimalWorkspacesReducer(minWorkspacesR: IMinimalWorkspacesRecord
       .setIn(['minimalWorkspaces'], fromJS(action.payload));
   }
 
+  // FETCH_WORKSPACE* from workspace.reducer
+  // we want to keep track of the current workspace (workspace.reducer)
+  // but we also want to be aware if user requested another workspace
+  if (action.type === FETCH_WORKSPACE) {
+    return minWorkspacesR.setIn(['fetchingWorkspaceWithId'], action.payload);
+  }
+
+  else if (action.type ===  FETCH_WORKSPACE_FAILED) {
+    return minWorkspacesR.setIn(['fetchingWorkspaceWithId'], null);
+  }
+
+  else if (action.type === FETCH_WORKSPACE_SUCCESS) {
+    return minWorkspacesR.setIn(['fetchingWorkspaceWithId'], null);
+  }
+
+  // ADD_WORKSPACE*
   else if (action.type === ADD_WORKSPACE) {
     return minWorkspacesR.set('addingWorkspace', true);
   }
