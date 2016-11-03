@@ -58,6 +58,13 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
     //   }
     // }
 
+    // if we changed from workspace A to B
+    // (not a refresh from A to A updated)
+    // clear petals search
+    if (workspaceR.get('id') !== action.payload.id) {
+      workspaceR = workspaceR.set('searchPetals', '');
+    }
+
     return workspaceR
       .set('fetchingWorkspace', false)
       .set('id', action.payload.id)
