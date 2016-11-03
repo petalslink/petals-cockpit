@@ -16,6 +16,11 @@ export interface IWorkspace extends IMinimalWorkspace {
   fetchingWorkspace: boolean;
   importingBus: boolean;
   gettingBusConfig: boolean;
+
+  selectedBusId: null;
+  selectedContainerId: null;
+  selectedComponentId: null;
+  selectedServiceUnitId: null;
 }
 
 export interface IWorkspaceRecord extends TypedRecord<IWorkspaceRecord>, IWorkspace { };

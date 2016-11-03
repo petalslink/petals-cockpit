@@ -1,6 +1,6 @@
 // angular modules
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 
 // rxjs
 import { Subscription } from 'rxjs';
@@ -23,7 +23,10 @@ import { IWorkspaceRecord, IWorkspace } from '../../../shared-module/interfaces/
 
 // our actions
 import { FETCH_WORKSPACES } from '../../../shared-module/reducers/minimal-workspaces.reducer';
-import { FETCH_WORKSPACE } from '../../../shared-module/reducers/workspace.reducer';
+import {
+  FETCH_WORKSPACE, SET_BUS_ID, SET_SERVICE_UNIT_ID,
+  SET_CONTAINER_ID, SET_COMPONENT_ID
+} from '../../../shared-module/reducers/workspace.reducer';
 
 interface ITabs extends Array<{ title: string, url: string }> {};
 
@@ -110,11 +113,19 @@ export class CockpitComponent implements OnInit, OnDestroy {
     const reService = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/service/;
     const reApi = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/api/;
 
+    /* tslint:disable:max-line-length */
+    const rePetalsBusContCompSu = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals\/bus\/([0-9a-zA-Z-_]+)\/container\/([0-9a-zA-Z-_]+)\/component\/([0-9a-zA-Z-_]+)\/serviceUnit\/([0-9a-zA-Z-_]+)/;
+    const rePetalsBusContComp = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals\/bus\/([0-9a-zA-Z-_]+)\/container\/([0-9a-zA-Z-_]+)\/component\/([0-9a-zA-Z-_]+)/;
+    const rePetalsBusCont = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals\/bus\/([0-9a-zA-Z-_]+)\/container\/([0-9a-zA-Z-_]+)/;
+    const rePetalsBus = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals\/bus\/([0-9a-zA-Z-_]+)/;
+    /* tslint:enable:max-line-length */
+
     this.router.events
-      // .throttle(val => Observable.interval(500))
+      .filter(event => event instanceof NavigationEnd)
       .subscribe((eventUrl: any) => {
         const url = eventUrl.urlAfterRedirects;
 
+        // check selected tab
         if (typeof url === 'undefined') {
           this.tabSelectedIndex = 0;
         } else if (url.match(rePetals)) {
@@ -125,6 +136,40 @@ export class CockpitComponent implements OnInit, OnDestroy {
           this.tabSelectedIndex = 2;
         } else {
           this.tabSelectedIndex = 0;
+        }
+
+        // check selected bus/container/component/su
+        let rePetalsBusContCompSuRslt = rePetalsBusContCompSu.exec(url);
+        let rePetalsBusContCompRslt = rePetalsBusContComp.exec(url);
+        let rePetalsBusContRslt = rePetalsBusCont.exec(url);
+        let rePetalsBusRslt = rePetalsBus.exec(url);
+
+        if (rePetalsBusContCompSuRslt !== null) {
+          this.store$.dispatch({ type: SET_BUS_ID, payload: rePetalsBusContCompSuRslt[1] });
+          this.store$.dispatch({ type: SET_CONTAINER_ID, payload: rePetalsBusContCompSuRslt[2] });
+          this.store$.dispatch({ type: SET_COMPONENT_ID, payload: rePetalsBusContCompSuRslt[3] });
+          this.store$.dispatch({ type: SET_SERVICE_UNIT_ID, payload: rePetalsBusContCompSuRslt[4] });
+        }
+
+        else if (rePetalsBusContCompRslt !== null) {
+          this.store$.dispatch({ type: SET_BUS_ID, payload: rePetalsBusContCompRslt[1] });
+          this.store$.dispatch({ type: SET_CONTAINER_ID, payload: rePetalsBusContCompRslt[2] });
+          this.store$.dispatch({ type: SET_COMPONENT_ID, payload: rePetalsBusContCompRslt[3] });
+          this.store$.dispatch({ type: SET_SERVICE_UNIT_ID, payload: null });
+        }
+
+        else if (rePetalsBusContRslt !== null) {
+          this.store$.dispatch({ type: SET_BUS_ID, payload: rePetalsBusContRslt[1] });
+          this.store$.dispatch({ type: SET_CONTAINER_ID, payload: rePetalsBusContRslt[2] });
+          this.store$.dispatch({ type: SET_COMPONENT_ID, payload: null });
+          this.store$.dispatch({ type: SET_SERVICE_UNIT_ID, payload: null });
+        }
+
+        else if (rePetalsBusRslt !== null) {
+          this.store$.dispatch({ type: SET_BUS_ID, payload: rePetalsBusRslt[1] });
+          this.store$.dispatch({ type: SET_CONTAINER_ID, payload: null });
+          this.store$.dispatch({ type: SET_COMPONENT_ID, payload: null });
+          this.store$.dispatch({ type: SET_SERVICE_UNIT_ID, payload: null });
         }
 
         // as the component is set to OnPush

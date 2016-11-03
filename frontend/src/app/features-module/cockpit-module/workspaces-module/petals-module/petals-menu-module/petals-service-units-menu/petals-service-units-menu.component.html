@@ -3,6 +3,7 @@
   <a md-list-item
      [routerLink]="generateLink(serviceUnit.id)"
      class="service-unit"
+     [class.color-primary-bold]="serviceUnit.id === idServiceUnitSelected"
   >
     <span appColorSearchedLetters [search]="search" [text]="serviceUnit.name" classToApply="searched"></span>
   </a>

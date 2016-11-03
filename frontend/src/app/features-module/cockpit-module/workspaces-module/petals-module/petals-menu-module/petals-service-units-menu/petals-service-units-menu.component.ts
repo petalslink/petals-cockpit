@@ -11,19 +11,21 @@ import { IServiceUnit } from '../../../../../../shared-module/interfaces/petals.
 })
 export class ServiceUnitsMenuComponent {
   @Input() serviceUnits: Array<IServiceUnit>;
+  @Input() search: string;
 
-  @Input() idWorkspace: number;
   @Input() idBus: number;
   @Input() idContainer: number;
   @Input() idComponent: number;
-  @Input() search: string;
+
+  @Input() idWorkspaceSelected: string;
+  @Input() idServiceUnitSelected: string;
 
   constructor() { }
 
   generateLink(serviceUnitId) {
     return [
       '/cockpit',
-      'workspaces', this.idWorkspace,
+      'workspaces', this.idWorkspaceSelected,
       'petals', 'bus', this.idBus,
       'container', this.idContainer,
       'component', this.idComponent,

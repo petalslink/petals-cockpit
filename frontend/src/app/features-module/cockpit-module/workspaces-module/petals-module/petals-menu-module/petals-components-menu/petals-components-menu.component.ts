@@ -12,10 +12,14 @@ import { IComponent } from '../../../../../../shared-module/interfaces/petals.in
 })
 export class ComponentsMenuComponent {
   @Input() components: Array<IComponent>;
-  @Input() idWorkspace: number;
+  @Input() search: string;
+
   @Input() idBus: number;
   @Input() idContainer: number;
-  @Input() search: string;
+
+  @Input() idWorkspaceSelected: string;
+  @Input() idComponentSelected: string;
+  @Input() idServiceUnitSelected: string;
 
   constructor() { }
 }
