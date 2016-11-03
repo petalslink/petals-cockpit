@@ -34,7 +34,8 @@ import {
   IMPORT_BUS_MINIMAL_CONFIG,
   FETCH_BUS_CONFIG,
   FETCH_BUS_CONFIG_SUCCESS,
-  FETCH_BUS_CONFIG_FAILED, ADD_BUS
+  FETCH_BUS_CONFIG_FAILED,
+  ADD_BUS_SUCCESS
 } from '../reducers/workspace.reducer';
 
 @Injectable()
@@ -86,10 +87,10 @@ export class WorkspaceEffects {
       this.router.navigate(['/cockpit', 'workspaces', action.payload.id]);
 
       let sseServiceObs: Observable<Action> =
-        this.sseService.subscribeToMessage(action.payload)
+        this.sseService.subscribeToMessage(action.payload.id)
           .map((msg: IOnMessageEvent) => {
             if (msg.event === 'BUS_IMPORT_OK') {
-              return { type: ADD_BUS, payload: msg.data };
+              return { type: ADD_BUS_SUCCESS, payload: msg.data };
             }
             else if (msg.event === 'BUS_IMPORT_ERROR') {
               // TODO
@@ -107,7 +108,8 @@ export class WorkspaceEffects {
   // TODO: This effect needs a review
   @Effect({dispatch: true}) importBus$: Observable<Action> = this.actions$
     .ofType(IMPORT_BUS)
-    .switchMap(action => this.workspaceService.importBus(action.payload)
+    .withLatestFrom(this.store$.select('workspace'))
+    .switchMap(([action, workspaceR]: [Action, IWorkspaceRecord]) => this.workspaceService.importBus(workspaceR.get('id'), action.payload)
       .map((res: Response) => {
         if (!res.ok) {
           throw new Error('Error while importing the bus');
@@ -115,7 +117,7 @@ export class WorkspaceEffects {
 
         // at this point, the server has only returned an ID + the previous information
         // sent to create the bus. Save it so we can display the bus into importing list
-        return { type: IMPORT_BUS_MINIMAL_CONFIG, payload: res.json() };
+        return { type: IMPORT_BUS_MINIMAL_CONFIG, payload: Object.assign(res.json(), action.payload) };
       })
       .catch((err) => {
         if (environment.debug) {

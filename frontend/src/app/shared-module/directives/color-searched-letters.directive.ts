@@ -28,7 +28,7 @@ export class ColorSearchedLettersDirective implements OnInit {
     this.renderer.setElementProperty(this.el.nativeElement, 'innerHTML', this.replace(this.text, search));
   }
 
-  replace(txt: string, search: string) {
+  replace(txt = '', search: string) {
     let searchRgx = new RegExp(`(${search})`, 'gi');
 
     return txt.replace(searchRgx, `<span class="${this.classToApply}">$1</span>`);

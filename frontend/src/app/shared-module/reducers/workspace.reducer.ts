@@ -32,7 +32,8 @@ export const IMPORT_BUS_FAILED = 'IMPORT_BUS_FAILED';
 
 export const IMPORT_BUS_MINIMAL_CONFIG = 'IMPORT_BUS_MINIMAL_CONFIG';
 
-export const ADD_BUS = 'ADD_BUS';
+export const ADD_BUS_SUCCESS = 'ADD_BUS_SUCCESS';
+
 export const FETCH_BUS_CONFIG = 'FETCH_BUS_CONFIG';
 export const FETCH_BUS_CONFIG_SUCCESS = 'FETCH_BUS_CONFIG_SUCCESS';
 export const FETCH_BUS_CONFIG_FAILED = 'FETCH_BUS_CONFIG_FAILED';
@@ -78,7 +79,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
   else if (action.type === IMPORT_BUS_SUCCESS) {
     // once the bus is imported, move it from workspaces
     // but not here as it's been done in an async way using sse
-    // CF ADD_BUS
+    // CF ADD_BUS_SUCCESS
     return workspaceR.set('importingBus', false);
   }
 
@@ -95,16 +96,15 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
           config: {
             ip: action.payload.ip,
             port: parseInt(`${action.payload.port}`, 10),
-            login: action.payload.login,
+            login: action.payload.username,
             password: action.payload.password
           }
         }))
       );
   }
 
-  /* ADD_BUS */
-  else if (action.type === ADD_BUS) {
-    // TODO : Check that we don't have to use temp var instead of returning it directly
+  /* ADD_BUS_SUCCESS */
+  else if (action.type === ADD_BUS_SUCCESS) {
     return workspaceR
       .set('buses', workspaceR.get('buses').push(fromJS(action.payload)))
       .set('busesInProgress',

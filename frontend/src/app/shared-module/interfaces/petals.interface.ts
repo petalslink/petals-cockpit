@@ -42,7 +42,7 @@ export interface IBusRecord extends TypedRecord<IBusRecord>, IBus { };
 export interface INewBus {
   ip: string;
   port: number;
-  login: string;
+  username: string;
   password: string;
 }
 

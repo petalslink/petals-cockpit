@@ -31,7 +31,6 @@
     "no-bitwise": true,
     "no-console": [
       true,
-      "info",
       "time",
       "timeEnd",
       "trace"
