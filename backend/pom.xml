@@ -66,6 +66,18 @@
       <artifactId>quasar-core</artifactId>
       <classifier>jdk8</classifier>
     </dependency>
+    <!-- Petals dependencies -->
+    <dependency>
+      <groupId>org.ow2.petals</groupId>
+      <artifactId>petals-admin-api</artifactId>
+      <version>1.4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.petals</groupId>
+      <artifactId>petals-admin-jmx</artifactId>
+      <version>1.4.2</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>io.dropwizard</groupId>
