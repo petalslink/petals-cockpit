@@ -164,7 +164,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
 
         try {
             container.connect(bus.nb.getIp(), bus.nb.getPort(), bus.nb.getUsername(), bus.nb.getPassword());
-            Domain topology = container.getTopology(".*", null, true);
+            Domain topology = container.getTopology(".*", bus.nb.getPassphrase(), true);
             return buildBusTree(bus.id, topology);
         } finally {
             try {
