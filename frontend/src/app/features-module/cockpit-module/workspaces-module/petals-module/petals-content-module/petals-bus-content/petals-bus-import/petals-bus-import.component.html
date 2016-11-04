@@ -23,18 +23,45 @@
           <md-input type="password" [(ngModel)]="newBus.config.password" name="password" placeholder="Password" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
           <md-input type="password" [(ngModel)]="newBus.config.passphrase" name="passphrase" placeholder="Topology Passphrase" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
         </div>
-
+        
         <div align="end" class="pnl-btn-import">
           <button
             md-raised-button
             color="primary"
             type="submit"
-            [disabled]="workspace.importingBus || importing"
+            [disabled]="(workspace.importingBus || importing) && !newBus.importError"
           >
-            <span *ngIf="!workspace.importingBus && !importing">Import bus</span>
-            <span *ngIf="workspace.importingBus || importing">
+            <span *ngIf="!workspace.importingBus && !importing && !newBus.importError">
+              Import bus
+            </span>
+
+            <span *ngIf="(workspace.importingBus || importing) && !newBus.importError">
               Importing bus <md-progress-circle mode="indeterminate"></md-progress-circle>
             </span>
+          </button>
+
+          <!--<button
+            md-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="(workspace.importingBus || importing) && !newBus.importError"
+          >
+            <span *ngIf="newBus.importError">
+              Retry to import bus
+            </span>
+          </button>-->
+
+          <button
+            *ngIf="newBus.importError"
+            md-raised-button
+            color="primary"
+            type="button"
+            [disabled]="newBus.removing"
+            (click)="removeBus(newBus.id)"
+          >
+            Discard<span *ngIf="newBus.removing">ing</span>
+
+            <md-progress-circle *ngIf="newBus.removing" mode="indeterminate"></md-progress-circle>
           </button>
         </div>
       </form>

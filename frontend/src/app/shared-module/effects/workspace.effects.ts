@@ -36,7 +36,10 @@ import {
   FETCH_BUS_CONFIG_SUCCESS,
   FETCH_BUS_CONFIG_FAILED,
   ADD_BUS_SUCCESS,
-  ADD_BUS_FAILED
+  ADD_BUS_FAILED,
+  REMOVE_BUS,
+  REMOVE_BUS_SUCCESS,
+  REMOVE_BUS_FAILED
 } from '../reducers/workspace.reducer';
 
 @Injectable()
@@ -162,6 +165,28 @@ export class WorkspaceEffects {
           console.error(err);
         }
         return Observable.of({ type: FETCH_BUS_CONFIG_FAILED });
+      })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: true}) removeBus$: Observable<Action> = this.actions$
+    .ofType(REMOVE_BUS)
+    .withLatestFrom(this.store$.select('workspace'))
+    .switchMap(([action, workspace]: [Action, IWorkspaceRecord]) => this.workspaceService.removeBus(workspace.get('id'), action.payload)
+      .map((res: Response) => {
+        if (!res.ok) {
+          throw new Error('Error while removing the bus');
+        }
+
+        this.router.navigate(['/cockpit', 'workspaces', workspace.get('id')]);
+
+        return { type: REMOVE_BUS_SUCCESS, payload: { idWorkspace: workspace.get('id'), idBus: action.payload } };
+      })
+      .catch((err) => {
+        if (environment.debug) {
+          console.error(err);
+        }
+        return Observable.of({ type: REMOVE_BUS_FAILED });
       })
     );
 }
