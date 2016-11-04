@@ -140,7 +140,9 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                                 (CheckedCallable<Document, Exception>) () -> doImportBus(bus));
                         d = BuilderFactory.start().add("event", "BUS_IMPORT_OK").add("data", nd).build();
                     } catch (Exception e) {
-                        LOG.info("Can't retrieve topology from container {}:{}", bus.nb.getIp(), bus.nb.getPort(), e);
+                        LOG.info("Can't retrieve topology from container {}:{}: {}", bus.nb.getIp(), bus.nb.getPort(),
+                                e.getMessage());
+                        LOG.debug("Can't retrieve topology from container {}:{}", bus.nb.getIp(), bus.nb.getPort(), e);
                         Document nd = BuilderFactory.start().add("id", bus.id).add("error", e.getMessage()).build();
                         d = BuilderFactory.start().add("event", "BUS_IMPORT_ERROR").add("data", nd).build();
                     }
