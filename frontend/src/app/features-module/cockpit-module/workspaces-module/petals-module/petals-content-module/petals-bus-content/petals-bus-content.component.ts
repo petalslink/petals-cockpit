@@ -50,7 +50,7 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
     // get the current workspace (once) only if
     // it has an array of buses with at least one value
     this.workspace$WithBus = this.workspace$
-      .filter((workspaceR: IWorkspaceRecord) => workspaceR.get('buses').size > 0);
+      .filter((workspaceR: IWorkspaceRecord) => (workspaceR.get('buses').size + workspaceR.get('busesInProgress').size) > 0);
 
     // update the current bus IF
     // it's ID is in the URL AND the current workspace has at least one bus
