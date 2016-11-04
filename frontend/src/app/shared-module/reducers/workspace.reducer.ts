@@ -113,7 +113,8 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
             ip: action.payload.ip,
             port: parseInt(`${action.payload.port}`, 10),
             login: action.payload.username,
-            password: action.payload.password
+            password: action.payload.password,
+            passphrase: action.payload.passphrase
           }
         }))
       );
