@@ -11,29 +11,60 @@
       <form #formImportBus="ngForm" (ngSubmit)="importBus(formImportBus.value)">
         <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
 
-        <div class="input-row">
-          <md-input #ipInput type="text" [(ngModel)]="newBus.config.ip" name="ip" placeholder="IP" [disabled]="workspace.importingBus || importing"></md-input>
-          <md-input type="number" [(ngModel)]="newBus.config.port" name="port" placeholder="Port" [disabled]="workspace.importingBus || importing"></md-input>
-          <md-input type="text" [(ngModel)]="newBus.config.login" name="username" placeholder="Username" [disabled]="workspace.importingBus || importing"></md-input>
-          <md-input type="password" [(ngModel)]="newBus.config.password" name="password" placeholder="Password" [disabled]="workspace.importingBus || importing"></md-input>
-          <md-input type="password" [(ngModel)]="newBus.config.passphrase" name="passphrase" placeholder="Topology Passphrase" [disabled]="workspace.importingBus || importing"></md-input>
+        <div *ngIf="newBus.importError" class="error">
+          <b>Import failed with error :</b>
+          <p>"{{ newBus.importError }}"</p>
         </div>
 
+        <div class="input-row">
+          <md-input #ipInput type="text" [(ngModel)]="newBus.config.ip" name="ip" placeholder="IP" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+          <md-input type="number" [(ngModel)]="newBus.config.port" name="port" placeholder="Port" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+          <md-input type="text" [(ngModel)]="newBus.config.login" name="username" placeholder="Login" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+          <md-input type="password" [(ngModel)]="newBus.config.password" name="password" placeholder="Password" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+          <md-input type="password" [(ngModel)]="newBus.config.passphrase" name="passphrase" placeholder="Topology Passphrase" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+        </div>
+        
         <div align="end" class="pnl-btn-import">
           <button
             md-raised-button
             color="primary"
             type="submit"
-            [disabled]="workspace.importingBus || importing"
+            [disabled]="(workspace.importingBus || importing) && !newBus.importError"
           >
-            <span *ngIf="!workspace.importingBus && !importing">Import bus</span>
-            <span *ngIf="workspace.importingBus || importing">
+            <span *ngIf="!workspace.importingBus && !importing && !newBus.importError">
+              Import bus
+            </span>
+
+            <span *ngIf="(workspace.importingBus || importing) && !newBus.importError">
               Importing bus <md-progress-circle mode="indeterminate"></md-progress-circle>
             </span>
           </button>
+
+          <!--<button
+            md-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="(workspace.importingBus || importing) && !newBus.importError"
+          >
+            <span *ngIf="newBus.importError">
+              Retry to import bus
+            </span>
+          </button>-->
+
+          <button
+            *ngIf="newBus.importError"
+            md-raised-button
+            color="primary"
+            type="button"
+            [disabled]="newBus.removing"
+            (click)="removeBus(newBus.id)"
+          >
+            Discard<span *ngIf="newBus.removing">ing</span>
+
+            <md-progress-circle *ngIf="newBus.removing" mode="indeterminate"></md-progress-circle>
+          </button>
         </div>
       </form>
-
     </md-card-content>
   </md-card>
 </div>

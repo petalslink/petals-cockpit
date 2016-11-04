@@ -44,4 +44,8 @@ export class WorkspaceService {
     let bid = '85fd4ddf-bbd4-4562-99cc-62e7fb7d698b';
     return this.http.put(`${environment.urlBackend}/workspaces/${wid}/bus/${bid}`, <any>bus);
   }
+
+  removeBus(idWorkspace: string, idBus: string) {
+    return this.http.delete(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${idBus}`);
+  }
 }

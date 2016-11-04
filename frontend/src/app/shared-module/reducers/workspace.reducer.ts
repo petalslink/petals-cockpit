@@ -33,6 +33,11 @@ export const IMPORT_BUS_FAILED = 'IMPORT_BUS_FAILED';
 export const IMPORT_BUS_MINIMAL_CONFIG = 'IMPORT_BUS_MINIMAL_CONFIG';
 
 export const ADD_BUS_SUCCESS = 'ADD_BUS_SUCCESS';
+export const ADD_BUS_FAILED = 'ADD_BUS_FAILED';
+
+export const REMOVE_BUS = 'REMOVE_BUS';
+export const REMOVE_BUS_SUCCESS = 'REMOVE_BUS_SUCCESS';
+export const REMOVE_BUS_FAILED = 'REMOVE_BUS_FAILED';
 
 export const FETCH_BUS_CONFIG = 'FETCH_BUS_CONFIG';
 export const FETCH_BUS_CONFIG_SUCCESS = 'FETCH_BUS_CONFIG_SUCCESS';
@@ -112,7 +117,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
       );
   }
 
-  /* ADD_BUS_SUCCESS */
+  /* ADD_BUS* */
   else if (action.type === ADD_BUS_SUCCESS) {
     return workspaceR
       .set('buses', workspaceR.get('buses').push(fromJS(action.payload)))
@@ -123,7 +128,37 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
       );
   }
 
-  /* FETCH_BUS_CONFIG */
+  else if (action.type === ADD_BUS_FAILED) {
+    let busIndex = workspaceR
+      .get('busesInProgress')
+      .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload.idBus);
+
+    return workspaceR
+      .setIn(['busesInProgress', busIndex],
+        workspaceR
+          .getIn(['busesInProgress', busIndex])
+          .set('importError', action.payload.errorMsg)
+      );
+  }
+
+  /* REMOVE_BUS* */
+  else if (action.type === REMOVE_BUS || action.type === REMOVE_BUS_FAILED) {
+    let busIndex = workspaceR
+      .get('busesInProgress')
+      .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload);
+
+    return workspaceR.setIn(['busesInProgress', busIndex, 'removing'], action.type === REMOVE_BUS);
+  }
+
+  else if (action.type === REMOVE_BUS_SUCCESS) {
+    return workspaceR.set('busesInProgress',
+      workspaceR
+        .get('busesInProgress')
+        .filter((buses: IWorkspaceRecord) => buses.get('id') !== action.payload.idBus)
+    );
+  }
+
+  /* FETCH_BUS_CONFIG* */
   else if (action.type === FETCH_BUS_CONFIG) {
     return workspaceR.setIn(['gettingBusConfig'], true);
   }

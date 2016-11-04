@@ -34,6 +34,11 @@ export interface IBus {
   config: IBusConfig;
   containers: Array<IContainer>;
   selectedContainerId: number;
+  importError: string;
+
+  // UI
+  // is the user trying to remove this bus ?
+  removing: boolean;
 }
 
 export interface IBusRecord extends TypedRecord<IBusRecord>, IBus { };

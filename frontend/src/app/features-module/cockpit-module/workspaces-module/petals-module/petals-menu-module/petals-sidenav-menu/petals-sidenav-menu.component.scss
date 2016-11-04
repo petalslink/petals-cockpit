@@ -14,3 +14,32 @@ select {
   float: right;
   margin-top: 8px;
 }
+
+.link-content {
+  width: 100%;
+
+  .import-state {
+    position: absolute;
+    right: 32px;
+
+    .state-pending {
+      color: #0074D9;
+
+      md-progress-circle {
+        width: 10px;
+        height: 10px;
+        line-height: 10px;
+        display: inline-block;
+      }
+    }
+
+    .state-error {
+      margin-top: -5px;
+      color: red;
+    }
+  }
+
+  .ip {
+    float: left;
+  }
+}

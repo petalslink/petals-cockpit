@@ -99,4 +99,17 @@ export class WorkspaceMockService {
         };
       });
   }
+
+  removeBus(idWorkspace: string, idBus: string): Observable<Response> {
+    let response = <Response>{
+      ok: true,
+      json: () => {
+        return {};
+      }
+    };
+
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
+  }
 }

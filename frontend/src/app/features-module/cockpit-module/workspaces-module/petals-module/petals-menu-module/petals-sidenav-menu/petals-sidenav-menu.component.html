@@ -24,7 +24,20 @@
       *ngFor="let bus of workspace.busesInProgress"
       [routerLink]="['/', 'cockpit', 'workspaces', workspace.id, 'petals', 'bus', bus.id]"
     >
-      {{ bus.config.ip }}
+      <div class="link-content">
+        <div class="import-state">
+          <div *ngIf="bus.importError" class="state-error">
+            <md-icon class="md-24">warning</md-icon>
+          </div>
+          <div *ngIf="!bus.importError" class="state-pending">
+            <md-progress-circle mode="indeterminate"></md-progress-circle>
+          </div>
+        </div>
+
+        <div class="ip">
+          {{ bus.config.ip }}
+        </div>
+      </div>
     </a>
   </md-nav-list>
 

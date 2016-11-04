@@ -18,5 +18,6 @@ export const environment = {
     let rand = (Math.floor(Math.random() * (1 + 30 - 15)) + 15) * 1000;
     console.debug(`sse random timer : ${rand}`);
     return rand;
-  }
+  },
+  sseFirstBusImportShouldFail: true
 };
