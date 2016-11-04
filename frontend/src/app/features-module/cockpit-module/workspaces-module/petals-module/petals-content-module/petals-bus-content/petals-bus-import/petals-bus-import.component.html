@@ -11,12 +11,17 @@
       <form #formImportBus="ngForm" (ngSubmit)="importBus(formImportBus.value)">
         <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
 
+        <div *ngIf="newBus.importError" class="error">
+          <b>Import failed with error :</b>
+          <p>"{{ newBus.importError }}"</p>
+        </div>
+
         <div class="input-row">
-          <md-input #ipInput type="text" [(ngModel)]="newBus.config.ip" name="ip" placeholder="IP" [disabled]="workspace.importingBus || importing"></md-input>
-          <md-input type="number" [(ngModel)]="newBus.config.port" name="port" placeholder="Port" [disabled]="workspace.importingBus || importing"></md-input>
-          <md-input type="text" [(ngModel)]="newBus.config.login" name="username" placeholder="Username" [disabled]="workspace.importingBus || importing"></md-input>
-          <md-input type="password" [(ngModel)]="newBus.config.password" name="password" placeholder="Password" [disabled]="workspace.importingBus || importing"></md-input>
-          <md-input type="password" [(ngModel)]="newBus.config.passphrase" name="passphrase" placeholder="Topology Passphrase" [disabled]="workspace.importingBus || importing"></md-input>
+          <md-input #ipInput type="text" [(ngModel)]="newBus.config.ip" name="ip" placeholder="IP" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+          <md-input type="number" [(ngModel)]="newBus.config.port" name="port" placeholder="Port" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+          <md-input type="text" [(ngModel)]="newBus.config.login" name="username" placeholder="Login" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+          <md-input type="password" [(ngModel)]="newBus.config.password" name="password" placeholder="Password" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+          <md-input type="password" [(ngModel)]="newBus.config.passphrase" name="passphrase" placeholder="Topology Passphrase" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
         </div>
 
         <div align="end" class="pnl-btn-import">
@@ -33,7 +38,6 @@
           </button>
         </div>
       </form>
-
     </md-card-content>
   </md-card>
 </div>
