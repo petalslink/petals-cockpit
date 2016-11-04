@@ -90,6 +90,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.ow2.petals</groupId>
+      <artifactId>petals-admin-mock</artifactId>
+      <version>1.0.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.glassfish.jersey.test-framework.providers</groupId>
       <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
       <scope>test</scope>

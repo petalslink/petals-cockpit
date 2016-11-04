@@ -98,10 +98,22 @@
         <version>4.0.0</version>
       </dependency>
       <dependency>
-        <!-- force version because of quasar-core and dropwizard-testing -->
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <!-- Let's use a version with similar (1.4.x) byte-buddy version than quasar -->
+        <version>2.2.8</version>
+      </dependency>
+      <dependency>
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy</artifactId>
-        <version>1.4.16</version>
+        <!-- Let's use latest 1.4.x version -->
+        <version>1.4.33</version>
+      </dependency>
+      <dependency>
+        <!-- force version because of kryo and mockito -->
+        <groupId>org.objenesis</groupId>
+        <artifactId>objenesis</artifactId>
+        <version>2.4</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
