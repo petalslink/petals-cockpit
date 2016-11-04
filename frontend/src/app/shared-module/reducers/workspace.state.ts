@@ -24,5 +24,10 @@ export const workspaceFactory = makeTypedFactory<IWorkspace, IWorkspaceRecord>({
   searchPetals: '',
   fetchingWorkspace: false,
   importingBus: false,
-  gettingBusConfig: false
+  gettingBusConfig: false,
+
+  selectedBusId: null,
+  selectedContainerId: null,
+  selectedComponentId: null,
+  selectedServiceUnitId: null
 });

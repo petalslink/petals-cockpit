@@ -38,6 +38,8 @@ export const FETCH_BUS_CONFIG = 'FETCH_BUS_CONFIG';
 export const FETCH_BUS_CONFIG_SUCCESS = 'FETCH_BUS_CONFIG_SUCCESS';
 export const FETCH_BUS_CONFIG_FAILED = 'FETCH_BUS_CONFIG_FAILED';
 
+export const SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT = 'SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT';
+
 function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(), action: Action) {
   if (action.type === FETCH_WORKSPACE) {
     return workspaceR.setIn(['fetchingWorkspace'], true);
@@ -57,6 +59,13 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
     //     buses: [...]
     //   }
     // }
+
+    // if we changed from workspace A to B
+    // (not a refresh from A to A updated)
+    // clear petals search
+    if (workspaceR.get('id') !== action.payload.id) {
+      workspaceR = workspaceR.set('searchPetals', '');
+    }
 
     return workspaceR
       .set('fetchingWorkspace', false)
@@ -131,6 +140,14 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
 
   else if (action.type === FETCH_BUS_CONFIG_FAILED) {
     return workspaceR.set('gettingBusConfig', false);
+  }
+
+  else if (action.type === SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT) {
+    return workspaceR
+      .set('selectedBusId', action.payload.selectedBusId)
+      .set('selectedContainerId', action.payload.selectedContainerId)
+      .set('selectedComponentId', action.payload.selectedComponentId)
+      .set('selectedServiceUnitId', action.payload.selectedServiceUnitId);
   }
 
   return workspaceR;

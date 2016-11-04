@@ -2,19 +2,25 @@
 
   <a md-list-item
      [routerLink]="['/', 'cockpit',
-       'workspaces', idWorkspace,
+       'workspaces', idWorkspaceSelected,
        'petals', 'bus', idBus,
        'container', container.id]"
      class="container"
+     [class.color-primary-bold]="container.id === idContainerSelected"
   >
     <span appColorSearchedLetters [search]="search" [text]="container.name" classToApply="searched"></span>
   </a>
 
   <app-components-menu
     [components]="container.components"
-    [idWorkspace]="idWorkspace"
+    [search]="search"
+
     [idBus]="idBus"
     [idContainer]="container.id"
-    [search]="search"
+
+    [idWorkspaceSelected]="idWorkspaceSelected"
+    [idComponentSelected]="idComponentSelected"
+    [idServiceUnitSelected]="idServiceUnitSelected"
+
   ></app-components-menu>
 </md-nav-list>

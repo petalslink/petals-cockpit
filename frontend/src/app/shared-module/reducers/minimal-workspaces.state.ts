@@ -10,5 +10,6 @@ export const minimalWorkspacesFactory = makeTypedFactory<IMinimalWorkspaces, IMi
 
   // for UI
   addingWorkspace: false,
-  fetchingWorkspaces: false
+  fetchingWorkspaces: false,
+  fetchingWorkspaceWithId: null
 });

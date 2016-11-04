@@ -12,9 +12,14 @@ import { IContainer } from '../../../../../../shared-module/interfaces/petals.in
 })
 export class ContainersMenuComponent {
   @Input() containers: Array<IContainer>;
-  @Input() idWorkspace: number;
-  @Input() idBus: number;
   @Input() search: string;
+
+  @Input() idBus: number;
+
+  @Input() idWorkspaceSelected: number;
+  @Input() idContainerSelected: string;
+  @Input() idComponentSelected: string;
+  @Input() idServiceUnitSelected: string;
 
   constructor() { }
 }

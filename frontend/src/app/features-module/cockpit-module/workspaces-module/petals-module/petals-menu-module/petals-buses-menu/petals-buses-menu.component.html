@@ -8,17 +8,23 @@
 
   <a
     md-list-item
-    [routerLink]="['/', 'cockpit', 'workspaces', idWorkspace, 'petals', 'bus', bus.id]"
+    [routerLink]="['/', 'cockpit', 'workspaces', idWorkspaceSelected, 'petals', 'bus', bus.id]"
     class="bus"
+    [class.color-primary-bold]="bus.id === idBusSelected"
   >
     <span appColorSearchedLetters [search]="search" [text]="bus.name" classToApply="searched"></span>
   </a>
 
   <app-containers-menu
     [containers]="bus.containers"
-    [idWorkspace]="idWorkspace"
-    [idBus]="bus.id"
     [search]="search"
+
+    [idBus]="bus.id"
+
+    [idWorkspaceSelected]="idWorkspaceSelected"
+    [idContainerSelected]="idContainerSelected"
+    [idComponentSelected]="idComponentSelected"
+    [idServiceUnitSelected]="idServiceUnitSelected"
   ></app-containers-menu>
 
   <!--<md-divider *ngIf="!last"></md-divider>-->

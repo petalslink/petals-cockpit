@@ -14,8 +14,13 @@ import { IWorkspace } from '../../../../../../shared-module/interfaces/workspace
 export class BusesMenuComponent {
   @Input() workspace: IWorkspace;
   @Input() buses: Array<IBus>;
-  @Input() idWorkspace: number;
   @Input() search: string;
+
+  @Input() idWorkspaceSelected: number;
+  @Input() idBusSelected: string;
+  @Input() idContainerSelected: string;
+  @Input() idComponentSelected: string;
+  @Input() idServiceUnitSelected: string;
 
   constructor() { }
 }
