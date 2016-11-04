@@ -9,5 +9,6 @@ export const environment = {
   // delay for each http request (used if mock is set to true)
   httpDelay: 0,
   // delay for sse events
-  sseDelay: 0
+  sseDelay: 0,
+  sseFirstBusImportShouldFail: true
 };

@@ -35,7 +35,8 @@ import {
   FETCH_BUS_CONFIG,
   FETCH_BUS_CONFIG_SUCCESS,
   FETCH_BUS_CONFIG_FAILED,
-  ADD_BUS_SUCCESS
+  ADD_BUS_SUCCESS,
+  ADD_BUS_FAILED
 } from '../reducers/workspace.reducer';
 
 @Injectable()
@@ -93,8 +94,7 @@ export class WorkspaceEffects {
               return { type: ADD_BUS_SUCCESS, payload: msg.data };
             }
             else if (msg.event === 'BUS_IMPORT_ERROR') {
-              // TODO
-              return { type: '', payload: null };
+              return { type: ADD_BUS_FAILED, payload: { idBus: msg.data.id, errorMsg: msg.data.error } };
             }
             else {
               return { type: '', payload: null };

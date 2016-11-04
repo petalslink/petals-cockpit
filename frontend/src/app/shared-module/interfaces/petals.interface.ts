@@ -34,6 +34,7 @@ export interface IBus {
   config: IBusConfig;
   containers: Array<IContainer>;
   selectedContainerId: number;
+  importError: string;
 }
 
 export interface IBusRecord extends TypedRecord<IBusRecord>, IBus { };

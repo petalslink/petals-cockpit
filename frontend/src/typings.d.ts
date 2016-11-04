@@ -56,6 +56,6 @@ declare module sse {
 
   interface IOnMessageEvent {
     event: string;
-    data: string;
+    data: any;
   }
 }
