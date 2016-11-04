@@ -75,6 +75,8 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
     return workspaceR
       .set('fetchingWorkspace', false)
       .set('id', action.payload.id)
+      .set('buses', [])
+      .set('busesInProgress', [])
       .mergeDeep(fromJS(action.payload.data));
   }
 
