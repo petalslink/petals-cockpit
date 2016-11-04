@@ -28,7 +28,7 @@
         <repository>
           <id>staging</id>
           <url>file:staging</url>
-          <releases><enabled>false</enabled></releases>
+          <releases><enabled>true</enabled></releases>
           <snapshots><enabled>true</enabled></snapshots>
         </repository>
         <repository>
