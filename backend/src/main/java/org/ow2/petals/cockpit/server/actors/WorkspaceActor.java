@@ -141,7 +141,8 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                         d = BuilderFactory.start().add("event", "BUS_IMPORT_OK").add("data", nd).build();
                     } catch (Exception e) {
                         LOG.info("Can't retrieve topology from container {}:{}", bus.nb.getIp(), bus.nb.getPort(), e);
-                        d = BuilderFactory.start().add("event", "BUS_IMPORT_ERROR").add("data", e.getMessage()).build();
+                        Document nd = BuilderFactory.start().add("id", bus.id).add("error", e.getMessage()).build();
+                        d = BuilderFactory.start().add("event", "BUS_IMPORT_ERROR").add("data", nd).build();
                     }
                     // we use send in order to keep concurrency under control by the actor!
                     self().send(new SseEvent("WORKSPACE_CHANGE", d));
