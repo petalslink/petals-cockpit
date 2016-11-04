@@ -19,6 +19,7 @@ package org.ow2.petals.cockpit.server.resources;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -56,6 +57,7 @@ public class BusesResource {
     public Bus addBus(@PathParam("wsId") String wsId, NewBus nb) {
         ObjectId id = new ObjectId();
         String stringId = id.toHexString();
+        // TODO validate that ws exists?
         WorkspaceActor.send(wsId, new WorkspaceActor.ImportBus(stringId, nb));
         return new Bus(stringId);
     }
@@ -67,6 +69,11 @@ public class BusesResource {
         public BusTree get(@PathParam("bId") String bId) {
             // TODO
             return new BusTree(bId);
+        }
+
+        @DELETE
+        public void delete(@PathParam("bId") String bId) {
+            // TODO
         }
     }
 
@@ -80,13 +87,17 @@ public class BusesResource {
 
         private final String password;
 
+        private final String passphrase;
+
         public NewBus(@NotEmpty @JsonProperty("ip") String ip, @NotEmpty @JsonProperty("port") int port,
                 @NotEmpty @JsonProperty("username") String username,
-                @NotEmpty @JsonProperty("password") String password) {
+                @NotEmpty @JsonProperty("password") String password,
+                @NotEmpty @JsonProperty("passphrase") String passphrase) {
             this.ip = ip;
             this.port = port;
             this.username = username;
             this.password = password;
+            this.passphrase = passphrase;
         }
 
         public String getIp() {
@@ -103,6 +114,10 @@ public class BusesResource {
 
         public String getPassword() {
             return password;
+        }
+
+        public String getPassphrase() {
+            return passphrase;
         }
     }
 

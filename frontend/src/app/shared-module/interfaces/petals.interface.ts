@@ -44,6 +44,7 @@ export interface INewBus {
   port: number;
   username: string;
   password: string;
+  passphrase: string;
 }
 
 export interface INewBusRecord extends TypedRecord<INewBusRecord>, INewBus { };

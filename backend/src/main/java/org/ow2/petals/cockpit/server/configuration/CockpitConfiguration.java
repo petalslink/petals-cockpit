@@ -48,7 +48,7 @@ public class CockpitConfiguration extends Configuration {
     @Valid
     @Nullable
     @JsonProperty("pac4j")
-    final Pac4jFactory pac4jFactory = null;
+    private Pac4jFactory pac4jFactory = null;
 
     @Nullable
     public Pac4jFactory getPac4jFactory() {
@@ -73,7 +73,7 @@ public class CockpitConfiguration extends Configuration {
 
         @NotEmpty
         @JsonProperty
-        private String database = "";
+        private String database = "cockpit";
 
         public String getDatabase() {
             return database;
@@ -120,7 +120,7 @@ public class CockpitConfiguration extends Configuration {
 
             @NotEmpty
             @JsonProperty
-            private String host = "";
+            private String host = "localhost";
 
             @Min(1)
             @Max(65535)

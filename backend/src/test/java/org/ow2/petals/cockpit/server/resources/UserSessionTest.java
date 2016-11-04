@@ -34,12 +34,7 @@ import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserData;
 import org.ow2.petals.cockpit.server.security.CockpitExtractor.Authentication;
-import org.pac4j.core.context.WebContext;
-import org.pac4j.core.credentials.UsernamePasswordCredentials;
-import org.pac4j.core.credentials.authenticator.Authenticator;
-import org.pac4j.core.exception.BadCredentialsException;
-import org.pac4j.core.exception.HttpAction;
-import org.pac4j.core.profile.CommonProfile;
+import org.ow2.petals.cockpit.server.security.MockAuthenticator;
 
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.ResourceHelpers;
@@ -49,15 +44,13 @@ public class UserSessionTest {
 
     public static final String SESSION_COOKIE_NAME = Globals.SESSION_COOKIE_NAME;
 
-    public static final UserData ADMIN = new UserData("admin", "Administrator");
-
     public static class App extends CockpitApplication<CockpitConfiguration> {
 
     }
 
     @ClassRule
     public static final DropwizardAppRule<CockpitConfiguration> RULE = new DropwizardAppRule<>(App.class,
-            ResourceHelpers.resourceFilePath("test-conf.yml"));
+            ResourceHelpers.resourceFilePath("user-session-tests.yml"));
 
     @Nullable
     private static Client client;
@@ -99,7 +92,7 @@ public class UserSessionTest {
 
         Response get = client().target(url("user")).request().cookie(cookie).get();
         assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
+        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(MockAuthenticator.ADMIN);
     }
 
     @Test
@@ -112,7 +105,7 @@ public class UserSessionTest {
 
         final Response get = request().cookie(cookie).get();
         assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
+        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(MockAuthenticator.ADMIN);
     }
 
     @Test
@@ -145,7 +138,7 @@ public class UserSessionTest {
 
         final Response get = request().cookie(cookie).get();
         assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(ADMIN);
+        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(MockAuthenticator.ADMIN);
 
         final Response logout = request().cookie(cookie).delete();
         // TODO should be 204: https://github.com/pac4j/pac4j/issues/701
@@ -153,23 +146,5 @@ public class UserSessionTest {
 
         final Response getWrong = request().cookie(cookie).get();
         assertThat(getWrong.getStatus()).isEqualTo(401);
-    }
-}
-
-class MockAuthenticator implements Authenticator<@Nullable UsernamePasswordCredentials> {
-
-    @Override
-    public void validate(@Nullable UsernamePasswordCredentials credentials, @Nullable WebContext context)
-            throws HttpAction {
-        assert context != null;
-        assert credentials != null;
-        if (UserSessionTest.ADMIN.getUsername().equals(credentials.getUsername())) {
-            final CommonProfile userProfile = new CommonProfile();
-            userProfile.setId(UserSessionTest.ADMIN.getUsername());
-            userProfile.addAttribute("display_name", UserSessionTest.ADMIN.getName());
-            credentials.setUserProfile(userProfile);
-        } else {
-            throw new BadCredentialsException("Bad credentials for: " + credentials.getUsername());
-        }
     }
 }
