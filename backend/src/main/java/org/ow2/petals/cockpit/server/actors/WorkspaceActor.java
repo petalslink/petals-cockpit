@@ -168,7 +168,9 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
             return buildBusTree(bus.id, topology);
         } finally {
             try {
-                container.disconnect();
+                if (container.isConnected()) {
+                    container.disconnect();
+                }
             } catch (ContainerAdministrationException e) {
                 LOG.warn("Error while disconnecting from container", e);
             }
