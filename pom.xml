@@ -47,6 +47,20 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>cz.jirutka.maven</groupId>
+        <artifactId>jetty-bom</artifactId>
+        <version>9.3.14.v20161028</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey</groupId>
+        <artifactId>jersey-bom</artifactId>
+        <version>2.24</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>io.dropwizard</groupId>
         <artifactId>dropwizard-bom</artifactId>
         <version>${dropwizard.version}</version>
