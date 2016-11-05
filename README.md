@@ -18,7 +18,7 @@ $ mvn -s ci/settings.xml clean package
 ```
 - Execute Petals Cockpit
 ```
-$ java -jar cockpit/target/petals-cockpit-0.2.0-capsule.jar server cockpit/default.yml
+$ java -jar cockpit/target/petals-cockpit-0.3.0-SNAPSHOT-capsule.jar server cockpit/default.yml
 ```
 
 ### Executing only the Backend
@@ -32,7 +32,7 @@ $ mvn -s ci/settings.xml compile exec:exec -pl backend
 
 A user can be added with the following command:
 ```
-$ java -jar cockpit/target/petals-cockpit-0.2.0-capsule.jar add-user -u username -n Name -p password cockpit/default.yml
+$ java -jar cockpit/target/petals-cockpit-0.3.0-SNAPSHOT-capsule.jar add-user -u username -n Name -p password cockpit/default.yml
 ```
 
 ## Copyright and License
