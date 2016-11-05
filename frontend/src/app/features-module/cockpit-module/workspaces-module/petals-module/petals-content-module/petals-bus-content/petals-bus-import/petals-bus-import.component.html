@@ -19,11 +19,11 @@
         <div class="input-row">
           <md-input #ipInput type="text" [(ngModel)]="newBus.config.ip" name="ip" placeholder="IP" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
           <md-input type="number" [(ngModel)]="newBus.config.port" name="port" placeholder="Port" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
-          <md-input type="text" [(ngModel)]="newBus.config.login" name="username" placeholder="Login" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+          <md-input type="text" [(ngModel)]="newBus.config.login" name="username" placeholder="Username" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
           <md-input type="password" [(ngModel)]="newBus.config.password" name="password" placeholder="Password" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
           <md-input type="password" [(ngModel)]="newBus.config.passphrase" name="passphrase" placeholder="Topology Passphrase" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
         </div>
-        
+
         <div align="end" class="pnl-btn-import">
           <button
             md-raised-button

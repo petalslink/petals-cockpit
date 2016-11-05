@@ -140,7 +140,9 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                                 (CheckedCallable<Document, Exception>) () -> doImportBus(bus));
                         d = BuilderFactory.start().add("event", "BUS_IMPORT_OK").add("data", nd).build();
                     } catch (Exception e) {
-                        LOG.info("Can't retrieve topology from container {}:{}", bus.nb.getIp(), bus.nb.getPort(), e);
+                        LOG.info("Can't retrieve topology from container {}:{}: {}", bus.nb.getIp(), bus.nb.getPort(),
+                                e.getMessage());
+                        LOG.debug("Can't retrieve topology from container {}:{}", bus.nb.getIp(), bus.nb.getPort(), e);
                         Document nd = BuilderFactory.start().add("id", bus.id).add("error", e.getMessage()).build();
                         d = BuilderFactory.start().add("event", "BUS_IMPORT_ERROR").add("data", nd).build();
                     }
@@ -162,11 +164,13 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
 
         try {
             container.connect(bus.nb.getIp(), bus.nb.getPort(), bus.nb.getUsername(), bus.nb.getPassword());
-            Domain topology = container.getTopology(".*", null, true);
+            Domain topology = container.getTopology(".*", bus.nb.getPassphrase(), true);
             return buildBusTree(bus.id, topology);
         } finally {
             try {
-                container.disconnect();
+                if (container.isConnected()) {
+                    container.disconnect();
+                }
             } catch (ContainerAdministrationException e) {
                 LOG.warn("Error while disconnecting from container", e);
             }

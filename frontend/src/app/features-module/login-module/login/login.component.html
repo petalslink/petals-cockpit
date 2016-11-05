@@ -32,19 +32,6 @@
         </div>
       </form>
 
-      <div align="center">
-        <p>
-          <button md-icon-button color="primary">
-            <md-icon>info</md-icon>
-          </button>
-          <span>Debug :</span>
-          <span class="connecting" *ngIf="user.isConnecting">Connecting ...</span>
-          <span class="connected" *ngIf="user.isConnected">Is connected !</span>
-          <span class="not-connected" *ngIf="!user.isConnected && !user.isConnecting">Is NOT connected !</span>
-          <span class="connection-failed" *ngIf="user.connectionFailed">Connection failed !</span>
-        </p>
-      </div>
-
       <br>
     </md-card-content>
 

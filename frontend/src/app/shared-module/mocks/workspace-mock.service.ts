@@ -72,7 +72,7 @@ export class WorkspaceMockService {
       json: () => {
         // no need to return the newbus as we'll have to listen on sse
         // because it can be quite a long task to import a bus
-        let bus: any = Object.assign({ id: generateUuidV4() }, newBus);
+        let bus: any = { id: generateUuidV4() };
 
         // trigger a fake sse response
         this.sseService.triggerSse(bus);

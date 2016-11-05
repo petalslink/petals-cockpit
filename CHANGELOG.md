@@ -1,4 +1,23 @@
-<a name=""></a>
+<a name="0.2.0"></a>
+# 0.2.0 (2016-11-04)
+
+
+### Features
+
+* add workspaces creation/retrieval ([b20bb6a](https://gitlab.com/victornoel/petals-cockpit/commit/b20bb6a) [3c901a9](https://gitlab.com/victornoel/petals-cockpit/commit/3c901a9))
+* display bus import status (pending|failed) and let the user review/cancel if an error occurred ([7a6d5ac](https://gitlab.com/victornoel/petals-cockpit/commit/7a6d5ac))
+*  import a bus within a given workspace ([fc3f07d](https://gitlab.com/victornoel/petals-cockpit/commit/fc3f07d) [85bf46c](https://gitlab.com/victornoel/petals-cockpit/commit/85bf46c))
+* **backend:** retrieve bus info from Petals container ([34b6f3f](https://gitlab.com/victornoel/petals-cockpit/commit/34b6f3f))
+* **backend:** switch to spring-security-crypto ([894b83c](https://gitlab.com/victornoel/petals-cockpit/commit/894b83c))
+* **frontend**: settings as full page ([408ad6f](https://gitlab.com/victornoel/petals-cockpit/commit/408ad6f))
+
+### Performance Improvements
+
+* **backend:** Add index for username in db ([13a2c48](https://gitlab.com/victornoel/petals-cockpit/commit/13a2c48))
+
+
+
+<a name="0.1.0"></a>
 # 0.1.0 (2016-10-13)
 
 
