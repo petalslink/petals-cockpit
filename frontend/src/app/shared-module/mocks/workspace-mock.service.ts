@@ -5,6 +5,9 @@ import { Http, Response } from '@angular/http';
 // rxjs
 import { Observable } from 'rxjs';
 
+// ngrx
+import { Store } from '@ngrx/store';
+
 // our environment
 import { environment } from '../../../environments/environment';
 
@@ -12,14 +15,17 @@ import { environment } from '../../../environments/environment';
 import { generateUuidV4 } from '../helpers/helper';
 
 // our interfaces
+import { IStore } from './../interfaces/store.interface';
 import { INewBus } from '../interfaces/petals.interface';
+import { IMinimalWorkspaceRecord, IMinimalWorkspacesRecord } from './../interfaces/minimal-workspaces.interface';
+import { IWorkspace } from './../interfaces/workspace.interface';
 
 // our services
 import { SseService } from '../services/sse.service';
 
 @Injectable()
 export class WorkspaceMockService {
-  constructor(private http: Http, private sseService: SseService) { }
+  constructor(private http: Http, private store$: Store<IStore>, private sseService: SseService) { }
 
   updateWorkspaces(): Observable<Response> {
     return this.http.get('/mocks-json/workspaces.json')
@@ -39,13 +45,42 @@ export class WorkspaceMockService {
     return this.http.get(`/mocks-json/ws-${idWorkspace}.json`)
       .map((res: Response) => res.json())
       .delay(environment.httpDelay)
-      .map(workspace => {
+      .map((workspace: IWorkspace) => {
         return <Response> {
           ok: true,
           json: function () {
             return workspace;
           }
         };
+      })
+      .catch((res: Response) => {
+        let obs: Observable<Response>;
+
+        obs = new Observable(observer => {
+          this.store$
+            .select('minimalWorkspaces')
+            .filter((minimalWorkspaces: IMinimalWorkspacesRecord) => typeof minimalWorkspaces.get('minimalWorkspaces') !== 'undefined')
+            .subscribe((minimalWorkspaces: IMinimalWorkspacesRecord) => {
+              let currentMinimalWorkspace = minimalWorkspaces.get('minimalWorkspaces').find((minimalWorkspace: IMinimalWorkspaceRecord) =>
+                minimalWorkspace.get('id') === idWorkspace
+              );
+
+              let emptyWorkspace = {
+                name: currentMinimalWorkspace ? currentMinimalWorkspace.get('name') : `can't reload on a created workspace with mock: true`,
+                busesInProgress: [],
+                buses: []
+              };
+
+              observer.next({
+                ok: true,
+                json: function () {
+                  return emptyWorkspace;
+                }
+              });
+            });
+        });
+
+        return obs;
       });
   }
 
