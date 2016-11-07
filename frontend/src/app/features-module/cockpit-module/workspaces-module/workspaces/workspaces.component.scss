@@ -3,8 +3,9 @@
 }
 
 .btn-show-panel-add-workspace {
-  float: right;
-  top: -40px;
+  position: absolute;
+  margin-top: -40px;
+  right: 24px;
 }
 
 md-progress-circle {
