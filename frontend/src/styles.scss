@@ -76,6 +76,20 @@ body {
   background-color: md-color($accent);
 }
 
+.info {
+  @extend .error;
+
+  background-color: rgba(206, 227, 255, 0.4) !important;
+  color: #4c83ef !important;
+}
+
+.warning {
+  @extend .error;
+
+  background-color: rgba(255, 234, 206, 0.4) !important;
+  color: orange !important;
+}
+
 /* Petals Components Overview, Config */
 
 .list-subheader {
