@@ -1,6 +1,6 @@
 // angular modules
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { CanActivate, Router, ActivatedRoute } from '@angular/router';
 import { Response } from '@angular/http';
 
 // ngrx
@@ -14,6 +14,7 @@ import { environment } from '../../../environments/environment';
 
 // our services
 import { UserService } from './user.service';
+import { RouteService } from './route.service';
 
 // our actions
 import { USR_IS_CONNECTED } from '../reducers/user.reducer';
@@ -24,7 +25,13 @@ import { IUser } from '../interfaces/user.interface';
 
 @Injectable()
 export class AlreadyLoggedGuardService implements CanActivate {
-  constructor(private store: Store<IStore>, private user: UserService, private router: Router) { }
+  constructor(
+    private store: Store<IStore>,
+    private user: UserService,
+    private routeService: RouteService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) { }
 
   canActivate() {
     return this.user.getUserInformations(true)
@@ -50,6 +57,11 @@ export class AlreadyLoggedGuardService implements CanActivate {
 
         // 401 --> unauthorized
         if (err.status === 401) {
+          let url = window.location.pathname;
+
+          // before we redirect to /login, save the asked URL so we can route back the user once he's logged
+          this.routeService.urlBeforeRedirectToLogin = (url === '/login' ? null : url);
+
           // user is not logged
           return Observable.of(true);
         }

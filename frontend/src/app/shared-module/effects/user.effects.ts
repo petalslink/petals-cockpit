@@ -18,6 +18,7 @@ import { IUser } from '../interfaces/user.interface';
 
 // our services
 import { UserService } from '../services/user.service';
+import { RouteService } from './../services/route.service';
 
 // our actions
 import {
@@ -34,7 +35,8 @@ export class UserEffects {
   constructor(
     private router: Router,
     private actions$: Actions,
-    private userService: UserService
+    private userService: UserService,
+    private routeService: RouteService
   ) { }
 
   // tslint:disable-next-line:member-ordering
@@ -48,7 +50,19 @@ export class UserEffects {
 
         let user: IUser = res.json();
 
-        this.router.navigate(['/cockpit']);
+        if (this.routeService.urlBeforeRedirectToLogin) {
+          if (environment.debug) {
+            console.debug(
+              `Redirecting to the URL "${this.routeService.urlBeforeRedirectToLogin}" which was asked before being redirected to /login`
+            );
+          }
+
+          this.router.navigate([this.routeService.urlBeforeRedirectToLogin]);
+        }
+
+        else {
+          this.router.navigate(['/cockpit']);
+        }
 
         return { type: USR_IS_CONNECTED, payload: user };
       })
