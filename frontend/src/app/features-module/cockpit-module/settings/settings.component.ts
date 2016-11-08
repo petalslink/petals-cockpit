@@ -42,7 +42,7 @@ import { IStore } from '../../../shared-module/interfaces/store.interface';
 export class SettingsComponent implements OnDestroy {
   private config: IConfig;
   private configSub: Subscription;
-
+  
   private lang: string;
 
   constructor(private store$: Store<IStore>, private translate: TranslateService) {

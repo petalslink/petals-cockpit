@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <md-nav-list>
         <h3 md-subheader>Theme</h3>
         <md-list-item (click)="toggleTheme()">
-          <md-slide-toggle [checked]="isDarkTheme" disabled>
+          <md-slide-toggle [checked]="isDarkTheme">
             Night mode
           </md-slide-toggle>
         </md-list-item>
@@ -35,13 +35,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <h3 md-subheader>Language</h3>
 
         <md-radio-group [(ngModel)]="lang" (ngModelChange)="changeLanguageTo()">
-          <md-list-item>
-            <md-radio-button value="fr">French</md-radio-button>
-          </md-list-item>
-
-          <md-list-item>
-              <md-radio-button value="en">English</md-radio-button>
-          </md-list-item>
+          <md-radio-button value="fr">French</md-radio-button>
+          <md-radio-button value="en">English</md-radio-button>
         </md-radio-group>
       </md-nav-list>
     </md-card-content>
