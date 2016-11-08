@@ -5,6 +5,9 @@ import { ActionReducer, Action } from '@ngrx/store';
 import { IConfigRecord } from '../interfaces/config.interface';
 import { configFactory } from './config.state';
 
+// our reducers
+import { USR_IS_DISCONNECTED } from "./user.reducer";
+
 // actions
 export const TOGGLE_THEME = 'TOGGLE_THEME ';
 
@@ -12,6 +15,9 @@ function createConfigReducer(configR: IConfigRecord = configFactory(), action: A
   switch (action.type) {
     case TOGGLE_THEME:
       return configR.setIn(['isDarkTheme'], !configR.isDarkTheme);
+
+    case USR_IS_DISCONNECTED:
+      return configFactory();
 
     default:
       return configR;
