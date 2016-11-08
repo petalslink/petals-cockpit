@@ -24,6 +24,11 @@
             </span>
           </md-input>
         </div>
+
+        <div class="error" *ngIf="user?.connectionFailed">
+          Username and password do not match
+        </div>
+
         <div align="end" class="pnl-btn-connect">
           <button type="submit" md-raised-button color="primary" [disabled]="user?.isConnecting">
             <span>{{ 'LOG_ME' | translate }}</span>
