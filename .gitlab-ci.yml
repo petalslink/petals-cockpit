@@ -94,10 +94,9 @@ e2e-product:
   dependencies:
     - build-product
   variables:
-    COCKPIT: "java -Ddw.mongo.servers[0].host=mongo -Ddw.server.applicationConnectors[0].port=4200 -jar cockpit/target/petals-cockpit-*-capsule.jar"
-  services:
-    - mongo:3
+    COCKPIT: "java -Ddw.server.applicationConnectors[0].port=4200 -jar cockpit/target/petals-cockpit-*-capsule.jar"
   script:
+    - "$COCKPIT db migrate cockpit/default.yml"
     - "$COCKPIT add-user -u admin -p admin -n Administrator cockpit/default.yml"
     - "nohup $COCKPIT server cockpit/default.yml &"
     - "nohup $XVFB &"

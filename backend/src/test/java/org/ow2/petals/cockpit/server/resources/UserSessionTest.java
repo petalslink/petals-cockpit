@@ -32,7 +32,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
-import org.ow2.petals.cockpit.server.resources.UserSession.UserData;
+import org.ow2.petals.cockpit.server.resources.UserSession.User;
 import org.ow2.petals.cockpit.server.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.security.MockAuthenticator;
 
@@ -45,7 +45,7 @@ public class UserSessionTest {
     public static final String SESSION_COOKIE_NAME = Globals.SESSION_COOKIE_NAME;
 
     public static class App extends CockpitApplication<CockpitConfiguration> {
-
+        // only needed because of generics
     }
 
     @ClassRule
@@ -57,7 +57,9 @@ public class UserSessionTest {
 
     @BeforeClass
     public static void setUpClient() {
-        client = new JerseyClientBuilder(RULE.getEnvironment()).build("test client");
+        client = new JerseyClientBuilder(RULE.getEnvironment()).build("test client")
+                // sometimes it fails with the default value...
+                .property(ClientProperties.READ_TIMEOUT, 1000);
     }
 
     public static Client client() {
@@ -92,7 +94,7 @@ public class UserSessionTest {
 
         Response get = client().target(url("user")).request().cookie(cookie).get();
         assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(MockAuthenticator.ADMIN);
+        assertThat(get.readEntity(User.class)).isEqualToComparingFieldByField(MockAuthenticator.ADMIN);
     }
 
     @Test
@@ -105,7 +107,7 @@ public class UserSessionTest {
 
         final Response get = request().cookie(cookie).get();
         assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(MockAuthenticator.ADMIN);
+        assertThat(get.readEntity(User.class)).isEqualToComparingFieldByField(MockAuthenticator.ADMIN);
     }
 
     @Test
@@ -138,7 +140,7 @@ public class UserSessionTest {
 
         final Response get = request().cookie(cookie).get();
         assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(UserData.class)).isEqualToComparingFieldByField(MockAuthenticator.ADMIN);
+        assertThat(get.readEntity(User.class)).isEqualToComparingFieldByField(MockAuthenticator.ADMIN);
 
         final Response logout = request().cookie(cookie).delete();
         // TODO should be 204: https://github.com/pac4j/pac4j/issues/701

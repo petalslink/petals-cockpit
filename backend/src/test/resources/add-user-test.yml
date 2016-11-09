@@ -1,0 +1,11 @@
+database:
+  driverClass: org.h2.Driver
+  url: jdbc:h2:mem:cockpit
+  # see http://stackoverflow.com/a/3670000
+  validationQuery: "/* Health Check */ SELECT 1"
+
+logging:
+  level: INFO
+  loggers:
+    org.pac4j: DEBUG
+    org.ow2.petals.cockpit: DEBUG

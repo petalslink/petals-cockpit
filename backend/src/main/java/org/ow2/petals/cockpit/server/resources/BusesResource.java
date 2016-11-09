@@ -16,7 +16,9 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
-import javax.inject.Inject;
+import java.util.List;
+import java.util.UUID;
+
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -28,23 +30,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
 
-import com.allanbank.mongodb.MongoCollection;
-import com.allanbank.mongodb.MongoDatabase;
-import com.allanbank.mongodb.bson.element.ObjectId;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Singleton
 public class BusesResource {
-
-    private final MongoCollection db;
-
-    @Inject
-    public BusesResource(MongoDatabase db) {
-        assert db != null;
-        this.db = db.getCollection("buses");
-    }
 
     @Path("/{bId}")
     public Class<BusResource> busResource() {
@@ -54,9 +46,8 @@ public class BusesResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Bus addBus(@PathParam("wsId") String wsId, NewBus nb) {
-        ObjectId id = new ObjectId();
-        String stringId = id.toHexString();
+    public Bus addBus(@PathParam("wsId") long wsId, NewBus nb) {
+        String stringId = UUID.randomUUID().toString();
         // TODO validate that ws exists?
         WorkspaceActor.send(wsId, new WorkspaceActor.ImportBus(stringId, nb));
         return new Bus(stringId);
@@ -66,9 +57,9 @@ public class BusesResource {
 
         @GET
         @Produces(MediaType.APPLICATION_JSON)
-        public BusTree get(@PathParam("bId") String bId) {
+        public BusConfig get(@PathParam("bId") String bId) {
             // TODO
-            return new BusTree(bId);
+            return new BusConfig(bId);
         }
 
         @DELETE
@@ -135,11 +126,124 @@ public class BusesResource {
         }
     }
 
-    public static class BusTree extends Bus {
+    public static class BusConfig extends Bus {
 
-        public BusTree(String id) {
+        public BusConfig(String id) {
             super(id);
         }
 
+    }
+
+    public static class BusTree extends Bus {
+
+        @JsonProperty
+        private final String name;
+
+        @JsonProperty
+        private final List<ContainerTree> containers;
+
+        public BusTree(String id, String name, List<ContainerTree> containers) {
+            super(id);
+            this.name = name;
+            this.containers = containers;
+        }
+    }
+
+    public static class ContainerTree {
+
+        public enum State {
+            Deployed
+        }
+
+        @JsonProperty
+        private final String id;
+
+        @JsonProperty
+        private final String name;
+
+        @JsonProperty
+        private final State state;
+
+        @JsonProperty
+        private final List<ComponentTree> components;
+
+        public ContainerTree(String id, String name, State state, List<ComponentTree> components) {
+            this.id = id;
+            this.name = name;
+            this.state = state;
+            this.components = components;
+        }
+    }
+
+    public static class ComponentTree {
+
+        public enum State {
+            Loaded, Started, Stopped, Shutdown, Unknown;
+            
+            public static State from(ArtifactState.State state) {
+                switch (state) {
+                    case LOADED: return Loaded;
+                    case STARTED: return Started;
+                    case STOPPED: return Stopped;
+                    case SHUTDOWN: return Shutdown;
+                    case UNKNOWN: return Unknown;
+                    default:
+                        throw new AssertionError();
+                }
+            }
+        }
+
+        @JsonProperty
+        private final String id;
+
+        @JsonProperty
+        private final String name;
+
+        @JsonProperty
+        private final State state;
+
+        @JsonProperty
+        private final List<SUTree> serviceUnits;
+
+        public ComponentTree(String id, String name, State state, List<SUTree> serviceUnits) {
+            this.id = id;
+            this.name = name;
+            this.state = state;
+            this.serviceUnits = serviceUnits;
+        }
+    }
+
+    public static class SUTree {
+
+        public enum State {
+            Loaded, Started, Stopped, Shutdown, Unknown;
+            
+            public static State from(ArtifactState.State state) {
+                switch (state) {
+                    case LOADED: return Loaded;
+                    case STARTED: return Started;
+                    case STOPPED: return Stopped;
+                    case SHUTDOWN: return Shutdown;
+                    case UNKNOWN: return Unknown;
+                    default:
+                        throw new AssertionError();
+                }
+            }
+        }
+
+        @JsonProperty
+        private final String id;
+
+        @JsonProperty
+        private final String name;
+
+        @JsonProperty
+        private final State state;
+
+        public SUTree(String id, String name, State state) {
+            this.id = id;
+            this.name = name;
+            this.state = state;
+        }
     }
 }

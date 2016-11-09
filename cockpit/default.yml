@@ -30,12 +30,13 @@ pac4j:
   clients:
     - org.ow2.petals.cockpit.server.security.CockpitAuthClient: {}
 
-# configuration to connect to mongo
-mongo:
-  database: petalscockpit
-  servers:
-    - host: localhost
-      port: 27017
+database:
+  driverClass: org.h2.Driver
+  user: petals
+  password: petals
+  url: jdbc:h2:./cockpit
+  # see http://stackoverflow.com/a/3670000
+  validationQuery: "/* Health Check */ SELECT 1"
 
 logging:
   level: INFO

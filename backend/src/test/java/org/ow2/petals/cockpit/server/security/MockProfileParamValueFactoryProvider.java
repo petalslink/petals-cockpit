@@ -30,10 +30,13 @@ import org.glassfish.jersey.server.internal.inject.MultivaluedParameterExtractor
 import org.glassfish.jersey.server.internal.inject.ParamInjectionResolver;
 import org.glassfish.jersey.server.model.Parameter;
 import org.glassfish.jersey.server.spi.internal.ValueFactoryProvider;
+import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 public class MockProfileParamValueFactoryProvider extends AbstractValueFactoryProvider {
+
+    public static final DbUser ADMIN = new DbUser("admin", "...", "Admin");
 
     @Inject
     public MockProfileParamValueFactoryProvider(MultivaluedParameterExtractorProvider mpep, ServiceLocator locator) {
@@ -49,9 +52,7 @@ public class MockProfileParamValueFactoryProvider extends AbstractValueFactoryPr
             return new Factory<CommonProfile>() {
                 @Override
                 public CommonProfile provide() {
-                    CommonProfile commonProfile = new CommonProfile();
-                    commonProfile.setId("admin");
-                    return commonProfile;
+                    return new CockpitProfile(ADMIN);
                 }
 
                 @Override

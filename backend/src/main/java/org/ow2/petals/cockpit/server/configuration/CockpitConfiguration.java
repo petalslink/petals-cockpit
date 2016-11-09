@@ -16,26 +16,16 @@
  */
 package org.ow2.petals.cockpit.server.configuration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.pac4j.dropwizard.Pac4jFactory;
 
-import com.allanbank.mongodb.MongoClient;
-import com.allanbank.mongodb.MongoClientConfiguration;
-import com.allanbank.mongodb.MongoFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.dropwizard.Configuration;
-import io.dropwizard.lifecycle.Managed;
-import io.dropwizard.setup.Environment;
+import io.dropwizard.db.DataSourceFactory;
 
 /**
  * Read from the main configuration YAML.
@@ -47,93 +37,22 @@ public class CockpitConfiguration extends Configuration {
 
     @Valid
     @Nullable
-    @JsonProperty("pac4j")
-    private Pac4jFactory pac4jFactory = null;
+    @JsonProperty
+    private Pac4jFactory pac4j = null;
 
     @Nullable
+    @JsonProperty("pac4j")
     public Pac4jFactory getPac4jFactory() {
-        return pac4jFactory;
+        return pac4j;
     }
 
     @Valid
     @NotNull
-    @JsonProperty("mongo")
-    private MongoDatabaseFactory database = new MongoDatabaseFactory();
+    @JsonProperty
+    private DataSourceFactory database = new DataSourceFactory();
 
-    public MongoDatabaseFactory getDatabaseFactory() {
+    @JsonProperty("database")
+    public DataSourceFactory getDataSourceFactory() {
         return database;
-    }
-
-    public static class MongoDatabaseFactory {
-
-        @Valid
-        @NotNull
-        @JsonProperty
-        private List<MongoServer> servers = new ArrayList<>();
-
-        @NotEmpty
-        @JsonProperty
-        private String database = "cockpit";
-
-        public String getDatabase() {
-            return database;
-        }
-
-        public List<MongoServer> getServers() {
-            return servers;
-        }
-
-        @SuppressWarnings("null")
-        public MongoClient buildClient(@Nullable Environment env) {
-
-            final MongoClientConfiguration mcc = new MongoClientConfiguration();
-
-            if (!servers.isEmpty()) {
-                for (final MongoServer server : servers) {
-                    mcc.addServer(server.getHost() + ":" + server.getPort());
-                }
-            } else {
-                mcc.addServer("localhost:27017");
-            }
-
-            final MongoClient client = MongoFactory.createClient(mcc);
-
-            if (env != null) {
-                env.lifecycle().manage(new Managed() {
-
-                    @Override
-                    public void stop() throws Exception {
-                        client.close();
-                    }
-
-                    @Override
-                    public void start() throws Exception {
-                        // it's automatically started
-                    }
-                });
-            }
-
-            return client;
-        }
-
-        public static class MongoServer {
-
-            @NotEmpty
-            @JsonProperty
-            private String host = "localhost";
-
-            @Min(1)
-            @Max(65535)
-            @JsonProperty
-            private int port = 27017;
-
-            public String getHost() {
-                return host;
-            }
-
-            public int getPort() {
-                return port;
-            }
-        }
     }
 }

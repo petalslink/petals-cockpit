@@ -37,17 +37,20 @@
       <artifactId>dropwizard-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-migrations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-jdbi</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-sse</artifactId>
     </dependency>
     <dependency>
       <groupId>co.paralleluniverse</groupId>
       <artifactId>quasar-actors</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.allanbank</groupId>
-      <artifactId>mongodb-async-driver</artifactId>
-      <version>2.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.pac4j</groupId>
@@ -65,6 +68,12 @@
       <groupId>co.paralleluniverse</groupId>
       <artifactId>quasar-core</artifactId>
       <classifier>jdk8</classifier>
+    </dependency>
+    <!-- Database dependencies -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <!-- Petals dependencies -->
     <dependency>
@@ -100,6 +109,18 @@
       <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.github.stefanbirkner</groupId>
+      <artifactId>system-rules</artifactId>
+      <version>1.16.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.zapodot</groupId>
+      <artifactId>embedded-db-junit</artifactId>
+      <version>0.7</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Code quality dependencies -->
     <dependency>
       <groupId>org.eclipse.jdt</groupId>
@@ -111,35 +132,55 @@
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
-        <!-- Run with "mvn compile dependency:properties exec:exec" -->
         <artifactId>exec-maven-plugin</artifactId>
-        <configuration>
-          <executable>${java.home}/bin/java</executable>
-          <arguments>
-            <!-- Debug -->
-            <!-- argument>-Xdebug</argument -->
-            <!-- argument>-agentlib:jdwp=transport=dt_socket,server=y,address=8000</argument-->
+        <executions>
+          <execution>
+            <!-- Run with (for example): mvn compile exec:java@cli -Dexec.args="db migrate backend/default.yml" -->
+            <id>cli</id>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>org.ow2.petals.cockpit.server.CockpitApplication</mainClass>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Run with: mvn compile dependency:properties exec:exec@server-->
+            <id>server</id>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>${java.home}/bin/java</executable>
+              <arguments>
+                <!-- Debug -->
+                <!-- argument>-Xdebug</argument -->
+                <!-- argument>-agentlib:jdwp=transport=dt_socket,server=y,address=8000</argument-->
+    
+                <!-- Configure memory settings as needed -->
+                <!-- argument>-Xmx1000m</argument -->
 
-            <!-- Configure memory settings as needed -->
-            <!-- argument>-Xmx1000m</argument -->
+                <argument>-Dco.paralleluniverse.fibers.verifyInstrumentation=true</argument>
 
-            <argument>-Dco.paralleluniverse.fibers.verifyInstrumentation=true</argument>
+                <!-- Quasar Agent for JDK 8 -->
+                <argument>-javaagent:${quasar.path}</argument>
 
-            <!-- Quasar Agent for JDK 8 -->
-            <argument>-javaagent:${quasar.path}</argument> <!-- Add "=b" to force instrumenting blocking calls like Thread.sleep() -->
+                <argument>-ea</argument>
 
-            <argument>-ea</argument>
+                <!-- Classpath -->
+                <argument>-classpath</argument>
+                <classpath />
 
-            <!-- Classpath -->
-            <argument>-classpath</argument>
-            <classpath />
-
-            <!-- Main class -->
-            <argument>org.ow2.petals.cockpit.server.CockpitApplication</argument>
-            <argument>${cockpit.exec.command}</argument>
-            <argument>default.yml</argument>
-          </arguments>
-        </configuration>
+                <!-- Main class -->
+                <argument>org.ow2.petals.cockpit.server.CockpitApplication</argument>
+                
+                <!-- Command -->
+                <argument>${cockpit.exec.command}</argument>
+                <argument>default.yml</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

@@ -16,8 +16,8 @@
  */
 package org.ow2.petals.cockpit.server.actors;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,14 +40,15 @@ import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
+import org.ow2.petals.cockpit.server.resources.BusesResource.BusTree;
+import org.ow2.petals.cockpit.server.resources.BusesResource.ComponentTree;
+import org.ow2.petals.cockpit.server.resources.BusesResource.ContainerTree;
 import org.ow2.petals.cockpit.server.resources.BusesResource.NewBus;
+import org.ow2.petals.cockpit.server.resources.BusesResource.SUTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.allanbank.mongodb.bson.Document;
-import com.allanbank.mongodb.bson.builder.ArrayBuilder;
-import com.allanbank.mongodb.bson.builder.BuilderFactory;
-import com.allanbank.mongodb.bson.builder.DocumentBuilder;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import co.paralleluniverse.actors.ActorRegistry;
@@ -80,11 +81,11 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
     private static final ExecutorService exec = Executors.newFixedThreadPool(1,
             new ThreadFactoryBuilder().setNameFormat("petals-admin-worker-%d").setDaemon(true).build());
 
-    private final String id;
+    private final long id;
 
     private final SseBroadcaster broadcaster = new SseBroadcaster();
 
-    public WorkspaceActor(String id) {
+    public WorkspaceActor(long id) {
         this.id = id;
         this.broadcaster.add(new BroadcasterListener<OutboundEvent>() {
             @Override
@@ -105,7 +106,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
     }
 
     @Suspendable
-    public static void send(String wsId, Msg msg) {
+    public static void send(long wsId, Msg msg) {
         if (Strand.isCurrentFiber()) {
             try {
                 send0(wsId, msg);
@@ -117,7 +118,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         }
     }
 
-    private static void send0(String wsId, Msg msg) throws SuspendExecution {
+    private static void send0(long wsId, Msg msg) throws SuspendExecution {
         ActorRegistry.getOrRegisterActor("workspace-" + wsId, () -> new WorkspaceActor(wsId)).send(msg);
     }
 
@@ -134,20 +135,19 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                 ImportBus bus = (ImportBus) msg;
                 // we use a fiber to let the actor handles other message during bus import
                 new Fiber<>(() -> {
-                    Document d;
+                    WorkspaceEvent ev;
                     try {
-                        Document nd = FiberAsync.runBlocking(exec,
-                                (CheckedCallable<Document, Exception>) () -> doImportBus(bus));
-                        d = BuilderFactory.start().add("event", "BUS_IMPORT_OK").add("data", nd).build();
+                        BusTree tree = FiberAsync.runBlocking(exec,
+                                (CheckedCallable<BusTree, Exception>) () -> doImportBus(bus));
+                        ev = WorkspaceEvent.ok(bus.id, tree);
                     } catch (Exception e) {
                         LOG.info("Can't retrieve topology from container {}:{}: {}", bus.nb.getIp(), bus.nb.getPort(),
                                 e.getMessage());
                         LOG.debug("Can't retrieve topology from container {}:{}", bus.nb.getIp(), bus.nb.getPort(), e);
-                        Document nd = BuilderFactory.start().add("id", bus.id).add("error", e.getMessage()).build();
-                        d = BuilderFactory.start().add("event", "BUS_IMPORT_ERROR").add("data", nd).build();
+                        ev = WorkspaceEvent.error(bus.id, e.getMessage());
                     }
                     // we use send in order to keep concurrency under control by the actor!
-                    self().send(new SseEvent("WORKSPACE_CHANGE", d));
+                    self().send(new SseEvent("WORKSPACE_CHANGE", ev));
                 }).start();
             } else if (msg instanceof SseEvent) {
                 LOG.debug("Sending SSE event to clients for workspace {}: {}", id, msg);
@@ -158,7 +158,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         }
     }
 
-    private static Document doImportBus(ImportBus bus) throws Exception {
+    private static BusTree doImportBus(ImportBus bus) throws Exception {
         PetalsAdministration petals = PetalsAdministrationFactory.getInstance().newPetalsAdministrationAPI();
         ContainerAdministration container = petals.newContainerAdministration();
 
@@ -177,51 +177,33 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         }
     }
 
-    private static Document buildBusTree(String id, Domain topology) {
-        DocumentBuilder b = BuilderFactory.start();
+    private static BusTree buildBusTree(String id, Domain topology) {
 
-        b.add("id", id);
-        b.add("name", topology.getName());
-
-        ArrayBuilder cs = b.pushArray("containers");
-
+        List<ContainerTree> containers = new ArrayList<>();
         for (Container container : topology.getContainers()) {
-            DocumentBuilder cont = cs.push();
-            // TODO id
-            cont.add("id", "a");
-            cont.add("name", container.getContainerName());
-            cont.add("state", "Deployed");
-            ArrayBuilder comps = cont.pushArray("components");
-            Map<String, @Nullable ArrayBuilder> compsMap = new HashMap<>();
+            List<ComponentTree> components = new ArrayList<>();
             for (Component component : container.getComponents()) {
-                DocumentBuilder comp = comps.push();
-                // TODO id
-                comp.add("id", "a");
-                comp.add("name", component.getName());
-                comp.add("state", component.getState().toString());
-                compsMap.put(component.getName(), comp.pushArray("serviceUnits"));
-            }
-
-            for (ServiceAssembly sa : container.getServiceAssemblies()) {
-                for (ServiceUnit su : sa.getServiceUnits()) {
-                    String tc = su.getTargetComponent();
-                    ArrayBuilder sus = compsMap.get(tc);
-                    if (sus != null) {
-                        DocumentBuilder sub = sus.push();
-                        // TODO id
-                        sub.add("id", "a");
-                        sub.add("name", su.getName());
-                        // TODO bof bof
-                        sub.add("state", sa.getState().toString());
-                    } else {
-                        LOG.warn("Retrieved a SU {} deployed on component {}, but {} does not exist", su.getName(), tc,
-                                tc);
+                List<SUTree> serviceUnits = new ArrayList<>();
+                for (ServiceAssembly sa : container.getServiceAssemblies()) {
+                    for (ServiceUnit su : sa.getServiceUnits()) {
+                        if (su.getTargetComponent().equals(component.getName())) {
+                            // TODO id
+                            serviceUnits.add(new SUTree("a", su.getName(), SUTree.State.from(sa.getState())));
+                        }
                     }
                 }
+
+                // TODO id
+                components.add(new ComponentTree("a", component.getName(),
+                        ComponentTree.State.from(component.getState()), serviceUnits));
             }
+
+            // TODO id
+            containers.add(
+                    new ContainerTree("a", container.getContainerName(), ContainerTree.State.Deployed, components));
         }
 
-        return b.build();
+        return new BusTree(id, topology.getName(), containers);
     }
 
     public interface Msg {
@@ -267,6 +249,42 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         public String toString() {
             return "SseEvent[name:" + event.getName() + ", mt: " + event.getMediaType() + ", d: " + event.getData()
                     + "]";
+        }
+    }
+
+    public static class WorkspaceEvent {
+
+        @JsonProperty
+        private final String event;
+
+        @JsonProperty
+        private final Object data;
+
+        public WorkspaceEvent(String event, Object data) {
+            this.event = event;
+            this.data = data;
+        }
+
+        public static WorkspaceEvent error(String id, String error) {
+            return new WorkspaceEvent("BUS_IMPORT_ERROR", new ImportBusError(id, error));
+        }
+
+        public static WorkspaceEvent ok(String id, BusTree bus) {
+            return new WorkspaceEvent("BUS_IMPORT_OK", bus);
+        }
+    }
+
+    public static class ImportBusError {
+
+        @JsonProperty
+        private final String id;
+
+        @JsonProperty
+        private final String error;
+
+        public ImportBusError(String id, String error) {
+            this.id = id;
+            this.error = error;
         }
     }
 }

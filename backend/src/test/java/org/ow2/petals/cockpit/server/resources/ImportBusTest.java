@@ -17,8 +17,12 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -34,38 +38,35 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
+import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvider;
-import org.ow2.petals.cockpit.server.utils.DocumentAssignableModule;
 
-import com.allanbank.mongodb.MongoDatabase;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
-import io.dropwizard.jackson.Jackson;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
 public class ImportBusTest {
 
-    private static MongoDatabase db = Mockito.mock(MongoDatabase.class);
+    private static WorkspacesDAO workspaces = mock(WorkspacesDAO.class);
 
     @ClassRule
     public static ResourceTestRule resources = ResourceTestRule.builder()
             // in memory does not support SSE
             .setTestContainerFactory(new GrizzlyTestContainerFactory())
-            .setMapper(Jackson.newObjectMapper().registerModule(new DocumentAssignableModule()))
             // we pass the resource as a provider to get injection in constructor
             .addProvider(WorkspacesResource.class).addProvider(new MockProfileParamValueFactoryProvider.Binder())
             .addProvider(new AbstractBinder() {
                 @Override
                 protected void configure() {
-                    bind(db).to(MongoDatabase.class);
+                    bind(workspaces).to(WorkspacesDAO.class);
                 }
             }).build();
 
@@ -79,19 +80,22 @@ public class ImportBusTest {
                 State.REACHABLE);
         domain.addContainers(ImmutableList.of(container));
         petals.registerDomain(domain);
+
+        when(workspaces.findById(1)).thenReturn(
+                new DbWorkspace(1, "test", Arrays.asList(MockProfileParamValueFactoryProvider.ADMIN.getUsername())));
     }
 
     @After
     public void tearDown() {
-        reset(db);
+        reset(workspaces);
     }
 
     @Test
     public void testImportBusOk() {
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/w1/events").request()
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
                 .get(EventInput.class)) {
 
-            ImportBusResponse post = resources.getJerseyTest().target("/workspaces/w1/buses").request().post(
+            ImportBusResponse post = resources.getJerseyTest().target("/workspaces/1/buses").request().post(
                     Entity.json(new BusesResource.NewBus("host1", 7700, "user", "pass", "??")),
                     ImportBusResponse.class);
             assertThat(post).isNotNull();
@@ -106,14 +110,16 @@ public class ImportBusTest {
                 assertThat(ev.data.get("name")).isEqualTo("dom");
             });
         }
+
+        verify(workspaces).findById(1);
     }
 
     @Test
     public void testImportBusError() {
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/w1/events").request()
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
                 .get(EventInput.class)) {
 
-            ImportBusResponse post = resources.getJerseyTest().target("/workspaces/w1/buses").request().post(
+            ImportBusResponse post = resources.getJerseyTest().target("/workspaces/1/buses").request().post(
                     Entity.json(new BusesResource.NewBus("host2", 7700, "user", "pass", "??")),
                     ImportBusResponse.class);
             assertThat(post).isNotNull();
@@ -127,6 +133,8 @@ public class ImportBusTest {
                 assertThat(ev.data.get("error")).isEqualTo("Unknown Host");
             });
         }
+
+        verify(workspaces).findById(1);
     }
 
     private static void expectEvent(EventInput eventInput, Consumer<InboundEvent> c) {
@@ -161,5 +169,3 @@ class ImportBusResponse {
     public String id = "";
 
 }
-
-

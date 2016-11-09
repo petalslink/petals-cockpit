@@ -16,31 +16,30 @@
  */
 package org.ow2.petals.cockpit.server.security;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.eclipse.jdt.annotation.Nullable;
-import org.ow2.petals.cockpit.server.resources.UserSession.UserData;
+import org.ow2.petals.cockpit.server.db.UsersDAO;
+import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
+import org.ow2.petals.cockpit.server.resources.UserSession.User;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.credentials.UsernamePasswordCredentials;
-import org.pac4j.core.credentials.authenticator.Authenticator;
-import org.pac4j.core.exception.BadCredentialsException;
-import org.pac4j.core.exception.HttpAction;
-import org.pac4j.core.profile.CommonProfile;
 
-public class MockAuthenticator implements Authenticator<@Nullable UsernamePasswordCredentials> {
+public class MockAuthenticator extends CockpitAuthenticator {
 
-    public static final UserData ADMIN = new UserData("admin", "Administrator");
+    public MockAuthenticator() {
+        super(mock(UsersDAO.class));
+    }
+
+    public static final User ADMIN = new User("admin", "Administrator");
 
     @Override
-    public void validate(@Nullable UsernamePasswordCredentials credentials, @Nullable WebContext context)
-            throws HttpAction {
-        assert context != null;
-        assert credentials != null;
-        if (ADMIN.getUsername().equals(credentials.getUsername())) {
-            final CommonProfile userProfile = new CommonProfile();
-            userProfile.setId(ADMIN.getUsername());
-            userProfile.addAttribute("display_name", ADMIN.getName());
-            credentials.setUserProfile(userProfile);
-        } else {
-            throw new BadCredentialsException("Bad credentials for: " + credentials.getUsername());
-        }
+    protected void internalInit(@Nullable WebContext context) {
+        super.internalInit(context);
+
+        String pw = getPasswordEncoder().encode(ADMIN.getUsername());
+
+        when(users.findByUsername(ADMIN.getUsername()))
+                .thenReturn(new DbUser(ADMIN.getUsername(), pw, ADMIN.getName()));
     }
 }

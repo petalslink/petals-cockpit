@@ -29,28 +29,28 @@ import org.glassfish.jersey.ServiceLocatorProvider;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.db.UsersDAO;
+import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.resources.UserSession;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
-import org.ow2.petals.cockpit.server.security.mongo.MongoAllanbankAuthenticator;
-import org.ow2.petals.cockpit.server.utils.DocumentAssignableModule;
-import org.ow2.petals.cockpit.server.utils.DocumentAssignableWriter;
+import org.ow2.petals.cockpit.server.security.CockpitAuthenticator;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.credentials.password.SpringSecurityPasswordEncoder;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
+import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.allanbank.mongodb.MongoClient;
-import com.allanbank.mongodb.MongoDatabase;
-import com.codahale.metrics.health.HealthCheck;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 
 import io.dropwizard.Application;
+import io.dropwizard.db.PooledDataSourceFactory;
+import io.dropwizard.jdbi.DBIFactory;
+import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.jetty.BiDiGzipHandler;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
+import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -64,12 +64,21 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
     private static final Logger LOG = LoggerFactory.getLogger(CockpitApplication.class);
 
-    private final Pac4jBundle<CockpitConfiguration> pac4j = new Pac4jBundle<CockpitConfiguration>() {
+    public final Pac4jBundle<C> pac4j = new Pac4jBundle<C>() {
         @Nullable
         @Override
-        public Pac4jFactory getPac4jFactory(CockpitConfiguration configuration) {
+        public Pac4jFactory getPac4jFactory(C configuration) {
             return configuration.getPac4jFactory();
         }
+    };
+
+    public final MigrationsBundle<C> migrations = new MigrationsBundle<C>() {
+
+        @Override
+        public PooledDataSourceFactory getDataSourceFactory(C configuration) {
+            return configuration.getDataSourceFactory();
+        }
+
     };
 
     public static void main(String[] args) throws Exception {
@@ -85,27 +94,25 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
     public void initialize(@Nullable Bootstrap<C> bootstrap) {
         assert bootstrap != null;
 
+        bootstrap.addBundle(migrations);
         bootstrap.addBundle(pac4j);
-        bootstrap.addCommand(new AddUserCommand());
+        // ease debugging of exceptions thrown by JDBI!
+        bootstrap.addBundle(new DBIExceptionsBundle());
+        bootstrap.addCommand(new AddUserCommand<>(this));
     }
 
     @Override
-    public void run(CockpitConfiguration configuration, @Nullable Environment environment) throws Exception {
+    public void run(C configuration, @Nullable Environment environment) throws Exception {
         assert environment != null;
 
-        @SuppressWarnings("resource")
-        final MongoClient client = configuration.getDatabaseFactory().buildClient(environment);
-        final MongoDatabase db = client.getDatabase(configuration.getDatabaseFactory().getDatabase());
-        environment.healthChecks().register("mongo", new MongoHealthCheck(client));
+        final DBIFactory factory = new DBIFactory();
+        final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "cockpit");
+        final UsersDAO users = jdbi.onDemand(UsersDAO.class);
+        final WorkspacesDAO workspaces = jdbi.onDemand(WorkspacesDAO.class);
 
         // use bytecode instrumentation to improve performance of json
         // serialization/deserialization
         environment.getObjectMapper().registerModule(new AfterburnerModule());
-
-        // support DocumentAssignable in object serialized/deserialized by
-        // jackson and jersey
-        environment.getObjectMapper().registerModule(new DocumentAssignableModule());
-        environment.jersey().register(DocumentAssignableWriter.class);
 
         // activate session management in jetty
         environment.servlets().setSessionHandler(new SessionHandler());
@@ -114,12 +121,13 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
             @Override
             protected void configure() {
                 bind(configuration).to(CockpitConfiguration.class);
-                bind(client).to(MongoClient.class);
-                bind(db).to(MongoDatabase.class);
+                bind(users).to(UsersDAO.class);
+                bind(workspaces).to(WorkspacesDAO.class);
+                bind(jdbi).to(DBI.class);
             }
         });
 
-        setupPac4J(configuration, client);
+        setupPac4J(users);
 
         environment.jersey().register(UserSession.class);
         environment.jersey().register(WorkspacesResource.class);
@@ -155,7 +163,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
     /**
      * public for tests
      */
-    private void setupPac4J(CockpitConfiguration configuration, MongoClient client) {
+    private void setupPac4J(UsersDAO users) {
 
         Config conf = pac4j.getConfig();
 
@@ -168,32 +176,11 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
             // if it's already set, either we are in a test, or another backend is used
             if (cac.getAuthenticator() == null) {
-                // this can't be set from the configuration because we rely on the MongoClient
-                // TODO can something be done about that?
-                final MongoAllanbankAuthenticator auth = new MongoAllanbankAuthenticator(client);
-                auth.setUsersDatabase(configuration.getDatabaseFactory().getDatabase());
-                auth.setUsersCollection("users");
-                auth.setAttributes("display_name");
-                auth.setPasswordEncoder(new SpringSecurityPasswordEncoder(new BCryptPasswordEncoder()));
+                // this can't be set from the configuration because we rely on the UserDAO
+                // TODO can something be done about that? for example with injection...
+                final CockpitAuthenticator auth = new CockpitAuthenticator(users);
                 cac.setAuthenticator(auth);
             }
         }
-    }
-}
-
-class MongoHealthCheck extends HealthCheck {
-
-    private final MongoClient client;
-
-    public MongoHealthCheck(MongoClient client) {
-        this.client = client;
-    }
-
-    @Override
-    protected Result check() throws Exception {
-        // if this does not fail, it means the connection is working
-        client.listDatabaseNames();
-
-        return Result.healthy();
     }
 }
