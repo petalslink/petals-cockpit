@@ -42,7 +42,12 @@ import { IStore } from '../../../shared-module/interfaces/store.interface';
 export class SettingsComponent implements OnDestroy {
   private config: IConfig;
   private configSub: Subscription;
-  
+
+  langOptions = [
+    'fr',
+    'en'
+  ];
+
   private lang: string;
 
   constructor(private store$: Store<IStore>, private translate: TranslateService) {
@@ -50,6 +55,8 @@ export class SettingsComponent implements OnDestroy {
       store$.select('config')
         .map((configR: IConfigRecord) => configR.toJS())
         .subscribe((config: IConfig) => this.config = config);
+
+    this.lang = this.translate.currentLang;
   }
 
   ngOnDestroy() {
@@ -60,7 +67,8 @@ export class SettingsComponent implements OnDestroy {
     this.store$.dispatch({ type: ConfigActions.TOGGLE_THEME });
   }
 
-  changeLanguageTo() {
+  changeLanguageTo(lang) {
+    this.lang = lang || this.lang;
     this.translate.use(this.lang);
   }
 }
