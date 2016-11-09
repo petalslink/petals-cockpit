@@ -57,12 +57,13 @@ build-frontend:
     - /^back\/.*$/
   script:
     - "cd frontend"
-    - "$NG build --prod"
     - "$NG lint"
+    - "node generate-headers.js --dry"
     - "nohup $XVFB &"
     - "$NG test --watch false"
     - "nohup $NG serve -e=prod-e2e &"
     - "$NG e2e"
+    - "$NG build --prod"
   artifacts:
     paths:
       - frontend/dist
