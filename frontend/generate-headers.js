@@ -2,6 +2,28 @@ const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
 
+// folders
+const sourceFolders = [
+  './src/app',
+  './e2e'
+];
+
+// individual files
+const sourceFiles = {
+  ts: [
+    './src/test.ts',
+    './src/main.ts'
+  ],
+
+  scss: [
+    './src/styles.scss',
+    './src/custom-theme.scss',
+    './src/_libs.scss'
+  ],
+
+  html: []
+};
+
 const headers = [
   {ts: null},
   {scss: null},
@@ -47,12 +69,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->`;
 
 // ----------------------------------------------------------------------------------
 
-const generateFileTree = function(dir, filelist) {
+// arguments
+const args = {
+  dry: false
+};
+
+process.argv.forEach(arg => {
+  if (arg === '--dry') {
+    args.dry = true;
+  }
+});
+
+// ----------------------------------------------------------------------------------
+
+const generateFileTree = (dir, filelist) => {
   let files = fs.readdirSync(dir);
 
   filelist = filelist || {ts: [], scss: [], html: []};
 
-  files.forEach(function(file) {
+  files.forEach((file) => {
     if (fs.statSync(path.join(dir, file)).isDirectory()) {
       filelist = generateFileTree(path.join(dir, file), filelist);
     }
@@ -77,8 +112,8 @@ const generateFileTree = function(dir, filelist) {
 
 // check if a header is already available and
 // inject the corresponding header otherwise
-const checkHeaderAndInjectIfNeeded = (fileType, filePath, headerSplit) => {
-  let fileSplit = fs.readFileSync(filePath).toString().trim().split('\n');
+const checkHeaderAndInjectIfNeeded = (fileType, filePath, headerSplit, stats) => {
+  let fileSplit = fs.readFileSync(filePath).toString().trimLeft().split('\n');
   let filePotentialHeader = fileSplit.slice(0, headerSplit.length).join('\n');
 
   if (filePotentialHeader === headerSplit.join('\n')) {
@@ -87,18 +122,40 @@ const checkHeaderAndInjectIfNeeded = (fileType, filePath, headerSplit) => {
 
   // no header, we need to inject it
   let fileWithInjectedHeader = headerSplit.join('\n') + '\n\n' + fileSplit.join('\n');
-  fs.writeFile(filePath, fileWithInjectedHeader, (err) => {
-    if(err) {
-      return console.log(err);
-    }
 
-    console.log(`updated : ${filePath}`);
-  });
+  stats[fileType]++;
+
+  if (!args.dry) {
+    fs.writeFileSync(filePath, fileWithInjectedHeader);
+  }
 };
 
 const main = () => {
+  // flatten source folders
+  let sourceFoldersFlattened = sourceFolders
+    .map(f => generateFileTree(f))
+    .reduce((previous, current) => {
+      let rslt = {};
+
+      Object.keys(previous).forEach((fileType) => {
+        rslt[fileType] = [...previous[fileType], ...current[fileType]];
+      });
+
+      return rslt;
+    });
+
   // generate the file tree
-  let fileTree = generateFileTree('./src/app');
+  let fileTree = {};
+
+  Object
+    .keys(sourceFoldersFlattened)
+    .forEach((fileType) => {
+      fileTree[fileType] = [...sourceFiles[fileType], ...sourceFoldersFlattened[fileType]]
+    });
+
+  // init stats
+  let stats = {};
+  Object.keys(fileTree).forEach((fileType) => stats[fileType] = 0);
 
   // for each type of file
   Object.keys(fileTree).forEach((fileType) => {
@@ -108,8 +165,19 @@ const main = () => {
     // as many time as we call checkHeaderAndInjectIfNeeded function
     let headerSplit = headers[fileType].split('\n');
 
-    filesPath.forEach(filePath => checkHeaderAndInjectIfNeeded(fileType, filePath, headerSplit));
+    filesPath.forEach(filePath => checkHeaderAndInjectIfNeeded(fileType, filePath, headerSplit, stats));
   });
+
+  let headerOnEveryFile = Object.keys(stats).map(fileType => stats[fileType]).reduce((previous, current) => previous + current) === 0;
+
+  // display stats
+  Object.keys(stats).forEach(fileType => console.log(`${args.dry ? '[ERROR] ': ''}${stats[fileType]} ${fileType} file${stats[fileType] > 1 ? 's' : ''} ${args.dry ? `don't have a header` : `updated`}`));
+
+  if (!headerOnEveryFile) {
+    process.exit(1);
+  }
+
+  process.exit(0);
 };
 
 main();
