@@ -6,7 +6,7 @@ import { IConfigRecord } from '../interfaces/config.interface';
 import { configFactory } from './config.state';
 
 // our reducers
-import { USR_IS_DISCONNECTED } from "./user.reducer";
+import { USR_IS_DISCONNECTED } from './user.reducer';
 
 // actions
 export const TOGGLE_THEME = 'TOGGLE_THEME ';
