@@ -171,7 +171,9 @@ const main = () => {
   let headerOnEveryFile = Object.keys(stats).map(fileType => stats[fileType]).reduce((previous, current) => previous + current) === 0;
 
   // display stats
-  Object.keys(stats).forEach(fileType => console.log(`${args.dry ? '[ERROR] ': ''}${stats[fileType]} ${fileType} file${stats[fileType] > 1 ? 's' : ''} ${args.dry ? `don't have a header` : `updated`}`));
+  Object.keys(stats).forEach(fileType =>
+    console.log(`${args.dry && stats[fileType] > 0 ? '[ERROR] ': ''}${stats[fileType]} ${fileType} file${stats[fileType] > 1 ? 's' : ''} ${args.dry ? `don't have a header` : `updated`}`)
+  );
 
   if (!headerOnEveryFile) {
     process.exit(1);
