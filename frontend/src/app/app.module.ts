@@ -39,6 +39,7 @@ import { WorkspaceService } from './shared-module/services/workspace.service';
 import { WorkspaceMockService } from './shared-module/mocks/workspace-mock.service';
 import { SseService } from './shared-module/services/sse.service';
 import { SseMockService } from './shared-module/mocks/sse-mock.service';
+import { RouteService } from './shared-module/services/route.service';
 
 // our guards
 import { AuthGuardService } from './shared-module/services/auth-guard.service';
@@ -110,6 +111,7 @@ export function createTranslateLoader(http: Http) {
     AlreadyLoggedGuardService,
 
     // services
+    RouteService,
     {
       provide: SseService,
       useClass: (environment.mock ? SseMockService : SseService)

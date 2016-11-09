@@ -28,6 +28,11 @@ The following command will simply execute the backend (for testing for example):
 $ mvn -s ci/settings.xml compile exec:exec -pl backend
 ```
 
+To work on the frontend without mock:
+```
+ng serve --proxy-config proxy.conf.json -e=dev-nomock
+```
+
 ### Available Commands
 
 A user can be added with the following command:
