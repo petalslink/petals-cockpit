@@ -17,8 +17,6 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,55 +26,48 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
+import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
+import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusTree;
-import org.pac4j.core.profile.CommonProfile;
+import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
-import com.allanbank.mongodb.MongoCollection;
-import com.allanbank.mongodb.MongoDatabase;
-import com.allanbank.mongodb.MongoIterator;
-import com.allanbank.mongodb.bson.Document;
-import com.allanbank.mongodb.bson.Element;
-import com.allanbank.mongodb.bson.builder.BuilderFactory;
-import com.allanbank.mongodb.bson.element.ArrayElement;
-import com.allanbank.mongodb.bson.element.ObjectIdElement;
-import com.allanbank.mongodb.builder.QueryBuilder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Singleton
 @Path("/workspaces")
 public class WorkspacesResource {
 
-    private final MongoCollection db;
+    private final WorkspacesDAO workspaces;
 
     @Inject
-    public WorkspacesResource(MongoDatabase db) {
-        assert db != null;
-        this.db = db.getCollection("workspaces");
+    public WorkspacesResource(WorkspacesDAO workspaces) {
+        this.workspaces = workspaces;
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Workspace create(NewWorkspace ws, @Pac4JProfile CommonProfile profile) {
-        Document d = BuilderFactory.start().add("name", ws.getName()).add("users", BuilderFactory.a(profile.getId()))
-                .build();
-        db.insert(d);
-        return Workspace.from(d);
+    public Workspace create(NewWorkspace ws, @Pac4JProfile CockpitProfile profile) {
+        DbWorkspace w = workspaces.create(ws.name, profile.getUser());
+
+        return new Workspace(Long.toString(w.getId()), w.getName(), w.getUsers());
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Workspace> workspaces(@Pac4JProfile CommonProfile profile) {
-        try (MongoIterator<Document> wss = db.find(QueryBuilder.where("users").all(profile.getId()))) {
-            return StreamSupport.stream(wss.spliterator(), false).map(Workspace::from).collect(Collectors.toList());
-        }
+    public Workspace[] workspaces(@Pac4JProfile CockpitProfile profile) {
+        return workspaces.getUserWorkspaces(profile.getUser()).stream()
+                .map(w -> new Workspace(Long.toString(w.getId()), w.getName(), w.getUsers()))
+                .toArray(Workspace[]::new);
     }
 
     @Path("/{wsId}")
@@ -87,17 +78,45 @@ public class WorkspacesResource {
     @Singleton
     public static class WorkspaceResource {
 
+        private final WorkspacesDAO workspaces;
+
+        @Inject
+        public WorkspaceResource(WorkspacesDAO workspaces) {
+            assert workspaces != null;
+            this.workspaces = workspaces;
+        }
+
+        private DbWorkspace getWorkspace(long wsId, CockpitProfile profile) {
+            DbWorkspace w = workspaces.findById(wsId);
+
+            if (w == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
+
+            // TODO I should be able to easily use contains on the list...
+            if (!w.getUsers().stream().anyMatch(u -> u.equals(profile.getUser().getUsername()))) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
+
+            return w;
+        }
+
         @GET
         @Produces(MediaType.APPLICATION_JSON)
-        public WorkspaceTree get(@PathParam("wsId") String wsId) {
-            // TODO
-            return new WorkspaceTree();
+        public WorkspaceTree get(@PathParam("wsId") long wsId, @Pac4JProfile CockpitProfile profile) {
+            DbWorkspace w = getWorkspace(wsId, profile);
+
+            return new WorkspaceTree(Long.toString(w.getId()), w.getName());
+
         }
 
         @GET
         @Path("/events")
         @Produces(SseFeature.SERVER_SENT_EVENTS)
-        public EventOutput sse(@PathParam("wsId") String wsId) {
+        public EventOutput sse(@PathParam("wsId") long wsId, @Pac4JProfile CockpitProfile profile) {
+            // this validates the workspace
+            getWorkspace(wsId, profile);
+
             final EventOutput eventOutput = new EventOutput();
             WorkspaceActor.send(wsId, new WorkspaceActor.NewClient(eventOutput));
             return eventOutput;
@@ -123,48 +142,49 @@ public class WorkspacesResource {
         }
     }
 
-    public static class Workspace extends NewWorkspace {
+    public static class MinWorkspace extends NewWorkspace {
 
         private final String id;
 
-        private final String[] usedBy;
-
-        public Workspace(String id, String name, String[] usedBy) {
+        public MinWorkspace(String id, String name) {
             super(name);
             this.id = id;
-            this.usedBy = usedBy;
         }
 
         @JsonProperty
         public String getId() {
             return id;
         }
+    }
 
-        @JsonProperty
-        public String[] getUsedBy() {
-            return usedBy;
+    public static class Workspace extends MinWorkspace {
+
+        private final List<String> usedBy;
+
+        public Workspace(@NotEmpty @JsonProperty("id") String id, @NotEmpty @JsonProperty("name") String name,
+                @NotEmpty @JsonProperty("usedBy") List<String> usedBy) {
+            super(id, name);
+            this.usedBy = usedBy;
         }
 
-        public static Workspace from(Document d) {
-            String id = d.get(ObjectIdElement.class, "_id").getId().toHexString();
-            String name = d.get("name").getValueAsString();
-            String[] usedBy = d.get(ArrayElement.class, "users").getEntries().stream().map(Element::getValueAsString)
-                    .toArray(String[]::new);
-            return new Workspace(id, name, usedBy);
+        @JsonProperty
+        public List<String> getUsedBy() {
+            return usedBy;
         }
     }
 
-    public static class WorkspaceTree {
+    public static class WorkspaceTree extends MinWorkspace {
 
         private final BusTree[] busesInProgress;
 
         private final BusTree[] buses;
 
-        public WorkspaceTree() {
-            this(new BusTree[] {}, new BusTree[] {});
+        public WorkspaceTree(String id, String name) {
+            this(id, name, new BusTree[] {}, new BusTree[] {});
         }
 
-        public WorkspaceTree(BusTree[] buses, BusTree[] busesInProgress) {
+        public WorkspaceTree(String id, String name, BusTree[] buses, BusTree[] busesInProgress) {
+            super(id, name);
             this.buses = buses;
             this.busesInProgress = busesInProgress;
         }

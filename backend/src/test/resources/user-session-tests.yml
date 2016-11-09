@@ -10,7 +10,13 @@ server:
   adminContextPath: /admin
   connector:
     type: http
-    port: 8080
+    port: 0
+
+database:
+  driverClass: org.h2.Driver
+  url: jdbc:h2:mem:cockpit
+  # see http://stackoverflow.com/a/3670000
+  validationQuery: "/* Health Check */ SELECT 1"
 
 pac4j:
   filters:

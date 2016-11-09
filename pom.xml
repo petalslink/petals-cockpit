@@ -100,14 +100,14 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <!-- Let's use a version with similar (1.4.x) byte-buddy version than quasar -->
-        <version>2.2.8</version>
+        <!-- Let's use a version with similar (1.x) byte-buddy version than quasar -->
+        <version>2.2.13</version>
       </dependency>
       <dependency>
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy</artifactId>
-        <!-- Let's use latest 1.4.x version -->
-        <version>1.4.33</version>
+        <!-- Let's use latest 1.x version -->
+        <version>1.5.3</version>
       </dependency>
       <dependency>
         <!-- force version because of kryo and mockito -->

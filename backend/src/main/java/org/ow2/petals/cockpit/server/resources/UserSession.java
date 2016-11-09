@@ -24,7 +24,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.pac4j.core.profile.CommonProfile;
+import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
+import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JCallback;
 import org.pac4j.jax.rs.annotations.Pac4JLogout;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
@@ -50,17 +51,19 @@ public class UserSession {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public UserData getUserData(@Pac4JProfile CommonProfile profile) {
+    public User getUserData(@Pac4JProfile CockpitProfile profile) {
         LOG.debug("Returning infos for {}", profile.getId());
 
-        return new UserData(profile.getId(), profile.getDisplayName());
+        DbUser user = profile.getUser();
+
+        return new User(user.getUsername(), user.getName());
     }
 
     @GET
     @Path("/session")
     @Produces(MediaType.APPLICATION_JSON)
     @Pac4JSecurity(authorizers = "isAuthenticated")
-    public UserData status(@Pac4JProfile CommonProfile profile) {
+    public User status(@Pac4JProfile CockpitProfile profile) {
         return getUserData(profile);
     }
 
@@ -76,13 +79,13 @@ public class UserSession {
     public void logout() {
     }
 
-    public static class UserData {
+    public static class User {
 
         private final String username;
 
         private final String name;
 
-        public UserData(@NotEmpty @JsonProperty("username") String username,
+        public User(@NotEmpty @JsonProperty("username") String username,
                 @NotEmpty @JsonProperty("name") String name) {
             this.username = username;
             this.name = name;

@@ -16,22 +16,24 @@
  */
 package org.ow2.petals.cockpit.server.commands;
 
+import java.util.Optional;
+
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.db.UsersDAO;
+import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
+import org.skife.jdbi.v2.DBI;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.allanbank.mongodb.MongoClient;
-import com.allanbank.mongodb.MongoCollection;
-import com.allanbank.mongodb.MongoDatabase;
-import com.allanbank.mongodb.bson.Document;
-import com.allanbank.mongodb.bson.builder.BuilderFactory;
-import com.allanbank.mongodb.bson.builder.DocumentBuilder;
-import com.allanbank.mongodb.builder.Index;
-import com.allanbank.mongodb.builder.QueryBuilder;
-
-import io.dropwizard.cli.ConfiguredCommand;
+import io.dropwizard.Application;
+import io.dropwizard.Configuration;
+import io.dropwizard.cli.EnvironmentCommand;
+import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
+import io.dropwizard.util.Generics;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
@@ -41,12 +43,21 @@ import net.sourceforge.argparse4j.inf.Subparser;
  * @author vnoel
  *
  */
-public class AddUserCommand extends ConfiguredCommand<CockpitConfiguration> {
+public class AddUserCommand<C extends CockpitConfiguration> extends EnvironmentCommand<C> {
 
     private static final PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
 
-    public AddUserCommand() {
-        super("add-user", "Add a user to the database");
+    private Application<C> app;
+
+    public AddUserCommand(Application<C> app) {
+        super(app, "add-user", "Add a user to the database");
+        this.app = app;
+    }
+
+    @Override
+    protected Class<C> getConfigurationClass() {
+        // because we subclass the configuration type in the application, the command itself has not enough information
+        return Generics.getTypeParameter(app.getClass(), Configuration.class);
     }
 
     @Override
@@ -60,32 +71,44 @@ public class AddUserCommand extends ConfiguredCommand<CockpitConfiguration> {
     }
 
     @Override
-    protected void run(@Nullable Bootstrap<CockpitConfiguration> bootstrap, @Nullable Namespace namespace,
-            CockpitConfiguration configuration) throws Exception {
-        assert namespace != null;
-        try (final MongoClient client = configuration.getDatabaseFactory().buildClient(null)) {
-            final MongoDatabase db = client.getDatabase(configuration.getDatabaseFactory().getDatabase());
+    protected void run(@Nullable Bootstrap<C> bootstrap, @Nullable Namespace namespace, C configuration)
+            throws Exception {
 
-            addUser(db, namespace);
-        }
+        configuration.getDataSourceFactory().asSingleConnectionPool();
+
+        super.run(bootstrap, namespace, configuration);
     }
 
-    private void addUser(MongoDatabase db, Namespace namespace) {
+    @Override
+    protected void run(@Nullable Environment environment, @Nullable Namespace namespace, @NonNull C configuration)
+            throws Exception {
+        assert namespace != null;
+        assert environment != null;
+
         final String username = namespace.getString("username");
-        final MongoCollection users = db.getCollection("users");
-        // TODO move that in a command to initialize the db
-        // TODO check it is the correct way to create the index (because text is maybe not...)
-        users.createIndex(Index.text("username"));
-        final Document user = users.findOne(QueryBuilder.where("username").equals(username));
-        if (user == null) {
-            final DocumentBuilder builder = BuilderFactory.start();
-            builder.add("username", username);
-            builder.add("password", pwEncoder.encode(namespace.getString("password")));
-            builder.add("display_name", namespace.getString("name"));
-            users.insert(builder.build());
-            System.out.println("Added user " + username);
-        } else {
-            throw new IllegalArgumentException("User " + username + " already exists");
-        }
+        // it is required
+        assert username != null;
+
+        String password = namespace.getString("password");
+        // required
+        assert password != null;
+
+        String name = namespace.getString("name");
+        // required
+        assert name != null;
+
+        final DBIFactory factory = new DBIFactory();
+        final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "cockpit");
+
+        jdbi.withHandle(h -> {
+            UsersDAO users = h.attach(UsersDAO.class);
+            Optional<DbUser> mu = users.create(username, pwEncoder.encode(password), name);
+            if (mu.isPresent()) {
+                System.out.println("Added user " + username);
+            } else {
+                System.err.println("User " + username + " already exists");
+            }
+            return null;
+        });
     }
 }
