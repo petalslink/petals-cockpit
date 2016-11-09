@@ -32,6 +32,9 @@ import { workspaceFactory } from './workspace.state';
 // our helpers
 import { escapeStringRegexp } from '../helpers/helper';
 
+// our reducers
+import { USR_IS_DISCONNECTED } from './user.reducer';
+
 // actions
 export const FETCH_WORKSPACE = 'FETCH_WORKSPACE';
 export const FETCH_WORKSPACE_SUCCESS = 'FETCH_WORKSPACE_SUCCESS';
@@ -203,6 +206,10 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
       .set('selectedContainerId', action.payload.selectedContainerId)
       .set('selectedComponentId', action.payload.selectedComponentId)
       .set('selectedServiceUnitId', action.payload.selectedServiceUnitId);
+  }
+
+  if (action.type === USR_IS_DISCONNECTED) {
+    return workspaceFactory();
   }
 
   return workspaceR;

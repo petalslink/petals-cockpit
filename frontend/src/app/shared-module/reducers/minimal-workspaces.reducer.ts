@@ -26,6 +26,9 @@ import { IMinimalWorkspacesRecord, IMinimalWorkspace } from '../interfaces/minim
 import { minimalWorkspacesFactory } from './minimal-workspaces.state';
 import { FETCH_WORKSPACE, FETCH_WORKSPACE_FAILED, FETCH_WORKSPACE_SUCCESS } from './workspace.reducer';
 
+// our reducers
+import { USR_IS_DISCONNECTED } from './user.reducer';
+
 // actions
 export const FETCH_WORKSPACES = 'FETCH_WORKSPACES';
 export const FETCH_WORKSPACES_SUCCESS = 'FETCH_WORKSPACES_SUCCESS';
@@ -85,6 +88,10 @@ function createMinimalWorkspacesReducer(minWorkspacesR: IMinimalWorkspacesRecord
 
   else if (action.type === ADD_WORKSPACE_FAILED) {
     return minWorkspacesR.set('addingWorkspace', false);
+  }
+
+  if (action.type === USR_IS_DISCONNECTED) {
+    return minimalWorkspacesFactory();
   }
 
   return minWorkspacesR;

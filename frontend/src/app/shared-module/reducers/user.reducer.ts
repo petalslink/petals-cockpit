@@ -56,13 +56,7 @@ function createUserReducer (userR: IUserRecord = userFactory(), action: Action) 
               .setIn(['connectionFailed'], false);
 
     case USR_IS_DISCONNECTED:
-      return userR
-              .setIn(['name'], null)
-              .setIn(['username'], null)
-              .setIn(['isConnected'], false)
-              .setIn(['isConnecting'], false)
-              .setIn(['isDisconnecting'], false)
-              .setIn(['connectionFailed'], false);
+      return userFactory();
 
     case USR_CONNECTION_FAILED:
       return userR
