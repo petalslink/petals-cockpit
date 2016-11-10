@@ -39,10 +39,16 @@ import { IWorkspace } from './../interfaces/workspace.interface';
 
 // our services
 import { SseService } from '../services/sse.service';
+import { UserService } from '../services/user.service';
 
 @Injectable()
 export class WorkspaceMockService {
-  constructor(private http: Http, private store$: Store<IStore>, private sseService: SseService) { }
+  constructor(
+    private http: Http,
+    private store$: Store<IStore>,
+    private sseService: SseService,
+    private userService: UserService
+  ) { }
 
   updateWorkspaces(): Observable<Response> {
     return this.http.get('/mocks-json/workspaces.json')
@@ -51,7 +57,7 @@ export class WorkspaceMockService {
       .map(workspaces => {
         return <Response> {
           ok: true,
-          json: function () {
+          json: () => {
             return workspaces;
           }
         };
@@ -63,9 +69,11 @@ export class WorkspaceMockService {
       .map((res: Response) => res.json())
       .delay(environment.httpDelay)
       .map((workspace: IWorkspace) => {
+        this.userService.adminUser.lastWorkspace = idWorkspace;
+
         return <Response> {
           ok: true,
-          json: function () {
+          json: () => {
             return workspace;
           }
         };
@@ -90,7 +98,7 @@ export class WorkspaceMockService {
 
               observer.next({
                 ok: true,
-                json: function () {
+                json: () => {
                   return emptyWorkspace;
                 }
               });
@@ -145,7 +153,7 @@ export class WorkspaceMockService {
       .map(config => {
         return <Response> {
           ok: true,
-          json: function () {
+          json: () => {
             return config;
           }
         };

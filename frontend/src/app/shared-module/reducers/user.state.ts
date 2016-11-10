@@ -27,6 +27,7 @@ export function userFactory(): IUser {
     name: null,
     username: null,
     password: null,
+    lastWorkspace: null,
 
     // for UI
     isConnecting: false,

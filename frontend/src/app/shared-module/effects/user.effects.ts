@@ -70,6 +70,10 @@ export class UserEffects {
           this.router.navigate([this.routeService.urlBeforeRedirectToLogin]);
         }
 
+        else if (user.lastWorkspace) {
+          this.router.navigate([`/cockpit/workspaces/${user.lastWorkspace}`]);
+        }
+
         else {
           this.router.navigate(['/cockpit']);
         }
@@ -96,7 +100,6 @@ export class UserEffects {
 
         this.router.navigate(['/login']);
 
-        // TODO : clear user data once disconnected !
         return { type: UserActions.USR_IS_DISCONNECTED };
       })
       .catch((err) => {
