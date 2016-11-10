@@ -22,8 +22,12 @@ import { fromJS } from 'immutable';
 import { ActionReducer, Action } from '@ngrx/store';
 
 // our interfaces
-import { IMinimalWorkspacesRecord, IMinimalWorkspace } from '../interfaces/minimal-workspaces.interface';
-import { minimalWorkspacesFactory } from './minimal-workspaces.state';
+import { IMinimalWorkspaceRecord, IMinimalWorkspacesRecord } from '../interfaces/minimal-workspaces.interface';
+
+// our states
+import { minimalWorkspacesRecordFactory } from './minimal-workspaces.state';
+
+// our actions
 import { FETCH_WORKSPACE, FETCH_WORKSPACE_FAILED, FETCH_WORKSPACE_SUCCESS } from './workspace.reducer';
 
 // our reducers
@@ -38,7 +42,7 @@ export const ADD_WORKSPACE = 'ADD_WORKSPACE';
 export const ADD_WORKSPACE_SUCCESS = 'ADD_WORKSPACE_SUCCESS';
 export const ADD_WORKSPACE_FAILED = 'ADD_WORKSPACE_FAILED';
 
-function createMinimalWorkspacesReducer(minWorkspacesR: IMinimalWorkspacesRecord = minimalWorkspacesFactory(), action: Action) {
+function createMinimalWorkspacesReducer(minWorkspacesR: IMinimalWorkspacesRecord = minimalWorkspacesRecordFactory(), action: Action) {
   if (action.type === FETCH_WORKSPACES) {
     return minWorkspacesR.setIn(['fetchingWorkspaces'], true);
   }
@@ -76,14 +80,12 @@ function createMinimalWorkspacesReducer(minWorkspacesR: IMinimalWorkspacesRecord
   }
 
   else if (action.type === ADD_WORKSPACE_SUCCESS) {
-    let newMinimalWorkspace: IMinimalWorkspace;
+    let newMinimalWorkspace: IMinimalWorkspaceRecord;
     newMinimalWorkspace = fromJS(action.payload);
 
     return minWorkspacesR
       .set('addingWorkspace', false)
-      .set('minimalWorkspaces',
-        minWorkspacesR.get('minimalWorkspaces').push(newMinimalWorkspace)
-      );
+      .update('minimalWorkspaces', arr => arr.push(newMinimalWorkspace));
   }
 
   else if (action.type === ADD_WORKSPACE_FAILED) {
