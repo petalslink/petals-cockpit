@@ -19,7 +19,6 @@ package org.ow2.petals.cockpit.server.actors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.ws.rs.core.MediaType;
 
@@ -39,6 +38,7 @@ import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusTree;
 import org.ow2.petals.cockpit.server.resources.BusesResource.ComponentTree;
@@ -49,7 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.actors.BasicActor;
@@ -75,15 +74,12 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
     @Nullable
     private static ServiceLocator serviceLocator;
 
-    /**
-     * This needs to have only ONE thread because petals-admin uses a singleton which prevent concurrent use
-     */
-    private static final ExecutorService exec = Executors.newFixedThreadPool(1,
-            new ThreadFactoryBuilder().setNameFormat("petals-admin-worker-%d").setDaemon(true).build());
-
     private final long id;
 
     private final SseBroadcaster broadcaster = new SseBroadcaster();
+
+    @Nullable
+    private ExecutorService executor;
 
     public WorkspaceActor(long id) {
         this.id = id;
@@ -103,6 +99,11 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
 
     public static void setServiceLocator(ServiceLocator sl) {
         serviceLocator = sl;
+    }
+
+    private static ServiceLocator serviceLocator() {
+        assert serviceLocator != null;
+        return serviceLocator;
     }
 
     @Suspendable
@@ -125,6 +126,8 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
     @Override
     @SuppressWarnings("squid:S2189")
     protected Void doRun() throws InterruptedException, SuspendExecution {
+        executor = serviceLocator().getService(ExecutorService.class, CockpitApplication.PETALS_ADMIN_ES);
+
         for (;;) {
             Msg msg = receive();
             if (msg instanceof NewClient) {
@@ -137,7 +140,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                 new Fiber<>(() -> {
                     WorkspaceEvent ev;
                     try {
-                        BusTree tree = FiberAsync.runBlocking(exec,
+                        BusTree tree = FiberAsync.runBlocking(executor,
                                 (CheckedCallable<BusTree, Exception>) () -> doImportBus(bus));
                         ev = WorkspaceEvent.ok(bus.id, tree);
                     } catch (Exception e) {

@@ -16,6 +16,8 @@
  */
 package org.ow2.petals.cockpit.server;
 
+import java.util.concurrent.ExecutorService;
+
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
@@ -61,6 +63,8 @@ import io.dropwizard.setup.Environment;
  *
  */
 public class CockpitApplication<C extends CockpitConfiguration> extends Application<C> {
+
+    public static final String PETALS_ADMIN_ES = "petals-admin-exec-service";
 
     private static final Logger LOG = LoggerFactory.getLogger(CockpitApplication.class);
 
@@ -117,10 +121,15 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         // activate session management in jetty
         environment.servlets().setSessionHandler(new SessionHandler());
 
+        // This needs to have only ONE thread because petals-admin uses a singleton which prevent concurrent use
+        ExecutorService petalsAdminES = environment.lifecycle().executorService("petals-admin-worker-%d").maxThreads(1)
+                .build();
+
         environment.jersey().register(new AbstractBinder() {
             @Override
             protected void configure() {
                 bind(configuration).to(CockpitConfiguration.class);
+                bind(petalsAdminES).named(PETALS_ADMIN_ES).to(ExecutorService.class);
                 bind(users).to(UsersDAO.class);
                 bind(workspaces).to(WorkspacesDAO.class);
                 bind(jdbi).to(DBI.class);
