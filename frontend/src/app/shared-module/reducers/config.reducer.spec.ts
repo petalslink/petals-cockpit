@@ -16,7 +16,7 @@
  */
 
 import { ConfigReducer, TOGGLE_THEME } from './config.reducer';
-import { configFactory } from './config.state';
+import { configRecordFactory } from './config.state';
 import { IConfig } from './../interfaces/config.interface';
 import { IConfigRecord } from './../interfaces/config.interface';
 
@@ -24,7 +24,7 @@ describe(`Config Reducer`, () => {
   let state;
 
   beforeAll(() => {
-    state = configFactory();
+    state = configRecordFactory();
   });
 
   // DEFAULT

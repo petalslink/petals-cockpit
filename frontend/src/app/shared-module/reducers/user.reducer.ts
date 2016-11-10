@@ -20,7 +20,9 @@ import { ActionReducer, Action } from '@ngrx/store';
 
 // our interfaces
 import { IUserRecord } from '../interfaces/user.interface';
-import { userFactory } from './user.state';
+
+// our states
+import { userRecordFactory } from './user.state';
 
 // actions
 export const USR_IS_CONNECTING = 'USR_IS_CONNECTING';
@@ -30,7 +32,7 @@ export const USR_IS_DISCONNECTED = 'USR_IS_DISCONNECTED';
 export const USR_CONNECTION_FAILED = 'USR_CONNECTION_FAILED';
 export const USR_DISCONNECTION_FAILED = 'USR_DISCONNECTION_FAILED';
 
-function createUserReducer (userR: IUserRecord = userFactory(), action: Action) {
+function createUserReducer (userR: IUserRecord = userRecordFactory(), action: Action) {
   switch (action.type) {
     case USR_IS_CONNECTING:
       return userR
@@ -56,7 +58,7 @@ function createUserReducer (userR: IUserRecord = userFactory(), action: Action) 
               .setIn(['connectionFailed'], false);
 
     case USR_IS_DISCONNECTED:
-      return userFactory();
+      return userRecordFactory();
 
     case USR_CONNECTION_FAILED:
       return userR

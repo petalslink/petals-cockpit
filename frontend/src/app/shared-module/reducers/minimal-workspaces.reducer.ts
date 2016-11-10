@@ -91,7 +91,7 @@ function createMinimalWorkspacesReducer(minWorkspacesR: IMinimalWorkspacesRecord
   }
 
   if (action.type === USR_IS_DISCONNECTED) {
-    return minimalWorkspacesFactory();
+    return minimalWorkspacesRecordFactory();
   }
 
   return minWorkspacesR;

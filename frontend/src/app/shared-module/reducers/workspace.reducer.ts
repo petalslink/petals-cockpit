@@ -27,7 +27,9 @@ import { Observable } from 'rxjs';
 // our interfaces
 import { IStore } from '../interfaces/store.interface';
 import { IWorkspaceRecord } from '../interfaces/workspace.interface';
-import { workspaceFactory } from './workspace.state';
+
+// our states
+import { workspaceRecordFactory } from './workspace.state';
 
 // our helpers
 import { escapeStringRegexp } from '../helpers/helper';
@@ -65,7 +67,7 @@ export const FETCH_BUS_CONFIG_FAILED = 'FETCH_BUS_CONFIG_FAILED';
 
 export const SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT = 'SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT';
 
-function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(), action: Action) {
+function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFactory(), action: Action) {
   if (action.type === FETCH_WORKSPACE) {
     return workspaceR.setIn(['fetchingWorkspace'], true);
   }
@@ -209,7 +211,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
   }
 
   if (action.type === USR_IS_DISCONNECTED) {
-    return workspaceFactory();
+    return workspaceRecordFactory();
   }
 
   return workspaceR;

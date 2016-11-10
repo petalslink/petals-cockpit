@@ -15,18 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { makeTypedFactory } from 'typed-immutable-record';
+// our helpers
+import { makeTypedFactory } from '../helpers/helper';
+
+// our interfaces
 import { IUser, IUserRecord } from '../interfaces/user.interface';
 
-export const userFactory = makeTypedFactory<IUser, IUserRecord>({
-  // from server
-  name: null,
-  username: null,
-  password: null,
+export function userFactory(): IUser {
+  return {
+    // from server
+    name: null,
+    username: null,
+    password: null,
 
-  // for UI
-  isConnecting: false,
-  isDisconnecting: false,
-  isConnected: false,
-  connectionFailed: false
-});
+    // for UI
+    isConnecting: false,
+    isDisconnecting: false,
+    isConnected: false,
+    connectionFailed: false
+  };
+}
+
+export const userRecordFactory = makeTypedFactory<IUser, IUserRecord>(userFactory());

@@ -16,14 +16,14 @@
  */
 
 // our interfaces
-import { IWorkspaceRecord } from './workspace.interface';
-import { IMinimalWorkspacesRecord } from './minimal-workspaces.interface';
-import { IUserRecord } from './user.interface';
-import { IConfigRecord } from './config.interface';
+import { IWorkspace } from './workspace.interface';
+import { IMinimalWorkspaces } from './minimal-workspaces.interface';
+import { IUser } from './user.interface';
+import { IConfig } from './config.interface';
 
 export interface IStore {
-  config: IConfigRecord;
-  user: IUserRecord;
-  minimalWorkspaces: IMinimalWorkspacesRecord;
-  workspace: IWorkspaceRecord;
+  config: IConfig;
+  user: IUser;
+  minimalWorkspaces: IMinimalWorkspaces;
+  workspace: IWorkspace;
 };
