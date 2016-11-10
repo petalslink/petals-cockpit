@@ -15,27 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// our actions
 import { ConfigReducer, TOGGLE_THEME } from './config.reducer';
+
+// our states
 import { configRecordFactory } from './config.state';
-import { IConfig } from './../interfaces/config.interface';
+
+// our interfaces
 import { IConfigRecord } from './../interfaces/config.interface';
 
 describe(`Config Reducer`, () => {
-  let state;
+  let stateR: IConfigRecord;
 
   beforeAll(() => {
-    state = configRecordFactory();
+    stateR = configRecordFactory();
   });
 
   // DEFAULT
   it(`should return the same state (reference) if action.type doesn't match existing action`, () => {
-    let nextState: IConfigRecord = ConfigReducer(state, {type: ''});
+    let nextStateR: IConfigRecord = ConfigReducer(stateR, {type: ''});
 
-    expect(state === nextState).toBeTruthy();
+    expect(stateR === nextStateR).toBeTruthy();
   });
 
   it(`should have a default state`, () => {
-    let nextState: IConfig = ConfigReducer(state, {type: ''}).toJS();
+    let nextStateR: IConfigRecord = ConfigReducer(stateR, {type: ''});
+    let nextState = nextStateR.toJS();
 
     let defaultState = {
       isDarkTheme: false
@@ -46,7 +51,8 @@ describe(`Config Reducer`, () => {
 
   // TOGGLE_THEME
   it(`should toggle dark theme`, () => {
-    let nextState: IConfig = ConfigReducer(state, {type: TOGGLE_THEME}).toJS();
+    let nextStateR: IConfigRecord = ConfigReducer(stateR, {type: TOGGLE_THEME});
+    let nextState = nextStateR.toJS();
 
     expect(nextState.isDarkTheme).toBeTruthy();
   });

@@ -31,24 +31,25 @@ import {
 import { minimalWorkspacesRecordFactory } from './minimal-workspaces.state';
 
 // our interfaces
-import { IMinimalWorkspaces, IMinimalWorkspacesRecord } from './../interfaces/minimal-workspaces.interface';
+import { IMinimalWorkspacesRecord } from './../interfaces/minimal-workspaces.interface';
 
 describe(`Minimal Workspaces Reducer`, () => {
-  let state: IMinimalWorkspacesRecord;
+  let stateR: IMinimalWorkspacesRecord;
 
   beforeAll(() => {
-    state = minimalWorkspacesRecordFactory();
+    stateR = minimalWorkspacesRecordFactory();
   });
 
   // DEFAULT
   it(`should return the same state (reference) if action.type doesn't match existing action`, () => {
-    let nextState: IMinimalWorkspaces = MinimalWorkspacesReducer(state, { type: '' });
+    let nextStateR: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(stateR, { type: '' });
 
-    expect(state === nextState).toBeTruthy();
+    expect(stateR === nextStateR).toBeTruthy();
   });
 
   it(`should have a default state`, () => {
-    let nextState: IMinimalWorkspaces = MinimalWorkspacesReducer(state, { type: '' }).toJS();
+    let nextStateR: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(stateR, { type: '' });
+    let nextState = nextStateR.toJS();
 
     let defaultState = {
       // from server
@@ -65,22 +66,26 @@ describe(`Minimal Workspaces Reducer`, () => {
 
   // FETCH_WORKSPACES*
   it(`${FETCH_WORKSPACES}: should toggle the flag fetching fetchingWorkspaces to true`, () => {
-    let nextState: IMinimalWorkspaces = MinimalWorkspacesReducer(state, { type: FETCH_WORKSPACES }).toJS();
+    let nextStateR: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(stateR, { type: FETCH_WORKSPACES });
+    let nextState = nextStateR.toJS();
 
     expect(nextState.fetchingWorkspaces).toBeTruthy();
   });
 
   it(`${FETCH_WORKSPACES_FAILED}: should toggle the flag fetching fetchingWorkspaces to false`, () => {
-    let nextState: IMinimalWorkspaces = MinimalWorkspacesReducer(state, { type: FETCH_WORKSPACES_FAILED }).toJS();
+    let nextStateR: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(stateR, { type: FETCH_WORKSPACES_FAILED });
+    let nextState = nextStateR.toJS();
 
     expect(nextState.fetchingWorkspaces).toBeFalsy();
   });
 
   it(`${FETCH_WORKSPACES_SUCCESS}`, () => {
-    let nextState: IMinimalWorkspaces = MinimalWorkspacesReducer(state, {
+    let nextStateR: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(stateR, {
       type: FETCH_WORKSPACES_SUCCESS,
       payload: [1, 2]
-    }).toJS();
+    });
+
+    let nextState = nextStateR.toJS();
 
     let expectedState = {
       fetchingWorkspaces: false,
@@ -92,10 +97,12 @@ describe(`Minimal Workspaces Reducer`, () => {
 
   // FETCH_WORKSPACE*
   it(`${FETCH_WORKSPACE}`, () => {
-    let nextState: IMinimalWorkspaces = MinimalWorkspacesReducer(state, {
+    let nextStateR: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(stateR, {
       type: FETCH_WORKSPACE,
       payload: 'idOfSomeWorkspace'
-    }).toJS();
+    });
+
+    let nextState = nextStateR.toJS();
 
     let expectedState = {
       fetchingWorkspaceWithId: 'idOfSomeWorkspace'
@@ -105,7 +112,8 @@ describe(`Minimal Workspaces Reducer`, () => {
   });
 
   it(`${FETCH_WORKSPACE_FAILED}`, () => {
-    let nextState: IMinimalWorkspaces = MinimalWorkspacesReducer(state, { type: FETCH_WORKSPACE_FAILED }).toJS();
+    let nextStateR: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(stateR, { type: FETCH_WORKSPACE_FAILED });
+    let nextState = nextStateR.toJS();
 
     let expectedState = {
       fetchingWorkspaceWithId: null
@@ -115,7 +123,8 @@ describe(`Minimal Workspaces Reducer`, () => {
   });
 
   it(`${FETCH_WORKSPACE_SUCCESS}`, () => {
-    let nextState: IMinimalWorkspaces = MinimalWorkspacesReducer(state, { type: FETCH_WORKSPACE_SUCCESS }).toJS();
+    let nextStateR: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(stateR, { type: FETCH_WORKSPACE_SUCCESS });
+    let nextState = nextStateR.toJS();
 
     let expectedState = {
       fetchingWorkspaceWithId: null
@@ -126,13 +135,14 @@ describe(`Minimal Workspaces Reducer`, () => {
 
   // ADD_WORKSPACE*
   it(`${ADD_WORKSPACE}`, () => {
-    let nextState: IMinimalWorkspaces = MinimalWorkspacesReducer(state, { type: ADD_WORKSPACE }).toJS();
+    let nextStateR: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(stateR, { type: ADD_WORKSPACE });
+    let nextState = nextStateR.toJS();
 
     expect(nextState.addingWorkspace).toBeTruthy();
   });
 
   it(`${ADD_WORKSPACE_SUCCESS}`, () => {
-    let nextState1R: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(state, {
+    let nextState1R: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(stateR, {
       type: ADD_WORKSPACE_SUCCESS,
       payload: { id: 'idWorkspace1', name: 'W1', usedBy: 'Only me' }
      });
@@ -168,7 +178,8 @@ describe(`Minimal Workspaces Reducer`, () => {
   });
 
   it(`${ADD_WORKSPACE_FAILED}`, () => {
-    let nextState: IMinimalWorkspaces = MinimalWorkspacesReducer(state, { type: ADD_WORKSPACE_FAILED }).toJS();
+    let nextStateR: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(stateR, { type: ADD_WORKSPACE_FAILED });
+    let nextState = nextStateR.toJS();
 
     let expectedState = {
       addingWorkspace: false
