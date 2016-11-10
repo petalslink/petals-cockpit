@@ -97,9 +97,11 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     return workspaceR
       .set('fetchingWorkspace', false)
       .set('id', action.payload.id)
-      .set('buses', [])
-      .set('busesInProgress', [])
-      .mergeDeep(fromJS(action.payload.data));
+      .set('buses', List.of())
+      .set('busesInProgress', List.of())
+      .mergeDeep(
+        fromJS(action.payload.data)
+      );
   }
 
   else if (action.type === EDIT_PETALS_SEARCH) {
@@ -145,12 +147,8 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
   /* ADD_BUS* */
   else if (action.type === ADD_BUS_SUCCESS) {
     return workspaceR
-      .set('buses', workspaceR.get('buses').push(fromJS(action.payload)))
-      .set('busesInProgress',
-        workspaceR
-          .get('busesInProgress')
-          .filter((busInP: IWorkspaceRecord) => busInP.get('id') !== action.payload.id)
-      );
+      .update('buses', buses => buses.push(fromJS(action.payload)))
+      .update('busesInProgress', buses => buses.filter((busInP: IWorkspaceRecord) => busInP.get('id') !== action.payload.id));
   }
 
   else if (action.type === ADD_BUS_FAILED) {
