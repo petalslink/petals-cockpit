@@ -28,8 +28,11 @@ import { Store } from '@ngrx/store';
 import { IStore } from '../../../../../../shared-module/interfaces/store.interface';
 import { IWorkspaceRecord, IWorkspace } from '../../../../../../shared-module/interfaces/workspace.interface';
 
+// our selectors
+import { getSearchedWorkspace } from '../../../../../../shared-module/reducers/workspace.reducer';
+
 // our actions
-import { EDIT_PETALS_SEARCH, getSearchedWorkspace } from '../../../../../../shared-module/reducers/workspace.reducer';
+import { WorkspaceActions } from '../../../../../../shared-module/reducers/workspace.actions';
 
 @Component({
   selector: 'app-petals-sidenav-menu',
@@ -52,6 +55,6 @@ export class PetalsSidenavMenuComponent implements OnDestroy {
   }
 
   search(textSearch) {
-    this.store$.dispatch({ type: EDIT_PETALS_SEARCH, payload: textSearch });
+    this.store$.dispatch({ type: WorkspaceActions.EDIT_PETALS_SEARCH, payload: textSearch });
   }
 }

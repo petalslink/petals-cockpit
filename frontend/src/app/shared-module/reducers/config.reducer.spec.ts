@@ -15,14 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// our interfaces
+import { IConfigRecord } from './../interfaces/config.interface';
+
+// our reducers
+import { ConfigReducer } from './config.reducer';
+
 // our actions
-import { ConfigReducer, TOGGLE_THEME } from './config.reducer';
+import { ConfigActions } from './config.actions';
 
 // our states
 import { configRecordFactory } from './config.state';
-
-// our interfaces
-import { IConfigRecord } from './../interfaces/config.interface';
 
 describe(`Config Reducer`, () => {
   let stateR: IConfigRecord;
@@ -51,7 +54,7 @@ describe(`Config Reducer`, () => {
 
   // TOGGLE_THEME
   it(`should toggle dark theme`, () => {
-    let nextStateR: IConfigRecord = ConfigReducer(stateR, {type: TOGGLE_THEME});
+    let nextStateR: IConfigRecord = ConfigReducer(stateR, {type: ConfigActions.TOGGLE_THEME});
     let nextState = nextStateR.toJS();
 
     expect(nextState.isDarkTheme).toBeTruthy();

@@ -15,11 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// angular modules
 import { Component, OnDestroy } from '@angular/core';
+
+// ngrx
 import { Store } from '@ngrx/store';
+
+// rxjs
 import { Subscription } from 'rxjs';
 
-import { TOGGLE_THEME } from '../reducers/config.reducer';
+// our actions
+import { ConfigActions } from '../reducers/config.actions';
+
+// our interfaces
 import { IStore } from '../interfaces/store.interface';
 import { IConfig, IConfigRecord } from '../interfaces/config.interface';
 
@@ -43,6 +51,6 @@ export class ToggleThemeComponent implements OnDestroy {
   }
 
   toggleTheme() {
-    this.store$.dispatch({ type: TOGGLE_THEME });
+    this.store$.dispatch({ type: ConfigActions.TOGGLE_THEME });
   }
 }

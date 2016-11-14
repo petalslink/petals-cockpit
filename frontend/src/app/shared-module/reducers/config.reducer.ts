@@ -24,18 +24,16 @@ import { IConfigRecord } from '../interfaces/config.interface';
 // our states
 import { configRecordFactory } from './config.state';
 
-// our reducers
-import { USR_IS_DISCONNECTED } from './user.reducer';
-
 // actions
-export const TOGGLE_THEME = 'TOGGLE_THEME ';
+import { ConfigActions } from './config.actions';
+import { UserActions } from './user.actions';
 
 function createConfigReducer(configR: IConfigRecord = configRecordFactory(), action: Action) {
   switch (action.type) {
-    case TOGGLE_THEME:
+    case ConfigActions.TOGGLE_THEME:
       return configR.setIn(['isDarkTheme'], !configR.isDarkTheme);
 
-    case USR_IS_DISCONNECTED:
+    case UserActions.USR_IS_DISCONNECTED:
       return configRecordFactory();
 
     default:

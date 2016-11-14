@@ -15,16 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// our reducers
+import { UserReducer } from './user.reducer';
+
 // our actions
-import {
-  UserReducer,
-  USR_IS_CONNECTING,
-  USR_IS_CONNECTED,
-  USR_IS_DISCONNECTING,
-  USR_IS_DISCONNECTED,
-  USR_CONNECTION_FAILED,
-  USR_DISCONNECTION_FAILED
-} from './user.reducer';
+import { UserActions } from './user.actions';
 
 // our states
 import { userRecordFactory } from './user.state';
@@ -54,8 +49,8 @@ describe(`User Reducer`, () => {
   });
 
   // USR_IS_CONNECT*
-  it(`${USR_IS_CONNECTING}`, () => {
-    let nextStateR: IUserRecord = UserReducer(stateR, {type: USR_IS_CONNECTING});
+  it(`${UserActions.USR_IS_CONNECTING}`, () => {
+    let nextStateR: IUserRecord = UserReducer(stateR, {type: UserActions.USR_IS_CONNECTING});
     let nextState = nextStateR.toJS();
 
     let expectedState = {
@@ -68,11 +63,11 @@ describe(`User Reducer`, () => {
     expect(nextState).toEqual(jasmine.objectContaining(expectedState));
   });
 
-  it(`${USR_IS_CONNECTED}`, () => {
+  it(`${UserActions.USR_IS_CONNECTED}`, () => {
     let nextStateR: IUserRecord = UserReducer(
       stateR,
       {
-        type: USR_IS_CONNECTED,
+        type: UserActions.USR_IS_CONNECTED,
         payload: {
           name: 'Some name',
           username: 'Some username'
@@ -94,8 +89,8 @@ describe(`User Reducer`, () => {
   });
 
   // USR_IS_DISCONNECT*
-  it(`${USR_IS_DISCONNECTING}`, () => {
-    let nextStateR: IUserRecord = UserReducer(stateR, { type: USR_IS_DISCONNECTING });
+  it(`${UserActions.USR_IS_DISCONNECTING}`, () => {
+    let nextStateR: IUserRecord = UserReducer(stateR, { type: UserActions.USR_IS_DISCONNECTING });
     let nextState = nextStateR.toJS();
 
     let expectedState = {
@@ -108,16 +103,16 @@ describe(`User Reducer`, () => {
     expect(nextState).toEqual(jasmine.objectContaining(expectedState));
   });
 
-  it(`${USR_IS_DISCONNECTED}`, () => {
-    let nextStateR: IUserRecord = UserReducer(stateR, { type: USR_IS_DISCONNECTED });
+  it(`${UserActions.USR_IS_DISCONNECTED}`, () => {
+    let nextStateR: IUserRecord = UserReducer(stateR, { type: UserActions.USR_IS_DISCONNECTED });
     let nextState = nextStateR.toJS();
 
     expect(nextState).toEqual(userRecordFactory().toJS());
   });
 
   // USR_CONNECTION_FAILED
-  it(`${USR_CONNECTION_FAILED}`, () => {
-    let nextStateR: IUserRecord = UserReducer(stateR, { type: USR_CONNECTION_FAILED });
+  it(`${UserActions.USR_CONNECTION_FAILED}`, () => {
+    let nextStateR: IUserRecord = UserReducer(stateR, { type: UserActions.USR_CONNECTION_FAILED });
     let nextState = nextStateR.toJS();
 
     let expectedState = {
@@ -131,8 +126,8 @@ describe(`User Reducer`, () => {
   });
 
   // USR_DISCONNECTION_FAILED
-  it(`${USR_DISCONNECTION_FAILED}`, () => {
-    let nextStateR: IUserRecord = UserReducer(stateR, { type: USR_DISCONNECTION_FAILED });
+  it(`${UserActions.USR_DISCONNECTION_FAILED}`, () => {
+    let nextStateR: IUserRecord = UserReducer(stateR, { type: UserActions.USR_DISCONNECTION_FAILED });
     let nextState = nextStateR.toJS();
 
     let expectedState = {

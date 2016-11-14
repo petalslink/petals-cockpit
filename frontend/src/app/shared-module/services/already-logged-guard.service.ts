@@ -34,7 +34,7 @@ import { UserService } from './user.service';
 import { RouteService } from './route.service';
 
 // our actions
-import { USR_IS_CONNECTED } from '../reducers/user.reducer';
+import { UserActions } from '../reducers/user.actions';
 
 // our interfaces
 import { IStore } from '../interfaces/store.interface';
@@ -57,7 +57,7 @@ export class AlreadyLoggedGuardService implements CanActivate {
         if (res.ok) {
           let user: IUser = res.json();
 
-          this.store.dispatch({ type: USR_IS_CONNECTED, payload: user });
+          this.store.dispatch({ type: UserActions.USR_IS_CONNECTED, payload: user });
 
           this.router.navigate(['/cockpit']);
           return false;
