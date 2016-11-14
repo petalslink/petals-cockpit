@@ -36,8 +36,8 @@ import {
 import { IWorkspace, IWorkspaceRecord } from '../../../../shared-module/interfaces/workspace.interface';
 
 // our actions
-import { FETCH_WORKSPACE } from '../../../../shared-module/reducers/workspace.reducer';
-import { ADD_WORKSPACE } from '../../../../shared-module/reducers/minimal-workspaces.reducer';
+import { WorkspaceActions } from '../../../../shared-module/reducers/workspace.actions';
+import { MinimalWorkspacesActions } from '../../../../shared-module/reducers/minimal-workspaces.actions';
 
 // import
 @Component({
@@ -87,11 +87,11 @@ export class WorkspacesComponent implements OnDestroy {
   }
 
   selectWorkspace(workspaceId: string) {
-    this.store$.dispatch({ type: FETCH_WORKSPACE, payload: workspaceId });
+    this.store$.dispatch({ type: WorkspaceActions.FETCH_WORKSPACE, payload: workspaceId });
   }
 
   addWorkspace(name: string) {
-    this.store$.dispatch({ type: ADD_WORKSPACE, payload: name });
+    this.store$.dispatch({ type: MinimalWorkspacesActions.ADD_WORKSPACE, payload: name });
   }
 
   toggleAddPanel() {

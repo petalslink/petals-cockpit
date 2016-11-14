@@ -15,10 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { makeTypedFactory } from 'typed-immutable-record';
+// our helpers
+import { makeTypedFactory } from '../helpers/helper';
 
+// our interfaces
 import { IConfig, IConfigRecord } from '../interfaces/config.interface';
 
-export const configFactory = makeTypedFactory<IConfig, IConfigRecord>({
-  isDarkTheme: false
-});
+export function configFactory(): IConfig {
+  return {
+    isDarkTheme: false
+  };
+}
+
+export const configRecordFactory = makeTypedFactory<IConfig, IConfigRecord>(configFactory());

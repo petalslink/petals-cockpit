@@ -26,7 +26,6 @@ import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 // our actions
-import { USR_IS_DISCONNECTING } from '../../../shared-module/reducers/user.reducer';
 
 // our interfaces
 import { IStore } from '../../../shared-module/interfaces/store.interface';
@@ -39,11 +38,9 @@ import {
 import { IWorkspaceRecord, IWorkspace } from '../../../shared-module/interfaces/workspace.interface';
 
 // our actions
-import { FETCH_WORKSPACES } from '../../../shared-module/reducers/minimal-workspaces.reducer';
-import {
-  FETCH_WORKSPACE,
-  SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT
-} from '../../../shared-module/reducers/workspace.reducer';
+import { UserActions } from '../../../shared-module/reducers/user.actions';
+import { MinimalWorkspacesActions } from '../../../shared-module/reducers/minimal-workspaces.actions';
+import { WorkspaceActions } from '../../../shared-module/reducers/workspace.actions';
 
 interface ITabs extends Array<{ title: string, url: string }> {};
 
@@ -113,7 +110,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.store$.dispatch({ type: FETCH_WORKSPACES });
+    this.store$.dispatch({ type: MinimalWorkspacesActions.FETCH_WORKSPACES });
 
     this.route.firstChild.firstChild.params.map(params => params['idWorkspace'])
       .filter(idWorkspace => typeof idWorkspace !== 'undefined')
@@ -123,7 +120,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
       // this avoid to call change workspace twice in some cases
       .take(1)
       .map((idWorkspace: string) => {
-        this.store$.dispatch({ type: FETCH_WORKSPACE, payload: idWorkspace });
+        this.store$.dispatch({ type: WorkspaceActions.FETCH_WORKSPACE, payload: idWorkspace });
       }).subscribe();
 
     const rePetals = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals/;
@@ -156,7 +153,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
         let reRslt = rePetalsBusContCompSu.exec(url);
 
         this.store$.dispatch({
-            type: SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT,
+            type: WorkspaceActions.SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT,
             payload: {
               selectedBusId: (reRslt !== null && typeof reRslt[1] !== 'undefined' ? reRslt[1] : null),
               selectedContainerId: (reRslt !== null && typeof reRslt[2] !== 'undefined' ? reRslt[2] : null),
@@ -175,6 +172,6 @@ export class CockpitComponent implements OnInit, OnDestroy {
   }
 
   disconnectUser() {
-    this.store$.dispatch({ type: USR_IS_DISCONNECTING });
+    this.store$.dispatch({ type: UserActions.USR_IS_DISCONNECTING });
   }
 }

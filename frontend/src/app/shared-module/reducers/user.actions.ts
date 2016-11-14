@@ -15,25 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// our helpers
-import { makeTypedFactory } from '../helpers/helper';
-
-// our interfaces
-import { IUser, IUserRecord } from '../interfaces/user.interface';
-
-export function userFactory(): IUser {
-  return {
-    // from server
-    name: null,
-    username: null,
-    password: null,
-
-    // for UI
-    isConnecting: false,
-    isDisconnecting: false,
-    isConnected: false,
-    connectionFailed: false
-  };
-}
-
-export const userRecordFactory = makeTypedFactory<IUser, IUserRecord>(userFactory());
+export const UserActions = {
+  USR_IS_CONNECTING: 'USR_IS_CONNECTING',
+  USR_IS_CONNECTED: 'USR_IS_CONNECTED',
+  USR_IS_DISCONNECTING: 'USR_IS_DISCONNECTING',
+  USR_IS_DISCONNECTED: 'USR_IS_DISCONNECTED',
+  USR_CONNECTION_FAILED: 'USR_CONNECTION_FAILED',
+  USR_DISCONNECTION_FAILED: 'USR_DISCONNECTION_FAILED'
+};

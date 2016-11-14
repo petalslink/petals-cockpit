@@ -20,21 +20,21 @@ import { ActionReducer, Action } from '@ngrx/store';
 
 // our interfaces
 import { IConfigRecord } from '../interfaces/config.interface';
-import { configFactory } from './config.state';
 
-// our reducers
-import { USR_IS_DISCONNECTED } from './user.reducer';
+// our states
+import { configRecordFactory } from './config.state';
 
 // actions
-export const TOGGLE_THEME = 'TOGGLE_THEME ';
+import { ConfigActions } from './config.actions';
+import { UserActions } from './user.actions';
 
-function createConfigReducer(configR: IConfigRecord = configFactory(), action: Action) {
+function createConfigReducer(configR: IConfigRecord = configRecordFactory(), action: Action) {
   switch (action.type) {
-    case TOGGLE_THEME:
-      return configR.setIn(['isDarkTheme'], !configR.isDarkTheme);
+    case ConfigActions.TOGGLE_THEME:
+      return configR.set('isDarkTheme', !configR.isDarkTheme);
 
-    case USR_IS_DISCONNECTED:
-      return configFactory();
+    case UserActions.USR_IS_DISCONNECTED:
+      return configRecordFactory();
 
     default:
       return configR;

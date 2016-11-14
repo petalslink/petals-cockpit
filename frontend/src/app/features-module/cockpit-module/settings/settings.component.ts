@@ -28,7 +28,7 @@ import { TranslateService } from 'ng2-translate';
 import { Subscription } from 'rxjs';
 
 // our actions
-import { TOGGLE_THEME } from '../../../shared-module/reducers/config.reducer';
+import { ConfigActions } from '../../../shared-module/reducers/config.actions';
 
 // our interfaces
 import { IConfigRecord, IConfig } from '../../../shared-module/interfaces/config.interface';
@@ -57,7 +57,7 @@ export class SettingsComponent implements OnDestroy {
   }
 
   toggleTheme() {
-    this.store$.dispatch({ type: TOGGLE_THEME });
+    this.store$.dispatch({ type: ConfigActions.TOGGLE_THEME });
   }
 
   changeLanguageTo() {

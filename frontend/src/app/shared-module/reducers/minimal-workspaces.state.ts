@@ -15,18 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// immutable
-import { makeTypedFactory } from 'typed-immutable-record';
+// our helpers
+import { makeTypedFactory } from '../helpers/helper';
 
 // our interfaces
 import { IMinimalWorkspaces, IMinimalWorkspacesRecord } from '../interfaces/minimal-workspaces.interface';
 
-export const minimalWorkspacesFactory = makeTypedFactory<IMinimalWorkspaces, IMinimalWorkspacesRecord>({
-  // from server
-  minimalWorkspaces: [],
+export function minimalWorkspacesFactory(): IMinimalWorkspaces {
+  return {
+    // from server
+    minimalWorkspaces: [],
 
-  // for UI
-  addingWorkspace: false,
-  fetchingWorkspaces: false,
-  fetchingWorkspaceWithId: null
-});
+    // for UI
+    addingWorkspace: false,
+    fetchingWorkspaces: false,
+    fetchingWorkspaceWithId: null
+  };
+}
+
+export const minimalWorkspacesRecordFactory = makeTypedFactory<IMinimalWorkspaces, IMinimalWorkspacesRecord>(minimalWorkspacesFactory());

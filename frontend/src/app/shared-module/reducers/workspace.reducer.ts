@@ -27,54 +27,27 @@ import { Observable } from 'rxjs';
 // our interfaces
 import { IStore } from '../interfaces/store.interface';
 import { IWorkspaceRecord } from '../interfaces/workspace.interface';
-import { workspaceFactory } from './workspace.state';
+
+// our states
+import { workspaceRecordFactory } from './workspace.state';
 
 // our helpers
 import { escapeStringRegexp } from '../helpers/helper';
 
-// our reducers
-import { USR_IS_DISCONNECTED } from './user.reducer';
+// our actions
+import { UserActions } from './user.actions';
+import { WorkspaceActions } from './workspace.actions';
 
-// actions
-export const FETCH_WORKSPACE = 'FETCH_WORKSPACE';
-export const FETCH_WORKSPACE_SUCCESS = 'FETCH_WORKSPACE_SUCCESS';
-export const FETCH_WORKSPACE_FAILED = 'FETCH_WORKSPACE_FAILED';
-
-export const EDIT_PETALS_SEARCH = 'EDIT_PETALS_SEARCH';
-export const DELETE_PETALS_SEARCH = 'DELETE_PETALS_SEARCH';
-
-export const IMPORT_BUS = 'IMPORT_BUS';
-// once the http request is launched to import a bus,
-// the server returns us an id (bus id) so we can display at least the name (that we already have)
-// and update the object later according to the id
-export const IMPORT_BUS_SUCCESS = 'IMPORT_BUS_SUCCESS';
-export const IMPORT_BUS_FAILED = 'IMPORT_BUS_FAILED';
-
-export const IMPORT_BUS_MINIMAL_CONFIG = 'IMPORT_BUS_MINIMAL_CONFIG';
-
-export const ADD_BUS_SUCCESS = 'ADD_BUS_SUCCESS';
-export const ADD_BUS_FAILED = 'ADD_BUS_FAILED';
-
-export const REMOVE_BUS = 'REMOVE_BUS';
-export const REMOVE_BUS_SUCCESS = 'REMOVE_BUS_SUCCESS';
-export const REMOVE_BUS_FAILED = 'REMOVE_BUS_FAILED';
-
-export const FETCH_BUS_CONFIG = 'FETCH_BUS_CONFIG';
-export const FETCH_BUS_CONFIG_SUCCESS = 'FETCH_BUS_CONFIG_SUCCESS';
-export const FETCH_BUS_CONFIG_FAILED = 'FETCH_BUS_CONFIG_FAILED';
-
-export const SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT = 'SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT';
-
-function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(), action: Action) {
-  if (action.type === FETCH_WORKSPACE) {
-    return workspaceR.setIn(['fetchingWorkspace'], true);
+function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFactory(), action: Action) {
+  if (action.type === WorkspaceActions.FETCH_WORKSPACE) {
+    return workspaceR.set('fetchingWorkspace', true);
   }
 
-  else if (action.type === FETCH_WORKSPACE_FAILED) {
-    return workspaceR.setIn(['fetchingWorkspace'], false);
+  else if (action.type === WorkspaceActions.FETCH_WORKSPACE_FAILED) {
+    return workspaceR.set('fetchingWorkspace', false);
   }
 
-  else if (action.type === FETCH_WORKSPACE_SUCCESS) {
+  else if (action.type === WorkspaceActions.FETCH_WORKSPACE_SUCCESS) {
     // payload.data contains :
     // -----------------------
     // payload: {
@@ -85,49 +58,53 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
     //   }
     // }
 
+    let newWorkspaceR = workspaceR;
+
     // if we changed from workspace A to B
     // (not a refresh from A to A updated)
     // clear petals search
     if (workspaceR.get('id') !== action.payload.id) {
-      workspaceR = workspaceR.set('searchPetals', '');
+      newWorkspaceR = workspaceR.set('searchPetals', '');
     }
 
-    return workspaceR
-      .set('fetchingWorkspace', false)
-      .set('id', action.payload.id)
-      .set('buses', [])
-      .set('busesInProgress', [])
-      .mergeDeep(fromJS(action.payload.data));
+    return newWorkspaceR
+      .merge({
+        id: action.payload.id,
+        fetchingWorkspace: false,
+        name: action.payload.data.name,
+        buses: action.payload.data.buses,
+        busesInProgress: action.payload.data.busesInProgress
+      });
   }
 
-  else if (action.type === EDIT_PETALS_SEARCH) {
+  else if (action.type === WorkspaceActions.EDIT_PETALS_SEARCH) {
     return workspaceR.set('searchPetals', action.payload);
   }
 
-  else if (action.type === DELETE_PETALS_SEARCH) {
+  else if (action.type === WorkspaceActions.DELETE_PETALS_SEARCH) {
     return workspaceR.set('searchPetals', '');
   }
 
-  else if (action.type === IMPORT_BUS) {
+  else if (action.type === WorkspaceActions.IMPORT_BUS) {
     return workspaceR.set('importingBus', true);
   }
 
-  else if (action.type === IMPORT_BUS_SUCCESS) {
+  else if (action.type === WorkspaceActions.IMPORT_BUS_SUCCESS) {
     // once the bus is imported, move it from workspaces
     // but not here as it's been done in an async way using sse
     // CF ADD_BUS_SUCCESS
     return workspaceR.set('importingBus', false);
   }
 
-  else if (action.type === IMPORT_BUS_FAILED) {
+  else if (action.type === WorkspaceActions.IMPORT_BUS_FAILED) {
     return workspaceR.set('importingBus', false);
   }
 
-  else if (action.type === IMPORT_BUS_MINIMAL_CONFIG) {
+  else if (action.type === WorkspaceActions.IMPORT_BUS_MINIMAL_CONFIG) {
     return workspaceR
-      .set('importingBus', false)
-      .set('busesInProgress',
-        workspaceR.get('busesInProgress').push(fromJS({
+      .merge({
+        importingBus: false,
+        busesInProgress: workspaceR.get('busesInProgress').push(fromJS({
           id: action.payload.id,
           config: {
             ip: action.payload.ip,
@@ -137,24 +114,26 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
             passphrase: action.payload.passphrase
           }
         }))
-      );
+      });
   }
 
   /* ADD_BUS* */
-  else if (action.type === ADD_BUS_SUCCESS) {
+  else if (action.type === WorkspaceActions.ADD_BUS_SUCCESS) {
     return workspaceR
-      .set('buses', workspaceR.get('buses').push(fromJS(action.payload)))
-      .set('busesInProgress',
-        workspaceR
-          .get('busesInProgress')
-          .filter((busInP: IWorkspaceRecord) => busInP.get('id') !== action.payload.id)
-      );
+      .merge({
+        buses: workspaceR.get('buses').push(fromJS(action.payload)),
+        busesInProgress: workspaceR.get('busesInProgress').filter((busInP: IWorkspaceRecord) => busInP.get('id') !== action.payload.id)
+      });
   }
 
-  else if (action.type === ADD_BUS_FAILED) {
+  else if (action.type === WorkspaceActions.ADD_BUS_FAILED) {
     let busIndex = workspaceR
       .get('busesInProgress')
       .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
 
     return workspaceR
       .setIn(['busesInProgress', busIndex],
@@ -165,15 +144,19 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
   }
 
   /* REMOVE_BUS* */
-  else if (action.type === REMOVE_BUS || action.type === REMOVE_BUS_FAILED) {
+  else if (action.type === WorkspaceActions.REMOVE_BUS || action.type === WorkspaceActions.REMOVE_BUS_FAILED) {
     let busIndex = workspaceR
       .get('busesInProgress')
       .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload);
 
-    return workspaceR.setIn(['busesInProgress', busIndex, 'removing'], action.type === REMOVE_BUS);
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['busesInProgress', busIndex, 'removing'], action.type === WorkspaceActions.REMOVE_BUS);
   }
 
-  else if (action.type === REMOVE_BUS_SUCCESS) {
+  else if (action.type === WorkspaceActions.REMOVE_BUS_SUCCESS) {
     return workspaceR.set('busesInProgress',
       workspaceR
         .get('busesInProgress')
@@ -182,34 +165,42 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceFactory(
   }
 
   /* FETCH_BUS_CONFIG* */
-  else if (action.type === FETCH_BUS_CONFIG) {
-    return workspaceR.setIn(['gettingBusConfig'], true);
+  else if (action.type === WorkspaceActions.FETCH_BUS_CONFIG) {
+    return workspaceR.set('gettingBusConfig', true);
   }
 
-  else if (action.type === FETCH_BUS_CONFIG_SUCCESS) {
+  else if (action.type === WorkspaceActions.FETCH_BUS_CONFIG_SUCCESS) {
     let busIndex = workspaceR
       .get('buses')
       .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload.idBus);
 
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
     return workspaceR
-      .set('gettingBusConfig', false)
-      .setIn(['buses', busIndex, 'config'], fromJS(action.payload.config));
+      .merge({
+        gettingBusConfig: false,
+        buses: workspaceR.setIn(['buses', busIndex, 'config'], fromJS(action.payload.config))
+      });
   }
 
-  else if (action.type === FETCH_BUS_CONFIG_FAILED) {
+  else if (action.type === WorkspaceActions.FETCH_BUS_CONFIG_FAILED) {
     return workspaceR.set('gettingBusConfig', false);
   }
 
-  else if (action.type === SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT) {
+  else if (action.type === WorkspaceActions.SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT) {
     return workspaceR
-      .set('selectedBusId', action.payload.selectedBusId)
-      .set('selectedContainerId', action.payload.selectedContainerId)
-      .set('selectedComponentId', action.payload.selectedComponentId)
-      .set('selectedServiceUnitId', action.payload.selectedServiceUnitId);
+      .merge({
+        selectedBusId: action.payload.selectedBusId,
+        selectedContainerId: action.payload.selectedContainerId,
+        selectedComponentId: action.payload.selectedComponentId,
+        selectedServiceUnitId: action.payload.selectedServiceUnitId
+      });
   }
 
-  if (action.type === USR_IS_DISCONNECTED) {
-    return workspaceFactory();
+  if (action.type === UserActions.USR_IS_DISCONNECTED) {
+    return workspaceRecordFactory();
   }
 
   return workspaceR;

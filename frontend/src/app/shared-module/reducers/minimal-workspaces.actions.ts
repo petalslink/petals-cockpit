@@ -15,25 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// our helpers
-import { makeTypedFactory } from '../helpers/helper';
+export const MinimalWorkspacesActions = {
+  FETCH_WORKSPACES: 'FETCH_WORKSPACES',
+  FETCH_WORKSPACES_SUCCESS: 'FETCH_WORKSPACES_SUCCESS',
+  FETCH_WORKSPACES_FAILED: 'FETCH_WORKSPACES_FAILED',
 
-// our interfaces
-import { IUser, IUserRecord } from '../interfaces/user.interface';
-
-export function userFactory(): IUser {
-  return {
-    // from server
-    name: null,
-    username: null,
-    password: null,
-
-    // for UI
-    isConnecting: false,
-    isDisconnecting: false,
-    isConnected: false,
-    connectionFailed: false
-  };
-}
-
-export const userRecordFactory = makeTypedFactory<IUser, IUserRecord>(userFactory());
+  ADD_WORKSPACE: 'ADD_WORKSPACE',
+  ADD_WORKSPACE_SUCCESS: 'ADD_WORKSPACE_SUCCESS',
+  ADD_WORKSPACE_FAILED: 'ADD_WORKSPACE_FAILED'
+};

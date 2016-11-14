@@ -15,6 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// immutable
+import { fromJS } from 'immutable';
+
+// typed record
+import { TypedRecord } from 'typed-immutable-record';
+
 let matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
 
 export function escapeStringRegexp (str) {
@@ -46,3 +52,12 @@ export function replaceIds(obj) {
     }
   }
 }
+
+// https://github.com/rangle/typed-immutable-record/issues/23
+// redefine the makeTypedFactory to use fromJS so we can have
+// deep parsing object
+export function makeTypedFactory<E, T extends TypedRecord<T> & E>(obj: E): (val?: E) => T {
+  return function TypedFactory(val: E = null): T {
+    return fromJS(Object.assign(obj, val)) as T;
+  };
+};

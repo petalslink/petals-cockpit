@@ -38,7 +38,7 @@ import { IUser } from '../interfaces/user.interface';
 import { IStore } from '../interfaces/store.interface';
 
 // our actions
-import { USR_IS_CONNECTED } from '../reducers/user.reducer';
+import { UserActions } from '../reducers/user.actions';
 
 @Injectable()
 export class AuthGuardService implements CanActivate {
@@ -55,7 +55,7 @@ export class AuthGuardService implements CanActivate {
         if (res.ok) {
           let user: IUser = res.json();
 
-          this.store.dispatch({ type: USR_IS_CONNECTED, payload: user });
+          this.store.dispatch({ type: UserActions.USR_IS_CONNECTED, payload: user });
           return true;
         }
 

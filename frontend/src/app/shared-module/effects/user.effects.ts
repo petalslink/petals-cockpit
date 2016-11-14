@@ -38,14 +38,7 @@ import { UserService } from '../services/user.service';
 import { RouteService } from './../services/route.service';
 
 // our actions
-import {
-  USR_IS_CONNECTING,
-  USR_IS_CONNECTED,
-  USR_CONNECTION_FAILED,
-  USR_IS_DISCONNECTING,
-  USR_IS_DISCONNECTED,
-  USR_DISCONNECTION_FAILED
-} from '../reducers/user.reducer';
+import { UserActions } from '../reducers/user.actions';
 
 @Injectable()
 export class UserEffects {
@@ -58,7 +51,7 @@ export class UserEffects {
 
   // tslint:disable-next-line:member-ordering
   @Effect({dispatch: true}) usrConnect$: Observable<Action> = this.actions$
-    .ofType(USR_IS_CONNECTING)
+    .ofType(UserActions.USR_IS_CONNECTING)
     .switchMap((action: Action) => this.userService.connectUser(action.payload)
       .map((res: any) => {
         if (!res.ok) {
@@ -81,20 +74,20 @@ export class UserEffects {
           this.router.navigate(['/cockpit']);
         }
 
-        return { type: USR_IS_CONNECTED, payload: user };
+        return { type: UserActions.USR_IS_CONNECTED, payload: user };
       })
       .catch((err) => {
         if (environment.debug) {
           console.error(err);
         }
 
-        return Observable.of({ type: USR_CONNECTION_FAILED });
+        return Observable.of({ type: UserActions.USR_CONNECTION_FAILED });
       })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({dispatch: true}) usrDisconnect$: Observable<Action> = this.actions$
-    .ofType(USR_IS_DISCONNECTING)
+    .ofType(UserActions.USR_IS_DISCONNECTING)
     .switchMap(() => this.userService.disconnectUser()
       .map((res: Response) => {
         if (!res.ok) {
@@ -104,14 +97,14 @@ export class UserEffects {
         this.router.navigate(['/login']);
 
         // TODO : clear user data once disconnected !
-        return { type: USR_IS_DISCONNECTED };
+        return { type: UserActions.USR_IS_DISCONNECTED };
       })
       .catch((err) => {
         if (environment.debug) {
           console.error(err);
         }
 
-        return Observable.of({ type: USR_DISCONNECTION_FAILED });
+        return Observable.of({ type: UserActions.USR_DISCONNECTION_FAILED });
       })
     );
 }

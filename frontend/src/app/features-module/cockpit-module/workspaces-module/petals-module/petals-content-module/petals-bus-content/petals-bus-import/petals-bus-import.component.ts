@@ -34,7 +34,7 @@ import {
 } from '../../../../../../../shared-module/interfaces/minimal-workspaces.interface';
 
 // our actions
-import { IMPORT_BUS, REMOVE_BUS } from '../../../../../../../shared-module/reducers/workspace.reducer';
+import { WorkspaceActions } from '../../../../../../../shared-module/reducers/workspace.actions';
 
 import { MdInput } from '@angular/material';
 
@@ -88,10 +88,10 @@ export class PetalsBusImportComponent implements OnInit, OnDestroy {
   }
 
   importBus(newBus: INewBus) {
-    this.store$.dispatch({ type: IMPORT_BUS, payload: newBus });
+    this.store$.dispatch({ type: WorkspaceActions.IMPORT_BUS, payload: newBus });
   }
 
   removeBus(idBus: string) {
-    this.store$.dispatch({ type: REMOVE_BUS, payload: idBus });
+    this.store$.dispatch({ type: WorkspaceActions.REMOVE_BUS, payload: idBus });
   }
 }

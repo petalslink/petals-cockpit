@@ -15,36 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// immutable
-import { makeTypedFactory } from 'typed-immutable-record';
+// our helpers
+import { makeTypedFactory } from '../helpers/helper';
 
 // our interfaces
 import { IWorkspace, IWorkspaceRecord } from '../interfaces/workspace.interface';
 
-export const workspaceFactory = makeTypedFactory<IWorkspace, IWorkspaceRecord>({
-  // IMinimalWorkspace
-  // -----------------
-  // from server
-  id: null,
-  name: null,
-  usedBy: null,
+export function workspaceFactory(): IWorkspace {
+  return {
+    // IMinimalWorkspace
+    // -----------------
+    // from server
+    id: null,
+    name: null,
+    usedBy: null,
 
-  // ------------------------
+    // ------------------------
 
-  // IWorkspace
-  // ----------
-  // from server
-  buses: [],
-  busesInProgress: [],
+    // IWorkspace
+    // ----------
+    // from server
+    buses: [],
+    busesInProgress: [],
 
-  // for UI
-  searchPetals: '',
-  fetchingWorkspace: false,
-  importingBus: false,
-  gettingBusConfig: false,
+    // for UI
+    searchPetals: '',
+    fetchingWorkspace: false,
+    importingBus: false,
+    gettingBusConfig: false,
 
-  selectedBusId: null,
-  selectedContainerId: null,
-  selectedComponentId: null,
-  selectedServiceUnitId: null
-});
+    selectedBusId: null,
+    selectedContainerId: null,
+    selectedComponentId: null,
+    selectedServiceUnitId: null
+  };
+}
+
+export const workspaceRecordFactory = makeTypedFactory<IWorkspace, IWorkspaceRecord>(workspaceFactory());
