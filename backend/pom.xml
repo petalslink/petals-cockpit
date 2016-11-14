@@ -55,7 +55,7 @@
     <dependency>
       <groupId>org.pac4j</groupId>
       <artifactId>dropwizard-pac4j</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>1.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <!-- Needed for pac4j's password encoder -->
@@ -156,7 +156,7 @@
                 <!-- Debug -->
                 <!-- argument>-Xdebug</argument -->
                 <!-- argument>-agentlib:jdwp=transport=dt_socket,server=y,address=8000</argument-->
-    
+
                 <!-- Configure memory settings as needed -->
                 <!-- argument>-Xmx1000m</argument -->
 
@@ -173,7 +173,7 @@
 
                 <!-- Main class -->
                 <argument>org.ow2.petals.cockpit.server.CockpitApplication</argument>
-                
+
                 <!-- Command -->
                 <argument>${cockpit.exec.command}</argument>
                 <argument>default.yml</argument>

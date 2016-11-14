@@ -15,7 +15,7 @@ server:
       port: 8082
 
 pac4j:
-  filters:
+  globalFilters:
     - # this protects the whole application
       matchers: excludeUserSession
       authorizers: isAuthenticated

@@ -19,7 +19,7 @@ database:
   validationQuery: "/* Health Check */ SELECT 1"
 
 pac4j:
-  filters:
+  globalFilters:
     - # this protects the whole application
       matchers: excludeUserSession
       authorizers: isAuthenticated
