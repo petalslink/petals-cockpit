@@ -28,21 +28,23 @@ import { environment } from '../../../environments/environment';
 // our interfaces
 import { IUser } from '../interfaces/user.interface';
 
-const adminUser = {
-  'username': 'admin',
-  'name': 'Administrator'
-};
-
 @Injectable()
 export class UserMockService {
   private userIsConnected: boolean = environment.alreadyConnected;
+  public adminUser;
 
-  constructor() { }
+  constructor() {
+    this.adminUser = {
+      username: 'admin',
+      name: 'Administrator',
+      lastWorkspace: null
+    };
+  }
 
   public connectUser(user: IUser) {
     let response: Response;
 
-    // if user's already logged OR if user's informations are wrong
+    // if user's already logged OR if user's information are wrong
     if (this.userIsConnected || (user.username !== 'admin' || user.password !== 'admin')) {
       response = <Response>{ ok: false };
     } else {
@@ -50,8 +52,8 @@ export class UserMockService {
 
       response = <Response>{
         ok: true,
-        json: function () {
-          return adminUser;
+        json: () => {
+          return this.adminUser;
         }
       };
     }
@@ -79,8 +81,8 @@ export class UserMockService {
     if (this.userIsConnected) {
       response = <Response>{
         ok: true,
-        json: function () {
-          return adminUser;
+        json: () => {
+          return this.adminUser;
         }
       };
     } else {
