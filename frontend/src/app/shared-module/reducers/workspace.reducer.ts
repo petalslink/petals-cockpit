@@ -40,11 +40,11 @@ import { WorkspaceActions } from './workspace.actions';
 
 function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFactory(), action: Action) {
   if (action.type === WorkspaceActions.FETCH_WORKSPACE) {
-    return workspaceR.setIn(['fetchingWorkspace'], true);
+    return workspaceR.set('fetchingWorkspace', true);
   }
 
   else if (action.type === WorkspaceActions.FETCH_WORKSPACE_FAILED) {
-    return workspaceR.setIn(['fetchingWorkspace'], false);
+    return workspaceR.set('fetchingWorkspace', false);
   }
 
   else if (action.type === WorkspaceActions.FETCH_WORKSPACE_SUCCESS) {
@@ -58,21 +58,23 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     //   }
     // }
 
+    let newWorkspaceR = workspaceR;
+
     // if we changed from workspace A to B
     // (not a refresh from A to A updated)
     // clear petals search
     if (workspaceR.get('id') !== action.payload.id) {
-      workspaceR = workspaceR.set('searchPetals', '');
+      newWorkspaceR = workspaceR.set('searchPetals', '');
     }
 
-    return workspaceR
-      .set('fetchingWorkspace', false)
-      .set('id', action.payload.id)
-      .set('buses', List.of())
-      .set('busesInProgress', List.of())
-      .mergeDeep(
-        fromJS(action.payload.data)
-      );
+    return newWorkspaceR
+      .merge({
+        id: action.payload.id,
+        fetchingWorkspace: false,
+        name: action.payload.data.name,
+        buses: action.payload.data.buses,
+        busesInProgress: action.payload.data.busesInProgress
+      });
   }
 
   else if (action.type === WorkspaceActions.EDIT_PETALS_SEARCH) {
@@ -100,9 +102,9 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
 
   else if (action.type === WorkspaceActions.IMPORT_BUS_MINIMAL_CONFIG) {
     return workspaceR
-      .set('importingBus', false)
-      .set('busesInProgress',
-        workspaceR.get('busesInProgress').push(fromJS({
+      .merge({
+        importingBus: false,
+        busesInProgress: workspaceR.get('busesInProgress').push(fromJS({
           id: action.payload.id,
           config: {
             ip: action.payload.ip,
@@ -112,14 +114,16 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
             passphrase: action.payload.passphrase
           }
         }))
-      );
+      });
   }
 
   /* ADD_BUS* */
   else if (action.type === WorkspaceActions.ADD_BUS_SUCCESS) {
     return workspaceR
-      .update('buses', buses => buses.push(fromJS(action.payload)))
-      .update('busesInProgress', buses => buses.filter((busInP: IWorkspaceRecord) => busInP.get('id') !== action.payload.id));
+      .merge({
+        buses: workspaceR.get('buses').push(fromJS(action.payload)),
+        busesInProgress: workspaceR.get('busesInProgress').filter((busInP: IWorkspaceRecord) => busInP.get('id') !== action.payload.id)
+      });
   }
 
   else if (action.type === WorkspaceActions.ADD_BUS_FAILED) {
@@ -162,7 +166,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
 
   /* FETCH_BUS_CONFIG* */
   else if (action.type === WorkspaceActions.FETCH_BUS_CONFIG) {
-    return workspaceR.setIn(['gettingBusConfig'], true);
+    return workspaceR.set('gettingBusConfig', true);
   }
 
   else if (action.type === WorkspaceActions.FETCH_BUS_CONFIG_SUCCESS) {
@@ -175,8 +179,10 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     }
 
     return workspaceR
-      .set('gettingBusConfig', false)
-      .setIn(['buses', busIndex, 'config'], fromJS(action.payload.config));
+      .merge({
+        gettingBusConfig: false,
+        buses: workspaceR.setIn(['buses', busIndex, 'config'], fromJS(action.payload.config))
+      });
   }
 
   else if (action.type === WorkspaceActions.FETCH_BUS_CONFIG_FAILED) {
@@ -185,10 +191,12 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
 
   else if (action.type === WorkspaceActions.SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT) {
     return workspaceR
-      .set('selectedBusId', action.payload.selectedBusId)
-      .set('selectedContainerId', action.payload.selectedContainerId)
-      .set('selectedComponentId', action.payload.selectedComponentId)
-      .set('selectedServiceUnitId', action.payload.selectedServiceUnitId);
+      .merge({
+        selectedBusId: action.payload.selectedBusId,
+        selectedContainerId: action.payload.selectedContainerId,
+        selectedComponentId: action.payload.selectedComponentId,
+        selectedServiceUnitId: action.payload.selectedServiceUnitId
+      });
   }
 
   if (action.type === UserActions.USR_IS_DISCONNECTED) {

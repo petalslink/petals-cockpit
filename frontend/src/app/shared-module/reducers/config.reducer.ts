@@ -31,7 +31,7 @@ import { UserActions } from './user.actions';
 function createConfigReducer(configR: IConfigRecord = configRecordFactory(), action: Action) {
   switch (action.type) {
     case ConfigActions.TOGGLE_THEME:
-      return configR.setIn(['isDarkTheme'], !configR.isDarkTheme);
+      return configR.set('isDarkTheme', !configR.isDarkTheme);
 
     case UserActions.USR_IS_DISCONNECTED:
       return configRecordFactory();

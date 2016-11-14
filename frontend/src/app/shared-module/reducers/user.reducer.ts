@@ -31,43 +31,53 @@ function createUserReducer (userR: IUserRecord = userRecordFactory(), action: Ac
   switch (action.type) {
     case UserActions.USR_IS_CONNECTING:
       return userR
-              .setIn(['isConnecting'], true)
-              .setIn(['isConnected'], false)
-              .setIn(['isDisconnecting'], false)
-              .setIn(['connectionFailed'], false);
+        .merge({
+          isConnecting: true,
+          isConnected: false,
+          isDisconnecting: false,
+          connectionFailed: false
+        });
 
     case UserActions.USR_IS_CONNECTED:
       return userR
-              .setIn(['name'], action.payload.name)
-              .setIn(['username'], action.payload.username)
-              .setIn(['isConnected'], true)
-              .setIn(['isConnecting'], false)
-              .setIn(['isDisconnecting'], false)
-              .setIn(['connectionFailed'], false);
+        .merge({
+          name: action.payload.name,
+          username: action.payload.username,
+          isConnected: true,
+          isConnecting: false,
+          isDisconnecting: false,
+          connectionFailed: false
+        });
 
     case UserActions.USR_IS_DISCONNECTING:
       return userR
-              .setIn(['isDisconnecting'], true)
-              .setIn(['isConnecting'], false)
-              .setIn(['isConnected'], true)
-              .setIn(['connectionFailed'], false);
+        .merge({
+          isDisconnecting: true,
+          isConnecting: false,
+          isConnected: true,
+          connectionFailed: false
+        });
 
     case UserActions.USR_IS_DISCONNECTED:
       return userRecordFactory();
 
     case UserActions.USR_CONNECTION_FAILED:
       return userR
-              .setIn(['connectionFailed'], true)
-              .setIn(['isDisconnecting'], false)
-              .setIn(['isConnecting'], false)
-              .setIn(['isConnected'], false);
+        .merge({
+          connectionFailed: true,
+          isDisconnecting: false,
+          isConnecting: false,
+          isConnected: false
+        });
 
     case UserActions.USR_DISCONNECTION_FAILED:
       return userR
-              .setIn(['connectionFailed'], false)
-              .setIn(['isDisconnecting'], false)
-              .setIn(['isConnecting'], false)
-              .setIn(['isConnected'], true);
+        .merge({
+          connectionFailed: false,
+          isDisconnecting: false,
+          isConnecting: false,
+          isConnected: true
+        });
 
     default:
       return userR;
