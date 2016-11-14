@@ -42,6 +42,7 @@ target/
 /frontend/npm-debug.log
 /frontend/testem.log
 /frontend/typings
+/frontend/yarn-error.log
 
 # e2e
 /frontend/e2e/*.js
