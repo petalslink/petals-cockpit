@@ -19,6 +19,7 @@
 import { fromJS } from 'immutable';
 
 // our actions
+import { USR_IS_DISCONNECTED } from './user.reducer';
 import {
   WorkspaceReducer,
   FETCH_WORKSPACE,
@@ -31,7 +32,14 @@ import {
   IMPORT_BUS_FAILED,
   IMPORT_BUS_MINIMAL_CONFIG,
   ADD_BUS_SUCCESS,
-  ADD_BUS_FAILED
+  ADD_BUS_FAILED,
+  REMOVE_BUS,
+  REMOVE_BUS_SUCCESS,
+  REMOVE_BUS_FAILED,
+  FETCH_BUS_CONFIG,
+  FETCH_BUS_CONFIG_SUCCESS,
+  FETCH_BUS_CONFIG_FAILED,
+  SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT
 } from './workspace.reducer';
 
 // our states
@@ -297,6 +305,13 @@ describe(`Workspace Reducer`, () => {
   });
 
   it(`${ADD_BUS_FAILED}`, () => {
+    // test with no buses in progress
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(stateR, { type: ADD_BUS_FAILED, payload: 'someId' });
+    let nextState1 = nextStateR1.toJS();
+
+    expect(nextState1.busesInProgress).toEqual([]);
+
+    // test with some buses in progress
     let bus1 = {
       id: 'id1',
       name: 'bus 1',
@@ -311,14 +326,14 @@ describe(`Workspace Reducer`, () => {
       containers: []
     };
 
-    stateR = stateR.set('busesInProgress', fromJS([bus1, bus2]));
+    let newStateR = stateR.set('busesInProgress', fromJS([bus1, bus2]));
 
     // first, check that the buses doesn't have any error
-    expect(stateR.getIn(['busesInProgress', 0, 'importError'])).toBeUndefined();
-    expect(stateR.getIn(['busesInProgress', 1, 'importError'])).toBeUndefined();
+    expect(newStateR.getIn(['busesInProgress', 0, 'importError'])).toBeUndefined();
+    expect(newStateR.getIn(['busesInProgress', 1, 'importError'])).toBeUndefined();
 
     let nextStateR: IWorkspaceRecord = WorkspaceReducer(
-      stateR,
+      newStateR,
       {
         type: ADD_BUS_FAILED,
         payload: {
@@ -341,4 +356,113 @@ describe(`Workspace Reducer`, () => {
 
     expect(nextState).toEqual(jasmine.objectContaining(expectedState));
   });
+
+  // REMOVE_BUS*
+  it(`${REMOVE_BUS}`, () => {
+    // try to remove when no busesInProgress
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(stateR, { type: REMOVE_BUS, payload: 'someId' });
+    let nextState1 = nextStateR1.toJS();
+
+    expect(nextState1.busesInProgress).toEqual([]);
+
+    // try to flag the first bus as removing
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(
+      stateR.update('busesInProgress', buses => fromJS([
+        { id: 'id1', removing: false },
+        { id: 'id2', removing: false },
+        { id: 'id3', removing: false }
+      ])),
+      {
+        type: REMOVE_BUS,
+        payload: 'id2'
+      }
+    );
+    let nextState2 = nextStateR2.toJS();
+
+    let expectedState2 = [
+        { id: 'id1', removing: false },
+        { id: 'id2', removing: true },
+        { id: 'id3', removing: false }
+    ];
+
+    expect(nextState2.busesInProgress).toEqual(jasmine.objectContaining(expectedState2));
+  });
+
+  it(`${REMOVE_BUS_FAILED}`, () => {
+    // try to remove when no busesInProgress
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(stateR, { type: REMOVE_BUS_FAILED, payload: 'someId' });
+    let nextState1 = nextStateR1.toJS();
+
+    expect(nextState1.busesInProgress).toEqual([]);
+
+    // try to flag the first bus as removing
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(
+      stateR.update('busesInProgress', buses => fromJS([
+        { id: 'id1', removing: false },
+        { id: 'id2', removing: false },
+        { id: 'id3', removing: false }
+      ])),
+      {
+        type: REMOVE_BUS_FAILED,
+        payload: 'id2'
+      }
+    );
+    let nextState2 = nextStateR2.toJS();
+
+    let expectedState2 = [
+        { id: 'id1', removing: false },
+        { id: 'id2', removing: false },
+        { id: 'id3', removing: false }
+    ];
+
+    expect(nextState2.busesInProgress).toEqual(jasmine.objectContaining(expectedState2));
+  });
+
+  it(`${REMOVE_BUS_SUCCESS}`, () => {
+    // try to remove when no busesInProgress
+    let nextStateR: IWorkspaceRecord = WorkspaceReducer(
+      stateR.update('busesInProgress', buses => fromJS([
+        { id: 'id1' },
+        { id: 'id2' },
+        { id: 'id3' }
+      ])),
+      {
+        type: REMOVE_BUS_SUCCESS,
+        payload: { idBus: 'id2' }
+      }
+    );
+    let nextState = nextStateR.toJS();
+
+    let expectedState = [
+        { id: 'id1' },
+        { id: 'id3' }
+    ];
+
+    expect(nextState.busesInProgress).toEqual(jasmine.objectContaining(expectedState));
+  });
+
+  xit(`${FETCH_BUS_CONFIG}`, () => {
+    // TODO
+  });
+
+  xit(`${FETCH_BUS_CONFIG_SUCCESS}`, () => {
+    // TODO
+  });
+
+  xit(`${FETCH_BUS_CONFIG_FAILED}`, () => {
+    // TODO
+  });
+
+  xit(`${SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT}`, () => {
+    // TODO
+  });
+
+  it(`${USR_IS_DISCONNECTED}`, () => {
+    let nextStateR: IWorkspaceRecord = WorkspaceReducer(stateR, { type: USR_IS_DISCONNECTED });
+    let nextState = nextStateR.toJS();
+
+    expect(workspaceRecordFactory().toJS()).toEqual(nextState);
+  });
+
+  // TODO: Test selector
 });

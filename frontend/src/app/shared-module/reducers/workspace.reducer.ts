@@ -156,6 +156,10 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
       .get('busesInProgress')
       .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload.idBus);
 
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
     return workspaceR
       .setIn(['busesInProgress', busIndex],
         workspaceR
@@ -169,6 +173,10 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     let busIndex = workspaceR
       .get('busesInProgress')
       .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
 
     return workspaceR.setIn(['busesInProgress', busIndex, 'removing'], action.type === REMOVE_BUS);
   }
@@ -190,6 +198,10 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     let busIndex = workspaceR
       .get('buses')
       .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
 
     return workspaceR
       .set('gettingBusConfig', false)
