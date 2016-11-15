@@ -36,7 +36,8 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 public class MockProfileParamValueFactoryProvider extends AbstractValueFactoryProvider {
 
-    public static final DbUser ADMIN = new DbUser("admin", "...", "Admin");
+    public static final DbUser ADMIN = new DbUser(MockAuthenticator.ADMIN.username, "...",
+            MockAuthenticator.ADMIN.name);
 
     @Inject
     public MockProfileParamValueFactoryProvider(MultivaluedParameterExtractorProvider mpep, ServiceLocator locator) {

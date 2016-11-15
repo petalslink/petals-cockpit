@@ -1,6 +1,20 @@
 {
   "name": "Workspace 1",
-  "busesInProgress": [],
+  "busesInProgress": [
+    {
+      "id": "85fd4ddf-bbd4-4562-99cc-ok",
+      "importIp": "192.168.0.1",
+      "importPort": "5000",
+      "importUsername": "petals"
+    },
+    {
+      "id": "85fd4ddf-bbd4-4562-99cc-error",
+      "importIp": "192.168.0.2",
+      "importPort": 5000,
+      "importUsername": "petals",
+      "importError": "ERROR!!!!"
+    }
+  ],
   "buses": [
     {
       "id": "85fd4ddf-bbd4-4562-99cc-62e7fb7d698b",

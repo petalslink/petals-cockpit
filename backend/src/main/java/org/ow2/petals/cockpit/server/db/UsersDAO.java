@@ -21,19 +21,18 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.ow2.petals.cockpit.server.db.UsersDAO.DbUserMapper;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.Transaction;
-import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
+import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
-@RegisterMapper(DbUserMapper.class)
 public abstract class UsersDAO {
 
     @SqlQuery("select * from users where username = :u")
+    @Mapper(DbUser.Mapper.class)
     @Nullable
     public abstract DbUser findByUsername(@Bind("u") String username);
 
@@ -51,21 +50,13 @@ public abstract class UsersDAO {
         }
     }
 
-    public static class DbUserMapper implements ResultSetMapper<DbUser> {
-        @Override
-        public DbUser map(int index, @Nullable ResultSet r, @Nullable StatementContext ctx) throws SQLException {
-            assert r != null;
-            return new DbUser(r.getString("username"), r.getString("password"), r.getString("name"));
-        }
-    }
-
     public static class DbUser {
 
-        private String username;
+        public final String username;
 
-        private String password;
+        public final String password;
 
-        private String name;
+        public final String name;
 
         public DbUser(String username, String password, String name) {
             this.username = username;
@@ -77,12 +68,12 @@ public abstract class UsersDAO {
             return username;
         }
 
-        public String getPassword() {
-            return password;
-        }
-
-        public String getName() {
-            return name;
+        public static class Mapper implements ResultSetMapper<DbUser> {
+            @Override
+            public DbUser map(int index, @Nullable ResultSet r, @Nullable StatementContext ctx) throws SQLException {
+                assert r != null;
+                return new DbUser(r.getString("username"), r.getString("password"), r.getString("name"));
+            }
         }
     }
 }

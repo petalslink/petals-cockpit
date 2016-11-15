@@ -56,7 +56,7 @@ public class UserSession {
 
         DbUser user = profile.getUser();
 
-        return new User(user.getUsername(), user.getName());
+        return new User(user.username, user.name);
     }
 
     @GET
@@ -81,24 +81,16 @@ public class UserSession {
 
     public static class User {
 
-        private final String username;
+        @JsonProperty
+        public final String username;
 
-        private final String name;
+        @JsonProperty
+        public final String name;
 
         public User(@NotEmpty @JsonProperty("username") String username,
                 @NotEmpty @JsonProperty("name") String name) {
             this.username = username;
             this.name = name;
-        }
-
-        @JsonProperty
-        public String getUsername() {
-            return username;
-        }
-
-        @JsonProperty
-        public String getName() {
-            return name;
         }
     }
 }

@@ -104,12 +104,14 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     return workspaceR
       .merge({
         importingBus: false,
+        // TODO factor with the equivalent code in workspace.effects.ts!!
         busesInProgress: workspaceR.get('busesInProgress').push(fromJS({
           id: action.payload.id,
           config: {
-            ip: action.payload.ip,
-            port: parseInt(`${action.payload.port}`, 10),
-            login: action.payload.username,
+            ip: action.payload.importIp,
+            // even if the server send a number, we should also accept a string
+            port: parseInt(`${action.payload.importPort}`, 10),
+            login: action.payload.importUsername,
             password: action.payload.password,
             passphrase: action.payload.passphrase
           }
@@ -129,7 +131,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
   else if (action.type === WorkspaceActions.ADD_BUS_FAILED) {
     let busIndex = workspaceR
       .get('busesInProgress')
-      .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload.idBus);
+      .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload.id);
 
     if (busIndex === -1) {
       return workspaceR;
@@ -139,7 +141,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
       .setIn(['busesInProgress', busIndex],
         workspaceR
           .getIn(['busesInProgress', busIndex])
-          .set('importError', action.payload.errorMsg)
+          .set('importError', action.payload.importError)
       );
   }
 

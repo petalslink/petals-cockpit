@@ -65,11 +65,28 @@ export class WorkspaceEffects {
           throw new Error(`Error while fetching workspace with ID : ${action.payload}`);
         }
 
+        let r = res.json();
+
+        // TODO factor with similar code in workspace.reducer.ts
+        r.busesInProgress = r.busesInProgress.map(b => {
+          return {
+            id: b.id,
+            config: {
+              ip: b.importIp,
+              port: parseInt(`${action.payload.importPort}`, 10),
+              login: b.importUsername,
+              password: '',
+              passphrase: ''
+            },
+            importError: b.importError
+          };
+        });
+
         return {
           type: WorkspaceActions.FETCH_WORKSPACE_SUCCESS,
           payload: {
             id: action.payload,
-            data: res.json()
+            data: r
           }
         };
       })
@@ -99,7 +116,7 @@ export class WorkspaceEffects {
               return { type: WorkspaceActions.ADD_BUS_SUCCESS, payload: msg.data };
             }
             else if (msg.event === 'BUS_IMPORT_ERROR') {
-              return { type: WorkspaceActions.ADD_BUS_FAILED, payload: { idBus: msg.data.id, errorMsg: msg.data.error } };
+              return { type: WorkspaceActions.ADD_BUS_FAILED, payload: msg.data };
             }
             else {
               return { type: '', payload: null };

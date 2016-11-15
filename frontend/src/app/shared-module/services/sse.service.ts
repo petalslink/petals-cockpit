@@ -29,7 +29,7 @@ import IOnMessageEvent = sse.IOnMessageEvent;
 import { environment } from '../../../environments/environment';
 
 // our interfaces
-import { IBus } from '../interfaces/petals.interface';
+import { INewBus } from '../interfaces/petals.interface';
 
 @Injectable()
 export class SseService {
@@ -85,7 +85,7 @@ export class SseService {
   // only used for mock !
   // but we do have to put it here otherwise we'd have to import the mock
   // and it would also be in prod
-  triggerSse(bus: IBus) {
+  triggerSse(id: string, bus: INewBus) {
 
   }
 }

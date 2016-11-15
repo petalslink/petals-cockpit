@@ -22,7 +22,7 @@ import org.pac4j.core.profile.CommonProfile;
 public class CockpitProfile extends CommonProfile {
 
     public CockpitProfile(DbUser user) {
-        setId(user.getUsername());
+        setId(user.username);
         addAttribute("dao", user);
     }
 

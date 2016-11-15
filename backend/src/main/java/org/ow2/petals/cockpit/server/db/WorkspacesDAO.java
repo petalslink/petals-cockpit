@@ -23,32 +23,31 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.ow2.petals.cockpit.server.actors.WorkspaceTree;
 import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbMinimalWorkspaceMapper;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.BindBean;
+import org.skife.jdbi.v2.sqlobject.CreateSqlObject;
 import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.Transaction;
-import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
+import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
 import com.google.common.collect.ImmutableList;
 
-@RegisterMapper(DbMinimalWorkspaceMapper.class)
 public abstract class WorkspacesDAO {
 
-    @SqlQuery("select * from workspaces w"
-            + " where w.id = :id")
+    @SqlQuery("select * from workspaces where id = :id")
+    @Mapper(DbMinimalWorkspace.Mapper.class)
     @Nullable
     protected abstract DbMinimalWorkspace _findById(@Bind("id") long id);
 
-    @SqlQuery("select uw.username from users_workspaces uw"
-            + " where uw.workspace_id = :id")
+    @SqlQuery("select username from users_workspaces where workspace_id = :id")
     protected abstract List<String> _findWorkspaceUsers(@Bind("id") long id);
-    
+
     @Nullable
     public DbWorkspace findById(long id) {
         DbMinimalWorkspace w = _findById(id);
@@ -63,13 +62,14 @@ public abstract class WorkspacesDAO {
     @SqlQuery("select * from workspaces w"
             + " inner join users_workspaces uw on w.id = uw.workspace_id"
             + " where uw.username = :u.username")
+    @Mapper(DbMinimalWorkspace.Mapper.class)
     protected abstract List<DbMinimalWorkspace> _findUserWorkspaces(@BindBean("u") DbUser user);
 
     public List<DbWorkspace> getUserWorkspaces(DbUser user) {
         return _findUserWorkspaces(user).stream().map(w -> new DbWorkspace(w.id, w.name, _findWorkspaceUsers(w.id)))
                 .collect(Collectors.toList());
     }
-    
+
     @SqlUpdate("insert into workspaces (name) values (:n)")
     @GetGeneratedKeys
     protected abstract long insert(@Bind("n") String name);
@@ -80,52 +80,55 @@ public abstract class WorkspacesDAO {
     @Transaction
     public DbWorkspace create(String name, DbUser by) {
         long id = insert(name);
-        map(id, by.getUsername());
-        return new DbWorkspace(id, name, Arrays.asList(by.getUsername()));
+        map(id, by.username);
+        return new DbWorkspace(id, name, Arrays.asList(by.username));
     }
 
-    public static class DbMinimalWorkspaceMapper implements ResultSetMapper<DbMinimalWorkspace> {
+    @CreateSqlObject
+    protected abstract BusesDAO buses();
 
-        @Override
-        public DbMinimalWorkspace map(int index, @Nullable ResultSet r, @Nullable StatementContext ctx)
-                throws SQLException {
-            assert r != null;
-
-            return new DbMinimalWorkspace(r.getLong("id"), r.getString("name"));
-        }
+    /**
+     * TODO should I use transaction here?
+     */
+    @Transaction
+    public WorkspaceTree getWorkspaceTree(DbWorkspace w) {
+        return WorkspaceTree.buildFromDatabase(buses(), w);
     }
 
     public static class DbMinimalWorkspace {
 
-        private final long id;
+        public final long id;
 
-        private final String name;
+        public final String name;
 
         public DbMinimalWorkspace(long id, String name) {
             this.id = id;
             this.name = name;
         }
 
-        public String getName() {
-            return name;
-        }
-
         public long getId() {
             return id;
+        }
+
+        public static class Mapper implements ResultSetMapper<DbMinimalWorkspace> {
+
+            @Override
+            public DbMinimalWorkspace map(int index, @Nullable ResultSet r, @Nullable StatementContext ctx)
+                    throws SQLException {
+                assert r != null;
+
+                return new DbMinimalWorkspace(r.getLong("id"), r.getString("name"));
+            }
         }
     }
 
     public static class DbWorkspace extends DbMinimalWorkspace {
 
-        private ImmutableList<String> users;
+        public final ImmutableList<String> users;
 
         public DbWorkspace(long id, String name, List<String> users) {
             super(id, name);
             this.users = ImmutableList.copyOf(users);
-        }
-
-        public ImmutableList<String> getUsers() {
-            return users;
         }
     }
 }

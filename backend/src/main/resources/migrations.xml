@@ -31,6 +31,7 @@
         <constraints nullable="false" />
       </column>
     </createTable>
+
     <createTable tableName="workspaces">
       <column name="id" type="bigint" autoIncrement="true">
         <constraints primaryKey="true" nullable="false" />
@@ -39,13 +40,126 @@
         <constraints nullable="false" />
       </column>
     </createTable>
+
     <createTable tableName="users_workspaces">
       <column name="workspace_id" type="bigint">
-        <constraints nullable="false" foreignKeyName="fk_workspaces_id" referencedTableName="workspaces" referencedColumnNames="id" />
+        <constraints nullable="false" foreignKeyName="fk_workspaces_id" referencedTableName="workspaces"
+          referencedColumnNames="id" />
       </column>
       <column name="username" type="varchar(255)">
-        <constraints nullable="false" foreignKeyName="fk_users_username" referencedTableName="users" referencedColumnNames="username" />
+        <constraints nullable="false" foreignKeyName="fk_users_username" referencedTableName="users"
+          referencedColumnNames="username" />
       </column>
     </createTable>
   </changeSet>
+
+  <changeSet id="v0.3.0-2" author="vnoel">
+    <createTable tableName="buses">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+      <column name="workspace_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_buses_workspace_id" referencedTableName="workspaces"
+          referencedColumnNames="id" deleteCascade="true" />
+      </column>
+      <column name="imported" type="boolean" defaultValueBoolean="false">
+        <constraints nullable="false" />
+      </column>
+      <column name="import_ip" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="import_port" type="integer">
+        <constraints nullable="false" />
+      </column>
+      <column name="import_username" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="import_password" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="import_passphrase" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="import_error" type="varchar(255)">
+        <constraints nullable="true" />
+      </column>
+      <column name="name" type="varchar(255)">
+        <constraints nullable="true" />
+      </column>
+    </createTable>
+
+    <createIndex tableName="buses" indexName="idx_workspace">
+      <column name="workspace_id" />
+    </createIndex>
+
+    <createTable tableName="containers">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+      <column name="bus_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_containers_buses_id" referencedTableName="buses"
+          referencedColumnNames="id" deleteCascade="true" />
+      </column>
+      <column name="name" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="ip" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="port" type="integer">
+        <constraints nullable="false" />
+      </column>
+      <column name="username" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="password" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+
+    <createIndex tableName="containers" indexName="idx_bus">
+      <column name="bus_id" />
+    </createIndex>
+
+    <createTable tableName="components">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+      <column name="container_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_components_containers_id" referencedTableName="containers"
+          referencedColumnNames="id" deleteCascade="true" />
+      </column>
+      <column name="name" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="state" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+
+    <createIndex tableName="components" indexName="idx_container">
+      <column name="container_id" />
+    </createIndex>
+
+    <createTable tableName="serviceunits">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+      <column name="component_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_serviceunits_components_id" referencedTableName="components"
+          referencedColumnNames="id" deleteCascade="true" />
+      </column>
+      <column name="name" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="state" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+
+    <createIndex tableName="serviceunits" indexName="idx_component">
+      <column name="component_id" />
+    </createIndex>
+  </changeSet>
+
 </databaseChangeLog>

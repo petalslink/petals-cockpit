@@ -55,7 +55,7 @@ public class CockpitAuthenticator extends AbstractUsernamePasswordAuthenticator 
         final DbUser user = users.findByUsername(username);
 
         if (user != null) {
-            if (!getPasswordEncoder().matches(credentials.getPassword(), user.getPassword())) {
+            if (!getPasswordEncoder().matches(credentials.getPassword(), user.password)) {
                 throw new BadCredentialsException("Bad credentials for: " + username);
             } else {
                 credentials.setUserProfile(new CockpitProfile(user));

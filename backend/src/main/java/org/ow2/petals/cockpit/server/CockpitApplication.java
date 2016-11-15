@@ -31,6 +31,7 @@ import org.glassfish.jersey.ServiceLocatorProvider;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.resources.UserSession;
@@ -65,6 +66,8 @@ import io.dropwizard.setup.Environment;
 public class CockpitApplication<C extends CockpitConfiguration> extends Application<C> {
 
     public static final String PETALS_ADMIN_ES = "petals-admin-exec-service";
+
+    public static final String JDBC_ES = "jdbc-exec-service";
 
     private static final Logger LOG = LoggerFactory.getLogger(CockpitApplication.class);
 
@@ -113,6 +116,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "cockpit");
         final UsersDAO users = jdbi.onDemand(UsersDAO.class);
         final WorkspacesDAO workspaces = jdbi.onDemand(WorkspacesDAO.class);
+        final BusesDAO buses = jdbi.onDemand(BusesDAO.class);
 
         // use bytecode instrumentation to improve performance of json
         // serialization/deserialization
@@ -121,17 +125,25 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         // activate session management in jetty
         environment.servlets().setSessionHandler(new SessionHandler());
 
+        // TODO add the fiber pool executor to the metrics
+        // TODO add these ExecutorService to the metrics
+
         // This needs to have only ONE thread because petals-admin uses a singleton which prevent concurrent use
         ExecutorService petalsAdminES = environment.lifecycle().executorService("petals-admin-worker-%d").maxThreads(1)
                 .build();
+        // This is needed for executing database requests from within a fiber (actors)
+        ExecutorService jdbcExec = environment.lifecycle().executorService("jdbc-worker-%d").minThreads(10)
+                .maxThreads(10).build();
 
         environment.jersey().register(new AbstractBinder() {
             @Override
             protected void configure() {
                 bind(configuration).to(CockpitConfiguration.class);
                 bind(petalsAdminES).named(PETALS_ADMIN_ES).to(ExecutorService.class);
+                bind(jdbcExec).named(JDBC_ES).to(ExecutorService.class);
                 bind(users).to(UsersDAO.class);
                 bind(workspaces).to(WorkspacesDAO.class);
+                bind(buses).to(BusesDAO.class);
                 bind(jdbi).to(DBI.class);
             }
         });
@@ -142,14 +154,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         environment.jersey().register(WorkspacesResource.class);
 
         // TODO can we do better than that?
-        environment.jersey().register(new Feature() {
-            @Override
-            public boolean configure(@Nullable FeatureContext context) {
-                WorkspaceActor.setServiceLocator(ServiceLocatorProvider.getServiceLocator(context));
-                // no need to keep that in memory...
-                return false;
-            }
-        });
+        environment.jersey().register(new ActorServiceLocator());
 
         // This is needed for SSE to work correctly!
         // See https://github.com/dropwizard/dropwizard/issues/1673
@@ -190,6 +195,15 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 final CockpitAuthenticator auth = new CockpitAuthenticator(users);
                 cac.setAuthenticator(auth);
             }
+        }
+    }
+
+    public static class ActorServiceLocator implements Feature {
+        @Override
+        public boolean configure(@Nullable FeatureContext context) {
+            WorkspaceActor.setServiceLocator(ServiceLocatorProvider.getServiceLocator(context));
+            // no need to keep that in memory...
+            return false;
         }
     }
 }

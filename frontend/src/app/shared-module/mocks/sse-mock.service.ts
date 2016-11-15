@@ -32,7 +32,7 @@ import { environment } from '../../../environments/environment';
 import { replaceIds } from '../helpers/helper';
 
 // our interfaces
-import { IBus } from '../interfaces/petals.interface';
+import { IBus, INewBus } from '../interfaces/petals.interface';
 
 @Injectable()
 export class SseMockService {
@@ -76,7 +76,7 @@ export class SseMockService {
   }
 
   // used only for the mock
-  triggerSse(bus: IBus) {
+  triggerSse(id: string, bus: INewBus) {
     // wait before simulating an sse response
     let sseDelay = environment.sseDelay;
     let sseBusImportShouldFail = false;
@@ -97,7 +97,7 @@ export class SseMockService {
           replaceIds(newBus);
 
           // ... but keep the original bus ID
-          newBus.id = bus.id;
+          newBus.id = id;
 
           let debugSseMsg;
 
@@ -107,8 +107,11 @@ export class SseMockService {
             this.observer.next({
               event: 'BUS_IMPORT_ERROR',
               data: {
-                id: newBus.id,
-                error: `An error occurred while trying to import the bus : ${newBus.id}`
+                id: id,
+                importIp: bus.ip,
+                importPort: bus.port,
+                importUsername: bus.username,
+                importError: `An error occurred while trying to import the bus : ${id}`
               }
             });
           }
