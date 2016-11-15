@@ -13,9 +13,13 @@
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@angular-cli/base-href-webpack/-/base-href-webpack-1.0.6.tgz#a4082cbdf1b7648a59f89dbb366c7fc53772dc73"
 
-"@angular/common@~2.1.0", "@angular/common@2.1.2":
+"@angular/common@~2.1.0":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@angular/common/-/common-2.1.2.tgz#5c5b37c21d6e573def1670f43962c262bc9be82e"
+
+"@angular/common@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@angular/common/-/common-2.2.0.tgz#b52686eafd71e053169ac0257f9135f9583247b6"
 
 "@angular/compiler-cli@~2.1.0":
   version "2.1.2"
@@ -25,21 +29,29 @@
     minimist "^1.2.0"
     reflect-metadata "^0.1.2"
 
-"@angular/compiler@~2.1.0", "@angular/compiler@2.1.2":
+"@angular/compiler@~2.1.0":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-2.1.2.tgz#bd2a6c558de5350bdd43aa8e8de757943ac01d2a"
 
-"@angular/core@~2.1.0", "@angular/core@2.1.2":
+"@angular/compiler@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-2.2.0.tgz#154dfba521f2cce2655610f7d2e5065b04ea86b9"
+
+"@angular/core@~2.1.0":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@angular/core/-/core-2.1.2.tgz#ce39521643f3d97bc5923d5a7aa76604e973dac8"
 
-"@angular/forms@2.1.2":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-2.1.2.tgz#c55539ea5da6d60f64475f39392ae5dd76a7e990"
+"@angular/core@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@angular/core/-/core-2.2.0.tgz#7a3a8592b6731a65e5a9746ce45419d86d15fe56"
 
-"@angular/http@2.1.2":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@angular/http/-/http-2.1.2.tgz#50aa96c3b68a44b98e3f837886c96e5930eb543a"
+"@angular/forms@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-2.2.0.tgz#1e11781c740445ab5d08fd54f3b0d6f25d4ba34d"
+
+"@angular/http@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@angular/http/-/http-2.2.0.tgz#7e44c820692be03b8c882531dbd697ee04a4e993"
 
 "@angular/material@2.0.0-alpha.9-3":
   version "2.0.0-alpha.9-3"
@@ -47,13 +59,17 @@
   dependencies:
     "@types/hammerjs" "^2.0.30"
 
-"@angular/platform-browser-dynamic@2.1.2":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@angular/platform-browser-dynamic/-/platform-browser-dynamic-2.1.2.tgz#3d51b494cfe0a29354c8c1f28369883679982af4"
+"@angular/platform-browser-dynamic@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@angular/platform-browser-dynamic/-/platform-browser-dynamic-2.2.0.tgz#db044fbdf8caeb8c4cb3eb5f5a7a57bbcf2eb9eb"
 
-"@angular/platform-browser@~2.1.0", "@angular/platform-browser@2.1.2":
+"@angular/platform-browser@~2.1.0":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@angular/platform-browser/-/platform-browser-2.1.2.tgz#1f07c3a5668ac2381a7324f9001521deede159bc"
+
+"@angular/platform-browser@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@angular/platform-browser/-/platform-browser-2.2.0.tgz#6c39651ee861be9ca86ef6b7a21a160415b2ce8e"
 
 "@angular/platform-server@~2.1.0":
   version "2.1.2"
@@ -61,9 +77,9 @@
   dependencies:
     parse5 "^2.2.1"
 
-"@angular/router@3.1.2":
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/@angular/router/-/router-3.1.2.tgz#1046c943ace795027e2e5057df8c897da968fcd6"
+"@angular/router@3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@angular/router/-/router-3.2.0.tgz#522585357ff9216e3ffae47e9045b3c150d00c7f"
 
 "@angular/tsc-wrapped@^0.3.0", "@angular/tsc-wrapped@~0.3.0":
   version "0.3.0"
@@ -93,7 +109,7 @@
   dependencies:
     "@angular-cli/ast-tools" "^1.0.0"
 
-"@types/chai@3.4.34":
+"@types/chai":
   version "3.4.34"
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-3.4.34.tgz#d5335792823bb09cddd5e38c3d211b709183854d"
 
@@ -101,13 +117,21 @@
   version "2.0.33"
   resolved "https://registry.yarnpkg.com/@types/hammerjs/-/hammerjs-2.0.33.tgz#45f57352474181425bb4b65f7313a60426d54bab"
 
-"@types/jasmine@^2.5.36", "@types/jasmine@2.5.37":
+"@types/jasmine@^2.5.36":
   version "2.5.37"
   resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.5.37.tgz#15f16040b1106941ec4aeefa3cd9c55342a0dcbb"
 
-"@types/node@^6.0.46", "@types/node@6.0.46":
+"@types/jasmine@2.5.38":
+  version "2.5.38"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.5.38.tgz#a4379124c4921d4e21de54ec74669c9e9b356717"
+
+"@types/node@^6.0.46":
   version "6.0.46"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.46.tgz#8d9e48572831f05b11cc4c793754d43437219d62"
+
+"@types/node@6.0.47":
+  version "6.0.47"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.47.tgz#07dd004f05d0b74344ebf943b559659bd7f445b1"
 
 "@types/q@^0.0.32":
   version "0.0.32"
@@ -6561,9 +6585,9 @@ rxjs@5.0.0-beta.12:
   dependencies:
     symbol-observable "^1.0.1"
 
-rxjs@5.0.0-rc.2:
-  version "5.0.0-rc.2"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.0.0-rc.2.tgz#d38206f50eeb1e77b0832a74c1c2adeeed5ec2b7"
+rxjs@5.0.0-rc.3:
+  version "5.0.0-rc.3"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.0.0-rc.3.tgz#d8bc390d83277846b2d2afa1acf3c5f4f114a8d5"
   dependencies:
     symbol-observable "^1.0.1"
 
