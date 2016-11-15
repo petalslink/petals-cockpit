@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import org.assertj.core.api.SoftAssertions;
 import org.eclipse.jdt.annotation.Nullable;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +38,7 @@ import com.codahale.metrics.MetricFilter;
 import io.dropwizard.cli.Cli;
 import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
 import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.util.JarLocation;
 
 public class AddUserTest {
@@ -45,7 +47,9 @@ public class AddUserTest {
      * The name is used in the config file
      */
     @Rule
-    public EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder().withName("cockpit").build();
+    public EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder().build();
+
+    public ConfigOverride dbConfig = ConfigOverride.config("database.url", () -> dbRule.getConnectionJdbcUrl());
 
     @Rule
     public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
@@ -87,14 +91,17 @@ public class AddUserTest {
 
         cli = new Cli(location, bootstrap, System.out, System.err);
 
-        // TODO until https://github.com/zapodot/embedded-db-junit/issues/5 is fixed
-        // let's clean the db before the test
-        cli().run("db", "drop-all", "--confirm-delete-everything", "add-user-test.yml");
+        dbConfig.addToSystemProperties();
 
         // let's setup the db
         cli().run("db", "migrate", "add-user-test.yml");
 
         systemOutRule.clearLog();
+    }
+
+    @After
+    public void tearDown() {
+        dbConfig.removeFromSystemProperties();
     }
 
     @Test
