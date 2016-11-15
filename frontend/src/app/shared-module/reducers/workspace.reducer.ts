@@ -77,6 +77,10 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
       });
   }
 
+  else if (action.type === WorkspaceActions.RESET_WORKSPACE) {
+    return workspaceRecordFactory();
+  }
+
   else if (action.type === WorkspaceActions.EDIT_PETALS_SEARCH) {
     return workspaceR.set('searchPetals', action.payload);
   }

@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div class="sidenav-menu" [class.cockpit-theme]="config?.isDarkTheme">
   <md-sidenav-layout fullscreen>
-    <md-sidenav #sidenav align="start" mode="side" opened="true">
+    <md-sidenav #sidenav align="start" mode="side" opened="true" [class.sidenav-no-workspace-selected]="!workspace.id">
 
       <md-card id="header-sidenav">
         <img class="logo-petals" src="/assets/img/logo_petalscockpit.png">
@@ -39,6 +39,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       >
         {{ 'CHANGE_WORKSPACE' | translate }}
       </button>
+
+      <div *ngIf="!workspace.id" class="info no-workspace-selected">
+        No workspace selected<br>
+        Please select one
+      </div>
 
       <md-tab-group
         #tabGroup

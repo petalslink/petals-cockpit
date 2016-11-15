@@ -179,6 +179,13 @@ describe(`Workspace Reducer`, () => {
     expect(nextState.fetchingWorkspace).toBeFalsy();
   });
 
+  it(`${WorkspaceActions.RESET_WORKSPACE}`, () => {
+    let nextStateR: IWorkspaceRecord = WorkspaceReducer(stateR, { type: WorkspaceActions.RESET_WORKSPACE });
+    let nextState = nextStateR.toJS();
+
+    expect(workspaceRecordFactory().toJS()).toEqual(nextState);
+  });
+
   // EDIT_PETALS_SEARCH
   it(`${WorkspaceActions.EDIT_PETALS_SEARCH}`, () => {
     let nextStateR: IWorkspaceRecord = WorkspaceReducer(stateR, { type: WorkspaceActions.EDIT_PETALS_SEARCH, payload: 'bus 1' });

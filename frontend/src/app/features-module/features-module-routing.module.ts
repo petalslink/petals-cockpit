@@ -27,6 +27,7 @@ import { PetalsModuleComponent } from './cockpit-module/workspaces-module/petals
 import { ServiceModuleComponent } from './cockpit-module/workspaces-module/service-module/service-module.component';
 import { ApiModuleComponent } from './cockpit-module/workspaces-module/api-module/api-module.component';
 import { SettingsComponent } from './cockpit-module/settings/settings.component';
+import { NotFoundComponent } from './../shared-module/components/not-found/not-found.component';
 /* tslint:disable:max-line-length */
 import { PetalsBusContentComponent } from './cockpit-module/workspaces-module/petals-module/petals-content-module/petals-bus-content/petals-bus-content.component';
 import { PetalsContainerContentComponent } from './cockpit-module/workspaces-module/petals-module/petals-content-module/petals-container-content/petals-container-content.component';
@@ -58,6 +59,10 @@ const routes: Routes = [
         path: '',
         component: CockpitComponent,
         children: [
+          {
+            path: '404',
+            component: NotFoundComponent,
+          },
           {
             path: '',
             pathMatch: 'full',
@@ -112,6 +117,10 @@ const routes: Routes = [
                 component: ApiModuleComponent
               }
             ]
+          },
+          {
+            path: '**',
+            redirectTo: '404'
           }
         ]
       }

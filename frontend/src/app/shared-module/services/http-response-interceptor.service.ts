@@ -44,7 +44,15 @@ export class HttpResponseInterceptor implements Interceptor {
       this.routeService.urlBeforeRedirectToLogin = (url === '/login' ? null : url);
 
       this.router.navigate(['/login']);
-    };
+    }
+
+    else if (interceptedResponse.response.status === 404) {
+      if (environment.debug) {
+        console.debug('Http response code : 404 - Redirect to /cockpit/404');
+      }
+
+      this.router.navigate(['/cockpit/404']);
+    }
 
     // return either the modified response or nothing (it's like returning the original)
     return;
