@@ -2,6 +2,7 @@ stages:
   - build
   - package
   - integration
+  - deploy
 
 variables:
   # it is also referenced in ci/settings.xml
@@ -36,6 +37,19 @@ variables:
     key: "node-6-yarn"
     paths:
       - $YARN_CACHE_DIRECTORY
+
+pages:
+  <<: *node-6
+  stage: deploy
+  script:
+    - "cd frontend"
+    - "ng build -e=gitlab-pages -bh=/petals-cockpit/"
+    - "mv dist ../public"
+  artifacts:
+    paths:
+      - public
+  #only:
+    #- master
 
 build-backend:
   <<: *mvn-java-8
