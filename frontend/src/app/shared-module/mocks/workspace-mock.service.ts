@@ -126,16 +126,21 @@ export class WorkspaceMockService {
       .delay(environment.httpDelay);
   }
 
-  importBus(newBus: INewBus) {
+  importBus(idWorkspace: string, newBus: INewBus) {
     let response = <Response>{
       ok: true,
       json: () => {
         // no need to return the newbus as we'll have to listen on sse
         // because it can be quite a long task to import a bus
-        let bus: any = { id: generateUuidV4() };
+        let bus: any = {
+          id: generateUuidV4(),
+          importIp: newBus.ip,
+          importPort: newBus.port,
+          importUsername: newBus.username
+        };
 
         // trigger a fake sse response
-        this.sseService.triggerSse(bus);
+        this.sseService.triggerSse(bus.id, newBus);
 
         return bus;
       }

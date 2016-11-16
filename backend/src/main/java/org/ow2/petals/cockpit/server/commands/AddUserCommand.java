@@ -18,8 +18,8 @@ package org.ow2.petals.cockpit.server.commands;
 
 import java.util.Optional;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jetty.util.component.LifeCycle;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
@@ -28,12 +28,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import io.dropwizard.Application;
-import io.dropwizard.Configuration;
-import io.dropwizard.cli.EnvironmentCommand;
+import io.dropwizard.cli.ConfiguredCommand;
+import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.jdbi.DBIFactory;
+import io.dropwizard.lifecycle.JettyManaged;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import io.dropwizard.util.Generics;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
@@ -43,21 +43,12 @@ import net.sourceforge.argparse4j.inf.Subparser;
  * @author vnoel
  *
  */
-public class AddUserCommand<C extends CockpitConfiguration> extends EnvironmentCommand<C> {
+public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCommand<C> {
 
     private static final PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
 
-    private Application<C> app;
-
     public AddUserCommand(Application<C> app) {
-        super(app, "add-user", "Add a user to the database");
-        this.app = app;
-    }
-
-    @Override
-    protected Class<C> getConfigurationClass() {
-        // because we subclass the configuration type in the application, the command itself has not enough information
-        return Generics.getTypeParameter(app.getClass(), Configuration.class);
+        super("add-user", "Add a user to the database");
     }
 
     @Override
@@ -73,18 +64,18 @@ public class AddUserCommand<C extends CockpitConfiguration> extends EnvironmentC
     @Override
     protected void run(@Nullable Bootstrap<C> bootstrap, @Nullable Namespace namespace, C configuration)
             throws Exception {
+        assert namespace != null;
+        assert bootstrap != null;
 
         configuration.getDataSourceFactory().asSingleConnectionPool();
-
-        super.run(bootstrap, namespace, configuration);
-    }
-
-    @Override
-    protected void run(@Nullable Environment environment, @Nullable Namespace namespace, @NonNull C configuration)
-            throws Exception {
-        assert namespace != null;
-        assert environment != null;
-
+        
+        final Environment environment = new Environment(bootstrap.getApplication().getName(),
+                bootstrap.getObjectMapper(),
+                bootstrap.getValidatorFactory().getValidator(),
+                bootstrap.getMetricRegistry(),
+                bootstrap.getClassLoader(),
+                bootstrap.getHealthCheckRegistry());
+        
         final String username = namespace.getString("username");
         // it is required
         assert username != null;
@@ -97,18 +88,37 @@ public class AddUserCommand<C extends CockpitConfiguration> extends EnvironmentC
         // required
         assert name != null;
 
-        final DBIFactory factory = new DBIFactory();
-        final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "cockpit");
+        final DBI jdbi = new DBIFactory().build(environment, configuration.getDataSourceFactory(), "cockpit");
 
-        jdbi.withHandle(h -> {
-            UsersDAO users = h.attach(UsersDAO.class);
-            Optional<DbUser> mu = users.create(username, pwEncoder.encode(password), name);
-            if (mu.isPresent()) {
-                System.out.println("Added user " + username);
-            } else {
-                System.err.println("User " + username + " already exists");
+        for (LifeCycle lifeCycle : environment.lifecycle().getManagedObjects()) {
+            if (lifeCycle instanceof JettyManaged
+                    && ((JettyManaged) lifeCycle).getManaged() instanceof ManagedDataSource) {
+                lifeCycle.start();
             }
-            return null;
-        });
+        }
+
+        try {
+            jdbi.withHandle(h -> {
+                UsersDAO users = h.attach(UsersDAO.class);
+                Optional<DbUser> mu = users.create(username, pwEncoder.encode(password), name);
+                if (mu.isPresent()) {
+                    System.out.println("Added user " + username);
+                } else {
+                    System.err.println("User " + username + " already exists");
+                }
+                return null;
+            });
+        } finally {
+            for (LifeCycle lifeCycle : environment.lifecycle().getManagedObjects()) {
+                if (lifeCycle instanceof JettyManaged
+                        && ((JettyManaged) lifeCycle).getManaged() instanceof ManagedDataSource) {
+                    try {
+                        lifeCycle.stop();
+                    } catch (Exception e) {
+                        System.err.println("Exception caught on datasource close: " + e.getMessage());
+                    }
+                }
+            }
+        }
     }
 }

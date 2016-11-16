@@ -223,9 +223,11 @@ describe(`Workspace Reducer`, () => {
       type: WorkspaceActions.IMPORT_BUS_MINIMAL_CONFIG,
       payload: {
         id: 'id1',
-        ip: '192.168.1.1',
-        port: '5000',
-        username: 'admin',
+        importIp: '192.168.1.1',
+        // even if server send a number,
+        // let's test that it works with a string
+        importPort: '5000',
+        importUsername: 'admin',
         password: 'admin',
         passphrase: 'myPassPhrase'
       }
@@ -320,8 +322,8 @@ describe(`Workspace Reducer`, () => {
       {
         type: WorkspaceActions.ADD_BUS_FAILED,
         payload: {
-          idBus: bus2.id,
-          errorMsg: 'Some error'
+          id: bus2.id,
+          importError: 'Some error'
         }
       }
     );

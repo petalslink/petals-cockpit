@@ -16,9 +16,7 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
-import java.util.List;
-import java.util.UUID;
-
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -30,13 +28,26 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
+import org.ow2.petals.cockpit.server.db.BusesDAO;
+import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
+import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.security.CockpitProfile;
+import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Singleton
 public class BusesResource {
+
+    private final WorkspacesDAO workspaces;
+
+    @Inject
+    public BusesResource(WorkspacesDAO workspaces) {
+        this.workspaces = workspaces;
+    }
 
     @Path("/{bId}")
     public Class<BusResource> busResource() {
@@ -46,204 +57,109 @@ public class BusesResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Bus addBus(@PathParam("wsId") long wsId, NewBus nb) {
-        String stringId = UUID.randomUUID().toString();
-        // TODO validate that ws exists?
-        WorkspaceActor.send(wsId, new WorkspaceActor.ImportBus(stringId, nb));
-        return new Bus(stringId);
+    public BusInProgress addBus(@PathParam("wsId") long wsId, @Pac4JProfile CockpitProfile profile, NewBus nb) {
+        DbWorkspace w = ResourcesHelpers.getWorkspace(workspaces, wsId, profile);
+
+        return WorkspaceActor.importBus(w, nb);
     }
 
     public static class BusResource {
 
+        private final BusesDAO buses;
+
+        @Inject
+        public BusResource(BusesDAO buses) {
+            this.buses = buses;
+        }
+
         @GET
         @Produces(MediaType.APPLICATION_JSON)
-        public BusConfig get(@PathParam("bId") String bId) {
+        public BusConfig get(@PathParam("bId") long bId) {
             // TODO
             return new BusConfig(bId);
         }
 
         @DELETE
         public void delete(@PathParam("bId") String bId) {
-            // TODO
+            // TODO validate workspace and access right!
+            buses.delete(bId);
         }
     }
 
     public static class NewBus {
 
-        private final String ip;
+        @JsonProperty
+        public final String importIp;
 
-        private final int port;
+        @JsonProperty
+        public final int importPort;
 
-        private final String username;
+        @JsonProperty
+        public final String importUsername;
 
-        private final String password;
+        @JsonIgnore
+        public final String importPassword;
 
-        private final String passphrase;
+        @JsonIgnore
+        public final String importPassphrase;
 
         public NewBus(@NotEmpty @JsonProperty("ip") String ip, @NotEmpty @JsonProperty("port") int port,
                 @NotEmpty @JsonProperty("username") String username,
                 @NotEmpty @JsonProperty("password") String password,
                 @NotEmpty @JsonProperty("passphrase") String passphrase) {
-            this.ip = ip;
-            this.port = port;
-            this.username = username;
-            this.password = password;
-            this.passphrase = passphrase;
-        }
-
-        public String getIp() {
-            return ip;
-        }
-
-        public int getPort() {
-            return port;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public String getPassphrase() {
-            return passphrase;
+            this.importIp = ip;
+            this.importPort = port;
+            this.importUsername = username;
+            this.importPassword = password;
+            this.importPassphrase = passphrase;
         }
     }
 
-    public static class Bus {
+    public static class BusInProgress extends NewBus {
 
-        private final String id;
+        public final long id;
 
-        public Bus(String id) {
+        @JsonCreator
+        private BusInProgress(@NotEmpty @JsonProperty("id") String id, @NotEmpty @JsonProperty("ip") String ip,
+                @NotEmpty @JsonProperty("port") int port, @NotEmpty @JsonProperty("username") String username) {
+            this(Long.valueOf(id), ip, port, username);
+        }
+
+        public BusInProgress(long id, String ip, int port, String username) {
+            super(ip, port, username, "", "");
             this.id = id;
         }
 
         @JsonProperty
         public String getId() {
-            return id;
-        }
-    }
-
-    public static class BusConfig extends Bus {
-
-        public BusConfig(String id) {
-            super(id);
+            return Long.toString(id);
         }
 
     }
 
-    public static class BusTree extends Bus {
+    public static class BusInError extends BusInProgress {
 
         @JsonProperty
-        private final String name;
+        public final String importError;
 
-        @JsonProperty
-        private final List<ContainerTree> containers;
-
-        public BusTree(String id, String name, List<ContainerTree> containers) {
-            super(id);
-            this.name = name;
-            this.containers = containers;
+        public BusInError(long id, String ip, int port, String username, String error) {
+            super(id, ip, port, username);
+            this.importError = error;
         }
     }
 
-    public static class ContainerTree {
+    public static class BusConfig {
 
-        public enum State {
-            Deployed
-        }
+        public final long id;
 
-        @JsonProperty
-        private final String id;
-
-        @JsonProperty
-        private final String name;
-
-        @JsonProperty
-        private final State state;
-
-        @JsonProperty
-        private final List<ComponentTree> components;
-
-        public ContainerTree(String id, String name, State state, List<ComponentTree> components) {
+        public BusConfig(long id) {
             this.id = id;
-            this.name = name;
-            this.state = state;
-            this.components = components;
-        }
-    }
-
-    public static class ComponentTree {
-
-        public enum State {
-            Loaded, Started, Stopped, Shutdown, Unknown;
-            
-            public static State from(ArtifactState.State state) {
-                switch (state) {
-                    case LOADED: return Loaded;
-                    case STARTED: return Started;
-                    case STOPPED: return Stopped;
-                    case SHUTDOWN: return Shutdown;
-                    case UNKNOWN: return Unknown;
-                    default:
-                        throw new AssertionError();
-                }
-            }
         }
 
         @JsonProperty
-        private final String id;
-
-        @JsonProperty
-        private final String name;
-
-        @JsonProperty
-        private final State state;
-
-        @JsonProperty
-        private final List<SUTree> serviceUnits;
-
-        public ComponentTree(String id, String name, State state, List<SUTree> serviceUnits) {
-            this.id = id;
-            this.name = name;
-            this.state = state;
-            this.serviceUnits = serviceUnits;
-        }
-    }
-
-    public static class SUTree {
-
-        public enum State {
-            Loaded, Started, Stopped, Shutdown, Unknown;
-            
-            public static State from(ArtifactState.State state) {
-                switch (state) {
-                    case LOADED: return Loaded;
-                    case STARTED: return Started;
-                    case STOPPED: return Stopped;
-                    case SHUTDOWN: return Shutdown;
-                    case UNKNOWN: return Unknown;
-                    default:
-                        throw new AssertionError();
-                }
-            }
+        public String getId() {
+            return Long.toString(id);
         }
 
-        @JsonProperty
-        private final String id;
-
-        @JsonProperty
-        private final String name;
-
-        @JsonProperty
-        private final State state;
-
-        public SUTree(String id, String name, State state) {
-            this.id = id;
-            this.name = name;
-            this.state = state;
-        }
     }
 }

@@ -37,9 +37,8 @@ public class MockAuthenticator extends CockpitAuthenticator {
     protected void internalInit(@Nullable WebContext context) {
         super.internalInit(context);
 
-        String pw = getPasswordEncoder().encode(ADMIN.getUsername());
+        String pw = getPasswordEncoder().encode(ADMIN.username);
 
-        when(users.findByUsername(ADMIN.getUsername()))
-                .thenReturn(new DbUser(ADMIN.getUsername(), pw, ADMIN.getName()));
+        when(users.findByUsername(ADMIN.username)).thenReturn(new DbUser(ADMIN.username, pw, ADMIN.name));
     }
 }

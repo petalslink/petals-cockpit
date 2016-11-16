@@ -16,11 +16,10 @@
  */
 package org.ow2.petals.cockpit.server.actors;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -33,32 +32,32 @@ import org.glassfish.jersey.server.ChunkedOutput;
 import org.ow2.petals.admin.api.ContainerAdministration;
 import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
-import org.ow2.petals.admin.api.artifact.Component;
-import org.ow2.petals.admin.api.artifact.ServiceAssembly;
-import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
-import org.ow2.petals.admin.topology.Container;
+import org.ow2.petals.admin.api.exception.DuplicatedServiceException;
+import org.ow2.petals.admin.api.exception.MissingServiceException;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
-import org.ow2.petals.cockpit.server.resources.BusesResource.BusTree;
-import org.ow2.petals.cockpit.server.resources.BusesResource.ComponentTree;
-import org.ow2.petals.cockpit.server.resources.BusesResource.ContainerTree;
+import org.ow2.petals.cockpit.server.actors.WorkspaceTree.BusTree;
+import org.ow2.petals.cockpit.server.db.BusesDAO;
+import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.resources.BusesResource.BusInError;
+import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.BusesResource.NewBus;
-import org.ow2.petals.cockpit.server.resources.BusesResource.SUTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.actors.BasicActor;
+import co.paralleluniverse.actors.behaviors.RequestMessage;
+import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.common.util.CheckedCallable;
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.FiberAsync;
 import co.paralleluniverse.fibers.SuspendExecution;
-import co.paralleluniverse.fibers.Suspendable;
-import co.paralleluniverse.strands.Strand;
 
 /**
  * TODO should we make it die after some time if there is no listeners?
@@ -75,15 +74,20 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
     @Nullable
     private static ServiceLocator serviceLocator;
 
-    /**
-     * This needs to have only ONE thread because petals-admin uses a singleton which prevent concurrent use
-     */
-    private static final ExecutorService exec = Executors.newFixedThreadPool(1,
-            new ThreadFactoryBuilder().setNameFormat("petals-admin-worker-%d").setDaemon(true).build());
-
     private final long id;
 
     private final SseBroadcaster broadcaster = new SseBroadcaster();
+
+    @Inject
+    @Named(CockpitApplication.PETALS_ADMIN_ES)
+    private ExecutorService executor;
+
+    @Inject
+    @Named(CockpitApplication.PETALS_ADMIN_ES)
+    private ExecutorService sqlExecutor;
+
+    @Inject
+    private BusesDAO buses;
 
     public WorkspaceActor(long id) {
         this.id = id;
@@ -105,21 +109,35 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         serviceLocator = sl;
     }
 
-    @Suspendable
-    public static void send(long wsId, Msg msg) {
-        if (Strand.isCurrentFiber()) {
-            try {
-                send0(wsId, msg);
-            } catch (final SuspendExecution e) {
-                throw new AssertionError(e);
-            }
-        } else {
-            new Fiber<>(() -> send0(wsId, msg)).start();
+    private static ServiceLocator serviceLocator() {
+        assert serviceLocator != null;
+        return serviceLocator;
+    }
+
+    public static BusInProgress importBus(DbWorkspace w, NewBus nb) {
+        try {
+            return RequestReplyHelper.call(WorkspaceActor.get(w), new WorkspaceActor.ImportBus(nb));
+        } catch (InterruptedException | SuspendExecution e) {
+            throw new AssertionError(e);
         }
     }
 
-    private static void send0(long wsId, Msg msg) throws SuspendExecution {
-        ActorRegistry.getOrRegisterActor("workspace-" + wsId, () -> new WorkspaceActor(wsId)).send(msg);
+    public static void newClient(DbWorkspace w, EventOutput eo) {
+        try {
+            WorkspaceActor.get(w).send(new WorkspaceActor.NewClient(eo));
+        } catch (SuspendExecution e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    private static ActorRef<Msg> get(DbWorkspace w) throws SuspendExecution {
+        ActorRef<Msg> a = ActorRegistry.getOrRegisterActor("workspace-" + w.id, () -> {
+            WorkspaceActor workspaceActor = new WorkspaceActor(w.id);
+            serviceLocator().inject(workspaceActor);
+            return workspaceActor;
+        });
+        assert a != null;
+        return a;
     }
 
     @Override
@@ -132,23 +150,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                 // this one is coming from the SSE resource
                 broadcaster.add(((NewClient) msg).output);
             } else if (msg instanceof ImportBus) {
-                ImportBus bus = (ImportBus) msg;
-                // we use a fiber to let the actor handles other message during bus import
-                new Fiber<>(() -> {
-                    WorkspaceEvent ev;
-                    try {
-                        BusTree tree = FiberAsync.runBlocking(exec,
-                                (CheckedCallable<BusTree, Exception>) () -> doImportBus(bus));
-                        ev = WorkspaceEvent.ok(bus.id, tree);
-                    } catch (Exception e) {
-                        LOG.info("Can't retrieve topology from container {}:{}: {}", bus.nb.getIp(), bus.nb.getPort(),
-                                e.getMessage());
-                        LOG.debug("Can't retrieve topology from container {}:{}", bus.nb.getIp(), bus.nb.getPort(), e);
-                        ev = WorkspaceEvent.error(bus.id, e.getMessage());
-                    }
-                    // we use send in order to keep concurrency under control by the actor!
-                    self().send(new SseEvent("WORKSPACE_CHANGE", ev));
-                }).start();
+                handleImportBus((ImportBus) msg);
             } else if (msg instanceof SseEvent) {
                 LOG.debug("Sending SSE event to clients for workspace {}: {}", id, msg);
                 broadcaster.broadcast(((SseEvent) msg).event);
@@ -158,14 +160,79 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         }
     }
 
-    private static BusTree doImportBus(ImportBus bus) throws Exception {
-        PetalsAdministration petals = PetalsAdministrationFactory.getInstance().newPetalsAdministrationAPI();
-        ContainerAdministration container = petals.newContainerAdministration();
+    private void handleImportBus(ImportBus bus) throws SuspendExecution {
+        try {
+            final NewBus nb = bus.nb;
+            final long bId = FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<Long, RuntimeException>() {
+                @Override
+                public Long call() {
+                    return buses.createBus(nb.importIp, nb.importPort, nb.importUsername, nb.importPassword,
+                            nb.importPassphrase, id);
+                }
+            });
+            RequestReplyHelper.reply(bus, new BusInProgress(bId, nb.importIp, nb.importPort, nb.importUsername));
+            // we use a fiber to let the actor handles other message during bus import
+            new Fiber<>(() -> {
+                final WorkspaceEvent ev = doImportBus(bId, nb);
+                // we use send in order to keep concurrency under control by the actor!
+                self().send(new SseEvent("WORKSPACE_CHANGE", ev));
+            }).start();
+        } catch (Exception e) {
+            RequestReplyHelper.replyError(bus, e);
+        }
+    }
+
+    private WorkspaceEvent doImportBus(long bId, NewBus bus) throws SuspendExecution, InterruptedException {
+        try {
+            final Domain topology = FiberAsync.runBlocking(executor,
+                    new CheckedCallable<Domain, ContainerAdministrationException>() {
+                        @Override
+                        public Domain call() throws ContainerAdministrationException {
+                            return getTopology(bus);
+                        }
+                    });
+            final BusTree tree = FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<BusTree, RuntimeException>() {
+                @Override
+                public BusTree call() {
+                    return buses.saveImport(bId, topology);
+                }
+            });
+            return WorkspaceEvent.ok(tree);
+        } catch (Exception e) {
+            LOG.info("Can't import bus from container {}:{}: {}", bus.importIp, bus.importPort, e.getMessage());
+            LOG.debug("Can't import bus from container {}:{}", bus.importIp, bus.importPort, e);
+            FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<@Nullable Void, RuntimeException>() {
+                @Override
+                @Nullable
+                public Void call() {
+                    buses.saveError(bId, e.getMessage());
+                    return null;
+                }
+            });
+            return WorkspaceEvent
+                    .error(new BusInError(bId, bus.importIp, bus.importPort, bus.importUsername, e.getMessage()));
+        }
+    }
+
+    /**
+     * This is meant to be run inside the single thread executor with fiber async for two reasons:
+     * 
+     * It is blocking and the petals-admin API sucks (it usess singletons)
+     */
+    private Domain getTopology(NewBus bus) throws ContainerAdministrationException {
+
+        final PetalsAdministration petals;
+        try {
+            petals = PetalsAdministrationFactory.getInstance().newPetalsAdministrationAPI();
+        } catch (DuplicatedServiceException | MissingServiceException e) {
+            throw new AssertionError(e);
+        }
+
+        final ContainerAdministration container = petals.newContainerAdministration();
 
         try {
-            container.connect(bus.nb.getIp(), bus.nb.getPort(), bus.nb.getUsername(), bus.nb.getPassword());
-            Domain topology = container.getTopology(".*", bus.nb.getPassphrase(), true);
-            return buildBusTree(bus.id, topology);
+            container.connect(bus.importIp, bus.importPort, bus.importUsername, bus.importPassword);
+            return container.getTopology(".*", bus.importPassphrase, true);
         } finally {
             try {
                 if (container.isConnected()) {
@@ -175,35 +242,6 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                 LOG.warn("Error while disconnecting from container", e);
             }
         }
-    }
-
-    private static BusTree buildBusTree(String id, Domain topology) {
-
-        List<ContainerTree> containers = new ArrayList<>();
-        for (Container container : topology.getContainers()) {
-            List<ComponentTree> components = new ArrayList<>();
-            for (Component component : container.getComponents()) {
-                List<SUTree> serviceUnits = new ArrayList<>();
-                for (ServiceAssembly sa : container.getServiceAssemblies()) {
-                    for (ServiceUnit su : sa.getServiceUnits()) {
-                        if (su.getTargetComponent().equals(component.getName())) {
-                            // TODO id
-                            serviceUnits.add(new SUTree("a", su.getName(), SUTree.State.from(sa.getState())));
-                        }
-                    }
-                }
-
-                // TODO id
-                components.add(new ComponentTree("a", component.getName(),
-                        ComponentTree.State.from(component.getState()), serviceUnits));
-            }
-
-            // TODO id
-            containers.add(
-                    new ContainerTree("a", container.getContainerName(), ContainerTree.State.Deployed, components));
-        }
-
-        return new BusTree(id, topology.getName(), containers);
     }
 
     public interface Msg {
@@ -220,14 +258,13 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
 
     }
 
-    public static class ImportBus implements Msg {
+    public static class ImportBus extends RequestMessage<BusInProgress> implements Msg {
 
-        final String id;
+        private static final long serialVersionUID = 1286574765918364762L;
 
         final NewBus nb;
 
-        public ImportBus(String id, NewBus nb) {
-            this.id = id;
+        public ImportBus(NewBus nb) {
             this.nb = nb;
         }
     }
@@ -265,26 +302,17 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
             this.data = data;
         }
 
-        public static WorkspaceEvent error(String id, String error) {
-            return new WorkspaceEvent("BUS_IMPORT_ERROR", new ImportBusError(id, error));
+        public static WorkspaceEvent error(BusInError bus) {
+            return new WorkspaceEvent("BUS_IMPORT_ERROR", bus);
         }
 
-        public static WorkspaceEvent ok(String id, BusTree bus) {
+        public static WorkspaceEvent ok(BusTree bus) {
             return new WorkspaceEvent("BUS_IMPORT_OK", bus);
         }
-    }
 
-    public static class ImportBusError {
-
-        @JsonProperty
-        private final String id;
-
-        @JsonProperty
-        private final String error;
-
-        public ImportBusError(String id, String error) {
-            this.id = id;
-            this.error = error;
+        @Override
+        public String toString() {
+            return "WorkspaceEvent [event=" + event + ", data=" + data + "]";
         }
     }
 }
