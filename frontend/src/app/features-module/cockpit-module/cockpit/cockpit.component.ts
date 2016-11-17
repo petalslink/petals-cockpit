@@ -112,20 +112,29 @@ export class CockpitComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.store$.dispatch({ type: MinimalWorkspacesActions.FETCH_WORKSPACES });
 
-    this.route.firstChild.firstChild.params.map(params => params['idWorkspace'])
-      .filter(idWorkspace => typeof idWorkspace !== 'undefined')
-      // take(1) because cockpitComponent is loaded once by the app
-      // and we won't change workspace without passing through workspacesComponent
-      // (which trigger a CHANGE_WORKSPACE too)
-      // this avoid to call change workspace twice in some cases
-      .take(1)
-      .map((idWorkspace: string) => {
-        this.store$.dispatch({ type: WorkspaceActions.FETCH_WORKSPACE, payload: idWorkspace });
-      }).subscribe();
+    let routeFirstChild = this.route.firstChild;
+
+    // check because of 404 page
+    if (routeFirstChild && routeFirstChild.firstChild) {
+      routeFirstChild.firstChild
+        .params
+        .filter(params => params !== null)
+        .map(params => params['idWorkspace'])
+        .filter(idWorkspace => typeof idWorkspace !== 'undefined')
+        // take(1) because cockpitComponent is loaded once by the app
+        // and we won't change workspace without passing through workspacesComponent
+        // (which trigger a CHANGE_WORKSPACE too)
+        // this avoid to call change workspace twice in some cases
+        .take(1)
+        .map((idWorkspace: string) => {
+          this.store$.dispatch({ type: WorkspaceActions.FETCH_WORKSPACE, payload: idWorkspace });
+        }).subscribe();
+    }
 
     const rePetals = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals/;
     const reService = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/service/;
     const reApi = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/api/;
+    const re404 = /\/cockpit\/404/;
 
     /* tslint:disable:max-line-length */
     const rePetalsBusContCompSu = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals(?:\/bus\/([0-9a-zA-Z-_]+)(?:\/container\/([0-9a-zA-Z-_]+)(?:\/component\/([0-9a-zA-Z-_]+)(?:\/serviceUnit\/([0-9a-zA-Z-_]+))?)?)?)?/;
@@ -135,6 +144,11 @@ export class CockpitComponent implements OnInit, OnDestroy {
       .filter(event => event instanceof NavigationEnd)
       .subscribe((eventUrl: any) => {
         const url = eventUrl.urlAfterRedirects;
+        // check if 404
+        if (url.match(re404)) {
+          this.store$.dispatch({ type: WorkspaceActions.RESET_WORKSPACE });
+          return;
+        }
 
         // check selected tab
         if (typeof url === 'undefined') {
