@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -33,7 +35,6 @@ import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
-import org.ow2.petals.cockpit.server.actors.WorkspaceTree;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
@@ -57,7 +58,8 @@ public class WorkspacesResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Workspace create(NewWorkspace ws, @Pac4JProfile CockpitProfile profile) {
+    @Valid
+    public Workspace create(@Valid NewWorkspace ws, @Pac4JProfile CockpitProfile profile) {
         DbWorkspace w = workspaces.create(ws.name, profile.getUser());
 
         return new Workspace(w.id, w.name, w.users);
@@ -65,6 +67,7 @@ public class WorkspacesResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Valid
     public List<Workspace> workspaces(@Pac4JProfile CockpitProfile profile) {
         return workspaces.getUserWorkspaces(profile.getUser()).stream().map(w -> new Workspace(w.id, w.name, w.users))
                 .collect(Collectors.toList());
@@ -90,7 +93,8 @@ public class WorkspacesResource {
 
         @GET
         @Produces(MediaType.APPLICATION_JSON)
-        public WorkspaceTree get(@PathParam("wsId") long wsId, @Pac4JProfile CockpitProfile profile) {
+        @Valid
+        public WorkspaceTree get(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile) {
             DbWorkspace w = ResourcesHelpers.getWorkspace(workspaces, wsId, profile);
 
             return workspaces.getWorkspaceTree(w);
@@ -99,7 +103,7 @@ public class WorkspacesResource {
         @GET
         @Path("/events")
         @Produces(SseFeature.SERVER_SENT_EVENTS)
-        public EventOutput sse(@PathParam("wsId") long wsId, @Pac4JProfile CockpitProfile profile) {
+        public EventOutput sse(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile) {
             DbWorkspace w = ResourcesHelpers.getWorkspace(workspaces, wsId, profile);
 
             final EventOutput eventOutput = new EventOutput();
@@ -116,16 +120,18 @@ public class WorkspacesResource {
 
     public static class NewWorkspace {
 
+        @NotEmpty
         @JsonProperty
         public final String name;
 
-        public NewWorkspace(@NotEmpty @JsonProperty("name") String name) {
+        public NewWorkspace(@JsonProperty("name") String name) {
             this.name = name;
         }
     }
 
     public static class MinWorkspace extends NewWorkspace {
 
+        @Min(1)
         public final long id;
 
         public MinWorkspace(long id, String name) {

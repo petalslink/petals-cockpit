@@ -38,12 +38,12 @@ import org.ow2.petals.admin.api.exception.MissingServiceException;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
-import org.ow2.petals.cockpit.server.actors.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusInError;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.BusesResource.NewBus;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,11 +166,10 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
             final long bId = FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<Long, RuntimeException>() {
                 @Override
                 public Long call() {
-                    return buses.createBus(nb.importIp, nb.importPort, nb.importUsername, nb.importPassword,
-                            nb.importPassphrase, id);
+                    return buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, id);
                 }
             });
-            RequestReplyHelper.reply(bus, new BusInProgress(bId, nb.importIp, nb.importPort, nb.importUsername));
+            RequestReplyHelper.reply(bus, new BusInProgress(bId, nb.ip, nb.port, nb.username));
             // we use a fiber to let the actor handles other message during bus import
             new Fiber<>(() -> {
                 final WorkspaceEvent ev = doImportBus(bId, nb);
@@ -199,8 +198,8 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
             });
             return WorkspaceEvent.ok(tree);
         } catch (Exception e) {
-            LOG.info("Can't import bus from container {}:{}: {}", bus.importIp, bus.importPort, e.getMessage());
-            LOG.debug("Can't import bus from container {}:{}", bus.importIp, bus.importPort, e);
+            LOG.info("Can't import bus from container {}:{}: {}", bus.ip, bus.port, e.getMessage());
+            LOG.debug("Can't import bus from container {}:{}", bus.ip, bus.port, e);
             FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<@Nullable Void, RuntimeException>() {
                 @Override
                 @Nullable
@@ -209,8 +208,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                     return null;
                 }
             });
-            return WorkspaceEvent
-                    .error(new BusInError(bId, bus.importIp, bus.importPort, bus.importUsername, e.getMessage()));
+            return WorkspaceEvent.error(new BusInError(bId, bus.ip, bus.port, bus.username, e.getMessage()));
         }
     }
 
@@ -231,8 +229,8 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         final ContainerAdministration container = petals.newContainerAdministration();
 
         try {
-            container.connect(bus.importIp, bus.importPort, bus.importUsername, bus.importPassword);
-            return container.getTopology(".*", bus.importPassphrase, true);
+            container.connect(bus.ip, bus.port, bus.username, bus.password);
+            return container.getTopology(".*", bus.passphrase, true);
         } finally {
             try {
                 if (container.isConnected()) {
