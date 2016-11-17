@@ -7,7 +7,7 @@ variables:
   # it is also referenced in ci/settings.xml
   M2_STAGING_DIRECTORY: staging
   M2_CACHED_REPOSITORY: m2cache
-  NG: "node_modules/angular-cli/bin/ng"
+  YARN_CACHE_DIRECTORY: yarncache
   DISPLAY: ":99"
   XVFB: "Xvfb $DISPLAY -ac -screen 0 1280x720x16 -nolisten tcp"
 
@@ -26,15 +26,16 @@ variables:
 .node-6: &node-6
   image: registry.gitlab.com/victornoel/petals-cockpit
   before_script:
+    # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
     - "cd frontend"
-    - "npm install"
-    - "npm prune"
-    - "$NG -v"
+    - "export PATH=`yarn bin`:$PATH"
+    # see https://github.com/yarnpkg/yarn/issues/1316 for cache
+    - "yarn --cache-folder ../$YARN_CACHE_DIRECTORY --pure-lockfile"
     - "cd .."
   cache:
-    key: "node-6"
+    key: "node-6-yarn"
     paths:
-      - frontend/node_modules/
+      - $YARN_CACHE_DIRECTORY
 
 build-backend:
   <<: *mvn-java-8
@@ -57,13 +58,13 @@ build-frontend:
     - /^back\/.*$/
   script:
     - "cd frontend"
-    - "$NG lint"
+    - "ng lint"
     - "node generate-headers.js --dry"
     - "nohup $XVFB &"
-    - "$NG test --watch false"
-    - "nohup $NG serve -e=prod-e2e &"
-    - "$NG e2e"
-    - "$NG build --prod"
+    - "ng test --watch false"
+    - "nohup ng serve -e=prod-e2e &"
+    - "ng e2e"
+    - "ng build --prod"
   artifacts:
     paths:
       - frontend/dist
@@ -101,4 +102,4 @@ e2e-product:
     - "nohup $COCKPIT server cockpit/default.yml &"
     - "nohup $XVFB &"
     - "cd frontend"
-    - "$NG e2e"
+    - "ng e2e"
