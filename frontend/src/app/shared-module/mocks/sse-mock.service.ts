@@ -90,7 +90,7 @@ export class SseMockService {
     }
 
     let timeoutSseTmp = setTimeout(() => {
-      this.http.get('./mocks-json/imported-bus.json')
+      this.http.get('mocks-json/imported-bus.json')
         .map(data => data.json())
         .subscribe((newBus: IBus) => {
           // replace every ID by a generated UUID

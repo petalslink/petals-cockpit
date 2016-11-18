@@ -38,10 +38,8 @@ export class HttpResponseInterceptor implements Interceptor {
         console.debug('Http response code : 401 - Redirect to /login');
       }
 
-      let url = window.location.pathname;
-
       // before we redirect to /login, save the asked URL so we can route back the user once he's logged
-      this.routeService.urlBeforeRedirectToLogin = (url === '/login' ? null : url);
+      this.routeService.urlBeforeRedirectToLogin = (this.router.url === '/login' ? null : this.router.url);
 
       this.router.navigate(['/login']);
     }

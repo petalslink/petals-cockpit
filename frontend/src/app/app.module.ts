@@ -20,6 +20,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { Http } from '@angular/http';
+import { LocationStrategy, HashLocationStrategy, PathLocationStrategy } from '@angular/common';
 
 // http interceptor
 import { provideInterceptorService } from 'ng2-interceptors';
@@ -117,6 +118,12 @@ export function createTranslateLoader(http: Http) {
     MaterialModule.forRoot(),
   ],
   providers: [
+    // use hash location strategy or not based on env
+    {
+      provide: LocationStrategy,
+      useClass: (environment.hashLocationStrategy ? HashLocationStrategy : PathLocationStrategy)
+    },
+
     // http interceptors
     HttpResponseInterceptor,
     provideInterceptorService([

@@ -51,7 +51,7 @@ export class WorkspaceMockService {
   ) { }
 
   updateWorkspaces(): Observable<Response> {
-    return this.http.get('/mocks-json/workspaces.json')
+    return this.http.get('mocks-json/workspaces.json')
       .map((res: Response) => res.json())
       .delay(environment.httpDelay)
       .map(workspaces => {
@@ -65,7 +65,7 @@ export class WorkspaceMockService {
   }
 
   updateWorkspace(idWorkspace: string): Observable<Response> {
-    return this.http.get(`/mocks-json/ws-${idWorkspace}.json`)
+    return this.http.get(`mocks-json/ws-${idWorkspace}.json`)
       .map((res: Response) => res.json())
       .delay(environment.httpDelay)
       .map((workspace: IWorkspace) => {
@@ -152,7 +152,7 @@ export class WorkspaceMockService {
   }
 
   getBusConfig(): Observable<Response> {
-    return this.http.get('/mocks-json/bus0-demo.json')
+    return this.http.get('mocks-json/bus0-demo.json')
       .map((res: Response) => res.json())
       .delay(environment.httpDelay)
       .map(config => {

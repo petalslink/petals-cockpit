@@ -9,6 +9,7 @@
       "outDir": "dist",
       "assets": [
         "assets",
+        "mocks-json",
         "favicon.ico"
       ],
       "mocks-json": "mocks-json",
@@ -32,7 +33,8 @@
         "prod": "environments/environment.prod.ts",
         "dev-e2e": "environments/environment.dev-e2e.ts",
         "dev-nomock": "environments/environment.dev-nomock.ts",
-        "prod-e2e": "environments/environment.prod-e2e.ts"
+        "prod-e2e": "environments/environment.prod-e2e.ts",
+        "gitlab-pages": "environments/environment.gitlab-pages.ts"
       }
     }
   ],

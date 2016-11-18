@@ -98,8 +98,6 @@ export class UserEffects {
           throw new Error('Error while disconnecting user');
         }
 
-        this.router.navigate(['/login']);
-
         return { type: UserActions.USR_IS_DISCONNECTED };
       })
       .catch((err) => {
@@ -110,4 +108,10 @@ export class UserEffects {
         return Observable.of({ type: UserActions.USR_DISCONNECTION_FAILED });
       })
     );
+
+  @Effect({dispatch: false}) usrDisconnected$: Observable<void> = this.actions$
+    .ofType(UserActions.USR_IS_DISCONNECTED)
+    .map(() => {
+        this.router.navigate(['/login']);
+    });
 }

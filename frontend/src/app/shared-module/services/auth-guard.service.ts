@@ -66,10 +66,8 @@ export class AuthGuardService implements CanActivate {
           console.error(err);
         }
 
-        let url = window.location.pathname;
-
         // before we redirect to /login, save the asked URL so we can route back the user once he's logged
-        this.routeService.urlBeforeRedirectToLogin = (url === '/login' ? null : url);
+        this.routeService.urlBeforeRedirectToLogin = (this.router.url === '/login' ? null : this.router.url);
 
         this.router.navigate(['/login']);
         return Observable.of(false);
