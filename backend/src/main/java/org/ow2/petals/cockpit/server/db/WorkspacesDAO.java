@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.ow2.petals.cockpit.server.actors.WorkspaceTree;
 import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.BindBean;

@@ -14,11 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.actors;
+package org.ow2.petals.cockpit.server.resources;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotEmpty;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
@@ -46,9 +51,11 @@ import co.paralleluniverse.fibers.Suspendable;
 
 public class WorkspaceTree extends MinWorkspace {
 
+    @Valid
     @JsonProperty
     public final ImmutableList<BusInProgress> busesInProgress;
 
+    @Valid
     @JsonProperty
     public final ImmutableList<BusTree> buses;
 
@@ -127,11 +134,14 @@ public class WorkspaceTree extends MinWorkspace {
 
     public static class BusTree {
 
+        @Min(1)
         public final long id;
 
+        @NotEmpty
         @JsonProperty
         public final String name;
 
+        @Valid
         @JsonProperty
         public final ImmutableList<ContainerTree> containers;
 
@@ -149,11 +159,14 @@ public class WorkspaceTree extends MinWorkspace {
 
     public static class ContainerTree {
 
+        @Min(1)
         public final long id;
 
+        @NotEmpty
         @JsonProperty
         public final String name;
 
+        @Valid
         @JsonProperty
         public final ImmutableList<ComponentTree> components;
 
@@ -192,14 +205,18 @@ public class WorkspaceTree extends MinWorkspace {
             }
         }
 
+        @Min(1)
         public final long id;
 
+        @NotEmpty
         @JsonProperty
         public final String name;
 
+        @NotNull
         @JsonProperty
         public final State state;
 
+        @Valid
         @JsonProperty
         public final ImmutableList<SUTree> serviceUnits;
 
@@ -239,11 +256,14 @@ public class WorkspaceTree extends MinWorkspace {
             }
         }
 
+        @Min(1)
         public final long id;
 
+        @NotEmpty
         @JsonProperty
         public final String name;
 
+        @NotNull
         @JsonProperty
         public final State state;
 

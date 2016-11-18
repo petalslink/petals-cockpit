@@ -34,7 +34,7 @@
     <!-- empty by default (if not, @{argLine} is not replaced in surefire and failsafe -->
     <argLine></argLine>
 
-    <dropwizard.version>1.0.3</dropwizard.version>
+    <dropwizard.version>1.0.4</dropwizard.version>
     <quasar.version>0.7.6</quasar.version>
     <comsat.version>0.7.0</comsat.version>
   </properties>

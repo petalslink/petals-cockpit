@@ -51,37 +51,32 @@ public class CockpitExtractor implements CredentialsExtractor<@Nullable Username
             // should be ok, since we don't need to read it, and we shouldn't anyway)
             final Authentication auth = request.readEntity(Authentication.class);
 
-            if (auth == null || Strings.isNullOrEmpty(auth.getUsername())
-                    || Strings.isNullOrEmpty(auth.getPassword())) {
+            if (auth == null || Strings.isNullOrEmpty(auth.username) || Strings.isNullOrEmpty(auth.password)) {
                 return null;
             }
 
-            return new UsernamePasswordCredentials(auth.getUsername(), auth.getPassword(), clientName);
+            return new UsernamePasswordCredentials(auth.username, auth.password, clientName);
         } else {
             return null;
         }
     }
 
+    /**
+     * Careful, the {@link NotEmpty} annotations are not used by readEntity above for now
+     */
     public static class Authentication {
 
-        private final String username;
+        @NotEmpty
+        @JsonProperty
+        public final String username;
 
-        private final String password;
+        @NotEmpty
+        @JsonProperty
+        public final String password;
 
-        public Authentication(@NotEmpty @JsonProperty("username") String username,
-                @NotEmpty @JsonProperty("password") String password) {
+        public Authentication(@JsonProperty("username") String username, @JsonProperty("password") String password) {
             this.username = username;
             this.password = password;
-        }
-
-        @JsonProperty
-        public String getUsername() {
-            return username;
-        }
-
-        @JsonProperty
-        public String getPassword() {
-            return password;
         }
     }
 

@@ -18,6 +18,9 @@ package org.ow2.petals.cockpit.server.resources;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -36,7 +39,6 @@ import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Singleton
@@ -57,7 +59,9 @@ public class BusesResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public BusInProgress addBus(@PathParam("wsId") long wsId, @Pac4JProfile CockpitProfile profile, NewBus nb) {
+    @Valid
+    public BusInProgress addBus(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
+            @Valid NewBus nb) {
         DbWorkspace w = ResourcesHelpers.getWorkspace(workspaces, wsId, profile);
 
         return WorkspaceActor.importBus(w, nb);
@@ -74,13 +78,14 @@ public class BusesResource {
 
         @GET
         @Produces(MediaType.APPLICATION_JSON)
-        public BusConfig get(@PathParam("bId") long bId) {
+        @Valid
+        public BusConfig get(@PathParam("bId") @Min(1) long bId) {
             // TODO
             return new BusConfig(bId);
         }
 
         @DELETE
-        public void delete(@PathParam("bId") String bId) {
+        public void delete(@PathParam("bId") @Min(1) long bId) {
             // TODO validate workspace and access right!
             buses.delete(bId);
         }
@@ -88,46 +93,67 @@ public class BusesResource {
 
     public static class NewBus {
 
+        @NotEmpty
         @JsonProperty
-        public final String importIp;
+        public final String ip;
 
+        @Min(1)
+        @Max(65535)
         @JsonProperty
-        public final int importPort;
+        public final int port;
 
+        @NotEmpty
         @JsonProperty
-        public final String importUsername;
+        public final String username;
 
-        @JsonIgnore
-        public final String importPassword;
+        @NotEmpty
+        @JsonProperty
+        public final String password;
 
-        @JsonIgnore
-        public final String importPassphrase;
+        @NotEmpty
+        @JsonProperty
+        public final String passphrase;
 
-        public NewBus(@NotEmpty @JsonProperty("ip") String ip, @NotEmpty @JsonProperty("port") int port,
-                @NotEmpty @JsonProperty("username") String username,
-                @NotEmpty @JsonProperty("password") String password,
-                @NotEmpty @JsonProperty("passphrase") String passphrase) {
-            this.importIp = ip;
-            this.importPort = port;
-            this.importUsername = username;
-            this.importPassword = password;
-            this.importPassphrase = passphrase;
+        public NewBus(@JsonProperty("ip") String ip, @JsonProperty("port") int port,
+                @JsonProperty("username") String username, @JsonProperty("password") String password,
+                @JsonProperty("passphrase") String passphrase) {
+            this.ip = ip;
+            this.port = port;
+            this.username = username;
+            this.password = password;
+            this.passphrase = passphrase;
         }
     }
 
-    public static class BusInProgress extends NewBus {
+    public static class BusInProgress {
 
+        @NotEmpty
+        @JsonProperty
+        public final String importIp;
+
+        @Min(1)
+        @Max(65535)
+        @JsonProperty
+        public final int importPort;
+
+        @NotEmpty
+        @JsonProperty
+        public final String importUsername;
+
+        @Min(1)
         public final long id;
 
         @JsonCreator
-        private BusInProgress(@NotEmpty @JsonProperty("id") String id, @NotEmpty @JsonProperty("ip") String ip,
-                @NotEmpty @JsonProperty("port") int port, @NotEmpty @JsonProperty("username") String username) {
+        private BusInProgress(@JsonProperty("id") String id, @JsonProperty("ip") String ip,
+                @JsonProperty("port") int port, @JsonProperty("username") String username) {
             this(Long.valueOf(id), ip, port, username);
         }
 
         public BusInProgress(long id, String ip, int port, String username) {
-            super(ip, port, username, "", "");
             this.id = id;
+            this.importIp = ip;
+            this.importPort = port;
+            this.importUsername = username;
         }
 
         @JsonProperty
@@ -150,9 +176,11 @@ public class BusesResource {
 
     public static class BusConfig {
 
+        @Min(1)
         public final long id;
 
-        public BusConfig(long id) {
+        @JsonCreator
+        public BusConfig(@JsonProperty("id") long id) {
             this.id = id;
         }
 

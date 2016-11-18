@@ -22,9 +22,9 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.actors.WorkspaceTree;
-import org.ow2.petals.cockpit.server.actors.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.BindBean;
@@ -84,7 +84,7 @@ public abstract class BusesDAO {
     }
 
     @SqlUpdate("delete from buses where id = :id")
-    public abstract void delete(@Bind("id") String bId);
+    public abstract void delete(@Bind("id") long bId);
 
     public abstract static class DbBus {
 
