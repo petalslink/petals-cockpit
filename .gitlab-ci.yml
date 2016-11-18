@@ -31,7 +31,7 @@ variables:
     - "cd frontend"
     - "export PATH=`yarn bin`:$PATH"
     # see https://github.com/yarnpkg/yarn/issues/1316 for cache
-    - "yarn --cache-folder ../$YARN_CACHE_DIRECTORY --pure-lockfile"
+    - "time yarn --cache-folder ../$YARN_CACHE_DIRECTORY --pure-lockfile"
     - "cd .."
   cache:
     key: "node-6-yarn"
@@ -72,13 +72,17 @@ build-frontend:
     - /^back\/.*$/
   script:
     - "cd frontend"
-    - "ng lint"
-    - "node generate-headers.js --dry"
+    - "time ng lint"
+    - "time node generate-headers.js --dry"
     - "nohup $XVFB &"
-    - "ng test --watch false"
+    - "XVFBPID=$!"
+    - "time ng test --watch false"
     - "nohup ng serve -e=prod-e2e &"
-    - "ng e2e"
-    - "ng build --prod"
+    - "NGPID=$!"
+    - "time ng e2e"
+    - "kill $NGPID"
+    - "kill $XVFBPID"
+    - "time ng build --prod"
   artifacts:
     paths:
       - frontend/dist
