@@ -2,6 +2,7 @@ export const environment = {
   production: false,
   mock: true,
   urlBackend: '/api',
+  hashLocationStrategy: true,
   debug: true,
   // auto log user or not
   // useful for dev env to avoid being redirected to /login every time the page is reloaded
