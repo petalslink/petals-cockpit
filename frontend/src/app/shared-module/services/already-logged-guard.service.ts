@@ -74,10 +74,8 @@ export class AlreadyLoggedGuardService implements CanActivate {
 
         // 401 --> unauthorized
         if (err.status === 401) {
-          let url = window.location.pathname;
-
           // before we redirect to /login, save the asked URL so we can route back the user once he's logged
-          this.routeService.urlBeforeRedirectToLogin = (url === '/login' ? null : url);
+          this.routeService.urlBeforeRedirectToLogin = (this.router.url === '/login' ? null : this.router.url);
 
           // user is not logged
           return Observable.of(true);

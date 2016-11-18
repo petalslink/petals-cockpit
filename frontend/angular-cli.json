@@ -9,6 +9,7 @@
       "outDir": "dist",
       "assets": [
         "assets",
+        "mocks-json",
         "favicon.ico"
       ],
       "mocks-json": "mocks-json",
