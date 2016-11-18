@@ -1,4 +1,7 @@
 # Petals Cockpit
+Running demo (mock) [https://victornoel.gitlab.io/petals-cockpit](https://victornoel.gitlab.io/petals-cockpit)
+- Username: admin
+- Password: admin
 
 ## Trying Petals Cockpit
 
