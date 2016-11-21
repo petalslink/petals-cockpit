@@ -27,7 +27,10 @@ import { IBus } from '../../../../../../shared-module/interfaces/petals.interfac
 import { IWorkspace } from '../../../../../../shared-module/interfaces/workspace.interface';
 
 // our actions
+
 import { WorkspaceActions } from './../../../../../../shared-module/reducers/workspace.actions';
+
+import { ConfigActions } from '../../../../../../shared-module/reducers/config.actions';
 
 @Component({
   selector: 'app-buses-menu',
@@ -51,5 +54,9 @@ export class BusesMenuComponent {
   fold(idBus: string) {
     this.store$.dispatch({ type: WorkspaceActions.TOGGLE_FOLD_BUS, payload: { idBus } });
     return false;
+  }
+
+  closeSidenav() {
+    this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV });
   }
 }

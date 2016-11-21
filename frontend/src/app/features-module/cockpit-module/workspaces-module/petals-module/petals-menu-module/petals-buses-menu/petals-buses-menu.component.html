@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       md-list-item
       [routerLink]="['/', 'cockpit', 'workspaces', idWorkspaceSelected, 'petals', 'bus', bus.id]"
       class="bus"
+      (click)="closeSidenav()"
       [class.color-primary-bold]="bus.id === idBusSelected"
     >
       <md-icon (click)="fold(bus.id)" [class.rotate-minus-90]="bus.isFolded">arrow_drop_down</md-icon>

@@ -14,10 +14,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div class="page-workspaces">
-  <md-toolbar color="primary">
+  <md-toolbar align="start" color="primary">
+    <app-toggle-sidenav></app-toggle-sidenav>
     <span>Workspaces</span>
 
-    <span class="flex-space"></span>
+    <span flex></span>
 
     <button md-icon-button [md-menu-trigger-for]="menu">
       <md-icon>more_vert</md-icon>
@@ -49,29 +50,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   </md-toolbar>
 
   <div class="bkg-primary-card">
-    <md-card class="central-content">
-      <md-card-header>
+    <md-card class="central-content" layout="column">
+      <md-card-header layout-margin layout-padding>
         <md-card-title>
           Workspaces
           <md-progress-circle *ngIf="minimalWorkspaces.fetchingWorkspaces" mode="indeterminate"></md-progress-circle>
         </md-card-title>
-
         <md-card-subtitle>Select the workspace you want to work with</md-card-subtitle>
       </md-card-header>
 
-      <img md-card-image src="assets/img/workspace.png">
+      <div class="pnl-workspace-img">
+        <img md-card-image src="assets/img/workspace.png">
+        <button
+          md-mini-fab
+          class="btn-show-panel-add-workspace"
+          *ngIf="minimalWorkspaces && minimalWorkspaces.minimalWorkspaces.length > 0"
+          (click)="toggleAddPanel()"
+        >
+          <md-icon class="md-24" *ngIf="!addingWorkspace">add</md-icon>
+          <md-icon class="md-24" *ngIf="addingWorkspace">clear</md-icon>
+        </button>
+      </div>
 
-      <button
-        md-mini-fab
-        class="btn-show-panel-add-workspace"
-        *ngIf="minimalWorkspaces && minimalWorkspaces.minimalWorkspaces.length > 0"
-        (click)="toggleAddPanel()"
-      >
-        <md-icon class="md-24" *ngIf="!addingWorkspace">add</md-icon>
-        <md-icon class="md-24" *ngIf="addingWorkspace">clear</md-icon>
-      </button>
-
-      <md-card-content *ngIf="minimalWorkspaces">
+      <md-card-content layout-margin *ngIf="minimalWorkspaces">
         <p *ngIf="!minimalWorkspaces.fetchingWorkspaces && minimalWorkspaces.minimalWorkspaces.length === 0">
           You don't have any workspace.
         </p>
@@ -81,19 +82,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           #addWorkspaceForm="ngForm"
           (ngSubmit)="addWorkspace(addWorkspaceForm.value.name)"
         >
-          <p>
-            <md-input #nameInput [(ngModel)]="name" class="new-workspace-name" name="name" placeholder="Workspace's name" [disabled]="minimalWorkspaces.addingWorkspace"></md-input>
-
-            <button md-raised-button type="submit" [disabled]="minimalWorkspaces.addingWorkspace" class="btn-add-workspace">
+          <div layout="row" layout-margin layout-padding layout-align="start center">
+            <md-input color="primary" #nameInput [(ngModel)]="name"
+                      name="name" placeholder="Workspace's name" [disabled]="minimalWorkspaces.addingWorkspace">
+            </md-input>
+            <button [class.color-primary-bold]="minimalWorkspaces.addingWorkspace" md-raised-button type="submit"
+                    [disabled]="minimalWorkspaces.addingWorkspace">
               Add workspace
-
               <md-progress-circle *ngIf="minimalWorkspaces.addingWorkspace" mode="indeterminate"></md-progress-circle>
             </button>
-          </p>
+          </div>
         </form>
 
         <md-nav-list>
-          <md-list-item *ngFor="let minimalWorkspace of minimalWorkspaces.minimalWorkspaces" (click)="selectWorkspace(minimalWorkspace.id)">
+          <md-list-item *ngFor="let minimalWorkspace of minimalWorkspaces.minimalWorkspaces"
+                        (click)="selectWorkspace(minimalWorkspace.id)">
             <h3 md-line [class.color-primary-bold]="workspace.id === minimalWorkspace.id">
               {{ minimalWorkspace.name }}
 
@@ -125,7 +128,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </p>
           </md-list-item>
         </md-nav-list>
+
       </md-card-content>
+
     </md-card>
   </div>
+
 </div>

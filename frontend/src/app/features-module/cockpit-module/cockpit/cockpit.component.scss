@@ -39,10 +39,6 @@ md-sidenav {
   padding-bottom: 10px;
 }
 
-.icon-power {
-  float: right;
-}
-
 /deep/ .md-tab-label {
   min-width: 1px !important;
   width: 100% !important;
@@ -69,11 +65,6 @@ md-progress-circle {
 }
 
 /* Content */
-
-#card-full-size {
-  justify-content: space-between;
-  background-color: #c2c2c2;
-}
 
 .no-workspace-selected {
   margin-top: 20px;

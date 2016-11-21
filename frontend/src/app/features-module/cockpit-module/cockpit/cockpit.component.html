@@ -13,19 +13,21 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div class="sidenav-menu" [class.cockpit-theme]="config?.isDarkTheme">
+<div layout="column" class="sidenav-menu" [class.cockpit-theme]="config?.isDarkTheme">
   <md-sidenav-layout fullscreen>
-    <md-sidenav #sidenav align="start" mode="side" opened="true" [class.sidenav-no-workspace-selected]="!workspace.id">
+    <md-sidenav #start mode="over" (close)="closeSidenav()" [class.sidenav-no-workspace-selected]="!workspace.id">
 
       <md-card id="header-sidenav">
         <img class="logo-petals" src="assets/img/logo_petalscockpit.png">
         <md-card-title-group>
-          <button class="settings" md-icon-button routerLink="/cockpit/workspaces/settings">
+
+          <button md-icon-button routerLink="/cockpit/workspaces/settings" (click)="closeSidenav()">
+
             <md-icon>settings</md-icon>
           </button>
-
+          <span flex></span>
           <p>{{ user.name }}</p>
-
+          <span flex></span>
           <button md-icon-button [disabled]="user.isDisconnecting" class="icon-power" (click)="disconnectUser()">
             <md-icon *ngIf="!user.isDisconnecting">power_settings_new</md-icon>
             <md-progress-circle *ngIf="user.isDisconnecting" mode="indeterminate"></md-progress-circle>
@@ -40,6 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           md-raised-button
           *ngIf="workspace.name"
           color="accent"
+          (click)="closeSidenav()"
           [routerLink]="['workspaces', workspace.id]"
         >
           {{ workspace.name }}
@@ -48,6 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           md-raised-button
           *ngIf="workspace.name"
           color="accent"
+          (click)="closeSidenav()"
           [routerLink]="['workspaces']"
         >
           <md-icon>view_list</md-icon>
@@ -60,6 +64,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </div>
 
       <md-tab-group
+        layout="row"
         #tabGroup
         *ngIf="workspace.id"
         [selectedIndex]="tabSelectedIndex"

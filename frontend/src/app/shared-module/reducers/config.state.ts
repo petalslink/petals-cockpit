@@ -23,7 +23,8 @@ import { IConfig, IConfigRecord } from '../interfaces/config.interface';
 
 export function configFactory(): IConfig {
   return {
-    isDarkTheme: false
+    isDarkTheme: false,
+    isSidenavVisible: true
   };
 }
 

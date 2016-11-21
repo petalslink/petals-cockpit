@@ -33,6 +33,7 @@ import { getSearchedWorkspace } from '../../../../../../shared-module/reducers/w
 
 // our actions
 import { WorkspaceActions } from '../../../../../../shared-module/reducers/workspace.actions';
+import { ConfigActions } from '../../../../../../shared-module/reducers/config.actions';
 
 @Component({
   selector: 'app-petals-sidenav-menu',
@@ -69,5 +70,9 @@ export class PetalsSidenavMenuComponent implements OnDestroy {
 
   search(textSearch) {
     this.store$.dispatch({ type: WorkspaceActions.EDIT_PETALS_SEARCH, payload: textSearch });
+  }
+
+  closeSidenav() {
+    this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV });
   }
 }

@@ -16,16 +16,15 @@
  */
 
 // angular modules
-import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, AfterViewInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { MdSidenav } from '@angular/material';
 
 // rxjs
 import { Subscription } from 'rxjs';
 
 // ngrx - store
 import { Store } from '@ngrx/store';
-
-// our actions
 
 // our interfaces
 import { IStore } from '../../../shared-module/interfaces/store.interface';
@@ -41,6 +40,7 @@ import { IWorkspaceRecord, IWorkspace } from '../../../shared-module/interfaces/
 import { UserActions } from '../../../shared-module/reducers/user.actions';
 import { MinimalWorkspacesActions } from '../../../shared-module/reducers/minimal-workspaces.actions';
 import { WorkspaceActions } from '../../../shared-module/reducers/workspace.actions';
+import { ConfigActions } from '../../../shared-module/reducers/config.actions';
 
 interface ITabs extends Array<{ title: string, url: string }> {};
 
@@ -60,8 +60,10 @@ const tabs = [{
   templateUrl: 'cockpit.component.html',
   styleUrls: ['cockpit.component.scss']
 })
-export class CockpitComponent implements OnInit, OnDestroy {
+
+export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   public config: IConfig;
+
   private configSub: Subscription;
   public user: IUser;
   private userSub: Subscription;
@@ -70,8 +72,11 @@ export class CockpitComponent implements OnInit, OnDestroy {
   public workspace: IWorkspace;
   private workspaceSub: Subscription;
 
+  public isSidenavVisibleSub: Subscription;
   public tabSelectedIndex: number = -1;
   public tabs: ITabs;
+
+  @ViewChild('start') start: MdSidenav;
 
   constructor(
     private store$: Store<IStore>,
@@ -82,7 +87,9 @@ export class CockpitComponent implements OnInit, OnDestroy {
     this.configSub =
       store$.select('config')
         .map((configR: IConfigRecord) => configR.toJS())
-        .subscribe((config: IConfig) => this.config = config);
+        .subscribe((config: IConfig) => {
+            this.config = config;
+        });
 
     this.userSub =
       store$.select('user')
@@ -107,6 +114,23 @@ export class CockpitComponent implements OnInit, OnDestroy {
     this.userSub.unsubscribe();
     this.minimalWorkspacesSub.unsubscribe();
     this.workspaceSub.unsubscribe();
+    this.isSidenavVisibleSub.unsubscribe();
+  }
+
+  ngAfterViewInit() {
+
+    this.isSidenavVisibleSub =
+      this.store$.select('config')
+        .map((configR: IConfigRecord) => configR.get('isSidenavVisible'))
+        .distinctUntilChanged()
+        .map((isSidenavVisible: boolean) => {
+          if (isSidenavVisible) {
+            this.start.open();
+          } else {
+            this.start.close();
+          }
+        })
+        .subscribe();
   }
 
   ngOnInit() {
@@ -190,5 +214,13 @@ export class CockpitComponent implements OnInit, OnDestroy {
 
   disconnectUser() {
     this.store$.dispatch({ type: UserActions.USR_IS_DISCONNECTING });
+  }
+
+  toggleSidenav() {
+    this.store$.dispatch({ type: ConfigActions.TOGGLE_SIDENAV });
+  }
+
+  closeSidenav() {
+    this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV });
   }
 }

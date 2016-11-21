@@ -18,10 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
     <a md-list-item
       [routerLink]="['/', 'cockpit',
-        'workspaces', idWorkspaceSelected,
-        'petals', 'bus', idBus,
-        'container', container.id]"
+      'workspaces', idWorkspaceSelected,
+      'petals', 'bus', idBus,
+      'container', container.id]"
       class="container"
+      (click)="closeSidenav()"
       [class.color-primary-bold]="container.id === idContainerSelected"
     >
       <md-icon (click)="fold(idBus, container.id)" [class.rotate-minus-90]="container.isFolded">arrow_drop_down</md-icon>

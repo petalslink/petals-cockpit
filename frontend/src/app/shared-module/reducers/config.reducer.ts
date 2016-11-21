@@ -33,6 +33,15 @@ function createConfigReducer(configR: IConfigRecord = configRecordFactory(), act
     case ConfigActions.TOGGLE_THEME:
       return configR.set('isDarkTheme', !configR.get('isDarkTheme'));
 
+    case ConfigActions.TOGGLE_SIDENAV:
+      return configR.set('isSidenavVisible', !configR.get('isSidenavVisible'));
+
+    case ConfigActions.CLOSE_SIDENAV:
+      return configR.set('isSidenavVisible', false);
+
+    case ConfigActions.OPEN_SIDENAV:
+      return configR.set('isSidenavVisible', true);
+
     case UserActions.USR_IS_DISCONNECTED:
       return configRecordFactory();
 
