@@ -36,9 +36,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <h3 md-subheader>Language</h3>
 
           <md-radio-group [(ngModel)]="lang">
-            <md-list-item (click)="changeLanguageTo(l)" *ngFor="let l of langOptions">
-              <md-radio-button [value]="l" [checked]="lang == l">
-                {{l}}
+            <md-list-item (click)="changeLanguageTo(l)" *ngFor="let l of availableLanguages">
+              <md-radio-button [value]="l" [checked]="lang === l">
+                {{ l }}
               </md-radio-button>
             </md-list-item>
           </md-radio-group>

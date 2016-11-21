@@ -16,7 +16,7 @@
  */
 
 // angular modules
-import { Component, OnDestroy } from '@angular/core';
+import {Component, OnDestroy, Inject} from '@angular/core';
 
 // ngrx
 import { Store } from '@ngrx/store';
@@ -34,6 +34,9 @@ import { ConfigActions } from '../../../shared-module/reducers/config.actions';
 import { IConfigRecord, IConfig } from '../../../shared-module/interfaces/config.interface';
 import { IStore } from '../../../shared-module/interfaces/store.interface';
 
+// opaque tokens
+import { AVAILABLE_LANGUAGES } from '../../../shared-module/opaque-tokens/opaque-tokens';
+
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
@@ -43,14 +46,13 @@ export class SettingsComponent implements OnDestroy {
   private config: IConfig;
   private configSub: Subscription;
 
-  langOptions = [
-    'fr',
-    'en'
-  ];
-
   private lang: string;
 
-  constructor(private store$: Store<IStore>, private translate: TranslateService) {
+  constructor(
+    private store$: Store<IStore>,
+    private translate: TranslateService,
+    @Inject(AVAILABLE_LANGUAGES) private availableLanguages: string
+  ) {
     this.configSub =
       store$.select('config')
         .map((configR: IConfigRecord) => configR.toJS())
