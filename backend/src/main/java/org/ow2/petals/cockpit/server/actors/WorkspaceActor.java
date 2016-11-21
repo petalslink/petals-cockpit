@@ -132,6 +132,10 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
 
     private static ActorRef<Msg> get(DbWorkspace w) throws SuspendExecution {
         ActorRef<Msg> a = ActorRegistry.getOrRegisterActor("workspace-" + w.id, () -> {
+            // TODO here actually, we should leave the responsibility of checking
+            // workspace existence, creation, deletion as well as access right to the actor!
+            // So that if an actor exists then the workspace must exists and if not
+            // either it is in db or it doesn't exists!
             WorkspaceActor workspaceActor = new WorkspaceActor(w.id);
             serviceLocator().inject(workspaceActor);
             return workspaceActor;
