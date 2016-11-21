@@ -16,6 +16,7 @@
  */
 package org.ow2.petals.cockpit.server.commands;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +32,9 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
+import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.Handle;
+import org.skife.jdbi.v2.util.StringColumnMapper;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
 
 import com.codahale.metrics.MetricFilter;
@@ -116,13 +120,12 @@ public class AddUserTest {
         softly.assertThat(systemErrRule.getLog()).as("stderr").isEmpty();
         softly.assertAll();
 
-        // TODO can't test that until https://github.com/zapodot/embedded-db-junit/issues/4 is fixed
-        // final DBI dbi = new DBI(dbRule.getDataSource());
-        // try (Handle handle = dbi.open()) {
-        // String found = handle.createQuery("select name from users where username = :username")
-        // .bind("username", "admin").map(StringColumnMapper.INSTANCE).first();
-        // assertThat(found).as("admin's name").isEqualTo("Admin");
-        // }
+        final DBI dbi = new DBI(dbRule.getDataSource());
+        try (Handle handle = dbi.open()) {
+            String found = handle.createQuery("select name from users where username = :username")
+                    .bind("username", "admin").map(StringColumnMapper.INSTANCE).first();
+            assertThat(found).as("admin's name").isEqualTo("Admin");
+        }
     }
 
     @Test
