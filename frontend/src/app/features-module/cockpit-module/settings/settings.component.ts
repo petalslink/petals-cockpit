@@ -16,7 +16,7 @@
  */
 
 // angular modules
-import {Component, OnDestroy, Inject} from '@angular/core';
+import { Component, OnDestroy, Inject } from '@angular/core';
 
 // ngrx
 import { Store } from '@ngrx/store';
