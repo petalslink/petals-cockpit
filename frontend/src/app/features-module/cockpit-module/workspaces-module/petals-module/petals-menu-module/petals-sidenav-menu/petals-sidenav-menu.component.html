@@ -44,7 +44,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <div span class="info-import-bus">You may want to <a [routerLink]="['/cockpit', 'workspaces', workspace.id, 'petals', 'bus', 'import']">import</a> one.</div>
   </div>
 
-  <md-nav-list dense *ngIf="workspace && workspace.busesInProgress && workspace.busesInProgress.length > 0">
+  <md-nav-list dense *ngIf="workspace && workspace.busesInProgress && workspace.busesInProgress.length > 0" class="buses-in-progress">
     <h3 md-subheader>In progress</h3>
     <a
       md-list-item

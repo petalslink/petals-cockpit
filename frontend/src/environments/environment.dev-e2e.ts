@@ -7,21 +7,14 @@ export const environment = {
   production: false,
   mock: true,
   urlBackend: '/api',
-  hashLocationStrategy: false,
+  hashLocationStrategy: true,
   debug: true,
   // auto log user or not
   // useful for dev env to avoid being redirected to /login every time the page is reloaded
-  alreadyConnected: true,
+  alreadyConnected: false,
   // delay for each http request (used if mock is set to true)
-/*  httpDelay: 0,
+  httpDelay: 0,
   // delay for sse events
-  sseDelay: 0,*/
-  httpDelay: 500,
-  // delay for sse events (between 15 and 30s)
-  get sseDelay(): number {
-    let rand = (Math.floor(Math.random() * (1 + 8 - 4)) + 4) * 1000;
-    console.debug(`sse random timer : ${rand}`);
-    return rand;
-  },
+  sseDelay: 0,
   sseFirstBusImportShouldFail: true
 };

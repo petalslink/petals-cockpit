@@ -38,6 +38,9 @@ export class UserService {
 
   constructor(private httpAngular: Http, private http: InterceptorService) { }
 
+  // this is only for mock
+  public setLastWorkspace(lastWorkspace: string) { }
+
   public connectUser(user: IUser): Observable<Response> {
     return this.http.post(`${environment.urlBackend}/user/session`, <any>user);
   }
