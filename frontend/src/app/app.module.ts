@@ -79,6 +79,9 @@ import { FeatureModule } from './features-module/features-module.module';
 // shared module
 import { SharedModule } from './shared-module/shared-module.module';
 
+// opaque tokens
+import { AVAILABLE_LANGUAGES } from './shared-module/opaque-tokens/opaque-tokens';
+
 export function createTranslateLoader(http: Http) {
   return new TranslateStaticLoader(http, './assets/i18n', '.json');
 }
@@ -156,6 +159,10 @@ const store = compose(...metaReducers)({
     {
       provide: WorkspaceService,
       useClass: (environment.mock ? WorkspaceMockService : WorkspaceService)
+    },
+    {
+      provide: AVAILABLE_LANGUAGES,
+      useValue: ['en', 'fr']
     }
   ],
   bootstrap: [

@@ -54,9 +54,16 @@ describe(`Config Reducer`, () => {
 
   // TOGGLE_THEME
   it(`should toggle dark theme`, () => {
-    let nextStateR: IConfigRecord = ConfigReducer(stateR, {type: ConfigActions.TOGGLE_THEME});
-    let nextState = nextStateR.toJS();
+    // from dark to light
+    let nextStateR1: IConfigRecord = ConfigReducer(stateR, {type: ConfigActions.TOGGLE_THEME});
+    let nextState1 = nextStateR1.toJS();
 
-    expect(nextState.isDarkTheme).toBeTruthy();
+    expect(nextState1.isDarkTheme).toBe(true);
+
+    // from (previous) light to dark
+    let nextStateR2: IConfigRecord = ConfigReducer(nextStateR1, {type: ConfigActions.TOGGLE_THEME});
+    let nextState2 = nextStateR2.toJS();
+
+    expect(nextState2.isDarkTheme).toBe(false);
   });
 });

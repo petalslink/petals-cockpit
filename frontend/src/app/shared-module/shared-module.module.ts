@@ -33,12 +33,12 @@ import { EffectsModule } from '@ngrx/effects';
 import { TranslateModule } from 'ng2-translate';
 
 // our components
-import { ToggleThemeComponent } from './components/toggle-theme/toggle-theme.component';
-import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 
+// our directives
+import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
+
 const SHARED_COMPONENTS = [
-  ToggleThemeComponent,
   NotFoundComponent,
   ColorSearchedLettersDirective
 ];
