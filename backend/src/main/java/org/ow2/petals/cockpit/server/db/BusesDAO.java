@@ -84,7 +84,7 @@ public abstract class BusesDAO {
     }
 
     @SqlUpdate("delete from buses where id = :id")
-    public abstract void delete(@Bind("id") long bId);
+    public abstract int delete(@Bind("id") long bId);
 
     public abstract static class DbBus {
 

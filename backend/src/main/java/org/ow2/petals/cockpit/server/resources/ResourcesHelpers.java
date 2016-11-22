@@ -16,12 +16,19 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import java.util.Optional;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
-import org.ow2.petals.cockpit.server.security.CockpitProfile;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.WorkspaceRequest;
+
+import co.paralleluniverse.actors.ActorRef;
+import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
+import co.paralleluniverse.fibers.SuspendExecution;
+import javaslang.control.Either;
 
 public class ResourcesHelpers {
 
@@ -29,17 +36,28 @@ public class ResourcesHelpers {
         // helper class
     }
 
-    public static DbWorkspace getWorkspace(WorkspacesDAO workspaces, long wsId, CockpitProfile profile) {
-        DbWorkspace w = workspaces.findById(wsId);
+    /**
+     * @throws WebApplicationException
+     */
+    @SuppressWarnings("resource")
+    public static <O, I extends WorkspaceRequest<O> & Msg> O call(long wsId, I msg)
+            throws InterruptedException {
+        try {
+            Optional<ActorRef<Msg>> ma = WorkspaceActor.get(wsId);
+            if (ma.isPresent()) {
+                ActorRef<Msg> a = ma.get();
+                Either<Status, O> res = RequestReplyHelper.call(a, msg);
 
-        if (w == null) {
-            throw new WebApplicationException(Status.NOT_FOUND);
+                if (res.isLeft()) {
+                    throw new WebApplicationException(res.getLeft());
+                } else {
+                    return res.get();
+                }
+            } else {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
+        } catch (SuspendExecution e) {
+            throw new AssertionError(e);
         }
-
-        if (!w.users.stream().anyMatch(profile.getUser().username::equals)) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
-
-        return w;
     }
 }
