@@ -35,9 +35,13 @@ import { MaterialModule } from '@angular/material';
 import { TranslateStaticLoader, TranslateLoader, TranslateModule } from 'ng2-translate';
 
 // ngrx
-import { StoreModule } from '@ngrx/store';
+import { compose } from '@ngrx/core/compose';
+import { StoreModule, combineReducers } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+
+// store freeze
+import { storeFreeze } from 'ngrx-store-freeze';
 
 // our reducers
 import { ConfigReducer } from './shared-module/reducers/config.reducer';
@@ -79,6 +83,16 @@ export function createTranslateLoader(http: Http) {
   return new TranslateStaticLoader(http, './assets/i18n', '.json');
 }
 
+// define a meta reducer that prevent object mutation when dev env
+const metaReducers = !environment.production ? [storeFreeze, combineReducers] : [combineReducers];
+
+const store = compose(...metaReducers)({
+  config: ConfigReducer,
+  user: UserReducer,
+  minimalWorkspaces: MinimalWorkspacesReducer,
+  workspace: WorkspaceReducer
+});
+
 @NgModule({
   declarations: [
     AppComponent
@@ -92,12 +106,7 @@ export function createTranslateLoader(http: Http) {
     FormsModule,
 
     // ngrx - store
-    StoreModule.provideStore({
-      config: ConfigReducer,
-      user: UserReducer,
-      minimalWorkspaces: MinimalWorkspacesReducer,
-      workspace: WorkspaceReducer
-    }),
+    StoreModule.provideStore(store),
 
     // ngrx
     StoreDevtoolsModule.instrumentOnlyWithExtension(),

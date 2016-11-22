@@ -25,11 +25,11 @@ import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 
 // our actions
-import { ConfigActions } from '../reducers/config.actions';
+import { ConfigActions } from '../../reducers/config.actions';
 
 // our interfaces
-import { IStore } from '../interfaces/store.interface';
-import { IConfig, IConfigRecord } from '../interfaces/config.interface';
+import { IStore } from '../../interfaces/store.interface';
+import { IConfig, IConfigRecord } from '../../interfaces/config.interface';
 
 @Component({
   selector: 'app-toggle-theme',

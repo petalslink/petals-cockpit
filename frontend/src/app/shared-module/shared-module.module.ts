@@ -33,7 +33,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { TranslateModule } from 'ng2-translate';
 
 // our components
-import { ToggleThemeComponent } from './toggle-theme/toggle-theme.component';
+import { ToggleThemeComponent } from './components/toggle-theme/toggle-theme.component';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 
