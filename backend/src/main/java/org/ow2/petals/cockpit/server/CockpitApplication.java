@@ -99,7 +99,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         bootstrap.addBundle(pac4j);
         // ease debugging of exceptions thrown by JDBI!
         bootstrap.addBundle(new DBIExceptionsBundle());
-        bootstrap.addCommand(new AddUserCommand<>(this));
+        bootstrap.addCommand(new AddUserCommand<>());
     }
 
     @Override

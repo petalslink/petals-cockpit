@@ -91,7 +91,7 @@ public class AddUserTest {
 
         // let's simulate the initialize method only for what we need here
         bootstrap().addBundle(app.migrations);
-        bootstrap().addCommand(new AddUserCommand<>(app));
+        bootstrap().addCommand(new AddUserCommand<>());
 
         cli = new Cli(location, bootstrap, System.out, System.err);
 

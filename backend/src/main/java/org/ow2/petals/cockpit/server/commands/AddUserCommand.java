@@ -26,7 +26,6 @@ import org.skife.jdbi.v2.DBI;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import io.dropwizard.Application;
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.jdbi.DBIFactory;
@@ -46,7 +45,7 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
 
     private static final PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
 
-    public AddUserCommand(Application<C> app) {
+    public AddUserCommand() {
         super("add-user", "Add a user to the database");
     }
 
