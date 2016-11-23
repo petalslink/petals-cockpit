@@ -69,7 +69,7 @@ export class WorkspaceMockService {
       .map((res: Response) => res.json())
       .delay(environment.httpDelay)
       .map((workspace: IWorkspace) => {
-        this.userService.adminUser.lastWorkspace = idWorkspace;
+        this.userService.setLastWorkspace(idWorkspace);
 
         return <Response> {
           ok: true,
@@ -78,7 +78,11 @@ export class WorkspaceMockService {
           }
         };
       })
-      .catch((res: Response) => {
+      .catch(err => {
+        if (environment.debug) {
+          console.debug(err);
+        }
+
         let obs: Observable<Response>;
 
         obs = new Observable(observer => {
@@ -86,9 +90,11 @@ export class WorkspaceMockService {
             .select('minimalWorkspaces')
             .filter((minimalWorkspaces: IMinimalWorkspacesRecord) => typeof minimalWorkspaces.get('minimalWorkspaces') !== 'undefined')
             .subscribe((minimalWorkspaces: IMinimalWorkspacesRecord) => {
-              let currentMinimalWorkspace = minimalWorkspaces.get('minimalWorkspaces').find((minimalWorkspace: IMinimalWorkspaceRecord) =>
-                minimalWorkspace.get('id') === idWorkspace
-              );
+              let currentMinimalWorkspace = minimalWorkspaces
+                .get('minimalWorkspaces')
+                .find((minimalWorkspace: IMinimalWorkspaceRecord) =>
+                  minimalWorkspace.get('id') === idWorkspace
+                );
 
               let emptyWorkspace = {
                 name: currentMinimalWorkspace ? currentMinimalWorkspace.get('name') : `can't reload on a created workspace with mock: true`,

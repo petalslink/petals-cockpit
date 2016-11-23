@@ -41,6 +41,11 @@ export class UserMockService {
     };
   }
 
+  // cannot modify the value directly otherwise ngrx-store-freeze throws an error
+  public setLastWorkspace(lastWorkspace: string) {
+    this.adminUser = Object.assign({}, this.adminUser, { lastWorkspace });
+  }
+
   public connectUser(user: IUser) {
     let response: Response;
 

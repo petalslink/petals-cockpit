@@ -8,7 +8,8 @@ exports.config = {
   getPageTimeout: 60000,
   allScriptsTimeout: 11000,
   specs: [
-    './e2e/**/*.e2e-spec.ts'
+    './e2e/login.e2e-spec.ts',
+    './e2e/workspaces.e2e-spec.ts'
   ],
   capabilities: {
     'browserName': 'chrome',

@@ -13,34 +13,34 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-nav-list dense *ngFor="let bus of buses; let last=last; let index=index">
-  <h3
-    md-subheader
-    *ngIf="index === 0 && workspace.busesInProgress.length > 0"
-  >
-    Available buses
-  </h3>
+<div class="select-bus">
+  <md-nav-list dense *ngFor="let bus of buses; let last=last; let index=index">
+    <h3
+      md-subheader
+      *ngIf="index === 0 && workspace.busesInProgress.length > 0"
+    >
+      Available buses
+    </h3>
 
-  <a
-    md-list-item
-    [routerLink]="['/', 'cockpit', 'workspaces', idWorkspaceSelected, 'petals', 'bus', bus.id]"
-    class="bus"
-    [class.color-primary-bold]="bus.id === idBusSelected"
-  >
-    <span appColorSearchedLetters [search]="search" [text]="bus.name" classToApply="searched"></span>
-  </a>
+    <a
+      md-list-item
+      [routerLink]="['/', 'cockpit', 'workspaces', idWorkspaceSelected, 'petals', 'bus', bus.id]"
+      class="bus"
+      [class.color-primary-bold]="bus.id === idBusSelected"
+    >
+      <span appColorSearchedLetters [search]="search" [text]="bus.name" classToApply="searched"></span>
+    </a>
 
-  <app-containers-menu
-    [containers]="bus.containers"
-    [search]="search"
+    <app-containers-menu
+      [containers]="bus.containers"
+      [search]="search"
 
-    [idBus]="bus.id"
+      [idBus]="bus.id"
 
-    [idWorkspaceSelected]="idWorkspaceSelected"
-    [idContainerSelected]="idContainerSelected"
-    [idComponentSelected]="idComponentSelected"
-    [idServiceUnitSelected]="idServiceUnitSelected"
-  ></app-containers-menu>
-
-  <!--<md-divider *ngIf="!last"></md-divider>-->
-</md-nav-list>
+      [idWorkspaceSelected]="idWorkspaceSelected"
+      [idContainerSelected]="idContainerSelected"
+      [idComponentSelected]="idComponentSelected"
+      [idServiceUnitSelected]="idServiceUnitSelected"
+    ></app-containers-menu>
+  </md-nav-list>
+</div>

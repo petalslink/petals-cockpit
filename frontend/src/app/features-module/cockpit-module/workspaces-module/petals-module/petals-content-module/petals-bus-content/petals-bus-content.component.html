@@ -13,58 +13,60 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-toolbar color="primary">
-  <span>
-    Petals
-  </span>
+<div class="select-tab-bus">
+  <md-toolbar color="primary">
+    <span>
+      Petals
+    </span>
 
-  <span class="flex-space"></span>
+    <span class="flex-space"></span>
 
-  <button md-icon-button [md-menu-trigger-for]="menu">
-    <md-icon>more_vert</md-icon>
-  </button>
+    <button md-icon-button [md-menu-trigger-for]="menu">
+      <md-icon>more_vert</md-icon>
+    </button>
 
-  <md-menu x-position="before" #menu="mdMenu" >
-    <button md-menu-item>
-      Overview
-    </button>
-    <button md-menu-item>
-      Operation
-    </button>
-    <button md-menu-item>
-      Config
-    </button>
-    <button md-menu-item>
-      Flow
-    </button>
-    <button md-menu-item>
-      Monitor
-    </button>
-    <button md-menu-item>
-      Log
-    </button>
-    <button md-menu-item>
-      User
-    </button>
-  </md-menu>
-</md-toolbar>
+    <md-menu x-position="before" #menu="mdMenu" >
+      <button md-menu-item>
+        Overview
+      </button>
+      <button md-menu-item>
+        Operation
+      </button>
+      <button md-menu-item>
+        Config
+      </button>
+      <button md-menu-item>
+        Flow
+      </button>
+      <button md-menu-item>
+        Monitor
+      </button>
+      <button md-menu-item>
+        Log
+      </button>
+      <button md-menu-item>
+        User
+      </button>
+    </md-menu>
+  </md-toolbar>
 
-<div *ngIf="busInImport">
-  <app-petals-bus-import [importing]="true" [newBus]="bus"></app-petals-bus-import>
+  <div *ngIf="busInImport">
+    <app-petals-bus-import [importing]="true" [newBus]="bus"></app-petals-bus-import>
+  </div>
+
+  <md-tab-group *ngIf="!busInImport">
+    <md-tab class="bus-overview">
+      <template md-tab-label>Overview</template>
+      <template md-tab-content>
+        <app-bus-overview [bus]="bus" (OnInit)="bus"></app-bus-overview>
+      </template>
+    </md-tab>
+
+    <md-tab class="bus-config">
+      <template md-tab-label>Config</template>
+      <template md-tab-content>
+        <app-bus-config [bus]="bus" (OnInit)="bus"></app-bus-config>
+      </template>
+    </md-tab>
+  </md-tab-group>
 </div>
-
-<md-tab-group *ngIf="!busInImport">
-  <md-tab>
-    <template md-tab-label>Overview</template>
-    <template md-tab-content>
-      <app-bus-overview [bus]="bus" (OnInit)="bus"></app-bus-overview>
-    </template>
-  </md-tab>
-
-  <md-tab>
-    <template md-tab-label>Config</template>
-    <template md-tab-content>
-      <app-bus-config [bus]="bus" (OnInit)="bus"></app-bus-config>
-    </template>
-  </md-tab>
-</md-tab-group>

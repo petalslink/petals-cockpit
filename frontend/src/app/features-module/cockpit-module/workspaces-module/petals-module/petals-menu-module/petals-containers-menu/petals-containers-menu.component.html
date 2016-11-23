@@ -13,29 +13,31 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-nav-list class="containers-menu-component" *ngFor="let container of containers">
+<div class="select-container">
+  <md-nav-list class="containers-menu-component" *ngFor="let container of containers">
 
-  <a md-list-item
-     [routerLink]="['/', 'cockpit',
-       'workspaces', idWorkspaceSelected,
-       'petals', 'bus', idBus,
-       'container', container.id]"
-     class="container"
-     [class.color-primary-bold]="container.id === idContainerSelected"
-  >
-    <span appColorSearchedLetters [search]="search" [text]="container.name" classToApply="searched"></span>
-  </a>
+    <a md-list-item
+       [routerLink]="['/', 'cockpit',
+         'workspaces', idWorkspaceSelected,
+         'petals', 'bus', idBus,
+         'container', container.id]"
+       class="container"
+       [class.color-primary-bold]="container.id === idContainerSelected"
+    >
+      <span appColorSearchedLetters [search]="search" [text]="container.name" classToApply="searched"></span>
+    </a>
 
-  <app-components-menu
-    [components]="container.components"
-    [search]="search"
+    <app-components-menu
+      [components]="container.components"
+      [search]="search"
 
-    [idBus]="idBus"
-    [idContainer]="container.id"
+      [idBus]="idBus"
+      [idContainer]="container.id"
 
-    [idWorkspaceSelected]="idWorkspaceSelected"
-    [idComponentSelected]="idComponentSelected"
-    [idServiceUnitSelected]="idServiceUnitSelected"
+      [idWorkspaceSelected]="idWorkspaceSelected"
+      [idComponentSelected]="idComponentSelected"
+      [idServiceUnitSelected]="idServiceUnitSelected"
 
-  ></app-components-menu>
-</md-nav-list>
+    ></app-components-menu>
+  </md-nav-list>
+</div>
