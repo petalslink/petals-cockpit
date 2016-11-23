@@ -1,0 +1,10 @@
+class org/junit/contrib/java/lang/system/SystemOutRule
+enableLog
+ ()Lorg/junit/contrib/java/lang/system/SystemOutRule;
+ ()L1org/junit/contrib/java/lang/system/SystemOutRule;
+mute
+ ()Lorg/junit/contrib/java/lang/system/SystemOutRule;
+ ()L1org/junit/contrib/java/lang/system/SystemOutRule;
+muteForSuccessfulTests
+ ()Lorg/junit/contrib/java/lang/system/SystemOutRule;
+ ()L1org/junit/contrib/java/lang/system/SystemOutRule;

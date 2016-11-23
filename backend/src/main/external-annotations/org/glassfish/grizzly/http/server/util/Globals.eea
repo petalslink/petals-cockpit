@@ -1,0 +1,4 @@
+class org/glassfish/grizzly/http/server/util/Globals
+SESSION_COOKIE_NAME
+ Ljava/lang/String;
+ L1java/lang/String;

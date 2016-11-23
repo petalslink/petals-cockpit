@@ -1,0 +1,4 @@
+class org/skife/jdbi/v2/DBI
+onDemand
+ <SqlObjectType:Ljava/lang/Object;>(Ljava/lang/Class<TSqlObjectType;>;)TSqlObjectType;
+ <SqlObjectType:Ljava/lang/Object;>(L1java/lang/Class<TSqlObjectType;>;)T1SqlObjectType;

@@ -74,12 +74,14 @@ public class UserSession {
     @Path("/session")
     @Pac4JCallback(defaultUrl = "/user/session", renewSession = false)
     public void login() {
+        // the method is never called, everything is handled by pac4j
     }
 
     @DELETE
     @Path("/session")
     @Pac4JLogout
     public void logout() {
+        // the method is never called, everything is handled by pac4j
     }
 
     public static class User {

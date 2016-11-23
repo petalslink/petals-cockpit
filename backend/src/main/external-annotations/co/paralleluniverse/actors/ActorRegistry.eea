@@ -1,0 +1,16 @@
+class co/paralleluniverse/actors/ActorRegistry
+getActor
+ <T:Lco/paralleluniverse/actors/ActorRef<*>;>(Ljava/lang/String;)TT;
+ <T:Lco/paralleluniverse/actors/ActorRef<*>;>(L1java/lang/String;)T1T;
+getActor
+ <T:Lco/paralleluniverse/actors/ActorRef<*>;>(Ljava/lang/String;JLjava/util/concurrent/TimeUnit;)TT;
+ <T:Lco/paralleluniverse/actors/ActorRef<*>;>(L1java/lang/String;JL1java/util/concurrent/TimeUnit;)T0T;
+getOrRegisterActor
+ <Message:Ljava/lang/Object;>(Ljava/lang/String;Ljava/util/concurrent/Callable<Lco/paralleluniverse/actors/Actor<TMessage;*>;>;)Lco/paralleluniverse/actors/ActorRef<TMessage;>;
+ <Message:Ljava/lang/Object;>(L1java/lang/String;L1java/util/concurrent/Callable<L1co/paralleluniverse/actors/Actor<TMessage;*>;>;)L1co/paralleluniverse/actors/ActorRef<TMessage;>;
+getOrRegisterActor
+ <Message:Ljava/lang/Object;>(Ljava/lang/String;Ljava/util/concurrent/Callable<Lco/paralleluniverse/actors/Actor<TMessage;*>;>;Lco/paralleluniverse/fibers/FiberScheduler;)Lco/paralleluniverse/actors/ActorRef<TMessage;>;
+ <Message:Ljava/lang/Object;>(L1java/lang/String;L1java/util/concurrent/Callable<L1co/paralleluniverse/actors/Actor<TMessage;*>;>;L1co/paralleluniverse/fibers/FiberScheduler;)L1co/paralleluniverse/actors/ActorRef<TMessage;>;
+tryGetActor
+ <T:Lco/paralleluniverse/actors/ActorRef<*>;>(Ljava/lang/String;)TT;
+ <T:Lco/paralleluniverse/actors/ActorRef<*>;>(L1java/lang/String;)T0T;

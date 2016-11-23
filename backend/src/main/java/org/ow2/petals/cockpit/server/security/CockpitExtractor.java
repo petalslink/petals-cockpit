@@ -28,7 +28,7 @@ import org.pac4j.jax.rs.pac4j.JaxRsContext;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
 
-public class CockpitExtractor implements CredentialsExtractor<@Nullable UsernamePasswordCredentials> {
+public class CockpitExtractor implements CredentialsExtractor<UsernamePasswordCredentials> {
 
     private final String clientName;
 
@@ -36,11 +36,9 @@ public class CockpitExtractor implements CredentialsExtractor<@Nullable Username
         this.clientName = clientName;
     }
 
-    @Nullable
     @Override
-    public UsernamePasswordCredentials extract(@Nullable WebContext context) throws HttpAction {
-        assert context != null;
-
+    @Nullable
+    public UsernamePasswordCredentials extract(WebContext context) throws HttpAction {
         if (context instanceof JaxRsContext) {
             final JaxRsContext cContext = (JaxRsContext) context;
 

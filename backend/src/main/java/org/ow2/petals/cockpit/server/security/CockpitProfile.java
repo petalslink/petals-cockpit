@@ -21,12 +21,18 @@ import org.pac4j.core.profile.CommonProfile;
 
 public class CockpitProfile extends CommonProfile {
 
+    CockpitProfile() {
+        // needed because UserProfile is Externalizable
+    }
+
     public CockpitProfile(DbUser user) {
         setId(user.username);
         addAttribute("dao", user);
     }
 
     public DbUser getUser() {
-        return (DbUser) getAttribute("dao");
+        Object attribute = getAttribute("dao");
+        assert attribute != null;
+        return (DbUser) attribute;
     }
 }

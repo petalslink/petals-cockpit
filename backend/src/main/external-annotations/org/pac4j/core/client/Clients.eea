@@ -1,0 +1,10 @@
+class org/pac4j/core/client/Clients
+findClient
+ (Ljava/lang/String;)Lorg/pac4j/core/client/Client;
+ (Ljava/lang/String;)L1org/pac4j/core/client/Client;
+findClient
+ (Lorg/pac4j/core/context/WebContext;)Lorg/pac4j/core/client/Client;
+ (Lorg/pac4j/core/context/WebContext;)L1org/pac4j/core/client/Client;
+findClient
+ <C::Lorg/pac4j/core/client/Client;>(Ljava/lang/Class<TC;>;)TC;
+ <C::Lorg/pac4j/core/client/Client;>(Ljava/lang/Class<TC;>;)T1C;

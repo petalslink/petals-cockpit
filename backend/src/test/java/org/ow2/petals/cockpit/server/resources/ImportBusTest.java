@@ -36,6 +36,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+import javax.inject.Singleton;
 import javax.ws.rs.client.Entity;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -56,7 +57,7 @@ import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.CockpitApplication.ActorServiceLocator;
+import org.ow2.petals.cockpit.server.actors.ActorsComponent;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
@@ -72,7 +73,6 @@ import co.paralleluniverse.common.util.Debug;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
-@SuppressWarnings("null")
 public class ImportBusTest {
 
     @Rule
@@ -94,7 +94,7 @@ public class ImportBusTest {
             .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
             // we pass the resource as a provider to get injection in constructor
             .addProvider(WorkspacesResource.class).addProvider(new MockProfileParamValueFactoryProvider.Binder())
-            .addProvider(new ActorServiceLocator()).addProvider(new AbstractBinder() {
+            .addProvider(new AbstractBinder() {
                 @Override
                 protected void configure() {
                     bind(workspaces).to(WorkspacesDAO.class);
@@ -103,6 +103,7 @@ public class ImportBusTest {
                             .to(ExecutorService.class);
                     bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.JDBC_ES)
                             .to(ExecutorService.class);
+                    bind(ActorsComponent.class).to(ActorsComponent.class).in(Singleton.class);
                 }
             }).build();
 
@@ -129,7 +130,8 @@ public class ImportBusTest {
         when(workspaces.findById(workspaceId)).thenReturn(new DbWorkspace(workspaceId, "test",
                 Arrays.asList(MockProfileParamValueFactoryProvider.ADMIN.username)));
 
-        int port = container.getPorts().get(PortType.JMX);
+        Integer port = container.getPorts().get(PortType.JMX);
+        assert port != null;
 
         long busId = 4;
         when(buses.createBus(container.getHost(), port, container.getJmxUsername(), container.getJmxPassword(), "??",
@@ -156,7 +158,8 @@ public class ImportBusTest {
     @Test
     public void testImportBusOk() {
 
-        int port = container.getPorts().get(PortType.JMX);
+        Integer port = container.getPorts().get(PortType.JMX);
+        assert port != null;
 
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
                 .get(EventInput.class)) {
@@ -188,7 +191,9 @@ public class ImportBusTest {
     @Test
     public void testImportBusError() {
 
-        int port = container.getPorts().get(PortType.JMX);
+        Integer port = container.getPorts().get(PortType.JMX);
+        assert port != null;
+
         String incorrectHost = "host2";
 
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()

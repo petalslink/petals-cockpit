@@ -1,0 +1,10 @@
+class co/paralleluniverse/actors/Actor
+receive
+ ()TMessage;
+ ()T1Message;
+receive
+ (JLjava/util/concurrent/TimeUnit;)TMessage;
+ (JL1java/util/concurrent/TimeUnit;)T0Message;
+receive
+ (Lco/paralleluniverse/strands/Timeout;)TMessage;
+ (L1co/paralleluniverse/strands/Timeout;)T0Message;

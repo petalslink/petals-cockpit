@@ -1,0 +1,4 @@
+class co/paralleluniverse/common/test/TestUtil
+WATCHMAN
+ Lorg/junit/rules/TestRule;
+ L1org/junit/rules/TestRule;

@@ -1,0 +1,13 @@
+class io/dropwizard/testing/ConfigOverride
+config
+ (Ljava/lang/String;Ljava/lang/String;)Lio/dropwizard/testing/ConfigOverride;
+ (Ljava/lang/String;Ljava/lang/String;)L1io/dropwizard/testing/ConfigOverride;
+config
+ (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/dropwizard/testing/ConfigOverride;
+ (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)L1io/dropwizard/testing/ConfigOverride;
+config
+ (Ljava/lang/String;Ljava/lang/String;Ljava/util/function/Supplier<Ljava/lang/String;>;)Lio/dropwizard/testing/ConfigOverride;
+ (Ljava/lang/String;Ljava/lang/String;Ljava/util/function/Supplier<Ljava/lang/String;>;)L1io/dropwizard/testing/ConfigOverride;
+config
+ (Ljava/lang/String;Ljava/util/function/Supplier<Ljava/lang/String;>;)Lio/dropwizard/testing/ConfigOverride;
+ (Ljava/lang/String;Ljava/util/function/Supplier<Ljava/lang/String;>;)L1io/dropwizard/testing/ConfigOverride;

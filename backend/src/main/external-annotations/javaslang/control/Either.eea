@@ -1,0 +1,10 @@
+class javaslang/control/Either
+left
+ <L:Ljava/lang/Object;R:Ljava/lang/Object;>(TL;)Ljavaslang/control/Either<TL;TR;>;
+ <L:Ljava/lang/Object;R:Ljava/lang/Object;>(TL;)L1javaslang/control/Either<TL;TR;>;
+narrow
+ <L:Ljava/lang/Object;R:Ljava/lang/Object;>(Ljavaslang/control/Either<+TL;+TR;>;)Ljavaslang/control/Either<TL;TR;>;
+ <L:Ljava/lang/Object;R:Ljava/lang/Object;>(L1javaslang/control/Either<+TL;+TR;>;)L1javaslang/control/Either<TL;TR;>;
+right
+ <L:Ljava/lang/Object;R:Ljava/lang/Object;>(TR;)Ljavaslang/control/Either<TL;TR;>;
+ <L:Ljava/lang/Object;R:Ljava/lang/Object;>(TR;)L1javaslang/control/Either<TL;TR;>;

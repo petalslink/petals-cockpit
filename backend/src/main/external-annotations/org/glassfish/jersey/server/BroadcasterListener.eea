@@ -1,0 +1,7 @@
+class org/glassfish/jersey/server/BroadcasterListener
+onClose
+ (Lorg/glassfish/jersey/server/ChunkedOutput<TT;>;)V
+ (L1org/glassfish/jersey/server/ChunkedOutput<T1T;>;)V
+onException
+ (Lorg/glassfish/jersey/server/ChunkedOutput<TT;>;Ljava/lang/Exception;)V
+ (L1org/glassfish/jersey/server/ChunkedOutput<T1T;>;L1java/lang/Exception;)V

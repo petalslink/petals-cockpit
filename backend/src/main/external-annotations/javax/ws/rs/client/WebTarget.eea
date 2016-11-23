@@ -1,0 +1,10 @@
+class javax/ws/rs/client/WebTarget
+request
+ ()Ljavax/ws/rs/client/Invocation$Builder;
+ ()L1javax/ws/rs/client/Invocation$Builder;
+request
+ ([Ljava/lang/String;)Ljavax/ws/rs/client/Invocation$Builder;
+ ([Ljava/lang/String;)L1javax/ws/rs/client/Invocation$Builder;
+request
+ ([Ljavax/ws/rs/core/MediaType;)Ljavax/ws/rs/client/Invocation$Builder;
+ ([Ljavax/ws/rs/core/MediaType;)L1javax/ws/rs/client/Invocation$Builder;

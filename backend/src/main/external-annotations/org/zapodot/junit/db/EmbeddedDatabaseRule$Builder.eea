@@ -1,0 +1,40 @@
+class org/zapodot/junit/db/EmbeddedDatabaseRule$Builder
+build
+ ()Lorg/zapodot/junit/db/EmbeddedDatabaseRule;
+ ()L1org/zapodot/junit/db/EmbeddedDatabaseRule;
+escapeSpecialChars
+ (Ljava/lang/String;)Ljava/lang/String;
+ (L1java/lang/String;)L1java/lang/String;
+initializedByPlugin
+ <P::Lorg/zapodot/junit/db/plugin/InitializationPlugin;>(TP;)Lorg/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+ <P::Lorg/zapodot/junit/db/plugin/InitializationPlugin;>(T0P;)L1org/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+instance
+ ()Lorg/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+ ()L1org/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+normalizeString
+ (Ljava/lang/String;)Ljava/lang/String;
+ (L0java/lang/String;)L0java/lang/String;
+propertiesMap
+ ()Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;
+ ()L1java/util/Map<Ljava/lang/String;Ljava/lang/String;>;
+withInitialSql
+ (Ljava/lang/String;)Lorg/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+ (L1java/lang/String;)L1org/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+withInitialSqlFromResource
+ (Ljava/lang/String;)Lorg/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+ (L1java/lang/String;)L1org/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+withMode
+ (Ljava/lang/String;)Lorg/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+ (L1java/lang/String;)L1org/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+withMode
+ (Lorg/zapodot/junit/db/EmbeddedDatabaseRule$CompatibilityMode;)Lorg/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+ (L1org/zapodot/junit/db/EmbeddedDatabaseRule$CompatibilityMode;)L1org/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+withName
+ (Ljava/lang/String;)Lorg/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+ (Ljava/lang/String;)L1org/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+withProperty
+ (Ljava/lang/String;Ljava/lang/String;)Lorg/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+ (L0java/lang/String;L0java/lang/String;)L1org/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+withoutAutoCommit
+ ()Lorg/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+ ()L1org/zapodot/junit/db/EmbeddedDatabaseRule$Builder;

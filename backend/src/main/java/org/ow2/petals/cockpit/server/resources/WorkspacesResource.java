@@ -29,11 +29,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.ow2.petals.cockpit.server.actors.ActorsComponent;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
@@ -80,12 +82,20 @@ public class WorkspacesResource {
     @Singleton
     public static class WorkspaceResource {
 
+        private final ActorsComponent as;
+
+        @Inject
+        public WorkspaceResource(ActorsComponent as) {
+            this.as = as;
+        }
+
         @GET
         @Produces(MediaType.APPLICATION_JSON)
         @Valid
         public WorkspaceTree get(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile)
                 throws InterruptedException {
-            return ResourcesHelpers.call(wsId, new WorkspaceActor.GetTree(profile.getUser().getUsername()));
+            return as.call(wsId, new WorkspaceActor.GetTree(profile.getUser().getUsername()))
+                    .getOrElseThrow(s -> new WebApplicationException(s));
         }
 
         @GET
@@ -95,7 +105,8 @@ public class WorkspacesResource {
                 throws InterruptedException {
             final EventOutput eo = new EventOutput();
 
-            ResourcesHelpers.call(wsId, new WorkspaceActor.NewClient(profile.getUser().getUsername(), eo));
+            as.call(wsId, new WorkspaceActor.NewClient(profile.getUser().getUsername(), eo))
+                    .getOrElseThrow(s -> new WebApplicationException(s));
 
             return eo;
         }

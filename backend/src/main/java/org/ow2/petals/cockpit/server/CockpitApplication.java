@@ -18,17 +18,14 @@ package org.ow2.petals.cockpit.server;
 
 import java.util.concurrent.ExecutorService;
 
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
+import javax.inject.Singleton;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.ServiceLocatorProvider;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
+import org.ow2.petals.cockpit.server.actors.ActorsComponent;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
@@ -52,7 +49,6 @@ import io.dropwizard.db.PooledDataSourceFactory;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.jetty.BiDiGzipHandler;
-import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -98,20 +94,16 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
     }
 
     @Override
-    public void initialize(@Nullable Bootstrap<C> bootstrap) {
-        assert bootstrap != null;
-
+    public void initialize(Bootstrap<C> bootstrap) {
         bootstrap.addBundle(migrations);
         bootstrap.addBundle(pac4j);
         // ease debugging of exceptions thrown by JDBI!
         bootstrap.addBundle(new DBIExceptionsBundle());
-        bootstrap.addCommand(new AddUserCommand<>(this));
+        bootstrap.addCommand(new AddUserCommand<>());
     }
 
     @Override
-    public void run(C configuration, @Nullable Environment environment) throws Exception {
-        assert environment != null;
-
+    public void run(C configuration, Environment environment) throws Exception {
         final DBIFactory factory = new DBIFactory();
         final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "cockpit");
         final UsersDAO users = jdbi.onDemand(UsersDAO.class);
@@ -145,6 +137,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 bind(workspaces).to(WorkspacesDAO.class);
                 bind(buses).to(BusesDAO.class);
                 bind(jdbi).to(DBI.class);
+                bind(ActorsComponent.class).to(ActorsComponent.class).in(Singleton.class);
             }
         });
 
@@ -153,22 +146,15 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         environment.jersey().register(UserSession.class);
         environment.jersey().register(WorkspacesResource.class);
 
-        // TODO can we do better than that?
-        environment.jersey().register(new ActorServiceLocator());
-
         // This is needed for SSE to work correctly!
         // See https://github.com/dropwizard/dropwizard/issues/1673
-        environment.lifecycle().addServerLifecycleListener(new ServerLifecycleListener() {
-            @Override
-            public void serverStarted(@Nullable Server server) {
-                assert server != null;
-                Handler handler = server.getHandler();
-                while (handler instanceof HandlerWrapper) {
-                    handler = ((HandlerWrapper) handler).getHandler();
-                    if (handler instanceof BiDiGzipHandler) {
-                        LOG.info("Setting sync flush on gzip compression handler");
-                        ((BiDiGzipHandler) handler).setSyncFlush(true);
-                    }
+        environment.lifecycle().addServerLifecycleListener(server -> {
+            Handler handler = server.getHandler();
+            while (handler instanceof HandlerWrapper) {
+                handler = ((HandlerWrapper) handler).getHandler();
+                if (handler instanceof BiDiGzipHandler) {
+                    LOG.info("Setting sync flush on gzip compression handler");
+                    ((BiDiGzipHandler) handler).setSyncFlush(true);
                 }
             }
         });
@@ -195,15 +181,6 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 final CockpitAuthenticator auth = new CockpitAuthenticator(users);
                 cac.setAuthenticator(auth);
             }
-        }
-    }
-
-    public static class ActorServiceLocator implements Feature {
-        @Override
-        public boolean configure(@Nullable FeatureContext context) {
-            WorkspaceActor.setServiceLocator(ServiceLocatorProvider.getServiceLocator(context));
-            // no need to keep that in memory...
-            return false;
         }
     }
 }

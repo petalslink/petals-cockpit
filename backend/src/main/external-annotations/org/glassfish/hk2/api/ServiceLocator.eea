@@ -1,0 +1,4 @@
+class org/glassfish/hk2/api/ServiceLocator
+getService
+ <T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;[Ljava/lang/annotation/Annotation;)TT;
+ <T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;[Ljava/lang/annotation/Annotation;)T0T;

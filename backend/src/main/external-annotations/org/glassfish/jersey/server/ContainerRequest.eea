@@ -1,0 +1,4 @@
+class org/glassfish/jersey/server/ContainerRequest
+readEntity
+ <T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)TT;
+ <T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)T0T;

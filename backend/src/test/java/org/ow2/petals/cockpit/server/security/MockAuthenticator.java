@@ -19,7 +19,6 @@ package org.ow2.petals.cockpit.server.security;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
 import org.ow2.petals.cockpit.server.resources.UserSession.User;
@@ -34,7 +33,7 @@ public class MockAuthenticator extends CockpitAuthenticator {
     public static final User ADMIN = new User("admin", "Administrator");
 
     @Override
-    protected void internalInit(@Nullable WebContext context) {
+    protected void internalInit(WebContext context) {
         super.internalInit(context);
 
         String pw = getPasswordEncoder().encode(ADMIN.username);

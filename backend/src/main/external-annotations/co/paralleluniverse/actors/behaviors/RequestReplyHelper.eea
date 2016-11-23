@@ -1,0 +1,4 @@
+class co/paralleluniverse/actors/behaviors/RequestReplyHelper
+call
+ <V:Ljava/lang/Object;M:Lco/paralleluniverse/actors/behaviors/RequestMessage<TV;>;>(Lco/paralleluniverse/actors/ActorRef<-TM;>;TM;)TV;
+ <V:Ljava/lang/Object;M:Lco/paralleluniverse/actors/behaviors/RequestMessage<TV;>;>(L1co/paralleluniverse/actors/ActorRef<-TM;>;T1M;)TV;

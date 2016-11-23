@@ -18,7 +18,6 @@ package org.ow2.petals.cockpit.server.commands;
 
 import java.util.Optional;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
@@ -27,7 +26,6 @@ import org.skife.jdbi.v2.DBI;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import io.dropwizard.Application;
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.jdbi.DBIFactory;
@@ -47,14 +45,13 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
 
     private static final PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
 
-    public AddUserCommand(Application<C> app) {
+    public AddUserCommand() {
         super("add-user", "Add a user to the database");
     }
 
     @Override
-    public void configure(@Nullable Subparser subparser) {
+    public void configure(Subparser subparser) {
         super.configure(subparser);
-        assert subparser != null;
 
         subparser.addArgument("-u", "--username").dest("username").required(true);
         subparser.addArgument("-n", "--name").dest("name").required(true);
@@ -62,10 +59,8 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
     }
 
     @Override
-    protected void run(@Nullable Bootstrap<C> bootstrap, @Nullable Namespace namespace, C configuration)
+    protected void run(Bootstrap<C> bootstrap, Namespace namespace, C configuration)
             throws Exception {
-        assert namespace != null;
-        assert bootstrap != null;
 
         configuration.getDataSourceFactory().asSingleConnectionPool();
         

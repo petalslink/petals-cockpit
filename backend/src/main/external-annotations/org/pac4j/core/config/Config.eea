@@ -1,0 +1,4 @@
+class org/pac4j/core/config/Config
+setClients
+ (Lorg/pac4j/core/client/Clients;)V
+ (Lorg/pac4j/core/client/Clients;)V

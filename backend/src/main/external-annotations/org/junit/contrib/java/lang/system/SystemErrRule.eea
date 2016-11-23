@@ -1,0 +1,10 @@
+class org/junit/contrib/java/lang/system/SystemErrRule
+enableLog
+ ()Lorg/junit/contrib/java/lang/system/SystemErrRule;
+ ()L1org/junit/contrib/java/lang/system/SystemErrRule;
+mute
+ ()Lorg/junit/contrib/java/lang/system/SystemErrRule;
+ ()L1org/junit/contrib/java/lang/system/SystemErrRule;
+muteForSuccessfulTests
+ ()Lorg/junit/contrib/java/lang/system/SystemErrRule;
+ ()L1org/junit/contrib/java/lang/system/SystemErrRule;

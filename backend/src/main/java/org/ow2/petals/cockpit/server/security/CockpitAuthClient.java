@@ -16,17 +16,16 @@
  */
 package org.ow2.petals.cockpit.server.security;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.pac4j.core.client.IndirectClientV2;
 import org.pac4j.core.client.RedirectAction;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.profile.CommonProfile;
 
-public class CockpitAuthClient extends IndirectClientV2<@Nullable UsernamePasswordCredentials, CommonProfile> {
+public class CockpitAuthClient extends IndirectClientV2<UsernamePasswordCredentials, CommonProfile> {
 
     @Override
-    protected void internalInit(final @Nullable WebContext context) {
+    protected void internalInit(final WebContext context) {
         setCredentialsExtractor(new CockpitExtractor(getName()));
         // let's always consider it as an ajax request: no redirect will happen then!
         setAjaxRequestResolver(ctx -> true);

@@ -1,0 +1,31 @@
+class io/dropwizard/testing/junit/ResourceTestRule$Builder
+addProperty
+ (Ljava/lang/String;Ljava/lang/Object;)Lio/dropwizard/testing/junit/ResourceTestRule$Builder;
+ (Ljava/lang/String;Ljava/lang/Object;)L1io/dropwizard/testing/junit/ResourceTestRule$Builder;
+addProvider
+ (Ljava/lang/Class<*>;)Lio/dropwizard/testing/junit/ResourceTestRule$Builder;
+ (Ljava/lang/Class<*>;)L1io/dropwizard/testing/junit/ResourceTestRule$Builder;
+addProvider
+ (Ljava/lang/Object;)Lio/dropwizard/testing/junit/ResourceTestRule$Builder;
+ (Ljava/lang/Object;)L1io/dropwizard/testing/junit/ResourceTestRule$Builder;
+addResource
+ (Ljava/lang/Object;)Lio/dropwizard/testing/junit/ResourceTestRule$Builder;
+ (Ljava/lang/Object;)L1io/dropwizard/testing/junit/ResourceTestRule$Builder;
+build
+ ()Lio/dropwizard/testing/junit/ResourceTestRule;
+ ()L1io/dropwizard/testing/junit/ResourceTestRule;
+setClientConfigurator
+ (Ljava/util/function/Consumer<Lorg/glassfish/jersey/client/ClientConfig;>;)Lio/dropwizard/testing/junit/ResourceTestRule$Builder;
+ (Ljava/util/function/Consumer<Lorg/glassfish/jersey/client/ClientConfig;>;)L1io/dropwizard/testing/junit/ResourceTestRule$Builder;
+setMapper
+ (Lcom/fasterxml/jackson/databind/ObjectMapper;)Lio/dropwizard/testing/junit/ResourceTestRule$Builder;
+ (Lcom/fasterxml/jackson/databind/ObjectMapper;)L1io/dropwizard/testing/junit/ResourceTestRule$Builder;
+setRegisterDefaultExceptionMappers
+ (Z)Lio/dropwizard/testing/junit/ResourceTestRule$Builder;
+ (Z)L1io/dropwizard/testing/junit/ResourceTestRule$Builder;
+setTestContainerFactory
+ (Lorg/glassfish/jersey/test/spi/TestContainerFactory;)Lio/dropwizard/testing/junit/ResourceTestRule$Builder;
+ (Lorg/glassfish/jersey/test/spi/TestContainerFactory;)L1io/dropwizard/testing/junit/ResourceTestRule$Builder;
+setValidator
+ (Ljavax/validation/Validator;)Lio/dropwizard/testing/junit/ResourceTestRule$Builder;
+ (Ljavax/validation/Validator;)L1io/dropwizard/testing/junit/ResourceTestRule$Builder;

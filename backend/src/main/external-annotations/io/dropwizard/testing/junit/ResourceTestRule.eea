@@ -1,0 +1,7 @@
+class io/dropwizard/testing/junit/ResourceTestRule
+builder
+ ()Lio/dropwizard/testing/junit/ResourceTestRule$Builder;
+ ()L1io/dropwizard/testing/junit/ResourceTestRule$Builder;
+getJerseyTest
+ ()Lorg/glassfish/jersey/test/JerseyTest;
+ ()L1org/glassfish/jersey/test/JerseyTest;
