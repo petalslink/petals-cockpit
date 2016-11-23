@@ -1,0 +1,4 @@
+class org/assertj/core/api/Assertions
+assertThat
+ (Ljava/lang/String;)Lorg/assertj/core/api/AbstractCharSequenceAssert<*Ljava/lang/String;>;
+ (Ljava/lang/String;)Lorg/assertj/core/api/AbstractCharSequenceAssert<*Ljava/lang/String;>;

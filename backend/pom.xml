@@ -189,4 +189,19 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <properties>
+        <!-- the following is effective if the eclipse-external-annotations-m2e-plugin is installed -->
+        <m2e.jdt.annotationpath>src/main/external-annotations/</m2e.jdt.annotationpath>
+      </properties>
+    </profile>
+  </profiles>
 </project>

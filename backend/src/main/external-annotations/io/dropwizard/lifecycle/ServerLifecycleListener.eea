@@ -1,0 +1,4 @@
+class io/dropwizard/lifecycle/ServerLifecycleListener
+serverStarted
+ (Lorg/eclipse/jetty/server/Server;)V
+ (L1org/eclipse/jetty/server/Server;)V

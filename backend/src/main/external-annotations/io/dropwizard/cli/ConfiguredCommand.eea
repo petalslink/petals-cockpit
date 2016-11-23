@@ -1,0 +1,7 @@
+class io/dropwizard/cli/ConfiguredCommand
+configure
+ (Lnet/sourceforge/argparse4j/inf/Subparser;)V
+ (L1net/sourceforge/argparse4j/inf/Subparser;)V
+run
+ (Lio/dropwizard/setup/Bootstrap<TT;>;Lnet/sourceforge/argparse4j/inf/Namespace;TT;)V
+ (L1io/dropwizard/setup/Bootstrap<T1T;>;L1net/sourceforge/argparse4j/inf/Namespace;T1T;)V

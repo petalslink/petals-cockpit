@@ -45,7 +45,6 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.util.JarLocation;
 
-@SuppressWarnings("null")
 public class AddUserTest {
 
     /**

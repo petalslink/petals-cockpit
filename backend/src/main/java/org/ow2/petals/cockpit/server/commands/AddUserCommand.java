@@ -18,7 +18,6 @@ package org.ow2.petals.cockpit.server.commands;
 
 import java.util.Optional;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
@@ -52,9 +51,8 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
     }
 
     @Override
-    public void configure(@Nullable Subparser subparser) {
+    public void configure(Subparser subparser) {
         super.configure(subparser);
-        assert subparser != null;
 
         subparser.addArgument("-u", "--username").dest("username").required(true);
         subparser.addArgument("-n", "--name").dest("name").required(true);
@@ -62,10 +60,8 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
     }
 
     @Override
-    protected void run(@Nullable Bootstrap<C> bootstrap, @Nullable Namespace namespace, C configuration)
+    protected void run(Bootstrap<C> bootstrap, Namespace namespace, C configuration)
             throws Exception {
-        assert namespace != null;
-        assert bootstrap != null;
 
         configuration.getDataSourceFactory().asSingleConnectionPool();
         

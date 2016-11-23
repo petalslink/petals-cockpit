@@ -1,0 +1,4 @@
+class org/skife/jdbi/v2/tweak/ResultSetMapper
+map
+ (ILjava/sql/ResultSet;Lorg/skife/jdbi/v2/StatementContext;)TT;
+ (IL1java/sql/ResultSet;L1org/skife/jdbi/v2/StatementContext;)TT;

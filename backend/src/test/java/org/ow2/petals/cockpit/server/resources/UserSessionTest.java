@@ -40,7 +40,6 @@ import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 
-@SuppressWarnings("null")
 public class UserSessionTest {
 
     public static final String SESSION_COOKIE_NAME = Globals.SESSION_COOKIE_NAME;

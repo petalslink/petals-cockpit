@@ -1,0 +1,4 @@
+class javax/ws/rs/core/Feature
+configure
+ (Ljavax/ws/rs/core/FeatureContext;)Z
+ (L1javax/ws/rs/core/FeatureContext;)Z

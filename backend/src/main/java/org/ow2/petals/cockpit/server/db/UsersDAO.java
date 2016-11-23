@@ -70,8 +70,7 @@ public abstract class UsersDAO {
 
         public static class Mapper implements ResultSetMapper<DbUser> {
             @Override
-            public DbUser map(int index, @Nullable ResultSet r, @Nullable StatementContext ctx) throws SQLException {
-                assert r != null;
+            public DbUser map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                 return new DbUser(r.getString("username"), r.getString("password"), r.getString("name"));
             }
         }

@@ -1,0 +1,7 @@
+class com/google/common/collect/ImmutableMap
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()Lcom/google/common/collect/ImmutableMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()L1com/google/common/collect/ImmutableMap<TK;TV;>;
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;)Lcom/google/common/collect/ImmutableMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(T1K;T1V;)L1com/google/common/collect/ImmutableMap<TK;TV;>;

@@ -16,7 +16,6 @@
  */
 package org.ow2.petals.cockpit.server.security;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
 import org.pac4j.core.context.WebContext;
@@ -37,20 +36,20 @@ public class CockpitAuthenticator extends AbstractUsernamePasswordAuthenticator 
     }
 
     @Override
-    protected void internalInit(@Nullable WebContext context) {
+    protected void internalInit(WebContext context) {
         setPasswordEncoder(new SpringSecurityPasswordEncoder(new BCryptPasswordEncoder()));
         
         super.internalInit(context);
     }
 
     @Override
-    public void validate(@Nullable UsernamePasswordCredentials credentials, @Nullable WebContext context)
-            throws HttpAction {
-        assert credentials != null;
-
+    public void validate(UsernamePasswordCredentials credentials, WebContext context) throws HttpAction {
         init(context);
 
         final String username = credentials.getUsername();
+
+        // can't be null according to CockpitExtractor!
+        assert username != null;
 
         final DbUser user = users.findByUsername(username);
 

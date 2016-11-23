@@ -20,7 +20,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree;
@@ -113,9 +112,7 @@ public abstract class BusesDAO {
         public static class Mapper implements ResultSetMapper<DbBus> {
 
             @Override
-            public DbBus map(int index, @Nullable ResultSet r, @Nullable StatementContext ctx) throws SQLException {
-                assert r != null;
-
+            public DbBus map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                 if (r.getBoolean("imported")) {
                     return new DbBusImported(r.getLong("id"), r.getString("import_ip"), r.getInt("import_port"),
                             r.getString("import_username"), r.getString("import_password"),
@@ -192,10 +189,7 @@ public abstract class BusesDAO {
         public static class Mapper implements ResultSetMapper<DbContainer> {
 
             @Override
-            public DbContainer map(int index, @Nullable ResultSet r, @Nullable StatementContext ctx)
-                    throws SQLException {
-                assert r != null;
-
+            public DbContainer map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                 return new DbContainer(r.getLong("id"), r.getString("name"), r.getString("ip"), r.getInt("port"),
                         r.getString("username"), r.getString("password"));
 
@@ -220,10 +214,7 @@ public abstract class BusesDAO {
         public static class Mapper implements ResultSetMapper<DbComponent> {
 
             @Override
-            public DbComponent map(int index, @Nullable ResultSet r, @Nullable StatementContext ctx)
-                    throws SQLException {
-                assert r != null;
-
+            public DbComponent map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                 return new DbComponent(r.getLong("id"), r.getString("name"), r.getString("state"));
 
             }
@@ -247,10 +238,7 @@ public abstract class BusesDAO {
         public static class Mapper implements ResultSetMapper<DbServiceUnit> {
 
             @Override
-            public DbServiceUnit map(int index, @Nullable ResultSet r, @Nullable StatementContext ctx)
-                    throws SQLException {
-                assert r != null;
-
+            public DbServiceUnit map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                 return new DbServiceUnit(r.getLong("id"), r.getString("name"), r.getString("state"));
 
             }

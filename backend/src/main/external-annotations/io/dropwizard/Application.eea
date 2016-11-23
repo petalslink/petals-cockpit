@@ -1,0 +1,7 @@
+class io/dropwizard/Application
+initialize
+ (Lio/dropwizard/setup/Bootstrap<TT;>;)V
+ (L1io/dropwizard/setup/Bootstrap<T1T;>;)V
+run
+ (TT;Lio/dropwizard/setup/Environment;)V
+ (T1T;L1io/dropwizard/setup/Environment;)V

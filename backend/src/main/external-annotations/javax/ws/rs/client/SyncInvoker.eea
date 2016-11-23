@@ -1,0 +1,4 @@
+class javax/ws/rs/client/SyncInvoker
+get
+ <T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)TT;
+ <T:Ljava/lang/Object;>(L1java/lang/Class<TT;>;)T1T;

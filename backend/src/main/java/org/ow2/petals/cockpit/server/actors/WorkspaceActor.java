@@ -102,13 +102,12 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         this.w = w;
         this.broadcaster.add(new BroadcasterListener<OutboundEvent>() {
             @Override
-            public void onException(@Nullable ChunkedOutput<OutboundEvent> chunkedOutput,
-                    @Nullable Exception exception) {
+            public void onException(ChunkedOutput<OutboundEvent> chunkedOutput, Exception exception) {
                 LOG.error("Error in SSE broadcaster for workspace {}", w.id, exception);
             }
 
             @Override
-            public void onClose(@Nullable ChunkedOutput<OutboundEvent> chunkedOutput) {
+            public void onClose(ChunkedOutput<OutboundEvent> chunkedOutput) {
                 LOG.debug("Client left workspace {}", w.id);
             }
         });
@@ -128,6 +127,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         String name = "workspace-" + wId;
 
         ActorRef<Msg> a = ActorRegistry.tryGetActor(name);
+
         if (a == null) {
             WorkspacesDAO workspaces = serviceLocator().getService(WorkspacesDAO.class);
             assert workspaces != null;
@@ -138,13 +138,10 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                     serviceLocator().inject(workspaceActor);
                     return workspaceActor;
                 });
-                return Optional.of(a);
-            } else {
-                return Optional.empty();
             }
-        } else {
-            return Optional.of(a);
         }
+
+        return Optional.ofNullable(a);
     }
 
     @Override
@@ -195,7 +192,6 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
     private Either<Status, BusInProgress> handleImportBus(ImportBus bus) throws SuspendExecution, InterruptedException {
         final NewBus nb = bus.nb;
 
-        @SuppressWarnings("null")
         final long bId = FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<Long, RuntimeException>() {
             @Override
             public Long call() {
@@ -218,7 +214,6 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
 
     private WorkspaceEvent doImportBus(long bId, NewBus bus) throws SuspendExecution, InterruptedException {
         try {
-            @SuppressWarnings("null")
             final Domain topology = FiberAsync.runBlocking(executor,
                     new CheckedCallable<Domain, ContainerAdministrationException>() {
                         @Override
@@ -226,27 +221,33 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                             return getTopology(bus);
                         }
                     });
-            @SuppressWarnings("null")
+
             final BusTree tree = FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<BusTree, RuntimeException>() {
                 @Override
                 public BusTree call() {
                     return buses.saveImport(bId, topology);
                 }
             });
+
             return WorkspaceEvent.ok(tree);
 
         } catch (Exception e) {
-            LOG.info("Can't import bus from container {}:{}: {}", bus.ip, bus.port, e.getMessage());
+            String m = e.getMessage();
+            String message = m != null ? m : e.getClass().getName();
+
+            LOG.info("Can't import bus from container {}:{}: {}", bus.ip, bus.port, message);
             LOG.debug("Can't import bus from container {}:{}", bus.ip, bus.port, e);
+
             FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<@Nullable Void, RuntimeException>() {
                 @Override
                 @Nullable
                 public Void call() {
-                    buses.saveError(bId, e.getMessage());
+                    buses.saveError(bId, message);
                     return null;
                 }
             });
-            return WorkspaceEvent.error(new BusInError(bId, bus.ip, bus.port, bus.username, e.getMessage()));
+
+            return WorkspaceEvent.error(new BusInError(bId, bus.ip, bus.port, bus.username, message));
         }
     }
 

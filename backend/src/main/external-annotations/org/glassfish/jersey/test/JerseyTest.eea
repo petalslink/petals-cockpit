@@ -1,0 +1,7 @@
+class org/glassfish/jersey/test/JerseyTest
+target
+ ()Ljavax/ws/rs/client/WebTarget;
+ ()L1javax/ws/rs/client/WebTarget;
+target
+ (Ljava/lang/String;)Ljavax/ws/rs/client/WebTarget;
+ (Ljava/lang/String;)L1javax/ws/rs/client/WebTarget;

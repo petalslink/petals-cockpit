@@ -75,9 +75,10 @@ public class WorkspaceTree extends MinWorkspace {
     public static BusTree buildAndSaveToDatabase(BusesDAO buses, long bId, Domain topology) {
         List<ContainerTree> cs = new ArrayList<>();
         for (Container container : topology.getContainers()) {
-            long cId = buses.createContainer(container.getContainerName(), container.getHost(),
-                    container.getPorts().get(PortType.JMX), container.getJmxUsername(), container.getJmxPassword(),
-                    bId);
+            Integer port = container.getPorts().get(PortType.JMX);
+            assert port != null;
+            long cId = buses.createContainer(container.getContainerName(), container.getHost(), port,
+                    container.getJmxUsername(), container.getJmxPassword(), bId);
             List<ComponentTree> comps = new ArrayList<>();
             for (Component component : container.getComponents()) {
                 ComponentTree.State compState = ComponentTree.State.from(component.getState());

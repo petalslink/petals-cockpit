@@ -1,0 +1,4 @@
+class co/paralleluniverse/fibers/FiberAsync
+runBlocking
+ <V:Ljava/lang/Object;E:Ljava/lang/Exception;>(Ljava/util/concurrent/ExecutorService;Lco/paralleluniverse/common/util/CheckedCallable<TV;TE;>;)TV;^TE;^Lco/paralleluniverse/fibers/SuspendExecution;^Ljava/lang/InterruptedException;
+ <V:Ljava/lang/Object;E:Ljava/lang/Exception;>(Ljava/util/concurrent/ExecutorService;L1co/paralleluniverse/common/util/CheckedCallable<TV;TE;>;)TV;^TE;^Lco/paralleluniverse/fibers/SuspendExecution;^Ljava/lang/InterruptedException;

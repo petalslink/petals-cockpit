@@ -27,6 +27,8 @@ public class CockpitProfile extends CommonProfile {
     }
 
     public DbUser getUser() {
-        return (DbUser) getAttribute("dao");
+        Object attribute = getAttribute("dao");
+        assert attribute != null;
+        return (DbUser) attribute;
     }
 }

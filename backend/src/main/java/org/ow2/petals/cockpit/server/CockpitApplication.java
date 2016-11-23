@@ -23,7 +23,6 @@ import javax.ws.rs.core.FeatureContext;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -52,7 +51,6 @@ import io.dropwizard.db.PooledDataSourceFactory;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.jetty.BiDiGzipHandler;
-import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -98,9 +96,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
     }
 
     @Override
-    public void initialize(@Nullable Bootstrap<C> bootstrap) {
-        assert bootstrap != null;
-
+    public void initialize(Bootstrap<C> bootstrap) {
         bootstrap.addBundle(migrations);
         bootstrap.addBundle(pac4j);
         // ease debugging of exceptions thrown by JDBI!
@@ -109,9 +105,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
     }
 
     @Override
-    public void run(C configuration, @Nullable Environment environment) throws Exception {
-        assert environment != null;
-
+    public void run(C configuration, Environment environment) throws Exception {
         final DBIFactory factory = new DBIFactory();
         final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "cockpit");
         final UsersDAO users = jdbi.onDemand(UsersDAO.class);
@@ -158,17 +152,13 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
         // This is needed for SSE to work correctly!
         // See https://github.com/dropwizard/dropwizard/issues/1673
-        environment.lifecycle().addServerLifecycleListener(new ServerLifecycleListener() {
-            @Override
-            public void serverStarted(@Nullable Server server) {
-                assert server != null;
-                Handler handler = server.getHandler();
-                while (handler instanceof HandlerWrapper) {
-                    handler = ((HandlerWrapper) handler).getHandler();
-                    if (handler instanceof BiDiGzipHandler) {
-                        LOG.info("Setting sync flush on gzip compression handler");
-                        ((BiDiGzipHandler) handler).setSyncFlush(true);
-                    }
+        environment.lifecycle().addServerLifecycleListener(server -> {
+            Handler handler = server.getHandler();
+            while (handler instanceof HandlerWrapper) {
+                handler = ((HandlerWrapper) handler).getHandler();
+                if (handler instanceof BiDiGzipHandler) {
+                    LOG.info("Setting sync flush on gzip compression handler");
+                    ((BiDiGzipHandler) handler).setSyncFlush(true);
                 }
             }
         });
@@ -200,7 +190,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
     public static class ActorServiceLocator implements Feature {
         @Override
-        public boolean configure(@Nullable FeatureContext context) {
+        public boolean configure(FeatureContext context) {
             WorkspaceActor.setServiceLocator(ServiceLocatorProvider.getServiceLocator(context));
             // no need to keep that in memory...
             return false;

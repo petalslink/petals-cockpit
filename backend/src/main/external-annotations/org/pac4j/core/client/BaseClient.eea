@@ -1,0 +1,4 @@
+class org/pac4j/core/client/BaseClient
+getName
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

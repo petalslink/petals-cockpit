@@ -1,0 +1,7 @@
+class org/pac4j/core/client/IndirectClient
+internalInit
+ (Lorg/pac4j/core/context/WebContext;)V
+ (L1org/pac4j/core/context/WebContext;)V
+redirect
+ (Lorg/pac4j/core/context/WebContext;)Lorg/pac4j/core/exception/HttpAction;
+ (Lorg/pac4j/core/context/WebContext;)Lorg/pac4j/core/exception/HttpAction;

@@ -59,8 +59,7 @@ public abstract class WorkspacesDAO {
         }
     }
 
-    @SqlQuery("select * from workspaces w"
-            + " inner join users_workspaces uw on w.id = uw.workspace_id"
+    @SqlQuery("select * from workspaces w" + " inner join users_workspaces uw on w.id = uw.workspace_id"
             + " where uw.username = :u.username")
     @Mapper(DbMinimalWorkspace.Mapper.class)
     protected abstract List<DbMinimalWorkspace> _findUserWorkspaces(@BindBean("u") DbUser user);
@@ -113,10 +112,7 @@ public abstract class WorkspacesDAO {
         public static class Mapper implements ResultSetMapper<DbMinimalWorkspace> {
 
             @Override
-            public DbMinimalWorkspace map(int index, @Nullable ResultSet r, @Nullable StatementContext ctx)
-                    throws SQLException {
-                assert r != null;
-
+            public DbMinimalWorkspace map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                 return new DbMinimalWorkspace(r.getLong("id"), r.getString("name"));
             }
         }

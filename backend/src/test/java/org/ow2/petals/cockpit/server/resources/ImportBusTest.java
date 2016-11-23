@@ -72,7 +72,6 @@ import co.paralleluniverse.common.util.Debug;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
-@SuppressWarnings("null")
 public class ImportBusTest {
 
     @Rule
@@ -129,7 +128,8 @@ public class ImportBusTest {
         when(workspaces.findById(workspaceId)).thenReturn(new DbWorkspace(workspaceId, "test",
                 Arrays.asList(MockProfileParamValueFactoryProvider.ADMIN.username)));
 
-        int port = container.getPorts().get(PortType.JMX);
+        Integer port = container.getPorts().get(PortType.JMX);
+        assert port != null;
 
         long busId = 4;
         when(buses.createBus(container.getHost(), port, container.getJmxUsername(), container.getJmxPassword(), "??",
@@ -156,7 +156,8 @@ public class ImportBusTest {
     @Test
     public void testImportBusOk() {
 
-        int port = container.getPorts().get(PortType.JMX);
+        Integer port = container.getPorts().get(PortType.JMX);
+        assert port != null;
 
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
                 .get(EventInput.class)) {
@@ -188,7 +189,9 @@ public class ImportBusTest {
     @Test
     public void testImportBusError() {
 
-        int port = container.getPorts().get(PortType.JMX);
+        Integer port = container.getPorts().get(PortType.JMX);
+        assert port != null;
+
         String incorrectHost = "host2";
 
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()

@@ -1,0 +1,25 @@
+class java/util/stream/Stream
+concat
+ <T:Ljava/lang/Object;>(Ljava/util/stream/Stream<+TT;>;Ljava/util/stream/Stream<+TT;>;)Ljava/util/stream/Stream<TT;>;
+ <T:Ljava/lang/Object;>(L1java/util/stream/Stream<+TT;>;L1java/util/stream/Stream<+TT;>;)L1java/util/stream/Stream<TT;>;
+empty
+ <T:Ljava/lang/Object;>()Ljava/util/stream/Stream<TT;>;
+ <T:Ljava/lang/Object;>()L1java/util/stream/Stream<TT;>;
+filter
+ (Ljava/util/function/Predicate<-TT;>;)Ljava/util/stream/Stream<TT;>;
+ (Ljava/util/function/Predicate<-TT;>;)L1java/util/stream/Stream<TT;>;
+generate
+ <T:Ljava/lang/Object;>(Ljava/util/function/Supplier<TT;>;)Ljava/util/stream/Stream<TT;>;
+ <T:Ljava/lang/Object;>(L1java/util/function/Supplier<TT;>;)L1java/util/stream/Stream<TT;>;
+iterate
+ <T:Ljava/lang/Object;>(TT;Ljava/util/function/UnaryOperator<TT;>;)Ljava/util/stream/Stream<TT;>;
+ <T:Ljava/lang/Object;>(TT;L1java/util/function/UnaryOperator<TT;>;)L1java/util/stream/Stream<TT;>;
+map
+ <R:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TR;>;)Ljava/util/stream/Stream<TR;>;
+ <R:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TR;>;)L1java/util/stream/Stream<TR;>;
+of
+ <T:Ljava/lang/Object;>(TT;)Ljava/util/stream/Stream<TT;>;
+ <T:Ljava/lang/Object;>(TT;)L1java/util/stream/Stream<TT;>;
+of
+ <T:Ljava/lang/Object;>([TT;)Ljava/util/stream/Stream<TT;>;
+ <T:Ljava/lang/Object;>([TT;)L1java/util/stream/Stream<TT;>;
