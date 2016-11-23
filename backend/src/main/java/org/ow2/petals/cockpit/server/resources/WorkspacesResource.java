@@ -35,7 +35,6 @@ import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
@@ -81,35 +80,24 @@ public class WorkspacesResource {
     @Singleton
     public static class WorkspaceResource {
 
-        private final WorkspacesDAO workspaces;
-
-        private final BusesDAO buses;
-
-        @Inject
-        public WorkspaceResource(WorkspacesDAO workspaces, BusesDAO buses) {
-            this.buses = buses;
-            this.workspaces = workspaces;
-        }
-
         @GET
         @Produces(MediaType.APPLICATION_JSON)
         @Valid
-        public WorkspaceTree get(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile) {
-            DbWorkspace w = ResourcesHelpers.getWorkspace(workspaces, wsId, profile);
-
-            return workspaces.getWorkspaceTree(w);
+        public WorkspaceTree get(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile)
+                throws InterruptedException {
+            return ResourcesHelpers.call(wsId, new WorkspaceActor.GetTree(profile.getUser().getUsername()));
         }
 
         @GET
         @Path("/events")
         @Produces(SseFeature.SERVER_SENT_EVENTS)
-        public EventOutput sse(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile) {
-            DbWorkspace w = ResourcesHelpers.getWorkspace(workspaces, wsId, profile);
+        public EventOutput sse(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile)
+                throws InterruptedException {
+            final EventOutput eo = new EventOutput();
 
-            final EventOutput eventOutput = new EventOutput();
-            WorkspaceActor.newClient(w, eventOutput);
+            ResourcesHelpers.call(wsId, new WorkspaceActor.NewClient(profile.getUser().getUsername(), eo));
 
-            return eventOutput;
+            return eo;
         }
 
         @Path("/buses")

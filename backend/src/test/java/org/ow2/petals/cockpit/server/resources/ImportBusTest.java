@@ -47,7 +47,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
@@ -64,10 +66,17 @@ import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvid
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
+import co.paralleluniverse.actors.ActorRegistry;
+import co.paralleluniverse.common.test.TestUtil;
+import co.paralleluniverse.common.util.Debug;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
+@SuppressWarnings("null")
 public class ImportBusTest {
+
+    @Rule
+    public TestRule watchman = TestUtil.WATCHMAN;
 
     private static WorkspacesDAO workspaces = mock(WorkspacesDAO.class,
             withSettings()
@@ -110,6 +119,8 @@ public class ImportBusTest {
         container.addProperty("petals.topology.passphrase", "??");
         domain.addContainers(ImmutableList.of(container));
         petals.registerDomain(domain);
+        // ensure this doesn't get called in a non-unit test thread and return false later when clearing the registry!
+        assertThat(Debug.isUnitTest()).isTrue();
     }
 
     @Before
@@ -138,6 +149,8 @@ public class ImportBusTest {
 
         reset(workspaces);
         reset(buses);
+
+        ActorRegistry.clear();
     }
 
     @Test
@@ -164,7 +177,8 @@ public class ImportBusTest {
             });
         }
 
-        verify(workspaces, times(3)).findById(1);
+        // once from the setUp (not sure why) and once when creating the actor
+        verify(workspaces, times(2)).findById(1);
         verify(buses).createBus(container.getHost(), port, container.getJmxUsername(), container.getJmxPassword(), "??",
                 1);
         verify(buses).saveImport(eq(4L), any());
@@ -195,7 +209,8 @@ public class ImportBusTest {
             });
         }
 
-        verify(workspaces, times(3)).findById(1);
+        // once from the setUp (not sure why) and once when creating the actor
+        verify(workspaces, times(2)).findById(1);
         verify(buses).createBus(incorrectHost, port, container.getJmxUsername(), container.getJmxPassword(), "??", 1);
         verify(buses).saveError(5, "Unknown Host");
     }

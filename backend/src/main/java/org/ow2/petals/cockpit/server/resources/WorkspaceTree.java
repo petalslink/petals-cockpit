@@ -31,6 +31,7 @@ import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbBus;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
@@ -68,7 +69,7 @@ public class WorkspaceTree extends MinWorkspace {
     /**
      * Meant to be called from inside a DB transaction!
      * 
-     * TODO store error!
+     * TODO this should be done by {@link WorkspaceActor}
      */
     @Suspendable
     public static BusTree buildAndSaveToDatabase(BusesDAO buses, long bId, Domain topology) {
@@ -101,6 +102,9 @@ public class WorkspaceTree extends MinWorkspace {
         return new BusTree(bId, topology.getName(), cs);
     }
 
+    /**
+     * TODO this should be done by {@link WorkspaceActor}
+     */
     public static WorkspaceTree buildFromDatabase(BusesDAO buses, DbWorkspace w) {
         List<BusTree> importedBus = new ArrayList<>();
         List<BusInProgress> busInProgress = new ArrayList<>();
