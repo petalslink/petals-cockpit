@@ -16,6 +16,7 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -27,9 +28,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.ow2.petals.cockpit.server.actors.ActorsComponent;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
@@ -39,6 +42,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Singleton
 public class BusesResource {
+
+    private final ActorsComponent as;
+
+    @Inject
+    public BusesResource(ActorsComponent as) {
+        this.as = as;
+    }
 
     @Path("/{bId}")
     public Class<BusResource> busResource() {
@@ -51,10 +61,18 @@ public class BusesResource {
     @Valid
     public BusInProgress addBus(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
             @Valid NewBus nb) throws InterruptedException {
-        return ResourcesHelpers.call(wsId, new WorkspaceActor.ImportBus(profile.getUser().getUsername(), nb));
+        return as.call(wsId, new WorkspaceActor.ImportBus(profile.getUser().getUsername(), nb))
+                .getOrElseThrow(s -> new WebApplicationException(s));
     }
 
     public static class BusResource {
+
+        private final ActorsComponent as;
+
+        @Inject
+        public BusResource(ActorsComponent as) {
+            this.as = as;
+        }
 
         @GET
         @Produces(MediaType.APPLICATION_JSON)
@@ -67,7 +85,8 @@ public class BusesResource {
         @DELETE
         public void delete(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
                 @PathParam("bId") @Min(1) long bId) throws InterruptedException {
-            ResourcesHelpers.call(wsId, new WorkspaceActor.DeleteBus(profile.getUser().getUsername(), bId));
+            as.call(wsId, new WorkspaceActor.DeleteBus(profile.getUser().getUsername(), bId))
+                    .getOrElseThrow(s -> new WebApplicationException(s));
         }
     }
 

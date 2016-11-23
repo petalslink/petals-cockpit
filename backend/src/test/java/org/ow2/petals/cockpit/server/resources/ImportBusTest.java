@@ -36,6 +36,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+import javax.inject.Singleton;
 import javax.ws.rs.client.Entity;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -56,7 +57,7 @@ import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.CockpitApplication.ActorServiceLocator;
+import org.ow2.petals.cockpit.server.actors.ActorsComponent;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
@@ -93,7 +94,7 @@ public class ImportBusTest {
             .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
             // we pass the resource as a provider to get injection in constructor
             .addProvider(WorkspacesResource.class).addProvider(new MockProfileParamValueFactoryProvider.Binder())
-            .addProvider(new ActorServiceLocator()).addProvider(new AbstractBinder() {
+            .addProvider(new AbstractBinder() {
                 @Override
                 protected void configure() {
                     bind(workspaces).to(WorkspacesDAO.class);
@@ -102,6 +103,7 @@ public class ImportBusTest {
                             .to(ExecutorService.class);
                     bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.JDBC_ES)
                             .to(ExecutorService.class);
+                    bind(ActorsComponent.class).to(ActorsComponent.class).in(Singleton.class);
                 }
             }).build();
 

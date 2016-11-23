@@ -18,16 +18,14 @@ package org.ow2.petals.cockpit.server;
 
 import java.util.concurrent.ExecutorService;
 
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
+import javax.inject.Singleton;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.ServiceLocatorProvider;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
+import org.ow2.petals.cockpit.server.actors.ActorsComponent;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
@@ -139,6 +137,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 bind(workspaces).to(WorkspacesDAO.class);
                 bind(buses).to(BusesDAO.class);
                 bind(jdbi).to(DBI.class);
+                bind(ActorsComponent.class).to(ActorsComponent.class).in(Singleton.class);
             }
         });
 
@@ -146,9 +145,6 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
         environment.jersey().register(UserSession.class);
         environment.jersey().register(WorkspacesResource.class);
-
-        // TODO can we do better than that?
-        environment.jersey().register(new ActorServiceLocator());
 
         // This is needed for SSE to work correctly!
         // See https://github.com/dropwizard/dropwizard/issues/1673
@@ -185,15 +181,6 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 final CockpitAuthenticator auth = new CockpitAuthenticator(users);
                 cac.setAuthenticator(auth);
             }
-        }
-    }
-
-    public static class ActorServiceLocator implements Feature {
-        @Override
-        public boolean configure(FeatureContext context) {
-            WorkspaceActor.setServiceLocator(ServiceLocatorProvider.getServiceLocator(context));
-            // no need to keep that in memory...
-            return false;
         }
     }
 }

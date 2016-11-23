@@ -16,7 +16,6 @@
  */
 package org.ow2.petals.cockpit.server.actors;
 
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 import javax.inject.Inject;
@@ -25,7 +24,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.glassfish.jersey.media.sse.SseBroadcaster;
@@ -53,8 +51,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import co.paralleluniverse.actors.ActorRef;
-import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.actors.BasicActor;
 import co.paralleluniverse.actors.behaviors.RequestMessage;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
@@ -76,9 +72,6 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
     private static final Logger LOG = LoggerFactory.getLogger(WorkspaceActor.class);
 
     private static final long serialVersionUID = -2202357041789526859L;
-
-    @Nullable
-    private static ServiceLocator serviceLocator;
 
     private final DbWorkspace w;
 
@@ -111,37 +104,6 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                 LOG.debug("Client left workspace {}", w.id);
             }
         });
-    }
-
-    public static void setServiceLocator(ServiceLocator sl) {
-        serviceLocator = sl;
-    }
-
-    private static ServiceLocator serviceLocator() {
-        assert serviceLocator != null;
-        return serviceLocator;
-    }
-
-    @SuppressWarnings("resource")
-    public static Optional<ActorRef<Msg>> get(long wId) throws SuspendExecution {
-        String name = "workspace-" + wId;
-
-        ActorRef<Msg> a = ActorRegistry.tryGetActor(name);
-
-        if (a == null) {
-            WorkspacesDAO workspaces = serviceLocator().getService(WorkspacesDAO.class);
-            assert workspaces != null;
-            DbWorkspace ws = workspaces.findById(wId);
-            if (ws != null) {
-                a = ActorRegistry.getOrRegisterActor(name, () -> {
-                    WorkspaceActor workspaceActor = new WorkspaceActor(ws);
-                    serviceLocator().inject(workspaceActor);
-                    return workspaceActor;
-                });
-            }
-        }
-
-        return Optional.ofNullable(a);
     }
 
     @Override
