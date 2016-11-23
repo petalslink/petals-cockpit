@@ -21,7 +21,7 @@ describe(`Login`, () => {
   it(`should be redirected to login if a user is trying to access a protected route without being logged`, () => {
     browser.get(`/#/cockpit`);
 
-    expect(browser.getCurrentUrl()).toMatch(`login`);
+    expect(browser.getCurrentUrl()).toMatch(/login$/);
   });
 
   it(`should not login if user/pwd not match`, () => {
@@ -34,7 +34,7 @@ describe(`Login`, () => {
 
     element(by.css(`.page-login button`)).click();
 
-    expect(browser.getCurrentUrl()).toMatch(`/login`);
+    expect(browser.getCurrentUrl()).toMatch(/login$/);
   });
 
   it(`should login if user/pwd match`, () => {
@@ -45,6 +45,6 @@ describe(`Login`, () => {
 
     element(by.css(`.page-login button`)).click();
 
-    expect(browser.getCurrentUrl()).toMatch(`/cockpit/workspaces`);
+    expect(browser.getCurrentUrl()).toMatch(/cockpit\/workspaces$/);
   });
 });
