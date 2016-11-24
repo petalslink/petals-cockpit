@@ -177,4 +177,14 @@
       </column>
     </addColumn>
   </changeSet>
+
+  <changeSet id="v0.4.0-3" author="vnoel">
+    <addColumn tableName="users">
+      <column name="last_workspace" type="bigint" defaultValue="NULL">
+        <constraints nullable="true" />
+      </column>
+    </addColumn>
+    <addForeignKeyConstraint constraintName="fk_users_last_workspace" baseTableName="users"
+      baseColumnNames="last_workspace" referencedTableName="workspaces" referencedColumnNames="id" onDelete="SET DEFAULT" />
+  </changeSet>
 </databaseChangeLog>

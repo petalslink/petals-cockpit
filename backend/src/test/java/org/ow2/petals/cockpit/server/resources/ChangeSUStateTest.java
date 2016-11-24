@@ -43,10 +43,10 @@ import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.ContainerResource.ChangeState;
 import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit;
 import org.ow2.petals.cockpit.server.resources.ContainerResource.ServiceUnitOverview;
-import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvider;
 
 import com.google.common.collect.ImmutableMap;
 

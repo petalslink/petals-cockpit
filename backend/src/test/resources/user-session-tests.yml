@@ -14,9 +14,7 @@ server:
 
 database:
   driverClass: org.h2.Driver
-  url: jdbc:h2:mem:cockpit
-  # see http://stackoverflow.com/a/3670000
-  validationQuery: "/* Health Check */ SELECT 1"
+  # url is set by test
 
 pac4j:
   globalFilters:
@@ -34,7 +32,7 @@ pac4j:
   clients:
     - org.ow2.petals.cockpit.server.security.CockpitAuthClient:
         authenticator:
-          class: org.ow2.petals.cockpit.server.security.MockAuthenticator
+          class: org.ow2.petals.cockpit.server.mocks.MockAuthenticator
 
 logging:
   level: INFO

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.resources;
+package org.ow2.petals.cockpit.server.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,18 +27,24 @@ import javax.ws.rs.core.Response;
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.grizzly.http.server.util.Globals;
 import org.glassfish.jersey.client.ClientProperties;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.mocks.MockAuthenticator;
 import org.ow2.petals.cockpit.server.resources.UserSession.User;
 import org.ow2.petals.cockpit.server.security.CockpitExtractor.Authentication;
-import org.ow2.petals.cockpit.server.security.MockAuthenticator;
+import org.zapodot.junit.db.EmbeddedDatabaseRule;
 
 import io.dropwizard.client.JerseyClientBuilder;
+import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
+import liquibase.Liquibase;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.LiquibaseException;
+import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class UserSessionTest {
 
@@ -48,33 +54,44 @@ public class UserSessionTest {
         // only needed because of generics
     }
 
-    @ClassRule
-    public static final DropwizardAppRule<CockpitConfiguration> RULE = new DropwizardAppRule<>(App.class,
-            ResourceHelpers.resourceFilePath("user-session-tests.yml"));
+    @Rule
+    public EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder().build();
+
+    @Rule
+    public final DropwizardAppRule<CockpitConfiguration> appRule = new DropwizardAppRule<>(App.class,
+            ResourceHelpers.resourceFilePath("user-session-tests.yml"),
+            ConfigOverride.config("database.url", () -> dbRule.getConnectionJdbcUrl()));
 
     @Nullable
-    private static Client client;
+    private Client client;
 
-    @BeforeClass
-    public static void setUpClient() {
-        client = new JerseyClientBuilder(RULE.getEnvironment()).build("test client")
+    @Before
+    public void setUpClient() {
+        client = new JerseyClientBuilder(appRule.getEnvironment()).build("test client")
                 // sometimes it fails with the default value...
                 .property(ClientProperties.READ_TIMEOUT, 1000);
     }
 
-    public static Client client() {
+    @Before
+    public void setUpDb() throws LiquibaseException {
+        // we need a valid empty db for those tests
+        Liquibase migrator = new Liquibase("migrations.xml", new ClassLoaderResourceAccessor(),
+                new JdbcConnection(dbRule.getConnection()));
+        migrator.update("");
+    }
+
+    public Client client() {
         assert client != null;
         return client;
     }
 
-    private static Builder request() {
+    private Builder request() {
         // jersey client does not keep cookies in redirect...
-        return client().target(url("user/session"))
-                .property(ClientProperties.FOLLOW_REDIRECTS, false).request();
+        return client().target(url("user/session")).property(ClientProperties.FOLLOW_REDIRECTS, false).request();
     }
 
-    private static String url(String url) {
-        return String.format("http://localhost:%d/api/%s", RULE.getLocalPort(), url);
+    private String url(String url) {
+        return String.format("http://localhost:%d/api/%s", appRule.getLocalPort(), url);
     }
 
     @Test

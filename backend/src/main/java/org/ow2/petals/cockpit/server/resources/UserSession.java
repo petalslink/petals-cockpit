@@ -16,7 +16,9 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -24,7 +26,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JCallback;
@@ -47,6 +51,13 @@ public class UserSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserSession.class);
 
+    private final UsersDAO users;
+
+    @Inject
+    public UserSession(UsersDAO users) {
+        this.users = users;
+    }
+
     /**
      * Note: Security is covered by the global filter
      */
@@ -58,7 +69,10 @@ public class UserSession {
 
         DbUser user = profile.getUser();
 
-        return new User(user.username, user.name);
+        // it's better to query it now, since we are not sure the DbUser wasn't cached!
+        Long lastWorkspace = users.getLastWorkspace(user);
+
+        return new User(user.username, user.name, lastWorkspace);
     }
 
     @GET
@@ -94,9 +108,22 @@ public class UserSession {
         @JsonProperty
         public final String name;
 
-        public User(@JsonProperty("username") String username, @JsonProperty("name") String name) {
+        @Nullable
+        @Min(1)
+        public final Long lastWorkspace;
+
+        public User(@JsonProperty("username") String username, @JsonProperty("name") String name,
+                @Nullable @JsonProperty("lastWorkspace") Long lastWorkspace) {
             this.username = username;
             this.name = name;
+            this.lastWorkspace = lastWorkspace;
+        }
+
+        @Nullable
+        @JsonProperty
+        public String getLastWorkspace() {
+            Long lw = lastWorkspace;
+            return lw == null ? null : Long.toString(lw);
         }
     }
 }

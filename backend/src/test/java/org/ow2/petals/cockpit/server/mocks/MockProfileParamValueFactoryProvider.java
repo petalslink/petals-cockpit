@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.security;
+package org.ow2.petals.cockpit.server.mocks;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,6 +31,7 @@ import org.glassfish.jersey.server.internal.inject.ParamInjectionResolver;
 import org.glassfish.jersey.server.model.Parameter;
 import org.glassfish.jersey.server.spi.internal.ValueFactoryProvider;
 import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
+import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 

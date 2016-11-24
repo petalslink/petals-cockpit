@@ -60,15 +60,16 @@ import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbComponent;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbServiceUnit;
+import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.ContainerResource.MinComponent;
 import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
-import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvider;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -96,6 +97,11 @@ public class AbstractWorkspacesResourceTest {
     @Rule
     public TestRule watchman = TestUtil.WATCHMAN;
 
+    protected UsersDAO users = mock(UsersDAO.class,
+            withSettings()
+                    // .verboseLogging()
+                    .defaultAnswer(CALLS_REAL_METHODS));
+
     protected WorkspacesDAO workspaces = mock(WorkspacesDAO.class,
             withSettings()
                     // .verboseLogging()
@@ -117,6 +123,7 @@ public class AbstractWorkspacesResourceTest {
                 protected void configure() {
                     bind(workspaces).to(WorkspacesDAO.class);
                     bind(buses).to(BusesDAO.class);
+                    bind(users).to(UsersDAO.class);
                     bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.PETALS_ADMIN_ES)
                             .to(ExecutorService.class);
                     bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.JDBC_ES)

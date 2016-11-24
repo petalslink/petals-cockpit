@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.security;
+package org.ow2.petals.cockpit.server.mocks;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
 import org.ow2.petals.cockpit.server.resources.UserSession.User;
+import org.ow2.petals.cockpit.server.security.CockpitAuthenticator;
 import org.pac4j.core.context.WebContext;
 
 public class MockAuthenticator extends CockpitAuthenticator {
@@ -30,7 +31,7 @@ public class MockAuthenticator extends CockpitAuthenticator {
         super(mock(UsersDAO.class));
     }
 
-    public static final User ADMIN = new User("admin", "Administrator");
+    public static final User ADMIN = new User("admin", "Administrator", null);
 
     @Override
     protected void internalInit(WebContext context) {

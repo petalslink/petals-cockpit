@@ -1,8 +1,6 @@
 database:
   driverClass: org.h2.Driver
   # url is set by test
-  # see http://stackoverflow.com/a/3670000
-  validationQuery: "/* Health Check */ SELECT 1"
 
 logging:
   level: INFO

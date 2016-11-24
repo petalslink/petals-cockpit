@@ -47,9 +47,6 @@ import io.dropwizard.util.JarLocation;
 
 public class AddUserTest {
 
-    /**
-     * The name is used in the config file
-     */
     @Rule
     public EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder().build();
 
