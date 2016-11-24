@@ -1,0 +1,42 @@
+# configuration for dropwizard
+---
+server:
+  # the backend will be served via /api on 8080
+  rootPath: /api
+  # the frontend will be served via / on 8080
+  applicationContextPath: /
+  applicationConnectors:
+    - type: http
+      port: 4200
+  # the admin console will be served via / on 8082
+  adminContextPath: /
+  adminConnectors:
+    - type: http
+      port: 8082
+
+pac4j:
+  globalFilters:
+    - # this protects the whole application
+      matchers: excludeUserSession
+      authorizers: isAuthenticated
+  matchers:
+    # this let the /user/session url be handled for the callbacks, logout, etc
+    excludeUserSession:
+      class: org.pac4j.core.matching.ExcludedPathMatcher
+      excludePath: ^/user/session$
+  # this will be used by SSO-type authenticators (appended with client name as parameter)
+  # for now, we still need to give a value in order for pac4j to be happy
+  callbackUrl: /user/session
+  clients:
+    - org.ow2.petals.cockpit.server.security.CockpitAuthClient: {}
+
+database:
+  driverClass: org.h2.Driver
+  user: petals
+  password: petals
+  url: jdbc:h2:./e2e/cockpit
+  # see http://stackoverflow.com/a/3670000
+  validationQuery: "/* Health Check */ SELECT 1"
+
+logging:
+  level: INFO
