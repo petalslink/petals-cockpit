@@ -22,12 +22,13 @@
   <include file="backend/src/main/resources/migrations.xml" />
 
   <changeSet id="e2e-tests" author="vnoel">
-    <insert tableName="users">
-      <column name="username" value="admin" />
-      <column name="name" value="Administrator" />
-      <!-- password is admin -->
-      <column name="password" value="$2a$10$YusDTWPr/Juq7U9CXynM0.qPrvRy./11nvSYyo0y/oLvSQO5DDNzW" />
-    </insert>
+    <loadData tableName="users" file="e2e/data/users.csv" />
+    <loadData tableName="workspaces" file="e2e/data/workspaces.csv" />
+    <loadData tableName="users_workspaces" file="e2e/data/users_workspaces.csv" />
+    <loadData tableName="buses" file="e2e/data/buses.csv" />
+    <loadData tableName="containers" file="e2e/data/containers.csv" />
+    <loadData tableName="components" file="e2e/data/components.csv" />
+    <loadData tableName="serviceunits" file="e2e/data/serviceunits.csv" />
   </changeSet>
 
 </databaseChangeLog>

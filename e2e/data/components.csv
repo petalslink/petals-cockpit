@@ -1,0 +1,9 @@
+id,container_id,name,state
+1,1,Component 0,Started
+2,1,Component 1,Started
+3,2,Component 2,Started
+4,2,Component 3,Started
+5,3,Component 4,Started
+6,3,Component 5,Started
+7,4,Component 6,Started
+8,4,Component 7,Started

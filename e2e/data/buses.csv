@@ -1,0 +1,5 @@
+id,workspace_id,imported,import_ip,import_port,import_username,import_password,import_passphrase,import_error,name
+1,1,true,192.168.0.1,7700,petals,petals,petals,NULL,Bus 0
+2,2,false,192.168.0.2,7700,petals,petals,petals,NULL,NULL
+3,2,false,192.168.0.3,7700,petals,petals,petals,ERROR!!!!,NULL
+4,2,true,192.168.0.4,7700,petals,petals,petals,NULL,Bus 1
