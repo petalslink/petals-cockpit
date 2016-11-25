@@ -40,10 +40,22 @@ import { WorkspaceActions } from '../../../../../../shared-module/reducers/works
   styleUrls: ['petals-sidenav-menu.component.scss']
 })
 export class PetalsSidenavMenuComponent implements OnDestroy {
+  // the workspace here will be retrieved from a selector (computed view)
+  // it's the one we'll be mainly using in the view
   private workspace: IWorkspace;
   private workspaceSub: Subscription;
 
+  // but, in order not to lock the search bar when a search doesn't have any bus
+  // when need to be aware of the real workspace (not the computed one)
+  private workspaceNotComputed: IWorkspace;
+  private workspaceNotComputedSub: Subscription;
+
   constructor(private store$: Store<IStore>) {
+    this.workspaceNotComputedSub =
+      store$.select('workspace')
+        .map((workspaceNotComputedR: IWorkspaceRecord) => workspaceNotComputedR.toJS())
+        .subscribe((workspaceNotComputed: IWorkspace) => this.workspaceNotComputed = workspaceNotComputed);
+
     this.workspaceSub =
       store$.let(getSearchedWorkspace())
         .map((workspaceR: IWorkspaceRecord) => workspaceR.toJS())
@@ -52,6 +64,7 @@ export class PetalsSidenavMenuComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.workspaceSub.unsubscribe();
+    this.workspaceNotComputedSub.unsubscribe();
   }
 
   search(textSearch) {
