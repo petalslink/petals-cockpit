@@ -31,7 +31,7 @@ import { IUser } from '../interfaces/user.interface';
 @Injectable()
 export class UserMockService {
   private userIsConnected: boolean = environment.alreadyConnected;
-  public adminUser;
+  private adminUser;
 
   constructor() {
     this.adminUser = {
