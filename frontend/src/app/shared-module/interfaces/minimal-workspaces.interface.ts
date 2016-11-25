@@ -24,7 +24,7 @@ export interface IMinimalWorkspace {
   // from server
   id: string;
   name: string;
-  usedBy: string;
+  usedBy: Array<string>;
 }
 
 export interface IMinimalWorkspaceRecord extends TypedRecord<IMinimalWorkspaceRecord>, IMinimalWorkspace { };

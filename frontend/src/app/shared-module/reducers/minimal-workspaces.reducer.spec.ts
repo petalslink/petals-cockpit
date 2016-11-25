@@ -139,7 +139,7 @@ describe(`Minimal Workspaces Reducer`, () => {
   it(`${MinimalWorkspacesActions.ADD_WORKSPACE_SUCCESS}`, () => {
     let nextState1R: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(stateR, {
       type: MinimalWorkspacesActions.ADD_WORKSPACE_SUCCESS,
-      payload: { id: 'idWorkspace1', name: 'W1', usedBy: 'Only me' }
+      payload: { id: 'idWorkspace1', name: 'W1', usedBy: ['admin'] }
      });
 
     let nextState1 = nextState1R.toJS();
@@ -147,7 +147,7 @@ describe(`Minimal Workspaces Reducer`, () => {
     let expectedState1 = {
       addingWorkspace: false,
       minimalWorkspaces: [
-        { id: 'idWorkspace1', name: 'W1', usedBy: 'Only me' }
+        { id: 'idWorkspace1', name: 'W1', usedBy: ['admin'] }
       ]
     };
 
@@ -156,7 +156,7 @@ describe(`Minimal Workspaces Reducer`, () => {
     // if another workspace is added, it should be in last position
     let nextState2R: IMinimalWorkspacesRecord = MinimalWorkspacesReducer(nextState1R, {
       type: MinimalWorkspacesActions.ADD_WORKSPACE_SUCCESS,
-      payload: { id: 'idWorkspace2', name: 'W2', usedBy: 'Only me' }
+      payload: { id: 'idWorkspace2', name: 'W2', usedBy: ['admin'] }
      });
 
     let nextState2 = nextState2R.toJS();
@@ -164,8 +164,8 @@ describe(`Minimal Workspaces Reducer`, () => {
     let expectedState2 = {
       addingWorkspace: false,
       minimalWorkspaces: [
-        { id: 'idWorkspace1', name: 'W1', usedBy: 'Only me' },
-        { id: 'idWorkspace2', name: 'W2', usedBy: 'Only me' }
+        { id: 'idWorkspace1', name: 'W1', usedBy: ['admin'] },
+        { id: 'idWorkspace2', name: 'W2', usedBy: ['admin'] }
       ]
     };
 

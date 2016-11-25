@@ -17,6 +17,11 @@
 
 import { browser, element, by } from 'protractor';
 
+// IDs from mock are of this type 559b4c47-5026-435c-bd6e-a47a903a7ba5
+// IDs from server are integer
+// create a regex that allows both
+let reId = '(([0-9]+)|([a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}))$';
+
 describe(`Workspaces`, () => {
   it(`should not have any workspace selected`, () => {
     expect(browser.getCurrentUrl()).toMatch(/cockpit\/workspaces$/);
@@ -30,7 +35,7 @@ describe(`Workspaces`, () => {
       `Workspace 0`,
         `You're the only one to use this workspace`,
       `Workspace 1`,
-        `Workspace also used by Victor NOEL, Christophe CHEVALIER and Maxime ROBERT`
+        `Workspace also used by mrobert`
     ];
     expect(element(by.css(`.page-workspaces md-nav-list`)).getText()).toEqual(workspacesAndOwners.join(`\n`));
 
@@ -43,7 +48,7 @@ describe(`Workspaces`, () => {
     element.all(by.css(`.page-workspaces .md-list-item`)).get(0).click();
 
     // check that url is set to this workspace
-    expect(browser.getCurrentUrl()).toMatch(/cockpit\/workspaces\/559b4c47-5026-435c-bd6e-a47a903a7ba5$/);
+    expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}`));
 
     // check there's no warning saying no bus
     expect(element(by.css(`md-sidenav .info.no-bus`)).isPresent()).toBe(false);
@@ -131,7 +136,7 @@ describe(`Workspaces`, () => {
       `Workspace 0`,
         `You're the only one to use this workspace`,
       `Workspace 1`,
-        `Workspace also used by Victor NOEL, Christophe CHEVALIER and Maxime ROBERT`,
+        `Workspace also used by mrobert`,
       `Test`,
         `You're the only one to use this workspace`
     ];
@@ -142,7 +147,7 @@ describe(`Workspaces`, () => {
 
     // check that url is set to this workspace
     expect(browser.getCurrentUrl())
-    .toMatch(/cockpit\/workspaces\/[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}$/);
+    .toMatch(new RegExp(`/cockpit/workspaces/${reId}`));
 
     // check there's a warning saying no buses available
     expect(element(by.css(`md-sidenav .info.no-bus`)).getText())

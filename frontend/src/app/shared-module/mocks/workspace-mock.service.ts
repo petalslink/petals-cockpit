@@ -122,7 +122,7 @@ export class WorkspaceMockService {
         return {
           id: generateUuidV4(),
           name,
-          usedBy: `You're the only one to use this workspace`
+          usedBy: [`admin`]
         };
       }
     };
