@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     placeholder="Search"
     [(ngModel)]="workspace.searchPetals"
     (ngModelChange)="search(workspace.searchPetals)"
-    [disabled]="workspace.buses.length === 0 && workspace.busesInProgress.length === 0"
+    [disabled]="workspaceNotComputed.buses.length === 0 && workspaceNotComputed.busesInProgress.length === 0"
   >
     <span md-suffix>
       <md-icon>search</md-icon>

@@ -115,6 +115,25 @@ describe(`Workspaces`, () => {
     expect(element(by.css(`md-sidenav app-buses-menu`)).getText()).toEqual(availableBusesFiltered.join(`\n`));
     // there should be 8 matches : Bus, SU 0, SU 1, SU 2, SU 3, SU 4, SU 5, SU
     expect(element.all(by.css(`md-sidenav app-buses-menu .searched`)).count()).toEqual(8);
+
+    // ---------------------------------------
+
+    // test 3 : When no match, should display a message and search bar should still be enabled
+    element(by.css(`.petals-component input`)).clear();
+    element(by.css(`.petals-component input`)).sendKeys(`Some random search`);
+
+    // check that the input is not disabled if no bus/container/component/su match
+    expect(element(by.css(`.petals-component input`)).isEnabled()).toBe(true);
+
+    // check there's a warning saying no buses available
+    expect(element(by.css(`md-sidenav .info.no-bus`)).getText())
+    .toEqual(`The workspace "Workspace 0" doesn't have any bus or bus in progress. You may want to import one.`);
+
+    availableBusesFiltered = [];
+
+    expect(element(by.css(`md-sidenav app-buses-menu`)).getText()).toEqual(availableBusesFiltered.join(`\n`).trim());
+    // there shouldn't be any match
+    expect(element.all(by.css(`md-sidenav app-buses-menu .searched`)).count()).toEqual(0);
   });
 
   it(`should create a new workspace and this workspace shouldn't have any bus`, () => {
