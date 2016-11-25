@@ -33,8 +33,6 @@ import { IUser } from '../interfaces/user.interface';
 
 @Injectable()
 export class UserService {
-  // this is only for mock
-  public adminUser;
 
   constructor(private httpAngular: Http, private http: InterceptorService) { }
 
