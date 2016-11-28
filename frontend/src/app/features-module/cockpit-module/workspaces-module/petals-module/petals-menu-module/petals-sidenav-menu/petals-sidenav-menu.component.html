@@ -38,7 +38,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </span>
   </md-input>
 
-  <div *ngIf="workspace.buses.length === 0 && workspace.busesInProgress.length === 0" class="info no-bus">
+  <div *ngIf="workspace.searchPetals !== '' && workspace.buses.length === 0" class="info no-bus">
+    The workspace "<b><i>{{workspace.name}}</i></b>" doesn't match any bus, container, component or SU with a name containing "<b><i>{{ workspace.searchPetals }}</i></b>".
+  </div>
+
+  <div *ngIf="workspace.searchPetals === '' && workspaceNotComputed.buses.length === 0 && workspaceNotComputed.busesInProgress.length === 0" class="info no-bus">
     The workspace "<b><i>{{workspace.name}}</i></b>" doesn't have any bus or bus in progress.
 
     <div span class="info-import-bus">You may want to <a [routerLink]="['/cockpit', 'workspaces', workspace.id, 'petals', 'bus', 'import']">import</a> one.</div>

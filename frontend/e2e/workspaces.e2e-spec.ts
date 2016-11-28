@@ -132,7 +132,7 @@ describe(`Workspaces`, () => {
 
     // check there's a warning saying no buses available
     expect(element(by.css(`md-sidenav .info.no-bus`)).getText())
-    .toEqual(`The workspace "Workspace 0" doesn't have any bus or bus in progress. You may want to import one.`);
+    .toEqual(`The workspace "Workspace 0" doesn't match any bus, container, component or SU with a name containing "Some random search".`);
 
     availableBusesFiltered = [];
 
