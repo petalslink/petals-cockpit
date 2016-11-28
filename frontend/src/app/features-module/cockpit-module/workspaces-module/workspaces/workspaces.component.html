@@ -104,7 +104,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </h3>
 
             <p md-line>
-              <span class="workspace-used-by">{{ minimalWorkspace.usedBy }}</span>
+              <span class="workspace-used-by">
+                <span *ngIf="minimalWorkspace.usedBy.length === 0">
+                  You're the only one to use this workspace
+                </span>
+
+                <span *ngIf="minimalWorkspace.usedBy.length >= 1">
+                  Workspace also used by
+                  <span *ngIf="minimalWorkspace.usedBy.length === 1">
+                    {{ minimalWorkspace.usedBy }}
+                  </span>
+
+                  <span *ngIf="minimalWorkspace.usedBy.length > 1">
+                    {{ minimalWorkspace.usedBy.slice(0, - 1).join(', ') }}
+                    and
+                    {{ minimalWorkspace.usedBy.slice(-1) }}
+                  </span>
+                </span>
+              </span>
             </p>
           </md-list-item>
         </md-nav-list>

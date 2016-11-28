@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (C) 2016 Linagora
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see http://www.gnu.org/licenses/.
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+  <include file="backend/src/main/resources/migrations.xml" />
+
+  <changeSet id="e2e-tests" author="vnoel">
+    <loadData tableName="users" file="e2e/data/users.csv" />
+    <loadData tableName="workspaces" file="e2e/data/workspaces.csv" />
+    <loadData tableName="users_workspaces" file="e2e/data/users_workspaces.csv" />
+    <loadData tableName="buses" file="e2e/data/buses.csv" />
+    <loadData tableName="containers" file="e2e/data/containers.csv" />
+    <loadData tableName="components" file="e2e/data/components.csv" />
+    <loadData tableName="serviceunits" file="e2e/data/serviceunits.csv" />
+  </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,14 @@
+id,component_id,name,state
+1,1,SU 0,Started
+2,1,SU 1,Started
+3,2,SU 2,Started
+4,2,SU 3,Started
+5,3,SU 4,Started
+6,4,SU 5,Started
+7,4,SU 6,Started
+8,5,SU 7,Started
+9,6,SU 8,Started
+10,6,SU 9,Started
+11,7,SU 10,Started
+12,8,SU 11,Started
+13,8,SU 12,Started

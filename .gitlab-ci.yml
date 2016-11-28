@@ -113,11 +113,11 @@ e2e-product:
   dependencies:
     - build-product
   variables:
-    COCKPIT: "java -Ddw.server.applicationConnectors[0].port=4200 -jar cockpit/target/petals-cockpit-*-capsule.jar"
+    COCKPIT: "java -jar cockpit/target/petals-cockpit-*-capsule.jar"
+    COCKPIT_CONFIG: "e2e/default.yml"
   script:
-    - "$COCKPIT db migrate cockpit/default.yml"
-    - "$COCKPIT add-user -u admin -p admin -n Administrator cockpit/default.yml"
-    - "nohup $COCKPIT server cockpit/default.yml &"
+    - "$COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml"
+    - "nohup $COCKPIT server $COCKPIT_CONFIG &"
     - "nohup $XVFB &"
     - "cd frontend"
     - "ng e2e"
