@@ -30,7 +30,7 @@ describe(`Workspaces`, () => {
     expect(element(by.css(`md-sidenav .info.no-workspace-selected`)).getText()).toEqual(`No workspace selected\nPlease select one`);
 
     // even if no selected, check that 2 workspaces are displayed
-    expect(element.all(by.css(`.page-workspaces .md-list-item`)).count()).toEqual(2);
+    expect(element.all(by.css(`.page-workspaces div.md-list-item`)).count()).toEqual(2);
     let workspacesAndOwners = [
       `Workspace 0`,
         `You're the only one to use this workspace`,
@@ -40,12 +40,12 @@ describe(`Workspaces`, () => {
     expect(element(by.css(`.page-workspaces md-nav-list`)).getText()).toEqual(workspacesAndOwners.join(`\n`));
 
     // among those 2 workspaces, check that none is selected (have a particular class)
-    expect(element.all(by.css(`.page-workspaces .md-list-item .color-primary-bold`)).count()).toEqual(0);
+    expect(element.all(by.css(`.page-workspaces div.md-list-item .color-primary-bold`)).count()).toEqual(0);
   });
 
   it(`should select a workspace when clicking on his line`, () => {
     // select the first workspace
-    element.all(by.css(`.page-workspaces .md-list-item`)).get(0).click();
+    element.all(by.css(`.page-workspaces div.md-list-item`)).get(0).click();
 
     // check that url is set to this workspace
     expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}`));
@@ -150,7 +150,7 @@ describe(`Workspaces`, () => {
     element(by.css(`.btn-add-workspace`)).click();
 
     // check that 3 workspaces are listed
-    expect(element.all(by.css(`.page-workspaces .md-list-item`)).count()).toEqual(3);
+    expect(element.all(by.css(`.page-workspaces div.md-list-item`)).count()).toEqual(3);
     let workspacesAndOwners = [
       `Workspace 0`,
         `You're the only one to use this workspace`,
@@ -162,7 +162,7 @@ describe(`Workspaces`, () => {
     expect(element(by.css(`.page-workspaces md-nav-list`)).getText()).toEqual(workspacesAndOwners.join(`\n`));
 
     // select the new workspace
-    element.all(by.css(`.page-workspaces .md-list-item`)).get(2).click();
+    element.all(by.css(`.page-workspaces div.md-list-item`)).get(2).click();
 
     // check that url is set to this workspace
     expect(browser.getCurrentUrl())
