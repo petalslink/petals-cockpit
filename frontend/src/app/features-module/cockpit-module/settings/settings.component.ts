@@ -43,10 +43,10 @@ import { AVAILABLE_LANGUAGES } from '../../../shared-module/opaque-tokens/opaque
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnDestroy {
-  private config: IConfig;
+  public config: IConfig;
   private configSub: Subscription;
 
-  private lang: string;
+  public lang: string;
 
   constructor(
     private store$: Store<IStore>,

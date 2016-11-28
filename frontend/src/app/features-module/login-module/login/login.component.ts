@@ -41,7 +41,7 @@ import { IUser, IUserRecord } from '../../../shared-module/interfaces/user.inter
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent implements OnDestroy, AfterViewInit {
-  private user: IUser;
+  public user: IUser;
   private userSub: Subscription;
 
   // TODO: Review needed, isn't there a directive for that ?

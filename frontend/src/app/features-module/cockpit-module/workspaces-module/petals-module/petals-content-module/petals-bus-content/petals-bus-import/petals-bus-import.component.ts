@@ -48,10 +48,10 @@ export class PetalsBusImportComponent implements OnInit, OnDestroy, AfterViewIni
   @Input() newBus?: any;
   @ViewChild('ipInput') ipInput: MdInput;
 
-  private workspace: IWorkspace;
+  public workspace: IWorkspace;
   private workspaceSub: Subscription;
 
-  private minimalWorkspaces: IMinimalWorkspaces;
+  public minimalWorkspaces: IMinimalWorkspaces;
   private minimalWorkspacesSub: Subscription;
 
   constructor(private store$: Store<IStore>) {

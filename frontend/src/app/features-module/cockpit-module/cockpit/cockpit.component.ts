@@ -61,17 +61,17 @@ const tabs = [{
   styleUrls: ['cockpit.component.scss']
 })
 export class CockpitComponent implements OnInit, OnDestroy {
-  private config: IConfig;
+  public config: IConfig;
   private configSub: Subscription;
-  private user: IUser;
+  public user: IUser;
   private userSub: Subscription;
-  private minimalWorkspaces: IMinimalWorkspaces;
+  public minimalWorkspaces: IMinimalWorkspaces;
   private minimalWorkspacesSub: Subscription;
-  private workspace: IWorkspace;
+  public workspace: IWorkspace;
   private workspaceSub: Subscription;
 
-  private tabSelectedIndex: number = -1;
-  private tabs: ITabs;
+  public tabSelectedIndex: number = -1;
+  public tabs: ITabs;
 
   constructor(
     private store$: Store<IStore>,
