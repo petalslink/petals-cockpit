@@ -1,3 +1,14 @@
+<a name="0.3.0"></a>
+# [0.3.0](https://gitlab.com/victornoel/petals-cockpit/compare/v0.2.0...v0.3.0) (2016-11-28)
+
+
+### Features
+
+* Switch to a relational database ([f2ffaf5](https://gitlab.com/victornoel/petals-cockpit/commit/f2ffaf5)), closes [#106](https://gitlab.com/victornoel/petals-cockpit/issues/106)
+* store imported buses and errors in database ([437dc3b](https://gitlab.com/victornoel/petals-cockpit/commit/437dc3b)), closes [#113](https://gitlab.com/victornoel/petals-cockpit/issues/113)
+
+
+
 <a name="0.2.0"></a>
 # 0.2.0 (2016-11-04)
 
