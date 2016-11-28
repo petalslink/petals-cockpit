@@ -41,13 +41,13 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
   private workspace$WithBus: Observable<IWorkspaceRecord>;
   private workspace$WithBusSub: Subscription;
 
-  private workspace: IWorkspace;
+  public workspace: IWorkspace;
   private workspaceSub: Subscription;
 
   private routeSub: Subscription;
 
-  private bus: IBus;
-  private busInImport: boolean;
+  public bus: IBus;
+  public busInImport: boolean;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) {
     this.workspace$ = store$.select('workspace');

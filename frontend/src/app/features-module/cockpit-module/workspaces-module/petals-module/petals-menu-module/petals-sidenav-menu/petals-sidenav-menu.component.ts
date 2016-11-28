@@ -42,12 +42,12 @@ import { WorkspaceActions } from '../../../../../../shared-module/reducers/works
 export class PetalsSidenavMenuComponent implements OnDestroy {
   // the workspace here will be retrieved from a selector (computed view)
   // it's the one we'll be mainly using in the view
-  private workspace: IWorkspace;
+  public workspace: IWorkspace;
   private workspaceSub: Subscription;
 
   // but, in order not to lock the search bar when a search doesn't have any bus
   // when need to be aware of the real workspace (not the computed one)
-  private workspaceNotComputed: IWorkspace;
+  public workspaceNotComputed: IWorkspace;
   private workspaceNotComputedSub: Subscription;
 
   constructor(private store$: Store<IStore>) {

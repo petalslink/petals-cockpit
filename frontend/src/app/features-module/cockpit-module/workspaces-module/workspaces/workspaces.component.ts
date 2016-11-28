@@ -48,14 +48,14 @@ import { MinimalWorkspacesActions } from '../../../../shared-module/reducers/min
   styleUrls: ['workspaces.component.scss']
 })
 export class WorkspacesComponent implements OnDestroy {
-  private minimalWorkspaces: IMinimalWorkspaces;
+  public minimalWorkspaces: IMinimalWorkspaces;
   private minimalWorkspacesSub: Subscription;
 
-  private workspace: IWorkspace;
+  public workspace: IWorkspace;
   private workspaceSub: Subscription;
 
-  private name: string;
-  private addingWorkspace = false;
+  public name: string;
+  public addingWorkspace = false;
 
   @ViewChild('nameInput') nameInput: MdInput;
 

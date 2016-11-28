@@ -16,7 +16,7 @@
  */
 
 // angular modules
-import { Component, Input, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 
 // rxjs
 import { Subscription } from 'rxjs';
@@ -43,15 +43,15 @@ import { MdInput } from '@angular/material';
   templateUrl: './petals-bus-import.component.html',
   styleUrls: ['./petals-bus-import.component.scss']
 })
-export class PetalsBusImportComponent implements OnInit, OnDestroy {
+export class PetalsBusImportComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() importing = false;
   @Input() newBus?: any;
   @ViewChild('ipInput') ipInput: MdInput;
 
-  private workspace: IWorkspace;
+  public workspace: IWorkspace;
   private workspaceSub: Subscription;
 
-  private minimalWorkspaces: IMinimalWorkspaces;
+  public minimalWorkspaces: IMinimalWorkspaces;
   private minimalWorkspacesSub: Subscription;
 
   constructor(private store$: Store<IStore>) {
@@ -83,8 +83,12 @@ export class PetalsBusImportComponent implements OnInit, OnDestroy {
         }
       };
     }
+  }
 
-    this.ipInput.focus();
+  ngAfterViewInit() {
+    if (!this.importing) {
+      this.ipInput.focus();
+    }
   }
 
   importBus(newBus: INewBus) {

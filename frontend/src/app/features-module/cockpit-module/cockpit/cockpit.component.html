@@ -51,25 +51,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         [selectedIndex]="tabSelectedIndex"
         (selectChange)="openTab(tabGroup.selectedIndex)"
       >
-        <md-tab class="md-tab-petals">
-          <template md-tab-label>Petals</template>
-          <template md-tab-content>
-            <app-petals-menu-module></app-petals-menu-module>
-          </template>
+        <md-tab label="Petals" class="md-tab-petals">
+          <app-petals-menu-module></app-petals-menu-module>
         </md-tab>
 
-        <md-tab class="md-tab-service">
-          <template md-tab-label>Service</template>
-          <template md-tab-content>
-            <app-service-menu-module></app-service-menu-module>
-          </template>
+        <md-tab label="Service" class="md-tab-service">
+          <app-service-menu-module></app-service-menu-module>
         </md-tab>
 
-        <md-tab class="md-tab-api">
-          <template md-tab-label>API</template>
-          <template md-tab-content>
-            <app-api-menu-module></app-api-menu-module>
-          </template>
+        <md-tab label="API" class="md-tab-api">
+          <app-api-menu-module></app-api-menu-module>
         </md-tab>
       </md-tab-group>
     </md-sidenav>

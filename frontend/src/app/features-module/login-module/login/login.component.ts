@@ -16,7 +16,7 @@
  */
 
 // angular modules
-import { Component, ChangeDetectionStrategy, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
 
 // rxjs
 import { Subscription } from 'rxjs';
@@ -40,8 +40,8 @@ import { IUser, IUserRecord } from '../../../shared-module/interfaces/user.inter
   styleUrls: ['login.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LoginComponent implements OnInit, OnDestroy {
-  private user: IUser;
+export class LoginComponent implements OnDestroy, AfterViewInit {
+  public user: IUser;
   private userSub: Subscription;
 
   // TODO: Review needed, isn't there a directive for that ?
@@ -54,7 +54,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         .subscribe((user: IUser) => this.user = user);
   }
 
-  ngOnInit() {
+  ngAfterViewInit() {
     this.nameInput.focus();
   }
 
