@@ -25,10 +25,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
        class="component"
        [class.color-primary-bold]="component.id === idComponentSelected"
     >
+      <md-icon (click)="fold(idBus, idContainer, component.id)" [class.rotate-minus-90]="component.isFolded">arrow_drop_down</md-icon>
       <span appColorSearchedLetters [search]="search" [text]="component.name" classToApply="searched"></span>
     </a>
 
     <app-service-units-menu
+      *ngIf="!component.isFolded"
       [serviceUnits]="component.serviceUnits"
       [search]="search"
 

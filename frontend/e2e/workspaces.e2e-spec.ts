@@ -74,7 +74,17 @@ describe(`Workspaces`, () => {
             `SU 6`
     ];
 
-    expect(element(by.css(`md-sidenav app-buses-menu`)).getText()).toEqual(availableBuses.join(`\n`));
+    // angular-material icon's name are displayed
+    // in getText() method, remove them
+    let listWithoutIcons = element(by.css(`md-sidenav app-buses-menu`))
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+      });
+
+    expect(listWithoutIcons).toEqual(availableBuses);
   });
 
   it(`should filter by bus, container, component and su when searching in Petals menu`, () => {
@@ -89,10 +99,31 @@ describe(`Workspaces`, () => {
             `SU 1`
     ];
 
+    // angular-material icon's name are displayed
+    // in getText() method, remove them
+    let listWithoutIcons = element(by.css(`md-sidenav app-buses-menu`))
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+      });
+
     // check the list content
-    expect(element(by.css(`md-sidenav app-buses-menu`)).getText()).toEqual(availableBusesFiltered.join(`\n`));
+    expect(listWithoutIcons).toEqual(availableBusesFiltered);
+
+    // angular-material icon's name are displayed
+    // in getText() method, remove them
+    let itemWithoutIcons = element(by.css(`md-sidenav app-buses-menu .searched`))
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+          .join();
+      });
     // check if the searched word is highlighted
-    expect(element(by.css(`md-sidenav app-buses-menu .searched`)).getText()).toEqual(`Component 0`);
+    expect(itemWithoutIcons).toEqual(`Component 0`);
 
     // ---------------------------------------
 
@@ -117,7 +148,15 @@ describe(`Workspaces`, () => {
             `SU 6`
     ];
 
-    expect(element(by.css(`md-sidenav app-buses-menu`)).getText()).toEqual(availableBusesFiltered.join(`\n`));
+    listWithoutIcons = element(by.css(`md-sidenav app-buses-menu`))
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down');
+      });
+
+    expect(listWithoutIcons).toEqual(availableBusesFiltered);
     // there should be 8 matches : Bus, SU 0, SU 1, SU 2, SU 3, SU 4, SU 5, SU
     expect(element.all(by.css(`md-sidenav app-buses-menu .searched`)).count()).toEqual(8);
 

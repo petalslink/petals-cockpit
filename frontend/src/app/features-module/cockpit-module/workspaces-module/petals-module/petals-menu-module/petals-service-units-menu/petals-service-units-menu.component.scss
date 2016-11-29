@@ -19,4 +19,8 @@
 
 .service-units-menu-component {
   padding-left: $space-left-item-menu;
+
+  span {
+    padding-left: $padding-left-item-menu;
+  }
 }
