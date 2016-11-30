@@ -8,12 +8,6 @@
       </activation>
       <repositories>
         <repository>
-          <id>allanbank</id>
-          <name>Allanbank Releases</name>
-          <url>http://www.allanbank.com/repo/</url>
-          <releases><updatePolicy>always</updatePolicy></releases>
-        </repository>
-        <repository>
           <id>oss-sonatype-snapshot</id>
           <url>https://oss.sonatype.org/content/repositories/snapshots</url>
           <releases><enabled>false</enabled></releases>
