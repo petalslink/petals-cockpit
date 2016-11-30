@@ -54,7 +54,7 @@ export class ContainersMenuComponent {
     return false;
   }
 
-  closeSidenav() {
-    this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV });
+  closeSidenavMobile() {
+    this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV_IF_MOBILE });
   }
 }

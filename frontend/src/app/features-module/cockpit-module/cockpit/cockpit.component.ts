@@ -21,7 +21,7 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { MdSidenav } from '@angular/material';
 
 // rxjs
-import { Subscription } from 'rxjs';
+import {Subscription, Observable} from 'rxjs';
 
 // ngrx - store
 import { Store } from '@ngrx/store';
@@ -134,6 +134,13 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit() {
+    this.start._onTransitionEnd = function () {
+      this._openPromise = null;
+      this._closePromise = null;
+    };
+
+    this.onResize();
+
     this.store$.dispatch({ type: MinimalWorkspacesActions.FETCH_WORKSPACES });
 
     let routeFirstChild = this.route.firstChild;
@@ -222,5 +229,28 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
 
   closeSidenav() {
     this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV });
+  }
+
+  closeSidenavMobile() {
+    this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV_IF_MOBILE });
+  }
+
+  openSidenav() {
+    this.store$.dispatch({ type: ConfigActions.OPEN_SIDENAV });
+  }
+
+  onResize() {
+    Observable.fromEvent(window, 'resize')
+      .debounceTime(100)
+      .subscribe((event: Event) => {
+        if (event.target['innerWidth'] < 960) {
+          this.store$.dispatch({ type: ConfigActions.SET_SIDENAV_MODE, payload: 'over' });
+          this.closeSidenav();
+        }
+        else {
+          this.store$.dispatch({ type: ConfigActions.SET_SIDENAV_MODE, payload: 'side' });
+          this.openSidenav();
+        }
+      });
   }
 }

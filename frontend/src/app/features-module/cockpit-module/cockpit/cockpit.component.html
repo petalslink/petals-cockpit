@@ -13,15 +13,16 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div layout="column" class="sidenav-menu" [class.cockpit-theme]="config?.isDarkTheme">
+<div layout="column" layout-fill class="sidenav-menu" [class.cockpit-theme]="config?.isDarkTheme">
   <md-sidenav-layout fullscreen>
-    <md-sidenav #start mode="over" (close)="closeSidenav()" [class.sidenav-no-workspace-selected]="!workspace.id">
+    <md-sidenav layout="column" layout-fill #start [mode]="config.sidenavMode" (close)="closeSidenavMobile()"
+                [class.sidenav-no-workspace-selected]="!workspace.id">
 
       <md-card id="header-sidenav">
         <img class="logo-petals" src="assets/img/logo_petalscockpit.png">
         <md-card-title-group>
 
-          <button md-icon-button routerLink="/cockpit/workspaces/settings" (click)="closeSidenav()">
+          <button md-icon-button routerLink="/cockpit/workspaces/settings" (click)="closeSidenavMobile()">
 
             <md-icon>settings</md-icon>
           </button>
@@ -42,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           md-raised-button
           *ngIf="workspace.name"
           color="accent"
-          (click)="closeSidenav()"
+          (click)="closeSidenavMobile()"
           [routerLink]="['workspaces', workspace.id]"
         >
           {{ workspace.name }}
@@ -51,7 +52,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           md-raised-button
           *ngIf="workspace.name"
           color="accent"
-          (click)="closeSidenav()"
+          (click)="closeSidenavMobile()"
           [routerLink]="['workspaces']"
         >
           <md-icon>view_list</md-icon>
@@ -63,27 +64,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         Please select one
       </div>
 
-      <md-tab-group
-        layout="row"
-        #tabGroup
-        *ngIf="workspace.id"
-        [selectedIndex]="tabSelectedIndex"
-        (focusChange)="openTab(tabGroup.selectedIndex)"
-      >
-        <md-tab label="Petals" class="md-tab-petals">
-          <app-petals-menu-module></app-petals-menu-module>
-        </md-tab>
+      <div layout="column" flex>
+        <md-tab-group
+          layout-fill
+          flex
+          #tabGroup
+          *ngIf="workspace.id"
+          [selectedIndex]="tabSelectedIndex"
+          (focusChange)="openTab(tabGroup.selectedIndex)"
+        >
+          <md-tab label="Petals" class="md-tab-petals" layout-fill>
+            <div layout="row" flex>
+              <app-petals-menu-module layout="column" flex layout-fill></app-petals-menu-module>
+            </div>
+          </md-tab>
 
-        <md-tab label="Service" class="md-tab-service">
-          <app-service-menu-module></app-service-menu-module>
-        </md-tab>
+          <md-tab label="Service" class="md-tab-service">
+            <app-service-menu-module layout="column" flex></app-service-menu-module>
+          </md-tab>
 
-        <md-tab label="API" class="md-tab-api">
-          <app-api-menu-module></app-api-menu-module>
-        </md-tab>
-      </md-tab-group>
+          <md-tab label="API" class="md-tab-api">
+            <app-api-menu-module layout="column" flex></app-api-menu-module>
+          </md-tab>
+        </md-tab-group>
+      </div>
     </md-sidenav>
 
-    <router-outlet></router-outlet>
+    <router-outlet flex></router-outlet>
   </md-sidenav-layout>
 </div>

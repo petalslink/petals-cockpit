@@ -24,7 +24,8 @@ import { IConfig, IConfigRecord } from '../interfaces/config.interface';
 export function configFactory(): IConfig {
   return {
     isDarkTheme: false,
-    isSidenavVisible: true
+    isSidenavVisible: true,
+    sidenavMode: 'side'
   };
 }
 

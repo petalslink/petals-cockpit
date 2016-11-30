@@ -72,7 +72,7 @@ export class PetalsSidenavMenuComponent implements OnDestroy {
     this.store$.dispatch({ type: WorkspaceActions.EDIT_PETALS_SEARCH, payload: textSearch });
   }
 
-  closeSidenav() {
-    this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV });
+  closeSidenavMobile() {
+    this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV_IF_MOBILE });
   }
 }

@@ -17,13 +17,14 @@
 
 /* Sidenav */
 
-md-sidenav-layout {
-  height: 100%;
-}
-
 md-sidenav {
   width: 320px;
+  overflow-y: hidden;
+  height: 100% !important;
+  max-height: 100% !important;
 }
+
+md-sidenav-layout.my-sidenav-layout .md-sidenav-content { width: 100%; }
 
 #header-sidenav {
   background: url("assets/img/wallpaper-header.png") no-repeat center;

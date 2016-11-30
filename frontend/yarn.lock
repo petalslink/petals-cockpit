@@ -298,6 +298,10 @@ angular-cli@1.0.0-beta.21:
     yam "0.0.18"
     zone.js "^0.6.23"
 
+angular-material@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/angular-material/-/angular-material-1.1.1.tgz#ed12f394ba71a9189d664115624f6787a7439af2"
+
 angular2-prettyjson@2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/angular2-prettyjson/-/angular2-prettyjson-2.0.1.tgz#7f628429f24f2eee2722469796e5225ae432a650"
