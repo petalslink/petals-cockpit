@@ -29,6 +29,7 @@
 
   <properties>
     <cockpit.exec.command>server</cockpit.exec.command>
+    <petals-admin.version>2.0.0-SNAPSHOT</petals-admin.version> 
   </properties>
 
   <dependencies>
@@ -84,12 +85,12 @@
     <dependency>
       <groupId>org.ow2.petals</groupId>
       <artifactId>petals-admin-api</artifactId>
-      <version>1.4.2</version>
+      <version>${petals-admin.version}</version>
     </dependency>
     <dependency>
       <groupId>org.ow2.petals</groupId>
       <artifactId>petals-admin-jmx</artifactId>
-      <version>1.4.2</version>
+      <version>${petals-admin.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- Test dependencies -->
@@ -106,7 +107,7 @@
     <dependency>
       <groupId>org.ow2.petals</groupId>
       <artifactId>petals-admin-mock</artifactId>
-      <version>1.0.2</version>
+      <version>${petals-admin.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

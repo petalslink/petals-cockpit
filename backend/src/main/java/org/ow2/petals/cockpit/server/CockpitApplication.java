@@ -117,15 +117,15 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         // activate session management in jetty
         environment.servlets().setSessionHandler(new SessionHandler());
 
-        // TODO add the fiber pool executor to the metrics
         // TODO add these ExecutorService to the metrics
+        // TODO choose adequate parameters?
 
-        // This needs to have only ONE thread because petals-admin uses a singleton which prevent concurrent use
-        ExecutorService petalsAdminES = environment.lifecycle().executorService("petals-admin-worker-%d").maxThreads(1)
-                .build();
+        // This is needed for executing petals admins requests from within a fiber (actors)
+        ExecutorService petalsAdminES = environment.lifecycle().executorService("petals-admin-worker-%d").minThreads(1)
+                .maxThreads(2).build();
         // This is needed for executing database requests from within a fiber (actors)
-        ExecutorService jdbcExec = environment.lifecycle().executorService("jdbc-worker-%d").minThreads(10)
-                .maxThreads(10).build();
+        ExecutorService jdbcExec = environment.lifecycle().executorService("jdbc-worker-%d")
+                .minThreads(2).maxThreads(Runtime.getRuntime().availableProcessors()).build();
 
         environment.jersey().register(new AbstractBinder() {
             @Override
