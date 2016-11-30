@@ -449,6 +449,490 @@ describe(`Workspace Reducer`, () => {
     // TODO
   });
 
+  /* (UN)FOLD_BUS */
+  it(`${WorkspaceActions.FOLD_BUS}`, () => {
+    // 1
+    let stateRWithBuses = stateR.set('buses', fromJS([
+      { id: 'id1', name: 'Bus 1' },
+      { id: 'id2', name: 'Bus 2' },
+      { id: 'id3', name: 'Bus 3' }
+    ]));
+
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, { type: WorkspaceActions.FOLD_BUS, payload: { idBus: 'id1' } });
+    let nextState1 = nextStateR1.toJS();
+
+    let expectedState1 = {
+      buses: [
+        { id: 'id1', name: 'Bus 1', isFolded: true },
+        { id: 'id2', name: 'Bus 2' },
+        { id: 'id3', name: 'Bus 3' }
+      ]
+    };
+
+    expect(nextState1).toEqual(jasmine.objectContaining(expectedState1));
+
+    // 2 : bad ID
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.FOLD_BUS,
+      payload: {idBus: 'some random id' }
+    });
+    let nextState2 = nextStateR2.toJS();
+
+    expect(nextState2).toEqual(stateRWithBuses.toJS());
+  });
+
+  it(`${WorkspaceActions.UNFOLD_BUS}`, () => {
+    // 1
+    let stateRWithBuses = stateR.set('buses', fromJS([
+      { id: 'id1', name: 'Bus 1', isFolded: true },
+      { id: 'id2', name: 'Bus 2', isFolded: true },
+      { id: 'id3', name: 'Bus 3', isFolded: true }
+    ]));
+
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, { type: WorkspaceActions.UNFOLD_BUS, payload: { idBus: 'id1' } });
+    let nextState1 = nextStateR1.toJS();
+
+    let expectedState1 = {
+      buses: [
+        { id: 'id1', name: 'Bus 1', isFolded: false },
+        { id: 'id2', name: 'Bus 2', isFolded: true },
+        { id: 'id3', name: 'Bus 3', isFolded: true }
+      ]
+    };
+
+    expect(nextState1).toEqual(jasmine.objectContaining(expectedState1));
+
+    // 2 : bad ID
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.FOLD_BUS,
+      payload: { idBus: 'some random id' }
+    });
+    let nextState2 = nextStateR2.toJS();
+
+    expect(nextState2).toEqual(stateRWithBuses.toJS());
+  });
+
+  it(`${WorkspaceActions.TOGGLE_FOLD_BUS}`, () => {
+    // 1
+    let stateRWithBuses = stateR.set('buses', fromJS([
+      { id: 'id1', name: 'Bus 1', isFolded: true },
+      { id: 'id2', name: 'Bus 2', isFolded: true },
+      { id: 'id3', name: 'Bus 3', isFolded: true }
+    ]));
+
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.TOGGLE_FOLD_BUS,
+      payload: { idBus: 'id1' }
+    });
+    let nextState1 = nextStateR1.toJS();
+
+    let expectedState1 = {
+      buses: [
+        { id: 'id1', name: 'Bus 1', isFolded: false },
+        { id: 'id2', name: 'Bus 2', isFolded: true },
+        { id: 'id3', name: 'Bus 3', isFolded: true }
+      ]
+    };
+
+    expect(nextState1).toEqual(jasmine.objectContaining(expectedState1));
+
+    // 2
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(nextStateR1, {
+      type: WorkspaceActions.TOGGLE_FOLD_BUS,
+      payload: { idBus: 'id1' }
+    });
+    let nextState2 = nextStateR2.toJS();
+
+    let expectedState2 = {
+      buses: [
+        { id: 'id1', name: 'Bus 1', isFolded: true },
+        { id: 'id2', name: 'Bus 2', isFolded: true },
+        { id: 'id3', name: 'Bus 3', isFolded: true }
+      ]
+    };
+
+    expect(nextState2).toEqual(jasmine.objectContaining(expectedState2));
+
+    // 3 : bad ID
+    let nextStateR3: IWorkspaceRecord = WorkspaceReducer(nextStateR2, {
+      type: WorkspaceActions.FOLD_BUS, payload: { idBus: 'some random id' }
+    });
+
+    expect(nextState2).toEqual(nextStateR3.toJS());
+  });
+
+  /* (UN)FOLD_CONTAINER */
+  it(`${WorkspaceActions.FOLD_CONTAINER}`, () => {
+    // 1
+    let stateRWithBuses = stateR.set('buses', fromJS([
+      {
+        id: 'id1',
+        name: 'Bus 1',
+        containers: [
+          { id: 'idC1', name: 'Container 1' },
+          { id: 'idC2', name: 'Container 2' }
+        ]
+      },
+      { id: 'id2', name: 'Bus 2', containers: [] }
+    ]));
+
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.FOLD_CONTAINER,
+      payload: { idBus: 'id1', idContainer: 'idC1' }
+    });
+    let nextState1 = nextStateR1.toJS();
+
+    let expectedState1 = {
+      buses: [
+        {
+          id: 'id1',
+          name: 'Bus 1',
+          containers: [
+            { id: 'idC1', name: 'Container 1', isFolded: true },
+            { id: 'idC2', name: 'Container 2' }
+          ]
+        },
+        { id: 'id2', name: 'Bus 2', containers: [] }
+      ]
+    };
+
+    expect(nextState1).toEqual(jasmine.objectContaining(expectedState1));
+
+    // 2 : bad ID
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.FOLD_CONTAINER,
+      payload: { idBus: 'some random id' }
+    });
+    let nextState2 = nextStateR2.toJS();
+
+    expect(nextState2).toEqual(stateRWithBuses.toJS());
+  });
+
+  it(`${WorkspaceActions.UNFOLD_CONTAINER}`, () => {
+    // 1
+    let stateRWithBuses = stateR.set('buses', fromJS([
+      {
+        id: 'id1',
+        name: 'Bus 1',
+        containers: [
+          { id: 'idC1', name: 'Container 1', isFolded: true },
+          { id: 'idC2', name: 'Container 2', isFolded: true }
+        ]
+      },
+      { id: 'id2', name: 'Bus 2', containers: [] }
+    ]));
+
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.UNFOLD_CONTAINER,
+      payload: { idBus: 'id1', idContainer: 'idC1' }
+    });
+    let nextState1 = nextStateR1.toJS();
+
+    let expectedState1 = {
+      buses: [
+        {
+          id: 'id1',
+          name: 'Bus 1',
+          containers: [
+            { id: 'idC1', name: 'Container 1', isFolded: false },
+            { id: 'idC2', name: 'Container 2', isFolded: true }
+          ]
+        },
+        { id: 'id2', name: 'Bus 2', containers: [] }
+      ]
+    };
+
+    expect(nextState1).toEqual(jasmine.objectContaining(expectedState1));
+
+    // 2 : bad ID
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.FOLD_CONTAINER,
+      payload: { idBus: 'some random id' }
+    });
+    let nextState2 = nextStateR2.toJS();
+
+    expect(nextState2).toEqual(stateRWithBuses.toJS());
+  });
+
+  it(`${WorkspaceActions.TOGGLE_FOLD_CONTAINER}`, () => {
+    // 1
+    let stateRWithBuses = stateR.set('buses', fromJS([
+      {
+        id: 'id1',
+        name: 'Bus 1',
+        containers: [
+          { id: 'idC1', name: 'Container 1', isFolded: true },
+          { id: 'idC2', name: 'Container 2', isFolded: true }
+        ]
+      },
+      { id: 'id2', name: 'Bus 2', containers: [] }
+    ]));
+
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.TOGGLE_FOLD_CONTAINER,
+      payload: { idBus: 'id1', idContainer: 'idC1' }
+    });
+    let nextState1 = nextStateR1.toJS();
+
+    let expectedState1 = {
+      buses: [
+        {
+          id: 'id1',
+          name: 'Bus 1',
+          containers: [
+            { id: 'idC1', name: 'Container 1', isFolded: false },
+            { id: 'idC2', name: 'Container 2', isFolded: true }
+          ]
+        },
+        { id: 'id2', name: 'Bus 2', containers: [] }
+      ]
+    };
+
+    expect(nextState1).toEqual(jasmine.objectContaining(expectedState1));
+
+    // 2
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(nextStateR1, {
+      type: WorkspaceActions.TOGGLE_FOLD_CONTAINER,
+      payload: { idBus: 'id1', idContainer: 'idC1' }
+    });
+    let nextState2 = nextStateR2.toJS();
+
+    let expectedState2 = {
+      buses: [
+        {
+          id: 'id1',
+          name: 'Bus 1',
+          containers: [
+            { id: 'idC1', name: 'Container 1', isFolded: true },
+            { id: 'idC2', name: 'Container 2', isFolded: true }
+          ]
+        },
+        { id: 'id2', name: 'Bus 2', containers: [] }
+      ]
+    };
+
+    expect(nextState2).toEqual(jasmine.objectContaining(expectedState2));
+
+    // 3 : bad ID
+    let nextStateR3: IWorkspaceRecord = WorkspaceReducer(nextStateR2, {
+      type: WorkspaceActions.TOGGLE_FOLD_CONTAINER,
+      payload: { idBus: 'some random id' }
+    });
+
+    expect(nextState2).toEqual(nextStateR3.toJS());
+  });
+
+  /* (UN)FOLD_COMPONENT */
+  it(`${WorkspaceActions.FOLD_COMPONENT}`, () => {
+    // 1
+    let stateRWithBuses = stateR.set('buses', fromJS([
+      {
+        id: 'id1',
+        name: 'Bus 1',
+        containers: [
+          {
+            id: 'idC1',
+            name: 'Container 1',
+            components: [
+              { id: 'idComp1', name: 'Component 1' },
+              { id: 'idComp2', name: 'Component 2' }
+            ]
+          },
+          { id: 'idC2', name: 'Container 2', components: [] }
+        ]
+      },
+      { id: 'id2', name: 'Bus 2', containers: [] }
+    ]));
+
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.FOLD_COMPONENT,
+      payload: { idBus: 'id1', idContainer: 'idC1', idComponent: 'idComp1' }
+    });
+    let nextState1 = nextStateR1.toJS();
+
+    let expectedState1 = {
+      buses: [
+        {
+          id: 'id1',
+          name: 'Bus 1',
+          containers: [
+            {
+              id: 'idC1',
+              name: 'Container 1',
+              components: [
+                { id: 'idComp1', name: 'Component 1', isFolded: true },
+                { id: 'idComp2', name: 'Component 2' }
+              ]
+            },
+            { id: 'idC2', name: 'Container 2', components: [] }
+          ]
+        },
+        { id: 'id2', name: 'Bus 2', containers: [] }
+      ]
+    };
+
+    expect(nextState1).toEqual(jasmine.objectContaining(expectedState1));
+
+    // 2 : bad ID
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.FOLD_COMPONENT,
+      payload: { idBus: 'some random id' }
+    });
+    let nextState2 = nextStateR2.toJS();
+
+    expect(nextState2).toEqual(stateRWithBuses.toJS());
+  });
+
+  it(`${WorkspaceActions.UNFOLD_COMPONENT}`, () => {
+    // 1
+    let stateRWithBuses = stateR.set('buses', fromJS([
+      {
+        id: 'id1',
+        name: 'Bus 1',
+        containers: [
+          {
+            id: 'idC1',
+            name: 'Container 1',
+            components: [
+              { id: 'idComp1', name: 'Component 1', isFolded: true },
+              { id: 'idComp2', name: 'Component 2', isFolded: true }
+            ]
+          },
+          { id: 'idC2', name: 'Container 2', components: [] }
+        ]
+      },
+      { id: 'id2', name: 'Bus 2', containers: [] }
+    ]));
+
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.UNFOLD_COMPONENT,
+      payload: { idBus: 'id1', idContainer: 'idC1', idComponent: 'idComp1' }
+    });
+    let nextState1 = nextStateR1.toJS();
+
+    let expectedState1 = {
+      buses: [
+        {
+          id: 'id1',
+          name: 'Bus 1',
+          containers: [
+            {
+              id: 'idC1',
+              name: 'Container 1',
+              components: [
+                { id: 'idComp1', name: 'Component 1', isFolded: false },
+                { id: 'idComp2', name: 'Component 2', isFolded: true }
+              ]
+            },
+            { id: 'idC2', name: 'Container 2', components: [] }
+          ]
+        },
+        { id: 'id2', name: 'Bus 2', containers: [] }
+      ]
+    };
+
+    expect(nextState1).toEqual(jasmine.objectContaining(expectedState1));
+
+    // 2 : bad ID
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.FOLD_COMPONENT,
+      payload: { idBus: 'some random id' }
+    });
+    let nextState2 = nextStateR2.toJS();
+
+    expect(nextState2).toEqual(stateRWithBuses.toJS());
+  });
+
+  it(`${WorkspaceActions.TOGGLE_FOLD_COMPONENT}`, () => {
+    // 1
+    let stateRWithBuses = stateR.set('buses', fromJS([
+      {
+        id: 'id1',
+        name: 'Bus 1',
+        containers: [
+          {
+            id: 'idC1',
+            name: 'Container 1',
+            components: [
+              { id: 'idComp1', name: 'Component 1', isFolded: true },
+              { id: 'idComp2', name: 'Component 2', isFolded: true }
+            ]
+          },
+          { id: 'idC2', name: 'Container 2', components: [] }
+        ]
+      },
+      { id: 'id2', name: 'Bus 2', containers: [] }
+    ]));
+
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(stateRWithBuses, {
+      type: WorkspaceActions.TOGGLE_FOLD_COMPONENT,
+      payload: { idBus: 'id1', idContainer: 'idC1', idComponent: 'idComp1' }
+    });
+    let nextState1 = nextStateR1.toJS();
+
+    let expectedState1 = {
+      buses: [
+        {
+          id: 'id1',
+          name: 'Bus 1',
+          containers: [
+            {
+              id: 'idC1',
+              name: 'Container 1',
+              components: [
+                { id: 'idComp1', name: 'Component 1', isFolded: false },
+                { id: 'idComp2', name: 'Component 2', isFolded: true }
+              ]
+            },
+            { id: 'idC2', name: 'Container 2', components: [] }
+          ]
+        },
+        { id: 'id2', name: 'Bus 2', containers: [] }
+      ]
+    };
+
+    expect(nextState1).toEqual(jasmine.objectContaining(expectedState1));
+
+    // 2
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(nextStateR1, {
+      type: WorkspaceActions.TOGGLE_FOLD_COMPONENT,
+      payload: { idBus: 'id1', idContainer: 'idC1', idComponent: 'idComp1' }
+    });
+    let nextState2 = nextStateR2.toJS();
+
+    let expectedState2 = {
+      buses: [
+        {
+          id: 'id1',
+          name: 'Bus 1',
+          containers: [
+            {
+              id: 'idC1',
+              name: 'Container 1',
+              components: [
+                { id: 'idComp1', name: 'Component 1', isFolded: true },
+                { id: 'idComp2', name: 'Component 2', isFolded: true }
+              ]
+            },
+            { id: 'idC2', name: 'Container 2', components: [] }
+          ]
+        },
+        { id: 'id2', name: 'Bus 2', containers: [] }
+      ]
+    };
+
+    expect(nextState2).toEqual(jasmine.objectContaining(expectedState2));
+
+    // 3 : bad ID
+    let nextStateR3: IWorkspaceRecord = WorkspaceReducer(nextStateR2, {
+      type: WorkspaceActions.TOGGLE_FOLD_COMPONENT,
+      payload: { idBus: 'some random id' }
+    });
+
+    expect(nextState2).toEqual(nextStateR3.toJS());
+  });
+
+  /* (UN)FOLD_COMPONENT */
   it(`${UserActions.USR_IS_DISCONNECTED}`, () => {
     let nextStateR: IWorkspaceRecord = WorkspaceReducer(stateR, { type: UserActions.USR_IS_DISCONNECTED });
     let nextState = nextStateR.toJS();

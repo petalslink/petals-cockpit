@@ -18,8 +18,15 @@
 // angular modules
 import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 
+// ngrx - store
+import { Store } from '@ngrx/store';
+
 // our interfaces
+import { IStore } from '../../../../../../shared-module/interfaces/store.interface';
 import { IComponent } from '../../../../../../shared-module/interfaces/petals.interface';
+
+// our actions
+import { WorkspaceActions } from './../../../../../../shared-module/reducers/workspace.actions';
 
 @Component({
   selector: 'app-components-menu',
@@ -38,5 +45,10 @@ export class ComponentsMenuComponent {
   @Input() idComponentSelected: string;
   @Input() idServiceUnitSelected: string;
 
-  constructor() { }
+  constructor(private store$: Store<IStore>) { }
+
+  fold(idBus: string, idContainer: string, idComponent: string) {
+    this.store$.dispatch({ type: WorkspaceActions.TOGGLE_FOLD_COMPONENT, payload: { idBus, idContainer, idComponent } });
+    return false;
+  }
 }

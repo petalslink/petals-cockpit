@@ -28,10 +28,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       class="bus"
       [class.color-primary-bold]="bus.id === idBusSelected"
     >
+      <md-icon (click)="fold(bus.id)" [class.rotate-minus-90]="bus.isFolded">arrow_drop_down</md-icon>
       <span appColorSearchedLetters [search]="search" [text]="bus.name" classToApply="searched"></span>
     </a>
 
     <app-containers-menu
+      *ngIf="!bus.isFolded"
       [containers]="bus.containers"
       [search]="search"
 

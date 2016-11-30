@@ -66,7 +66,7 @@ describe(`Workspaces`, () => {
           `Component 1`,
             `SU 2`,
             `SU 3`,
-          `Container 1`,
+        `Container 1`,
           `Component 2`,
             `SU 4`,
           `Component 3`,
@@ -74,7 +74,17 @@ describe(`Workspaces`, () => {
             `SU 6`
     ];
 
-    expect(element(by.css(`md-sidenav app-buses-menu`)).getText()).toEqual(availableBuses.join(`\n`));
+    // angular-material icon's name are displayed
+    // in getText() method, remove them
+    let listWithoutIcons = element(by.css(`md-sidenav app-buses-menu`))
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+      });
+
+    expect(listWithoutIcons).toEqual(availableBuses);
   });
 
   it(`should filter by bus, container, component and su when searching in Petals menu`, () => {
@@ -89,10 +99,31 @@ describe(`Workspaces`, () => {
             `SU 1`
     ];
 
+    // angular-material icon's name are displayed
+    // in getText() method, remove them
+    let listWithoutIcons = element(by.css(`md-sidenav app-buses-menu`))
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+      });
+
     // check the list content
-    expect(element(by.css(`md-sidenav app-buses-menu`)).getText()).toEqual(availableBusesFiltered.join(`\n`));
+    expect(listWithoutIcons).toEqual(availableBusesFiltered);
+
+    // angular-material icon's name are displayed
+    // in getText() method, remove them
+    let itemWithoutIcons = element(by.css(`md-sidenav app-buses-menu .searched`))
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+          .join();
+      });
     // check if the searched word is highlighted
-    expect(element(by.css(`md-sidenav app-buses-menu .searched`)).getText()).toEqual(`Component 0`);
+    expect(itemWithoutIcons).toEqual(`Component 0`);
 
     // ---------------------------------------
 
@@ -109,7 +140,7 @@ describe(`Workspaces`, () => {
           `Component 1`,
             `SU 2`,
             `SU 3`,
-          `Container 1`,
+        `Container 1`,
           `Component 2`,
             `SU 4`,
           `Component 3`,
@@ -117,7 +148,15 @@ describe(`Workspaces`, () => {
             `SU 6`
     ];
 
-    expect(element(by.css(`md-sidenav app-buses-menu`)).getText()).toEqual(availableBusesFiltered.join(`\n`));
+    listWithoutIcons = element(by.css(`md-sidenav app-buses-menu`))
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down');
+      });
+
+    expect(listWithoutIcons).toEqual(availableBusesFiltered);
     // there should be 8 matches : Bus, SU 0, SU 1, SU 2, SU 3, SU 4, SU 5, SU
     expect(element.all(by.css(`md-sidenav app-buses-menu .searched`)).count()).toEqual(8);
 
@@ -139,6 +178,175 @@ describe(`Workspaces`, () => {
     expect(element(by.css(`md-sidenav app-buses-menu`)).getText()).toEqual(availableBusesFiltered.join(`\n`).trim());
     // there shouldn't be any match
     expect(element.all(by.css(`md-sidenav app-buses-menu .searched`)).count()).toEqual(0);
+  });
+
+
+  it(`should fold and unfold Petals Buses/Containers/Components/SUs`, () => {
+    // 1
+    element(by.css(`.petals-component input`)).clear();
+
+    // fold the bus 0
+    element(by.css(`app-buses-menu md-nav-list md-icon[aria-label="arrow_drop_down"]`)).click();
+
+    // angular-material icon's name are displayed
+    // in getText() method, remove them
+    let listWithoutIcons = element(by.css(`md-sidenav app-buses-menu`))
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+      });
+
+    // check the list content
+    expect(listWithoutIcons).toEqual([`Bus 0`]);
+
+    // 2
+    // unfold the bus 0
+    element(by.css(`app-buses-menu md-nav-list md-icon[aria-label="arrow_drop_down"]`)).click();
+
+    let availableBusesFiltered = [
+      `Bus 0`,
+        `Container 0`,
+          `Component 0`,
+            `SU 0`,
+            `SU 1`,
+          `Component 1`,
+            `SU 2`,
+            `SU 3`,
+        `Container 1`,
+          `Component 2`,
+            `SU 4`,
+          `Component 3`,
+            `SU 5`,
+            `SU 6`
+    ];
+
+    listWithoutIcons = element(by.css(`md-sidenav app-buses-menu`))
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+      });
+
+    expect(listWithoutIcons).toEqual(availableBusesFiltered);
+
+    // 3
+    // fold the container 0
+    element.all(by.css(`app-containers-menu md-nav-list md-icon[aria-label="arrow_drop_down"]`)).get(0).click();
+
+    availableBusesFiltered = [
+      `Bus 0`,
+        `Container 0`,
+        `Container 1`,
+          `Component 2`,
+            `SU 4`,
+          `Component 3`,
+            `SU 5`,
+            `SU 6`
+    ];
+
+    listWithoutIcons = element.all(by.css(`md-sidenav app-buses-menu`)).get(0)
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+      });
+
+    expect(listWithoutIcons).toEqual(availableBusesFiltered);
+
+    // 4
+    // unfold the container 0
+    element.all(by.css(`app-containers-menu md-nav-list md-icon[aria-label="arrow_drop_down"]`)).get(0).click();
+
+    availableBusesFiltered = [
+      `Bus 0`,
+        `Container 0`,
+          `Component 0`,
+            `SU 0`,
+            `SU 1`,
+          `Component 1`,
+            `SU 2`,
+            `SU 3`,
+        `Container 1`,
+          `Component 2`,
+            `SU 4`,
+          `Component 3`,
+            `SU 5`,
+            `SU 6`
+    ];
+
+    listWithoutIcons = element.all(by.css(`md-sidenav app-buses-menu`)).get(0)
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+      });
+
+    expect(listWithoutIcons).toEqual(availableBusesFiltered);
+
+    // 5
+    // fold the component 0
+    element.all(by.css(`app-components-menu md-nav-list md-icon[aria-label="arrow_drop_down"]`)).get(0).click();
+
+    availableBusesFiltered = [
+      `Bus 0`,
+        `Container 0`,
+          `Component 0`,
+          `Component 1`,
+            `SU 2`,
+            `SU 3`,
+        `Container 1`,
+          `Component 2`,
+            `SU 4`,
+          `Component 3`,
+            `SU 5`,
+            `SU 6`
+    ];
+
+    listWithoutIcons = element.all(by.css(`md-sidenav app-buses-menu`)).get(0)
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+      });
+
+    expect(listWithoutIcons).toEqual(availableBusesFiltered);
+
+    // 6
+    // unfold the component 0
+    element.all(by.css(`app-components-menu md-nav-list md-icon[aria-label="arrow_drop_down"]`)).get(0).click();
+
+    availableBusesFiltered = [
+      `Bus 0`,
+        `Container 0`,
+          `Component 0`,
+            `SU 0`,
+            `SU 1`,
+          `Component 1`,
+            `SU 2`,
+            `SU 3`,
+        `Container 1`,
+          `Component 2`,
+            `SU 4`,
+          `Component 3`,
+            `SU 5`,
+            `SU 6`
+    ];
+
+    listWithoutIcons = element.all(by.css(`md-sidenav app-buses-menu`)).get(0)
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+      });
+
+    expect(listWithoutIcons).toEqual(availableBusesFiltered);
   });
 
   it(`should create a new workspace and this workspace shouldn't have any bus`, () => {

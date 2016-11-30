@@ -27,6 +27,7 @@ import { Observable } from 'rxjs';
 // our interfaces
 import { IStore } from '../interfaces/store.interface';
 import { IWorkspaceRecord } from '../interfaces/workspace.interface';
+import { IContainerRecord, IBusRecord, IComponentRecord } from './../interfaces/petals.interface';
 
 // our states
 import { workspaceRecordFactory } from './workspace.state';
@@ -135,7 +136,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
   else if (action.type === WorkspaceActions.ADD_BUS_FAILED) {
     let busIndex = workspaceR
       .get('busesInProgress')
-      .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload.id);
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.id);
 
     if (busIndex === -1) {
       return workspaceR;
@@ -153,7 +154,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
   else if (action.type === WorkspaceActions.REMOVE_BUS || action.type === WorkspaceActions.REMOVE_BUS_FAILED) {
     let busIndex = workspaceR
       .get('busesInProgress')
-      .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload);
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload);
 
     if (busIndex === -1) {
       return workspaceR;
@@ -166,7 +167,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     return workspaceR.set('busesInProgress',
       workspaceR
         .get('busesInProgress')
-        .filter((buses: IWorkspaceRecord) => buses.get('id') !== action.payload.idBus)
+        .filter((buses: IBusRecord) => buses.get('id') !== action.payload.idBus)
     );
   }
 
@@ -178,7 +179,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
   else if (action.type === WorkspaceActions.FETCH_BUS_CONFIG_SUCCESS) {
     let busIndex = workspaceR
       .get('buses')
-      .findIndex((buses: IWorkspaceRecord) => buses.get('id') === action.payload.idBus);
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
 
     if (busIndex === -1) {
       return workspaceR;
@@ -205,7 +206,199 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
       });
   }
 
-  if (action.type === UserActions.USR_IS_DISCONNECTED) {
+  /* (UN)FOLD_BUS */
+  else if (action.type === WorkspaceActions.FOLD_BUS) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'isFolded'], true);
+  }
+
+  else if (action.type === WorkspaceActions.UNFOLD_BUS) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'isFolded'], false);
+  }
+
+  else if (action.type === WorkspaceActions.TOGGLE_FOLD_BUS) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(
+      ['buses', busIndex, 'isFolded'],
+      !workspaceR.getIn(['buses', busIndex, 'isFolded'])
+    );
+  }
+
+  /* (UN)FOLD_CONTAINER */
+  else if (action.type === WorkspaceActions.FOLD_CONTAINER) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((containers: IContainerRecord) => containers.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex, 'isFolded'], true);
+  }
+
+  else if (action.type === WorkspaceActions.UNFOLD_CONTAINER) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((containers: IContainerRecord) => containers.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex, 'isFolded'], false);
+  }
+
+  else if (action.type === WorkspaceActions.TOGGLE_FOLD_CONTAINER) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((containers: IContainerRecord) => containers.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(
+      ['buses', busIndex, 'containers', containerIndex, 'isFolded'],
+      !workspaceR.getIn(['buses', busIndex, 'containers', containerIndex, 'isFolded'])
+    );
+  }
+
+  /* (UN)FOLD_COMPONENT */
+  else if (action.type === WorkspaceActions.FOLD_COMPONENT) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((containers: IContainerRecord) => containers.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    let componentIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components'])
+      .findIndex((components: IComponentRecord) => components.get('id') === action.payload.idComponent);
+
+    if (componentIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'isFolded'], true);
+  }
+
+  else if (action.type === WorkspaceActions.UNFOLD_COMPONENT) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((containers: IContainerRecord) => containers.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    let componentIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components'])
+      .findIndex((components: IComponentRecord) => components.get('id') === action.payload.idComponent);
+
+    if (componentIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'isFolded'], false);
+  }
+
+  else if (action.type === WorkspaceActions.TOGGLE_FOLD_COMPONENT) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((containers: IContainerRecord) => containers.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    let componentIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components'])
+      .findIndex((components: IComponentRecord) => components.get('id') === action.payload.idComponent);
+
+    if (componentIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(
+      ['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'isFolded'],
+      !workspaceR.getIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'isFolded'])
+    );
+  }
+
+  else if (action.type === UserActions.USR_IS_DISCONNECTED) {
     return workspaceRecordFactory();
   }
 
