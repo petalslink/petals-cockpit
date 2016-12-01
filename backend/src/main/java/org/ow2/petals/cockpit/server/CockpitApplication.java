@@ -25,7 +25,7 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.ow2.petals.cockpit.server.actors.ActorsComponent;
+import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
@@ -137,7 +137,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 bind(workspaces).to(WorkspacesDAO.class);
                 bind(buses).to(BusesDAO.class);
                 bind(jdbi).to(DBI.class);
-                bind(ActorsComponent.class).to(ActorsComponent.class).in(Singleton.class);
+                bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
             }
         });
 

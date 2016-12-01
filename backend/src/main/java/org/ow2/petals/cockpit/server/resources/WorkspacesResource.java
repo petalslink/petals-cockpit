@@ -35,7 +35,7 @@ import javax.ws.rs.core.MediaType;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.cockpit.server.actors.ActorsComponent;
+import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
@@ -82,10 +82,10 @@ public class WorkspacesResource {
     @Singleton
     public static class WorkspaceResource {
 
-        private final ActorsComponent as;
+        private final CockpitActors as;
 
         @Inject
-        public WorkspaceResource(ActorsComponent as) {
+        public WorkspaceResource(CockpitActors as) {
             this.as = as;
         }
 
