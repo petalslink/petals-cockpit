@@ -43,8 +43,6 @@ import { IUser, IUserRecord } from '../../../shared-module/interfaces/user.inter
 export class LoginComponent implements OnDestroy, AfterViewInit {
   public user: IUser;
   private userSub: Subscription;
-  private msgUsernameRequired = 'Username is required !';
-  private msgPasswordRequired = 'Password is required !';
 
   // TODO: Review needed, isn't there a directive for that ?
   @ViewChild('nameInput') nameInput: MdInput;
@@ -66,22 +64,5 @@ export class LoginComponent implements OnDestroy, AfterViewInit {
 
   connectUser(user: IUser) {
     this.store$.dispatch({ type: UserActions.USR_IS_CONNECTING, payload: user });
-  }
-
-  // TODO: Review needed, may be use generic messages for all text fields ?
-  errorMessageUsername() {
-    if (this.user.username === null || this.user.username === '') {
-      return this.msgUsernameRequired;
-    } else {
-      return '';
-    }
-  }
-
-  errorMessagePassword() {
-    if (this.user.password === null || this.user.password === '') {
-      return this.msgPasswordRequired;
-    } else {
-      return '';
-    }
   }
 }

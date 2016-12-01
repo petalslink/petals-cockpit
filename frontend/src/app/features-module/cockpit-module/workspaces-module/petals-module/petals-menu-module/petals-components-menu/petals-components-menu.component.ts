@@ -53,7 +53,7 @@ export class ComponentsMenuComponent {
     return false;
   }
 
-  closeSidenavMobile() {
+  closeSidenavIfMobile() {
     this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV_IF_MOBILE });
   }
 }

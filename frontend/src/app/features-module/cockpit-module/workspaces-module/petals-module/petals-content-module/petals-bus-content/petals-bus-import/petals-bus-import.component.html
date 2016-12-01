@@ -33,29 +33,73 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <p>"{{ newBus.importError }}"</p>
           </div>
 
-          <div layout-xs="column" layout-margin layout-padding>
-            <div layout-gt-xs="row" flex-gt-xs layout-align="space-between center">
-              <md-input #ipInput type="text" [(ngModel)]="newBus.config.ip" name="ip" placeholder="IP"
-                        [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+          <div
+            layout-xs="column"
+            layout-margin
+            layout-padding
+          >
+            <div
+              layout-gt-xs="row"
+              flex-gt-xs
+              layout-align="space-between center"
+            >
+              <md-input
+                #ipInput
+                type="text"
+                flex-gt-xs="45"
+                [(ngModel)]="newBus.config.ip"
+                name="ip"
+                placeholder="IP"
+                [disabled]="(workspace.importingBus || importing) && !newBus.importError">
+              </md-input>
 
-              <md-input type="number" flex-gt-xs="45" [(ngModel)]="newBus.config.port" name="port" placeholder="Port"
-                        [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+              <md-input
+                type="number"
+                flex-gt-xs="45"
+                [(ngModel)]="newBus.config.port"
+                name="port"
+                placeholder="Port"
+                [disabled]="(workspace.importingBus || importing) && !newBus.importError">
+              </md-input>
             </div>
 
-            <div layout-gt-xs="row" flex-gt-xs layout-align="space-between center">
-              <md-input type="text" flex-gt-xs="45" [(ngModel)]="newBus.config.login" name="username"
-                        placeholder="Username"
-                        [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+            <div
+              layout-gt-xs="row"
+              flex-gt-xs
+              layout-align="space-between center"
+            >
+              <md-input
+                type="text"
+                flex-gt-xs="45"
+                [(ngModel)]="newBus.config.login"
+                name="username"
+                placeholder="Username"
+                [disabled]="(workspace.importingBus || importing) && !newBus.importError">
+              </md-input>
 
-              <md-input type="password" flex-gt-xs="45" [(ngModel)]="newBus.config.password" name="password"
-                        placeholder="Password"
-                        [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+              <md-input
+                type="password"
+                flex-gt-xs="45"
+                [(ngModel)]="newBus.config.password"
+                name="password"
+                placeholder="Password"
+                [disabled]="(workspace.importingBus || importing) && !newBus.importError">
+              </md-input>
             </div>
 
-            <div layout-gt-xs="row" flex-gt-xs layout-align="start center">
-              <md-input type="password" flex-gt-xs="45" [(ngModel)]="newBus.config.passphrase" name="passphrase"
-                        placeholder="Topology Passphrase"
-                        [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
+            <div
+              layout-gt-xs="row"
+              flex-gt-xs
+              layout-align="start center"
+            >
+              <md-input
+                type="password"
+                flex-gt-xs="45"
+                [(ngModel)]="newBus.config.passphrase"
+                name="passphrase"
+                placeholder="Topology Passphrase"
+                [disabled]="(workspace.importingBus || importing) && !newBus.importError">
+              </md-input>
             </div>
 
             <div align="end" class="pnl-btn-import">
@@ -66,25 +110,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 type="submit"
                 [disabled]="(workspace.importingBus || importing) && !newBus.importError"
               >
-              <span *ngIf="!workspace.importingBus && !importing && !newBus.importError">
-                Import bus
-              </span>
-
-              <span *ngIf="(workspace.importingBus || importing) && !newBus.importError">
-                Importing bus <md-progress-circle mode="indeterminate"></md-progress-circle>
-              </span>
-              </button>
-
-              <!--<button
-                md-raised-button
-                color="primary"
-                type="submit"
-                [disabled]="(workspace.importingBus || importing) && !newBus.importError"
-              >
-                <span *ngIf="newBus.importError">
-                  Retry to import bus
+                <span *ngIf="!workspace.importingBus && !importing && !newBus.importError">
+                  Import bus
                 </span>
-              </button>-->
+
+                <span *ngIf="(workspace.importingBus || importing) && !newBus.importError">
+                  Importing bus <md-progress-circle mode="indeterminate"></md-progress-circle>
+                </span>
+              </button>
 
               <button
                 *ngIf="newBus.importError"

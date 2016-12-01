@@ -28,7 +28,7 @@ describe(`Workspace that Needs Petals`, () => {
     // check the title
     element.all(by.css(`app-buses-menu md-nav-list .md-list-item`)).get(0).click();
 
-    let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+    let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(1).getText();
 
     expect(title).toEqual(`Bus 0`);
 
@@ -39,14 +39,14 @@ describe(`Workspace that Needs Petals`, () => {
     // select the first container
     element.all(by.css(`app-containers-menu a.container .md-list-item`)).get(0).click();
 
-    let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+    let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(1).getText();
 
     expect(title).toEqual(`Container 0`);
 
     // select the second container
     element.all(by.css(`app-containers-menu a.container .md-list-item`)).get(1).click();
 
-    title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+    title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(1).getText();
 
     expect(title).toEqual(`Container 1`);
 
@@ -57,14 +57,14 @@ describe(`Workspace that Needs Petals`, () => {
     // select the first container
     element.all(by.css(`app-components-menu a.component .md-list-item`)).get(0).click();
 
-    let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+    let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(1).getText();
 
     expect(title).toEqual(`Component 0`);
 
     // select the second container
     element.all(by.css(`app-components-menu a.component .md-list-item`)).get(1).click();
 
-    title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+    title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(1).getText();
 
     expect(title).toEqual(`Component 1`);
 
@@ -75,14 +75,14 @@ describe(`Workspace that Needs Petals`, () => {
     // select the first service unit
     element.all(by.css(`app-service-units-menu a.service-unit .md-list-item`)).get(0).click();
 
-    let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+    let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(1).getText();
 
     expect(title).toEqual(`SU 0`);
 
     // select the second container
     element.all(by.css(`app-service-units-menu a.service-unit .md-list-item`)).get(1).click();
 
-    title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+    title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(1).getText();
 
     expect(title).toEqual(`SU 1`);
 
@@ -118,7 +118,7 @@ describe(`Workspace that Needs Petals`, () => {
     expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
 
     // check that the page displayed has a title with the workspace name
-    expect(element.all(by.css(`app-workspace md-toolbar md-toolbar-row > span`)).get(0).getText()).toEqual(`Workspace 0`);
+    expect(element.all(by.css(`app-workspace md-toolbar md-toolbar-row > span`)).get(1).getText()).toEqual(`Workspace 0`);
 
     // the SU shouldn't be in left menu anymore
     let firstSuName = element(by.css(`app-service-units-menu a.service-unit .md-list-item > span`)).getText();

@@ -83,11 +83,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           (ngSubmit)="addWorkspace(addWorkspaceForm.value.name)"
         >
           <div layout="row" layout-margin layout-padding layout-align="start center">
-            <md-input color="primary" #nameInput [(ngModel)]="name"
+            <md-input color="primary" #nameInput [(ngModel)]="name" class="new-workspace-name"
                       name="name" placeholder="Workspace's name" [disabled]="minimalWorkspaces.addingWorkspace">
             </md-input>
             <button [class.color-primary-bold]="minimalWorkspaces.addingWorkspace" md-raised-button type="submit"
-                    [disabled]="minimalWorkspaces.addingWorkspace">
+                    [disabled]="minimalWorkspaces.addingWorkspace" class="btn-add-workspace">
               Add workspace
               <md-progress-circle *ngIf="minimalWorkspaces.addingWorkspace" mode="indeterminate"></md-progress-circle>
             </button>

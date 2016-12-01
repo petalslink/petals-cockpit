@@ -33,20 +33,21 @@ function createConfigReducer(configR: IConfigRecord = configRecordFactory(), act
     case ConfigActions.TOGGLE_THEME:
       return configR.set('isDarkTheme', !configR.get('isDarkTheme'));
 
-    case ConfigActions.TOGGLE_SIDENAV:
-      return configR.set('isSidenavVisible', !configR.get('isSidenavVisible'));
+    case ConfigActions.OPEN_SIDENAV:
+      return configR.set('isSidenavVisible', true);
 
     case ConfigActions.CLOSE_SIDENAV:
       return configR.set('isSidenavVisible', false);
 
+    case ConfigActions.TOGGLE_SIDENAV:
+      return configR.set('isSidenavVisible', !configR.get('isSidenavVisible'));
+
+    // Mobile
     case ConfigActions.CLOSE_SIDENAV_IF_MOBILE:
       if (configR.get('sidenavMode') === 'over') {
         return configR.set('isSidenavVisible', false);
       }
       return configR;
-
-    case ConfigActions.OPEN_SIDENAV:
-      return configR.set('isSidenavVisible', true);
 
     case ConfigActions.SET_SIDENAV_MODE:
       return configR.set('sidenavMode', action.payload);

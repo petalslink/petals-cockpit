@@ -155,7 +155,7 @@ body {
     height: 40px !important;
   }
   md-input {
-    width: 350px !important;
+    width: 350px;
   }
 }
 
@@ -169,7 +169,7 @@ body {
 .error{
   padding: 12px;
   background-color: rgba(255, 0, 0, 0.2);
-  color: md-color($md-red, 500, 1) !important;
+  color: md-color($md-red, 500, 1);
 }
 
 .rotate-minus-90 {

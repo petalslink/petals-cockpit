@@ -13,16 +13,26 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div layout="column" layout-fill class="sidenav-menu" [class.cockpit-theme]="config?.isDarkTheme">
+<div
+  layout="column"
+  layout-fill
+  class="sidenav-menu"
+  [class.cockpit-theme]="config?.isDarkTheme"
+>
   <md-sidenav-layout fullscreen>
-    <md-sidenav layout="column" layout-fill #start [mode]="config.sidenavMode" (close)="closeSidenavMobile()"
-                [class.sidenav-no-workspace-selected]="!workspace.id">
-
+    <md-sidenav
+      layout="column"
+      layout-fill
+      #start
+      [mode]="config.sidenavMode"
+      (close)="closeSidenavIfMobile()"
+      [class.sidenav-no-workspace-selected]="!workspace.id"
+    >
       <md-card id="header-sidenav">
         <img class="logo-petals" src="assets/img/logo_petalscockpit.png">
         <md-card-title-group>
 
-          <button md-icon-button routerLink="/cockpit/workspaces/settings" (click)="closeSidenavMobile()">
+          <button md-icon-button routerLink="/cockpit/workspaces/settings" (click)="closeSidenavIfMobile()">
 
             <md-icon>settings</md-icon>
           </button>
@@ -43,7 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           md-raised-button
           *ngIf="workspace.name"
           color="accent"
-          (click)="closeSidenavMobile()"
+          (click)="closeSidenavIfMobile()"
           [routerLink]="['workspaces', workspace.id]"
         >
           {{ workspace.name }}
@@ -52,7 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           md-raised-button
           *ngIf="workspace.name"
           color="accent"
-          (click)="closeSidenavMobile()"
+          (click)="closeSidenavIfMobile()"
           [routerLink]="['workspaces']"
         >
           <md-icon>view_list</md-icon>

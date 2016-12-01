@@ -21,7 +21,7 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { MdSidenav } from '@angular/material';
 
 // rxjs
-import {Subscription, Observable} from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 
 // ngrx - store
 import { Store } from '@ngrx/store';
@@ -118,7 +118,6 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit() {
-
     this.isSidenavVisibleSub =
       this.store$.select('config')
         .map((configR: IConfigRecord) => configR.get('isSidenavVisible'))
@@ -134,6 +133,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit() {
+    // temporary fix based on problems with property opened in Angular Material sidenav
     this.start._onTransitionEnd = function () {
       this._openPromise = null;
       this._closePromise = null;
@@ -231,7 +231,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV });
   }
 
-  closeSidenavMobile() {
+  closeSidenavIfMobile() {
     this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV_IF_MOBILE });
   }
 

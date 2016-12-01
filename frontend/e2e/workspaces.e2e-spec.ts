@@ -58,7 +58,7 @@ describe(`Workspaces`, () => {
     expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
 
     // check that the page displayed has a title with the workspace name
-    expect(element.all(by.css(`app-workspace md-toolbar md-toolbar-row > span`)).get(0).getText()).toEqual(`Workspace 0`);
+    expect(element.all(by.css(`app-workspace md-toolbar md-toolbar-row > span`)).get(1).getText()).toEqual(`Workspace 0`);
 
     // check that there's no warning saying no bus ...
     expect(element(by.css(`md-sidenav .info.no-bus`)).isPresent()).toBe(false);
