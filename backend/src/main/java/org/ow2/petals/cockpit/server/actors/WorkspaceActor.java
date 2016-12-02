@@ -260,15 +260,16 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
             throw new AssertionError(e);
         }
 
-        final ContainerAdministration container = petals.newContainerAdministration();
-
         try {
-            container.connect(bus.ip, bus.port, bus.username, bus.password);
-            return container.getTopology(".*", bus.passphrase, true);
+            petals.connect(bus.ip, bus.port, bus.username, bus.password);
+
+            final ContainerAdministration container = petals.newContainerAdministration();
+
+            return container.getTopology(bus.passphrase, true);
         } finally {
             try {
-                if (container.isConnected()) {
-                    container.disconnect();
+                if (petals.isConnected()) {
+                    petals.disconnect();
                 }
             } catch (ContainerAdministrationException e) {
                 LOG.warn("Error while disconnecting from container", e);
