@@ -23,27 +23,33 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.hk2.api.ServiceLocator;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.WorkspaceRequest;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 
 import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.actors.ActorRegistry;
+import co.paralleluniverse.actors.BasicActor;
+import co.paralleluniverse.actors.behaviors.RequestMessage;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.SuspendExecution;
 import javaslang.control.Either;
 
-public class ActorsComponent {
+public class CockpitActors {
 
     private final ServiceLocator serviceLocator;
 
     @Inject
-    public ActorsComponent(ServiceLocator serviceLocator) {
+    public CockpitActors(ServiceLocator serviceLocator) {
         this.serviceLocator = serviceLocator;
     }
 
+    public <M> ActorRef<M> getActor(BasicActor<M, Void> actor) {
+        serviceLocator.inject(actor);
+        return actor.spawn();
+    }
+
     @SuppressWarnings("resource")
-    public Optional<ActorRef<Msg>> getWorkspace(long wId) throws SuspendExecution {
+    public Optional<ActorRef<WorkspaceActor.Msg>> getWorkspace(long wId) throws SuspendExecution {
         String name = "workspace-" + wId;
 
         ActorRef<Msg> a = ActorRegistry.tryGetActor(name);
@@ -65,7 +71,7 @@ public class ActorsComponent {
     }
 
     @SuppressWarnings("resource")
-    public <O, I extends WorkspaceRequest<O> & Msg> Either<Status, O> call(long wsId, I msg)
+    public <O, I extends Request<O> & WorkspaceActor.Msg> Either<Status, O> call(long wsId, I msg)
             throws InterruptedException {
         try {
             Optional<ActorRef<Msg>> ma = getWorkspace(wsId);
@@ -79,4 +85,16 @@ public class ActorsComponent {
             throw new AssertionError(e);
         }
     }
+
+    public abstract static class Request<R> extends RequestMessage<Either<Status, R>> {
+
+        private static final long serialVersionUID = -5915325922592086753L;
+
+        final String user;
+
+        public Request(String user) {
+            this.user = user;
+        }
+    }
+
 }

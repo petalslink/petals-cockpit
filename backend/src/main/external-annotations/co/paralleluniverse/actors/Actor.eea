@@ -8,3 +8,9 @@ receive
 receive
  (Lco/paralleluniverse/strands/Timeout;)TMessage;
  (L1co/paralleluniverse/strands/Timeout;)T0Message;
+self
+ ()Lco/paralleluniverse/actors/ActorRef<TMessage;>;
+ ()L1co/paralleluniverse/actors/ActorRef<TMessage;>;
+spawn
+ ()Lco/paralleluniverse/actors/ActorRef<TMessage;>;
+ ()L1co/paralleluniverse/actors/ActorRef<TMessage;>;

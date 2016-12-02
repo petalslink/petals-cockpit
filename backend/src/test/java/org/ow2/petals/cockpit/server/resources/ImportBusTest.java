@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.ignoreStubs;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -57,7 +58,7 @@ import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.actors.ActorsComponent;
+import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
@@ -103,7 +104,7 @@ public class ImportBusTest {
                             .to(ExecutorService.class);
                     bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.JDBC_ES)
                             .to(ExecutorService.class);
-                    bind(ActorsComponent.class).to(ActorsComponent.class).in(Singleton.class);
+                    bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
                 }
             }).build();
 
@@ -127,11 +128,16 @@ public class ImportBusTest {
     @Before
     public void setUp() {
         long workspaceId = 1;
-        when(workspaces.findById(workspaceId)).thenReturn(new DbWorkspace(workspaceId, "test",
-                Arrays.asList(MockProfileParamValueFactoryProvider.ADMIN.username)));
+        DbWorkspace w = new DbWorkspace(workspaceId, "test",
+                Arrays.asList(MockProfileParamValueFactoryProvider.ADMIN.username));
+        // this form must be used for implemented methods
+        doReturn(w).when(workspaces).findById(workspaceId);
 
         Integer port = container.getPorts().get(PortType.JMX);
         assert port != null;
+        
+        doReturn(new WorkspaceTree(workspaceId, "test", Arrays.asList(), Arrays.asList())).when(workspaces)
+                .getWorkspaceTree(w);
 
         long busId = 4;
         when(buses.createBus(container.getHost(), port, container.getJmxUsername(), container.getJmxPassword(), "??",
@@ -146,13 +152,16 @@ public class ImportBusTest {
 
     @After
     public void tearDown() {
-        verifyNoMoreInteractions(ignoreStubs(workspaces));
-        verifyNoMoreInteractions(ignoreStubs(buses));
+        try {
+            verifyNoMoreInteractions(ignoreStubs(workspaces));
+            verifyNoMoreInteractions(ignoreStubs(buses));
+        } finally {
+            // in case the checks before fail, we still really need to execute this!
+            reset(workspaces);
+            reset(buses);
 
-        reset(workspaces);
-        reset(buses);
-
-        ActorRegistry.clear();
+            ActorRegistry.clear();
+        }
     }
 
     @Test
@@ -180,8 +189,11 @@ public class ImportBusTest {
             });
         }
 
-        // once from the setUp (not sure why) and once when creating the actor
-        verify(workspaces, times(2)).findById(1);
+        // once when creating the actor and once on bus import success (not that the value returned will be wrong but
+        // it's ok for this test)
+        verify(workspaces, times(2)).getWorkspaceTree(any());
+        verify(workspaces).findById(1);
+
         verify(buses).createBus(container.getHost(), port, container.getJmxUsername(), container.getJmxPassword(), "??",
                 1);
         verify(buses).saveImport(eq(4L), any());
@@ -214,8 +226,9 @@ public class ImportBusTest {
             });
         }
 
-        // once from the setUp (not sure why) and once when creating the actor
-        verify(workspaces, times(2)).findById(1);
+        verify(workspaces).getWorkspaceTree(any());
+        verify(workspaces).findById(1);
+
         verify(buses).createBus(incorrectHost, port, container.getJmxUsername(), container.getJmxPassword(), "??", 1);
         verify(buses).saveError(5, "Unknown Host");
     }

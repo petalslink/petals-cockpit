@@ -16,7 +16,10 @@
  */
 package org.ow2.petals.cockpit.server.actors;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -50,9 +53,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
 
+import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.actors.BasicActor;
-import co.paralleluniverse.actors.behaviors.RequestMessage;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.common.util.CheckedCallable;
 import co.paralleluniverse.fibers.Fiber;
@@ -73,7 +77,11 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
 
     private static final long serialVersionUID = -2202357041789526859L;
 
-    private final DbWorkspace w;
+    private final DbWorkspace workspace;
+
+    private WorkspaceTree tree = new WorkspaceTree(0, "", ImmutableList.of(), ImmutableList.of());
+
+    private final Map<Long, ActorRef<BusActor.Msg>> wsBuses = new HashMap<>();
 
     private final SseBroadcaster broadcaster = new SseBroadcaster();
 
@@ -91,8 +99,11 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
     @Inject
     private WorkspacesDAO workspaces;
 
+    @Inject
+    private CockpitActors as;
+
     public WorkspaceActor(DbWorkspace w) {
-        this.w = w;
+        this.workspace = w;
         this.broadcaster.add(new BroadcasterListener<OutboundEvent>() {
             @Override
             public void onException(ChunkedOutput<OutboundEvent> chunkedOutput, Exception exception) {
@@ -106,14 +117,34 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         });
     }
 
+    /**
+     * This is needed because the java compiler has trouble typechecking lambda on {@link CheckedCallable}.
+     */
+    private <T> T runDAO(Supplier<T> s) throws SuspendExecution, InterruptedException {
+        return FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<T, RuntimeException>() {
+            @Override
+            public T call() {
+                return s.get();
+            }
+        });
+    }
+
     @Override
     @SuppressWarnings("squid:S2189")
     protected Void doRun() throws InterruptedException, SuspendExecution {
+
+        assert wsBuses.isEmpty();
+
+        tree = runDAO(() -> workspaces.getWorkspaceTree(workspace));
+
+        for (BusTree b : tree.buses) {
+            wsBuses.put(b.id, as.getActor(new BusActor(b, self())));
+        }
+
         for (;;) {
             Msg msg = receive();
             if (msg instanceof GetTree) {
-                // TODO let the actor keep the workspace tree in memory and take care of sync to db
-                answer((GetTree) msg, m -> Either.right(workspaces.getWorkspaceTree(w)));
+                answer((GetTree) msg, m -> Either.right(tree));
             } else if (msg instanceof ImportBus) {
                 answer((ImportBus) msg, this::handleImportBus);
             } else if (msg instanceof DeleteBus) {
@@ -126,22 +157,31 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                     }
                 });
             } else if (msg instanceof NewClient) {
-                LOG.debug("New SSE client for workspace {}", w.id);
+                LOG.debug("New SSE client for workspace {}", workspace.id);
                 // this one is coming from the SSE resource
                 answer((NewClient) msg, nc -> {
                     broadcaster.add(nc.output);
                     return Either.right(null);
                 });
+            } else if (msg instanceof BusActor.BusRequest) {
+                BusActor.BusRequest<?> bMsg = (BusActor.BusRequest<?>) msg;
+                @SuppressWarnings("resource")
+                ActorRef<BusActor.Msg> bus = wsBuses.get(bMsg.getBusId());
+                if (bus == null) {
+                    RequestReplyHelper.reply(bMsg, Either.left(Status.NOT_FOUND));
+                } else {
+                    bus.send(bMsg);
+                }
             } else {
-                LOG.warn("Unexpected event for workspace {}: {}", w.id, msg);
+                LOG.warn("Unexpected event for workspace {}: {}", workspace.id, msg);
             }
         }
     }
 
-    private <R, T extends WorkspaceRequest<R>> void answer(T r, CheckedFunction1<T, Either<Status, R>> f)
+    private <R, T extends CockpitActors.Request<R>> void answer(T r, CheckedFunction1<T, Either<Status, R>> f)
             throws SuspendExecution {
         try {
-            if (w.users.stream().anyMatch(r.user::equals)) {
+            if (workspace.users.stream().anyMatch(r.user::equals)) {
                 RequestReplyHelper.reply(r, f.apply(r));
             } else {
                 RequestReplyHelper.reply(r, Either.left(Status.FORBIDDEN));
@@ -154,12 +194,8 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
     private Either<Status, BusInProgress> handleImportBus(ImportBus bus) throws SuspendExecution, InterruptedException {
         final NewBus nb = bus.nb;
 
-        final long bId = FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<Long, RuntimeException>() {
-            @Override
-            public Long call() {
-                return buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, w.id);
-            }
-        });
+        final long bId = runDAO(
+                () -> buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, workspace.id));
 
         // we use a fiber to let the actor handles other message during bus import
         new Fiber<>(() -> importBus(bId, nb)).start();
@@ -184,15 +220,16 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                         }
                     });
 
-            final BusTree tree = FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<BusTree, RuntimeException>() {
-                @Override
-                public BusTree call() {
-                    return buses.saveImport(bId, topology);
-                }
-            });
+            final BusTree bTree = runDAO(() -> buses.saveImport(bId, topology));
+            
+            // TODO update it more nicely!! (as a result of the import made by the bus actor!)
+            tree = runDAO(() -> workspaces.getWorkspaceTree(workspace));
 
-            return WorkspaceEvent.ok(tree);
+            // TODO see how it interact with our WorkspaceTree...
+            // TODO maybe delegate him the import itself?
+            wsBuses.put(tree.id, as.getActor(new BusActor(bTree, self())));
 
+            return WorkspaceEvent.ok(bTree);
         } catch (Exception e) {
             String m = e.getMessage();
             String message = m != null ? m : e.getClass().getName();
@@ -200,13 +237,9 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
             LOG.info("Can't import bus from container {}:{}: {}", bus.ip, bus.port, message);
             LOG.debug("Can't import bus from container {}:{}", bus.ip, bus.port, e);
 
-            FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<@Nullable Void, RuntimeException>() {
-                @Override
-                @Nullable
-                public Void call() {
-                    buses.saveError(bId, message);
-                    return null;
-                }
+            runDAO(() -> {
+                buses.saveError(bId, message);
+                return null;
             });
 
             return WorkspaceEvent.error(new BusInError(bId, bus.ip, bus.port, bus.username, message));
@@ -247,14 +280,12 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         // marker interface for messages to this actor
     }
 
-    public abstract static class WorkspaceRequest<R> extends RequestMessage<Either<Status, R>> implements Msg {
+    public static class WorkspaceRequest<T> extends CockpitActors.Request<T> implements Msg {
 
-        private static final long serialVersionUID = -5915325922592086753L;
-
-        final String user;
+        private static final long serialVersionUID = -564899978996631515L;
 
         public WorkspaceRequest(String user) {
-            this.user = user;
+            super(user);
         }
     }
 

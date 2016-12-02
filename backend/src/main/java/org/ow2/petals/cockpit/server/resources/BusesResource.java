@@ -32,7 +32,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.cockpit.server.actors.ActorsComponent;
+import org.ow2.petals.cockpit.server.actors.BusActor;
+import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
@@ -43,10 +44,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Singleton
 public class BusesResource {
 
-    private final ActorsComponent as;
+    private final CockpitActors as;
 
     @Inject
-    public BusesResource(ActorsComponent as) {
+    public BusesResource(CockpitActors as) {
         this.as = as;
     }
 
@@ -67,19 +68,20 @@ public class BusesResource {
 
     public static class BusResource {
 
-        private final ActorsComponent as;
+        private final CockpitActors as;
 
         @Inject
-        public BusResource(ActorsComponent as) {
+        public BusResource(CockpitActors as) {
             this.as = as;
         }
 
         @GET
         @Produces(MediaType.APPLICATION_JSON)
         @Valid
-        public BusConfig get(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId) {
-            // TODO
-            return new BusConfig(bId);
+        public BusOverview get(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
+                @Pac4JProfile CockpitProfile profile) throws InterruptedException {
+            return as.call(wsId, new BusActor.GetOverview(profile.getUser().getUsername(), bId))
+                    .getOrElseThrow(s -> new WebApplicationException(s));
         }
 
         @DELETE
@@ -173,20 +175,14 @@ public class BusesResource {
         }
     }
 
-    public static class BusConfig {
+    public static class BusOverview {
 
-        @Min(1)
-        public final long id;
-
-        @JsonCreator
-        public BusConfig(@JsonProperty("id") long id) {
-            this.id = id;
-        }
-
+        @NotEmpty
         @JsonProperty
-        public String getId() {
-            return Long.toString(id);
-        }
+        public final String name;
 
+        public BusOverview(String name) {
+            this.name = name;
+        }
     }
 }
