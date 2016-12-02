@@ -19,171 +19,93 @@ package org.ow2.petals.cockpit.server.resources;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.ignoreStubs;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-import javax.inject.Singleton;
 import javax.ws.rs.client.Entity;
 
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.InboundEvent;
-import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.actors.CockpitActors;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
 import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvider;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableList;
 
-import co.paralleluniverse.actors.ActorRegistry;
-import co.paralleluniverse.common.test.TestUtil;
-import co.paralleluniverse.common.util.Debug;
-import io.dropwizard.testing.junit.ResourceTestRule;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
-public class ImportBusTest {
+public class ImportBusTest extends AbstractWorkspacesResourceTest {
 
     @Rule
-    public TestRule watchman = TestUtil.WATCHMAN;
+    public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
 
-    private static WorkspacesDAO workspaces = mock(WorkspacesDAO.class,
-            withSettings()
-                    // .verboseLogging()
-                    .defaultAnswer(CALLS_REAL_METHODS));
+    private final Domain domain = new Domain("dom");
 
-    private static BusesDAO buses = mock(BusesDAO.class,
-            withSettings()
-                    // .verboseLogging()
-                    .defaultAnswer(CALLS_REAL_METHODS));
+    private final int containerPort = 7700;
 
-    @ClassRule
-    public static ResourceTestRule resources = ResourceTestRule.builder()
-            // in memory does not support SSE and the no-servlet one does not log...
-            .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
-            // we pass the resource as a provider to get injection in constructor
-            .addProvider(WorkspacesResource.class).addProvider(new MockProfileParamValueFactoryProvider.Binder())
-            .addProvider(new AbstractBinder() {
-                @Override
-                protected void configure() {
-                    bind(workspaces).to(WorkspacesDAO.class);
-                    bind(buses).to(BusesDAO.class);
-                    bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.PETALS_ADMIN_ES)
-                            .to(ExecutorService.class);
-                    bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.JDBC_ES)
-                            .to(ExecutorService.class);
-                    bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
-                }
-            }).build();
-
-    @ClassRule
-    public static final PetalsAdministrationApi petals = new PetalsAdministrationApi();
-
-    private static Domain domain = new Domain("dom");
-
-    private static Container container = new Container("cont", "host1", ImmutableMap.of(PortType.JMX, 7700), "user",
-            "pass", State.REACHABLE);
-
-    @BeforeClass
-    public static void classSetUp() {
-        container.addProperty("petals.topology.passphrase", "phrase");
-        domain.addContainers(ImmutableList.of(container));
-        petals.registerDomain(domain);
-        // ensure this doesn't get called in a non-unit test thread and return false later when clearing the registry!
-        assertThat(Debug.isUnitTest()).isTrue();
-    }
+    private final Container container = new Container("cont", "host1", ImmutableMap.of(PortType.JMX, containerPort),
+            "user", "pass", State.REACHABLE);
 
     @Before
     public void setUp() {
+        // petals
+        container.addProperty("petals.topology.passphrase", "phrase");
+        petals.registerDomain(domain);
+        petals.registerContainer(container);
+
+        // mocks
         long workspaceId = 1;
         DbWorkspace w = new DbWorkspace(workspaceId, "test",
                 Arrays.asList(MockProfileParamValueFactoryProvider.ADMIN.username));
-        // this form must be used for implemented methods
-        doReturn(w).when(workspaces).getWorkspaceById(workspaceId);
 
-        Integer port = container.getPorts().get(PortType.JMX);
-        assert port != null;
+        doReturn(w).when(workspaces).getWorkspaceById(workspaceId);
 
         doReturn(new WorkspaceTree(workspaceId, "test", Arrays.asList(), Arrays.asList())).when(workspaces)
                 .getWorkspaceTree(w);
 
         long busId = 4;
-        when(buses.createBus(container.getHost(), port, container.getJmxUsername(), container.getJmxPassword(),
+        when(buses.createBus(container.getHost(), containerPort, container.getJmxUsername(), container.getJmxPassword(),
                 "phrase", workspaceId)).thenReturn(busId);
-        when(buses.createBus("host2", port, container.getJmxUsername(), container.getJmxPassword(), "phrase",
+        when(buses.createBus("host2", containerPort, container.getJmxUsername(), container.getJmxPassword(), "phrase",
                 workspaceId)).thenReturn(busId + 1);
 
-        when(buses.getBusById(busId)).thenReturn(new DbBusImported(busId, container.getHost(), port,
+        when(buses.getBusById(busId)).thenReturn(new DbBusImported(busId, container.getHost(), containerPort,
                 container.getJmxUsername(), container.getJmxPassword(), "phrase", domain.getName()));
 
         long containerId = 45;
-        when(buses.createContainer(container.getContainerName(), container.getHost(), port, container.getJmxUsername(),
-                container.getJmxPassword(), busId)).thenReturn(containerId);
+        when(buses.createContainer(container.getContainerName(), container.getHost(), containerPort,
+                container.getJmxUsername(), container.getJmxPassword(), busId)).thenReturn(containerId);
         when(buses.getContainerById(containerId)).thenReturn(new DbContainer(containerId, container.getContainerName(),
-                container.getHost(), port, container.getJmxUsername(), container.getJmxPassword()));
+                container.getHost(), containerPort, container.getJmxUsername(), container.getJmxPassword()));
 
-    }
-
-    @After
-    public void tearDown() {
-        try {
-            verifyNoMoreInteractions(ignoreStubs(workspaces));
-            verifyNoMoreInteractions(ignoreStubs(buses));
-        } finally {
-            // in case the checks before fail, we still really need to execute this!
-            reset(workspaces);
-            reset(buses);
-
-            ActorRegistry.clear();
-        }
     }
 
     @Test
     public void testImportBusOk() {
-
-        Integer port = container.getPorts().get(PortType.JMX);
-        assert port != null;
-
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
                 .get(EventInput.class)) {
 
-            BusInProgress post = resources.getJerseyTest().target("/workspaces/1/buses").request()
-                    .post(Entity.json(new NewBus(container.getHost(), port, container.getJmxUsername(),
-                            container.getJmxPassword(), "phrase")), BusInProgress.class);
+            BusInProgress post = resources.getJerseyTest()
+                    .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),
+                            containerPort, container.getJmxUsername(), container.getJmxPassword(), "phrase")),
+                            BusInProgress.class);
 
             assertThat(post.id).isEqualTo(4);
 
@@ -197,33 +119,23 @@ public class ImportBusTest {
             });
         }
 
-        // once when creating the actor and once on bus import success (not that the value returned will be wrong but
-        // it's ok for this test)
-        verify(workspaces, times(2)).getWorkspaceTree(any());
-        verify(workspaces).getWorkspaceById(1);
-
-        verify(buses).createBus(container.getHost(), port, container.getJmxUsername(), container.getJmxPassword(),
-                "phrase", 1);
+        // let's just ensure that the bus is created and updated in the db
+        verify(buses).createBus(container.getHost(), containerPort, container.getJmxUsername(),
+                container.getJmxPassword(), "phrase", 1);
         verify(buses).saveImport(eq(4L), any());
         verify(buses).updateBus(4, domain.getName());
-        verify(buses).getBusById(4);
-        verify(buses).getContainerById(45);
     }
 
     @Test
     public void testImportBusError() {
-
-        Integer port = container.getPorts().get(PortType.JMX);
-        assert port != null;
-
         String incorrectHost = "host2";
 
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
                 .get(EventInput.class)) {
 
-            BusInProgress post = resources.getJerseyTest().target("/workspaces/1/buses").request().post(Entity.json(
-                    new NewBus(incorrectHost, port, container.getJmxUsername(), container.getJmxPassword(), "phrase")),
-                    BusInProgress.class);
+            BusInProgress post = resources.getJerseyTest().target("/workspaces/1/buses").request()
+                    .post(Entity.json(new NewBus(incorrectHost, containerPort, container.getJmxUsername(),
+                            container.getJmxPassword(), "phrase")), BusInProgress.class);
 
             assertThat(post.id).isEqualTo(5);
 
@@ -236,11 +148,9 @@ public class ImportBusTest {
             });
         }
 
-        verify(workspaces).getWorkspaceTree(any());
-        verify(workspaces).getWorkspaceById(1);
-
-        verify(buses).createBus(incorrectHost, port, container.getJmxUsername(), container.getJmxPassword(), "phrase",
-                1);
+        // let's just ensure that the bus is created and updated in the db
+        verify(buses).createBus(incorrectHost, containerPort, container.getJmxUsername(), container.getJmxPassword(),
+                "phrase", 1);
         verify(buses).saveError(5, "Unknown Host");
     }
 

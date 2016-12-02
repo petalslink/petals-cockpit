@@ -84,7 +84,8 @@ public class ContainersResource {
         @JsonProperty
         public final ImmutableMap<String, String> reachabilities;
 
-        public ContainerOverview(String name, String ip, int port, Map<String, String> reachabilities) {
+        public ContainerOverview(@JsonProperty("name") String name, @JsonProperty("ip") String ip,
+                @JsonProperty("port") int port, @JsonProperty("reachabilities") Map<String, String> reachabilities) {
             this.name = name;
             this.ip = ip;
             this.port = port;

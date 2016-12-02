@@ -45,6 +45,7 @@ import org.ow2.petals.cockpit.server.resources.BusesResource.BusInError;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.MinWorkspace;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
@@ -60,7 +61,10 @@ public class WorkspaceTree extends MinWorkspace {
     @JsonProperty
     public final ImmutableList<BusTree> buses;
 
-    public WorkspaceTree(long id, String name, List<BusTree> buses, List<BusInProgress> busesInProgress) {
+    @JsonCreator
+    public WorkspaceTree(@JsonProperty("id") long id, @JsonProperty("name") String name,
+            @JsonProperty("buses") List<BusTree> buses,
+            @JsonProperty("busesInProgress") List<BusInProgress> busesInProgress) {
         super(id, name);
         this.buses = ImmutableList.copyOf(buses);
         this.busesInProgress = ImmutableList.copyOf(busesInProgress);
@@ -112,11 +116,11 @@ public class WorkspaceTree extends MinWorkspace {
         for (DbBus b : buses.getBusesByWorkspace(w)) {
             if (b instanceof DbBusImported) {
                 List<ContainerTree> cs = new ArrayList<>();
-                for (DbContainer c : buses.getContainersByBus(b.id)) {
+                for (DbContainer c : buses.getContainersByBus(b)) {
                     List<ComponentTree> comps = new ArrayList<>();
-                    for (DbComponent comp : buses.getComponentsByContainer(c.id)) {
+                    for (DbComponent comp : buses.getComponentsByContainer(c)) {
                         List<SUTree> sus = new ArrayList<>();
-                        for (DbServiceUnit su : buses.getServiceUnitByComponent(comp.id)) {
+                        for (DbServiceUnit su : buses.getServiceUnitByComponent(comp)) {
                             sus.add(new SUTree(su.id, su.name, SUTree.State.valueOf(su.state)));
                         }
                         comps.add(new ComponentTree(comp.id, comp.name, ComponentTree.State.valueOf(comp.state), sus));
@@ -150,7 +154,9 @@ public class WorkspaceTree extends MinWorkspace {
         @JsonProperty
         public final ImmutableList<ContainerTree> containers;
 
-        public BusTree(long id, String name, List<ContainerTree> containers) {
+        @JsonCreator
+        public BusTree(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("containers") List<ContainerTree> containers) {
             this.id = id;
             this.name = name;
             this.containers = ImmutableList.copyOf(containers);
@@ -175,7 +181,9 @@ public class WorkspaceTree extends MinWorkspace {
         @JsonProperty
         public final ImmutableList<ComponentTree> components;
 
-        public ContainerTree(long id, String name, List<ComponentTree> components) {
+        @JsonCreator
+        public ContainerTree(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("components") List<ComponentTree> components) {
             this.id = id;
             this.name = name;
             this.components = ImmutableList.copyOf(components);

@@ -1,4 +1,25 @@
 class javaslang/Tuple
 of
+ <T1:Ljava/lang/Object;>(TT1;)Ljavaslang/Tuple1<TT1;>;
+ <T1:Ljava/lang/Object;>(TT1;)L1javaslang/Tuple1<TT1;>;
+of
  <T1:Ljava/lang/Object;T2:Ljava/lang/Object;>(TT1;TT2;)Ljavaslang/Tuple2<TT1;TT2;>;
  <T1:Ljava/lang/Object;T2:Ljava/lang/Object;>(TT1;TT2;)L1javaslang/Tuple2<TT1;TT2;>;
+of
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;T3:Ljava/lang/Object;>(TT1;TT2;TT3;)Ljavaslang/Tuple3<TT1;TT2;TT3;>;
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;T3:Ljava/lang/Object;>(TT1;TT2;TT3;)L1javaslang/Tuple3<TT1;TT2;TT3;>;
+of
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;T3:Ljava/lang/Object;T4:Ljava/lang/Object;>(TT1;TT2;TT3;TT4;)Ljavaslang/Tuple4<TT1;TT2;TT3;TT4;>;
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;T3:Ljava/lang/Object;T4:Ljava/lang/Object;>(TT1;TT2;TT3;TT4;)L1javaslang/Tuple4<TT1;TT2;TT3;TT4;>;
+of
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;T3:Ljava/lang/Object;T4:Ljava/lang/Object;T5:Ljava/lang/Object;>(TT1;TT2;TT3;TT4;TT5;)Ljavaslang/Tuple5<TT1;TT2;TT3;TT4;TT5;>;
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;T3:Ljava/lang/Object;T4:Ljava/lang/Object;T5:Ljava/lang/Object;>(TT1;TT2;TT3;TT4;TT5;)L1javaslang/Tuple5<TT1;TT2;TT3;TT4;TT5;>;
+of
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;T3:Ljava/lang/Object;T4:Ljava/lang/Object;T5:Ljava/lang/Object;T6:Ljava/lang/Object;>(TT1;TT2;TT3;TT4;TT5;TT6;)Ljavaslang/Tuple6<TT1;TT2;TT3;TT4;TT5;TT6;>;
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;T3:Ljava/lang/Object;T4:Ljava/lang/Object;T5:Ljava/lang/Object;T6:Ljava/lang/Object;>(TT1;TT2;TT3;TT4;TT5;TT6;)L1javaslang/Tuple6<TT1;TT2;TT3;TT4;TT5;TT6;>;
+of
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;T3:Ljava/lang/Object;T4:Ljava/lang/Object;T5:Ljava/lang/Object;T6:Ljava/lang/Object;T7:Ljava/lang/Object;>(TT1;TT2;TT3;TT4;TT5;TT6;TT7;)Ljavaslang/Tuple7<TT1;TT2;TT3;TT4;TT5;TT6;TT7;>;
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;T3:Ljava/lang/Object;T4:Ljava/lang/Object;T5:Ljava/lang/Object;T6:Ljava/lang/Object;T7:Ljava/lang/Object;>(TT1;TT2;TT3;TT4;TT5;TT6;TT7;)L1javaslang/Tuple7<TT1;TT2;TT3;TT4;TT5;TT6;TT7;>;
+of
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;T3:Ljava/lang/Object;T4:Ljava/lang/Object;T5:Ljava/lang/Object;T6:Ljava/lang/Object;T7:Ljava/lang/Object;T8:Ljava/lang/Object;>(TT1;TT2;TT3;TT4;TT5;TT6;TT7;TT8;)Ljavaslang/Tuple8<TT1;TT2;TT3;TT4;TT5;TT6;TT7;TT8;>;
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;T3:Ljava/lang/Object;T4:Ljava/lang/Object;T5:Ljava/lang/Object;T6:Ljava/lang/Object;T7:Ljava/lang/Object;T8:Ljava/lang/Object;>(TT1;TT2;TT3;TT4;TT5;TT6;TT7;TT8;)L1javaslang/Tuple8<TT1;TT2;TT3;TT4;TT5;TT6;TT7;TT8;>;

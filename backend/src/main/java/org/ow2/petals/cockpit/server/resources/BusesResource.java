@@ -186,7 +186,8 @@ public class BusesResource {
         @JsonProperty
         public final String name;
 
-        public BusOverview(String name) {
+        @JsonCreator
+        public BusOverview(@JsonProperty("name") String name) {
             this.name = name;
         }
     }
