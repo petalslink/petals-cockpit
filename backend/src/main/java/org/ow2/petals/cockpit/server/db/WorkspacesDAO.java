@@ -43,17 +43,18 @@ public abstract class WorkspacesDAO {
     @SqlQuery("select * from workspaces where id = :id")
     @Mapper(DbMinimalWorkspace.Mapper.class)
     @Nullable
-    protected abstract DbMinimalWorkspace findById0(@Bind("id") long id);
+    protected abstract DbMinimalWorkspace getWorkspaceById0(@Bind("id") long id);
 
     @SqlQuery("select username from users_workspaces where workspace_id = :id")
-    protected abstract List<String> findWorkspaceUsers0(@Bind("id") long id);
+    protected abstract List<String> getWorkspaceUsers0(@Bind("id") long id);
 
     @Nullable
-    public DbWorkspace findById(long id) {
-        DbMinimalWorkspace w = findById0(id);
+    @Transaction
+    public DbWorkspace getWorkspaceById(long id) {
+        DbMinimalWorkspace w = getWorkspaceById0(id);
 
         if (w != null) {
-            return new DbWorkspace(w.id, w.name, findWorkspaceUsers0(id));
+            return new DbWorkspace(w.id, w.name, getWorkspaceUsers0(id));
         } else {
             return null;
         }
@@ -65,7 +66,7 @@ public abstract class WorkspacesDAO {
     protected abstract List<DbMinimalWorkspace> findUserWorkspaces0(@BindBean("u") DbUser user);
 
     public List<DbWorkspace> getUserWorkspaces(DbUser user) {
-        return findUserWorkspaces0(user).stream().map(w -> new DbWorkspace(w.id, w.name, findWorkspaceUsers0(w.id)))
+        return findUserWorkspaces0(user).stream().map(w -> new DbWorkspace(w.id, w.name, getWorkspaceUsers0(w.id)))
                 .collect(Collectors.toList());
     }
 

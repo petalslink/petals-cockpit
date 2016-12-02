@@ -90,6 +90,11 @@ public class BusesResource {
             as.call(wsId, new WorkspaceActor.DeleteBus(profile.getUser().getUsername(), bId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
+
+        @Path("/containers")
+        public Class<ContainersResource> getContainers() {
+            return ContainersResource.class;
+        }
     }
 
     public static class NewBus {
@@ -181,7 +186,8 @@ public class BusesResource {
         @JsonProperty
         public final String name;
 
-        public BusOverview(String name) {
+        @JsonCreator
+        public BusOverview(@JsonProperty("name") String name) {
             this.name = name;
         }
     }

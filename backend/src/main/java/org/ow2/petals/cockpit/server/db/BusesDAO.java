@@ -46,6 +46,10 @@ public abstract class BusesDAO {
     @Mapper(DbBus.Mapper.class)
     public abstract List<DbBus> getBusesByWorkspace(@BindBean("w") DbWorkspace w);
 
+    @SqlQuery("select * from buses where id = :bId")
+    @Mapper(DbBus.Mapper.class)
+    public abstract DbBus getBusById(@Bind("bId") long bId);
+
     @SqlUpdate("update buses set name = :n, imported = true where id = :id")
     public abstract void updateBus(@Bind("id") long bId, @Bind("n") String name);
 
@@ -57,25 +61,29 @@ public abstract class BusesDAO {
     public abstract long createContainer(@Bind("n") String name, @Bind("i") String ip, @Bind("p") int port,
             @Bind("u") String username, @Bind("pw") String password, @Bind("bId") long bId);
 
-    @SqlQuery("select * from containers where bus_id = :bId")
+    @SqlQuery("select * from containers where bus_id = :b.id")
     @Mapper(DbContainer.Mapper.class)
-    public abstract List<DbContainer> getContainersByBus(@Bind("bId") long bId);
+    public abstract List<DbContainer> getContainersByBus(@BindBean("b") DbBus b);
+
+    @SqlQuery("select * from containers where id = :cId")
+    @Mapper(DbContainer.Mapper.class)
+    public abstract DbContainer getContainerById(@Bind("cId") long cId);
 
     @SqlUpdate("insert into components (container_id,name,state)" + " values (:cId,:n,:s)")
     @GetGeneratedKeys
     public abstract long createComponent(@Bind("n") String name, @Bind("s") String state, @Bind("cId") long cId);
 
-    @SqlQuery("select * from components where container_id = :cId")
+    @SqlQuery("select * from components where container_id = :c.id")
     @Mapper(DbComponent.Mapper.class)
-    public abstract List<DbComponent> getComponentsByContainer(@Bind("cId") long cId);
+    public abstract List<DbComponent> getComponentsByContainer(@BindBean("c") DbContainer c);
 
     @SqlUpdate("insert into serviceunits (component_id,name,state)" + " values (:cId,:n,:s)")
     @GetGeneratedKeys
     public abstract long createServiceUnit(@Bind("n") String name, @Bind("s") String state, @Bind("cId") long cId);
 
-    @SqlQuery("select * from serviceunits where component_id = :cId")
+    @SqlQuery("select * from serviceunits where component_id = :c.id")
     @Mapper(DbServiceUnit.Mapper.class)
-    public abstract List<DbServiceUnit> getServiceUnitByComponent(@Bind("cId") long cId);
+    public abstract List<DbServiceUnit> getServiceUnitByComponent(@BindBean("c") DbComponent c);
 
     @Transaction
     public BusTree saveImport(long bId, Domain topology) {
@@ -107,6 +115,10 @@ public abstract class BusesDAO {
             this.importUsername = importUsername;
             this.importPassword = importPassword;
             this.importPassphrase = importPassphrase;
+        }
+
+        public long getId() {
+            return id;
         }
 
         public static class Mapper implements ResultSetMapper<DbBus> {
@@ -186,6 +198,10 @@ public abstract class BusesDAO {
             this.password = password;
         }
 
+        public long getId() {
+            return id;
+        }
+
         public static class Mapper implements ResultSetMapper<DbContainer> {
 
             @Override
@@ -209,6 +225,10 @@ public abstract class BusesDAO {
             this.id = id;
             this.name = name;
             this.state = state;
+        }
+
+        public long getId() {
+            return id;
         }
 
         public static class Mapper implements ResultSetMapper<DbComponent> {

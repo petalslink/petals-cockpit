@@ -1,0 +1,4 @@
+class org/mockito/ArgumentMatchers
+any
+ <T:Ljava/lang/Object;>()TT;
+ <T:Ljava/lang/Object;>()T1T;
