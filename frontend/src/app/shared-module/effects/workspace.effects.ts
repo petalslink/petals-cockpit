@@ -39,6 +39,7 @@ import { SseService } from '../services/sse.service';
 
 // our interfaces
 import { IStore } from '../interfaces/store.interface';
+import { IBusRecord } from './../interfaces/petals.interface';
 import { IWorkspaceRecord } from '../interfaces/workspace.interface';
 
 // our actions
@@ -102,12 +103,23 @@ export class WorkspaceEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({dispatch: true}) fetchWorkspaceSuccess$: Observable<Action> = this.actions$
     .ofType(WorkspaceActions.FETCH_WORKSPACE_SUCCESS)
-    .switchMap((action: Action) => {
+    .withLatestFrom(this.store$.select('workspace'))
+    .switchMap(([action, workspaceR]: [Action, IWorkspaceRecord]) => {
       if (typeof this.sseServiceSub !== 'undefined') {
         this.sseServiceSub.unsubscribe();
       }
 
-      this.router.navigate(['/cockpit', 'workspaces', action.payload.id]);
+      // if the workspace has at least one bus
+      // navigate to this bus
+      if (workspaceR.get('buses').size > 0) {
+        let firstBus: IBusRecord = workspaceR.getIn(['buses', 0]);
+
+        this.router.navigate(['/cockpit', 'workspaces', action.payload.id, 'petals', 'bus', firstBus.get('id')]);
+      }
+
+      else {
+        this.router.navigate(['/cockpit', 'workspaces', action.payload.id]);
+      }
 
       let sseServiceObs: Observable<Action> =
         this.sseService.subscribeToMessage(action.payload.id)

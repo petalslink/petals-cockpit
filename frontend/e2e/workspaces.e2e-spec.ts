@@ -20,7 +20,7 @@ import { browser, element, by } from 'protractor';
 // IDs from mock are of this type 559b4c47-5026-435c-bd6e-a47a903a7ba5
 // IDs from server are integer
 // create a regex that allows both
-let reId = '(([0-9]+)|([a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}))$';
+let reId = '(([0-9]+)|([a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}))';
 
 describe(`Workspaces`, () => {
   it(`should not have any workspace selected`, () => {
@@ -43,15 +43,26 @@ describe(`Workspaces`, () => {
     expect(element.all(by.css(`.page-workspaces div.md-list-item .color-primary-bold`)).count()).toEqual(0);
   });
 
-  it(`should select a workspace when clicking on his line`, () => {
+  it(`should select a workspace when clicking on his line and display his first bus`, () => {
     // select the first workspace
     element.all(by.css(`.page-workspaces div.md-list-item`)).get(0).click();
 
-    // check that url is set to this workspace
-    expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}`));
+    // check that url is set to the first bus of the workspace
+    expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}/petals/bus/${reId}$`));
 
-    // check there's no warning saying no bus
+    // check there's no warning saying no bus ...
     expect(element(by.css(`md-sidenav .info.no-bus`)).isPresent()).toBe(false);
+
+    /// and that the first bus has the 'searched' class to highlight it
+    let itemWithoutIcons = element(by.css(`md-sidenav app-buses-menu .md-list-item > span[classtoapply="searched"]`))
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'arrow_drop_down')
+          .join();
+      });
+    expect(itemWithoutIcons).toEqual(`Bus 0`);
 
     // there shouldn't be a title 'buses in progress'
     expect(element(by.css(`.buses-in-progress h3`)).isPresent()).toBe(false);
@@ -179,7 +190,6 @@ describe(`Workspaces`, () => {
     // there shouldn't be any match
     expect(element.all(by.css(`md-sidenav app-buses-menu .searched`)).count()).toEqual(0);
   });
-
 
   it(`should fold and unfold Petals Buses/Containers/Components/SUs`, () => {
     // 1
@@ -350,6 +360,8 @@ describe(`Workspaces`, () => {
   });
 
   it(`should create a new workspace and this workspace shouldn't have any bus`, () => {
+    element(by.css(`button.change-workspace`)).click();
+
     // reveal the part to add a workspace
     element(by.css(`button.btn-show-panel-add-workspace`)).click();
 
@@ -374,7 +386,7 @@ describe(`Workspaces`, () => {
 
     // check that url is set to this workspace
     expect(browser.getCurrentUrl())
-    .toMatch(new RegExp(`/cockpit/workspaces/${reId}`));
+    .toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
 
     // check there's a warning saying no buses available
     expect(element(by.css(`md-sidenav .info.no-bus`)).getText())
