@@ -17,11 +17,6 @@
 
 import { browser, element, by } from 'protractor';
 
-// IDs from mock are of this type 559b4c47-5026-435c-bd6e-a47a903a7ba5
-// IDs from server are integer
-// create a regex that allows both
-let reId = '(([0-9]+)|([a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}))$';
-
 describe(`Login`, () => {
   it(`should be redirected to login if a user is trying to access a protected route without being logged`, () => {
     browser.get(`/#/cockpit`);
