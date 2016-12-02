@@ -19,6 +19,7 @@ package org.ow2.petals.cockpit.server.actors;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.hk2.api.ServiceLocator;
@@ -28,7 +29,6 @@ import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 
 import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.actors.ActorRegistry;
-import co.paralleluniverse.actors.BasicActor;
 import co.paralleluniverse.actors.behaviors.RequestMessage;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.SuspendExecution;
@@ -38,16 +38,24 @@ public class CockpitActors {
 
     private final ServiceLocator serviceLocator;
 
+    private final WorkspacesDAO workspaces;
+
     @Inject
-    public CockpitActors(ServiceLocator serviceLocator) {
+    public CockpitActors(ServiceLocator serviceLocator, WorkspacesDAO workspaces) {
         this.serviceLocator = serviceLocator;
+        this.workspaces = workspaces;
     }
 
-    public <M> ActorRef<M> getActor(BasicActor<M, Void> actor) {
+    public <M> ActorRef<M> getActor(CockpitActor<M> actor) {
         serviceLocator.inject(actor);
         return actor.spawn();
     }
 
+    /**
+     * TODO instead of doing this, we could always create the actor and let it answer with {@link Status#NOT_FOUND} if
+     * needed and then let it die... this would ensure proper concurrency handling for the db queries as well as make
+     * things homogeneous w.r.t. to other actors?
+     */
     @SuppressWarnings("resource")
     public Optional<ActorRef<WorkspaceActor.Msg>> getWorkspace(long wId) throws SuspendExecution {
         String name = "workspace-" + wId;
@@ -55,9 +63,7 @@ public class CockpitActors {
         ActorRef<Msg> a = ActorRegistry.tryGetActor(name);
 
         if (a == null) {
-            WorkspacesDAO workspaces = serviceLocator.getService(WorkspacesDAO.class);
-            assert workspaces != null;
-            DbWorkspace ws = workspaces.findById(wId);
+            DbWorkspace ws = workspaces.getWorkspaceById(wId);
             if (ws != null) {
                 a = ActorRegistry.getOrRegisterActor(name, () -> {
                     WorkspaceActor workspaceActor = new WorkspaceActor(ws);
@@ -70,6 +76,10 @@ public class CockpitActors {
         return Optional.ofNullable(a);
     }
 
+    /**
+     * TODO instead of doing that, we could simply pass the request to the actor that will answer it with an
+     * {@link AsyncResponse}.
+     */
     @SuppressWarnings("resource")
     public <O, I extends Request<O> & WorkspaceActor.Msg> Either<Status, O> call(long wsId, I msg)
             throws InterruptedException {

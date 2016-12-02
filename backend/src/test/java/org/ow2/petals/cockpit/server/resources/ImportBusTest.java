@@ -60,6 +60,8 @@ import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
+import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
+import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
@@ -118,7 +120,7 @@ public class ImportBusTest {
 
     @BeforeClass
     public static void classSetUp() {
-        container.addProperty("petals.topology.passphrase", "??");
+        container.addProperty("petals.topology.passphrase", "phrase");
         domain.addContainers(ImmutableList.of(container));
         petals.registerDomain(domain);
         // ensure this doesn't get called in a non-unit test thread and return false later when clearing the registry!
@@ -131,23 +133,29 @@ public class ImportBusTest {
         DbWorkspace w = new DbWorkspace(workspaceId, "test",
                 Arrays.asList(MockProfileParamValueFactoryProvider.ADMIN.username));
         // this form must be used for implemented methods
-        doReturn(w).when(workspaces).findById(workspaceId);
+        doReturn(w).when(workspaces).getWorkspaceById(workspaceId);
 
         Integer port = container.getPorts().get(PortType.JMX);
         assert port != null;
-        
+
         doReturn(new WorkspaceTree(workspaceId, "test", Arrays.asList(), Arrays.asList())).when(workspaces)
                 .getWorkspaceTree(w);
 
         long busId = 4;
-        when(buses.createBus(container.getHost(), port, container.getJmxUsername(), container.getJmxPassword(), "??",
-                workspaceId)).thenReturn(busId);
-        when(buses.createBus("host2", port, container.getJmxUsername(), container.getJmxPassword(), "??", workspaceId))
-                .thenReturn(busId + 1);
+        when(buses.createBus(container.getHost(), port, container.getJmxUsername(), container.getJmxPassword(),
+                "phrase", workspaceId)).thenReturn(busId);
+        when(buses.createBus("host2", port, container.getJmxUsername(), container.getJmxPassword(), "phrase",
+                workspaceId)).thenReturn(busId + 1);
+
+        when(buses.getBusById(busId)).thenReturn(new DbBusImported(busId, container.getHost(), port,
+                container.getJmxUsername(), container.getJmxPassword(), "phrase", domain.getName()));
 
         long containerId = 45;
         when(buses.createContainer(container.getContainerName(), container.getHost(), port, container.getJmxUsername(),
                 container.getJmxPassword(), busId)).thenReturn(containerId);
+        when(buses.getContainerById(containerId)).thenReturn(new DbContainer(containerId, container.getContainerName(),
+                container.getHost(), port, container.getJmxUsername(), container.getJmxPassword()));
+
     }
 
     @After
@@ -175,7 +183,7 @@ public class ImportBusTest {
 
             BusInProgress post = resources.getJerseyTest().target("/workspaces/1/buses").request()
                     .post(Entity.json(new NewBus(container.getHost(), port, container.getJmxUsername(),
-                            container.getJmxPassword(), "??")), BusInProgress.class);
+                            container.getJmxPassword(), "phrase")), BusInProgress.class);
 
             assertThat(post.id).isEqualTo(4);
 
@@ -192,12 +200,14 @@ public class ImportBusTest {
         // once when creating the actor and once on bus import success (not that the value returned will be wrong but
         // it's ok for this test)
         verify(workspaces, times(2)).getWorkspaceTree(any());
-        verify(workspaces).findById(1);
+        verify(workspaces).getWorkspaceById(1);
 
-        verify(buses).createBus(container.getHost(), port, container.getJmxUsername(), container.getJmxPassword(), "??",
-                1);
+        verify(buses).createBus(container.getHost(), port, container.getJmxUsername(), container.getJmxPassword(),
+                "phrase", 1);
         verify(buses).saveImport(eq(4L), any());
         verify(buses).updateBus(4, domain.getName());
+        verify(buses).getBusById(4);
+        verify(buses).getContainerById(45);
     }
 
     @Test
@@ -212,7 +222,7 @@ public class ImportBusTest {
                 .get(EventInput.class)) {
 
             BusInProgress post = resources.getJerseyTest().target("/workspaces/1/buses").request().post(Entity.json(
-                    new NewBus(incorrectHost, port, container.getJmxUsername(), container.getJmxPassword(), "??")),
+                    new NewBus(incorrectHost, port, container.getJmxUsername(), container.getJmxPassword(), "phrase")),
                     BusInProgress.class);
 
             assertThat(post.id).isEqualTo(5);
@@ -227,9 +237,10 @@ public class ImportBusTest {
         }
 
         verify(workspaces).getWorkspaceTree(any());
-        verify(workspaces).findById(1);
+        verify(workspaces).getWorkspaceById(1);
 
-        verify(buses).createBus(incorrectHost, port, container.getJmxUsername(), container.getJmxPassword(), "??", 1);
+        verify(buses).createBus(incorrectHost, port, container.getJmxUsername(), container.getJmxPassword(), "phrase",
+                1);
         verify(buses).saveError(5, "Unknown Host");
     }
 

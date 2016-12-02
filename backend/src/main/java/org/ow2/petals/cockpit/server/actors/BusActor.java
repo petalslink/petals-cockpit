@@ -16,50 +16,77 @@
  */
 package org.ow2.petals.cockpit.server.actors;
 
-import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.ws.rs.core.Response.Status;
 
 import org.ow2.petals.cockpit.server.actors.BusActor.Msg;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
+import org.ow2.petals.cockpit.server.db.BusesDAO.DbBus;
+import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import co.paralleluniverse.actors.ActorRef;
-import co.paralleluniverse.actors.BasicActor;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.SuspendExecution;
 import javaslang.control.Either;
 
-public class BusActor extends BasicActor<Msg, Void> {
+public class BusActor extends CockpitActor<Msg> {
 
     private static final Logger LOG = LoggerFactory.getLogger(BusActor.class);
 
     private static final long serialVersionUID = -6353310817718062675L;
 
-    private final BusTree bus;
+    private final BusTree tree;
+
+    private DbBusImported db = new DbBusImported(0, "", 0, "", "", "", "");
 
     private final ActorRef<WorkspaceActor.Msg> workspace;
 
-    @Inject
-    private BusesDAO buses;
+    private final Map<Long, ActorRef<ContainerActor.Msg>> busContainers = new HashMap<>();
 
     public BusActor(BusTree bus, ActorRef<WorkspaceActor.Msg> workspace) {
-        this.bus = bus;
+        // TODO better manage the BusTree!
+        this.tree = bus;
         this.workspace = workspace;
     }
 
     @Override
     @SuppressWarnings("squid:S2189")
     protected Void doRun() throws InterruptedException, SuspendExecution {
+
+        DbBus b = runDAO(() -> buses.getBusById(tree.id));
+
+        assert b instanceof DbBusImported;
+
+        db = (DbBusImported) b;
+
+        for (ContainerTree c : tree.containers) {
+            busContainers.put(c.id, as.getActor(new ContainerActor(c, workspace, self())));
+        }
+
         for (;;) {
             Msg msg = receive();
             if (msg instanceof GetOverview) {
                 GetOverview get = (GetOverview) msg;
-                assert get.bId == bus.id;
-                RequestReplyHelper.reply(get, Either.right(new BusOverview(bus.name)));
+                assert get.bId == db.id;
+                RequestReplyHelper.reply(get, Either.right(new BusOverview(db.name)));
+            } else if (msg instanceof ContainerActor.Msg && msg instanceof CockpitActors.Request) {
+                ContainerActor.Msg bMsg = (ContainerActor.Msg) msg;
+                CockpitActors.Request<?> bReq = (CockpitActors.Request<?>) msg;
+                @SuppressWarnings("resource")
+                ActorRef<ContainerActor.Msg> container = busContainers.get(bMsg.getContainerId());
+                if (container == null) {
+                    RequestReplyHelper.reply(bReq, Either.left(Status.NOT_FOUND));
+                } else {
+                    container.send(bMsg);
+                }
             } else {
-                LOG.warn("Unexpected event for bus {}: {}", bus.id, msg);
+                LOG.warn("Unexpected event for bus {}: {}", db.id, msg);
             }
         }
     }

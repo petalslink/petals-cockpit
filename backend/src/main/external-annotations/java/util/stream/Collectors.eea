@@ -1,4 +1,7 @@
 class java/util/stream/Collectors
 toList
  <T:Ljava/lang/Object;>()Ljava/util/stream/Collector<TT;*Ljava/util/List<TT;>;>;
- <T:Ljava/lang/Object;>()L1java/util/stream/Collector<TT;*L1java/util/List<TT;>;>;
+ <T:Ljava/lang/Object;>()L1java/util/stream/Collector<TT;*1L1java/util/List<TT;>;>;
+toMap
+ <T:Ljava/lang/Object;K:Ljava/lang/Object;U:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TK;>;Ljava/util/function/Function<-TT;+TU;>;)Ljava/util/stream/Collector<TT;*Ljava/util/Map<TK;TU;>;>;
+ <T:Ljava/lang/Object;K:Ljava/lang/Object;U:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TK;>;Ljava/util/function/Function<-TT;+TU;>;)Ljava/util/stream/Collector<TT;*L1java/util/Map<TK;TU;>;>;

@@ -1,0 +1,4 @@
+class javaslang/Tuple
+of
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;>(TT1;TT2;)Ljavaslang/Tuple2<TT1;TT2;>;
+ <T1:Ljava/lang/Object;T2:Ljava/lang/Object;>(TT1;TT2;)L1javaslang/Tuple2<TT1;TT2;>;

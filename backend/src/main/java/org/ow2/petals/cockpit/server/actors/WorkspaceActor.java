@@ -18,11 +18,7 @@ package org.ow2.petals.cockpit.server.actors;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
@@ -32,17 +28,9 @@ import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.glassfish.jersey.media.sse.SseBroadcaster;
 import org.glassfish.jersey.server.BroadcasterListener;
 import org.glassfish.jersey.server.ChunkedOutput;
-import org.ow2.petals.admin.api.ContainerAdministration;
-import org.ow2.petals.admin.api.PetalsAdministration;
-import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
-import org.ow2.petals.admin.api.exception.DuplicatedServiceException;
-import org.ow2.petals.admin.api.exception.MissingServiceException;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusInError;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
@@ -56,22 +44,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
 import co.paralleluniverse.actors.ActorRef;
-import co.paralleluniverse.actors.BasicActor;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
-import co.paralleluniverse.common.util.CheckedCallable;
 import co.paralleluniverse.fibers.Fiber;
-import co.paralleluniverse.fibers.FiberAsync;
 import co.paralleluniverse.fibers.SuspendExecution;
 import javaslang.CheckedFunction1;
+import javaslang.Tuple;
 import javaslang.control.Either;
+import javaslang.control.Option;
 
 /**
- * TODO should we make it die after some time if there is no listeners?
+ * TODO should we make it die after some time if there is no listeners? not sure, see next TODO
+ * 
+ * TODO should we start it on application start? for now it doesn't make any sense
  * 
  * @author vnoel
  *
  */
-public class WorkspaceActor extends BasicActor<Msg, Void> {
+public class WorkspaceActor extends CockpitActor<Msg> {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkspaceActor.class);
 
@@ -85,23 +74,6 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
 
     private final SseBroadcaster broadcaster = new SseBroadcaster();
 
-    @Inject
-    @Named(CockpitApplication.PETALS_ADMIN_ES)
-    private ExecutorService paExecutor;
-
-    @Inject
-    @Named(CockpitApplication.JDBC_ES)
-    private ExecutorService sqlExecutor;
-
-    @Inject
-    private BusesDAO buses;
-
-    @Inject
-    private WorkspacesDAO workspaces;
-
-    @Inject
-    private CockpitActors as;
-
     public WorkspaceActor(DbWorkspace w) {
         this.db = w;
         this.broadcaster.add(new BroadcasterListener<OutboundEvent>() {
@@ -113,18 +85,6 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
             @Override
             public void onClose(ChunkedOutput<OutboundEvent> chunkedOutput) {
                 LOG.debug("Client left workspace {}", w.id);
-            }
-        });
-    }
-
-    /**
-     * This is needed because the java compiler has trouble typechecking lambda on {@link CheckedCallable}.
-     */
-    private <T> T runDAO(Supplier<T> s) throws SuspendExecution, InterruptedException {
-        return FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<T, RuntimeException>() {
-            @Override
-            public T call() {
-                return s.get();
             }
         });
     }
@@ -147,6 +107,8 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                 answer((ImportBus) msg, this::handleImportBus);
             } else if (msg instanceof DeleteBus) {
                 answer((DeleteBus) msg, b -> {
+                    // TODO for now this is only used for in error buses, so there is no actor to kill, but in the
+                    // future, we should be careful about that!
                     final int deleted = buses.delete(b.bId);
                     if (deleted < 1) {
                         return Either.left(Status.NOT_FOUND);
@@ -161,15 +123,16 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                     broadcaster.add(nc.output);
                     return Either.right(null);
                 });
-            } else if (msg instanceof BusActor.BusRequest) {
-                BusActor.BusRequest<?> bMsg = (BusActor.BusRequest<?>) msg;
+            } else if (msg instanceof BusActor.Msg && msg instanceof CockpitActors.Request) {
+                BusActor.Msg bMsg = (BusActor.Msg) msg;
+                CockpitActors.Request<?> bReq = (CockpitActors.Request<?>) msg;
                 @SuppressWarnings("resource")
                 ActorRef<BusActor.Msg> bus = wsBuses.get(bMsg.getBusId());
                 // TODO factorise with answer?
-                if (!hasAccess(bMsg.user)) {
-                    RequestReplyHelper.reply(bMsg, Either.left(Status.FORBIDDEN));
+                if (!hasAccess(bReq.user)) {
+                    RequestReplyHelper.reply(bReq, Either.left(Status.FORBIDDEN));
                 } else if (bus == null) {
-                    RequestReplyHelper.reply(bMsg, Either.left(Status.NOT_FOUND));
+                    RequestReplyHelper.reply(bReq, Either.left(Status.NOT_FOUND));
                 } else {
                     bus.send(bMsg);
                 }
@@ -217,13 +180,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
 
     private WorkspaceEvent doImportBus(long bId, NewBus bus) throws SuspendExecution, InterruptedException {
         try {
-            final Domain topology = FiberAsync.runBlocking(paExecutor,
-                    new CheckedCallable<Domain, ContainerAdministrationException>() {
-                        @Override
-                        public Domain call() throws ContainerAdministrationException {
-                            return getTopology(bus);
-                        }
-                    });
+            final Domain topology = getTopology(bus);
 
             final BusTree bTree = runDAO(() -> buses.saveImport(bId, topology));
             
@@ -251,35 +208,10 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         }
     }
 
-    /**
-     * This is meant to be run inside the single thread executor with fiber async for two reasons:
-     * 
-     * It is blocking and the petals-admin API sucks (it usess singletons)
-     */
-    private Domain getTopology(NewBus bus) throws ContainerAdministrationException {
-
-        final PetalsAdministration petals;
-        try {
-            petals = PetalsAdministrationFactory.getInstance().newPetalsAdministrationAPI();
-        } catch (DuplicatedServiceException | MissingServiceException e) {
-            throw new AssertionError(e);
-        }
-
-        try {
-            petals.connect(bus.ip, bus.port, bus.username, bus.password);
-
-            final ContainerAdministration container = petals.newContainerAdministration();
-
-            return container.getTopology(bus.passphrase, true);
-        } finally {
-            try {
-                if (petals.isConnected()) {
-                    petals.disconnect();
-                }
-            } catch (ContainerAdministrationException e) {
-                LOG.warn("Error while disconnecting from container", e);
-            }
-        }
+    private Domain getTopology(NewBus bus)
+            throws ContainerAdministrationException, SuspendExecution, InterruptedException {
+        return super.getTopology(bus.ip, bus.port, bus.username, bus.password,
+                Option.some(Tuple.of(bus.passphrase, true)));
     }
 
     public interface Msg {

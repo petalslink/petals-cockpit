@@ -90,6 +90,11 @@ public class BusesResource {
             as.call(wsId, new WorkspaceActor.DeleteBus(profile.getUser().getUsername(), bId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
+
+        @Path("/containers")
+        public Class<ContainersResource> getContainers() {
+            return ContainersResource.class;
+        }
     }
 
     public static class NewBus {

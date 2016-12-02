@@ -1,0 +1,4 @@
+class javaslang/Value
+toJavaMap
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+Ljavaslang/Tuple2<+TK;+TV;>;>;)Ljava/util/Map<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(L1java/util/function/Function<-TT;+Ljavaslang/Tuple2<+TK;+TV;>;>;)L1java/util/Map<TK;TV;>;

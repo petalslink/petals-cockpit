@@ -46,6 +46,10 @@ public abstract class BusesDAO {
     @Mapper(DbBus.Mapper.class)
     public abstract List<DbBus> getBusesByWorkspace(@BindBean("w") DbWorkspace w);
 
+    @SqlQuery("select * from buses where id = :bId")
+    @Mapper(DbBus.Mapper.class)
+    public abstract DbBus getBusById(@Bind("bId") long bId);
+
     @SqlUpdate("update buses set name = :n, imported = true where id = :id")
     public abstract void updateBus(@Bind("id") long bId, @Bind("n") String name);
 
@@ -60,6 +64,10 @@ public abstract class BusesDAO {
     @SqlQuery("select * from containers where bus_id = :bId")
     @Mapper(DbContainer.Mapper.class)
     public abstract List<DbContainer> getContainersByBus(@Bind("bId") long bId);
+
+    @SqlQuery("select * from containers where id = :cId")
+    @Mapper(DbContainer.Mapper.class)
+    public abstract DbContainer getContainerById(@Bind("cId") long cId);
 
     @SqlUpdate("insert into components (container_id,name,state)" + " values (:cId,:n,:s)")
     @GetGeneratedKeys
