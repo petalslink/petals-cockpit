@@ -43,7 +43,7 @@ pages:
   stage: deploy
   script:
     - "cd frontend"
-    - "ng build -e=gitlab-pages -bh=/petals-cockpit/"
+    - "ng build --prod -e=gitlab-pages -bh=/petals-cockpit/"
     - "mv dist ../public"
   artifacts:
     paths:
