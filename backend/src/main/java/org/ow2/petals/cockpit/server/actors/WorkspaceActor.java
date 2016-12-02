@@ -77,7 +77,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
 
     private static final long serialVersionUID = -2202357041789526859L;
 
-    private final DbWorkspace workspace;
+    private final DbWorkspace db;
 
     private WorkspaceTree tree = new WorkspaceTree(0, "", ImmutableList.of(), ImmutableList.of());
 
@@ -87,7 +87,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
 
     @Inject
     @Named(CockpitApplication.PETALS_ADMIN_ES)
-    private ExecutorService executor;
+    private ExecutorService paExecutor;
 
     @Inject
     @Named(CockpitApplication.JDBC_ES)
@@ -103,7 +103,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
     private CockpitActors as;
 
     public WorkspaceActor(DbWorkspace w) {
-        this.workspace = w;
+        this.db = w;
         this.broadcaster.add(new BroadcasterListener<OutboundEvent>() {
             @Override
             public void onException(ChunkedOutput<OutboundEvent> chunkedOutput, Exception exception) {
@@ -133,9 +133,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
     @SuppressWarnings("squid:S2189")
     protected Void doRun() throws InterruptedException, SuspendExecution {
 
-        assert wsBuses.isEmpty();
-
-        tree = runDAO(() -> workspaces.getWorkspaceTree(workspace));
+        tree = runDAO(() -> workspaces.getWorkspaceTree(db));
 
         for (BusTree b : tree.buses) {
             wsBuses.put(b.id, as.getActor(new BusActor(b, self())));
@@ -157,7 +155,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                     }
                 });
             } else if (msg instanceof NewClient) {
-                LOG.debug("New SSE client for workspace {}", workspace.id);
+                LOG.debug("New SSE client for workspace {}", db.id);
                 // this one is coming from the SSE resource
                 answer((NewClient) msg, nc -> {
                     broadcaster.add(nc.output);
@@ -167,21 +165,28 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
                 BusActor.BusRequest<?> bMsg = (BusActor.BusRequest<?>) msg;
                 @SuppressWarnings("resource")
                 ActorRef<BusActor.Msg> bus = wsBuses.get(bMsg.getBusId());
-                if (bus == null) {
+                // TODO factorise with answer?
+                if (!hasAccess(bMsg.user)) {
+                    RequestReplyHelper.reply(bMsg, Either.left(Status.FORBIDDEN));
+                } else if (bus == null) {
                     RequestReplyHelper.reply(bMsg, Either.left(Status.NOT_FOUND));
                 } else {
                     bus.send(bMsg);
                 }
             } else {
-                LOG.warn("Unexpected event for workspace {}: {}", workspace.id, msg);
+                LOG.warn("Unexpected event for workspace {}: {}", db.id, msg);
             }
         }
+    }
+
+    private boolean hasAccess(String username) {
+        return db.users.stream().anyMatch(username::equals);
     }
 
     private <R, T extends CockpitActors.Request<R>> void answer(T r, CheckedFunction1<T, Either<Status, R>> f)
             throws SuspendExecution {
         try {
-            if (workspace.users.stream().anyMatch(r.user::equals)) {
+            if (hasAccess(r.user)) {
                 RequestReplyHelper.reply(r, f.apply(r));
             } else {
                 RequestReplyHelper.reply(r, Either.left(Status.FORBIDDEN));
@@ -195,7 +200,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
         final NewBus nb = bus.nb;
 
         final long bId = runDAO(
-                () -> buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, workspace.id));
+                () -> buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, db.id));
 
         // we use a fiber to let the actor handles other message during bus import
         new Fiber<>(() -> importBus(bId, nb)).start();
@@ -212,7 +217,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
 
     private WorkspaceEvent doImportBus(long bId, NewBus bus) throws SuspendExecution, InterruptedException {
         try {
-            final Domain topology = FiberAsync.runBlocking(executor,
+            final Domain topology = FiberAsync.runBlocking(paExecutor,
                     new CheckedCallable<Domain, ContainerAdministrationException>() {
                         @Override
                         public Domain call() throws ContainerAdministrationException {
@@ -223,7 +228,7 @@ public class WorkspaceActor extends BasicActor<Msg, Void> {
             final BusTree bTree = runDAO(() -> buses.saveImport(bId, topology));
             
             // TODO update it more nicely!! (as a result of the import made by the bus actor!)
-            tree = runDAO(() -> workspaces.getWorkspaceTree(workspace));
+            tree = runDAO(() -> workspaces.getWorkspaceTree(db));
 
             // TODO see how it interact with our WorkspaceTree...
             // TODO maybe delegate him the import itself?
