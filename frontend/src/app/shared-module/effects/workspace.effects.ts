@@ -39,7 +39,6 @@ import { SseService } from '../services/sse.service';
 
 // our interfaces
 import { IStore } from '../interfaces/store.interface';
-import { IBusRecord } from './../interfaces/petals.interface';
 import { IWorkspaceRecord } from '../interfaces/workspace.interface';
 
 // our actions
@@ -103,8 +102,7 @@ export class WorkspaceEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({dispatch: true}) fetchWorkspaceSuccess$: Observable<Action> = this.actions$
     .ofType(WorkspaceActions.FETCH_WORKSPACE_SUCCESS)
-    .withLatestFrom(this.store$.select('workspace'))
-    .switchMap(([action, workspaceR]: [Action, IWorkspaceRecord]) => {
+    .switchMap((action: Action) => {
       if (typeof this.sseServiceSub !== 'undefined') {
         this.sseServiceSub.unsubscribe();
       }

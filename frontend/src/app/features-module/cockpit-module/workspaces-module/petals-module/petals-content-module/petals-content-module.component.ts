@@ -22,7 +22,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 // rxjs
-import { Subscription, Observable } from 'rxjs/Rx';
+import { Subscription } from 'rxjs';
 
 // our interfaces
 import { IStore } from './../../../../../shared-module/interfaces/store.interface';

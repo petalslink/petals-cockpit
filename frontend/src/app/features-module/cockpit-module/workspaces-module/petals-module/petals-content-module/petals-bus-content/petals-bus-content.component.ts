@@ -20,7 +20,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 
 // rxjs
-import { Subscription, Observable } from 'rxjs/Rx';
+import { Subscription, Observable } from 'rxjs';
 
 // ngrx
 import { Store } from '@ngrx/store';
