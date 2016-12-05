@@ -26,8 +26,15 @@ describe(`Workspaces`, () => {
   it(`should not have any workspace selected`, () => {
     expect(browser.getCurrentUrl()).toMatch(/cockpit\/workspaces$/);
 
-    // check there's a warning saying no workspace selected
+    // check there's a warning saying that no workspace is selected
     expect(element(by.css(`md-sidenav .info.no-workspace-selected`)).getText()).toEqual(`No workspace selected\nPlease select one`);
+
+    // check that the buttons showing :
+    // - the current workspace
+    // - the button to choose a workspace
+    // are not shown
+    expect(element(by.css(`md-sidenav .workspace-name`)).isPresent()).toEqual(false);
+    expect(element(by.css(`md-sidenav .change-workspace`)).isPresent()).toEqual(false);
 
     // even if no selected, check that 2 workspaces are displayed
     expect(element.all(by.css(`.page-workspaces div.md-list-item`)).count()).toEqual(2);
@@ -43,15 +50,22 @@ describe(`Workspaces`, () => {
     expect(element.all(by.css(`.page-workspaces div.md-list-item .color-primary-bold`)).count()).toEqual(0);
   });
 
-  it(`should select a workspace when clicking on his line and display his first bus`, () => {
+  it(`should select a workspace when clicking on his line`, () => {
     // select the first workspace
     element.all(by.css(`.page-workspaces div.md-list-item`)).get(0).click();
 
-    // check that url is set to the first bus of the workspace
-    expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}/petals/bus/${reId}$`));
+    // check that url is set to Petals by default
+    expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}/petals$`));
 
-    // check there's no warning saying no bus ...
+    // check that there's no warning saying no bus ...
     expect(element(by.css(`md-sidenav .info.no-bus`)).isPresent()).toBe(false);
+
+    // check that the buttons showing :
+    // - the current workspace
+    // - the button to choose a workspace
+    // are shown
+    expect(element(by.css(`md-sidenav .workspace-name`)).isPresent()).toEqual(true);
+    expect(element(by.css(`md-sidenav .change-workspace`)).isPresent()).toEqual(true);
 
     /// and that the first bus has the 'searched' class to highlight it
     let itemWithoutIcons = element(by.css(`md-sidenav app-buses-menu .md-list-item > span[classtoapply="searched"]`))
@@ -369,6 +383,21 @@ describe(`Workspaces`, () => {
     element(by.css(`md-input.new-workspace-name input`)).sendKeys(`Test`);
     element(by.css(`.btn-add-workspace`)).click();
 
+    // no need to select the new workspace, it should be auto-selected after being created
+
+    // check that the URL is set to this workspace
+    // this is not really accurate as we do not test the ID in particular
+    // TODO: find a way to know the IDs on mock and also IDs from real server
+    expect(browser.getCurrentUrl())
+      .toMatch(new RegExp(`/cockpit/workspaces/${reId}/petals$`));
+
+    // check there's a warning saying no buses available
+    expect(element(by.css(`md-sidenav .info.no-bus`)).getText())
+      .toEqual(`The workspace "Test" doesn't have any bus or bus in progress. You may want to import one.`);
+
+    // come back on workspace's list
+    element(by.css(`md-sidenav button.change-workspace`)).click();
+
     // check that 3 workspaces are listed
     expect(element.all(by.css(`.page-workspaces div.md-list-item`)).count()).toEqual(3);
     let workspacesAndOwners = [
@@ -380,17 +409,5 @@ describe(`Workspaces`, () => {
         `You're the only one to use this workspace`
     ];
     expect(element(by.css(`.page-workspaces md-nav-list`)).getText()).toEqual(workspacesAndOwners.join(`\n`));
-
-    // no need to select the new workspace, it should be auto-selected after being created
-
-    // check that the URL is set to this workspace
-    // this is not really accurate as we do not test the ID in particular
-    // TODO: find a way to know the IDs on mock and also IDs from real server
-    expect(browser.getCurrentUrl())
-    .toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
-
-    // check there's a warning saying no buses available
-    expect(element(by.css(`md-sidenav .info.no-bus`)).getText())
-    .toEqual(`The workspace "Test" doesn't have any bus or bus in progress. You may want to import one.`);
   });
 });

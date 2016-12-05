@@ -20,9 +20,11 @@
 md-sidenav-layout {
   height: 100%;
 }
+
 md-sidenav {
   width: 320px;
 }
+
 #header-sidenav {
   background: url("assets/img/wallpaper-header.png") no-repeat center;
   background-size: cover;
@@ -30,21 +32,29 @@ md-sidenav {
   color: white;
   border-radius: 0;
 }
+
 .logo-petals {
   flex: 1 1 auto;
   max-width: 110px;
   padding-bottom: 10px;
 }
+
 .icon-power {
   float: right;
 }
+
 /deep/ .md-tab-label {
   min-width: 1px !important;
   width: 100% !important;
 }
 
+.workspace-name {
+  width: 232px;
+  border-radius: 0;
+}
+
 .change-workspace {
-  width: 100%;
+  width: 88px;
   border-radius: 0;
 }
 
