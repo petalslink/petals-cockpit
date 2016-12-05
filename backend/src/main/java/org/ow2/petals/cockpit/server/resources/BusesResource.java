@@ -80,7 +80,7 @@ public class BusesResource {
         @Valid
         public BusOverview get(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
                 @Pac4JProfile CockpitProfile profile) throws InterruptedException {
-            return as.call(wsId, new BusActor.GetOverview(profile.getUser().getUsername(), bId))
+            return as.call(wsId, new BusActor.GetBusOverview(profile.getUser().getUsername(), bId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
 

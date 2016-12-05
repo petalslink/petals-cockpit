@@ -1,0 +1,4 @@
+class javaslang/collection/Traversable
+find
+ (Ljava/util/function/Predicate<-TT;>;)Ljavaslang/control/Option<TT;>;
+ (L1java/util/function/Predicate<-TT;>;)L1javaslang/control/Option<TT;>;

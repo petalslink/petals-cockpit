@@ -64,8 +64,8 @@ public class ContainerActor extends CockpitActor<Msg> {
 
         for (;;) {
             Msg msg = receive();
-            if (msg instanceof GetOverview) {
-                GetOverview get = (GetOverview) msg;
+            if (msg instanceof GetContainerOverview) {
+                GetContainerOverview get = (GetContainerOverview) msg;
                 assert get.cId == db.id;
                 try {
                     final Domain topology = getTopology(db.ip, db.port, db.username, db.password, Option.none());
@@ -85,43 +85,51 @@ public class ContainerActor extends CockpitActor<Msg> {
 
     public interface Msg {
         // marker interface for messages to this actor
+    }
 
-        long getBusId();
+    public static class ContainerRequest<T> extends CockpitActors.Request<T> implements Msg {
 
+        private static final long serialVersionUID = -564899978996631515L;
+
+        public ContainerRequest(String user) {
+            super(user);
+        }
+    }
+
+    public interface ForwardedMsg extends Msg, BusActor.ForwardedMsg, WorkspaceActor.Msg {
         long getContainerId();
     }
 
-    public static class ContainerRequest<T> extends CockpitActors.Request<T>
-            implements Msg, BusActor.Msg, WorkspaceActor.Msg {
+    public static class ForwardedContainerRequest<T> extends ContainerRequest<T> implements ForwardedMsg {
 
-        private static final long serialVersionUID = -564899978996631515L;
+        private static final long serialVersionUID = 308263095400474513L;
 
         final long bId;
 
         final long cId;
 
-        public ContainerRequest(String user, long bId, long cId) {
+        public ForwardedContainerRequest(String user, long bId, long cId) {
             super(user);
             this.bId = bId;
             this.cId = cId;
         }
 
         @Override
-        public long getBusId() {
-            return bId;
-        }
-
-        @Override
         public long getContainerId() {
             return cId;
         }
+
+        @Override
+        public long getBusId() {
+            return bId;
+        }
     }
 
-    public static class GetOverview extends ContainerRequest<ContainerOverview> {
+    public static class GetContainerOverview extends ForwardedContainerRequest<ContainerOverview> {
 
         private static final long serialVersionUID = -2520646870000161079L;
 
-        public GetOverview(String user, long bId, long cId) {
+        public GetContainerOverview(String user, long bId, long cId) {
             super(user, bId, cId);
         }
     }

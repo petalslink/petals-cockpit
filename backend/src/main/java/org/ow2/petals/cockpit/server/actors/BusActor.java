@@ -71,12 +71,13 @@ public class BusActor extends CockpitActor<Msg> {
 
         for (;;) {
             Msg msg = receive();
-            if (msg instanceof GetOverview) {
-                GetOverview get = (GetOverview) msg;
+            if (msg instanceof GetBusOverview) {
+                GetBusOverview get = (GetBusOverview) msg;
                 assert get.bId == db.id;
                 RequestReplyHelper.reply(get, Either.right(new BusOverview(db.name)));
-            } else if (msg instanceof ContainerActor.Msg && msg instanceof CockpitActors.Request) {
-                ContainerActor.Msg bMsg = (ContainerActor.Msg) msg;
+            } else if (msg instanceof ContainerActor.ForwardedMsg && msg instanceof CockpitActors.Request) {
+                // forward requests to the adequate bus
+                ContainerActor.ForwardedMsg bMsg = (ContainerActor.ForwardedMsg) msg;
                 CockpitActors.Request<?> bReq = (CockpitActors.Request<?>) msg;
                 @SuppressWarnings("resource")
                 ActorRef<ContainerActor.Msg> container = busContainers.get(bMsg.getContainerId());
@@ -93,17 +94,28 @@ public class BusActor extends CockpitActor<Msg> {
 
     public interface Msg {
         // marker interface for messages to this actor
+    }
 
+    public static class BusRequest<T> extends CockpitActors.Request<T> implements Msg {
+
+        private static final long serialVersionUID = -564899978996631515L;
+
+        public BusRequest(String user) {
+            super(user);
+        }
+    }
+
+    public interface ForwardedMsg extends Msg, WorkspaceActor.Msg {
         long getBusId();
     }
 
-    public static class BusRequest<T> extends CockpitActors.Request<T> implements Msg, WorkspaceActor.Msg {
+    public static class ForwardedBusRequest<T> extends BusRequest<T> implements ForwardedMsg {
 
         private static final long serialVersionUID = -564899978996631515L;
 
         final long bId;
 
-        public BusRequest(String user, long bId) {
+        public ForwardedBusRequest(String user, long bId) {
             super(user);
             this.bId = bId;
         }
@@ -114,11 +126,11 @@ public class BusActor extends CockpitActor<Msg> {
         }
     }
 
-    public static class GetOverview extends BusRequest<BusOverview> {
+    public static class GetBusOverview extends ForwardedBusRequest<BusOverview> {
 
         private static final long serialVersionUID = -2520646870000161079L;
 
-        public GetOverview(String user, long bId) {
+        public GetBusOverview(String user, long bId) {
             super(user, bId);
         }
     }

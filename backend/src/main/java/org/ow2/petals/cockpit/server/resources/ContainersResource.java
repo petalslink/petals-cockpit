@@ -36,6 +36,7 @@ import org.ow2.petals.cockpit.server.actors.ContainerActor;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 
@@ -61,7 +62,7 @@ public class ContainersResource {
         @Valid
         public ContainerOverview get(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
                 @PathParam("cId") @Min(1) long cId, @Pac4JProfile CockpitProfile profile) throws InterruptedException {
-            return as.call(wsId, new ContainerActor.GetOverview(profile.getUser().getUsername(), bId, cId))
+            return as.call(wsId, new ContainerActor.GetContainerOverview(profile.getUser().getUsername(), bId, cId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
     }
@@ -84,6 +85,7 @@ public class ContainersResource {
         @JsonProperty
         public final ImmutableMap<String, String> reachabilities;
 
+        @JsonCreator
         public ContainerOverview(@JsonProperty("name") String name, @JsonProperty("ip") String ip,
                 @JsonProperty("port") int port, @JsonProperty("reachabilities") Map<String, String> reachabilities) {
             this.name = name;

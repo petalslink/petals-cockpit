@@ -123,8 +123,9 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                     broadcaster.add(nc.output);
                     return Either.right(null);
                 });
-            } else if (msg instanceof BusActor.Msg && msg instanceof CockpitActors.Request) {
-                BusActor.Msg bMsg = (BusActor.Msg) msg;
+            } else if (msg instanceof BusActor.ForwardedMsg && msg instanceof CockpitActors.Request) {
+                // forward requests to the adequate bus
+                BusActor.ForwardedMsg bMsg = (BusActor.ForwardedMsg) msg;
                 CockpitActors.Request<?> bReq = (CockpitActors.Request<?>) msg;
                 @SuppressWarnings("resource")
                 ActorRef<BusActor.Msg> bus = wsBuses.get(bMsg.getBusId());
@@ -162,8 +163,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     private Either<Status, BusInProgress> handleImportBus(ImportBus bus) throws SuspendExecution, InterruptedException {
         final NewBus nb = bus.nb;
 
-        final long bId = runDAO(
-                () -> buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, db.id));
+        final long bId = runDAO(() -> buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, db.id));
 
         // we use a fiber to let the actor handles other message during bus import
         new Fiber<>(() -> importBus(bId, nb)).start();
@@ -183,12 +183,13 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             final Domain topology = getTopology(bus);
 
             final BusTree bTree = runDAO(() -> buses.saveImport(bId, topology));
-            
+
             // TODO update it more nicely!! (as a result of the import made by the bus actor!)
             tree = runDAO(() -> workspaces.getWorkspaceTree(db));
 
             // TODO see how it interact with our WorkspaceTree...
-            // TODO maybe delegate him the import itself?
+            // TODO maybe delegate him the import itself? maybe it's best to leave the creation to the workspace,
+            // because then it would be akward to have the bus create the container object in db so...
             wsBuses.put(tree.id, as.getActor(new BusActor(bTree, self())));
 
             return WorkspaceEvent.ok(bTree);

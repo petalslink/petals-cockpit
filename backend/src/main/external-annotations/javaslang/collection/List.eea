@@ -2,3 +2,6 @@ class javaslang/collection/List
 collector
  <T:Ljava/lang/Object;>()Ljava/util/stream/Collector<TT;Ljava/util/ArrayList<TT;>;Ljavaslang/collection/List<TT;>;>;
  <T:Ljava/lang/Object;>()L1java/util/stream/Collector<TT;L1java/util/ArrayList<TT;>;L1javaslang/collection/List<TT;>;>;
+ofAll
+ <T:Ljava/lang/Object;>(Ljava/lang/Iterable<+TT;>;)Ljavaslang/collection/List<TT;>;
+ <T:Ljava/lang/Object;>(L1java/lang/Iterable<+TT;>;)L1javaslang/collection/List<TT;>;
