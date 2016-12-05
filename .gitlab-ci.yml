@@ -25,7 +25,7 @@ variables:
       - $M2_CACHED_REPOSITORY
 
 .node-6: &node-6
-  image: registry.gitlab.com/victornoel/petals-cockpit
+  image: registry.gitlab.com/victornoel/node-java-yarn-docker
   before_script:
     # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
     - "cd frontend"
