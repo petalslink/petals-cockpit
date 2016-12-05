@@ -65,6 +65,18 @@ public class ContainersResource {
             return as.call(wsId, new ContainerActor.GetContainerOverview(profile.getUser().getUsername(), bId, cId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
+
+        @GET
+        @Path("/components/{compId}")
+        @Produces(MediaType.APPLICATION_JSON)
+        public ComponentOverview getComp(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
+                @PathParam("cId") @Min(1) long cId, @PathParam("compId") @Min(1) long compId,
+                @Pac4JProfile CockpitProfile profile) throws InterruptedException {
+            return as
+                    .call(wsId,
+                            new ContainerActor.GetComponentOverview(profile.getUser().getUsername(), bId, cId, compId))
+                    .getOrElseThrow(s -> new WebApplicationException(s));
+        }
     }
 
     public static class ContainerOverview {
@@ -92,6 +104,18 @@ public class ContainersResource {
             this.ip = ip;
             this.port = port;
             this.reachabilities = ImmutableMap.copyOf(reachabilities);
+        }
+    }
+
+    public static class ComponentOverview {
+
+        @NotEmpty
+        @JsonProperty
+        public final String name;
+
+        @JsonCreator
+        public ComponentOverview(@JsonProperty("name") String name) {
+            this.name = name;
         }
     }
 }

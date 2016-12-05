@@ -40,6 +40,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.mockito.Mockito;
+import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Domain;
@@ -48,10 +49,12 @@ import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbBus;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
+import org.ow2.petals.cockpit.server.db.BusesDAO.DbComponent;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
 import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvider;
 
@@ -60,6 +63,7 @@ import co.paralleluniverse.common.test.TestUtil;
 import co.paralleluniverse.common.util.Debug;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import javaslang.Tuple2;
+import javaslang.Tuple3;
 import javaslang.Tuple4;
 
 /**
@@ -118,7 +122,6 @@ public class AbstractWorkspacesResourceTest {
 
     @After
     public void tearDown() {
-        // in case the checks before fail, we still really need to execute this!
         reset(workspaces);
         reset(buses);
 
@@ -129,31 +132,42 @@ public class AbstractWorkspacesResourceTest {
      * TODO generate id automatically? but then we need some kind of way to query this data after that!
      */
     protected void setupWorkspace(long wsId, String wsName,
-            List<Tuple4<Long, Domain, String, List<Tuple2<Long, Container>>>> data, String... users) {
+            List<Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple2<Long, Component>>>>>> data, String... users) {
         List<BusTree> bTrees = new ArrayList<>();
         List<DbBus> bs = new ArrayList<>();
-        for (Tuple4<Long, Domain, String, List<Tuple2<Long, Container>>> bus : data) {
+        for (Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple2<Long, Component>>>>> bus : data) {
             Domain domain = bus._2;
             String passphrase = bus._3;
-            List<Tuple2<Long, Container>> containers = bus._4;
-            Tuple2<Long, Container> entry = containers.get(0);
+            List<Tuple3<Long, Container, List<Tuple2<Long, Component>>>> containers = bus._4;
+            Tuple3<Long, Container, List<Tuple2<Long, Component>>> entry = containers.get(0);
             assert entry != null;
             DbBusImported bDb = new DbBusImported(bus._1, entry._2.getHost(), getPort(entry._2),
                     entry._2.getJmxUsername(), entry._2.getJmxPassword(), passphrase, domain.getName());
 
             List<ContainerTree> cTrees = new ArrayList<>();
             List<DbContainer> cs = new ArrayList<>();
-            for (Tuple2<Long, Container> c : containers) {
+            for (Tuple3<Long, Container, List<Tuple2<Long, Component>>> c : containers) {
 
                 c._2.addProperty("petals.topology.passphrase", passphrase);
 
                 DbContainer cDb = new DbContainer(c._1, c._2.getContainerName(), c._2.getHost(), getPort(c._2),
                         c._2.getJmxUsername(), c._2.getJmxPassword());
 
+                List<ComponentTree> compTrees = new ArrayList<>();
+                List<DbComponent> comps = new ArrayList<>();
+                for (Tuple2<Long, Component> comp : c._3) {
+                    DbComponent compDb = new DbComponent(comp._1, comp._2.getName(), comp._2.getState().toString());
+
+                    compTrees.add(new ComponentTree(compDb.id, compDb.name,
+                            ComponentTree.State.from(comp._2.getState()), Arrays.asList()));
+                    comps.add(compDb);
+                }
+
                 // TODO handle also artifacts
-                cTrees.add(new ContainerTree(cDb.id, cDb.name, Arrays.asList()));
+                cTrees.add(new ContainerTree(cDb.id, cDb.name, compTrees));
                 cs.add(cDb);
                 when(buses.getContainerById(cDb.id)).thenReturn(cDb);
+                when(buses.getComponentsByContainer(cDb)).thenReturn(comps);
             }
 
             bTrees.add(new BusTree(bDb.id, bDb.name, cTrees));

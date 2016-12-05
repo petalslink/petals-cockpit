@@ -19,11 +19,15 @@ package org.ow2.petals.cockpit.server.actors;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.actors.ContainerActor.Msg;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.ComponentOverview;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerOverview;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +36,7 @@ import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.SuspendExecution;
 import javaslang.Tuple;
+import javaslang.collection.List;
 import javaslang.control.Either;
 import javaslang.control.Option;
 
@@ -77,10 +82,19 @@ public class ContainerActor extends CockpitActor<Msg> {
                 } catch (ContainerAdministrationException e) {
                     RequestReplyHelper.replyError(get, e);
                 }
+            } else if (msg instanceof GetComponentOverview) {
+                GetComponentOverview get = (GetComponentOverview) msg;
+                assert get.cId == db.id;
+                RequestReplyHelper.reply(get,
+                        getComponent(get.compId).map(c -> new ComponentOverview(c.name)).toRight(Status.NOT_FOUND));
             } else {
                 LOG.warn("Unexpected event for container {}: {}", db.id, msg);
             }
         }
+    }
+
+    private Option<ComponentTree> getComponent(long compId) {
+        return List.ofAll(tree.components).find(c -> c.id == compId);
     }
 
     public interface Msg {
@@ -132,5 +146,18 @@ public class ContainerActor extends CockpitActor<Msg> {
         public GetContainerOverview(String user, long bId, long cId) {
             super(user, bId, cId);
         }
+    }
+
+    public static class GetComponentOverview extends ForwardedContainerRequest<ComponentOverview> {
+
+        private static final long serialVersionUID = -7710132982021451498L;
+
+        final long compId;
+
+        public GetComponentOverview(String user, long bId, long cId, long compId) {
+            super(user, bId, cId);
+            this.compId = compId;
+        }
+
     }
 }

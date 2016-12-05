@@ -233,7 +233,8 @@ public class WorkspaceTree extends MinWorkspace {
         @JsonProperty
         public final ImmutableList<SUTree> serviceUnits;
 
-        public ComponentTree(long id, String name, State state, List<SUTree> serviceUnits) {
+        public ComponentTree(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("state") State state, @JsonProperty("serviceUnits") List<SUTree> serviceUnits) {
             this.id = id;
             this.name = name;
             this.state = state;
