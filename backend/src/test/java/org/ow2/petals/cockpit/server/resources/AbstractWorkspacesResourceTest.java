@@ -53,6 +53,7 @@ import org.ow2.petals.cockpit.server.db.BusesDAO.DbComponent;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.MinComponent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
@@ -132,7 +133,8 @@ public class AbstractWorkspacesResourceTest {
      * TODO generate id automatically? but then we need some kind of way to query this data after that!
      */
     protected void setupWorkspace(long wsId, String wsName,
-            List<Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple2<Long, Component>>>>>> data, String... users) {
+            List<Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple2<Long, Component>>>>>> data,
+            String... users) {
         List<BusTree> bTrees = new ArrayList<>();
         List<DbBus> bs = new ArrayList<>();
         for (Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple2<Long, Component>>>>> bus : data) {
@@ -156,10 +158,11 @@ public class AbstractWorkspacesResourceTest {
                 List<ComponentTree> compTrees = new ArrayList<>();
                 List<DbComponent> comps = new ArrayList<>();
                 for (Tuple2<Long, Component> comp : c._3) {
-                    DbComponent compDb = new DbComponent(comp._1, comp._2.getName(), comp._2.getState().toString());
+                    DbComponent compDb = new DbComponent(comp._1, comp._2.getName(), comp._2.getState().toString(),
+                            comp._2.getComponentType().toString());
 
-                    compTrees.add(new ComponentTree(compDb.id, compDb.name,
-                            ComponentTree.State.from(comp._2.getState()), Arrays.asList()));
+                    compTrees.add(new ComponentTree(compDb.id, compDb.name, MinComponent.State.from(comp._2.getState()),
+                            MinComponent.Type.from(comp._2.getComponentType()), Arrays.asList()));
                     comps.add(compDb);
                 }
 

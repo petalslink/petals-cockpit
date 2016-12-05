@@ -214,6 +214,7 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         // TODO check assumptions
         BusOverview get = resources.getJerseyTest().target("/workspaces/1/buses/10").request().get(BusOverview.class);
 
+        assertThat(get.id).isEqualTo(10);
         assertThat(get.name).isEqualTo(domain.getName());
     }
 
@@ -223,6 +224,7 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         ContainerOverview get = resources.getJerseyTest().target("/workspaces/1/buses/10/containers/21").request()
                 .get(ContainerOverview.class);
 
+        assertThat(get.id).isEqualTo(21);
         assertThat(get.name).isEqualTo(container2.getContainerName());
         assertThat(get.ip).isEqualTo(container2.getHost());
         assertThat(get.port).isEqualTo(containerPort);
@@ -245,7 +247,10 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         ComponentOverview get = resources.getJerseyTest().target("/workspaces/1/buses/10/containers/20/components/30")
                 .request().get(ComponentOverview.class);
 
+        assertThat(get.id).isEqualTo(30);
         assertThat(get.name).isEqualTo(component.getName());
+        assertThat(get.state.toString()).isEqualTo(component.getState().toString());
+        assertThat(get.type.toString()).isEqualTo(component.getComponentType().toString());
     }
 
     @Test

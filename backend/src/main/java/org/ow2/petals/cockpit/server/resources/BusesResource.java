@@ -180,15 +180,33 @@ public class BusesResource {
         }
     }
 
-    public static class BusOverview {
+    public static class MinBus {
+
+        @Min(1)
+        public final long id;
 
         @NotEmpty
         @JsonProperty
         public final String name;
 
         @JsonCreator
-        public BusOverview(@JsonProperty("name") String name) {
+        public MinBus(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+            this.id = id;
             this.name = name;
+        }
+
+        @JsonProperty
+        public String getId() {
+            return Long.toString(id);
+        }
+
+    }
+
+    public static class BusOverview extends MinBus {
+
+        @JsonCreator
+        public BusOverview(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+            super(id, name);
         }
     }
 }

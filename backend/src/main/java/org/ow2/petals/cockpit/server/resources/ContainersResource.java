@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -31,6 +32,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.ow2.petals.admin.api.artifact.ArtifactState;
+import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.ContainerActor;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
@@ -79,11 +82,28 @@ public class ContainersResource {
         }
     }
 
-    public static class ContainerOverview {
+    public static class MinContainer {
+
+        @Min(1)
+        public final long id;
 
         @NotEmpty
         @JsonProperty
         public final String name;
+
+        @JsonCreator
+        public MinContainer(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        @JsonProperty
+        public String getId() {
+            return Long.toString(id);
+        }
+    }
+
+    public static class ContainerOverview extends MinContainer {
 
         @NotEmpty
         @JsonProperty
@@ -98,24 +118,90 @@ public class ContainersResource {
         public final ImmutableMap<String, String> reachabilities;
 
         @JsonCreator
-        public ContainerOverview(@JsonProperty("name") String name, @JsonProperty("ip") String ip,
+        public ContainerOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("ip") String ip,
                 @JsonProperty("port") int port, @JsonProperty("reachabilities") Map<String, String> reachabilities) {
-            this.name = name;
+            super(id, name);
             this.ip = ip;
             this.port = port;
             this.reachabilities = ImmutableMap.copyOf(reachabilities);
         }
     }
 
-    public static class ComponentOverview {
+    public static class MinComponent {
+
+        public enum State {
+            Loaded, Started, Stopped, Shutdown, Unknown;
+
+            public static State from(ArtifactState.State state) {
+                switch (state) {
+                    case LOADED:
+                        return Loaded;
+                    case STARTED:
+                        return Started;
+                    case STOPPED:
+                        return Stopped;
+                    case SHUTDOWN:
+                        return Shutdown;
+                    case UNKNOWN:
+                        return Unknown;
+                    default:
+                        throw new AssertionError();
+                }
+            }
+        }
+
+        public enum Type {
+            BC, SE;
+
+            public static Type from(Component.ComponentType type) {
+                switch (type) {
+                    case BC:
+                        return BC;
+                    case SE:
+                        return SE;
+                    default:
+                        throw new AssertionError();
+                }
+            }
+        }
+
+        @Min(1)
+        public final long id;
 
         @NotEmpty
         @JsonProperty
         public final String name;
 
+        @NotNull
+        @JsonProperty
+        public final State state;
+
+        @NotNull
+        @JsonProperty
+        public final Type type;
+
         @JsonCreator
-        public ComponentOverview(@JsonProperty("name") String name) {
+        public MinComponent(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("state") State state, @JsonProperty("type") Type type) {
+            this.id = id;
             this.name = name;
+            this.state = state;
+            this.type = type;
+        }
+
+        @JsonProperty
+        public String getId() {
+            return Long.toString(id);
+        }
+    }
+
+    public static class ComponentOverview extends MinComponent {
+
+        @JsonCreator
+        public ComponentOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("state") State state, @JsonProperty("type") Type type) {
+            super(id, name, state, type);
         }
     }
 }

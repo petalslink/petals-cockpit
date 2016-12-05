@@ -74,7 +74,7 @@ public class BusActor extends CockpitActor<Msg> {
             if (msg instanceof GetBusOverview) {
                 GetBusOverview get = (GetBusOverview) msg;
                 assert get.bId == db.id;
-                RequestReplyHelper.reply(get, Either.right(new BusOverview(db.name)));
+                RequestReplyHelper.reply(get, Either.right(new BusOverview(db.id, db.name)));
             } else if (msg instanceof ContainerActor.ForwardedMsg && msg instanceof CockpitActors.Request) {
                 // forward requests to the adequate bus
                 ContainerActor.ForwardedMsg bMsg = (ContainerActor.ForwardedMsg) msg;

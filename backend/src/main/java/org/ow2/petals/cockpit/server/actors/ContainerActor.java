@@ -78,15 +78,15 @@ public class ContainerActor extends CockpitActor<Msg> {
                             .filter(c -> !Objects.equals(db.name, c.getContainerName()))
                             .toJavaMap(c -> Tuple.of(c.getContainerName(), c.getState().toString()));
                     RequestReplyHelper.reply(get,
-                            Either.right(new ContainerOverview(db.name, db.ip, db.port, reachabilities)));
+                            Either.right(new ContainerOverview(db.id, db.name, db.ip, db.port, reachabilities)));
                 } catch (ContainerAdministrationException e) {
                     RequestReplyHelper.replyError(get, e);
                 }
             } else if (msg instanceof GetComponentOverview) {
                 GetComponentOverview get = (GetComponentOverview) msg;
                 assert get.cId == db.id;
-                RequestReplyHelper.reply(get,
-                        getComponent(get.compId).map(c -> new ComponentOverview(c.name)).toRight(Status.NOT_FOUND));
+                RequestReplyHelper.reply(get, getComponent(get.compId)
+                        .map(c -> new ComponentOverview(c.id, c.name, c.state, c.type)).toRight(Status.NOT_FOUND));
             } else {
                 LOG.warn("Unexpected event for container {}: {}", db.id, msg);
             }
