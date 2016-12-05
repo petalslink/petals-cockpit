@@ -50,13 +50,13 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
 
     private final int containerPort = 7700;
 
-    private final Container container1 = new Container("cont", "host1", ImmutableMap.of(PortType.JMX, containerPort),
+    private final Container container1 = new Container("cont1", "host1", ImmutableMap.of(PortType.JMX, containerPort),
             "user", "pass", State.REACHABLE);
 
-    private final Container container2 = new Container("cont", "host2", ImmutableMap.of(PortType.JMX, containerPort),
+    private final Container container2 = new Container("cont2", "host2", ImmutableMap.of(PortType.JMX, containerPort),
             "user", "pass", State.REACHABLE);
 
-    private final Container container3 = new Container("cont", "host3", ImmutableMap.of(PortType.JMX, containerPort),
+    private final Container container3 = new Container("cont3", "host3", ImmutableMap.of(PortType.JMX, containerPort),
             "user", "pass", State.UNREACHABLE);
 
     @Before

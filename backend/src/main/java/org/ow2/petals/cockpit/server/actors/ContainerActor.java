@@ -17,6 +17,7 @@
 package org.ow2.petals.cockpit.server.actors;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
@@ -30,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.SuspendExecution;
-import javaslang.Predicates;
 import javaslang.Tuple;
 import javaslang.control.Either;
 import javaslang.control.Option;
@@ -70,7 +70,7 @@ public class ContainerActor extends CockpitActor<Msg> {
                 try {
                     final Domain topology = getTopology(db.ip, db.port, db.username, db.password, Option.none());
                     Map<String, String> reachabilities = javaslang.collection.List.ofAll(topology.getContainers())
-                            .filter(Predicates.noneOf(db.name::equals))
+                            .filter(c -> !Objects.equals(db.name, c.getContainerName()))
                             .toJavaMap(c -> Tuple.of(c.getContainerName(), c.getState().toString()));
                     RequestReplyHelper.reply(get,
                             Either.right(new ContainerOverview(db.name, db.ip, db.port, reachabilities)));
