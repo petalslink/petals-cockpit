@@ -19,6 +19,7 @@
 import { NgModule } from '@angular/core';
 
 // our modules
+import { CockpitRoutingModule } from './cockpit-module-routing.module';
 import { SharedModule } from '../../shared-module/shared-module.module';
 import { CockpitModuleComponent } from './cockpit-module.component';
 import { WorkspacesModule } from './workspaces-module/workspaces-module.module';
@@ -33,6 +34,7 @@ import { SettingsComponent } from './settings/settings.component';
 @NgModule({
   imports: [
     SharedModule,
+    CockpitRoutingModule,
     WorkspacesModule,
     PetalsMenuModule,
     ServiceMenuModule,
