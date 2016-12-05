@@ -15,13 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component } from '@angular/core';
+// angular modules
+import { Component, OnDestroy } from '@angular/core';
+
+// ngrx
+import { Store } from '@ngrx/store';
+
+// rxjs
+import { Subscription, Observable } from 'rxjs/Rx';
+
+// our interfaces
+import { IStore } from './../../../../../shared-module/interfaces/store.interface';
+import { IWorkspace, IWorkspaceRecord } from './../../../../../shared-module/interfaces/workspace.interface';
 
 @Component({
   selector: 'app-petals-content-module',
   templateUrl: './petals-content-module.component.html',
   styleUrls: ['./petals-content-module.component.scss']
 })
-export class PetalsContentModuleComponent {
-  constructor() { }
+export class PetalsContentModuleComponent implements OnDestroy {
+  public workspace: IWorkspace;
+  private workspaceSub: Subscription;
+
+  constructor(private store$: Store<IStore>) {
+    this.workspaceSub =
+      store$.select('workspace')
+        .map((workspaceR: IWorkspaceRecord) => workspaceR.toJS())
+        .subscribe((workspace: IWorkspace) => this.workspace = workspace);
+  }
+
+  ngOnDestroy() {
+    this.workspaceSub.unsubscribe();
+  }
 }

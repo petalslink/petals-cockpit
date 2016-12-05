@@ -387,10 +387,10 @@ describe(`Workspaces`, () => {
     // this is not really accurate as we do not test the ID in particular
     // TODO: find a way to know the IDs on mock and also IDs from real server
     expect(browser.getCurrentUrl())
-    .toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
+      .toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
 
     // check there's a warning saying no buses available
     expect(element(by.css(`md-sidenav .info.no-bus`)).getText())
-    .toEqual(`The workspace "Test" doesn't have any bus or bus in progress. You may want to import one.`);
+      .toEqual(`The workspace "Test" doesn't have any bus or bus in progress. You may want to import one.`);
   });
 });

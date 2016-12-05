@@ -109,17 +109,7 @@ export class WorkspaceEffects {
         this.sseServiceSub.unsubscribe();
       }
 
-      // if the workspace has at least one bus
-      // navigate to this bus
-      if (workspaceR.get('buses').size > 0) {
-        let firstBus: IBusRecord = workspaceR.getIn(['buses', 0]);
-
-        this.router.navigate(['/cockpit', 'workspaces', action.payload.id, 'petals', 'bus', firstBus.get('id')]);
-      }
-
-      else {
-        this.router.navigate(['/cockpit', 'workspaces', action.payload.id]);
-      }
+      this.router.navigate(['/cockpit', 'workspaces', action.payload.id, 'petals']);
 
       let sseServiceObs: Observable<Action> =
         this.sseService.subscribeToMessage(action.payload.id)
