@@ -40,7 +40,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.mockito.Mockito;
+import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
+import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Domain;
@@ -51,19 +53,21 @@ import org.ow2.petals.cockpit.server.db.BusesDAO.DbBus;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbComponent;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
+import org.ow2.petals.cockpit.server.db.BusesDAO.DbServiceUnit;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.MinComponent;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.MinServiceUnit;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
 import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvider;
 
 import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.common.test.TestUtil;
 import co.paralleluniverse.common.util.Debug;
 import io.dropwizard.testing.junit.ResourceTestRule;
-import javaslang.Tuple2;
 import javaslang.Tuple3;
 import javaslang.Tuple4;
 
@@ -133,22 +137,23 @@ public class AbstractWorkspacesResourceTest {
      * TODO generate id automatically? but then we need some kind of way to query this data after that!
      */
     protected void setupWorkspace(long wsId, String wsName,
-            List<Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple2<Long, Component>>>>>> data,
+            List<Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple3<Long, ServiceUnit, ArtifactState.State>>>>>>>> data,
             String... users) {
         List<BusTree> bTrees = new ArrayList<>();
         List<DbBus> bs = new ArrayList<>();
-        for (Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple2<Long, Component>>>>> bus : data) {
+        for (Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple3<Long, ServiceUnit, ArtifactState.State>>>>>>> bus : data) {
             Domain domain = bus._2;
             String passphrase = bus._3;
-            List<Tuple3<Long, Container, List<Tuple2<Long, Component>>>> containers = bus._4;
-            Tuple3<Long, Container, List<Tuple2<Long, Component>>> entry = containers.get(0);
+            List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple3<Long, ServiceUnit, ArtifactState.State>>>>>> containers = bus._4;
+            Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple3<Long, ServiceUnit, ArtifactState.State>>>>> entry = containers
+                    .get(0);
             assert entry != null;
             DbBusImported bDb = new DbBusImported(bus._1, entry._2.getHost(), getPort(entry._2),
                     entry._2.getJmxUsername(), entry._2.getJmxPassword(), passphrase, domain.getName());
 
             List<ContainerTree> cTrees = new ArrayList<>();
             List<DbContainer> cs = new ArrayList<>();
-            for (Tuple3<Long, Container, List<Tuple2<Long, Component>>> c : containers) {
+            for (Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple3<Long, ServiceUnit, ArtifactState.State>>>>> c : containers) {
 
                 c._2.addProperty("petals.topology.passphrase", passphrase);
 
@@ -157,13 +162,23 @@ public class AbstractWorkspacesResourceTest {
 
                 List<ComponentTree> compTrees = new ArrayList<>();
                 List<DbComponent> comps = new ArrayList<>();
-                for (Tuple2<Long, Component> comp : c._3) {
+                for (Tuple3<Long, Component, List<Tuple3<Long, ServiceUnit, ArtifactState.State>>> comp : c._3) {
                     DbComponent compDb = new DbComponent(comp._1, comp._2.getName(), comp._2.getState().toString(),
                             comp._2.getComponentType().toString());
 
+                    List<SUTree> suTrees = new ArrayList<>();
+                    List<DbServiceUnit> sus = new ArrayList<>();
+                    for (Tuple3<Long, ServiceUnit, ArtifactState.State> su : comp._3) {
+                        DbServiceUnit suDb = new DbServiceUnit(su._1, su._2.getName(), su._3.toString());
+
+                        suTrees.add(new SUTree(suDb.id, suDb.name, MinServiceUnit.State.from(su._3)));
+                        sus.add(suDb);
+                    }
+
                     compTrees.add(new ComponentTree(compDb.id, compDb.name, MinComponent.State.from(comp._2.getState()),
-                            MinComponent.Type.from(comp._2.getComponentType()), Arrays.asList()));
+                            MinComponent.Type.from(comp._2.getComponentType()), suTrees));
                     comps.add(compDb);
+                    when(buses.getServiceUnitByComponent(compDb)).thenReturn(sus);
                 }
 
                 // TODO handle also artifacts

@@ -80,9 +80,21 @@ public class ContainersResource {
                             new ContainerActor.GetComponentOverview(profile.getUser().getUsername(), bId, cId, compId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
+
+        @GET
+        @Path("/components/{compId}/serviceunits/{suId}")
+        @Produces(MediaType.APPLICATION_JSON)
+        public ServiceUnitOverview getSU(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
+                @PathParam("cId") @Min(1) long cId, @PathParam("compId") @Min(1) long compId,
+                @PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile)
+                throws InterruptedException {
+            return as.call(wsId,
+                    new ContainerActor.GetServiceUnitOverview(profile.getUser().getUsername(), bId, cId, compId, suId))
+                    .getOrElseThrow(s -> new WebApplicationException(s));
+        }
     }
 
-    public static class MinContainer {
+    public abstract static class MinContainer {
 
         @Min(1)
         public final long id;
@@ -91,8 +103,7 @@ public class ContainersResource {
         @JsonProperty
         public final String name;
 
-        @JsonCreator
-        public MinContainer(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+        public MinContainer(long id, String name) {
             this.id = id;
             this.name = name;
         }
@@ -128,7 +139,7 @@ public class ContainersResource {
         }
     }
 
-    public static class MinComponent {
+    public abstract static class MinComponent {
 
         public enum State {
             Loaded, Started, Stopped, Shutdown, Unknown;
@@ -181,9 +192,7 @@ public class ContainersResource {
         @JsonProperty
         public final Type type;
 
-        @JsonCreator
-        public MinComponent(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("state") State state, @JsonProperty("type") Type type) {
+        public MinComponent(long id, String name, State state, Type type) {
             this.id = id;
             this.name = name;
             this.state = state;
@@ -202,6 +211,59 @@ public class ContainersResource {
         public ComponentOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
                 @JsonProperty("state") State state, @JsonProperty("type") Type type) {
             super(id, name, state, type);
+        }
+    }
+
+    public abstract static class MinServiceUnit {
+        public enum State {
+            Loaded, Started, Stopped, Shutdown, Unknown;
+
+            public static State from(ArtifactState.State state) {
+                switch (state) {
+                    case LOADED:
+                        return Loaded;
+                    case STARTED:
+                        return Started;
+                    case STOPPED:
+                        return Stopped;
+                    case SHUTDOWN:
+                        return Shutdown;
+                    case UNKNOWN:
+                        return Unknown;
+                    default:
+                        throw new AssertionError();
+                }
+            }
+        }
+
+        @Min(1)
+        public final long id;
+
+        @NotEmpty
+        @JsonProperty
+        public final String name;
+
+        @NotNull
+        @JsonProperty
+        public final State state;
+
+        public MinServiceUnit(long id, String name, State state) {
+            this.id = id;
+            this.name = name;
+            this.state = state;
+        }
+
+        @JsonProperty
+        public String getId() {
+            return Long.toString(id);
+        }
+    }
+
+    public static class ServiceUnitOverview extends MinServiceUnit {
+
+        public ServiceUnitOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("state") State state) {
+            super(id, name, state);
         }
     }
 }

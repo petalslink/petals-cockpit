@@ -20,11 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
@@ -46,6 +42,7 @@ import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.BusesResource.MinBus;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.MinComponent;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.MinContainer;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.MinServiceUnit;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.MinWorkspace;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -188,49 +185,11 @@ public class WorkspaceTree extends MinWorkspace {
         }
     }
 
-    public static class SUTree {
+    public static class SUTree extends MinServiceUnit {
 
-        public enum State {
-            Loaded, Started, Stopped, Shutdown, Unknown;
-
-            public static State from(ArtifactState.State state) {
-                switch (state) {
-                    case LOADED:
-                        return Loaded;
-                    case STARTED:
-                        return Started;
-                    case STOPPED:
-                        return Stopped;
-                    case SHUTDOWN:
-                        return Shutdown;
-                    case UNKNOWN:
-                        return Unknown;
-                    default:
-                        throw new AssertionError();
-                }
-            }
-        }
-
-        @Min(1)
-        public final long id;
-
-        @NotEmpty
-        @JsonProperty
-        public final String name;
-
-        @NotNull
-        @JsonProperty
-        public final State state;
-
-        public SUTree(long id, String name, State state) {
-            this.id = id;
-            this.name = name;
-            this.state = state;
-        }
-
-        @JsonProperty
-        public String getId() {
-            return Long.toString(id);
+        public SUTree(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("state") State state) {
+            super(id, name, state);
         }
     }
 }

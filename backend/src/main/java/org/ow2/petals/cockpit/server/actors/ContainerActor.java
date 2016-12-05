@@ -27,8 +27,10 @@ import org.ow2.petals.cockpit.server.actors.ContainerActor.Msg;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ComponentOverview;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerOverview;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.ServiceUnitOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,10 +89,19 @@ public class ContainerActor extends CockpitActor<Msg> {
                 assert get.cId == db.id;
                 RequestReplyHelper.reply(get, getComponent(get.compId)
                         .map(c -> new ComponentOverview(c.id, c.name, c.state, c.type)).toRight(Status.NOT_FOUND));
+            } else if (msg instanceof GetServiceUnitOverview) {
+                GetServiceUnitOverview get = (GetServiceUnitOverview) msg;
+                assert get.cId == db.id;
+                RequestReplyHelper.reply(get, getServiceUnit(get.compId, get.suId)
+                        .map(su -> new ServiceUnitOverview(su.id, su.name, su.state)).toRight(Status.NOT_FOUND));
             } else {
                 LOG.warn("Unexpected event for container {}: {}", db.id, msg);
             }
         }
+    }
+
+    private Option<SUTree> getServiceUnit(long compId, long suId) {
+        return getComponent(compId).flatMap(c -> List.ofAll(c.serviceUnits).find(su -> su.id == suId));
     }
 
     private Option<ComponentTree> getComponent(long compId) {
@@ -158,6 +169,20 @@ public class ContainerActor extends CockpitActor<Msg> {
             super(user, bId, cId);
             this.compId = compId;
         }
+    }
 
+    public static class GetServiceUnitOverview extends ForwardedContainerRequest<ServiceUnitOverview> {
+
+        private static final long serialVersionUID = -9164203963795147371L;
+
+        final long compId;
+
+        final long suId;
+
+        public GetServiceUnitOverview(String user, long bId, long cId, long compId, long suId) {
+            super(user, bId, cId);
+            this.compId = compId;
+            this.suId = suId;
+        }
     }
 }

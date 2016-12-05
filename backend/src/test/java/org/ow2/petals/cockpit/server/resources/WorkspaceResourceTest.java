@@ -26,8 +26,11 @@ import org.assertj.core.data.MapEntry;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.Component.ComponentType;
+import org.ow2.petals.admin.api.artifact.ServiceAssembly;
+import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
@@ -36,9 +39,11 @@ import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusOverview;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ComponentOverview;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerOverview;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.ServiceUnitOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
 import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvider;
 
 import com.google.common.collect.ImmutableMap;
@@ -65,6 +70,10 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
 
     private final Component component = new Component("comp", ComponentType.SE);
 
+    private final ServiceUnit serviceUnit = new ServiceUnit("su", component.getName());
+
+    private final ServiceAssembly serviceAssembly = new ServiceAssembly("sa", Arrays.asList(serviceUnit));
+
     @Before
     public void setup() {
         // petals
@@ -72,19 +81,29 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         petals.registerContainer(container1);
         petals.registerContainer(container2);
         petals.registerContainer(container3);
+        petals.registerArtifact(component, container1);
+        serviceAssembly.setState(ArtifactState.State.STARTED);
+        petals.registerArtifact(serviceAssembly, container1);
 
         // forbidden workspace (it is NOT registered in petals admin)
         setupWorkspace(2, "test2",
-                Arrays.asList(Tuple.of(2L, new Domain("dom2"), "", Arrays.asList(Tuple.of(2L,
-                        new Container("cont2", "", ImmutableMap.of(PortType.JMX, containerPort), "", "",
-                                State.REACHABLE),
-                        Arrays.asList(Tuple.of(2L, new Component("", ComponentType.SE))))))),
+                Arrays.asList(Tuple.of(2L, new Domain("dom2"), "", Arrays.asList(Tuple.of(2L, new Container(
+                        "cont2", "", ImmutableMap.of(PortType.JMX, containerPort), "", "", State.REACHABLE), Arrays
+                                .asList(Tuple.of(2L, new Component("", ComponentType.SE), Arrays.asList(
+                                        Tuple.of(2L, new ServiceUnit("", ""), ArtifactState.State.STARTED)))))))),
                 "anotherusers");
 
         // test workspace
-        setupWorkspace(1, "test", Arrays.asList(Tuple.of(10L, domain, "phrase",
-                Arrays.asList(Tuple.of(20L, container1, Arrays.asList(Tuple.of(30L, component))),
-                        Tuple.of(21L, container2, Arrays.asList()), Tuple.of(22L, container3, Arrays.asList())))),
+        setupWorkspace(1, "test",
+                Arrays.asList(
+                        Tuple.of(10L, domain, "phrase",
+                                Arrays.asList(
+                                        Tuple.of(20L, container1,
+                                                Arrays.asList(Tuple.of(30L, component,
+                                                        Arrays.asList(Tuple.of(40L, serviceUnit,
+                                                                serviceAssembly.getState()))))),
+                                        Tuple.of(21L, container2, Arrays.asList()),
+                                        Tuple.of(22L, container3, Arrays.asList())))),
                 MockProfileParamValueFactoryProvider.ADMIN.username);
     }
 
@@ -155,6 +174,24 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
     }
 
     @Test
+    public void getExistingSUForbidden() {
+        // TODO check assumptions
+        Response get = resources.getJerseyTest()
+                .target("/workspaces/2/buses/2/containers/2/components/2/serviceunits/2").request().get();
+
+        assertThat(get.getStatus()).isEqualTo(403);
+    }
+
+    @Test
+    public void getNonExistingSUForbidden() {
+        // TODO check assumptions
+        Response get = resources.getJerseyTest()
+                .target("/workspaces/2/buses/2/containers/2/components/2/serviceunits/3").request().get();
+
+        assertThat(get.getStatus()).isEqualTo(403);
+    }
+
+    @Test
     public void getExistingWorkspace() {
         // TODO check assumptions
         WorkspaceTree tree = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class);
@@ -191,6 +228,13 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         assertThat(comp.id).isEqualTo(30);
         assertThat(comp.name).isEqualTo(component.getName());
         assertThat(comp.state.toString()).isEqualTo(component.getState().toString());
+        assertThat(comp.serviceUnits).hasSize(1);
+
+        SUTree su = comp.serviceUnits.get(0);
+        assert su != null;
+        assertThat(su.id).isEqualTo(40);
+        assertThat(su.name).isEqualTo(serviceUnit.getName());
+        assertThat(su.state.toString()).isEqualTo(serviceAssembly.getState().toString());
     }
 
     @Test
@@ -258,6 +302,27 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         // TODO check assumptions
         Response get = resources.getJerseyTest().target("/workspaces/1/buses/10/containers/20/components/31").request()
                 .get();
+
+        assertThat(get.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void getExistingSU() {
+        // TODO check assumptions
+        ServiceUnitOverview get = resources.getJerseyTest()
+                .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/40").request()
+                .get(ServiceUnitOverview.class);
+
+        assertThat(get.id).isEqualTo(40);
+        assertThat(get.name).isEqualTo(serviceUnit.getName());
+        assertThat(get.state.toString()).isEqualTo(serviceAssembly.getState().toString());
+    }
+
+    @Test
+    public void getNonExistingServiceUnitNotFound() {
+        // TODO check assumptions
+        Response get = resources.getJerseyTest()
+                .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/41").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }

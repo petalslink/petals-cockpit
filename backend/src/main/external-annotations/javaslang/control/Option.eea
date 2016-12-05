@@ -1,4 +1,7 @@
 class javaslang/control/Option
+flatMap
+ <U:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+Ljavaslang/control/Option<+TU;>;>;)Ljavaslang/control/Option<TU;>;
+ <U:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+Ljavaslang/control/Option<+TU;>;>;)L1javaslang/control/Option<TU;>;
 map
  <U:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TU;>;)Ljavaslang/control/Option<TU;>;
  <U:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TU;>;)L1javaslang/control/Option<T1U;>;
