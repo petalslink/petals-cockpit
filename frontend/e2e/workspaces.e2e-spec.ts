@@ -381,10 +381,11 @@ describe(`Workspaces`, () => {
     ];
     expect(element(by.css(`.page-workspaces md-nav-list`)).getText()).toEqual(workspacesAndOwners.join(`\n`));
 
-    // select the new workspace
-    element.all(by.css(`.page-workspaces div.md-list-item`)).get(2).click();
+    // no need to select the new workspace, it should be auto-selected after being created
 
-    // check that url is set to this workspace
+    // check that the URL is set to this workspace
+    // this is not really accurate as we do not test the ID in particular
+    // TODO: find a way to know the IDs on mock and also IDs from real server
     expect(browser.getCurrentUrl())
     .toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
 
