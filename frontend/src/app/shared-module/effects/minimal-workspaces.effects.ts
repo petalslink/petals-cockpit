@@ -34,6 +34,7 @@ import { WorkspaceService } from '../services/workspace.service';
 
 // our actions
 import { MinimalWorkspacesActions } from '../reducers/minimal-workspaces.actions';
+import { WorkspaceActions } from '../reducers/workspace.actions';
 
 // our interfaces
 import { IMinimalWorkspace } from '../interfaces/minimal-workspaces.interface';
@@ -85,4 +86,11 @@ export class MinimalWorkspacesEffects {
         return Observable.of({ type: MinimalWorkspacesActions.ADD_WORKSPACE_FAILED });
       })
     );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: true}) addWorkspaceSuccess$: Observable<Action> = this.actions$
+    .ofType(MinimalWorkspacesActions.ADD_WORKSPACE_SUCCESS)
+    .map((action: Action) => {
+      return { type: WorkspaceActions.FETCH_WORKSPACE, payload: action.payload.id };
+    });
 }
