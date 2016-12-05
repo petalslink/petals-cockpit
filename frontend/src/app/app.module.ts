@@ -73,11 +73,9 @@ import { UserMockService } from './shared-module/mocks/user-mock.service';
 // our components
 import { AppComponent } from './app.component';
 
-// features module
-import { FeatureModule } from './features-module/features-module.module';
-
-// shared module
+// our modules
 import { SharedModule } from './shared-module/shared-module.module';
+import { FeatureModule } from './features-module/features-module.module';
 
 // opaque tokens
 import { AVAILABLE_LANGUAGES } from './shared-module/opaque-tokens/opaque-tokens';

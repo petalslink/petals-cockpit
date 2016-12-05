@@ -15,17 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// angular modules
 import { NgModule } from '@angular/core';
-import { LoginComponent } from './login/login.component';
+
+// our modules
 import { SharedModule } from '../../shared-module/shared-module.module';
+import { LoginRoutingModule } from './login-module-routing.module';
+
+// our components
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   imports: [
-    SharedModule
+    SharedModule,
+    LoginRoutingModule
   ],
-  declarations: [LoginComponent],
-  exports: [
-    LoginComponent
-  ]
+  declarations: [LoginComponent]
 })
 export class LoginModule { }

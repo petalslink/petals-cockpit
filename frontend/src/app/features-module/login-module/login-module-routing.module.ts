@@ -17,26 +17,20 @@
 
 // angular modules
 import { NgModule } from '@angular/core';
-import { FeatureComponent } from './features-module.component';
+import { Routes, RouterModule } from '@angular/router';
 
-// our modules
-import { SharedModule } from '../shared-module/shared-module.module';
+// our components
+import { LoginComponent } from './login/login.component';
 
-// our routes
-import { FeaturesRoutingModule } from './features-module-routing.module';
+const routes: Routes = [
+  {
+    path: '',
+    component: LoginComponent
+  }
+];
 
 @NgModule({
-  imports: [
-    SharedModule,
-
-    // routes
-    FeaturesRoutingModule
-  ],
-  declarations: [
-    FeatureComponent
-  ],
-  exports: [
-    FeatureComponent
-  ]
+  imports: [RouterModule.forChild(routes)],
+  providers: []
 })
-export class FeatureModule { }
+export class LoginRoutingModule { }
