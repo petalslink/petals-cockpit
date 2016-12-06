@@ -24,8 +24,8 @@ variables:
     paths:
       - $M2_CACHED_REPOSITORY
 
-.node-6: &node-6
-  image: registry.gitlab.com/victornoel/node-java-yarn-docker
+.node-6: &node-java-yarn
+  image: registry.gitlab.com/victornoel/node-java-yarn-docker:n7-j8-y0.18
   before_script:
     # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
     - "cd frontend"
@@ -34,12 +34,12 @@ variables:
     - "time yarn --cache-folder ../$YARN_CACHE_DIRECTORY --pure-lockfile"
     - "cd .."
   cache:
-    key: "node-6-yarn"
+    key: "node-yarn"
     paths:
       - $YARN_CACHE_DIRECTORY
 
 pages:
-  <<: *node-6
+  <<: *node-java-yarn
   stage: deploy
   script:
     - "cd frontend"
@@ -66,7 +66,7 @@ build-backend:
       - $M2_STAGING_DIRECTORY
 
 build-frontend:
-  <<: *node-6
+  <<: *node-java-yarn
   stage: build
   except:
     - /^back\/.*$/
@@ -104,7 +104,7 @@ build-product:
       - cockpit/target/petals-cockpit-*-capsule.jar
 
 e2e-product:
-  <<: *node-6
+  <<: *node-java-yarn
   stage: integration
   only:
     - master
