@@ -96,6 +96,9 @@ public class CockpitActors {
         }
     }
 
+    /**
+     * This represents requests coming from the REST API (i.e. Jersey's Resources)
+     */
     public abstract static class Request<R> extends RequestMessage<Either<Status, R>> {
 
         private static final long serialVersionUID = -5915325922592086753L;

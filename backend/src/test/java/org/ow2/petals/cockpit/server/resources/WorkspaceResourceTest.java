@@ -26,15 +26,24 @@ import org.assertj.core.data.MapEntry;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.ow2.petals.admin.api.artifact.ArtifactState;
+import org.ow2.petals.admin.api.artifact.Component;
+import org.ow2.petals.admin.api.artifact.Component.ComponentType;
+import org.ow2.petals.admin.api.artifact.ServiceAssembly;
+import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusOverview;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.ComponentOverview;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerOverview;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.ServiceUnitOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
 import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvider;
 
 import com.google.common.collect.ImmutableMap;
@@ -50,14 +59,20 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
 
     private final int containerPort = 7700;
 
-    private final Container container1 = new Container("cont", "host1", ImmutableMap.of(PortType.JMX, containerPort),
+    private final Container container1 = new Container("cont1", "host1", ImmutableMap.of(PortType.JMX, containerPort),
             "user", "pass", State.REACHABLE);
 
-    private final Container container2 = new Container("cont", "host2", ImmutableMap.of(PortType.JMX, containerPort),
+    private final Container container2 = new Container("cont2", "host2", ImmutableMap.of(PortType.JMX, containerPort),
             "user", "pass", State.REACHABLE);
 
-    private final Container container3 = new Container("cont", "host3", ImmutableMap.of(PortType.JMX, containerPort),
+    private final Container container3 = new Container("cont3", "host3", ImmutableMap.of(PortType.JMX, containerPort),
             "user", "pass", State.UNREACHABLE);
+
+    private final Component component = new Component("comp", ComponentType.SE);
+
+    private final ServiceUnit serviceUnit = new ServiceUnit("su", component.getName());
+
+    private final ServiceAssembly serviceAssembly = new ServiceAssembly("sa", Arrays.asList(serviceUnit));
 
     @Before
     public void setup() {
@@ -66,17 +81,29 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         petals.registerContainer(container1);
         petals.registerContainer(container2);
         petals.registerContainer(container3);
+        petals.registerArtifact(component, container1);
+        serviceAssembly.setState(ArtifactState.State.STARTED);
+        petals.registerArtifact(serviceAssembly, container1);
 
-        // forbidden workspace (also not registered in petals)
+        // forbidden workspace (it is NOT registered in petals admin)
         setupWorkspace(2, "test2",
-                Arrays.asList(Tuple.of(2L, new Domain("dom2"), "",
-                        Arrays.asList(Tuple.of(2L, new Container("cont2", "",
-                                ImmutableMap.of(PortType.JMX, containerPort), "", "", State.REACHABLE))))),
+                Arrays.asList(Tuple.of(2L, new Domain("dom2"), "", Arrays.asList(Tuple.of(2L, new Container(
+                        "cont2", "", ImmutableMap.of(PortType.JMX, containerPort), "", "", State.REACHABLE), Arrays
+                                .asList(Tuple.of(2L, new Component("", ComponentType.SE), Arrays.asList(
+                                        Tuple.of(2L, new ServiceUnit("", ""), ArtifactState.State.STARTED)))))))),
                 "anotherusers");
 
         // test workspace
-        setupWorkspace(1, "test", Arrays.asList(Tuple.of(10L, domain, "phrase",
-                Arrays.asList(Tuple.of(20L, container1), Tuple.of(21L, container2), Tuple.of(22L, container3)))),
+        setupWorkspace(1, "test",
+                Arrays.asList(
+                        Tuple.of(10L, domain, "phrase",
+                                Arrays.asList(
+                                        Tuple.of(20L, container1,
+                                                Arrays.asList(Tuple.of(30L, component,
+                                                        Arrays.asList(Tuple.of(40L, serviceUnit,
+                                                                serviceAssembly.getState()))))),
+                                        Tuple.of(21L, container2, Arrays.asList()),
+                                        Tuple.of(22L, container3, Arrays.asList())))),
                 MockProfileParamValueFactoryProvider.ADMIN.username);
     }
 
@@ -129,6 +156,42 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
     }
 
     @Test
+    public void getExistingComponentForbidden() {
+        // TODO check assumptions
+        Response get = resources.getJerseyTest().target("/workspaces/2/buses/2/containers/2/components/2").request()
+                .get();
+
+        assertThat(get.getStatus()).isEqualTo(403);
+    }
+
+    @Test
+    public void getNonExistingComponentForbidden() {
+        // TODO check assumptions
+        Response get = resources.getJerseyTest().target("/workspaces/2/buses/2/containers/2/components/3").request()
+                .get();
+
+        assertThat(get.getStatus()).isEqualTo(403);
+    }
+
+    @Test
+    public void getExistingSUForbidden() {
+        // TODO check assumptions
+        Response get = resources.getJerseyTest()
+                .target("/workspaces/2/buses/2/containers/2/components/2/serviceunits/2").request().get();
+
+        assertThat(get.getStatus()).isEqualTo(403);
+    }
+
+    @Test
+    public void getNonExistingSUForbidden() {
+        // TODO check assumptions
+        Response get = resources.getJerseyTest()
+                .target("/workspaces/2/buses/2/containers/2/components/2/serviceunits/3").request().get();
+
+        assertThat(get.getStatus()).isEqualTo(403);
+    }
+
+    @Test
     public void getExistingWorkspace() {
         // TODO check assumptions
         WorkspaceTree tree = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class);
@@ -146,16 +209,32 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         assert c1 != null;
         assertThat(c1.id).isEqualTo(20);
         assertThat(c1.name).isEqualTo(container1.getContainerName());
+        assertThat(c1.components).hasSize(1);
 
         ContainerTree c2 = b.containers.get(1);
         assert c2 != null;
         assertThat(c2.id).isEqualTo(21);
         assertThat(c2.name).isEqualTo(container2.getContainerName());
+        assertThat(c2.components).hasSize(0);
 
         ContainerTree c3 = b.containers.get(2);
         assert c3 != null;
         assertThat(c3.id).isEqualTo(22);
         assertThat(c3.name).isEqualTo(container3.getContainerName());
+        assertThat(c3.components).hasSize(0);
+
+        ComponentTree comp = c1.components.get(0);
+        assert comp != null;
+        assertThat(comp.id).isEqualTo(30);
+        assertThat(comp.name).isEqualTo(component.getName());
+        assertThat(comp.state.toString()).isEqualTo(component.getState().toString());
+        assertThat(comp.serviceUnits).hasSize(1);
+
+        SUTree su = comp.serviceUnits.get(0);
+        assert su != null;
+        assertThat(su.id).isEqualTo(40);
+        assertThat(su.name).isEqualTo(serviceUnit.getName());
+        assertThat(su.state.toString()).isEqualTo(serviceAssembly.getState().toString());
     }
 
     @Test
@@ -179,6 +258,7 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         // TODO check assumptions
         BusOverview get = resources.getJerseyTest().target("/workspaces/1/buses/10").request().get(BusOverview.class);
 
+        assertThat(get.id).isEqualTo(10);
         assertThat(get.name).isEqualTo(domain.getName());
     }
 
@@ -188,6 +268,7 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         ContainerOverview get = resources.getJerseyTest().target("/workspaces/1/buses/10/containers/21").request()
                 .get(ContainerOverview.class);
 
+        assertThat(get.id).isEqualTo(21);
         assertThat(get.name).isEqualTo(container2.getContainerName());
         assertThat(get.ip).isEqualTo(container2.getHost());
         assertThat(get.port).isEqualTo(containerPort);
@@ -200,6 +281,48 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
     public void getNonExistingContainerNotFound() {
         // TODO check assumptions
         Response get = resources.getJerseyTest().target("/workspaces/1/buses/10/containers/1").request().get();
+
+        assertThat(get.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void getExistingComponent() {
+        // TODO check assumptions
+        ComponentOverview get = resources.getJerseyTest().target("/workspaces/1/buses/10/containers/20/components/30")
+                .request().get(ComponentOverview.class);
+
+        assertThat(get.id).isEqualTo(30);
+        assertThat(get.name).isEqualTo(component.getName());
+        assertThat(get.state.toString()).isEqualTo(component.getState().toString());
+        assertThat(get.type.toString()).isEqualTo(component.getComponentType().toString());
+    }
+
+    @Test
+    public void getNonExistingComponentNotFound() {
+        // TODO check assumptions
+        Response get = resources.getJerseyTest().target("/workspaces/1/buses/10/containers/20/components/31").request()
+                .get();
+
+        assertThat(get.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void getExistingSU() {
+        // TODO check assumptions
+        ServiceUnitOverview get = resources.getJerseyTest()
+                .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/40").request()
+                .get(ServiceUnitOverview.class);
+
+        assertThat(get.id).isEqualTo(40);
+        assertThat(get.name).isEqualTo(serviceUnit.getName());
+        assertThat(get.state.toString()).isEqualTo(serviceAssembly.getState().toString());
+    }
+
+    @Test
+    public void getNonExistingServiceUnitNotFound() {
+        // TODO check assumptions
+        Response get = resources.getJerseyTest()
+                .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/41").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }

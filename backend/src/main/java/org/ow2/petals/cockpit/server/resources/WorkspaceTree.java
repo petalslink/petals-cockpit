@@ -20,11 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
@@ -43,6 +39,10 @@ import org.ow2.petals.cockpit.server.db.BusesDAO.DbServiceUnit;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusInError;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
+import org.ow2.petals.cockpit.server.resources.BusesResource.MinBus;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.MinComponent;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.MinContainer;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.MinServiceUnit;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.MinWorkspace;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -85,8 +85,9 @@ public class WorkspaceTree extends MinWorkspace {
                     container.getJmxUsername(), container.getJmxPassword(), bId);
             List<ComponentTree> comps = new ArrayList<>();
             for (Component component : container.getComponents()) {
-                ComponentTree.State compState = ComponentTree.State.from(component.getState());
-                long compId = buses.createComponent(component.getName(), compState.name(), cId);
+                MinComponent.State compState = MinComponent.State.from(component.getState());
+                MinComponent.Type compType = MinComponent.Type.from(component.getComponentType());
+                long compId = buses.createComponent(component.getName(), compState.name(), compType.name(), cId);
                 List<SUTree> sus = new ArrayList<>();
                 for (ServiceAssembly sa : container.getServiceAssemblies()) {
                     for (ServiceUnit su : sa.getServiceUnits()) {
@@ -97,7 +98,7 @@ public class WorkspaceTree extends MinWorkspace {
                         }
                     }
                 }
-                comps.add(new ComponentTree(compId, component.getName(), compState, sus));
+                comps.add(new ComponentTree(compId, component.getName(), compState, compType, sus));
             }
             cs.add(new ContainerTree(cId, container.getContainerName(), comps));
         }
@@ -123,7 +124,8 @@ public class WorkspaceTree extends MinWorkspace {
                         for (DbServiceUnit su : buses.getServiceUnitByComponent(comp)) {
                             sus.add(new SUTree(su.id, su.name, SUTree.State.valueOf(su.state)));
                         }
-                        comps.add(new ComponentTree(comp.id, comp.name, ComponentTree.State.valueOf(comp.state), sus));
+                        comps.add(new ComponentTree(comp.id, comp.name, MinComponent.State.valueOf(comp.state),
+                                MinComponent.Type.valueOf(comp.type), sus));
                     }
                     cs.add(new ContainerTree(c.id, c.name, comps));
                 }
@@ -141,14 +143,7 @@ public class WorkspaceTree extends MinWorkspace {
         return new WorkspaceTree(w.id, w.name, importedBus, busInProgress);
     }
 
-    public static class BusTree {
-
-        @Min(1)
-        public final long id;
-
-        @NotEmpty
-        @JsonProperty
-        public final String name;
+    public static class BusTree extends MinBus {
 
         @Valid
         @JsonProperty
@@ -157,25 +152,12 @@ public class WorkspaceTree extends MinWorkspace {
         @JsonCreator
         public BusTree(@JsonProperty("id") long id, @JsonProperty("name") String name,
                 @JsonProperty("containers") List<ContainerTree> containers) {
-            this.id = id;
-            this.name = name;
+            super(id, name);
             this.containers = ImmutableList.copyOf(containers);
-        }
-
-        @JsonProperty
-        public String getId() {
-            return Long.toString(id);
         }
     }
 
-    public static class ContainerTree {
-
-        @Min(1)
-        public final long id;
-
-        @NotEmpty
-        @JsonProperty
-        public final String name;
+    public static class ContainerTree extends MinContainer {
 
         @Valid
         @JsonProperty
@@ -184,111 +166,30 @@ public class WorkspaceTree extends MinWorkspace {
         @JsonCreator
         public ContainerTree(@JsonProperty("id") long id, @JsonProperty("name") String name,
                 @JsonProperty("components") List<ComponentTree> components) {
-            this.id = id;
-            this.name = name;
+            super(id, name);
             this.components = ImmutableList.copyOf(components);
-        }
-
-        @JsonProperty
-        public String getId() {
-            return Long.toString(id);
         }
     }
 
-    public static class ComponentTree {
-
-        public enum State {
-            Loaded, Started, Stopped, Shutdown, Unknown;
-
-            public static State from(ArtifactState.State state) {
-                switch (state) {
-                    case LOADED:
-                        return Loaded;
-                    case STARTED:
-                        return Started;
-                    case STOPPED:
-                        return Stopped;
-                    case SHUTDOWN:
-                        return Shutdown;
-                    case UNKNOWN:
-                        return Unknown;
-                    default:
-                        throw new AssertionError();
-                }
-            }
-        }
-
-        @Min(1)
-        public final long id;
-
-        @NotEmpty
-        @JsonProperty
-        public final String name;
-
-        @NotNull
-        @JsonProperty
-        public final State state;
+    public static class ComponentTree extends MinComponent {
 
         @Valid
         @JsonProperty
         public final ImmutableList<SUTree> serviceUnits;
 
-        public ComponentTree(long id, String name, State state, List<SUTree> serviceUnits) {
-            this.id = id;
-            this.name = name;
-            this.state = state;
+        public ComponentTree(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("state") State state, @JsonProperty("type") Type type,
+                @JsonProperty("serviceUnits") List<SUTree> serviceUnits) {
+            super(id, name, state, type);
             this.serviceUnits = ImmutableList.copyOf(serviceUnits);
-        }
-
-        @JsonProperty
-        public String getId() {
-            return Long.toString(id);
         }
     }
 
-    public static class SUTree {
+    public static class SUTree extends MinServiceUnit {
 
-        public enum State {
-            Loaded, Started, Stopped, Shutdown, Unknown;
-
-            public static State from(ArtifactState.State state) {
-                switch (state) {
-                    case LOADED:
-                        return Loaded;
-                    case STARTED:
-                        return Started;
-                    case STOPPED:
-                        return Stopped;
-                    case SHUTDOWN:
-                        return Shutdown;
-                    case UNKNOWN:
-                        return Unknown;
-                    default:
-                        throw new AssertionError();
-                }
-            }
-        }
-
-        @Min(1)
-        public final long id;
-
-        @NotEmpty
-        @JsonProperty
-        public final String name;
-
-        @NotNull
-        @JsonProperty
-        public final State state;
-
-        public SUTree(long id, String name, State state) {
-            this.id = id;
-            this.name = name;
-            this.state = state;
-        }
-
-        @JsonProperty
-        public String getId() {
-            return Long.toString(id);
+        public SUTree(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("state") State state) {
+            super(id, name, state);
         }
     }
 }

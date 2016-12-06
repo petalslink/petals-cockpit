@@ -69,9 +69,10 @@ public abstract class BusesDAO {
     @Mapper(DbContainer.Mapper.class)
     public abstract DbContainer getContainerById(@Bind("cId") long cId);
 
-    @SqlUpdate("insert into components (container_id,name,state)" + " values (:cId,:n,:s)")
+    @SqlUpdate("insert into components (container_id,name,state,type)" + " values (:cId,:n,:s,:t)")
     @GetGeneratedKeys
-    public abstract long createComponent(@Bind("n") String name, @Bind("s") String state, @Bind("cId") long cId);
+    public abstract long createComponent(@Bind("n") String name, @Bind("s") String state, @Bind("t") String type,
+            @Bind("cId") long cId);
 
     @SqlQuery("select * from components where container_id = :c.id")
     @Mapper(DbComponent.Mapper.class)
@@ -221,10 +222,13 @@ public abstract class BusesDAO {
 
         public final String state;
 
-        public DbComponent(long id, String name, String state) {
+        public final String type;
+
+        public DbComponent(long id, String name, String state, String type) {
             this.id = id;
             this.name = name;
             this.state = state;
+            this.type = type;
         }
 
         public long getId() {
@@ -235,7 +239,7 @@ public abstract class BusesDAO {
 
             @Override
             public DbComponent map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-                return new DbComponent(r.getLong("id"), r.getString("name"), r.getString("state"));
+                return new DbComponent(r.getLong("id"), r.getString("name"), r.getString("state"), r.getString("type"));
 
             }
         }

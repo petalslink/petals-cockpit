@@ -80,7 +80,7 @@ public class BusesResource {
         @Valid
         public BusOverview get(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
                 @Pac4JProfile CockpitProfile profile) throws InterruptedException {
-            return as.call(wsId, new BusActor.GetOverview(profile.getUser().getUsername(), bId))
+            return as.call(wsId, new BusActor.GetBusOverview(profile.getUser().getUsername(), bId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
 
@@ -180,15 +180,33 @@ public class BusesResource {
         }
     }
 
-    public static class BusOverview {
+    public static class MinBus {
+
+        @Min(1)
+        public final long id;
 
         @NotEmpty
         @JsonProperty
         public final String name;
 
         @JsonCreator
-        public BusOverview(@JsonProperty("name") String name) {
+        public MinBus(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+            this.id = id;
             this.name = name;
+        }
+
+        @JsonProperty
+        public String getId() {
+            return Long.toString(id);
+        }
+
+    }
+
+    public static class BusOverview extends MinBus {
+
+        @JsonCreator
+        public BusOverview(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+            super(id, name);
         }
     }
 }
