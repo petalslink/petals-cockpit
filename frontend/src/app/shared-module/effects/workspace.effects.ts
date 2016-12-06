@@ -167,25 +167,25 @@ export class WorkspaceEffects {
 
   // tslint:disable-next-line:member-ordering
   // TODO: This effect needs a review
-  @Effect({dispatch: true}) fetchBusConfig$: Observable<Action> = this.actions$
-    .ofType(WorkspaceActions.FETCH_BUS_CONFIG)
-    .switchMap(action => this.workspaceService.getBusConfig()
-      .map((res: Response) => {
-        if (!res.ok) {
-          throw new Error('Error while getting the bus');
-        }
+  // @Effect({dispatch: true}) fetchBusConfig$: Observable<Action> = this.actions$
+  //   .ofType(WorkspaceActions.FETCH_BUS_CONFIG)
+  //   .switchMap(action => this.workspaceService.getBusConfig()
+  //     .map((res: Response) => {
+  //       if (!res.ok) {
+  //         throw new Error('Error while getting the bus');
+  //       }
 
-        let config: any = res.json();
+  //       let config: any = res.json();
 
-        return { type: WorkspaceActions.FETCH_BUS_CONFIG_SUCCESS, payload: { idBus: action.payload, config } };
-      })
-      .catch((err) => {
-        if (environment.debug) {
-          console.error(err);
-        }
-        return Observable.of({ type: WorkspaceActions.FETCH_BUS_CONFIG_FAILED });
-      })
-    );
+  //       return { type: WorkspaceActions.FETCH_BUS_CONFIG_SUCCESS, payload: { idBus: action.payload, config } };
+  //     })
+  //     .catch((err) => {
+  //       if (environment.debug) {
+  //         console.error(err);
+  //       }
+  //       return Observable.of({ type: WorkspaceActions.FETCH_BUS_CONFIG_FAILED });
+  //     })
+  //   );
 
   // tslint:disable-next-line:member-ordering
   @Effect({dispatch: true}) removeBus$: Observable<Action> = this.actions$
@@ -206,6 +206,25 @@ export class WorkspaceEffects {
           console.error(err);
         }
         return Observable.of({ type: WorkspaceActions.REMOVE_BUS_FAILED });
+      })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: true}) fetchBusDetails$: Observable<Action> = this.actions$
+    .ofType(WorkspaceActions.FETCH_BUS_DETAILS)
+    .switchMap((action: Action) => this.workspaceService.getDetailsBus(action.payload.idWorkspace, action.payload.idBus)
+      .map((res: Response) => {
+        if (!res.ok) {
+          throw new Error('Error while fetching the bus details');
+        }
+
+        return { type: WorkspaceActions.FETCH_BUS_DETAILS_SUCCESS, payload: res.json() };
+      })
+      .catch((err) => {
+        if (environment.debug) {
+          console.error(err);
+        }
+        return Observable.of({ type: WorkspaceActions.FETCH_BUS_DETAILS_FAILED });
       })
     );
 }

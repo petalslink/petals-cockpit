@@ -171,6 +171,49 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     );
   }
 
+  else if (action.type === WorkspaceActions.FETCH_BUS_DETAILS) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'isFetchingDetails'], true);
+  }
+
+  else if (action.type === WorkspaceActions.FETCH_BUS_DETAILS_SUCCESS) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.id);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex],
+      workspaceR
+        .getIn(['buses', busIndex])
+        .merge(
+          fromJS({ isFetchingDetails: false }),
+          fromJS(action.payload)
+        )
+    );
+  }
+
+  else if (action.type === WorkspaceActions.FETCH_BUS_DETAILS_FAILED) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'isFetchingDetails'], false);
+  }
+
   /* FETCH_BUS_CONFIG* */
   else if (action.type === WorkspaceActions.FETCH_BUS_CONFIG) {
     return workspaceR.set('gettingBusConfig', true);

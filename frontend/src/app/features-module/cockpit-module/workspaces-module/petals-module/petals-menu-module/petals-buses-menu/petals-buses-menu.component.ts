@@ -48,6 +48,10 @@ export class BusesMenuComponent {
 
   constructor(private store$: Store<IStore>) { }
 
+  getBusDetails(idBus: string) {
+    this.store$.dispatch({ type: WorkspaceActions.FETCH_BUS_DETAILS, payload: { idWorkspace: this.idWorkspaceSelected, idBus } });
+  }
+
   fold(idBus: string) {
     this.store$.dispatch({ type: WorkspaceActions.TOGGLE_FOLD_BUS, payload: { idBus } });
     return false;
