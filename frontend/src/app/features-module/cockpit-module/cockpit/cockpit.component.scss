@@ -48,14 +48,17 @@ md-sidenav {
   width: 100% !important;
 }
 
-.workspace-name {
-  width: 232px;
-  border-radius: 0;
-}
+.wrapper-workspace-name {
+  display: flex;
 
-.change-workspace {
-  width: 88px;
-  border-radius: 0;
+  .workspace-name {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .change-workspace {
+    border-radius: 0;
+  }
 }
 
 md-progress-circle {
