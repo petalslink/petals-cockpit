@@ -32,9 +32,10 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.cockpit.server.actors.BusActor;
+import org.ow2.petals.cockpit.server.actors.BusActor.GetBusOverview;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -62,7 +63,7 @@ public class BusesResource {
     @Valid
     public BusInProgress addBus(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
             @Valid NewBus nb) throws InterruptedException {
-        return as.call(wsId, new WorkspaceActor.ImportBus(profile.getUser().getUsername(), nb))
+        return as.call(wsId, new ImportBus(profile.getUser().getUsername(), nb))
                 .getOrElseThrow(s -> new WebApplicationException(s));
     }
 
@@ -80,14 +81,14 @@ public class BusesResource {
         @Valid
         public BusOverview get(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
                 @Pac4JProfile CockpitProfile profile) throws InterruptedException {
-            return as.call(wsId, new BusActor.GetBusOverview(profile.getUser().getUsername(), bId))
+            return as.call(wsId, new GetBusOverview(profile.getUser().getUsername(), bId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
 
         @DELETE
         public void delete(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
                 @PathParam("bId") @Min(1) long bId) throws InterruptedException {
-            as.call(wsId, new WorkspaceActor.DeleteBus(profile.getUser().getUsername(), bId))
+            as.call(wsId, new DeleteBus(profile.getUser().getUsername(), bId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
 

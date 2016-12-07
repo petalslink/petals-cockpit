@@ -23,6 +23,8 @@ import java.util.function.Function;
 import javax.ws.rs.core.Response.Status;
 
 import org.ow2.petals.cockpit.server.actors.BusActor.Msg;
+import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
+import org.ow2.petals.cockpit.server.actors.ContainerActor.ForContainerMsg;
 import org.ow2.petals.cockpit.server.actors.ContainerActor.GetContainerOverviewFromBus;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbBus;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
@@ -79,9 +81,9 @@ public class BusActor extends CockpitActor<Msg> {
                 GetBusOverview get = (GetBusOverview) msg;
                 assert get.bId == db.id;
                 RequestReplyHelper.reply(get, Either.right(new BusOverview(db.id, db.name)));
-            } else if (msg instanceof ContainerActor.ForwardedMsg && msg instanceof CockpitActors.Request) {
+            } else if (msg instanceof ForContainerMsg && msg instanceof CockpitRequest) {
                 // requests for container actor
-                forward((CockpitActors.Request<?> & ContainerActor.ForwardedMsg) msg);
+                forward((CockpitRequest<?> & ForContainerMsg) msg);
             } else if (msg instanceof GetContainerOverview) {
                 // this request is a bit specific so we handle it differently
                 GetContainerOverview get = (GetContainerOverview) msg;
@@ -97,12 +99,11 @@ public class BusActor extends CockpitActor<Msg> {
         }
     }
 
-    public <R extends CockpitActors.Request<?> & ContainerActor.ForwardedMsg> void forward(R req)
-            throws SuspendExecution {
+    public <R extends CockpitRequest<?> & ForContainerMsg> void forward(R req) throws SuspendExecution {
         forward(req.getContainerId(), req, m -> m);
     }
 
-    public <R extends CockpitActors.Request<?>> void forward(long id, R req, Function<R, ContainerActor.Msg> f)
+    public <R extends CockpitRequest<?>> void forward(long id, R req, Function<R, ContainerActor.Msg> f)
             throws SuspendExecution {
         @SuppressWarnings("resource")
         ActorRef<ContainerActor.Msg> container = busContainers.get(id);
@@ -117,26 +118,20 @@ public class BusActor extends CockpitActor<Msg> {
         // marker interface for messages to this actor
     }
 
-    public static class BusRequest<T> extends CockpitActors.Request<T> implements Msg {
-
-        private static final long serialVersionUID = -564899978996631515L;
-
-        public BusRequest(String user) {
-            super(user);
-        }
-    }
-
-    public interface ForwardedMsg extends Msg, WorkspaceActor.Msg {
+    /**
+     * Meant to be forwarded to bus by workspace
+     */
+    public interface ForBusMsg extends BusActor.Msg, WorkspaceActor.Msg {
         long getBusId();
     }
 
-    public static class ForwardedBusRequest<T> extends BusRequest<T> implements ForwardedMsg {
+    public static class ForBusRequest<T> extends CockpitRequest<T> implements ForBusMsg {
 
         private static final long serialVersionUID = -564899978996631515L;
 
         final long bId;
 
-        public ForwardedBusRequest(String user, long bId) {
+        public ForBusRequest(String user, long bId) {
             super(user);
             this.bId = bId;
         }
@@ -147,7 +142,7 @@ public class BusActor extends CockpitActor<Msg> {
         }
     }
 
-    public static class GetBusOverview extends ForwardedBusRequest<BusOverview> {
+    public static class GetBusOverview extends ForBusRequest<BusOverview> {
 
         private static final long serialVersionUID = -2520646870000161079L;
 
@@ -156,7 +151,7 @@ public class BusActor extends CockpitActor<Msg> {
         }
     }
 
-    public static class GetContainerOverview extends ForwardedBusRequest<ContainerOverview> {
+    public static class GetContainerOverview extends ForBusRequest<ContainerOverview> {
 
         private static final long serialVersionUID = -2520646870000161079L;
 
@@ -167,5 +162,4 @@ public class BusActor extends CockpitActor<Msg> {
             this.cId = cId;
         }
     }
-
 }

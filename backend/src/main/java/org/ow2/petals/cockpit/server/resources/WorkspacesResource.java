@@ -36,9 +36,12 @@ import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.GetWorkspaceTree;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.resources.BusesResource.BusInError;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -94,10 +97,13 @@ public class WorkspacesResource {
         @Valid
         public WorkspaceTree get(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile)
                 throws InterruptedException {
-            return as.call(wsId, new WorkspaceActor.GetTree(profile.getUser().getUsername()))
+            return as.call(wsId, new GetWorkspaceTree(profile.getUser().getUsername()))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
 
+        /**
+         * Produces {@link WorkspaceEvent}
+         */
         @GET
         @Path("/events")
         @Produces(SseFeature.SERVER_SENT_EVENTS)
@@ -105,7 +111,7 @@ public class WorkspacesResource {
                 throws InterruptedException {
             final EventOutput eo = new EventOutput();
 
-            as.call(wsId, new WorkspaceActor.NewClient(profile.getUser().getUsername(), eo))
+            as.call(wsId, new NewWorkspaceClient(profile.getUser().getUsername(), eo))
                     .getOrElseThrow(s -> new WebApplicationException(s));
 
             return eo;
@@ -152,6 +158,33 @@ public class WorkspacesResource {
         public Workspace(long id, String name, List<String> usedBy) {
             super(id, name);
             this.usedBy = ImmutableList.copyOf(usedBy);
+        }
+    }
+
+    public static class WorkspaceEvent {
+
+        @JsonProperty
+        private final String event;
+
+        @JsonProperty
+        private final Object data;
+
+        public WorkspaceEvent(String event, Object data) {
+            this.event = event;
+            this.data = data;
+        }
+
+        public static WorkspaceEvent error(BusInError bus) {
+            return new WorkspaceEvent("BUS_IMPORT_ERROR", bus);
+        }
+
+        public static WorkspaceEvent ok(BusTree bus) {
+            return new WorkspaceEvent("BUS_IMPORT_OK", bus);
+        }
+
+        @Override
+        public String toString() {
+            return "WorkspaceEvent [event=" + event + ", data=" + data + "]";
         }
     }
 }

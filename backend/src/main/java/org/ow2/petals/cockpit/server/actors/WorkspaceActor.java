@@ -30,6 +30,8 @@ import org.glassfish.jersey.server.BroadcasterListener;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.actors.BusActor.ForBusMsg;
+import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusInError;
@@ -37,10 +39,10 @@ import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.BusesResource.NewBus;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
+import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspaceEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
 import co.paralleluniverse.actors.ActorRef;
@@ -101,8 +103,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         for (;;) {
             Msg msg = receive();
-            if (msg instanceof GetTree) {
-                answer((GetTree) msg, m -> Either.right(tree));
+            if (msg instanceof GetWorkspaceTree) {
+                answer((GetWorkspaceTree) msg, m -> Either.right(tree));
             } else if (msg instanceof ImportBus) {
                 answer((ImportBus) msg, this::handleImportBus);
             } else if (msg instanceof DeleteBus) {
@@ -116,15 +118,15 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                         return Either.right(null);
                     }
                 });
-            } else if (msg instanceof NewClient) {
+            } else if (msg instanceof NewWorkspaceClient) {
                 LOG.debug("New SSE client for workspace {}", db.id);
                 // this one is coming from the SSE resource
-                answer((NewClient) msg, nc -> {
+                answer((NewWorkspaceClient) msg, nc -> {
                     broadcaster.add(nc.output);
                     return Either.right(null);
                 });
-            } else if (msg instanceof BusActor.ForwardedMsg && msg instanceof CockpitActors.Request) {
-                forward((CockpitActors.Request<?> & BusActor.ForwardedMsg) msg);
+            } else if (msg instanceof ForBusMsg && msg instanceof CockpitRequest) {
+                forward((CockpitRequest<?> & ForBusMsg) msg);
             } else {
                 LOG.warn("Unexpected event for workspace {}: {}", db.id, msg);
             }
@@ -135,7 +137,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         return db.users.stream().anyMatch(username::equals);
     }
 
-    public <R extends CockpitActors.Request<?> & BusActor.ForwardedMsg> void forward(R req) throws SuspendExecution {
+    public <R extends CockpitRequest<?> & ForBusMsg> void forward(R req) throws SuspendExecution {
         @SuppressWarnings("resource")
         ActorRef<BusActor.Msg> bus = wsBuses.get(req.getBusId());
         if (!hasAccess(req.user)) {
@@ -147,7 +149,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private <R, T extends CockpitActors.Request<R>> void answer(T r, CheckedFunction1<T, Either<Status, R>> f)
+    private <R, T extends CockpitRequest<R>> void answer(T r, CheckedFunction1<T, Either<Status, R>> f)
             throws SuspendExecution {
         try {
             if (hasAccess(r.user)) {
@@ -219,7 +221,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         // marker interface for messages to this actor
     }
 
-    public static class WorkspaceRequest<T> extends CockpitActors.Request<T> implements Msg {
+    public static class WorkspaceRequest<T> extends CockpitRequest<T> implements Msg {
 
         private static final long serialVersionUID = -564899978996631515L;
 
@@ -228,13 +230,13 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    public static class NewClient extends WorkspaceRequest<@Nullable Void> {
+    public static class NewWorkspaceClient extends WorkspaceRequest<@Nullable Void> {
 
         private static final long serialVersionUID = 1L;
 
         final EventOutput output;
 
-        public NewClient(String user, EventOutput output) {
+        public NewWorkspaceClient(String user, EventOutput output) {
             super(user);
             this.output = output;
         }
@@ -264,39 +266,12 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    public static class GetTree extends WorkspaceRequest<WorkspaceTree> {
+    public static class GetWorkspaceTree extends WorkspaceRequest<WorkspaceTree> {
 
         private static final long serialVersionUID = -2520646870000161079L;
 
-        public GetTree(String user) {
+        public GetWorkspaceTree(String user) {
             super(user);
-        }
-    }
-
-    public static class WorkspaceEvent {
-
-        @JsonProperty
-        private final String event;
-
-        @JsonProperty
-        private final Object data;
-
-        public WorkspaceEvent(String event, Object data) {
-            this.event = event;
-            this.data = data;
-        }
-
-        public static WorkspaceEvent error(BusInError bus) {
-            return new WorkspaceEvent("BUS_IMPORT_ERROR", bus);
-        }
-
-        public static WorkspaceEvent ok(BusTree bus) {
-            return new WorkspaceEvent("BUS_IMPORT_OK", bus);
-        }
-
-        @Override
-        public String toString() {
-            return "WorkspaceEvent [event=" + event + ", data=" + data + "]";
         }
     }
 }

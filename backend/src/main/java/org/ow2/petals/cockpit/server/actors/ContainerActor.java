@@ -23,7 +23,9 @@ import javax.ws.rs.core.Response.Status;
 
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.actors.BusActor.ForBusMsg;
 import org.ow2.petals.cockpit.server.actors.BusActor.GetContainerOverview;
+import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
 import org.ow2.petals.cockpit.server.actors.ContainerActor.Msg;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ComponentOverview;
@@ -117,20 +119,14 @@ public class ContainerActor extends CockpitActor<Msg> {
         // marker interface for messages to this actor
     }
 
-    public static class ContainerRequest<T> extends CockpitActors.Request<T> implements Msg {
-
-        private static final long serialVersionUID = -564899978996631515L;
-
-        public ContainerRequest(String user) {
-            super(user);
-        }
-    }
-
-    public interface ForwardedMsg extends Msg, BusActor.ForwardedMsg, WorkspaceActor.Msg {
+    /**
+     * Meant to be forwarded to container by bus (and before by workspace)
+     */
+    public interface ForContainerMsg extends ContainerActor.Msg, ForBusMsg {
         long getContainerId();
     }
 
-    public static class ForwardedContainerRequest<T> extends ContainerRequest<T> implements ForwardedMsg {
+    public static class ForContainerRequest<T> extends CockpitRequest<T> implements ForContainerMsg {
 
         private static final long serialVersionUID = 308263095400474513L;
 
@@ -138,7 +134,7 @@ public class ContainerActor extends CockpitActor<Msg> {
 
         final long cId;
 
-        public ForwardedContainerRequest(String user, long bId, long cId) {
+        public ForContainerRequest(String user, long bId, long cId) {
             super(user);
             this.bId = bId;
             this.cId = cId;
@@ -155,6 +151,48 @@ public class ContainerActor extends CockpitActor<Msg> {
         }
     }
 
+    public static class ForComponentRequest<T> extends ForContainerRequest<T> {
+
+        private static final long serialVersionUID = -7710132982021451498L;
+
+        final long compId;
+
+        public ForComponentRequest(String user, long bId, long cId, long compId) {
+            super(user, bId, cId);
+            this.compId = compId;
+        }
+    }
+
+    public static class GetComponentOverview extends ForComponentRequest<ComponentOverview> {
+
+        private static final long serialVersionUID = -7710132982021451498L;
+
+        public GetComponentOverview(String user, long bId, long cId, long compId) {
+            super(user, bId, cId, compId);
+        }
+    }
+
+    public static class ForServiceUnitRequest<T> extends ForComponentRequest<T> {
+
+        private static final long serialVersionUID = -9164203963795147371L;
+
+        final long suId;
+
+        public ForServiceUnitRequest(String user, long bId, long cId, long compId, long suId) {
+            super(user, bId, cId, compId);
+            this.suId = suId;
+        }
+    }
+
+    public static class GetServiceUnitOverview extends ForServiceUnitRequest<ServiceUnitOverview> {
+
+        private static final long serialVersionUID = -9164203963795147371L;
+
+        public GetServiceUnitOverview(String user, long bId, long cId, long compId, long suId) {
+            super(user, bId, cId, compId, suId);
+        }
+    }
+
     public static class GetContainerOverviewFromBus implements Msg {
 
         final Map<String, Long> ids;
@@ -164,33 +202,6 @@ public class ContainerActor extends CockpitActor<Msg> {
         public GetContainerOverviewFromBus(GetContainerOverview get, Map<String, Long> ids) {
             this.get = get;
             this.ids = ids;
-        }
-    }
-
-    public static class GetComponentOverview extends ForwardedContainerRequest<ComponentOverview> {
-
-        private static final long serialVersionUID = -7710132982021451498L;
-
-        final long compId;
-
-        public GetComponentOverview(String user, long bId, long cId, long compId) {
-            super(user, bId, cId);
-            this.compId = compId;
-        }
-    }
-
-    public static class GetServiceUnitOverview extends ForwardedContainerRequest<ServiceUnitOverview> {
-
-        private static final long serialVersionUID = -9164203963795147371L;
-
-        final long compId;
-
-        final long suId;
-
-        public GetServiceUnitOverview(String user, long bId, long cId, long compId, long suId) {
-            super(user, bId, cId);
-            this.compId = compId;
-            this.suId = suId;
         }
     }
 }

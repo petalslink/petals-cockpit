@@ -34,9 +34,10 @@ import javax.ws.rs.core.MediaType;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
-import org.ow2.petals.cockpit.server.actors.BusActor;
+import org.ow2.petals.cockpit.server.actors.BusActor.GetContainerOverview;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
-import org.ow2.petals.cockpit.server.actors.ContainerActor;
+import org.ow2.petals.cockpit.server.actors.ContainerActor.GetComponentOverview;
+import org.ow2.petals.cockpit.server.actors.ContainerActor.GetServiceUnitOverview;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -66,7 +67,7 @@ public class ContainersResource {
         @Valid
         public ContainerOverview get(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
                 @PathParam("cId") @Min(1) long cId, @Pac4JProfile CockpitProfile profile) throws InterruptedException {
-            return as.call(wsId, new BusActor.GetContainerOverview(profile.getUser().getUsername(), bId, cId))
+            return as.call(wsId, new GetContainerOverview(profile.getUser().getUsername(), bId, cId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
 
@@ -76,9 +77,7 @@ public class ContainersResource {
         public ComponentOverview getComp(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
                 @PathParam("cId") @Min(1) long cId, @PathParam("compId") @Min(1) long compId,
                 @Pac4JProfile CockpitProfile profile) throws InterruptedException {
-            return as
-                    .call(wsId,
-                            new ContainerActor.GetComponentOverview(profile.getUser().getUsername(), bId, cId, compId))
+            return as.call(wsId, new GetComponentOverview(profile.getUser().getUsername(), bId, cId, compId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
 
@@ -89,8 +88,7 @@ public class ContainersResource {
                 @PathParam("cId") @Min(1) long cId, @PathParam("compId") @Min(1) long compId,
                 @PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile)
                 throws InterruptedException {
-            return as.call(wsId,
-                    new ContainerActor.GetServiceUnitOverview(profile.getUser().getUsername(), bId, cId, compId, suId))
+            return as.call(wsId, new GetServiceUnitOverview(profile.getUser().getUsername(), bId, cId, compId, suId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
     }
@@ -131,8 +129,8 @@ public class ContainersResource {
 
         @JsonCreator
         public ContainerOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("ip") String ip,
-                @JsonProperty("port") int port, @JsonProperty("reachabilities") Map<String, String> reachabilities) {
+                @JsonProperty("ip") String ip, @JsonProperty("port") int port,
+                @JsonProperty("reachabilities") Map<String, String> reachabilities) {
             super(id, name);
             this.ip = ip;
             this.port = port;
