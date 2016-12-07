@@ -34,23 +34,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </md-card>
 
       <!-- do not separate the buttons otherwise there's a space between them -->
-      <button
-        class="workspace-name"
-        md-raised-button
-        *ngIf="workspace.name"
-        color="accent"
-        [routerLink]="['workspaces', workspace.id, 'petals']"
-      >
-        {{ workspace.name }}
-      </button><button
-        class="change-workspace"
-        md-raised-button
-        *ngIf="workspace.name"
-        color="accent"
-        [routerLink]="['workspaces', (workspace && workspace.id ? workspace.id : '' )]"
-      >
-        <md-icon>view_list</md-icon>
-      </button>
+      <div class="wrapper-workspace-name">
+        <button
+          class="workspace-name"
+          md-raised-button
+          *ngIf="workspace.name"
+          color="accent"
+          [routerLink]="['workspaces', workspace.id, 'petals']"
+        >
+          {{ workspace.name }}
+        </button><button
+          class="change-workspace"
+          md-raised-button
+          *ngIf="workspace.name"
+          color="accent"
+          [routerLink]="['workspaces', (workspace && workspace.id ? workspace.id : '' )]"
+        >
+          <md-icon>view_list</md-icon>
+        </button>
+      </div>
 
       <div *ngIf="!workspace.id" class="info no-workspace-selected">
         No workspace selected<br>
