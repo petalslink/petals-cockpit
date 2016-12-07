@@ -373,6 +373,22 @@ describe(`Workspaces`, () => {
     expect(listWithoutIcons).toEqual(availableBusesFiltered);
   });
 
+  it(`should select a bus and display a content page with the bus name as title + 2 tabs`, () => {
+    // check the title
+    element.all(by.css(`app-buses-menu md-nav-list .md-list-item`)).get(0).click();
+
+    let textWithoutIcons = element(by.css(`.md-sidenav-content md-toolbar`))
+      .getText()
+      .then((txt: string) => {
+        return txt
+          .split(`\n`)
+          .filter((t: string) => t !== 'more_vert')
+          .join()
+      });
+
+    expect(textWithoutIcons).toEqual(`Bus 0`);
+  });
+
   it(`should create a new workspace and this workspace shouldn't have any bus`, () => {
     element(by.css(`button.change-workspace`)).click();
 
