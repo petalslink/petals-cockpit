@@ -171,6 +171,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     );
   }
 
+  /* FETCH_BUS_DETAILS* */
   else if (action.type === WorkspaceActions.FETCH_BUS_DETAILS) {
     let busIndex = workspaceR
       .get('buses')
@@ -186,6 +187,8 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
   else if (action.type === WorkspaceActions.FETCH_BUS_DETAILS_SUCCESS) {
     let busIndex = workspaceR
       .get('buses')
+      // here we use action.payload.id instead of idBus because
+      // the payload's coming from the server
       .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.id);
 
     if (busIndex === -1) {
