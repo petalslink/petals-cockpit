@@ -55,7 +55,10 @@ describe(`Workspaces`, () => {
     element.all(by.css(`.page-workspaces div.md-list-item`)).get(0).click();
 
     // check that url is set to Petals by default
-    expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}/petals$`));
+    expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
+
+    // check that the page displayed has a title with the workspace name
+    expect(element.all(by.css(`app-workspace md-toolbar md-toolbar-row > span`)).get(0).getText()).toEqual(`Workspace 0`);
 
     // check that there's no warning saying no bus ...
     expect(element(by.css(`md-sidenav .info.no-bus`)).isPresent()).toBe(false);
@@ -405,7 +408,7 @@ describe(`Workspaces`, () => {
     // this is not really accurate as we do not test the ID in particular
     // TODO: find a way to know the IDs on mock and also IDs from real server
     expect(browser.getCurrentUrl())
-      .toMatch(new RegExp(`/cockpit/workspaces/${reId}/petals$`));
+      .toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
 
     // check there's a warning saying no buses available
     expect(element(by.css(`md-sidenav .info.no-bus`)).getText())
