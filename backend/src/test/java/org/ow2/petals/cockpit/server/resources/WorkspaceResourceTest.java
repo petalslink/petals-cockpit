@@ -273,8 +273,8 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         assertThat(get.ip).isEqualTo(container2.getHost());
         assertThat(get.port).isEqualTo(containerPort);
         assertThat(get.reachabilities).containsOnly(
-                MapEntry.entry(container1.getContainerName(), container1.getState().toString()),
-                MapEntry.entry(container3.getContainerName(), container3.getState().toString()));
+                MapEntry.entry("20", container1.getState().name()),
+                MapEntry.entry("22", container3.getState().name()));
     }
 
     @Test

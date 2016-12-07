@@ -124,19 +124,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                     return Either.right(null);
                 });
             } else if (msg instanceof BusActor.ForwardedMsg && msg instanceof CockpitActors.Request) {
-                // forward requests to the adequate bus
-                BusActor.ForwardedMsg bMsg = (BusActor.ForwardedMsg) msg;
-                CockpitActors.Request<?> bReq = (CockpitActors.Request<?>) msg;
-                @SuppressWarnings("resource")
-                ActorRef<BusActor.Msg> bus = wsBuses.get(bMsg.getBusId());
-                // TODO factorise with answer?
-                if (!hasAccess(bReq.user)) {
-                    RequestReplyHelper.reply(bReq, Either.left(Status.FORBIDDEN));
-                } else if (bus == null) {
-                    RequestReplyHelper.reply(bReq, Either.left(Status.NOT_FOUND));
-                } else {
-                    bus.send(bMsg);
-                }
+                forward((CockpitActors.Request<?> & BusActor.ForwardedMsg) msg);
             } else {
                 LOG.warn("Unexpected event for workspace {}: {}", db.id, msg);
             }
@@ -145,6 +133,18 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
     private boolean hasAccess(String username) {
         return db.users.stream().anyMatch(username::equals);
+    }
+
+    public <R extends CockpitActors.Request<?> & BusActor.ForwardedMsg> void forward(R req) throws SuspendExecution {
+        @SuppressWarnings("resource")
+        ActorRef<BusActor.Msg> bus = wsBuses.get(req.getBusId());
+        if (!hasAccess(req.user)) {
+            RequestReplyHelper.reply(req, Either.left(Status.FORBIDDEN));
+        } else if (bus == null) {
+            RequestReplyHelper.reply(req, Either.left(Status.NOT_FOUND));
+        } else {
+            bus.send(req);
+        }
     }
 
     private <R, T extends CockpitActors.Request<R>> void answer(T r, CheckedFunction1<T, Either<Status, R>> f)
