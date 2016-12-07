@@ -107,7 +107,7 @@ export class WorkspaceEffects {
         this.sseServiceSub.unsubscribe();
       }
 
-      this.router.navigate(['/cockpit', 'workspaces', action.payload.id, 'petals']);
+      this.router.navigate(['/cockpit', 'workspaces', action.payload.id]);
 
       let sseServiceObs: Observable<Action> =
         this.sseService.subscribeToMessage(action.payload.id)

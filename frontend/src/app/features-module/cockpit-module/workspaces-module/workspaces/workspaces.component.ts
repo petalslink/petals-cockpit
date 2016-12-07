@@ -59,9 +59,7 @@ export class WorkspacesComponent implements OnDestroy {
 
   @ViewChild('nameInput') nameInput: MdInput;
 
-  constructor(
-    private store$: Store<IStore>
-  ) {
+  constructor(private store$: Store<IStore>) {
     this.minimalWorkspacesSub =
       store$.select('minimalWorkspaces')
       .map((minimalWorkspacesR: IMinimalWorkspacesRecord) => minimalWorkspacesR.toJS())
