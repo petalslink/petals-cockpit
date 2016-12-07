@@ -16,7 +16,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div class="select-tab-bus">
   <md-toolbar color="primary">
     <span>
-      Petals
+      <span *ngIf="busInImport">
+        Importing bus with IP : "{{ bus.ip }}"
+      </span>
+
+      <span *ngIf="!busInImport">
+        {{ bus?.name }}
+      </span>
     </span>
 
     <span class="flex-space"></span>

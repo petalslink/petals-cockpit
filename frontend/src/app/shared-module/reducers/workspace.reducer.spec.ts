@@ -433,6 +433,138 @@ describe(`Workspace Reducer`, () => {
     expect(nextState.busesInProgress).toEqual(jasmine.objectContaining(expectedState));
   });
 
+  // FETCH_BUS_DETAILS*
+  it(`${WorkspaceActions.FETCH_BUS_DETAILS}`, () => {
+    let stateRWithBus = stateR.update('buses', buses => fromJS([
+      { id: 'idBus1' },
+      { id: 'idBus2' },
+      { id: 'idBus3' }
+    ]));
+
+    // try to fetch details of a non existant bus
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(
+      stateRWithBus,
+      {
+        type: WorkspaceActions.FETCH_BUS_DETAILS,
+        payload: { idBus: 'randomId' }
+      }
+    );
+
+    expect(stateRWithBus).toEqual(nextStateR1);
+
+    // try to fetch details of an existing bus
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(
+      stateR.update('buses', buses => fromJS([
+        { id: 'idBus1', isFetchingDetails: false },
+        { id: 'idBus2', isFetchingDetails: false },
+        { id: 'idBus3', isFetchingDetails: false }
+      ])),
+      {
+        type: WorkspaceActions.FETCH_BUS_DETAILS,
+        payload: { idBus: 'idBus2' }
+      }
+    );
+    let nextState2 = nextStateR2.toJS();
+
+    let expectedState2 = [
+        { id: 'idBus1', isFetchingDetails: false },
+        { id: 'idBus2', isFetchingDetails: true },
+        { id: 'idBus3', isFetchingDetails: false }
+    ];
+
+    expect(nextState2.buses).toEqual(jasmine.objectContaining(expectedState2));
+  });
+
+  it(`${WorkspaceActions.FETCH_BUS_DETAILS_SUCCESS}`, () => {
+    let stateRWithBus = stateR.update('buses', buses => fromJS([
+      { id: 'idBus1', isFetchingDetails: true },
+      { id: 'idBus2', isFetchingDetails: true },
+      { id: 'idBus3', isFetchingDetails: true }
+    ]));
+
+    // try set details of a non existant bus
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(
+      stateRWithBus,
+      {
+        type: WorkspaceActions.FETCH_BUS_DETAILS_SUCCESS,
+        // as we want to fetch every details (that may changes),
+        // we apply a merge. It means that we can pass any key: value and
+        // it'll be added to the bus
+        payload: { id: 'randomId' }
+      }
+    );
+
+    expect(stateRWithBus).toEqual(nextStateR1);
+
+    // try set details of an existing bus
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(
+      stateR.update('buses', buses => fromJS([
+        { id: 'idBus1', isFetchingDetails: true },
+        { id: 'idBus2', isFetchingDetails: true },
+        { id: 'idBus3', isFetchingDetails: true }
+      ])),
+      {
+        type: WorkspaceActions.FETCH_BUS_DETAILS_SUCCESS,
+        payload: {
+          id: 'idBus2',
+          randomValue1: 'random value 1',
+          randomValue2: 'random value 2'
+        }
+      }
+    );
+    let nextState2 = nextStateR2.toJS();
+
+    let expectedState2 = [
+        { id: 'idBus1', isFetchingDetails: true },
+        { id: 'idBus2', isFetchingDetails: false, randomValue1: 'random value 1', randomValue2: 'random value 2' },
+        { id: 'idBus3', isFetchingDetails: true }
+    ];
+
+    expect(nextState2.buses).toEqual(jasmine.objectContaining(expectedState2));
+  });
+
+  it(`${WorkspaceActions.FETCH_BUS_DETAILS_FAILED}`, () => {
+    let stateRWithBus = stateR.update('buses', buses => fromJS([
+      { id: 'idBus1' },
+      { id: 'idBus2' },
+      { id: 'idBus3' }
+    ]));
+
+    // on non existing bus
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(
+      stateRWithBus,
+      {
+        type: WorkspaceActions.FETCH_BUS_DETAILS_FAILED,
+        payload: { idBus: 'randomId' }
+      }
+    );
+
+    expect(stateRWithBus).toEqual(nextStateR1);
+
+    // on an existing bus
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(
+      stateR.update('buses', buses => fromJS([
+        { id: 'idBus1', isFetchingDetails: true },
+        { id: 'idBus2', isFetchingDetails: true },
+        { id: 'idBus3', isFetchingDetails: true }
+      ])),
+      {
+        type: WorkspaceActions.FETCH_BUS_DETAILS_FAILED,
+        payload: { idBus: 'idBus2' }
+      }
+    );
+    let nextState2 = nextStateR2.toJS();
+
+    let expectedState2 = [
+        { id: 'idBus1', isFetchingDetails: true },
+        { id: 'idBus2', isFetchingDetails: false },
+        { id: 'idBus3', isFetchingDetails: true }
+    ];
+
+    expect(nextState2.buses).toEqual(jasmine.objectContaining(expectedState2));
+  });
+
+  // FETCH_BUS_CONFIG*
   xit(`${WorkspaceActions.FETCH_BUS_CONFIG}`, () => {
     // TODO
   });
@@ -449,7 +581,7 @@ describe(`Workspace Reducer`, () => {
     // TODO
   });
 
-  /* (UN)FOLD_BUS */
+  // (UN)FOLD_BUS
   it(`${WorkspaceActions.FOLD_BUS}`, () => {
     // 1
     let stateRWithBuses = stateR.set('buses', fromJS([
@@ -561,7 +693,7 @@ describe(`Workspace Reducer`, () => {
     expect(nextState2).toEqual(nextStateR3.toJS());
   });
 
-  /* (UN)FOLD_CONTAINER */
+  // (UN)FOLD_CONTAINER
   it(`${WorkspaceActions.FOLD_CONTAINER}`, () => {
     // 1
     let stateRWithBuses = stateR.set('buses', fromJS([
@@ -722,7 +854,7 @@ describe(`Workspace Reducer`, () => {
     expect(nextState2).toEqual(nextStateR3.toJS());
   });
 
-  /* (UN)FOLD_COMPONENT */
+  // (UN)FOLD_COMPONENT
   it(`${WorkspaceActions.FOLD_COMPONENT}`, () => {
     // 1
     let stateRWithBuses = stateR.set('buses', fromJS([
@@ -932,7 +1064,7 @@ describe(`Workspace Reducer`, () => {
     expect(nextState2).toEqual(nextStateR3.toJS());
   });
 
-  /* (UN)FOLD_COMPONENT */
+  // (UN)FOLD_COMPONENT
   it(`${UserActions.USR_IS_DISCONNECTED}`, () => {
     let nextStateR: IWorkspaceRecord = WorkspaceReducer(stateR, { type: UserActions.USR_IS_DISCONNECTED });
     let nextState = nextStateR.toJS();

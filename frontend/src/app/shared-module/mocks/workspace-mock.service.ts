@@ -157,25 +157,28 @@ export class WorkspaceMockService {
       .delay(environment.httpDelay);
   }
 
-  getBusConfig(): Observable<Response> {
-    return this.http.get('mocks-json/bus0-demo.json')
-      .map((res: Response) => res.json())
-      .delay(environment.httpDelay)
-      .map(config => {
-        return <Response> {
-          ok: true,
-          json: () => {
-            return config;
-          }
-        };
-      });
-  }
-
   removeBus(idWorkspace: string, idBus: string): Observable<Response> {
     let response = <Response>{
       ok: true,
       json: () => {
         return {};
+      }
+    };
+
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
+  }
+
+  getDetailsBus(idWorkspace: string, idBus: string) {
+    let response = <Response>{
+      ok: true,
+      json: () => {
+        return {
+          // as we use merge in the reducer,
+          // whatever is added here will be added to the bus
+          id: idBus
+        };
       }
     };
 

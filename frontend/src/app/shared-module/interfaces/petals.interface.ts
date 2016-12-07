@@ -22,6 +22,7 @@ import { IBusConfig } from './bus-config.interface';
 export interface IServiceUnit {
   id: string;
   name: string;
+  state: string;
 
   // UI
   // is the service unit folded into petals menu ?
@@ -33,6 +34,8 @@ export interface IServiceUnitRecord extends TypedRecord<IServiceUnitRecord>, ISe
 export interface IComponent {
   id: string;
   name: string;
+  state: string;
+  type: string;
   serviceUnits: Array<IServiceUnit>;
   selectedServiceUnitId: number;
 
@@ -49,6 +52,10 @@ export interface IContainer {
   components: Array<IComponent>;
   selectedComponentId: number;
 
+  // overview view
+  ip: string;
+  port: number;
+
   // UI
   // is the container folded into petals menu ?
   isFolded: boolean;
@@ -59,10 +66,8 @@ export interface IContainerRecord extends TypedRecord<IContainerRecord>, IContai
 export interface IBus {
   id: string;
   name: string;
-  state: string;
   config: IBusConfig;
   containers: Array<IContainer>;
-  selectedContainerId: number;
   importError: string;
 
   // UI
@@ -70,6 +75,7 @@ export interface IBus {
   removing: boolean;
   // is the bus folded into petals menu ?
   isFolded: boolean;
+  isFetchingDetails: boolean;
 }
 
 export interface IBusRecord extends TypedRecord<IBusRecord>, IBus { };

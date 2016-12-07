@@ -13,6 +13,19 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
+<md-card class="central-content list-element" *ngIf="bus">
+  <md-card-title align="center">
+    <span *ngIf="bus.isFetchingDetails">Bus content : Fetching</span>
+    <span *ngIf="!bus.isFetchingDetails">Bus content : Fetched</span>
+  </md-card-title>
+
+  <md-card-content>
+    <p>Bus ID : {{ bus.id }}</p>
+    <p>Bus name : {{ bus.name }}</p>
+  </md-card-content>
+</md-card>
+
+<!-- config is temporarily disabled -->
 <div class="bkg-primary-card" *ngIf="bus && bus.config">
   <md-card class="central-content list-element">
     <md-card-content>

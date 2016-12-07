@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
     <a
       md-list-item
+      (click)="getBusDetails(bus.id)"
       [routerLink]="['/', 'cockpit', 'workspaces', idWorkspaceSelected, 'petals', 'bus', bus.id]"
       class="bus"
       [class.color-primary-bold]="bus.id === idBusSelected"
