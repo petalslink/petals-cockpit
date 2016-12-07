@@ -18,13 +18,16 @@ package org.ow2.petals.cockpit.server.actors;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import javax.ws.rs.core.Response.Status;
 
 import org.ow2.petals.cockpit.server.actors.BusActor.Msg;
+import org.ow2.petals.cockpit.server.actors.ContainerActor.GetContainerOverviewFromBus;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbBus;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusOverview;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
 import org.slf4j.Logger;
@@ -33,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.SuspendExecution;
+import javaslang.Tuple;
 import javaslang.control.Either;
 
 public class BusActor extends CockpitActor<Msg> {
@@ -61,7 +65,7 @@ public class BusActor extends CockpitActor<Msg> {
 
         DbBus b = runDAO(() -> buses.getBusById(tree.id));
 
-        assert b instanceof DbBusImported;
+        assert b instanceof DbBusImported : tree.id;
 
         db = (DbBusImported) b;
 
@@ -76,19 +80,36 @@ public class BusActor extends CockpitActor<Msg> {
                 assert get.bId == db.id;
                 RequestReplyHelper.reply(get, Either.right(new BusOverview(db.id, db.name)));
             } else if (msg instanceof ContainerActor.ForwardedMsg && msg instanceof CockpitActors.Request) {
-                // forward requests to the adequate bus
-                ContainerActor.ForwardedMsg bMsg = (ContainerActor.ForwardedMsg) msg;
-                CockpitActors.Request<?> bReq = (CockpitActors.Request<?>) msg;
-                @SuppressWarnings("resource")
-                ActorRef<ContainerActor.Msg> container = busContainers.get(bMsg.getContainerId());
-                if (container == null) {
-                    RequestReplyHelper.reply(bReq, Either.left(Status.NOT_FOUND));
-                } else {
-                    container.send(bMsg);
-                }
+                // requests for container actor
+                forward((CockpitActors.Request<?> & ContainerActor.ForwardedMsg) msg);
+            } else if (msg instanceof GetContainerOverview) {
+                // this request is a bit specific so we handle it differently
+                GetContainerOverview get = (GetContainerOverview) msg;
+                // the container needs that information
+                forward(get.cId, get, r -> {
+                    Map<String, Long> ids = javaslang.collection.List.ofAll(tree.containers)
+                            .toJavaMap(c -> Tuple.of(c.name, c.id));
+                    return new GetContainerOverviewFromBus(r, ids);
+                });
             } else {
                 LOG.warn("Unexpected event for bus {}: {}", db.id, msg);
             }
+        }
+    }
+
+    public <R extends CockpitActors.Request<?> & ContainerActor.ForwardedMsg> void forward(R req)
+            throws SuspendExecution {
+        forward(req.getContainerId(), req, m -> m);
+    }
+
+    public <R extends CockpitActors.Request<?>> void forward(long id, R req, Function<R, ContainerActor.Msg> f)
+            throws SuspendExecution {
+        @SuppressWarnings("resource")
+        ActorRef<ContainerActor.Msg> container = busContainers.get(id);
+        if (container == null) {
+            RequestReplyHelper.reply(req, Either.left(Status.NOT_FOUND));
+        } else {
+            container.send(f.apply(req));
         }
     }
 
@@ -132,6 +153,18 @@ public class BusActor extends CockpitActor<Msg> {
 
         public GetBusOverview(String user, long bId) {
             super(user, bId);
+        }
+    }
+
+    public static class GetContainerOverview extends ForwardedBusRequest<ContainerOverview> {
+
+        private static final long serialVersionUID = -2520646870000161079L;
+
+        final long cId;
+
+        public GetContainerOverview(String user, long bId, long cId) {
+            super(user, bId);
+            this.cId = cId;
         }
     }
 

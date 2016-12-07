@@ -34,6 +34,7 @@ import javax.ws.rs.core.MediaType;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
+import org.ow2.petals.cockpit.server.actors.BusActor;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.ContainerActor;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
@@ -65,7 +66,7 @@ public class ContainersResource {
         @Valid
         public ContainerOverview get(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
                 @PathParam("cId") @Min(1) long cId, @Pac4JProfile CockpitProfile profile) throws InterruptedException {
-            return as.call(wsId, new ContainerActor.GetContainerOverview(profile.getUser().getUsername(), bId, cId))
+            return as.call(wsId, new BusActor.GetContainerOverview(profile.getUser().getUsername(), bId, cId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
 

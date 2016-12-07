@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.actors.BusActor.GetContainerOverview;
 import org.ow2.petals.cockpit.server.actors.ContainerActor.Msg;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ComponentOverview;
@@ -71,18 +72,22 @@ public class ContainerActor extends CockpitActor<Msg> {
 
         for (;;) {
             Msg msg = receive();
-            if (msg instanceof GetContainerOverview) {
-                GetContainerOverview get = (GetContainerOverview) msg;
-                assert get.cId == db.id;
+            if (msg instanceof GetContainerOverviewFromBus) {
+                GetContainerOverviewFromBus get = (GetContainerOverviewFromBus) msg;
+                assert get.get.cId == db.id;
                 try {
                     final Domain topology = getTopology(db.ip, db.port, db.username, db.password, Option.none());
                     Map<String, String> reachabilities = javaslang.collection.List.ofAll(topology.getContainers())
+                            // remove myself
                             .filter(c -> !Objects.equals(db.name, c.getContainerName()))
-                            .toJavaMap(c -> Tuple.of(c.getContainerName(), c.getState().toString()));
-                    RequestReplyHelper.reply(get,
+                            // get the ids (if they exist) TODO what do I do with unknown container names?
+                            .flatMap(c -> Option.of(get.ids.get(c.getContainerName())).map(i -> Tuple.of(i, c)))
+                            // transform to a reachability information
+                            .toJavaMap(p -> p.map((i, c) -> Tuple.of(Long.toString(i), c.getState().name())));
+                    RequestReplyHelper.reply(get.get,
                             Either.right(new ContainerOverview(db.id, db.name, db.ip, db.port, reachabilities)));
                 } catch (ContainerAdministrationException e) {
-                    RequestReplyHelper.replyError(get, e);
+                    RequestReplyHelper.replyError(get.get, e);
                 }
             } else if (msg instanceof GetComponentOverview) {
                 GetComponentOverview get = (GetComponentOverview) msg;
@@ -150,12 +155,15 @@ public class ContainerActor extends CockpitActor<Msg> {
         }
     }
 
-    public static class GetContainerOverview extends ForwardedContainerRequest<ContainerOverview> {
+    public static class GetContainerOverviewFromBus implements Msg {
 
-        private static final long serialVersionUID = -2520646870000161079L;
+        final Map<String, Long> ids;
 
-        public GetContainerOverview(String user, long bId, long cId) {
-            super(user, bId, cId);
+        final GetContainerOverview get;
+
+        public GetContainerOverviewFromBus(GetContainerOverview get, Map<String, Long> ids) {
+            this.get = get;
+            this.ids = ids;
         }
     }
 
