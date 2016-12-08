@@ -7,6 +7,7 @@ module.exports = function (config) {
     frameworks: ['jasmine', 'angular-cli'],
     plugins: [
       require('karma-jasmine'),
+      require('karma-jasmine-diff-reporter'),
       require('karma-chrome-launcher'),
       require('karma-remap-istanbul'),
       require('angular-cli/plugins/karma')
@@ -31,8 +32,11 @@ module.exports = function (config) {
       environment: 'dev'
     },
     reporters: config.angularCli && config.angularCli.codeCoverage
-              ? ['progress', 'karma-remap-istanbul']
-              : ['progress'],
+              ? ['jasmine-diff', 'progress', 'karma-remap-istanbul']
+              : ['jasmine-diff', 'progress'],
+    jasmineDiffReporter: {
+      pretty: true
+    },
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,

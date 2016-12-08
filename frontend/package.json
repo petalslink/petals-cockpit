@@ -50,6 +50,7 @@
     "karma-chrome-launcher": "2.0.0",
     "karma-cli": "1.0.1",
     "karma-jasmine": "1.0.2",
+    "karma-jasmine-diff-reporter": "0.6.3",
     "karma-remap-istanbul": "0.2.1",
     "ngrx-store-freeze": "0.1.4",
     "protractor": "4.0.11",
