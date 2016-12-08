@@ -56,4 +56,8 @@ export class WorkspaceService {
   getDetailsBus(idWorkspace: string, idBus: string) {
     return this.http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${idBus}`);
   }
+
+  getDetailsContainer(idWorkspace: string, idBus: string, idContainer: string) {
+    return this.http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${idBus}/containers/${idContainer}`);
+  }
 }

@@ -15,13 +15,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component } from '@angular/core';
+// angular modules
+import { Component, OnDestroy } from '@angular/core';
+
+// rxjs
+import { Subscription } from 'rxjs';
+
+// ngrx
+import { Store } from '@ngrx/store';
+
+// our interfaces
+import { IStore } from './../../../../../../shared-module/interfaces/store.interface';
+import { IContainer } from './../../../../../../shared-module/interfaces/petals.interface';
+import { IWorkspace, IWorkspaceRecord } from './../../../../../../shared-module/interfaces/workspace.interface';
+import { IContainerRecord } from './../../../../../../shared-module/interfaces/petals.interface';
+
+// our selectors
+import { getCurrentContainer } from './../../../../../../shared-module/reducers/workspace.reducer';
 
 @Component({
   selector: 'app-petals-container-content',
   templateUrl: './petals-container-content.component.html',
   styleUrls: ['./petals-container-content.component.scss']
 })
-export class PetalsContainerContentComponent {
-  constructor() { }
+export class PetalsContainerContentComponent implements OnDestroy {
+  public workspace: IWorkspace;
+  private workspaceSub: Subscription;
+
+  public container: IContainer;
+  private containerSub: Subscription;
+
+  constructor(private store$: Store<IStore>) {
+    this.workspaceSub =
+      store$.select('workspace')
+        .map((workspaceR: IWorkspaceRecord) => workspaceR.toJS())
+        .subscribe((workspace: IWorkspace) => this.workspace = workspace);
+
+    this.containerSub = store$
+      .let(getCurrentContainer())
+      .map((containerR: IContainerRecord) => containerR.toJS())
+      .subscribe((container: IContainer) => {
+        this.container = container;
+      });
+  }
+
+  ngOnDestroy() {
+    this.workspaceSub.unsubscribe();
+    this.containerSub.unsubscribe();
+  }
 }

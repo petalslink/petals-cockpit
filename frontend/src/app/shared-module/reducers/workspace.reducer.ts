@@ -144,9 +144,9 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
 
     return workspaceR
       .setIn(['busesInProgress', busIndex],
-        workspaceR
-          .getIn(['busesInProgress', busIndex])
-          .set('importError', action.payload.importError)
+      workspaceR
+        .getIn(['busesInProgress', busIndex])
+        .set('importError', action.payload.importError)
       );
   }
 
@@ -199,8 +199,8 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
       workspaceR
         .getIn(['buses', busIndex])
         .merge(
-          fromJS({ isFetchingDetails: false }),
-          fromJS(action.payload)
+        fromJS({ isFetchingDetails: false }),
+        fromJS(action.payload)
         )
     );
   }
@@ -215,6 +215,78 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     }
 
     return workspaceR.setIn(['buses', busIndex, 'isFetchingDetails'], false);
+  }
+
+  /* FETCH_CONTAINER_DETAILS* */
+  else if (action.type === WorkspaceActions.FETCH_CONTAINER_DETAILS) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((containers: IContainerRecord) => containers.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex, 'isFetchingDetails'], true);
+  }
+
+  else if (action.type === WorkspaceActions.FETCH_CONTAINER_DETAILS_SUCCESS) {
+    let busIndex = workspaceR
+      .get('buses')
+      // here we use action.payload.id instead of idBus because
+      // the payload's coming from the server
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.bus.id);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      // here we use action.payload.id instead of idBus because
+      // the payload's coming from the server
+      .findIndex((containers: IContainerRecord) => containers.get('id') === action.payload.bus.container.id);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex],
+      workspaceR
+        .getIn(['buses', busIndex, 'containers', containerIndex])
+        .merge(
+          fromJS({ isFetchingDetails: false }),
+          fromJS(action.payload.bus.container)
+        )
+    );
+  }
+
+  else if (action.type === WorkspaceActions.FETCH_CONTAINER_DETAILS_FAILED) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((containers: IContainerRecord) => containers.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex, 'isFetchingDetails'], false);
   }
 
   /* FETCH_BUS_CONFIG* */
@@ -499,23 +571,82 @@ export function getSearchedWorkspace() {
   return (store$: Store<IStore>): Observable<IWorkspaceRecord> => {
     return store$
       .select('workspace')
-      .map((workspace: IWorkspaceRecord) => {
-        let searchPetals: string = workspace.get('searchPetals');
+      .map((workspaceR: IWorkspaceRecord) => {
+        let searchPetals: string = workspaceR.get('searchPetals');
 
         if (typeof searchPetals === 'undefined' || searchPetals.trim() === '') {
-          return workspace;
+          return workspaceR;
         }
 
         searchPetals = escapeStringRegexp(searchPetals);
 
-        let nb = workspace
+        let nb = workspaceR
           .get('buses')
           .map(e => filterElement(searchPetals, e))
           .filterNot(e => (e === null))
           .toList();
 
-        return workspace.set('buses', nb);
+        return workspaceR.set('buses', nb);
+      });
+  };
+};
+
+export function getCurrentContainer() {
+  return (store$: Store<IStore>): Observable<IContainerRecord> => {
+    return store$.let(getContainerById());
+  };
+};
+
+export function getContainerById(idContainer?: string) {
+  return (store$: Store<IStore>): Observable<IContainerRecord> => {
+    return store$
+      .select('workspace')
+      .filter((workspaceR: IWorkspaceRecord) => workspaceR.get('selectedBusId') !== null)
+      .filter((workspaceR: IWorkspaceRecord) => {
+        let selectedBusId = workspaceR.get('selectedBusId');
+
+        let busIndex = workspaceR
+          .get('buses')
+          .findIndex((buses: IBusRecord) => buses.get('id') === selectedBusId);
+
+
+        return busIndex !== -1;
+      })
+      .map((workspaceR: IWorkspaceRecord) => {
+        if (typeof idContainer === 'undefined' || idContainer === null) {
+          let selectedContainerId = workspaceR.get('selectedContainerId');
+          return [workspaceR, selectedContainerId];
+        }
+
+        return [workspaceR, idContainer];
+      })
+      /* tslint:disable:no-unused-variable */
+      .filter(([workspaceR, idContainerTmp]: [IWorkspaceRecord, string]) => idContainerTmp !== null)
+      /* tslint:enable:no-unused-variable */
+      .map(([workspaceR, idContainerTmp]: [IWorkspaceRecord, string]) => {
+        let selectedBusId = workspaceR.get('selectedBusId');
+
+        let busIndex = workspaceR
+          .get('buses')
+          .findIndex((buses: IBusRecord) => buses.get('id') === selectedBusId);
+
+        let containersR = workspaceR.getIn(['buses', busIndex, 'containers']);
+
+        return [containersR, idContainerTmp];
+      })
+      .map(([containersR, idContainerTmp]: [List<IContainerRecord>, number]) => {
+        return containersR
+          .find((containerR: IContainerRecord) => containerR.get('id') === idContainerTmp);
       });
   };
 }
 
+// export function getCurrentContainer() {
+//   // : Observable<IContainerRecord>
+//   return (source$: Store<IStore>) => {
+//     return source$
+//       .select('workspace')
+//       .filter((workspaceR: IWorkspaceRecord) => workspaceR.get('selectedContainerId') !== null)
+//       .switchMap((workspaceR: IWorkspaceRecord) => getContainerById(<string>workspaceR.get('selectedContainerId')));
+//   };
+// };

@@ -17,12 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <md-nav-list class="containers-menu-component" *ngFor="let container of containers">
 
     <a md-list-item
-       [routerLink]="['/', 'cockpit',
-         'workspaces', idWorkspaceSelected,
-         'petals', 'bus', idBus,
-         'container', container.id]"
-       class="container"
-       [class.color-primary-bold]="container.id === idContainerSelected"
+      (click)="getContainerDetails(container.id)"
+      [routerLink]="['/', 'cockpit',
+        'workspaces', idWorkspaceSelected,
+        'petals', 'bus', idBus,
+        'container', container.id]"
+      class="container"
+      [class.color-primary-bold]="container.id === idContainerSelected"
     >
       <md-icon (click)="fold(idBus, container.id)" [class.rotate-minus-90]="container.isFolded">arrow_drop_down</md-icon>
       <span appColorSearchedLetters [search]="search" [text]="container.name" classToApply="searched"></span>

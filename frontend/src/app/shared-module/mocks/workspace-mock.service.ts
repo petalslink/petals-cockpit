@@ -32,10 +32,11 @@ import { environment } from '../../../environments/environment';
 import { generateUuidV4 } from '../helpers/helper';
 
 // our interfaces
-import { IStore } from './../interfaces/store.interface';
+import { IStore } from '../interfaces/store.interface';
 import { INewBus } from '../interfaces/petals.interface';
-import { IMinimalWorkspaceRecord, IMinimalWorkspacesRecord } from './../interfaces/minimal-workspaces.interface';
-import { IWorkspace } from './../interfaces/workspace.interface';
+import { IBus, IContainer } from '../interfaces/petals.interface';
+import { IMinimalWorkspaceRecord, IMinimalWorkspacesRecord } from '../interfaces/minimal-workspaces.interface';
+import { IWorkspace } from '../interfaces/workspace.interface';
 
 // our services
 import { SseService } from '../services/sse.service';
@@ -43,6 +44,10 @@ import { UserService } from '../services/user.service';
 
 @Injectable()
 export class WorkspaceMockService {
+  // just to alternate reachable/unreachable
+  private reachable = true;
+  private reachableById = new Map<string, string>();
+
   constructor(
     private http: Http,
     private store$: Store<IStore>,
@@ -185,5 +190,43 @@ export class WorkspaceMockService {
     return Observable
       .of(response)
       .delay(environment.httpDelay);
+  }
+
+  getDetailsContainer(idWorkspace: string, idBus: string, idContainer: string) {
+    return this.http.get(`mocks-json/ws-${idWorkspace}.json`)
+      .map((res: Response) => res.json())
+      .delay(environment.httpDelay)
+      .map((workspace: IWorkspace) => {
+        let containersWithoutCurrentContainer = workspace
+          .buses
+          .find((bus: IBus) => bus.id === idBus)
+          .containers
+          .filter((container: IContainer) => container.id !== idContainer);
+
+        let reachabilities = {};
+
+        for (let container of containersWithoutCurrentContainer) {
+          if (typeof this.reachableById.get(container.id) === 'undefined') {
+            this.reachableById.set(container.id, this.reachable ? 'Reachable' : 'Unreachable');
+            this.reachable = !this.reachable;
+          }
+
+          reachabilities[container.id] = this.reachableById.get(container.id);
+        }
+
+        return <Response>{
+          ok: true,
+          json: () => {
+            return {
+              // as we use merge in the reducer,
+              // whatever is added here will be added to the bus
+              id: idContainer,
+              ip: '192.168.0.1',
+              port: 7700,
+              reachabilities
+            };
+          }
+        };
+      });
   }
 }
