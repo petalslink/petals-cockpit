@@ -219,17 +219,20 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
 
   /* FETCH_CONTAINER_DETAILS* */
   else if (action.type === WorkspaceActions.FETCH_CONTAINER_DETAILS) {
+    // console.log('action.payload.idBus')
+    // console.log(action.payload.idBus)
+    // console.log(JSON.stringify(workspaceR.get('buses').toJS(), null, 2));
     let busIndex = workspaceR
       .get('buses')
-      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.idBus);
+      .findIndex((bus: IBusRecord) => bus.get('id') === action.payload.idBus);
 
-    if (busIndex === -1) {
+    if (busIndex === -1 || typeof workspaceR.getIn(['buses', busIndex, 'containers']) === 'undefined') {
       return workspaceR;
     }
 
     let containerIndex = workspaceR
       .getIn(['buses', busIndex, 'containers'])
-      .findIndex((containers: IContainerRecord) => containers.get('id') === action.payload.idContainer);
+      .findIndex((container: IContainerRecord) => container.get('id') === action.payload.idContainer);
 
     if (containerIndex === -1) {
       return workspaceR;
