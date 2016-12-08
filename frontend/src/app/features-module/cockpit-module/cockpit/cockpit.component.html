@@ -40,7 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           md-raised-button
           *ngIf="workspace.name"
           color="accent"
-          [routerLink]="['workspaces', workspace.id, 'petals']"
+          [routerLink]="['workspaces', workspace.id]"
         >
           {{ workspace.name }}
         </button><button
@@ -48,7 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           md-raised-button
           *ngIf="workspace.name"
           color="accent"
-          [routerLink]="['workspaces', (workspace && workspace.id ? workspace.id : '' )]"
+          [routerLink]="['workspaces']"
         >
           <md-icon>view_list</md-icon>
         </button>
@@ -61,9 +61,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
       <md-tab-group
         #tabGroup
-        *ngIf="workspace.id && tabSelectedIndex !== -1"
+        *ngIf="workspace.id"
         [selectedIndex]="tabSelectedIndex"
-        (selectChange)="openTab(tabGroup.selectedIndex)"
+        (focusChange)="openTab(tabGroup.selectedIndex)"
       >
         <md-tab label="Petals" class="md-tab-petals">
           <app-petals-menu-module></app-petals-menu-module>

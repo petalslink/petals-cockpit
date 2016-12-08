@@ -13,9 +13,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-toolbar color="primary">
+<md-toolbar color="primary" *ngIf="workspace">
   <span>
-    Petals
+    {{ workspace.name }}
   </span>
 
   <span class="flex-space"></span>
@@ -49,10 +49,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   </md-menu>
 </md-toolbar>
 
-<md-card class="central-content">
+<md-card class="central-content" *ngIf="workspace">
   <md-card-content>
     <md-card-title align="center">
-      Petals content
+      {{ workspace.name }}
     </md-card-title>
   </md-card-content>
 </md-card>

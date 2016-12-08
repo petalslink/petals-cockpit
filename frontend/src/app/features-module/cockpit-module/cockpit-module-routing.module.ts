@@ -34,6 +34,7 @@ import { PetalsBusContentComponent } from './workspaces-module/petals-module/pet
 import { PetalsModuleComponent } from './workspaces-module/petals-module/petals-module.component';
 import { SettingsComponent } from './settings/settings.component';
 import { WorkspacesComponent } from './workspaces-module/workspaces/workspaces.component';
+import { WorkspaceComponent } from './workspaces-module/workspaces/workspace/workspace.component';
 /* tslint:enable:max-line-length */
 
 const routes: Routes = [
@@ -63,7 +64,7 @@ const routes: Routes = [
           },
           {
             path: ':idWorkspace',
-            component: WorkspacesComponent,
+            component: WorkspaceComponent,
             pathMatch: 'full',
           },
           {

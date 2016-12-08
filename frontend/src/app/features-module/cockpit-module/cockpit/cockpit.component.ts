@@ -140,6 +140,8 @@ export class CockpitComponent implements OnInit, OnDestroy {
     const rePetalsBusContCompSu = /\/cockpit\/workspaces\/[0-9a-zA-Z-_]+\/petals(?:\/bus\/([0-9a-zA-Z-_]+)(?:\/container\/([0-9a-zA-Z-_]+)(?:\/component\/([0-9a-zA-Z-_]+)(?:\/serviceUnit\/([0-9a-zA-Z-_]+))?)?)?)?/;
     /* tslint:enable:max-line-length */
 
+    let selectTabByDefault = true;
+
     this.router.events
       .filter(event => event instanceof NavigationEnd)
       .subscribe((eventUrl: any) => {
@@ -151,7 +153,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
         }
 
         // check selected tab
-        if (typeof url === 'undefined') {
+        if (typeof url === 'undefined' || url === null) {
           this.tabSelectedIndex = 0;
         } else if (url.match(rePetals)) {
           this.tabSelectedIndex = 0;
@@ -159,7 +161,8 @@ export class CockpitComponent implements OnInit, OnDestroy {
           this.tabSelectedIndex = 1;
         } else if (url.match(reApi)) {
           this.tabSelectedIndex = 2;
-        } else {
+        } else if (selectTabByDefault) {
+          selectTabByDefault = false;
           this.tabSelectedIndex = 0;
         }
 

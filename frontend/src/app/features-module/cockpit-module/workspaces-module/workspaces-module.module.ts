@@ -27,6 +27,7 @@ import { SharedModule } from '../../../shared-module/shared-module.module';
 import { PetalsModule } from './petals-module/petals-module.module';
 import { ServiceModule } from './service-module/service-module.module';
 import { ApiModule } from './api-module/api-module.module';
+import { WorkspaceComponent } from './workspaces/workspace/workspace.component';
 
 @NgModule({
   imports: [
@@ -37,7 +38,8 @@ import { ApiModule } from './api-module/api-module.module';
   ],
   declarations: [
     WorkspacesModuleComponent,
-    WorkspacesComponent
+    WorkspacesComponent,
+    WorkspaceComponent
   ],
   exports: [
     WorkspacesModuleComponent,
