@@ -3139,6 +3139,10 @@ karma-chrome-launcher@2.0.0:
     fs-access "^1.0.0"
     which "^1.2.1"
 
+"karma-clear-screen-reporter@https://github.com/arthurc/karma-clear-screen-reporter/tarball/master":
+  version "1.0.0"
+  resolved "https://github.com/arthurc/karma-clear-screen-reporter/tarball/master#53f666111266713199f001f7b8e858f9c0344e64"
+
 karma-cli@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/karma-cli/-/karma-cli-1.0.1.tgz#ae6c3c58a313a1d00b45164c455b9b86ce17f960"
