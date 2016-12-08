@@ -246,10 +246,15 @@ public class ContainersResource {
         @JsonProperty
         public final State state;
 
-        public MinServiceUnit(long id, String name, State state) {
+        @NotNull
+        @JsonProperty
+        public final String saName;
+
+        public MinServiceUnit(long id, String name, State state, String saName) {
             this.id = id;
             this.name = name;
             this.state = state;
+            this.saName = saName;
         }
 
         @JsonProperty
@@ -261,8 +266,8 @@ public class ContainersResource {
     public static class ServiceUnitOverview extends MinServiceUnit {
 
         public ServiceUnitOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("state") State state) {
-            super(id, name, state);
+                @JsonProperty("state") State state, @JsonProperty("saName") String saName) {
+            super(id, name, state, saName);
         }
     }
 }

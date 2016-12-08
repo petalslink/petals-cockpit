@@ -40,8 +40,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.mockito.Mockito;
-import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
+import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
@@ -68,6 +68,7 @@ import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.common.test.TestUtil;
 import co.paralleluniverse.common.util.Debug;
 import io.dropwizard.testing.junit.ResourceTestRule;
+import javaslang.Tuple2;
 import javaslang.Tuple3;
 import javaslang.Tuple4;
 
@@ -137,15 +138,15 @@ public class AbstractWorkspacesResourceTest {
      * TODO generate id automatically? but then we need some kind of way to query this data after that!
      */
     protected void setupWorkspace(long wsId, String wsName,
-            List<Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple3<Long, ServiceUnit, ArtifactState.State>>>>>>>> data,
+            List<Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>>>>> data,
             String... users) {
         List<BusTree> bTrees = new ArrayList<>();
         List<DbBus> bs = new ArrayList<>();
-        for (Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple3<Long, ServiceUnit, ArtifactState.State>>>>>>> bus : data) {
+        for (Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>>>> bus : data) {
             Domain domain = bus._2;
             String passphrase = bus._3;
-            List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple3<Long, ServiceUnit, ArtifactState.State>>>>>> containers = bus._4;
-            Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple3<Long, ServiceUnit, ArtifactState.State>>>>> entry = containers
+            List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>>> containers = bus._4;
+            Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>> entry = containers
                     .get(0);
             assert entry != null;
             DbBusImported bDb = new DbBusImported(bus._1, entry._2.getHost(), getPort(entry._2),
@@ -153,7 +154,7 @@ public class AbstractWorkspacesResourceTest {
 
             List<ContainerTree> cTrees = new ArrayList<>();
             List<DbContainer> cs = new ArrayList<>();
-            for (Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple3<Long, ServiceUnit, ArtifactState.State>>>>> c : containers) {
+            for (Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>> c : containers) {
 
                 c._2.addProperty("petals.topology.passphrase", passphrase);
 
@@ -162,16 +163,22 @@ public class AbstractWorkspacesResourceTest {
 
                 List<ComponentTree> compTrees = new ArrayList<>();
                 List<DbComponent> comps = new ArrayList<>();
-                for (Tuple3<Long, Component, List<Tuple3<Long, ServiceUnit, ArtifactState.State>>> comp : c._3) {
+                for (Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>> comp : c._3) {
                     DbComponent compDb = new DbComponent(comp._1, comp._2.getName(), comp._2.getState().toString(),
                             comp._2.getComponentType().toString());
 
                     List<SUTree> suTrees = new ArrayList<>();
                     List<DbServiceUnit> sus = new ArrayList<>();
-                    for (Tuple3<Long, ServiceUnit, ArtifactState.State> su : comp._3) {
-                        DbServiceUnit suDb = new DbServiceUnit(su._1, su._2.getName(), su._3.toString());
+                    for (Tuple2<Long, ServiceAssembly> su : comp._3) {
+                        List<ServiceUnit> sasus = su._2.getServiceUnits();
+                        assert sasus.size() == 1;
+                        ServiceUnit sasu = sasus.get(0);
+                        assert sasu != null;
+                        DbServiceUnit suDb = new DbServiceUnit(su._1, sasu.getName(), su._2.getState().toString(),
+                                su._2.getName());
 
-                        suTrees.add(new SUTree(suDb.id, suDb.name, MinServiceUnit.State.from(su._3)));
+                        suTrees.add(new SUTree(suDb.id, suDb.name, MinServiceUnit.State.from(su._2.getState()),
+                                suDb.saName));
                         sus.add(suDb);
                     }
 

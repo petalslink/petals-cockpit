@@ -78,9 +78,10 @@ public abstract class BusesDAO {
     @Mapper(DbComponent.Mapper.class)
     public abstract List<DbComponent> getComponentsByContainer(@BindBean("c") DbContainer c);
 
-    @SqlUpdate("insert into serviceunits (component_id,name,state)" + " values (:cId,:n,:s)")
+    @SqlUpdate("insert into serviceunits (component_id,name,state,sa_name)" + " values (:cId,:n,:s,:sa)")
     @GetGeneratedKeys
-    public abstract long createServiceUnit(@Bind("n") String name, @Bind("s") String state, @Bind("cId") long cId);
+    public abstract long createServiceUnit(@Bind("n") String name, @Bind("s") String state, @Bind("cId") long cId,
+            @Bind("sa") String saName);
 
     @SqlQuery("select * from serviceunits where component_id = :c.id")
     @Mapper(DbServiceUnit.Mapper.class)
@@ -253,17 +254,21 @@ public abstract class BusesDAO {
 
         public final String state;
 
-        public DbServiceUnit(long id, String name, String state) {
+        public final String saName;
+
+        public DbServiceUnit(long id, String name, String state, String saName) {
             this.id = id;
             this.name = name;
             this.state = state;
+            this.saName = saName;
         }
 
         public static class Mapper implements ResultSetMapper<DbServiceUnit> {
 
             @Override
             public DbServiceUnit map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-                return new DbServiceUnit(r.getLong("id"), r.getString("name"), r.getString("state"));
+                return new DbServiceUnit(r.getLong("id"), r.getString("name"), r.getString("state"),
+                        r.getString("sa_name"));
 
             }
         }

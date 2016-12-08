@@ -99,8 +99,10 @@ public class ContainerActor extends CockpitActor<Msg> {
             } else if (msg instanceof GetServiceUnitOverview) {
                 GetServiceUnitOverview get = (GetServiceUnitOverview) msg;
                 assert get.cId == db.id;
-                RequestReplyHelper.reply(get, getServiceUnit(get.compId, get.suId)
-                        .map(su -> new ServiceUnitOverview(su.id, su.name, su.state)).toRight(Status.NOT_FOUND));
+                RequestReplyHelper.reply(get,
+                        getServiceUnit(get.compId, get.suId)
+                                .map(su -> new ServiceUnitOverview(su.id, su.name, su.state, su.saName))
+                                .toRight(Status.NOT_FOUND));
             } else {
                 LOG.warn("Unexpected event for container {}: {}", db.id, msg);
             }

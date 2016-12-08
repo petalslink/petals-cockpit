@@ -170,4 +170,11 @@
     </addColumn>
   </changeSet>
 
+  <changeSet id="v0.4.0-2" author="vnoel">
+    <addColumn tableName="serviceunits">
+      <column name="sa_name" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>

@@ -92,9 +92,11 @@ public class WorkspaceTree extends MinWorkspace {
                 for (ServiceAssembly sa : container.getServiceAssemblies()) {
                     for (ServiceUnit su : sa.getServiceUnits()) {
                         if (su.getTargetComponent().equals(component.getName())) {
+                            // TODO is this information returned by admin correct? Some SUs could be in a different
+                            // state in case of problems...!
                             SUTree.State suState = SUTree.State.from(sa.getState());
-                            long suId = buses.createServiceUnit(su.getName(), suState.name(), compId);
-                            sus.add(new SUTree(suId, su.getName(), suState));
+                            long suId = buses.createServiceUnit(su.getName(), suState.name(), compId, sa.getName());
+                            sus.add(new SUTree(suId, su.getName(), suState, sa.getName()));
                         }
                     }
                 }
@@ -122,7 +124,7 @@ public class WorkspaceTree extends MinWorkspace {
                     for (DbComponent comp : buses.getComponentsByContainer(c)) {
                         List<SUTree> sus = new ArrayList<>();
                         for (DbServiceUnit su : buses.getServiceUnitByComponent(comp)) {
-                            sus.add(new SUTree(su.id, su.name, SUTree.State.valueOf(su.state)));
+                            sus.add(new SUTree(su.id, su.name, SUTree.State.valueOf(su.state), su.saName));
                         }
                         comps.add(new ComponentTree(comp.id, comp.name, MinComponent.State.valueOf(comp.state),
                                 MinComponent.Type.valueOf(comp.type), sus));
@@ -188,8 +190,8 @@ public class WorkspaceTree extends MinWorkspace {
     public static class SUTree extends MinServiceUnit {
 
         public SUTree(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("state") State state) {
-            super(id, name, state);
+                @JsonProperty("state") State state, @JsonProperty("saName") String saName) {
+            super(id, name, state, saName);
         }
     }
 }

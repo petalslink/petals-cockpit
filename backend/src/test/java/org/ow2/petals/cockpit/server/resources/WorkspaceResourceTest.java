@@ -68,11 +68,11 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
     private final Container container3 = new Container("cont3", "host3", ImmutableMap.of(PortType.JMX, containerPort),
             "user", "pass", State.UNREACHABLE);
 
-    private final Component component = new Component("comp", ComponentType.SE);
+    private final Component component = new Component("comp", ComponentType.SE, ArtifactState.State.STARTED);
 
     private final ServiceUnit serviceUnit = new ServiceUnit("su", component.getName());
 
-    private final ServiceAssembly serviceAssembly = new ServiceAssembly("sa", Arrays.asList(serviceUnit));
+    private final ServiceAssembly serviceAssembly = new ServiceAssembly("sa", ArtifactState.State.STARTED, serviceUnit);
 
     @Before
     public void setup() {
@@ -82,28 +82,25 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         petals.registerContainer(container2);
         petals.registerContainer(container3);
         petals.registerArtifact(component, container1);
-        serviceAssembly.setState(ArtifactState.State.STARTED);
         petals.registerArtifact(serviceAssembly, container1);
 
         // forbidden workspace (it is NOT registered in petals admin)
-        setupWorkspace(2, "test2",
-                Arrays.asList(Tuple.of(2L, new Domain("dom2"), "", Arrays.asList(Tuple.of(2L, new Container(
-                        "cont2", "", ImmutableMap.of(PortType.JMX, containerPort), "", "", State.REACHABLE), Arrays
-                                .asList(Tuple.of(2L, new Component("", ComponentType.SE), Arrays.asList(
-                                        Tuple.of(2L, new ServiceUnit("", ""), ArtifactState.State.STARTED)))))))),
+        setupWorkspace(2, "test2", Arrays.asList(Tuple.of(2L, new Domain("dom2"), "", Arrays.asList(Tuple.of(2L,
+                new Container("cont2", "", ImmutableMap.of(PortType.JMX, containerPort), "", "", State.REACHABLE),
+                Arrays.asList(Tuple.of(2L, new Component("", ComponentType.SE, ArtifactState.State.STARTED),
+                        Arrays.asList(Tuple.of(2L,
+                                new ServiceAssembly("", ArtifactState.State.STARTED, new ServiceUnit("", "")))))))))),
                 "anotherusers");
 
         // test workspace
         setupWorkspace(1, "test",
-                Arrays.asList(
-                        Tuple.of(10L, domain, "phrase",
-                                Arrays.asList(
-                                        Tuple.of(20L, container1,
-                                                Arrays.asList(Tuple.of(30L, component,
-                                                        Arrays.asList(Tuple.of(40L, serviceUnit,
-                                                                serviceAssembly.getState()))))),
-                                        Tuple.of(21L, container2, Arrays.asList()),
-                                        Tuple.of(22L, container3, Arrays.asList())))),
+                Arrays.asList(Tuple.of(10L, domain, "phrase",
+                        Arrays.asList(
+                                Tuple.of(20L, container1,
+                                        Arrays.asList(Tuple.of(30L, component,
+                                                Arrays.asList(Tuple.of(40L, serviceAssembly))))),
+                                Tuple.of(21L, container2, Arrays.asList()),
+                                Tuple.of(22L, container3, Arrays.asList())))),
                 MockProfileParamValueFactoryProvider.ADMIN.username);
     }
 
@@ -235,6 +232,7 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         assertThat(su.id).isEqualTo(40);
         assertThat(su.name).isEqualTo(serviceUnit.getName());
         assertThat(su.state.toString()).isEqualTo(serviceAssembly.getState().toString());
+        assertThat(su.saName).isEqualTo(serviceAssembly.getName());
     }
 
     @Test
@@ -272,8 +270,7 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         assertThat(get.name).isEqualTo(container2.getContainerName());
         assertThat(get.ip).isEqualTo(container2.getHost());
         assertThat(get.port).isEqualTo(containerPort);
-        assertThat(get.reachabilities).containsOnly(
-                MapEntry.entry("20", container1.getState().name()),
+        assertThat(get.reachabilities).containsOnly(MapEntry.entry("20", container1.getState().name()),
                 MapEntry.entry("22", container3.getState().name()));
     }
 
@@ -316,6 +313,7 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         assertThat(get.id).isEqualTo(40);
         assertThat(get.name).isEqualTo(serviceUnit.getName());
         assertThat(get.state.toString()).isEqualTo(serviceAssembly.getState().toString());
+        assertThat(get.saName).isEqualTo(serviceAssembly.getName());
     }
 
     @Test
