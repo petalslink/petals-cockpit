@@ -141,7 +141,7 @@ public class ContainersResource {
     public abstract static class MinComponent {
 
         public enum State {
-            Loaded, Started, Stopped, Shutdown, Unknown;
+            NotLoaded, Loaded, Shutdown, Stopped, Started, Unknown;
 
             public static State from(ArtifactState.State state) {
                 switch (state) {
@@ -156,7 +156,7 @@ public class ContainersResource {
                     case UNKNOWN:
                         return Unknown;
                     default:
-                        throw new AssertionError();
+                        throw new AssertionError("impossible");
                 }
             }
         }
@@ -215,12 +215,10 @@ public class ContainersResource {
 
     public abstract static class MinServiceUnit {
         public enum State {
-            Loaded, Started, Stopped, Shutdown, Unknown;
+            NotLoaded, Started, Stopped, Shutdown, Unknown;
 
             public static State from(ArtifactState.State state) {
                 switch (state) {
-                    case LOADED:
-                        return Loaded;
                     case STARTED:
                         return Started;
                     case STOPPED:
@@ -229,8 +227,10 @@ public class ContainersResource {
                         return Shutdown;
                     case UNKNOWN:
                         return Unknown;
+                    case LOADED:
+                        throw new AssertionError("Loaded state does not exist for SA/SU");
                     default:
-                        throw new AssertionError();
+                        throw new AssertionError("impossible");
                 }
             }
         }
