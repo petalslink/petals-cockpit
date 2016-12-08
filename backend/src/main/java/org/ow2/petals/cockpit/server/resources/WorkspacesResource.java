@@ -29,19 +29,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
-import org.glassfish.jersey.media.sse.EventOutput;
-import org.glassfish.jersey.media.sse.SseFeature;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.GetWorkspaceTree;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
-import org.ow2.petals.cockpit.server.resources.BusesResource.BusInError;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.MinWorkspace;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -54,8 +48,11 @@ public class WorkspacesResource {
 
     private final WorkspacesDAO workspaces;
 
+    private final CockpitActors as;
+
     @Inject
-    public WorkspacesResource(WorkspacesDAO workspaces) {
+    public WorkspacesResource(CockpitActors as, WorkspacesDAO workspaces) {
+        this.as = as;
         this.workspaces = workspaces;
     }
 
@@ -78,49 +75,8 @@ public class WorkspacesResource {
     }
 
     @Path("/{wsId}")
-    public Class<WorkspaceResource> workspaceResource() {
-        return WorkspaceResource.class;
-    }
-
-    @Singleton
-    public static class WorkspaceResource {
-
-        private final CockpitActors as;
-
-        @Inject
-        public WorkspaceResource(CockpitActors as) {
-            this.as = as;
-        }
-
-        @GET
-        @Produces(MediaType.APPLICATION_JSON)
-        @Valid
-        public WorkspaceTree get(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile)
-                throws InterruptedException {
-            return as.call(wsId, new GetWorkspaceTree(profile.getUser().getUsername()))
-                    .getOrElseThrow(s -> new WebApplicationException(s));
-        }
-
-        /**
-         * Produces {@link WorkspaceEvent}
-         */
-        @GET
-        @Path("/events")
-        @Produces(SseFeature.SERVER_SENT_EVENTS)
-        public EventOutput sse(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile)
-                throws InterruptedException {
-            final EventOutput eo = new EventOutput();
-
-            as.call(wsId, new NewWorkspaceClient(profile.getUser().getUsername(), eo))
-                    .getOrElseThrow(s -> new WebApplicationException(s));
-
-            return eo;
-        }
-
-        @Path("/buses")
-        public Class<BusesResource> getBuses() {
-            return BusesResource.class;
-        }
+    public WorkspaceResource workspace(@PathParam("wsId") @Min(1) long wsId) {
+        return new WorkspaceResource(as, wsId);
     }
 
     public static class NewWorkspace {
@@ -134,22 +90,6 @@ public class WorkspacesResource {
         }
     }
 
-    public static class MinWorkspace extends NewWorkspace {
-
-        @Min(1)
-        public final long id;
-
-        public MinWorkspace(long id, String name) {
-            super(name);
-            this.id = id;
-        }
-
-        @JsonProperty
-        public String getId() {
-            return Long.toString(id);
-        }
-    }
-
     public static class Workspace extends MinWorkspace {
 
         @JsonProperty
@@ -158,33 +98,6 @@ public class WorkspacesResource {
         public Workspace(long id, String name, List<String> usedBy) {
             super(id, name);
             this.usedBy = ImmutableList.copyOf(usedBy);
-        }
-    }
-
-    public static class WorkspaceEvent {
-
-        @JsonProperty
-        private final String event;
-
-        @JsonProperty
-        private final Object data;
-
-        public WorkspaceEvent(String event, Object data) {
-            this.event = event;
-            this.data = data;
-        }
-
-        public static WorkspaceEvent error(BusInError bus) {
-            return new WorkspaceEvent("BUS_IMPORT_ERROR", bus);
-        }
-
-        public static WorkspaceEvent ok(BusTree bus) {
-            return new WorkspaceEvent("BUS_IMPORT_OK", bus);
-        }
-
-        @Override
-        public String toString() {
-            return "WorkspaceEvent [event=" + event + ", data=" + data + "]";
         }
     }
 }

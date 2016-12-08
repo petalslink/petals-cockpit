@@ -16,13 +16,10 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -31,70 +28,86 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.media.sse.EventOutput;
+import org.glassfish.jersey.media.sse.SseFeature;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.cockpit.server.actors.BusActor.GetBusOverview;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.GetWorkspaceTree;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Singleton
-public class BusesResource {
+public class WorkspaceResource {
+
+    private final long wsId;
 
     private final CockpitActors as;
 
-    @Inject
-    public BusesResource(CockpitActors as) {
+    public WorkspaceResource(CockpitActors as, long wsId) {
         this.as = as;
+        this.wsId = wsId;
     }
 
-    @Path("/{bId}")
-    public Class<BusResource> busResource() {
-        return BusResource.class;
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Valid
+    public WorkspaceTree get(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
+        return as.call(wsId, new GetWorkspaceTree(profile.getUser().getUsername()))
+                .getOrElseThrow(s -> new WebApplicationException(s));
+    }
+
+    /**
+     * Produces {@link WorkspaceEvent}
+     */
+    @GET
+    @Path("/events")
+    @Produces(SseFeature.SERVER_SENT_EVENTS)
+    public EventOutput sse(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
+        final EventOutput eo = new EventOutput();
+
+        as.call(wsId, new NewWorkspaceClient(profile.getUser().getUsername(), eo))
+                .getOrElseThrow(s -> new WebApplicationException(s));
+
+        return eo;
     }
 
     @POST
+    @Path("/buses")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
-    public BusInProgress addBus(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
-            @Valid NewBus nb) throws InterruptedException {
+    public BusInProgress addBus(@Pac4JProfile CockpitProfile profile, @Valid NewBus nb) throws InterruptedException {
         return as.call(wsId, new ImportBus(profile.getUser().getUsername(), nb))
                 .getOrElseThrow(s -> new WebApplicationException(s));
     }
 
-    public static class BusResource {
+    @Path("/buses/{bId}")
+    public BusResource bus(@PathParam("bId") @Min(1) long bId) {
+        return new BusResource(as, wsId, bId);
+    }
 
-        private final CockpitActors as;
+    public static class MinWorkspace {
 
-        @Inject
-        public BusResource(CockpitActors as) {
-            this.as = as;
+        @Min(1)
+        public final long id;
+
+        @NotEmpty
+        @JsonProperty
+        public final String name;
+
+        public MinWorkspace(long id, String name) {
+            this.id = id;
+            this.name = name;
         }
 
-        @GET
-        @Produces(MediaType.APPLICATION_JSON)
-        @Valid
-        public BusOverview get(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
-                @Pac4JProfile CockpitProfile profile) throws InterruptedException {
-            return as.call(wsId, new GetBusOverview(profile.getUser().getUsername(), bId))
-                    .getOrElseThrow(s -> new WebApplicationException(s));
-        }
-
-        @DELETE
-        public void delete(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
-                @PathParam("bId") @Min(1) long bId) throws InterruptedException {
-            as.call(wsId, new DeleteBus(profile.getUser().getUsername(), bId))
-                    .getOrElseThrow(s -> new WebApplicationException(s));
-        }
-
-        @Path("/containers")
-        public Class<ContainersResource> getContainers() {
-            return ContainersResource.class;
+        @JsonProperty
+        public String getId() {
+            return Long.toString(id);
         }
     }
 
@@ -181,33 +194,30 @@ public class BusesResource {
         }
     }
 
-    public static class MinBus {
-
-        @Min(1)
-        public final long id;
-
-        @NotEmpty
-        @JsonProperty
-        public final String name;
-
-        @JsonCreator
-        public MinBus(@JsonProperty("id") long id, @JsonProperty("name") String name) {
-            this.id = id;
-            this.name = name;
-        }
+    public static class WorkspaceEvent {
 
         @JsonProperty
-        public String getId() {
-            return Long.toString(id);
+        private final String event;
+
+        @JsonProperty
+        private final Object data;
+
+        public WorkspaceEvent(String event, Object data) {
+            this.event = event;
+            this.data = data;
         }
 
-    }
+        public static WorkspaceEvent error(BusInError bus) {
+            return new WorkspaceEvent("BUS_IMPORT_ERROR", bus);
+        }
 
-    public static class BusOverview extends MinBus {
+        public static WorkspaceEvent ok(BusTree bus) {
+            return new WorkspaceEvent("BUS_IMPORT_OK", bus);
+        }
 
-        @JsonCreator
-        public BusOverview(@JsonProperty("id") long id, @JsonProperty("name") String name) {
-            super(id, name);
+        @Override
+        public String toString() {
+            return "WorkspaceEvent [event=" + event + ", data=" + data + "]";
         }
     }
 }

@@ -34,12 +34,12 @@ import org.ow2.petals.cockpit.server.actors.BusActor.ForBusMsg;
 import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
-import org.ow2.petals.cockpit.server.resources.BusesResource.BusInError;
-import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
-import org.ow2.petals.cockpit.server.resources.BusesResource.NewBus;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInError;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewBus;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
-import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspaceEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

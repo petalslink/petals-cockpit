@@ -18,8 +18,6 @@ package org.ow2.petals.cockpit.server.resources;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -45,49 +43,95 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 
-@Singleton
-public class ContainersResource {
+public class ContainerResource {
 
-    @Path("/{cId}")
-    public Class<ContainerResource> containerResource() {
-        return ContainerResource.class;
+    private final long wsId;
+
+    private final long bId;
+
+    private final long cId;
+
+    private final CockpitActors as;
+
+    public ContainerResource(CockpitActors as, long wsId, long bId, long cId) {
+        this.as = as;
+        this.wsId = wsId;
+        this.bId = bId;
+        this.cId = cId;
     }
 
-    public static class ContainerResource {
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Valid
+    public ContainerOverview get(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
+        return as.call(wsId, new GetContainerOverview(profile.getUser().getUsername(), bId, cId))
+                .getOrElseThrow(s -> new WebApplicationException(s));
+    }
+
+    @Path("/components/{compId}")
+    public ComponentResource component(@PathParam("compId") @Min(1) long compId) {
+        return new ComponentResource(as, wsId, bId, cId, compId);
+    }
+
+    public static class ComponentResource {
+
+        private final long wsId;
+
+        private final long bId;
+
+        private final long cId;
+
+        private final long compId;
 
         private final CockpitActors as;
 
-        @Inject
-        public ContainerResource(CockpitActors as) {
+        public ComponentResource(CockpitActors as, long wsId, long bId, long cId, long compId) {
             this.as = as;
+            this.wsId = wsId;
+            this.bId = bId;
+            this.cId = cId;
+            this.compId = compId;
+        }
+
+        @Path("/serviceunits/{suId}")
+        public SUResource su(@PathParam("suId") @Min(1) long suId) {
+            return new SUResource(as, wsId, bId, cId, compId, suId);
         }
 
         @GET
         @Produces(MediaType.APPLICATION_JSON)
-        @Valid
-        public ContainerOverview get(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
-                @PathParam("cId") @Min(1) long cId, @Pac4JProfile CockpitProfile profile) throws InterruptedException {
-            return as.call(wsId, new GetContainerOverview(profile.getUser().getUsername(), bId, cId))
-                    .getOrElseThrow(s -> new WebApplicationException(s));
-        }
-
-        @GET
-        @Path("/components/{compId}")
-        @Produces(MediaType.APPLICATION_JSON)
-        public ComponentOverview getComp(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
-                @PathParam("cId") @Min(1) long cId, @PathParam("compId") @Min(1) long compId,
-                @Pac4JProfile CockpitProfile profile) throws InterruptedException {
+        public ComponentOverview getComp(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
             return as.call(wsId, new GetComponentOverview(profile.getUser().getUsername(), bId, cId, compId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
+    }
+
+    public static class SUResource {
+
+        private final long wsId;
+
+        private final long bId;
+
+        private final long cId;
+
+        private final long compId;
+
+        private final long suId;
+
+        private final CockpitActors as;
+
+        public SUResource(CockpitActors as, long wsId, long bId, long cId, long compId, long suId) {
+            this.as = as;
+            this.wsId = wsId;
+            this.bId = bId;
+            this.cId = cId;
+            this.compId = compId;
+            this.suId = suId;
+        }
 
         @GET
-        @Path("/components/{compId}/serviceunits/{suId}")
         @Produces(MediaType.APPLICATION_JSON)
-        public ServiceUnitOverview getSU(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
-                @PathParam("cId") @Min(1) long cId, @PathParam("compId") @Min(1) long compId,
-                @PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile)
-                throws InterruptedException {
+        public ServiceUnitOverview getSU(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
             return as.call(wsId, new GetServiceUnitOverview(profile.getUser().getUsername(), bId, cId, compId, suId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
