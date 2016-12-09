@@ -24,6 +24,7 @@ import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.InvalidPetalsBus;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.BindBean;
@@ -89,7 +90,12 @@ public abstract class BusesDAO {
 
     @Transaction
     public BusTree saveImport(long bId, Domain topology) {
-        return WorkspaceTree.buildAndSaveToDatabase(this, bId, topology);
+        try {
+            return WorkspaceTree.buildAndSaveToDatabase(this, bId, topology);
+        } catch (InvalidPetalsBus e) {
+            // TODO handle that better
+            throw new RuntimeException(e);
+        }
     }
 
     @SqlUpdate("delete from buses where id = :id")

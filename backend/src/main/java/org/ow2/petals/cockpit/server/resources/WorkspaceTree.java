@@ -70,13 +70,23 @@ public class WorkspaceTree extends MinWorkspace {
         this.busesInProgress = ImmutableList.copyOf(busesInProgress);
     }
 
+    public static class InvalidPetalsBus extends Exception {
+
+        private static final long serialVersionUID = 8866405347860930056L;
+
+        public InvalidPetalsBus(String msg) {
+            super(msg);
+        }
+
+    }
+
     /**
      * Meant to be called from inside a DB transaction!
      * 
      * TODO this should be done by {@link WorkspaceActor}
      */
     @Suspendable
-    public static BusTree buildAndSaveToDatabase(BusesDAO buses, long bId, Domain topology) {
+    public static BusTree buildAndSaveToDatabase(BusesDAO buses, long bId, Domain topology) throws InvalidPetalsBus {
         List<ContainerTree> cs = new ArrayList<>();
         for (Container container : topology.getContainers()) {
             Integer port = container.getPorts().get(PortType.JMX);
@@ -90,6 +100,9 @@ public class WorkspaceTree extends MinWorkspace {
                 long compId = buses.createComponent(component.getName(), compState.name(), compType.name(), cId);
                 List<SUTree> sus = new ArrayList<>();
                 for (ServiceAssembly sa : container.getServiceAssemblies()) {
+                    if (sa.getServiceUnits().size() != 1) {
+                        throw new InvalidPetalsBus("Buses with not-single SU SAs are not supported!");
+                    }
                     for (ServiceUnit su : sa.getServiceUnits()) {
                         if (su.getTargetComponent().equals(component.getName())) {
                             // TODO is this information returned by admin correct? Some SUs could be in a different

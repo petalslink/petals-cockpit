@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
@@ -36,7 +35,6 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.mockito.Mockito;
@@ -76,6 +74,10 @@ import javaslang.Tuple4;
  * Note: to override one of the already implemented method in {@link #workspaces} or {@link #buses}, it is needed to use
  * {@link Mockito#doReturn(Object)} and not {@link Mockito#when(Object)}!!
  * 
+ * Note: because the backend is implemented using actors, it can happen that some of those are initialised late or even
+ * after the test is finished and thus exceptions are printed in the console. TODO It's ok, but it would be better not
+ * to have that, see https://groups.google.com/d/msg/quasar-pulsar-user/LLhGRQDiykY/F8apfp8JCQAJ
+ *
  * @author vnoel
  *
  */
@@ -84,25 +86,18 @@ public class AbstractWorkspacesResourceTest {
     @Rule
     public TestRule watchman = TestUtil.WATCHMAN;
 
-    protected static WorkspacesDAO workspaces = mock(WorkspacesDAOMock.class,
+    protected WorkspacesDAO workspaces = mock(WorkspacesDAO.class,
             withSettings()
                     // .verboseLogging()
                     .defaultAnswer(CALLS_REAL_METHODS));
 
-    protected static BusesDAO buses = mock(BusesDAO.class,
+    protected BusesDAO buses = mock(BusesDAO.class,
             withSettings()
                     // .verboseLogging()
                     .defaultAnswer(CALLS_REAL_METHODS));
 
-    public abstract static class WorkspacesDAOMock extends WorkspacesDAO {
-        @Override
-        protected BusesDAO buses() {
-            return buses;
-        }
-    }
-
-    @ClassRule
-    public static ResourceTestRule resources = ResourceTestRule.builder()
+    @Rule
+    public ResourceTestRule resources = ResourceTestRule.builder()
             // in memory does not support SSE and the no-servlet one does not log...
             .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
             // we pass the resource as a provider to get injection in constructor
@@ -128,9 +123,6 @@ public class AbstractWorkspacesResourceTest {
 
     @After
     public void tearDown() {
-        reset(workspaces);
-        reset(buses);
-
         ActorRegistry.clear();
     }
 
