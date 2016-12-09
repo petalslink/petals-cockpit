@@ -32,8 +32,8 @@
     "immutable": "3.8.1",
     "material-design-icons": "3.0.1",
     "ng2-interceptors": "1.2.1",
-    "ng2-translate": "4.0.1",
-    "rxjs": "5.0.0-rc.4",
+    "ng2-translate": "4.2.0",
+    "rxjs": "5.0.0-rc.5",
     "ts-helpers": "1.1.2",
     "typed-immutable-record": "0.0.6",
     "zone.js": "0.7.2"
@@ -54,10 +54,10 @@
     "karma-jasmine-diff-reporter": "0.6.3",
     "karma-remap-istanbul": "0.2.1",
     "ngrx-store-freeze": "0.1.4",
-    "protractor": "4.0.11",
+    "protractor": "4.0.13",
     "ts-node": "1.7.0",
     "tslint": "4.0.2",
     "typescript": "2.1.4",
-    "webdriver-manager": "10.2.8"
+    "webdriver-manager": "10.2.10"
   }
 }

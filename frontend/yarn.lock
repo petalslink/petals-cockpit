@@ -3882,9 +3882,9 @@ ng2-interceptors@1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/ng2-interceptors/-/ng2-interceptors-1.2.1.tgz#5ece29d68d230b3002356d1d8887929afa23c166"
 
-ng2-translate@4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/ng2-translate/-/ng2-translate-4.0.1.tgz#2fc6fd3b3e343d8958dacdcd22454dabda031264"
+ng2-translate@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/ng2-translate/-/ng2-translate-4.2.0.tgz#83bc8feca329b5fc56a636e36073241c6280c659"
 
 ngrx-store-freeze@0.1.4:
   version "0.1.4"
@@ -4661,9 +4661,9 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-protractor@4.0.11:
-  version "4.0.11"
-  resolved "https://registry.yarnpkg.com/protractor/-/protractor-4.0.11.tgz#fc4bf8d75deec8516b600f87ea5b95ecf537d059"
+protractor@4.0.13:
+  version "4.0.13"
+  resolved "https://registry.yarnpkg.com/protractor/-/protractor-4.0.13.tgz#24070732cd912545d42ef257c5bbe1998a237f73"
   dependencies:
     "@types/jasmine" "^2.5.36"
     "@types/node" "^6.0.46"
@@ -5163,9 +5163,9 @@ rxjs@5.0.0-beta.12:
   dependencies:
     symbol-observable "^1.0.1"
 
-rxjs@5.0.0-rc.4:
-  version "5.0.0-rc.4"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.0.0-rc.4.tgz#a4d08bc5d7f30d48ed7130e2995490c326a325c4"
+rxjs@5.0.0-rc.5:
+  version "5.0.0-rc.5"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.0.0-rc.5.tgz#8cbd17fc242a54c07ef9116da23b0ec8e7d5cea9"
   dependencies:
     symbol-observable "^1.0.1"
 
@@ -6169,9 +6169,9 @@ wbuf@^1.1.0, wbuf@^1.4.0:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-webdriver-manager@10.2.8, webdriver-manager@^10.2.8:
-  version "10.2.8"
-  resolved "https://registry.yarnpkg.com/webdriver-manager/-/webdriver-manager-10.2.8.tgz#b3b4ef7983271a97b9432c4211c39ff5caecd9dc"
+webdriver-manager@10.2.10, webdriver-manager@^10.2.8:
+  version "10.2.10"
+  resolved "https://registry.yarnpkg.com/webdriver-manager/-/webdriver-manager-10.2.10.tgz#e81d869375dd9395e1a88d7342bbc759b8d654f3"
   dependencies:
     adm-zip "^0.4.7"
     chalk "^1.1.1"
