@@ -26,7 +26,7 @@ import { Store } from '@ngrx/store';
 
 // our interfaces
 import { IStore } from './../../../../../../shared-module/interfaces/store.interface';
-import { IContainer } from './../../../../../../shared-module/interfaces/petals.interface';
+import { IBus, IContainer } from './../../../../../../shared-module/interfaces/petals.interface';
 import { IWorkspace, IWorkspaceRecord } from './../../../../../../shared-module/interfaces/workspace.interface';
 import { IContainerRecord } from './../../../../../../shared-module/interfaces/petals.interface';
 
@@ -62,5 +62,15 @@ export class PetalsContainerContentComponent implements OnDestroy {
   ngOnDestroy() {
     this.workspaceSub.unsubscribe();
     this.containerSub.unsubscribe();
+  }
+
+  getContainerById(idContainer: string) {
+    let bus = this.workspace.buses.find((b: IBus) => b.id === this.workspace.selectedBusId);
+
+    if (!bus) {
+      return;
+    }
+
+    return bus.containers.find((cont: IContainer) => cont.id === idContainer);
   }
 }

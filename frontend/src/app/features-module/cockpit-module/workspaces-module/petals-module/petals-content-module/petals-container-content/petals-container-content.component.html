@@ -69,7 +69,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             '/cockpit/workspaces', workspace.id,
             'petals', 'bus', workspace.selectedBusId,
             'container', reachability.key
-          ]">{{ reachability.key }}</a> : <span [ngClass]="reachability.value.toLowerCase()">{{ reachability.value }}</span>
+          ]">{{ getContainerById(reachability.key)?.name }}</a> : <span [ngClass]="reachability.value.toLowerCase()">{{ reachability.value }}</span>
         </li>
       </ul>
     </ul>
