@@ -224,7 +224,40 @@ export class WorkspaceEffects {
         if (environment.debug) {
           console.error(err);
         }
-        return Observable.of({ type: WorkspaceActions.FETCH_BUS_DETAILS_FAILED });
+
+        return Observable.of({
+          type: WorkspaceActions.FETCH_BUS_DETAILS_FAILED,
+          payload: { idBus: action.payload.idBus }
+        });
+      })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: true}) fetchContainerDetails$: Observable<Action> = this.actions$
+    .ofType(WorkspaceActions.FETCH_CONTAINER_DETAILS)
+    .switchMap((action: Action) =>
+      this.workspaceService.getDetailsContainer(action.payload.idWorkspace, action.payload.idBus, action.payload.idContainer)
+      .map((res: Response) => {
+        if (!res.ok) {
+          throw new Error('Error while fetching the bus details');
+        }
+
+        return { type: WorkspaceActions.FETCH_CONTAINER_DETAILS_SUCCESS, payload: {
+          bus: {
+            id: action.payload.idBus,
+            container: res.json()
+          }
+        }};
+      })
+      .catch((err) => {
+        if (environment.debug) {
+          console.error(err);
+        }
+
+        return Observable.of({
+          type: WorkspaceActions.FETCH_CONTAINER_DETAILS_FAILED,
+          payload: { idBus: action.payload.idBus, idContainer: action.payload.idContainer }
+        });
       })
     );
 }

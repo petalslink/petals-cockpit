@@ -71,7 +71,7 @@ describe(`Workspaces`, () => {
     expect(element(by.css(`md-sidenav .change-workspace`)).isPresent()).toEqual(true);
 
     /// and that the first bus has the 'searched' class to highlight it
-    let itemWithoutIcons = element(by.css(`md-sidenav app-buses-menu .md-list-item > span[classtoapply="searched"]`))
+    let itemWithoutIcons = element.all(by.css(`md-sidenav app-buses-menu .md-list-item > span[classtoapply="searched"]`)).get(0)
       .getText()
       .then((txt: string) => {
         return txt
@@ -213,7 +213,7 @@ describe(`Workspaces`, () => {
     element(by.css(`.petals-component input`)).clear();
 
     // fold the bus 0
-    element(by.css(`app-buses-menu md-nav-list md-icon[aria-label="arrow_drop_down"]`)).click();
+    element.all(by.css(`app-buses-menu md-nav-list md-icon[aria-label="arrow_drop_down"]`)).get(0).click();
 
     // angular-material icon's name are displayed
     // in getText() method, remove them
@@ -230,7 +230,7 @@ describe(`Workspaces`, () => {
 
     // 2
     // unfold the bus 0
-    element(by.css(`app-buses-menu md-nav-list md-icon[aria-label="arrow_drop_down"]`)).click();
+    element.all(by.css(`app-buses-menu md-nav-list md-icon[aria-label="arrow_drop_down"]`)).get(0).click();
 
     let availableBusesFiltered = [
       `Bus 0`,
@@ -380,16 +380,29 @@ describe(`Workspaces`, () => {
     // check the title
     element.all(by.css(`app-buses-menu md-nav-list .md-list-item`)).get(0).click();
 
-    let textWithoutIcons = element(by.css(`.md-sidenav-content md-toolbar`))
-      .getText()
-      .then((txt: string) => {
-        return txt
-          .split(`\n`)
-          .filter((t: string) => t !== 'more_vert')
-          .join()
-      });
+    let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
 
-    expect(textWithoutIcons).toEqual(`Bus 0`);
+    expect(title).toEqual(`Bus 0`);
+
+    // TODO: Check view content once we decide what goes here exactly
+  });
+
+  it(`should select a container and display a content page with the container name as title`, () => {
+    // select the first container
+    element.all(by.css(`app-containers-menu a.container .md-list-item`)).get(0).click();
+
+    let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+
+    expect(title).toEqual(`Container 0`);
+
+    // select the second container
+    element.all(by.css(`app-containers-menu a.container .md-list-item`)).get(1).click();
+
+    title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+
+    expect(title).toEqual(`Container 1`);
+
+    // TODO: Check view content once we decide what goes here exactly
   });
 
   it(`should create a new workspace and this workspace shouldn't have any bus`, () => {

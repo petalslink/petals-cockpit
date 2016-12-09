@@ -14,8 +14,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <md-toolbar color="primary">
-  <span>
-    Petals
+  <span *ngIf="container">
+    {{ container.name }}
   </span>
 
   <span class="flex-space"></span>
@@ -50,9 +50,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 </md-toolbar>
 
 <md-card class="central-content">
-  <md-card-content>
-    <md-card-title align="center">
-      Petals container content works
-    </md-card-title>
+  <md-card-title align="center">
+    <span *ngIf="container?.isFetchingDetails">Container content : Fetching</span>
+    <span *ngIf="!container?.isFetchingDetails">Container content : Fetched</span>
+  </md-card-title>
+
+  <md-card-content *ngIf="container">
+    <ul>
+      <li *ngIf="container.id"><b>id</b> : {{ container.id }}</li>
+      <li *ngIf="container.name"><b>name</b> : {{ container.name }}</li>
+      <li *ngIf="container.ip"><b>ip</b> : {{ container.ip }}</li>
+      <li *ngIf="container.port"><b>port</b> : {{ container.port }}</li>
+      <li *ngIf="container.reachabilities"><b>reachabilities</b> :</li>
+
+      <ul>
+        <li *ngFor="let reachability of container.reachabilities | keys">
+          <a [routerLink]="[
+            '/cockpit/workspaces', workspace.id,
+            'petals', 'bus', workspace.selectedBusId,
+            'container', reachability.key
+          ]">{{ getContainerById(reachability.key)?.name }}</a> : <span [ngClass]="reachability.value.toLowerCase()">{{ reachability.value }}</span>
+        </li>
+      </ul>
+    </ul>
+
   </md-card-content>
 </md-card>

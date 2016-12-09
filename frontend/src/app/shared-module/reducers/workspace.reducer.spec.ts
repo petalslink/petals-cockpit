@@ -564,6 +564,210 @@ describe(`Workspace Reducer`, () => {
     expect(nextState2.buses).toEqual(jasmine.objectContaining(expectedState2));
   });
 
+  // FETCH_CONTAINER_DETAILS*
+  it(`${WorkspaceActions.FETCH_CONTAINER_DETAILS}`, () => {
+    let stateRWithBus = stateR.set('buses', fromJS([
+      { id: 'idBus1' },
+      {
+        id: 'idBus2',
+        containers: [
+          { id: 'idContainer1' },
+          { id: 'idContainer2' },
+          { id: 'idContainer3' }
+        ]
+      },
+      { id: 'idBus3' }
+    ]));
+
+    // try to fetch details of a non existant container
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(
+      stateRWithBus,
+      {
+        type: WorkspaceActions.FETCH_CONTAINER_DETAILS,
+        payload: { idBus: 'idBus2', idContainer: 'randomId' }
+      }
+    );
+
+    expect(stateRWithBus).toEqual(nextStateR1);
+
+    // try to fetch details of an existing container
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(
+      stateR.update('buses', buses => fromJS([
+        { id: 'idBus1' },
+        {
+          id: 'idBus2',
+          containers: [
+            { id: 'idContainer1', isFetchingDetails: false },
+            { id: 'idContainer2', isFetchingDetails: false },
+            { id: 'idContainer3', isFetchingDetails: false }
+          ]
+        },
+        { id: 'idBus3' }
+      ])),
+      {
+        type: WorkspaceActions.FETCH_CONTAINER_DETAILS,
+        payload: { idBus: 'idBus2', idContainer: 'idContainer2' }
+      }
+    );
+    let nextState2 = nextStateR2.toJS();
+
+    let expectedState2 = [
+      { id: 'idBus1' },
+      {
+        id: 'idBus2',
+        containers: [
+          { id: 'idContainer1', isFetchingDetails: false },
+          { id: 'idContainer2', isFetchingDetails: true },
+          { id: 'idContainer3', isFetchingDetails: false }
+        ]
+      },
+      { id: 'idBus3' }
+    ];
+
+    expect(nextState2.buses).toEqual(jasmine.objectContaining(expectedState2));
+  });
+
+  it(`${WorkspaceActions.FETCH_CONTAINER_DETAILS_SUCCESS}`, () => {
+    let stateRWithBus = stateR.set('buses', fromJS([
+      { id: 'idBus1' },
+      {
+        id: 'idBus2',
+        containers: [
+          { id: 'idContainer1' },
+          { id: 'idContainer2' },
+          { id: 'idContainer3' }
+        ]
+      },
+      { id: 'idBus3' }
+    ]));
+
+    // try to set details of a non existant container
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(
+      stateRWithBus,
+      {
+        type: WorkspaceActions.FETCH_CONTAINER_DETAILS_SUCCESS,
+        payload: {
+          bus: {
+            id: 'idBus2',
+            container: {
+              id: 'randomId'
+            }
+          }
+        }
+      }
+    );
+
+    expect(stateRWithBus).toEqual(nextStateR1);
+
+    // try to set details of an existing container
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(
+      stateR.update('buses', buses => fromJS([
+        { id: 'idBus1' },
+        {
+          id: 'idBus2',
+          containers: [
+            { id: 'idContainer1', isFetchingDetails: false },
+            { id: 'idContainer2', isFetchingDetails: true },
+            { id: 'idContainer3', isFetchingDetails: false }
+          ]
+        },
+        { id: 'idBus3' }
+      ])),
+      {
+        type: WorkspaceActions.FETCH_CONTAINER_DETAILS_SUCCESS,
+        // as we merge values from bus.container into the selected container
+        // we should be able to merge new values
+        payload: {
+          bus: {
+            id: 'idBus2',
+            container: {
+              id: 'idContainer2',
+              someRandomKey: 'random value'
+            }
+          }
+        }
+      }
+    );
+    let nextState2 = nextStateR2.toJS();
+
+    let expectedState2 = [
+      { id: 'idBus1' },
+      {
+        id: 'idBus2',
+        containers: [
+          { id: 'idContainer1', isFetchingDetails: false },
+          { id: 'idContainer2', isFetchingDetails: false, someRandomKey: 'random value' },
+          { id: 'idContainer3', isFetchingDetails: false }
+        ]
+      },
+      { id: 'idBus3' }
+    ];
+
+    expect(nextState2.buses).toEqual(jasmine.objectContaining(expectedState2));
+  });
+
+  it(`${WorkspaceActions.FETCH_CONTAINER_DETAILS_FAILED}`, () => {
+    let stateRWithBus = stateR.set('buses', fromJS([
+      { id: 'idBus1' },
+      {
+        id: 'idBus2',
+        containers: [
+          { id: 'idContainer1' },
+          { id: 'idContainer2' },
+          { id: 'idContainer3' }
+        ]
+      },
+      { id: 'idBus3' }
+    ]));
+
+    // try to fetch details of a non existant container
+    let nextStateR1: IWorkspaceRecord = WorkspaceReducer(
+      stateRWithBus,
+      {
+        type: WorkspaceActions.FETCH_CONTAINER_DETAILS,
+        payload: { idBus: 'idBus2', idContainer: 'randomId' }
+      }
+    );
+
+    expect(stateRWithBus).toEqual(nextStateR1);
+
+    // try to fetch details of an existing container
+    let nextStateR2: IWorkspaceRecord = WorkspaceReducer(
+      stateR.update('buses', buses => fromJS([
+        { id: 'idBus1' },
+        {
+          id: 'idBus2',
+          containers: [
+            { id: 'idContainer1', isFetchingDetails: false },
+            { id: 'idContainer2', isFetchingDetails: false },
+            { id: 'idContainer3', isFetchingDetails: false }
+          ]
+        },
+        { id: 'idBus3' }
+      ])),
+      {
+        type: WorkspaceActions.FETCH_CONTAINER_DETAILS,
+        payload: { idBus: 'idBus2', idContainer: 'idContainer2' }
+      }
+    );
+    let nextState2 = nextStateR2.toJS();
+
+    let expectedState2 = [
+      { id: 'idBus1' },
+      {
+        id: 'idBus2',
+        containers: [
+          { id: 'idContainer1', isFetchingDetails: false },
+          { id: 'idContainer2', isFetchingDetails: true },
+          { id: 'idContainer3', isFetchingDetails: false }
+        ]
+      },
+      { id: 'idBus3' }
+    ];
+
+    expect(nextState2.buses).toEqual(jasmine.objectContaining(expectedState2));
+  });
+
   // FETCH_BUS_CONFIG*
   xit(`${WorkspaceActions.FETCH_BUS_CONFIG}`, () => {
     // TODO

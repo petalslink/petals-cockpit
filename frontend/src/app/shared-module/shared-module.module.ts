@@ -38,9 +38,13 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 // our directives
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
 
+// our pipes
+import { KeysPipe } from './pipes/keys.pipe';
+
 const SHARED_COMPONENTS = [
   NotFoundComponent,
-  ColorSearchedLettersDirective
+  ColorSearchedLettersDirective,
+  KeysPipe
 ];
 
 const SHARED_MODULES = [
