@@ -21,14 +21,27 @@ import java.util.Objects;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.ow2.petals.admin.api.ArtifactAdministration;
+import org.ow2.petals.admin.api.PetalsAdministration;
+import org.ow2.petals.admin.api.artifact.Artifact;
+import org.ow2.petals.admin.api.artifact.ServiceAssembly;
+import org.ow2.petals.admin.api.artifact.lifecycle.ServiceAssemblyLifecycle;
+import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.actors.BusActor.ForBusMsg;
 import org.ow2.petals.cockpit.server.actors.BusActor.GetContainerOverview;
+import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
 import org.ow2.petals.cockpit.server.actors.ContainerActor.Msg;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.WorkspaceEventMsg;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
-import org.ow2.petals.cockpit.server.resources.ContainersResource.ComponentOverview;
-import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerOverview;
-import org.ow2.petals.cockpit.server.resources.ContainersResource.ServiceUnitOverview;
+import org.ow2.petals.cockpit.server.resources.ContainerResource.ComponentOverview;
+import org.ow2.petals.cockpit.server.resources.ContainerResource.ContainerOverview;
+import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit;
+import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit.State;
+import org.ow2.petals.cockpit.server.resources.ContainerResource.ServiceUnitOverview;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewSUState;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
@@ -97,12 +110,100 @@ public class ContainerActor extends CockpitActor<Msg> {
             } else if (msg instanceof GetServiceUnitOverview) {
                 GetServiceUnitOverview get = (GetServiceUnitOverview) msg;
                 assert get.cId == db.id;
-                RequestReplyHelper.reply(get, getServiceUnit(get.compId, get.suId)
-                        .map(su -> new ServiceUnitOverview(su.id, su.name, su.state)).toRight(Status.NOT_FOUND));
+                RequestReplyHelper.reply(get,
+                        getServiceUnit(get.compId, get.suId)
+                                .map(su -> new ServiceUnitOverview(su.id, su.name, su.state, su.saName))
+                                .toRight(Status.NOT_FOUND));
+            } else if (msg instanceof ChangeServiceUnitState) {
+                ChangeServiceUnitState change = (ChangeServiceUnitState) msg;
+                assert change.cId == db.id;
+                Option<SUTree> msu = getServiceUnit(change.compId, change.suId);
+                if (!msu.isDefined()) {
+                    RequestReplyHelper.reply(change, Either.left(Status.NOT_FOUND));
+                } else {
+                    handleSUStateChange(change, msu.get());
+                }
             } else {
                 LOG.warn("Unexpected event for container {}: {}", db.id, msg);
             }
         }
+    }
+
+    private void handleSUStateChange(ChangeServiceUnitState change, SUTree su)
+            throws SuspendExecution, InterruptedException {
+        if (su.state.equals(change.newState)) {
+            RequestReplyHelper.reply(change,
+                    Either.right(new ServiceUnitOverview(su.id, su.name, su.state, su.saName)));
+        } else if (!isSAStateTransitionOk(su, change.newState)) {
+            // TODO or should I rely on the information from the container instead of my own?
+            RequestReplyHelper.reply(change, Either.left(Status.CONFLICT));
+        } else {
+            try {
+                ServiceUnitOverview res = runAdmin(db.ip, db.port, db.username, db.password, petals -> {
+                    ArtifactAdministration aa = petals.newArtifactAdministration();
+                    Artifact a = aa.getArtifact(ServiceAssembly.TYPE, su.saName, null);
+                    assert a instanceof ServiceAssembly;
+                    ServiceAssembly sa = (ServiceAssembly) a;
+                    changeSAState(petals, sa, change.newState);
+                    return new ServiceUnitOverview(su.id, su.name, MinServiceUnit.State.from(sa.getState()), su.saName);
+                });
+
+                serviceUnitStateUpdated(su.id, res.state);
+
+                assert res != null;
+                RequestReplyHelper.reply(change, Either.right(res));
+            } catch (ContainerAdministrationException e) {
+                RequestReplyHelper.replyError(change, e);
+            }
+        }
+    }
+
+    private void serviceUnitStateUpdated(long id, MinServiceUnit.State state)
+            throws SuspendExecution, InterruptedException {
+        // TODO error handling???
+        // TODO I should have a suDb for it, no?
+        runDAO(() -> buses.updateServiceUnitState(id, state));
+        workspace.send(new WorkspaceEventMsg(WorkspaceEvent.suStateChange(new NewSUState(id, state))));
+    }
+
+    /**
+     * 
+     * Note : petals admin does not expose a way to go to shutdown (except from {@link MinServiceUnit.State#NotLoaded},
+     * but we don't support it yet!)
+     */
+    private boolean isSAStateTransitionOk(SUTree su, MinServiceUnit.State to) {
+        switch (su.state) {
+            case Shutdown:
+                return to == State.NotLoaded || to == State.Started;
+            case Started:
+                return to == State.Stopped;
+            case Stopped:
+                return to == State.Started || to == State.NotLoaded;
+            default:
+                LOG.warn("Impossible case for state transition check from {} to {} for SU {} ({})", su.state, to,
+                        su.name, su.id);
+                return false;
+        }
+    }
+
+    private void changeSAState(PetalsAdministration petals, ServiceAssembly sa, State desiredState)
+            throws ArtifactAdministrationException {
+        ServiceAssemblyLifecycle sal = petals.newArtifactLifecycleFactory().createServiceAssemblyLifecycle(sa);
+        switch (desiredState) {
+            case NotLoaded:
+                sal.undeploy();
+                break;
+            case Started:
+                sal.start();
+                break;
+            case Stopped:
+                sal.stop();
+                break;
+            default:
+                LOG.warn("Impossible case for state transition from {} to {} for SA {} ({})", sa.getState(),
+                        desiredState, sa.getName());
+        }
+        sal.updateState();
     }
 
     private Option<SUTree> getServiceUnit(long compId, long suId) {
@@ -117,20 +218,14 @@ public class ContainerActor extends CockpitActor<Msg> {
         // marker interface for messages to this actor
     }
 
-    public static class ContainerRequest<T> extends CockpitActors.Request<T> implements Msg {
-
-        private static final long serialVersionUID = -564899978996631515L;
-
-        public ContainerRequest(String user) {
-            super(user);
-        }
-    }
-
-    public interface ForwardedMsg extends Msg, BusActor.ForwardedMsg, WorkspaceActor.Msg {
+    /**
+     * Meant to be forwarded to container by bus (and before by workspace)
+     */
+    public interface ForContainerMsg extends ContainerActor.Msg, ForBusMsg {
         long getContainerId();
     }
 
-    public static class ForwardedContainerRequest<T> extends ContainerRequest<T> implements ForwardedMsg {
+    public static class ForContainerRequest<T> extends CockpitRequest<T> implements ForContainerMsg {
 
         private static final long serialVersionUID = 308263095400474513L;
 
@@ -138,7 +233,7 @@ public class ContainerActor extends CockpitActor<Msg> {
 
         final long cId;
 
-        public ForwardedContainerRequest(String user, long bId, long cId) {
+        public ForContainerRequest(String user, long bId, long cId) {
             super(user);
             this.bId = bId;
             this.cId = cId;
@@ -155,6 +250,60 @@ public class ContainerActor extends CockpitActor<Msg> {
         }
     }
 
+    public static class ForComponentRequest<T> extends ForContainerRequest<T> {
+
+        private static final long serialVersionUID = -7710132982021451498L;
+
+        final long compId;
+
+        public ForComponentRequest(String user, long bId, long cId, long compId) {
+            super(user, bId, cId);
+            this.compId = compId;
+        }
+    }
+
+    public static class GetComponentOverview extends ForComponentRequest<ComponentOverview> {
+
+        private static final long serialVersionUID = -7710132982021451498L;
+
+        public GetComponentOverview(String user, long bId, long cId, long compId) {
+            super(user, bId, cId, compId);
+        }
+    }
+
+    public static class ForServiceUnitRequest<T> extends ForComponentRequest<T> {
+
+        private static final long serialVersionUID = -9164203963795147371L;
+
+        final long suId;
+
+        public ForServiceUnitRequest(String user, long bId, long cId, long compId, long suId) {
+            super(user, bId, cId, compId);
+            this.suId = suId;
+        }
+    }
+
+    public static class GetServiceUnitOverview extends ForServiceUnitRequest<ServiceUnitOverview> {
+
+        private static final long serialVersionUID = -9164203963795147371L;
+
+        public GetServiceUnitOverview(String user, long bId, long cId, long compId, long suId) {
+            super(user, bId, cId, compId, suId);
+        }
+    }
+
+    public static class ChangeServiceUnitState extends ForServiceUnitRequest<ServiceUnitOverview> {
+
+        private static final long serialVersionUID = 8119375036012239516L;
+
+        final State newState;
+
+        public ChangeServiceUnitState(String user, long bId, long cId, long compId, long suId, State newState) {
+            super(user, bId, cId, compId, suId);
+            this.newState = newState;
+        }
+    }
+
     public static class GetContainerOverviewFromBus implements Msg {
 
         final Map<String, Long> ids;
@@ -164,33 +313,6 @@ public class ContainerActor extends CockpitActor<Msg> {
         public GetContainerOverviewFromBus(GetContainerOverview get, Map<String, Long> ids) {
             this.get = get;
             this.ids = ids;
-        }
-    }
-
-    public static class GetComponentOverview extends ForwardedContainerRequest<ComponentOverview> {
-
-        private static final long serialVersionUID = -7710132982021451498L;
-
-        final long compId;
-
-        public GetComponentOverview(String user, long bId, long cId, long compId) {
-            super(user, bId, cId);
-            this.compId = compId;
-        }
-    }
-
-    public static class GetServiceUnitOverview extends ForwardedContainerRequest<ServiceUnitOverview> {
-
-        private static final long serialVersionUID = -9164203963795147371L;
-
-        final long compId;
-
-        final long suId;
-
-        public GetServiceUnitOverview(String user, long bId, long cId, long compId, long suId) {
-            super(user, bId, cId);
-            this.compId = compId;
-            this.suId = suId;
         }
     }
 }

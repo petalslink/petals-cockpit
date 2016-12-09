@@ -30,17 +30,19 @@ import org.glassfish.jersey.server.BroadcasterListener;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.actors.BusActor.ForBusMsg;
+import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
-import org.ow2.petals.cockpit.server.resources.BusesResource.BusInError;
-import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
-import org.ow2.petals.cockpit.server.resources.BusesResource.NewBus;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInError;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewBus;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
 import co.paralleluniverse.actors.ActorRef;
@@ -55,7 +57,8 @@ import javaslang.control.Option;
 /**
  * TODO should we make it die after some time if there is no listeners? not sure, see next TODO
  * 
- * TODO should we start it on application start? for now it doesn't make any sense
+ * TODO should we start it on application start? for now it doesn't make any sense since the actor are not proactively
+ * monitoring the buses
  * 
  * @author vnoel
  *
@@ -101,8 +104,10 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         for (;;) {
             Msg msg = receive();
-            if (msg instanceof GetTree) {
-                answer((GetTree) msg, m -> Either.right(tree));
+            if (msg instanceof WorkspaceEventMsg) {
+                broadcast(((WorkspaceEventMsg) msg).event);
+            } else if (msg instanceof GetWorkspaceTree) {
+                answer((GetWorkspaceTree) msg, m -> Either.right(tree));
             } else if (msg instanceof ImportBus) {
                 answer((ImportBus) msg, this::handleImportBus);
             } else if (msg instanceof DeleteBus) {
@@ -116,26 +121,33 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                         return Either.right(null);
                     }
                 });
-            } else if (msg instanceof NewClient) {
+            } else if (msg instanceof NewWorkspaceClient) {
                 LOG.debug("New SSE client for workspace {}", db.id);
                 // this one is coming from the SSE resource
-                answer((NewClient) msg, nc -> {
+                answer((NewWorkspaceClient) msg, nc -> {
                     broadcaster.add(nc.output);
+                    // TODO why would we need to answer actually?!
                     return Either.right(null);
                 });
-            } else if (msg instanceof BusActor.ForwardedMsg && msg instanceof CockpitActors.Request) {
-                forward((CockpitActors.Request<?> & BusActor.ForwardedMsg) msg);
+            } else if (msg instanceof ForBusMsg && msg instanceof CockpitRequest) {
+                forward((CockpitRequest<?> & ForBusMsg) msg);
             } else {
                 LOG.warn("Unexpected event for workspace {}: {}", db.id, msg);
             }
         }
     }
 
+    private void broadcast(WorkspaceEvent event) {
+        OutboundEvent oe = new OutboundEvent.Builder().name("WORKSPACE_CHANGE")
+                .mediaType(MediaType.APPLICATION_JSON_TYPE).data(event).build();
+        broadcaster.broadcast(oe);
+    }
+
     private boolean hasAccess(String username) {
         return db.users.stream().anyMatch(username::equals);
     }
 
-    public <R extends CockpitActors.Request<?> & BusActor.ForwardedMsg> void forward(R req) throws SuspendExecution {
+    public <R extends CockpitRequest<?> & ForBusMsg> void forward(R req) throws SuspendExecution {
         @SuppressWarnings("resource")
         ActorRef<BusActor.Msg> bus = wsBuses.get(req.getBusId());
         if (!hasAccess(req.user)) {
@@ -147,7 +159,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private <R, T extends CockpitActors.Request<R>> void answer(T r, CheckedFunction1<T, Either<Status, R>> f)
+    private <R, T extends CockpitRequest<R>> void answer(T r, CheckedFunction1<T, Either<Status, R>> f)
             throws SuspendExecution {
         try {
             if (hasAccess(r.user)) {
@@ -166,16 +178,12 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         final long bId = runDAO(() -> buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, db.id));
 
         // we use a fiber to let the actor handles other message during bus import
-        new Fiber<>(() -> importBus(bId, nb)).start();
+        new Fiber<>(() -> {
+            WorkspaceEvent ev = doImportBus(bId, nb);
+            self().send(new WorkspaceEventMsg(ev));
+        }).start();
 
         return Either.right(new BusInProgress(bId, nb.ip, nb.port, nb.username));
-    }
-
-    private void importBus(long bId, NewBus bus) throws SuspendExecution, InterruptedException {
-        WorkspaceEvent ev = doImportBus(bId, bus);
-        OutboundEvent oe = new OutboundEvent.Builder().name("WORKSPACE_CHANGE")
-                .mediaType(MediaType.APPLICATION_JSON_TYPE).data(ev).build();
-        broadcaster.broadcast(oe);
     }
 
     private WorkspaceEvent doImportBus(long bId, NewBus bus) throws SuspendExecution, InterruptedException {
@@ -192,7 +200,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             // because then it would be akward to have the bus create the container object in db so...
             wsBuses.put(tree.id, as.getActor(new BusActor(bTree, self())));
 
-            return WorkspaceEvent.ok(bTree);
+            return WorkspaceEvent.busImportOk(bTree);
         } catch (Exception e) {
             String m = e.getMessage();
             String message = m != null ? m : e.getClass().getName();
@@ -200,12 +208,9 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             LOG.info("Can't import bus from container {}:{}: {}", bus.ip, bus.port, message);
             LOG.debug("Can't import bus from container {}:{}", bus.ip, bus.port, e);
 
-            runDAO(() -> {
-                buses.saveError(bId, message);
-                return null;
-            });
+            runDAO(() -> buses.saveError(bId, message));
 
-            return WorkspaceEvent.error(new BusInError(bId, bus.ip, bus.port, bus.username, message));
+            return WorkspaceEvent.busImportError(new BusInError(bId, bus.ip, bus.port, bus.username, message));
         }
     }
 
@@ -219,7 +224,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         // marker interface for messages to this actor
     }
 
-    public static class WorkspaceRequest<T> extends CockpitActors.Request<T> implements Msg {
+    public static class WorkspaceRequest<T> extends CockpitRequest<T> implements Msg {
 
         private static final long serialVersionUID = -564899978996631515L;
 
@@ -228,13 +233,13 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    public static class NewClient extends WorkspaceRequest<@Nullable Void> {
+    public static class NewWorkspaceClient extends WorkspaceRequest<@Nullable Void> {
 
         private static final long serialVersionUID = 1L;
 
         final EventOutput output;
 
-        public NewClient(String user, EventOutput output) {
+        public NewWorkspaceClient(String user, EventOutput output) {
             super(user);
             this.output = output;
         }
@@ -264,39 +269,22 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    public static class GetTree extends WorkspaceRequest<WorkspaceTree> {
+    public static class GetWorkspaceTree extends WorkspaceRequest<WorkspaceTree> {
 
         private static final long serialVersionUID = -2520646870000161079L;
 
-        public GetTree(String user) {
+        public GetWorkspaceTree(String user) {
             super(user);
         }
     }
 
-    public static class WorkspaceEvent {
+    public static class WorkspaceEventMsg implements Msg {
 
-        @JsonProperty
-        private final String event;
+        final WorkspaceEvent event;
 
-        @JsonProperty
-        private final Object data;
-
-        public WorkspaceEvent(String event, Object data) {
+        public WorkspaceEventMsg(WorkspaceEvent event) {
             this.event = event;
-            this.data = data;
         }
 
-        public static WorkspaceEvent error(BusInError bus) {
-            return new WorkspaceEvent("BUS_IMPORT_ERROR", bus);
-        }
-
-        public static WorkspaceEvent ok(BusTree bus) {
-            return new WorkspaceEvent("BUS_IMPORT_OK", bus);
-        }
-
-        @Override
-        public String toString() {
-            return "WorkspaceEvent [event=" + event + ", data=" + data + "]";
-        }
     }
 }

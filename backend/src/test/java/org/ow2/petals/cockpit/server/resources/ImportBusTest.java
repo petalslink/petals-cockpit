@@ -24,18 +24,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Consumer;
 
 import javax.ws.rs.client.Entity;
 
 import org.glassfish.jersey.media.sse.EventInput;
-import org.glassfish.jersey.media.sse.InboundEvent;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.ow2.petals.admin.api.artifact.Component;
+import org.ow2.petals.admin.api.artifact.Component.ComponentType;
+import org.ow2.petals.admin.api.artifact.ServiceAssembly;
+import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
@@ -44,7 +43,7 @@ import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
-import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvider;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -110,12 +109,10 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
             assertThat(post.id).isEqualTo(4);
 
             // TODO add timeout
-            expectEvent(eventInput, e -> {
-                assertThat(e.getName()).isEqualTo("WORKSPACE_CHANGE");
-                ImportBusEvent ev = e.readData(ImportBusEvent.class);
-                assertThat(ev.event).isEqualTo("BUS_IMPORT_OK");
-                assertThat(ev.data.get("id")).isEqualTo(post.getId());
-                assertThat(ev.data.get("name")).isEqualTo(domain.getName());
+            expectWorkspaceEvent(eventInput, (e, a) -> {
+                a.assertThat(e.event).isEqualTo("BUS_IMPORT_OK");
+                a.assertThat(e.data.get("id")).isEqualTo(post.getId());
+                a.assertThat(e.data.get("name")).isEqualTo(domain.getName());
             });
         }
 
@@ -140,11 +137,9 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
             assertThat(post.id).isEqualTo(5);
 
             // TODO add timeout
-            expectEvent(eventInput, e -> {
-                assertThat(e.getName()).isEqualTo("WORKSPACE_CHANGE");
-                ImportBusEvent ev = e.readData(ImportBusEvent.class);
-                assertThat(ev.event).isEqualTo("BUS_IMPORT_ERROR");
-                assertThat(ev.data.get("importError")).isEqualTo("Unknown Host");
+            expectWorkspaceEvent(eventInput, (e, a) -> {
+                a.assertThat(e.event).isEqualTo("BUS_IMPORT_ERROR");
+                a.assertThat(e.data.get("importError")).isEqualTo("Unknown Host");
             });
         }
 
@@ -154,29 +149,30 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
         verify(buses).saveError(5, "Unknown Host");
     }
 
-    private static void expectEvent(EventInput eventInput, Consumer<InboundEvent> c) {
-        while (!eventInput.isClosed()) {
-            final InboundEvent inboundEvent = eventInput.read();
-            if (inboundEvent == null) {
-                // connection has been closed
-                break;
-            }
+    @Test
+    public void importBusErrorSA() {
+        petals.registerArtifact(new Component("comp", ComponentType.BC), container);
+        petals.registerArtifact(
+                new ServiceAssembly("sa", new ServiceUnit("su1", "comp"), new ServiceUnit("su2", "comp")), container);
 
-            c.accept(inboundEvent);
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
+                .get(EventInput.class)) {
 
-            eventInput.close();
+            BusInProgress post = resources.getJerseyTest()
+                    .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),
+                            containerPort, container.getJmxUsername(), container.getJmxPassword(), "phrase")),
+                            BusInProgress.class);
+
+            assertThat(post.id).isEqualTo(4);
+
+            // TODO add timeout
+            expectWorkspaceEvent(eventInput, (e, a) -> {
+                a.assertThat(e.event).isEqualTo("BUS_IMPORT_ERROR");
+                a.assertThat((String) e.data.get("importError"))
+                        .contains("Buses with not-single SU SAs are not supported");
+            });
         }
     }
-}
-
-class ImportBusEvent {
-
-    @JsonProperty
-    @NotEmpty
-    public String event = "";
-
-    @JsonProperty
-    public Map<?, ?> data = new HashMap<>();
 }
 
 /**

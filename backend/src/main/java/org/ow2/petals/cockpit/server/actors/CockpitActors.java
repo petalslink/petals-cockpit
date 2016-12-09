@@ -78,10 +78,11 @@ public class CockpitActors {
 
     /**
      * TODO instead of doing that, we could simply pass the request to the actor that will answer it with an
-     * {@link AsyncResponse}.
+     * {@link AsyncResponse}. The problem is that we would loose the static typing of each of the REST methods (as well
+     * as the possibility to automatically generate documentation from it)
      */
     @SuppressWarnings("resource")
-    public <O, I extends Request<O> & WorkspaceActor.Msg> Either<Status, O> call(long wsId, I msg)
+    public <O, I extends CockpitRequest<O> & WorkspaceActor.Msg> Either<Status, O> call(long wsId, I msg)
             throws InterruptedException {
         try {
             Optional<ActorRef<Msg>> ma = getWorkspace(wsId);
@@ -99,15 +100,14 @@ public class CockpitActors {
     /**
      * This represents requests coming from the REST API (i.e. Jersey's Resources)
      */
-    public abstract static class Request<R> extends RequestMessage<Either<Status, R>> {
+    public abstract static class CockpitRequest<R> extends RequestMessage<Either<Status, R>> {
 
         private static final long serialVersionUID = -5915325922592086753L;
 
         final String user;
 
-        public Request(String user) {
+        public CockpitRequest(String user) {
             this.user = user;
         }
     }
-
 }

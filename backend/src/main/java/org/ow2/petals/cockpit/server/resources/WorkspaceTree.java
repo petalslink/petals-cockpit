@@ -37,13 +37,13 @@ import org.ow2.petals.cockpit.server.db.BusesDAO.DbComponent;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbServiceUnit;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
-import org.ow2.petals.cockpit.server.resources.BusesResource.BusInError;
-import org.ow2.petals.cockpit.server.resources.BusesResource.BusInProgress;
-import org.ow2.petals.cockpit.server.resources.BusesResource.MinBus;
-import org.ow2.petals.cockpit.server.resources.ContainersResource.MinComponent;
-import org.ow2.petals.cockpit.server.resources.ContainersResource.MinContainer;
-import org.ow2.petals.cockpit.server.resources.ContainersResource.MinServiceUnit;
-import org.ow2.petals.cockpit.server.resources.WorkspacesResource.MinWorkspace;
+import org.ow2.petals.cockpit.server.resources.BusResource.MinBus;
+import org.ow2.petals.cockpit.server.resources.ContainerResource.MinComponent;
+import org.ow2.petals.cockpit.server.resources.ContainerResource.MinContainer;
+import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInError;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.MinWorkspace;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -70,13 +70,23 @@ public class WorkspaceTree extends MinWorkspace {
         this.busesInProgress = ImmutableList.copyOf(busesInProgress);
     }
 
+    public static class InvalidPetalsBus extends Exception {
+
+        private static final long serialVersionUID = 8866405347860930056L;
+
+        public InvalidPetalsBus(String msg) {
+            super(msg);
+        }
+
+    }
+
     /**
      * Meant to be called from inside a DB transaction!
      * 
      * TODO this should be done by {@link WorkspaceActor}
      */
     @Suspendable
-    public static BusTree buildAndSaveToDatabase(BusesDAO buses, long bId, Domain topology) {
+    public static BusTree buildAndSaveToDatabase(BusesDAO buses, long bId, Domain topology) throws InvalidPetalsBus {
         List<ContainerTree> cs = new ArrayList<>();
         for (Container container : topology.getContainers()) {
             Integer port = container.getPorts().get(PortType.JMX);
@@ -87,14 +97,19 @@ public class WorkspaceTree extends MinWorkspace {
             for (Component component : container.getComponents()) {
                 MinComponent.State compState = MinComponent.State.from(component.getState());
                 MinComponent.Type compType = MinComponent.Type.from(component.getComponentType());
-                long compId = buses.createComponent(component.getName(), compState.name(), compType.name(), cId);
+                long compId = buses.createComponent(component.getName(), compState, compType, cId);
                 List<SUTree> sus = new ArrayList<>();
                 for (ServiceAssembly sa : container.getServiceAssemblies()) {
+                    if (sa.getServiceUnits().size() != 1) {
+                        throw new InvalidPetalsBus("Buses with not-single SU SAs are not supported!");
+                    }
                     for (ServiceUnit su : sa.getServiceUnits()) {
                         if (su.getTargetComponent().equals(component.getName())) {
+                            // TODO is this information returned by admin correct? Some SUs could be in a different
+                            // state in case of problems...!
                             SUTree.State suState = SUTree.State.from(sa.getState());
-                            long suId = buses.createServiceUnit(su.getName(), suState.name(), compId);
-                            sus.add(new SUTree(suId, su.getName(), suState));
+                            long suId = buses.createServiceUnit(su.getName(), suState, compId, sa.getName());
+                            sus.add(new SUTree(suId, su.getName(), suState, sa.getName()));
                         }
                     }
                 }
@@ -122,10 +137,9 @@ public class WorkspaceTree extends MinWorkspace {
                     for (DbComponent comp : buses.getComponentsByContainer(c)) {
                         List<SUTree> sus = new ArrayList<>();
                         for (DbServiceUnit su : buses.getServiceUnitByComponent(comp)) {
-                            sus.add(new SUTree(su.id, su.name, SUTree.State.valueOf(su.state)));
+                            sus.add(new SUTree(su.id, su.name, su.state, su.saName));
                         }
-                        comps.add(new ComponentTree(comp.id, comp.name, MinComponent.State.valueOf(comp.state),
-                                MinComponent.Type.valueOf(comp.type), sus));
+                        comps.add(new ComponentTree(comp.id, comp.name, comp.state, comp.type, sus));
                     }
                     cs.add(new ContainerTree(c.id, c.name, comps));
                 }
@@ -188,8 +202,8 @@ public class WorkspaceTree extends MinWorkspace {
     public static class SUTree extends MinServiceUnit {
 
         public SUTree(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("state") State state) {
-            super(id, name, state);
+                @JsonProperty("state") State state, @JsonProperty("saName") String saName) {
+            super(id, name, state, saName);
         }
     }
 }

@@ -18,13 +18,13 @@ package org.ow2.petals.cockpit.server.resources;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -34,9 +34,11 @@ import javax.ws.rs.core.MediaType;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
-import org.ow2.petals.cockpit.server.actors.BusActor;
+import org.ow2.petals.cockpit.server.actors.BusActor.GetContainerOverview;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
-import org.ow2.petals.cockpit.server.actors.ContainerActor;
+import org.ow2.petals.cockpit.server.actors.ContainerActor.ChangeServiceUnitState;
+import org.ow2.petals.cockpit.server.actors.ContainerActor.GetComponentOverview;
+import org.ow2.petals.cockpit.server.actors.ContainerActor.GetServiceUnitOverview;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -44,54 +46,118 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 
-@Singleton
-public class ContainersResource {
+public class ContainerResource {
 
-    @Path("/{cId}")
-    public Class<ContainerResource> containerResource() {
-        return ContainerResource.class;
+    private final long wsId;
+
+    private final long bId;
+
+    private final long cId;
+
+    private final CockpitActors as;
+
+    public ContainerResource(CockpitActors as, long wsId, long bId, long cId) {
+        this.as = as;
+        this.wsId = wsId;
+        this.bId = bId;
+        this.cId = cId;
     }
 
-    public static class ContainerResource {
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Valid
+    public ContainerOverview get(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
+        return as.call(wsId, new GetContainerOverview(profile.getUser().getUsername(), bId, cId))
+                .getOrElseThrow(s -> new WebApplicationException(s));
+    }
+
+    @Path("/components/{compId}")
+    public ComponentResource component(@PathParam("compId") @Min(1) long compId) {
+        return new ComponentResource(as, wsId, bId, cId, compId);
+    }
+
+    public static class ComponentResource {
+
+        private final long wsId;
+
+        private final long bId;
+
+        private final long cId;
+
+        private final long compId;
 
         private final CockpitActors as;
 
-        @Inject
-        public ContainerResource(CockpitActors as) {
+        public ComponentResource(CockpitActors as, long wsId, long bId, long cId, long compId) {
             this.as = as;
+            this.wsId = wsId;
+            this.bId = bId;
+            this.cId = cId;
+            this.compId = compId;
+        }
+
+        @Path("/serviceunits/{suId}")
+        public SUResource su(@PathParam("suId") @Min(1) long suId) {
+            return new SUResource(as, wsId, bId, cId, compId, suId);
         }
 
         @GET
         @Produces(MediaType.APPLICATION_JSON)
-        @Valid
-        public ContainerOverview get(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
-                @PathParam("cId") @Min(1) long cId, @Pac4JProfile CockpitProfile profile) throws InterruptedException {
-            return as.call(wsId, new BusActor.GetContainerOverview(profile.getUser().getUsername(), bId, cId))
+        public ComponentOverview getComp(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
+            return as.call(wsId, new GetComponentOverview(profile.getUser().getUsername(), bId, cId, compId))
+                    .getOrElseThrow(s -> new WebApplicationException(s));
+        }
+    }
+
+    public static class SUResource {
+
+        private final long wsId;
+
+        private final long bId;
+
+        private final long cId;
+
+        private final long compId;
+
+        private final long suId;
+
+        private final CockpitActors as;
+
+        public SUResource(CockpitActors as, long wsId, long bId, long cId, long compId, long suId) {
+            this.as = as;
+            this.wsId = wsId;
+            this.bId = bId;
+            this.cId = cId;
+            this.compId = compId;
+            this.suId = suId;
+        }
+
+        @GET
+        @Produces(MediaType.APPLICATION_JSON)
+        public ServiceUnitOverview getSU(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
+            return as.call(wsId, new GetServiceUnitOverview(profile.getUser().getUsername(), bId, cId, compId, suId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
         }
 
-        @GET
-        @Path("/components/{compId}")
+        @PUT
+        @Consumes(MediaType.APPLICATION_JSON)
         @Produces(MediaType.APPLICATION_JSON)
-        public ComponentOverview getComp(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
-                @PathParam("cId") @Min(1) long cId, @PathParam("compId") @Min(1) long compId,
-                @Pac4JProfile CockpitProfile profile) throws InterruptedException {
-            return as
-                    .call(wsId,
-                            new ContainerActor.GetComponentOverview(profile.getUser().getUsername(), bId, cId, compId))
-                    .getOrElseThrow(s -> new WebApplicationException(s));
-        }
-
-        @GET
-        @Path("/components/{compId}/serviceunits/{suId}")
-        @Produces(MediaType.APPLICATION_JSON)
-        public ServiceUnitOverview getSU(@PathParam("wsId") @Min(1) long wsId, @PathParam("bId") @Min(1) long bId,
-                @PathParam("cId") @Min(1) long cId, @PathParam("compId") @Min(1) long compId,
-                @PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile)
+        public ServiceUnitOverview changeSUState(@Pac4JProfile CockpitProfile profile, @Valid ChangeState action)
                 throws InterruptedException {
             return as.call(wsId,
-                    new ContainerActor.GetServiceUnitOverview(profile.getUser().getUsername(), bId, cId, compId, suId))
+                    new ChangeServiceUnitState(profile.getUser().getUsername(), bId, cId, compId, suId, action.state))
                     .getOrElseThrow(s -> new WebApplicationException(s));
+        }
+    }
+
+    public static class ChangeState {
+
+        @NotNull
+        @JsonProperty
+        public final MinServiceUnit.State state;
+
+        public ChangeState(@JsonProperty("state") MinServiceUnit.State state) {
+            this.state = state;
         }
     }
 
@@ -131,8 +197,8 @@ public class ContainersResource {
 
         @JsonCreator
         public ContainerOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("ip") String ip,
-                @JsonProperty("port") int port, @JsonProperty("reachabilities") Map<String, String> reachabilities) {
+                @JsonProperty("ip") String ip, @JsonProperty("port") int port,
+                @JsonProperty("reachabilities") Map<String, String> reachabilities) {
             super(id, name);
             this.ip = ip;
             this.port = port;
@@ -143,7 +209,7 @@ public class ContainersResource {
     public abstract static class MinComponent {
 
         public enum State {
-            Loaded, Started, Stopped, Shutdown, Unknown;
+            NotLoaded, Loaded, Shutdown, Stopped, Started, Unknown;
 
             public static State from(ArtifactState.State state) {
                 switch (state) {
@@ -158,7 +224,7 @@ public class ContainersResource {
                     case UNKNOWN:
                         return Unknown;
                     default:
-                        throw new AssertionError();
+                        throw new AssertionError("impossible");
                 }
             }
         }
@@ -217,12 +283,10 @@ public class ContainersResource {
 
     public abstract static class MinServiceUnit {
         public enum State {
-            Loaded, Started, Stopped, Shutdown, Unknown;
+            NotLoaded, Started, Stopped, Shutdown, Unknown;
 
             public static State from(ArtifactState.State state) {
                 switch (state) {
-                    case LOADED:
-                        return Loaded;
                     case STARTED:
                         return Started;
                     case STOPPED:
@@ -231,8 +295,10 @@ public class ContainersResource {
                         return Shutdown;
                     case UNKNOWN:
                         return Unknown;
+                    case LOADED:
+                        throw new AssertionError("Loaded state does not exist for SA/SU");
                     default:
-                        throw new AssertionError();
+                        throw new AssertionError("impossible");
                 }
             }
         }
@@ -248,10 +314,15 @@ public class ContainersResource {
         @JsonProperty
         public final State state;
 
-        public MinServiceUnit(long id, String name, State state) {
+        @NotNull
+        @JsonProperty
+        public final String saName;
+
+        public MinServiceUnit(long id, String name, State state, String saName) {
             this.id = id;
             this.name = name;
             this.state = state;
+            this.saName = saName;
         }
 
         @JsonProperty
@@ -263,8 +334,8 @@ public class ContainersResource {
     public static class ServiceUnitOverview extends MinServiceUnit {
 
         public ServiceUnitOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("state") State state) {
-            super(id, name, state);
+                @JsonProperty("state") State state, @JsonProperty("saName") String saName) {
+            super(id, name, state, saName);
         }
     }
 }

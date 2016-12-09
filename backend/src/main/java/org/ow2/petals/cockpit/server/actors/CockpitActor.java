@@ -22,7 +22,6 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.ow2.petals.admin.api.ContainerAdministration;
 import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
@@ -39,6 +38,7 @@ import co.paralleluniverse.actors.BasicActor;
 import co.paralleluniverse.common.util.CheckedCallable;
 import co.paralleluniverse.fibers.FiberAsync;
 import co.paralleluniverse.fibers.SuspendExecution;
+import javaslang.CheckedFunction1;
 import javaslang.Tuple2;
 import javaslang.control.Option;
 
@@ -68,11 +68,46 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
     /**
      * This is needed because the java compiler has trouble typechecking lambda on {@link CheckedCallable}.
      */
-    protected <T> T runDAO(Supplier<T> s) throws SuspendExecution, InterruptedException {
-        return FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<T, RuntimeException>() {
+    protected <R> R runDAO(Supplier<R> s) throws SuspendExecution, InterruptedException {
+        return FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<R, RuntimeException>() {
             @Override
-            public T call() {
+            public R call() {
                 return s.get();
+            }
+        });
+    }
+
+    protected <R> R runAdmin(String ip, int port, String username, String password,
+            CheckedFunction1<PetalsAdministration, R> f)
+            throws ContainerAdministrationException, SuspendExecution, InterruptedException {
+        return FiberAsync.runBlocking(paExecutor, new CheckedCallable<R, ContainerAdministrationException>() {
+            @Override
+            public R call() throws ContainerAdministrationException {
+                final PetalsAdministration petals;
+                try {
+                    petals = PetalsAdministrationFactory.getInstance().newPetalsAdministrationAPI();
+                } catch (DuplicatedServiceException | MissingServiceException e) {
+                    throw new AssertionError(e);
+                }
+
+                try {
+                    petals.connect(ip, port, username, password);
+
+                    return f.apply(petals);
+                } catch (ContainerAdministrationException e) {
+                    throw e;
+                } catch (Throwable e) {
+                    // TODO this is not the best... use Try or Either instead?
+                    throw new RuntimeException(e);
+                } finally {
+                    try {
+                        if (petals.isConnected()) {
+                            petals.disconnect();
+                        }
+                    } catch (ContainerAdministrationException e) {
+                        LOG.warn("Error while disconnecting from container", e);
+                    }
+                }
             }
         });
     }
@@ -80,44 +115,12 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
     protected Domain getTopology(String ip, int port, String username, String password,
             Option<Tuple2<String, Boolean>> extra)
             throws ContainerAdministrationException, SuspendExecution, InterruptedException {
-        return FiberAsync.runBlocking(paExecutor, new CheckedCallable<Domain, ContainerAdministrationException>() {
-            @Override
-            public Domain call() throws ContainerAdministrationException {
-                return getTopology0(ip, port, username, password, extra);
-            }
-        });
-    }
 
-    /**
-     * This is meant to be run inside the thread executor with fiber async because it is blocking.
-     */
-    private Domain getTopology0(String ip, int port, String username, String password,
-            Option<Tuple2<String, Boolean>> extra) throws ContainerAdministrationException {
-
-        final PetalsAdministration petals;
-        try {
-            petals = PetalsAdministrationFactory.getInstance().newPetalsAdministrationAPI();
-        } catch (DuplicatedServiceException | MissingServiceException e) {
-            throw new AssertionError(e);
-        }
-
-        try {
-            petals.connect(ip, port, username, password);
-
-            final ContainerAdministration container = petals.newContainerAdministration();
-
+        return runAdmin(ip, port, username, password, petals -> {
             String passphrase = extra.map(Tuple2::_1).getOrElse("");
             boolean artifacts = extra.map(Tuple2::_2).getOrElse(false);
 
-            return container.getTopology(passphrase, artifacts);
-        } finally {
-            try {
-                if (petals.isConnected()) {
-                    petals.disconnect();
-                }
-            } catch (ContainerAdministrationException e) {
-                LOG.warn("Error while disconnecting from container", e);
-            }
-        }
+            return petals.newContainerAdministration().getTopology(passphrase, artifacts);
+        });
     }
 }
