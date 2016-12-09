@@ -98,7 +98,7 @@ build-product:
     - build-frontend
   script:
     - 'maven dependency:purge-local-repository --non-recursive -DmanualInclude="org.ow2.petals:petals-cockpit-server,org.ow2.petals:petals-cockpit-parent" -DreResolve=false -DsnapshotsOnly=true'
-    - "maven -pl cockpit package"
+    - "maven -pl cockpit verify"
   artifacts:
     paths:
       - cockpit/target/petals-cockpit-*-capsule.jar
