@@ -24,16 +24,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiConsumer;
 
 import javax.ws.rs.client.Entity;
 
-import org.assertj.core.api.SoftAssertions;
 import org.glassfish.jersey.media.sse.EventInput;
-import org.glassfish.jersey.media.sse.InboundEvent;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -115,12 +109,10 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
             assertThat(post.id).isEqualTo(4);
 
             // TODO add timeout
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("WORKSPACE_CHANGE");
-                ImportBusEvent ev = e.readData(ImportBusEvent.class);
-                a.assertThat(ev.event).isEqualTo("BUS_IMPORT_OK");
-                a.assertThat(ev.data.get("id")).isEqualTo(post.getId());
-                a.assertThat(ev.data.get("name")).isEqualTo(domain.getName());
+            expectWorkspaceEvent(eventInput, (e, a) -> {
+                a.assertThat(e.event).isEqualTo("BUS_IMPORT_OK");
+                a.assertThat(e.data.get("id")).isEqualTo(post.getId());
+                a.assertThat(e.data.get("name")).isEqualTo(domain.getName());
             });
         }
 
@@ -145,11 +137,9 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
             assertThat(post.id).isEqualTo(5);
 
             // TODO add timeout
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("WORKSPACE_CHANGE");
-                ImportBusEvent ev = e.readData(ImportBusEvent.class);
-                a.assertThat(ev.event).isEqualTo("BUS_IMPORT_ERROR");
-                a.assertThat(ev.data.get("importError")).isEqualTo("Unknown Host");
+            expectWorkspaceEvent(eventInput, (e, a) -> {
+                a.assertThat(e.event).isEqualTo("BUS_IMPORT_ERROR");
+                a.assertThat(e.data.get("importError")).isEqualTo("Unknown Host");
             });
         }
 
@@ -176,44 +166,13 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
             assertThat(post.id).isEqualTo(4);
 
             // TODO add timeout
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("WORKSPACE_CHANGE");
-                ImportBusEvent ev = e.readData(ImportBusEvent.class);
-                a.assertThat(ev.event).isEqualTo("BUS_IMPORT_ERROR");
-                a.assertThat((String) ev.data.get("importError"))
+            expectWorkspaceEvent(eventInput, (e, a) -> {
+                a.assertThat(e.event).isEqualTo("BUS_IMPORT_ERROR");
+                a.assertThat((String) e.data.get("importError"))
                         .contains("Buses with not-single SU SAs are not supported");
             });
         }
     }
-
-    private static void expectEvent(EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {
-        SoftAssertions sa = new SoftAssertions();
-        while (!eventInput.isClosed()) {
-            try {
-                final InboundEvent inboundEvent = eventInput.read();
-                if (inboundEvent == null) {
-                    // connection has been closed
-                    break;
-                }
-
-                c.accept(inboundEvent, sa);
-
-                sa.assertAll();
-            } finally {
-                eventInput.close();
-            }
-        }
-    }
-}
-
-class ImportBusEvent {
-
-    @JsonProperty
-    @NotEmpty
-    public String event = "";
-
-    @JsonProperty
-    public Map<?, ?> data = new HashMap<>();
 }
 
 /**

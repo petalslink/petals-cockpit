@@ -57,7 +57,8 @@ import javaslang.control.Option;
 /**
  * TODO should we make it die after some time if there is no listeners? not sure, see next TODO
  * 
- * TODO should we start it on application start? for now it doesn't make any sense
+ * TODO should we start it on application start? for now it doesn't make any sense since the actor are not proactively
+ * monitoring the buses
  * 
  * @author vnoel
  *
@@ -103,7 +104,9 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         for (;;) {
             Msg msg = receive();
-            if (msg instanceof GetWorkspaceTree) {
+            if (msg instanceof WorkspaceEventMsg) {
+                broadcast(((WorkspaceEventMsg) msg).event);
+            } else if (msg instanceof GetWorkspaceTree) {
                 answer((GetWorkspaceTree) msg, m -> Either.right(tree));
             } else if (msg instanceof ImportBus) {
                 answer((ImportBus) msg, this::handleImportBus);
@@ -123,6 +126,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 // this one is coming from the SSE resource
                 answer((NewWorkspaceClient) msg, nc -> {
                     broadcaster.add(nc.output);
+                    // TODO why would we need to answer actually?!
                     return Either.right(null);
                 });
             } else if (msg instanceof ForBusMsg && msg instanceof CockpitRequest) {
@@ -131,6 +135,12 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 LOG.warn("Unexpected event for workspace {}: {}", db.id, msg);
             }
         }
+    }
+
+    private void broadcast(WorkspaceEvent event) {
+        OutboundEvent oe = new OutboundEvent.Builder().name("WORKSPACE_CHANGE")
+                .mediaType(MediaType.APPLICATION_JSON_TYPE).data(event).build();
+        broadcaster.broadcast(oe);
     }
 
     private boolean hasAccess(String username) {
@@ -168,16 +178,12 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         final long bId = runDAO(() -> buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, db.id));
 
         // we use a fiber to let the actor handles other message during bus import
-        new Fiber<>(() -> importBus(bId, nb)).start();
+        new Fiber<>(() -> {
+            WorkspaceEvent ev = doImportBus(bId, nb);
+            self().send(new WorkspaceEventMsg(ev));
+        }).start();
 
         return Either.right(new BusInProgress(bId, nb.ip, nb.port, nb.username));
-    }
-
-    private void importBus(long bId, NewBus bus) throws SuspendExecution, InterruptedException {
-        WorkspaceEvent ev = doImportBus(bId, bus);
-        OutboundEvent oe = new OutboundEvent.Builder().name("WORKSPACE_CHANGE")
-                .mediaType(MediaType.APPLICATION_JSON_TYPE).data(ev).build();
-        broadcaster.broadcast(oe);
     }
 
     private WorkspaceEvent doImportBus(long bId, NewBus bus) throws SuspendExecution, InterruptedException {
@@ -194,7 +200,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             // because then it would be akward to have the bus create the container object in db so...
             wsBuses.put(tree.id, as.getActor(new BusActor(bTree, self())));
 
-            return WorkspaceEvent.ok(bTree);
+            return WorkspaceEvent.busImportOk(bTree);
         } catch (Exception e) {
             String m = e.getMessage();
             String message = m != null ? m : e.getClass().getName();
@@ -202,12 +208,9 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             LOG.info("Can't import bus from container {}:{}: {}", bus.ip, bus.port, message);
             LOG.debug("Can't import bus from container {}:{}", bus.ip, bus.port, e);
 
-            runDAO(() -> {
-                buses.saveError(bId, message);
-                return null;
-            });
+            runDAO(() -> buses.saveError(bId, message));
 
-            return WorkspaceEvent.error(new BusInError(bId, bus.ip, bus.port, bus.username, message));
+            return WorkspaceEvent.busImportError(new BusInError(bId, bus.ip, bus.port, bus.username, message));
         }
     }
 
@@ -273,5 +276,15 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         public GetWorkspaceTree(String user) {
             super(user);
         }
+    }
+
+    public static class WorkspaceEventMsg implements Msg {
+
+        final WorkspaceEvent event;
+
+        public WorkspaceEventMsg(WorkspaceEvent event) {
+            this.event = event;
+        }
+
     }
 }

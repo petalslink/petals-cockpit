@@ -22,7 +22,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -34,6 +36,7 @@ import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.cockpit.server.actors.BusActor.GetContainerOverview;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
+import org.ow2.petals.cockpit.server.actors.ContainerActor.ChangeServiceUnitState;
 import org.ow2.petals.cockpit.server.actors.ContainerActor.GetComponentOverview;
 import org.ow2.petals.cockpit.server.actors.ContainerActor.GetServiceUnitOverview;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
@@ -134,6 +137,27 @@ public class ContainerResource {
         public ServiceUnitOverview getSU(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
             return as.call(wsId, new GetServiceUnitOverview(profile.getUser().getUsername(), bId, cId, compId, suId))
                     .getOrElseThrow(s -> new WebApplicationException(s));
+        }
+
+        @PUT
+        @Consumes(MediaType.APPLICATION_JSON)
+        @Produces(MediaType.APPLICATION_JSON)
+        public ServiceUnitOverview changeSUState(@Pac4JProfile CockpitProfile profile, @Valid ChangeState action)
+                throws InterruptedException {
+            return as.call(wsId,
+                    new ChangeServiceUnitState(profile.getUser().getUsername(), bId, cId, compId, suId, action.state))
+                    .getOrElseThrow(s -> new WebApplicationException(s));
+        }
+    }
+
+    public static class ChangeState {
+
+        @NotNull
+        @JsonProperty
+        public final MinServiceUnit.State state;
+
+        public ChangeState(@JsonProperty("state") MinServiceUnit.State state) {
+            this.state = state;
         }
     }
 

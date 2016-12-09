@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.resources.ContainerResource.MinComponent;
+import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.InvalidPetalsBus;
@@ -55,7 +57,7 @@ public abstract class BusesDAO {
     public abstract void updateBus(@Bind("id") long bId, @Bind("n") String name);
 
     @SqlUpdate("update buses set import_error = :e where id = :id")
-    public abstract void saveError(@Bind("id") long bId, @Bind("e") String message);
+    public abstract int saveError(@Bind("id") long bId, @Bind("e") String message);
 
     @SqlUpdate("insert into containers (bus_id,name,ip,port,username,password)" + " values (:bId,:n,:i,:p,:u,:pw)")
     @GetGeneratedKeys
@@ -72,8 +74,8 @@ public abstract class BusesDAO {
 
     @SqlUpdate("insert into components (container_id,name,state,type)" + " values (:cId,:n,:s,:t)")
     @GetGeneratedKeys
-    public abstract long createComponent(@Bind("n") String name, @Bind("s") String state, @Bind("t") String type,
-            @Bind("cId") long cId);
+    public abstract long createComponent(@Bind("n") String name, @Bind("s") MinComponent.State state,
+            @Bind("t") MinComponent.Type type, @Bind("cId") long cId);
 
     @SqlQuery("select * from components where container_id = :c.id")
     @Mapper(DbComponent.Mapper.class)
@@ -81,12 +83,15 @@ public abstract class BusesDAO {
 
     @SqlUpdate("insert into serviceunits (component_id,name,state,sa_name)" + " values (:cId,:n,:s,:sa)")
     @GetGeneratedKeys
-    public abstract long createServiceUnit(@Bind("n") String name, @Bind("s") String state, @Bind("cId") long cId,
-            @Bind("sa") String saName);
+    public abstract long createServiceUnit(@Bind("n") String name, @Bind("s") MinServiceUnit.State state,
+            @Bind("cId") long cId, @Bind("sa") String saName);
 
     @SqlQuery("select * from serviceunits where component_id = :c.id")
     @Mapper(DbServiceUnit.Mapper.class)
     public abstract List<DbServiceUnit> getServiceUnitByComponent(@BindBean("c") DbComponent c);
+
+    @SqlUpdate("update servicesunits set state = :s where id = :suId")
+    public abstract int updateServiceUnitState(@Bind("suId") long su, @Bind("s") MinServiceUnit.State state);
 
     @Transaction
     public BusTree saveImport(long bId, Domain topology) {
@@ -227,11 +232,11 @@ public abstract class BusesDAO {
 
         public final String name;
 
-        public final String state;
+        public final MinComponent.State state;
 
-        public final String type;
+        public final MinComponent.Type type;
 
-        public DbComponent(long id, String name, String state, String type) {
+        public DbComponent(long id, String name, MinComponent.State state, MinComponent.Type type) {
             this.id = id;
             this.name = name;
             this.state = state;
@@ -246,7 +251,9 @@ public abstract class BusesDAO {
 
             @Override
             public DbComponent map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-                return new DbComponent(r.getLong("id"), r.getString("name"), r.getString("state"), r.getString("type"));
+                return new DbComponent(r.getLong("id"), r.getString("name"),
+                        MinComponent.State.valueOf(r.getString("state")),
+                        MinComponent.Type.valueOf(r.getString("type")));
 
             }
         }
@@ -258,11 +265,11 @@ public abstract class BusesDAO {
 
         public final String name;
 
-        public final String state;
+        public final MinServiceUnit.State state;
 
         public final String saName;
 
-        public DbServiceUnit(long id, String name, String state, String saName) {
+        public DbServiceUnit(long id, String name, MinServiceUnit.State state, String saName) {
             this.id = id;
             this.name = name;
             this.state = state;
@@ -273,8 +280,8 @@ public abstract class BusesDAO {
 
             @Override
             public DbServiceUnit map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-                return new DbServiceUnit(r.getLong("id"), r.getString("name"), r.getString("state"),
-                        r.getString("sa_name"));
+                return new DbServiceUnit(r.getLong("id"), r.getString("name"),
+                        MinServiceUnit.State.valueOf(r.getString("state")), r.getString("sa_name"));
 
             }
         }

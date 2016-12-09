@@ -19,6 +19,7 @@ package org.ow2.petals.cockpit.server.resources;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -35,6 +36,8 @@ import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.GetWorkspaceTree;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
+import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit;
+import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit.State;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
@@ -194,6 +197,27 @@ public class WorkspaceResource {
         }
     }
 
+    public static class NewSUState {
+
+        @Min(1)
+        public final long id;
+
+        @NotNull
+        @JsonProperty
+        public final MinServiceUnit.State state;
+
+        @JsonCreator
+        public NewSUState(@JsonProperty("id") long id, @JsonProperty("state") State state) {
+            this.id = id;
+            this.state = state;
+        }
+
+        @JsonProperty
+        public String getId() {
+            return Long.toString(id);
+        }
+    }
+
     public static class WorkspaceEvent {
 
         @JsonProperty
@@ -207,12 +231,16 @@ public class WorkspaceResource {
             this.data = data;
         }
 
-        public static WorkspaceEvent error(BusInError bus) {
+        public static WorkspaceEvent busImportError(BusInError bus) {
             return new WorkspaceEvent("BUS_IMPORT_ERROR", bus);
         }
 
-        public static WorkspaceEvent ok(BusTree bus) {
+        public static WorkspaceEvent busImportOk(BusTree bus) {
             return new WorkspaceEvent("BUS_IMPORT_OK", bus);
+        }
+
+        public static WorkspaceEvent suStateChange(NewSUState ns) {
+            return new WorkspaceEvent("SU_STATE_CHANGE", ns);
         }
 
         @Override

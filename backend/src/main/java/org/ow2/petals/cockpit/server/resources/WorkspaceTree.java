@@ -97,7 +97,7 @@ public class WorkspaceTree extends MinWorkspace {
             for (Component component : container.getComponents()) {
                 MinComponent.State compState = MinComponent.State.from(component.getState());
                 MinComponent.Type compType = MinComponent.Type.from(component.getComponentType());
-                long compId = buses.createComponent(component.getName(), compState.name(), compType.name(), cId);
+                long compId = buses.createComponent(component.getName(), compState, compType, cId);
                 List<SUTree> sus = new ArrayList<>();
                 for (ServiceAssembly sa : container.getServiceAssemblies()) {
                     if (sa.getServiceUnits().size() != 1) {
@@ -108,7 +108,7 @@ public class WorkspaceTree extends MinWorkspace {
                             // TODO is this information returned by admin correct? Some SUs could be in a different
                             // state in case of problems...!
                             SUTree.State suState = SUTree.State.from(sa.getState());
-                            long suId = buses.createServiceUnit(su.getName(), suState.name(), compId, sa.getName());
+                            long suId = buses.createServiceUnit(su.getName(), suState, compId, sa.getName());
                             sus.add(new SUTree(suId, su.getName(), suState, sa.getName()));
                         }
                     }
@@ -137,10 +137,9 @@ public class WorkspaceTree extends MinWorkspace {
                     for (DbComponent comp : buses.getComponentsByContainer(c)) {
                         List<SUTree> sus = new ArrayList<>();
                         for (DbServiceUnit su : buses.getServiceUnitByComponent(comp)) {
-                            sus.add(new SUTree(su.id, su.name, SUTree.State.valueOf(su.state), su.saName));
+                            sus.add(new SUTree(su.id, su.name, su.state, su.saName));
                         }
-                        comps.add(new ComponentTree(comp.id, comp.name, MinComponent.State.valueOf(comp.state),
-                                MinComponent.Type.valueOf(comp.type), sus));
+                        comps.add(new ComponentTree(comp.id, comp.name, comp.state, comp.type, sus));
                     }
                     cs.add(new ContainerTree(c.id, c.name, comps));
                 }

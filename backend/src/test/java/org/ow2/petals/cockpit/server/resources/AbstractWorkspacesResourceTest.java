@@ -25,19 +25,27 @@ import static org.mockito.Mockito.withSettings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
 
 import javax.inject.Singleton;
 
+import org.assertj.core.api.SoftAssertions;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.media.sse.EventInput;
+import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.mockito.Mockito;
+import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
@@ -61,6 +69,8 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
 import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvider;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.common.test.TestUtil;
@@ -156,8 +166,9 @@ public class AbstractWorkspacesResourceTest {
                 List<ComponentTree> compTrees = new ArrayList<>();
                 List<DbComponent> comps = new ArrayList<>();
                 for (Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>> comp : c._3) {
-                    DbComponent compDb = new DbComponent(comp._1, comp._2.getName(), comp._2.getState().toString(),
-                            comp._2.getComponentType().toString());
+                    DbComponent compDb = new DbComponent(comp._1, comp._2.getName(),
+                            MinComponent.State.from(comp._2.getState()),
+                            MinComponent.Type.from(comp._2.getComponentType()));
 
                     List<SUTree> suTrees = new ArrayList<>();
                     List<DbServiceUnit> sus = new ArrayList<>();
@@ -166,8 +177,8 @@ public class AbstractWorkspacesResourceTest {
                         assert sasus.size() == 1;
                         ServiceUnit sasu = sasus.get(0);
                         assert sasu != null;
-                        DbServiceUnit suDb = new DbServiceUnit(su._1, sasu.getName(), su._2.getState().toString(),
-                                su._2.getName());
+                        DbServiceUnit suDb = new DbServiceUnit(su._1, sasu.getName(),
+                                MinServiceUnit.State.from(su._2.getState()), su._2.getName());
 
                         suTrees.add(new SUTree(suDb.id, suDb.name, MinServiceUnit.State.from(su._2.getState()),
                                 suDb.saName));
@@ -209,4 +220,40 @@ public class AbstractWorkspacesResourceTest {
         return port;
     }
 
+    protected static void expectEvent(EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {
+        SoftAssertions sa = new SoftAssertions();
+        while (!eventInput.isClosed()) {
+            try {
+                final InboundEvent inboundEvent = eventInput.read();
+                if (inboundEvent == null) {
+                    // connection has been closed
+                    break;
+                }
+
+                c.accept(inboundEvent, sa);
+
+                sa.assertAll();
+            } finally {
+                eventInput.close();
+            }
+        }
+    }
+
+    protected static void expectWorkspaceEvent(EventInput eventInput, BiConsumer<WorkspaceEvent, SoftAssertions> c) {
+        expectEvent(eventInput, (e, a) -> {
+            a.assertThat(e.getName()).isEqualTo("WORKSPACE_CHANGE");
+            WorkspaceEvent ev = e.readData(WorkspaceEvent.class);
+            c.accept(ev, a);
+        });
+    }
+
+    public static class WorkspaceEvent {
+
+        @JsonProperty
+        @NotEmpty
+        public String event = "";
+
+        @JsonProperty
+        public Map<?, ?> data = new HashMap<>();
+    }
 }
