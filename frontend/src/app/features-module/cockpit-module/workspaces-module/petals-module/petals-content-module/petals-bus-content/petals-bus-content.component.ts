@@ -65,7 +65,7 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // get the current workspace (once) only if
-    // it has an array of buses with at least one value
+    // it has an array of buses OR buses in progress with at least one value
     this.workspace$WithBus = this.workspace$
       .filter((workspaceR: IWorkspaceRecord) => (workspaceR.get('buses').size + workspaceR.get('busesInProgress').size) > 0);
 
@@ -87,16 +87,16 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
 
   updateBus(idBus: string, reloadConfig: boolean) {
     // try to find the bus in buses in progress
-    let busInProgressFiltered = this.workspace.busesInProgress.filter((b: IBus) => b.id === idBus);
+    let busInProgressFiltered = this.workspace.busesInProgress.find((b: IBus) => b.id === idBus);
 
     // if importing bus
-    if (busInProgressFiltered.length > 0) {
-      this.bus = busInProgressFiltered[0];
+    if (busInProgressFiltered) {
+      this.bus = busInProgressFiltered;
       this.busInImport = true;
     }
 
     else {
-      this.bus = this.workspace.buses.filter((b: IBus) => b.id === idBus)[0];
+      this.bus = this.workspace.buses.find((b: IBus) => b.id === idBus);
       this.busInImport = false;
     }
 
