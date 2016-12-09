@@ -47,18 +47,6 @@ export class ContainersMenuComponent {
 
   constructor(private store$: Store<IStore>) { }
 
-  // TODO: Move that logic into container component
-  // see https://gitlab.com/victornoel/petals-cockpit/issues/155
-  getContainerDetails(idContainer: string) {
-    this.store$.dispatch({ type: WorkspaceActions.FETCH_CONTAINER_DETAILS,
-      payload: {
-        idWorkspace: this.idWorkspaceSelected,
-        idBus: this.idBus,
-        idContainer
-      }
-    });
-  }
-
   fold(idBus: string, idContainer: string) {
     this.store$.dispatch({ type: WorkspaceActions.TOGGLE_FOLD_CONTAINER, payload: { idBus, idContainer } });
     return false;

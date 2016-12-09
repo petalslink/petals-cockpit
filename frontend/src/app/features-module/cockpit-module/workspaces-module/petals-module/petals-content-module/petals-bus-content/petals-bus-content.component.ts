@@ -30,6 +30,9 @@ import { IBus } from '../../../../../../shared-module/interfaces/petals.interfac
 import { IStore } from '../../../../../../shared-module/interfaces/store.interface';
 import { IWorkspace, IWorkspaceRecord } from '../../../../../../shared-module/interfaces/workspace.interface';
 
+// our actions
+import { WorkspaceActions } from './../../../../../../shared-module/reducers/workspace.actions';
+
 @Component({
   selector: 'app-petals-bus-content',
   templateUrl: './petals-bus-content.component.html',
@@ -83,6 +86,16 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
           this.updateBus(params['idBus'], false);
         }
       ).subscribe();
+
+      this.route.params.subscribe(param => {
+        this.store$.dispatch({
+          type: WorkspaceActions.FETCH_BUS_DETAILS,
+          payload: {
+            idWorkspace: param['idWorkspace'],
+            idBus: param['idBus']
+          }
+        });
+      });
   }
 
   updateBus(idBus: string, reloadConfig: boolean) {

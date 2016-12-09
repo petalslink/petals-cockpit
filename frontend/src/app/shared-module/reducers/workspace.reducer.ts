@@ -643,13 +643,3 @@ export function getContainerById(idContainer?: string) {
       });
   };
 }
-
-// export function getCurrentContainer() {
-//   // : Observable<IContainerRecord>
-//   return (source$: Store<IStore>) => {
-//     return source$
-//       .select('workspace')
-//       .filter((workspaceR: IWorkspaceRecord) => workspaceR.get('selectedContainerId') !== null)
-//       .switchMap((workspaceR: IWorkspaceRecord) => getContainerById(<string>workspaceR.get('selectedContainerId')));
-//   };
-// };
