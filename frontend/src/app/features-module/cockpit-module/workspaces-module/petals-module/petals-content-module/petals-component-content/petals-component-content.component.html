@@ -49,18 +49,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   </md-menu>
 </md-toolbar>
 
-<md-card class="central-content">
-  <md-card-title align="center">
-    <span *ngIf="component?.isFetchingDetails">Component content : Fetching</span>
-    <span *ngIf="!component?.isFetchingDetails">Component content : Fetched</span>
-  </md-card-title>
+<md-tab-group>
+    <md-tab label="Overview">
 
-  <md-card-content *ngIf="component">
-    <ul>
-      <li *ngIf="component.id"><b>id</b> : {{ component.id }}</li>
-      <li *ngIf="component.name"><b>name</b> : {{ component.name }}</li>
-      <li *ngIf="component.state"><b>state</b> : {{ component.state }}</li>
-      <li *ngIf="component.type"><b>type</b> : {{ component.type }}</li>
-    </ul>
-  </md-card-content>
-</md-card>
+      <md-card class="central-content" *ngIf="component">
+        <md-card-title align="center">
+          <md-progress-circle *ngIf="component.isFetchingDetails" mode="indeterminate"></md-progress-circle>
+
+          Component content
+        </md-card-title>
+
+        <md-card-content>
+          <ul>
+            <li *ngIf="component.id"><b>id</b> : {{ component.id }}</li>
+            <li *ngIf="component.name"><b>name</b> : {{ component.name }}</li>
+            <li *ngIf="component.state"><b>state</b> : {{ component.state }}</li>
+            <li *ngIf="component.type"><b>type</b> : {{ component.type }}</li>
+          </ul>
+        </md-card-content>
+      </md-card>
+
+    </md-tab>
+</md-tab-group>
