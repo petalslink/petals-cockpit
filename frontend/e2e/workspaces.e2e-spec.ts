@@ -423,6 +423,24 @@ describe(`Workspaces`, () => {
     // TODO: Check view content once we decide what goes here exactly
   });
 
+  it(`should select a service unit and display a content page with the service unit name as title`, () => {
+    // select the first container
+    element.all(by.css(`app-service-units-menu a.service-unit .md-list-item`)).get(0).click();
+
+    let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+
+    expect(title).toEqual(`SU 0`);
+
+    // select the second container
+    element.all(by.css(`app-service-units-menu a.service-unit .md-list-item`)).get(1).click();
+
+    title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+
+    expect(title).toEqual(`SU 1`);
+
+    // TODO: Check view content once we decide what goes here exactly
+  });
+
   it(`should create a new workspace and this workspace shouldn't have any bus`, () => {
     element(by.css(`button.change-workspace`)).click();
 
