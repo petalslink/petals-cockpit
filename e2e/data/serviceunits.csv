@@ -1,14 +1,14 @@
-id,component_id,name,state
-1,1,SU 0,Started
-2,1,SU 1,Started
-3,2,SU 2,Started
-4,2,SU 3,Started
-5,3,SU 4,Started
-6,4,SU 5,Started
-7,4,SU 6,Started
-8,5,SU 7,Started
-9,6,SU 8,Started
-10,6,SU 9,Started
-11,7,SU 10,Started
-12,8,SU 11,Started
-13,8,SU 12,Started
+id,component_id,name,state,sa_name
+1,1,SU 0,Started,SA0
+2,1,SU 1,Started,SA1
+3,2,SU 2,Started,SA2
+4,2,SU 3,Started,SA3
+5,3,SU 4,Started,SA4
+6,4,SU 5,Started,SA5
+7,4,SU 6,Started,SA6
+8,5,SU 7,Started,SA7
+9,6,SU 8,Started,SA8
+10,6,SU 9,Started,SA9
+11,7,SU 10,Started,SA10
+12,8,SU 11,Started,SA11
+13,8,SU 12,Started,SA12
