@@ -49,33 +49,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   </md-menu>
 </md-toolbar>
 
-<md-card class="central-content" *ngIf="container">
-  <md-card-title align="center">
-    <md-progress-circle *ngIf="container.isFetchingDetails" mode="indeterminate"></md-progress-circle>
+<md-tab-group>
+    <md-tab label="Overview">
 
-    Container content
-  </md-card-title>
+      <md-card class="central-content" *ngIf="container">
+        <md-card-title align="center">
+          <md-progress-circle *ngIf="container.isFetchingDetails" mode="indeterminate"></md-progress-circle>
 
-  <md-card-content>
-    <ul>
-      <li *ngIf="container.id"><b>id</b> : {{ container.id }}</li>
-      <li *ngIf="container.name"><b>name</b> : {{ container.name }}</li>
-      <li *ngIf="container.ip"><b>ip</b> : {{ container.ip }}</li>
-      <li *ngIf="container.port"><b>port</b> : {{ container.port }}</li>
-      <li *ngIf="container.reachabilities"><b>reachabilities</b> :</li>
+          Container content
+        </md-card-title>
 
-      <ul>
-        <li *ngFor="let reachability of container.reachabilities | keys">
-          <a [routerLink]="[
-            '/cockpit/workspaces', workspace.id,
-            'petals', 'bus', workspace.selectedBusId,
-            'container', reachability.key
-          ]">{{ getContainerById(reachability.key)?.name }}</a> : <span [ngClass]="reachability.value.toLowerCase()">{{ reachability.value }}</span>
-        </li>
-      </ul>
+        <md-card-content>
+          <ul>
+            <li *ngIf="container.id"><b>id</b> : {{ container.id }}</li>
+            <li *ngIf="container.name"><b>name</b> : {{ container.name }}</li>
+            <li *ngIf="container.ip"><b>ip</b> : {{ container.ip }}</li>
+            <li *ngIf="container.port"><b>port</b> : {{ container.port }}</li>
+            <li *ngIf="container.reachabilities"><b>reachabilities</b> :</li>
 
-      <li *ngIf="container.systemInfo"><b>system info</b> : {{ container.systemInfo }}</li>
-    </ul>
+            <ul>
+              <li *ngFor="let reachability of container.reachabilities | keys">
+                <a [routerLink]="[
+                  '/cockpit/workspaces', workspace.id,
+                  'petals', 'bus', workspace.selectedBusId,
+                  'container', reachability.key
+                ]">{{ getContainerById(reachability.key)?.name }}</a> : <span [ngClass]="reachability.value.toLowerCase()">{{ reachability.value }}</span>
+              </li>
+            </ul>
 
-  </md-card-content>
-</md-card>
+            <li *ngIf="container.systemInfo"><b>system info</b> : {{ container.systemInfo }}</li>
+          </ul>
+
+        </md-card-content>
+      </md-card>
+
+    </md-tab>
+</md-tab-group>
