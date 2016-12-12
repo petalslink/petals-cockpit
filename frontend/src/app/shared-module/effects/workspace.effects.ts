@@ -304,4 +304,53 @@ export class WorkspaceEffects {
         });
       })
     );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: true}) fetchSuDetails$: Observable<Action> = this.actions$
+    .ofType(WorkspaceActions.FETCH_SU_DETAILS)
+    .switchMap((action: Action) =>
+      this.workspaceService.getDetailsServiceUnit(
+        action.payload.idWorkspace,
+        action.payload.idBus,
+        action.payload.idContainer,
+        action.payload.idComponent,
+        action.payload.idServiceUnit
+      )
+      .map((res: Response) => {
+        if (!res.ok) {
+          throw new Error('Error while fetching the service unit details');
+        }
+
+        return {
+          type: WorkspaceActions.FETCH_SU_DETAILS_SUCCESS,
+          payload: {
+            bus: {
+              id: action.payload.idBus,
+              container: {
+                id: action.payload.idContainer,
+                component: {
+                  id: action.payload.idComponent,
+                  serviceUnit: res.json()
+                }
+              }
+            }
+          }
+        };
+      })
+      .catch((err) => {
+        if (environment.debug) {
+          console.error(err);
+        }
+
+        return Observable.of({
+          type: WorkspaceActions.FETCH_SU_DETAILS_FAILED,
+          payload: {
+            idBus: action.payload.idBus,
+            idContainer: action.payload.idContainer,
+            idComponent: action.payload.idComponent,
+            idServiceUnit: action.payload.idserviceUnit
+          }
+        });
+      })
+    );
 }

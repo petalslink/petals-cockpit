@@ -219,7 +219,7 @@ export class WorkspaceMockService {
           json: () => {
             return {
               // as we use merge in the reducer,
-              // whatever is added here will be added to the bus
+              // whatever is added here will be added to the container
               id: idContainer,
               ip: '192.168.0.1',
               port: 7700,
@@ -242,10 +242,28 @@ export class WorkspaceMockService {
       json: () => {
         return {
           // as we use merge in the reducer,
-          // whatever is added here will be added to the bus
+          // whatever is added here will be added to the component
           id: idComponent,
           state: 'Started',
           type: 'BC'
+        };
+      }
+    };
+
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
+  }
+
+  getDetailsServiceUnit(idWorkspace: string, idBus: string, idContainer: string, idComponent: string, idServiceUnit: string) {
+    let response = <Response>{
+      ok: true,
+      json: () => {
+        return {
+          // as we use merge in the reducer,
+          // whatever is added here will be added to the component
+          id: idServiceUnit,
+          state: 'Started'
         };
       }
     };

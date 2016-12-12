@@ -27,7 +27,7 @@ import { Observable } from 'rxjs';
 // our interfaces
 import { IStore } from '../interfaces/store.interface';
 import { IWorkspaceRecord } from '../interfaces/workspace.interface';
-import { IContainerRecord, IBusRecord, IComponentRecord } from './../interfaces/petals.interface';
+import { IContainerRecord, IBusRecord, IComponentRecord, IServiceUnitRecord } from './../interfaces/petals.interface';
 
 // our states
 import { workspaceRecordFactory } from './workspace.state';
@@ -391,6 +391,145 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     }
 
     return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'isFetchingDetails'], false);
+  }
+
+  /* FETCH_SU_DETAILS* */
+  else if (action.type === WorkspaceActions.FETCH_SU_DETAILS) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((bus: IBusRecord) => bus.get('id') === action.payload.idBus);
+
+    if (busIndex === -1 || typeof workspaceR.getIn(['buses', busIndex, 'containers']) === 'undefined') {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((container: IContainerRecord) => container.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    let componentIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components'])
+      .findIndex((component: IComponentRecord) => component.get('id') === action.payload.idComponent);
+
+    if (componentIndex === -1) {
+      return workspaceR;
+    }
+
+    let suIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'serviceUnits'])
+      .findIndex((su: IServiceUnitRecord) => su.get('id') === action.payload.idServiceUnit);
+
+    if (suIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn([
+      'buses', busIndex,
+      'containers', containerIndex,
+      'components', componentIndex,
+      'serviceUnits', suIndex,
+      'isFetchingDetails'], true
+    );
+  }
+
+  else if (action.type === WorkspaceActions.FETCH_SU_DETAILS_SUCCESS) {
+    let busIndex = workspaceR
+      .get('buses')
+      // here we use action.payload.id instead of idBus because
+      // the payload's coming from the server
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.bus.id);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      // here we use action.payload.id instead of idBus because
+      // the payload's coming from the server
+      .findIndex((containers: IContainerRecord) => containers.get('id') === action.payload.bus.container.id);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    let componentIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components'])
+      // here we use action.payload.id instead of idBus because
+      // the payload's coming from the server
+      .findIndex((component: IComponentRecord) => component.get('id') === action.payload.bus.container.component.id);
+
+    if (componentIndex === -1) {
+      return workspaceR;
+    }
+
+    let suIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'serviceUnits'])
+      .findIndex((su: IServiceUnitRecord) => su.get('id') === action.payload.bus.container.component.serviceUnit.id);
+
+    if (suIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'serviceUnits', suIndex],
+      workspaceR
+        .getIn([
+          'buses', busIndex,
+          'containers', containerIndex,
+          'components', componentIndex,
+          'serviceUnits', suIndex
+        ])
+        .merge(
+          fromJS({ isFetchingDetails: false }),
+          fromJS(action.payload.bus.container.component.serviceUnit)
+        )
+    );
+  }
+
+  else if (action.type === WorkspaceActions.FETCH_SU_DETAILS_FAILED) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((bus: IBusRecord) => bus.get('id') === action.payload.idBus);
+
+    if (busIndex === -1 || typeof workspaceR.getIn(['buses', busIndex, 'containers']) === 'undefined') {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((container: IContainerRecord) => container.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    let componentIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components'])
+      .findIndex((component: IComponentRecord) => component.get('id') === action.payload.idComponent);
+
+    if (componentIndex === -1) {
+      return workspaceR;
+    }
+
+    let suIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'serviceUnits'])
+      .findIndex((su: IServiceUnitRecord) => su.get('id') === action.payload.idServiceUnit);
+
+    if (suIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn([
+      'buses', busIndex,
+      'containers', containerIndex,
+      'components', componentIndex,
+      'serviceUnits', suIndex,
+      'isFetchingDetails'], false
+    );
   }
 
   /* FETCH_BUS_CONFIG* */
@@ -761,6 +900,25 @@ export function getCurrentComponent() {
         container
           .get('components')
           .find((component: IComponentRecord) => component.get('id') === selectedComponentId)
+      );
+  };
+};
+
+export function getCurrentServiceUnit() {
+  return (store$: Store<IStore>): Observable<IServiceUnitRecord> => {
+    return store$
+      .let(getCurrentComponent())
+      .withLatestFrom(
+        // get the selectedServiceUnitId
+        store$
+          .select('workspace')
+          .filter((workspaceR: IWorkspaceRecord) => workspaceR.get('selectedServiceUnitId') !== null)
+          .map((workspaceR: IWorkspaceRecord) => workspaceR.get('selectedServiceUnitId'))
+      )
+      .map(([component, selectedServiceUnitId]: [IComponentRecord, number]) =>
+        component
+          .get('serviceUnits')
+          .find((serviceUnit: IServiceUnitRecord) => serviceUnit.get('id') === selectedServiceUnitId)
       );
   };
 };

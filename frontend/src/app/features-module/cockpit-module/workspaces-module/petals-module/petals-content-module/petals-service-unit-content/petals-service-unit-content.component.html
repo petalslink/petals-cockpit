@@ -14,8 +14,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <md-toolbar color="primary">
-  <span>
-    Petals
+  <span *ngIf="serviceUnit">
+    {{ serviceUnit.name }}
   </span>
 
   <span class="flex-space"></span>
@@ -49,10 +49,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   </md-menu>
 </md-toolbar>
 
-<md-card class="central-content">
-  <md-card-content>
-    <md-card-title align="center">
-      Petals service unit content works
-    </md-card-title>
-  </md-card-content>
-</md-card>
+<md-tab-group>
+    <md-tab label="Overview">
+
+      <md-card class="central-content" *ngIf="serviceUnit">
+        <md-card-title align="center">
+          <md-progress-circle *ngIf="serviceUnit.isFetchingDetails" mode="indeterminate"></md-progress-circle>
+
+          Service Unit content
+        </md-card-title>
+        <md-card-content>
+          <ul>
+            <li *ngIf="serviceUnit.id"><b>id</b> : {{ serviceUnit.id }}</li>
+            <li *ngIf="serviceUnit.name"><b>name</b> : {{ serviceUnit.name }}</li>
+            <li *ngIf="serviceUnit.state"><b>state</b> : {{ serviceUnit.state }}</li>
+          </ul>
+        </md-card-content>
+      </md-card>
+
+    </md-tab>
+</md-tab-group>
