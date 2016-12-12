@@ -49,13 +49,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   </md-menu>
 </md-toolbar>
 
-<md-card class="central-content">
+<md-card class="central-content" *ngIf="component">
   <md-card-title align="center">
-    <span *ngIf="component?.isFetchingDetails">Component content : Fetching</span>
-    <span *ngIf="!component?.isFetchingDetails">Component content : Fetched</span>
+    <md-progress-circle *ngIf="component.isFetchingDetails" mode="indeterminate"></md-progress-circle>
+
+    Component content
   </md-card-title>
 
-  <md-card-content *ngIf="component">
+  <md-card-content>
     <ul>
       <li *ngIf="component.id"><b>id</b> : {{ component.id }}</li>
       <li *ngIf="component.name"><b>name</b> : {{ component.name }}</li>

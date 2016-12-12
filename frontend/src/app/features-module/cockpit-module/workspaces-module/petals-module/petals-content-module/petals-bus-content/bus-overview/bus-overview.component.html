@@ -15,8 +15,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <md-card class="central-content list-element" *ngIf="bus">
   <md-card-title align="center">
-    <span *ngIf="bus.isFetchingDetails">Bus content : Fetching</span>
-    <span *ngIf="!bus.isFetchingDetails">Bus content : Fetched</span>
+    <md-progress-circle *ngIf="bus.isFetchingDetails" mode="indeterminate"></md-progress-circle>
+
+    Bus content
   </md-card-title>
 
   <md-card-content>
