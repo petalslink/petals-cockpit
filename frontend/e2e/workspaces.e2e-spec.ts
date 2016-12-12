@@ -405,6 +405,24 @@ describe(`Workspaces`, () => {
     // TODO: Check view content once we decide what goes here exactly
   });
 
+  it(`should select a component and display a content page with the component name as title`, () => {
+    // select the first container
+    element.all(by.css(`app-components-menu a.component .md-list-item`)).get(0).click();
+
+    let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+
+    expect(title).toEqual(`Component 0`);
+
+    // select the second container
+    element.all(by.css(`app-components-menu a.component .md-list-item`)).get(1).click();
+
+    title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
+
+    expect(title).toEqual(`Component 1`);
+
+    // TODO: Check view content once we decide what goes here exactly
+  });
+
   it(`should create a new workspace and this workspace shouldn't have any bus`, () => {
     element(by.css(`button.change-workspace`)).click();
 
