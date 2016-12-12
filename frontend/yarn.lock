@@ -47,7 +47,7 @@
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@angular/core/-/core-2.2.1.tgz#86fdc34a370a4fcfe84ed9de4b3c43548612919c"
 
-"@angular/core@2.3.0":
+"@angular/core@2.3.0", "@angular/core@^2.0.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@angular/core/-/core-2.3.0.tgz#e60bd398584d69467d075d001b718364174a2534"
 
@@ -293,6 +293,13 @@ angular-cli@1.0.0-beta.21:
     webpack-merge "^0.14.0"
     yam "0.0.18"
     zone.js "^0.6.23"
+
+angular2-prettyjson@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/angular2-prettyjson/-/angular2-prettyjson-2.0.1.tgz#7f628429f24f2eee2722469796e5225ae432a650"
+  dependencies:
+    "@angular/core" "^2.0.0"
+    rxjs "^5.0.0-rc.4"
 
 angular2-template-loader@^0.5.0:
   version "0.5.0"
@@ -5174,7 +5181,7 @@ rxjs@5.0.0-beta.12:
   dependencies:
     symbol-observable "^1.0.1"
 
-rxjs@5.0.0-rc.5:
+rxjs@5.0.0-rc.5, rxjs@^5.0.0-rc.4:
   version "5.0.0-rc.5"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.0.0-rc.5.tgz#8cbd17fc242a54c07ef9116da23b0ec8e7d5cea9"
   dependencies:
