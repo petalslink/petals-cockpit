@@ -32,6 +32,8 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateModule } from 'ng2-translate';
 
+import { PrettyJsonModule } from 'angular2-prettyjson';
+
 // our components
 import { NotFoundComponent } from './components/not-found/not-found.component';
 
@@ -55,7 +57,8 @@ const SHARED_MODULES = [
   MaterialModule,
   StoreModule,
   EffectsModule,
-  TranslateModule
+  TranslateModule,
+  PrettyJsonModule
 ];
 
 @NgModule({

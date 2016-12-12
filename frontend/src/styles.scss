@@ -182,3 +182,13 @@ body {
 ul > li {
   margin-bottom: 10px;
 }
+
+// lib to have a pretty json display
+// <prettyjson [obj]="someObj"></prettyjson>
+pre {
+  .string { color: green; }
+  .number { color: darkorange; }
+  .boolean { color: blue; }
+  .null { color: magenta; }
+  .key { color: red; }
+}
