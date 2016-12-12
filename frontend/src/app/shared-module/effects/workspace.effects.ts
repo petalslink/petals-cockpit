@@ -239,7 +239,7 @@ export class WorkspaceEffects {
       this.workspaceService.getDetailsContainer(action.payload.idWorkspace, action.payload.idBus, action.payload.idContainer)
       .map((res: Response) => {
         if (!res.ok) {
-          throw new Error('Error while fetching the bus details');
+          throw new Error('Error while fetching the container details');
         }
 
         return { type: WorkspaceActions.FETCH_CONTAINER_DETAILS_SUCCESS, payload: {
@@ -257,6 +257,50 @@ export class WorkspaceEffects {
         return Observable.of({
           type: WorkspaceActions.FETCH_CONTAINER_DETAILS_FAILED,
           payload: { idBus: action.payload.idBus, idContainer: action.payload.idContainer }
+        });
+      })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: true}) fetchComponentDetails$: Observable<Action> = this.actions$
+    .ofType(WorkspaceActions.FETCH_COMPONENT_DETAILS)
+    .switchMap((action: Action) =>
+      this.workspaceService.getDetailsComponent(
+        action.payload.idWorkspace,
+        action.payload.idBus,
+        action.payload.idContainer,
+        action.payload.idComponent
+      )
+      .map((res: Response) => {
+        if (!res.ok) {
+          throw new Error('Error while fetching the component details');
+        }
+
+        return {
+          type: WorkspaceActions.FETCH_COMPONENT_DETAILS_SUCCESS,
+          payload: {
+            bus: {
+              id: action.payload.idBus,
+              container: {
+                id: action.payload.idContainer,
+                component: res.json()
+              }
+            }
+          }
+        };
+      })
+      .catch((err) => {
+        if (environment.debug) {
+          console.error(err);
+        }
+
+        return Observable.of({
+          type: WorkspaceActions.FETCH_COMPONENT_DETAILS_FAILED,
+          payload: {
+            idBus: action.payload.idBus,
+            idContainer: action.payload.idContainer,
+            idComponent: action.payload.idComponent
+          }
         });
       })
     );

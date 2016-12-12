@@ -768,6 +768,19 @@ describe(`Workspace Reducer`, () => {
     expect(nextState2.buses).toEqual(jasmine.objectContaining(expectedState2));
   });
 
+  // TODO: FETCH_COMPONENT_DETAILS*
+  it(`${WorkspaceActions.FETCH_COMPONENT_DETAILS}`, () => {
+    // TODO once the refactor to flatten the structure is done
+  });
+
+  it(`${WorkspaceActions.FETCH_COMPONENT_DETAILS_SUCCESS}`, () => {
+    // TODO once the refactor to flatten the structure is done
+  });
+
+  it(`${WorkspaceActions.FETCH_COMPONENT_DETAILS_FAILED}`, () => {
+    // TODO once the refactor to flatten the structure is done
+  });
+
   // FETCH_BUS_CONFIG*
   xit(`${WorkspaceActions.FETCH_BUS_CONFIG}`, () => {
     // TODO

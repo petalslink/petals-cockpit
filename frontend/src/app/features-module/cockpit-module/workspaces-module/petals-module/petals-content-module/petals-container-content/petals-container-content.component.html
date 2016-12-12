@@ -72,6 +72,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           ]">{{ getContainerById(reachability.key)?.name }}</a> : <span [ngClass]="reachability.value.toLowerCase()">{{ reachability.value }}</span>
         </li>
       </ul>
+
+      <li *ngIf="container.systemInfo"><b>system info</b> : {{ container.systemInfo }}</li>
     </ul>
 
   </md-card-content>
