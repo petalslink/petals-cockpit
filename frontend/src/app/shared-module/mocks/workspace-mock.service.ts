@@ -223,10 +223,35 @@ export class WorkspaceMockService {
               id: idContainer,
               ip: '192.168.0.1',
               port: 7700,
-              reachabilities
+              reachabilities,
+              systemInfo: `
+                Petals ESB µKernel 4.0.2
+                Petals Standalone Shared Memory 4.0.2
+                OpenJDK Runtime Environment 1.7.0_111-b01 Oracle Corporation
+                Linux 3.16.0-4-amd64 amd64
+              `
             };
           }
         };
       });
+  }
+
+  getDetailsComponent(idWorkspace: string, idBus: string, idContainer: string, idComponent: string) {
+    let response = <Response>{
+      ok: true,
+      json: () => {
+        return {
+          // as we use merge in the reducer,
+          // whatever is added here will be added to the bus
+          id: idComponent,
+          state: 'Started',
+          type: 'BC'
+        };
+      }
+    };
+
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
   }
 }

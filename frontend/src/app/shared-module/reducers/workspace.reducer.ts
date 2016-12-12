@@ -40,6 +40,7 @@ import { UserActions } from './user.actions';
 import { WorkspaceActions } from './workspace.actions';
 
 function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFactory(), action: Action) {
+  /* FETCH_WORKSPACE* */
   if (action.type === WorkspaceActions.FETCH_WORKSPACE) {
     return workspaceR.set('fetchingWorkspace', true);
   }
@@ -78,18 +79,22 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
       });
   }
 
+  /* RESET_WORKSPACE */
   else if (action.type === WorkspaceActions.RESET_WORKSPACE) {
     return workspaceRecordFactory();
   }
 
+  /* EDIT_PETALS_SEARCH */
   else if (action.type === WorkspaceActions.EDIT_PETALS_SEARCH) {
     return workspaceR.set('searchPetals', action.payload);
   }
 
+  /* DELETE_PETALS_SEARCH */
   else if (action.type === WorkspaceActions.DELETE_PETALS_SEARCH) {
     return workspaceR.set('searchPetals', '');
   }
 
+  /* IMPORT_BUS* */
   else if (action.type === WorkspaceActions.IMPORT_BUS) {
     return workspaceR.set('importingBus', true);
   }
@@ -105,6 +110,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     return workspaceR.set('importingBus', false);
   }
 
+  /* IMPORT_BUS_MINIMAL_CONFIG */
   else if (action.type === WorkspaceActions.IMPORT_BUS_MINIMAL_CONFIG) {
     return workspaceR
       .merge({
@@ -219,9 +225,6 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
 
   /* FETCH_CONTAINER_DETAILS* */
   else if (action.type === WorkspaceActions.FETCH_CONTAINER_DETAILS) {
-    // console.log('action.payload.idBus')
-    // console.log(action.payload.idBus)
-    // console.log(JSON.stringify(workspaceR.get('buses').toJS(), null, 2));
     let busIndex = workspaceR
       .get('buses')
       .findIndex((bus: IBusRecord) => bus.get('id') === action.payload.idBus);
@@ -292,6 +295,104 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex, 'isFetchingDetails'], false);
   }
 
+  /* FETCH_COMPONENT_DETAILS* */
+  else if (action.type === WorkspaceActions.FETCH_COMPONENT_DETAILS) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((bus: IBusRecord) => bus.get('id') === action.payload.idBus);
+
+    if (busIndex === -1 || typeof workspaceR.getIn(['buses', busIndex, 'containers']) === 'undefined') {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((container: IContainerRecord) => container.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    let componentIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components'])
+      .findIndex((component: IComponentRecord) => component.get('id') === action.payload.idComponent);
+
+    if (componentIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'isFetchingDetails'], true);
+  }
+
+  else if (action.type === WorkspaceActions.FETCH_COMPONENT_DETAILS_SUCCESS) {
+    let busIndex = workspaceR
+      .get('buses')
+      // here we use action.payload.id instead of idBus because
+      // the payload's coming from the server
+      .findIndex((buses: IBusRecord) => buses.get('id') === action.payload.bus.id);
+
+    if (busIndex === -1) {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      // here we use action.payload.id instead of idBus because
+      // the payload's coming from the server
+      .findIndex((containers: IContainerRecord) => containers.get('id') === action.payload.bus.container.id);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    let componentIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components'])
+      // here we use action.payload.id instead of idBus because
+      // the payload's coming from the server
+      .findIndex((component: IComponentRecord) => component.get('id') === action.payload.bus.container.component.id);
+
+    if (componentIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex],
+      workspaceR
+        .getIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex])
+        .merge(
+          fromJS({ isFetchingDetails: false }),
+          fromJS(action.payload.bus.container.component)
+        )
+    );
+  }
+
+  else if (action.type === WorkspaceActions.FETCH_COMPONENT_DETAILS_FAILED) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((bus: IBusRecord) => bus.get('id') === action.payload.idBus);
+
+    if (busIndex === -1 || typeof workspaceR.getIn(['buses', busIndex, 'containers']) === 'undefined') {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((container: IContainerRecord) => container.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    let componentIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components'])
+      .findIndex((component: IComponentRecord) => component.get('id') === action.payload.idComponent);
+
+    if (componentIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'isFetchingDetails'], false);
+  }
+
   /* FETCH_BUS_CONFIG* */
   else if (action.type === WorkspaceActions.FETCH_BUS_CONFIG) {
     return workspaceR.set('gettingBusConfig', true);
@@ -317,6 +418,7 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     return workspaceR.set('gettingBusConfig', false);
   }
 
+  /* SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT */
   else if (action.type === WorkspaceActions.SET_ID_BUS_CONTAINER_COMPONENT_SERVICE_UNIT) {
     return workspaceR
       .merge({
@@ -643,3 +745,22 @@ export function getContainerById(idContainer?: string) {
       });
   };
 }
+
+export function getCurrentComponent() {
+  return (store$: Store<IStore>): Observable<IComponentRecord> => {
+    return store$
+      .let(getCurrentContainer())
+      .withLatestFrom(
+        // get the selectedComponentId
+        store$
+          .select('workspace')
+          .filter((workspaceR: IWorkspaceRecord) => workspaceR.get('selectedComponentId') !== null)
+          .map((workspaceR: IWorkspaceRecord) => workspaceR.get('selectedComponentId'))
+      )
+      .map(([container, selectedComponentId]: [IContainerRecord, number]) =>
+        container
+          .get('components')
+          .find((component: IComponentRecord) => component.get('id') === selectedComponentId)
+      );
+  };
+};
