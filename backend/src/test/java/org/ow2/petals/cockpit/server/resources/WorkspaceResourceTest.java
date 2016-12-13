@@ -53,6 +53,8 @@ import javaslang.Tuple;
 
 public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
 
+    private static final String SYSINFO = "WORKSPACE TEST SYSINFO";
+
     @Rule
     public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
 
@@ -78,6 +80,7 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
     @Before
     public void setup() {
         // petals
+        petals.registerSystemInfo(SYSINFO);
         petals.registerDomain(domain);
         petals.registerContainer(container1);
         petals.registerContainer(container2);
@@ -276,6 +279,7 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         assertThat(get.port).isEqualTo(containerPort);
         assertThat(get.reachabilities).containsOnly(MapEntry.entry("20", container1.getState().name()),
                 MapEntry.entry("22", container3.getState().name()));
+        assertThat(get.systemInfo).isEqualTo(SYSINFO);
     }
 
     @Test

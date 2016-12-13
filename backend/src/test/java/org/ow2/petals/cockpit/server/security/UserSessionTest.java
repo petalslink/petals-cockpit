@@ -75,9 +75,8 @@ public class UserSessionTest {
     @Before
     public void setUpDb() throws LiquibaseException {
         // we need a valid empty db for those tests
-        Liquibase migrator = new Liquibase("migrations.xml", new ClassLoaderResourceAccessor(),
-                new JdbcConnection(dbRule.getConnection()));
-        migrator.update("");
+        new Liquibase("migrations.xml", new ClassLoaderResourceAccessor(), new JdbcConnection(dbRule.getConnection()))
+                .update("");
     }
 
     public Client client() {

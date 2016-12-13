@@ -25,7 +25,6 @@ import javax.inject.Named;
 import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
-import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
@@ -37,8 +36,6 @@ import co.paralleluniverse.common.util.CheckedCallable;
 import co.paralleluniverse.fibers.FiberAsync;
 import co.paralleluniverse.fibers.SuspendExecution;
 import javaslang.CheckedFunction1;
-import javaslang.Tuple2;
-import javaslang.control.Option;
 
 @SuppressWarnings("squid:S3306")
 public abstract class CockpitActor<M> extends BasicActor<M, Void> {
@@ -106,18 +103,6 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
                     }
                 }
             }
-        });
-    }
-
-    protected Domain getTopology(String ip, int port, String username, String password,
-            Option<Tuple2<String, Boolean>> extra)
-            throws ContainerAdministrationException, SuspendExecution, InterruptedException {
-
-        return runAdmin(ip, port, username, password, petals -> {
-            String passphrase = extra.map(Tuple2::_1).getOrElse("");
-            boolean artifacts = extra.map(Tuple2::_2).getOrElse(false);
-
-            return petals.newContainerAdministration().getTopology(passphrase, artifacts);
         });
     }
 }

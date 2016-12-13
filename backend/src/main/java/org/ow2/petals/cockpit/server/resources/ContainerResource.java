@@ -195,14 +195,20 @@ public class ContainerResource {
         @JsonProperty
         public final ImmutableMap<String, String> reachabilities;
 
+        @NotNull
+        @JsonProperty
+        public final String systemInfo;
+
         @JsonCreator
         public ContainerOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
                 @JsonProperty("ip") String ip, @JsonProperty("port") int port,
-                @JsonProperty("reachabilities") Map<String, String> reachabilities) {
+                @JsonProperty("reachabilities") Map<String, String> reachabilities,
+                @JsonProperty("systemInfo") String systemInfo) {
             super(id, name);
             this.ip = ip;
             this.port = port;
             this.reachabilities = ImmutableMap.copyOf(reachabilities);
+            this.systemInfo = systemInfo;
         }
     }
 

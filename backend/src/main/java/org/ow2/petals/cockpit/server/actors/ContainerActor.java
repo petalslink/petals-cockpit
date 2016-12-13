@@ -22,6 +22,7 @@ import java.util.Objects;
 import javax.ws.rs.core.Response.Status;
 
 import org.ow2.petals.admin.api.ArtifactAdministration;
+import org.ow2.petals.admin.api.ContainerAdministration;
 import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.artifact.Artifact;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
@@ -52,6 +53,7 @@ import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.SuspendExecution;
 import javaslang.Tuple;
+import javaslang.Tuple2;
 import javaslang.collection.List;
 import javaslang.control.Either;
 import javaslang.control.Option;
@@ -89,16 +91,23 @@ public class ContainerActor extends CockpitActor<Msg> {
                 GetContainerOverviewFromBus get = (GetContainerOverviewFromBus) msg;
                 assert get.get.cId == db.id;
                 try {
-                    final Domain topology = getTopology(db.ip, db.port, db.username, db.password, Option.none());
-                    Map<String, String> reachabilities = javaslang.collection.List.ofAll(topology.getContainers())
+                    final Tuple2<Domain, String> topology = runAdmin(db.ip, db.port, db.username, db.password,
+                            petals -> {
+                                ContainerAdministration admin = petals.newContainerAdministration();
+                                Domain domain = admin.getTopology(null, false);
+                                String sysInfo = admin.getSystemInfo();
+                                return Tuple.of(domain, sysInfo);
+                            });
+
+                    Map<String, String> reachabilities = javaslang.collection.List.ofAll(topology._1.getContainers())
                             // remove myself
                             .filter(c -> !Objects.equals(db.name, c.getContainerName()))
                             // get the ids (if they exist) TODO what do I do with unknown container names?
                             .flatMap(c -> Option.of(get.ids.get(c.getContainerName())).map(i -> Tuple.of(i, c)))
                             // transform to a reachability information
                             .toJavaMap(p -> p.map((i, c) -> Tuple.of(Long.toString(i), c.getState().name())));
-                    RequestReplyHelper.reply(get.get,
-                            Either.right(new ContainerOverview(db.id, db.name, db.ip, db.port, reachabilities)));
+                    RequestReplyHelper.reply(get.get, Either
+                            .right(new ContainerOverview(db.id, db.name, db.ip, db.port, reachabilities, topology._2)));
                 } catch (ContainerAdministrationException e) {
                     RequestReplyHelper.replyError(get.get, e);
                 }
