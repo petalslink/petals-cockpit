@@ -36,6 +36,7 @@ import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.GetWorkspaceTree;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
+import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit;
 import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit.State;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
@@ -51,8 +52,11 @@ public class WorkspaceResource {
 
     private final CockpitActors as;
 
-    public WorkspaceResource(CockpitActors as, long wsId) {
+    private final UsersDAO users;
+
+    public WorkspaceResource(CockpitActors as, UsersDAO users, long wsId) {
         this.as = as;
+        this.users = users;
         this.wsId = wsId;
     }
 
@@ -60,8 +64,12 @@ public class WorkspaceResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
     public WorkspaceTree get(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
-        return as.call(wsId, new GetWorkspaceTree(profile.getUser().getUsername()))
+        WorkspaceTree tree = as.call(wsId, new GetWorkspaceTree(profile.getUser().getUsername()))
                 .getOrElseThrow(s -> new WebApplicationException(s));
+
+        users.saveLastWorkspace(profile.getUser(), wsId);
+
+        return tree;
     }
 
     /**

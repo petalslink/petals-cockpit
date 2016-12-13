@@ -33,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
+import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.MinWorkspace;
@@ -50,10 +51,13 @@ public class WorkspacesResource {
 
     private final CockpitActors as;
 
+    private final UsersDAO users;
+
     @Inject
-    public WorkspacesResource(CockpitActors as, WorkspacesDAO workspaces) {
+    public WorkspacesResource(CockpitActors as, WorkspacesDAO workspaces, UsersDAO users) {
         this.as = as;
         this.workspaces = workspaces;
+        this.users = users;
     }
 
     @POST
@@ -76,7 +80,7 @@ public class WorkspacesResource {
 
     @Path("/{wsId}")
     public WorkspaceResource workspace(@PathParam("wsId") @Min(1) long wsId) {
-        return new WorkspaceResource(as, wsId);
+        return new WorkspaceResource(as, users, wsId);
     }
 
     public static class NewWorkspace {

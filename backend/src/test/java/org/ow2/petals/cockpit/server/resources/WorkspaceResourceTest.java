@@ -17,6 +17,7 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 
@@ -36,6 +37,7 @@ import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.BusResource.BusOverview;
 import org.ow2.petals.cockpit.server.resources.ContainerResource.ComponentOverview;
 import org.ow2.petals.cockpit.server.resources.ContainerResource.ContainerOverview;
@@ -44,7 +46,6 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
-import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvider;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -233,6 +234,9 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         assertThat(su.name).isEqualTo(serviceUnit.getName());
         assertThat(su.state.toString()).isEqualTo(serviceAssembly.getState().toString());
         assertThat(su.saName).isEqualTo(serviceAssembly.getName());
+
+        // ensure that calling get workspace tree set the last workspace in the db
+        verify(users).saveLastWorkspace(MockProfileParamValueFactoryProvider.ADMIN, 1);
     }
 
     @Test

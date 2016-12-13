@@ -23,6 +23,7 @@ import java.util.Optional;
 import org.eclipse.jdt.annotation.Nullable;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.sqlobject.Bind;
+import org.skife.jdbi.v2.sqlobject.BindBean;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.Transaction;
@@ -38,6 +39,13 @@ public abstract class UsersDAO {
 
     @SqlUpdate("insert into users (username, password, name) values (:u, :p, :n)")
     protected abstract void insert(@Bind("u") String username, @Bind("p") String password, @Bind("n") String name);
+
+    @SqlQuery("select last_workspace from users where username = :u.username")
+    @Nullable
+    public abstract Long getLastWorkspace(@BindBean("u") DbUser user);
+
+    @SqlUpdate("update users set last_workspace = :wsId where username = :u.username")
+    public abstract void saveLastWorkspace(@BindBean("u") DbUser user, @Bind("wsId") long wsId);
 
     @Transaction
     public Optional<DbUser> create(String username, String password, String name) {

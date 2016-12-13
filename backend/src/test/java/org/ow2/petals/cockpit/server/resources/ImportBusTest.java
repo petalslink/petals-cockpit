@@ -43,8 +43,8 @@ import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
-import org.ow2.petals.cockpit.server.security.MockProfileParamValueFactoryProvider;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
