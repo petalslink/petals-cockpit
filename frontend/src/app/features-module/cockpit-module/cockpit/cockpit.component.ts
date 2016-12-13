@@ -133,12 +133,6 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit() {
-    // temporary fix based on problems with property opened in Angular Material sidenav
-    this.start._onTransitionEnd = function () {
-      this._openPromise = null;
-      this._closePromise = null;
-    };
-
     this.onResize();
 
     this.store$.dispatch({ type: MinimalWorkspacesActions.FETCH_WORKSPACES });
