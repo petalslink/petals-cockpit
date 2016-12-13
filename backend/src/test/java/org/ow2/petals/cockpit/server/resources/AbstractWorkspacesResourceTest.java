@@ -122,6 +122,7 @@ public class AbstractWorkspacesResourceTest {
                     bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.JDBC_ES)
                             .to(ExecutorService.class);
                     bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
+                    bind(PetalsAdministrationFactory.getInstance()).to(PetalsAdministrationFactory.class);
                 }
             }).build();
 

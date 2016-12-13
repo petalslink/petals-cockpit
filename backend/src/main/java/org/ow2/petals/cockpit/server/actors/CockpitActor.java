@@ -25,8 +25,6 @@ import javax.inject.Named;
 import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
-import org.ow2.petals.admin.api.exception.DuplicatedServiceException;
-import org.ow2.petals.admin.api.exception.MissingServiceException;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
@@ -42,6 +40,7 @@ import javaslang.CheckedFunction1;
 import javaslang.Tuple2;
 import javaslang.control.Option;
 
+@SuppressWarnings("squid:S3306")
 public abstract class CockpitActor<M> extends BasicActor<M, Void> {
 
     private static final Logger LOG = LoggerFactory.getLogger(CockpitActor.class);
@@ -65,6 +64,9 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
     @Inject
     protected CockpitActors as;
 
+    @Inject
+    protected PetalsAdministrationFactory adminFactory;
+
     /**
      * This is needed because the java compiler has trouble typechecking lambda on {@link CheckedCallable}.
      */
@@ -83,12 +85,7 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
         return FiberAsync.runBlocking(paExecutor, new CheckedCallable<R, ContainerAdministrationException>() {
             @Override
             public R call() throws ContainerAdministrationException {
-                final PetalsAdministration petals;
-                try {
-                    petals = PetalsAdministrationFactory.getInstance().newPetalsAdministrationAPI();
-                } catch (DuplicatedServiceException | MissingServiceException e) {
-                    throw new AssertionError(e);
-                }
+                final PetalsAdministration petals = adminFactory.newPetalsAdministrationAPI();
 
                 try {
                     petals.connect(ip, port, username, password);
