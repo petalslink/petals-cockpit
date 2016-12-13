@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   class="sidenav-menu"
   [class.cockpit-theme]="config?.isDarkTheme"
 >
-  <md-sidenav-layout fullscreen>
+  <md-sidenav-layout fullscreen (backdrop-clicked)="closeSidenav()">
     <md-sidenav
       layout="column"
       layout-fill
@@ -81,7 +81,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           #tabGroup
           *ngIf="workspace.id"
           [selectedIndex]="tabSelectedIndex"
-          (focusChange)="openTab(tabGroup.selectedIndex)"
+          (selectChange)="openTab(tabGroup.selectedIndex)"
         >
           <md-tab label="Petals" class="md-tab-petals" layout-fill>
             <div layout="row" flex>
