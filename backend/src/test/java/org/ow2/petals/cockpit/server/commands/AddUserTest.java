@@ -44,6 +44,9 @@ import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.util.JarLocation;
+import liquibase.Liquibase;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class AddUserTest {
 
@@ -76,28 +79,26 @@ public class AddUserTest {
 
     @Before
     public void setUp() throws Exception {
+        // setup the database schema
+        new Liquibase("migrations.xml", new ClassLoaderResourceAccessor(), new JdbcConnection(dbRule.getConnection()))
+                .update("");
+
         final JarLocation location = mock(JarLocation.class);
         when(location.getVersion()).thenReturn(Optional.of("1.0.0"));
 
-        // it's initialize method won't be run (but its run method will!)
-        CockpitApplication<CockpitConfiguration> app = new CockpitApplication<>();
-        bootstrap = new Bootstrap<>(app);
+        // its initialize method won't be run (but its run method will!)
+        bootstrap = new Bootstrap<>(new CockpitApplication<>());
 
         // let's load configuration from resources
         bootstrap().setConfigurationSourceProvider(new ResourceConfigurationSourceProvider());
 
         // let's simulate the initialize method only for what we need here
-        bootstrap().addBundle(app.migrations);
         bootstrap().addCommand(new AddUserCommand<>());
 
         cli = new Cli(location, bootstrap, System.out, System.err);
 
+        // used by the cli when running command
         dbConfig.addToSystemProperties();
-
-        // let's setup the db
-        cli().run("db", "migrate", "add-user-test.yml");
-
-        systemOutRule.clearLog();
     }
 
     @After
@@ -112,8 +113,7 @@ public class AddUserTest {
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(success).as("Exit success").isTrue();
 
-        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout")
-                .contains("Added user admin");
+        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").contains("Added user admin");
         softly.assertThat(systemErrRule.getLog()).as("stderr").isEmpty();
         softly.assertAll();
 
@@ -127,20 +127,19 @@ public class AddUserTest {
 
     @Test
     public void addUserToDbTwice() throws Exception {
-        
+
         addUserToDb();
         systemErrRule.clearLog();
         systemOutRule.clearLog();
         // needed because running cli will register them again...
         bootstrap().getMetricRegistry().removeMatching(MetricFilter.ALL);
-        
+
         boolean success = cli().run("add-user", "-n", "Admin", "-u", "admin", "-p", "password", "add-user-test.yml");
 
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(success).as("Exit success").isTrue();
 
-        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout")
-                .doesNotContain("Added user");
+        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").doesNotContain("Added user");
         softly.assertThat(systemErrRule.getLog()).as("stderr").contains("User admin already exists");
         softly.assertAll();
     }
