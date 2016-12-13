@@ -68,8 +68,8 @@ public class UserSessionTest {
     @Before
     public void setUpClient() {
         client = new JerseyClientBuilder(appRule.getEnvironment()).build("test client")
-                // sometimes it fails with the default value...
-                .property(ClientProperties.READ_TIMEOUT, 1000);
+                // sometimes it fails with the default value because things are lazily initialised in Jersey
+                .property(ClientProperties.READ_TIMEOUT, 4000);
     }
 
     @Before
