@@ -25,6 +25,7 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
@@ -127,6 +128,8 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         ExecutorService jdbcExec = environment.lifecycle().executorService("jdbc-worker-%d")
                 .minThreads(2).maxThreads(Runtime.getRuntime().availableProcessors()).build();
 
+        final PetalsAdministrationFactory adminFactory = PetalsAdministrationFactory.getInstance();
+
         environment.jersey().register(new AbstractBinder() {
             @Override
             protected void configure() {
@@ -138,6 +141,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 bind(buses).to(BusesDAO.class);
                 bind(jdbi).to(DBI.class);
                 bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
+                bind(adminFactory).to(PetalsAdministrationFactory.class);
             }
         });
 

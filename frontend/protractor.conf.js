@@ -9,7 +9,9 @@ exports.config = {
   allScriptsTimeout: 11000,
   specs: [
     './e2e/login.e2e-spec.ts',
-    './e2e/workspaces.e2e-spec.ts'
+    './e2e/workspaces.e2e-spec.ts',
+    './e2e/workspace-tree.e2e-spec.ts',
+    './e2e/workspace-needspetals.e2e-spec.ts'
   ],
   capabilities: {
     'browserName': 'chrome',
