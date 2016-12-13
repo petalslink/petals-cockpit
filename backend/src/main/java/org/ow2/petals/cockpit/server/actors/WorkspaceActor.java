@@ -50,9 +50,7 @@ import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.SuspendExecution;
 import javaslang.CheckedFunction1;
-import javaslang.Tuple;
 import javaslang.control.Either;
-import javaslang.control.Option;
 
 /**
  * TODO should we make it die after some time if there is no listeners? not sure, see next TODO
@@ -216,8 +214,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
     private Domain getTopology(NewBus bus)
             throws ContainerAdministrationException, SuspendExecution, InterruptedException {
-        return super.getTopology(bus.ip, bus.port, bus.username, bus.password,
-                Option.some(Tuple.of(bus.passphrase, true)));
+        return runAdmin(bus.ip, bus.port, bus.username, bus.password,
+                petals -> petals.newContainerAdministration().getTopology(bus.passphrase, true));
     }
 
     public interface Msg {
