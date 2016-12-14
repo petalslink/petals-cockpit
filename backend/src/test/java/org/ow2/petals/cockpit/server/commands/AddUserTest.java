@@ -41,6 +41,7 @@ import com.codahale.metrics.MetricFilter;
 
 import io.dropwizard.cli.Cli;
 import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
+import io.dropwizard.logging.BootstrapLogging;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.util.JarLocation;
@@ -49,6 +50,10 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class AddUserTest {
+
+    static {
+        BootstrapLogging.bootstrap();
+    }
 
     @Rule
     public EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder().build();
