@@ -56,8 +56,8 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
     this.workspace$ = store$.select('workspace');
 
     this.workspaceSub = this.workspace$
-        .map((workspaceR: IWorkspaceRecord) => workspaceR.toJS())
-        .subscribe((workspace: IWorkspace) => this.workspace = workspace);
+      .map((workspaceR: IWorkspaceRecord) => workspaceR.toJS())
+      .subscribe((workspace: IWorkspace) => this.workspace = workspace);
   }
 
   ngOnDestroy() {
@@ -67,38 +67,36 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // get the current workspace (once) only if
-    // it has an array of buses OR buses in progress with at least one value
     this.workspace$WithBus = this.workspace$
       .filter((workspaceR: IWorkspaceRecord) => (workspaceR.get('buses').size + workspaceR.get('busesInProgress').size) > 0);
 
     // update the current bus IF
-    // it's ID is in the URL AND the current workspace has at least one bus
-    this.routeSub =
-      this.route.params.combineLatest(this.workspace$WithBus.take(1),
-        (params: Params) => {
-          this.updateBus(params['idBus'], true);
-        }).subscribe();
-
+    // either the URL changed OR the current workspace changed (while having at least one bus)
     this.workspace$WithBusSub =
       this.route.params.combineLatest(this.workspace$WithBus,
         (params: Params) => {
-          this.updateBus(params['idBus'], false);
+          this.updateBus(params['idBus']);
         }
       ).subscribe();
 
-      this.route.params.subscribe(param => {
-        this.store$.dispatch({
-          type: WorkspaceActions.FETCH_BUS_DETAILS,
-          payload: {
-            idWorkspace: param['idWorkspace'],
-            idBus: param['idBus']
-          }
-        });
+    this.routeSub =
+      this.route.params.subscribe(params => {
+        // TODO refactor all of this because there is too much calls to updateBus... ?
+        this.updateBus(params['idBus']);
+
+        if (!this.busInImport) {
+          this.store$.dispatch({
+            type: WorkspaceActions.FETCH_BUS_DETAILS,
+            payload: {
+              idWorkspace: params['idWorkspace'],
+              idBus: params['idBus']
+            }
+          });
+        }
       });
   }
 
-  updateBus(idBus: string, reloadConfig: boolean) {
+  updateBus(idBus: string) {
     // try to find the bus in buses in progress
     let busInProgressFiltered = this.workspace.busesInProgress.find((b: IBus) => b.id === idBus);
 
@@ -112,11 +110,5 @@ export class PetalsBusContentComponent implements OnInit, OnDestroy {
       this.bus = this.workspace.buses.find((b: IBus) => b.id === idBus);
       this.busInImport = false;
     }
-
-    // reload if asked OR if bus status change from importing to imported
-    // if (reloadConfig || busInImportPreviousStatus !== this.busInImport) {
-    //   console.log(FETCH_BUS_CONFIG);
-    //   this.store$.dispatch({ type: FETCH_BUS_CONFIG, payload: idBus });
-    // }
   }
 }
