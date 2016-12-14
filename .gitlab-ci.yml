@@ -121,4 +121,4 @@ e2e-product:
     - "nohup $COCKPIT server $COCKPIT_CONFIG &"
     - "nohup $XVFB &"
     - "cd frontend"
-    - "yarn run e2e -- --exclude e2e/*needspetals*.ts"
+    - yarn run e2e -- --exclude "e2e/*needspetals*.ts"
