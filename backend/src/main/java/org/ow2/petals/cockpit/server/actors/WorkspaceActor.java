@@ -196,7 +196,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             // TODO see how it interact with our WorkspaceTree...
             // TODO maybe delegate him the import itself? maybe it's best to leave the creation to the workspace,
             // because then it would be akward to have the bus create the container object in db so...
-            wsBuses.put(tree.id, as.getActor(new BusActor(bTree, self())));
+            wsBuses.put(bTree.id, as.getActor(new BusActor(bTree, self())));
 
             return WorkspaceEvent.busImportOk(bTree);
         } catch (Exception e) {
