@@ -157,8 +157,7 @@ public class AbstractWorkspacesResourceTest {
             String passphrase = bus._3;
             List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>>> containers = bus._4;
             Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>> entry = containers
-                    .get(0);
-            assert entry != null;
+                    .iterator().next();
             DbBusImported bDb = new DbBusImported(bus._1, entry._2.getHost(), getPort(entry._2),
                     entry._2.getJmxUsername(), entry._2.getJmxPassword(), passphrase, domain.getName());
 
