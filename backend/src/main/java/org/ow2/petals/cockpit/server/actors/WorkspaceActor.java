@@ -103,7 +103,23 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         for (;;) {
             Msg msg = receive();
             if (msg instanceof WorkspaceEventMsg) {
-                broadcast(((WorkspaceEventMsg) msg).event);
+                WorkspaceEvent event = ((WorkspaceEventMsg) msg).event;
+                if (event.event == WorkspaceEvent.Type.BUS_IMPORT_OK) {
+                    BusTree bTree = (BusTree) event.data;
+
+                    // TODO update it more nicely!! (as a result of the import made by the bus actor for example)
+                    tree = runDAO(() -> workspaces.getWorkspaceTree(db));
+
+                    // TODO see how it interact with our WorkspaceTree...
+                    // TODO maybe delegate to the actor the import itself? but inversely, maybe it's best to leave the
+                    // creation to the workspace, because then it would be akward to have the bus create the container
+                    // object in db...
+                    @SuppressWarnings("resource")
+                    BusActor actor = new BusActor(bTree, self());
+                    wsBuses.put(bTree.id, as.getActor(actor));
+                }
+
+                broadcast(event);
             } else if (msg instanceof GetWorkspaceTree) {
                 answer((GetWorkspaceTree) msg, m -> Either.right(tree));
             } else if (msg instanceof ImportBus) {
@@ -189,14 +205,6 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             final Domain topology = getTopology(bus);
 
             final BusTree bTree = runDAO(() -> buses.saveImport(bId, topology));
-
-            // TODO update it more nicely!! (as a result of the import made by the bus actor!)
-            tree = runDAO(() -> workspaces.getWorkspaceTree(db));
-
-            // TODO see how it interact with our WorkspaceTree...
-            // TODO maybe delegate him the import itself? maybe it's best to leave the creation to the workspace,
-            // because then it would be akward to have the bus create the container object in db so...
-            wsBuses.put(bTree.id, as.getActor(new BusActor(bTree, self())));
 
             return WorkspaceEvent.busImportOk(bTree);
         } catch (Exception e) {

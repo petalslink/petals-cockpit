@@ -228,27 +228,31 @@ public class WorkspaceResource {
 
     public static class WorkspaceEvent {
 
-        @JsonProperty
-        private final String event;
+        public static enum Type {
+            BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE
+        }
 
         @JsonProperty
-        private final Object data;
+        public final Type event;
 
-        public WorkspaceEvent(String event, Object data) {
+        @JsonProperty
+        public final Object data;
+
+        public WorkspaceEvent(Type event, Object data) {
             this.event = event;
             this.data = data;
         }
 
         public static WorkspaceEvent busImportError(BusInError bus) {
-            return new WorkspaceEvent("BUS_IMPORT_ERROR", bus);
+            return new WorkspaceEvent(Type.BUS_IMPORT_ERROR, bus);
         }
 
         public static WorkspaceEvent busImportOk(BusTree bus) {
-            return new WorkspaceEvent("BUS_IMPORT_OK", bus);
+            return new WorkspaceEvent(Type.BUS_IMPORT_OK, bus);
         }
 
         public static WorkspaceEvent suStateChange(NewSUState ns) {
-            return new WorkspaceEvent("SU_STATE_CHANGE", ns);
+            return new WorkspaceEvent(Type.SU_STATE_CHANGE, ns);
         }
 
         @Override
