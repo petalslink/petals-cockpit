@@ -1289,5 +1289,17 @@ describe(`Workspace Reducer`, () => {
     expect(workspaceRecordFactory().toJS()).toEqual(nextState);
   });
 
+  xit(`${WorkspaceActions.UPDATE_SERVICE_UNIT_STATE}`, () => {
+    // TODO (after refactor to flatten our store)
+  });
+
+  xit(`${WorkspaceActions.UPDATE_SERVICE_UNIT_STATE_SUCCESS}`, () => {
+    // TODO (after refactor to flatten our store)
+  });
+
+  xit(`${WorkspaceActions.UPDATE_SERVICE_UNIT_STATE_FAILED}`, () => {
+    // TODO (after refactor to flatten our store)
+  });
+
   // TODO: Test selector
 });

@@ -353,4 +353,51 @@ export class WorkspaceEffects {
         });
       })
     );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: true}) updateServiceUnitState$: Observable<Action> = this.actions$
+    .ofType(WorkspaceActions.UPDATE_SERVICE_UNIT_STATE)
+    .switchMap((action: Action) =>
+      this.workspaceService.updateServiceUnitState(
+        action.payload.idWorkspace,
+        action.payload.idBus,
+        action.payload.idContainer,
+        action.payload.idComponent,
+        action.payload.idServiceUnit,
+        action.payload.newState
+      )
+      .map((res: Response) => {
+        if (!res.ok) {
+          throw new Error('Error while updating the service unit state');
+        }
+
+        return {
+          type: WorkspaceActions.UPDATE_SERVICE_UNIT_STATE_SUCCESS,
+          payload: {
+            idWorkspace: action.payload.idWorkspace,
+            idBus: action.payload.idBus,
+            idContainer: action.payload.idContainer,
+            idComponent: action.payload.idComponent,
+            idServiceUnit: action.payload.idServiceUnit,
+            newState: action.payload.newState
+          }
+        };
+      })
+      .catch((err) => {
+        if (environment.debug) {
+          console.error(err);
+        }
+
+        return Observable.of({
+          type: WorkspaceActions.UPDATE_SERVICE_UNIT_STATE_FAILED,
+          payload: {
+            idWorkspace: action.payload.idWorkspace,
+            idBus: action.payload.idBus,
+            idContainer: action.payload.idContainer,
+            idComponent: action.payload.idComponent,
+            idServiceUnit: action.payload.idServiceUnit,
+          }
+        });
+      })
+    );
 }

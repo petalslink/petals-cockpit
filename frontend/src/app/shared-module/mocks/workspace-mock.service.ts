@@ -48,6 +48,8 @@ export class WorkspaceMockService {
   private reachable = true;
   private reachableById = new Map<string, string>();
 
+  private suStateById = new Map<string, string>();
+
   constructor(
     private http: Http,
     private store$: Store<IStore>,
@@ -256,6 +258,8 @@ export class WorkspaceMockService {
   }
 
   getDetailsServiceUnit(idWorkspace: string, idBus: string, idContainer: string, idComponent: string, idServiceUnit: string) {
+    let state: string = this.suStateById.get(idServiceUnit) || 'Started';
+
     let response = <Response>{
       ok: true,
       json: () => {
@@ -263,8 +267,23 @@ export class WorkspaceMockService {
           // as we use merge in the reducer,
           // whatever is added here will be added to the component
           id: idServiceUnit,
-          state: 'Started'
+          state
         };
+      }
+    };
+
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
+  }
+
+  updateServiceUnitState(idWorkspace: string, idBus: string, idContainer: string, idComponent: string, idServiceUnit: string, state: string) {
+    this.suStateById.set(idServiceUnit, state);
+
+    let response = <Response>{
+      ok: true,
+      json: () => {
+        return {};
       }
     };
 

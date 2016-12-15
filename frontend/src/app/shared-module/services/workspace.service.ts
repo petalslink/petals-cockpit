@@ -70,6 +70,11 @@ export class WorkspaceService {
   getDetailsServiceUnit(idWorkspace: string, idBus: string, idContainer: string, idComponent: string, idServiceUnit: string) {
     /* tslint:disable:max-line-length */
     return this.http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${idBus}/containers/${idContainer}/components/${idComponent}/serviceunits/${idServiceUnit}`);
+  }
+
+  updateServiceUnitState(idWorkspace: string, idBus: string, idContainer: string, idComponent: string, idServiceUnit: string, state: string) {
+    /* tslint:disable:max-line-length */
+    return this.http.put(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${idBus}/containers/${idContainer}/components/${idComponent}/serviceunits/${idServiceUnit}`, { state });
     /* tslint:enable:max-line-length */
   }
 }

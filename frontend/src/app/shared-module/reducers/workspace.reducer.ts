@@ -760,6 +760,144 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
     );
   }
 
+  /* UPDATE_SERVICE_UNIT_STATE* */
+  else if (action.type === WorkspaceActions.UPDATE_SERVICE_UNIT_STATE) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((bus: IBusRecord) => bus.get('id') === action.payload.idBus);
+
+    if (busIndex === -1 || typeof workspaceR.getIn(['buses', busIndex, 'containers']) === 'undefined') {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((container: IContainerRecord) => container.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    let componentIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components'])
+      .findIndex((component: IComponentRecord) => component.get('id') === action.payload.idComponent);
+
+    if (componentIndex === -1) {
+      return workspaceR;
+    }
+
+    let suIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'serviceUnits'])
+      .findIndex((su: IServiceUnitRecord) => su.get('id') === action.payload.idServiceUnit);
+
+    if (suIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn([
+      'buses', busIndex,
+      'containers', containerIndex,
+      'components', componentIndex,
+      'serviceUnits', suIndex,
+      'isUpdatingState'], true
+    );
+  }
+
+  else if (action.type === WorkspaceActions.UPDATE_SERVICE_UNIT_STATE_SUCCESS) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((bus: IBusRecord) => bus.get('id') === action.payload.idBus);
+
+    if (busIndex === -1 || typeof workspaceR.getIn(['buses', busIndex, 'containers']) === 'undefined') {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((container: IContainerRecord) => container.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    let componentIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components'])
+      .findIndex((component: IComponentRecord) => component.get('id') === action.payload.idComponent);
+
+    if (componentIndex === -1) {
+      return workspaceR;
+    }
+
+    let suIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'serviceUnits'])
+      .findIndex((su: IServiceUnitRecord) => su.get('id') === action.payload.idServiceUnit);
+
+    if (suIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn([
+      'buses', busIndex,
+      'containers', containerIndex,
+      'components', componentIndex,
+      'serviceUnits', suIndex],
+
+      workspaceR
+        .getIn([
+          'buses', busIndex,
+          'containers', containerIndex,
+          'components', componentIndex,
+          'serviceUnits', suIndex
+        ])
+        .merge({
+          isUpdatingState: false,
+          state: action.payload.newState
+        })
+    );
+  }
+
+  else if (action.type === WorkspaceActions.UPDATE_SERVICE_UNIT_STATE_FAILED) {
+    let busIndex = workspaceR
+      .get('buses')
+      .findIndex((bus: IBusRecord) => bus.get('id') === action.payload.idBus);
+
+    if (busIndex === -1 || typeof workspaceR.getIn(['buses', busIndex, 'containers']) === 'undefined') {
+      return workspaceR;
+    }
+
+    let containerIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers'])
+      .findIndex((container: IContainerRecord) => container.get('id') === action.payload.idContainer);
+
+    if (containerIndex === -1) {
+      return workspaceR;
+    }
+
+    let componentIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components'])
+      .findIndex((component: IComponentRecord) => component.get('id') === action.payload.idComponent);
+
+    if (componentIndex === -1) {
+      return workspaceR;
+    }
+
+    let suIndex = workspaceR
+      .getIn(['buses', busIndex, 'containers', containerIndex, 'components', componentIndex, 'serviceUnits'])
+      .findIndex((su: IServiceUnitRecord) => su.get('id') === action.payload.idServiceUnit);
+
+    if (suIndex === -1) {
+      return workspaceR;
+    }
+
+    return workspaceR.setIn([
+      'buses', busIndex,
+      'containers', containerIndex,
+      'components', componentIndex,
+      'serviceUnits', suIndex,
+      'isUpdatingState'], false
+    );
+  }
+
   else if (action.type === UserActions.USR_IS_DISCONNECTED) {
     return workspaceRecordFactory();
   }

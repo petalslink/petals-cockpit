@@ -45,6 +45,12 @@ export class PetalsServiceUnitContentComponent implements OnInit, OnDestroy {
   public serviceUnit: IServiceUnit;
   private serviceUnitSub: Subscription;
 
+  private idWorkspace: string;
+  private idBus: string;
+  private idContainer: string;
+  private idComponent: string;
+  private idServiceUnit: string;
+
   constructor(private route: ActivatedRoute, private store$: Store<IStore>) {
     this.serviceUnitSub =
       store$.let(getCurrentServiceUnit())
@@ -53,15 +59,21 @@ export class PetalsServiceUnitContentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.route.params.subscribe(param => {
+    this.route.params.subscribe(params => {
+      this.idWorkspace = params['idWorkspace'];
+      this.idBus = params['idBus'];
+      this.idContainer = params['idContainer'];
+      this.idComponent = params['idComponent'];
+      this.idServiceUnit = params['idServiceUnit'];
+
       this.store$.dispatch({
         type: WorkspaceActions.FETCH_SU_DETAILS,
         payload: {
-          idWorkspace: param['idWorkspace'],
-          idBus: param['idBus'],
-          idContainer: param['idContainer'],
-          idComponent: param['idComponent'],
-          idServiceUnit: param['idServiceUnit']
+          idWorkspace: this.idWorkspace,
+          idBus: this.idBus,
+          idContainer: this.idContainer,
+          idComponent: this.idComponent,
+          idServiceUnit: this.idServiceUnit
         }
       });
     });
@@ -69,5 +81,19 @@ export class PetalsServiceUnitContentComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.serviceUnitSub.unsubscribe();
+  }
+
+  editState(newState: string) {
+      this.store$.dispatch({
+        type: WorkspaceActions.UPDATE_SERVICE_UNIT_STATE,
+        payload: {
+          idWorkspace: this.idWorkspace,
+          idBus: this.idBus,
+          idContainer: this.idContainer,
+          idComponent: this.idComponent,
+          idServiceUnit: this.idServiceUnit,
+          newState
+        }
+      });
   }
 }
