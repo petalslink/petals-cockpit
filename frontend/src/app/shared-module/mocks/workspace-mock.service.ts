@@ -153,7 +153,7 @@ export class WorkspaceMockService {
         };
 
         // trigger a fake sse response
-        this.sseService.triggerSse(bus.id, newBus);
+        this.sseService.triggerSse('BUS_IMPORT_OK', { id: bus.id, bus: newBus });
 
         return bus;
       }
@@ -286,6 +286,9 @@ export class WorkspaceMockService {
         return {};
       }
     };
+
+    // trigger a fake sse response
+    this.sseService.triggerSse('SU_STATE_CHANGE', { id: idServiceUnit, state });
 
     return Observable
       .of(response)

@@ -76,60 +76,82 @@ export class SseMockService {
   }
 
   // used only for the mock
-  triggerSse(id: string, bus: INewBus) {
+  triggerSse(type: string, obj: any) {
     // wait before simulating an sse response
     let sseDelay = environment.sseDelay;
-    let sseBusImportShouldFail = false;
 
-    if (environment.sseFirstBusImportShouldFail && !this.hasAlreadyFailed) {
-      sseBusImportShouldFail = true;
-      this.hasAlreadyFailed = true;
+    let action;
 
-      // if the first has to fail, just wait 3s
+    if (type === 'SU_STATE_CHANGE') {
+      // do not use the random timer here, just wait 3s
       sseDelay = 3000;
-    }
 
-    let timeoutSseTmp = setTimeout(() => {
-      this.http.get('mocks-json/imported-bus.json')
-        .map(data => data.json())
-        .subscribe((newBus: IBus) => {
-          // replace every ID by a generated UUID
-          replaceIds(newBus);
-
-          // ... but keep the original bus ID
-          newBus.id = id;
-
-          let debugSseMsg;
-
-          if (sseBusImportShouldFail) {
-            debugSseMsg = 'sse : An error occurred while trying to import the bus :';
-
-            this.observer.next({
-              event: 'BUS_IMPORT_ERROR',
-              data: {
-                id: id,
-                importIp: bus.ip,
-                importPort: bus.port,
-                importUsername: bus.username,
-                importError: `An error occurred while trying to import the bus : ${id}`
-              }
-            });
-          }
-
-          else {
-            debugSseMsg = 'sse : A bus was added :';
-
-            this.observer.next({
-              event: 'BUS_IMPORT_OK',
-              data: newBus
-            });
-          }
-
-          if (environment.debug) {
-            console.debug(debugSseMsg, newBus);
+      action = () => {
+        this.observer.next({
+          event: 'SU_STATE_CHANGE',
+          data: {
+            id: obj.id,
+            state: obj.state
           }
         });
-    }, sseDelay);
+      };
+    }
+
+    else if (type === 'BUS_IMPORT_OK') {
+      let sseBusImportShouldFail = false;
+
+      if (environment.sseFirstBusImportShouldFail && !this.hasAlreadyFailed) {
+        sseBusImportShouldFail = true;
+        this.hasAlreadyFailed = true;
+
+        // if the first has to fail, just wait 3s
+        sseDelay = 3000;
+      }
+
+      action = () => {
+        this.http.get('mocks-json/imported-bus.json')
+          .map(data => data.json())
+          .subscribe((newBus: IBus) => {
+            // replace every ID by a generated UUID
+            replaceIds(newBus);
+
+            // ... but keep the original bus ID
+            newBus.id = obj.id;
+
+            let debugSseMsg;
+
+            if (sseBusImportShouldFail) {
+              debugSseMsg = 'sse : An error occurred while trying to import the bus :';
+
+              this.observer.next({
+                event: 'BUS_IMPORT_ERROR',
+                data: {
+                  id: obj.id,
+                  importIp: obj.bus.ip,
+                  importPort: obj.bus.port,
+                  importUsername: obj.bus.username,
+                  importError: `An error occurred while trying to import the bus : ${obj.id}`
+                }
+              });
+            }
+
+            else {
+              debugSseMsg = 'sse : A bus was added :';
+
+              this.observer.next({
+                event: 'BUS_IMPORT_OK',
+                data: newBus
+              });
+            }
+
+            if (environment.debug) {
+              console.debug(debugSseMsg, newBus);
+            }
+          });
+      }
+    }
+
+    let timeoutSseTmp = setTimeout(action, sseDelay);
 
     this.timeoutSse.push(timeoutSseTmp);
   }

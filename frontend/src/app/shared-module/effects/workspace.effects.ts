@@ -115,10 +115,27 @@ export class WorkspaceEffects {
             if (msg.event === 'BUS_IMPORT_OK') {
               return { type: WorkspaceActions.ADD_BUS_SUCCESS, payload: msg.data };
             }
+
             else if (msg.event === 'BUS_IMPORT_ERROR') {
               return { type: WorkspaceActions.ADD_BUS_FAILED, payload: msg.data };
             }
+
+            else if (msg.event === 'SU_STATE_CHANGE') {
+              return {
+                type: WorkspaceActions.UPDATE_SERVICE_UNIT_STATE_SUCCESS,
+                payload: {
+                  idWorkspace: action.payload.id,
+                  idServiceUnit: msg.data.id,
+                  newState: msg.data.state
+                }
+              };
+            }
+
             else {
+              if (environment.debug) {
+                console.debug(`Unknown message : ${msg}`);
+              }
+
               return { type: '', payload: null };
             }
           });
@@ -366,22 +383,12 @@ export class WorkspaceEffects {
         action.payload.idServiceUnit,
         action.payload.newState
       )
-      .map((res: Response) => {
+      .switchMap((res: Response) => {
         if (!res.ok) {
           throw new Error('Error while updating the service unit state');
         }
 
-        return {
-          type: WorkspaceActions.UPDATE_SERVICE_UNIT_STATE_SUCCESS,
-          payload: {
-            idWorkspace: action.payload.idWorkspace,
-            idBus: action.payload.idBus,
-            idContainer: action.payload.idContainer,
-            idComponent: action.payload.idComponent,
-            idServiceUnit: action.payload.idServiceUnit,
-            newState: action.payload.newState
-          }
-        };
+        return Observable.empty();
       })
       .catch((err) => {
         if (environment.debug) {
