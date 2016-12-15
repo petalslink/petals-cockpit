@@ -18,6 +18,7 @@ package org.ow2.petals.cockpit.server.actors;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -64,7 +65,7 @@ public class ContainerActor extends CockpitActor<Msg> {
 
     private static final long serialVersionUID = -6353310817718062675L;
 
-    private final ContainerTree tree;
+    private ContainerTree tree;
 
     private DbContainer db = new DbContainer(0, "", "", 0, "", "");
 
@@ -148,31 +149,42 @@ public class ContainerActor extends CockpitActor<Msg> {
             RequestReplyHelper.reply(change, Either.left(Status.CONFLICT));
         } else {
             try {
-                ServiceUnitOverview res = runAdmin(db.ip, db.port, db.username, db.password, petals -> {
+                SUTree res = runAdmin(db.ip, db.port, db.username, db.password, petals -> {
                     ArtifactAdministration aa = petals.newArtifactAdministration();
                     Artifact a = aa.getArtifact(ServiceAssembly.TYPE, su.saName, null);
                     assert a instanceof ServiceAssembly;
                     ServiceAssembly sa = (ServiceAssembly) a;
                     changeSAState(petals, sa, change.newState);
-                    return new ServiceUnitOverview(su.id, su.name, MinServiceUnit.State.from(sa.getState()), su.saName);
+                    return new SUTree(su.id, su.name, MinServiceUnit.State.from(sa.getState()), su.saName);
                 });
 
-                serviceUnitStateUpdated(su.id, res.state);
-
+                serviceUnitStateUpdated(res);
                 assert res != null;
-                RequestReplyHelper.reply(change, Either.right(res));
+                RequestReplyHelper.reply(change,
+                        Either.right(new ServiceUnitOverview(res.id, res.name, res.state, res.saName)));
             } catch (ContainerAdministrationException e) {
                 RequestReplyHelper.replyError(change, e);
             }
         }
     }
 
-    private void serviceUnitStateUpdated(long id, MinServiceUnit.State state)
+    private void serviceUnitStateUpdated(SUTree su)
             throws SuspendExecution, InterruptedException {
         // TODO error handling???
         // TODO I should have a suDb for it, no?
-        runDAO(() -> buses.updateServiceUnitState(id, state));
-        workspace.send(new WorkspaceEventMsg(WorkspaceEvent.suStateChange(new NewSUState(id, state))));
+        runDAO(() -> buses.updateServiceUnitState(su.id, su.state));
+        tree = updateSUinTree(tree, su);
+        workspace.send(new WorkspaceEventMsg(WorkspaceEvent.suStateChange(new NewSUState(su.id, su.state))));
+    }
+
+    private static ContainerTree updateSUinTree(ContainerTree tree, SUTree su) {
+        return new ContainerTree(tree.id, tree.name,
+                tree.components.stream().map(c -> updateSUinTree(c, su)).collect(Collectors.toList()));
+    }
+
+    private static ComponentTree updateSUinTree(ComponentTree tree, SUTree su) {
+        return new ComponentTree(tree.id, tree.name, tree.state, tree.type,
+                tree.serviceUnits.stream().map(t -> t.id == su.id ? su : t).collect(Collectors.toList()));
     }
 
     /**
