@@ -89,12 +89,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </div>
           </md-tab>
 
-          <md-tab label="Service" class="md-tab-service">
-            <app-service-menu-module layout="column" flex></app-service-menu-module>
+          <md-tab label="Service" class="md-tab-service" layout-fill>
+            <div layout="row" flex>
+              <app-service-menu-module layout="column" flex layout-fill></app-service-menu-module>
+            </div>
           </md-tab>
 
-          <md-tab label="API" class="md-tab-api">
-            <app-api-menu-module layout="column" flex></app-api-menu-module>
+          <md-tab label="API" class="md-tab-api" layout-fill>
+            <div layout="row" flex>
+              <app-api-menu-module layout="column" flex layout-fill></app-api-menu-module>
+            </div>
           </md-tab>
         </md-tab-group>
       </div>

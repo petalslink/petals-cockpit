@@ -20,13 +20,15 @@ import { NgModule } from '@angular/core';
 
 // our modules
 import { SharedModule } from '../../../../shared-module/shared-module.module';
+import { ApiContentModule } from './api-content-module/api-content-module.module';
 
 // our components
 import { ApiModuleComponent } from './api-module.component';
 
 @NgModule({
   imports: [
-    SharedModule
+    SharedModule,
+    ApiContentModule
   ],
   declarations: [
     ApiModuleComponent
