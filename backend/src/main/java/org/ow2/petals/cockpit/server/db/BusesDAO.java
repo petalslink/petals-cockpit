@@ -90,7 +90,7 @@ public abstract class BusesDAO {
     @Mapper(DbServiceUnit.Mapper.class)
     public abstract List<DbServiceUnit> getServiceUnitByComponent(@BindBean("c") DbComponent c);
 
-    @SqlUpdate("update servicesunits set state = :s where id = :suId")
+    @SqlUpdate("update serviceunits set state = :s where id = :suId")
     public abstract int updateServiceUnitState(@Bind("suId") long su, @Bind("s") MinServiceUnit.State state);
 
     @Transaction
