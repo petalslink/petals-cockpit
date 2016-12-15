@@ -148,7 +148,7 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
 
         Response put = resources.getJerseyTest()
                 .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/40").request()
-                .put(Entity.json(new ChangeState(MinServiceUnit.State.NotLoaded)));
+                .put(Entity.json(new ChangeState(MinServiceUnit.State.Unloaded)));
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
 

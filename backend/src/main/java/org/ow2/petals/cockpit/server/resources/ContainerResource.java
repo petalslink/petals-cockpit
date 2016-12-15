@@ -215,7 +215,7 @@ public class ContainerResource {
     public abstract static class MinComponent {
 
         public enum State {
-            NotLoaded, Loaded, Shutdown, Stopped, Started, Unknown;
+            Unloaded, Loaded, Shutdown, Stopped, Started, Unknown;
 
             public static State from(ArtifactState.State state) {
                 switch (state) {
@@ -289,7 +289,7 @@ public class ContainerResource {
 
     public abstract static class MinServiceUnit {
         public enum State {
-            NotLoaded, Started, Stopped, Shutdown, Unknown;
+            Unloaded, Started, Stopped, Shutdown, Unknown;
 
             public static State from(ArtifactState.State state) {
                 switch (state) {

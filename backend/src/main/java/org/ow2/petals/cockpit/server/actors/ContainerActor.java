@@ -177,17 +177,17 @@ public class ContainerActor extends CockpitActor<Msg> {
 
     /**
      * 
-     * Note : petals admin does not expose a way to go to shutdown (except from {@link MinServiceUnit.State#NotLoaded},
+     * Note : petals admin does not expose a way to go to shutdown (except from {@link MinServiceUnit.State#Unloaded},
      * but we don't support it yet!)
      */
     private boolean isSAStateTransitionOk(SUTree su, MinServiceUnit.State to) {
         switch (su.state) {
             case Shutdown:
-                return to == State.NotLoaded || to == State.Started;
+                return to == State.Unloaded || to == State.Started;
             case Started:
                 return to == State.Stopped;
             case Stopped:
-                return to == State.Started || to == State.NotLoaded;
+                return to == State.Started || to == State.Unloaded;
             default:
                 LOG.warn("Impossible case for state transition check from {} to {} for SU {} ({})", su.state, to,
                         su.name, su.id);
@@ -199,7 +199,7 @@ public class ContainerActor extends CockpitActor<Msg> {
             throws ArtifactAdministrationException {
         ServiceAssemblyLifecycle sal = petals.newArtifactLifecycleFactory().createServiceAssemblyLifecycle(sa);
         switch (desiredState) {
-            case NotLoaded:
+            case Unloaded:
                 sal.undeploy();
                 break;
             case Started:
