@@ -11,12 +11,13 @@ exports.config = {
     './e2e/login.e2e-spec.ts',
     './e2e/workspaces.e2e-spec.ts',
     './e2e/workspace-tree.e2e-spec.ts',
-    './e2e/workspace-needspetals.e2e-spec.ts'
+    './e2e/workspace-needspetals.e2e-spec.ts',
+    './e2e/cockpit-resize.e2e-spec.ts'
   ],
   capabilities: {
     'browserName': 'chrome',
     'chromeOptions': {
-      'args': ['--no-sandbox']
+      'args': ['--no-sandbox', '--start-maximized']
     }
   },
   directConnect: true,
@@ -24,7 +25,7 @@ exports.config = {
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,
-    defaultTimeoutInterval: 60000,
+    defaultTimeoutInterval: 360000,
     print: function() {}
   },
   useAllAngular2AppRoots: true,

@@ -27,6 +27,7 @@ import { IComponent } from '../../../../../../shared-module/interfaces/petals.in
 
 // our actions
 import { WorkspaceActions } from './../../../../../../shared-module/reducers/workspace.actions';
+import { ConfigActions } from '../../../../../../shared-module/reducers/config.actions';
 
 @Component({
   selector: 'app-components-menu',
@@ -50,5 +51,9 @@ export class ComponentsMenuComponent {
   fold(idBus: string, idContainer: string, idComponent: string) {
     this.store$.dispatch({ type: WorkspaceActions.TOGGLE_FOLD_COMPONENT, payload: { idBus, idContainer, idComponent } });
     return false;
+  }
+
+  closeSidenavIfMobile() {
+    this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV_IF_MOBILE });
   }
 }

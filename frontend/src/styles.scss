@@ -29,6 +29,10 @@
   color: md-color($accent) !important;
 }
 
+.color-red {
+  color: md-color($md-red, 500, 1) !important;
+}
+
 .bold {
   font-weight: bold !important;
 }
@@ -165,7 +169,7 @@ body {
 .error{
   padding: 12px;
   background-color: rgba(255, 0, 0, 0.2);
-  color: red;
+  color: md-color($md-red, 500, 1);
 }
 
 .rotate-minus-90 {

@@ -14,20 +14,17 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div class="cockpit-settings">
-  <md-toolbar color="primary">
-    <span>
-      Settings
-    </span>
-
-    <span class="flex-space"></span>
+  <md-toolbar align="start" color="primary">
+    <app-toggle-sidenav></app-toggle-sidenav>
+    <span>Settings</span>
   </md-toolbar>
 
   <div class="bkg-primary-card">
-    <md-card class="central-content">
-      <md-card-content>
+    <md-card class="central-content" layout="column">
+      <md-card-content layout-margin>
         <md-nav-list>
           <h3 md-subheader>Theme</h3>
-          <md-list-item (click)="toggleTheme()">
+          <md-list-item layout="row" layout-align="stretch center" (click)="toggleTheme()">
             <md-slide-toggle [checked]="config.isDarkTheme">
               Night mode
             </md-slide-toggle>
@@ -35,8 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
           <h3 md-subheader>Language</h3>
 
-          <md-radio-group [(ngModel)]="lang">
-            <md-list-item (click)="changeLanguageTo(l)" *ngFor="let l of availableLanguages">
+          <md-radio-group layout="row" layout-align="stretch center" [(ngModel)]="lang">
+            <md-list-item layout="row" (click)="changeLanguageTo(l)" *ngFor="let l of availableLanguages">
               <md-radio-button [value]="l" [checked]="lang === l">
                 {{ l }}
               </md-radio-button>

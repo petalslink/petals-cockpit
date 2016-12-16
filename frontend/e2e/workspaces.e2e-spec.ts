@@ -58,7 +58,7 @@ describe(`Workspaces`, () => {
     expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
 
     // check that the page displayed has a title with the workspace name
-    expect(element.all(by.css(`app-workspace md-toolbar md-toolbar-row > span`)).get(0).getText()).toEqual(`Workspace 0`);
+    expect(element.all(by.css(`app-workspace md-toolbar md-toolbar-row > span`)).get(1).getText()).toEqual(`Workspace 0`);
 
     // check that there's no warning saying no bus ...
     expect(element(by.css(`md-sidenav .info.no-bus`)).isPresent()).toBe(false);
@@ -113,5 +113,43 @@ describe(`Workspaces`, () => {
       });
 
     expect(listWithoutIcons).toEqual(availableBuses);
+  });
+
+  it(`should create a new workspace and this workspace shouldn't have any bus`, () => {
+    element(by.css(`button.change-workspace`)).click();
+
+    // reveal the part to add a workspace
+    element(by.css(`button.btn-show-panel-add-workspace`)).click();
+
+    // create 'Test' workspace
+    element(by.css(`md-input.new-workspace-name input`)).sendKeys(`Test`);
+    element(by.css(`.btn-add-workspace`)).click();
+
+    // no need to select the new workspace, it should be auto-selected after being created
+
+    // check that the URL is set to this workspace
+    // this is not really accurate as we do not test the ID in particular
+    // TODO: find a way to know the IDs on mock and also IDs from real server
+    expect(browser.getCurrentUrl())
+      .toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
+
+    // check there's a warning saying no buses available
+    expect(element(by.css(`md-sidenav .info.no-bus`)).getText())
+      .toEqual(`The workspace "Test" doesn't have any bus or bus in progress. You may want to import one.`);
+
+    // come back on workspace's list
+    element(by.css(`md-sidenav button.change-workspace`)).click();
+
+    // check that 3 workspaces are listed
+    expect(element.all(by.css(`.page-workspaces div.md-list-item`)).count()).toEqual(3);
+    let workspacesAndOwners = [
+      `Workspace 0`,
+        `You're the only one to use this workspace`,
+      `Workspace 1`,
+        `Workspace also used by mrobert`,
+      `Test`,
+        `You're the only one to use this workspace`
+    ];
+    expect(element(by.css(`.page-workspaces md-nav-list`)).getText()).toEqual(workspacesAndOwners.join(`\n`));
   });
 });

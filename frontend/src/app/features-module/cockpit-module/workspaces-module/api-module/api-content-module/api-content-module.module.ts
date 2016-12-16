@@ -15,8 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// angular modules
 import { NgModule } from '@angular/core';
+
+// our component
 import { ApiContentModuleComponent } from './api-content-module.component';
+
+// our modules
 import { SharedModule } from '../../../../../shared-module/shared-module.module';
 
 @NgModule({

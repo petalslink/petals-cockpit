@@ -15,14 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
-import { ApiComponent } from './api.component';
-import { SharedModule } from '../../../../../shared-module/shared-module.module';
+import { browser, element, by } from 'protractor';
 
-@NgModule({
-  imports: [
-    SharedModule
-  ],
-  declarations: [ApiComponent]
-})
-export class ApiModule { }
+describe(`Cockpit Resize`, () => {
+  // Todo: Fix problem with sidenav animation(transition)
+  xit(`should be displayed sidenav or not`, () => {
+    expect(element(by.css(`md-sidenav`)).isDisplayed()).toBe(true);
+
+    element(by.css(`app-toggle-sidenav`)).click();
+  });
+});

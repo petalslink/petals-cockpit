@@ -15,16 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// angular modules
 import { NgModule } from '@angular/core';
-import { ApiMenuModuleComponent } from './api-menu-module.component';
+
+// our modules
 import { SharedModule } from '../../../../../shared-module/shared-module.module';
+
+// our components
+import { ApiMenuModuleComponent } from './api-menu-module.component';
+import { ApiSidenavMenuComponent } from './api-sidenav-menu/api-sidenav-menu.component';
 
 @NgModule({
   imports: [
     SharedModule
   ],
   declarations: [
-    ApiMenuModuleComponent
+    ApiMenuModuleComponent,
+    ApiSidenavMenuComponent
   ],
   exports: [
     ApiMenuModuleComponent

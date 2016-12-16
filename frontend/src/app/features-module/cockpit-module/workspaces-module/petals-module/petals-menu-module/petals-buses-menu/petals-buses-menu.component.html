@@ -13,7 +13,10 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div class="select-bus">
+<div class="select-bus tree-petals"
+  layout="column"
+  layout-fill
+  flex="100">
   <md-nav-list dense *ngFor="let bus of buses; let last=last; let index=index">
     <h3
       md-subheader
@@ -26,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       md-list-item
       [routerLink]="['/', 'cockpit', 'workspaces', idWorkspaceSelected, 'petals', 'bus', bus.id]"
       class="bus"
+      (click)="closeSidenavIfMobile()"
       [class.color-primary-bold]="bus.id === idBusSelected"
     >
       <md-icon (click)="fold(bus.id)" [class.rotate-minus-90]="bus.isFolded">arrow_drop_down</md-icon>

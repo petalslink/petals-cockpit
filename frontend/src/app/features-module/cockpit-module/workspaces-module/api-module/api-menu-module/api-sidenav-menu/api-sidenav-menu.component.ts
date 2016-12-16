@@ -15,19 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// angular modules
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 
-// our components
-import { ServiceComponent } from './service.component';
-
-@NgModule({
-  imports: [
-    CommonModule
-  ],
-  declarations: [
-    ServiceComponent
-  ]
+@Component({
+  selector: 'app-api-sidenav-menu',
+  templateUrl: './api-sidenav-menu.component.html',
+  styleUrls: ['./api-sidenav-menu.component.scss']
 })
-export class ServiceModule { }
+export class ApiSidenavMenuComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}

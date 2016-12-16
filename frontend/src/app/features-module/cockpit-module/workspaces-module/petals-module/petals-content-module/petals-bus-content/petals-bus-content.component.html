@@ -15,7 +15,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div class="select-tab-bus">
   <md-toolbar color="primary">
-    <span>
+    <app-toggle-sidenav></app-toggle-sidenav>
+    <span>Petals</span>
+    <md-icon>chevron_right</md-icon>
+    <span class="color-accent-bold">
       <span *ngIf="busInImport">
         Importing bus with IP : "{{ bus.config.ip }}"
       </span>
@@ -25,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </span>
     </span>
 
-    <span class="flex-space"></span>
+    <span flex></span>
 
     <button md-icon-button [md-menu-trigger-for]="menu">
       <md-icon>more_vert</md-icon>

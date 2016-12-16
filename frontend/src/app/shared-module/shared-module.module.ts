@@ -36,6 +36,7 @@ import { PrettyJsonModule } from 'angular2-prettyjson';
 
 // our components
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { ToggleSidenavComponent } from './components/toggle-sidenav/toggle-sidenav.component';
 
 // our directives
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
@@ -46,7 +47,8 @@ import { KeysPipe } from './pipes/keys.pipe';
 const SHARED_COMPONENTS = [
   NotFoundComponent,
   ColorSearchedLettersDirective,
-  KeysPipe
+  KeysPipe,
+  ToggleSidenavComponent
 ];
 
 const SHARED_MODULES = [

@@ -20,59 +20,62 @@
 .connecting {
   color: orange;
 }
+
 .connected {
   color: green;
 }
+
 .not-connected {
   color: red;
 }
+
 .connection-failed {
   @extend .not-connected;
 }
+
 md-input {
   width: 90%;
 }
+
 md-progress-circle {
   width: 10px;
   height: 10px;
   line-height: 10px;
   display: inline-block;
 }
-md-card-content > * {
-  margin: 16px;
-}
+
 .pnl-auth {
-  max-width: 500px;
   margin: auto;
   padding: 0;
 }
+
 .pnl-btn-connect {
   margin: 16px;
 }
+
 .background-auth {
-  background-color: rgba(224, 224, 224, .6);
-  padding: 50px;
-  margin-top: 250px;
-  flex: 1 1 auto;
+  background-color: rgba(224, 224, 224, .8);
+  display: flex;
+  min-height: 100vh;
+  padding: 10px;
 }
 
 /* Toolbar Auth */
 .logo-petals-auth {
   max-width: 70px;
 }
+
 md-toolbar {
   img {
     padding-right: 30px;
   }
 }
 
-@media screen and (max-width: 600px)
-{
+@media screen and (max-width: 600px) {
   .background-auth {
-    background-color: rgba(224, 224, 224, .6);
-    padding: 50px;
-    margin-top: 100px;
-    flex: 1 1 auto;
+    background-color: rgba(224, 224, 224, .8);
+    display: flex;
+    min-height: 100vh;
   }
 }
 

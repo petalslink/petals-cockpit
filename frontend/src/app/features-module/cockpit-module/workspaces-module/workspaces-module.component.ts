@@ -19,8 +19,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-workspaces-module',
-  templateUrl: './workspaces-module.component.html',
-  styleUrls: ['./workspaces-module.component.scss']
+  templateUrl: './workspaces-module.component.html'
 })
 export class WorkspacesModuleComponent {
   constructor() { }

@@ -17,12 +17,15 @@
 
 /* Sidenav */
 
-md-sidenav-layout {
-  height: 100%;
-}
-
 md-sidenav {
   width: 320px;
+  overflow-y: hidden;
+  height: 100%;
+  max-height: 100%;
+}
+
+md-sidenav-layout.my-sidenav-layout .md-sidenav-content {
+  width: 100%;
 }
 
 #header-sidenav {
@@ -37,10 +40,6 @@ md-sidenav {
   flex: 1 1 auto;
   max-width: 110px;
   padding-bottom: 10px;
-}
-
-.icon-power {
-  float: right;
 }
 
 /deep/ .md-tab-label {
@@ -69,11 +68,6 @@ md-progress-circle {
 }
 
 /* Content */
-
-#card-full-size {
-  justify-content: space-between;
-  background-color: #c2c2c2;
-}
 
 .no-workspace-selected {
   margin-top: 20px;

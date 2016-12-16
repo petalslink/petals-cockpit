@@ -19,6 +19,11 @@ import { element, by } from 'protractor';
 
 describe(`Workspace Tree`, () => {
   it(`should filter by bus, container, component and su when searching in Petals menu`, () => {
+    element(by.css(`button.change-workspace`)).click();
+
+    // select the first workspace
+    element.all(by.css(`.page-workspaces div.md-list-item`)).get(0).click();
+
     // test 1 : Display only parents and children, regardless of the case
     element(by.css(`.petals-component input`)).sendKeys(`CoMpOnEnT 0`);
 

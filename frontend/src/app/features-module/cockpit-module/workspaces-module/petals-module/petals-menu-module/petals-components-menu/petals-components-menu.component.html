@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
          'container', idContainer,
          'component', component.id]"
        class="component"
+       (click)="closeSidenavIfMobile()"
        [class.color-primary-bold]="component.id === idComponentSelected"
     >
       <md-icon (click)="fold(idBus, idContainer, component.id)" [class.rotate-minus-90]="component.isFolded">arrow_drop_down</md-icon>

@@ -15,73 +15,126 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div class="page-import-bus">
   <md-toolbar color="primary" *ngIf="!importing">
-    <span>
-      Petals - Import a bus
-    </span>
+    <app-toggle-sidenav></app-toggle-sidenav>
+    <span>Petals</span>
+    <md-icon>chevron_right</md-icon>
+    <span class="color-accent-bold">Import a bus</span>
   </md-toolbar>
 
   <div class="bkg-primary-card">
-    <md-card class="central-content list-element">
+    <md-card layout-align="center center" class="central-content list-element" layout-xs="column">
       <md-card-content>
 
         <form #formImportBus="ngForm" (ngSubmit)="importBus(formImportBus.value)">
-          <h3 md-subheader align="start" class="color-primary list-title">Description</h3>
+          <h3 md-subheader align="start" class="color-primary list-title">Description :</h3>
 
           <div *ngIf="newBus.importError" class="error">
             <b>Import failed with error :</b>
             <p>"{{ newBus.importError }}"</p>
           </div>
 
-          <div class="input-row">
-            <md-input #ipInput type="text" [(ngModel)]="newBus.config.ip" name="ip" placeholder="IP" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
-            <md-input type="number" [(ngModel)]="newBus.config.port" name="port" placeholder="Port" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
-            <md-input type="text" [(ngModel)]="newBus.config.login" name="username" placeholder="Username" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
-            <md-input type="password" [(ngModel)]="newBus.config.password" name="password" placeholder="Password" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
-            <md-input type="password" [(ngModel)]="newBus.config.passphrase" name="passphrase" placeholder="Topology Passphrase" [disabled]="(workspace.importingBus || importing) && !newBus.importError"></md-input>
-          </div>
-
-          <div align="end" class="pnl-btn-import">
-            <button
-              class="btn-import-bus"
-              md-raised-button
-              color="primary"
-              type="submit"
-              [disabled]="(workspace.importingBus || importing) && !newBus.importError"
+          <div
+            layout-xs="column"
+            layout-margin
+            layout-padding
+          >
+            <div
+              layout-gt-xs="row"
+              flex-gt-xs
+              layout-align="space-between center"
             >
-              <span *ngIf="!workspace.importingBus && !importing && !newBus.importError">
-                Import bus
-              </span>
+              <md-input
+                #ipInput
+                type="text"
+                flex-gt-xs="45"
+                [(ngModel)]="newBus.config.ip"
+                name="ip"
+                placeholder="IP"
+                [disabled]="(workspace.importingBus || importing) && !newBus.importError">
+              </md-input>
 
-              <span *ngIf="(workspace.importingBus || importing) && !newBus.importError">
-                Importing bus <md-progress-circle mode="indeterminate"></md-progress-circle>
-              </span>
-            </button>
+              <md-input
+                type="number"
+                flex-gt-xs="45"
+                [(ngModel)]="newBus.config.port"
+                name="port"
+                placeholder="Port"
+                [disabled]="(workspace.importingBus || importing) && !newBus.importError">
+              </md-input>
+            </div>
 
-            <!--<button
-              md-raised-button
-              color="primary"
-              type="submit"
-              [disabled]="(workspace.importingBus || importing) && !newBus.importError"
+            <div
+              layout-gt-xs="row"
+              flex-gt-xs
+              layout-align="space-between center"
             >
-              <span *ngIf="newBus.importError">
-                Retry to import bus
-              </span>
-            </button>-->
+              <md-input
+                type="text"
+                flex-gt-xs="45"
+                [(ngModel)]="newBus.config.login"
+                name="username"
+                placeholder="Username"
+                [disabled]="(workspace.importingBus || importing) && !newBus.importError">
+              </md-input>
 
-            <button
-              *ngIf="newBus.importError"
-              md-raised-button
-              color="primary"
-              type="button"
-              [disabled]="newBus.removing"
-              (click)="removeBus(newBus.id)"
+              <md-input
+                type="password"
+                flex-gt-xs="45"
+                [(ngModel)]="newBus.config.password"
+                name="password"
+                placeholder="Password"
+                [disabled]="(workspace.importingBus || importing) && !newBus.importError">
+              </md-input>
+            </div>
+
+            <div
+              layout-gt-xs="row"
+              flex-gt-xs
+              layout-align="start center"
             >
-              Discard<span *ngIf="newBus.removing">ing</span>
+              <md-input
+                type="password"
+                flex-gt-xs="45"
+                [(ngModel)]="newBus.config.passphrase"
+                name="passphrase"
+                placeholder="Topology Passphrase"
+                [disabled]="(workspace.importingBus || importing) && !newBus.importError">
+              </md-input>
+            </div>
 
-              <md-progress-circle *ngIf="newBus.removing" mode="indeterminate"></md-progress-circle>
-            </button>
+            <div align="end" class="pnl-btn-import">
+              <button
+                class="btn-import-bus"
+                md-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="(workspace.importingBus || importing) && !newBus.importError"
+              >
+                <span *ngIf="!workspace.importingBus && !importing && !newBus.importError">
+                  Import bus
+                </span>
+
+                <span *ngIf="(workspace.importingBus || importing) && !newBus.importError">
+                  Importing bus <md-progress-circle mode="indeterminate"></md-progress-circle>
+                </span>
+              </button>
+
+              <button
+                *ngIf="newBus.importError"
+                md-raised-button
+                color="primary"
+                type="button"
+                [disabled]="newBus.removing"
+                (click)="removeBus(newBus.id)"
+              >
+                Discard<span *ngIf="newBus.removing">ing</span>
+
+                <md-progress-circle *ngIf="newBus.removing" mode="indeterminate"></md-progress-circle>
+              </button>
+            </div>
           </div>
         </form>
+
       </md-card-content>
     </md-card>
   </div>

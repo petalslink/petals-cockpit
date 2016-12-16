@@ -28,6 +28,7 @@ import { IWorkspace } from '../../../../../../shared-module/interfaces/workspace
 
 // our actions
 import { WorkspaceActions } from './../../../../../../shared-module/reducers/workspace.actions';
+import { ConfigActions } from '../../../../../../shared-module/reducers/config.actions';
 
 @Component({
   selector: 'app-buses-menu',
@@ -51,5 +52,9 @@ export class BusesMenuComponent {
   fold(idBus: string) {
     this.store$.dispatch({ type: WorkspaceActions.TOGGLE_FOLD_BUS, payload: { idBus } });
     return false;
+  }
+
+  closeSidenavIfMobile() {
+    this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV_IF_MOBILE });
   }
 }

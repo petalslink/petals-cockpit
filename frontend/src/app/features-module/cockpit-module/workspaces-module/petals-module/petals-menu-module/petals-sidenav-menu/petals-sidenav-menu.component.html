@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     color="primary"
     md-tooltip="Import a bus"
     tooltip-position="below"
+    (click)="closeSidenavIfMobile()"
     [routerLink]="['/cockpit', 'workspaces', workspace.id, 'petals', 'bus', 'import']"
   >
     <md-icon class="md-24">add</md-icon>

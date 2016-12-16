@@ -27,7 +27,7 @@ $theme: md-light-theme($primary, $accent);
 @include angular-material-theme($theme);
 
 .cockpit-theme {
-  $dark-p: md-palette($md-deep-purple, 700, 500, 900);
+  $dark-p: md-palette($md-deep-purple, 400);
   $dark-a: md-palette($md-amber, 600);
 
   $dark-t: md-dark-theme($dark-p, $dark-a);

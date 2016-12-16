@@ -13,19 +13,32 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div class="sidenav-menu" [class.cockpit-theme]="config?.isDarkTheme">
-  <md-sidenav-layout fullscreen>
-    <md-sidenav #sidenav align="start" mode="side" opened="true" [class.sidenav-no-workspace-selected]="!workspace.id">
-
+<div
+  layout="column"
+  layout-fill
+  class="sidenav-menu"
+  [class.cockpit-theme]="config?.isDarkTheme"
+>
+  <md-sidenav-layout fullscreen (backdrop-clicked)="closeSidenav()">
+    <md-sidenav
+      layout="column"
+      layout-fill
+      #start
+      [mode]="config.sidenavMode"
+      (close)="closeSidenavIfMobile()"
+      [class.sidenav-no-workspace-selected]="!workspace.id"
+    >
       <md-card id="header-sidenav">
         <img class="logo-petals" src="assets/img/logo_petalscockpit.png">
         <md-card-title-group>
-          <button class="settings" md-icon-button routerLink="/cockpit/workspaces/settings">
+
+          <button md-icon-button routerLink="/cockpit/workspaces/settings" (click)="closeSidenavIfMobile()">
+
             <md-icon>settings</md-icon>
           </button>
-
+          <span flex></span>
           <p>{{ user.name }}</p>
-
+          <span flex></span>
           <button md-icon-button [disabled]="user.isDisconnecting" class="icon-power" (click)="disconnectUser()">
             <md-icon *ngIf="!user.isDisconnecting">power_settings_new</md-icon>
             <md-progress-circle *ngIf="user.isDisconnecting" mode="indeterminate"></md-progress-circle>
@@ -40,6 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           md-raised-button
           *ngIf="workspace.name"
           color="accent"
+          (click)="closeSidenavIfMobile()"
           [routerLink]="['workspaces', workspace.id]"
         >
           {{ workspace.name }}
@@ -48,6 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           md-raised-button
           *ngIf="workspace.name"
           color="accent"
+          (click)="closeSidenavIfMobile()"
           [routerLink]="['workspaces']"
         >
           <md-icon>view_list</md-icon>
@@ -59,26 +74,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         Please select one
       </div>
 
-      <md-tab-group
-        #tabGroup
-        *ngIf="workspace.id"
-        [selectedIndex]="tabSelectedIndex"
-        (focusChange)="openTab(tabGroup.selectedIndex)"
-      >
-        <md-tab label="Petals" class="md-tab-petals">
-          <app-petals-menu-module></app-petals-menu-module>
-        </md-tab>
+      <div layout="column" flex>
+        <md-tab-group
+          layout-fill
+          flex
+          #tabGroup
+          *ngIf="workspace.id"
+          [selectedIndex]="tabSelectedIndex"
+          (selectChange)="openTab(tabGroup.selectedIndex)"
+        >
+          <md-tab label="Petals" class="md-tab-petals" layout-fill>
+            <div layout="row" flex>
+              <app-petals-menu-module layout="column" flex layout-fill></app-petals-menu-module>
+            </div>
+          </md-tab>
 
-        <md-tab label="Service" class="md-tab-service">
-          <app-service-menu-module></app-service-menu-module>
-        </md-tab>
+          <md-tab label="Service" class="md-tab-service" layout-fill>
+            <div layout="row" flex>
+              <app-service-menu-module layout="column" flex layout-fill></app-service-menu-module>
+            </div>
+          </md-tab>
 
-        <md-tab label="API" class="md-tab-api">
-          <app-api-menu-module></app-api-menu-module>
-        </md-tab>
-      </md-tab-group>
+          <md-tab label="API" class="md-tab-api" layout-fill>
+            <div layout="row" flex>
+              <app-api-menu-module layout="column" flex layout-fill></app-api-menu-module>
+            </div>
+          </md-tab>
+        </md-tab-group>
+      </div>
     </md-sidenav>
 
-    <router-outlet></router-outlet>
+    <router-outlet flex></router-outlet>
   </md-sidenav-layout>
 </div>

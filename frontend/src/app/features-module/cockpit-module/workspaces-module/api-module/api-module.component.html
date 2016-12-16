@@ -13,46 +13,4 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-toolbar color="primary">
-  <span>
-    API
-  </span>
-
-  <span class="flex-space"></span>
-
-  <button md-icon-button [md-menu-trigger-for]="menu">
-    <md-icon>more_vert</md-icon>
-  </button>
-
-  <md-menu x-position="before" #menu="mdMenu">
-    <button md-menu-item>
-      Overview
-    </button>
-    <button md-menu-item>
-      Operation
-    </button>
-    <button md-menu-item>
-      Config
-    </button>
-    <button md-menu-item>
-      Flow
-    </button>
-    <button md-menu-item>
-      Monitor
-    </button>
-    <button md-menu-item>
-      Log
-    </button>
-    <button md-menu-item>
-      User
-    </button>
-  </md-menu>
-</md-toolbar>
-
-<md-card class="central-content">
-  <md-card-content>
-    <md-card-title align="center">
-      API works
-    </md-card-title>
-  </md-card-content>
-</md-card>
+<app-api-content-module layout="column"></app-api-content-module>

@@ -18,8 +18,17 @@
 // angular modules
 import { Component, Input } from '@angular/core';
 
+// ngrx - store
+import { Store } from '@ngrx/store';
+
 // our interfaces
 import { IServiceUnit } from '../../../../../../shared-module/interfaces/petals.interface';
+
+// our actions
+import { ConfigActions } from '../../../../../../shared-module/reducers/config.actions';
+
+// // our interfaces
+import { IStore } from '../../../../../../shared-module/interfaces/store.interface';
 
 @Component({
   selector: 'app-service-units-menu',
@@ -37,7 +46,7 @@ export class ServiceUnitsMenuComponent {
   @Input() idWorkspaceSelected: string;
   @Input() idServiceUnitSelected: string;
 
-  constructor() { }
+  constructor(private store$: Store<IStore>) { }
 
   generateLink(serviceUnitId) {
     return [
@@ -48,5 +57,9 @@ export class ServiceUnitsMenuComponent {
       'component', this.idComponent,
       'serviceUnit', serviceUnitId
     ].join('/');
+  }
+
+  closeSidenavIfMobile() {
+    this.store$.dispatch({ type: ConfigActions.CLOSE_SIDENAV_IF_MOBILE });
   }
 }
