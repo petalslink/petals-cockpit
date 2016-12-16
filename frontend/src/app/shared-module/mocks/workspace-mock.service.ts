@@ -277,7 +277,10 @@ export class WorkspaceMockService {
       .delay(environment.httpDelay);
   }
 
+
+  /* tslint:disable:max-line-length */
   updateServiceUnitState(idWorkspace: string, idBus: string, idContainer: string, idComponent: string, idServiceUnit: string, state: string) {
+    /* tslint:enable:max-line-length */
     this.suStateById.set(idServiceUnit, state);
 
     let response = <Response>{

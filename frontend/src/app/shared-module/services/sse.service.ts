@@ -28,9 +28,6 @@ import IOnMessageEvent = sse.IOnMessageEvent;
 // our environment
 import { environment } from '../../../environments/environment';
 
-// our interfaces
-import { INewBus } from '../interfaces/petals.interface';
-
 @Injectable()
 export class SseService {
   private currentSse: IEventSourceStatic;

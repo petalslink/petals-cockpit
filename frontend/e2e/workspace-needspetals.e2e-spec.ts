@@ -114,12 +114,16 @@ describe(`Workspace that Needs Petals`, () => {
   it(`should change a service unit state from stopped to unload`, () => {
     element.all(by.css(`.md-sidenav-content .state .unload`)).get(0).click();
 
-    let state = element(by.css(`.md-sidenav-content .state .current-state`)).getText();
+    // as the SU should be removed, check that we're redirected to workspaces/idCurrentWorkspace
+    expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
 
-    expect(state).toEqual(`Unloaded`);
-    expect(element(by.css(`.md-sidenav-content .state .stop`)).isPresent()).toBe(false);
-    expect(element(by.css(`.md-sidenav-content .state .start`)).isPresent()).toBe(false);
-    expect(element(by.css(`.md-sidenav-content .state .unload`)).isPresent()).toBe(false);
+    // check that the page displayed has a title with the workspace name
+    expect(element.all(by.css(`app-workspace md-toolbar md-toolbar-row > span`)).get(0).getText()).toEqual(`Workspace 0`);
+
+    // the SU shouldn't be in left menu anymore
+    let firstSuName = element(by.css(`app-service-units-menu a.service-unit .md-list-item > span`)).getText();
+
+    expect(firstSuName).toEqual('SU 1');
   });
 
   it(`should create a new workspace and this workspace shouldn't have any bus`, () => {

@@ -121,6 +121,12 @@ export class WorkspaceEffects {
             }
 
             else if (msg.event === 'SU_STATE_CHANGE') {
+              // if the SU is unloaded, it will be removed from the service units array
+              // redirect the user on the workspace
+              if (msg.data.state === 'Unloaded') {
+                this.router.navigate(['/cockpit/workspaces', action.payload.id]);
+              }
+
               return {
                 type: WorkspaceActions.UPDATE_SERVICE_UNIT_STATE_SUCCESS,
                 payload: {

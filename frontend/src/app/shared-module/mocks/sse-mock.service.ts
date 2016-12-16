@@ -32,7 +32,7 @@ import { environment } from '../../../environments/environment';
 import { replaceIds } from '../helpers/helper';
 
 // our interfaces
-import { IBus, INewBus } from '../interfaces/petals.interface';
+import { IBus } from '../interfaces/petals.interface';
 
 @Injectable()
 export class SseMockService {
@@ -148,7 +148,7 @@ export class SseMockService {
               console.debug(debugSseMsg, newBus);
             }
           });
-      }
+      };
     }
 
     let timeoutSseTmp = setTimeout(action, sseDelay);

@@ -824,6 +824,25 @@ function createWorkspaceReducer(workspaceR: IWorkspaceRecord = workspaceRecordFa
       return workspaceR;
     }
 
+    // if the new state is 'Unloaded', the SU should be removed
+    if (action.payload.newState === 'Unloaded') {
+      return workspaceR
+        .setIn([
+            'buses', busIndex,
+            'containers', containerIndex,
+            'components', componentIndex,
+            'serviceUnits'
+          ],
+          workspaceR.getIn([
+            'buses', busIndex,
+            'containers', containerIndex,
+            'components', componentIndex,
+            'serviceUnits']
+          ).filter((serviceUnit: IServiceUnitRecord) => serviceUnit.get('id') !== action.payload.idServiceUnit)
+      );
+    }
+
+    // otherwise update the state
     return workspaceR.setIn([
       'buses', busIndex,
       'containers', containerIndex,
@@ -1041,10 +1060,16 @@ export function getCurrentServiceUnit() {
         .filter((workspaceR: IWorkspaceRecord) => workspaceR.get('selectedServiceUnitId') !== null)
         .map((workspaceR: IWorkspaceRecord) => workspaceR.get('selectedServiceUnitId'))
       )
-      .map(([component, selectedServiceUnitId]: [IComponentRecord, number]) =>
-        component
+      .switchMap(([component, selectedServiceUnitId]: [IComponentRecord, number]) => {
+        let su = component
           .get('serviceUnits')
-          .find((serviceUnit: IServiceUnitRecord) => serviceUnit.get('id') === selectedServiceUnitId)
-      );
+          .find((serviceUnit: IServiceUnitRecord) => serviceUnit.get('id') === selectedServiceUnitId);
+
+        if (typeof su === 'undefined' || !su) {
+          return Observable.empty();
+        }
+
+        return Observable.of(su);
+      });
   };
 };
