@@ -153,8 +153,8 @@ public class ContainerActor extends CockpitActor<Msg> {
                     Artifact a = aa.getArtifact(ServiceAssembly.TYPE, su.saName, null);
                     assert a instanceof ServiceAssembly;
                     ServiceAssembly sa = (ServiceAssembly) a;
-                    changeSAState(petals, sa, change.newState);
-                    return new SUTree(su.id, su.name, MinServiceUnit.State.from(sa.getState()), su.saName);
+                    State newState = changeSAState(petals, sa, change.newState);
+                    return new SUTree(su.id, su.name, newState, su.saName);
                 });
                 assert res != null;
 
@@ -170,7 +170,9 @@ public class ContainerActor extends CockpitActor<Msg> {
     private void serviceUnitStateUpdated(SUTree su) throws SuspendExecution, InterruptedException {
         // TODO error handling???
         // TODO I should have a suDb for it, no?
-        runDAO(() -> buses.updateServiceUnitState(su.id, su.state));
+        runDAO(() -> su.state != MinServiceUnit.State.Unloaded ? buses.updateServiceUnitState(su.id, su.state)
+                : buses.removeServiceUnit(su.id));
+        // TODO improve this whole update thing...
         tree = updateSUinTree(tree, su);
         workspace.send(new WorkspaceEventMsg(WorkspaceEvent.suStateChange(new NewSUState(su.id, su.state))));
     }
@@ -182,7 +184,8 @@ public class ContainerActor extends CockpitActor<Msg> {
 
     private static ComponentTree updateSUinTree(ComponentTree tree, SUTree su) {
         return new ComponentTree(tree.id, tree.name, tree.state, tree.type,
-                tree.serviceUnits.stream().map(t -> t.id == su.id ? su : t).collect(Collectors.toList()));
+                tree.serviceUnits.stream().map(t -> t.id == su.id ? su : t)
+                        .filter(t -> t.state != MinServiceUnit.State.Unloaded).collect(Collectors.toList()));
     }
 
     /**
@@ -193,11 +196,11 @@ public class ContainerActor extends CockpitActor<Msg> {
     private boolean isSAStateTransitionOk(SUTree su, MinServiceUnit.State to) {
         switch (su.state) {
             case Shutdown:
-                return to == State.Unloaded || to == State.Started;
+                return to == MinServiceUnit.State.Unloaded || to == MinServiceUnit.State.Started;
             case Started:
-                return to == State.Stopped;
+                return to == MinServiceUnit.State.Stopped;
             case Stopped:
-                return to == State.Started || to == State.Unloaded;
+                return to == MinServiceUnit.State.Started || to == MinServiceUnit.State.Unloaded;
             default:
                 LOG.warn("Impossible case for state transition check from {} to {} for SU {} ({})", su.state, to,
                         su.name, su.id);
@@ -205,7 +208,8 @@ public class ContainerActor extends CockpitActor<Msg> {
         }
     }
 
-    private void changeSAState(PetalsAdministration petals, ServiceAssembly sa, State desiredState)
+    private MinServiceUnit.State changeSAState(PetalsAdministration petals, ServiceAssembly sa,
+            MinServiceUnit.State desiredState)
             throws ArtifactAdministrationException {
         ServiceAssemblyLifecycle sal = petals.newArtifactLifecycleFactory().createServiceAssemblyLifecycle(sa);
         switch (desiredState) {
@@ -222,7 +226,13 @@ public class ContainerActor extends CockpitActor<Msg> {
                 LOG.warn("Impossible case for state transition from {} to {} for SA {} ({})", sa.getState(),
                         desiredState, sa.getName());
         }
-        sal.updateState();
+        if (desiredState != MinServiceUnit.State.Unloaded) {
+            sal.updateState();
+            return MinServiceUnit.State.from(sa.getState());
+        } else {
+            // we can't call updateState for this one, it will fail since it has been unloaded
+            return MinServiceUnit.State.Unloaded;
+        }
     }
 
     private Option<SUTree> getServiceUnit(long compId, long suId) {

@@ -93,6 +93,9 @@ public abstract class BusesDAO {
     @SqlUpdate("update serviceunits set state = :s where id = :suId")
     public abstract int updateServiceUnitState(@Bind("suId") long su, @Bind("s") MinServiceUnit.State state);
 
+    @SqlUpdate("delete from serviceunits where id = :id")
+    public abstract int removeServiceUnit(@Bind("id") long id);
+
     @Transaction
     public BusTree saveImport(long bId, Domain topology) {
         try {
