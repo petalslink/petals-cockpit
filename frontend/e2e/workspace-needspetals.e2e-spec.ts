@@ -23,8 +23,13 @@ import { browser, element, by } from 'protractor';
 let reId = '(([0-9]+)|([a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}))';
 
 describe(`Workspace that Needs Petals`, () => {
-
   it(`should select a bus and display a content page with the bus name as title + 2 tabs`, () => {
+
+    element(by.css(`button.change-workspace`)).click();
+
+    // select the first workspace
+    element.all(by.css(`.page-workspaces div.md-list-item`)).get(0).click();
+
     // check the title
     element.all(by.css(`app-buses-menu md-nav-list .md-list-item`)).get(0).click();
 
