@@ -100,9 +100,13 @@ build-product:
   script:
     - 'maven dependency:purge-local-repository --non-recursive -DmanualInclude="org.ow2.petals:petals-cockpit-server,org.ow2.petals:petals-cockpit-parent" -DreResolve=false -DsnapshotsOnly=true'
     - "maven -pl cockpit verify"
+    - export VC=`ls cockpit/target/petals-cockpit-*-capsule.jar | sed -E 's/.*petals-cockpit-(.*)-capsule.jar/\1/'`
+    - "mkdir -p dist/$VC"
+    - "cp cockpit/target/petals-cockpit-*-capsule.jar dist/$VC/petals-cockpit.jar"
+    - "cp cockpit/default.yml dist/$VC/config.yml"
   artifacts:
     paths:
-      - cockpit/target/petals-cockpit-*-capsule.jar
+      - dist/
 
 e2e-product:
   <<: *node-java-yarn
@@ -114,7 +118,7 @@ e2e-product:
   dependencies:
     - build-product
   variables:
-    COCKPIT: "java -jar cockpit/target/petals-cockpit-*-capsule.jar"
+    COCKPIT: "java -jar dist/*/petals-cockpit.jar"
     COCKPIT_CONFIG: "e2e/default.yml"
   script:
     - "$COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml"
