@@ -5,6 +5,25 @@ Running demo (mock) [https://victornoel.gitlab.io/petals-cockpit](https://victor
 
 ## Trying Petals Cockpit
 
+### Running the pre-compiled JAR
+
+1. Download the latest compiled petals-cockpit:
+ - [Version 0.3.0](https://gitlab.com/victornoel/petals-cockpit/builds/artifacts/v0.3.0/download?job=build-product)
+ - [Version 0.4.0-SNAPSHOT](https://gitlab.com/victornoel/petals-cockpit/builds/artifacts/master/download?job=build-product)
+2. Unpack it and go into the directory
+3. Initialize the database (or update it if you already had one from a previous version):
+```
+$ java -jar petals-cockpit.jar db migrate config.yml
+```
+4. Create a user if necessary:
+```
+$ java -jar petals-cockpit.jar add-user -u username -n Name -p password config.yml
+```
+5. Run Petals Cockpit:
+```
+$ java -jar petals-cockpit.jar server config.yml
+```
+
 ### Build an Executable Petals Cockpit
 
 In order to create an executable product, simply build the frontend, the backend and then the product that will embed both of them:
