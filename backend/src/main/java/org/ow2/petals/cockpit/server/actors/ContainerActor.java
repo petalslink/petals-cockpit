@@ -29,7 +29,6 @@ import org.ow2.petals.admin.api.artifact.Artifact;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.lifecycle.ServiceAssemblyLifecycle;
 import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
-import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.actors.BusActor.ForBusMsg;
 import org.ow2.petals.cockpit.server.actors.BusActor.GetContainerOverview;
@@ -109,7 +108,7 @@ public class ContainerActor extends CockpitActor<Msg> {
                             .toJavaMap(p -> p.map((i, c) -> Tuple.of(Long.toString(i), c.getState().name())));
                     RequestReplyHelper.reply(get.get, Either
                             .right(new ContainerOverview(db.id, db.name, db.ip, db.port, reachabilities, topology._2)));
-                } catch (ContainerAdministrationException e) {
+                } catch (Exception e) {
                     RequestReplyHelper.replyError(get.get, e);
                 }
             } else if (msg instanceof GetComponentOverview) {
@@ -157,19 +156,18 @@ public class ContainerActor extends CockpitActor<Msg> {
                     changeSAState(petals, sa, change.newState);
                     return new SUTree(su.id, su.name, MinServiceUnit.State.from(sa.getState()), su.saName);
                 });
+                assert res != null;
 
                 serviceUnitStateUpdated(res);
-                assert res != null;
                 RequestReplyHelper.reply(change,
                         Either.right(new ServiceUnitOverview(res.id, res.name, res.state, res.saName)));
-            } catch (ContainerAdministrationException e) {
+            } catch (Exception e) {
                 RequestReplyHelper.replyError(change, e);
             }
         }
     }
 
-    private void serviceUnitStateUpdated(SUTree su)
-            throws SuspendExecution, InterruptedException {
+    private void serviceUnitStateUpdated(SUTree su) throws SuspendExecution, InterruptedException {
         // TODO error handling???
         // TODO I should have a suDb for it, no?
         runDAO(() -> buses.updateServiceUnitState(su.id, su.state));

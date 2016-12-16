@@ -24,7 +24,6 @@ import javax.inject.Named;
 
 import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
-import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
@@ -78,17 +77,17 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
 
     protected <R> R runAdmin(String ip, int port, String username, String password,
             CheckedFunction1<PetalsAdministration, R> f)
-            throws ContainerAdministrationException, SuspendExecution, InterruptedException {
-        return FiberAsync.runBlocking(paExecutor, new CheckedCallable<R, ContainerAdministrationException>() {
+            throws Exception, SuspendExecution, InterruptedException {
+        return FiberAsync.runBlocking(paExecutor, new CheckedCallable<R, Exception>() {
             @Override
-            public R call() throws ContainerAdministrationException {
+            public R call() throws Exception {
                 final PetalsAdministration petals = adminFactory.newPetalsAdministrationAPI();
 
                 try {
                     petals.connect(ip, port, username, password);
 
                     return f.apply(petals);
-                } catch (ContainerAdministrationException e) {
+                } catch (Exception e) {
                     throw e;
                 } catch (Throwable e) {
                     // TODO this is not the best... use Try or Either instead?
@@ -98,7 +97,7 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
                         if (petals.isConnected()) {
                             petals.disconnect();
                         }
-                    } catch (ContainerAdministrationException e) {
+                    } catch (Exception e) {
                         LOG.warn("Error while disconnecting from container", e);
                     }
                 }

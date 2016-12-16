@@ -28,7 +28,6 @@ import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.glassfish.jersey.media.sse.SseBroadcaster;
 import org.glassfish.jersey.server.BroadcasterListener;
 import org.glassfish.jersey.server.ChunkedOutput;
-import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.actors.BusActor.ForBusMsg;
 import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
@@ -221,7 +220,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     }
 
     private Domain getTopology(NewBus bus)
-            throws ContainerAdministrationException, SuspendExecution, InterruptedException {
+            throws Exception, SuspendExecution, InterruptedException {
         return runAdmin(bus.ip, bus.port, bus.username, bus.password,
                 petals -> petals.newContainerAdministration().getTopology(bus.passphrase, true));
     }
