@@ -13,3 +13,5 @@ conventional-changelog -p angular -i ../CHANGELOG.md -s
 - verify CI is ok
 - merge
 - tag the merge commit (with an annotated tag!) vX.X.X and message: Release version X.X.X
+- prepare for next development version (bump to SNAPSHOT in poms and README)
+- push that on master with --follow-tags option
