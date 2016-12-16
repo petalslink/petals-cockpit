@@ -8,8 +8,8 @@ Running demo (mock) [https://victornoel.gitlab.io/petals-cockpit](https://victor
 ### Running the pre-compiled JAR
 
 1. Download the latest compiled petals-cockpit:
- - [Version 0.3.0](https://gitlab.com/victornoel/petals-cockpit/builds/artifacts/v0.3.0/download?job=build-product)
- - [Version 0.4.0-SNAPSHOT](https://gitlab.com/victornoel/petals-cockpit/builds/artifacts/master/download?job=build-product)
+ - [Version 0.4.0](https://gitlab.com/victornoel/petals-cockpit/builds/artifacts/v0.4.0/download?job=build-product)
+ - [Version Latest](https://gitlab.com/victornoel/petals-cockpit/builds/artifacts/master/download?job=build-product)
 2. Unpack it and go into the directory
 3. Initialize the database (or update it if you already had one from a previous version):
 ```
@@ -43,19 +43,19 @@ Don't forget to first initialise the database (see below).
 
 Execute Petals Cockpit:
 ```
-$ java -jar cockpit/target/petals-cockpit-0.4.0-SNAPSHOT-capsule.jar server cockpit/default.yml
+$ java -jar cockpit/target/petals-cockpit-0.4.0-capsule.jar server cockpit/default.yml
 ```
 
 ### Available Commands
 
 A user can be added with:
 ```
-$ java -jar cockpit/target/petals-cockpit-0.3.0-SNAPSHOT-capsule.jar add-user -u username -n Name -p password cockpit/default.yml
+$ java -jar cockpit/target/petals-cockpit-0.4.0-capsule.jar add-user -u username -n Name -p password cockpit/default.yml
 ```
 
 The database can be migrated to the latest version with:
 ```
-$ java -jar cockpit/target/petals-cockpit-0.4.0-SNAPSHOT-capsule.jar db migrate cockpit/default.yml
+$ java -jar cockpit/target/petals-cockpit-0.4.0-capsule.jar db migrate cockpit/default.yml
 ```
 
 ### Working with the backend and the frontend

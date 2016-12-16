@@ -1,3 +1,26 @@
+<a name="0.4.0"></a>
+# [0.4.0](https://gitlab.com/victornoel/petals-cockpit/compare/v0.3.0...v0.4.0) (2016-12-16)
+
+
+### Bug Fixes
+
+* Bus and container details are loaded only if clicked from the menu ([8415bda](https://gitlab.com/victornoel/petals-cockpit/commit/8415bda)), closes [#155](https://gitlab.com/victornoel/petals-cockpit/issues/155)
+* Importing bus, IP is not shown ([f1a141e](https://gitlab.com/victornoel/petals-cockpit/commit/f1a141e)), closes [#156](https://gitlab.com/victornoel/petals-cockpit/issues/156)
+* **backend:** buses were not found when they just were imported ([25c3726](https://gitlab.com/victornoel/petals-cockpit/commit/25c3726))
+* **backend:** prevent race condition on bus import ([e34598f](https://gitlab.com/victornoel/petals-cockpit/commit/e34598f))
+
+
+### Features
+
+* Show basic bus information [7503d39](https://gitlab.com/victornoel/petals-cockpit/commit/7503d39)), closes [#114](https://gitlab.com/victornoel/petals-cockpit/issues/114)
+* Show basic container information ([f7a440c](https://gitlab.com/victornoel/petals-cockpit/commit/f7a440c)), closes [#147](https://gitlab.com/victornoel/petals-cockpit/issues/147)
+* Show basic service unit information ([0c6b8bc](https://gitlab.com/victornoel/petals-cockpit/commit/0c6b8bc)), closes [#148](https://gitlab.com/victornoel/petals-cockpit/issues/148)
+* Allow to update Service Unit state ([f318887](https://gitlab.com/victornoel/petals-cockpit/commit/f318887), [9d61c56](https://gitlab.com/victornoel/petals-cockpit/commit/9d61c56)), closes [#12](https://gitlab.com/victornoel/petals-cockpit/issues/12)
+* **frontend:** Split bundle by lazy loading login/rest of the app ([ef8905f](https://gitlab.com/victornoel/petals-cockpit/commit/ef8905f)), closes [#127](https://gitlab.com/victornoel/petals-cockpit/issues/127)
+* **product:** Add an easy to use jar to run Cockpit ([9801eb8](https://gitlab.com/victornoel/petals-cockpit/commit/9801eb8)), closes [#120](https://gitlab.com/victornoel/petals-cockpit/issues/120)
+
+
+
 <a name="0.3.0"></a>
 # [0.3.0](https://gitlab.com/victornoel/petals-cockpit/compare/v0.2.0...v0.3.0) (2016-11-28)
 
