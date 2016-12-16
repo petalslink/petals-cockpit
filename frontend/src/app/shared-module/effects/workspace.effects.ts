@@ -115,10 +115,33 @@ export class WorkspaceEffects {
             if (msg.event === 'BUS_IMPORT_OK') {
               return { type: WorkspaceActions.ADD_BUS_SUCCESS, payload: msg.data };
             }
+
             else if (msg.event === 'BUS_IMPORT_ERROR') {
               return { type: WorkspaceActions.ADD_BUS_FAILED, payload: msg.data };
             }
+
+            else if (msg.event === 'SU_STATE_CHANGE') {
+              // if the SU is unloaded, it will be removed from the service units array
+              // redirect the user on the workspace
+              if (msg.data.state === 'Unloaded') {
+                this.router.navigate(['/cockpit/workspaces', action.payload.id]);
+              }
+
+              return {
+                type: WorkspaceActions.UPDATE_SERVICE_UNIT_STATE_SUCCESS,
+                payload: {
+                  idWorkspace: action.payload.id,
+                  idServiceUnit: msg.data.id,
+                  newState: msg.data.state
+                }
+              };
+            }
+
             else {
+              if (environment.debug) {
+                console.debug(`Unknown message : ${msg}`);
+              }
+
               return { type: '', payload: null };
             }
           });
@@ -349,6 +372,43 @@ export class WorkspaceEffects {
             idContainer: action.payload.idContainer,
             idComponent: action.payload.idComponent,
             idServiceUnit: action.payload.idserviceUnit
+          }
+        });
+      })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({dispatch: true}) updateServiceUnitState$: Observable<Action> = this.actions$
+    .ofType(WorkspaceActions.UPDATE_SERVICE_UNIT_STATE)
+    .switchMap((action: Action) =>
+      this.workspaceService.updateServiceUnitState(
+        action.payload.idWorkspace,
+        action.payload.idBus,
+        action.payload.idContainer,
+        action.payload.idComponent,
+        action.payload.idServiceUnit,
+        action.payload.newState
+      )
+      .switchMap((res: Response) => {
+        if (!res.ok) {
+          throw new Error('Error while updating the service unit state');
+        }
+
+        return Observable.empty();
+      })
+      .catch((err) => {
+        if (environment.debug) {
+          console.error(err);
+        }
+
+        return Observable.of({
+          type: WorkspaceActions.UPDATE_SERVICE_UNIT_STATE_FAILED,
+          payload: {
+            idWorkspace: action.payload.idWorkspace,
+            idBus: action.payload.idBus,
+            idContainer: action.payload.idContainer,
+            idComponent: action.payload.idComponent,
+            idServiceUnit: action.payload.idServiceUnit,
           }
         });
       })

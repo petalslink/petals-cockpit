@@ -58,11 +58,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
           Service Unit content
         </md-card-title>
+
         <md-card-content>
           <ul>
             <li *ngIf="serviceUnit.id"><b>id</b> : {{ serviceUnit.id }}</li>
             <li *ngIf="serviceUnit.name"><b>name</b> : {{ serviceUnit.name }}</li>
-            <li *ngIf="serviceUnit.state"><b>state</b> : {{ serviceUnit.state }}</li>
+            <li *ngIf="serviceUnit.state" class="state">
+              <b>state</b> : <span class="current-state">{{ serviceUnit.state }}</span>
+
+              <span *ngIf="serviceUnit.state">
+                <span *ngIf="serviceUnit.state === 'Started'">
+                  <button md-raised-button color="accent" type="text" class="stop" (click)="editState('Stopped')" [disabled]="serviceUnit.isUpdatingState">Stop</button>
+                </span>
+
+                <span *ngIf="serviceUnit.state === 'Shutdown'">
+                  <button md-raised-button color="primary" type="text" class="start" (click)="editState('Stared')" [disabled]="serviceUnit.isUpdatingState">Start</button>
+                  <button md-raised-button color="warn" type="text" class="unload" (click)="editState('Unloaded')" [disabled]="serviceUnit.isUpdatingState">Unload</button>
+                </span>
+
+                <span *ngIf="serviceUnit.state === 'Stopped'">
+                  <button md-raised-button color="primary" type="text" class="start" (click)="editState('Started')" [disabled]="serviceUnit.isUpdatingState">Start</button>
+                  <button md-raised-button color="warn" type="text" class="unload" (click)="editState('Unloaded')" [disabled]="serviceUnit.isUpdatingState">Unload</button>
+                </span>
+              </span>
+            </li>
           </ul>
         </md-card-content>
       </md-card>

@@ -72,7 +72,7 @@ describe(`Workspace that Needs Petals`, () => {
   });
 
   it(`should select a service unit and display a content page with the service unit name as title`, () => {
-    // select the first container
+    // select the first service unit
     element.all(by.css(`app-service-units-menu a.service-unit .md-list-item`)).get(0).click();
 
     let title = element.all(by.css(`.md-sidenav-content md-toolbar md-toolbar-row > span`)).get(0).getText();
@@ -87,6 +87,43 @@ describe(`Workspace that Needs Petals`, () => {
     expect(title).toEqual(`SU 1`);
 
     // TODO: Check view content once we decide what goes here exactly
+  });
+
+  it(`should change a service unit state from started to stopped`, () => {
+    // select the first service unit
+    element.all(by.css(`app-service-units-menu a.service-unit .md-list-item`)).get(0).click();
+
+    let state = element(by.css(`.md-sidenav-content .state .current-state`)).getText();
+
+    expect(state).toEqual(`Started`);
+    expect(element(by.css(`.md-sidenav-content .state .stop`)).isPresent()).toBe(true);
+    expect(element(by.css(`.md-sidenav-content .state .start`)).isPresent()).toBe(false);
+    expect(element(by.css(`.md-sidenav-content .state .unload`)).isPresent()).toBe(false);
+
+    // stop it
+    element.all(by.css(`.md-sidenav-content .state .stop`)).get(0).click();
+
+    state = element(by.css(`.md-sidenav-content .state .current-state`)).getText();
+
+    expect(state).toEqual(`Stopped`);
+    expect(element(by.css(`.md-sidenav-content .state .stop`)).isPresent()).toBe(false);
+    expect(element(by.css(`.md-sidenav-content .state .start`)).isPresent()).toBe(true);
+    expect(element(by.css(`.md-sidenav-content .state .unload`)).isPresent()).toBe(true);
+  });
+
+  it(`should change a service unit state from stopped to unload`, () => {
+    element.all(by.css(`.md-sidenav-content .state .unload`)).get(0).click();
+
+    // as the SU should be removed, check that we're redirected to workspaces/idCurrentWorkspace
+    expect(browser.getCurrentUrl()).toMatch(new RegExp(`/cockpit/workspaces/${reId}$`));
+
+    // check that the page displayed has a title with the workspace name
+    expect(element.all(by.css(`app-workspace md-toolbar md-toolbar-row > span`)).get(0).getText()).toEqual(`Workspace 0`);
+
+    // the SU shouldn't be in left menu anymore
+    let firstSuName = element(by.css(`app-service-units-menu a.service-unit .md-list-item > span`)).getText();
+
+    expect(firstSuName).toEqual('SU 1');
   });
 
   it(`should create a new workspace and this workspace shouldn't have any bus`, () => {

@@ -28,9 +28,6 @@ import IOnMessageEvent = sse.IOnMessageEvent;
 // our environment
 import { environment } from '../../../environments/environment';
 
-// our interfaces
-import { INewBus } from '../interfaces/petals.interface';
-
 @Injectable()
 export class SseService {
   private currentSse: IEventSourceStatic;
@@ -85,7 +82,7 @@ export class SseService {
   // only used for mock !
   // but we do have to put it here otherwise we'd have to import the mock
   // and it would also be in prod
-  triggerSse(id: string, bus: INewBus) {
+  triggerSse(type: string, obj: any) {
 
   }
 }

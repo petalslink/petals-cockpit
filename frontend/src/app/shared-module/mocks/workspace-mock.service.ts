@@ -48,6 +48,8 @@ export class WorkspaceMockService {
   private reachable = true;
   private reachableById = new Map<string, string>();
 
+  private suStateById = new Map<string, string>();
+
   constructor(
     private http: Http,
     private store$: Store<IStore>,
@@ -151,7 +153,7 @@ export class WorkspaceMockService {
         };
 
         // trigger a fake sse response
-        this.sseService.triggerSse(bus.id, newBus);
+        this.sseService.triggerSse('BUS_IMPORT_OK', { id: bus.id, bus: newBus });
 
         return bus;
       }
@@ -256,6 +258,8 @@ export class WorkspaceMockService {
   }
 
   getDetailsServiceUnit(idWorkspace: string, idBus: string, idContainer: string, idComponent: string, idServiceUnit: string) {
+    let state: string = this.suStateById.get(idServiceUnit) || 'Started';
+
     let response = <Response>{
       ok: true,
       json: () => {
@@ -263,10 +267,31 @@ export class WorkspaceMockService {
           // as we use merge in the reducer,
           // whatever is added here will be added to the component
           id: idServiceUnit,
-          state: 'Started'
+          state
         };
       }
     };
+
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
+  }
+
+
+  /* tslint:disable:max-line-length */
+  updateServiceUnitState(idWorkspace: string, idBus: string, idContainer: string, idComponent: string, idServiceUnit: string, state: string) {
+    /* tslint:enable:max-line-length */
+    this.suStateById.set(idServiceUnit, state);
+
+    let response = <Response>{
+      ok: true,
+      json: () => {
+        return {};
+      }
+    };
+
+    // trigger a fake sse response
+    this.sseService.triggerSse('SU_STATE_CHANGE', { id: idServiceUnit, state });
 
     return Observable
       .of(response)

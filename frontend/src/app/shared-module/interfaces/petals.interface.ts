@@ -42,6 +42,7 @@ export interface IComponent {
   // UI
   // is the component folded into petals menu ?
   isFolded: boolean;
+  isUpdatingState: boolean;
 }
 
 export interface IComponentRecord extends TypedRecord<IComponentRecord>, IComponent { };

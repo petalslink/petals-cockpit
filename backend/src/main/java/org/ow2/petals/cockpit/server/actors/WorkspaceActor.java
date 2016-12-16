@@ -28,7 +28,6 @@ import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.glassfish.jersey.media.sse.SseBroadcaster;
 import org.glassfish.jersey.server.BroadcasterListener;
 import org.glassfish.jersey.server.ChunkedOutput;
-import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.actors.BusActor.ForBusMsg;
 import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
@@ -104,11 +103,13 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             Msg msg = receive();
             if (msg instanceof WorkspaceEventMsg) {
                 WorkspaceEvent event = ((WorkspaceEventMsg) msg).event;
+
+                // events are about ws changes, so we must update the tree
+                // TODO handle that in a batter way: we need to merge the Tree and the Db access together!!
+                tree = runDAO(() -> workspaces.getWorkspaceTree(db));
+
                 if (event.event == WorkspaceEvent.Type.BUS_IMPORT_OK) {
                     BusTree bTree = (BusTree) event.data;
-
-                    // TODO update it more nicely!! (as a result of the import made by the bus actor for example)
-                    tree = runDAO(() -> workspaces.getWorkspaceTree(db));
 
                     // TODO see how it interact with our WorkspaceTree...
                     // TODO maybe delegate to the actor the import itself? but inversely, maybe it's best to leave the
@@ -129,6 +130,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                     // TODO for now this is only used for in error buses, so there is no actor to kill, but in the
                     // future, we should be careful about that!
                     final int deleted = buses.delete(b.bId);
+                    // TODO we must notify the others people on the workspace!
                     if (deleted < 1) {
                         return Either.left(Status.NOT_FOUND);
                     } else {
@@ -221,7 +223,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     }
 
     private Domain getTopology(NewBus bus)
-            throws ContainerAdministrationException, SuspendExecution, InterruptedException {
+            throws Exception, SuspendExecution, InterruptedException {
         return runAdmin(bus.ip, bus.port, bus.username, bus.password,
                 petals -> petals.newContainerAdministration().getTopology(bus.passphrase, true));
     }
