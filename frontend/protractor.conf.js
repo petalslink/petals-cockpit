@@ -17,7 +17,7 @@ exports.config = {
   capabilities: {
     'browserName': 'chrome',
     'chromeOptions': {
-      'args': ['--no-sandbox']
+      'args': ['--no-sandbox', '--start-maximized']
     }
   },
   directConnect: true,

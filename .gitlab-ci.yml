@@ -9,7 +9,7 @@ variables:
   M2_CACHED_REPOSITORY: m2cache
   YARN_CACHE_DIRECTORY: yarncache
   DISPLAY: ":99"
-  XVFB: "Xvfb $DISPLAY -ac -screen 0 1280x720x16 -nolisten tcp"
+  XVFB: "Xvfb $DISPLAY -ac -screen 0 1920x1080x24 -nolisten tcp"
 
 .mvn-java-8: &mvn-java-8
   image: maven:3.3-jdk-8-alpine
