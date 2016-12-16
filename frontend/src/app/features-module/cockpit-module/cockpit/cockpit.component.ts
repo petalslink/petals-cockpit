@@ -233,6 +233,8 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     this.store$.dispatch({ type: ConfigActions.OPEN_SIDENAV });
   }
 
+  // Todo : When upgrading from angular/material to flex-layout
+  // use built in services instead of that function
   onResize() {
     Observable.fromEvent(window, 'resize')
       .debounceTime(100)

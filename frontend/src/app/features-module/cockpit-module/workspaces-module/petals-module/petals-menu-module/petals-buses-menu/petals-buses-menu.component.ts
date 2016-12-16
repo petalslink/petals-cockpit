@@ -27,9 +27,7 @@ import { IBus } from '../../../../../../shared-module/interfaces/petals.interfac
 import { IWorkspace } from '../../../../../../shared-module/interfaces/workspace.interface';
 
 // our actions
-
 import { WorkspaceActions } from './../../../../../../shared-module/reducers/workspace.actions';
-
 import { ConfigActions } from '../../../../../../shared-module/reducers/config.actions';
 
 @Component({

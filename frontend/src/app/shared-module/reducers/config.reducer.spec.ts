@@ -112,8 +112,10 @@ describe(`Config Reducer`, () => {
   // CLOSE_SIDENAV_IF_MOBILE
   it(`${ConfigActions.CLOSE_SIDENAV_IF_MOBILE}`, () => {
     let stateRTmp = stateR
-      .set('sidenavMode', 'over')
-      .set('isSidenavVisible', false);
+      .merge({
+        'sidenavMode': 'over',
+        'isSidenavVisible': false
+      });
 
     let nextStateR1: IConfigRecord = ConfigReducer(stateRTmp, {
       type: ConfigActions.CLOSE_SIDENAV_IF_MOBILE,
