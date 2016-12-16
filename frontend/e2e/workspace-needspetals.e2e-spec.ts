@@ -121,7 +121,7 @@ describe(`Workspace that Needs Petals`, () => {
     expect(element.all(by.css(`app-workspace md-toolbar md-toolbar-row > span`)).get(1).getText()).toEqual(`Workspace 0`);
 
     // the SU shouldn't be in left menu anymore
-    let firstSuName = element(by.css(`app-service-units-menu a.service-unit .md-list-item > span`)).getText();
+    let firstSuName = element.all(by.css(`app-service-units-menu a.service-unit .md-list-item > span`)).get(0).getText();
 
     expect(firstSuName).toEqual('SU 1');
   });
