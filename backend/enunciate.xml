@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<enunciate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://enunciate.webcohesion.com/schemas/enunciate-2.7.0.xsd">
+
+  <modules>
+    <jaxrs>
+      <custom-system-parameter-annotation qualifiedName="org.pac4j.jax.rs.annotations.Pac4JProfile" />
+    </jaxrs>
+  </modules>
+
+</enunciate>
