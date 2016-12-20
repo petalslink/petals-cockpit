@@ -34,6 +34,7 @@ import org.ow2.petals.cockpit.server.actors.BusActor.ForBusMsg;
 import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInError;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewBus;
@@ -113,10 +114,10 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                     // TODO for now this is only used for in error buses, so there is no actor to kill, but in the
                     // future, we should be careful about that!
                     final int deleted = buses.delete(b.bId);
-                    // TODO we must notify the others people on the workspace!
                     if (deleted < 1) {
                         return Either.left(Status.NOT_FOUND);
                     } else {
+                        broadcast(WorkspaceEvent.busDeleted(new BusDeleted(b.bId)));
                         return Either.right(null);
                     }
                 });
@@ -163,6 +164,15 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             wsBuses.put(bTree.id, as.getActor(actor));
         }
 
+        if (event.event == WorkspaceEvent.Type.BUS_DELETED) {
+            BusDeleted bd = (BusDeleted) event.data;
+
+            @SuppressWarnings("resource")
+            ActorRef<BusActor.Msg> bus = wsBuses.get(bd.id);
+            if (bus != null) {
+                // TODO tell the actor to die (for now, there is no actor for deletable bus, so it's ok!
+            }
+        }
         OutboundEvent oe = new OutboundEvent.Builder().name("WORKSPACE_CHANGE")
                 .mediaType(MediaType.APPLICATION_JSON_TYPE).data(event).build();
         broadcaster.broadcast(oe);

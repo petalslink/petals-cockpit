@@ -225,10 +225,26 @@ public class WorkspaceResource {
         }
     }
 
+    public static class BusDeleted {
+
+        @Min(1)
+        public final long id;
+
+        @JsonCreator
+        public BusDeleted(@JsonProperty("id") long id) {
+            this.id = id;
+        }
+
+        @JsonProperty
+        public String getId() {
+            return Long.toString(id);
+        }
+    }
+
     public static class WorkspaceEvent {
 
-        public static enum Type {
-            BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE
+        public enum Type {
+            BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, BUS_DELETED
         }
 
         @JsonProperty
@@ -252,6 +268,10 @@ public class WorkspaceResource {
 
         public static WorkspaceEvent suStateChange(NewSUState ns) {
             return new WorkspaceEvent(Type.SU_STATE_CHANGE, ns);
+        }
+
+        public static WorkspaceEvent busDeleted(BusDeleted bd) {
+            return new WorkspaceEvent(Type.BUS_DELETED, bd);
         }
 
         @Override
