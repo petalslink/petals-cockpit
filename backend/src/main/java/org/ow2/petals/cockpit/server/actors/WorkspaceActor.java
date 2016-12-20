@@ -103,25 +103,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         for (;;) {
             Msg msg = receive();
             if (msg instanceof WorkspaceEventMsg) {
-                WorkspaceEvent event = ((WorkspaceEventMsg) msg).event;
-
-                // events are about ws changes, so we must update the tree
-                // TODO handle that in a batter way: we need to merge the Tree and the Db access together!!
-                tree = runDAO(() -> workspaces.getWorkspaceTree(db));
-
-                if (event.event == WorkspaceEvent.Type.BUS_IMPORT_OK) {
-                    BusTree bTree = (BusTree) event.data;
-
-                    // TODO see how it interact with our WorkspaceTree...
-                    // TODO maybe delegate to the actor the import itself? but inversely, maybe it's best to leave the
-                    // creation to the workspace, because then it would be akward to have the bus create the container
-                    // object in db...
-                    @SuppressWarnings("resource")
-                    BusActor actor = new BusActor(bTree, self());
-                    wsBuses.put(bTree.id, as.getActor(actor));
-                }
-
-                broadcast(event);
+                broadcast(((WorkspaceEventMsg) msg).event);
             } else if (msg instanceof GetWorkspaceTree) {
                 answer((GetWorkspaceTree) msg, m -> Either.right(tree));
             } else if (msg instanceof ImportBus) {
@@ -161,7 +143,26 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         return eo;
     }
 
-    private void broadcast(WorkspaceEvent event) {
+    /**
+     * This centralises all changes to {@link #tree} and {@link #wsBuses}.
+     */
+    private void broadcast(WorkspaceEvent event) throws SuspendExecution, InterruptedException {
+        // events are about ws changes, so we must update the tree
+        // TODO handle that in a batter way: we need to merge the Tree and the Db access together!!
+        tree = runDAO(() -> workspaces.getWorkspaceTree(db));
+
+        if (event.event == WorkspaceEvent.Type.BUS_IMPORT_OK) {
+            BusTree bTree = (BusTree) event.data;
+
+            // TODO see how it interact with our WorkspaceTree...
+            // TODO maybe delegate to the actor the import itself? but inversely, maybe it's best to leave the
+            // creation to the workspace, because then it would be akward to have the bus create the container
+            // object in db...
+            @SuppressWarnings("resource")
+            BusActor actor = new BusActor(bTree, self());
+            wsBuses.put(bTree.id, as.getActor(actor));
+        }
+
         OutboundEvent oe = new OutboundEvent.Builder().name("WORKSPACE_CHANGE")
                 .mediaType(MediaType.APPLICATION_JSON_TYPE).data(event).build();
         broadcaster.broadcast(oe);
