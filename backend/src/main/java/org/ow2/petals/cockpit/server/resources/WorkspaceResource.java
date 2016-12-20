@@ -76,13 +76,12 @@ public class WorkspaceResource {
      * Produces {@link WorkspaceEvent}
      */
     @GET
-    @Path("/events")
     @Produces(SseFeature.SERVER_SENT_EVENTS)
     public EventOutput sse(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
-        final EventOutput eo = new EventOutput();
-
-        as.call(wsId, new NewWorkspaceClient(profile.getUser().getUsername(), eo))
+        EventOutput eo = as.call(wsId, new NewWorkspaceClient(profile.getUser().getUsername()))
                 .getOrElseThrow(s -> new WebApplicationException(s));
+
+        users.saveLastWorkspace(profile.getUser(), wsId);
 
         return eo;
     }

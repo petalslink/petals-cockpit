@@ -16,6 +16,7 @@
  */
 package org.ow2.petals.cockpit.server.actors;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -140,17 +141,24 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             } else if (msg instanceof NewWorkspaceClient) {
                 LOG.debug("New SSE client for workspace {}", db.id);
                 // this one is coming from the SSE resource
-                answer((NewWorkspaceClient) msg, nc -> {
-                    broadcaster.add(nc.output);
-                    // TODO why would we need to answer actually?!
-                    return Either.right(null);
-                });
+                answer((NewWorkspaceClient) msg, nc -> Either.right(addBroadcastClient()));
             } else if (msg instanceof ForBusMsg && msg instanceof CockpitRequest) {
                 forward((CockpitRequest<?> & ForBusMsg) msg);
             } else {
                 LOG.warn("Unexpected event for workspace {}: {}", db.id, msg);
             }
         }
+    }
+
+    private EventOutput addBroadcastClient() throws IOException {
+        EventOutput eo = new EventOutput();
+
+        eo.write(new OutboundEvent.Builder().name("WORKSPACE_TREE").mediaType(MediaType.APPLICATION_JSON_TYPE)
+                .data(this.tree).build());
+
+        broadcaster.add(eo);
+
+        return eo;
     }
 
     private void broadcast(WorkspaceEvent event) {
@@ -222,8 +230,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private Domain getTopology(NewBus bus)
-            throws Exception, SuspendExecution, InterruptedException {
+    private Domain getTopology(NewBus bus) throws Exception, SuspendExecution, InterruptedException {
         return runAdmin(bus.ip, bus.port, bus.username, bus.password,
                 petals -> petals.newContainerAdministration().getTopology(bus.passphrase, true));
     }
@@ -241,15 +248,12 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    public static class NewWorkspaceClient extends WorkspaceRequest<@Nullable Void> {
+    public static class NewWorkspaceClient extends WorkspaceRequest<EventOutput> {
 
         private static final long serialVersionUID = 1L;
 
-        final EventOutput output;
-
-        public NewWorkspaceClient(String user, EventOutput output) {
+        public NewWorkspaceClient(String user) {
             super(user);
-            this.output = output;
         }
     }
 

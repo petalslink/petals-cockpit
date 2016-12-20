@@ -21,9 +21,11 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.assertj.core.data.MapEntry;
+import org.glassfish.jersey.media.sse.EventInput;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -195,8 +197,28 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
     @Test
     public void getExistingWorkspace() {
         // TODO check assumptions
-        WorkspaceTree tree = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class);
+        WorkspaceTree tree = resources.getJerseyTest().target("/workspaces/1").request(MediaType.APPLICATION_JSON_TYPE)
+                .get(WorkspaceTree.class);
 
+        assertTree(tree);
+
+        // ensure that calling get workspace tree set the last workspace in the db
+        verify(users).saveLastWorkspace(MockProfileParamValueFactoryProvider.ADMIN, 1);
+    }
+
+    @Test
+    public void getExistingWorkspaceEvent() {
+
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
+                .get(EventInput.class)) {
+            expectWorkspaceTree(eventInput, (t, a) -> assertTree(t));
+        }
+
+        // ensure that calling get workspace tree set the last workspace in the db
+        verify(users).saveLastWorkspace(MockProfileParamValueFactoryProvider.ADMIN, 1);
+    }
+
+    private void assertTree(WorkspaceTree tree) {
         assertThat(tree.id).isEqualTo(1);
         assertThat(tree.name).isEqualTo("test");
         assertThat(tree.buses).hasSize(1);
@@ -237,9 +259,6 @@ public class WorkspaceResourceTest extends AbstractWorkspacesResourceTest {
         assertThat(su.name).isEqualTo(serviceUnit.getName());
         assertThat(su.state.toString()).isEqualTo(serviceAssembly.getState().toString());
         assertThat(su.saName).isEqualTo(serviceAssembly.getName());
-
-        // ensure that calling get workspace tree set the last workspace in the db
-        verify(users).saveLastWorkspace(MockProfileParamValueFactoryProvider.ADMIN, 1);
     }
 
     @Test

@@ -98,8 +98,10 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
 
     @Test
     public void testImportBusOk() {
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
                 .get(EventInput.class)) {
+
+            expectWorkspaceTree(eventInput);
 
             BusInProgress post = resources.getJerseyTest()
                     .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),
@@ -127,8 +129,10 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
     public void testImportBusError() {
         String incorrectHost = "host2";
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
                 .get(EventInput.class)) {
+
+            expectWorkspaceTree(eventInput);
 
             BusInProgress post = resources.getJerseyTest().target("/workspaces/1/buses").request()
                     .post(Entity.json(new NewBus(incorrectHost, containerPort, container.getJmxUsername(),
@@ -155,8 +159,10 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
         petals.registerArtifact(
                 new ServiceAssembly("sa", new ServiceUnit("su1", "comp"), new ServiceUnit("su2", "comp")), container);
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
                 .get(EventInput.class)) {
+
+            expectWorkspaceTree(eventInput);
 
             BusInProgress post = resources.getJerseyTest()
                     .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),

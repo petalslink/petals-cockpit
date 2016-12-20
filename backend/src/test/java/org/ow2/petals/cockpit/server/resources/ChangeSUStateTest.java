@@ -24,7 +24,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.List;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
@@ -48,7 +47,6 @@ import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.ContainerResource.ChangeState;
 import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit;
 import org.ow2.petals.cockpit.server.resources.ContainerResource.ServiceUnitOverview;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -102,8 +100,10 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
                 .get(ServiceUnitOverview.class);
         assertThat(get1.state).isEqualTo(MinServiceUnit.State.Started);
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
                 .get(EventInput.class)) {
+
+            expectWorkspaceTree(eventInput);
 
             ServiceUnitOverview put = resources.getJerseyTest()
                     .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/40").request()
@@ -118,21 +118,14 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
             });
         }
 
-        /* TODO uncomment when tree is merged with db (because for now, with the mocks, it doesn't work)
-        WorkspaceTree get2 = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class);
-        List<SUTree> serviceUnits = get2.buses.iterator().next().containers.iterator().next().components.iterator()
-                .next().serviceUnits;
-
-        assertThat(serviceUnits).hasSize(2);
-        for (SUTree su : serviceUnits) {
-            if (su.id == 40) {
-                assertThat(su.state).isEqualTo(MinServiceUnit.State.Stopped);
-            }
-            if (su.id == 41) {
-                assertThat(su.state).isEqualTo(MinServiceUnit.State.Stopped);
-            }
-        }
-        */
+        /*
+         * TODO uncomment when tree is merged with db (because for now, with the mocks, it doesn't work) WorkspaceTree
+         * get2 = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class); List<SUTree>
+         * serviceUnits = get2.buses.iterator().next().containers.iterator().next().components.iterator()
+         * .next().serviceUnits; assertThat(serviceUnits).hasSize(2); for (SUTree su : serviceUnits) { if (su.id == 40)
+         * { assertThat(su.state).isEqualTo(MinServiceUnit.State.Stopped); } if (su.id == 41) {
+         * assertThat(su.state).isEqualTo(MinServiceUnit.State.Stopped); } }
+         */
 
         verify(buses).updateServiceUnitState(40, MinServiceUnit.State.Stopped);
         verify(buses, times(0)).updateServiceUnitState(eq(41), any());
@@ -147,8 +140,10 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
                 .get(ServiceUnitOverview.class);
         assertThat(get1.state).isEqualTo(MinServiceUnit.State.Stopped);
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
                 .get(EventInput.class)) {
+
+            expectWorkspaceTree(eventInput);
 
             ServiceUnitOverview put = resources.getJerseyTest()
                     .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/41").request()
@@ -163,16 +158,13 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
             });
         }
 
-        /* TODO uncomment when tree is merged with db (because for now, with the mocks, it doesn't work)
-        WorkspaceTree get2 = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class);
-
-        List<SUTree> serviceUnits = get2.buses.iterator().next().containers.iterator().next().components.iterator()
-                .next().serviceUnits;
-        assertThat(serviceUnits).hasSize(1);
-        SUTree su = serviceUnits.iterator().next();
-        assertThat(su.id).isEqualTo(40);
-        assertThat(su.state).isEqualTo(MinServiceUnit.State.Started);
-        */
+        /*
+         * TODO uncomment when tree is merged with db (because for now, with the mocks, it doesn't work) WorkspaceTree
+         * get2 = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class); List<SUTree>
+         * serviceUnits = get2.buses.iterator().next().containers.iterator().next().components.iterator()
+         * .next().serviceUnits; assertThat(serviceUnits).hasSize(1); SUTree su = serviceUnits.iterator().next();
+         * assertThat(su.id).isEqualTo(40); assertThat(su.state).isEqualTo(MinServiceUnit.State.Started);
+         */
 
         verify(buses, times(0)).updateServiceUnitState(eq(40), any());
         verify(buses, times(0)).updateServiceUnitState(eq(41), any());
@@ -192,21 +184,14 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
 
         assertThat(put.state).isEqualTo(MinServiceUnit.State.Started);
 
-        /* TODO uncomment when tree is merged with db (because for now, with the mocks, it doesn't work)
-        WorkspaceTree get2 = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class);
-        List<SUTree> serviceUnits = get2.buses.iterator().next().containers.iterator().next().components.iterator()
-                .next().serviceUnits;
-
-        assertThat(serviceUnits).hasSize(2);
-        for (SUTree su : serviceUnits) {
-            if (su.id == 40) {
-                assertThat(su.state).isEqualTo(MinServiceUnit.State.Started);
-            }
-            if (su.id == 41) {
-                assertThat(su.state).isEqualTo(MinServiceUnit.State.Stopped);
-            }
-        }
-        */
+        /*
+         * TODO uncomment when tree is merged with db (because for now, with the mocks, it doesn't work) WorkspaceTree
+         * get2 = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class); List<SUTree>
+         * serviceUnits = get2.buses.iterator().next().containers.iterator().next().components.iterator()
+         * .next().serviceUnits; assertThat(serviceUnits).hasSize(2); for (SUTree su : serviceUnits) { if (su.id == 40)
+         * { assertThat(su.state).isEqualTo(MinServiceUnit.State.Started); } if (su.id == 41) {
+         * assertThat(su.state).isEqualTo(MinServiceUnit.State.Stopped); } }
+         */
 
         verify(buses, times(0)).updateServiceUnitState(eq(40), any());
         verify(buses, times(0)).updateServiceUnitState(eq(41), any());
@@ -227,21 +212,14 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
 
-        /* TODO uncomment when tree is merged with db (because for now, with the mocks, it doesn't work)
-        WorkspaceTree get2 = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class);
-        List<SUTree> serviceUnits = get2.buses.iterator().next().containers.iterator().next().components.iterator()
-                .next().serviceUnits;
-
-        assertThat(serviceUnits).hasSize(2);
-        for (SUTree su : serviceUnits) {
-            if (su.id == 40) {
-                assertThat(su.state).isEqualTo(MinServiceUnit.State.Started);
-            }
-            if (su.id == 41) {
-                assertThat(su.state).isEqualTo(MinServiceUnit.State.Stopped);
-            }
-        }
-        */
+        /*
+         * TODO uncomment when tree is merged with db (because for now, with the mocks, it doesn't work) WorkspaceTree
+         * get2 = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class); List<SUTree>
+         * serviceUnits = get2.buses.iterator().next().containers.iterator().next().components.iterator()
+         * .next().serviceUnits; assertThat(serviceUnits).hasSize(2); for (SUTree su : serviceUnits) { if (su.id == 40)
+         * { assertThat(su.state).isEqualTo(MinServiceUnit.State.Started); } if (su.id == 41) {
+         * assertThat(su.state).isEqualTo(MinServiceUnit.State.Stopped); } }
+         */
 
         verify(buses, times(0)).updateServiceUnitState(eq(40), any());
         verify(buses, times(0)).updateServiceUnitState(eq(41), any());

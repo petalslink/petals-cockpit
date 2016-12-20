@@ -229,21 +229,30 @@ public class AbstractWorkspacesResourceTest {
 
     protected static void expectEvent(EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {
         SoftAssertions sa = new SoftAssertions();
-        while (!eventInput.isClosed()) {
-            try {
-                final InboundEvent inboundEvent = eventInput.read();
-                if (inboundEvent == null) {
-                    // connection has been closed
-                    break;
-                }
-
-                c.accept(inboundEvent, sa);
-
-                sa.assertAll();
-            } finally {
-                eventInput.close();
+        if (!eventInput.isClosed()) {
+            final InboundEvent inboundEvent = eventInput.read();
+            if (inboundEvent == null) {
+                // connection has been closed
+                return;
             }
+
+            c.accept(inboundEvent, sa);
+
+            sa.assertAll();
         }
+    }
+
+    protected static void expectWorkspaceTree(EventInput eventInput) {
+        expectWorkspaceTree(eventInput, (t, a) -> {
+        });
+    }
+
+    protected static void expectWorkspaceTree(EventInput eventInput, BiConsumer<WorkspaceTree, SoftAssertions> c) {
+        expectEvent(eventInput, (e, a) -> {
+            a.assertThat(e.getName()).isEqualTo("WORKSPACE_TREE");
+            WorkspaceTree ev = e.readData(WorkspaceTree.class);
+            c.accept(ev, a);
+        });
     }
 
     protected static void expectWorkspaceEvent(EventInput eventInput, BiConsumer<WorkspaceEvent, SoftAssertions> c) {
