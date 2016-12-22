@@ -44,15 +44,16 @@ import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
-import org.ow2.petals.cockpit.server.resources.ContainerResource.ChangeState;
-import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit;
-import org.ow2.petals.cockpit.server.resources.ContainerResource.ServiceUnitOverview;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ChangeState;
 
 import com.google.common.collect.ImmutableMap;
 
+import io.dropwizard.testing.junit.ResourceTestRule;
 import javaslang.Tuple;
 
-public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
+public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
     @Rule
     public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
@@ -76,6 +77,9 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
     private final ServiceAssembly serviceAssembly2 = new ServiceAssembly("sa2", ArtifactState.State.STOPPED,
             serviceUnit2);
 
+    @Rule
+    public final ResourceTestRule resources = buildResourceTest(ServiceUnitsResource.class, WorkspaceResource.class);
+
     @Before
     public void setUp() {
         petals.registerDomain(domain);
@@ -95,8 +99,7 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
     public void changeSU1State() {
         when(buses.updateServiceUnitState(eq(40), any())).thenReturn(1);
 
-        ServiceUnitOverview get1 = resources.getJerseyTest()
-                .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/40").request()
+        ServiceUnitOverview get1 = resources.getJerseyTest().target("/serviceunits/40").request()
                 .get(ServiceUnitOverview.class);
         assertThat(get1.state).isEqualTo(MinServiceUnit.State.Started);
 
@@ -105,8 +108,7 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
 
             expectWorkspaceTree(eventInput);
 
-            ServiceUnitOverview put = resources.getJerseyTest()
-                    .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/40").request()
+            ServiceUnitOverview put = resources.getJerseyTest().target("/workspaces/1/serviceunits/40").request()
                     .put(Entity.json(new ChangeState(MinServiceUnit.State.Stopped)), ServiceUnitOverview.class);
 
             assertThat(put.state).isEqualTo(MinServiceUnit.State.Stopped);
@@ -118,16 +120,24 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
             });
         }
 
-        /*
-         * TODO uncomment when tree is merged with db (because for now, with the mocks, it doesn't work) WorkspaceTree
-         * get2 = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class); List<SUTree>
-         * serviceUnits = get2.buses.iterator().next().containers.iterator().next().components.iterator()
-         * .next().serviceUnits; assertThat(serviceUnits).hasSize(2); for (SUTree su : serviceUnits) { if (su.id == 40)
-         * { assertThat(su.state).isEqualTo(MinServiceUnit.State.Stopped); } if (su.id == 41) {
-         * assertThat(su.state).isEqualTo(MinServiceUnit.State.Stopped); } }
-         */
-
         verify(buses).updateServiceUnitState(40, MinServiceUnit.State.Stopped);
+        verify(buses, times(0)).updateServiceUnitState(eq(41), any());
+    }
+
+    @Test
+    public void changeSU1StateForbidden() {
+        setupWorkspace(2, "test2",
+                Arrays.asList(Tuple.of(11L, domain, "phrase", Arrays.asList(Tuple.of(21L, container,
+                        Arrays.asList(Tuple.of(31L, component,
+                                Arrays.asList(Tuple.of(41L, serviceAssembly1), Tuple.of(42L, serviceAssembly2)))))))),
+                "anotheruser");
+
+        Response put = resources.getJerseyTest().target("/workspaces/2/serviceunits/41").request()
+                .put(Entity.json(new ChangeState(MinServiceUnit.State.Stopped)));
+
+        assertThat(put.getStatus()).isEqualTo(403);
+
+        verify(buses, times(0)).updateServiceUnitState(eq(41), any());
         verify(buses, times(0)).updateServiceUnitState(eq(41), any());
     }
 
@@ -135,8 +145,7 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
     public void changeSU2StateUnload() {
         when(buses.updateServiceUnitState(eq(40), any())).thenReturn(1);
 
-        ServiceUnitOverview get1 = resources.getJerseyTest()
-                .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/41").request()
+        ServiceUnitOverview get1 = resources.getJerseyTest().target("/serviceunits/41").request()
                 .get(ServiceUnitOverview.class);
         assertThat(get1.state).isEqualTo(MinServiceUnit.State.Stopped);
 
@@ -145,8 +154,7 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
 
             expectWorkspaceTree(eventInput);
 
-            ServiceUnitOverview put = resources.getJerseyTest()
-                    .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/41").request()
+            ServiceUnitOverview put = resources.getJerseyTest().target("/workspaces/1/serviceunits/41").request()
                     .put(Entity.json(new ChangeState(MinServiceUnit.State.Unloaded)), ServiceUnitOverview.class);
 
             assertThat(put.state).isEqualTo(MinServiceUnit.State.Unloaded);
@@ -158,14 +166,6 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
             });
         }
 
-        /*
-         * TODO uncomment when tree is merged with db (because for now, with the mocks, it doesn't work) WorkspaceTree
-         * get2 = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class); List<SUTree>
-         * serviceUnits = get2.buses.iterator().next().containers.iterator().next().components.iterator()
-         * .next().serviceUnits; assertThat(serviceUnits).hasSize(1); SUTree su = serviceUnits.iterator().next();
-         * assertThat(su.id).isEqualTo(40); assertThat(su.state).isEqualTo(MinServiceUnit.State.Started);
-         */
-
         verify(buses, times(0)).updateServiceUnitState(eq(40), any());
         verify(buses, times(0)).updateServiceUnitState(eq(41), any());
         verify(buses).removeServiceUnit(41);
@@ -173,25 +173,14 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
 
     @Test
     public void changeSU1StateNoChange() {
-        ServiceUnitOverview get1 = resources.getJerseyTest()
-                .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/40").request()
+        ServiceUnitOverview get1 = resources.getJerseyTest().target("/serviceunits/40").request()
                 .get(ServiceUnitOverview.class);
         assertThat(get1.state).isEqualTo(MinServiceUnit.State.Started);
 
-        ServiceUnitOverview put = resources.getJerseyTest()
-                .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/40").request()
+        ServiceUnitOverview put = resources.getJerseyTest().target("/workspaces/1/serviceunits/40").request()
                 .put(Entity.json(new ChangeState(MinServiceUnit.State.Started)), ServiceUnitOverview.class);
 
         assertThat(put.state).isEqualTo(MinServiceUnit.State.Started);
-
-        /*
-         * TODO uncomment when tree is merged with db (because for now, with the mocks, it doesn't work) WorkspaceTree
-         * get2 = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class); List<SUTree>
-         * serviceUnits = get2.buses.iterator().next().containers.iterator().next().components.iterator()
-         * .next().serviceUnits; assertThat(serviceUnits).hasSize(2); for (SUTree su : serviceUnits) { if (su.id == 40)
-         * { assertThat(su.state).isEqualTo(MinServiceUnit.State.Started); } if (su.id == 41) {
-         * assertThat(su.state).isEqualTo(MinServiceUnit.State.Stopped); } }
-         */
 
         verify(buses, times(0)).updateServiceUnitState(eq(40), any());
         verify(buses, times(0)).updateServiceUnitState(eq(41), any());
@@ -201,25 +190,14 @@ public class ChangeSUStateTest extends AbstractWorkspacesResourceTest {
     public void changeSU1StateConflict() {
         when(buses.updateServiceUnitState(eq(40), any())).thenReturn(1);
 
-        ServiceUnitOverview get1 = resources.getJerseyTest()
-                .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/40").request()
+        ServiceUnitOverview get1 = resources.getJerseyTest().target("/serviceunits/40").request()
                 .get(ServiceUnitOverview.class);
         assertThat(get1.state).isEqualTo(MinServiceUnit.State.Started);
 
-        Response put = resources.getJerseyTest()
-                .target("/workspaces/1/buses/10/containers/20/components/30/serviceunits/40").request()
+        Response put = resources.getJerseyTest().target("/workspaces/1/serviceunits/40").request()
                 .put(Entity.json(new ChangeState(MinServiceUnit.State.Unloaded)));
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
-
-        /*
-         * TODO uncomment when tree is merged with db (because for now, with the mocks, it doesn't work) WorkspaceTree
-         * get2 = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class); List<SUTree>
-         * serviceUnits = get2.buses.iterator().next().containers.iterator().next().components.iterator()
-         * .next().serviceUnits; assertThat(serviceUnits).hasSize(2); for (SUTree su : serviceUnits) { if (su.id == 40)
-         * { assertThat(su.state).isEqualTo(MinServiceUnit.State.Started); } if (su.id == 41) {
-         * assertThat(su.state).isEqualTo(MinServiceUnit.State.Stopped); } }
-         */
 
         verify(buses, times(0)).updateServiceUnitState(eq(40), any());
         verify(buses, times(0)).updateServiceUnitState(eq(41), any());

@@ -20,10 +20,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
-import org.ow2.petals.cockpit.server.resources.ContainerResource.MinComponent;
-import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.MinComponent;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.InvalidPetalsBus;
@@ -45,13 +45,16 @@ public abstract class BusesDAO {
     public abstract long createBus(@Bind("i") String ip, @Bind("p") int port, @Bind("u") String username,
             @Bind("pw") String password, @Bind("pp") String passphrase, @Bind("w") long wId);
 
-    @SqlQuery("select * from buses where workspace_id = :w.id")
+    @SqlQuery("select b.*, NULL as acl from buses b where b.workspace_id = :wId")
     @Mapper(DbBus.Mapper.class)
-    public abstract List<DbBus> getBusesByWorkspace(@BindBean("w") DbWorkspace w);
+    public abstract List<DbBus> getBusesByWorkspace(@Bind("wId") long wId);
 
-    @SqlQuery("select * from buses where id = :bId")
-    @Mapper(DbBus.Mapper.class)
-    public abstract DbBus getBusById(@Bind("bId") long bId);
+    @SqlQuery("select b.*, uw.username as acl from buses b"
+            + " left join users_workspaces uw on uw.workspace_id = b.workspace_id and uw.username = :u"
+            + " where b.id = :bId and b.imported = true")
+    @Mapper(DbBus.MapperImported.class)
+    @Nullable
+    public abstract DbBusImported getBusById(@Bind("bId") long bId, @Nullable @Bind("u") String username);
 
     @SqlUpdate("update buses set name = :n, imported = true where id = :id")
     public abstract void updateBus(@Bind("id") long bId, @Bind("n") String name);
@@ -64,20 +67,33 @@ public abstract class BusesDAO {
     public abstract long createContainer(@Bind("n") String name, @Bind("i") String ip, @Bind("p") int port,
             @Bind("u") String username, @Bind("pw") String password, @Bind("bId") long bId);
 
-    @SqlQuery("select * from containers where bus_id = :b.id")
+    @SqlQuery("select c.*, NULL as acl from containers c where c.bus_id = :bId")
     @Mapper(DbContainer.Mapper.class)
-    public abstract List<DbContainer> getContainersByBus(@BindBean("b") DbBus b);
+    public abstract List<DbContainer> getContainersByBus(@Bind("bId") long bId);
 
-    @SqlQuery("select * from containers where id = :cId")
+    @SqlQuery("select c.*, uw.username as acl from containers c"
+            + " left join buses b on b.id = c.bus_id"
+            + " left join users_workspaces uw on uw.workspace_id = b.workspace_id and uw.username = :u"
+            + " where c.id = :cId")
     @Mapper(DbContainer.Mapper.class)
-    public abstract DbContainer getContainerById(@Bind("cId") long cId);
+    @Nullable
+    public abstract DbContainer getContainerById(@Bind("cId") long cId, @Nullable @Bind("u") String username);
 
     @SqlUpdate("insert into components (container_id,name,state,type)" + " values (:cId,:n,:s,:t)")
     @GetGeneratedKeys
     public abstract long createComponent(@Bind("n") String name, @Bind("s") MinComponent.State state,
             @Bind("t") MinComponent.Type type, @Bind("cId") long cId);
 
-    @SqlQuery("select * from components where container_id = :c.id")
+    @SqlQuery("select cp.*, uw.username as acl from components cp"
+            + " left join containers c on c.id = cp.container_id"
+            + " left join buses b on b.id = c.bus_id"
+            + " left join users_workspaces uw on uw.workspace_id = b.workspace_id and uw.username = :u"
+            + " where cp.id = :compId")
+    @Mapper(DbComponent.Mapper.class)
+    @Nullable
+    public abstract DbComponent getComponentsById(@Bind("compId") long compId, @Nullable @Bind("u") String username);
+
+    @SqlQuery("select cp.*, NULL as acl from components cp where cp.container_id = :c.id")
     @Mapper(DbComponent.Mapper.class)
     public abstract List<DbComponent> getComponentsByContainer(@BindBean("c") DbContainer c);
 
@@ -86,7 +102,19 @@ public abstract class BusesDAO {
     public abstract long createServiceUnit(@Bind("n") String name, @Bind("s") MinServiceUnit.State state,
             @Bind("cId") long cId, @Bind("sa") String saName);
 
-    @SqlQuery("select * from serviceunits where component_id = :c.id")
+    @SqlQuery("select su.*, cp.container_id, uw.username as acl from serviceunits su"
+            + " left join components cp on cp.id = su.component_id "
+            + " left join containers c on c.id = cp.container_id"
+            + " left join buses b on b.id = c.bus_id"
+            + " left join users_workspaces uw on uw.workspace_id = b.workspace_id and uw.username = :u"
+            + " where su.id = :suId")
+    @Mapper(DbServiceUnit.Mapper.class)
+    @Nullable
+    public abstract DbServiceUnit getServiceUnitById(@Bind("suId") long suId, @Nullable @Bind("u") String username);
+
+    @SqlQuery("select su.*, cp.container_id, NULL as acl from serviceunits su"
+            + " left join components cp on cp.id = su.component_id"
+            + " where su.component_id = :c.id")
     @Mapper(DbServiceUnit.Mapper.class)
     public abstract List<DbServiceUnit> getServiceUnitByComponent(@BindBean("c") DbComponent c);
 
@@ -139,12 +167,12 @@ public abstract class BusesDAO {
 
         public static class Mapper implements ResultSetMapper<DbBus> {
 
+            private final MapperImported m = new MapperImported();
+
             @Override
             public DbBus map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                 if (r.getBoolean("imported")) {
-                    return new DbBusImported(r.getLong("id"), r.getString("import_ip"), r.getInt("import_port"),
-                            r.getString("import_username"), r.getString("import_password"),
-                            r.getString("import_passphrase"), r.getString("name"));
+                    return m.map(index, r, ctx);
                 } else {
                     String error = r.getString("import_error");
                     if (error != null) {
@@ -158,6 +186,15 @@ public abstract class BusesDAO {
                     }
                 }
 
+            }
+        }
+
+        public static class MapperImported implements ResultSetMapper<DbBusImported> {
+            @Override
+            public DbBusImported map(int index, ResultSet r, StatementContext ctx) throws SQLException {
+                return new DbBusImported(r.getLong("id"), r.getString("import_ip"), r.getInt("import_port"),
+                        r.getString("import_username"), r.getString("import_password"),
+                        r.getString("import_passphrase"), r.getString("name"), r.getString("acl"));
             }
         }
     }
@@ -184,16 +221,22 @@ public abstract class BusesDAO {
 
         public final String name;
 
+        @Nullable
+        public final String acl;
+
         public DbBusImported(long id, String importIp, int importPort, String importUsername, String importPassword,
-                String importPassphrase, String name) {
+                String importPassphrase, String name, @Nullable String acl) {
             super(id, importIp, importPort, importUsername, importPassword, importPassphrase);
             this.name = name;
+            this.acl = acl;
         }
     }
 
     public static class DbContainer {
 
         public final long id;
+
+        public final long busId;
 
         public final String name;
 
@@ -205,13 +248,19 @@ public abstract class BusesDAO {
 
         public final String password;
 
-        public DbContainer(long id, String name, String ip, int port, String username, String password) {
+        @Nullable
+        public final String acl;
+
+        public DbContainer(long id, long busId, String name, String ip, int port, String username, String password,
+                @Nullable String acl) {
             this.id = id;
+            this.busId = busId;
             this.name = name;
             this.ip = ip;
             this.port = port;
             this.username = username;
             this.password = password;
+            this.acl = acl;
         }
 
         public long getId() {
@@ -222,8 +271,8 @@ public abstract class BusesDAO {
 
             @Override
             public DbContainer map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-                return new DbContainer(r.getLong("id"), r.getString("name"), r.getString("ip"), r.getInt("port"),
-                        r.getString("username"), r.getString("password"));
+                return new DbContainer(r.getLong("id"), r.getLong("bus_id"), r.getString("name"), r.getString("ip"),
+                        r.getInt("port"), r.getString("username"), r.getString("password"), r.getString("acl"));
 
             }
         }
@@ -239,11 +288,16 @@ public abstract class BusesDAO {
 
         public final MinComponent.Type type;
 
-        public DbComponent(long id, String name, MinComponent.State state, MinComponent.Type type) {
+        @Nullable
+        public final String acl;
+
+        public DbComponent(long id, String name, MinComponent.State state, MinComponent.Type type,
+                @Nullable String acl) {
             this.id = id;
             this.name = name;
             this.state = state;
             this.type = type;
+            this.acl = acl;
         }
 
         public long getId() {
@@ -256,7 +310,7 @@ public abstract class BusesDAO {
             public DbComponent map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                 return new DbComponent(r.getLong("id"), r.getString("name"),
                         MinComponent.State.valueOf(r.getString("state")),
-                        MinComponent.Type.valueOf(r.getString("type")));
+                        MinComponent.Type.valueOf(r.getString("type")), r.getString("acl"));
 
             }
         }
@@ -272,11 +326,19 @@ public abstract class BusesDAO {
 
         public final String saName;
 
-        public DbServiceUnit(long id, String name, MinServiceUnit.State state, String saName) {
+        public final long containerId;
+
+        @Nullable
+        public final String acl;
+
+        public DbServiceUnit(long id, String name, MinServiceUnit.State state, String saName, long containerId,
+                @Nullable String acl) {
             this.id = id;
             this.name = name;
             this.state = state;
             this.saName = saName;
+            this.containerId = containerId;
+            this.acl = acl;
         }
 
         public static class Mapper implements ResultSetMapper<DbServiceUnit> {
@@ -284,7 +346,8 @@ public abstract class BusesDAO {
             @Override
             public DbServiceUnit map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                 return new DbServiceUnit(r.getLong("id"), r.getString("name"),
-                        MinServiceUnit.State.valueOf(r.getString("state")), r.getString("sa_name"));
+                        MinServiceUnit.State.valueOf(r.getString("state")), r.getString("sa_name"),
+                        r.getLong("container_id"), r.getString("acl"));
 
             }
         }

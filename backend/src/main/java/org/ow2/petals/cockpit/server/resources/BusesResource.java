@@ -16,57 +16,55 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.cockpit.server.actors.BusActor.GetBusOverview;
-import org.ow2.petals.cockpit.server.actors.CockpitActors;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
+import org.ow2.petals.cockpit.server.db.BusesDAO;
+import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class BusResource {
+@Singleton
+@Path("/buses")
+public class BusesResource {
 
-    private final long wsId;
+    private final BusesDAO buses;
 
-    private final long bId;
-
-    private final CockpitActors as;
-
-    public BusResource(CockpitActors as, long wsId, long bId) {
-        this.as = as;
-        this.wsId = wsId;
-        this.bId = bId;
+    @Inject
+    public BusesResource(BusesDAO buses) {
+        this.buses = buses;
     }
 
     @GET
+    @Path("/{bId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
-    public BusOverview get(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
-        return as.call(wsId, new GetBusOverview(profile.getUser().getUsername(), bId))
-                .getOrElseThrow(s -> new WebApplicationException(s));
-    }
+    public BusOverview get(@PathParam("bId") @Min(1) long bId, @Pac4JProfile CockpitProfile profile) {
 
-    @DELETE
-    public void delete(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
-        as.call(wsId, new DeleteBus(profile.getUser().getUsername(), bId))
-                .getOrElseThrow(s -> new WebApplicationException(s));
-    }
+        DbBusImported bus = buses.getBusById(bId, profile.getUser().username);
 
-    @Path("/containers/{cId}")
-    public ContainerResource container(@PathParam("cId") @Min(1) long cId) {
-        return new ContainerResource(as, wsId, bId, cId);
+        if (bus == null) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
+        if (bus.acl == null) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
+
+        return new BusOverview(bus.id, bus.name);
     }
 
     public static class MinBus {

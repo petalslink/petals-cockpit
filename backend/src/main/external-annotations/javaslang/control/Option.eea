@@ -10,7 +10,7 @@ none
  <T:Ljava/lang/Object;>()L1javaslang/control/Option<TT;>;
 of
  <T:Ljava/lang/Object;>(TT;)Ljavaslang/control/Option<TT;>;
- <T:Ljava/lang/Object;>(TT;)Ljavaslang/control/Option<T1T;>;
+ <T:Ljava/lang/Object;>(T0T;)Ljavaslang/control/Option<T1T;>;
 some
  <T:Ljava/lang/Object;>(TT;)Ljavaslang/control/Option<TT;>;
  <T:Ljava/lang/Object;>(TT;)L1javaslang/control/Option<TT;>;

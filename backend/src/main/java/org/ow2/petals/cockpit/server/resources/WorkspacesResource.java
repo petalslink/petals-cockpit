@@ -16,6 +16,7 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,16 +28,12 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.cockpit.server.actors.CockpitActors;
-import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.MinWorkspace;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -49,15 +46,9 @@ public class WorkspacesResource {
 
     private final WorkspacesDAO workspaces;
 
-    private final CockpitActors as;
-
-    private final UsersDAO users;
-
     @Inject
-    public WorkspacesResource(CockpitActors as, WorkspacesDAO workspaces, UsersDAO users) {
-        this.as = as;
+    public WorkspacesResource(WorkspacesDAO workspaces) {
         this.workspaces = workspaces;
-        this.users = users;
     }
 
     @POST
@@ -67,20 +58,16 @@ public class WorkspacesResource {
     public Workspace create(@Valid NewWorkspace ws, @Pac4JProfile CockpitProfile profile) {
         DbWorkspace w = workspaces.create(ws.name, profile.getUser());
 
-        return new Workspace(w.id, w.name, w.users);
+        return new Workspace(w.id, w.name, Arrays.asList(profile.getUser().username));
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
     public List<Workspace> workspaces(@Pac4JProfile CockpitProfile profile) {
-        return workspaces.getUserWorkspaces(profile.getUser()).stream().map(w -> new Workspace(w.id, w.name, w.users))
+        return workspaces.getUserWorkspaces(profile.getUser()).stream()
+                .map(w -> new Workspace(w.id, w.name, workspaces.getWorkspaceUsers(w.id)))
                 .collect(Collectors.toList());
-    }
-
-    @Path("/{wsId}")
-    public WorkspaceResource workspace(@PathParam("wsId") @Min(1) long wsId) {
-        return new WorkspaceResource(as, users, wsId);
     }
 
     public static class NewWorkspace {
@@ -91,6 +78,26 @@ public class WorkspacesResource {
 
         public NewWorkspace(@JsonProperty("name") String name) {
             this.name = name;
+        }
+    }
+
+    public static class MinWorkspace {
+
+        @Min(1)
+        public final long id;
+
+        @NotEmpty
+        @JsonProperty
+        public final String name;
+
+        public MinWorkspace(long id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        @JsonProperty
+        public String getId() {
+            return Long.toString(id);
         }
     }
 

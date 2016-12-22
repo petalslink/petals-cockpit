@@ -17,39 +17,48 @@
 package org.ow2.petals.cockpit.server.actors;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jetty.io.EofException;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.glassfish.jersey.media.sse.SseBroadcaster;
 import org.glassfish.jersey.server.BroadcasterListener;
 import org.glassfish.jersey.server.ChunkedOutput;
+import org.ow2.petals.admin.api.ArtifactAdministration;
+import org.ow2.petals.admin.api.PetalsAdministration;
+import org.ow2.petals.admin.api.artifact.Artifact;
+import org.ow2.petals.admin.api.artifact.ServiceAssembly;
+import org.ow2.petals.admin.api.artifact.lifecycle.ServiceAssemblyLifecycle;
+import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.actors.BusActor.ForBusMsg;
 import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
+import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
+import org.ow2.petals.cockpit.server.db.BusesDAO.DbServiceUnit;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit.State;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInError;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewBus;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewSUState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
+import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableList;
-
-import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.SuspendExecution;
+import co.paralleluniverse.fibers.Suspendable;
 import javaslang.CheckedFunction1;
 import javaslang.control.Either;
 
@@ -68,25 +77,25 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
     private static final long serialVersionUID = -2202357041789526859L;
 
-    private final DbWorkspace db;
-
-    private WorkspaceTree tree = new WorkspaceTree(0, "", ImmutableList.of(), ImmutableList.of());
-
-    private final Map<Long, ActorRef<BusActor.Msg>> wsBuses = new HashMap<>();
-
     private final SseBroadcaster broadcaster = new SseBroadcaster();
 
-    public WorkspaceActor(DbWorkspace w) {
-        this.db = w;
+    private final long wId;
+
+    public WorkspaceActor(long wId) {
+        this.wId = wId;
         this.broadcaster.add(new BroadcasterListener<OutboundEvent>() {
             @Override
             public void onException(ChunkedOutput<OutboundEvent> chunkedOutput, Exception exception) {
-                LOG.error("Error in SSE broadcaster for workspace {}", w.id, exception);
+                if (exception instanceof EofException) {
+                    LOG.debug("Lost SSE connection in workspace {}", wId, exception);
+                } else {
+                    LOG.error("Error in SSE broadcaster for workspace {}", wId, exception);
+                }
             }
 
             @Override
             public void onClose(ChunkedOutput<OutboundEvent> chunkedOutput) {
-                LOG.debug("Client left workspace {}", w.id);
+                LOG.debug("Client left workspace {}", wId);
             }
         });
     }
@@ -94,25 +103,14 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     @Override
     @SuppressWarnings("squid:S2189")
     protected Void doRun() throws InterruptedException, SuspendExecution {
-
-        tree = runDAO(() -> workspaces.getWorkspaceTree(db));
-
-        for (BusTree b : tree.buses) {
-            wsBuses.put(b.id, as.getActor(new BusActor(b, self())));
-        }
-
         for (;;) {
             Msg msg = receive();
             if (msg instanceof WorkspaceEventMsg) {
                 broadcast(((WorkspaceEventMsg) msg).event);
-            } else if (msg instanceof GetWorkspaceTree) {
-                answer((GetWorkspaceTree) msg, m -> Either.right(tree));
             } else if (msg instanceof ImportBus) {
                 answer((ImportBus) msg, this::handleImportBus);
             } else if (msg instanceof DeleteBus) {
                 answer((DeleteBus) msg, b -> {
-                    // TODO for now this is only used for in error buses, so there is no actor to kill, but in the
-                    // future, we should be careful about that!
                     final int deleted = buses.delete(b.bId);
                     if (deleted < 1) {
                         return Either.left(Status.NOT_FOUND);
@@ -122,86 +120,71 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                     }
                 });
             } else if (msg instanceof NewWorkspaceClient) {
-                LOG.debug("New SSE client for workspace {}", db.id);
+                LOG.debug("New SSE client for workspace {}", wId);
                 // this one is coming from the SSE resource
-                answer((NewWorkspaceClient) msg, nc -> Either.right(addBroadcastClient()));
-            } else if (msg instanceof ForBusMsg && msg instanceof CockpitRequest) {
-                forward((CockpitRequest<?> & ForBusMsg) msg);
+                answer((NewWorkspaceClient) msg, this::addBroadcastClient);
+            } else if (msg instanceof ChangeServiceUnitState) {
+                ChangeServiceUnitState change = (ChangeServiceUnitState) msg;
+                DbServiceUnit su = runDAO(() -> buses.getServiceUnitById(change.suId, change.user));
+                if (su == null) {
+                    RequestReplyHelper.reply(change, Either.left(Status.NOT_FOUND));
+                } else if (su.acl == null) {
+                    RequestReplyHelper.reply(change, Either.left(Status.FORBIDDEN));
+                } else {
+                    handleSUStateChange(change, su);
+                }
             } else {
-                LOG.warn("Unexpected event for workspace {}: {}", db.id, msg);
+                LOG.warn("Unexpected event for workspace {}: {}", wId, msg);
             }
         }
     }
 
-    private EventOutput addBroadcastClient() throws IOException {
-        EventOutput eo = new EventOutput();
+    private Either<Status, EventOutput> addBroadcastClient(NewWorkspaceClient nc)
+            throws IOException, SuspendExecution, InterruptedException {
 
-        eo.write(new OutboundEvent.Builder().name("WORKSPACE_TREE").mediaType(MediaType.APPLICATION_JSON_TYPE)
-                .data(this.tree).build());
+        Either<Status, WorkspaceTree> tree = runDAO(() -> {
 
-        broadcaster.add(eo);
+            DbWorkspace ws = workspaces.getWorkspaceById(wId, nc.user);
 
-        return eo;
+            if (ws == null) {
+                LOG.error("Couldn't find workspace {} in db while being inside its actor!", wId);
+                return Either.left(Status.NOT_FOUND);
+            }
+
+            if (ws.acl == null) {
+                return Either.left(Status.FORBIDDEN);
+            }
+
+            return Either.right(WorkspaceTree.buildFromDatabase(buses, ws));
+        });
+
+        if (tree.isLeft()) {
+            return Either.left(tree.getLeft());
+        } else {
+            EventOutput eo = new EventOutput();
+
+            eo.write(new OutboundEvent.Builder().name("WORKSPACE_TREE").mediaType(MediaType.APPLICATION_JSON_TYPE)
+                    .data(tree.get()).build());
+
+            broadcaster.add(eo);
+
+            return Either.right(eo);
+        }
     }
 
     /**
      * This centralises all changes to {@link #tree} and {@link #wsBuses}.
      */
-    private void broadcast(WorkspaceEvent event) throws SuspendExecution, InterruptedException {
-        // events are about ws changes, so we must update the tree
-        // TODO handle that in a batter way: we need to merge the Tree and the Db access together!!
-        tree = runDAO(() -> workspaces.getWorkspaceTree(db));
-
-        if (event.event == WorkspaceEvent.Type.BUS_IMPORT_OK) {
-            BusTree bTree = (BusTree) event.data;
-
-            // TODO see how it interact with our WorkspaceTree...
-            // TODO maybe delegate to the actor the import itself? but inversely, maybe it's best to leave the
-            // creation to the workspace, because then it would be akward to have the bus create the container
-            // object in db...
-            @SuppressWarnings("resource")
-            BusActor actor = new BusActor(bTree, self());
-            wsBuses.put(bTree.id, as.getActor(actor));
-        }
-
-        if (event.event == WorkspaceEvent.Type.BUS_DELETED) {
-            BusDeleted bd = (BusDeleted) event.data;
-
-            @SuppressWarnings("resource")
-            ActorRef<BusActor.Msg> bus = wsBuses.get(bd.id);
-            if (bus != null) {
-                // TODO tell the actor to die (for now, there is no actor for deletable bus, so it's ok!
-            }
-        }
+    private void broadcast(WorkspaceEvent event) {
         OutboundEvent oe = new OutboundEvent.Builder().name("WORKSPACE_CHANGE")
                 .mediaType(MediaType.APPLICATION_JSON_TYPE).data(event).build();
         broadcaster.broadcast(oe);
     }
 
-    private boolean hasAccess(String username) {
-        return db.users.stream().anyMatch(username::equals);
-    }
-
-    public <R extends CockpitRequest<?> & ForBusMsg> void forward(R req) throws SuspendExecution {
-        @SuppressWarnings("resource")
-        ActorRef<BusActor.Msg> bus = wsBuses.get(req.getBusId());
-        if (!hasAccess(req.user)) {
-            RequestReplyHelper.reply(req, Either.left(Status.FORBIDDEN));
-        } else if (bus == null) {
-            RequestReplyHelper.reply(req, Either.left(Status.NOT_FOUND));
-        } else {
-            bus.send(req);
-        }
-    }
-
     private <R, T extends CockpitRequest<R>> void answer(T r, CheckedFunction1<T, Either<Status, R>> f)
             throws SuspendExecution {
         try {
-            if (hasAccess(r.user)) {
-                RequestReplyHelper.reply(r, f.apply(r));
-            } else {
-                RequestReplyHelper.reply(r, Either.left(Status.FORBIDDEN));
-            }
+            RequestReplyHelper.reply(r, f.apply(r));
         } catch (Throwable e) {
             RequestReplyHelper.replyError(r, e);
         }
@@ -210,7 +193,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     private Either<Status, BusInProgress> handleImportBus(ImportBus bus) throws SuspendExecution, InterruptedException {
         final NewBus nb = bus.nb;
 
-        final long bId = runDAO(() -> buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, db.id));
+        final long bId = runDAO(() -> buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, wId));
 
         // we use a fiber to let the actor handles other message during bus import
         new Fiber<>(() -> {
@@ -241,9 +224,94 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private Domain getTopology(NewBus bus) throws Exception, SuspendExecution, InterruptedException {
+    @Suspendable
+    private Domain getTopology(NewBus bus) throws Exception {
         return runAdmin(bus.ip, bus.port, bus.username, bus.password,
                 petals -> petals.newContainerAdministration().getTopology(bus.passphrase, true));
+    }
+
+    private void handleSUStateChange(ChangeServiceUnitState change, DbServiceUnit su)
+            throws SuspendExecution, InterruptedException {
+        if (su.state.equals(change.newState)) {
+            RequestReplyHelper.reply(change,
+                    Either.right(new ServiceUnitOverview(su.id, su.name, su.state, su.saName)));
+        } else if (!isSAStateTransitionOk(su, change.newState)) {
+            // TODO or should I rely on the information from the container instead of my own?
+            RequestReplyHelper.reply(change, Either.left(Status.CONFLICT));
+        } else {
+            DbContainer db = runDAO(() -> buses.getContainerById(su.containerId, null));
+            assert db != null;
+            try {
+                SUTree res = runAdmin(db.ip, db.port, db.username, db.password, petals -> {
+                    ArtifactAdministration aa = petals.newArtifactAdministration();
+                    Artifact a = aa.getArtifact(ServiceAssembly.TYPE, su.saName, null);
+                    assert a instanceof ServiceAssembly;
+                    ServiceAssembly sa = (ServiceAssembly) a;
+                    State newState = changeSAState(petals, sa, change.newState);
+                    return new SUTree(su.id, su.name, newState, su.saName);
+                });
+                assert res != null;
+
+                serviceUnitStateUpdated(res);
+                RequestReplyHelper.reply(change,
+                        Either.right(new ServiceUnitOverview(res.id, res.name, res.state, res.saName)));
+            } catch (Exception e) {
+                RequestReplyHelper.replyError(change, e);
+            }
+        }
+    }
+
+    private void serviceUnitStateUpdated(SUTree su) throws SuspendExecution, InterruptedException {
+        // TODO error handling???
+        runDAO(() -> su.state != MinServiceUnit.State.Unloaded ? buses.updateServiceUnitState(su.id, su.state)
+                : buses.removeServiceUnit(su.id));
+        self().send(new WorkspaceEventMsg(WorkspaceEvent.suStateChange(new NewSUState(su.id, su.state))));
+    }
+
+    /**
+     * 
+     * Note : petals admin does not expose a way to go to shutdown (except from {@link MinServiceUnit.State#Unloaded},
+     * but we don't support it yet!)
+     */
+    private boolean isSAStateTransitionOk(DbServiceUnit su, MinServiceUnit.State to) {
+        switch (su.state) {
+            case Shutdown:
+                return to == MinServiceUnit.State.Unloaded || to == MinServiceUnit.State.Started;
+            case Started:
+                return to == MinServiceUnit.State.Stopped;
+            case Stopped:
+                return to == MinServiceUnit.State.Started || to == MinServiceUnit.State.Unloaded;
+            default:
+                LOG.warn("Impossible case for state transition check from {} to {} for SU {} ({})", su.state, to,
+                        su.name, su.id);
+                return false;
+        }
+    }
+
+    private MinServiceUnit.State changeSAState(PetalsAdministration petals, ServiceAssembly sa,
+            MinServiceUnit.State desiredState) throws ArtifactAdministrationException {
+        ServiceAssemblyLifecycle sal = petals.newArtifactLifecycleFactory().createServiceAssemblyLifecycle(sa);
+        switch (desiredState) {
+            case Unloaded:
+                sal.undeploy();
+                break;
+            case Started:
+                sal.start();
+                break;
+            case Stopped:
+                sal.stop();
+                break;
+            default:
+                LOG.warn("Impossible case for state transition from {} to {} for SA {} ({})", sa.getState(),
+                        desiredState, sa.getName());
+        }
+        if (desiredState != MinServiceUnit.State.Unloaded) {
+            sal.updateState();
+            return MinServiceUnit.State.from(sa.getState());
+        } else {
+            // we can't call updateState for this one, it will fail since it has been unloaded
+            return MinServiceUnit.State.Unloaded;
+        }
     }
 
     public interface Msg {
@@ -292,12 +360,18 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    public static class GetWorkspaceTree extends WorkspaceRequest<WorkspaceTree> {
+    public static class ChangeServiceUnitState extends WorkspaceRequest<ServiceUnitOverview> {
 
-        private static final long serialVersionUID = -2520646870000161079L;
+        private static final long serialVersionUID = 8119375036012239516L;
 
-        public GetWorkspaceTree(String user) {
+        final State newState;
+
+        final long suId;
+
+        public ChangeServiceUnitState(String user, long suId, State newState) {
             super(user);
+            this.suId = suId;
+            this.newState = newState;
         }
     }
 

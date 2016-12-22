@@ -16,8 +16,6 @@
  */
 package org.ow2.petals.cockpit.server.actors;
 
-import java.util.Optional;
-
 import javax.inject.Inject;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
@@ -57,23 +55,25 @@ public class CockpitActors {
      * things homogeneous w.r.t. to other actors?
      */
     @SuppressWarnings("resource")
-    public Optional<ActorRef<WorkspaceActor.Msg>> getWorkspace(long wId) throws SuspendExecution {
+    public Either<Status, ActorRef<WorkspaceActor.Msg>> getWorkspace(long wId) throws SuspendExecution {
         String name = "workspace-" + wId;
 
         ActorRef<Msg> a = ActorRegistry.tryGetActor(name);
 
         if (a == null) {
-            DbWorkspace ws = workspaces.getWorkspaceById(wId);
-            if (ws != null) {
-                a = ActorRegistry.getOrRegisterActor(name, () -> {
-                    WorkspaceActor workspaceActor = new WorkspaceActor(ws);
+            DbWorkspace ws = workspaces.getWorkspaceById(wId, null);
+            if (ws == null) {
+                return Either.left(Status.NOT_FOUND);
+            } else {
+                return Either.right(ActorRegistry.getOrRegisterActor(name, () -> {
+                    WorkspaceActor workspaceActor = new WorkspaceActor(ws.id);
                     serviceLocator.inject(workspaceActor);
                     return workspaceActor;
-                });
+                }));
             }
+        } else {
+            return Either.right(a);
         }
-
-        return Optional.ofNullable(a);
     }
 
     /**
@@ -81,16 +81,14 @@ public class CockpitActors {
      * {@link AsyncResponse}. The problem is that we would loose the static typing of each of the REST methods (as well
      * as the possibility to automatically generate documentation from it)
      */
-    @SuppressWarnings("resource")
     public <O, I extends CockpitRequest<O> & WorkspaceActor.Msg> Either<Status, O> call(long wsId, I msg)
             throws InterruptedException {
         try {
-            Optional<ActorRef<Msg>> ma = getWorkspace(wsId);
-            if (ma.isPresent()) {
-                ActorRef<Msg> a = ma.get();
-                return RequestReplyHelper.call(a, msg);
+            Either<Status, ActorRef<Msg>> ma = getWorkspace(wsId);
+            if (ma.isRight()) {
+                return RequestReplyHelper.call(ma.get(), msg);
             } else {
-                return Either.left(Status.NOT_FOUND);
+                return Either.left(ma.getLeft());
             }
         } catch (SuspendExecution e) {
             throw new AssertionError(e);
