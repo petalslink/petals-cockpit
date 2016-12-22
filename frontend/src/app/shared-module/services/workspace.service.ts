@@ -54,27 +54,27 @@ export class WorkspaceService {
   }
 
   getDetailsBus(idWorkspace: string, idBus: string) {
-    return this.http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${idBus}`);
+    return this.http.get(`${environment.urlBackend}/buses/${idBus}`);
   }
 
   getDetailsContainer(idWorkspace: string, idBus: string, idContainer: string) {
-    return this.http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${idBus}/containers/${idContainer}`);
+    return this.http.get(`${environment.urlBackend}/containers/${idContainer}`);
   }
 
   getDetailsComponent(idWorkspace: string, idBus: string, idContainer: string, idComponent: string) {
     /* tslint:disable:max-line-length */
-    return this.http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${idBus}/containers/${idContainer}/components/${idComponent}`);
+    return this.http.get(`${environment.urlBackend}/components/${idComponent}`);
     /* tslint:enable:max-line-length */
   }
 
   getDetailsServiceUnit(idWorkspace: string, idBus: string, idContainer: string, idComponent: string, idServiceUnit: string) {
     /* tslint:disable:max-line-length */
-    return this.http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${idBus}/containers/${idContainer}/components/${idComponent}/serviceunits/${idServiceUnit}`);
+    return this.http.get(`${environment.urlBackend}/serviceunits/${idServiceUnit}`);
   }
 
   updateServiceUnitState(idWorkspace: string, idBus: string, idContainer: string, idComponent: string, idServiceUnit: string, state: string) {
     /* tslint:disable:max-line-length */
-    return this.http.put(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${idBus}/containers/${idContainer}/components/${idComponent}/serviceunits/${idServiceUnit}`, { state });
+    return this.http.put(`${environment.urlBackend}/workspaces/${idWorkspace}/serviceunits/${idServiceUnit}`, { state });
     /* tslint:enable:max-line-length */
   }
 }

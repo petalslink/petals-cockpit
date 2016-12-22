@@ -37,13 +37,13 @@ import org.ow2.petals.cockpit.server.db.BusesDAO.DbComponent;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbServiceUnit;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
-import org.ow2.petals.cockpit.server.resources.BusResource.MinBus;
-import org.ow2.petals.cockpit.server.resources.ContainerResource.MinComponent;
-import org.ow2.petals.cockpit.server.resources.ContainerResource.MinContainer;
-import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit;
+import org.ow2.petals.cockpit.server.resources.BusesResource.MinBus;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.MinComponent;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.MinContainer;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInError;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.MinWorkspace;
+import org.ow2.petals.cockpit.server.resources.WorkspacesResource.MinWorkspace;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -129,10 +129,10 @@ public class WorkspaceTree extends MinWorkspace {
     public static WorkspaceTree buildFromDatabase(BusesDAO buses, DbWorkspace w) {
         List<BusTree> importedBus = new ArrayList<>();
         List<BusInProgress> busInProgress = new ArrayList<>();
-        for (DbBus b : buses.getBusesByWorkspace(w)) {
+        for (DbBus b : buses.getBusesByWorkspace(w.id)) {
             if (b instanceof DbBusImported) {
                 List<ContainerTree> cs = new ArrayList<>();
-                for (DbContainer c : buses.getContainersByBus(b)) {
+                for (DbContainer c : buses.getContainersByBus(b.id)) {
                     List<ComponentTree> comps = new ArrayList<>();
                     for (DbComponent comp : buses.getComponentsByContainer(c)) {
                         List<SUTree> sus = new ArrayList<>();

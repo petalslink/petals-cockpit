@@ -32,7 +32,12 @@ import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
+import org.ow2.petals.cockpit.server.resources.BusesResource;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource;
+import org.ow2.petals.cockpit.server.resources.ContainersResource;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource;
 import org.ow2.petals.cockpit.server.resources.UserSession;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
 import org.ow2.petals.cockpit.server.security.CockpitAuthenticator;
@@ -149,6 +154,11 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
         environment.jersey().register(UserSession.class);
         environment.jersey().register(WorkspacesResource.class);
+        environment.jersey().register(WorkspaceResource.class);
+        environment.jersey().register(BusesResource.class);
+        environment.jersey().register(ContainersResource.class);
+        environment.jersey().register(ComponentsResource.class);
+        environment.jersey().register(ServiceUnitsResource.class);
 
         // This is needed for SSE to work correctly!
         // See https://github.com/dropwizard/dropwizard/issues/1673

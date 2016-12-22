@@ -23,9 +23,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
-
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.sse.EventInput;
 import org.junit.Before;
@@ -48,9 +47,10 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.dropwizard.testing.junit.ResourceTestRule;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
-public class ImportBusTest extends AbstractWorkspacesResourceTest {
+public class ImportBusTest extends AbstractCockpitResourceTest {
 
     @Rule
     public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
@@ -62,6 +62,10 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
     private final Container container = new Container("cont", "host1", ImmutableMap.of(PortType.JMX, containerPort),
             "user", "pass", State.REACHABLE);
 
+    @Rule
+    public final ResourceTestRule resources = buildResourceTest(WorkspaceResource.class);
+
+    @SuppressWarnings("null")
     @Before
     public void setUp() {
         // petals
@@ -70,36 +74,35 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
         petals.registerContainer(container);
 
         // mocks
-        long workspaceId = 1;
-        DbWorkspace w = new DbWorkspace(workspaceId, "test",
-                Arrays.asList(MockProfileParamValueFactoryProvider.ADMIN.username));
+        DbWorkspace w = new DbWorkspace(1, "test", MockProfileParamValueFactoryProvider.ADMIN.username);
 
-        doReturn(w).when(workspaces).getWorkspaceById(workspaceId);
-
-        doReturn(new WorkspaceTree(workspaceId, "test", Arrays.asList(), Arrays.asList())).when(workspaces)
-                .getWorkspaceTree(w);
+        doReturn(w).when(workspaces).getWorkspaceById(eq(w.id), any());
 
         long busId = 4;
         when(buses.createBus(container.getHost(), containerPort, container.getJmxUsername(), container.getJmxPassword(),
-                "phrase", workspaceId)).thenReturn(busId);
+                "phrase", w.id)).thenReturn(busId);
         when(buses.createBus("host2", containerPort, container.getJmxUsername(), container.getJmxPassword(), "phrase",
-                workspaceId)).thenReturn(busId + 1);
+                w.id)).thenReturn(busId + 1);
 
-        when(buses.getBusById(busId)).thenReturn(new DbBusImported(busId, container.getHost(), containerPort,
-                container.getJmxUsername(), container.getJmxPassword(), "phrase", domain.getName()));
+        when(buses.getBusById(eq(busId), any())).thenAnswer(
+                i -> new DbBusImported(busId, container.getHost(), containerPort, container.getJmxUsername(),
+                        container.getJmxPassword(), "phrase", domain.getName(), i.getArgument(1)));
 
         long containerId = 45;
         when(buses.createContainer(container.getContainerName(), container.getHost(), containerPort,
                 container.getJmxUsername(), container.getJmxPassword(), busId)).thenReturn(containerId);
-        when(buses.getContainerById(containerId)).thenReturn(new DbContainer(containerId, container.getContainerName(),
-                container.getHost(), containerPort, container.getJmxUsername(), container.getJmxPassword()));
+        when(buses.getContainerById(eq(containerId), any()))
+                .thenAnswer(i -> new DbContainer(containerId, busId, container.getContainerName(), container.getHost(),
+                        containerPort, container.getJmxUsername(), container.getJmxPassword(), i.getArgument(1)));
 
     }
 
     @Test
     public void testImportBusOk() {
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
                 .get(EventInput.class)) {
+
+            expectWorkspaceTree(eventInput);
 
             BusInProgress post = resources.getJerseyTest()
                     .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),
@@ -108,7 +111,6 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
 
             assertThat(post.id).isEqualTo(4);
 
-            // TODO add timeout
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("BUS_IMPORT_OK");
                 a.assertThat(e.data.get("id")).isEqualTo(post.getId());
@@ -124,11 +126,25 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
     }
 
     @Test
+    public void testImportBusForbidden() {
+
+        doReturn(new DbWorkspace(2, "test2", null)).when(workspaces).getWorkspaceById(eq(2L), any());
+
+        Response post = resources.getJerseyTest().target("/workspaces/2/buses").request()
+                .post(Entity.json(new NewBus(container.getHost(), containerPort, container.getJmxUsername(),
+                        container.getJmxPassword(), "phrase")));
+
+        assertThat(post.getStatus()).isEqualTo(403);
+    }
+
+    @Test
     public void testImportBusError() {
         String incorrectHost = "host2";
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
                 .get(EventInput.class)) {
+
+            expectWorkspaceTree(eventInput);
 
             BusInProgress post = resources.getJerseyTest().target("/workspaces/1/buses").request()
                     .post(Entity.json(new NewBus(incorrectHost, containerPort, container.getJmxUsername(),
@@ -136,7 +152,6 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
 
             assertThat(post.id).isEqualTo(5);
 
-            // TODO add timeout
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("BUS_IMPORT_ERROR");
                 a.assertThat(e.data.get("importError")).isEqualTo("Unknown Host");
@@ -155,8 +170,10 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
         petals.registerArtifact(
                 new ServiceAssembly("sa", new ServiceUnit("su1", "comp"), new ServiceUnit("su2", "comp")), container);
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1/events").request()
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
                 .get(EventInput.class)) {
+
+            expectWorkspaceTree(eventInput);
 
             BusInProgress post = resources.getJerseyTest()
                     .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),
@@ -165,7 +182,6 @@ public class ImportBusTest extends AbstractWorkspacesResourceTest {
 
             assertThat(post.id).isEqualTo(4);
 
-            // TODO add timeout
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("BUS_IMPORT_ERROR");
                 a.assertThat((String) e.data.get("importError"))

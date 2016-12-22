@@ -17,8 +17,10 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -35,6 +37,7 @@ import java.util.function.BiConsumer;
 import javax.inject.Singleton;
 
 import org.assertj.core.api.SoftAssertions;
+import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.InboundEvent;
@@ -64,8 +67,8 @@ import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
-import org.ow2.petals.cockpit.server.resources.ContainerResource.MinComponent;
-import org.ow2.petals.cockpit.server.resources.ContainerResource.MinServiceUnit;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.MinComponent;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
@@ -77,6 +80,7 @@ import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.common.test.TestUtil;
 import co.paralleluniverse.common.util.Debug;
 import io.dropwizard.testing.junit.ResourceTestRule;
+import io.dropwizard.testing.junit.ResourceTestRule.Builder;
 import javaslang.Tuple2;
 import javaslang.Tuple3;
 import javaslang.Tuple4;
@@ -92,7 +96,7 @@ import javaslang.Tuple4;
  * @author vnoel
  *
  */
-public class AbstractWorkspacesResourceTest {
+public class AbstractCockpitResourceTest {
 
     @Rule
     public TestRule watchman = TestUtil.WATCHMAN;
@@ -112,26 +116,30 @@ public class AbstractWorkspacesResourceTest {
                     // .verboseLogging()
                     .defaultAnswer(CALLS_REAL_METHODS));
 
-    @Rule
-    public ResourceTestRule resources = ResourceTestRule.builder()
-            // in memory does not support SSE and the no-servlet one does not log...
-            .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
+    protected ResourceTestRule buildResourceTest(Class<?>... resources) {
+        Builder builder = ResourceTestRule.builder()
+                // in memory does not support SSE and the no-servlet one does not log...
+                .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
+                .addProvider(new MockProfileParamValueFactoryProvider.Binder()).addProvider(new AbstractBinder() {
+                    @Override
+                    protected void configure() {
+                        bind(workspaces).to(WorkspacesDAO.class);
+                        bind(buses).to(BusesDAO.class);
+                        bind(users).to(UsersDAO.class);
+                        bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.PETALS_ADMIN_ES)
+                                .to(ExecutorService.class);
+                        bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.JDBC_ES)
+                                .to(ExecutorService.class);
+                        bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
+                        bind(PetalsAdministrationFactory.getInstance()).to(PetalsAdministrationFactory.class);
+                    }
+                });
+        for (Class<?> resource : resources) {
             // we pass the resource as a provider to get injection in constructor
-            .addProvider(WorkspacesResource.class).addProvider(new MockProfileParamValueFactoryProvider.Binder())
-            .addProvider(new AbstractBinder() {
-                @Override
-                protected void configure() {
-                    bind(workspaces).to(WorkspacesDAO.class);
-                    bind(buses).to(BusesDAO.class);
-                    bind(users).to(UsersDAO.class);
-                    bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.PETALS_ADMIN_ES)
-                            .to(ExecutorService.class);
-                    bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.JDBC_ES)
-                            .to(ExecutorService.class);
-                    bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
-                    bind(PetalsAdministrationFactory.getInstance()).to(PetalsAdministrationFactory.class);
-                }
-            }).build();
+            builder.addProvider(resource);
+        }
+        return builder.build();
+    }
 
     @BeforeClass
     public static void setUpQuasar() {
@@ -159,7 +167,7 @@ public class AbstractWorkspacesResourceTest {
             Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>> entry = containers
                     .iterator().next();
             DbBusImported bDb = new DbBusImported(bus._1, entry._2.getHost(), getPort(entry._2),
-                    entry._2.getJmxUsername(), entry._2.getJmxPassword(), passphrase, domain.getName());
+                    entry._2.getJmxUsername(), entry._2.getJmxPassword(), passphrase, domain.getName(), null);
 
             List<ContainerTree> cTrees = new ArrayList<>();
             List<DbContainer> cs = new ArrayList<>();
@@ -167,15 +175,15 @@ public class AbstractWorkspacesResourceTest {
 
                 c._2.addProperty("petals.topology.passphrase", passphrase);
 
-                DbContainer cDb = new DbContainer(c._1, c._2.getContainerName(), c._2.getHost(), getPort(c._2),
-                        c._2.getJmxUsername(), c._2.getJmxPassword());
+                DbContainer cDb = new DbContainer(c._1, bus._1, c._2.getContainerName(), c._2.getHost(), getPort(c._2),
+                        c._2.getJmxUsername(), c._2.getJmxPassword(), null);
 
                 List<ComponentTree> compTrees = new ArrayList<>();
                 List<DbComponent> comps = new ArrayList<>();
                 for (Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>> comp : c._3) {
                     DbComponent compDb = new DbComponent(comp._1, comp._2.getName(),
                             MinComponent.State.from(comp._2.getState()),
-                            MinComponent.Type.from(comp._2.getComponentType()));
+                            MinComponent.Type.from(comp._2.getComponentType()), null);
 
                     List<SUTree> suTrees = new ArrayList<>();
                     List<DbServiceUnit> sus = new ArrayList<>();
@@ -185,40 +193,53 @@ public class AbstractWorkspacesResourceTest {
                         ServiceUnit sasu = sasus.get(0);
                         assert sasu != null;
                         DbServiceUnit suDb = new DbServiceUnit(su._1, sasu.getName(),
-                                MinServiceUnit.State.from(su._2.getState()), su._2.getName());
+                                MinServiceUnit.State.from(su._2.getState()), su._2.getName(), c._1, null);
 
                         suTrees.add(new SUTree(suDb.id, suDb.name, MinServiceUnit.State.from(su._2.getState()),
                                 suDb.saName));
                         sus.add(suDb);
+                        when(buses.getServiceUnitById(eq(suDb.id), any()))
+                                .thenAnswer(i -> new DbServiceUnit(suDb.id, suDb.name, suDb.state, suDb.saName,
+                                        suDb.containerId, username(i.getArgument(1), users)));
                     }
 
                     compTrees.add(new ComponentTree(compDb.id, compDb.name, MinComponent.State.from(comp._2.getState()),
                             MinComponent.Type.from(comp._2.getComponentType()), suTrees));
                     comps.add(compDb);
+                    when(buses.getComponentsById(eq(compDb.id), any())).thenAnswer(i -> new DbComponent(compDb.id,
+                            compDb.name, compDb.state, compDb.type, username(i.getArgument(1), users)));
                     when(buses.getServiceUnitByComponent(compDb)).thenReturn(sus);
                 }
 
                 // TODO handle also artifacts
                 cTrees.add(new ContainerTree(cDb.id, cDb.name, compTrees));
                 cs.add(cDb);
-                when(buses.getContainerById(cDb.id)).thenReturn(cDb);
+                when(buses.getContainerById(eq(cDb.id), any())).thenAnswer(i -> new DbContainer(cDb.id, cDb.busId,
+                        cDb.name, cDb.ip, cDb.port, cDb.username, cDb.password, username(i.getArgument(1), users)));
                 when(buses.getComponentsByContainer(cDb)).thenReturn(comps);
             }
 
             bTrees.add(new BusTree(bDb.id, bDb.name, cTrees));
             bs.add(bDb);
-            when(buses.getBusById(bDb.id)).thenReturn(bDb);
-            when(buses.getContainersByBus(bDb)).thenReturn(cs);
+            when(buses.getBusById(eq(bDb.id), any()))
+                    .thenAnswer(i -> new DbBusImported(bDb.id, bDb.importIp, bDb.importPort, bDb.importUsername,
+                            bDb.importPassword, bDb.importPassphrase, bDb.name, username(i.getArgument(1), users)));
+            when(buses.getContainersByBus(bDb.id)).thenReturn(cs);
         }
 
-        DbWorkspace wDb = new DbWorkspace(wsId, wsName, Arrays.asList(users));
+        DbWorkspace wDb = new DbWorkspace(wsId, wsName, null);
 
-        doReturn(wDb).when(workspaces).getWorkspaceById(wDb.id);
-        when(buses.getBusesByWorkspace(wDb)).thenReturn(bs);
+        doAnswer(i -> new DbWorkspace(wDb.id, wDb.name, username(i.getArgument(1), users))).when(workspaces)
+                .getWorkspaceById(eq(wDb.id), any());
+        when(buses.getBusesByWorkspace(wDb.id)).thenReturn(bs);
 
         WorkspaceTree wTree = new WorkspaceTree(wDb.id, wDb.name, bTrees, Arrays.asList());
 
-        doReturn(wTree).when(workspaces).getWorkspaceTree(wDb);
+    }
+
+    @Nullable
+    private static String username(String username, String... users) {
+        return Arrays.asList(users).contains(username) ? username : null;
     }
 
     protected static int getPort(Container container) {
@@ -229,21 +250,31 @@ public class AbstractWorkspacesResourceTest {
 
     protected static void expectEvent(EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {
         SoftAssertions sa = new SoftAssertions();
-        while (!eventInput.isClosed()) {
-            try {
-                final InboundEvent inboundEvent = eventInput.read();
-                if (inboundEvent == null) {
-                    // connection has been closed
-                    break;
-                }
-
-                c.accept(inboundEvent, sa);
-
-                sa.assertAll();
-            } finally {
-                eventInput.close();
+        if (!eventInput.isClosed()) {
+            // TODO add timeout
+            final InboundEvent inboundEvent = eventInput.read();
+            if (inboundEvent == null) {
+                // connection has been closed
+                return;
             }
+
+            c.accept(inboundEvent, sa);
+
+            sa.assertAll();
         }
+    }
+
+    protected static void expectWorkspaceTree(EventInput eventInput) {
+        expectWorkspaceTree(eventInput, (t, a) -> {
+        });
+    }
+
+    protected static void expectWorkspaceTree(EventInput eventInput, BiConsumer<WorkspaceTree, SoftAssertions> c) {
+        expectEvent(eventInput, (e, a) -> {
+            a.assertThat(e.getName()).isEqualTo("WORKSPACE_TREE");
+            WorkspaceTree ev = e.readData(WorkspaceTree.class);
+            c.accept(ev, a);
+        });
     }
 
     protected static void expectWorkspaceEvent(EventInput eventInput, BiConsumer<WorkspaceEvent, SoftAssertions> c) {
