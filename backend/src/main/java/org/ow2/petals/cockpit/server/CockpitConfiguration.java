@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.configuration;
+package org.ow2.petals.cockpit.server;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

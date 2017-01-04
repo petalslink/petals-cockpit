@@ -28,7 +28,6 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
-import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;

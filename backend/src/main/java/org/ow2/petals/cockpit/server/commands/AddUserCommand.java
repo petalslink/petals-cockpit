@@ -19,7 +19,7 @@ package org.ow2.petals.cockpit.server.commands;
 import java.util.Optional;
 
 import org.eclipse.jetty.util.component.LifeCycle;
-import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
 import org.skife.jdbi.v2.DBI;

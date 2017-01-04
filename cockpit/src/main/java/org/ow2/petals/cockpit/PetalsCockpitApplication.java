@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.CockpitConfiguration;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

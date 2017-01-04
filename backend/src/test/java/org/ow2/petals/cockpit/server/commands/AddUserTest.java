@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.util.StringColumnMapper;
