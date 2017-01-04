@@ -16,7 +16,9 @@
  */
 package org.ow2.petals.cockpit.server;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 import javax.inject.Singleton;
 
@@ -39,6 +41,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
 import org.ow2.petals.cockpit.server.security.CockpitAuthenticator;
+import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
@@ -79,21 +82,41 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
     public final Pac4jBundle<C> pac4j = new Pac4jBundle<C>() {
         @Override
         public Pac4jFactory getPac4jFactory(C configuration) {
+            List<Client> clients = configuration.getSecurity().getPac4jClients();
+
+            // TODO would it make sense to do injection on the clients? e.g. for UsersDAO
+            List<String> clientsNames = clients.stream().map(Client::getName).collect(Collectors.toList());
+
+            String defaultClients = String.join(",", clientsNames);
+
             Pac4jFactory pac4jConf = new Pac4jFactory();
+
             // this let the /user/session url be handled by the callbacks, logout, etc filters
             pac4jConf.setMatchers(ImmutableMap.of("excludeUserSession", new ExcludedPathMatcher("^/user/session$")));
-            // this protects the whole application
+
+            // this protects the whole application with all the declared clients
             FilterConfiguration f = new FilterConfiguration();
             f.setMatchers("excludeUserSession");
             f.setAuthorizers("isAuthenticated");
-            // TODO make this configurable
-            f.setClients("CockpitAuthClient");
+            f.setClients(defaultClients);
             pac4jConf.setGlobalFilters(ImmutableList.of(f));
+
             // this will be used by SSO-type authenticators (appended with client name as parameter)
             // for now, we still need to give a value in order for pac4j to be happy
             pac4jConf.setCallbackUrl("/user/session");
-            // TODO actually exploit that information for security filters, callbacks and stuffs
-            pac4jConf.setClients(configuration.getSecurity().getPac4jClients());
+            pac4jConf.setClients(clients);
+
+            // this ensure Pac4JSecurity annotations use all the clients
+            // (for example on /user)
+            pac4jConf.setDefaultClients(defaultClients);
+
+            // if the local db client is enabled, use it by default for callbacks
+            // because the frontend does not pass a client name as a parameter by default
+            String defaultClient = CockpitAuthClient.class.getSimpleName();
+            if (clientsNames.contains(defaultClient)) {
+                pac4jConf.setDefaultClient(defaultClient);
+            }
+
             return pac4jConf;
         }
     };
@@ -210,10 +233,6 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
         if (conf != null) {
             CockpitAuthClient cac = conf.getClients().findClient(CockpitAuthClient.class);
-
-            // it is needed for it to be used by the callback filter (because the frontend does not pass a
-            // client name as a parameter by default)
-            conf.getClients().setDefaultClient(cac);
 
             // if it's already set, either we are in a test, or another backend is used
             if (cac.getAuthenticator() == null) {
