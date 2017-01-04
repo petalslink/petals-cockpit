@@ -20,7 +20,6 @@ import java.util.concurrent.ExecutorService;
 
 import javax.inject.Singleton;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.session.SessionHandler;
@@ -41,13 +40,17 @@ import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
 import org.ow2.petals.cockpit.server.security.CockpitAuthenticator;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
+import org.pac4j.dropwizard.Pac4jFactory.FilterConfiguration;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import io.dropwizard.Application;
 import io.dropwizard.db.PooledDataSourceFactory;
@@ -74,10 +77,24 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
     private static final Logger LOG = LoggerFactory.getLogger(CockpitApplication.class);
 
     public final Pac4jBundle<C> pac4j = new Pac4jBundle<C>() {
-        @Nullable
         @Override
         public Pac4jFactory getPac4jFactory(C configuration) {
-            return configuration.getPac4jFactory();
+            Pac4jFactory pac4jConf = new Pac4jFactory();
+            // this let the /user/session url be handled by the callbacks, logout, etc filters
+            pac4jConf.setMatchers(ImmutableMap.of("excludeUserSession", new ExcludedPathMatcher("^/user/session$")));
+            // this protects the whole application
+            FilterConfiguration f = new FilterConfiguration();
+            f.setMatchers("excludeUserSession");
+            f.setAuthorizers("isAuthenticated");
+            // TODO make this configurable
+            f.setClients("CockpitAuthClient");
+            pac4jConf.setGlobalFilters(ImmutableList.of(f));
+            // this will be used by SSO-type authenticators (appended with client name as parameter)
+            // for now, we still need to give a value in order for pac4j to be happy
+            pac4jConf.setCallbackUrl("/user/session");
+            // TODO actually exploit that information for security filters, callbacks and stuffs
+            pac4jConf.setClients(configuration.getSecurity().getPac4jClients());
+            return pac4jConf;
         }
     };
 
@@ -130,8 +147,8 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         ExecutorService petalsAdminES = environment.lifecycle().executorService("petals-admin-worker-%d").minThreads(1)
                 .maxThreads(2).build();
         // This is needed for executing database requests from within a fiber (actors)
-        ExecutorService jdbcExec = environment.lifecycle().executorService("jdbc-worker-%d")
-                .minThreads(2).maxThreads(Runtime.getRuntime().availableProcessors()).build();
+        ExecutorService jdbcExec = environment.lifecycle().executorService("jdbc-worker-%d").minThreads(2)
+                .maxThreads(Runtime.getRuntime().availableProcessors()).build();
 
         final PetalsAdministrationFactory adminFactory = PetalsAdministrationFactory.getInstance();
 
@@ -187,9 +204,6 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         });
     }
 
-    /**
-     * public for tests
-     */
     private void setupPac4J(UsersDAO users) {
 
         Config conf = pac4j.getConfig();
@@ -197,8 +211,8 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         if (conf != null) {
             CockpitAuthClient cac = conf.getClients().findClient(CockpitAuthClient.class);
 
-            // it seems needed for it to be used by the callback filter (because it does not have a
-            // client name passed as parameter)
+            // it is needed for it to be used by the callback filter (because the frontend does not pass a
+            // client name as a parameter by default)
             conf.getClients().setDefaultClient(cac);
 
             // if it's already set, either we are in a test, or another backend is used
