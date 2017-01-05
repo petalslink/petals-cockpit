@@ -55,6 +55,7 @@ import io.dropwizard.db.PooledDataSourceFactory;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.jetty.BiDiGzipHandler;
+import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -134,6 +135,19 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 .minThreads(2).maxThreads(Runtime.getRuntime().availableProcessors()).build();
 
         final PetalsAdministrationFactory adminFactory = PetalsAdministrationFactory.getInstance();
+
+        environment.lifecycle().manage(new Managed() {
+            @Override
+            public void start() throws Exception {
+                // the factory is already created at that point
+            }
+
+            @Override
+            public void stop() throws Exception {
+                // this ensure things are properly freed if needed
+                PetalsAdministrationFactory.close();
+            }
+        });
 
         environment.jersey().register(new AbstractBinder() {
             @Override
