@@ -16,11 +16,12 @@
  */
 package org.ow2.petals.cockpit.server;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 import javax.inject.Singleton;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.session.SessionHandler;
@@ -28,7 +29,6 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
-import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
@@ -41,14 +41,19 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
 import org.ow2.petals.cockpit.server.security.CockpitAuthenticator;
+import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
+import org.pac4j.dropwizard.Pac4jFactory.FilterConfiguration;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import io.dropwizard.Application;
 import io.dropwizard.db.PooledDataSourceFactory;
@@ -75,10 +80,44 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
     private static final Logger LOG = LoggerFactory.getLogger(CockpitApplication.class);
 
     public final Pac4jBundle<C> pac4j = new Pac4jBundle<C>() {
-        @Nullable
         @Override
         public Pac4jFactory getPac4jFactory(C configuration) {
-            return configuration.getPac4jFactory();
+            List<Client> clients = configuration.getSecurity().getPac4jClients();
+
+            // TODO would it make sense to do injection on the clients? e.g. for UsersDAO
+            List<String> clientsNames = clients.stream().map(Client::getName).collect(Collectors.toList());
+
+            String defaultClients = String.join(",", clientsNames);
+
+            Pac4jFactory pac4jConf = new Pac4jFactory();
+
+            // this let the /user/session url be handled by the callbacks, logout, etc filters
+            pac4jConf.setMatchers(ImmutableMap.of("excludeUserSession", new ExcludedPathMatcher("^/user/session$")));
+
+            // this protects the whole application with all the declared clients
+            FilterConfiguration f = new FilterConfiguration();
+            f.setMatchers("excludeUserSession");
+            f.setAuthorizers("isAuthenticated");
+            f.setClients(defaultClients);
+            pac4jConf.setGlobalFilters(ImmutableList.of(f));
+
+            // this will be used by SSO-type authenticators (appended with client name as parameter)
+            // for now, we still need to give a value in order for pac4j to be happy
+            pac4jConf.setCallbackUrl("/user/session");
+            pac4jConf.setClients(clients);
+
+            // this ensure Pac4JSecurity annotations use all the clients
+            // (for example on /user)
+            pac4jConf.setDefaultClients(defaultClients);
+
+            // if the local db client is enabled, use it by default for callbacks
+            // because the frontend does not pass a client name as a parameter by default
+            String defaultClient = CockpitAuthClient.class.getSimpleName();
+            if (clientsNames.contains(defaultClient)) {
+                pac4jConf.setDefaultClient(defaultClient);
+            }
+
+            return pac4jConf;
         }
     };
 
@@ -131,8 +170,8 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         ExecutorService petalsAdminES = environment.lifecycle().executorService("petals-admin-worker-%d").minThreads(1)
                 .maxThreads(2).build();
         // This is needed for executing database requests from within a fiber (actors)
-        ExecutorService jdbcExec = environment.lifecycle().executorService("jdbc-worker-%d")
-                .minThreads(2).maxThreads(Runtime.getRuntime().availableProcessors()).build();
+        ExecutorService jdbcExec = environment.lifecycle().executorService("jdbc-worker-%d").minThreads(2)
+                .maxThreads(Runtime.getRuntime().availableProcessors()).build();
 
         final PetalsAdministrationFactory adminFactory = PetalsAdministrationFactory.getInstance();
 
@@ -188,19 +227,12 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         });
     }
 
-    /**
-     * public for tests
-     */
     private void setupPac4J(UsersDAO users) {
 
         Config conf = pac4j.getConfig();
 
         if (conf != null) {
             CockpitAuthClient cac = conf.getClients().findClient(CockpitAuthClient.class);
-
-            // it seems needed for it to be used by the callback filter (because it does not have a
-            // client name passed as parameter)
-            conf.getClients().setDefaultClient(cac);
 
             // if it's already set, either we are in a test, or another backend is used
             if (cac.getAuthenticator() == null) {

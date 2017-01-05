@@ -14,20 +14,8 @@ server:
     - type: http
       port: 8082
 
-pac4j:
-  globalFilters:
-    - # this protects the whole application
-      matchers: excludeUserSession
-      authorizers: isAuthenticated
-  matchers:
-    # this let the /user/session url be handled for the callbacks, logout, etc
-    excludeUserSession:
-      class: org.pac4j.core.matching.ExcludedPathMatcher
-      excludePath: ^/user/session$
-  # this will be used by SSO-type authenticators (appended with client name as parameter)
-  # for now, we still need to give a value in order for pac4j to be happy
-  callbackUrl: /user/session
-  clients:
+security:
+  pac4jClients:
     - org.ow2.petals.cockpit.server.security.CockpitAuthClient: {}
 
 database:

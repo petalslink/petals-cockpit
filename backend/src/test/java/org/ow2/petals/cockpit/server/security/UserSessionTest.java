@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.configuration.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.mocks.MockAuthenticator;
 import org.ow2.petals.cockpit.server.resources.UserSession.User;
 import org.ow2.petals.cockpit.server.security.CockpitExtractor.Authentication;

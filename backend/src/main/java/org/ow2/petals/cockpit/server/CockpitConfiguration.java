@@ -14,13 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.configuration;
+package org.ow2.petals.cockpit.server;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.eclipse.jdt.annotation.Nullable;
-import org.pac4j.dropwizard.Pac4jFactory;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
+import org.pac4j.core.client.Client;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -36,14 +40,12 @@ import io.dropwizard.db.DataSourceFactory;
 public class CockpitConfiguration extends Configuration {
 
     @Valid
-    @Nullable
     @JsonProperty
-    private Pac4jFactory pac4j = null;
+    private CockpitSecurityConfiguration security = new CockpitSecurityConfiguration();
 
-    @Nullable
-    @JsonProperty("pac4j")
-    public Pac4jFactory getPac4jFactory() {
-        return pac4j;
+    @JsonProperty
+    public CockpitSecurityConfiguration getSecurity() {
+        return security;
     }
 
     @Valid
@@ -54,5 +56,26 @@ public class CockpitConfiguration extends Configuration {
     @JsonProperty("database")
     public DataSourceFactory getDataSourceFactory() {
         return database;
+    }
+
+    public static class CockpitSecurityConfiguration {
+
+        @NotNull
+        @NotEmpty
+        private List<Client> pac4jClients = new ArrayList<>();
+
+        public CockpitSecurityConfiguration() {
+            pac4jClients.add(new CockpitAuthClient());
+        }
+
+        @JsonProperty
+        public List<Client> getPac4jClients() {
+            return pac4jClients;
+        }
+
+        @JsonProperty
+        public void setPac4jClients(List<Client> pac4jClients) {
+            this.pac4jClients = pac4jClients;
+        }
     }
 }
