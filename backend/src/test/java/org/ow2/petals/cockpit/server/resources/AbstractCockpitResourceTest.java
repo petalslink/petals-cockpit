@@ -67,10 +67,6 @@ import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.MinComponent;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -158,7 +154,7 @@ public class AbstractCockpitResourceTest {
     protected void setupWorkspace(long wsId, String wsName,
             List<Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>>>>> data,
             String... users) {
-        List<BusTree> bTrees = new ArrayList<>();
+
         List<DbBus> bs = new ArrayList<>();
         for (Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>>>> bus : data) {
             Domain domain = bus._2;
@@ -169,7 +165,6 @@ public class AbstractCockpitResourceTest {
             DbBusImported bDb = new DbBusImported(bus._1, entry._2.getHost(), getPort(entry._2),
                     entry._2.getJmxUsername(), entry._2.getJmxPassword(), passphrase, domain.getName(), null);
 
-            List<ContainerTree> cTrees = new ArrayList<>();
             List<DbContainer> cs = new ArrayList<>();
             for (Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>> c : containers) {
 
@@ -178,14 +173,12 @@ public class AbstractCockpitResourceTest {
                 DbContainer cDb = new DbContainer(c._1, bus._1, c._2.getContainerName(), c._2.getHost(), getPort(c._2),
                         c._2.getJmxUsername(), c._2.getJmxPassword(), null);
 
-                List<ComponentTree> compTrees = new ArrayList<>();
                 List<DbComponent> comps = new ArrayList<>();
                 for (Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>> comp : c._3) {
                     DbComponent compDb = new DbComponent(comp._1, comp._2.getName(),
                             MinComponent.State.from(comp._2.getState()),
                             MinComponent.Type.from(comp._2.getComponentType()), null);
 
-                    List<SUTree> suTrees = new ArrayList<>();
                     List<DbServiceUnit> sus = new ArrayList<>();
                     for (Tuple2<Long, ServiceAssembly> su : comp._3) {
                         List<ServiceUnit> sasus = su._2.getServiceUnits();
@@ -195,16 +188,12 @@ public class AbstractCockpitResourceTest {
                         DbServiceUnit suDb = new DbServiceUnit(su._1, sasu.getName(),
                                 MinServiceUnit.State.from(su._2.getState()), su._2.getName(), c._1, null);
 
-                        suTrees.add(new SUTree(suDb.id, suDb.name, MinServiceUnit.State.from(su._2.getState()),
-                                suDb.saName));
                         sus.add(suDb);
                         when(buses.getServiceUnitById(eq(suDb.id), any()))
                                 .thenAnswer(i -> new DbServiceUnit(suDb.id, suDb.name, suDb.state, suDb.saName,
                                         suDb.containerId, username(i.getArgument(1), users)));
                     }
 
-                    compTrees.add(new ComponentTree(compDb.id, compDb.name, MinComponent.State.from(comp._2.getState()),
-                            MinComponent.Type.from(comp._2.getComponentType()), suTrees));
                     comps.add(compDb);
                     when(buses.getComponentsById(eq(compDb.id), any())).thenAnswer(i -> new DbComponent(compDb.id,
                             compDb.name, compDb.state, compDb.type, username(i.getArgument(1), users)));
@@ -212,14 +201,12 @@ public class AbstractCockpitResourceTest {
                 }
 
                 // TODO handle also artifacts
-                cTrees.add(new ContainerTree(cDb.id, cDb.name, compTrees));
                 cs.add(cDb);
                 when(buses.getContainerById(eq(cDb.id), any())).thenAnswer(i -> new DbContainer(cDb.id, cDb.busId,
                         cDb.name, cDb.ip, cDb.port, cDb.username, cDb.password, username(i.getArgument(1), users)));
                 when(buses.getComponentsByContainer(cDb)).thenReturn(comps);
             }
 
-            bTrees.add(new BusTree(bDb.id, bDb.name, cTrees));
             bs.add(bDb);
             when(buses.getBusById(eq(bDb.id), any()))
                     .thenAnswer(i -> new DbBusImported(bDb.id, bDb.importIp, bDb.importPort, bDb.importUsername,
@@ -232,8 +219,6 @@ public class AbstractCockpitResourceTest {
         doAnswer(i -> new DbWorkspace(wDb.id, wDb.name, username(i.getArgument(1), users))).when(workspaces)
                 .getWorkspaceById(eq(wDb.id), any());
         when(buses.getBusesByWorkspace(wDb.id)).thenReturn(bs);
-
-        WorkspaceTree wTree = new WorkspaceTree(wDb.id, wDb.name, bTrees, Arrays.asList());
 
     }
 

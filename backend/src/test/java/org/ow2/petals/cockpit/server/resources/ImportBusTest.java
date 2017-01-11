@@ -119,10 +119,13 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             });
         }
 
-        // let's just ensure that the bus is created and updated in the db
+        // let's just ensure that the bus is created,
+        // then that the container is also created
+        // and finally the bus is updated in the db
         verify(buses).createBus(container.getHost(), containerPort, container.getJmxUsername(),
                 container.getJmxPassword(), "phrase", 1);
-        verify(buses).saveImport(eq(4L), any());
+        verify(buses).createContainer(container.getContainerName(), container.getHost(), containerPort,
+                container.getJmxUsername(), container.getJmxPassword(), 4);
         verify(buses).updateBus(4, domain.getName());
     }
 
