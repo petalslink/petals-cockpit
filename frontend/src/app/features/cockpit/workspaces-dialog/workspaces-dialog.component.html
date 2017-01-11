@@ -1,0 +1,15 @@
+<h1 md-dialog-title>Workspaces</h1>
+
+<span>Select the workspace you want to work with</span>
+
+<md-dialog-content>
+  <md-nav-list>
+    <md-list-item *ngFor="let workspace of (workspaces$ | async).list" (click)="fetchWorkspace(workspace)">
+      <h3 md-line>{{ workspace.name }}</h3>
+
+      <p md-line>
+        You're the only one to use this workspace
+      </p>
+    </md-list-item>
+  </md-nav-list>
+</md-dialog-content>

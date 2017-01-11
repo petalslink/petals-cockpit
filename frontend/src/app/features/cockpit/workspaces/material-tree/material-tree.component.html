@@ -1,0 +1,19 @@
+<md-nav-list dense *ngFor="let item of tree; let i = index" [style.marginLeft.px]="margin">
+  <a md-list-item [routerLink]="[item.link]" (click)="select({deepLevel: deepLevel, index: i, item: item})">
+    <md-icon
+      *ngIf="item.children"
+      (click)="toggleFold({deepLevel: deepLevel, index: i, item: item}, $event)"
+      [class.rotate-minus-90]="item.isFolded"
+    >arrow_drop_down</md-icon>
+
+    {{ item.name }}
+  </a>
+
+  <app-material-tree
+    *ngIf="!item.isFolded && item.children"
+    [tree]="item.children"
+    [marginLeft]="marginLeft"
+    [deepLevel]="deepLevel + 1"
+    (onToggleFold)="toggleFold($event)"
+    (onSelect)="select($event)"></app-material-tree>
+</md-nav-list>

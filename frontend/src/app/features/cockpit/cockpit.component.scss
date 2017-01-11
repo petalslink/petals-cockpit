@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+}
+
+.logo-toolbar {
+  max-height: 45px;
+  margin-right: 15px;
+}
+
+md-sidenav {
+  width: 320px;
+}

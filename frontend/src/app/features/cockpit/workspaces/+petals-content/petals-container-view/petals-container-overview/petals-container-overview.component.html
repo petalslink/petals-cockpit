@@ -1,0 +1,30 @@
+<div class="content">
+  <div fxLayout="row" fxLayoutWrap fxLayoutGap="10px">
+    <md-card fxFlex="25%">
+      <md-card-subtitle>IP</md-card-subtitle>
+      <md-card-title class="color-primary">192.168.0.1</md-card-title>
+    </md-card>
+
+    <md-card fxFlex="25%">
+      <md-card-subtitle>Port</md-card-subtitle>
+      <md-card-title class="color-primary">7700</md-card-title>
+    </md-card>
+  </div>
+
+  <h2 class="margin-top-x3">Reachabilities</h2>
+  <div fxLayout="row" fxLayoutWrap fxLayoutGap="10px" class="margin-top-x1">
+    <!-- TODO : Once bugs are fixed, put 50% and maybe change size (responsive) -->
+    <!-- https://github.com/angular/flex-layout/issues/106 -->
+    <!-- https://github.com/angular/flex-layout/issues/108 -->
+    <md-card fxFlex="48%" *ngFor="let i of [0, 1]" class="background-color-light-green-x3 background-color-hover-light-green-x2 cursor-pointer">
+      <md-card-subtitle>Container</md-card-subtitle>
+      <md-card-title>Container X{{ i }}</md-card-title>
+    </md-card>
+  </div>
+
+  <h2 class="margin-top-x3">System info</h2>
+  <md-card fxFlex>
+    Petals ESB µKernel 4.0.2 Petals Standalone Shared Memory 4.0.2 OpenJDK Runtime Environment 1.7.0_111-b01 Oracle Corporation
+    Linux 3.16.0-4-amd64 amd64
+  </md-card>
+</div>
