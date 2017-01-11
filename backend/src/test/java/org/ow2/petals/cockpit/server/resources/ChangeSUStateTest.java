@@ -116,8 +116,8 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("SU_STATE_CHANGE");
-                a.assertThat(e.data.get("id")).isEqualTo("40");
-                a.assertThat(e.data.get("state")).isEqualTo(MinServiceUnit.State.Stopped.name());
+                a.assertThat(e.data.get("id").asText()).isEqualTo("40");
+                a.assertThat(e.data.get("state").asText()).isEqualTo(MinServiceUnit.State.Stopped.name());
             });
         }
 
@@ -162,8 +162,8 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("SU_STATE_CHANGE");
-                a.assertThat(e.data.get("id")).isEqualTo("41");
-                a.assertThat(e.data.get("state")).isEqualTo(MinServiceUnit.State.Unloaded.name());
+                a.assertThat(e.data.get("id").asText()).isEqualTo("41");
+                a.assertThat(e.data.get("state").asText()).isEqualTo(MinServiceUnit.State.Unloaded.name());
             });
         }
 

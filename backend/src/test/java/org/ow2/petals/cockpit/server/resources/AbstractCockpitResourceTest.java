@@ -27,9 +27,7 @@ import static org.mockito.Mockito.withSettings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
@@ -75,6 +73,8 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
 import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 
 import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.common.test.TestUtil;
@@ -275,21 +275,22 @@ public class AbstractCockpitResourceTest {
         });
     }
 
-    protected static void expectWorkspaceEvent(EventInput eventInput, BiConsumer<WorkspaceEvent, SoftAssertions> c) {
+    protected static void expectWorkspaceEvent(EventInput eventInput,
+            BiConsumer<RawWorkspaceChange, SoftAssertions> c) {
         expectEvent(eventInput, (e, a) -> {
             a.assertThat(e.getName()).isEqualTo("WORKSPACE_CHANGE");
-            WorkspaceEvent ev = e.readData(WorkspaceEvent.class);
+            RawWorkspaceChange ev = e.readData(RawWorkspaceChange.class);
             c.accept(ev, a);
         });
     }
 
-    public static class WorkspaceEvent {
+    public static class RawWorkspaceChange {
 
         @JsonProperty
         @NotEmpty
         public String event = "";
 
         @JsonProperty
-        public Map<?, ?> data = new HashMap<>();
+        public JsonNode data = NullNode.getInstance();
     }
 }

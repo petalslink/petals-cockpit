@@ -1,0 +1,4 @@
+class com/fasterxml/jackson/databind/node/NullNode
+getInstance
+ ()Lcom/fasterxml/jackson/databind/node/NullNode;
+ ()L1com/fasterxml/jackson/databind/node/NullNode;

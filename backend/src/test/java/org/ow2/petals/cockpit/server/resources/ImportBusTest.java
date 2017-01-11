@@ -114,8 +114,8 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("BUS_IMPORT_OK");
-                a.assertThat(e.data.get("id")).isEqualTo(post.getId());
-                a.assertThat(e.data.get("name")).isEqualTo(domain.getName());
+                a.assertThat(e.data.get("id").asText()).isEqualTo(post.getId());
+                a.assertThat(e.data.get("name").asText()).isEqualTo(domain.getName());
             });
         }
 
@@ -155,7 +155,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("BUS_IMPORT_ERROR");
-                a.assertThat(e.data.get("importError")).isEqualTo("Unknown Host");
+                a.assertThat(e.data.get("importError").asText()).isEqualTo("Unknown Host");
             });
         }
 
@@ -185,7 +185,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("BUS_IMPORT_ERROR");
-                a.assertThat((String) e.data.get("importError"))
+                a.assertThat(e.data.get("importError").asText())
                         .contains("Buses with not-single SU SAs are not supported");
             });
         }
