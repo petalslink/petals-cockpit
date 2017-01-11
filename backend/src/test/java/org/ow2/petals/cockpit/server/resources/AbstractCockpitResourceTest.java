@@ -250,18 +250,16 @@ public class AbstractCockpitResourceTest {
 
     protected static void expectEvent(EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {
         SoftAssertions sa = new SoftAssertions();
-        if (!eventInput.isClosed()) {
-            // TODO add timeout
-            final InboundEvent inboundEvent = eventInput.read();
-            if (inboundEvent == null) {
-                // connection has been closed
-                return;
-            }
+        assertThat(eventInput.isClosed()).isEqualTo(false);
 
-            c.accept(inboundEvent, sa);
+        // TODO add timeout
+        final InboundEvent inboundEvent = eventInput.read();
 
-            sa.assertAll();
-        }
+        assertThat(inboundEvent).isNotNull();
+
+        c.accept(inboundEvent, sa);
+
+        sa.assertAll();
     }
 
     protected static void expectWorkspaceTree(EventInput eventInput) {
