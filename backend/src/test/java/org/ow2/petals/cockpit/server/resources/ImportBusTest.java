@@ -27,6 +27,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.sse.EventInput;
+import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -99,8 +100,8 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
     @Test
     public void testImportBusOk() {
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
-                .get(EventInput.class)) {
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceTree(eventInput);
 
@@ -141,8 +142,8 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
     public void testImportBusError() {
         String incorrectHost = "host2";
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
-                .get(EventInput.class)) {
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceTree(eventInput);
 
@@ -170,8 +171,8 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         petals.registerArtifact(
                 new ServiceAssembly("sa", new ServiceUnit("su1", "comp"), new ServiceUnit("su2", "comp")), container);
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
-                .get(EventInput.class)) {
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceTree(eventInput);
 

@@ -19,7 +19,6 @@ package org.ow2.petals.cockpit.server.resources;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.sse.EventInput;
@@ -42,7 +41,7 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
     @Test
     public void getNonExistingWorkspaceNotFound() {
         // TODO check assumptions
-        Response get = resources.getJerseyTest().target("/workspaces/3").request(MediaType.APPLICATION_JSON_TYPE).get();
+        Response get = resources.getJerseyTest().target("/workspaces/3").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }
@@ -59,7 +58,7 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
     @Test
     public void getWorkspaceForbidden() {
         // TODO check assumptions
-        Response get = resources.getJerseyTest().target("/workspaces/2").request(MediaType.APPLICATION_JSON_TYPE).get();
+        Response get = resources.getJerseyTest().target("/workspaces/2").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -76,8 +75,7 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
     @Test
     public void getExistingWorkspace() {
         // TODO check assumptions
-        WorkspaceTree tree = resources.getJerseyTest().target("/workspaces/1").request(MediaType.APPLICATION_JSON_TYPE)
-                .get(WorkspaceTree.class);
+        WorkspaceTree tree = resources.getJerseyTest().target("/workspaces/1").request().get(WorkspaceTree.class);
 
         assertTree(tree);
 
@@ -88,8 +86,8 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
     @Test
     public void getExistingWorkspaceEvent() {
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
-                .get(EventInput.class)) {
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
             expectWorkspaceTree(eventInput, (t, a) -> assertTree(t));
         }
 

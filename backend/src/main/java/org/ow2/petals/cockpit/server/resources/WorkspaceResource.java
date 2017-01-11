@@ -81,7 +81,7 @@ public class WorkspaceResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + ";qs=1")
     @Valid
     public WorkspaceTree get(@Pac4JProfile CockpitProfile profile) {
 
@@ -104,7 +104,7 @@ public class WorkspaceResource {
      * Produces {@link WorkspaceEvent}
      */
     @GET
-    @Produces(SseFeature.SERVER_SENT_EVENTS)
+    @Produces(SseFeature.SERVER_SENT_EVENTS + ";qs=0.5")
     public EventOutput sse(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
         // TODO ACL is done by actor for now
         EventOutput eo = as.call(wsId, new NewWorkspaceClient(profile.getUser().getUsername()))

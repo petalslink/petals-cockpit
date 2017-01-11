@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.media.sse.EventInput;
+import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -103,8 +104,8 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
                 .get(ServiceUnitOverview.class);
         assertThat(get1.state).isEqualTo(MinServiceUnit.State.Started);
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
-                .get(EventInput.class)) {
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceTree(eventInput);
 
@@ -149,8 +150,8 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
                 .get(ServiceUnitOverview.class);
         assertThat(get1.state).isEqualTo(MinServiceUnit.State.Stopped);
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
-                .get(EventInput.class)) {
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceTree(eventInput);
 
