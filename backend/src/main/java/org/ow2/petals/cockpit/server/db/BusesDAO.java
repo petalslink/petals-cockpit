@@ -22,11 +22,10 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.resources.ComponentsResource.MinComponent;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.InvalidPetalsBus;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
+import org.ow2.petals.cockpit.server.resources.WorkspaceContent;
+import org.ow2.petals.cockpit.server.resources.WorkspaceContent.InvalidPetalsBus;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.BindBean;
@@ -81,8 +80,8 @@ public abstract class BusesDAO {
 
     @SqlUpdate("insert into components (container_id,name,state,type)" + " values (:cId,:n,:s,:t)")
     @GetGeneratedKeys
-    public abstract long createComponent(@Bind("n") String name, @Bind("s") MinComponent.State state,
-            @Bind("t") MinComponent.Type type, @Bind("cId") long cId);
+    public abstract long createComponent(@Bind("n") String name, @Bind("s") ComponentMin.State state,
+            @Bind("t") ComponentMin.Type type, @Bind("cId") long cId);
 
     @SqlQuery("select cp.*, uw.username as acl from components cp"
             + " left join containers c on c.id = cp.container_id"
@@ -99,7 +98,7 @@ public abstract class BusesDAO {
 
     @SqlUpdate("insert into serviceunits (component_id,name,state,sa_name)" + " values (:cId,:n,:s,:sa)")
     @GetGeneratedKeys
-    public abstract long createServiceUnit(@Bind("n") String name, @Bind("s") MinServiceUnit.State state,
+    public abstract long createServiceUnit(@Bind("n") String name, @Bind("s") ServiceUnitMin.State state,
             @Bind("cId") long cId, @Bind("sa") String saName);
 
     @SqlQuery("select su.*, cp.container_id, uw.username as acl from serviceunits su"
@@ -119,15 +118,15 @@ public abstract class BusesDAO {
     public abstract List<DbServiceUnit> getServiceUnitByComponent(@BindBean("c") DbComponent c);
 
     @SqlUpdate("update serviceunits set state = :s where id = :suId")
-    public abstract int updateServiceUnitState(@Bind("suId") long su, @Bind("s") MinServiceUnit.State state);
+    public abstract int updateServiceUnitState(@Bind("suId") long su, @Bind("s") ServiceUnitMin.State state);
 
     @SqlUpdate("delete from serviceunits where id = :id")
     public abstract int removeServiceUnit(@Bind("id") long id);
 
     @Transaction
-    public BusTree saveImport(long bId, Domain topology) {
+    public WorkspaceContent saveImport(long bId, Domain topology) {
         try {
-            return WorkspaceTree.buildAndSaveToDatabase(this, bId, topology);
+            return WorkspaceContent.buildAndSaveToDatabase(this, bId, topology);
         } catch (InvalidPetalsBus e) {
             // TODO handle that better
             throw new RuntimeException(e);
@@ -284,14 +283,14 @@ public abstract class BusesDAO {
 
         public final String name;
 
-        public final MinComponent.State state;
+        public final ComponentMin.State state;
 
-        public final MinComponent.Type type;
+        public final ComponentMin.Type type;
 
         @Nullable
         public final String acl;
 
-        public DbComponent(long id, String name, MinComponent.State state, MinComponent.Type type,
+        public DbComponent(long id, String name, ComponentMin.State state, ComponentMin.Type type,
                 @Nullable String acl) {
             this.id = id;
             this.name = name;
@@ -309,8 +308,8 @@ public abstract class BusesDAO {
             @Override
             public DbComponent map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                 return new DbComponent(r.getLong("id"), r.getString("name"),
-                        MinComponent.State.valueOf(r.getString("state")),
-                        MinComponent.Type.valueOf(r.getString("type")), r.getString("acl"));
+                        ComponentMin.State.valueOf(r.getString("state")),
+                        ComponentMin.Type.valueOf(r.getString("type")), r.getString("acl"));
 
             }
         }
@@ -322,7 +321,7 @@ public abstract class BusesDAO {
 
         public final String name;
 
-        public final MinServiceUnit.State state;
+        public final ServiceUnitMin.State state;
 
         public final String saName;
 
@@ -331,7 +330,7 @@ public abstract class BusesDAO {
         @Nullable
         public final String acl;
 
-        public DbServiceUnit(long id, String name, MinServiceUnit.State state, String saName, long containerId,
+        public DbServiceUnit(long id, String name, ServiceUnitMin.State state, String saName, long containerId,
                 @Nullable String acl) {
             this.id = id;
             this.name = name;
@@ -346,7 +345,7 @@ public abstract class BusesDAO {
             @Override
             public DbServiceUnit map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                 return new DbServiceUnit(r.getLong("id"), r.getString("name"),
-                        MinServiceUnit.State.valueOf(r.getString("state")), r.getString("sa_name"),
+                        ServiceUnitMin.State.valueOf(r.getString("state")), r.getString("sa_name"),
                         r.getLong("container_id"), r.getString("acl"));
 
             }

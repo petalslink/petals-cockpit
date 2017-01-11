@@ -16,6 +16,8 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import java.util.Collections;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -46,15 +48,16 @@ import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit.State;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin.State;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
+import org.ow2.petals.cockpit.server.resources.WorkspacesResource.MinWorkspace;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 @RequestScoped
 @Path("/workspaces/{wsId}")
@@ -83,7 +86,7 @@ public class WorkspaceResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";qs=1")
     @Valid
-    public WorkspaceTree get(@Pac4JProfile CockpitProfile profile) {
+    public WorkspaceFullContent get(@Pac4JProfile CockpitProfile profile) {
 
         DbWorkspace ws = workspaces.getWorkspaceById(wsId, profile.getUser().username);
 
@@ -95,13 +98,13 @@ public class WorkspaceResource {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
-        WorkspaceTree tree = WorkspaceTree.buildFromDatabase(buses, ws);
-        users.saveLastWorkspace(profile.getUser(), wsId);
-        return tree;
+        WorkspaceContent content = WorkspaceContent.buildFromDatabase(buses, ws);
+        users.saveLastWorkspace(profile.getUser(), ws.id);
+        return new WorkspaceFullContent(new MinWorkspace(ws.id, ws.name), content);
     }
 
     /**
-     * Produces {@link WorkspaceEvent}
+     * Produces {@link WorkspaceChange}
      */
     @GET
     @Produces(SseFeature.SERVER_SENT_EVENTS + ";qs=0.5")
@@ -256,7 +259,7 @@ public class WorkspaceResource {
 
         @NotNull
         @JsonProperty
-        public final MinServiceUnit.State state;
+        public final ServiceUnitMin.State state;
 
         @JsonCreator
         public NewSUState(@JsonProperty("id") long id, @JsonProperty("state") State state) {
@@ -286,7 +289,30 @@ public class WorkspaceResource {
         }
     }
 
-    public static class WorkspaceEvent {
+    public static class WorkspaceFullContent {
+
+        @Valid
+        @JsonProperty
+        public final MinWorkspace workspace;
+
+        @Valid
+        @JsonUnwrapped
+        public final WorkspaceContent content;
+
+        public WorkspaceFullContent(MinWorkspace workspace, WorkspaceContent content) {
+            this.content = content;
+            this.workspace = workspace;
+        }
+
+        @JsonCreator
+        private WorkspaceFullContent() {
+            // jackson will inject values itself (because of @JsonUnwrapped)
+            this(new MinWorkspace(0, ""), new WorkspaceContent(Collections.emptyMap(), Collections.emptyMap(),
+                    Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap()));
+        }
+    }
+
+    public static class WorkspaceChange {
 
         public enum Type {
             BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, BUS_DELETED
@@ -298,25 +324,25 @@ public class WorkspaceResource {
         @JsonProperty
         public final Object data;
 
-        public WorkspaceEvent(Type event, Object data) {
+        public WorkspaceChange(Type event, Object data) {
             this.event = event;
             this.data = data;
         }
 
-        public static WorkspaceEvent busImportError(BusInError bus) {
-            return new WorkspaceEvent(Type.BUS_IMPORT_ERROR, bus);
+        public static WorkspaceChange busImportError(BusInError bus) {
+            return new WorkspaceChange(Type.BUS_IMPORT_ERROR, bus);
         }
 
-        public static WorkspaceEvent busImportOk(BusTree bus) {
-            return new WorkspaceEvent(Type.BUS_IMPORT_OK, bus);
+        public static WorkspaceChange busImportOk(WorkspaceContent bus) {
+            return new WorkspaceChange(Type.BUS_IMPORT_OK, bus);
         }
 
-        public static WorkspaceEvent suStateChange(NewSUState ns) {
-            return new WorkspaceEvent(Type.SU_STATE_CHANGE, ns);
+        public static WorkspaceChange suStateChange(NewSUState ns) {
+            return new WorkspaceChange(Type.SU_STATE_CHANGE, ns);
         }
 
-        public static WorkspaceEvent busDeleted(BusDeleted bd) {
-            return new WorkspaceEvent(Type.BUS_DELETED, bd);
+        public static WorkspaceChange busDeleted(BusDeleted bd) {
+            return new WorkspaceChange(Type.BUS_DELETED, bd);
         }
 
         @Override
@@ -329,9 +355,9 @@ public class WorkspaceResource {
 
         @NotNull
         @JsonProperty
-        public final MinServiceUnit.State state;
+        public final ServiceUnitMin.State state;
 
-        public ChangeState(@JsonProperty("state") MinServiceUnit.State state) {
+        public ChangeState(@JsonProperty("state") ServiceUnitMin.State state) {
             this.state = state;
         }
     }

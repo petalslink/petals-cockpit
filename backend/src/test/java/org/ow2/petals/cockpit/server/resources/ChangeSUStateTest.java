@@ -45,7 +45,7 @@ import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ChangeState;
 
@@ -102,26 +102,26 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
         ServiceUnitOverview get1 = resources.getJerseyTest().target("/serviceunits/40").request()
                 .get(ServiceUnitOverview.class);
-        assertThat(get1.state).isEqualTo(MinServiceUnit.State.Started);
+        assertThat(get1.state).isEqualTo(ServiceUnitMin.State.Started);
 
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
-            expectWorkspaceTree(eventInput);
+            expectWorkspaceContent(eventInput);
 
             ServiceUnitOverview put = resources.getJerseyTest().target("/workspaces/1/serviceunits/40").request()
-                    .put(Entity.json(new ChangeState(MinServiceUnit.State.Stopped)), ServiceUnitOverview.class);
+                    .put(Entity.json(new ChangeState(ServiceUnitMin.State.Stopped)), ServiceUnitOverview.class);
 
-            assertThat(put.state).isEqualTo(MinServiceUnit.State.Stopped);
+            assertThat(put.state).isEqualTo(ServiceUnitMin.State.Stopped);
 
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("SU_STATE_CHANGE");
                 a.assertThat(e.data.get("id").asText()).isEqualTo("40");
-                a.assertThat(e.data.get("state").asText()).isEqualTo(MinServiceUnit.State.Stopped.name());
+                a.assertThat(e.data.get("state").asText()).isEqualTo(ServiceUnitMin.State.Stopped.name());
             });
         }
 
-        verify(buses).updateServiceUnitState(40, MinServiceUnit.State.Stopped);
+        verify(buses).updateServiceUnitState(40, ServiceUnitMin.State.Stopped);
         verify(buses, times(0)).updateServiceUnitState(eq(41), any());
     }
 
@@ -134,7 +134,7 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
                 "anotheruser");
 
         Response put = resources.getJerseyTest().target("/workspaces/2/serviceunits/41").request()
-                .put(Entity.json(new ChangeState(MinServiceUnit.State.Stopped)));
+                .put(Entity.json(new ChangeState(ServiceUnitMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
 
@@ -148,22 +148,22 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
         ServiceUnitOverview get1 = resources.getJerseyTest().target("/serviceunits/41").request()
                 .get(ServiceUnitOverview.class);
-        assertThat(get1.state).isEqualTo(MinServiceUnit.State.Stopped);
+        assertThat(get1.state).isEqualTo(ServiceUnitMin.State.Stopped);
 
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
-            expectWorkspaceTree(eventInput);
+            expectWorkspaceContent(eventInput);
 
             ServiceUnitOverview put = resources.getJerseyTest().target("/workspaces/1/serviceunits/41").request()
-                    .put(Entity.json(new ChangeState(MinServiceUnit.State.Unloaded)), ServiceUnitOverview.class);
+                    .put(Entity.json(new ChangeState(ServiceUnitMin.State.Unloaded)), ServiceUnitOverview.class);
 
-            assertThat(put.state).isEqualTo(MinServiceUnit.State.Unloaded);
+            assertThat(put.state).isEqualTo(ServiceUnitMin.State.Unloaded);
 
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("SU_STATE_CHANGE");
                 a.assertThat(e.data.get("id").asText()).isEqualTo("41");
-                a.assertThat(e.data.get("state").asText()).isEqualTo(MinServiceUnit.State.Unloaded.name());
+                a.assertThat(e.data.get("state").asText()).isEqualTo(ServiceUnitMin.State.Unloaded.name());
             });
         }
 
@@ -176,12 +176,12 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
     public void changeSU1StateNoChange() {
         ServiceUnitOverview get1 = resources.getJerseyTest().target("/serviceunits/40").request()
                 .get(ServiceUnitOverview.class);
-        assertThat(get1.state).isEqualTo(MinServiceUnit.State.Started);
+        assertThat(get1.state).isEqualTo(ServiceUnitMin.State.Started);
 
         ServiceUnitOverview put = resources.getJerseyTest().target("/workspaces/1/serviceunits/40").request()
-                .put(Entity.json(new ChangeState(MinServiceUnit.State.Started)), ServiceUnitOverview.class);
+                .put(Entity.json(new ChangeState(ServiceUnitMin.State.Started)), ServiceUnitOverview.class);
 
-        assertThat(put.state).isEqualTo(MinServiceUnit.State.Started);
+        assertThat(put.state).isEqualTo(ServiceUnitMin.State.Started);
 
         verify(buses, times(0)).updateServiceUnitState(eq(40), any());
         verify(buses, times(0)).updateServiceUnitState(eq(41), any());
@@ -193,10 +193,10 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
         ServiceUnitOverview get1 = resources.getJerseyTest().target("/serviceunits/40").request()
                 .get(ServiceUnitOverview.class);
-        assertThat(get1.state).isEqualTo(MinServiceUnit.State.Started);
+        assertThat(get1.state).isEqualTo(ServiceUnitMin.State.Started);
 
         Response put = resources.getJerseyTest().target("/workspaces/1/serviceunits/40").request()
-                .put(Entity.json(new ChangeState(MinServiceUnit.State.Unloaded)));
+                .put(Entity.json(new ChangeState(ServiceUnitMin.State.Unloaded)));
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
 

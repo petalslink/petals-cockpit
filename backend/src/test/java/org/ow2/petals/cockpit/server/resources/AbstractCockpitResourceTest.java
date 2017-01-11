@@ -65,8 +65,9 @@ import org.ow2.petals.cockpit.server.db.UsersDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
-import org.ow2.petals.cockpit.server.resources.ComponentsResource.MinComponent;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -176,8 +177,8 @@ public class AbstractCockpitResourceTest {
                 List<DbComponent> comps = new ArrayList<>();
                 for (Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>> comp : c._3) {
                     DbComponent compDb = new DbComponent(comp._1, comp._2.getName(),
-                            MinComponent.State.from(comp._2.getState()),
-                            MinComponent.Type.from(comp._2.getComponentType()), null);
+                            ComponentMin.State.from(comp._2.getState()),
+                            ComponentMin.Type.from(comp._2.getComponentType()), null);
 
                     List<DbServiceUnit> sus = new ArrayList<>();
                     for (Tuple2<Long, ServiceAssembly> su : comp._3) {
@@ -186,7 +187,7 @@ public class AbstractCockpitResourceTest {
                         ServiceUnit sasu = sasus.get(0);
                         assert sasu != null;
                         DbServiceUnit suDb = new DbServiceUnit(su._1, sasu.getName(),
-                                MinServiceUnit.State.from(su._2.getState()), su._2.getName(), c._1, null);
+                                ServiceUnitMin.State.from(su._2.getState()), su._2.getName(), c._1, null);
 
                         sus.add(suDb);
                         when(buses.getServiceUnitById(eq(suDb.id), any()))
@@ -247,15 +248,16 @@ public class AbstractCockpitResourceTest {
         sa.assertAll();
     }
 
-    protected static void expectWorkspaceTree(EventInput eventInput) {
-        expectWorkspaceTree(eventInput, (t, a) -> {
+    protected static void expectWorkspaceContent(EventInput eventInput) {
+        expectWorkspaceContent(eventInput, (t, a) -> {
         });
     }
 
-    protected static void expectWorkspaceTree(EventInput eventInput, BiConsumer<WorkspaceTree, SoftAssertions> c) {
+    protected static void expectWorkspaceContent(EventInput eventInput,
+            BiConsumer<WorkspaceFullContent, SoftAssertions> c) {
         expectEvent(eventInput, (e, a) -> {
-            a.assertThat(e.getName()).isEqualTo("WORKSPACE_TREE");
-            WorkspaceTree ev = e.readData(WorkspaceTree.class);
+            a.assertThat(e.getName()).isEqualTo("WORKSPACE_CONTENT");
+            WorkspaceFullContent ev = e.readData(WorkspaceFullContent.class);
             c.accept(ev, a);
         });
     }

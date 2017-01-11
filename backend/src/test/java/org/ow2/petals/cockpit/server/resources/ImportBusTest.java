@@ -47,6 +47,7 @@ import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
@@ -103,7 +104,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
-            expectWorkspaceTree(eventInput);
+            expectWorkspaceContent(eventInput);
 
             BusInProgress post = resources.getJerseyTest()
                     .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),
@@ -114,8 +115,9 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("BUS_IMPORT_OK");
-                a.assertThat(e.data.get("id").asText()).isEqualTo(post.getId());
-                a.assertThat(e.data.get("name").asText()).isEqualTo(domain.getName());
+                JsonNode bus = e.data.get("buses").get("byId").get("4");
+                a.assertThat(bus.get("id").asText()).isEqualTo(post.getId());
+                a.assertThat(bus.get("name").asText()).isEqualTo(domain.getName());
             });
         }
 
@@ -148,7 +150,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
-            expectWorkspaceTree(eventInput);
+            expectWorkspaceContent(eventInput);
 
             BusInProgress post = resources.getJerseyTest().target("/workspaces/1/buses").request()
                     .post(Entity.json(new NewBus(incorrectHost, containerPort, container.getJmxUsername(),
@@ -177,7 +179,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
-            expectWorkspaceTree(eventInput);
+            expectWorkspaceContent(eventInput);
 
             BusInProgress post = resources.getJerseyTest()
                     .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),

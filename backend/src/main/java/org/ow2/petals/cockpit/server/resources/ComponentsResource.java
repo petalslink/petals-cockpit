@@ -68,7 +68,7 @@ public class ComponentsResource {
         return new ComponentOverview(comp.id, comp.name, comp.state, comp.type);
     }
 
-    public abstract static class MinComponent {
+    public static class ComponentMin {
 
         public enum State {
             Unloaded, Loaded, Shutdown, Stopped, Started, Unknown;
@@ -121,7 +121,9 @@ public class ComponentsResource {
         @JsonProperty
         public final Type type;
 
-        public MinComponent(long id, String name, State state, Type type) {
+        @JsonCreator
+        public ComponentMin(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("state") State state, @JsonProperty("type") Type type) {
             this.id = id;
             this.name = name;
             this.state = state;
@@ -134,7 +136,7 @@ public class ComponentsResource {
         }
     }
 
-    public static class ComponentOverview extends MinComponent {
+    public static class ComponentOverview extends ComponentMin {
 
         @JsonCreator
         public ComponentOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,

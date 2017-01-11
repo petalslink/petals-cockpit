@@ -90,7 +90,7 @@ public class WorkspacesResource {
         @JsonProperty
         public final String name;
 
-        public MinWorkspace(long id, String name) {
+        public MinWorkspace(@JsonProperty("id") long id, @JsonProperty("name") String name) {
             this.id = id;
             this.name = name;
         }
