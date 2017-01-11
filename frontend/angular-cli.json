@@ -1,6 +1,6 @@
 {
   "project": {
-    "version": "1.0.0-beta.21",
+    "version": "1.0.0-beta.24",
     "name": "petals-cockpit"
   },
   "apps": [
@@ -9,10 +9,8 @@
       "outDir": "dist",
       "assets": [
         "assets",
-        "mocks-json",
         "favicon.ico"
       ],
-      "mocks-json": "mocks-json",
       "index": "index.html",
       "main": "main.ts",
       "test": "test.ts",
@@ -21,12 +19,9 @@
       "mobile": false,
       "styles": [
         "../node_modules/material-design-icons/iconfont/material-icons.css",
-        "styles.scss",
-        "custom-theme.scss"
+        "styles.scss"
       ],
-      "scripts": [
-        "../node_modules/hammerjs/hammer.min.js"
-      ],
+      "scripts": [],
       "environments": {
         "source": "environments/environment.ts",
         "dev": "environments/environment.ts",
