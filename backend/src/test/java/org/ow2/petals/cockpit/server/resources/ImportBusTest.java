@@ -27,6 +27,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.sse.EventInput;
+import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,6 +47,7 @@ import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
@@ -99,10 +101,10 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
     @Test
     public void testImportBusOk() {
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
-                .get(EventInput.class)) {
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
-            expectWorkspaceTree(eventInput);
+            expectWorkspaceContent(eventInput);
 
             BusInProgress post = resources.getJerseyTest()
                     .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),
@@ -113,15 +115,19 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("BUS_IMPORT_OK");
-                a.assertThat(e.data.get("id")).isEqualTo(post.getId());
-                a.assertThat(e.data.get("name")).isEqualTo(domain.getName());
+                JsonNode bus = e.data.get("buses").get("byId").get("4");
+                a.assertThat(bus.get("id").asText()).isEqualTo(post.getId());
+                a.assertThat(bus.get("name").asText()).isEqualTo(domain.getName());
             });
         }
 
-        // let's just ensure that the bus is created and updated in the db
+        // let's just ensure that the bus is created,
+        // then that the container is also created
+        // and finally the bus is updated in the db
         verify(buses).createBus(container.getHost(), containerPort, container.getJmxUsername(),
                 container.getJmxPassword(), "phrase", 1);
-        verify(buses).saveImport(eq(4L), any());
+        verify(buses).createContainer(container.getContainerName(), container.getHost(), containerPort,
+                container.getJmxUsername(), container.getJmxPassword(), 4);
         verify(buses).updateBus(4, domain.getName());
     }
 
@@ -141,10 +147,10 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
     public void testImportBusError() {
         String incorrectHost = "host2";
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
-                .get(EventInput.class)) {
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
-            expectWorkspaceTree(eventInput);
+            expectWorkspaceContent(eventInput);
 
             BusInProgress post = resources.getJerseyTest().target("/workspaces/1/buses").request()
                     .post(Entity.json(new NewBus(incorrectHost, containerPort, container.getJmxUsername(),
@@ -154,7 +160,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("BUS_IMPORT_ERROR");
-                a.assertThat(e.data.get("importError")).isEqualTo("Unknown Host");
+                a.assertThat(e.data.get("importError").asText()).isEqualTo("Unknown Host");
             });
         }
 
@@ -170,10 +176,10 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         petals.registerArtifact(
                 new ServiceAssembly("sa", new ServiceUnit("su1", "comp"), new ServiceUnit("su2", "comp")), container);
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
-                .get(EventInput.class)) {
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
-            expectWorkspaceTree(eventInput);
+            expectWorkspaceContent(eventInput);
 
             BusInProgress post = resources.getJerseyTest()
                     .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),
@@ -184,7 +190,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("BUS_IMPORT_ERROR");
-                a.assertThat((String) e.data.get("importError"))
+                a.assertThat(e.data.get("importError").asText())
                         .contains("Buses with not-single SU SAs are not supported");
             });
         }

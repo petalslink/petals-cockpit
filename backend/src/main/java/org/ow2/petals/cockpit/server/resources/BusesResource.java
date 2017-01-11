@@ -67,7 +67,7 @@ public class BusesResource {
         return new BusOverview(bus.id, bus.name);
     }
 
-    public static class MinBus {
+    public static class BusMin {
 
         @Min(1)
         public final long id;
@@ -77,7 +77,7 @@ public class BusesResource {
         public final String name;
 
         @JsonCreator
-        public MinBus(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+        public BusMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
             this.id = id;
             this.name = name;
         }
@@ -88,7 +88,7 @@ public class BusesResource {
         }
     }
 
-    public static class BusOverview extends MinBus {
+    public static class BusOverview extends BusMin {
 
         @JsonCreator
         public BusOverview(@JsonProperty("id") long id, @JsonProperty("name") String name) {

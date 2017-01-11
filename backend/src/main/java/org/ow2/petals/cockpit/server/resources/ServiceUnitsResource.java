@@ -66,7 +66,7 @@ public class ServiceUnitsResource {
         return new ServiceUnitOverview(su.id, su.name, su.state, su.saName);
     }
 
-    public abstract static class MinServiceUnit {
+    public static class ServiceUnitMin {
         public enum State {
             Unloaded, Started, Stopped, Shutdown, Unknown;
 
@@ -103,7 +103,8 @@ public class ServiceUnitsResource {
         @JsonProperty
         public final String saName;
 
-        public MinServiceUnit(long id, String name, State state, String saName) {
+        public ServiceUnitMin(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("state") State state, @JsonProperty("saName") String saName) {
             this.id = id;
             this.name = name;
             this.state = state;
@@ -116,7 +117,7 @@ public class ServiceUnitsResource {
         }
     }
 
-    public static class ServiceUnitOverview extends MinServiceUnit {
+    public static class ServiceUnitOverview extends ServiceUnitMin {
 
         public ServiceUnitOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
                 @JsonProperty("state") State state, @JsonProperty("saName") String saName) {

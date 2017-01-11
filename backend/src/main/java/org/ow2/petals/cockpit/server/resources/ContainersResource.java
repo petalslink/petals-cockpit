@@ -109,7 +109,7 @@ public class ContainersResource {
         }
     }
 
-    public abstract static class MinContainer {
+    public static class ContainerMin {
 
         @Min(1)
         public final long id;
@@ -118,7 +118,8 @@ public class ContainersResource {
         @JsonProperty
         public final String name;
 
-        public MinContainer(long id, String name) {
+        @JsonCreator
+        public ContainerMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
             this.id = id;
             this.name = name;
         }
@@ -129,7 +130,7 @@ public class ContainersResource {
         }
     }
 
-    public static class ContainerOverview extends MinContainer {
+    public static class ContainerOverview extends ContainerMin {
 
         @NotEmpty
         @JsonProperty

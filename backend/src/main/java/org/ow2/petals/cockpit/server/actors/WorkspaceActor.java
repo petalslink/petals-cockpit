@@ -40,18 +40,18 @@ import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
 import org.ow2.petals.cockpit.server.db.BusesDAO.DbServiceUnit;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.MinServiceUnit.State;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin.State;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
+import org.ow2.petals.cockpit.server.resources.WorkspaceContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInError;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewBus;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewSUState;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceChange;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
+import org.ow2.petals.cockpit.server.resources.WorkspacesResource.MinWorkspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +115,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                     if (deleted < 1) {
                         return Either.left(Status.NOT_FOUND);
                     } else {
-                        broadcast(WorkspaceEvent.busDeleted(new BusDeleted(b.bId)));
+                        broadcast(WorkspaceChange.busDeleted(new BusDeleted(b.bId)));
                         return Either.right(null);
                     }
                 });
@@ -142,7 +142,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     private Either<Status, EventOutput> addBroadcastClient(NewWorkspaceClient nc)
             throws IOException, SuspendExecution, InterruptedException {
 
-        Either<Status, WorkspaceTree> tree = runDAO(() -> {
+        Either<Status, WorkspaceFullContent> content = runDAO(() -> {
 
             DbWorkspace ws = workspaces.getWorkspaceById(wId, nc.user);
 
@@ -155,16 +155,17 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 return Either.left(Status.FORBIDDEN);
             }
 
-            return Either.right(WorkspaceTree.buildFromDatabase(buses, ws));
+            return Either.right(new WorkspaceFullContent(new MinWorkspace(ws.id, ws.name),
+                    WorkspaceContent.buildFromDatabase(buses, ws)));
         });
 
-        if (tree.isLeft()) {
-            return Either.left(tree.getLeft());
+        if (content.isLeft()) {
+            return Either.left(content.getLeft());
         } else {
             EventOutput eo = new EventOutput();
 
-            eo.write(new OutboundEvent.Builder().name("WORKSPACE_TREE").mediaType(MediaType.APPLICATION_JSON_TYPE)
-                    .data(tree.get()).build());
+            eo.write(new OutboundEvent.Builder().name("WORKSPACE_CONTENT").mediaType(MediaType.APPLICATION_JSON_TYPE)
+                    .data(content.get()).build());
 
             broadcaster.add(eo);
 
@@ -175,7 +176,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     /**
      * This centralises all changes to {@link #tree} and {@link #wsBuses}.
      */
-    private void broadcast(WorkspaceEvent event) {
+    private void broadcast(WorkspaceChange event) {
         OutboundEvent oe = new OutboundEvent.Builder().name("WORKSPACE_CHANGE")
                 .mediaType(MediaType.APPLICATION_JSON_TYPE).data(event).build();
         broadcaster.broadcast(oe);
@@ -197,20 +198,20 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         // we use a fiber to let the actor handles other message during bus import
         new Fiber<>(() -> {
-            WorkspaceEvent ev = doImportBus(bId, nb);
+            WorkspaceChange ev = doImportBus(bId, nb);
             self().send(new WorkspaceEventMsg(ev));
         }).start();
 
         return Either.right(new BusInProgress(bId, nb.ip, nb.port, nb.username));
     }
 
-    private WorkspaceEvent doImportBus(long bId, NewBus bus) throws SuspendExecution, InterruptedException {
+    private WorkspaceChange doImportBus(long bId, NewBus bus) throws SuspendExecution, InterruptedException {
         try {
             final Domain topology = getTopology(bus);
 
-            final BusTree bTree = runDAO(() -> buses.saveImport(bId, topology));
+            final WorkspaceContent content = runDAO(() -> buses.saveImport(bId, topology));
 
-            return WorkspaceEvent.busImportOk(bTree);
+            return WorkspaceChange.busImportOk(content);
         } catch (Exception e) {
             String m = e.getMessage();
             String message = m != null ? m : e.getClass().getName();
@@ -220,7 +221,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
             runDAO(() -> buses.saveError(bId, message));
 
-            return WorkspaceEvent.busImportError(new BusInError(bId, bus.ip, bus.port, bus.username, message));
+            return WorkspaceChange.busImportError(new BusInError(bId, bus.ip, bus.port, bus.username, message));
         }
     }
 
@@ -242,13 +243,13 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             DbContainer db = runDAO(() -> buses.getContainerById(su.containerId, null));
             assert db != null;
             try {
-                SUTree res = runAdmin(db.ip, db.port, db.username, db.password, petals -> {
+                ServiceUnitMin res = runAdmin(db.ip, db.port, db.username, db.password, petals -> {
                     ArtifactAdministration aa = petals.newArtifactAdministration();
                     Artifact a = aa.getArtifact(ServiceAssembly.TYPE, su.saName, null);
                     assert a instanceof ServiceAssembly;
                     ServiceAssembly sa = (ServiceAssembly) a;
                     State newState = changeSAState(petals, sa, change.newState);
-                    return new SUTree(su.id, su.name, newState, su.saName);
+                    return new ServiceUnitMin(su.id, su.name, newState, su.saName);
                 });
                 assert res != null;
 
@@ -261,26 +262,26 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private void serviceUnitStateUpdated(SUTree su) throws SuspendExecution, InterruptedException {
+    private void serviceUnitStateUpdated(ServiceUnitMin su) throws SuspendExecution, InterruptedException {
         // TODO error handling???
-        runDAO(() -> su.state != MinServiceUnit.State.Unloaded ? buses.updateServiceUnitState(su.id, su.state)
+        runDAO(() -> su.state != ServiceUnitMin.State.Unloaded ? buses.updateServiceUnitState(su.id, su.state)
                 : buses.removeServiceUnit(su.id));
-        self().send(new WorkspaceEventMsg(WorkspaceEvent.suStateChange(new NewSUState(su.id, su.state))));
+        self().send(new WorkspaceEventMsg(WorkspaceChange.suStateChange(new NewSUState(su.id, su.state))));
     }
 
     /**
      * 
-     * Note : petals admin does not expose a way to go to shutdown (except from {@link MinServiceUnit.State#Unloaded},
+     * Note : petals admin does not expose a way to go to shutdown (except from {@link ServiceUnitMin.State#Unloaded},
      * but we don't support it yet!)
      */
-    private boolean isSAStateTransitionOk(DbServiceUnit su, MinServiceUnit.State to) {
+    private boolean isSAStateTransitionOk(DbServiceUnit su, ServiceUnitMin.State to) {
         switch (su.state) {
             case Shutdown:
-                return to == MinServiceUnit.State.Unloaded || to == MinServiceUnit.State.Started;
+                return to == ServiceUnitMin.State.Unloaded || to == ServiceUnitMin.State.Started;
             case Started:
-                return to == MinServiceUnit.State.Stopped;
+                return to == ServiceUnitMin.State.Stopped;
             case Stopped:
-                return to == MinServiceUnit.State.Started || to == MinServiceUnit.State.Unloaded;
+                return to == ServiceUnitMin.State.Started || to == ServiceUnitMin.State.Unloaded;
             default:
                 LOG.warn("Impossible case for state transition check from {} to {} for SU {} ({})", su.state, to,
                         su.name, su.id);
@@ -288,8 +289,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private MinServiceUnit.State changeSAState(PetalsAdministration petals, ServiceAssembly sa,
-            MinServiceUnit.State desiredState) throws ArtifactAdministrationException {
+    private ServiceUnitMin.State changeSAState(PetalsAdministration petals, ServiceAssembly sa,
+            ServiceUnitMin.State desiredState) throws ArtifactAdministrationException {
         ServiceAssemblyLifecycle sal = petals.newArtifactLifecycleFactory().createServiceAssemblyLifecycle(sa);
         switch (desiredState) {
             case Unloaded:
@@ -305,12 +306,12 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 LOG.warn("Impossible case for state transition from {} to {} for SA {} ({})", sa.getState(),
                         desiredState, sa.getName());
         }
-        if (desiredState != MinServiceUnit.State.Unloaded) {
+        if (desiredState != ServiceUnitMin.State.Unloaded) {
             sal.updateState();
-            return MinServiceUnit.State.from(sa.getState());
+            return ServiceUnitMin.State.from(sa.getState());
         } else {
             // we can't call updateState for this one, it will fail since it has been unloaded
-            return MinServiceUnit.State.Unloaded;
+            return ServiceUnitMin.State.Unloaded;
         }
     }
 
@@ -377,9 +378,9 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
     public static class WorkspaceEventMsg implements Msg {
 
-        final WorkspaceEvent event;
+        final WorkspaceChange event;
 
-        public WorkspaceEventMsg(WorkspaceEvent event) {
+        public WorkspaceEventMsg(WorkspaceChange event) {
             this.event = event;
         }
 

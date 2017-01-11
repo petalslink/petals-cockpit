@@ -19,7 +19,6 @@ package org.ow2.petals.cockpit.server.resources;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.sse.EventInput;
@@ -27,10 +26,11 @@ import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.BusTree;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ComponentTree;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.ContainerTree;
-import org.ow2.petals.cockpit.server.resources.WorkspaceTree.SUTree;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
+import org.ow2.petals.cockpit.server.resources.WorkspaceContent.BusFull;
+import org.ow2.petals.cockpit.server.resources.WorkspaceContent.ComponentFull;
+import org.ow2.petals.cockpit.server.resources.WorkspaceContent.ContainerFull;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 
@@ -42,7 +42,7 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
     @Test
     public void getNonExistingWorkspaceNotFound() {
         // TODO check assumptions
-        Response get = resources.getJerseyTest().target("/workspaces/3").request(MediaType.APPLICATION_JSON_TYPE).get();
+        Response get = resources.getJerseyTest().target("/workspaces/3").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }
@@ -59,7 +59,7 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
     @Test
     public void getWorkspaceForbidden() {
         // TODO check assumptions
-        Response get = resources.getJerseyTest().target("/workspaces/2").request(MediaType.APPLICATION_JSON_TYPE).get();
+        Response get = resources.getJerseyTest().target("/workspaces/2").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -76,10 +76,10 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
     @Test
     public void getExistingWorkspace() {
         // TODO check assumptions
-        WorkspaceTree tree = resources.getJerseyTest().target("/workspaces/1").request(MediaType.APPLICATION_JSON_TYPE)
-                .get(WorkspaceTree.class);
+        WorkspaceFullContent tree = resources.getJerseyTest().target("/workspaces/1").request()
+                .get(WorkspaceFullContent.class);
 
-        assertTree(tree);
+        assertContent(tree);
 
         // ensure that calling get workspace tree set the last workspace in the db
         verify(users).saveLastWorkspace(MockProfileParamValueFactoryProvider.ADMIN, 1);
@@ -88,52 +88,63 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
     @Test
     public void getExistingWorkspaceEvent() {
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1").request()
-                .get(EventInput.class)) {
-            expectWorkspaceTree(eventInput, (t, a) -> assertTree(t));
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+            expectWorkspaceContent(eventInput, (t, a) -> assertContent(t));
         }
 
         // ensure that calling get workspace tree set the last workspace in the db
         verify(users).saveLastWorkspace(MockProfileParamValueFactoryProvider.ADMIN, 1);
     }
 
-    private void assertTree(WorkspaceTree tree) {
-        assertThat(tree.id).isEqualTo(1);
-        assertThat(tree.name).isEqualTo("test");
-        assertThat(tree.buses).hasSize(1);
-        BusTree b = tree.buses.get(0);
+    private void assertContent(WorkspaceFullContent content) {
+        assertThat(content.workspace.id).isEqualTo(1);
+        assertThat(content.workspace.name).isEqualTo("test");
+
+        assertThat(content.content.buses.map).hasSize(1);
+        assertThat(content.content.containers.map).hasSize(3);
+        assertThat(content.content.components.map).hasSize(1);
+        assertThat(content.content.serviceUnits.map).hasSize(1);
+
+        BusFull b = content.content.buses.map.values().iterator().next();
         assert b != null;
-        assertThat(b.id).isEqualTo(10);
-        assertThat(b.name).isEqualTo(domain.getName());
+
+        assertThat(b.bus.id).isEqualTo(10);
+        assertThat(b.bus.name).isEqualTo(domain.getName());
         assertThat(b.containers).hasSize(3);
 
-        ContainerTree c1 = b.containers.get(0);
+        ContainerFull c1 = content.content.containers.map.get("20");
         assert c1 != null;
-        assertThat(c1.id).isEqualTo(20);
-        assertThat(c1.name).isEqualTo(container1.getContainerName());
+
+        assertThat(c1.container.id).isEqualTo(20);
+        assertThat(c1.container.name).isEqualTo(container1.getContainerName());
         assertThat(c1.components).hasSize(1);
 
-        ContainerTree c2 = b.containers.get(1);
+        ContainerFull c2 = content.content.containers.map.get("21");
         assert c2 != null;
-        assertThat(c2.id).isEqualTo(21);
-        assertThat(c2.name).isEqualTo(container2.getContainerName());
+
+        assertThat(c2.container.id).isEqualTo(21);
+        assertThat(c2.container.name).isEqualTo(container2.getContainerName());
         assertThat(c2.components).hasSize(0);
 
-        ContainerTree c3 = b.containers.get(2);
+        ContainerFull c3 = content.content.containers.map.get("22");
         assert c3 != null;
-        assertThat(c3.id).isEqualTo(22);
-        assertThat(c3.name).isEqualTo(container3.getContainerName());
+
+        assertThat(c3.container.id).isEqualTo(22);
+        assertThat(c3.container.name).isEqualTo(container3.getContainerName());
         assertThat(c3.components).hasSize(0);
 
-        ComponentTree comp = c1.components.get(0);
+        ComponentFull comp = content.content.components.map.get("30");
         assert comp != null;
-        assertThat(comp.id).isEqualTo(30);
-        assertThat(comp.name).isEqualTo(component.getName());
-        assertThat(comp.state.toString()).isEqualTo(component.getState().toString());
+
+        assertThat(comp.component.id).isEqualTo(30);
+        assertThat(comp.component.name).isEqualTo(component.getName());
+        assertThat(comp.component.state.toString()).isEqualTo(component.getState().toString());
         assertThat(comp.serviceUnits).hasSize(1);
 
-        SUTree su = comp.serviceUnits.get(0);
+        ServiceUnitMin su = content.content.serviceUnits.map.get("40");
         assert su != null;
+
         assertThat(su.id).isEqualTo(40);
         assertThat(su.name).isEqualTo(serviceUnit.getName());
         assertThat(su.state.toString()).isEqualTo(serviceAssembly.getState().toString());
