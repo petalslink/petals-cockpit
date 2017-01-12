@@ -1,13 +1,17 @@
+import { IserviceUnitsTable } from './../service-units/service-units.interface';
+import { IComponentsTable } from './../components/components.interface';
+import { IContainersTable } from './../containers/containers.interface';
+import { IUsersTable } from './../../../../../shared/interfaces/users.interface';
 import { IServiceUnit } from './../service-units/service-unit.interface';
 import { IComponent } from './../components/component.interface';
 import { IContainer } from './../containers/container.interface';
 import { IWorkspace } from './workspace.interface';
-import { IBuses } from './../buses/buses.interface';
+import { IBuses, IBusesTable } from './../buses/buses.interface';
 import { IBus } from './../buses/bus.interface';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IWorkspaces } from './workspaces.interface';
+import { IWorkspaces, IWorkspacesTable } from './workspaces.interface';
 import { IStore } from './../../../../../shared/interfaces/store.interface';
 
 export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspaces> {
@@ -43,17 +47,28 @@ export function getWorkspacesList() {
 // -----------------------------------------------------------
 
 export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspace> {
-  const sWorkspaces = store$.select((state: IStore) => state.workspaces);
-  const sUsers = store$.select((state: IStore) => state.users);
-  const sBuses = store$.select((state: IStore) => state.buses);
-  const sContainers = store$.select((state: IStore) => state.containers);
-  const sComponents = store$.select((state: IStore) => state.components);
-  const sServiceUnits = store$.select((state: IStore) => state.serviceUnits);
-
-  return sWorkspaces
-    .filter(workspaces => workspaces.selectedWorkspaceId !== '')
-    .withLatestFrom(sUsers, sBuses, sContainers, sComponents, sServiceUnits)
-    .map(([workspaces, users, buses, containers, components, serviceUnits]) => {
+  return store$.select(state => {
+    return {
+      workspaces: state.workspaces,
+      users: state.users,
+      buses: state.buses,
+      containers: state.containers,
+      components: state.components,
+      serviceUnits: state.serviceUnits
+    }
+  })
+    // as the object has a new reference every time,
+    // use distinctUntilChanged for performance
+    .distinctUntilChanged((p, n) =>
+      p.workspaces === n.workspaces &&
+      p.users === n.users &&
+      p.buses === n.buses &&
+      p.containers === n.containers &&
+      p.components === n.components &&
+      p.serviceUnits === n.serviceUnits
+    )
+    .filter(({ workspaces }) => workspaces.selectedWorkspaceId !== '')
+    .map(({workspaces, users, buses, containers, components, serviceUnits}) => {
       return <IWorkspace>{
         id: workspaces.byId[workspaces.selectedWorkspaceId].id,
         name: workspaces.byId[workspaces.selectedWorkspaceId].name,
