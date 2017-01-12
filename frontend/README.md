@@ -46,6 +46,13 @@ To get more help on the `angular-cli` use `ng --help` or go check out the [Angul
   https://github.com/angular/angular-cli/issues/3204
   https://github.com/Meligy/angular/commit/167b1e3337247b9e93923403190b166382cc2c85
   Seems to work even if there's that error ... (working on a fix)
+  **TEMP Fix :**  
+  In file : node_modules/@angular/compiler-cli/src/ngtools_impl.js (L153)  
+  (in function _collectLoadChildren)  
+  Replace this line  
+    `if (r.loadChildren) {`
+  By
+    `if (r.loadChildren && typeof r.loadChildren === 'string') {`
 
 - Layout are bugged when using fxLayoutGap https://github.com/angular/flex-layout/issues/106 (should be merged in master soon)
 
