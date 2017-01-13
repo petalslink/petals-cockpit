@@ -69,7 +69,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
     )
     .filter(({ workspaces }) => workspaces.selectedWorkspaceId !== '')
     .map(({workspaces, users, buses, containers, components, serviceUnits}) => {
-      return <IWorkspace>{
+      return {
         id: workspaces.byId[workspaces.selectedWorkspaceId].id,
         name: workspaces.byId[workspaces.selectedWorkspaceId].name,
         selectedWorkspaceId: workspaces.selectedWorkspaceId,
@@ -81,6 +81,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
         users: {
           list: workspaces.byId[workspaces.selectedWorkspaceId].users.map(userId => users.byId[userId])
         },
+
         buses: {
           selectedBusId: buses.selectedBusId,
           importingBus: buses.importingBus,
@@ -88,6 +89,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
             return <IBus>{
               id: buses.byId[busId].id,
               name: buses.byId[busId].name,
+              isFolded: buses.byId[busId].isFolded || false,
 
               containers: {
                 selectedContainerId: containers.selectedContainerId,
@@ -95,6 +97,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                   return <IContainer>{
                     id: containers.byId[containerId].id,
                     name: containers.byId[containerId].name,
+                    isFolded: containers.byId[containerId].isFolded || false,
 
                     components: {
                       selectedComponentId: components.selectedComponentId,
@@ -102,11 +105,16 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                         return <IComponent>{
                           id: components.byId[componentId].id,
                           name: components.byId[componentId].name,
+                          isFolded: components.byId[componentId].isFolded || false,
 
                           serviceUnits: {
                             selectedServiceUnitId: serviceUnits.selectedServiceUnitId,
                             list: components.byId[componentId].serviceUnits.map(serviceUnitId => {
-                              return serviceUnits.byId[serviceUnitId];
+                              return {
+                                id: serviceUnits.byId[serviceUnitId].id,
+                                name: serviceUnits.byId[serviceUnitId].name,
+                                isFolded: serviceUnits.byId[serviceUnitId].isFolded || false
+                              };
                             })
                           }
                         };
@@ -135,23 +143,34 @@ export function _getCurrentTree(store$: Store<IStore>) {
       return workspace.buses.list.map(bus => {
         return {
           id: bus.id,
+          typeId: 'busId',
           name: bus.name,
           link: `${baseUrl}/buses/${bus.id}`,
+          isFolded: bus.isFolded,
+
           children: bus.containers.list.map(container => {
             return {
               id: container.id,
+              typeId: 'containerId',
               name: container.name,
               link: `${baseUrl}/containers/${container.id}`,
+              isFolded: container.isFolded,
+
               children: container.components.list.map(component => {
                 return {
                   id: component.id,
+                  typeId: 'componentId',
                   name: component.name,
                   link: `${baseUrl}/components/${component.id}`,
+                  isFolded: component.isFolded,
+
                   children: component.serviceUnits.list.map(serviceUnit => {
                     return {
                       id: serviceUnit.id,
+                      typeId: 'serviceUnitId',
                       name: serviceUnit.name,
                       link: `${baseUrl}/service-units/${serviceUnit.id}`,
+                      isFolded: serviceUnit.isFolded
                     };
                   })
                 };

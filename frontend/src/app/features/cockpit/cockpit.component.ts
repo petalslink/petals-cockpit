@@ -1,3 +1,7 @@
+import { ServiceUnits } from './workspaces/state/service-units/service-units.reducer';
+import { Components } from './workspaces/state/components/components.reducer';
+import { Containers } from './workspaces/state/containers/containers.reducer';
+import { Buses } from './workspaces/state/buses/buses.reducer';
 import { IWorkspace } from './workspaces/state/workspaces/workspace.interface';
 import { IWorkspaces, IWorkspacesTable } from './workspaces/state/workspaces/workspaces.interface';
 import { Workspaces } from './workspaces/state/workspaces/workspaces.reducer';
@@ -91,12 +95,23 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     this._store$.dispatch({ type: Ui.TOGGLE_SIDENAV });
   }
 
-  onTreeToggleFold() {
-    // TODO: Dispatch an action to toggle the line
+  onTreeToggleFold(e) {
+    switch (e.item.typeId) {
+      case 'busId':
+        this._store$.dispatch({ type: Buses.TOGGLE_FOLD_BUS, payload: { busId: e.item.id } });
+        break;
+      case 'containerId':
+        this._store$.dispatch({ type: Containers.TOGGLE_FOLD_CONTAINER, payload: { containerId: e.item.id } });
+        break;
+      case 'componentId':
+        this._store$.dispatch({ type: Components.TOGGLE_FOLD_COMPONENT, payload: { componentId: e.item.id } });
+    }
   }
 
   onTreeSelect(e) {
     // TODO: Dispatch an action to save the current bus/container/component/su
+    // Instead of dispatching it from here maybe it's a better idea to dispatch it once the
+    // component is loaded
   }
 
   fetchWorkspaces() {

@@ -2,7 +2,7 @@
   <a md-list-item [routerLink]="[item.link]" (click)="select({deepLevel: deepLevel, index: i, item: item})">
     <md-icon
       *ngIf="item.children"
-      (click)="toggleFold({deepLevel: deepLevel, index: i, item: item}, $event)"
+      (click)="toggleFold({deepLevel: deepLevel, index: i, item: item})"
       [class.rotate-minus-90]="item.isFolded"
     >arrow_drop_down</md-icon>
 

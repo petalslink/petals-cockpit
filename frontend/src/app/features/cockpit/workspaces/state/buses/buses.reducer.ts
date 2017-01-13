@@ -22,6 +22,62 @@ export class Buses {
   }
 
   // tslint:disable-next-line:member-ordering
+  public static FOLD_BUS = `${Buses.reducerName}_FOLD_BUS`;
+  private static foldBus(busesTable: IBusesTable, payload: { busId: string }) {
+    return <IBusesTable>Object.assign(
+      {},
+      busesTable,
+      {
+        byId: Object.assign(
+          {},
+          busesTable.byId,
+          {
+            [payload.busId]: <IBusRow>Object.assign(
+              {},
+              busesTable.byId[payload.busId],
+              { isFolded: true }
+            )
+          }
+        )
+      }
+    );
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static UNFOLD_BUS = `${Buses.reducerName}_UNFOLD_BUS`;
+  private static unfoldBus(busesTable: IBusesTable, payload: { busId: string }) {
+    return <IBusesTable>Object.assign(
+      {},
+      busesTable,
+      {
+        byId: Object.assign(
+          {},
+          busesTable.byId,
+          {
+            [payload.busId]: <IBusRow>Object.assign(
+              {},
+              busesTable.byId[payload.busId],
+              { isFolded: false }
+            )
+          }
+        )
+      }
+    );
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static TOGGLE_FOLD_BUS = `${Buses.reducerName}_TOGGLE_FOLD_BUS`;
+  private static toggleFoldBus(busesTable: IBusesTable, payload: { busId: string }) {
+    let bus = busesTable.byId[payload.busId];
+
+    if (bus.isFolded) {
+      return Buses.unfoldBus(busesTable, payload);
+    }
+
+    return Buses.foldBus(busesTable, payload);
+  }
+
+  // tslint:disable-next-line:member-ordering
   // public static IMPORT_BUS = `${Buses.reducerName}_IMPORT_BUS`;
   // private static importBus(busesTable, type, payload) {
   //   return <IBusesTable>Object.assign({}, busesTable, { importingBus: true });
@@ -294,6 +350,9 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod = {
     [Buses.FETCH_BUSES_SUCCESS]: Buses.fetchBusesSuccess,
+    [Buses.FOLD_BUS]: Buses.foldBus,
+    [Buses.UNFOLD_BUS]: Buses.unfoldBus,
+    [Buses.TOGGLE_FOLD_BUS]: Buses.toggleFoldBus,
     // [Buses.IMPORT_BUS]: Buses.importBus,
     // [Buses.IMPORT_BUS_SUCCESS]: Buses.importBusSuccess,
     // [Buses.IMPORT_BUS_FAILED]: Buses.importBusFailed,

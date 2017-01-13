@@ -36,11 +36,9 @@ export class MaterialViewComponent implements OnInit {
     this.onSelect.emit(treeEvent);
   }
 
-  toggleFold(treeEvent: TreeEvent, event: MouseEvent) {
+  toggleFold(treeEvent: TreeEvent) {
     this.onToggleFold.emit(treeEvent);
 
-    if (typeof event !== 'undefined') {
-      event.stopPropagation();
-    }
+    return false;
   }
 }

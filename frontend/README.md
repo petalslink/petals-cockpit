@@ -64,3 +64,8 @@ To get more help on the `angular-cli` use `ng --help` or go check out the [Angul
 When everything is stable, replace it by
     "build-electron": "ng build --prod --aot --no-sourcemap -bh='./' && node ./electron/generate-package-json.js && cp ./electron/electron.js dist/",
     "electron": "npm run build-electron && electron dist/"
+
+- BatchActions dispatch multiple actions into one action BUT selectors are triggered on every internal dispatch of the batchActions ...
+Need to use a global action and handle it inside every reducers
+I opened an issue here : https://github.com/ngrx/store/issues/312#issuecomment-272187930
+This has now been fixed by changing the way I get store parts but issue is still open even tho the code's working now

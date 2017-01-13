@@ -12,18 +12,18 @@ export class Workspaces {
       return workspacesTable;
     }
 
-    return Workspaces.mapActionsToMethod[type](workspacesTable, type, payload) || workspacesTable;
+    return Workspaces.mapActionsToMethod[type](workspacesTable, payload) || workspacesTable;
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES = `${Workspaces.reducerName}_FETCH_WORKSPACES`;
-  private static fetchWorkspaces(workspacesTable: IWorkspacesTable, type, payload) {
+  private static fetchWorkspaces(workspacesTable: IWorkspacesTable, payload) {
     return <IWorkspacesTable>Object.assign({}, workspacesTable, <IWorkspacesTable>{ isFetchingWorkspaces: true });
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES_SUCCESS = `${Workspaces.reducerName}_FETCH_WORKSPACES_SUCCESS`;
-  private static fetchWorkspacesSuccess(workspacesTable: IWorkspacesTable, type, payload) {
+  private static fetchWorkspacesSuccess(workspacesTable: IWorkspacesTable, payload) {
     return <IWorkspacesTable>Object.assign({}, workspacesTable,
       payload,
       <IWorkspacesTable>{
@@ -34,7 +34,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE = `${Workspaces.reducerName}_FETCH_WORKSPACE`;
-  private static fetchWorkspace(workspacesTable: IWorkspacesTable, type, payload) {
+  private static fetchWorkspace(workspacesTable: IWorkspacesTable, payload) {
     return <IWorkspacesTable>Object.assign({}, workspacesTable,
       <IWorkspacesTable>{
         byId: Object.assign(
@@ -56,7 +56,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_SUCCESS = `${Workspaces.reducerName}_FETCH_WORKSPACE_SUCCESS`;
-  private static fetchWorkspaceSuccess(workspacesTable: IWorkspacesTable, type, payload) {
+  private static fetchWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload) {
     return <IWorkspacesTable>Object.assign({}, workspacesTable,
       <IWorkspacesTable>{
         selectedWorkspaceId: payload.id,
