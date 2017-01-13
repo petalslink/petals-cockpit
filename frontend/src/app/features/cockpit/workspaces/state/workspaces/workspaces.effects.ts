@@ -16,6 +16,7 @@ import { Containers } from './../containers/containers.reducer';
 import { Components } from './../components/components.reducer';
 import { ServiceUnits } from './../service-units/service-units.reducer';
 import { Ui } from './../../../../../shared/state/ui.reducer';
+import { BusesInProgress } from './../buses-in-progress/buses-in-progress.reducer';
 
 @Injectable()
 export class WorkspacesEffects {
@@ -53,6 +54,7 @@ export class WorkspacesEffects {
       .switchMap((res: Response) => {
         return Observable.of(batchActions([
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: res.json().workspace },
+          { type: BusesInProgress.FETCH_BUSSES_IN_PROGRESS, payload: res.json().busesInProgress },
           { type: Buses.FETCH_BUSES_SUCCESS, payload: res.json().buses },
           { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: res.json().containers },
           { type: Components.FETCH_COMPONENTS_SUCCESS, payload: res.json().components },

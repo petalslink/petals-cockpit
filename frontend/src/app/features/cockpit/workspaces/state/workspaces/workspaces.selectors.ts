@@ -84,7 +84,6 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
 
         buses: {
           selectedBusId: buses.selectedBusId,
-          importingBus: buses.importingBus,
           list: workspaces.byId[workspaces.selectedWorkspaceId].buses.map(busId => {
             return <IBus>{
               id: buses.byId[busId].id,

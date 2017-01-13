@@ -2,7 +2,6 @@ import { IBusRow, IBus } from './bus.interface';
 
 export interface IBusesCommon {
   selectedBusId: string;
-  importingBus: boolean;
 }
 
 export interface IBusesTable extends IBusesCommon {

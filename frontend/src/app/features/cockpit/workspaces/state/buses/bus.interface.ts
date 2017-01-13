@@ -10,7 +10,6 @@ export interface IBusCommon {
   isFolded: boolean;
   isDiscarding: boolean;
   isFetchingDetails: boolean;
-  isInProgress: boolean;
   isBeingRemoved: boolean;
 }
 
@@ -23,13 +22,4 @@ export interface IBusRow extends IBusCommon {
 // used in generated views
 export interface IBus extends IBusCommon {
   containers: IContainers;
-}
-
-// used when we import a bus
-export interface INewBus {
-  ip: string;
-  port: number;
-  username: string;
-  password: string;
-  passphrase: string;
 }

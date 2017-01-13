@@ -6,6 +6,28 @@ export const fetchWorkspace0 = {
     buses: ['85fd4ddf-bbd4-4562-99cc-62e7fb7d698b']
   },
 
+  busesInProgress: {
+    byId: {
+      '85fd4ddf-bbd4-4562-99cc-ok': {
+        id: '85fd4ddf-bbd4-4562-99cc-ok',
+        importIp: '192.168.0.1',
+        importPort: 4250,
+        importUsername: 'petals'
+      },
+      '85fd4ddf-bbd4-4562-99cc-error': {
+        id: '85fd4ddf-bbd4-4562-99cc-error',
+        importIp: '192.168.0.2',
+        importPort: 5132,
+        importUsername: 'petals',
+        importError: 'ERROR!!!!'
+      }
+    },
+    allIds: [
+      '85fd4ddf-bbd4-4562-99cc-ok',
+      '85fd4ddf-bbd4-4562-99cc-error'
+    ]
+  },
+
   buses: {
     byId: {
       '85fd4ddf-bbd4-4562-99cc-62e7fb7d698b': {
@@ -18,28 +40,9 @@ export const fetchWorkspace0 = {
           '25dbde93-a507-4aa1-a98b-fc81d5e28b48'
         ]
       },
-      // '85fd4ddf-bbd4-4562-99cc-ok': {
-      //   id: '85fd4ddf-bbd4-4562-99cc-ok',
-      //   containers: [],
-      //   isImporting: true,
-      //   importIp: '192.168.0.1',
-      //   importPort: '5000',
-      //   importUsername: 'petals'
-      // },
-      // '85fd4ddf-bbd4-4562-99cc-error': {
-      //   id: '85fd4ddf-bbd4-4562-99cc-error',
-      //   containers: [],
-      //   isImporting: true,
-      //   importIp: '192.168.0.2',
-      //   importPort: 5000,
-      //   importUsername: 'petals',
-      //   importError: 'ERROR!!!!'
-      // }
     },
     allIds: [
-      '85fd4ddf-bbd4-4562-99cc-62e7fb7d698b',
-      // '85fd4ddf-bbd4-4562-99cc-ok',
-      // '85fd4ddf-bbd4-4562-99cc-error'
+      '85fd4ddf-bbd4-4562-99cc-62e7fb7d698b'
     ]
   },
 

@@ -9,6 +9,7 @@ import { Ui } from '../state/ui.reducer';
 import { Users } from './users.reducer';
 import { Workspaces } from './../../features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 import { Buses } from '../../features/cockpit/workspaces/state/buses/buses.reducer';
+import { BusesInProgress } from './../../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
 import { Containers } from './../../features/cockpit/workspaces/state/containers/containers.reducer';
 import { Components } from './../../features/cockpit/workspaces/state/components/components.reducer';
 import { ServiceUnits } from './../../features/cockpit/workspaces/state/service-units/service-units.reducer';
@@ -18,6 +19,7 @@ const reducers = {
   users: Users.reducer,
   workspaces: Workspaces.reducer,
   buses: Buses.reducer,
+  busesInProgress: BusesInProgress.reducer,
   containers: Containers.reducer,
   components: Components.reducer,
   serviceUnits: ServiceUnits.reducer
