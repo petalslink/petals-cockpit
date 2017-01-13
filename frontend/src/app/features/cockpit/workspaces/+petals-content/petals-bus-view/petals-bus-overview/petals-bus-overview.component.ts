@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 
-import { IBus } from './../../../state/buses/bus.interface';
+import { IBusRow } from './../../../state/buses/bus.interface';
 
 @Component({
   selector: 'app-petals-bus-overview',
@@ -9,7 +9,7 @@ import { IBus } from './../../../state/buses/bus.interface';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PetalsBusOverviewComponent implements OnInit {
-  @Input() bus: IBus;
+  @Input() bus: IBusRow;
 
   constructor() { }
 

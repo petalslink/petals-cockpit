@@ -20,6 +20,8 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
   constructor(private _store$: Store<IStore>, private _route: ActivatedRoute) { }
 
   ngOnInit() {
+    this.bus$ = this._store$.let(getCurrentBus());
+
     this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Bus' } });
 
     this._route
@@ -28,8 +30,6 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
         this._store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId: params.busId } });
       })
       .subscribe();
-
-    this.bus$ = this._store$.let(getCurrentBus());
   }
 
   ngOnDestroy() {
