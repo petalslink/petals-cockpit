@@ -1,12 +1,12 @@
 <div fxLayout="column" fxFill class="wrapper-content">
   <md-toolbar class="text-center">
-    <span>Service unit name</span>
+    <span>{{ (serviceUnit$ | async)?.name }}</span>
   </md-toolbar>
 
   <md-tab-group fxFlex>
     <md-tab label="Overview">
       <!-- TODO: Create a component for every tab -->
-      <app-petals-service-unit-overview fxFill></app-petals-service-unit-overview>
+      <app-petals-service-unit-overview [serviceUnit]="serviceUnit$ | async" fxFill></app-petals-service-unit-overview>
     </md-tab>
   </md-tab-group>
 </div>
