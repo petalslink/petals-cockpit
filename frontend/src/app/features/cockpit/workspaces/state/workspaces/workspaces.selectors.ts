@@ -55,7 +55,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
       containers: state.containers,
       components: state.components,
       serviceUnits: state.serviceUnits
-    }
+    };
   })
     // as the object has a new reference every time,
     // use distinctUntilChanged for performance
