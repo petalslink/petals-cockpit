@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 
 import { IStore } from './../../../../../shared/interfaces/store.interface';
 import { Ui } from './../../../../../shared/state/ui.reducer';
+import { ServiceUnits } from './../../state/service-units/service-units.reducer';
 
 @Component({
   selector: 'app-petals-service-unit-view',
@@ -10,9 +12,20 @@ import { Ui } from './../../../../../shared/state/ui.reducer';
   styleUrls: ['./petals-service-unit-view.component.scss']
 })
 export class PetalsServiceUnitViewComponent implements OnInit {
-  constructor(private _store$: Store<IStore>) { }
+  constructor(private _store$: Store<IStore>, private _route: ActivatedRoute) { }
 
   ngOnInit() {
     this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Service Unit' } });
+
+    this._route
+      .params
+      .map((params: { workspaceId: string, serviceUnitId: string }) => {
+        this._store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: params.serviceUnitId } });
+      })
+      .subscribe();
+  }
+
+  ngOnDestroy() {
+    this._store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: '' } });
   }
 }

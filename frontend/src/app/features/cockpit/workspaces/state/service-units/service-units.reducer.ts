@@ -20,10 +20,19 @@ export class ServiceUnits {
     return <IserviceUnitsTable>Object.assign({}, serviceUnitsTable, payload);
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static SET_CURRENT_SERVICE_UNIT = `${ServiceUnits.reducerName}_SET_CURRENT_SERVICE_UNIT`;
+  private static setCurrentServiceUnit(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+    return Object.assign({}, serviceUnitsTable, <IserviceUnitsTable>{
+      selectedServiceUnitId: payload.serviceUnitId
+    });
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod = {
     [ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS]: ServiceUnits.fetchServiceUnitsSuccess,
+    [ServiceUnits.SET_CURRENT_SERVICE_UNIT]: ServiceUnits.setCurrentServiceUnit,
   };
 }

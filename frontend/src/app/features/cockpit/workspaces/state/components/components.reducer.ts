@@ -77,6 +77,14 @@ export class Components {
     return Components.foldComponent(componentsTable, payload);
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static SET_CURRENT_COMPONENT = `${Components.reducerName}_SET_CURRENT_COMPONENT`;
+  private static setCurrentComponent(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    return Object.assign({}, componentsTable, <IComponentsTable>{
+      selectedComponentId: payload.componentId
+    });
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -85,5 +93,6 @@ export class Components {
     [Components.FOLD_COMPONENT]: Components.foldComponent,
     [Components.UNFOLD_COMPONENT]: Components.unfoldComponent,
     [Components.TOGGLE_FOLD_COMPONENT]: Components.toggleFoldComponent,
+    [Components.SET_CURRENT_COMPONENT]: Components.setCurrentComponent,
   };
 }

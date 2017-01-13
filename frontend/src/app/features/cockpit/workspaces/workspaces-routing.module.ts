@@ -16,11 +16,11 @@ const routes: Routes = [
     component: WorkspacesComponent
   },
   {
-    path: ':idWorkspace',
+    path: ':workspaceId',
     component: WorkspaceComponent
   },
   {
-    path: ':idWorkspace/petals',
+    path: ':workspaceId/petals',
     loadChildren: loadPetalsContentModule
   },
 ];

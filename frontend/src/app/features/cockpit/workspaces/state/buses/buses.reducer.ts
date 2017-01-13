@@ -78,6 +78,14 @@ export class Buses {
   }
 
   // tslint:disable-next-line:member-ordering
+  public static SET_CURRENT_BUS = `${Buses.reducerName}_SET_CURRENT_BUS`;
+  private static setCurrentBus(busesTable: IBusesTable, payload: { busId: string }) {
+    return Object.assign({}, busesTable, <IBusesTable>{
+      selectedBusId: payload.busId
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
   // public static IMPORT_BUS = `${Buses.reducerName}_IMPORT_BUS`;
   // private static importBus(busesTable, type, payload) {
   //   return <IBusesTable>Object.assign({}, busesTable, { importingBus: true });
@@ -353,6 +361,7 @@ export class Buses {
     [Buses.FOLD_BUS]: Buses.foldBus,
     [Buses.UNFOLD_BUS]: Buses.unfoldBus,
     [Buses.TOGGLE_FOLD_BUS]: Buses.toggleFoldBus,
+    [Buses.SET_CURRENT_BUS]: Buses.setCurrentBus,
     // [Buses.IMPORT_BUS]: Buses.importBus,
     // [Buses.IMPORT_BUS_SUCCESS]: Buses.importBusSuccess,
     // [Buses.IMPORT_BUS_FAILED]: Buses.importBusFailed,

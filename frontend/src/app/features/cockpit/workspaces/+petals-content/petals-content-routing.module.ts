@@ -30,19 +30,19 @@ const routes: Routes = [
     component: PetalsContentViewComponent
   },
   {
-    path: 'buses/:idBus',
+    path: 'buses/:busId',
     loadChildren: loadBusViewModule
   },
   {
-    path: 'containers/:idContainer',
+    path: 'containers/:containerId',
     loadChildren: loadContainerViewModule
   },
   {
-    path: 'components/:idComponent',
+    path: 'components/:componentId',
     loadChildren: loadComponentViewModule
   },
   {
-    path: 'service-units/:idServiceUnit',
+    path: 'service-units/:serviceUnitId',
     loadChildren: loadServiceUnitViewModule
   }
 ];

@@ -77,6 +77,14 @@ export class Containers {
     return Containers.foldContainers(containersTable, payload);
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static SET_CURRENT_CONTAINER = `${Containers.reducerName}_SET_CURRENT_CONTAINER`;
+  private static setCurrentContainer(containersTable: IContainersTable, payload: { containerId: string }) {
+    return Object.assign({}, containersTable, <IContainersTable>{
+      selectedContainerId: payload.containerId
+    });
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -85,5 +93,6 @@ export class Containers {
     [Containers.FOLD_CONTAINER]: Containers.foldContainers,
     [Containers.UNFOLD_CONTAINER]: Containers.unfoldContainer,
     [Containers.TOGGLE_FOLD_CONTAINER]: Containers.toggleFoldContainer,
+    [Containers.SET_CURRENT_CONTAINER]: Containers.setCurrentContainer,
   };
 }
