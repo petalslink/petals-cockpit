@@ -12,7 +12,7 @@ interface TreeEvent {
   styleUrls: ['./material-tree.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MaterialViewComponent implements OnInit {
+export class MaterialTreeComponent implements OnInit {
   // pass the tree to display
   @Input() tree;
   // pass a margin to apply on each level (in px)

@@ -3,19 +3,17 @@ import { NgModule } from '@angular/core';
 import { SharedModule } from '../../../shared/shared.module';
 import { WorkspacesRoutingModule } from './workspaces-routing.module';
 import { WorkspacesComponent } from './workspaces.component';
-import { WorkspacesViewComponent } from './workspaces-view/workspaces-view.component';
-import { MaterialViewComponent } from './material-tree/material-tree.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
+import { PetalsMenuModule } from './+petals-menu/petals-menu.module';
 
 @NgModule({
   imports: [
     SharedModule,
-    WorkspacesRoutingModule
+    WorkspacesRoutingModule,
+    PetalsMenuModule
   ],
   declarations: [
     WorkspacesComponent,
-    WorkspacesViewComponent,
-    MaterialViewComponent,
     WorkspaceComponent
   ],
   exports: [
@@ -23,7 +21,7 @@ import { WorkspaceComponent } from './workspace/workspace.component';
     // we export here to use this component from cockpit.component
     // were we should instead use a router-outlet
     // (in order to lazy load only what's needed)
-    MaterialViewComponent
+    PetalsMenuModule
   ]
 })
 export class WorkspacesModule { }

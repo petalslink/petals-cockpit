@@ -1,3 +1,7 @@
-<p>
-  petals-menu-view works!
-</p>
+<div *ngIf="(busesInProgress$ | async).list.length > 0">
+  <h1 class="color-primary">Buses in progress</h1>
+  <app-buses-in-progress [busesInProgress]="busesInProgress$ | async"></app-buses-in-progress>
+</div>
+
+<h1 class="color-primary" *ngIf="(busesInProgress$ | async).list.length > 0">Buses</h1>
+<app-material-tree fxFill [tree]="tree$ | async" [marginLeft]="18" (onToggleFold)="onTreeToggleFold($event)" (onSelect)="onTreeSelect($event)"></app-material-tree>
