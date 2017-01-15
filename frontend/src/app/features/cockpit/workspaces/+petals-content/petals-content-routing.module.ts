@@ -3,12 +3,17 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { PetalsContentViewComponent } from './petals-content.component';
 import { PetalsBusViewModule } from './petals-bus-view/petals-bus-view.module';
+import { PetalsBusInProgressViewModule } from './petals-bus-in-progress-view/petals-bus-in-progress-view.module';
 import { PetalsContainerViewModule } from './petals-container-view/petals-container-view.module';
 import { PetalsComponentViewModule } from './petals-component-view/petals-component-view.module';
 import { PetalsServiceUnitViewModule } from './petals-service-unit-view/petals-service-unit-view.module';
 
 export function loadBusViewModule() {
   return PetalsBusViewModule;
+}
+
+export function loadBusInProgressViewModule() {
+  return PetalsBusInProgressViewModule;
 }
 
 export function loadContainerViewModule() {
@@ -23,15 +28,19 @@ export function loadServiceUnitViewModule() {
   return PetalsServiceUnitViewModule;
 }
 
-// /workspaces/:idWorkspace/petals
+// /workspaces/:workspaceId/petals
 const routes: Routes = [
   {
     path: '',
-    component: PetalsContentViewComponent
+    loadChildren: loadBusInProgressViewModule
   },
   {
     path: 'buses/:busId',
     loadChildren: loadBusViewModule
+  },
+  {
+    path: 'buses-in-progress/:busInProgressId',
+    loadChildren: loadBusInProgressViewModule
   },
   {
     path: 'containers/:containerId',

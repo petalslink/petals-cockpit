@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { PetalsBusViewComponent } from './petals-bus-view.component';
 
-// /workspaces/:idWorkspace/petals/buses/:idBus
+// /workspaces/:workspaceId/petals/buses/:busId
 const routes: Routes = [
   {
     path: '',

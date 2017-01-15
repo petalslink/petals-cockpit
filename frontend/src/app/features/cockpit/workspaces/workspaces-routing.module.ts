@@ -22,7 +22,7 @@ const routes: Routes = [
   {
     path: ':workspaceId/petals',
     loadChildren: loadPetalsContentModule
-  },
+  }
 ];
 
 @NgModule({
