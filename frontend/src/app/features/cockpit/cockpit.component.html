@@ -1,8 +1,10 @@
 <div fxLayout="column" fxFill>
   <md-toolbar color="primary">
-    <img class="logo-toolbar" src="assets/img/logo-petals-cockpit.png">
+    <div class="toolbar-logo">
+      <img class="logo-toolbar" [src]="logoByScreenSize$ | async">
+    </div>
 
-    <button md-icon-button (click)="toggleSidenav()">
+    <button md-icon-button (click)="toggleSidenav()" class="menu-icon">
       <md-icon>menu</md-icon>
     </button>
 

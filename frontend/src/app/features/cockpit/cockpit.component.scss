@@ -7,10 +7,39 @@
 }
 
 .logo-toolbar {
-  max-height: 45px;
-  margin-right: 15px;
+  max-height: 40px;
 }
 
+$sidenavSize: 320px;
+
 md-sidenav {
-  width: 320px;
+  width: $sidenavSize;
+}
+
+
+@media (max-width: 1279px) {
+  md-toolbar {
+    .toolbar-logo {
+      margin-right: 25px;
+    }
+
+    .menu-icon {
+      margin-right: 10px;
+    }
+  }
+}
+
+@media (min-width: 1280px) {
+  md-toolbar {
+    padding-left: 0;
+
+    .toolbar-logo {
+      min-width: $sidenavSize;
+      text-align: center;
+    }
+
+    .menu-icon {
+      margin-right: 10px;
+    }
+  }
 }

@@ -12,6 +12,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
 import { MdDialog, MdDialogRef } from '@angular/material';
+import { MediaChange, MatchMediaObservable, BreakPointRegistry, MatchMedia } from '@angular/flex-layout';
 
 import { LANGUAGES } from '../../core/opaque-tokens';
 import { IStore } from '../../shared/interfaces/store.interface';
@@ -30,11 +31,13 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   public ui$: Observable<IUi>;
   public workspace$: Observable<IWorkspace>;
   public workspaces$: Observable<IWorkspacesTable>;
+  public logoByScreenSize$: Observable<string>;
 
   constructor(
     private _store$: Store<IStore>,
     @Inject(LANGUAGES) public languages,
-    public dialog: MdDialog
+    public dialog: MdDialog,
+    @Inject(MatchMediaObservable) public media$
   ) { }
 
   ngOnInit() {
@@ -55,6 +58,20 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       })
       .subscribe();
+
+    this.logoByScreenSize$ = this.media$
+      .map((change: MediaChange) => {
+        const imgSrcBase = `assets/img`;
+        const imgSrcExt = `png`;
+
+        const screenSize = change.mqAlias;
+
+        if (screenSize === 'lg' || screenSize === 'gt-lg') {
+          return `${imgSrcBase}/logo-petals-cockpit.${imgSrcExt}`;
+        } else {
+          return `${imgSrcBase}/logo-petals-cockpit-without-text.${imgSrcExt}`;
+        }
+      });
   }
 
   ngOnDestroy() { }
