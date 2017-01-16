@@ -1,3 +1,45 @@
-<p>
-  petals-bus-import-view works!
-</p>
+<div class="content">
+  <md-card>
+    <md-card-title class="color-primary margin-bottom-x0">Information of the bus</md-card-title>
+
+    <md-card-content>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="10px">
+        <!-- once this issue https://github.com/angular/flex-layout/issues/108
+        is fixed, replace fxFlex="45" to 50 -->
+        <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+          <md-input-container fxFill>
+            <input md-input placeholder="IP">
+          </md-input-container>
+        </div>
+
+        <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+          <md-input-container fxFill>
+            <input md-input placeholder="Port">
+          </md-input-container>
+        </div>
+
+        <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+          <md-input-container fxFill>
+            <input md-input placeholder="Username">
+          </md-input-container>
+        </div>
+
+        <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+          <md-input-container fxFill>
+            <input md-input placeholder="Password">
+          </md-input-container>
+        </div>
+
+        <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+          <md-input-container fxFill>
+            <input md-input placeholder="Topology passphrase">
+          </md-input-container>
+        </div>
+      </div>
+
+      <div class="margin-top-x2" fxLayout="row" fxLayoutAlign="end center">
+        <button md-raised-button color="primary">Import</button>
+      </div>
+    </md-card-content>
+  </md-card>
+</div>
