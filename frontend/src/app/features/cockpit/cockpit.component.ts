@@ -1,3 +1,12 @@
+import { Component, Inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { MdDialog, MdDialogRef } from '@angular/material';
+import { MediaChange, MatchMediaObservable, BreakPointRegistry, MatchMedia } from '@angular/flex-layout';
+import { Observable } from 'rxjs/Observable';
+import { TranslateService } from 'ng2-translate';
+import { Subscription } from 'rxjs/Subscription';
+import { Store } from '@ngrx/store';
+
 import { ServiceUnits } from './workspaces/state/service-units/service-units.reducer';
 import { Components } from './workspaces/state/components/components.reducer';
 import { Containers } from './workspaces/state/containers/containers.reducer';
@@ -6,14 +15,6 @@ import { IWorkspace } from './workspaces/state/workspaces/workspace.interface';
 import { IWorkspaces, IWorkspacesTable } from './workspaces/state/workspaces/workspaces.interface';
 import { Workspaces } from './workspaces/state/workspaces/workspaces.reducer';
 import { Ui } from './../../shared/state/ui.reducer';
-import { Component, Inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-import { TranslateService } from 'ng2-translate';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-import { Store } from '@ngrx/store';
-import { MdDialog, MdDialogRef } from '@angular/material';
-import { MediaChange, MatchMediaObservable, BreakPointRegistry, MatchMedia } from '@angular/flex-layout';
-
 import { LANGUAGES } from '../../core/opaque-tokens';
 import { IStore } from '../../shared/interfaces/store.interface';
 import { IUi } from './../../shared/interfaces/ui.interface';
@@ -29,6 +30,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   private workspacesDialogRef: MdDialogRef<WorkspacesDialogComponent>;
 
   public ui$: Observable<IUi>;
+  public _uiSub: Subscription;
   public workspace$: Observable<IWorkspace>;
   public workspaces$: Observable<IWorkspacesTable>;
   public logoByScreenSize$: Observable<string>;
@@ -37,7 +39,8 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     private _store$: Store<IStore>,
     @Inject(LANGUAGES) public languages,
     public dialog: MdDialog,
-    @Inject(MatchMediaObservable) public media$
+    @Inject(MatchMediaObservable) public media$,
+    private _router: Router
   ) { }
 
   ngOnInit() {
@@ -47,8 +50,9 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.ui$ = this._store$.select(state => state.ui);
 
-    this.ui$
+    this._uiSub = this.ui$
       .map(ui => ui.isPopupListWorkspacesVisible)
+      // .map(store => console.log(store))
       .distinctUntilChanged()
       .map(isPopupListWorkspacesVisible => {
         if (isPopupListWorkspacesVisible) {
@@ -74,10 +78,24 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
-  ngOnDestroy() { }
+  ngOnDestroy() {
+    console.log('DESTROYED !!!');
+    this._uiSub.unsubscribe();
+  }
 
   ngAfterViewInit() {
-    this.openWorkspacesDialog();
+    // if there's no workspace selected
+    // display the popup to select one
+    // otherwise just fetch data
+    const re = /workspaces\/([a-zA-Z0-9]+)\//;
+    const url = this._router.url;
+
+    if (re.test(url)) {
+      const workspaceId = url.match(re)[1];
+      this._store$.dispatch({ type: Workspaces.FETCH_WORKSPACE, payload: workspaceId });
+    } else {
+      this.openWorkspacesDialog();
+    }
   }
 
   private _openWorkspacesDialog() {
@@ -109,7 +127,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     this._store$.dispatch({ type: Ui.TOGGLE_SIDENAV });
   }
 
-  fetchWorkspaces() {
+  private fetchWorkspaces() {
     this._store$.dispatch({ type: Workspaces.FETCH_WORKSPACES });
   }
 }
