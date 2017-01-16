@@ -31,6 +31,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public ui$: Observable<IUi>;
   public _uiSub: Subscription;
+  public sidenavMode$: Observable<string>;
   public workspace$: Observable<IWorkspace>;
   public workspaces$: Observable<IWorkspacesTable>;
   public logoByScreenSize$: Observable<string>;
@@ -73,6 +74,17 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
           return `${imgSrcBase}/logo-petals-cockpit.${imgSrcExt}`;
         } else {
           return `${imgSrcBase}/logo-petals-cockpit-without-text.${imgSrcExt}`;
+        }
+      });
+
+    this.sidenavMode$ = this.media$
+      .map((change: MediaChange) => {
+        const screenSize = change.mqAlias;
+
+        if (screenSize === 'md' || screenSize === 'gt-md' || screenSize === 'lg' || screenSize === 'gt-lg') {
+          return `side`;
+        } else {
+          return `over`;
         }
       });
   }

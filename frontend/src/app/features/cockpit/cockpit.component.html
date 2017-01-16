@@ -27,7 +27,9 @@
   </md-toolbar>
 
   <md-sidenav-container fxFlex (backdrop-clicked)="closeSidenav()">
-    <md-sidenav [opened]="(ui$ | async).isSidenavVisible" mode="side">
+    <md-sidenav [opened]="(ui$ | async).isSidenavVisible" [mode]="sidenavMode$ | async">
+      <app-menu-user-panel></app-menu-user-panel>
+
       <div fxLayout="row">
         <button fxFlex="100" md-raised-button [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId]" class="width-full no-border-radius" color="accent">
           {{ (workspace$ | async)?.name }}
