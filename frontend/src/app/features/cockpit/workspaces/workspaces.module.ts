@@ -4,7 +4,7 @@ import { SharedModule } from '../../../shared/shared.module';
 import { WorkspacesRoutingModule } from './workspaces-routing.module';
 import { WorkspacesComponent } from './workspaces.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
-import { PetalsMenuModule } from './+petals-menu/petals-menu.module';
+import { PetalsMenuModule } from './petals-menu/petals-menu.module';
 
 @NgModule({
   imports: [

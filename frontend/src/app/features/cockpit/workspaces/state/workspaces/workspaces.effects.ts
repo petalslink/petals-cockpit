@@ -6,17 +6,17 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { batchActions } from 'redux-batched-actions';
 
-import { IStore } from './../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Workspaces } from './workspaces.reducer';
 import { WorkspacesService } from './workspaces.service';
-import { Users } from './../../../../../shared/state/users.reducer';
-import { environment } from './../../../../../../environments/environment';
-import { Buses } from './../buses/buses.reducer';
-import { Containers } from './../containers/containers.reducer';
-import { Components } from './../components/components.reducer';
-import { ServiceUnits } from './../service-units/service-units.reducer';
-import { Ui } from './../../../../../shared/state/ui.reducer';
-import { BusesInProgress } from './../buses-in-progress/buses-in-progress.reducer';
+import { Users } from '../../../../../shared/state/users.reducer';
+import { environment } from '../../../../../../environments/environment';
+import { Buses } from '../buses/buses.reducer';
+import { Containers } from '../containers/containers.reducer';
+import { Components } from '../components/components.reducer';
+import { ServiceUnits } from '../service-units/service-units.reducer';
+import { Ui } from '../../../../../shared/state/ui.reducer';
+import { BusesInProgress } from '../buses-in-progress/buses-in-progress.reducer';
 
 @Injectable()
 export class WorkspacesEffects {

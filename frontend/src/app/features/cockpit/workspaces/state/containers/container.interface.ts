@@ -1,4 +1,4 @@
-import { IComponents } from './../components/components.interface';
+import { IComponents } from '../components/components.interface';
 
 export interface IContainerCommon {
   // from server

@@ -4,7 +4,7 @@ import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
-import { IStore } from './../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../shared/interfaces/store.interface';
 
 @Injectable()
 export class BusesEffects {

@@ -2,8 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IBusesInProgress } from './../../state/buses-in-progress/buses-in-progress.interface';
-import { IStore } from './../../../../../shared/interfaces/store.interface';
+import { IBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
+import { IStore } from '../../../../../shared/interfaces/store.interface';
 
 @Component({
   selector: 'app-buses-in-progress',

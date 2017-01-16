@@ -11,7 +11,7 @@ export function LoadCockpitModule() {
 export const routes: Routes = [
   {
     path: '',
-    // loadChildren: 'app/features/+cockpit/cockpit.module#CockpitModule'
+    // loadChildren: 'app/features/cockpit/cockpit.module#CockpitModule'
     loadChildren: LoadCockpitModule
   }
 ];

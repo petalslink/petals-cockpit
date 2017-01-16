@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 
-import { IComponentRow } from './../../../state/components/component.interface';
+import { IComponentRow } from '../../../state/components/component.interface';
 
 @Component({
   selector: 'app-petals-component-overview',
@@ -15,5 +15,4 @@ export class PetalsComponentOverviewComponent implements OnInit {
 
   ngOnInit() {
   }
-
 }

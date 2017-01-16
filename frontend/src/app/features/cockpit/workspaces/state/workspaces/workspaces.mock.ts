@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
-import { fetchWorkspaces } from './../../../../../../mocks/workspaces';
-import { environment } from './../../../../../../environments/environment';
-import { fetchWorkspaceidWks0 } from './../../../../../../mocks/workspace-id-wks-0';
+import { fetchWorkspaces } from '../../../../../../mocks/workspaces';
+import { environment } from '../../../../../../environments/environment';
+import { fetchWorkspaceidWks0 } from '../../../../../../mocks/workspace-id-wks-0';
 
 @Injectable()
 export class WorkspacesMockService {

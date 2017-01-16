@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import { Ui } from './../../../../shared/state/ui.reducer';
-import { IStore } from './../../../../shared/interfaces/store.interface';
+import { Ui } from '../../../../shared/state/ui.reducer';
+import { IStore } from '../../../../shared/interfaces/store.interface';
 
 @Component({
   selector: 'app-workspace',

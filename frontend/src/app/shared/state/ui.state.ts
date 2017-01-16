@@ -1,4 +1,4 @@
-import { IUi } from './../interfaces/ui.interface';
+import { IUi } from '../interfaces/ui.interface';
 
 export function uiState(): IUi {
   return {

@@ -1,18 +1,18 @@
-import { IserviceUnitsTable } from './../service-units/service-units.interface';
-import { IComponentsTable } from './../components/components.interface';
-import { IContainersTable } from './../containers/containers.interface';
-import { IUsersTable } from './../../../../../shared/interfaces/users.interface';
-import { IServiceUnit } from './../service-units/service-unit.interface';
-import { IComponent } from './../components/component.interface';
-import { IContainer } from './../containers/container.interface';
+import { IserviceUnitsTable } from '../service-units/service-units.interface';
+import { IComponentsTable } from '../components/components.interface';
+import { IContainersTable } from '../containers/containers.interface';
+import { IUsersTable } from '../../../../../shared/interfaces/users.interface';
+import { IServiceUnit } from '../service-units/service-unit.interface';
+import { IComponent } from '../components/component.interface';
+import { IContainer } from '../containers/container.interface';
 import { IWorkspace } from './workspace.interface';
-import { IBuses, IBusesTable } from './../buses/buses.interface';
-import { IBus } from './../buses/bus.interface';
+import { IBuses, IBusesTable } from '../buses/buses.interface';
+import { IBus } from '../buses/bus.interface';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IWorkspaces, IWorkspacesTable } from './workspaces.interface';
-import { IStore } from './../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../shared/interfaces/store.interface';
 
 export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspaces> {
   const sWorkspaces = store$.select((state: IStore) => state.workspaces);

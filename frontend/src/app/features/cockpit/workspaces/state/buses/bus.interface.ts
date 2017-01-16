@@ -1,4 +1,4 @@
-import { IContainers } from './../containers/containers.interface';
+import { IContainers } from '../containers/containers.interface';
 
 export interface IBusCommon {
   // from server

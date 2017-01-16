@@ -1,4 +1,4 @@
-import { IUsersTable } from './../interfaces/users.interface';
+import { IUsersTable } from '../interfaces/users.interface';
 
 export function usersState(): IUsersTable {
   return {

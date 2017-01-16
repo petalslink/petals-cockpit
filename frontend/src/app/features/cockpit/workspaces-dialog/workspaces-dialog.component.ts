@@ -2,11 +2,11 @@ import { Observable } from 'rxjs/Observable';
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import { Workspaces } from './../workspaces/state/workspaces/workspaces.reducer';
-import { IStore } from './../../../shared/interfaces/store.interface';
+import { Workspaces } from '../workspaces/state/workspaces/workspaces.reducer';
+import { IStore } from '../../../shared/interfaces/store.interface';
 import { getWorkspacesList } from '../workspaces/state/workspaces/workspaces.selectors';
-import { IWorkspaces } from './../workspaces/state/workspaces/workspaces.interface';
-import { IWorkspace } from './../workspaces/state/workspaces/workspace.interface';
+import { IWorkspaces } from '../workspaces/state/workspaces/workspaces.interface';
+import { IWorkspace } from '../workspaces/state/workspaces/workspace.interface';
 
 @Component({
   selector: 'app-workspaces-dialog',

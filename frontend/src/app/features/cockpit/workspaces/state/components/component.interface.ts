@@ -1,4 +1,4 @@
-import { IserviceUnits } from './../service-units/service-units.interface';
+import { IserviceUnits } from '../service-units/service-units.interface';
 
 export enum EComponentState { Started, Stopped, Loaded, Unloaded, Shutdown }
 export enum EComponentType { BC, SE }

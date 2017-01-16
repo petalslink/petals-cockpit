@@ -2,13 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
-import { IStore } from './../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { getCurrentTree } from '../../../../cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { Components } from './../../state/components/components.reducer';
-import { Containers } from './../../state/containers/containers.reducer';
-import { Buses } from './../../state/buses/buses.reducer';
-import { IBusesInProgress } from './../../state/buses-in-progress/buses-in-progress.interface';
-import { getBusesInProgress } from './../../state/buses-in-progress/buses-in-progress.selectors';
+import { Components } from '../../state/components/components.reducer';
+import { Containers } from '../../state/containers/containers.reducer';
+import { Buses } from '../../state/buses/buses.reducer';
+import { IBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
+import { getBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.selectors';
 
 @Component({
   selector: 'app-petals-menu-view',

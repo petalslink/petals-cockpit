@@ -3,11 +3,11 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-import { Buses } from './../../state/buses/buses.reducer';
-import { IBusRow } from './../../state/buses/bus.interface';
-import { Ui } from './../../../../../shared/state/ui.reducer';
-import { IStore } from './../../../../../shared/interfaces/store.interface';
-import { getCurrentBus } from './../../state/buses/buses.selectors';
+import { Buses } from '../../state/buses/buses.reducer';
+import { IBusRow } from '../../state/buses/bus.interface';
+import { Ui } from '../../../../../shared/state/ui.reducer';
+import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { getCurrentBus } from '../../state/buses/buses.selectors';
 
 @Component({
   selector: 'app-petals-bus-view',

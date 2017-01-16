@@ -1,5 +1,5 @@
-import { IUsers } from './../../../../../shared/interfaces/users.interface';
-import { IBuses } from './../buses/buses.interface';
+import { IUsers } from '../../../../../shared/interfaces/users.interface';
+import { IBuses } from '../buses/buses.interface';
 import { IWorkspacesCommon } from './workspaces.interface';
 
 interface IWorkspaceCommon {

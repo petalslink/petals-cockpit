@@ -14,10 +14,10 @@ import { Buses } from './workspaces/state/buses/buses.reducer';
 import { IWorkspace } from './workspaces/state/workspaces/workspace.interface';
 import { IWorkspaces, IWorkspacesTable } from './workspaces/state/workspaces/workspaces.interface';
 import { Workspaces } from './workspaces/state/workspaces/workspaces.reducer';
-import { Ui } from './../../shared/state/ui.reducer';
+import { Ui } from '../../shared/state/ui.reducer';
 import { LANGUAGES } from '../../core/opaque-tokens';
 import { IStore } from '../../shared/interfaces/store.interface';
-import { IUi } from './../../shared/interfaces/ui.interface';
+import { IUi } from '../../shared/interfaces/ui.interface';
 import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog.component';
 import { getCurrentWorkspace } from '../cockpit/workspaces/state/workspaces/workspaces.selectors';
 
@@ -52,7 +52,6 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this._uiSub = this.ui$
       .map(ui => ui.isPopupListWorkspacesVisible)
-      // .map(store => console.log(store))
       .distinctUntilChanged()
       .map(isPopupListWorkspacesVisible => {
         if (isPopupListWorkspacesVisible) {
@@ -79,7 +78,6 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy() {
-    console.log('DESTROYED !!!');
     this._uiSub.unsubscribe();
   }
 

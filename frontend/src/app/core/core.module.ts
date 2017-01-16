@@ -1,5 +1,5 @@
-import { WorkspacesMockService } from './../features/cockpit/workspaces/state/workspaces/workspaces.mock';
-import { WorkspacesService } from './../features/cockpit/workspaces/state/workspaces/workspaces.service';
+import { WorkspacesMockService } from '../features/cockpit/workspaces/state/workspaces/workspaces.mock';
+import { WorkspacesService } from '../features/cockpit/workspaces/state/workspaces/workspaces.service';
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { LocationStrategy, HashLocationStrategy, PathLocationStrategy } from '@angular/common';
 import { Http } from '@angular/http';
@@ -13,9 +13,9 @@ import { TranslateModule, TranslateLoader, TranslateStaticLoader } from 'ng2-tra
 import './rxjs-operators';
 import { createTranslateLoader } from '../shared/helpers/aot.helper';
 import { LANGUAGES } from './opaque-tokens';
-import { environment } from './../../environments/environment';
-import { getRootReducer } from './../shared/state/root.reducer';
-import { WorkspacesEffects } from './../features/cockpit/workspaces/state/workspaces/workspaces.effects';
+import { environment } from '../../environments/environment';
+import { getRootReducer } from '../shared/state/root.reducer';
+import { WorkspacesEffects } from '../features/cockpit/workspaces/state/workspaces/workspaces.effects';
 
 @NgModule({
   imports: [

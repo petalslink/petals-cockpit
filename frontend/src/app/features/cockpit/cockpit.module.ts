@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 
-import { SharedModule } from './../../shared/shared.module';
+import { SharedModule } from '../../shared/shared.module';
 import { CockpitRoutingModule } from './cockpit-routing.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { CockpitComponent } from './cockpit.component';
