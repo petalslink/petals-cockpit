@@ -1,5 +1,16 @@
+<div class="wrapper-search-add-bus" fxLayout="row" fxLayoutGap="10px">
+  <md-input-container fxFlex>
+    <input md-input placeholder="Search">
+  </md-input-container>
+
+  <button md-mini-fab class="btn-add-bus" color="primary" fxFlex="40px" mdTooltip="Import a bus" mdTooltipPosition="below"
+    [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId, 'petals', 'buses', 'import']">
+    <md-icon class="md-24">add</md-icon>
+  </button>
+</div>
+
 <div *ngIf="(busesInProgress$ | async).list.length > 0">
-  <h1 class="color-primary">Buses in progress</h1>
+  <h1 class="color-primary margin-top-x0">Buses in progress</h1>
   <app-buses-in-progress [busesInProgress]="busesInProgress$ | async"></app-buses-in-progress>
 </div>
 

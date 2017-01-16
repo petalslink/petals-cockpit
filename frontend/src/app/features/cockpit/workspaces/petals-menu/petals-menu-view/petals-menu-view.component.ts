@@ -9,6 +9,7 @@ import { Containers } from '../../state/containers/containers.reducer';
 import { Buses } from '../../state/buses/buses.reducer';
 import { IBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
 import { getBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.selectors';
+import { IWorkspacesTable } from './../../state/workspaces/workspaces.interface';
 
 @Component({
   selector: 'app-petals-menu-view',
@@ -16,12 +17,14 @@ import { getBusesInProgress } from '../../state/buses-in-progress/buses-in-progr
   styleUrls: ['./petals-menu-view.component.scss']
 })
 export class PetalsMenuViewComponent implements OnInit {
+  public workspaces$: Observable<IWorkspacesTable>;
   public tree$: Observable<any>;
   public busesInProgress$: Observable<IBusesInProgress>;
 
   constructor(private _store$: Store<IStore>) { }
 
   ngOnInit() {
+    this.workspaces$ = this._store$.select(state => state.workspaces);
     this.tree$ = this._store$.let(getCurrentTree());
     this.busesInProgress$ = this._store$.let(getBusesInProgress());
   }
