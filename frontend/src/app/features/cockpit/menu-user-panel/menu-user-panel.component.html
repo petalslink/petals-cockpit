@@ -1,0 +1,12 @@
+<div class="wrapper">
+  <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="25px" fxFill>
+    <app-generate-icon [size]="35" [text]="user.username"></app-generate-icon>
+
+    <div>
+      <div class="username">{{ user.username }}</div>
+      <div class="name">{{ user.name }}</div>
+    </div>
+
+    <md-icon class="cursor-pointer" mdTooltip="Disconnect" mdTooltipPosition="below">power_settings_new</md-icon>
+  </div>
+</div>

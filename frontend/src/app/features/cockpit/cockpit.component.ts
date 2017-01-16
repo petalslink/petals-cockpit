@@ -85,7 +85,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     // if there's no workspace selected
     // display the popup to select one
     // otherwise just fetch data
-    const re = /workspaces\/([a-zA-Z0-9]+)\//;
+    const re = /workspaces\/([a-zA-Z0-9]+)(\/)?/;
     const url = this._router.url;
 
     if (re.test(url)) {

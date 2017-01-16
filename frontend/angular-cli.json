@@ -21,7 +21,10 @@
         "../node_modules/material-design-icons/iconfont/material-icons.css",
         "styles.scss"
       ],
-      "scripts": [],
+      "scripts": [
+        "../node_modules/jdenticon/dist/jdenticon.min.js",
+        "../node_modules/js-md5/build/md5.min.js"
+      ],
       "environments": {
         "source": "environments/environment.ts",
         "dev": "environments/environment.ts",

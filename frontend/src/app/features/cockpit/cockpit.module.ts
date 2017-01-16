@@ -6,6 +6,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
 import { CockpitComponent } from './cockpit.component';
 import { EmptyMenuComponent } from './empty-menu/empty-menu.component';
 import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog.component';
+import { MenuUserPanelComponent } from './menu-user-panel/menu-user-panel.component';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog
   declarations: [
     CockpitComponent,
     EmptyMenuComponent,
-    WorkspacesDialogComponent
+    WorkspacesDialogComponent,
+    MenuUserPanelComponent
   ],
   entryComponents: [WorkspacesDialogComponent]
 })
