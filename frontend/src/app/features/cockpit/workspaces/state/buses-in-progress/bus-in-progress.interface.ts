@@ -2,9 +2,9 @@
 export interface IBusInProgressCommon {
   // from server
   id: string;
-  importUsername: string;
-  importPort: number;
-  importIp: string;
+  username: string;
+  port: number;
+  ip: string;
 
   // for UI
 }
@@ -18,7 +18,7 @@ export interface IBusInProgressRow extends IBusInProgressCommon {
 export interface IBusInProgress extends IBusInProgressCommon { }
 
 // used when we import a bus
-export interface INewBus extends IBusInProgressRow {
+export interface IBusInProgressImport extends IBusInProgressRow {
   password: string;
   passphrase: string;
 }

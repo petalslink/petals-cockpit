@@ -55,6 +55,11 @@ app-root {
   @extend .padding-x3;
 }
 
+.form-error {
+  color: red;
+  font-size: 12px;
+}
+
 // lib to have a pretty json display
 // use <prettyjson [obj]="someObj"></prettyjson>
 // instead of json pipe to have a pretty debug

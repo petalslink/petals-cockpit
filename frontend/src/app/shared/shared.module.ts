@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -13,7 +13,7 @@ import { GenerateIconComponent } from './components/generate-icon/generate-icon.
 
 export const modules = [
   CommonModule,
-  FormsModule,
+  ReactiveFormsModule,
   HttpModule,
   RouterModule,
   MaterialModule,

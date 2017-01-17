@@ -3,43 +3,77 @@
     <md-card-title class="color-primary margin-bottom-x0">Information of the bus</md-card-title>
 
     <md-card-content>
-      <div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="10px">
-        <!-- once this issue https://github.com/angular/flex-layout/issues/108
-        is fixed, replace fxFlex="45" to 50 -->
-        <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
-          <md-input-container fxFill>
-            <input md-input placeholder="IP">
-          </md-input-container>
+      <form novalidate [formGroup]="busImportForm" (ngSubmit)="onSubmit(busImportForm)">
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="10px">
+          <!-- once this issue https://github.com/angular/flex-layout/issues/108 -->
+          <!-- is fixed, replace fxFlex="45" to 50 -->
+          <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+            <md-input-container fxFill>
+              <input md-input placeholder="IP" formControlName="ip">
+              <md-hint>
+                <div class="form-error">
+                  <!-- TODO : when angular 4.0 is available we'll have access to an else -->
+                  <!-- property and we should start by check if required is OK, if not we shouldn't display others errors -->
+                  <div *ngIf="busImportForm.controls.ip.hasError('required') && busImportForm.controls.ip.touched">IP is required</div>
+                  <div *ngIf="busImportForm.controls.ip.hasError('isIp') && busImportForm.controls.ip.touched">Invalid IP format</div>
+                </div>
+              </md-hint>
+            </md-input-container>
+
+          </div>
+
+          <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+            <md-input-container fxFill>
+              <input md-input placeholder="Port" formControlName="port">
+              <md-hint>
+                <div class="form-error">
+                  <div *ngIf="busImportForm.controls.port.hasError('required') && busImportForm.controls.port.touched">Port is required</div>
+                  <div *ngIf="busImportForm.controls.port.hasError('isPort') && busImportForm.controls.port.touched">
+                    Invalid port format. Should be 0 <= port <= 65535
+                  </div>
+                </div>
+              </md-hint>
+            </md-input-container>
+          </div>
+
+          <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+            <md-input-container fxFill>
+              <input md-input placeholder="Username" formControlName="username">
+              <md-hint>
+                <div class="form-error">
+                  <div *ngIf="busImportForm.controls.username.hasError('required') && busImportForm.controls.username.touched">Username is required</div>
+                </div>
+              </md-hint>
+            </md-input-container>
+          </div>
+
+          <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+            <md-input-container fxFill>
+              <input md-input placeholder="Password" formControlName="password">
+              <md-hint>
+                <div class="form-error">
+                  <div *ngIf="busImportForm.controls.password.hasError('required') && busImportForm.controls.password.touched">Password is required</div>
+                </div>
+              </md-hint>
+            </md-input-container>
+          </div>
+
+          <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+            <md-input-container fxFill>
+              <input md-input placeholder="Topology passphrase" formControlName="passphrase">
+              <md-hint>
+                <div class="form-error">
+                  <div *ngIf="busImportForm.controls.passphrase.hasError('required') && busImportForm.controls.passphrase.touched">Passphrase is required</div>
+                </div>
+              </md-hint>
+            </md-input-container>
+          </div>
         </div>
 
-        <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
-          <md-input-container fxFill>
-            <input md-input placeholder="Port">
-          </md-input-container>
+        <div class="margin-top-x2" fxLayout="row" fxLayoutAlign="end center">
+          <button md-raised-button color="primary" type="submit" [disabled]="busImportForm.invalid">Import</button>
         </div>
-
-        <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
-          <md-input-container fxFill>
-            <input md-input placeholder="Username">
-          </md-input-container>
-        </div>
-
-        <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
-          <md-input-container fxFill>
-            <input md-input placeholder="Password">
-          </md-input-container>
-        </div>
-
-        <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
-          <md-input-container fxFill>
-            <input md-input placeholder="Topology passphrase">
-          </md-input-container>
-        </div>
-      </div>
-
-      <div class="margin-top-x2" fxLayout="row" fxLayoutAlign="end center">
-        <button md-raised-button color="primary">Import</button>
-      </div>
+      </form>
     </md-card-content>
   </md-card>
 </div>

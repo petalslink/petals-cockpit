@@ -13,6 +13,6 @@ export class WorkspaceComponent implements OnInit {
   constructor(private _store$: Store<IStore>) { }
 
   ngOnInit() {
-    this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals' } });
+    this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: '' } });
   }
 }
