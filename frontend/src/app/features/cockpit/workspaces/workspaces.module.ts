@@ -5,6 +5,7 @@ import { WorkspacesRoutingModule } from './workspaces-routing.module';
 import { WorkspacesComponent } from './workspaces.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { PetalsMenuModule } from './petals-menu/petals-menu.module';
+import { SseService } from './sse.service';
 
 @NgModule({
   imports: [
@@ -22,6 +23,9 @@ import { PetalsMenuModule } from './petals-menu/petals-menu.module';
     // were we should instead use a router-outlet
     // (in order to lazy load only what's needed)
     PetalsMenuModule
+  ],
+  providers: [
+    SseService
   ]
 })
 export class WorkspacesModule { }

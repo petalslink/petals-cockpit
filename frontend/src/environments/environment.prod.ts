@@ -15,6 +15,11 @@ export const environment = {
   // variable with .delay to simulate a network latency
   httpDelay: 500,
 
+  // SSEDELAY
+  // when using mocked data, you can use that
+  // variable with .delay to simulate a network latency
+  sseDelay: 500,
+
   // MOCK
   // should you keep mocks when building the app
   // or hit the real API
