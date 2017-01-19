@@ -9,7 +9,7 @@ export function _getCurrentBus(store$: Store<IStore>): Observable<IBusRow> {
   return store$.select(state => state.buses)
     .filter(buses => buses.selectedBusId !== '')
     .map(buses => {
-      let bus = buses.byId[buses.selectedBusId];
+      const bus = buses.byId[buses.selectedBusId];
 
       return bus;
     });

@@ -15,9 +15,17 @@ export class BusesInProgress {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_BUSSES_IN_PROGRESS = `${BusesInProgress.reducerName}_FETCH_BUSSES_IN_PROGRESS`;
-  private static fetchBussesInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
+  public static FETCH_BUSES_IN_PROGRESS = `${BusesInProgress.reducerName}_FETCH_BUSES_IN_PROGRESS`;
+  private static fetchBusesInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
     return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, payload);
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static SET_SELECTED_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_SET_SELECTED_BUS_IN_PROGRESS`;
+  private static setSelectedBusInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
+    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
+      selectedBusInProgressId: payload
+    });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -46,6 +54,7 @@ export class BusesInProgress {
 
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod = {
-    [BusesInProgress.FETCH_BUSSES_IN_PROGRESS]: BusesInProgress.fetchBussesInProgress,
+    [BusesInProgress.FETCH_BUSES_IN_PROGRESS]: BusesInProgress.fetchBusesInProgress,
+    [BusesInProgress.SET_SELECTED_BUS_IN_PROGRESS]: BusesInProgress.setSelectedBusInProgress,
   };
 }

@@ -68,7 +68,7 @@ export class WorkspacesEffects {
         const data = JSON.parse(res);
         return Observable.of(batchActions([
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
-          { type: BusesInProgress.FETCH_BUSSES_IN_PROGRESS, payload: data.busesInProgress },
+          { type: BusesInProgress.FETCH_BUSES_IN_PROGRESS, payload: data.busesInProgress },
           { type: Buses.FETCH_BUSES_SUCCESS, payload: data.buses },
           { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: data.containers },
           { type: Components.FETCH_COMPONENTS_SUCCESS, payload: data.components },

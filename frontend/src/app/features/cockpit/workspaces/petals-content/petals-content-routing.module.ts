@@ -7,15 +7,11 @@ import { PetalsBusInProgressViewModule } from './petals-bus-in-progress-view/pet
 import { PetalsContainerViewModule } from './petals-container-view/petals-container-view.module';
 import { PetalsComponentViewModule } from './petals-component-view/petals-component-view.module';
 import { PetalsServiceUnitViewModule } from './petals-service-unit-view/petals-service-unit-view.module';
-import { PetalsBusImportViewModule } from './petals-bus-import-view/petals-bus-import-view.module';
 
 export function loadBusViewModule() {
   return PetalsBusViewModule;
 }
 
-export function loadBusImportViewModule() {
-  return PetalsBusImportViewModule;
-}
 
 export function loadBusInProgressViewModule() {
   return PetalsBusInProgressViewModule;
@@ -40,15 +36,11 @@ const routes: Routes = [
     loadChildren: loadBusInProgressViewModule
   },
   {
-    path: 'buses/import',
-    loadChildren: loadBusImportViewModule
-  },
-  {
     path: 'buses/:busId',
     loadChildren: loadBusViewModule
   },
   {
-    path: 'buses-in-progress/:busInProgressId',
+    path: 'buses-in-progress',
     loadChildren: loadBusInProgressViewModule
   },
   {

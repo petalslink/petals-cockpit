@@ -10,15 +10,15 @@ export const fetchWorkspaceidWks0 = {
     byId: {
       'idBusInPro0': {
         id: 'idBusInPro0',
-        importIp: '192.168.0.1',
-        importPort: 4250,
-        importUsername: 'petals'
+        ip: '192.168.0.1',
+        port: 4250,
+        username: 'petals'
       },
       'idBusInPro1': {
         id: 'idBusInPro1',
-        importIp: '192.168.0.2',
-        importPort: 5132,
-        importUsername: 'petals',
+        ip: '192.168.0.2',
+        port: 5132,
+        username: 'petals',
         importError: 'ERROR!!!!'
       }
     },

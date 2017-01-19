@@ -11,7 +11,7 @@ export const environment = {
   httpDelay: 1000,
   // delay for sse events (between 10 and 15s)
   get sseDelay(): number {
-    let rand = (Math.floor(Math.random() * (1 + 15 - 10)) + 10) * 1000;
+    const rand = (Math.floor(Math.random() * (1 + 15 - 10)) + 10) * 1000;
     console.debug(`sse random timer : ${rand}`);
     return rand;
   },
