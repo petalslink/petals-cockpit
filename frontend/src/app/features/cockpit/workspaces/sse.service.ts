@@ -8,12 +8,14 @@ import { environment } from './../../../../environments/environment';
 // define all the workspace events
 export class SseWorkspaceEvent {
   public static BUS_IMPORT_OK = 'BUS_IMPORT_OK';
+  public static WORKSPACE_CONTENT = 'WORKSPACE_CONTENT';
   public static BUS_IMPORT_ERROR = 'BUS_IMPORT_ERROR';
   public static SU_STATE_CHANGE = 'SU_STATE_CHANGE';
 
   public static get allEvents() {
     return [
       SseWorkspaceEvent.BUS_IMPORT_OK,
+      SseWorkspaceEvent.WORKSPACE_CONTENT,
       SseWorkspaceEvent.BUS_IMPORT_ERROR,
       SseWorkspaceEvent.SU_STATE_CHANGE
     ];
@@ -45,6 +47,9 @@ export class SseService {
   private _registeredEvents: Map<string, { eventListener: any, subject$: Subject<any> }> = new Map();
 
   constructor() { }
+
+  // for mock only
+  public triggerSseEvent(eventName: string, data?: any) { }
 
   /**
    * watchWorkspaceRealTime
@@ -95,6 +100,8 @@ export class SseService {
 
       this._currentSse$.addEventListener(eventName, eventListener);
     });
+
+    return Observable.of(null);
   }
 
   /**

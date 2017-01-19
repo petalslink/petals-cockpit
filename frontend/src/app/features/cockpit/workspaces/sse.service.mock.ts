@@ -2,34 +2,33 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
+import { Subscription } from 'rxjs/Subscription';
 
 import { environment } from './../../../../environments/environment';
 import { SseWorkspaceEvent } from './sse.service';
+import { fetchWorkspaceidWks0 } from './../../../../mocks/workspace-id-wks-0';
 
 @Injectable()
-export class SseService {
-  // simulate an SSE stream with a subject
-  private _currentSse$: Subject<any>;
+export class SseServiceMock {
+  private _isSseOpened = false;
 
-  private _registeredEvents: Map<string, { eventListener: any, subject$: Subject<any> }> = new Map();
+  private _registeredEvents: Map<string, Subject<any>> = new Map();
 
   constructor() { }
 
   // call that method from another mock to simulate an SSE event
-  public triggerSseEvent(eventName) {
-    this._currentSse$.next(eventName);
+  public triggerSseEvent(eventName: string, data?: any) {
+    if (eventName === SseWorkspaceEvent.WORKSPACE_CONTENT) {
+      this._registeredEvents.get(eventName).next(this.getDataWorkspaceContent(data));
+    }
   }
 
   public watchWorkspaceRealTime(workspaceId: string) {
-    if (typeof this._currentSse$ !== 'undefined' && this._currentSse$ !== null) {
-      if (environment.debug) {
-        console.debug('closing previous sse connection');
-      }
-      // nothing to close in mock
-    } else {
-      // if it's the first time, init the subject
-      this._currentSse$ = new Subject<any>();
+    if (this._isSseOpened && environment.debug) {
+      console.debug('closing previous sse connection');
     }
+
+    this._isSseOpened = true;
 
     if (environment.debug) {
       console.debug('subscribing to a new sse connection');
@@ -38,24 +37,22 @@ export class SseService {
     // foreach event
     SseWorkspaceEvent.allEvents.forEach(eventName => {
       if (!this._registeredEvents.has(eventName)) {
-        this._registeredEvents.set(eventName, { eventListener: null, subject$: new Subject() });
+        this._registeredEvents.set(eventName, new Subject());
       }
 
-      // in both cases, add the new event listener (it was either removed or didn't exist)
       const eventListener = ({ data }: { data: string }) => {
-        this._registeredEvents.get(eventName).subject$.next(data);
+        this._registeredEvents.get(eventName).next(data);
       };
 
-      this._registeredEvents.set(eventName, {
-        eventListener,
-        subject$: this._registeredEvents.get(eventName).subject$
-      });
+      this._registeredEvents.set(eventName, this._registeredEvents.get(eventName));
     });
+
+    return Observable.of(null);
   }
 
   public subscribeToWorkspaceEvent(eventName: string) {
     if (this._registeredEvents.has(eventName)) {
-      return this._registeredEvents.get(eventName).subject$.asObservable().delay(environment.sseDelay);
+      return this._registeredEvents.get(eventName).asObservable().delay(environment.sseDelay);
     }
 
     if (environment.debug) {
@@ -66,5 +63,13 @@ export class SseService {
     }
 
     return Observable.empty();
+  }
+
+  // --------------------------------------------------------
+
+  private getDataWorkspaceContent(idWorkspace: string) {
+    if (idWorkspace === 'idWks0') {
+      return JSON.stringify(fetchWorkspaceidWks0);
+    }
   }
 }

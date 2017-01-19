@@ -32,6 +32,10 @@ export class Workspaces {
     );
   }
 
+  // only used in effect, no point to handle that action
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_WORKSPACE_WAIT_SSE = `${Workspaces.reducerName}_FETCH_WORKSPACE_WAIT_SSE`;
+
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE = `${Workspaces.reducerName}_FETCH_WORKSPACE`;
   private static fetchWorkspace(workspacesTable: IWorkspacesTable, payload) {

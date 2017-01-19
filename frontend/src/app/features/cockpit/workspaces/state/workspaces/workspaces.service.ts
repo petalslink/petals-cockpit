@@ -10,8 +10,4 @@ export class WorkspacesService {
   fetchWorkspaces() {
     return this._http.get(`${environment.urlBackend}/workspaces`);
   }
-
-  fetchWorkspace(idWorkspace: string) {
-    return this._http.get(`${environment.urlBackend}/workspaces/${idWorkspace}`);
-  }
 }

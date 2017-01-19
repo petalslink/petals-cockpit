@@ -17,19 +17,21 @@ import { Components } from '../components/components.reducer';
 import { ServiceUnits } from '../service-units/service-units.reducer';
 import { Ui } from '../../../../../shared/state/ui.reducer';
 import { BusesInProgress } from '../buses-in-progress/buses-in-progress.reducer';
+import { SseService, SseWorkspaceEvent } from './../../sse.service';
 
 @Injectable()
 export class WorkspacesEffects {
   constructor(
-    private actions$: Actions,
-    private store$: Store<IStore>,
-    private workspacesService: WorkspacesService
+    private _actions$: Actions,
+    private _store$: Store<IStore>,
+    private _workspacesService: WorkspacesService,
+    private _sseService: SseService
   ) { }
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchWorkspaces$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true }) fetchWorkspaces$: Observable<Action> = this._actions$
     .ofType(Workspaces.FETCH_WORKSPACES)
-    .switchMap((action: Action) => this.workspacesService.fetchWorkspaces()
+    .switchMap((action: Action) => this._workspacesService.fetchWorkspaces()
       .switchMap((res: Response) => {
         return Observable.of(batchActions([
           { type: Workspaces.FETCH_WORKSPACES_SUCCESS, payload: res.json().workspaces },
@@ -43,22 +45,34 @@ export class WorkspacesEffects {
         }
 
         // TODO : Define the FETCH_WORKSPACES_ERROR
-        return Observable.of({ type: 'Workspaces.FETCH_WORKSPACES_ERROR', payload: action.payload});
+        return Observable.of({ type: 'Workspaces.FETCH_WORKSPACES_ERROR', payload: action.payload });
       })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchWorkspace$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true }) fetchWorkspace$: Observable<Action> = this._actions$
     .ofType(Workspaces.FETCH_WORKSPACE)
-    .switchMap((action: Action) => this.workspacesService.fetchWorkspace(action.payload)
-      .switchMap((res: Response) => {
+    .switchMap((action: Action) => this._sseService.watchWorkspaceRealTime(action.payload)
+      .map(_ => {
+        return { type: Workspaces.FETCH_WORKSPACE_WAIT_SSE, payload: action.payload };
+      })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) fetchWorkspaceWaitSse$: Observable<Action> = this._actions$
+    .ofType(Workspaces.FETCH_WORKSPACE_WAIT_SSE)
+    // TODO there must be a way to improve the following line without setTimeout
+    .do(_ => setTimeout(() => this._sseService.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, 'idWks0'), 500))
+    .switchMap((action: Action) => this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
+      .switchMap((res: string) => {
+        const data = JSON.parse(res);
         return Observable.of(batchActions([
-          { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: res.json().workspace },
-          { type: BusesInProgress.FETCH_BUSSES_IN_PROGRESS, payload: res.json().busesInProgress },
-          { type: Buses.FETCH_BUSES_SUCCESS, payload: res.json().buses },
-          { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: res.json().containers },
-          { type: Components.FETCH_COMPONENTS_SUCCESS, payload: res.json().components },
-          { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: res.json().serviceUnits },
+          { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
+          { type: BusesInProgress.FETCH_BUSSES_IN_PROGRESS, payload: data.busesInProgress },
+          { type: Buses.FETCH_BUSES_SUCCESS, payload: data.buses },
+          { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: data.containers },
+          { type: Components.FETCH_COMPONENTS_SUCCESS, payload: data.components },
+          { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: data.serviceUnits },
 
           { type: Ui.OPEN_SIDENAV },
           { type: Ui.CLOSE_POPUP_WORKSPACES_LIST }
@@ -66,12 +80,12 @@ export class WorkspacesEffects {
       })
       .catch(err => {
         if (environment.debug) {
-          console.debug(`Error in workspaces.effects : ${Workspaces.FETCH_WORKSPACE}`);
+          console.debug(`Error in workspaces.effects : ${Workspaces.FETCH_WORKSPACE_WAIT_SSE}`);
           console.error(err);
         }
 
         // TODO : Define the FETCH_WORKSPACE_ERROR
-        return Observable.of({ type: 'Workspaces.FETCH_WORKSPACE_ERROR', payload: action.payload});
+        return Observable.of({ type: 'TODO Workspaces.FETCH_WORKSPACE_ERROR', payload: action.payload });
       })
     );
 }

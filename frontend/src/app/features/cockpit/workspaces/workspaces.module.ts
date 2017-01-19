@@ -6,6 +6,8 @@ import { WorkspacesComponent } from './workspaces.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { PetalsMenuModule } from './petals-menu/petals-menu.module';
 import { SseService } from './sse.service';
+import { environment } from './../../../../environments/environment';
+import { SseServiceMock } from './sse.service.mock';
 
 @NgModule({
   imports: [
@@ -25,7 +27,10 @@ import { SseService } from './sse.service';
     PetalsMenuModule
   ],
   providers: [
-    SseService
+    {
+      provide: SseService,
+      useClass: (environment.mock ? SseServiceMock : SseService)
+    }
   ]
 })
 export class WorkspacesModule { }
