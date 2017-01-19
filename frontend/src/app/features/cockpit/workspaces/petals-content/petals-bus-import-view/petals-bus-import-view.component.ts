@@ -6,6 +6,7 @@ import { IStore } from './../../../../../shared/interfaces/store.interface';
 import { Ui } from './../../../../../shared/state/ui.reducer';
 import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
 import { IBusInProgressImport } from './../../state/buses-in-progress/bus-in-progress.interface';
+import { environment } from './../../../../../../environments/environment.dev-e2e';
 
 @Component({
   selector: 'app-petals-bus-import-view',
@@ -20,13 +21,12 @@ export class PetalsBusImportViewComponent implements OnInit {
   ngOnInit() {
     this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Import bus' } });
 
-    // TODO : If dev env, fill the fields
     this.busImportForm = this._fb.group({
-      ip: ['', [Validators.required, CustomValidators.isIp]],
-      port: ['', [Validators.required, CustomValidators.isPort]],
-      username: ['', [Validators.required]],
-      password: ['', [Validators.required]],
-      passphrase: ['', [Validators.required]],
+      ip: [(environment.mock ? '192.168.1.1' : ''), [Validators.required, CustomValidators.isIp]],
+      port: [(environment.mock ? '2000' : ''), [Validators.required, CustomValidators.isPort]],
+      username: [(environment.mock ? 'admin' : ''), [Validators.required]],
+      password: [(environment.mock ? 'admin' : ''), [Validators.required]],
+      passphrase: [(environment.mock ? 'somePassphrase' : ''), [Validators.required]],
     });
   }
 

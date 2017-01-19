@@ -49,7 +49,7 @@
 
           <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
             <md-input-container fxFill>
-              <input md-input placeholder="Password" formControlName="password">
+              <input md-input type="password" placeholder="Password" formControlName="password">
               <md-hint>
                 <div class="form-error">
                   <div *ngIf="busImportForm.controls.password.hasError('required') && busImportForm.controls.password.touched">Password is required</div>
@@ -60,7 +60,7 @@
 
           <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
             <md-input-container fxFill>
-              <input md-input placeholder="Topology passphrase" formControlName="passphrase">
+              <input md-input type="password" placeholder="Topology passphrase" formControlName="passphrase">
               <md-hint>
                 <div class="form-error">
                   <div *ngIf="busImportForm.controls.passphrase.hasError('required') && busImportForm.controls.passphrase.touched">Passphrase is required</div>
