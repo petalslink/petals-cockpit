@@ -1,147 +1,169 @@
-export const fetchWorkspaceidWks0 = {
-  workspace: {
-    id: 'idWks0',
-    name: 'Workspace 0',
-    users: ['bescudie'],
-    buses: ['idBus0']
-  },
+import * as Chance from 'chance';
+const chance = new Chance;
 
-  busesInProgress: {
-    byId: {
-      'idBusInPro0': {
-        id: 'idBusInPro0',
-        ip: '192.168.0.1',
-        port: 4250,
-        username: 'petals'
-      },
-      'idBusInPro1': {
-        id: 'idBusInPro1',
-        ip: '192.168.0.2',
-        port: 5132,
-        username: 'petals',
-        importError: 'ERROR!!!!'
-      }
-    },
-    allIds: [
-      'idBusInPro0',
-      'idBusInPro1'
-    ]
-  },
+const _ids = {
+  idBusInPro0: 0, idBusInPro1: 0,
+  idBus0: 0,
+  idCont0: 0, idCont1: 0,
+  idComp0: 0, idComp1: 0, idComp2: 0, idComp3: 0,
+  idSu0: 0, idSu1: 0, idSu2: 0, idSu3: 0, idSu4: 0, idSu5: 0
+}
 
-  buses: {
-    byId: {
-      'idBus0': {
-        id: 'idBus0',
-        isImporting: false,
-        name: 'Bus 0',
-        state: 'UNDEPLOYED',
-        containers: [
-          'idCont0',
-          'idCont1'
-        ]
-      },
-    },
-    allIds: [
-      'idBus0'
-    ]
-  },
+export function _updateIdsForNewWorkspace() {
+  for (let i in _ids) {
+    _ids[i]++;
+  }
+}
 
-  containers: {
-    byId: {
-      'idCont0': {
-        id: 'idCont0',
-        name: 'Container 0',
-        components: [
-          'idComp0',
-          'idComp1'
-        ]
-      },
-      'idCont1': {
-        id: 'idCont1',
-        name: 'Container 1',
-        components: [
-          'idComp2',
-          'idComp3'
-        ]
-      }
-    },
-    allIds: [
-      'idCont0',
-      'idCont1'
-    ]
-  },
+// fetchWorkspaceidWks0
+export function getNewWorkspace() {
+  _updateIdsForNewWorkspace();
 
-  components: {
-    byId: {
-      'idComp0': {
-        id: 'idComp0',
-        name: 'Component 0',
-        serviceUnits: ['idSu0']
-      },
-      'idComp1': {
-        id: 'idComp1',
-        name: 'Component 1',
-        serviceUnits: [
-          'idSu1',
-          'idSu2'
-        ]
-      },
-      'idComp2': {
-        id: 'idComp2',
-        name: 'Component 2',
-        serviceUnits: ['idSu3']
-      },
-      'idComp3': {
-        id: 'idComp3',
-        name: 'Component 3',
-        serviceUnits: [
-          'idSu4',
-          'idSu5'
-        ]
-      }
+  return {
+    workspace: {
+      id: `idWks0`,
+      name: `Workspace 0`,
+      users: [`bescudie`],
+      buses: [`idBus${_ids.idBus0}`]
     },
-    allIds: [
-      'idComp0',
-      'idComp1',
-      'idComp2',
-      'idComp3'
-    ]
-  },
 
-  serviceUnits: {
-    byId: {
-      'idSu0': {
-        id: 'idSu0',
-        name: 'SU 0'
+    busesInProgress: {
+      byId: {
+        [`idBusInPro${_ids.idBusInPro0}`]: {
+          id: `idBusInPro${_ids.idBusInPro0}`,
+          ip: `192.168.0.1`,
+          port: 4250,
+          username: `petals`
+        },
+        [`idBusInPro${_ids.idBusInPro1}`]: {
+          id: `idBusInPro${_ids.idBusInPro1}`,
+          ip: `192.168.0.2`,
+          port: 5132,
+          username: `petals`,
+          importError: `ERROR!!!!`
+        }
       },
-      'idSu1': {
-        id: 'idSu1',
-        name: 'SU 1'
-      },
-      'idSu2': {
-        id: 'idSu2',
-        name: 'SU 2'
-      },
-      'idSu3': {
-        id: 'idSu3',
-        name: 'SU 3'
-      },
-      'idSu4': {
-        id: 'idSu4',
-        name: 'SU 4'
-      },
-      'idSu5': {
-        id: 'idSu5',
-        name: 'SU 5'
-      }
+      allIds: [
+        `idBusInPro${_ids.idBusInPro0}`,
+        `idBusInPro${_ids.idBusInPro1}`
+      ]
     },
-    allIds: [
-      'idSu0',
-      'idSu1',
-      'idSu2',
-      'idSu3',
-      'idSu4',
-      'idSu5'
-    ]
+
+    buses: {
+      byId: {
+        [`idBus${_ids.idBus0}`]: {
+          id: `idBus${_ids.idBus0}`,
+          isImporting: false,
+          name: `Bus ${_ids.idBus0}`,
+          state: `UNDEPLOYED`,
+          containers: [
+            `idCont${_ids.idCont0}`,
+            `idCont${_ids.idCont1}`
+          ]
+        },
+      },
+      allIds: [
+        `idBus${_ids.idBus0}`
+      ]
+    },
+
+    containers: {
+      byId: {
+        [`idCont${_ids.idCont0}`]: {
+          id: `idCont${_ids.idCont0}`,
+          name: `Container ${_ids.idCont0}`,
+          components: [
+            `idComp${_ids.idComp0}`,
+            `idComp${_ids.idComp1}`
+          ]
+        },
+        [`idCont${_ids.idCont1}`]: {
+          id: `idCont${_ids.idCont1}`,
+          name: `Container ${_ids.idCont1}`,
+          components: [
+            `idComp${_ids.idComp2}`,
+            `idComp${_ids.idComp3}`
+          ]
+        }
+      },
+      allIds: [
+        `idCont${_ids.idCont0}`,
+        `idCont${_ids.idCont1}`
+      ]
+    },
+
+    components: {
+      byId: {
+        [`idComp${_ids.idComp0}`]: {
+          id: `idComp${_ids.idComp0}`,
+          name: `Component ${_ids.idComp0}`,
+          serviceUnits: [`idSu${_ids.idSu0}`]
+        },
+        [`idComp${_ids.idComp1}`]: {
+          id: `idComp${_ids.idComp1}`,
+          name: `Component ${_ids.idComp1}`,
+          serviceUnits: [
+            `idSu${_ids.idSu1}`,
+            `idSu${_ids.idSu2}`
+          ]
+        },
+        [`idComp${_ids.idComp2}`]: {
+          id: `idComp${_ids.idComp2}`,
+          name: `Component ${_ids.idComp2}`,
+          serviceUnits: [`idSu${_ids.idSu3}`]
+        },
+        [`idComp${_ids.idComp3}`]: {
+          id: `idComp${_ids.idComp3}`,
+          name: `Component ${_ids.idComp3}`,
+          serviceUnits: [
+            `idSu${_ids.idSu4}`,
+            `idSu${_ids.idSu5}`
+          ]
+        }
+      },
+      allIds: [
+        `idComp${_ids.idComp0}`,
+        `idComp${_ids.idComp1}`,
+        `idComp${_ids.idComp2}`,
+        `idComp${_ids.idComp3}`
+      ]
+    },
+
+    serviceUnits: {
+      byId: {
+        [`idSu${_ids.idSu0}`]: {
+          id: `idSu${_ids.idSu0}`,
+          name: `SU ${_ids.idSu0}`
+        },
+        [`idSu${_ids.idSu1}`]: {
+          id: `idSu${_ids.idSu1}`,
+          name: `SU ${_ids.idSu1}`
+        },
+        [`idSu${_ids.idSu2}`]: {
+          id: `idSu${_ids.idSu2}`,
+          name: `SU ${_ids.idSu2}`
+        },
+        [`idSu${_ids.idSu3}`]: {
+          id: `idSu${_ids.idSu3}`,
+          name: `SU ${_ids.idSu3}`
+        },
+        [`idSu${_ids.idSu4}`]: {
+          id: `idSu${_ids.idSu4}`,
+          name: `SU ${_ids.idSu4}`
+        },
+        [`idSu${_ids.idSu5}`]: {
+          id: `idSu${_ids.idSu5}`,
+          name: `SU ${_ids.idSu5}`
+        }
+      },
+      allIds: [
+        `idSu${_ids.idSu0}`,
+        `idSu${_ids.idSu1}`,
+        `idSu${_ids.idSu2}`,
+        `idSu${_ids.idSu3}`,
+        `idSu${_ids.idSu4}`,
+        `idSu${_ids.idSu5}`
+      ]
+    }
   }
 };

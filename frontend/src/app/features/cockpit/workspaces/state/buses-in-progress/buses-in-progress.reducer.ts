@@ -37,6 +37,7 @@ export class BusesInProgress {
     });
   }
 
+  // once the http request is done
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS_SUCCESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS_SUCCESS`;
   private static postBusInProgressSuccess(busesInProgressTable: IBusesInProgressTable, payload) {
@@ -48,6 +49,10 @@ export class BusesInProgress {
       allIds: [...busesInProgressTable.allIds, payload.busInProgress.id]
     });
   }
+
+  // when the SSE received an event saying that the bus is now imported
+  public static BUS_IN_PROGRESS_IMPORT_SUCCESS = `${BusesInProgress.reducerName}_BUS_IN_PROGRESS_IMPORT_SUCCESS`;
+  //TODO : Implement the method
 
   // tslint:disable-next-line:member-ordering
   // public static FOLD_BUS = `${BusesInProgress.reducerName}_FOLD_BUS`;

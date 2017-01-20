@@ -18,7 +18,20 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUSES_SUCCESS = `${Buses.reducerName}_FETCH_BUSES_SUCCESS`;
   private static fetchBusesSuccess(busesTable: IBusesTable, payload) {
-    return <IBusesTable>Object.assign({}, busesTable, payload);
+    let allIds = busesTable.allIds;
+
+    payload.allIds.forEach(busId => {
+      if (!busesTable.byId[busId]) {
+        allIds = [...busesTable.allIds, busId];
+      }
+    });
+
+    return <IBusesTable>Object.assign({},
+      busesTable,
+      {
+        byId: Object.assign({}, busesTable.byId, { [busId]: payload.byId[busId] })
+      }
+    );
   }
 
   // tslint:disable-next-line:member-ordering

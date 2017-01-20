@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { environment } from './../../../../environments/environment';
 import { SseWorkspaceEvent } from './sse.service';
-import { fetchWorkspaceidWks0 } from './../../../../mocks/workspace-id-wks-0';
+import { getNewWorkspace } from './../../../../mocks/workspace-id-wks-0';
 
 @Injectable()
 export class SseServiceMock {
@@ -18,8 +18,14 @@ export class SseServiceMock {
 
   // call that method from another mock to simulate an SSE event
   public triggerSseEvent(eventName: string, data?: any) {
-    if (eventName === SseWorkspaceEvent.WORKSPACE_CONTENT) {
-      this._registeredEvents.get(eventName).next(this.getDataWorkspaceContent(data));
+    switch (eventName) {
+      case SseWorkspaceEvent.WORKSPACE_CONTENT:
+        this._registeredEvents.get(eventName).next(this.getDataWorkspaceContent(data));
+        break;
+
+      case SseWorkspaceEvent.BUS_IMPORT_OK:
+        this._registeredEvents.get(eventName).next(this.getDataBusImportOk(data));
+        break;
     }
   }
 
@@ -51,6 +57,7 @@ export class SseServiceMock {
   }
 
   public subscribeToWorkspaceEvent(eventName: string) {
+    console.log(eventName);
     if (this._registeredEvents.has(eventName)) {
       return this._registeredEvents.get(eventName).asObservable().delay(environment.sseDelay);
     }
@@ -69,7 +76,11 @@ export class SseServiceMock {
 
   private getDataWorkspaceContent(idWorkspace: string) {
     if (idWorkspace === 'idWks0') {
-      return JSON.stringify(fetchWorkspaceidWks0);
+      return JSON.stringify(getNewWorkspace());
     }
+  }
+
+  private getDataBusImportOk(idWorkspace: string) {
+    return JSON.stringify(getNewWorkspace());
   }
 }
