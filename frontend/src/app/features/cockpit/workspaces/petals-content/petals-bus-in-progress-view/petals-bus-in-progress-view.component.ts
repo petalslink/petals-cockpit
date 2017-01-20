@@ -20,6 +20,7 @@ import { IBusesInProgressTable } from './../../state/buses-in-progress/buses-in-
   styleUrls: ['./petals-bus-in-progress-view.component.scss']
 })
 export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
+  public busesInProgressTable$: Observable<IBusesInProgressTable>;
   public busInProgress$: Observable<IBusInProgressRow>;
   public busInProgress: IBusInProgressRow;
 
@@ -32,6 +33,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Import bus' } });
 
+    this.busesInProgressTable$ = this._store$.select(state => state.busesInProgress);
     this.busInProgress$ = this._store$.let(getCurrentBusInProgressEvenIfNull());
 
     this.busImportForm = this._fb.group({
@@ -58,6 +60,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
     // and an issue https://github.com/angular/material2/issues/2441
     // TODO : Unsubscribe
     this.busInProgress$
+      .filter(busInProgress => typeof busInProgress !== 'undefined')
       .map(busInProgress => {
         this.busInProgress = busInProgress;
 
@@ -104,8 +107,6 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   }
 
   onSubmit({value, valid}: { value: IBusInProgressImport, valid: boolean }) {
-    console.log('submit');
-    console.log('is the form valid ?', valid);
-    console.log('value of the form ', value);
+    this._store$.dispatch({ type: BusesInProgress.POST_BUS_IN_PROGRESS, payload: value });
   }
 }

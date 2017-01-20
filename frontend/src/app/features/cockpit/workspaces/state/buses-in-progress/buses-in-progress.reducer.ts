@@ -2,6 +2,7 @@ import { Action } from '@ngrx/store';
 
 import { busesInProgressTableFactory } from './buses-in-progress.initial-state';
 import { IBusesInProgressTable } from './buses-in-progress.interface';
+import { IBusInProgressRow } from './bus-in-progress.interface';
 
 export class BusesInProgress {
   private static reducerName = 'BUSES_IN_PROGRESS_REDUCER';
@@ -25,6 +26,26 @@ export class BusesInProgress {
   private static setSelectedBusInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
     return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
       selectedBusInProgressId: payload
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static POST_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS`;
+  private static postBusInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
+    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
+      isImportingBus: true
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static POST_BUS_IN_PROGRESS_SUCCESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS_SUCCESS`;
+  private static postBusInProgressSuccess(busesInProgressTable: IBusesInProgressTable, payload) {
+    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
+      isImportingBus: false,
+      byId: Object.assign({}, busesInProgressTable.byId, {
+        [payload.busInProgress.id]: <IBusInProgressRow>Object.assign({}, payload.busInProgress)
+      }),
+      allIds: [...busesInProgressTable.allIds, payload.busInProgress.id]
     });
   }
 
@@ -56,5 +77,7 @@ export class BusesInProgress {
   private static mapActionsToMethod = {
     [BusesInProgress.FETCH_BUSES_IN_PROGRESS]: BusesInProgress.fetchBusesInProgress,
     [BusesInProgress.SET_SELECTED_BUS_IN_PROGRESS]: BusesInProgress.setSelectedBusInProgress,
+    [BusesInProgress.POST_BUS_IN_PROGRESS]: BusesInProgress.postBusInProgress,
+    [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]: BusesInProgress.postBusInProgressSuccess,
   };
 }

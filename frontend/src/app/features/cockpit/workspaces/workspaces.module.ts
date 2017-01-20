@@ -8,6 +8,8 @@ import { PetalsMenuModule } from './petals-menu/petals-menu.module';
 import { SseService } from './sse.service';
 import { environment } from './../../../../environments/environment';
 import { SseServiceMock } from './sse.service.mock';
+import { BusesInProgressService } from './state/buses-in-progress/buses-in-progress.service';
+import { BusesInProgressMockService } from './state/buses-in-progress/buses-in-progress-mock.service';
 
 @NgModule({
   imports: [
@@ -30,6 +32,10 @@ import { SseServiceMock } from './sse.service.mock';
     {
       provide: SseService,
       useClass: (environment.mock ? SseServiceMock : SseService)
+    },
+    {
+      provide: BusesInProgressService,
+      useClass: (environment.mock ? BusesInProgressMockService : BusesInProgressService)
     }
   ]
 })

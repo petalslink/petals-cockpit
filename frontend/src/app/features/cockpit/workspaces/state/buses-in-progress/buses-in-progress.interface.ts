@@ -2,6 +2,7 @@ import { IBusInProgress, IBusInProgressRow } from './bus-in-progress.interface';
 
 export interface IBusesInProgressCommon {
   selectedBusInProgressId: string;
+  isImportingBus: boolean;
 }
 
 export interface IBusesInProgressTable extends IBusesInProgressCommon {

@@ -1,5 +1,3 @@
-import { WorkspacesMockService } from '../features/cockpit/workspaces/state/workspaces/workspaces.mock';
-import { WorkspacesService } from '../features/cockpit/workspaces/state/workspaces/workspaces.service';
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { LocationStrategy, HashLocationStrategy, PathLocationStrategy } from '@angular/common';
 import { Http } from '@angular/http';
@@ -16,6 +14,9 @@ import { LANGUAGES } from './opaque-tokens';
 import { environment } from '../../environments/environment';
 import { getRootReducer } from '../shared/state/root.reducer';
 import { WorkspacesEffects } from '../features/cockpit/workspaces/state/workspaces/workspaces.effects';
+import { BusesInProgressEffects } from './../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.effects';
+import { WorkspacesMockService } from '../features/cockpit/workspaces/state/workspaces/workspaces.mock';
+import { WorkspacesService } from '../features/cockpit/workspaces/state/workspaces/workspaces.service';
 
 @NgModule({
   imports: [
@@ -25,6 +26,7 @@ import { WorkspacesEffects } from '../features/cockpit/workspaces/state/workspac
     // https://github.com/ngrx/store/pull/269
     StoreModule.provideStore(getRootReducer),
     EffectsModule.run(WorkspacesEffects),
+    EffectsModule.run(BusesInProgressEffects),
     StoreDevtoolsModule.instrumentOnlyWithExtension(),
     TranslateModule.forRoot({
       provide: TranslateLoader,

@@ -40,31 +40,15 @@ To get more help on the `angular-cli` use `ng help` or go check out the [Angular
   See https://github.com/angular/angular/issues/13807#issuecomment-270880382
   When it work, it would be nice to have a separated URL for the left menu (this way we could be lazy loading menu components too)
 
-- loadChildren: () => SomeModule is not AOT compatible
-  When we export the function for AOT, we get an entry.split is not a function
-  https://github.com/angular/angular-cli/issues/3204
-  https://github.com/Meligy/angular/commit/167b1e3337247b9e93923403190b166382cc2c85
-  Seems to work even if there's that error ... (working on a fix)
-  **TEMP Fix :**  
-  In file : node_modules/@angular/compiler-cli/src/ngtools_impl.js (L153)  
-  (in function _collectLoadChildren)  
-  Replace this line  
-    `if (r.loadChildren) {`
-  By
-    `if (r.loadChildren && typeof r.loadChildren === 'string') {`
-
 - Layout are bugged when using fxLayoutGap https://github.com/angular/flex-layout/issues/106 (should be merged in master soon)
 
 - Can't have md-tab working well with router : https://github.com/angular/material2/issues/524 (should be released soon)
 
-- Due to error in build (CF previous report ...) we have that in package.json
+- AOT is not working because of : https://github.com/angular/angular/issues/14005 (see also https://github.com/angular/angular/issues/13909)
+
+- Due to error in build we have that in package.json
     "build-electron": "ng build --prod -bh='./'; node ./electron/generate-package-json.js; cp ./electron/electron.js dist/",
     "electron": "npm run build-electron; electron dist/"
 When everything is stable, replace it by
     "build-electron": "ng build --prod --aot --no-sourcemap -bh='./' && node ./electron/generate-package-json.js && cp ./electron/electron.js dist/",
     "electron": "npm run build-electron && electron dist/"
-
-- BatchActions dispatch multiple actions into one action BUT selectors are triggered on every internal dispatch of the batchActions ...
-Need to use a global action and handle it inside every reducers
-I opened an issue here : https://github.com/ngrx/store/issues/312#issuecomment-272187930
-This has now been fixed by changing the way I get store parts but issue is still open even tho the code's working now

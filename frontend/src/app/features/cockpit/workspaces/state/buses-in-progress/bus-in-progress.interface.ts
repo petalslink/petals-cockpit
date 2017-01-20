@@ -7,8 +7,6 @@ export interface IBusInProgressCommon {
   ip: string;
 
   // for UI
-  // TODO isInProgress is maybe not needed anymore
-  isInProgress: boolean;
   importError: string;
 
   password: string;
