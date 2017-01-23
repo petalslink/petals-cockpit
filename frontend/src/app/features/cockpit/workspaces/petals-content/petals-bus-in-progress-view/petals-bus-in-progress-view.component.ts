@@ -1,18 +1,31 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+// angular modules
+import { Component, Input, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { MdInputContainer } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+// ngrx
 import { Store } from '@ngrx/store';
+
+// rxjs
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 
+// our interfaces
 import { IStore } from './../../../../../shared/interfaces/store.interface';
-import { Ui } from './../../../../../shared/state/ui.reducer';
-import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
+import { IBusesInProgressTable } from './../../state/buses-in-progress/buses-in-progress.interface';
 import { IBusInProgress, IBusInProgressRow, IBusInProgressImport } from './../../state/buses-in-progress/bus-in-progress.interface';
-import { environment } from './../../../../../../environments/environment.dev-e2e';
+
+// our reducers - selectors
+import { Ui } from './../../../../../shared/state/ui.reducer';
 import { BusesInProgress } from './../../state/buses-in-progress/buses-in-progress.reducer';
 import { getCurrentBusInProgressEvenIfNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
-import { IBusesInProgressTable } from './../../state/buses-in-progress/buses-in-progress.interface';
+
+// environment
+import { environment } from './../../../../../../environments/environment.dev-e2e';
+
+// our helpers
+import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
 
 @Component({
   selector: 'app-petals-bus-in-progress-view',
@@ -20,6 +33,9 @@ import { IBusesInProgressTable } from './../../state/buses-in-progress/buses-in-
   styleUrls: ['./petals-bus-in-progress-view.component.scss']
 })
 export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
+  @Input() isImportingBus = false;
+  @ViewChild('ipInput') ipInput: MdInputContainer;
+
   public busesInProgressTable$: Observable<IBusesInProgressTable>;
   public busInProgress$: Observable<IBusInProgressRow>;
   public busInProgress: IBusInProgressRow;
@@ -151,11 +167,23 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
     }
   }
 
+  ngAfterViewInit() {
+    if (!this.isImportingBus) {
+      this.ipInput._focusInput();
+    }
+  }
+
   ngOnDestroy() {
     this._routeSub.unsubscribe();
   }
 
   onSubmit({value, valid}: { value: IBusInProgressImport, valid: boolean }) {
-    this._store$.dispatch({ type: BusesInProgress.POST_BUS_IN_PROGRESS, payload: value });
+    if (this.busImportForm.valid) {
+      this._store$.dispatch({ type: BusesInProgress.POST_BUS_IN_PROGRESS, payload: value });
+    }
+  }
+
+  reset() {
+    this.busImportForm.reset();
   }
 }

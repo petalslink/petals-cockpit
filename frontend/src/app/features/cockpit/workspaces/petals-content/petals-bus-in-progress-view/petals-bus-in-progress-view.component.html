@@ -1,14 +1,14 @@
 <div class="content">
-  <md-card>
-    <md-card-title class="color-primary margin-bottom-x0">Information of the bus</md-card-title>
+  <md-card class="card-import-bus">
+    <md-card-title class="color-primary margin-bottom-x0">Description :</md-card-title>
 
     <md-card-content>
-      <form novalidate [formGroup]="busImportForm" (ngSubmit)="onSubmit(busImportForm)">
+      <form novalidate [formGroup]="busImportForm" (ngSubmit)="onSubmit(busImportForm) && busImportForm.reset()">
         <div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="10px">
           <!-- once this issue https://github.com/angular/flex-layout/issues/108 -->
           <!-- is fixed, replace fxFlex="45" to 50 -->
           <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
-            <md-input-container fxFill>
+            <md-input-container #ipInput fxFill>
               <input md-input placeholder="IP" formControlName="ip" required>
               <span md-prefix><md-icon color="primary">star_half</md-icon>&nbsp;</span>
               <md-hint *ngIf="formErrors.ip" class="form-error">
@@ -17,13 +17,12 @@
                 {{ formErrors.ip }}
               </md-hint>
             </md-input-container>
-
           </div>
 
           <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
             <md-input-container fxFill>
               <input md-input placeholder="Port" formControlName="port" required>
-              <span md-prefix><md-icon color="primary">star_half</md-icon>&nbsp;</span>
+              <span md-prefix><md-icon color="primary">settings_ethernet</md-icon>&nbsp;</span>
               <md-hint *ngIf="formErrors.port" class="form-error">
                 {{ formErrors.port }}
               </md-hint>
