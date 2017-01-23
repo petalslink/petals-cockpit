@@ -57,7 +57,6 @@ export class SseServiceMock {
   }
 
   public subscribeToWorkspaceEvent(eventName: string) {
-    console.log(eventName);
     if (this._registeredEvents.has(eventName)) {
       return this._registeredEvents.get(eventName).asObservable().delay(environment.sseDelay);
     }
@@ -75,12 +74,10 @@ export class SseServiceMock {
   // --------------------------------------------------------
 
   private getDataWorkspaceContent(idWorkspace: string) {
-    if (idWorkspace === 'idWks0') {
-      return JSON.stringify(getNewWorkspace());
-    }
+      return JSON.stringify(getNewWorkspace(idWorkspace));
   }
 
   private getDataBusImportOk(idWorkspace: string) {
-    return JSON.stringify(getNewWorkspace());
+    return JSON.stringify(getNewWorkspace(idWorkspace));
   }
 }

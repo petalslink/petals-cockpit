@@ -15,14 +15,19 @@ export function _updateIdsForNewWorkspace() {
   }
 }
 
-// fetchWorkspaceidWks0
-export function getNewWorkspace() {
+const memoizeGetNewWorkspace = new Map();
+
+export function getNewWorkspace(idWks) {
+  if (memoizeGetNewWorkspace.has(idWks)) {
+    return memoizeGetNewWorkspace.get(idWks);
+  }
+
   _updateIdsForNewWorkspace();
 
-  return {
+  const wks = {
     workspace: {
-      id: `idWks0`,
-      name: `Workspace 0`,
+      id: idWks,
+      name: `Workspace ${idWks}`,
       users: [`bescudie`],
       buses: [`idBus${_ids.idBus0}`]
     },
@@ -165,5 +170,9 @@ export function getNewWorkspace() {
         `idSu${_ids.idSu5}`
       ]
     }
-  }
+  };
+
+  memoizeGetNewWorkspace.set(idWks, wks);
+
+  return wks;
 };

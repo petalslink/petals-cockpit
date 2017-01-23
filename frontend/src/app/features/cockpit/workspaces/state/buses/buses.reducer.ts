@@ -29,7 +29,7 @@ export class Buses {
     return <IBusesTable>Object.assign({},
       busesTable,
       {
-        byId: Object.assign({}, busesTable.byId, { [busId]: payload.byId[busId] })
+        byId: Object.assign({}, busesTable.byId, payload.byId)
       }
     );
   }
@@ -81,7 +81,7 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static TOGGLE_FOLD_BUS = `${Buses.reducerName}_TOGGLE_FOLD_BUS`;
   private static toggleFoldBus(busesTable: IBusesTable, payload: { busId: string }) {
-    let bus = busesTable.byId[payload.busId];
+    const bus = busesTable.byId[payload.busId];
 
     if (bus.isFolded) {
       return Buses.unfoldBus(busesTable, payload);

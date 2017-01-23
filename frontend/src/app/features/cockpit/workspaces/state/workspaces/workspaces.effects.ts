@@ -62,7 +62,7 @@ export class WorkspacesEffects {
   @Effect({ dispatch: true }) fetchWorkspaceWaitSse$: Observable<Action> = this._actions$
     .ofType(Workspaces.FETCH_WORKSPACE_WAIT_SSE)
     // TODO there must be a way to improve the following line without setTimeout
-    .do(_ => setTimeout(() => this._sseService.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, 'idWks0'), 500))
+    .do((action: Action) => setTimeout(() => this._sseService.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, action.payload), 500))
     .switchMap((action: Action) => this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
       .switchMap((res: string) => {
         const data = JSON.parse(res);

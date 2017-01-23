@@ -4,14 +4,14 @@ import { Observable } from 'rxjs/Observable';
 
 import { fetchWorkspaces } from '../../../../../../mocks/workspaces';
 import { environment } from '../../../../../../environments/environment';
-import { fetchWorkspaceidWks0 } from '../../../../../../mocks/workspace-id-wks-0';
+import { getNewWorkspace } from '../../../../../../mocks/workspace-id-wks-0';
 
 @Injectable()
 export class WorkspacesMockService {
   constructor() { }
 
   fetchWorkspaces(): Observable<Response> {
-    return Observable.of(fetchWorkspaces)
+    return Observable.of(fetchWorkspaces())
       .delay(environment.httpDelay)
       .map(workspaces => {
         return <Response>{
@@ -26,9 +26,7 @@ export class WorkspacesMockService {
   fetchWorkspace(idWorkspace: string): Observable<Response> {
     let fetchedWorkspace;
 
-    if (idWorkspace === 'idWks0') {
-      fetchedWorkspace = fetchWorkspaceidWks0;
-    }
+    fetchedWorkspace = getNewWorkspace(idWorkspace);
 
     return Observable.of(fetchedWorkspace)
       .delay(environment.httpDelay)

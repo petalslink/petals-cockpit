@@ -24,6 +24,18 @@ export class Workspaces {
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES_SUCCESS = `${Workspaces.reducerName}_FETCH_WORKSPACES_SUCCESS`;
   private static fetchWorkspacesSuccess(workspacesTable: IWorkspacesTable, payload) {
+    payload.allIds.forEach(workspaceId => {
+      payload = Object.assign({}, payload, {
+        byId: Object.assign({}, payload.byId, {
+          [workspaceId]: Object.assign({}, payload.byId[workspaceId], {
+            buses: (typeof workspacesTable.byId[workspaceId] === 'undefined' ? [] : workspacesTable.byId[workspaceId].buses)
+          })
+        })
+      });
+
+      return;
+    });
+
     return <IWorkspacesTable>Object.assign({}, workspacesTable,
       payload,
       <IWorkspacesTable>{
