@@ -28,6 +28,33 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
 
   private _routeSub: Subscription;
 
+  formErrors = {
+    'ip': '',
+    'port': '',
+    'username': '',
+    'password': '',
+    'passphrase': ''
+  };
+  validationMessages = {
+    'ip': {
+      'required': 'Required !',
+      'isIp': 'Invalid IP format'
+    },
+    'port': {
+      'required': 'Required !',
+      'isPort': 'Invalid port format. Should be 0 <= port <= 65535'
+    },
+    'username': {
+      'required': 'Required !'
+    },
+    'password': {
+      'required': 'Required !'
+    },
+    'passphrase': {
+      'required': 'Required !'
+    }
+  };
+
   constructor(private _store$: Store<IStore>, private _fb: FormBuilder, private _route: ActivatedRoute) { }
 
   ngOnInit() {
@@ -36,13 +63,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
     this.busesInProgressTable$ = this._store$.select(state => state.busesInProgress);
     this.busInProgress$ = this._store$.let(getCurrentBusInProgressEvenIfNull());
 
-    this.busImportForm = this._fb.group({
-      ip: ['', [Validators.required, CustomValidators.isIp]],
-      port: ['', [Validators.required, CustomValidators.isPort]],
-      username: ['', [Validators.required]],
-      password: ['', [Validators.required]],
-      passphrase: ['', [Validators.required]],
-    });
+    this.createFormImportBus();
 
     this._routeSub = this._route
       .params
@@ -100,6 +121,34 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
         this.busImportForm.patchValue({ passphrase });
       })
       .subscribe();
+  }
+
+  createFormImportBus() {
+    this.busImportForm = this._fb.group({
+      ip: ['', Validators.compose([Validators.required, CustomValidators.isIp])],
+      port: ['', Validators.compose([Validators.required, CustomValidators.isPort])],
+      username: ['', [Validators.required]],
+      password: ['', [Validators.required]],
+      passphrase: ['', [Validators.required]],
+    });
+
+    this.busImportForm.valueChanges
+      .subscribe(data => this.onValueChanged(data));
+    this.onValueChanged();
+  }
+
+  onValueChanged(data?: any) {
+    const form = this.busImportForm;
+    for (const field in this.formErrors) {
+      this.formErrors[field] = '';
+      const control = form.get(field);
+      if (control && control.dirty && !control.valid) {
+        const messages = this.validationMessages[field];
+        for (const key in control.errors) {
+          this.formErrors[field] += messages[key] + ' ';
+        }
+      }
+    }
   }
 
   ngOnDestroy() {
