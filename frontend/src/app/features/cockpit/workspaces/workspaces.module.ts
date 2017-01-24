@@ -22,7 +22,7 @@ import { BusesInProgressMockService } from './state/buses-in-progress/buses-in-p
     WorkspaceComponent
   ],
   exports: [
-    // TODO : Remove this line when lazy loading becomes available
+    // TODO : Remove this line when aux route becomes available in lazy loaded module
     // we export here to use this component from cockpit.component
     // were we should instead use a router-outlet
     // (in order to lazy load only what's needed)

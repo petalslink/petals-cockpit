@@ -11,8 +11,7 @@ export function LoadCockpitModule() {
 export const routes: Routes = [
   {
     path: '',
-    // loadChildren: 'app/features/cockpit/cockpit.module#CockpitModule'
-    loadChildren: LoadCockpitModule
+    loadChildren: 'app/features/cockpit/cockpit.module#CockpitModule'
   }
 ];
 
@@ -21,7 +20,7 @@ export const routes: Routes = [
     // TODO preload modules when lazy loading is activated
     // RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
     RouterModule.forRoot(routes),
-    LoginModule,
+    // LoginModule,
     CockpitModule
   ]
 })

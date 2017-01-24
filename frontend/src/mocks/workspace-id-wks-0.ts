@@ -1,5 +1,5 @@
-import * as Chance from 'chance';
-const chance = new Chance;
+// import * as Chance from 'chance';
+// const chance = new Chance;
 
 const _ids = {
   idBusInPro0: 0, idBusInPro1: 0,

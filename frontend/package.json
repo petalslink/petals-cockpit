@@ -11,12 +11,13 @@
     "pree2e": "webdriver-manager update --standalone false --gecko false",
     "e2e": "protractor",
     "precache": "sw-precache --verbose --config=sw-precache-config.js",
-    "prod": "ng build --prod --aot --no-sourcemap && npm run precache",
-    "prod-mock": "ng build --prod --no-sourcemap --e=prod-e2e && npm run precache",
-    "build-electron-mock": "ng build --prod --e=gitlab-pages -bh='./' --no-sourcemap; node ./electron/generate-package-json.js; cp ./electron/electron.js dist/",
-    "electron-mock": "npm run build-electron-mock; electron dist/",
-    "build-electron": "ng build --prod --e=gitlab-pages -bh='./'' --no-sourcemap; node ./electron/generate-package-json.js; cp ./electron/electron.js dist/",
-    "electron": "npm run build-electron; electron dist/"
+    "build": "ng build --prod --aot --no-sourcemap",
+    "prod": "yarn run build && yarn run precache",
+    "prod-mock": "yarn run build --e=prod-e2e && yarn run precache",
+    "build-electron-mock": "yarn run build --e=prod-e2e -bh='./' && yarn run precache; node ./electron/generate-package-json.js; cp ./electron/electron.js dist/",
+    "electron-mock": "yarn run build-electron-mock; electron dist/",
+    "build-electron": "yarn run build -bh='./' && yarn run precache; node ./electron/generate-package-json.js; cp ./electron/electron.js dist/",
+    "electron": "yarn run build-electron; electron dist/"
   },
   "private": true,
   "dependencies": {
