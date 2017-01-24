@@ -2,32 +2,31 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { PetalsContentViewComponent } from './petals-content.component';
-import { PetalsBusViewModule } from './petals-bus-view/petals-bus-view.module';
-import { PetalsBusInProgressViewModule } from './petals-bus-in-progress-view/petals-bus-in-progress-view.module';
-import { PetalsContainerViewModule } from './petals-container-view/petals-container-view.module';
-import { PetalsComponentViewModule } from './petals-component-view/petals-component-view.module';
-import { PetalsServiceUnitViewModule } from './petals-service-unit-view/petals-service-unit-view.module';
+// import { PetalsBusViewModule } from './petals-bus-view/petals-bus-view.module';
+// import { PetalsBusInProgressViewModule } from './petals-bus-in-progress-view/petals-bus-in-progress-view.module';
+// import { PetalsContainerViewModule } from './petals-container-view/petals-container-view.module';
+// import { PetalsComponentViewModule } from './petals-component-view/petals-component-view.module';
+// import { PetalsServiceUnitViewModule } from './petals-service-unit-view/petals-service-unit-view.module';
 
-export function loadBusViewModule() {
-  return PetalsBusViewModule;
-}
+// export function loadBusViewModule() {
+//   return PetalsBusViewModule;
+// }
 
+// export function loadBusInProgressViewModule() {
+//   return PetalsBusInProgressViewModule;
+// }
 
-export function loadBusInProgressViewModule() {
-  return PetalsBusInProgressViewModule;
-}
+// export function loadContainerViewModule() {
+//   return PetalsContainerViewModule;
+// }
 
-export function loadContainerViewModule() {
-  return PetalsContainerViewModule;
-}
+// export function loadComponentViewModule() {
+//   return PetalsComponentViewModule;
+// }
 
-export function loadComponentViewModule() {
-  return PetalsComponentViewModule;
-}
-
-export function loadServiceUnitViewModule() {
-  return PetalsServiceUnitViewModule;
-}
+// export function loadServiceUnitViewModule() {
+//   return PetalsServiceUnitViewModule;
+// }
 
 // /workspaces/:workspaceId/petals
 const routes: Routes = [

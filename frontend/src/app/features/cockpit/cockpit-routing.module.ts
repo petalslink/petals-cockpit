@@ -3,16 +3,16 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { CockpitComponent } from './cockpit.component';
 import { EmptyMenuComponent } from './empty-menu/empty-menu.component';
-import { WorkspacesModule } from './workspaces/workspaces.module';
-import { PetalsContentModule } from './workspaces/petals-content/petals-content.module';
+// import { WorkspacesModule } from './workspaces/workspaces.module';
+// import { PetalsContentModule } from './workspaces/petals-content/petals-content.module';
 
-export function loadWorkspacesModule() {
-  return WorkspacesModule;
-}
+// export function loadWorkspacesModule() {
+//   return WorkspacesModule;
+// }
 
-export function loadPetalsContentModule() {
-  return PetalsContentModule;
-}
+// export function loadPetalsContentModule() {
+//   return PetalsContentModule;
+// }
 
 const routes: Routes = [
   {
