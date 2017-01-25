@@ -53,6 +53,11 @@ app-root {
 
 .content {
   @extend .padding-x3;
+
+  &.content-max-width {
+    max-width: 800px;
+    margin: auto;
+  }
 }
 
 .form-error {

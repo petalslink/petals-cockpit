@@ -1,38 +1,27 @@
-// angular modules
 import { Component, Input, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MdInputContainer } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
-// ngrx
 import { Store } from '@ngrx/store';
-
-// rxjs
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 
-// our interfaces
 import { IStore } from './../../../../../shared/interfaces/store.interface';
 import { IBusesInProgressTable } from './../../state/buses-in-progress/buses-in-progress.interface';
 import { IBusInProgress, IBusInProgressRow, IBusInProgressImport } from './../../state/buses-in-progress/bus-in-progress.interface';
-
-// our reducers - selectors
 import { Ui } from './../../../../../shared/state/ui.reducer';
 import { BusesInProgress } from './../../state/buses-in-progress/buses-in-progress.reducer';
 import { getCurrentBusInProgressEvenIfNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
-
-// environment
 import { environment } from './../../../../../../environments/environment.dev-e2e';
-
-// our helpers
 import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
+import { getFormErrors, enableAllFormFields, disableAllFormFields } from './../../../../../shared/helpers/form.helper';
 
 @Component({
   selector: 'app-petals-bus-in-progress-view',
   templateUrl: './petals-bus-in-progress-view.component.html',
   styleUrls: ['./petals-bus-in-progress-view.component.scss']
 })
-export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
+export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() isImportingBus = false;
   @ViewChild('ipInput') ipInput: MdInputContainer;
 
@@ -41,34 +30,16 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   public busInProgress: IBusInProgressRow;
 
   public busImportForm: FormGroup;
+  private _busImportFormSubscription: Subscription;
 
   private _routeSub: Subscription;
 
-  formErrors = {
+  private formErrors = {
     'ip': '',
     'port': '',
     'username': '',
     'password': '',
     'passphrase': ''
-  };
-  validationMessages = {
-    'ip': {
-      'required': 'Required !',
-      'isIp': 'Invalid IP format'
-    },
-    'port': {
-      'required': 'Required !',
-      'isPort': 'Invalid port format. Should be 0 <= port <= 65535'
-    },
-    'username': {
-      'required': 'Required !'
-    },
-    'password': {
-      'required': 'Required !'
-    },
-    'passphrase': {
-      'required': 'Required !'
-    }
   };
 
   constructor(private _store$: Store<IStore>, private _fb: FormBuilder, private _route: ActivatedRoute) { }
@@ -101,40 +72,19 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
       .map(busInProgress => {
         this.busInProgress = busInProgress;
 
-        let ip, port, username, password, passphrase;
-
         if (environment.mock && this.busInProgress === null) {
-          // if dev env + no busInProgressId : Fill the form with random data
-          // ip = '192.168.1.1';
-          // port = '2000';
-          // username = 'admin';
-          // password = 'admin';
-          // passphrase = 'somePassphrase';
-
-          this.busImportForm.controls['ip'].enable();
-          this.busImportForm.controls['port'].enable();
-          this.busImportForm.controls['username'].enable();
-          this.busImportForm.controls['password'].enable();
-          this.busImportForm.controls['passphrase'].enable();
+          enableAllFormFields(this.busImportForm);
         } else if (this.busInProgress !== null) {
-          ip = busInProgress.ip;
-          port = busInProgress.port;
-          username = busInProgress.username;
-          password = busInProgress.password;
-          passphrase = busInProgress.passphrase;
+          this.busImportForm.patchValue({
+            ip: busInProgress.ip,
+            port: busInProgress.port,
+            username: busInProgress.username,
+            password: busInProgress.password,
+            passphrase: busInProgress.passphrase
+          });
 
-          this.busImportForm.controls['ip'].disable();
-          this.busImportForm.controls['port'].disable();
-          this.busImportForm.controls['username'].disable();
-          this.busImportForm.controls['password'].disable();
-          this.busImportForm.controls['passphrase'].disable();
+          disableAllFormFields(this.busImportForm);
         }
-
-        this.busImportForm.patchValue({ ip });
-        this.busImportForm.patchValue({ port });
-        this.busImportForm.patchValue({ username });
-        this.busImportForm.patchValue({ password });
-        this.busImportForm.patchValue({ passphrase });
       })
       .subscribe();
   }
@@ -148,23 +98,13 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
       passphrase: ['', [Validators.required]],
     });
 
-    this.busImportForm.valueChanges
-      .subscribe(data => this.onValueChanged(data));
-    this.onValueChanged();
-  }
-
-  onValueChanged(data?: any) {
-    const form = this.busImportForm;
-    for (const field in this.formErrors) {
-      this.formErrors[field] = '';
-      const control = form.get(field);
-      if (control && control.dirty && !control.valid) {
-        const messages = this.validationMessages[field];
-        for (const key in control.errors) {
-          this.formErrors[field] += messages[key] + ' ';
-        }
-      }
-    }
+    this._busImportFormSubscription = this
+      .busImportForm
+      .valueChanges
+      .map(data => {
+        this.formErrors = getFormErrors(this.busImportForm, this.formErrors, data);
+      })
+      .subscribe();
   }
 
   ngAfterViewInit() {
@@ -175,6 +115,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._routeSub.unsubscribe();
+    this._busImportFormSubscription.unsubscribe();
   }
 
   onSubmit({value, valid}: { value: IBusInProgressImport, valid: boolean }) {
