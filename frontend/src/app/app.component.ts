@@ -16,6 +16,17 @@ import { Ui } from './shared/state/ui.reducer';
 })
 export class AppComponent implements OnInit, OnDestroy {
   private _languageSub: Subscription;
+  public notificationOptions = {
+    position: ['bottom', 'right'],
+    // this timeout doesn't make any sense
+    // should open an issue on Github
+    // https://github.com/flauc/angular2-notifications
+    timeOut: 1200,
+    lastOnBottom: true,
+    showProgressBar: true,
+    pauseOnHover: true,
+    clickToClose: true
+  };
 
   constructor(
     private _translate: TranslateService,

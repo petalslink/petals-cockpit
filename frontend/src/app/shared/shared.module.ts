@@ -9,6 +9,7 @@ import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { TranslateModule } from 'ng2-translate';
 import { PrettyJsonModule } from 'angular2-prettyjson';
+import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 
@@ -22,7 +23,8 @@ export const modules = [
   StoreModule,
   StoreDevtoolsModule,
   TranslateModule,
-  PrettyJsonModule
+  PrettyJsonModule,
+  SimpleNotificationsModule
 ];
 
 export const declarations = [GenerateIconComponent];

@@ -1,4 +1,3 @@
-import { batchActions } from 'redux-batched-actions';
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Router } from '@angular/router';
@@ -6,6 +5,8 @@ import { Store, Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import { batchActions } from 'redux-batched-actions';
+import { NotificationsService } from 'angular2-notifications';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IBusInProgress, IBusInProgressRow } from './bus-in-progress.interface';
@@ -27,13 +28,15 @@ export class BusesInProgressEffects {
     private _store$: Store<IStore>,
     private _router: Router,
     private _busesInProgressService: BusesInProgressService,
-    private _sseService: SseService
+    private _sseService: SseService,
+    private _notifications: NotificationsService
   ) { }
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) postBus$: Observable<Action> = this._actions$
     .ofType(BusesInProgress.POST_BUS_IN_PROGRESS)
     .combineLatest(this._store$.select(state => state.workspaces.selectedWorkspaceId))
+    .do(([action]) => this._notifications.info(`Importing bus`, `Importing bus with IP ${action.payload.ip}`))
     .switchMap(([action, idWorkspace]) =>
       this._busesInProgressService.postBus(idWorkspace, action.payload)
         .map((res: Response) => {
@@ -61,6 +64,8 @@ export class BusesInProgressEffects {
     .switchMap(({ idWorkspace, busInProgress }: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
       this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_OK)
         .map(res => {
+          this._notifications.success(`Importing bus`, `The bus with the IP ${busInProgress.ip} has been imported`);
+
           const data = JSON.parse(res);
 
           return batchActions([
