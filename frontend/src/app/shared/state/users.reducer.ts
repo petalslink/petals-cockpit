@@ -21,9 +21,10 @@ export class Users {
     return Object.assign(<IUsersTable>{}, users, payload);
   }
 
+  // -------------------------------------------------------------------------------------------
+
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod = {
-    [Users.FETCH_USERS_SUCCESS]: Users.fetchUsersSuccess,
-    // [Users.]: Users.,
+    [Users.FETCH_USERS_SUCCESS]: Users.fetchUsersSuccess
   };
 }

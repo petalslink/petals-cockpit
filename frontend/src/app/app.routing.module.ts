@@ -17,7 +17,6 @@ export const routes: Routes = [
 
 @NgModule({
   imports: [
-    // TODO preload modules when lazy loading is activated
     RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
     // LoginModule,
     // TODO removing CockpitModule breaks the app in AOT with lazy loading ...

@@ -8,7 +8,7 @@ export function _getCurrentServiceUnit(store$: Store<IStore>): Observable<IServi
   return store$.select(state => state.serviceUnits)
     .filter(serviceUnits => serviceUnits.selectedServiceUnitId !== '')
     .map(serviceUnits => {
-      let serviceUnit = serviceUnits.byId[serviceUnits.selectedServiceUnitId];
+      const serviceUnit = serviceUnits.byId[serviceUnits.selectedServiceUnitId];
 
       return serviceUnit;
     });

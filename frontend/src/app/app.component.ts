@@ -1,4 +1,3 @@
-import { Ui } from './shared/state/ui.reducer';
 import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { TranslateService } from 'ng2-translate';
 import { Observable } from 'rxjs/Observable';
@@ -8,6 +7,7 @@ import { Store } from '@ngrx/store';
 import { LANGUAGES } from './core/opaque-tokens';
 import { IUi } from './shared/interfaces/ui.interface';
 import { IStore } from './shared/interfaces/store.interface';
+import { Ui } from './shared/state/ui.reducer';
 
 @Component({
   selector: 'app-root',

@@ -82,7 +82,7 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static TOGGLE_FOLD_COMPONENT = `${Components.reducerName}_TOGGLE_FOLD_COMPONENT`;
   private static toggleFoldComponent(componentsTable: IComponentsTable, payload: { componentId: string }) {
-    let component = componentsTable.byId[payload.componentId];
+    const component = componentsTable.byId[payload.componentId];
 
     if (component.isFolded) {
       return Components.unfoldComponent(componentsTable, payload);
@@ -107,6 +107,6 @@ export class Components {
     [Components.FOLD_COMPONENT]: Components.foldComponent,
     [Components.UNFOLD_COMPONENT]: Components.unfoldComponent,
     [Components.TOGGLE_FOLD_COMPONENT]: Components.toggleFoldComponent,
-    [Components.SET_CURRENT_COMPONENT]: Components.setCurrentComponent,
+    [Components.SET_CURRENT_COMPONENT]: Components.setCurrentComponent
   };
 }

@@ -9,7 +9,7 @@ export function _getCurrentComponent(store$: Store<IStore>): Observable<ICompone
   return store$.select(state => state.components)
     .filter(components => components.selectedComponentId !== '')
     .map(components => {
-      let component = components.byId[components.selectedComponentId];
+      const component = components.byId[components.selectedComponentId];
 
       return component;
     });

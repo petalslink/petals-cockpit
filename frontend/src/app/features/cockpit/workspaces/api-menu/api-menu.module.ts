@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
+import { SharedModule } from './../../../../shared/shared.module';
 import { ApiMenuRoutingModule } from './api-menu-routing.module';
 import { ApiMenuViewComponent } from './api-menu-view/api-menu-view.component';
 
 @NgModule({
   imports: [
-    CommonModule,
+    SharedModule,
     ApiMenuRoutingModule
   ],
   declarations: [ApiMenuViewComponent]

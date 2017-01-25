@@ -82,7 +82,7 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static TOGGLE_FOLD_CONTAINER = `${Containers.reducerName}_TOGGLE_FOLD_CONTAINER`;
   private static toggleFoldContainer(containersTable: IContainersTable, payload: { containerId: string }) {
-    let container = containersTable.byId[payload.containerId];
+    const container = containersTable.byId[payload.containerId];
 
     if (container.isFolded) {
       return Containers.unfoldContainer(containersTable, payload);

@@ -74,41 +74,6 @@ export class BusesInProgress {
     });
   }
 
-  // when the SSE received an event saying that the bus is now imported
-  // tslint:disable-next-line:member-ordering
-  // public static BUS_IMPORT_OK = `${BusesInProgress.reducerName}_BUS_IMPORT_OK`;
-  // private static busImportOk(busesInProgressTable: IBusesInProgressTable, payload) {
-  //   const busesInProgressTableTmp = <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
-  //     allIds: busesInProgressTable.allIds.filter(id => id !== payload.bus.id)
-  //   });
-
-  //   delete busesInProgressTableTmp.byId[payload.bus.id];
-
-  //   return busesInProgressTableTmp;
-  // }
-
-  // tslint:disable-next-line:member-ordering
-  // public static FOLD_BUS = `${BusesInProgress.reducerName}_FOLD_BUS`;
-  // private static foldBus(busesTable: IBusesTable, payload: { busId: string }) {
-  //   return <IBusesTable>Object.assign(
-  //     {},
-  //     busesTable,
-  //     {
-  //       byId: Object.assign(
-  //         {},
-  //         busesTable.byId,
-  //         {
-  //           [payload.busId]: <IBusRow>Object.assign(
-  //             {},
-  //             busesTable.byId[payload.busId],
-  //             { isFolded: true }
-  //           )
-  //         }
-  //       )
-  //     }
-  //   );
-  // }
-
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -117,7 +82,6 @@ export class BusesInProgress {
     [BusesInProgress.SET_SELECTED_BUS_IN_PROGRESS]: BusesInProgress.setSelectedBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS]: BusesInProgress.postBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]: BusesInProgress.postBusInProgressSuccess,
-    [BusesInProgress.REMOVE_BUS_IN_PROGRESS]: BusesInProgress.removeBusInProgress,
-    // [BusesInProgress.]: BusesInProgress.busImportOk,
+    [BusesInProgress.REMOVE_BUS_IN_PROGRESS]: BusesInProgress.removeBusInProgress
   };
 }

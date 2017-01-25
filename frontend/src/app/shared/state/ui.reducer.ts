@@ -60,6 +60,8 @@ export class Ui {
     });
   }
 
+  // -------------------------------------------------------------------------------------------
+
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod = {
     [Ui.SET_LANGUAGE]: Ui.setLanguage,

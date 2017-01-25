@@ -12,8 +12,4 @@ export class BusesEffects {
     private actions$: Actions,
     private store$: Store<IStore>
   ) { }
-
-  // tslint:disable-next-line:member-ordering
-  // @Effect({ dispatch: true }) effectName$: Observable<Action> = this.actions$
-  //   .ofType('');
 }

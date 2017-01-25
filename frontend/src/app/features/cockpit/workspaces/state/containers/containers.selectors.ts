@@ -9,7 +9,7 @@ export function _getCurrentContainer(store$: Store<IStore>): Observable<IContain
   return store$.select(state => state.containers)
     .filter(containers => containers.selectedContainerId !== '')
     .map(containers => {
-      let container = containers.byId[containers.selectedContainerId];
+      const container = containers.byId[containers.selectedContainerId];
 
       return container;
     });

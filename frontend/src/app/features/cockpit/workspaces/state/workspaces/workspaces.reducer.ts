@@ -125,7 +125,6 @@ export class Workspaces {
     [Workspaces.FETCH_WORKSPACES_SUCCESS]: Workspaces.fetchWorkspacesSuccess,
     [Workspaces.FETCH_WORKSPACE]: Workspaces.fetchWorkspace,
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Workspaces.fetchWorkspaceSuccess,
-    [Workspaces.ADD_BUS]: Workspaces.addBus,
-    // [Workspaces.]: Workspaces.,
+    [Workspaces.ADD_BUS]: Workspaces.addBus
   };
 }
