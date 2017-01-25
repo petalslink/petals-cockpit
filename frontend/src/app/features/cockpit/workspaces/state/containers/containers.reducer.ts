@@ -1,8 +1,8 @@
-import { IContainerRow } from './container.interface';
 import { Action } from '@ngrx/store';
 
 import { IContainersTable } from './containers.interface';
 import { containersTableFactory } from './containers.initial-state';
+import { IContainerRow } from './container.interface';
 
 export class Containers {
   private static reducerName = 'CONTAINERS_REDUCER';
@@ -18,7 +18,21 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINERS_SUCCESS = `${Containers.reducerName}_FETCH_CONTAINERS_SUCCESS`;
   private static fetchContainersSuccess(containersTable: IContainersTable, payload) {
-    return <IContainersTable>Object.assign({}, containersTable, payload);
+    let allIds = containersTable.allIds;
+
+    payload.allIds.forEach(containerId => {
+      if (!containersTable.byId[containerId]) {
+        allIds = [...allIds, containerId];
+      }
+    });
+
+    return <IContainersTable>Object.assign({},
+      containersTable,
+      {
+        byId: Object.assign({}, containersTable.byId, payload.byId),
+        allIds
+      }
+    );
   }
 
   // tslint:disable-next-line:member-ordering

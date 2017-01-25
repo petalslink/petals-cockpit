@@ -22,14 +22,15 @@ export class Buses {
 
     payload.allIds.forEach(busId => {
       if (!busesTable.byId[busId]) {
-        allIds = [...busesTable.allIds, busId];
+        allIds = [...allIds, busId];
       }
     });
 
     return <IBusesTable>Object.assign({},
       busesTable,
       {
-        byId: Object.assign({}, busesTable.byId, payload.byId)
+        byId: Object.assign({}, busesTable.byId, payload.byId),
+        allIds
       }
     );
   }
@@ -97,6 +98,14 @@ export class Buses {
       selectedBusId: payload.busId
     });
   }
+
+  // when the SSE received an event saying that the bus is now imported
+  // tslint:disable-next-line:member-ordering
+  // private static busImportOk(busesTable: IBusesTable, payload: { bus: Ibus }) {
+  //   return Object.assign({}, busesTable, <IBusesTable>{
+  //     selectedBusId: payload.busId
+  //   });
+  // }
 
   // tslint:disable-next-line:member-ordering
   // public static IMPORT_BUS = `${Buses.reducerName}_IMPORT_BUS`;

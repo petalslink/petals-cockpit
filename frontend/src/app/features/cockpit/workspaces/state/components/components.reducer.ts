@@ -1,7 +1,7 @@
-import { IComponentRow } from './component.interface';
 import { Action } from '@ngrx/store';
 
 import { IComponentsTable } from './components.interface';
+import { IComponentRow } from './component.interface';
 import { componentsTableFactory } from './components.initial-state';
 
 export class Components {
@@ -18,7 +18,21 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static FETCH_COMPONENTS_SUCCESS = `${Components.reducerName}_FETCH_COMPONENTS_SUCCESS`;
   private static fetchComponentsSuccess(componentsTable: IComponentsTable, payload) {
-    return <IComponentsTable>Object.assign({}, componentsTable, payload);
+    let allIds = componentsTable.allIds;
+
+    payload.allIds.forEach(containerId => {
+      if (!componentsTable.byId[containerId]) {
+        allIds = [...allIds, containerId];
+      }
+    });
+
+    return <IComponentsTable>Object.assign({},
+      componentsTable,
+      {
+        byId: Object.assign({}, componentsTable.byId, payload.byId),
+        allIds
+      }
+    );
   }
 
   // tslint:disable-next-line:member-ordering

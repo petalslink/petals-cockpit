@@ -17,7 +17,21 @@ export class ServiceUnits {
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNITS_SUCCESS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNITS_SUCCESS`;
   private static fetchServiceUnitsSuccess(serviceUnitsTable: IserviceUnitsTable, payload) {
-    return <IserviceUnitsTable>Object.assign({}, serviceUnitsTable, payload);
+    let allIds = serviceUnitsTable.allIds;
+
+    payload.allIds.forEach(busId => {
+      if (!serviceUnitsTable.byId[busId]) {
+        allIds = [...allIds, busId];
+      }
+    });
+
+    return <IserviceUnitsTable>Object.assign({},
+      serviceUnitsTable,
+      {
+        byId: Object.assign({}, serviceUnitsTable.byId, payload.byId),
+        allIds
+      }
+    );
   }
 
   // tslint:disable-next-line:member-ordering

@@ -1,47 +1,33 @@
-// import * as Chance from 'chance';
-// const chance = new Chance;
-
-const _ids = {
-  idBusInPro0: 0, idBusInPro1: 0,
-  idBus0: 0,
-  idCont0: 0, idCont1: 0,
-  idComp0: 0, idComp1: 0, idComp2: 0, idComp3: 0,
-  idSu0: 0, idSu1: 0, idSu2: 0, idSu3: 0, idSu4: 0, idSu5: 0
-}
-
-export function _updateIdsForNewWorkspace() {
-  for (let i in _ids) {
-    _ids[i]++;
-  }
-}
+let _cptIdBus = 0;
 
 const memoizeGetNewWorkspace = new Map();
 
 export function getNewWorkspace(idWks) {
   if (memoizeGetNewWorkspace.has(idWks)) {
-    return memoizeGetNewWorkspace.get(idWks);
+    return Object.assign({}, memoizeGetNewWorkspace.get(idWks));
   }
 
-  _updateIdsForNewWorkspace();
+  const newBusFull = getNewBusFull(idWks);
+  _cptIdBus--;
 
-  const wks = {
+  const wks = Object.assign(newBusFull, {
     workspace: {
       id: idWks,
       name: `Workspace ${idWks}`,
       users: [`bescudie`],
-      buses: [`idBus${_ids.idBus0}`]
+      buses: [`idBus${_cptIdBus++}`]
     },
 
     busesInProgress: {
       byId: {
-        [`idBusInPro${_ids.idBusInPro0}`]: {
-          id: `idBusInPro${_ids.idBusInPro0}`,
+        [`idBus${_cptIdBus}`]: {
+          id: `idBus${_cptIdBus++}`,
           ip: `192.168.0.1`,
           port: 4250,
           username: `petals`
         },
-        [`idBusInPro${_ids.idBusInPro1}`]: {
-          id: `idBusInPro${_ids.idBusInPro1}`,
+        [`idBus${_cptIdBus}`]: {
+          id: `idBus${_cptIdBus++}`,
           ip: `192.168.0.2`,
           port: 5132,
           username: `petals`,
@@ -49,17 +35,35 @@ export function getNewWorkspace(idWks) {
         }
       },
       allIds: [
-        `idBusInPro${_ids.idBusInPro0}`,
-        `idBusInPro${_ids.idBusInPro1}`
+        `idBus${_cptIdBus - 2}`,
+        `idBus${_cptIdBus - 1}`
       ]
     },
+  });
 
+  memoizeGetNewWorkspace.set(idWks, wks);
+
+  return Object.assign({}, wks);
+};
+
+// ------------------------------------------
+
+const _ids = {
+  idCont0: 0, idCont1: 1,
+  idComp0: 0, idComp1: 1, idComp2: 2, idComp3: 3,
+  idSu0: 0, idSu1: 1, idSu2: 2, idSu3: 3, idSu4: 4, idSu5: 5
+};
+
+// return a bus with containers/components/sus
+// and add them to the list of bus in corresponding workspace
+export function getNewBusFull(idWks) {
+  const obj = {
     buses: {
       byId: {
-        [`idBus${_ids.idBus0}`]: {
-          id: `idBus${_ids.idBus0}`,
+        [`idBus${_cptIdBus}`]: {
+          id: `idBus${_cptIdBus}`,
           isImporting: false,
-          name: `Bus ${_ids.idBus0}`,
+          name: `Bus ${_cptIdBus}`,
           state: `UNDEPLOYED`,
           containers: [
             `idCont${_ids.idCont0}`,
@@ -68,7 +72,7 @@ export function getNewWorkspace(idWks) {
         },
       },
       allIds: [
-        `idBus${_ids.idBus0}`
+        `idBus${_cptIdBus}`
       ]
     },
 
@@ -172,7 +176,24 @@ export function getNewWorkspace(idWks) {
     }
   };
 
-  memoizeGetNewWorkspace.set(idWks, wks);
+  // TODO add it to the workspace otherwise we will loose them when changing workspace
 
-  return wks;
-};
+  _cptIdBus++;
+
+  _ids.idCont0 += 2;
+  _ids.idCont1 += 2;
+
+  _ids.idComp0 += 4;
+  _ids.idComp1 += 4;
+  _ids.idComp2 += 4;
+  _ids.idComp3 += 4;
+
+  _ids.idSu0 += 6;
+  _ids.idSu1 += 6;
+  _ids.idSu2 += 6;
+  _ids.idSu3 += 6;
+  _ids.idSu4 += 6;
+  _ids.idSu5 += 6;
+
+  return obj;
+}

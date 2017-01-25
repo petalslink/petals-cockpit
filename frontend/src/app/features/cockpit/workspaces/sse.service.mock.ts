@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { environment } from './../../../../environments/environment';
 import { SseWorkspaceEvent } from './sse.service';
-import { getNewWorkspace } from './../../../../mocks/workspace-id-wks-0';
+import { getNewWorkspace, getNewBusFull } from './../../../../mocks/workspace-id-wks-0';
 
 @Injectable()
 export class SseServiceMock {
@@ -74,10 +74,10 @@ export class SseServiceMock {
   // --------------------------------------------------------
 
   private getDataWorkspaceContent(idWorkspace: string) {
-      return JSON.stringify(getNewWorkspace(idWorkspace));
+    return JSON.stringify(getNewWorkspace(idWorkspace));
   }
 
   private getDataBusImportOk(idWorkspace: string) {
-    return JSON.stringify(getNewWorkspace(idWorkspace));
+    return JSON.stringify(getNewBusFull(idWorkspace));
   }
 }

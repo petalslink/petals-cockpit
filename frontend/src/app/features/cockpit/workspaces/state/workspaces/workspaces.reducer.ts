@@ -94,6 +94,29 @@ export class Workspaces {
     );
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static ADD_BUS = `${Workspaces.reducerName}_ADD_BUS`;
+  private static addBus(workspacesTable: IWorkspacesTable, payload: { workspaceId: string, busesId: [string] }) {
+    return <IWorkspacesTable>Object.assign({}, workspacesTable,
+      <IWorkspacesTable>{
+        selectedWorkspaceId: payload.workspaceId,
+        byId: Object.assign(
+          {},
+          workspacesTable.byId,
+          {
+            [payload.workspaceId]: <IWorkspaceRow>Object.assign(
+              {},
+              workspacesTable.byId[payload.workspaceId],
+              {
+                buses: workspacesTable.byId[payload.workspaceId].buses.concat(payload.busesId)
+              }
+            )
+          }
+        )
+      }
+    );
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -102,6 +125,7 @@ export class Workspaces {
     [Workspaces.FETCH_WORKSPACES_SUCCESS]: Workspaces.fetchWorkspacesSuccess,
     [Workspaces.FETCH_WORKSPACE]: Workspaces.fetchWorkspace,
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Workspaces.fetchWorkspaceSuccess,
+    [Workspaces.ADD_BUS]: Workspaces.addBus,
     // [Workspaces.]: Workspaces.,
   };
 }

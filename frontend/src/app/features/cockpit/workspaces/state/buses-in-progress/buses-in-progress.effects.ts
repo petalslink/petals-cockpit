@@ -54,18 +54,23 @@ export class BusesInProgressEffects {
     .do(({idWorkspace, busInProgress}: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
       this._router.navigate(['/workspaces', idWorkspace, 'petals', 'buses-in-progress', busInProgress.id])
     )
-    .do(_ => setTimeout(() => this._sseService.triggerSseEvent(SseWorkspaceEvent.BUS_IMPORT_OK), 3000))
+    .do(({ idWorkspace }: { idWorkspace: string }) =>
+      // if dev env, this will simulate an SSE event, in prod it won't do anything as triggerSseEvent is empty
+      setTimeout(() => this._sseService.triggerSseEvent(SseWorkspaceEvent.BUS_IMPORT_OK, idWorkspace), environment.sseDelay)
+    )
     .switchMap(({ idWorkspace, busInProgress }: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
       this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_OK)
         .map(res => {
           const data = JSON.parse(res);
 
           return batchActions([
+            { type: Workspaces.ADD_BUS, payload: { workspaceId: idWorkspace, busesId: data.buses.allIds } },
+            { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: busInProgress.id } },
             { type: Buses.FETCH_BUSES_SUCCESS, payload: data.buses },
             { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: data.containers },
             { type: Components.FETCH_COMPONENTS_SUCCESS, payload: data.components },
             { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: data.serviceUnits },
-          ])
+          ]);
         })
     );
 }
