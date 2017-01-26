@@ -52,3 +52,8 @@ To get more help on the `angular-cli` use `ng help` or go check out the [Angular
 When everything is stable, replace it by
     "build-electron": "ng build --prod --aot --no-sourcemap -bh='./' && node ./electron/generate-package-json.js && cp ./electron/electron.js dist/",
     "electron": "npm run build-electron && electron dist/"
+
+- Material design popup do not work with lazy loaded routes and the whole app is broken
+Temp fix : Setup material2-builds while waiting for the new release :
+"@angular/material": "https://github.com/angular/material2-builds.git"
+Once solved, restore the original @angular/material

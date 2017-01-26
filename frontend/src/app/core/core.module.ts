@@ -18,6 +18,8 @@ import { WorkspacesService } from './../shared/services/workspaces.service';
 
 @NgModule({
   imports: [
+    // TODO : Material2 will soon remove the need of forRoot
+    // keep an eye on it
     MaterialModule.forRoot(),
     FlexLayoutModule.forRoot(),
     // TODO : Keep an eye on ngrx V3 to have lazy loaded reducers

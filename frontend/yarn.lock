@@ -19,7 +19,7 @@
   version "2.4.5"
   resolved "https://registry.yarnpkg.com/@angular/common/-/common-2.4.5.tgz#ada1a22b7ba01d1fdeb300115584478e031e9a4f"
 
-"@angular/compiler-cli@2.4.5":
+"@angular/compiler-cli@2.4.5", "@angular/compiler-cli@^2.3.1":
   version "2.4.5"
   resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-2.4.5.tgz#efabbe10558b233dcdfe985af2bd2e84f1414c97"
   dependencies:
@@ -27,29 +27,13 @@
     minimist "^1.2.0"
     reflect-metadata "^0.1.2"
 
-"@angular/compiler-cli@^2.3.1":
-  version "2.4.4"
-  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-2.4.4.tgz#726598f850e599677fa1638d1728096384665a63"
-  dependencies:
-    "@angular/tsc-wrapped" "0.5.1"
-    minimist "^1.2.0"
-    reflect-metadata "^0.1.2"
-
-"@angular/compiler@2.4.5":
+"@angular/compiler@2.4.5", "@angular/compiler@^2.3.1":
   version "2.4.5"
   resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-2.4.5.tgz#521da325e2e002398e8f9de52cfb03d303729e72"
 
-"@angular/compiler@^2.3.1":
-  version "2.4.4"
-  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-2.4.4.tgz#86b861685ebc4c7b19b1133bf8c5bf4d28c71475"
-
-"@angular/core@2.4.5":
+"@angular/core@2.4.5", "@angular/core@^2.0.0", "@angular/core@^2.3.1":
   version "2.4.5"
   resolved "https://registry.yarnpkg.com/@angular/core/-/core-2.4.5.tgz#8b05156398afde9636e65527ffb61fc74236af5a"
-
-"@angular/core@^2.0.0", "@angular/core@^2.3.1":
-  version "2.4.4"
-  resolved "https://registry.yarnpkg.com/@angular/core/-/core-2.4.4.tgz#eafef7bbdefea321fa5e79998bb2f6707c70729d"
 
 "@angular/flex-layout@2.0.0-beta.1":
   version "2.0.0-beta.1"
@@ -63,9 +47,9 @@
   version "2.4.5"
   resolved "https://registry.yarnpkg.com/@angular/http/-/http-2.4.5.tgz#de94b2daa4ff24e8b6c8839ffaf8089b62d4430b"
 
-"@angular/material@2.0.0-beta.1":
+"@angular/material@https://github.com/angular/material2-builds.git":
   version "2.0.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-2.0.0-beta.1.tgz#106a0b79fb2b48a7606a0682c4e5d0bbe03364a0"
+  resolved "https://github.com/angular/material2-builds.git#0f9e19bd29ad84220ec1d205f0c429447d4b2eee"
 
 "@angular/platform-browser-dynamic@2.4.5":
   version "2.4.5"
@@ -5237,7 +5221,7 @@ tslint-loader@^3.3.0:
     object-assign "^4.0.1"
     rimraf "^2.4.4"
 
-tslint@4.4.1:
+tslint@4.4.1, tslint@^4.0.2:
   version "4.4.1"
   resolved "https://registry.yarnpkg.com/tslint/-/tslint-4.4.1.tgz#1e06b4f39f1d5c8072f4e57619fedf88a74f1c7d"
   dependencies:
@@ -5248,20 +5232,6 @@ tslint@4.4.1:
     glob "^7.1.1"
     optimist "~0.6.0"
     resolve "^1.1.7"
-    update-notifier "^1.0.2"
-
-tslint@^4.0.2:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/tslint/-/tslint-4.3.1.tgz#28f679c53ca4b273688bcb6fcf0dde7ff1bb2169"
-  dependencies:
-    babel-code-frame "^6.20.0"
-    colors "^1.1.2"
-    diff "^3.0.1"
-    findup-sync "~0.3.0"
-    glob "^7.1.1"
-    optimist "~0.6.0"
-    resolve "^1.1.7"
-    underscore.string "^3.3.4"
     update-notifier "^1.0.2"
 
 tty-browserify@0.0.0:
@@ -5317,13 +5287,6 @@ uid-number@~0.0.6:
 ultron@1.0.x:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/ultron/-/ultron-1.0.2.tgz#ace116ab557cd197386a4e88f4685378c8b2e4fa"
-
-underscore.string@^3.3.4:
-  version "3.3.4"
-  resolved "https://registry.yarnpkg.com/underscore.string/-/underscore.string-3.3.4.tgz#2c2a3f9f83e64762fdc45e6ceac65142864213db"
-  dependencies:
-    sprintf-js "^1.0.3"
-    util-deprecate "^1.0.2"
 
 underscore.string@~2.3.3:
   version "2.3.3"
@@ -5420,7 +5383,7 @@ useragent@^2.1.10:
   dependencies:
     lru-cache "2.2.x"
 
-util-deprecate@^1.0.2, util-deprecate@~1.0.1:
+util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
 
