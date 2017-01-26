@@ -21,26 +21,26 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    // loadChildren: LoadLoginModule
-    loadChildren: 'app/features/login/login.module#LoginModule'
+    loadChildren: LoadLoginModule
+    // loadChildren: 'app/features/login/login.module#LoginModule'
   },
   {
     path: '',
-    // loadChildren: LoadCockpitModule
-    loadChildren: 'app/features/cockpit/cockpit.module#CockpitModule'
+    loadChildren: LoadCockpitModule
+    // loadChildren: 'app/features/cockpit/cockpit.module#CockpitModule'
   }
 ];
 
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, {
-      preloadingStrategy: PreloadAllModules,
+      // preloadingStrategy: PreloadAllModules,
       useHash: (environment.hashLocationStrategy ? true : false),
       enableTracing: false
     }),
     // LoginModule,
     // TODO removing CockpitModule breaks the app in AOT with lazy loading ...
-    CockpitModule
+    // CockpitModule
   ]
 })
 export class AppRoutingModule { }
