@@ -12,6 +12,9 @@ import { PrettyJsonModule } from 'angular2-prettyjson';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
+import { SseService } from './services/sse.service';
+import { SseServiceMock } from './services/sse.service.mock';
+import { environment } from './../../environments/environment';
 
 export const modules = [
   CommonModule,
@@ -29,9 +32,17 @@ export const modules = [
 
 export const declarations = [GenerateIconComponent];
 
+export const providers = [
+  {
+    provide: SseService,
+    useClass: (environment.mock ? SseServiceMock : SseService)
+  }
+];
+
 @NgModule({
   imports: modules,
   exports: [...modules, ...declarations],
-  declarations
+  declarations,
+  providers
 })
 export class SharedModule { }

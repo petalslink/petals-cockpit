@@ -4,9 +4,9 @@ import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { Subscription } from 'rxjs/Subscription';
 
-import { environment } from './../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { SseWorkspaceEvent } from './sse.service';
-import { getNewWorkspace, getNewBusFull } from './../../../../mocks/workspace-id-wks-0';
+import { getNewWorkspace, getNewBusFull } from '../../../mocks/workspace-id-wks-0';
 
 @Injectable()
 export class SseServiceMock {

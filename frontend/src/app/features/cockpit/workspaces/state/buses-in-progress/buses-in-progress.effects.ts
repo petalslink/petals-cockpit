@@ -13,7 +13,7 @@ import { IBusInProgress, IBusInProgressRow } from './bus-in-progress.interface';
 import { BusesInProgress } from './buses-in-progress.reducer';
 import { environment } from './../../../../../../environments/environment';
 import { BusesInProgressService } from './buses-in-progress.service';
-import { SseService, SseWorkspaceEvent } from './../../sse.service';
+import { SseService, SseWorkspaceEvent } from './../../../../../shared/services/sse.service';
 import { Ui } from './../../../../../shared/state/ui.reducer';
 import { ServiceUnits } from './../service-units/service-units.reducer';
 import { Buses } from './../buses/buses.reducer';
@@ -39,7 +39,7 @@ export class BusesInProgressEffects {
     .ofType(BusesInProgress.POST_BUS_IN_PROGRESS)
     .combineLatest(this._store$.select(state => state.workspaces.selectedWorkspaceId))
     .do(([action]) => {
-      const notifId = this._notifications.info(`Importing bus`, `Importing bus with IP ${action.payload.ip}`)
+      const notifId = this._notifications.info(`Importing bus`, `Importing bus with IP ${action.payload.ip}`);
       this._notifIds.set(action.payload.ip, notifId.id);
     })
     .switchMap(([action, idWorkspace]) =>

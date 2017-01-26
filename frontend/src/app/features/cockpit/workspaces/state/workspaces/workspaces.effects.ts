@@ -17,7 +17,7 @@ import { Components } from '../components/components.reducer';
 import { ServiceUnits } from '../service-units/service-units.reducer';
 import { Ui } from '../../../../../shared/state/ui.reducer';
 import { BusesInProgress } from '../buses-in-progress/buses-in-progress.reducer';
-import { SseService, SseWorkspaceEvent } from './../../sse.service';
+import { SseService, SseWorkspaceEvent } from './../../../../../shared/services/sse.service';
 
 @Injectable()
 export class WorkspacesEffects {

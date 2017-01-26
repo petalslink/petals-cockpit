@@ -3,7 +3,7 @@ import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 
-import { environment } from './../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 // define all the workspace events
 export class SseWorkspaceEvent {
