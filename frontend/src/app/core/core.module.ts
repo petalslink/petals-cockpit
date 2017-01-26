@@ -15,6 +15,7 @@ import { getRootReducer } from '../shared/state/root.reducer';
 import { WorkspacesEffects } from '../features/cockpit/workspaces/state/workspaces/workspaces.effects';
 import { BusesInProgressEffects } from './../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.effects';
 import { WorkspacesService } from './../shared/services/workspaces.service';
+import { UsersEffects } from './../shared/effects/users.effects';
 
 @NgModule({
   imports: [
@@ -27,6 +28,7 @@ import { WorkspacesService } from './../shared/services/workspaces.service';
     StoreModule.provideStore(getRootReducer),
     EffectsModule.run(WorkspacesEffects),
     EffectsModule.run(BusesInProgressEffects),
+    EffectsModule.run(UsersEffects),
     StoreDevtoolsModule.instrumentOnlyWithExtension(),
     TranslateModule.forRoot({
       provide: TranslateLoader,

@@ -15,7 +15,7 @@
         <input md-input type="password" placeholder="Password" formControlName="password" required>
       </md-input-container>
 
-      <button md-raised-button color="primary" class="margin-top-x1" [disabled]="loginForm.invalid">Log in</button>
+      <button md-raised-button color="primary" class="margin-top-x1" [disabled]="loginForm.invalid || (users$ | async).isConnecting">Log in</button>
     </div>
   </form>
 </md-card>

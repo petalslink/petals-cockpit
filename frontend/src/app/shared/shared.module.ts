@@ -19,6 +19,8 @@ import { BusesInProgressService } from './services/buses-in-progress.service';
 import { BusesInProgressMockService } from './services/buses-in-progress-mock.service';
 import { WorkspacesService } from './services/workspaces.service';
 import { WorkspacesMockService } from './services/workspaces.mock';
+import { UsersMockService } from './services/users.mock';
+import { UsersService } from './services/users.service';
 
 export const modules = [
   CommonModule,
@@ -48,6 +50,10 @@ export const providers = [
   {
     provide: WorkspacesService,
     useClass: (environment.mock ? WorkspacesMockService : WorkspacesService)
+  },
+  {
+    provide: UsersService,
+    useClass: (environment.mock ? UsersMockService : UsersService)
   }
 ];
 
