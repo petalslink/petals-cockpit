@@ -17,7 +17,11 @@ export const routes: Routes = [
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
+    RouterModule.forRoot(routes, {
+      preloadingStrategy: PreloadAllModules,
+      useHash: (environment.hashLocationStrategy ? true : false),
+      enableTracing: false
+    }),
     // LoginModule,
     // TODO removing CockpitModule breaks the app in AOT with lazy loading ...
     CockpitModule

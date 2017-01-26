@@ -1,5 +1,4 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
-import { LocationStrategy, HashLocationStrategy, PathLocationStrategy } from '@angular/common';
 import { Http } from '@angular/http';
 import { MaterialModule } from '@angular/material';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -39,11 +38,6 @@ import { WorkspacesService } from '../features/cockpit/workspaces/state/workspac
       provide: LANGUAGES,
       // order matters : The first one will be use by default
       useValue: ['en', 'fr']
-    },
-    // use hash location strategy or not based on env
-    {
-      provide: LocationStrategy,
-      useClass: (environment.hashLocationStrategy ? HashLocationStrategy : PathLocationStrategy)
     },
     {
       provide: WorkspacesService,
