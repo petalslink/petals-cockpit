@@ -23,6 +23,8 @@ import { Workspaces } from './../workspaces/workspaces.reducer';
 
 @Injectable()
 export class BusesInProgressEffects {
+  private _notifIds = new Map<string, string>();
+
   constructor(
     private _actions$: Actions,
     private _store$: Store<IStore>,
@@ -36,7 +38,10 @@ export class BusesInProgressEffects {
   @Effect({ dispatch: true }) postBus$: Observable<Action> = this._actions$
     .ofType(BusesInProgress.POST_BUS_IN_PROGRESS)
     .combineLatest(this._store$.select(state => state.workspaces.selectedWorkspaceId))
-    .do(([action]) => this._notifications.info(`Importing bus`, `Importing bus with IP ${action.payload.ip}`))
+    .do(([action]) => {
+      const notifId = this._notifications.info(`Importing bus`, `Importing bus with IP ${action.payload.ip}`)
+      this._notifIds.set(action.payload.ip, notifId.id);
+    })
     .switchMap(([action, idWorkspace]) =>
       this._busesInProgressService.postBus(idWorkspace, action.payload)
         .map((res: Response) => {
@@ -64,7 +69,12 @@ export class BusesInProgressEffects {
     .switchMap(({ idWorkspace, busInProgress }: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
       this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_OK)
         .map(res => {
-          this._notifications.success(`Importing bus`, `The bus with the IP ${busInProgress.ip} has been imported`);
+          if (this._notifIds.has(busInProgress.ip)) {
+            const notifId = this._notifIds.get(busInProgress.ip);
+            this._notifications.remove(notifId);
+          }
+
+          this._notifications.success(`Bus imported`, `The bus with the IP ${busInProgress.ip} has been imported`);
 
           const data = JSON.parse(res);
 

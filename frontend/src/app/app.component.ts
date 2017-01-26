@@ -21,7 +21,7 @@ export class AppComponent implements OnInit, OnDestroy {
     // this timeout doesn't make any sense
     // should open an issue on Github
     // https://github.com/flauc/angular2-notifications
-    timeOut: 1200,
+    timeOut: 2500,
     lastOnBottom: true,
     showProgressBar: true,
     pauseOnHover: true,
