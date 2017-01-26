@@ -26,8 +26,8 @@ const routes: Routes = [
     children: [
       {
         path: 'workspaces',
-        loadChildren: loadWorkspacesModule
-        // loadChildren: 'app/features/cockpit/workspaces/workspaces.module#WorkspacesModule'
+        // loadChildren: loadWorkspacesModule
+        loadChildren: 'app/features/cockpit/workspaces/workspaces.module#WorkspacesModule'
       }
       // {
       //   path: '',

@@ -33,38 +33,38 @@ const routes: Routes = [
   {
     path: '',
     // tslint:disable-next-line:max-line-length
-    loadChildren: loadBusInProgressViewModule
-    // loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule'
+    // loadChildren: loadBusInProgressViewModule
+    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule'
   },
   {
     path: 'buses/:busId',
     // tslint:disable-next-line:max-line-length
-    loadChildren: loadBusViewModule
-    // loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-bus-view/petals-bus-view.module#PetalsBusViewModule'
+    // loadChildren: loadBusViewModule
+    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-bus-view/petals-bus-view.module#PetalsBusViewModule'
   },
   {
     path: 'buses-in-progress',
     // tslint:disable-next-line:max-line-length
-    loadChildren: loadBusInProgressViewModule
-    // loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule'
+    // loadChildren: loadBusInProgressViewModule
+    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule'
   },
   {
     path: 'containers/:containerId',
     // tslint:disable-next-line:max-line-length
-    loadChildren: loadContainerViewModule
-    // loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-view.module#PetalsContainerViewModule'
+    // loadChildren: loadContainerViewModule
+    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-view.module#PetalsContainerViewModule'
   },
   {
     path: 'components/:componentId',
     // tslint:disable-next-line:max-line-length
-    loadChildren: loadComponentViewModule
-    // loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-view.module#PetalsComponentViewModule'
+    // loadChildren: loadComponentViewModule
+    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-view.module#PetalsComponentViewModule'
   },
   {
     path: 'service-units/:serviceUnitId',
     // tslint:disable-next-line:max-line-length
-    loadChildren: loadServiceUnitViewModule
-    // loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-service-unit-view/petals-service-unit-view.module#PetalsServiceUnitViewModule'
+    // loadChildren: loadServiceUnitViewModule
+    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-service-unit-view/petals-service-unit-view.module#PetalsServiceUnitViewModule'
   }
 ];
 

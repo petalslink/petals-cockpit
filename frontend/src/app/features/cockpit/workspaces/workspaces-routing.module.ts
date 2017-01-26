@@ -21,8 +21,8 @@ const routes: Routes = [
   },
   {
     path: ':workspaceId/petals',
-    loadChildren: loadPetalsContentModule
-    // loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule'
+    // loadChildren: loadPetalsContentModule
+    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule'
   }
 ];
 

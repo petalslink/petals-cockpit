@@ -21,13 +21,13 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    loadChildren: LoadLoginModule
-    // loadChildren: 'app/features/login/login.module#LoginModule'
+    // loadChildren: LoadLoginModule
+    loadChildren: 'app/features/login/login.module#LoginModule'
   },
   {
     path: '',
-    loadChildren: LoadCockpitModule
-    // loadChildren: 'app/features/cockpit/cockpit.module#CockpitModule'
+    // loadChildren: LoadCockpitModule
+    loadChildren: 'app/features/cockpit/cockpit.module#CockpitModule'
   }
 ];
 
