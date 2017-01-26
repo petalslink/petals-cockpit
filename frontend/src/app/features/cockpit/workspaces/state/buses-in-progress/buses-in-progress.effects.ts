@@ -12,7 +12,7 @@ import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IBusInProgress, IBusInProgressRow } from './bus-in-progress.interface';
 import { BusesInProgress } from './buses-in-progress.reducer';
 import { environment } from './../../../../../../environments/environment';
-import { BusesInProgressService } from './buses-in-progress.service';
+import { BusesInProgressService } from './../../../../../shared/services/buses-in-progress.service';
 import { SseService, SseWorkspaceEvent } from './../../../../../shared/services/sse.service';
 import { Ui } from './../../../../../shared/state/ui.reducer';
 import { ServiceUnits } from './../service-units/service-units.reducer';
@@ -68,7 +68,7 @@ export class BusesInProgressEffects {
     )
     .switchMap(({ idWorkspace, busInProgress }: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
       this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_OK)
-        .map(res => {
+        .map((res: any) => {
           if (this._notifIds.has(busInProgress.ip)) {
             const notifId = this._notifIds.get(busInProgress.ip);
             this._notifications.remove(notifId);

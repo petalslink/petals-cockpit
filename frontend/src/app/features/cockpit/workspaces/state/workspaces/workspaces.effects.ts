@@ -8,7 +8,7 @@ import { batchActions } from 'redux-batched-actions';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Workspaces } from './workspaces.reducer';
-import { WorkspacesService } from './workspaces.service';
+import { WorkspacesService } from './../../../../../shared/services/workspaces.service';
 import { Users } from '../../../../../shared/state/users.reducer';
 import { environment } from '../../../../../../environments/environment';
 import { Buses } from '../buses/buses.reducer';

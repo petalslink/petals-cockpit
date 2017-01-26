@@ -15,6 +15,10 @@ import { GenerateIconComponent } from './components/generate-icon/generate-icon.
 import { SseService } from './services/sse.service';
 import { SseServiceMock } from './services/sse.service.mock';
 import { environment } from './../../environments/environment';
+import { BusesInProgressService } from './services/buses-in-progress.service';
+import { BusesInProgressMockService } from './services/buses-in-progress-mock.service';
+import { WorkspacesService } from './services/workspaces.service';
+import { WorkspacesMockService } from './services/workspaces.mock';
 
 export const modules = [
   CommonModule,
@@ -36,6 +40,14 @@ export const providers = [
   {
     provide: SseService,
     useClass: (environment.mock ? SseServiceMock : SseService)
+  },
+  {
+    provide: BusesInProgressService,
+    useClass: (environment.mock ? BusesInProgressMockService : BusesInProgressService)
+  },
+  {
+    provide: WorkspacesService,
+    useClass: (environment.mock ? WorkspacesMockService : WorkspacesService)
   }
 ];
 

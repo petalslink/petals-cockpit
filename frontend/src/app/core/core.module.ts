@@ -14,8 +14,7 @@ import { environment } from '../../environments/environment';
 import { getRootReducer } from '../shared/state/root.reducer';
 import { WorkspacesEffects } from '../features/cockpit/workspaces/state/workspaces/workspaces.effects';
 import { BusesInProgressEffects } from './../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.effects';
-import { WorkspacesMockService } from '../features/cockpit/workspaces/state/workspaces/workspaces.mock';
-import { WorkspacesService } from '../features/cockpit/workspaces/state/workspaces/workspaces.service';
+import { WorkspacesService } from './../shared/services/workspaces.service';
 
 @NgModule({
   imports: [
@@ -38,10 +37,6 @@ import { WorkspacesService } from '../features/cockpit/workspaces/state/workspac
       provide: LANGUAGES,
       // order matters : The first one will be use by default
       useValue: ['en', 'fr']
-    },
-    {
-      provide: WorkspacesService,
-      useClass: (environment.mock ? WorkspacesMockService : WorkspacesService)
     }
   ]
 })
