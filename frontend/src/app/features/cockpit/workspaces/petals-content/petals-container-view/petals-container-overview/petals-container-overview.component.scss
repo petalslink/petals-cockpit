@@ -1,0 +1,25 @@
+@media (min-width: 480px) {
+  [md-card-avatar] {
+    max-width: 55px;
+    width: 55px;
+    height: 55px;
+  }
+}
+
+.img-card-ip {
+  background-image: url(assets/img/networking.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.img-card-port {
+  background-image: url(assets/img/usb-cable.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.img-card-server {
+  background-image: url(assets/img/server.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+}

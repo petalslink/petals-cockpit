@@ -24,6 +24,19 @@
   font-weight: bold;
 }
 
+.light-bold {
+  font-weight: 500;
+}
+
+.color-primary-light-bold {
+  @extend .color-primary;
+  @extend .light-bold;
+}
+.color-accent-light-bold {
+  @extend .color-accent;
+  @extend .light-bold;
+}
+
 .color-primary-bold {
   @extend .color-primary;
   @extend .bold;

@@ -117,7 +117,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     this.fetchWorkspaces();
 
     this.workspacesDialogRef = this.dialog.open(WorkspacesDialogComponent, {
-      disableClose: false
+      disableClose: true
     });
 
     this.workspacesDialogRef.afterClosed().subscribe(result => {

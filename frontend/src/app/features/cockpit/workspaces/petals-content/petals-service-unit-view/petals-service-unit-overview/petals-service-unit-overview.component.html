@@ -1,10 +1,15 @@
-<div class="content content-max-width">
-  <prettyjson [obj]="serviceUnit"></prettyjson>
-
-  <div fxLayout="row" fxLayoutWrap fxLayoutGap="10px">
-    <md-card fxFlex="25%" class="background-color-light-green-x3">
-      <md-card-subtitle>State</md-card-subtitle>
-      <md-card-title>Started</md-card-title>
+<div fxLayout="column" fxFill class="content content-max-width" fxLayoutWrap>
+  <div class="central-content">
+    <md-card fxLayout="row" fxFlex.gt-sm="48%" fxFlex="100%" class="background-color-hover-light-green-x2 cursor-pointer">
+      <img md-card-avatar class="img-card-state">
+      <span fxFlex></span>
+      <div fxLayout="column" fxLayoutAlign="start end">
+        <md-card-subtitle>State
+          <span class="green-led"></span>
+        </md-card-subtitle>
+        <md-card-title>Started</md-card-title>
+      </div>
     </md-card>
+    <!--<prettyjson fxFlex="100%" [obj]="serviceUnit"></prettyjson>-->
   </div>
 </div>

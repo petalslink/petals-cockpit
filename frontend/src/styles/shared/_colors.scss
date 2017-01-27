@@ -1,10 +1,40 @@
 @import '~@angular/material/core/theming/all-theme';
 @include md-core();
 
-$primary: md-palette($md-deep-purple, 600, 500, 900);
-$accent: md-palette($md-amber, A400, A300, A600);
+$primary: md-palette($md-deep-purple, 700);
+$accent: md-palette($md-amber, 500);
 
-// define some custom colors
+$theme-primary: md-palette($md-deep-purple, 700);
+$theme-primary-x: md-palette($md-deep-purple, 50);
+$theme-primary-x1: md-palette($md-deep-purple, 100);
+$theme-primary-x2: md-palette($md-deep-purple, 200);
+$theme-primary-x3: md-palette($md-deep-purple, 300);
+$theme-primary-x4: md-palette($md-deep-purple, 400);
+$theme-primary-x5: md-palette($md-deep-purple, 500);
+$theme-primary-x6: md-palette($md-deep-purple, 600);
+$theme-primary-x7: md-palette($md-deep-purple, 700);
+$theme-primary-x8: md-palette($md-deep-purple, 800);
+$theme-primary-x9: md-palette($md-deep-purple, 900);
+
+$theme-accent: md-palette($md-amber, 500);
+$theme-accent-x: md-palette($md-amber, 50);
+$theme-accent-x1: md-palette($md-amber, 100);
+$theme-accent-x2: md-palette($md-amber, 200);
+$theme-accent-x3: md-palette($md-amber, 300);
+$theme-accent-x4: md-palette($md-amber, 400);
+$theme-accent-x5: md-palette($md-amber, 500);
+$theme-accent-x6: md-palette($md-amber, 600);
+$theme-accent-x7: md-palette($md-amber, 700);
+$theme-accent-x8: md-palette($md-amber, 800);
+$theme-accent-x9: md-palette($md-amber, 900);
+
+$theme-warn: md-palette($md-red);
+// Create the theme object (a Sass map containing all of the palettes).
+$theme: md-light-theme($theme-primary, $theme-accent, $theme-warn);
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($theme);
 
 // will generate .color-{colorName}-x1, .color-{colorName}-x2, etc (same for background and others)
 $color-declination: 10;

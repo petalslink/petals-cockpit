@@ -1,5 +1,6 @@
+import { Component, ViewChild, OnInit } from '@angular/core';
+import { MdInputContainer } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
-import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { Workspaces } from '../workspaces/state/workspaces/workspaces.reducer';
@@ -14,12 +15,15 @@ import { IWorkspace } from '../workspaces/state/workspaces/workspace.interface';
   styleUrls: ['./workspaces-dialog.component.scss']
 })
 export class WorkspacesDialogComponent implements OnInit {
+  @ViewChild('workspaceInput') workspaceInput: MdInputContainer;
+  private disableClose: boolean = false;
   public workspaces$: Observable<IWorkspaces>;
 
   constructor(private _store$: Store<IStore>) { }
 
   ngOnInit() {
     this.workspaces$ = this._store$.let(getWorkspacesList());
+    this.workspaceInput._focusInput();
   }
 
   // TODO use good type

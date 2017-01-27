@@ -1,33 +1,47 @@
-<div class="content content-max-width">
-  <prettyjson [obj]="container"></prettyjson>
-
-  <div fxLayout="row" fxLayoutWrap fxLayoutGap="10px">
-    <md-card fxFlex="25%">
-      <md-card-subtitle>IP</md-card-subtitle>
-      <md-card-title class="color-primary">192.168.0.1</md-card-title>
-    </md-card>
-
-    <md-card fxFlex="25%">
-      <md-card-subtitle>Port</md-card-subtitle>
-      <md-card-title class="color-primary">7700</md-card-title>
-    </md-card>
+<div fxLayout="column" fxFill class="content content-max-width" fxLayoutWrap>
+  <div class="central-content">
+    <div fxLayoutWrap fxLayoutGap="10px">
+      <md-card fxLayout="row" fxFlex.gt-sm="48%" fxFlex="100%">
+        <img md-card-avatar class="img-card-ip">
+        <span fxFlex></span>
+        <div fxLayout="column" fxLayoutAlign="start end">
+          <md-card-subtitle>IP</md-card-subtitle>
+          <md-card-title>192.168.0.1</md-card-title>
+        </div>
+      </md-card>
+      <md-card fxLayout="row" fxFlex.gt-sm="48%" fxFlex="100%">
+        <img md-card-avatar class="img-card-port">
+        <span fxFlex></span>
+        <div fxLayout="column" fxLayoutAlign="start end">
+          <md-card-subtitle>PORT</md-card-subtitle>
+          <md-card-title>7700</md-card-title>
+        </div>
+      </md-card>
+    </div>
+    <h3 class="color-primary-light-bold margin-top-x2">Reachabilities</h3>
+    <div fxLayoutWrap fxLayoutGap="10px">
+      <!-- TODO : Once bugs are fixed, put 50% and maybe change size (responsive) -->
+      <!-- https://github.com/angular/flex-layout/issues/106 -->
+      <!-- https://github.com/angular/flex-layout/issues/108 -->
+      <md-card fxLayout="row" fxFlex.gt-sm="48%" fxFlex="100%" *ngFor="let i of [0, 1]" class="background-color-hover-light-green-x2 cursor-pointer"
+        [routerLink]="['/workspaces', (idWorkspace$ | async), 'petals', 'containers']">
+        <img md-card-avatar class="img-card-server">
+        <span fxFlex></span>
+        <div fxLayout="column" fxLayoutAlign="start end">
+          <md-card-subtitle>CONTAINER
+            <span class="green-led"></span>
+          </md-card-subtitle>
+          <md-card-title>Container X{{ i }}</md-card-title>
+        </div>
+      </md-card>
+    </div>
+    <h3 class="color-primary-light-bold margin-top-x2">System info</h3>
+    <div fxLayoutWrap fxLayoutGap="10px">
+      <md-card fxFlex>
+        Petals ESB µKernel 4.0.2 Petals Standalone Shared Memory 4.0.2 OpenJDK Runtime Environment 1.7.0_111-b01 Oracle Corporation
+        Linux 3.16.0-4-amd64 amd64
+      </md-card>
+    </div>
+    <!--<prettyjson fxFlex="100%" [obj]="container"></prettyjson>-->
   </div>
-
-  <h2 class="margin-top-x3">Reachabilities</h2>
-  <div fxLayout="row" fxLayoutWrap fxLayoutGap="10px" class="margin-top-x1">
-    <!-- TODO : Once bugs are fixed, put 50% and maybe change size (responsive) -->
-    <!-- https://github.com/angular/flex-layout/issues/106 -->
-    <!-- https://github.com/angular/flex-layout/issues/108 -->
-    <md-card fxFlex="48%" *ngFor="let i of [0, 1]" class="background-color-light-green-x3 background-color-hover-light-green-x2 cursor-pointer"
-      [routerLink]="['/workspaces', (idWorkspace$ | async), 'petals', 'containers']">
-      <md-card-subtitle>Container</md-card-subtitle>
-      <md-card-title>Container X{{ i }}</md-card-title>
-    </md-card>
-  </div>
-
-  <h2 class="margin-top-x3">System info</h2>
-  <md-card fxFlex>
-    Petals ESB µKernel 4.0.2 Petals Standalone Shared Memory 4.0.2 OpenJDK Runtime Environment 1.7.0_111-b01 Oracle Corporation
-    Linux 3.16.0-4-amd64 amd64
-  </md-card>
 </div>

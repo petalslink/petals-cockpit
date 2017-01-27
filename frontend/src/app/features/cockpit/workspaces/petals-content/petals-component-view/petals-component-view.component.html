@@ -1,12 +1,13 @@
+<md-toolbar>
+  <span><md-icon color="primary">grade</md-icon> {{ (component$ | async)?.name }}</span>
+</md-toolbar>
 <div fxLayout="column" fxFill class="wrapper-content">
-  <md-toolbar class="text-center">
-    <span>{{ (component$ | async)?.name }}</span>
-  </md-toolbar>
-
-  <md-tab-group fxFlex>
-    <md-tab label="Overview">
-      <!-- TODO: Create a component for every tab -->
-      <app-petals-component-overview [component]="component$ | async" fxFill></app-petals-component-overview>
-    </md-tab>
-  </md-tab-group>
+  <div class="content">
+    <md-tab-group fxFlex>
+      <md-tab label="Overview">
+        <!-- TODO: Create a component for every tab -->
+        <app-petals-component-overview [component]="component$ | async" fxFill></app-petals-component-overview>
+      </md-tab>
+    </md-tab-group>
+  </div>
 </div>
