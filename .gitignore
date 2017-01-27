@@ -15,6 +15,7 @@ data-mongodb
 *.launch
 .settings/
 target/
+.factorypath
 
 # ------------------------------------
 #              BACKEND
