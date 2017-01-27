@@ -64,8 +64,7 @@ export class WorkspacesEffects {
     // TODO there must be a way to improve the following line without setTimeout
     .do((action: Action) => setTimeout(() => this._sseService.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, action.payload), 500))
     .switchMap((action: Action) => this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
-      .switchMap((res: string) => {
-        const data = JSON.parse(res);
+      .switchMap((data: any) => {
         return Observable.of(batchActions([
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
           { type: BusesInProgress.FETCH_BUSES_IN_PROGRESS, payload: data.busesInProgress },

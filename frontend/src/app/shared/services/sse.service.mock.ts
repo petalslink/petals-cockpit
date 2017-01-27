@@ -20,11 +20,11 @@ export class SseServiceMock {
   public triggerSseEvent(eventName: string, data?: any) {
     switch (eventName) {
       case SseWorkspaceEvent.WORKSPACE_CONTENT:
-        this._registeredEvents.get(eventName).next(this.getDataWorkspaceContent(data));
+        this._registeredEvents.get(eventName).next(getNewWorkspace(data));
         break;
 
       case SseWorkspaceEvent.BUS_IMPORT_OK:
-        this._registeredEvents.get(eventName).next(this.getDataBusImportOk(data));
+        this._registeredEvents.get(eventName).next(getNewBusFull(data));
         break;
     }
   }
@@ -69,15 +69,5 @@ export class SseServiceMock {
     }
 
     return Observable.empty();
-  }
-
-  // --------------------------------------------------------
-
-  private getDataWorkspaceContent(idWorkspace: string) {
-    return JSON.stringify(getNewWorkspace(idWorkspace));
-  }
-
-  private getDataBusImportOk(idWorkspace: string) {
-    return JSON.stringify(getNewBusFull(idWorkspace));
   }
 }

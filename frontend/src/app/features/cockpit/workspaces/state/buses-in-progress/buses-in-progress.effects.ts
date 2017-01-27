@@ -68,15 +68,13 @@ export class BusesInProgressEffects {
     )
     .switchMap(({ idWorkspace, busInProgress }: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
       this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_OK)
-        .map((res: any) => {
+        .map((data: any) => {
           if (this._notifIds.has(busInProgress.ip)) {
             const notifId = this._notifIds.get(busInProgress.ip);
             this._notifications.remove(notifId);
           }
 
           this._notifications.success(`Bus imported`, `The bus with the IP ${busInProgress.ip} has been imported`);
-
-          const data = JSON.parse(res);
 
           return batchActions([
             { type: Workspaces.ADD_BUS, payload: { workspaceId: idWorkspace, busesId: data.buses.allIds } },
