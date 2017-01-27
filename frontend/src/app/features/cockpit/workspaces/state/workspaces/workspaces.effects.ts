@@ -18,6 +18,7 @@ import { ServiceUnits } from '../service-units/service-units.reducer';
 import { Ui } from '../../../../../shared/state/ui.reducer';
 import { BusesInProgress } from '../buses-in-progress/buses-in-progress.reducer';
 import { SseService, SseWorkspaceEvent } from './../../../../../shared/services/sse.service';
+import { toJavascriptMap } from '../../../../../shared/helpers/shared.helper';
 
 @Injectable()
 export class WorkspacesEffects {
@@ -33,9 +34,10 @@ export class WorkspacesEffects {
     .ofType(Workspaces.FETCH_WORKSPACES)
     .switchMap((action: Action) => this._workspacesService.fetchWorkspaces()
       .switchMap((res: Response) => {
+        const data = res.json();
         return Observable.of(batchActions([
-          { type: Workspaces.FETCH_WORKSPACES_SUCCESS, payload: res.json().workspaces },
-          { type: Users.FETCH_USERS_SUCCESS, payload: res.json().users }
+          { type: Workspaces.FETCH_WORKSPACES_SUCCESS, payload: toJavascriptMap(data.workspaces) },
+          { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap(data.users) }
         ]));
       })
       .catch(err => {
@@ -67,11 +69,12 @@ export class WorkspacesEffects {
       .switchMap((data: any) => {
         return Observable.of(batchActions([
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
-          { type: BusesInProgress.FETCH_BUSES_IN_PROGRESS, payload: data.busesInProgress },
-          { type: Buses.FETCH_BUSES_SUCCESS, payload: data.buses },
-          { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: data.containers },
-          { type: Components.FETCH_COMPONENTS_SUCCESS, payload: data.components },
-          { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: data.serviceUnits },
+          { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap(data.users) },
+          { type: BusesInProgress.FETCH_BUSES_IN_PROGRESS, payload: toJavascriptMap(data.busesInProgress) },
+          { type: Buses.FETCH_BUSES_SUCCESS, payload: toJavascriptMap(data.buses) },
+          { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap(data.containers) },
+          { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap(data.components) },
+          { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap(data.serviceUnits) },
 
           { type: Ui.OPEN_SIDENAV },
           { type: Ui.CLOSE_POPUP_WORKSPACES_LIST }

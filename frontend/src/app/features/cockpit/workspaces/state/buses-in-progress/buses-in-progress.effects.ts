@@ -20,6 +20,7 @@ import { Buses } from './../buses/buses.reducer';
 import { Components } from './../components/components.reducer';
 import { Containers } from './../containers/containers.reducer';
 import { Workspaces } from './../workspaces/workspaces.reducer';
+import { toJavascriptMap } from '../../../../../shared/helpers/shared.helper';
 
 @Injectable()
 export class BusesInProgressEffects {
@@ -77,12 +78,11 @@ export class BusesInProgressEffects {
           this._notifications.success(`Bus imported`, `The bus with the IP ${busInProgress.ip} has been imported`);
 
           return batchActions([
-            { type: Workspaces.ADD_BUS, payload: { workspaceId: idWorkspace, busesId: data.buses.allIds } },
             { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: busInProgress.id } },
-            { type: Buses.FETCH_BUSES_SUCCESS, payload: data.buses },
-            { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: data.containers },
-            { type: Components.FETCH_COMPONENTS_SUCCESS, payload: data.components },
-            { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: data.serviceUnits },
+            { type: Buses.FETCH_BUSES_SUCCESS, payload: toJavascriptMap(data.buses) },
+            { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap(data.containers) },
+            { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap(data.components) },
+            { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap(data.serviceUnits) },
           ]);
         })
     );
