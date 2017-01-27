@@ -207,16 +207,16 @@ public class WorkspaceResource {
 
         @NotEmpty
         @JsonProperty
-        public final String importIp;
+        public final String ip;
 
         @Min(1)
         @Max(65535)
         @JsonProperty
-        public final int importPort;
+        public final int port;
 
         @NotEmpty
         @JsonProperty
-        public final String importUsername;
+        public final String username;
 
         @Min(1)
         public final long id;
@@ -229,9 +229,9 @@ public class WorkspaceResource {
 
         public BusInProgress(long id, String ip, int port, String username) {
             this.id = id;
-            this.importIp = ip;
-            this.importPort = port;
-            this.importUsername = username;
+            this.ip = ip;
+            this.port = port;
+            this.username = username;
         }
 
         @JsonProperty
