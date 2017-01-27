@@ -27,4 +27,12 @@ export class UsersMockService {
       .of(response)
       .delay(environment.httpDelay);
   }
+
+  public disconnectUser(): Observable<Response> {
+    const response = <Response>{ ok: true };
+
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
+  }
 }

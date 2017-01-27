@@ -56,4 +56,31 @@ export class UsersEffects {
     .map((action: Action) => {
       this._router.navigate(['/workspaces']);
     });
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) disconnectUser$: Observable<Action> = this._actions$
+    .ofType(Users.DISCONNECT_USER)
+    .switchMap((action: Action) =>
+      this._usersService.disconnectUser()
+        .map((res: Response) => {
+          if (!res.ok) {
+            throw new Error('Error while disconnecting user');
+          }
+
+          return { type: Users.DISCONNECT_USER_SUCCESS };
+        })
+        .catch((err) => {
+          if (environment.debug) {
+            console.warn('Error catched in users.effects.ts : ofType(Users.DISCONNECT_USER)');
+            console.error(err);
+          }
+
+          return Observable.of({ type: Users.DISCONNECT_USER_FAILED });
+        })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: false }) disconnectUserSuccess$: any = this._actions$
+    .ofType(Users.DISCONNECT_USER_SUCCESS)
+    .map(() => this._router.navigate(['/login']));
 }

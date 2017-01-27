@@ -1,8 +1,8 @@
-import { IUsersTable } from '../interfaces/users.interface';
 import { ActionReducer, Action } from '@ngrx/store';
 
 import { IUi } from '../interfaces/ui.interface';
 import { usersState } from './users.initial-state';
+import { IUsersTable } from '../interfaces/users.interface';
 
 export class Users {
   private static reducerName = 'USERS_REDUCER';
@@ -47,6 +47,30 @@ export class Users {
     });
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static DISCONNECT_USER = `${Users.reducerName}_DISCONNECT_USER`;
+  private static disconnectUser(users: IUsersTable, payload) {
+    return Object.assign(<IUsersTable>{}, users, <IUsersTable>{ isDisconnecting: true });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DISCONNECT_USER_SUCCESS = `${Users.reducerName}_DISCONNECT_USER_SUCCESS`;
+  private static disconnectUserSuccess(users: IUsersTable, payload) {
+    return Object.assign(<IUsersTable>{}, users, <IUsersTable>{
+      isDisconnecting: false,
+      isConnected: false,
+      connectedUserId: ''
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DISCONNECT_USER_FAILED = `${Users.reducerName}_DISCONNECT_USER_FAILED`;
+  private static disconnectUserFailed(users: IUsersTable, payload) {
+    return Object.assign(<IUsersTable>{}, users, <IUsersTable>{
+      isDisconnecting: false
+    });
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -54,6 +78,9 @@ export class Users {
     [Users.FETCH_USERS_SUCCESS]: Users.fetchUsersSuccess,
     [Users.CONNECT_USER]: Users.connectUser,
     [Users.CONNECT_USER_SUCCESS]: Users.connectUserSuccess,
-    [Users.CONNECT_USER_FAILED]: Users.connectUserFailed
+    [Users.CONNECT_USER_FAILED]: Users.connectUserFailed,
+    [Users.DISCONNECT_USER]: Users.disconnectUser,
+    [Users.DISCONNECT_USER_SUCCESS]: Users.disconnectUserSuccess,
+    [Users.DISCONNECT_USER_FAILED]: Users.disconnectUserFailed
   };
 }

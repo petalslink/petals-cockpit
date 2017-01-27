@@ -13,4 +13,8 @@ export class UsersService {
   public connectUser(user: IUser): Observable<Response> {
     return this._http.post(`${environment.urlBackend}/user/session`, <any>user);
   }
+
+  public disconnectUser(): Observable<Response> {
+    return this._http.delete(`${environment.urlBackend}/user/session`);
+  }
 }
