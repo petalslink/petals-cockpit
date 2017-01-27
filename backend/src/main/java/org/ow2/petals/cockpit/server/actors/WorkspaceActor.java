@@ -51,7 +51,6 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewBus;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewSUState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceChange;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
-import org.ow2.petals.cockpit.server.resources.WorkspacesResource.MinWorkspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,6 +141,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     private Either<Status, EventOutput> addBroadcastClient(NewWorkspaceClient nc)
             throws IOException, SuspendExecution, InterruptedException {
 
+        // TODO ALL of this should be done in one transaction...
         Either<Status, WorkspaceFullContent> content = runDAO(() -> {
 
             DbWorkspace ws = workspaces.getWorkspaceById(wId, nc.user);
@@ -155,7 +155,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 return Either.left(Status.FORBIDDEN);
             }
 
-            return Either.right(new WorkspaceFullContent(new MinWorkspace(ws.id, ws.name),
+            return Either.right(new WorkspaceFullContent(ws, workspaces.getWorkspaceUsers(wId),
                     WorkspaceContent.buildFromDatabase(buses, ws)));
         });
 

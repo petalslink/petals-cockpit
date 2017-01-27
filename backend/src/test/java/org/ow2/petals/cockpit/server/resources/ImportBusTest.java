@@ -115,7 +115,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             expectWorkspaceEvent(eventInput, (e, a) -> {
                 a.assertThat(e.event).isEqualTo("BUS_IMPORT_OK");
-                JsonNode bus = e.data.get("buses").get("byId").get("4");
+                JsonNode bus = e.data.get("buses").get("4");
                 a.assertThat(bus.get("id").asText()).isEqualTo(post.getId());
                 a.assertThat(bus.get("name").asText()).isEqualTo(domain.getName());
             });

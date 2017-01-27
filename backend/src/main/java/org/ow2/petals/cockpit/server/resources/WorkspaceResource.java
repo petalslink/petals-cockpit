@@ -16,7 +16,7 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
-import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -46,18 +46,22 @@ import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
 import org.ow2.petals.cockpit.server.db.BusesDAO;
 import org.ow2.petals.cockpit.server.db.UsersDAO;
+import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin.State;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
-import org.ow2.petals.cockpit.server.resources.WorkspacesResource.MinWorkspace;
+import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
+import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 @RequestScoped
 @Path("/workspaces/{wsId}")
@@ -99,8 +103,11 @@ public class WorkspaceResource {
         }
 
         WorkspaceContent content = WorkspaceContent.buildFromDatabase(buses, ws);
+        List<DbUser> wsUsers = workspaces.getWorkspaceUsers(wsId);
+
         users.saveLastWorkspace(profile.getUser(), ws.id);
-        return new WorkspaceFullContent(new MinWorkspace(ws.id, ws.name), content);
+
+        return new WorkspaceFullContent(ws, wsUsers, content);
     }
 
     /**
@@ -207,16 +214,16 @@ public class WorkspaceResource {
 
         @NotEmpty
         @JsonProperty
-        public final String importIp;
+        public final String ip;
 
         @Min(1)
         @Max(65535)
         @JsonProperty
-        public final int importPort;
+        public final int port;
 
         @NotEmpty
         @JsonProperty
-        public final String importUsername;
+        public final String username;
 
         @Min(1)
         public final long id;
@@ -229,9 +236,9 @@ public class WorkspaceResource {
 
         public BusInProgress(long id, String ip, int port, String username) {
             this.id = id;
-            this.importIp = ip;
-            this.importPort = port;
-            this.importUsername = username;
+            this.ip = ip;
+            this.port = port;
+            this.username = username;
         }
 
         @JsonProperty
@@ -293,22 +300,31 @@ public class WorkspaceResource {
 
         @Valid
         @JsonProperty
-        public final MinWorkspace workspace;
+        public final Workspace workspace;
+
+        @Valid
+        @JsonProperty
+        public final ImmutableMap<String, UserMin> users;
 
         @Valid
         @JsonUnwrapped
         public final WorkspaceContent content;
 
-        public WorkspaceFullContent(MinWorkspace workspace, WorkspaceContent content) {
+        public WorkspaceFullContent(DbWorkspace ws, List<DbUser> users, WorkspaceContent content) {
+            this.users = users.stream()
+                    .collect(ImmutableMap.toImmutableMap(DbUser::getUsername, u -> new UserMin(u.username, u.name)));
+            List<String> wsUsernames = users.stream().map(DbUser::getUsername).collect(ImmutableList.toImmutableList());
+            this.workspace = new Workspace(ws.id, ws.name, wsUsernames);
             this.content = content;
-            this.workspace = workspace;
         }
 
         @JsonCreator
         private WorkspaceFullContent() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new MinWorkspace(0, ""), new WorkspaceContent(Collections.emptyMap(), Collections.emptyMap(),
-                    Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap()));
+            this.users = ImmutableMap.of();
+            this.content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                    ImmutableMap.of(), ImmutableMap.of());
+            this.workspace = new Workspace(0, "", ImmutableList.of());
         }
     }
 
