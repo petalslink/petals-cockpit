@@ -2,6 +2,7 @@ import { Action } from '@ngrx/store';
 
 import { IserviceUnitsTable } from './service-units.interface';
 import { serviceUnitsTableFactory } from './service-units.initial-state';
+import { Users } from './../../../../../shared/state/users.reducer';
 
 export class ServiceUnits {
   private static reducerName = 'SERVICE_UNITS_REDUCER';
@@ -42,11 +43,17 @@ export class ServiceUnits {
     });
   }
 
+  private static disconnectUserSuccess(serviceUnitsTable: IserviceUnitsTable, payload) {
+    return serviceUnitsTableFactory();
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod = {
     [ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS]: ServiceUnits.fetchServiceUnitsSuccess,
     [ServiceUnits.SET_CURRENT_SERVICE_UNIT]: ServiceUnits.setCurrentServiceUnit,
+
+    [Users.DISCONNECT_USER_SUCCESS]: ServiceUnits.disconnectUserSuccess
   };
 }

@@ -3,6 +3,7 @@ import { Action } from '@ngrx/store';
 import { IBusRow } from './bus.interface';
 import { IBusesTable } from './buses.interface';
 import { busesTableFactory } from './buses.initial-state';
+import { Users } from './../../../../../shared/state/users.reducer';
 
 export class Buses {
   private static reducerName = 'BUSES_REDUCER';
@@ -99,6 +100,10 @@ export class Buses {
     });
   }
 
+  private static disconnectUserSuccess(busesTable: IBusesTable, payload) {
+    return busesTableFactory();
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -107,6 +112,8 @@ export class Buses {
     [Buses.FOLD_BUS]: Buses.foldBus,
     [Buses.UNFOLD_BUS]: Buses.unfoldBus,
     [Buses.TOGGLE_FOLD_BUS]: Buses.toggleFoldBus,
-    [Buses.SET_CURRENT_BUS]: Buses.setCurrentBus
+    [Buses.SET_CURRENT_BUS]: Buses.setCurrentBus,
+
+    [Users.DISCONNECT_USER_SUCCESS]: Buses.disconnectUserSuccess
   };
 }

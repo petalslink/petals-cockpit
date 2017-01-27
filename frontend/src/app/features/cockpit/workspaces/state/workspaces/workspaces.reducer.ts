@@ -3,6 +3,7 @@ import { Action } from '@ngrx/store';
 import { IWorkspacesTable } from './workspaces.interface';
 import { workspacesTableFactory } from './workspaces.initial-state';
 import { IWorkspaceRow } from './workspace.interface';
+import { Users } from './../../../../../shared/state/users.reducer';
 
 export class Workspaces {
   private static reducerName = 'WORKSPACES_REDUCER';
@@ -117,6 +118,10 @@ export class Workspaces {
     );
   }
 
+  private static disconnectUserSuccess(workspacesTable: IWorkspacesTable, payload) {
+    return workspacesTableFactory();
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -125,6 +130,8 @@ export class Workspaces {
     [Workspaces.FETCH_WORKSPACES_SUCCESS]: Workspaces.fetchWorkspacesSuccess,
     [Workspaces.FETCH_WORKSPACE]: Workspaces.fetchWorkspace,
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Workspaces.fetchWorkspaceSuccess,
-    [Workspaces.ADD_BUS]: Workspaces.addBus
+    [Workspaces.ADD_BUS]: Workspaces.addBus,
+
+    [Users.DISCONNECT_USER_SUCCESS]: Workspaces.disconnectUserSuccess
   };
 }

@@ -3,6 +3,7 @@ import { Action } from '@ngrx/store';
 import { IContainersTable } from './containers.interface';
 import { containersTableFactory } from './containers.initial-state';
 import { IContainerRow } from './container.interface';
+import { Users } from './../../../../../shared/state/users.reducer';
 
 export class Containers {
   private static reducerName = 'CONTAINERS_REDUCER';
@@ -99,6 +100,10 @@ export class Containers {
     });
   }
 
+  private static disconnectUserSuccess(containersTable: IContainersTable, payload) {
+    return containersTableFactory();
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -108,5 +113,7 @@ export class Containers {
     [Containers.UNFOLD_CONTAINER]: Containers.unfoldContainer,
     [Containers.TOGGLE_FOLD_CONTAINER]: Containers.toggleFoldContainer,
     [Containers.SET_CURRENT_CONTAINER]: Containers.setCurrentContainer,
+
+    [Users.DISCONNECT_USER_SUCCESS]: Containers.disconnectUserSuccess
   };
 }

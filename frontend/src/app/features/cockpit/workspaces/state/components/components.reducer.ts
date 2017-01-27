@@ -3,6 +3,7 @@ import { Action } from '@ngrx/store';
 import { IComponentsTable } from './components.interface';
 import { IComponentRow } from './component.interface';
 import { componentsTableFactory } from './components.initial-state';
+import { Users } from './../../../../../shared/state/users.reducer';
 
 export class Components {
   private static reducerName = 'COMPONENTS_REDUCER';
@@ -99,6 +100,10 @@ export class Components {
     });
   }
 
+  private static disconnectUserSuccess(componentsTable: IComponentsTable, payload) {
+    return componentsTableFactory();
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -107,6 +112,8 @@ export class Components {
     [Components.FOLD_COMPONENT]: Components.foldComponent,
     [Components.UNFOLD_COMPONENT]: Components.unfoldComponent,
     [Components.TOGGLE_FOLD_COMPONENT]: Components.toggleFoldComponent,
-    [Components.SET_CURRENT_COMPONENT]: Components.setCurrentComponent
+    [Components.SET_CURRENT_COMPONENT]: Components.setCurrentComponent,
+
+    [Users.DISCONNECT_USER_SUCCESS]: Components.disconnectUserSuccess
   };
 }

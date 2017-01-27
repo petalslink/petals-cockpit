@@ -4,6 +4,7 @@ import { omit } from 'underscore';
 import { busesInProgressTableFactory } from './buses-in-progress.initial-state';
 import { IBusesInProgressTable } from './buses-in-progress.interface';
 import { IBusInProgressRow } from './bus-in-progress.interface';
+import { Users } from './../../../../../shared/state/users.reducer';
 
 export class BusesInProgress {
   private static reducerName = 'BUSES_IN_PROGRESS_REDUCER';
@@ -74,6 +75,10 @@ export class BusesInProgress {
     });
   }
 
+  private static disconnectUserSuccess(busesInProgressTable: IBusesInProgressTable, payload) {
+    return busesInProgressTableFactory();
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -82,6 +87,8 @@ export class BusesInProgress {
     [BusesInProgress.SET_SELECTED_BUS_IN_PROGRESS]: BusesInProgress.setSelectedBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS]: BusesInProgress.postBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]: BusesInProgress.postBusInProgressSuccess,
-    [BusesInProgress.REMOVE_BUS_IN_PROGRESS]: BusesInProgress.removeBusInProgress
+    [BusesInProgress.REMOVE_BUS_IN_PROGRESS]: BusesInProgress.removeBusInProgress,
+
+    [Users.DISCONNECT_USER_SUCCESS]: BusesInProgress.disconnectUserSuccess
   };
 }
