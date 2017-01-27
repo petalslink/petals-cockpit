@@ -18,7 +18,8 @@
     <!-- TODO : Once bugs are fixed, put 50% and maybe change size (responsive) -->
     <!-- https://github.com/angular/flex-layout/issues/106 -->
     <!-- https://github.com/angular/flex-layout/issues/108 -->
-    <md-card fxFlex="48%" *ngFor="let i of [0, 1]" class="background-color-light-green-x3 background-color-hover-light-green-x2 cursor-pointer">
+    <md-card fxFlex="48%" *ngFor="let i of [0, 1]" class="background-color-light-green-x3 background-color-hover-light-green-x2 cursor-pointer"
+      [routerLink]="['/workspaces', (idWorkspace$ | async), 'petals', 'containers']">
       <md-card-subtitle>Container</md-card-subtitle>
       <md-card-title>Container X{{ i }}</md-card-title>
     </md-card>
