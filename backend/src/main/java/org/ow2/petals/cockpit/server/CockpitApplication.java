@@ -170,8 +170,9 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         ExecutorService petalsAdminES = environment.lifecycle().executorService("petals-admin-worker-%d").minThreads(1)
                 .maxThreads(2).build();
         // This is needed for executing database requests from within a fiber (actors)
-        ExecutorService jdbcExec = environment.lifecycle().executorService("jdbc-worker-%d").minThreads(2)
-                .maxThreads(Runtime.getRuntime().availableProcessors()).build();
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        ExecutorService jdbcExec = environment.lifecycle().executorService("jdbc-worker-%d")
+                .minThreads(Math.min(2, availableProcessors)).maxThreads(availableProcessors).build();
 
         final PetalsAdministrationFactory adminFactory = PetalsAdministrationFactory.getInstance();
 
