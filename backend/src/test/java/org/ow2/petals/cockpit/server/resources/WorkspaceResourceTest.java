@@ -101,40 +101,40 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
         assertThat(content.workspace.id).isEqualTo(1);
         assertThat(content.workspace.name).isEqualTo("test");
 
-        assertThat(content.content.buses.map).hasSize(1);
-        assertThat(content.content.containers.map).hasSize(3);
-        assertThat(content.content.components.map).hasSize(1);
-        assertThat(content.content.serviceUnits.map).hasSize(1);
+        assertThat(content.content.buses).hasSize(1);
+        assertThat(content.content.containers).hasSize(3);
+        assertThat(content.content.components).hasSize(1);
+        assertThat(content.content.serviceUnits).hasSize(1);
 
-        BusFull b = content.content.buses.map.values().iterator().next();
+        BusFull b = content.content.buses.values().iterator().next();
         assert b != null;
 
         assertThat(b.bus.id).isEqualTo(10);
         assertThat(b.bus.name).isEqualTo(domain.getName());
         assertThat(b.containers).hasSize(3);
 
-        ContainerFull c1 = content.content.containers.map.get("20");
+        ContainerFull c1 = content.content.containers.get("20");
         assert c1 != null;
 
         assertThat(c1.container.id).isEqualTo(20);
         assertThat(c1.container.name).isEqualTo(container1.getContainerName());
         assertThat(c1.components).hasSize(1);
 
-        ContainerFull c2 = content.content.containers.map.get("21");
+        ContainerFull c2 = content.content.containers.get("21");
         assert c2 != null;
 
         assertThat(c2.container.id).isEqualTo(21);
         assertThat(c2.container.name).isEqualTo(container2.getContainerName());
         assertThat(c2.components).hasSize(0);
 
-        ContainerFull c3 = content.content.containers.map.get("22");
+        ContainerFull c3 = content.content.containers.get("22");
         assert c3 != null;
 
         assertThat(c3.container.id).isEqualTo(22);
         assertThat(c3.container.name).isEqualTo(container3.getContainerName());
         assertThat(c3.components).hasSize(0);
 
-        ComponentFull comp = content.content.components.map.get("30");
+        ComponentFull comp = content.content.components.get("30");
         assert comp != null;
 
         assertThat(comp.component.id).isEqualTo(30);
@@ -142,7 +142,7 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
         assertThat(comp.component.state.toString()).isEqualTo(component.getState().toString());
         assertThat(comp.serviceUnits).hasSize(1);
 
-        ServiceUnitMin su = content.content.serviceUnits.map.get("40");
+        ServiceUnitMin su = content.content.serviceUnits.get("40");
         assert su != null;
 
         assertThat(su.id).isEqualTo(40);

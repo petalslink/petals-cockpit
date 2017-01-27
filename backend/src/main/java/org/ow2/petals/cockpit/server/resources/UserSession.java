@@ -98,7 +98,7 @@ public class UserSession {
         // the method is never called, everything is handled by pac4j
     }
 
-    public static class User {
+    public static class UserMin {
 
         @NotEmpty
         @JsonProperty
@@ -108,14 +108,21 @@ public class UserSession {
         @JsonProperty
         public final String name;
 
+        public UserMin(@JsonProperty("username") String username, @JsonProperty("name") String name) {
+            this.username = username;
+            this.name = name;
+        }
+    }
+
+    public static class User extends UserMin {
+
         @Nullable
         @Min(1)
         public final Long lastWorkspace;
 
         public User(@JsonProperty("username") String username, @JsonProperty("name") String name,
                 @Nullable @JsonProperty("lastWorkspace") Long lastWorkspace) {
-            this.username = username;
-            this.name = name;
+            super(username, name);
             this.lastWorkspace = lastWorkspace;
         }
 

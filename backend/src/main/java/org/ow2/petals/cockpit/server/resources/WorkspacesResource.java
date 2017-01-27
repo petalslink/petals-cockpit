@@ -16,8 +16,8 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -32,13 +32,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 @Singleton
 @Path("/workspaces")
@@ -58,16 +62,27 @@ public class WorkspacesResource {
     public Workspace create(@Valid NewWorkspace ws, @Pac4JProfile CockpitProfile profile) {
         DbWorkspace w = workspaces.create(ws.name, profile.getUser());
 
-        return new Workspace(w.id, w.name, Arrays.asList(profile.getUser().username));
+        return new Workspace(w.id, w.name, ImmutableList.of(profile.getUser().username));
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
-    public List<Workspace> workspaces(@Pac4JProfile CockpitProfile profile) {
-        return workspaces.getUserWorkspaces(profile.getUser()).stream()
-                .map(w -> new Workspace(w.id, w.name, workspaces.getWorkspaceUsers(w.id)))
-                .collect(Collectors.toList());
+    public Workspaces workspaces(@Pac4JProfile CockpitProfile profile) {
+        // TODO this should be done in a transaction...
+        ImmutableMap.Builder<String, Workspace> wss = ImmutableMap.builder();
+        ImmutableMap.Builder<String, UserMin> users = ImmutableMap.builder();
+
+        workspaces.getUserWorkspaces(profile.getUser()).stream().forEach(w -> {
+            List<DbUser> dbUsers = workspaces.getWorkspaceUsers(w.id);
+
+            List<String> wsUsers = dbUsers.stream().map(DbUser::getUsername).collect(ImmutableList.toImmutableList());
+            wss.put(String.valueOf(w.id), new Workspace(w.id, w.name, wsUsers));
+            users.putAll(dbUsers.stream()
+                    .collect(Collectors.toMap(DbUser::getUsername, u -> new UserMin(u.username, u.name))));
+        });
+
+        return new Workspaces(wss.build(), users.build());
     }
 
     public static class NewWorkspace {
@@ -76,12 +91,13 @@ public class WorkspacesResource {
         @JsonProperty
         public final String name;
 
+        @JsonCreator
         public NewWorkspace(@JsonProperty("name") String name) {
             this.name = name;
         }
     }
 
-    public static class MinWorkspace {
+    public static class Workspace {
 
         @Min(1)
         public final long id;
@@ -90,9 +106,15 @@ public class WorkspacesResource {
         @JsonProperty
         public final String name;
 
-        public MinWorkspace(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+        @JsonProperty
+        public final ImmutableList<String> users;
+
+        @JsonCreator
+        public Workspace(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("users") List<String> users) {
             this.id = id;
             this.name = name;
+            this.users = ImmutableList.copyOf(users);
         }
 
         @JsonProperty
@@ -101,14 +123,19 @@ public class WorkspacesResource {
         }
     }
 
-    public static class Workspace extends MinWorkspace {
+    public static class Workspaces {
 
         @JsonProperty
-        public final ImmutableList<String> usedBy;
+        public final ImmutableMap<String, Workspace> workspaces;
 
-        public Workspace(long id, String name, List<String> usedBy) {
-            super(id, name);
-            this.usedBy = ImmutableList.copyOf(usedBy);
+        @Valid
+        @JsonProperty
+        public final ImmutableMap<String, UserMin> users;
+
+        @JsonCreator
+        public Workspaces(Map<String, Workspace> workspaces, Map<String, UserMin> users) {
+            this.workspaces = ImmutableMap.copyOf(workspaces);
+            this.users = ImmutableMap.copyOf(users);
         }
     }
 }

@@ -16,10 +16,8 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,9 +49,10 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInError;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import co.paralleluniverse.fibers.Suspendable;
 
@@ -61,41 +60,35 @@ public class WorkspaceContent {
 
     @Valid
     @JsonProperty
-    public final JsonMap<String, BusInProgress> busesInProgress;
+    public final ImmutableMap<String, BusInProgress> busesInProgress;
 
     @Valid
     @JsonProperty
-    public final JsonMap<String, BusFull> buses;
+    public final ImmutableMap<String, BusFull> buses;
 
     @Valid
     @JsonProperty
-    public final JsonMap<String, ContainerFull> containers;
+    public final ImmutableMap<String, ContainerFull> containers;
 
     @Valid
     @JsonProperty
-    public final JsonMap<String, ComponentFull> components;
+    public final ImmutableMap<String, ComponentFull> components;
 
     @Valid
     @JsonProperty
-    public final JsonMap<String, ServiceUnitMin> serviceUnits;
-
-    public WorkspaceContent(Map<String, BusInProgress> busesInProgress, Map<String, BusFull> buses,
-            Map<String, ContainerFull> containers, Map<String, ComponentFull> components,
-            Map<String, ServiceUnitMin> serviceUnits) {
-        this.busesInProgress = new JsonMap<>(busesInProgress);
-        this.buses = new JsonMap<>(buses);
-        this.containers = new JsonMap<>(containers);
-        this.components = new JsonMap<>(components);
-        this.serviceUnits = new JsonMap<>(serviceUnits);
-    }
+    public final ImmutableMap<String, ServiceUnitMin> serviceUnits;
 
     @JsonCreator
-    private WorkspaceContent(@JsonProperty("busesInProgress") JsonMap<String, BusInProgress> busesInProgress,
-            @JsonProperty("buses") JsonMap<String, BusFull> buses,
-            @JsonProperty("containers") JsonMap<String, ContainerFull> containers,
-            @JsonProperty("components") JsonMap<String, ComponentFull> components,
-            @JsonProperty("serviceUnits") JsonMap<String, ServiceUnitMin> serviceUnits) {
-        this(busesInProgress.map, buses.map, containers.map, components.map, serviceUnits.map);
+    public WorkspaceContent(@JsonProperty("busesInProgress") Map<String, BusInProgress> busesInProgress,
+            @JsonProperty("buses") Map<String, BusFull> buses,
+            @JsonProperty("containers") Map<String, ContainerFull> containers,
+            @JsonProperty("components") Map<String, ComponentFull> components,
+            @JsonProperty("serviceUnits") Map<String, ServiceUnitMin> serviceUnits) {
+        this.busesInProgress = ImmutableMap.copyOf(busesInProgress);
+        this.buses = ImmutableMap.copyOf(buses);
+        this.containers = ImmutableMap.copyOf(containers);
+        this.components = ImmutableMap.copyOf(components);
+        this.serviceUnits = ImmutableMap.copyOf(serviceUnits);
     }
 
     public static class InvalidPetalsBus extends Exception {
@@ -223,17 +216,17 @@ public class WorkspaceContent {
         public final BusMin bus;
 
         @JsonProperty
-        public final Set<String> containers;
+        public final ImmutableSet<String> containers;
 
         public BusFull(BusMin bus, Set<String> containers) {
             this.bus = bus;
-            this.containers = Collections.unmodifiableSet(containers);
+            this.containers = ImmutableSet.copyOf(containers);
         }
 
         @JsonCreator
         private BusFull() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new BusMin(0, ""), Collections.emptySet());
+            this(new BusMin(0, ""), ImmutableSet.of());
         }
     }
 
@@ -244,17 +237,17 @@ public class WorkspaceContent {
         public final ContainerMin container;
 
         @JsonProperty
-        public final Set<String> components;
+        public final ImmutableSet<String> components;
 
         public ContainerFull(ContainerMin container, Set<String> components) {
             this.container = container;
-            this.components = Collections.unmodifiableSet(components);
+            this.components = ImmutableSet.copyOf(components);
         }
 
         @JsonCreator
         private ContainerFull() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new ContainerMin(0, ""), Collections.emptySet());
+            this(new ContainerMin(0, ""), ImmutableSet.of());
         }
     }
 
@@ -265,47 +258,17 @@ public class WorkspaceContent {
         public final ComponentMin component;
 
         @JsonProperty
-        public final Set<String> serviceUnits;
+        public final ImmutableSet<String> serviceUnits;
 
         public ComponentFull(ComponentMin component, Set<String> serviceUnits) {
             this.component = component;
-            this.serviceUnits = Collections.unmodifiableSet(serviceUnits);
+            this.serviceUnits = ImmutableSet.copyOf(serviceUnits);
         }
 
         @JsonCreator
         private ComponentFull() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new ComponentMin(0, "", State.Unknown, Type.BC), Collections.emptySet());
-        }
-    }
-
-    /**
-     * In the frontend, we like to have maps of this format
-     */
-    public static class JsonMap<K, V> {
-
-        @Valid
-        @JsonIgnore
-        public final Map<K, V> map;
-
-        public JsonMap(Map<K, V> map) {
-            this.map = Collections.unmodifiableMap(map);
-        }
-
-        @JsonCreator
-        private JsonMap(@Valid @JsonProperty("byId") Map<K, V> map, @JsonProperty("allIds") List<K> keys) {
-            this(map);
-            assert map.keySet().equals(new HashSet<>(keys));
-        }
-
-        @JsonProperty
-        public Map<K, V> getById() {
-            return map;
-        }
-
-        @JsonProperty
-        public Set<K> getAllIds() {
-            return map.keySet();
+            this(new ComponentMin(0, "", State.Unknown, Type.BC), ImmutableSet.of());
         }
     }
 }

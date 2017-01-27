@@ -41,8 +41,11 @@ public abstract class WorkspacesDAO {
     @Nullable
     public abstract DbWorkspace getWorkspaceById(@Bind("id") long id, @Nullable @Bind("u") String username);
 
-    @SqlQuery("select uw.username from users_workspaces uw where uw.workspace_id = :id")
-    public abstract List<String> getWorkspaceUsers(@Bind("id") long id);
+    @SqlQuery("select uw.username, u.name, NULL as password from users_workspaces uw"
+            + " left join users u on u.username = uw.username"
+            + " where uw.workspace_id = :id")
+    @Mapper(DbUser.Mapper.class)
+    public abstract List<DbUser> getWorkspaceUsers(@Bind("id") long id);
 
     @SqlQuery("select w.*, uw.username as acl from workspaces w" 
             + " inner join users_workspaces uw on w.id = uw.workspace_id"

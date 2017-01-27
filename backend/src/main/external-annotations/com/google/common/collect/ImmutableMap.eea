@@ -11,3 +11,6 @@ of
 of
  <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;)Lcom/google/common/collect/ImmutableMap<TK;TV;>;
  <K:Ljava/lang/Object;V:Ljava/lang/Object;>(T1K;T1V;)L1com/google/common/collect/ImmutableMap<TK;TV;>;
+toImmutableMap
+ <T:Ljava/lang/Object;K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TK;>;Ljava/util/function/Function<-TT;+TV;>;)Ljava/util/stream/Collector<TT;*Lcom/google/common/collect/ImmutableMap<TK;TV;>;>;
+ <T:Ljava/lang/Object;K:Ljava/lang/Object;V:Ljava/lang/Object;>(L1java/util/function/Function<-TT;+TK;>;L1java/util/function/Function<-TT;+TV;>;)L1java/util/stream/Collector<TT;*1L1com/google/common/collect/ImmutableMap<TK;TV;>;>;
