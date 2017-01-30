@@ -16,6 +16,7 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -71,7 +72,9 @@ public class WorkspacesResource {
     public Workspaces workspaces(@Pac4JProfile CockpitProfile profile) {
         // TODO this should be done in a transaction...
         ImmutableMap.Builder<String, Workspace> wss = ImmutableMap.builder();
-        ImmutableMap.Builder<String, UserMin> users = ImmutableMap.builder();
+        // we need a normal Map because ImmutableMap does not accept duplicate put
+        // and with multiple workspaces it can be the case...
+        Map<String, UserMin> users = new HashMap<>();
 
         workspaces.getUserWorkspaces(profile.getUser()).stream().forEach(w -> {
             List<DbUser> dbUsers = workspaces.getWorkspaceUsers(w.id);
@@ -82,7 +85,7 @@ public class WorkspacesResource {
                     .collect(Collectors.toMap(DbUser::getUsername, u -> new UserMin(u.username, u.name))));
         });
 
-        return new Workspaces(wss.build(), users.build());
+        return new Workspaces(wss.build(), users);
     }
 
     public static class NewWorkspace {
