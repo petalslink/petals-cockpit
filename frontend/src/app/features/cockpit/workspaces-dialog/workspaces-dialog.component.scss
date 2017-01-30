@@ -1,13 +1,11 @@
-@media (min-width: 480px) {
-  [md-card-avatar] {
+[md-card-avatar] {
+  @media (min-width: 480px) {
     max-width: 55px;
     width: 55px;
     height: 55px;
   }
-}
 
-@media (max-width: 480px) {
-  [md-card-avatar] {
+  @media (max-width: 479px) {
     max-width: 25px;
     width: 25px;
     height: 25px;
@@ -20,7 +18,7 @@
   background-repeat: no-repeat;
 }
 
-md-input-container [md-prefix] {
+md-input-container [mdPrefix] {
   margin-right: 10px;
 }
 
@@ -30,4 +28,12 @@ md-input-container [md-prefix] {
 
 h3 {
   font-size: 16px;
+}
+
+md-dialog-content {
+  height: 100%;
+}
+
+.central-content {
+  margin-top: 0;
 }

@@ -1,34 +1,42 @@
-<md-toolbar fxLayout="column" fxLayoutAlign="center start">
-  <md-icon color="primary">folder</md-icon>
-  <h3 class="color-primary-bold margin-top-x0 md-dialog-title margin-left-x1"> WORKSPACES</h3>
-</md-toolbar>
 <div fxLayout="column" class="content content-max-width">
+  <md-toolbar fxLayout="column" fxLayoutAlign="center start">
+    <md-icon color="primary">folder</md-icon>
+    <h3 class="color-primary-bold margin-top-x0 md-dialog-title margin-left-x1">WORKSPACES</h3>
+  </md-toolbar>
+
   <div class="central-content">
     <md-dialog-content>
-      <div fxLayout="row" fxLayoutGap="10px">
-        <md-input-container #workspaceInput fxFlex>
-          <input md-input placeholder="New workspace name">
-          <span md-prefix><md-icon color="primary">edit</md-icon></span>
-        </md-input-container>
-        <button md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace" mdTooltipPosition="below">
-            <md-icon class="md-24">add</md-icon>
-        </button>
-      </div>
       <div fxLayout="column" fxFill>
-        <h3 class="color-primary-light-bold margin-top-x1">Select the workspace</h3>
+        <div fxFlex>
+          <div fxLayout="row" fxFlex fxLayoutGap="10px">
+            <md-input-container fxFlex>
+              <input mdInput placeholder="New workspace name">
+              <span mdPrefix><md-icon color="primary">edit</md-icon></span>
+            </md-input-container>
 
-        <md-card fxLayout="row" fxFlex="100%" class="background-color-hover-light-green-x2 cursor-pointer" *ngFor="let workspace of (workspaces$ | async).list"
-          (click)="fetchWorkspace(workspace)">
-          <!-- https://github.com/angular/flex-layout/issues/132 -->
-          <img md-card-avatar fxShow fxHide.xs class="img-card-workspace">
-          <span fxFlex></span>
-          <div fxLayout="column" fxLayoutAlign="start end">
-            <md-card-subtitle>{{ workspace.name }}
-              <span class="green-led"></span>
-            </md-card-subtitle>
-            <p md-line>You're the only one to use this workspace</p>
+            <button md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace" mdTooltipPosition="below">
+              <md-icon class="md-24">add</md-icon>
+          </button>
           </div>
-        </md-card>
+        </div>
+
+        <div fxFlexFill class="margin-bottom-x1">
+          <h3 class="color-primary-light-bold margin-top-x1">Select the workspace</h3>
+
+          <md-card fxLayout="row" fxFlex="100%" class="background-color-hover-light-green-x2 cursor-pointer" *ngFor="let workspace of (workspaces$ | async).list"
+            (click)="fetchWorkspace(workspace)">
+            <!-- https://github.com/angular/flex-layout/issues/132 -->
+            <img md-card-avatar fxShow fxHide.xs class="img-card-workspace">
+            <span fxFlex></span>
+            <div fxLayout="column" fxLayoutAlign="start end">
+              <md-card-subtitle>{{ workspace.name }}
+                <!--TODO : Display green led only if workspace selected-->
+                <span class="green-led"></span>
+              </md-card-subtitle>
+              <p md-line>You're the only one to use this workspace</p>
+            </div>
+          </md-card>
+        </div>
       </div>
     </md-dialog-content>
   </div>

@@ -26,7 +26,7 @@
     -->
   </md-toolbar>
 
-  <md-sidenav-container fxLayout="column" fxFill fxFlex (backdrop-clicked)="closeSidenav()">
+  <md-sidenav-container fxLayout="column" fxFlex (backdrop-clicked)="closeSidenav()">
     <md-sidenav fxLayout="column" [opened]="(ui$ | async).isSidenavVisible" [mode]="sidenavMode$ | async">
       <app-menu-user-panel></app-menu-user-panel>
 
@@ -42,7 +42,7 @@
 
       <md-tab-group>
         <md-tab label="Petals">
-          <app-petals-menu-view fxLayout="column"></app-petals-menu-view>
+          <app-petals-menu-view></app-petals-menu-view>
         </md-tab>
 
         <md-tab label="Service">
