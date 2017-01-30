@@ -1,7 +1,10 @@
 import { Component, Inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { MdDialog, MdDialogRef } from '@angular/material';
-import { MediaChange, MatchMediaObservable, BreakPointRegistry, MatchMedia } from '@angular/flex-layout';
+import { MediaChange } from '@angular/flex-layout';
+// this line will be replaced to @angular/flex-layout as expected in beta.5
+// see https://github.com/angular/flex-layout/issues/144
+import { ObservableMediaService } from '@angular/flex-layout/media-query/observable-media-service';
 import { Observable } from 'rxjs/Observable';
 import { TranslateService } from 'ng2-translate';
 import { Subscription } from 'rxjs/Subscription';
@@ -40,7 +43,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     private _store$: Store<IStore>,
     @Inject(LANGUAGES) public languages,
     public dialog: MdDialog,
-    @Inject(MatchMediaObservable) public media$,
+    @Inject(ObservableMediaService) public media$,
     private _router: Router
   ) { }
 
@@ -64,6 +67,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe();
 
     this.logoByScreenSize$ = this.media$
+      .asObservable()
       .map((change: MediaChange) => {
         const imgSrcBase = `assets/img`;
         const imgSrcExt = `png`;
@@ -78,6 +82,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
       });
 
     this.sidenavMode$ = this.media$
+      .asObservable()
       .map((change: MediaChange) => {
         const screenSize = change.mqAlias;
 
