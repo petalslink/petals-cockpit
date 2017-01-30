@@ -21,7 +21,17 @@
         </div>
 
         <div fxFlexFill class="margin-bottom-x1">
-          <h3 class="color-primary-light-bold margin-top-x1">Select the workspace</h3>
+
+          <!-- Error message when list workspaces is empty -->
+          <div fxLayout="column" fxFlex="100%" *ngIf="(workspaces$ | async).list.length === 0">
+            <h3 fxLayoutAlign="center center" class="form-error">Ooops, no workspace currently exists.</h3>
+            <div class="info-add-workspace" fxLayout="row" fxFlex="100%" fxLayoutAlign="start center">
+              <md-icon color="primary">info</md-icon>
+              <p md-line>Please, add a new workspace before.</p>
+            </div>
+          </div>
+
+          <h3 class="color-primary-light-bold margin-top-x1" *ngIf="(workspaces$ | async).list.length !== 0">Select the workspace</h3>
 
           <md-card fxLayout="row" fxFlex="100%" class="background-color-hover-light-green-x2 cursor-pointer" *ngFor="let workspace of (workspaces$ | async).list"
             (click)="fetchWorkspace(workspace)">
