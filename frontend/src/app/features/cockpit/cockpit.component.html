@@ -1,0 +1,63 @@
+<div fxLayout="column" fxFill>
+  <md-toolbar color="primary">
+    <div class="toolbar-logo">
+      <img class="logo-toolbar" [src]="logoByScreenSize$ | async">
+    </div>
+
+    <button md-icon-button (click)="toggleSidenav()" class="menu-icon">
+      <md-icon>menu</md-icon>
+    </button>
+
+    <span fxLayout="row">
+      {{ (ui$ | async)?.titleMainPart1 }}
+
+      <span *ngIf="(ui$ | async).titleMainPart2" fxLayoutAlign="center center">
+        <md-icon>chevron_right</md-icon> <span class="color-accent-bold">{{ (ui$ | async).titleMainPart2 }}</span>
+      </span>
+    </span>
+
+    <div fxFlex></div>
+
+    <!--
+    TODO: Find a way to handle immutability with md-select
+    <md-select id="language" name="language" [(ngModel)]="language">
+      <md-option *ngFor="let l of languages" [value]="l">{{ l }}</md-option>
+    </md-select>
+    -->
+  </md-toolbar>
+
+  <md-sidenav-container fxLayout="column" fxFlex (backdrop-clicked)="closeSidenav()">
+    <md-sidenav fxLayout="column" [opened]="(ui$ | async).isSidenavVisible" [mode]="sidenavMode$ | async">
+      <app-menu-user-panel></app-menu-user-panel>
+
+      <div fxLayout="row">
+        <button fxFlex="100" md-raised-button [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId]" class="width-full no-border-radius" color="accent">
+          {{ (workspace$ | async)?.name }}
+        </button>
+
+        <button fxFlex md-raised-button (click)="openWorkspacesDialog()" class="width-full no-border-radius" color="accent">
+          <md-icon>view_list</md-icon>
+        </button>
+      </div>
+
+      <md-tab-group>
+        <md-tab label="Petals">
+          <app-petals-menu-view></app-petals-menu-view>
+        </md-tab>
+
+        <md-tab label="Service">
+          <h1>Some more tab content</h1>
+          <p>...</p>
+        </md-tab>
+
+        <md-tab label="API">
+          <h1>Some more tab content</h1>
+          <p>...</p>
+        </md-tab>
+      </md-tab-group>
+      <!--<router-outlet name="aux"></router-outlet>-->
+    </md-sidenav>
+
+    <router-outlet></router-outlet>
+  </md-sidenav-container>
+</div>

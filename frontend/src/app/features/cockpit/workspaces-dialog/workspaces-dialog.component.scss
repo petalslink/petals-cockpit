@@ -1,0 +1,39 @@
+[md-card-avatar] {
+  @media (min-width: 480px) {
+    max-width: 55px;
+    width: 55px;
+    height: 55px;
+  }
+
+  @media (max-width: 479px) {
+    max-width: 25px;
+    width: 25px;
+    height: 25px;
+  }
+}
+
+.img-card-workspace {
+  background-image: url(assets/img/notes.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+md-input-container [mdPrefix] {
+  margin-right: 10px;
+}
+
+.central-content {
+  padding: 24px;
+}
+
+h3 {
+  font-size: 16px;
+}
+
+md-dialog-content {
+  height: 100%;
+}
+
+.central-content {
+  margin-top: 0;
+}

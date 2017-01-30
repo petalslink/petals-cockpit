@@ -1,0 +1,76 @@
+<div fxLayout="column" fxFill class="content wrapper-content">
+  <md-toolbar>
+    <md-icon color="primary">edit</md-icon>
+    Description
+  </md-toolbar>
+
+  <div fxLayout="column" class="content content-max-width" fxLayoutWrap>
+    <div class="central-content">
+      <md-card>
+        <!--<md-card-title class="color-primary margin-bottom-x0">Description :</md-card-title>-->
+        <md-card-content>
+          <form novalidate [formGroup]="busImportForm" (ngSubmit)="onSubmit(busImportForm) && busImportForm.reset()">
+            <div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="10px">
+              <!-- once this issue https://github.com/angular/flex-layout/issues/108 -->
+              <!-- is fixed, replace fxFlex="45" to 50 -->
+              <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+                <md-input-container #ipInput fxFill>
+                  <input mdInput placeholder="IP or domain name" formControlName="ip" required>
+                  <span mdPrefix><md-icon color="primary">star_half</md-icon></span>
+                  <md-hint *ngIf="formErrors.ip" class="form-error">
+                    {{ formErrors.ip }}
+                  </md-hint>
+                </md-input-container>
+              </div>
+
+              <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+                <md-input-container fxFill>
+                  <input mdInput placeholder="Port" formControlName="port" required>
+                  <span mdPrefix><md-icon color="primary">settings_ethernet</md-icon></span>
+                  <md-hint *ngIf="formErrors.port" class="form-error">
+                    {{ formErrors.port }}
+                  </md-hint>
+                </md-input-container>
+              </div>
+
+              <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+                <md-input-container fxFill>
+                  <input mdInput placeholder="Username" formControlName="username" required>
+                  <span mdPrefix><md-icon color="primary">person</md-icon></span>
+                  <md-hint *ngIf="formErrors.username" class="form-error">
+                    {{ formErrors.username }}
+                  </md-hint>
+                </md-input-container>
+              </div>
+
+              <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+                <md-input-container fxFill>
+                  <input mdInput type="password" placeholder="Password" formControlName="password" required>
+                  <span mdPrefix><md-icon color="primary">vpn_key</md-icon></span>
+                  <md-hint *ngIf="formErrors.password" class="form-error">
+                    {{ formErrors.password }}
+                  </md-hint>
+                </md-input-container>
+              </div>
+
+              <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+                <md-input-container fxFill>
+                  <input mdInput type="password" placeholder="Topology passphrase" formControlName="passphrase" required>
+                  <span mdPrefix><md-icon color="primary">security</md-icon></span>
+                  <md-hint *ngIf="formErrors.passphrase" class="form-error">
+                    {{ formErrors.passphrase }}
+                  </md-hint>
+                </md-input-container>
+              </div>
+            </div>
+
+            <div class="margin-top-x2" fxLayout="row" fxLayoutAlign="end center">
+              <button md-raised-button color="warn" type="submit" *ngIf="busInProgress && busInProgress.importError" class="margin-right-x1">Discard</button>
+              <button md-raised-button color="primary" type="submit" [disabled]="busImportForm.invalid || (busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError)">Import</button>
+            </div>
+          </form>
+        </md-card-content>
+      </md-card>
+    </div>
+  </div>
+</div>

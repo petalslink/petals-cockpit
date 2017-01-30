@@ -1,3 +1,4 @@
+// TODO : Update for 2016-2017 compatibility
 const path = require('path');
 const fs = require('fs');
 const readline = require('readline');

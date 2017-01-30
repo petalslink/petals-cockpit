@@ -1,4 +1,4 @@
 {
-  "LOG_ME": "Connexion",
-  "CHANGE_WORKSPACE": "Changer de workspace"
+  "OPEN_LEFT_SIDENAV": "Ouvrir la sidenav de gauche",
+  "OPEN_RIGHT_SIDENAV": "Ouvrir la sidenav de droite"
 }

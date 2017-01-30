@@ -1,0 +1,39 @@
+// shared
+@import './shared/_shared';
+
+// colors
+@import './shared/_colors';
+
+// themes
+@import './styles/themes/_light.theme';
+
+div > h3, md-dialog-container > h3 {
+  background-color: md-color($theme-primary-x);
+  margin: 0;
+  padding: 10px;
+  border-radius: 2dpi;
+}
+
+div > h4 {
+  @extend .color-accent;
+  @extend .bold;
+}
+
+md-sidenav-container {
+  background-color: md-color($theme-primary);
+  color: md-color($theme-primary, default-contrast);
+}
+md-toolbar {
+  background-color: md-color($theme-primary-x);
+  color: md-color($theme-primary-x2, default-contrast);
+  h3 {
+    margin: 0;
+  }
+}
+
+md-sidenav-container .md-list-item:hover, md-sidenav-container .md-list-item:active, md-sidenav-container .md-list-item:focus {
+  background-color: md-color($theme-primary-x);
+  @extend .color-primary;
+  @extend .light-bold;
+  margin: 0;
+}

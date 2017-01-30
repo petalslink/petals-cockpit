@@ -1,5 +1,5 @@
 // Protractor configuration file, see link for more information
-// https://github.com/angular/protractor/blob/master/docs/referenceConf.js
+// https://github.com/angular/protractor/blob/master/lib/config.ts
 
 /*global jasmine */
 var SpecReporter = require('jasmine-spec-reporter');
@@ -8,11 +8,7 @@ exports.config = {
   getPageTimeout: 60000,
   allScriptsTimeout: 11000,
   specs: [
-    './e2e/login.e2e-spec.ts',
-    './e2e/workspaces.e2e-spec.ts',
-    './e2e/workspace-tree.e2e-spec.ts',
-    './e2e/workspace-needspetals.e2e-spec.ts',
-    './e2e/cockpit-resize.e2e-spec.ts'
+    './e2e/**/*.e2e-spec.ts'
   ],
   capabilities: {
     'browserName': 'chrome',

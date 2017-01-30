@@ -33,7 +33,6 @@ target/
 
 # dependencies
 /frontend/node_modules
-/frontend/bower_components
 
 # misc
 /frontend/.sass-cache

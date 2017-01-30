@@ -1,0 +1,21 @@
+<md-card>
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm)">
+    <div fxLayout="column">
+      <md-input-container class="margin-top-x1">
+        <span mdPrefix>
+          <md-icon color="accent">person</md-icon>
+        </span>
+        <input mdInput type="text" placeholder="Username" formControlName="username" required>
+      </md-input-container>
+
+      <md-input-container class="margin-top-x1">
+        <span mdPrefix>
+          <md-icon color="accent">vpn_key</md-icon>
+        </span>
+        <input mdInput type="password" placeholder="Password" formControlName="password" required>
+      </md-input-container>
+
+      <button md-raised-button color="primary" class="margin-top-x1" [disabled]="loginForm.invalid || (users$ | async).isConnecting">Log in</button>
+    </div>
+  </form>
+</md-card>

@@ -1,0 +1,13 @@
+<div fxLayout="column" fxFill class="wrapper-content">
+  <md-toolbar>
+    <md-icon color="primary">grade</md-icon>
+    {{ (component$ | async)?.name }}
+  </md-toolbar>
+
+  <md-tab-group fxFlex>
+    <md-tab label="Overview">
+      <!-- TODO: Create a component for every tab -->
+      <app-petals-component-overview [component]="component$ | async" fxFill></app-petals-component-overview>
+    </md-tab>
+  </md-tab-group>
+</div>

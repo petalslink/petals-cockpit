@@ -1,0 +1,85 @@
+@import '~@angular/material/core/theming/all-theme';
+@include md-core();
+
+$primary: md-palette($md-deep-purple, 700);
+$accent: md-palette($md-amber, 500);
+
+$theme-primary: md-palette($md-deep-purple, 700);
+$theme-primary-x: md-palette($md-deep-purple, 50);
+$theme-primary-x1: md-palette($md-deep-purple, 100);
+$theme-primary-x2: md-palette($md-deep-purple, 200);
+$theme-primary-x3: md-palette($md-deep-purple, 300);
+$theme-primary-x4: md-palette($md-deep-purple, 400);
+$theme-primary-x5: md-palette($md-deep-purple, 500);
+$theme-primary-x6: md-palette($md-deep-purple, 600);
+$theme-primary-x7: md-palette($md-deep-purple, 700);
+$theme-primary-x8: md-palette($md-deep-purple, 800);
+$theme-primary-x9: md-palette($md-deep-purple, 900);
+
+$theme-accent: md-palette($md-amber, 500);
+$theme-accent-x: md-palette($md-amber, 50);
+$theme-accent-x1: md-palette($md-amber, 100);
+$theme-accent-x2: md-palette($md-amber, 200);
+$theme-accent-x3: md-palette($md-amber, 300);
+$theme-accent-x4: md-palette($md-amber, 400);
+$theme-accent-x5: md-palette($md-amber, 500);
+$theme-accent-x6: md-palette($md-amber, 600);
+$theme-accent-x7: md-palette($md-amber, 700);
+$theme-accent-x8: md-palette($md-amber, 800);
+$theme-accent-x9: md-palette($md-amber, 900);
+
+$theme-warn: md-palette($md-red);
+// Create the theme object (a Sass map containing all of the palettes).
+$theme: md-light-theme($theme-primary, $theme-accent, $theme-warn);
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($theme);
+
+// will generate .color-{colorName}-x1, .color-{colorName}-x2, etc (same for background and others)
+$color-declination: 10;
+
+// picked from http://www.cssauthor.com/wp-content/uploads/2015/01/Material-Color-Picker.jpg
+$red: #F54337;
+$pink: #EA1E63;
+$purple: #9C28B1;
+$deep-purple: #6937B7;
+$indigo: #3F51B5;
+$blue: #2295F4;
+$light-blue: #03A9F5;
+$cyan: #00BCD5;
+$teal: #00968A;
+$green: #4CAF50;
+$light-green: #8CC34B;
+$lime: #CDDC39;
+$yellow: #FFEB3C;
+$amber: #FEC107;
+$orange: #FF9801;
+$deep-orange: #FE5522;
+$brown: #775545;
+$grey: #9D9E9F;
+$white: #FFFFFF;
+$black: #000000;
+
+$color-palette: (
+	'red': $red,
+	'pink': $pink,
+	'purple': $purple,
+	'deep-purple': $deep-purple,
+	'indigo': $indigo,
+	'blue': $blue,
+	'light-blue': $light-blue,
+	'cyan': $cyan,
+	'teal': $teal,
+	'green': $green,
+	'light-green': $light-green,
+	'lime': $lime,
+	'yellow': $yellow,
+	'amber': $amber,
+	'orange': $orange,
+	'deep-orange': $deep-orange,
+	'brown': $brown,
+	'grey': $grey,
+	'white': $white,
+	'black': $black,
+);

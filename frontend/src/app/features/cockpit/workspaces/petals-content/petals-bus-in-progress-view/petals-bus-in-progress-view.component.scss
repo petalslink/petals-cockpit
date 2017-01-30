@@ -1,0 +1,11 @@
+md-icon {
+  padding-right: 10px;
+}
+
+@media (min-width: 480px) {
+  [md-card-avatar] {
+    max-width: 55px;
+    width: 55px;
+    height: 55px;
+  }
+}

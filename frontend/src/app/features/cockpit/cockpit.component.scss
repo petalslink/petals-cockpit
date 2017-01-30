@@ -1,0 +1,44 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+}
+
+.logo-toolbar {
+  max-height: 40px;
+}
+
+$sidenavSize: 320px;
+
+md-sidenav {
+  width: $sidenavSize;
+}
+
+@media (max-width: 1279px) {
+  md-toolbar {
+    .toolbar-logo {
+      margin-right: 10px;
+    }
+
+    .menu-icon {
+      margin-right: 10px;
+    }
+  }
+}
+
+@media (min-width: 1280px) {
+  md-toolbar {
+    padding-left: 0;
+
+    .toolbar-logo {
+      min-width: $sidenavSize;
+      text-align: center;
+    }
+
+    .menu-icon {
+      margin-right: 10px;
+    }
+  }
+}

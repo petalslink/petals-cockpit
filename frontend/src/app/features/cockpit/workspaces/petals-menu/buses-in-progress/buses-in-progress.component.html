@@ -1,0 +1,5 @@
+<md-nav-list dense *ngFor="let busInProgress of busesInProgress.list">
+  <a md-list-item [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'buses-in-progress', busInProgress.id]">
+    {{ busInProgress.ip }}
+  </a>
+</md-nav-list>

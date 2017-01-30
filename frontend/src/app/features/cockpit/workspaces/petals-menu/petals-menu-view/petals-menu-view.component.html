@@ -1,0 +1,23 @@
+<div class="wrapper-search-add-bus" fxLayout="row" fxLayoutGap="10px">
+  <md-input-container fxFlex>
+    <input mdInput placeholder="Search">
+    <span mdPrefix><md-icon color="primary">search</md-icon></span>
+  </md-input-container>
+
+  <button md-mini-fab class="btn-add-bus" color="primary" fxFlex="40px" mdTooltip="Import a bus" mdTooltipPosition="below"
+    [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId, 'petals', 'buses-in-progress']">
+    <md-icon class="md-24">add</md-icon>
+  </button>
+</div>
+
+<md-toolbar fxLayout="column" *ngIf="(busesInProgress$ | async).list.length > 0" fxLayoutAlign="center start">
+  <md-icon color="primary">import_export</md-icon>
+  <h3 class="color-primary margin-left-x1">IMPORT IN PROGRESS</h3>
+</md-toolbar>
+<app-buses-in-progress [busesInProgress]="busesInProgress$ | async"></app-buses-in-progress>
+
+<md-toolbar fxLayout="column" *ngIf="(busesInProgress$ | async).list.length > 0" fxLayoutAlign="center start">
+  <md-icon color="primary">star</md-icon>
+  <h3 class="color-primary margin-left-x1" *ngIf="(busesInProgress$ | async).list.length > 0">BUSES</h3>
+</md-toolbar>
+<app-material-tree fxFill [tree]="tree$ | async" [marginLeft]="18" (onToggleFold)="onTreeToggleFold($event)" (onSelect)="onTreeSelect($event)"></app-material-tree>

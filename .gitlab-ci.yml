@@ -44,7 +44,7 @@ pages:
   stage: package
   script:
     - "cd frontend"
-    - "ng build --prod -e=gitlab-pages -bh=/petals-cockpit/"
+    - "ng build --progress=false --prod -e=gitlab-pages -bh=/petals-cockpit/"
     - "mv dist ../public"
   artifacts:
     paths:
@@ -79,12 +79,12 @@ build-frontend:
     - "nohup $XVFB &"
     - "XVFBPID=$!"
     - "time ng test --watch false"
-    - "nohup ng serve -e=prod-e2e &"
+    - "nohup ng serve --progress=false -e=prod-e2e &"
     - "NGPID=$!"
     - "time ng e2e"
     - "kill $NGPID"
     - "kill $XVFBPID"
-    - "time ng build --prod"
+    - "time ng build --progress=false --prod"
   artifacts:
     paths:
       - frontend/dist

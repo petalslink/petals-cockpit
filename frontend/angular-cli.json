@@ -1,6 +1,6 @@
 {
   "project": {
-    "version": "1.0.0-beta.21",
+    "version": "1.0.0-beta.26",
     "name": "petals-cockpit"
   },
   "apps": [
@@ -9,10 +9,9 @@
       "outDir": "dist",
       "assets": [
         "assets",
-        "mocks-json",
-        "favicon.ico"
+        "favicon.ico",
+        "manifest.json"
       ],
-      "mocks-json": "mocks-json",
       "index": "index.html",
       "main": "main.ts",
       "test": "test.ts",
@@ -21,11 +20,11 @@
       "mobile": false,
       "styles": [
         "../node_modules/material-design-icons/iconfont/material-icons.css",
-        "styles.scss",
-        "custom-theme.scss"
+        "styles.scss"
       ],
       "scripts": [
-        "../node_modules/hammerjs/hammer.min.js"
+        "../node_modules/jdenticon/dist/jdenticon.min.js",
+        "../node_modules/js-md5/build/md5.min.js"
       ],
       "environments": {
         "source": "environments/environment.ts",
@@ -38,8 +37,6 @@
       }
     }
   ],
-  "addons": [],
-  "packages": [],
   "e2e": {
     "protractor": {
       "config": "./protractor.conf.js"
