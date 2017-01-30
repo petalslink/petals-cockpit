@@ -44,12 +44,8 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
     private static final long serialVersionUID = 4078882623710907546L;
 
     @Inject
-    @Named(CockpitApplication.PETALS_ADMIN_ES)
-    protected ExecutorService paExecutor;
-
-    @Inject
-    @Named(CockpitApplication.JDBC_ES)
-    protected ExecutorService sqlExecutor;
+    @Named(CockpitApplication.BLOCKING_TASK_ES)
+    protected ExecutorService executor;
 
     @Inject
     protected BusesDAO buses;
@@ -67,7 +63,7 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
      * This is needed because the java compiler has trouble typechecking lambda on {@link CheckedCallable}.
      */
     protected <R> R runDAO(Supplier<R> s) throws SuspendExecution, InterruptedException {
-        return FiberAsync.runBlocking(sqlExecutor, new CheckedCallable<R, RuntimeException>() {
+        return FiberAsync.runBlocking(executor, new CheckedCallable<R, RuntimeException>() {
             @Override
             public R call() {
                 return s.get();
@@ -78,7 +74,7 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
     protected <R> R runAdmin(String ip, int port, String username, String password,
             CheckedFunction1<PetalsAdministration, R> f)
             throws Exception, SuspendExecution, InterruptedException {
-        return FiberAsync.runBlocking(paExecutor, new CheckedCallable<R, Exception>() {
+        return FiberAsync.runBlocking(executor, new CheckedCallable<R, Exception>() {
             @Override
             public R call() throws Exception {
                 final PetalsAdministration petals = adminFactory.newPetalsAdministrationAPI();
