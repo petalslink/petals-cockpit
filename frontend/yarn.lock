@@ -49,7 +49,7 @@
 
 "@angular/material@https://github.com/angular/material2-builds.git":
   version "2.0.0-beta.1"
-  resolved "https://github.com/angular/material2-builds.git#0f9e19bd29ad84220ec1d205f0c429447d4b2eee"
+  resolved "https://github.com/angular/material2-builds.git#7aa366c32667c84eccdd329db3ccdcf9b3bccb22"
 
 "@angular/platform-browser-dynamic@2.4.5":
   version "2.4.5"
@@ -5220,22 +5220,9 @@ tslint-loader@^3.3.0:
     object-assign "^4.0.1"
     rimraf "^2.4.4"
 
-tslint@4.4.2:
+tslint@4.4.2, tslint@^4.0.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/tslint/-/tslint-4.4.2.tgz#b14cb79ae039c72471ab4c2627226b940dda19c6"
-  dependencies:
-    babel-code-frame "^6.20.0"
-    colors "^1.1.2"
-    diff "^3.0.1"
-    findup-sync "~0.3.0"
-    glob "^7.1.1"
-    optimist "~0.6.0"
-    resolve "^1.1.7"
-    update-notifier "^1.0.2"
-
-tslint@^4.0.2:
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/tslint/-/tslint-4.4.1.tgz#1e06b4f39f1d5c8072f4e57619fedf88a74f1c7d"
   dependencies:
     babel-code-frame "^6.20.0"
     colors "^1.1.2"

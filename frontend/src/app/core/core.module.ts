@@ -19,9 +19,6 @@ import { UsersEffects } from './../shared/effects/users.effects';
 
 @NgModule({
   imports: [
-    // TODO : Material2 will soon remove the need of forRoot
-    // keep an eye on it
-    MaterialModule.forRoot(),
     FlexLayoutModule.forRoot(),
     // TODO : Keep an eye on ngrx V3 to have lazy loaded reducers
     // https://github.com/ngrx/store/pull/269
