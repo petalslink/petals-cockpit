@@ -113,9 +113,10 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             assertThat(post.id).isEqualTo(4);
 
-            expectWorkspaceEvent(eventInput, (e, a) -> {
-                a.assertThat(e.event).isEqualTo("BUS_IMPORT_OK");
-                JsonNode bus = e.data.get("buses").get("4");
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT_OK");
+                JsonNode data = e.readData(JsonNode.class);
+                JsonNode bus = data.get("buses").get("4");
                 a.assertThat(bus.get("id").asText()).isEqualTo(post.getId());
                 a.assertThat(bus.get("name").asText()).isEqualTo(domain.getName());
             });
@@ -158,9 +159,10 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             assertThat(post.id).isEqualTo(5);
 
-            expectWorkspaceEvent(eventInput, (e, a) -> {
-                a.assertThat(e.event).isEqualTo("BUS_IMPORT_ERROR");
-                a.assertThat(e.data.get("importError").asText()).isEqualTo("Unknown Host");
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT_ERROR");
+                JsonNode data = e.readData(JsonNode.class);
+                a.assertThat(data.get("importError").asText()).isEqualTo("Unknown Host");
             });
         }
 
@@ -188,9 +190,10 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             assertThat(post.id).isEqualTo(4);
 
-            expectWorkspaceEvent(eventInput, (e, a) -> {
-                a.assertThat(e.event).isEqualTo("BUS_IMPORT_ERROR");
-                a.assertThat(e.data.get("importError").asText())
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT_ERROR");
+                JsonNode data = e.readData(JsonNode.class);
+                a.assertThat(data.get("importError").asText())
                         .contains("Buses with not-single SU SAs are not supported");
             });
         }

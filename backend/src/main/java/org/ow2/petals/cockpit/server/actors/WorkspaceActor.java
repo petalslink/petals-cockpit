@@ -170,8 +170,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         } else {
             EventOutput eo = new EventOutput();
 
-            eo.write(new OutboundEvent.Builder().name("WORKSPACE_CONTENT").mediaType(MediaType.APPLICATION_JSON_TYPE)
-                    .data(content.get()).build());
+            eo.write(new OutboundEvent.Builder().name(WorkspaceChange.Type.WORKSPACE_CONTENT.name())
+                    .mediaType(MediaType.APPLICATION_JSON_TYPE).data(content.get()).build());
 
             broadcaster.add(eo);
 
@@ -180,11 +180,11 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     }
 
     /**
-     * This centralises all changes to {@link #tree} and {@link #wsBuses}.
+     * This should only be called from inside the actor loop!
      */
     private void broadcast(WorkspaceChange event) {
-        OutboundEvent oe = new OutboundEvent.Builder().name("WORKSPACE_CHANGE")
-                .mediaType(MediaType.APPLICATION_JSON_TYPE).data(event).build();
+        OutboundEvent oe = new OutboundEvent.Builder().name(event.event.name())
+                .mediaType(MediaType.APPLICATION_JSON_TYPE).data(event.data).build();
         broadcaster.broadcast(oe);
     }
 
