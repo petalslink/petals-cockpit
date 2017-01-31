@@ -20,20 +20,30 @@ div > h4 {
 }
 
 md-sidenav-container {
-  background-color: md-color($theme-primary);
+  background-color: md-color($theme-primary-x1);
   color: md-color($theme-primary, default-contrast);
 }
+
 md-toolbar {
-  background-color: md-color($theme-primary-x);
+  background-color: md-color($theme-primary-x1);
   color: md-color($theme-primary-x2, default-contrast);
   h3 {
     margin: 0;
   }
 }
 
-md-sidenav-container .md-list-item:hover, md-sidenav-container .md-list-item:active, md-sidenav-container .md-list-item:focus {
+.active-link {
+  .md-list-item {
+    background-color: md-color($theme-primary-x);
+    @extend .color-primary;
+    @extend .bold;
+    margin: 0;
+    border: 1px solid #dedede;
+  }
+}
+
+md-sidenav-container .md-list-item:hover, md-sidenav-container .md-list-item:focus {
   background-color: md-color($theme-primary-x);
   @extend .color-primary;
   @extend .light-bold;
-  margin: 0;
 }
