@@ -1,17 +1,19 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 
-import { CockpitModule } from './features/cockpit/cockpit.module';
-import { LoginModule } from './features/login/login.module';
+// import { CockpitModule } from './features/cockpit/cockpit.module';
+// import { LoginModule } from './features/login/login.module';
 import { environment } from './../environments/environment';
+import { GuardLoginService } from './shared/services/guard-login.service';
+import { GuardAppService } from './shared/services/guard-app.service';
 
-export function LoadCockpitModule() {
-  return CockpitModule;
-}
+// export function LoadCockpitModule() {
+//   return CockpitModule;
+// }
 
-export function LoadLoginModule() {
-  return LoginModule;
-}
+// export function LoadLoginModule() {
+//   return LoginModule;
+// }
 
 export const routes: Routes = [
   {
@@ -21,11 +23,13 @@ export const routes: Routes = [
   },
   {
     path: 'login',
+    canLoad: [GuardLoginService],
     // loadChildren: LoadLoginModule
     loadChildren: 'app/features/login/login.module#LoginModule'
   },
   {
     path: '',
+    canLoad: [GuardAppService],
     // loadChildren: LoadCockpitModule
     loadChildren: 'app/features/cockpit/cockpit.module#CockpitModule'
   }

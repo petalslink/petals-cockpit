@@ -21,6 +21,8 @@ import { WorkspacesService } from './services/workspaces.service';
 import { WorkspacesMockService } from './services/workspaces.mock';
 import { UsersMockService } from './services/users.mock';
 import { UsersService } from './services/users.service';
+import { GuardLoginService } from './services/guard-login.service';
+import { GuardAppService } from './services/guard-app.service';
 
 export const modules = [
   CommonModule,
@@ -39,6 +41,8 @@ export const modules = [
 export const declarations = [GenerateIconComponent];
 
 export const providers = [
+  GuardLoginService,
+  GuardAppService,
   {
     provide: SseService,
     useClass: (environment.mock ? SseServiceMock : SseService)

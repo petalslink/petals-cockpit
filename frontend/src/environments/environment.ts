@@ -30,6 +30,11 @@ export const environment = {
   // or hit the real API
   mock: true,
 
+  // ALREADYCONNECTED
+  // When using `mock: true`, define wether we should consider
+  // that the user's already logged or not
+  alreadyConnected: true,
+
   // HASHLOCATIONSTRATEGY
   // should the URL be
   // http://some-domain#/your/app/routes (true)

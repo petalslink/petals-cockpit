@@ -7,12 +7,25 @@ import { environment } from './../../../environments/environment';
 
 @Injectable()
 export class UsersMockService {
-  constructor() { }
+  private _userIsConnected: boolean = environment.alreadyConnected;
+  private adminUser: IUser;
+
+  constructor() {
+    this.adminUser = {
+      id: 'admin',
+      name: 'Bertrand ESCUDIE',
+      username: 'admin',
+      lastWorkspace: '',
+      password: ''
+    };
+  }
 
   public connectUser(user: IUser): Observable<Response> {
     let response: Response;
 
     if (user.username === 'admin' && user.password === 'admin') {
+      this._userIsConnected = true;
+
       response = <Response>{
         ok: true,
         json: () => {
@@ -30,7 +43,26 @@ export class UsersMockService {
 
   public disconnectUser(): Observable<Response> {
     const response = <Response>{ ok: true };
+    this._userIsConnected = false;
 
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
+  }
+
+  public getUserInformations() {
+    let response: Response;
+
+    if (this._userIsConnected) {
+      response = <Response>{
+        ok: true,
+        json: () => {
+          return this.adminUser;
+        }
+      };
+    } else {
+      response = <Response>{ ok: false };
+    }
     return Observable
       .of(response)
       .delay(environment.httpDelay);
