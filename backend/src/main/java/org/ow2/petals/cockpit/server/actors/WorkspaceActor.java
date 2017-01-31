@@ -58,6 +58,7 @@ import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.SuspendExecution;
 import co.paralleluniverse.fibers.Suspendable;
+import co.paralleluniverse.strands.SuspendableCallable;
 import javaslang.CheckedFunction1;
 import javaslang.control.Either;
 
@@ -104,8 +105,9 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     protected Void doRun() throws InterruptedException, SuspendExecution {
         for (;;) {
             Msg msg = receive();
-            if (msg instanceof WorkspaceEventMsg) {
-                broadcast(((WorkspaceEventMsg) msg).event);
+            if (msg instanceof WorkspaceEventAction) {
+                WorkspaceEventAction action = (WorkspaceEventAction) msg;
+                broadcast(action.action.run());
             } else if (msg instanceof ImportBus) {
                 answer((ImportBus) msg, this::handleImportBus);
             } else if (msg instanceof DeleteBus) {
@@ -124,7 +126,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 answer((NewWorkspaceClient) msg, this::addBroadcastClient);
             } else if (msg instanceof ChangeServiceUnitState) {
                 ChangeServiceUnitState change = (ChangeServiceUnitState) msg;
-                DbServiceUnit su = runDAO(() -> buses.getServiceUnitById(change.suId, change.user));
+                DbServiceUnit su = run(() -> buses.getServiceUnitById(change.suId, change.user));
                 if (su == null) {
                     RequestReplyHelper.reply(change, Either.left(Status.NOT_FOUND));
                 } else if (su.acl == null) {
@@ -138,11 +140,15 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
+    private void doInActorLoop(SuspendableCallable<WorkspaceChange> action) throws SuspendExecution {
+        self().send(new WorkspaceEventAction(action));
+    }
+
     private Either<Status, EventOutput> addBroadcastClient(NewWorkspaceClient nc)
-            throws IOException, SuspendExecution, InterruptedException {
+            throws IOException, SuspendExecution {
 
         // TODO ALL of this should be done in one transaction...
-        Either<Status, WorkspaceFullContent> content = runDAO(() -> {
+        Either<Status, WorkspaceFullContent> content = run(() -> {
 
             DbWorkspace ws = workspaces.getWorkspaceById(wId, nc.user);
 
@@ -191,48 +197,60 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private Either<Status, BusInProgress> handleImportBus(ImportBus bus) throws SuspendExecution, InterruptedException {
+    // TODO verify access rights? access is verified in resource for now...
+    private Either<Status, BusInProgress> handleImportBus(ImportBus bus) throws SuspendExecution {
         final NewBus nb = bus.nb;
 
-        final long bId = runDAO(() -> buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, wId));
+        final long bId = run(() -> buses.createBus(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, wId));
 
         // we use a fiber to let the actor handles other message during bus import
         new Fiber<>(() -> {
-            WorkspaceChange ev = doImportBus(bId, nb);
-            self().send(new WorkspaceEventMsg(ev));
+            // this can be interrupted by Fiber.cancel
+            final Either<String, Domain> res = doImportExistingBus(nb);
+
+            // once we got the topology, it can't be cancelled anymore
+            // that's why the actions are passed back to the actor
+            // (we don't want the fiber to be interrupted!)
+            doInActorLoop(() -> {
+                return run(() -> {
+                    return res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
+                        try {
+                            return Either.right(buses.saveImport(bId, topology));
+                        } catch (WorkspaceContent.InvalidPetalsBus e) {
+                            return Either.left(e.getMessage());
+                        }
+                    }).fold(error -> {
+                        LOG.info("Can't import bus from container {}:{}: {}", nb.ip, nb.port, error);
+                        buses.saveError(bId, error);
+                        return WorkspaceChange.busImportError(new BusInError(bId, nb.ip, nb.port, nb.username, error));
+                    }, content -> WorkspaceChange.busImportOk(content));
+                });
+            });
         }).start();
 
         return Either.right(new BusInProgress(bId, nb.ip, nb.port, nb.username));
     }
 
-    private WorkspaceChange doImportBus(long bId, NewBus bus) throws SuspendExecution, InterruptedException {
+    // TODO in the future, there should be multiple methods like this for multiple type of imports
+    @Suspendable
+    private Either<String, Domain> doImportExistingBus(NewBus bus) {
         try {
-            final Domain topology = getTopology(bus);
-
-            final WorkspaceContent content = runDAO(() -> buses.saveImport(bId, topology));
-
-            return WorkspaceChange.busImportOk(content);
+            Domain topology = runAdmin(bus.ip, bus.port, bus.username, bus.password,
+                    petals -> petals.newContainerAdministration().getTopology(bus.passphrase, true));
+            return Either.right(topology);
+        } catch (InterruptedException e) {
+            return Either.left("Import cancelled");
         } catch (Exception e) {
             String m = e.getMessage();
             String message = m != null ? m : e.getClass().getName();
 
-            LOG.info("Can't import bus from container {}:{}: {}", bus.ip, bus.port, message);
             LOG.debug("Can't import bus from container {}:{}", bus.ip, bus.port, e);
 
-            runDAO(() -> buses.saveError(bId, message));
-
-            return WorkspaceChange.busImportError(new BusInError(bId, bus.ip, bus.port, bus.username, message));
+            return Either.left(message);
         }
     }
 
-    @Suspendable
-    private Domain getTopology(NewBus bus) throws Exception {
-        return runAdmin(bus.ip, bus.port, bus.username, bus.password,
-                petals -> petals.newContainerAdministration().getTopology(bus.passphrase, true));
-    }
-
-    private void handleSUStateChange(ChangeServiceUnitState change, DbServiceUnit su)
-            throws SuspendExecution, InterruptedException {
+    private void handleSUStateChange(ChangeServiceUnitState change, DbServiceUnit su) throws SuspendExecution {
         if (su.state.equals(change.newState)) {
             RequestReplyHelper.reply(change,
                     Either.right(new ServiceUnitOverview(su.id, su.name, su.state, su.saName)));
@@ -240,33 +258,35 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             // TODO or should I rely on the information from the container instead of my own?
             RequestReplyHelper.reply(change, Either.left(Status.CONFLICT));
         } else {
-            DbContainer db = runDAO(() -> buses.getContainerById(su.containerId, null));
+            DbContainer db = run(() -> buses.getContainerById(su.containerId, null));
             assert db != null;
             try {
-                ServiceUnitMin res = runAdmin(db.ip, db.port, db.username, db.password, petals -> {
+                ServiceUnitOverview res = runAdmin(db.ip, db.port, db.username, db.password, petals -> {
                     ArtifactAdministration aa = petals.newArtifactAdministration();
                     Artifact a = aa.getArtifact(ServiceAssembly.TYPE, su.saName, null);
                     assert a instanceof ServiceAssembly;
                     ServiceAssembly sa = (ServiceAssembly) a;
                     State newState = changeSAState(petals, sa, change.newState);
-                    return new ServiceUnitMin(su.id, su.name, newState, su.saName);
+                    return new ServiceUnitOverview(su.id, su.name, newState, su.saName);
                 });
                 assert res != null;
 
                 serviceUnitStateUpdated(res);
-                RequestReplyHelper.reply(change,
-                        Either.right(new ServiceUnitOverview(res.id, res.name, res.state, res.saName)));
+
+                RequestReplyHelper.reply(change, Either.right(res));
             } catch (Exception e) {
                 RequestReplyHelper.replyError(change, e);
             }
         }
     }
 
-    private void serviceUnitStateUpdated(ServiceUnitMin su) throws SuspendExecution, InterruptedException {
+    private void serviceUnitStateUpdated(ServiceUnitMin su) throws SuspendExecution {
         // TODO error handling???
-        runDAO(() -> su.state != ServiceUnitMin.State.Unloaded ? buses.updateServiceUnitState(su.id, su.state)
+        run(() -> su.state != ServiceUnitMin.State.Unloaded ? buses.updateServiceUnitState(su.id, su.state)
                 : buses.removeServiceUnit(su.id));
-        self().send(new WorkspaceEventMsg(WorkspaceChange.suStateChange(new NewSUState(su.id, su.state))));
+
+        // we want the event to be sent after we answered
+        doInActorLoop(() -> WorkspaceChange.suStateChange(new NewSUState(su.id, su.state)));
     }
 
     /**
@@ -376,13 +396,15 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    public static class WorkspaceEventMsg implements Msg {
+    /**
+     * Uses with {@link WorkspaceActor#doInActorLoop(SuspendableCallable)}
+     */
+    public static class WorkspaceEventAction implements Msg {
 
-        final WorkspaceChange event;
+        final SuspendableCallable<WorkspaceChange> action;
 
-        public WorkspaceEventMsg(WorkspaceChange event) {
-            this.event = event;
+        public WorkspaceEventAction(SuspendableCallable<WorkspaceChange> action) {
+            this.action = action;
         }
-
     }
 }

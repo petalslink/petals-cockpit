@@ -62,7 +62,7 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
     /**
      * This is needed because the java compiler has trouble typechecking lambda on {@link CheckedCallable}.
      */
-    protected <R> R runDAO(Supplier<R> s) throws SuspendExecution {
+    protected <R> R run(Supplier<R> s) throws SuspendExecution {
         try {
             return FiberAsync.runBlocking(executor, new CheckedCallable<R, RuntimeException>() {
                 @Override
