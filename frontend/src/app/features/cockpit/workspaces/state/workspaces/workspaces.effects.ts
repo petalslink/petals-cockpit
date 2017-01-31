@@ -70,7 +70,7 @@ export class WorkspacesEffects {
         }
 
         // TODO : Define the FETCH_WORKSPACES_ERROR
-        return Observable.of({ type: 'Workspaces.FETCH_WORKSPACES_ERROR', payload: action.payload });
+        return Observable.of({ type: Workspaces.FETCH_WORKSPACES_ERROR, payload: action.payload });
       })
     );
 

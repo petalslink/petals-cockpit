@@ -62,6 +62,17 @@ export class Workspaces {
     );
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_WORKSPACES_ERROR = `${Workspaces.reducerName}_FETCH_WORKSPACES_ERROR`;
+  private static fetchWorkspacesError(workspacesTable: IWorkspacesTable, payload) {
+    return <IWorkspacesTable>Object.assign({}, workspacesTable,
+      payload,
+      <IWorkspacesTable>{
+        isFetchingWorkspaces: false
+      }
+    );
+  }
+
   // only used in effect, no point to handle that action
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_WAIT_SSE = `${Workspaces.reducerName}_FETCH_WORKSPACE_WAIT_SSE`;
