@@ -1,4 +1,5 @@
 import { Action } from '@ngrx/store';
+import { omit } from 'underscore';
 
 import { IBusRow } from './bus.interface';
 import { IBusesTable } from './buses.interface';
@@ -100,6 +101,19 @@ export class Buses {
     });
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static REMOVE_BUS = `${Buses.reducerName}_REMOVE_BUS`;
+  private static removeBus(busesTable: IBusesTable, payload: { busId: string }) {
+    if (typeof busesTable.byId[payload.busId] !== 'undefined') {
+      return Object.assign({}, omit(busesTable, 'byId'), <IBusesTable>{
+        byId: omit(busesTable.byId, payload.busId),
+        allIds: busesTable.allIds.filter(id => id !== payload.busId)
+      });
+    }
+
+    return busesTable;
+  }
+
   private static disconnectUserSuccess(busesTable: IBusesTable, payload) {
     return busesTableFactory();
   }
@@ -113,6 +127,7 @@ export class Buses {
     [Buses.UNFOLD_BUS]: Buses.unfoldBus,
     [Buses.TOGGLE_FOLD_BUS]: Buses.toggleFoldBus,
     [Buses.SET_CURRENT_BUS]: Buses.setCurrentBus,
+    [Buses.REMOVE_BUS]: Buses.removeBus,
 
     [Users.DISCONNECT_USER_SUCCESS]: Buses.disconnectUserSuccess
   };

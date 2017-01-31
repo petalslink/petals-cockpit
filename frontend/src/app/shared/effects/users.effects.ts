@@ -6,7 +6,6 @@ import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { batchActions } from 'redux-batched-actions';
-import { NotificationsService } from 'angular2-notifications';
 
 import { IStore } from './../interfaces/store.interface';
 import { Users } from './../state/users.reducer';
@@ -16,8 +15,6 @@ import { environment } from './../../../environments/environment';
 
 @Injectable()
 export class UsersEffects {
-  private _notifIds = new Map<string, string>();
-
   constructor(
     private _actions$: Actions,
     private _store$: Store<IStore>,

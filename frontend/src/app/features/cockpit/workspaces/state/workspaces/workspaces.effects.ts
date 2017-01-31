@@ -19,6 +19,7 @@ import { Ui } from '../../../../../shared/state/ui.reducer';
 import { BusesInProgress } from '../buses-in-progress/buses-in-progress.reducer';
 import { SseService, SseWorkspaceEvent } from './../../../../../shared/services/sse.service';
 import { toJavascriptMap } from '../../../../../shared/helpers/shared.helper';
+import { BusesService } from './../../../../../shared/services/buses.service';
 
 @Injectable()
 export class WorkspacesEffects {
@@ -26,7 +27,8 @@ export class WorkspacesEffects {
     private _actions$: Actions,
     private _store$: Store<IStore>,
     private _workspacesService: WorkspacesService,
-    private _sseService: SseService
+    private _sseService: SseService,
+    private _busesService: BusesService
   ) { }
 
   // tslint:disable-next-line:member-ordering
@@ -58,6 +60,7 @@ export class WorkspacesEffects {
     .ofType(Workspaces.FETCH_WORKSPACE)
     .switchMap((action: Action) => this._sseService.watchWorkspaceRealTime(action.payload)
       .map(_ => {
+        this._busesService.watchEventBusDeleted();
         return { type: Workspaces.FETCH_WORKSPACE_WAIT_SSE, payload: action.payload };
       })
     );

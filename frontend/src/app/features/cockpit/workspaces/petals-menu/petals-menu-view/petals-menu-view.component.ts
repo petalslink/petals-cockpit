@@ -10,6 +10,8 @@ import { Buses } from '../../state/buses/buses.reducer';
 import { IBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
 import { getBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.selectors';
 import { IWorkspacesTable } from './../../state/workspaces/workspaces.interface';
+import { BusesService } from './../../../../../shared/services/buses.service';
+import { SseWorkspaceEvent } from './../../../../../shared/services/sse.service';
 
 @Component({
   selector: 'app-petals-menu-view',
@@ -21,7 +23,7 @@ export class PetalsMenuViewComponent implements OnInit {
   public tree$: Observable<any>;
   public busesInProgress$: Observable<IBusesInProgress>;
 
-  constructor(private _store$: Store<IStore>) { }
+  constructor(private _store$: Store<IStore>, private _busesService: BusesService) { }
 
   ngOnInit() {
     this.workspaces$ = this._store$.select(state => state.workspaces);

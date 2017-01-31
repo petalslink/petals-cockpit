@@ -11,13 +11,15 @@ export class SseWorkspaceEvent {
   public static WORKSPACE_CONTENT = 'WORKSPACE_CONTENT';
   public static BUS_IMPORT_ERROR = 'BUS_IMPORT_ERROR';
   public static SU_STATE_CHANGE = 'SU_STATE_CHANGE';
+  public static BUS_DELETED = 'BUS_DELETED';
 
   public static get allEvents() {
     return [
       SseWorkspaceEvent.BUS_IMPORT_OK,
       SseWorkspaceEvent.WORKSPACE_CONTENT,
       SseWorkspaceEvent.BUS_IMPORT_ERROR,
-      SseWorkspaceEvent.SU_STATE_CHANGE
+      SseWorkspaceEvent.SU_STATE_CHANGE,
+      SseWorkspaceEvent.BUS_DELETED
     ];
   }
 }

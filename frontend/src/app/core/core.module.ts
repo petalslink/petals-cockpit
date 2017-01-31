@@ -14,8 +14,49 @@ import { environment } from '../../environments/environment';
 import { getRootReducer } from '../shared/state/root.reducer';
 import { WorkspacesEffects } from '../features/cockpit/workspaces/state/workspaces/workspaces.effects';
 import { BusesInProgressEffects } from './../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.effects';
-import { WorkspacesService } from './../shared/services/workspaces.service';
 import { UsersEffects } from './../shared/effects/users.effects';
+import { SseService } from '../shared/services/sse.service';
+import { SseServiceMock } from '../shared/services/sse.service.mock';
+import { BusesInProgressService } from '../shared/services/buses-in-progress.service';
+import { BusesInProgressMockService } from '../shared/services/buses-in-progress-mock.service';
+import { WorkspacesService } from '../shared/services/workspaces.service';
+import { WorkspacesMockService } from '../shared/services/workspaces.mock';
+import { UsersMockService } from '../shared/services/users.mock';
+import { UsersService } from '../shared/services/users.service';
+import { GuardLoginService } from '../shared/services/guard-login.service';
+import { GuardAppService } from '../shared/services/guard-app.service';
+import { BusesService } from '../shared/services/buses.service';
+import { BusesMockService } from '../shared/services/buses.service.mock';
+
+export const providers = [
+  {
+    provide: LANGUAGES,
+    // order matters : The first one will be used by default
+    useValue: ['en', 'fr']
+  },
+  GuardLoginService,
+  GuardAppService,
+  {
+    provide: SseService,
+    useClass: (environment.mock ? SseServiceMock : SseService)
+  },
+  {
+    provide: BusesInProgressService,
+    useClass: (environment.mock ? BusesInProgressMockService : BusesInProgressService)
+  },
+  {
+    provide: BusesService,
+    useClass: (environment.mock ? BusesMockService : BusesService)
+  },
+  {
+    provide: WorkspacesService,
+    useClass: (environment.mock ? WorkspacesMockService : WorkspacesService)
+  },
+  {
+    provide: UsersService,
+    useClass: (environment.mock ? UsersMockService : UsersService)
+  }
+];
 
 @NgModule({
   imports: [
@@ -33,12 +74,6 @@ import { UsersEffects } from './../shared/effects/users.effects';
       deps: [Http]
     })
   ],
-  providers: [
-    {
-      provide: LANGUAGES,
-      // order matters : The first one will be use by default
-      useValue: ['en', 'fr']
-    }
-  ]
+  providers
 })
 export class CoreModule { }
