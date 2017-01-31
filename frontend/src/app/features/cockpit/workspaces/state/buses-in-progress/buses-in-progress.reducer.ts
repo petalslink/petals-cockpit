@@ -69,10 +69,14 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_REMOVE_BUS_IN_PROGRESS`;
   private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { busInProgressId: string }) {
-    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
-      byId: omit(busesInProgressTable.byId, payload.busInProgressId),
-      allIds: busesInProgressTable.allIds.filter(id => id !== payload.busInProgressId)
-    });
+    if (typeof busesInProgressTable.byId[payload.busInProgressId] !== 'undefined') {
+      return Object.assign({}, omit(busesInProgressTable, 'byId'), <IBusesInProgressTable>{
+        byId: omit(busesInProgressTable.byId, payload.busInProgressId),
+        allIds: busesInProgressTable.allIds.filter(id => id !== payload.busInProgressId)
+      });
+    }
+
+    return busesInProgressTable;
   }
 
   private static disconnectUserSuccess(busesInProgressTable: IBusesInProgressTable, payload) {

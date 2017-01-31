@@ -26,6 +26,10 @@ export class SseServiceMock {
       case SseWorkspaceEvent.BUS_IMPORT_OK:
         this._registeredEvents.get(eventName).next(getNewBusFull());
         break;
+
+      case SseWorkspaceEvent.BUS_DELETED:
+        this._registeredEvents.get(eventName).next({ id: data.id });
+        break;
     }
   }
 
