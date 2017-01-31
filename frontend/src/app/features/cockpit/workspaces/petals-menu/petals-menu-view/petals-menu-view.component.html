@@ -14,10 +14,13 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div class="wrapper-search-add-bus" fxLayout="row" fxLayoutGap="10px">
-  <md-input-container fxFlex>
-    <input mdInput placeholder="Search">
-    <span mdPrefix><md-icon color="primary">search</md-icon></span>
-  </md-input-container>
+  <form [formGroup]="searchForm" (ngSubmit)="search(searchForm)">
+    <md-input-container fxFlex>
+      <input mdInput placeholder="Search" formControlName="search">
+      <span mdPrefix><md-icon color="primary">search</md-icon></span>
+    </md-input-container>
+    <button type="submit">S</button>
+  </form>
 
   <button md-mini-fab class="btn-add-bus" color="primary" fxFlex="40px" mdTooltip="Import a bus" mdTooltipPosition="below"
     [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId, 'petals', 'buses-in-progress']">

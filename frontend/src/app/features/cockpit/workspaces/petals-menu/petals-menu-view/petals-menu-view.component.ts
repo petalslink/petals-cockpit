@@ -16,6 +16,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
@@ -29,6 +30,7 @@ import { getBusesInProgress } from '../../state/buses-in-progress/buses-in-progr
 import { IWorkspacesTable } from './../../state/workspaces/workspaces.interface';
 import { BusesService } from './../../../../../shared/services/buses.service';
 import { SseWorkspaceEvent } from './../../../../../shared/services/sse.service';
+import { Workspaces } from './../../state/workspaces/workspaces.reducer';
 
 @Component({
   selector: 'app-petals-menu-view',
@@ -36,16 +38,20 @@ import { SseWorkspaceEvent } from './../../../../../shared/services/sse.service'
   styleUrls: ['./petals-menu-view.component.scss']
 })
 export class PetalsMenuViewComponent implements OnInit {
+  public searchForm: FormGroup;
   public workspaces$: Observable<IWorkspacesTable>;
   public tree$: Observable<any>;
   public busesInProgress$: Observable<IBusesInProgress>;
 
-  constructor(private _store$: Store<IStore>, private _busesService: BusesService) { }
+  constructor(private _fb: FormBuilder, private _store$: Store<IStore>, private _busesService: BusesService) { }
 
   ngOnInit() {
     this.workspaces$ = this._store$.select(state => state.workspaces);
     this.tree$ = this._store$.let(getCurrentTree());
     this.busesInProgress$ = this._store$.let(getBusesInProgress());
+    this.searchForm = this._fb.group({
+      search: ''
+    });
   }
 
   onTreeToggleFold(e) {
@@ -65,5 +71,9 @@ export class PetalsMenuViewComponent implements OnInit {
     // TODO: Dispatch an action to save the current bus/container/component/su
     // Instead of dispatching it from here maybe it's a better idea to dispatch it once the
     // component is loaded
+  }
+
+  search({ value }) {
+    this._store$.dispatch({ type: Workspaces.SET_SEARCH, payload: value.search });
   }
 }
