@@ -49,6 +49,7 @@ import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitM
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ChangeState;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
@@ -114,10 +115,11 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
             assertThat(put.state).isEqualTo(ServiceUnitMin.State.Stopped);
 
-            expectWorkspaceEvent(eventInput, (e, a) -> {
-                a.assertThat(e.event).isEqualTo("SU_STATE_CHANGE");
-                a.assertThat(e.data.get("id").asText()).isEqualTo("40");
-                a.assertThat(e.data.get("state").asText()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("SU_STATE_CHANGE");
+                JsonNode data = e.readData(JsonNode.class);
+                a.assertThat(data.get("id").asText()).isEqualTo("40");
+                a.assertThat(data.get("state").asText()).isEqualTo(ServiceUnitMin.State.Stopped.name());
             });
         }
 
@@ -160,10 +162,11 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
             assertThat(put.state).isEqualTo(ServiceUnitMin.State.Unloaded);
 
-            expectWorkspaceEvent(eventInput, (e, a) -> {
-                a.assertThat(e.event).isEqualTo("SU_STATE_CHANGE");
-                a.assertThat(e.data.get("id").asText()).isEqualTo("41");
-                a.assertThat(e.data.get("state").asText()).isEqualTo(ServiceUnitMin.State.Unloaded.name());
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("SU_STATE_CHANGE");
+                JsonNode data = e.readData(JsonNode.class);
+                a.assertThat(data.get("id").asText()).isEqualTo("41");
+                a.assertThat(data.get("state").asText()).isEqualTo(ServiceUnitMin.State.Unloaded.name());
             });
         }
 

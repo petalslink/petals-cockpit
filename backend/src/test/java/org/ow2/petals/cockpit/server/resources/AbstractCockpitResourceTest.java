@@ -40,7 +40,6 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -68,10 +67,6 @@ import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.NullNode;
 
 import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.common.test.TestUtil;
@@ -258,24 +253,5 @@ public class AbstractCockpitResourceTest {
             WorkspaceFullContent ev = e.readData(WorkspaceFullContent.class);
             c.accept(ev, a);
         });
-    }
-
-    protected static void expectWorkspaceEvent(EventInput eventInput,
-            BiConsumer<RawWorkspaceChange, SoftAssertions> c) {
-        expectEvent(eventInput, (e, a) -> {
-            a.assertThat(e.getName()).isEqualTo("WORKSPACE_CHANGE");
-            RawWorkspaceChange ev = e.readData(RawWorkspaceChange.class);
-            c.accept(ev, a);
-        });
-    }
-
-    public static class RawWorkspaceChange {
-
-        @JsonProperty
-        @NotEmpty
-        public String event = "";
-
-        @JsonProperty
-        public JsonNode data = NullNode.getInstance();
     }
 }

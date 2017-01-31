@@ -62,18 +62,25 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
     /**
      * This is needed because the java compiler has trouble typechecking lambda on {@link CheckedCallable}.
      */
-    protected <R> R runDAO(Supplier<R> s) throws SuspendExecution, InterruptedException {
-        return FiberAsync.runBlocking(executor, new CheckedCallable<R, RuntimeException>() {
-            @Override
-            public R call() {
-                return s.get();
-            }
-        });
+    protected <R> R run(Supplier<R> s) throws SuspendExecution {
+        try {
+            return FiberAsync.runBlocking(executor, new CheckedCallable<R, RuntimeException>() {
+                @Override
+                public R call() {
+                    return s.get();
+                }
+            });
+        } catch (InterruptedException e) {
+            // TODO until https://github.com/puniverse/quasar/issues/245 is clarified, we shouldn't interrupt
+            // runBlocking because the actual behaviour is not the expected one!
+            throw new AssertionError("This should not be interrupted!", e);
+        }
     }
 
+    // here we are ok with interruption because it is a read-only action
+    // TODO still, it would be best if it was really interrupted, see issue 245 of quasar
     protected <R> R runAdmin(String ip, int port, String username, String password,
-            CheckedFunction1<PetalsAdministration, R> f)
-            throws Exception, SuspendExecution, InterruptedException {
+            CheckedFunction1<PetalsAdministration, R> f) throws Exception, SuspendExecution, InterruptedException {
         return FiberAsync.runBlocking(executor, new CheckedCallable<R, Exception>() {
             @Override
             public R call() throws Exception {

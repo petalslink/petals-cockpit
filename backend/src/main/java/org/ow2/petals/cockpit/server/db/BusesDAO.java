@@ -124,13 +124,8 @@ public abstract class BusesDAO {
     public abstract int removeServiceUnit(@Bind("id") long id);
 
     @Transaction
-    public WorkspaceContent saveImport(long bId, Domain topology) {
-        try {
-            return WorkspaceContent.buildAndSaveToDatabase(this, bId, topology);
-        } catch (InvalidPetalsBus e) {
-            // TODO handle that better
-            throw new RuntimeException(e);
-        }
+    public WorkspaceContent saveImport(long bId, Domain topology) throws InvalidPetalsBus {
+        return WorkspaceContent.buildAndSaveToDatabase(this, bId, topology);
     }
 
     @SqlUpdate("delete from buses where id = :id")

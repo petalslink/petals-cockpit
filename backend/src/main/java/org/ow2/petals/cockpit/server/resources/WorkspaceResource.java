@@ -331,7 +331,7 @@ public class WorkspaceResource {
     public static class WorkspaceChange {
 
         public enum Type {
-            BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, BUS_DELETED
+            WORKSPACE_CONTENT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, BUS_DELETED
         }
 
         @JsonProperty
@@ -340,7 +340,7 @@ public class WorkspaceResource {
         @JsonProperty
         public final Object data;
 
-        public WorkspaceChange(Type event, Object data) {
+        private WorkspaceChange(Type event, Object data) {
             this.event = event;
             this.data = data;
         }
