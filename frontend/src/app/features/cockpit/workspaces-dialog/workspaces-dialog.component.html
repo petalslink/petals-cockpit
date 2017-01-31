@@ -21,14 +21,9 @@
         </div>
 
         <div fxFlexFill class="margin-bottom-x1">
-
-          <!-- Error message when list workspaces is empty -->
-          <div fxLayout="column" fxFlex="100%" *ngIf="(workspaces$ | async).list.length === 0">
-            <h3 fxLayoutAlign="center center" class="form-error">Ooops, no workspace currently exists.</h3>
-            <div class="info-add-workspace" fxLayout="row" fxFlex="100%" fxLayoutAlign="start center">
-              <md-icon color="primary">info</md-icon>
-              <p md-line>Please, add a new workspace before.</p>
-            </div>
+          <div class="info-add-workspace margin-top-x1" fxLayout="row" fxLayoutAlign="center center" *ngIf="(workspaces$ | async).list.length === 0 && !(workspaces$ | async).isFetchingWorkspaces">
+            <md-icon color="primary">info</md-icon>
+            <span md-line>You don't have any workspace yet</span>
           </div>
 
           <h3 class="color-primary-light-bold margin-top-x1" *ngIf="(workspaces$ | async).list.length !== 0">Select the workspace</h3>
