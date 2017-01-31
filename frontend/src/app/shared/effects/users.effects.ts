@@ -42,8 +42,10 @@ export class UsersEffects {
         })
         .catch((err) => {
           if (environment.debug) {
+            console.group();
             console.warn('Error catched in users.effects.ts : ofType(Users.CONNECT_USER)');
             console.error(err);
+            console.groupEnd();
           }
 
           return Observable.of({ type: Users.CONNECT_USER_FAILED });
@@ -71,8 +73,10 @@ export class UsersEffects {
         })
         .catch((err) => {
           if (environment.debug) {
+            console.group();
             console.warn('Error catched in users.effects.ts : ofType(Users.DISCONNECT_USER)');
             console.error(err);
+            console.groupEnd();
           }
 
           return Observable.of({ type: Users.DISCONNECT_USER_FAILED });

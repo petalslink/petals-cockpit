@@ -17,4 +17,8 @@ export class UsersService {
   public disconnectUser(): Observable<Response> {
     return this._http.delete(`${environment.urlBackend}/user/session`);
   }
+
+  public getUserInformations() {
+    return this._http.get(`${environment.urlBackend}/user/session`);
+  }
 }

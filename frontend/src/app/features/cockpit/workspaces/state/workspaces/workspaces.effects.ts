@@ -42,8 +42,10 @@ export class WorkspacesEffects {
       })
       .catch(err => {
         if (environment.debug) {
+          console.group();
           console.debug(`Error in workspaces.effects : ${Workspaces.FETCH_WORKSPACES}`);
           console.error(err);
+          console.groupEnd();
         }
 
         // TODO : Define the FETCH_WORKSPACES_ERROR
@@ -82,8 +84,10 @@ export class WorkspacesEffects {
       })
       .catch(err => {
         if (environment.debug) {
+          console.group();
           console.debug(`Error in workspaces.effects : ${Workspaces.FETCH_WORKSPACE_WAIT_SSE}`);
           console.error(err);
+          console.groupEnd();
         }
 
         // TODO : Define the FETCH_WORKSPACE_ERROR
