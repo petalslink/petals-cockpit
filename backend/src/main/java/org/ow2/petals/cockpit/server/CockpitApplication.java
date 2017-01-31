@@ -73,9 +73,7 @@ import io.dropwizard.setup.Environment;
  */
 public class CockpitApplication<C extends CockpitConfiguration> extends Application<C> {
 
-    public static final String PETALS_ADMIN_ES = "petals-admin-exec-service";
-
-    public static final String JDBC_ES = "jdbc-exec-service";
+    public static final String BLOCKING_TASK_ES = "quasar-blocking-exec-service";
 
     private static final Logger LOG = LoggerFactory.getLogger(CockpitApplication.class);
 
@@ -166,13 +164,10 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         // TODO add these ExecutorService to the metrics
         // TODO choose adequate parameters?
 
-        // This is needed for executing petals admins requests from within a fiber (actors)
-        ExecutorService petalsAdminES = environment.lifecycle().executorService("petals-admin-worker-%d").minThreads(1)
-                .maxThreads(2).build();
-        // This is needed for executing database requests from within a fiber (actors)
+        // This is needed for executing database and petals admin requests from within a fiber (actors)
         int availableProcessors = Runtime.getRuntime().availableProcessors();
-        ExecutorService jdbcExec = environment.lifecycle().executorService("jdbc-worker-%d")
-                .minThreads(Math.min(2, availableProcessors)).maxThreads(availableProcessors).build();
+        ExecutorService jdbcExec = environment.lifecycle().executorService("quasar-blocking-worker-%d")
+                .minThreads(availableProcessors).maxThreads(availableProcessors).build();
 
         final PetalsAdministrationFactory adminFactory = PetalsAdministrationFactory.getInstance();
 
@@ -193,8 +188,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
             @Override
             protected void configure() {
                 bind(configuration).to(CockpitConfiguration.class);
-                bind(petalsAdminES).named(PETALS_ADMIN_ES).to(ExecutorService.class);
-                bind(jdbcExec).named(JDBC_ES).to(ExecutorService.class);
+                bind(jdbcExec).named(BLOCKING_TASK_ES).to(ExecutorService.class);
                 bind(users).to(UsersDAO.class);
                 bind(workspaces).to(WorkspacesDAO.class);
                 bind(buses).to(BusesDAO.class);

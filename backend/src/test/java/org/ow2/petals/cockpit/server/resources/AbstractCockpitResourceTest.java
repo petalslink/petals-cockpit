@@ -123,9 +123,7 @@ public class AbstractCockpitResourceTest {
                         bind(workspaces).to(WorkspacesDAO.class);
                         bind(buses).to(BusesDAO.class);
                         bind(users).to(UsersDAO.class);
-                        bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.PETALS_ADMIN_ES)
-                                .to(ExecutorService.class);
-                        bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.JDBC_ES)
+                        bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.BLOCKING_TASK_ES)
                                 .to(ExecutorService.class);
                         bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
                         bind(PetalsAdministrationFactory.getInstance()).to(PetalsAdministrationFactory.class);

@@ -16,23 +16,16 @@
  */
 package org.ow2.petals.cockpit;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.indexpage.IndexPageBundle;
 import com.palantir.indexpage.IndexPageConfigurable;
 
-import io.dropwizard.bundles.assets.AssetsBundleConfiguration;
-import io.dropwizard.bundles.assets.AssetsConfiguration;
-import io.dropwizard.bundles.assets.ConfiguredAssetsBundle;
+import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 
 public class PetalsCockpitApplication extends CockpitApplication<PetalsCockpitConfiguration> {
@@ -47,28 +40,17 @@ public class PetalsCockpitApplication extends CockpitApplication<PetalsCockpitCo
 
         super.initialize(bootstrap);
 
-        bootstrap.addBundle(new ConfiguredAssetsBundle(ImmutableMap.of("/frontend/", "/")));
+        bootstrap.addBundle(new AssetsBundle("/frontend", "/", "index.html"));
         // TODO this is not the best because every new prefix must be added... if not, the static asset servlet will
         // take over instead of returning index.html
         // Improve when https://github.com/palantir/dropwizard-index-page/issues/38 is fixed
         bootstrap.addBundle(
-                new IndexPageBundle("frontend/index.html", ImmutableSet.of("/login", "/cockpit", "/cockpit/*")));
+                new IndexPageBundle("frontend/index.html", ImmutableSet.of("/login", "/workspaces", "/workspaces/*")));
     }
 }
 
-class PetalsCockpitConfiguration extends CockpitConfiguration
-        implements AssetsBundleConfiguration, IndexPageConfigurable {
+class PetalsCockpitConfiguration extends CockpitConfiguration implements IndexPageConfigurable {
 
-    @Valid
-    @NotNull
-    @JsonProperty
-    private final AssetsConfiguration assets = AssetsConfiguration.builder().build();
-
-    @Override
-    public AssetsConfiguration getAssetsConfiguration() {
-        return assets;
-    }
-    
     @JsonIgnore
     @Nullable
     @Override
