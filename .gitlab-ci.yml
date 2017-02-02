@@ -74,7 +74,10 @@ build-frontend:
     - /^back\/.*$/
   script:
     - "cd frontend"
-    - "time ng lint"
+    # broken for now, see https://github.com/angular/angular-cli/issues/4350
+    # - "time ng lint"
+    # also broken for now, see https://github.com/angular/angular-cli/issues/4351
+    # - time tslint "src/**/*.ts" --project src/tsconfig.json && tslint "e2e/**/*.ts" --project e2e/tsconfig.json
     - "time node generate-headers.js --dry"
     - "nohup $XVFB &"
     - "XVFBPID=$!"
