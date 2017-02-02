@@ -81,7 +81,7 @@ build-frontend:
     - "time node generate-headers.js --dry"
     - "nohup $XVFB &"
     - "XVFBPID=$!"
-    - "time ng test --watch false"
+    - "time ng test --progress=false --watch=false"
     - "nohup ng serve --progress=false -e=prod-e2e &"
     - "NGPID=$!"
     - "time ng e2e"
