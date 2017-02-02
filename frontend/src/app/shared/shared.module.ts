@@ -42,6 +42,8 @@ import { GuardLoginService } from './services/guard-login.service';
 import { GuardAppService } from './services/guard-app.service';
 import { BusesService } from './services/buses.service';
 import { BusesMockService } from './services/buses.service.mock';
+// our directives
+import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive'
 
 export const modules = [
   CommonModule,
@@ -57,7 +59,10 @@ export const modules = [
   SimpleNotificationsModule
 ];
 
-export const declarations = [GenerateIconComponent];
+export const declarations = [
+  GenerateIconComponent,
+  ColorSearchedLettersDirective
+];
 
 @NgModule({
   imports: modules,
