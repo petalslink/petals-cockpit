@@ -42,7 +42,13 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chromium'],
+    browsers: ['ChromiumNoSandbox'],
+    customLaunchers: {
+      ChromiumNoSandbox: {
+        base: 'Chromium',
+        flags: ['--no-sandbox']
+      }
+    }
     singleRun: false
   });
 };
