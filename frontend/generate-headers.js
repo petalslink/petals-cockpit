@@ -33,7 +33,7 @@ const headers = [
 
 headers.ts =
 `/**
- * Copyright (C) 2016 Linagora
+ * Copyright (C) 2017 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -53,7 +53,7 @@ headers.ts =
 headers.scss = headers.ts;
 
 headers.html =
-`<!-- Copyright (C) 2016 Linagora
+`<!-- Copyright (C) 2017 Linagora
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
