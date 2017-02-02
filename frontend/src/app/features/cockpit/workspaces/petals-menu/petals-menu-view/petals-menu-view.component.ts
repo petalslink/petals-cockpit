@@ -49,6 +49,14 @@ export class PetalsMenuViewComponent implements OnInit {
     this.workspaces$ = this._store$.select(state => state.workspaces);
     this.tree$ = this._store$.let(getCurrentTree());
     this.busesInProgress$ = this._store$.let(getBusesInProgress());
+    this.formSearchPetals();
+
+    this.searchForm.valueChanges.subscribe(value => {
+      this.search(value.search);
+    });
+  }
+
+  formSearchPetals() {
     this.searchForm = this._fb.group({
       search: ''
     });
@@ -73,7 +81,7 @@ export class PetalsMenuViewComponent implements OnInit {
     // component is loaded
   }
 
-  search({ value }) {
-    this._store$.dispatch({ type: Workspaces.SET_SEARCH, payload: value.search });
+  search(search: string) {
+    this._store$.dispatch({ type: Workspaces.SET_SEARCH, payload: search });
   }
 }

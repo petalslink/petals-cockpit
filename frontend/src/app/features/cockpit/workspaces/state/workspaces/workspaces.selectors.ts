@@ -199,7 +199,6 @@ export function _getCurrentTree(store$: Store<IStore>) {
     })
     .withLatestFrom(store$.select(s => s.workspaces.searchPetals))
     .map(([tree, search]) => {
-
       if (typeof search !== 'string' || search.trim() === '') {
         return tree;
       }
@@ -212,7 +211,7 @@ export function _getCurrentTree(store$: Store<IStore>) {
     });
 }
 
-function filterElement(filter: string, element: any): any {
+export function filterElement(filter: string, element: any): any {
   if (element.name.toLowerCase().trim().match(filter.trim())) {
     return element;
   } else if (!element.children) {

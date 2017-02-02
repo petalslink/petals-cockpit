@@ -32,6 +32,8 @@ interface TreeEvent {
 export class MaterialTreeComponent implements OnInit {
   // pass the tree to display
   @Input() tree;
+  // pass the search to display
+  @Input() search;
   // pass a margin to apply on each level (in px)
   @Input() marginLeft = 0;
   // only used internally
