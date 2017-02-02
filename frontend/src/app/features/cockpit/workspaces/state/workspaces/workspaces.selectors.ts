@@ -138,7 +138,7 @@ export function getCurrentWorkspace() {
 export function _getCurrentTree(store$: Store<IStore>) {
   return _getCurrentWorkspace(store$)
     .map(workspace => {
-      let baseUrl = `/workspaces/${workspace.selectedWorkspaceId}/petals`;
+      const baseUrl = `/workspaces/${workspace.selectedWorkspaceId}/petals`;
       return workspace.buses.list.map(bus => {
         return {
           id: bus.id,
