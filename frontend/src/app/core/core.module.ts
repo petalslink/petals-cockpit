@@ -32,6 +32,7 @@ import { getRootReducer } from '../shared/state/root.reducer';
 import { WorkspacesEffects } from '../features/cockpit/workspaces/state/workspaces/workspaces.effects';
 import { BusesInProgressEffects } from './../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.effects';
 import { UsersEffects } from './../shared/effects/users.effects';
+import { BusesEffects } from './../features/cockpit/workspaces/state/buses/buses.effects';
 import { SseService } from '../shared/services/sse.service';
 import { SseServiceMock } from '../shared/services/sse.service.mock';
 import { BusesInProgressService } from '../shared/services/buses-in-progress.service';
@@ -84,6 +85,7 @@ export const providers = [
     EffectsModule.run(WorkspacesEffects),
     EffectsModule.run(BusesInProgressEffects),
     EffectsModule.run(UsersEffects),
+    EffectsModule.run(BusesEffects),
     StoreDevtoolsModule.instrumentOnlyWithExtension(),
     TranslateModule.forRoot({
       provide: TranslateLoader,

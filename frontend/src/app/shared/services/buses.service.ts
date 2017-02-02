@@ -15,18 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { batchActions } from 'redux-batched-actions';
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
 import { Store } from '@ngrx/store';
+import { batchActions } from 'redux-batched-actions';
 
 import { IStore } from './../interfaces/store.interface';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { Buses } from './../../features/cockpit/workspaces/state/buses/buses.reducer';
 import { BusesInProgress } from './../../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
+import { environment } from './../../../environments/environment';
+import { IBus } from './../../features/cockpit/workspaces/state/buses/bus.interface';
 
 @Injectable()
 export class BusesService {
-  constructor(private _store$: Store<IStore>, private _sseService: SseService) { }
+  constructor(
+    private _http: Http,
+    private _store$: Store<IStore>,
+    private _sseService: SseService
+  ) { }
 
   public watchEventBusDeleted() {
     this._sseService
@@ -38,5 +45,9 @@ export class BusesService {
         ]));
       })
       .subscribe();
+  }
+
+  getDetailsBus(idWorkspace: string, busId: string) {
+    return this._http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${busId}`);
   }
 }
