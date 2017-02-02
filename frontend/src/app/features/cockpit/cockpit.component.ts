@@ -41,9 +41,9 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private _store$: Store<IStore>,
-    @Inject(LANGUAGES) public languages,
+    @Inject(LANGUAGES) public languages: any,
     public dialog: MdDialog,
-    @Inject(ObservableMediaService) public media$,
+    @Inject(ObservableMediaService) public media$: any,
     private _router: Router
   ) { }
 

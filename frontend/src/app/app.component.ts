@@ -30,7 +30,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private _translate: TranslateService,
-    @Inject(LANGUAGES) public languages,
+    @Inject(LANGUAGES) public languages: any,
     private _store$: Store<IStore>
   ) { }
 
