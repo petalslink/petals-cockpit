@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IContainerRow, IContainer } from './container.interface';
+import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Store } from '@ngrx/store';
+import { batchActions } from 'redux-batched-actions';
 
-export interface IContainersCommon {
-  selectedContainerId: string;
-  isFetchingDetails: boolean;
-}
+import { environment } from './../../../environments/environment';
 
-export interface IContainersTable extends IContainersCommon {
-  byId: { [key: string]: IContainerRow };
-  allIds: Array<string>;
-}
+@Injectable()
+export class ContainersService {
+  constructor(private _http: Http) { }
 
-export interface IContainers extends IContainersCommon {
-  list: Array<IContainer>;
+  getDetailsContainer(idWorkspace: string, containerId: string) {
+    return this._http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/containers/${containerId}`);
+  }
 }

@@ -45,6 +45,7 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
       .params
       .map((params: { workspaceId: string, containerId: string }) => {
         this._store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: params.containerId } });
+        this._store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: params.containerId } });
       })
       .subscribe();
   }

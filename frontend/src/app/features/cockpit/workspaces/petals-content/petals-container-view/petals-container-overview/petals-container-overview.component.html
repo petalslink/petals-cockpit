@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <div md-card-sm-image class="img-card-ip"></div>
           <div fxFlex fxLayout="column" fxLayoutAlign="end end">
             <md-card-subtitle>IP</md-card-subtitle>
-            <md-card-title>192.168.0.1</md-card-title>
+            <md-card-title>{{ container.ip }}</md-card-title>
           </div>
         </md-card-title-group>
       </md-card>
@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <div md-card-sm-image class="img-card-port"></div>
           <div fxFlex fxLayout="column" fxLayoutAlign="end end">
             <md-card-subtitle>Port</md-card-subtitle>
-            <md-card-title>7700</md-card-title>
+            <md-card-title>{{ container.port }}</md-card-title>
           </div>
         </md-card-title-group>
       </md-card>
@@ -40,13 +40,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <!-- TODO : Once bugs are fixed, put 50% and maybe change size (responsive) -->
       <!-- https://github.com/angular/flex-layout/issues/106 -->
       <!-- https://github.com/angular/flex-layout/issues/108 -->
-      <md-card fxFlex.gt-sm="48%" fxFlex="100%" *ngFor="let i of [0, 1]" class="background-color-hover-light-green-x2 cursor-pointer"
-        [routerLink]="['/workspaces', (idWorkspace$ | async), 'petals', 'containers']">
+      <md-card fxFlex.gt-sm="48%" fxFlex="100%" *ngFor="let containerId of container.reachabilities" class="background-color-hover-light-green-x2 cursor-pointer"
+        [routerLink]="['/workspaces', (idWorkspace$ | async), 'petals', 'containers', containerId]">
         <md-card-title-group>
           <div md-card-sm-image class="img-card-server"></div>
           <div fxFlex fxLayout="column" fxLayoutAlign="end end">
             <md-card-subtitle>Container</md-card-subtitle>
-            <md-card-title>Container X{{ i }}</md-card-title>
+            <md-card-title>Container {{ containerId }}</md-card-title>
           </div>
           <div class="green-led"></div>
         </md-card-title-group>
@@ -54,11 +54,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </div>
     <h3 class="color-primary-light-bold margin-top-x2">System info</h3>
     <div fxLayout="row" fxLayoutWrap fxLayoutGap="10px">
-      <md-card fxFlex>
-        Petals ESB µKernel 4.0.2 Petals Standalone Shared Memory 4.0.2 OpenJDK Runtime Environment 1.7.0_111-b01 Oracle Corporation
-        Linux 3.16.0-4-amd64 amd64
-      </md-card>
+      <md-card fxFlex>{{ container.systemInfo }}</md-card>
     </div>
-    <!--<prettyjson fxFlex="100%" [obj]="container"></prettyjson>-->
+    <prettyjson fxFlex="100%" [obj]="container"></prettyjson>
   </div>
 </div>
