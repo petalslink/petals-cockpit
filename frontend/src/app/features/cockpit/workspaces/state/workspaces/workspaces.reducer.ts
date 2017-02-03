@@ -112,6 +112,16 @@ export class Workspaces {
     );
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static SET_SEARCH = `${Workspaces.reducerName}_SET_SEARCH`;
+  private static setSearch(workspacesTable: IWorkspacesTable, payload) {
+    return <IWorkspacesTable>Object.assign({}, workspacesTable,
+      <IWorkspacesTable>{
+        searchPetals: payload
+      }
+    );
+  }
+
   private static disconnectUserSuccess(workspacesTable: IWorkspacesTable, payload) {
     return workspacesTableFactory();
   }
@@ -124,6 +134,7 @@ export class Workspaces {
     [Workspaces.FETCH_WORKSPACES_SUCCESS]: Workspaces.fetchWorkspacesSuccess,
     [Workspaces.FETCH_WORKSPACE]: Workspaces.fetchWorkspace,
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Workspaces.fetchWorkspaceSuccess,
+    [Workspaces.SET_SEARCH]: Workspaces.setSearch,
 
     [Users.DISCONNECT_USER_SUCCESS]: Workspaces.disconnectUserSuccess
   };

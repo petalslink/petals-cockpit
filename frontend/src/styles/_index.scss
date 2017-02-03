@@ -44,6 +44,9 @@ md-toolbar {
 
 md-sidenav-container .md-list-item:hover, md-sidenav-container .md-list-item:focus {
   background-color: md-color($theme-primary-x);
-  @extend .color-primary;
   @extend .light-bold;
+}
+
+.highlight {
+  background-color: md-color($theme-accent-x5);
 }

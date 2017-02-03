@@ -30,6 +30,7 @@ import { IContainer } from '../containers/container.interface';
 import { IWorkspace } from './workspace.interface';
 import { IBuses, IBusesTable } from '../buses/buses.interface';
 import { IBus } from '../buses/bus.interface';
+import { escapeStringRegexp } from '../../../../../shared/helpers/shared.helper';
 
 export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspaces> {
   const sWorkspaces = store$.select((state: IStore) => state.workspaces);
@@ -195,7 +196,39 @@ export function _getCurrentTree(store$: Store<IStore>) {
           })
         };
       });
+    })
+    .withLatestFrom(store$.select(s => s.workspaces.searchPetals))
+    .map(([tree, search]) => {
+      if (typeof search !== 'string' || search.trim() === '') {
+        return tree;
+      }
+
+      const escaped = escapeStringRegexp(search);
+
+      return tree
+        .map(e => filterElement(escaped.toLowerCase(), e))
+        .filter(e => e !== null);
     });
+}
+
+export function filterElement(filter: string, element: any): any {
+  if (element.name.toLowerCase().trim().match(filter.trim())) {
+    return element;
+  } else if (!element.children) {
+    return null;
+  } else {
+    const es = (element.children as any[])
+      .map(e => filterElement(filter, e))
+      .filter(e => e !== null);
+
+    if (es.length === 0) {
+      return null;
+    } else {
+      return Object.assign({}, element, {
+        children: es
+      });
+    }
+  }
 }
 
 export function getCurrentTree() {

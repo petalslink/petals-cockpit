@@ -14,13 +14,18 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <md-nav-list dense *ngFor="let item of tree; let i = index" [style.marginLeft.px]="margin">
-
   <a md-list-item [routerLink]="[item.link]" routerLinkActive="active-link" (click)="select({deepLevel: deepLevel, index: i, item: item})">
     <md-icon md-list-icon *ngIf="item.children" (click)="toggleFold({deepLevel: deepLevel, index: i, item: item})" [class.rotate-minus-90]="item.isFolded">arrow_drop_down</md-icon>
-    {{ item.name }}
+
+    <span appColorSearchedLetters [search]="search" classToApply="highlight" [text]="item.name"></span>
   </a>
 
-  <app-material-tree *ngIf="!item.isFolded && item.children" [tree]="item.children" [marginLeft]="marginLeft" [deepLevel]="deepLevel + 1"
-    (onToggleFold)="toggleFold($event)" (onSelect)="select($event)"></app-material-tree>
-
+  <app-material-tree
+    *ngIf="!item.isFolded && item.children"
+    [tree]="item.children"
+    [search]="search"
+    [marginLeft]="marginLeft"
+    [deepLevel]="deepLevel + 1"
+    (onToggleFold)="toggleFold($event)"
+    (onSelect)="select($event)"></app-material-tree>
 </md-nav-list>
