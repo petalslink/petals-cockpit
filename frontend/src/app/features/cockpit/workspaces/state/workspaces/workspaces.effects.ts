@@ -17,6 +17,7 @@
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
+import { Router } from '@angular/router';
 import { Store, Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
@@ -41,6 +42,7 @@ import { BusesService } from './../../../../../shared/services/buses.service';
 @Injectable()
 export class WorkspacesEffects {
   constructor(
+    private _router$: Router,
     private _actions$: Actions,
     private _store$: Store<IStore>,
     private _workspacesService: WorkspacesService,
@@ -89,6 +91,8 @@ export class WorkspacesEffects {
     .do((action: Action) => setTimeout(() => this._sseService.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, action.payload), 500))
     .switchMap((action: Action) => this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
       .switchMap((data: any) => {
+        this._router$.navigate(['/workspaces', action.payload]);
+
         return Observable.of(batchActions([
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
           { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap(data.users) },
