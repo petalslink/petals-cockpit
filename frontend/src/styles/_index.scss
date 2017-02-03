@@ -32,7 +32,7 @@ md-toolbar {
   }
 }
 
-.active-link {
+.active-link, .active-link:hover {
   .md-list-item {
     background-color: md-color($theme-primary-x);
     @extend .color-primary;
