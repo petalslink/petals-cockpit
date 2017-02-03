@@ -41,7 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     -->
   </md-toolbar>
 
-  <md-sidenav-container fxLayout="column" fxFlex (backdrop-clicked)="closeSidenav()">
+  <md-sidenav-container fxLayout="column" fxFlex (backdropClick)="closeSidenav()">
     <md-sidenav fxLayout="column" [opened]="(ui$ | async).isSidenavVisible" [mode]="sidenavMode$ | async">
       <app-menu-user-panel></app-menu-user-panel>
 
