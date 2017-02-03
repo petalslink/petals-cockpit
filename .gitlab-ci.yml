@@ -79,14 +79,15 @@ build-frontend:
     # also broken for now, see https://github.com/angular/angular-cli/issues/4351
     # - time tslint "src/**/*.ts" --project src/tsconfig.json && tslint "e2e/**/*.ts" --project e2e/tsconfig.json
     - "time node generate-headers.js --dry"
-    - "nohup $XVFB &"
-    - "XVFBPID=$!"
-    - "time ng test --progress=false --watch=false"
-    - "nohup ng serve --progress=false -e=prod-e2e &"
-    - "NGPID=$!"
-    - "time ng e2e"
-    - "kill $NGPID"
-    - "kill $XVFBPID"
+    # disable test until they are some...
+    # - "nohup $XVFB &"
+    # - "XVFBPID=$!"
+    # - "time ng test --progress=false --watch=false"
+    # - "nohup ng serve --progress=false -e=prod-e2e &"
+    # - "NGPID=$!"
+    # - "time ng e2e"
+    # - "kill $NGPID"
+    # - "kill $XVFBPID"
     - "time ng build --progress=false --prod"
   artifacts:
     paths:
