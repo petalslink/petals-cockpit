@@ -48,7 +48,7 @@ module.exports = function (config) {
         base: 'Chromium',
         flags: ['--no-sandbox']
       }
-    }
+    },
     singleRun: false
   });
 };
