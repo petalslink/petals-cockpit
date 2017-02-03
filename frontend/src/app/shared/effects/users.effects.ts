@@ -23,6 +23,7 @@ import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { batchActions } from 'redux-batched-actions';
+import { NotificationsService } from 'angular2-notifications';
 
 import { IStore } from './../interfaces/store.interface';
 import { Users } from './../state/users.reducer';
@@ -36,7 +37,8 @@ export class UsersEffects {
     private _actions$: Actions,
     private _store$: Store<IStore>,
     private _router: Router,
-    private _usersService: UsersService
+    private _usersService: UsersService,
+    private _notification: NotificationsService
   ) { }
 
   // tslint:disable-next-line:member-ordering
@@ -100,5 +102,8 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false }) disconnectUserSuccess$: any = this._actions$
     .ofType(Users.DISCONNECT_USER_SUCCESS)
-    .map(() => this._router.navigate(['/login']));
+    .map(() => {
+      this._router.navigate(['/login']);
+      this._notification.success('Log out !', `You're now disconnected.`);
+    });
 }
