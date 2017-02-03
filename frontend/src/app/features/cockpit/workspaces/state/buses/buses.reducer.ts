@@ -131,6 +131,39 @@ export class Buses {
     return busesTable;
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_BUS_DETAILS = `${Buses.reducerName}_FETCH_BUS_DETAILS`;
+  private static fetchBusDetails(busesTable: IBusesTable, payload: { busId: string }) {
+    const allIds = (typeof busesTable.byId[payload.busId] !== 'undefined' ? busesTable.allIds : [...busesTable.allIds, payload.busId]);
+
+    return Object.assign({}, busesTable, <IBusesTable>{
+      byId: Object.assign({}, busesTable.byId, {
+        [payload.busId]: Object.assign({}, busesTable.byId[payload.busId], { isFetchingDetails: true })
+      }),
+      allIds
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_BUS_DETAILS_SUCCESS = `${Buses.reducerName}_FETCH_BUS_DETAILS_SUCCESS`;
+  private static fetchBusDetailsSuccess(busesTable: IBusesTable, payload: { busId: string, data: any }) {
+    return Object.assign({}, busesTable, <IBusesTable>{
+      byId: Object.assign({}, busesTable.byId, {
+        [payload.busId]: Object.assign({}, busesTable.byId[payload.busId], payload.data, { isFetchingDetails: false })
+      })
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_BUS_DETAILS_ERROR = `${Buses.reducerName}_FETCH_BUS_DETAILS_ERROR`;
+  private static fetchBusDetailsError(busesTable: IBusesTable, payload: { busId: string }) {
+    return Object.assign({}, busesTable, <IBusesTable>{
+      byId: Object.assign({}, busesTable.byId, {
+        [payload.busId]: Object.assign({}, busesTable.byId[payload.busId], { isFetchingDetails: false })
+      })
+    });
+  }
+
   private static disconnectUserSuccess(busesTable: IBusesTable, payload) {
     return busesTableFactory();
   }
@@ -145,6 +178,9 @@ export class Buses {
     [Buses.TOGGLE_FOLD_BUS]: Buses.toggleFoldBus,
     [Buses.SET_CURRENT_BUS]: Buses.setCurrentBus,
     [Buses.REMOVE_BUS]: Buses.removeBus,
+    [Buses.FETCH_BUS_DETAILS]: Buses.fetchBusDetails,
+    [Buses.FETCH_BUS_DETAILS_SUCCESS]: Buses.fetchBusDetailsSuccess,
+    [Buses.FETCH_BUS_DETAILS_ERROR]: Buses.fetchBusDetailsError,
 
     [Users.DISCONNECT_USER_SUCCESS]: Buses.disconnectUserSuccess
   };

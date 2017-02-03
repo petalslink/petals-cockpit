@@ -30,18 +30,6 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { environment } from './../../environments/environment';
-import { SseService } from './services/sse.service';
-import { SseServiceMock } from './services/sse.service.mock';
-import { BusesInProgressService } from './services/buses-in-progress.service';
-import { BusesInProgressMockService } from './services/buses-in-progress-mock.service';
-import { WorkspacesService } from './services/workspaces.service';
-import { WorkspacesMockService } from './services/workspaces.mock';
-import { UsersMockService } from './services/users.mock';
-import { UsersService } from './services/users.service';
-import { GuardLoginService } from './services/guard-login.service';
-import { GuardAppService } from './services/guard-app.service';
-import { BusesService } from './services/buses.service';
-import { BusesMockService } from './services/buses.service.mock';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive'
 
 export const modules = [
@@ -58,10 +46,7 @@ export const modules = [
   SimpleNotificationsModule
 ];
 
-export const declarations = [
-  GenerateIconComponent,
-  ColorSearchedLettersDirective
-];
+export const declarations = [GenerateIconComponent, ColorSearchedLettersDirective];
 
 @NgModule({
   imports: modules,

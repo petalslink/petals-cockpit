@@ -16,7 +16,9 @@
  */
 
 import { Injectable } from '@angular/core';
+import { Response } from '@angular/http';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 
 import { IStore } from './../interfaces/store.interface';
 import { SseService, SseWorkspaceEvent } from './sse.service';
@@ -24,6 +26,9 @@ import { Buses } from './../../features/cockpit/workspaces/state/buses/buses.red
 import { batchActions } from 'redux-batched-actions';
 import { BusesInProgress } from './../../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
 import { NotificationsService } from 'angular2-notifications';
+import { IBus } from './../../features/cockpit/workspaces/state/buses/bus.interface';
+import { getDetailsBus } from './../../../mocks/workspace-id-wks-0';
+import { environment } from './../../../environments/environment';
 
 @Injectable()
 export class BusesMockService {
@@ -44,11 +49,26 @@ export class BusesMockService {
       .map(({ id }) => {
         this._store$.dispatch(batchActions([
           { type: Buses.REMOVE_BUS, payload: { busId: id } },
-          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: id } },
+          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: id } }
         ]));
 
         this._notifications.info(`Bus removed`, `A bus has been removed`);
       })
       .subscribe();
+  }
+
+  getDetailsBus(idWorkspace: string, busId: string) {
+    const detailsBus = getDetailsBus(busId);
+
+    const response: Response = <Response>{
+      ok: true,
+      json: () => {
+        return detailsBus;
+      }
+    };
+
+    return Observable
+      .of(response)
+      .delay(environment.httpDelay);
   }
 }

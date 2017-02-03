@@ -159,3 +159,8 @@ export function getNewBusFull() {
 
   return obj;
 }
+
+export function getDetailsBus(busId: string) {
+  // right now a bus doesn't have more info
+  return {};
+}
