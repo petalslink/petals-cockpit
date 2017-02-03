@@ -51,12 +51,12 @@
     "zone.js": "0.7.6"
   },
   "devDependencies": {
+    "@angular/cli": "1.0.0-beta.30",
     "@angular/compiler-cli": "2.4.5",
     "@types/chance": "0.7.31",
     "@types/jasmine": "2.5.41",
     "@types/node": "7.0.4",
     "@types/underscore": "1.7.36",
-    "angular-cli": "1.0.0-beta.28.3",
     "codelyzer": "2.0.0-beta.4",
     "jasmine-core": "2.5.2",
     "jasmine-spec-reporter": "3.2.0",
