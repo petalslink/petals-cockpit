@@ -39,7 +39,8 @@ variables:
     paths:
       - $YARN_CACHE_DIRECTORY
 
-pages:
+# disable pages for now
+.pages:
   <<: *node-java-yarn
   stage: package
   script:
