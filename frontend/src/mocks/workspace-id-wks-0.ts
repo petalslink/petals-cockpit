@@ -193,3 +193,8 @@ export function getDetailsComponents(componentId: string) {
   // TODO
   return {};
 }
+
+export function getDetailsServiceUnit(serviceUnitId: string) {
+  // TODO
+  return {};
+}

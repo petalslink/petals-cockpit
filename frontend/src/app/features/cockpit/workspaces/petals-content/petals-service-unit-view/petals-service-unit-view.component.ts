@@ -45,6 +45,7 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
       .params
       .map((params: { workspaceId: string, serviceUnitId: string }) => {
         this._store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: params.serviceUnitId } });
+        this._store$.dispatch({ type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS, payload: { serviceUnitId: params.serviceUnitId } });
       })
       .subscribe();
   }

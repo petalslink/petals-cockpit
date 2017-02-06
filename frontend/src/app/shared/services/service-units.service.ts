@@ -15,14 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IserviceUnitsTable } from './service-units.interface';
+import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Store } from '@ngrx/store';
+import { batchActions } from 'redux-batched-actions';
 
-export function serviceUnitsTableFactory(): IserviceUnitsTable {
-  return {
-    selectedServiceUnitId: '',
-    isFetchingDetails: false,
+import { environment } from './../../../environments/environment';
 
-    byId: {},
-    allIds: []
-  };
+@Injectable()
+export class ServiceUnitsService {
+  constructor(private _http: Http) { }
+
+  getDetailsServiceUnit(idWorkspace: string, serviceUnitId: string) {
+    return this._http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/containers/${serviceUnitId}`);
+  }
 }

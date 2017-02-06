@@ -19,6 +19,7 @@ import { IServiceUnitRow, IServiceUnit } from './service-unit.interface';
 
 interface IserviceUnitsCommon {
   selectedServiceUnitId: string;
+  isFetchingDetails: boolean;
 }
 
 export interface IserviceUnitsTable extends IserviceUnitsCommon {
