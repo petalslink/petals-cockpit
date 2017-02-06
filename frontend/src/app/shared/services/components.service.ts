@@ -15,14 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IComponentsTable } from './components.interface';
+import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Store } from '@ngrx/store';
+import { batchActions } from 'redux-batched-actions';
 
-export function componentsTableFactory(): IComponentsTable {
-  return {
-    selectedComponentId: '',
-    isFetchingDetails: false,
+import { environment } from './../../../environments/environment';
 
-    byId: {},
-    allIds: []
-  };
+@Injectable()
+export class ComponentsService {
+  constructor(private _http: Http) { }
+
+  getDetailsComponent(idWorkspace: string, componentId: string) {
+    return this._http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/containers/${componentId}`);
+  }
 }

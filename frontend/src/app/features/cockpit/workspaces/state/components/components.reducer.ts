@@ -117,6 +117,39 @@ export class Components {
     });
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_COMPONENT_DETAILS = `${Components.reducerName}_FETCH_COMPONENT_DETAILS`;
+  private static fetchComponentDetails(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    const allIds = (typeof componentsTable.byId[payload.componentId] !== 'undefined' ? componentsTable.allIds : [...componentsTable.allIds, payload.componentId]);
+
+    return Object.assign({}, componentsTable, <IComponentsTable>{
+      byId: Object.assign({}, componentsTable.byId, {
+        [payload.componentId]: Object.assign({}, componentsTable.byId[payload.componentId], { isFetchingDetails: true })
+      }),
+      allIds
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_COMPONENT_DETAILS_SUCCESS = `${Components.reducerName}_FETCH_COMPONENT_DETAILS_SUCCESS`;
+  private static fetchComponentDetailsSuccess(componentsTable: IComponentsTable, payload: { componentId: string, data: any }) {
+    return Object.assign({}, componentsTable, <IComponentsTable>{
+      byId: Object.assign({}, componentsTable.byId, {
+        [payload.componentId]: Object.assign({}, componentsTable.byId[payload.componentId], payload.data, { isFetchingDetails: false })
+      })
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_COMPONENT_DETAILS_ERROR = `${Components.reducerName}_FETCH_COMPONENT_DETAILS_ERROR`;
+  private static fetchComponentDetailsError(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    return Object.assign({}, componentsTable, <IComponentsTable>{
+      byId: Object.assign({}, componentsTable.byId, {
+        [payload.componentId]: Object.assign({}, componentsTable.byId[payload.componentId], { isFetchingDetails: false })
+      })
+    });
+  }
+
   private static disconnectUserSuccess(componentsTable: IComponentsTable, payload) {
     return componentsTableFactory();
   }
@@ -130,6 +163,9 @@ export class Components {
     [Components.UNFOLD_COMPONENT]: Components.unfoldComponent,
     [Components.TOGGLE_FOLD_COMPONENT]: Components.toggleFoldComponent,
     [Components.SET_CURRENT_COMPONENT]: Components.setCurrentComponent,
+    [Components.FETCH_COMPONENT_DETAILS]: Components.fetchComponentDetails,
+    [Components.FETCH_COMPONENT_DETAILS_SUCCESS]: Components.fetchComponentDetailsSuccess,
+    [Components.FETCH_COMPONENT_DETAILS_ERROR]: Components.fetchComponentDetailsError,
 
     [Users.DISCONNECT_USER_SUCCESS]: Components.disconnectUserSuccess
   };

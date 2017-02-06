@@ -19,6 +19,7 @@ import { IComponentRow, IComponent } from './component.interface';
 
 export interface IComponentsCommon {
   selectedComponentId: string;
+  isFetchingDetails: boolean;
 }
 
 export interface IComponentsTable extends IComponentsCommon {
