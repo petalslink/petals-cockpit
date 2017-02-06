@@ -23,44 +23,44 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { Buses } from './buses.reducer';
-import { BusesService } from './../../../../../shared/services/buses.service';
 import { environment } from './../../../../../../environments/environment';
+import { Containers } from './containers.reducer';
+import { ContainersService } from './../../../../../shared/services/containers.service';
 
 @Injectable()
-export class BusesEffects {
+export class ContainersEffects {
   constructor(
     private _actions$: Actions,
     private _store$: Store<IStore>,
-    private _busesService: BusesService
+    private _containersService: ContainersService
   ) { }
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchBusDetails$: Observable<Action> = this._actions$
-    .ofType(Buses.FETCH_BUS_DETAILS)
+  @Effect({ dispatch: true }) fetchContainersDetails$: Observable<Action> = this._actions$
+    .ofType(Containers.FETCH_CONTAINER_DETAILS)
     .combineLatest(this._store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, workspaceId]:
-      [{ type: string, payload: { busId: string } }, string]) =>
-      this._busesService.getDetailsBus(workspaceId, action.payload.busId)
+      [{ type: string, payload: { containerId: string } }, string]) =>
+      this._containersService.getDetailsContainer(workspaceId, action.payload.containerId)
         .map((res: Response) => {
           if (!res.ok) {
-            throw new Error('Error while fetching the bus details');
+            throw new Error('Error while fetching the container details');
           }
 
-          const rslt = res.json();
-          return { type: Buses.FETCH_BUS_DETAILS_SUCCESS, payload: { busId: action.payload.busId, rslt } };
+          const data = res.json();
+          return { type: Containers.FETCH_CONTAINER_DETAILS_SUCCESS, payload: { containerId: action.payload.containerId, data } };
         })
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in buses.effects.ts : ofType(Buses.FETCH_BUS_DETAILS)');
+            console.warn('Error catched in containers.effects.ts : ofType(Containers.FETCH_CONTAINER_DETAILS)');
             console.error(err);
             console.groupEnd();
           }
 
           return Observable.of({
-            type: Buses.FETCH_BUS_DETAILS_ERROR,
-            payload: { busId: action.payload.busId }
+            type: Containers.FETCH_CONTAINER_DETAILS_ERROR,
+            payload: { containerId: action.payload.containerId }
           });
         })
     );

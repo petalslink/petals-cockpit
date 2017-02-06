@@ -24,6 +24,7 @@ export interface IContainerCommon {
   ip: string;
   port: number;
   systemInfo: string;
+  reachabilities: string[];
 
   // for UI
   isFolded: boolean;

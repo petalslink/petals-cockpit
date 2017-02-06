@@ -117,6 +117,39 @@ export class Containers {
     });
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_CONTAINER_DETAILS = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS`;
+  private static fetchContainerDetails(containersTable: IContainersTable, payload: { containerId: string }) {
+    const allIds = (typeof containersTable.byId[payload.containerId] !== 'undefined' ? containersTable.allIds : [...containersTable.allIds, payload.containerId]);
+
+    return Object.assign({}, containersTable, <IContainersTable>{
+      byId: Object.assign({}, containersTable.byId, {
+        [payload.containerId]: Object.assign({}, containersTable.byId[payload.containerId], { isFetchingDetails: true })
+      }),
+      allIds
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_CONTAINER_DETAILS_SUCCESS = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS_SUCCESS`;
+  private static fetchContainerDetailsSuccess(containersTable: IContainersTable, payload: { containerId: string, data: any }) {
+    return Object.assign({}, containersTable, <IContainersTable>{
+      byId: Object.assign({}, containersTable.byId, {
+        [payload.containerId]: Object.assign({}, containersTable.byId[payload.containerId], payload.data, { isFetchingDetails: false })
+      })
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_CONTAINER_DETAILS_ERROR = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS_ERROR`;
+  private static fetchContainerDetailsError(containersTable: IContainersTable, payload: { containerId: string }) {
+    return Object.assign({}, containersTable, <IContainersTable>{
+      byId: Object.assign({}, containersTable.byId, {
+        [payload.containerId]: Object.assign({}, containersTable.byId[payload.containerId], { isFetchingDetails: false })
+      })
+    });
+  }
+
   private static disconnectUserSuccess(containersTable: IContainersTable, payload) {
     return containersTableFactory();
   }
@@ -130,6 +163,9 @@ export class Containers {
     [Containers.UNFOLD_CONTAINER]: Containers.unfoldContainer,
     [Containers.TOGGLE_FOLD_CONTAINER]: Containers.toggleFoldContainer,
     [Containers.SET_CURRENT_CONTAINER]: Containers.setCurrentContainer,
+    [Containers.FETCH_CONTAINER_DETAILS]: Containers.fetchContainerDetails,
+    [Containers.FETCH_CONTAINER_DETAILS_SUCCESS]: Containers.fetchContainerDetailsSuccess,
+    [Containers.FETCH_CONTAINER_DETAILS_ERROR]: Containers.fetchContainerDetailsError,
 
     [Users.DISCONNECT_USER_SUCCESS]: Containers.disconnectUserSuccess
   };

@@ -33,6 +33,7 @@ import { WorkspacesEffects } from '../features/cockpit/workspaces/state/workspac
 import { BusesInProgressEffects } from './../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.effects';
 import { UsersEffects } from './../shared/effects/users.effects';
 import { BusesEffects } from './../features/cockpit/workspaces/state/buses/buses.effects';
+import { ContainersEffects } from './../features/cockpit/workspaces/state/containers/containers.effects';
 import { SseService } from '../shared/services/sse.service';
 import { SseServiceMock } from '../shared/services/sse.service.mock';
 import { BusesInProgressService } from '../shared/services/buses-in-progress.service';
@@ -45,6 +46,8 @@ import { GuardLoginService } from '../shared/services/guard-login.service';
 import { GuardAppService } from '../shared/services/guard-app.service';
 import { BusesService } from '../shared/services/buses.service';
 import { BusesMockService } from '../shared/services/buses.service.mock';
+import { ContainersService } from './../shared/services/containers.service';
+import { ContainersMockService } from './../shared/services/containers.service.mock';
 
 export const providers = [
   {
@@ -67,6 +70,10 @@ export const providers = [
     useClass: (environment.mock ? BusesMockService : BusesService)
   },
   {
+    provide: ContainersService,
+    useClass: (environment.mock ? ContainersMockService : ContainersService)
+  },
+  {
     provide: WorkspacesService,
     useClass: (environment.mock ? WorkspacesMockService : WorkspacesService)
   },
@@ -86,6 +93,7 @@ export const providers = [
     EffectsModule.run(BusesInProgressEffects),
     EffectsModule.run(UsersEffects),
     EffectsModule.run(BusesEffects),
+    EffectsModule.run(ContainersEffects),
     StoreDevtoolsModule.instrumentOnlyWithExtension(),
     TranslateModule.forRoot({
       provide: TranslateLoader,

@@ -164,3 +164,27 @@ export function getDetailsBus(busId: string) {
   // right now a bus doesn't have more info
   return {};
 }
+
+const detailsContainers = new Map<string, any>();
+let lastNumberIp = 0;
+
+export function getDetailsContainer(containerId: string) {
+  if (detailsContainers.has(containerId)) {
+    return detailsContainers.get(containerId);
+  }
+
+  const details = {
+    ip: `192.168.0.${lastNumberIp}`,
+    port: 7700 + lastNumberIp,
+    // TODO : Instead of idCont0 put some containers that can
+    // work with the current workspace
+    reachabilities: ['idCont0'],
+    systemInfo: 'Petals ESB µKernel 4.0.2 Petals Standalone Shared Memory 4.0.2 OpenJDK Runtime Environment 1.7.0_111-b01 Oracle Corporation Linux 3.16.0-4-amd64 amd64'
+  };
+
+  detailsContainers.set(containerId, details);
+
+  lastNumberIp++;
+
+  return detailsContainers.get(containerId);
+}
