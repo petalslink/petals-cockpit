@@ -188,3 +188,8 @@ export function getDetailsContainer(containerId: string) {
 
   return detailsContainers.get(containerId);
 }
+
+export function getDetailsComponents(componentId: string) {
+  // TODO
+  return {};
+}
