@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, Inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { MdDialog, MdDialogRef } from '@angular/material';
 import { MediaChange } from '@angular/flex-layout';
+import { MdSidenav } from '@angular/material';
 // this line will be replaced to @angular/flex-layout as expected in beta.5
 // see https://github.com/angular/flex-layout/issues/144
 import { ObservableMediaService } from '@angular/flex-layout/media-query/observable-media-service';
@@ -55,6 +56,8 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   public workspace$: Observable<IWorkspace>;
   public workspaces$: Observable<IWorkspacesTable>;
   public logoByScreenSize$: Observable<string>;
+
+  @ViewChild(MdSidenav) sidenav: MdSidenav;
 
   constructor(
     private _store$: Store<IStore>,
@@ -128,6 +131,11 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     } else {
       this.openWorkspacesDialog();
     }
+    // TODO : cf If hook available for handling escape
+    // https://github.com/angular/material2/pull/2501
+    // Handles the keyboard events ->
+    // https://github.com/angular/material2/issues/2544
+    this.sidenav.handleKeydown = () => {};
   }
 
   private _openWorkspacesDialog() {
