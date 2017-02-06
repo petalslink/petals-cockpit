@@ -35,6 +35,7 @@ import { UsersEffects } from './../shared/effects/users.effects';
 import { BusesEffects } from './../features/cockpit/workspaces/state/buses/buses.effects';
 import { ContainersEffects } from './../features/cockpit/workspaces/state/containers/containers.effects';
 import { ComponentsEffects } from './../features/cockpit/workspaces/state/components/components.effects';
+import { ServiceUnitsEffects } from './../features/cockpit/workspaces/state/service-units/service-units.effects';
 import { SseService } from '../shared/services/sse.service';
 import { SseServiceMock } from '../shared/services/sse.service.mock';
 import { BusesInProgressService } from '../shared/services/buses-in-progress.service';
@@ -51,6 +52,8 @@ import { ContainersService } from './../shared/services/containers.service';
 import { ContainersMockService } from './../shared/services/containers.service.mock';
 import { ComponentsService } from './../shared/services/components.service';
 import { ComponentsMockService } from './../shared/services/components.service.mock';
+import { ServiceUnitsService } from './../shared/services/service-units.service';
+import { ServiceUnitsMockService } from './../shared/services/service-units.service.mock';
 
 export const providers = [
   {
@@ -81,6 +84,10 @@ export const providers = [
     useClass: (environment.mock ? ComponentsMockService : ComponentsService)
   },
   {
+    provide: ServiceUnitsService,
+    useClass: (environment.mock ? ServiceUnitsMockService : ServiceUnitsService)
+  },
+  {
     provide: WorkspacesService,
     useClass: (environment.mock ? WorkspacesMockService : WorkspacesService)
   },
@@ -102,6 +109,7 @@ export const providers = [
     EffectsModule.run(BusesEffects),
     EffectsModule.run(ContainersEffects),
     EffectsModule.run(ComponentsEffects),
+    EffectsModule.run(ServiceUnitsEffects),
     StoreDevtoolsModule.instrumentOnlyWithExtension(),
     TranslateModule.forRoot({
       provide: TranslateLoader,

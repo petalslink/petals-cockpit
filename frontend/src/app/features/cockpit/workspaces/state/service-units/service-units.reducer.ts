@@ -60,6 +60,39 @@ export class ServiceUnits {
     });
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_SERVICE_UNIT_DETAILS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS`;
+  private static fetchServiceUnitDetails(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+    const allIds = (typeof serviceUnitsTable.byId[payload.serviceUnitId] !== 'undefined' ? serviceUnitsTable.allIds : [...serviceUnitsTable.allIds, payload.serviceUnitId]);
+
+    return Object.assign({}, serviceUnitsTable, <IserviceUnitsTable>{
+      byId: Object.assign({}, serviceUnitsTable.byId, {
+        [payload.serviceUnitId]: Object.assign({}, serviceUnitsTable.byId[payload.serviceUnitId], { isFetchingDetails: true })
+      }),
+      allIds
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_SERVICE_UNIT_DETAILS_SUCCESS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS_SUCCESS`;
+  private static fetchServiceUnitDetailsSuccess(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string, data: any }) {
+    return Object.assign({}, serviceUnitsTable, <IserviceUnitsTable>{
+      byId: Object.assign({}, serviceUnitsTable.byId, {
+        [payload.serviceUnitId]: Object.assign({}, serviceUnitsTable.byId[payload.serviceUnitId], payload.data, { isFetchingDetails: false })
+      })
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_SERVICE_UNIT_DETAILS_ERROR = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS_ERROR`;
+  private static fetchServiceUnitDetailsError(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+    return Object.assign({}, serviceUnitsTable, <IserviceUnitsTable>{
+      byId: Object.assign({}, serviceUnitsTable.byId, {
+        [payload.serviceUnitId]: Object.assign({}, serviceUnitsTable.byId[payload.serviceUnitId], { isFetchingDetails: false })
+      })
+    });
+  }
+
   private static disconnectUserSuccess(serviceUnitsTable: IserviceUnitsTable, payload) {
     return serviceUnitsTableFactory();
   }
@@ -70,6 +103,9 @@ export class ServiceUnits {
   private static mapActionsToMethod = {
     [ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS]: ServiceUnits.fetchServiceUnitsSuccess,
     [ServiceUnits.SET_CURRENT_SERVICE_UNIT]: ServiceUnits.setCurrentServiceUnit,
+    [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS]: ServiceUnits.fetchServiceUnitDetails,
+    [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS]: ServiceUnits.fetchServiceUnitDetailsSuccess,
+    [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR]: ServiceUnits.fetchServiceUnitDetailsError,
 
     [Users.DISCONNECT_USER_SUCCESS]: ServiceUnits.disconnectUserSuccess
   };
