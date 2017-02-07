@@ -1,20 +1,221 @@
-let _cptIdBus = 0;
+export class Workspace {
+  private static _cpt = 0;
+  private _id: number;
+  private _buses: Bus[] = [];
+  private _busesInProgress: BusInProgress[] = [];
 
-const memoizeGetNewWorkspace = new Map();
+  constructor() {
+    this._id = Workspace._cpt++;
 
-export function getNewWorkspace(idWks) {
-  if (memoizeGetNewWorkspace.has(idWks)) {
-    return Object.assign({}, memoizeGetNewWorkspace.get(idWks));
+    // by default add 1 bus
+    this._buses.push(new Bus());
+
+    // and 2 buses in progress
+    this._busesInProgress.push(new BusInProgress());
+    this._busesInProgress.push(new BusInProgress());
   }
 
-  const newBusFull = getNewBusFull();
+  public getIdFormatted() {
+    return `idWks${this._id}`;
+  }
 
-  const wks = Object.assign(newBusFull, {
-    workspace: {
-      id: idWks,
-      name: `Workspace ${idWks}`,
+  public toObj() {
+    return {
+      id: this._id,
+      name: `Workspace ${this._id}`,
       users: [`bescudie`]
-    },
+    };
+  }
+
+  public getBuses() {
+    return this._buses;
+  }
+
+  public getBusesInProgress() {
+    return this._busesInProgress;
+  }
+
+  public getContainers() {
+    return <Container[]>this._buses.reduce((acc, bus) =>
+      [...acc, ...bus.getContainers()],
+    []);
+  }
+
+  public getComponents() {
+    return <Component[]>this.getContainers().reduce((acc, container) =>
+      [...acc, ...container.getComponents()],
+    []);
+  }
+
+  public getServiceUnits() {
+    return <ServiceUnit[]>this.getComponents().reduce((acc, component) =>
+      [...acc, ...component.getServiceUnits()],
+    []);
+  }
+}
+
+export class BusBase {
+  private static _cpt = 0;
+  protected _id: number;
+
+  constructor() {
+    this._id = BusBase._cpt++;
+  }
+
+  public getIdFormatted() {
+    return `idBus${this._id}`;
+  }
+}
+
+export class Bus extends BusBase {
+  private _containers: Container[] = [];
+
+  constructor() {
+    super();
+
+    // by default add 2 containers
+    this._containers.push(new Container());
+    this._containers.push(new Container());
+  }
+
+  getContainers() {
+    return this._containers;
+  }
+
+  toObj() {
+    return {
+      [this.getIdFormatted()]: {
+        isImporting: false,
+        name: `Bus ${this._id}`,
+        state: `UNDEPLOYED`,
+        containers: this._containers.map(container => container.getIdFormatted())
+      }
+    };
+  }
+}
+
+export class BusInProgress extends BusBase {
+  constructor() {
+    super();
+  }
+
+  toObj() {
+    return {
+      [this.getIdFormatted()]: {
+        ip: `192.168.0.${this._id}`,
+        port: 4250 + this._id,
+        username: `petals`
+      }
+    };
+  }
+}
+
+export class Container {
+  private static _cpt = 0;
+  protected _id: number;
+  private _components: Component[] = []
+
+  constructor() {
+    this._id = Container._cpt++;
+
+    // by default add 2 containers
+    this._components.push(new Component());
+    this._components.push(new Component());
+  }
+
+  getComponents() {
+    return this._components;
+  }
+
+  public getIdFormatted() {
+    return `idCont${this._id}`;
+  }
+
+  toObj() {
+    return {
+      [this.getIdFormatted()]: {
+        name: `Cont ${this._id}`,
+        components: this._components.map(component => component.getIdFormatted())
+      }
+    };
+  }
+}
+
+export class Component {
+  private static _cpt = 0;
+  protected _id: number;
+  private _serviceUnits: ServiceUnit[] = []
+
+  constructor() {
+    this._id = Component._cpt++;
+
+    // by default add 2 service units
+    this._serviceUnits.push(new ServiceUnit());
+    this._serviceUnits.push(new ServiceUnit());
+  }
+
+  public getIdFormatted() {
+    return `idComp${this._id}`;
+  }
+
+  getServiceUnits() {
+    return this._serviceUnits;
+  }
+
+  toObj() {
+    return {
+      [this.getIdFormatted()]: {
+        name: `Comp ${this._id}`,
+        serviceUnits: this._serviceUnits.map(serviceUnit => serviceUnit.getIdFormatted())
+      }
+    };
+  }
+}
+
+export class ServiceUnit {
+  private static _cpt = 0;
+  protected _id: number;
+
+  constructor() {
+    this._id = ServiceUnit._cpt++;
+  }
+
+  public getIdFormatted() {
+    return `idSu${this._id}`;
+  }
+
+  toObj() {
+    return {
+      [this.getIdFormatted()]: {
+        name: `SU ${this._id}`
+      }
+    };
+  }
+}
+
+// map to cache the created workspaces
+const _memoizedWorkspaces = new Map();
+
+/**
+ * getWorkspace
+ *
+ * return the workspace which has an id `idWks`
+ * if it already exists, will return the existing one
+ * otherwise will create it with some default values
+ *
+ * @export
+ * @param {string} idWks The workspace id you're looking for
+ * @returns {any} the workspace
+ */
+export function getWorkspace(idWks: string) {
+  if (_memoizedWorkspaces.has(idWks)) {
+    return Object.assign({}, _memoizedWorkspaces.get(idWks));
+  }
+
+  const newWorkspace = new Workspace();
+
+  const wks = {
+    workspace: newWorkspace.toObj(),
 
     users: {
       bescudie: {
@@ -22,143 +223,33 @@ export function getNewWorkspace(idWks) {
       }
     },
 
-    busesInProgress: {
-      [`idBus${_cptIdBus++}`]: {
-        ip: `192.168.0.1`,
-        port: 4250,
-        username: `petals`
-      },
-      [`idBus${_cptIdBus++}`]: {
-        ip: `192.168.0.2`,
-        port: 5132,
-        username: `petals`,
-        importError: `ERROR!!!!`
-      }
-    },
-  });
+    busesInProgress: newWorkspace
+      .getBusesInProgress()
+      .reduce((acc, busInProgress) => Object.assign(acc, busInProgress.toObj()), {}),
 
-  memoizeGetNewWorkspace.set(idWks, wks);
+    buses: newWorkspace
+      .getBuses()
+      .reduce((acc, bus) => Object.assign(acc, bus.toObj()), {}),
+
+    containers: newWorkspace
+      .getContainers()
+      .reduce((acc, container) => Object.assign(acc, container.toObj()), {}),
+
+    components: newWorkspace
+      .getComponents()
+      .reduce((acc, component) => Object.assign(acc, component.toObj()), {}),
+
+    serviceUnits: newWorkspace
+      .getServiceUnits()
+      .reduce((acc, serviceUnit) => Object.assign(acc, serviceUnit.toObj()), {})
+  };
+
+  _memoizedWorkspaces.set(idWks, wks);
 
   return Object.assign({}, wks);
 };
 
 // ------------------------------------------
-
-const _ids = {
-  idCont0: 0, idCont1: 1,
-  idComp0: 0, idComp1: 1, idComp2: 2, idComp3: 3,
-  idSu0: 0, idSu1: 1, idSu2: 2, idSu3: 3, idSu4: 4, idSu5: 5
-};
-
-// return a bus with containers/components/sus
-// and add them to the list of bus in corresponding workspace
-export function getNewBusFull() {
-  const obj = {
-    buses: {
-      [`idBus${_cptIdBus}`]: {
-        isImporting: false,
-        name: `Bus ${_cptIdBus}`,
-        state: `UNDEPLOYED`,
-        containers: [
-          `idCont${_ids.idCont0}`,
-          `idCont${_ids.idCont1}`
-        ]
-      }
-    },
-
-    containers: {
-      [`idCont${_ids.idCont0}`]: {
-        name: `Container ${_ids.idCont0}`,
-        components: [
-          `idComp${_ids.idComp0}`,
-          `idComp${_ids.idComp1}`
-        ]
-      },
-      [`idCont${_ids.idCont1}`]: {
-        name: `Container ${_ids.idCont1}`,
-        components: [
-          `idComp${_ids.idComp2}`,
-          `idComp${_ids.idComp3}`
-        ]
-      }
-    },
-
-    components: {
-      [`idComp${_ids.idComp0}`]: {
-        name: `Component ${_ids.idComp0}`,
-        serviceUnits: [`idSu${_ids.idSu0}`]
-      },
-      [`idComp${_ids.idComp1}`]: {
-        name: `Component ${_ids.idComp1}`,
-        serviceUnits: [
-          `idSu${_ids.idSu1}`,
-          `idSu${_ids.idSu2}`
-        ]
-      },
-      [`idComp${_ids.idComp2}`]: {
-        name: `Component ${_ids.idComp2}`,
-        serviceUnits: [`idSu${_ids.idSu3}`]
-      },
-      [`idComp${_ids.idComp3}`]: {
-        name: `Component ${_ids.idComp3}`,
-        serviceUnits: [
-          `idSu${_ids.idSu4}`,
-          `idSu${_ids.idSu5}`
-        ]
-      }
-    },
-
-    serviceUnits: {
-      [`idSu${_ids.idSu0}`]: {
-        name: `SU ${_ids.idSu0}`
-      },
-      [`idSu${_ids.idSu1}`]: {
-        name: `SU ${_ids.idSu1}`
-      },
-      [`idSu${_ids.idSu2}`]: {
-        name: `SU ${_ids.idSu2}`
-      },
-      [`idSu${_ids.idSu3}`]: {
-        name: `SU ${_ids.idSu3}`
-      },
-      [`idSu${_ids.idSu4}`]: {
-        name: `SU ${_ids.idSu4}`
-      },
-      [`idSu${_ids.idSu5}`]: {
-        name: `SU ${_ids.idSu5}`
-      }
-    },
-    allIds: [
-      `idSu${_ids.idSu0}`,
-      `idSu${_ids.idSu1}`,
-      `idSu${_ids.idSu2}`,
-      `idSu${_ids.idSu3}`,
-      `idSu${_ids.idSu4}`,
-      `idSu${_ids.idSu5}`
-    ]
-  };
-
-  // TODO add it to the workspace otherwise we will loose them when changing workspace
-
-  _cptIdBus++;
-
-  _ids.idCont0 += 2;
-  _ids.idCont1 += 2;
-
-  _ids.idComp0 += 4;
-  _ids.idComp1 += 4;
-  _ids.idComp2 += 4;
-  _ids.idComp3 += 4;
-
-  _ids.idSu0 += 6;
-  _ids.idSu1 += 6;
-  _ids.idSu2 += 6;
-  _ids.idSu3 += 6;
-  _ids.idSu4 += 6;
-  _ids.idSu5 += 6;
-
-  return obj;
-}
 
 export function getDetailsBus(busId: string) {
   // right now a bus doesn't have more info
@@ -169,22 +260,28 @@ const detailsContainers = new Map<string, any>();
 let lastNumberIp = 0;
 
 export function getDetailsContainer(containerId: string) {
-  if (detailsContainers.has(containerId)) {
-    return detailsContainers.get(containerId);
-  }
+  // if (typeof _currentWks === 'undefined') {
+  //   return;
+  // }
+
+
+
+  // if (detailsContainers.has(containerId)) {
+  //   return detailsContainers.get(containerId);
+  // }
 
   const details = {
     ip: `192.168.0.${lastNumberIp}`,
     port: 7700 + lastNumberIp,
     // TODO : Instead of idCont0 put some containers that can
     // work with the current workspace
-    reachabilities: ['idCont0'],
+    reachabilities: [],
     systemInfo: 'Petals ESB µKernel 4.0.2 Petals Standalone Shared Memory 4.0.2 OpenJDK Runtime Environment 1.7.0_111-b01 Oracle Corporation Linux 3.16.0-4-amd64 amd64'
   };
 
   detailsContainers.set(containerId, details);
 
-  lastNumberIp++;
+  // lastNumberIp++;
 
   return detailsContainers.get(containerId);
 }
