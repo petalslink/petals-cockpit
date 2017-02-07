@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { environment } from '../../../environments/environment';
 import { SseWorkspaceEvent } from './sse.service';
-import { getWorkspace } from '../../../mocks/workspace-id-wks-0';
+import { workspacesService } from '../../../mocks/workspaces-mock';
 
 @Injectable()
 export class SseServiceMock {
@@ -37,11 +37,13 @@ export class SseServiceMock {
   public triggerSseEvent(eventName: string, data?: any) {
     switch (eventName) {
       case SseWorkspaceEvent.WORKSPACE_CONTENT:
-        this._registeredEvents.get(eventName).next(getWorkspace(data));
+        this._registeredEvents.get(eventName).next(workspacesService.getWorkspace(data));
         break;
 
       case SseWorkspaceEvent.BUS_IMPORT_OK:
-        // TODO
+        // TODO : Since the mock refactor getNewBus doesn't exist anymore
+        // we need to find a way to do that
+        // this._registeredEvents.get(eventName).next(getNewBus());
         break;
 
       case SseWorkspaceEvent.BUS_DELETED:

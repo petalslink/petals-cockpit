@@ -27,7 +27,7 @@ import { batchActions } from 'redux-batched-actions';
 import { BusesInProgress } from './../../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
 import { NotificationsService } from 'angular2-notifications';
 import { IBus } from './../../features/cockpit/workspaces/state/buses/bus.interface';
-import { getDetailsBus } from './../../../mocks/workspace-id-wks-0';
+import { busesService } from './../../../mocks/buses-mock';
 import { environment } from './../../../environments/environment';
 
 @Injectable()
@@ -58,7 +58,7 @@ export class BusesMockService {
   }
 
   getDetailsBus(idWorkspace: string, busId: string) {
-    const detailsBus = getDetailsBus(busId);
+    const detailsBus = busesService.read(busId).getDetails();
 
     const response: Response = <Response>{
       ok: true,
