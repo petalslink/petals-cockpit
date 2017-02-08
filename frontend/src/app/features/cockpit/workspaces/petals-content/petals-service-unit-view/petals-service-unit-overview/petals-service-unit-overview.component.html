@@ -21,13 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <div md-card-sm-image class="img-card-state"></div>
           <div fxFlex fxLayout="column" fxLayoutAlign="end end">
             <md-card-subtitle>State</md-card-subtitle>
-            <md-card-title>Started</md-card-title>
+            <md-card-title>{{ serviceUnit.state }}</md-card-title>
           </div>
           <div class="green-led"></div>
         </md-card-title-group>
       </md-card>
     </div>
 
-    <prettyjson fxFlex="100%" [obj]="serviceUnit"></prettyjson>
+    <!--<prettyjson fxFlex="100%" [obj]="serviceUnit"></prettyjson>-->
   </div>
 </div>
