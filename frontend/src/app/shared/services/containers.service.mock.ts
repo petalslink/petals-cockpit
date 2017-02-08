@@ -21,14 +21,14 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
-import { getDetailsContainer } from '../../../mocks/workspace-id-wks-0';
+import { containersService } from '../../../mocks/containers-mock';
 
 @Injectable()
 export class ContainersMockService {
   constructor() { }
 
   getDetailsContainer(idWorkspace: string, containerId: string) {
-    const detailsContainer = getDetailsContainer(containerId);
+    const detailsContainer = containersService.read(containerId).getDetails();
 
     const response: Response = <Response>{
       ok: true,

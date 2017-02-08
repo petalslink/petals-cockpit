@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { environment } from '../../../environments/environment';
 import { SseWorkspaceEvent } from './sse.service';
-import { getNewWorkspace, getNewBusFull } from '../../../mocks/workspace-id-wks-0';
+import { workspacesService } from '../../../mocks/workspaces-mock';
 
 @Injectable()
 export class SseServiceMock {
@@ -37,12 +37,16 @@ export class SseServiceMock {
   public triggerSseEvent(eventName: string, data?: any) {
     switch (eventName) {
       case SseWorkspaceEvent.WORKSPACE_CONTENT:
-        this._registeredEvents.get(eventName).next(getNewWorkspace(data));
+        this._registeredEvents.get(eventName).next(workspacesService.getWorkspaceComposed(data));
         break;
 
-      case SseWorkspaceEvent.BUS_IMPORT_OK:
-        this._registeredEvents.get(eventName).next(getNewBusFull());
+      case SseWorkspaceEvent.BUS_IMPORT_OK: {
+        const idWorkspace = data;
+        const newBus = workspacesService.getWorkspace(idWorkspace).addBus();
+
+        this._registeredEvents.get(eventName).next(newBus);
         break;
+      }
 
       case SseWorkspaceEvent.BUS_DELETED:
         this._registeredEvents.get(eventName).next({ id: data.id });
