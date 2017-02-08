@@ -37,14 +37,16 @@ export class SseServiceMock {
   public triggerSseEvent(eventName: string, data?: any) {
     switch (eventName) {
       case SseWorkspaceEvent.WORKSPACE_CONTENT:
-        this._registeredEvents.get(eventName).next(workspacesService.getWorkspace(data));
+        this._registeredEvents.get(eventName).next(workspacesService.getWorkspaceComposed(data));
         break;
 
-      case SseWorkspaceEvent.BUS_IMPORT_OK:
-        // TODO : Since the mock refactor getNewBus doesn't exist anymore
-        // we need to find a way to do that
-        // this._registeredEvents.get(eventName).next(getNewBus());
+      case SseWorkspaceEvent.BUS_IMPORT_OK: {
+        const idWorkspace = data;
+        const newBus = workspacesService.getWorkspace(idWorkspace).addBus();
+
+        this._registeredEvents.get(eventName).next(newBus);
         break;
+      }
 
       case SseWorkspaceEvent.BUS_DELETED:
         this._registeredEvents.get(eventName).next({ id: data.id });

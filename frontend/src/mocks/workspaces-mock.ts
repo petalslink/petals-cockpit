@@ -39,13 +39,34 @@ export class Workspace {
   public getBusesInProgress() {
     return this._busesInProgress;
   }
+
+  public addBus() {
+    const bus = busesService.create();
+    this._buses.push(bus);
+
+    const containers = bus.getContainers();
+    const components = containers.reduce((acc: Component[], container) => [...acc, ...container.getComponents()], []);
+    const serviceUnits = components.reduce((acc: ServiceUnit[], component) => [...acc, ...component.getServiceUnits()], []);
+
+    const composedBus = {
+      buses: bus.toObj(),
+
+      containers: containers.reduce((acc, container) => Object.assign(acc, container.toObj()), {}),
+
+      components: components.reduce((acc, component) => Object.assign(acc, component.toObj()), {}),
+
+      serviceUnits: serviceUnits.reduce((acc, serviceUnit) => Object.assign(acc, serviceUnit.toObj()), {})
+    };
+
+    return composedBus;
+  }
 }
 
 export class Workspaces {
   private _currentWorkspace;
 
   // map to cache the created workspaces
-  private _memoizedWorkspaces = new Map();
+  private _memoizedWorkspaces = new Map<string, {wks: Workspace, composedWks: any}>();
 
   constructor() { }
 
@@ -53,18 +74,31 @@ export class Workspaces {
    * getWorkspace
    *
    * return the workspace which has an id `idWks`
-   * if it already exists, will return the existing one
-   * otherwise will create it with some default values
    *
    * @export
    * @param {string} idWks The workspace id you're looking for
    * @returns {any} the workspace
    */
   getWorkspace(idWks: string) {
+    return this._memoizedWorkspaces.get(idWks).wks;
+  }
+
+  /**
+   * getWorkspaceComposed
+   *
+   * return the composed workspace which has an id `idWks`
+   * if it already exists, will return the existing one
+   * otherwise will create it with some default values
+   *
+   * @export
+   * @param {string} idWks The workspace id you're looking for
+   * @returns {any} the workspace composed
+   */
+  getWorkspaceComposed(idWks: string) {
     this._currentWorkspace = idWks;
 
     if (this._memoizedWorkspaces.has(idWks)) {
-      return Object.assign({}, this._memoizedWorkspaces.get(idWks));
+      return <Workspace>Object.assign({}, this._memoizedWorkspaces.get(idWks).composedWks);
     }
 
     const newWorkspace = new Workspace();
@@ -75,7 +109,7 @@ export class Workspaces {
     const components = containers.reduce((acc: Component[], container) => [...acc, ...container.getComponents()], []);
     const serviceUnits = components.reduce((acc: ServiceUnit[], component) => [...acc, ...component.getServiceUnits()], []);
 
-    const wks = {
+    const composedWks = {
       workspace: newWorkspace.toObj(),
 
       users: {
@@ -95,9 +129,9 @@ export class Workspaces {
       serviceUnits: serviceUnits.reduce((acc, serviceUnit) => Object.assign(acc, serviceUnit.toObj()), {})
     };
 
-    this._memoizedWorkspaces.set(idWks, wks);
+    this._memoizedWorkspaces.set(idWks, {wks: newWorkspace, composedWks});
 
-    return Object.assign({}, wks);
+    return <Workspace>Object.assign({}, composedWks);
   };
 }
 
