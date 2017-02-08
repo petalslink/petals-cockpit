@@ -91,7 +91,9 @@ export class WorkspacesEffects {
     .do((action: Action) => setTimeout(() => this._sseService.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, action.payload), 500))
     .switchMap((action: Action) => this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
       .switchMap((data: any) => {
-        this._router$.navigate(['/workspaces', action.payload]);
+        // TODO : Temp commented because if we're reloading a page, we loose that page
+        // needs some more logic
+        // this._router$.navigate(['/workspaces', action.payload]);
 
         return Observable.of(batchActions([
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },

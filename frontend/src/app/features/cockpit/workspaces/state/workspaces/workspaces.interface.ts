@@ -24,6 +24,7 @@ export interface IWorkspacesCommon {
   isFetchingWorkspaces: boolean;
   fetchingWorkspaceWithId: string;
   searchPetals: string;
+  firstWorkspaceFetched: boolean;
 }
 
 export interface IWorkspacesTableOnly {

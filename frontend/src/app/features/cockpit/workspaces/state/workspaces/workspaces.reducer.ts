@@ -93,6 +93,7 @@ export class Workspaces {
   private static fetchWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload) {
     return <IWorkspacesTable>Object.assign({}, workspacesTable,
       <IWorkspacesTable>{
+        firstWorkspaceFetched: true,
         selectedWorkspaceId: payload.id,
         byId: Object.assign(
           {},

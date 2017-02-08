@@ -26,7 +26,7 @@ export class Workspace {
 
   public toObj() {
     return {
-      id: this._id,
+      id: this.getIdFormatted(),
       name: `Workspace ${this._id}`,
       users: [`bescudie`]
     };
