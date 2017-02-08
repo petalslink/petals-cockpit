@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <div md-card-sm-image class="img-card-state"></div>
           <div fxFlex fxLayout="column" fxLayoutAlign="end end">
             <md-card-subtitle>State</md-card-subtitle>
-            <md-card-title>Started</md-card-title>
+            <md-card-title>{{ component.state }}</md-card-title>
           </div>
           <div class="green-led"></div>
         </md-card-title-group>
@@ -32,13 +32,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <div md-card-sm-image class="img-card-type"></div>
           <div fxFlex fxLayout="column" fxLayoutAlign="end end">
             <md-card-subtitle>Type</md-card-subtitle>
-            <md-card-title>BC</md-card-title>
+            <md-card-title>{{ component.type }}</md-card-title>
           </div>
           <div class="green-led"></div>
         </md-card-title-group>
       </md-card>
     </div>
 
-    <prettyjson fxFlex="100%" [obj]="component"></prettyjson>
+    <!--<prettyjson fxFlex="100%" [obj]="component"></prettyjson>-->
   </div>
 </div>

@@ -49,6 +49,9 @@ export class Component {
   }
 
   getDetails() {
-    return {};
+    return {
+      state: 'Started',
+      type: 'BC'
+    };
   }
 }

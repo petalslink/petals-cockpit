@@ -37,6 +37,8 @@ export class ServiceUnit {
   }
 
   getDetails() {
-    return {};
+    return {
+      state: 'Started'
+    };
   }
 }
