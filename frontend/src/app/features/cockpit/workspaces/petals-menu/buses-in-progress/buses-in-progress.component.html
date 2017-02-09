@@ -16,5 +16,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <md-nav-list dense *ngFor="let busInProgress of busesInProgress.list">
   <a md-list-item routerLinkActive="active-link" [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'buses-in-progress', busInProgress.id]">
     {{ busInProgress.ip }}
+
+    <div fxFlex></div>
+
+    <md-spinner *ngIf="!busInProgress.importError"></md-spinner>
   </a>
 </md-nav-list>
