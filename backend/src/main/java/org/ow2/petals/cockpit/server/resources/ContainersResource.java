@@ -16,9 +16,15 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_CONTAINERS_BUSES_ID;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -35,13 +41,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.jooq.Configuration;
+import org.jooq.Record;
+import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.ContainerAdministration;
 import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
-import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -56,13 +63,13 @@ import javaslang.control.Option;
 @Path("/containers")
 public class ContainersResource {
 
-    private final BusesDAO buses;
+    private final Configuration jooq;
 
     private final PetalsAdministrationFactory adminFactory;
 
     @Inject
-    public ContainersResource(BusesDAO buses, PetalsAdministrationFactory adminFactory) {
-        this.buses = buses;
+    public ContainersResource(Configuration jooq, PetalsAdministrationFactory adminFactory) {
+        this.jooq = jooq;
         this.adminFactory = adminFactory;
     }
 
@@ -70,43 +77,53 @@ public class ContainersResource {
     @Path("/{cId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
-    public ContainerOverview get(@PathParam("cId") @Min(1) long cId, @Pac4JProfile CockpitProfile profile)
-            throws ContainerAdministrationException {
+    public ContainerOverview get(@PathParam("cId") @Min(1) long cId, @Pac4JProfile CockpitProfile profile) {
+        return DSL.using(jooq).transactionResult(conf -> {
+            ContainersRecord container = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(cId)).fetchOne();
 
-        DbContainer container = buses.getContainerById(cId, profile.getUser().username);
-
-        if (container == null) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
-
-        if (container.acl == null) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
-
-        PetalsAdministration petals = adminFactory.newPetalsAdministrationAPI();
-        petals.connect(container.ip, container.port, container.username, container.password);
-        try {
-            ContainerAdministration admin = petals.newContainerAdministration();
-            Domain domain = admin.getTopology(null, false);
-            String sysInfo = admin.getSystemInfo();
-
-            Map<String, Long> ids = buses.getContainersByBus(container.busId).stream()
-                    .collect(Collectors.toMap(c -> c.name, c -> c.id));
-
-            Map<String, String> reachabilities = javaslang.collection.List.ofAll(domain.getContainers())
-                    // remove myself
-                    .filter(c -> !Objects.equals(container.name, c.getContainerName()))
-                    // get the ids (if they exist) TODO what do I do with unknown container names?
-                    .flatMap(c -> Option.of(ids.get(c.getContainerName())).map(i -> Tuple.of(i, c)))
-                    // transform to a reachability information
-                    .toJavaMap(p -> p.map((i, c) -> Tuple.of(Long.toString(i), c.getState().name())));
-            return new ContainerOverview(container.id, container.name, container.ip, container.port, reachabilities,
-                    sysInfo);
-        } finally {
-            if (petals.isConnected()) {
-                petals.disconnect();
+            if (container == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
             }
-        }
+
+            Record user = DSL.using(conf).select()
+                    .from(USERS_WORKSPACES)
+                    .join(BUSES).on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID))
+                    .join(CONTAINERS).onKey(FK_CONTAINERS_BUSES_ID)
+                    .where(CONTAINERS.ID.eq(cId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
+
+            if (user == null) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
+
+            PetalsAdministration petals = adminFactory.newPetalsAdministrationAPI();
+            petals.connect(container.getIp(), container.getPort(), container.getUsername(), container.getPassword());
+            try {
+                ContainerAdministration admin = petals.newContainerAdministration();
+                Domain domain = admin.getTopology(null, false);
+                String sysInfo = admin.getSystemInfo();
+
+                Map<String, Long> ids;
+                try (Stream<ContainersRecord> s = DSL.using(conf).selectFrom(CONTAINERS)
+                        .where(CONTAINERS.BUS_ID.eq(container.getBusId())).stream()) {
+                    ids = s.collect(Collectors.toMap(ContainersRecord::getName, ContainersRecord::getId));
+                }
+
+                Map<String, String> reachabilities = javaslang.collection.List.ofAll(domain.getContainers())
+                        // remove myself
+                        .filter(c -> !Objects.equals(container.getName(), c.getContainerName()))
+                        // get the ids (if they exist) TODO what do I do with unknown container names?
+                        .flatMap(c -> Option.of(ids.get(c.getContainerName())).map(i -> Tuple.of(i, c)))
+                        // transform to a reachability information
+                        .toJavaMap(p -> p.map((i, c) -> Tuple.of(Long.toString(i), c.getState().name())));
+                return new ContainerOverview(container.getId(), container.getName(), container.getIp(),
+                        container.getPort(), reachabilities,
+                        sysInfo);
+            } finally {
+                if (petals.isConnected()) {
+                    petals.disconnect();
+                }
+            }
+        });
     }
 
     public static class ContainerMin {

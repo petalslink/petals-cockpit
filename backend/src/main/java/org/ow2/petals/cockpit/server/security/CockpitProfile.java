@@ -16,7 +16,7 @@
  */
 package org.ow2.petals.cockpit.server.security;
 
-import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
+import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.profile.CommonProfile;
 
 public class CockpitProfile extends CommonProfile {
@@ -25,14 +25,8 @@ public class CockpitProfile extends CommonProfile {
         // needed because UserProfile is Externalizable
     }
 
-    public CockpitProfile(DbUser user) {
-        setId(user.username);
-        addAttribute("dao", user);
-    }
-
-    public DbUser getUser() {
-        Object attribute = getAttribute("dao");
-        assert attribute != null;
-        return (DbUser) attribute;
+    public CockpitProfile(String username) {
+        setId(username);
+        addAttribute(Pac4jConstants.USERNAME, username);
     }
 }

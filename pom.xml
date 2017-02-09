@@ -42,8 +42,9 @@
     <liquibase.version>3.5.3</liquibase.version>
     <quasar.version>0.7.7</quasar.version>
     <comsat.version>0.7.0</comsat.version>
-    <pac4j.version>1.9.5</pac4j.version>
+    <pac4j.version>1.9.6-SNAPSHOT</pac4j.version>
     <h2.version>1.4.193</h2.version>
+    <jooq.version>3.9.1</jooq.version>
   </properties>
 
   <modules>
@@ -90,6 +91,11 @@
         <version>${liquibase.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.jooq</groupId>
+        <artifactId>jooq</artifactId>
+        <version>${jooq.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.eclipse.jdt</groupId>
         <artifactId>org.eclipse.jdt.annotation</artifactId>
         <version>2.0.0</version>
@@ -110,6 +116,11 @@
       <dependency>
         <groupId>org.zapodot</groupId>
         <artifactId>embedded-db-junit</artifactId>
+        <version>0.8</version>
+      </dependency>
+      <dependency>
+        <groupId>org.zapodot</groupId>
+        <artifactId>embedded-db-junit-liquibase</artifactId>
         <version>0.8</version>
       </dependency>
       <dependency>

@@ -15,12 +15,6 @@ server:
 database:
   driverClass: org.h2.Driver
   # url is set by test
-
-security:
-  pac4jClients:
-    - org.ow2.petals.cockpit.server.security.CockpitAuthClient:
-        authenticator:
-          class: org.ow2.petals.cockpit.server.mocks.MockAuthenticator
     
 logging:
   level: INFO

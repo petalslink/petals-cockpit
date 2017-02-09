@@ -2,3 +2,6 @@ class org/assertj/core/api/AbstractAssert
 as
  (Ljava/lang/String;[Ljava/lang/Object;)TS;
  (Ljava/lang/String;[Ljava/lang/Object;)T1S;
+isNotNull
+ ()TS;
+ ()TS;

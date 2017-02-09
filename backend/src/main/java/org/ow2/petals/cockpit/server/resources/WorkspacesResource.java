@@ -16,10 +16,15 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_USERNAME;
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_WORKSPACES_ID;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -33,9 +38,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.jooq.Configuration;
+import org.jooq.impl.DSL;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
@@ -49,11 +56,11 @@ import com.google.common.collect.ImmutableMap;
 @Path("/workspaces")
 public class WorkspacesResource {
 
-    private final WorkspacesDAO workspaces;
+    private final Configuration jooq;
 
     @Inject
-    public WorkspacesResource(WorkspacesDAO workspaces) {
-        this.workspaces = workspaces;
+    public WorkspacesResource(Configuration jooq) {
+        this.jooq = jooq;
     }
 
     @POST
@@ -61,31 +68,43 @@ public class WorkspacesResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
     public Workspace create(@Valid NewWorkspace ws, @Pac4JProfile CockpitProfile profile) {
-        DbWorkspace w = workspaces.create(ws.name, profile.getUser());
+        return DSL.using(jooq).transactionResult(conf -> {
+            WorkspacesRecord wsDb = new WorkspacesRecord(null, ws.name);
+            wsDb.attach(conf);
+            wsDb.insert();
 
-        return new Workspace(w.id, w.name, ImmutableList.of(profile.getUser().username));
+            DSL.using(conf).executeInsert(new UsersWorkspacesRecord(wsDb.getId(), profile.getId()));
+
+            return new Workspace(wsDb.getId(), wsDb.getName(), ImmutableList.of(profile.getId()));
+        });
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
     public Workspaces workspaces(@Pac4JProfile CockpitProfile profile) {
-        // TODO this should be done in a transaction...
-        ImmutableMap.Builder<String, Workspace> wss = ImmutableMap.builder();
-        // we need a normal Map because ImmutableMap does not accept duplicate put
-        // and with multiple workspaces it can be the case...
-        Map<String, UserMin> users = new HashMap<>();
+        return DSL.using(jooq).transactionResult(conf -> {
+            ImmutableMap.Builder<String, Workspace> wss = ImmutableMap.builder();
+            // we need a normal Map because ImmutableMap does not accept duplicate put
+            // and with multiple workspaces it can be the case...
+            Map<String, UserMin> users = new HashMap<>();
 
-        workspaces.getUserWorkspaces(profile.getUser()).stream().forEach(w -> {
-            List<DbUser> dbUsers = workspaces.getWorkspaceUsers(w.id);
+            for (WorkspacesRecord w : DSL.using(conf).select().from(WORKSPACES).join(USERS_WORKSPACES)
+                    .onKey(FK_WORKSPACES_ID).where(USERS_WORKSPACES.USERNAME.eq(profile.getId()))
+                    .fetchInto(WORKSPACES)) {
 
-            List<String> wsUsers = dbUsers.stream().map(DbUser::getUsername).collect(ImmutableList.toImmutableList());
-            wss.put(String.valueOf(w.id), new Workspace(w.id, w.name, wsUsers));
-            users.putAll(dbUsers.stream()
-                    .collect(Collectors.toMap(DbUser::getUsername, u -> new UserMin(u.username, u.name))));
+                ImmutableList.Builder<String> wsUsers = ImmutableList.builder();
+                for (UsersRecord u : DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
+                        .onKey(FK_USERS_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(w.getId())).fetchInto(USERS)) {
+                    wsUsers.add(u.getUsername());
+                    users.put(u.getUsername(), new UserMin(u.getUsername(), u.getName()));
+                }
+
+                wss.put(String.valueOf(w.getId()), new Workspace(w.getId(), w.getName(), wsUsers.build()));
+            }
+
+            return new Workspaces(wss.build(), users);
         });
-
-        return new Workspaces(wss.build(), users);
     }
 
     public static class NewWorkspace {
@@ -136,7 +155,8 @@ public class WorkspacesResource {
         public final ImmutableMap<String, UserMin> users;
 
         @JsonCreator
-        public Workspaces(Map<String, Workspace> workspaces, Map<String, UserMin> users) {
+        public Workspaces(@JsonProperty("workspaces") Map<String, Workspace> workspaces,
+                @JsonProperty("users") Map<String, UserMin> users) {
             this.workspaces = ImmutableMap.copyOf(workspaces);
             this.users = ImmutableMap.copyOf(users);
         }

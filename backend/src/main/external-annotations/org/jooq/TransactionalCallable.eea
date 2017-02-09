@@ -1,0 +1,4 @@
+class org/jooq/TransactionalCallable
+run
+ (Lorg/jooq/Configuration;)TT;
+ (L1org/jooq/Configuration;)TT;

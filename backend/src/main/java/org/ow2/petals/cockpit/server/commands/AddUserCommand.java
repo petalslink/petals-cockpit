@@ -16,19 +16,21 @@
  */
 package org.ow2.petals.cockpit.server.commands;
 
-import java.util.Optional;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 
 import org.eclipse.jetty.util.component.LifeCycle;
+import org.jooq.Configuration;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
-import org.ow2.petals.cockpit.server.db.UsersDAO;
-import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
-import org.skife.jdbi.v2.DBI;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.bendb.dropwizard.jooq.JooqFactory;
+
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.db.ManagedDataSource;
-import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.lifecycle.JettyManaged;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -83,7 +85,7 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         // required
         assert name != null;
 
-        final DBI jdbi = new DBIFactory().build(environment, configuration.getDataSourceFactory(), "cockpit");
+        Configuration jooqConf = new JooqFactory().build(environment, configuration.getDataSourceFactory());
 
         for (LifeCycle lifeCycle : environment.lifecycle().getManagedObjects()) {
             if (lifeCycle instanceof JettyManaged
@@ -92,16 +94,15 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
             }
         }
 
-        try {
-            jdbi.withHandle(h -> {
-                UsersDAO users = h.attach(UsersDAO.class);
-                Optional<DbUser> mu = users.create(username, pwEncoder.encode(password), name);
-                if (mu.isPresent()) {
-                    System.out.println("Added user " + username);
-                } else {
+        try (DSLContext jooq = DSL.using(jooqConf)) {
+            jooq.transaction(c -> {
+
+                if (DSL.using(c).fetchExists(USERS, USERS.USERNAME.eq(username))) {
                     System.err.println("User " + username + " already exists");
+                } else {
+                    DSL.using(c).executeInsert(new UsersRecord(username, pwEncoder.encode(password), name, null));
+                    System.out.println("Added user " + username);
                 }
-                return null;
             });
         } finally {
             for (LifeCycle lifeCycle : environment.lifecycle().getManagedObjects()) {

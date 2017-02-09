@@ -26,6 +26,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
 import org.pac4j.core.client.Client;
 
+import com.bendb.dropwizard.jooq.JooqFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.dropwizard.Configuration;
@@ -56,6 +57,16 @@ public class CockpitConfiguration extends Configuration {
     @JsonProperty("database")
     public DataSourceFactory getDataSourceFactory() {
         return database;
+    }
+
+    @Valid
+    @NotNull
+    @JsonProperty
+    private JooqFactory jooq = new JooqFactory();
+
+    @JsonProperty("jooq")
+    public JooqFactory getJooqFactory() {
+        return jooq;
     }
 
     public static class CockpitSecurityConfiguration {

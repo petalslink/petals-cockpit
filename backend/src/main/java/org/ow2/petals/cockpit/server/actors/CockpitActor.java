@@ -22,11 +22,12 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.jooq.Configuration;
+import org.jooq.TransactionalCallable;
+import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,13 +49,7 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
     protected ExecutorService executor;
 
     @Inject
-    protected BusesDAO buses;
-
-    @Inject
-    protected WorkspacesDAO workspaces;
-
-    @Inject
-    protected CockpitActors as;
+    protected Configuration jooq;
 
     @Inject
     protected PetalsAdministrationFactory adminFactory;
@@ -62,7 +57,7 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
     /**
      * This is needed because the java compiler has trouble typechecking lambda on {@link CheckedCallable}.
      */
-    protected <R> R run(Supplier<R> s) throws SuspendExecution {
+    protected <R> R runBlocking(Supplier<R> s) throws SuspendExecution {
         try {
             return FiberAsync.runBlocking(executor, new CheckedCallable<R, RuntimeException>() {
                 @Override
@@ -71,40 +66,58 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
                 }
             });
         } catch (InterruptedException e) {
-            // TODO until https://github.com/puniverse/quasar/issues/245 is clarified, we shouldn't interrupt
+            // TODO until https://github.com/puniverse/quasar/issues/245 is fixed, we shouldn't interrupt
             // runBlocking because the actual behaviour is not the expected one!
             throw new AssertionError("This should not be interrupted!", e);
         }
     }
 
-    // here we are ok with interruption because it is a read-only action
-    // TODO still, it would be best if it was really interrupted, see issue 245 of quasar
-    protected <R> R runAdmin(String ip, int port, String username, String password,
-            CheckedFunction1<PetalsAdministration, R> f) throws Exception, SuspendExecution, InterruptedException {
-        return FiberAsync.runBlocking(executor, new CheckedCallable<R, Exception>() {
-            @Override
-            public R call() throws Exception {
-                final PetalsAdministration petals = adminFactory.newPetalsAdministrationAPI();
-
-                try {
-                    petals.connect(ip, port, username, password);
-
-                    return f.apply(petals);
-                } catch (Exception e) {
-                    throw e;
-                } catch (Throwable e) {
-                    // TODO this is not the best... use Try or Either instead?
-                    throw new RuntimeException(e);
-                } finally {
-                    try {
-                        if (petals.isConnected()) {
-                            petals.disconnect();
-                        }
-                    } catch (Exception e) {
-                        LOG.warn("Error while disconnecting from container", e);
-                    }
-                }
-            }
-        });
+    protected <R> R runTransaction(Configuration conf, TransactionalCallable<R> transaction) throws SuspendExecution {
+        return runBlocking(() -> DSL.using(conf).transactionResult(transaction));
     }
+
+    protected <R> R runTransaction(TransactionalCallable<R> transaction) throws SuspendExecution {
+        return runTransaction(jooq, transaction);
+    }
+
+    protected <R> R runBlockingAdmin(String ip, int port, String username, String password,
+            CheckedFunction1<PetalsAdministration, R> f) throws Exception, SuspendExecution {
+        try {
+            return FiberAsync.runBlocking(executor, new CheckedCallable<R, Exception>() {
+                @Override
+                public R call() throws Exception {
+                    return runAdmin(ip, port, username, password, f);
+                }
+            });
+        } catch (InterruptedException e) {
+            // TODO until https://github.com/puniverse/quasar/issues/245 is fixed, we shouldn't interrupt
+            // runBlocking because the actual behaviour is not the expected one!
+            throw new AssertionError("This should not be interrupted!", e);
+        }
+    }
+
+    protected <R> R runAdmin(String ip, int port, String username, String password,
+            CheckedFunction1<PetalsAdministration, R> f) throws Exception {
+        final PetalsAdministration petals = adminFactory.newPetalsAdministrationAPI();
+
+        try {
+            petals.connect(ip, port, username, password);
+
+            return f.apply(petals);
+        } catch (Exception e) {
+            throw e;
+        } catch (Throwable e) {
+            // TODO this is not the best... use Try or Either instead?
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (petals.isConnected()) {
+                    petals.disconnect();
+                }
+            } catch (Exception e) {
+                LOG.warn("Error while disconnecting from container", e);
+            }
+        }
+    }
+
 }

@@ -16,6 +16,13 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_COMPONENTS_CONTAINERS_ID;
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_CONTAINERS_BUSES_ID;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.constraints.Min;
@@ -29,10 +36,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.jooq.Configuration;
+import org.jooq.Record;
+import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbComponent;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -43,29 +52,36 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Path("/components")
 public class ComponentsResource {
 
-    private final BusesDAO buses;
+    private final Configuration jooq;
 
     @Inject
-    public ComponentsResource(BusesDAO buses) {
-        this.buses = buses;
+    public ComponentsResource(Configuration jooq) {
+        this.jooq = jooq;
     }
 
     @GET
     @Path("/{compId}")
     @Produces(MediaType.APPLICATION_JSON)
     public ComponentOverview getComp(@PathParam("compId") @Min(1) long compId, @Pac4JProfile CockpitProfile profile) {
+        return DSL.using(jooq).transactionResult(conf -> {
+            ComponentsRecord comp = DSL.using(conf).selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(compId)).fetchOne();
 
-        DbComponent comp = buses.getComponentsById(compId, profile.getUser().username);
+            if (comp == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
 
-        if (comp == null) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
+            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
+                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
+                    .onKey(FK_CONTAINERS_BUSES_ID).join(COMPONENTS).onKey(FK_COMPONENTS_CONTAINERS_ID)
+                    .where(COMPONENTS.ID.eq(compId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
 
-        if (comp.acl == null) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
+            if (user == null) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
 
-        return new ComponentOverview(comp.id, comp.name, comp.state, comp.type);
+            return new ComponentOverview(comp.getId(), comp.getName(), ComponentMin.State.valueOf(comp.getState()),
+                    ComponentMin.Type.valueOf(comp.getType()));
+        });
     }
 
     public static class ComponentMin {

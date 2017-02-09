@@ -26,7 +26,7 @@ import org.ow2.petals.cockpit.server.resources.BusesResource.BusOverview;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 
-public class BusesResourceTest extends AbstractReadOnlyResourceTest {
+public class BusesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     @Rule
     public final ResourceTestRule resources = buildResourceTest(BusesResource.class);

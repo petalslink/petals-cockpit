@@ -16,6 +16,9 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
@@ -29,8 +32,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
+import org.jooq.Configuration;
+import org.jooq.Record;
+import org.jooq.impl.DSL;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -41,11 +46,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Path("/buses")
 public class BusesResource {
 
-    private final BusesDAO buses;
+    private final Configuration jooq;
 
     @Inject
-    public BusesResource(BusesDAO buses) {
-        this.buses = buses;
+    public BusesResource(Configuration jooq) {
+        this.jooq = jooq;
     }
 
     @GET
@@ -53,18 +58,24 @@ public class BusesResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
     public BusOverview get(@PathParam("bId") @Min(1) long bId, @Pac4JProfile CockpitProfile profile) {
+        return DSL.using(jooq).transactionResult(conf -> {
 
-        DbBusImported bus = buses.getBusById(bId, profile.getUser().username);
+            BusesRecord bus = DSL.using(conf).selectFrom(BUSES).where(BUSES.ID.eq(bId)).fetchOne();
 
-        if (bus == null) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
+            if (bus == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
 
-        if (bus.acl == null) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
+            Record user = DSL.using(conf).select()
+                    .from(USERS_WORKSPACES).join(BUSES).on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID))
+                    .where(BUSES.ID.eq(bId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
 
-        return new BusOverview(bus.id, bus.name);
+            if (user == null) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
+
+            return new BusOverview(bus.getId(), bus.getName());
+        });
     }
 
     public static class BusMin {

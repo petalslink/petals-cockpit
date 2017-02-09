@@ -15,4 +15,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 @org.eclipse.jdt.annotation.NonNullByDefault
-package org.ow2.petals.cockpit.server.db;
+package org.ow2.petals.cockpit.server.mocks;

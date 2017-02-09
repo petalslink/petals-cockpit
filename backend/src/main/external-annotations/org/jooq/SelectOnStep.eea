@@ -1,0 +1,4 @@
+class org/jooq/SelectOnStep
+onKey
+ (Lorg/jooq/ForeignKey<**>;)Lorg/jooq/SelectJoinStep<TR;>;
+ (Lorg/jooq/ForeignKey<**>;)L1org/jooq/SelectJoinStep<TR;>;
