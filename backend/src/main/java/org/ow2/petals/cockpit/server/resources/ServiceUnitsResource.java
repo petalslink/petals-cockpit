@@ -15,6 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.ow2.petals.cockpit.server.resources;
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_COMPONENTS_CONTAINERS_ID;
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_CONTAINERS_BUSES_ID;
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_SERVICEUNITS_COMPONENTS_ID;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -29,9 +37,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.jooq.Configuration;
+import org.jooq.Record;
+import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbServiceUnit;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -41,29 +51,37 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Path("/serviceunits")
 public class ServiceUnitsResource {
 
-    private final BusesDAO buses;
+    private final Configuration jooq;
 
     @Inject
-    public ServiceUnitsResource(BusesDAO buses) {
-        this.buses = buses;
+    public ServiceUnitsResource(Configuration jooq) {
+        this.jooq = jooq;
     }
 
     @GET
     @Path("/{suId}")
     @Produces(MediaType.APPLICATION_JSON)
     public ServiceUnitOverview getSU(@PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile) {
+        return DSL.using(jooq).transactionResult(conf -> {
+            ServiceunitsRecord su = DSL.using(conf).selectFrom(SERVICEUNITS).where(SERVICEUNITS.ID.eq(suId)).fetchOne();
 
-        DbServiceUnit su = buses.getServiceUnitById(suId, profile.getUser().getUsername());
+            if (su == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
 
-        if (su == null) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
+            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
+                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
+                    .onKey(FK_CONTAINERS_BUSES_ID).join(COMPONENTS).onKey(FK_COMPONENTS_CONTAINERS_ID)
+                    .join(SERVICEUNITS).onKey(FK_SERVICEUNITS_COMPONENTS_ID)
+                    .where(SERVICEUNITS.ID.eq(suId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
 
-        if (su.acl == null) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
+            if (user == null) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
 
-        return new ServiceUnitOverview(su.id, su.name, su.state, su.saName);
+            ServiceUnitMin.State state = ServiceUnitMin.State.valueOf(su.getState());
+            return new ServiceUnitOverview(su.getId(), su.getName(), state, su.getSaName());
+        });
     }
 
     public static class ServiceUnitMin {

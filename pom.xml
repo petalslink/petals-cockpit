@@ -38,10 +38,13 @@
     <!-- empty by default (if not, @{argLine} is not replaced in surefire and failsafe -->
     <argLine></argLine>
 
-    <dropwizard.version>1.0.5</dropwizard.version>
+    <dropwizard.version>1.0.6</dropwizard.version>
+    <liquibase.version>3.5.3</liquibase.version>
     <quasar.version>0.7.7</quasar.version>
     <comsat.version>0.7.0</comsat.version>
-    <pac4j.version>1.9.5</pac4j.version>
+    <pac4j.version>1.9.6-SNAPSHOT</pac4j.version>
+    <h2.version>1.4.193</h2.version>
+    <jooq.version>3.9.1</jooq.version>
   </properties>
 
   <modules>
@@ -75,12 +78,22 @@
       <dependency>
         <groupId>org.pac4j</groupId>
         <artifactId>pac4j-core</artifactId>
-        <version>1.9.5</version>
+        <version>${pac4j.version}</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>21.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-core</artifactId>
+        <version>${liquibase.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jooq</groupId>
+        <artifactId>jooq</artifactId>
+        <version>${jooq.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jdt</groupId>
@@ -104,6 +117,16 @@
         <groupId>org.zapodot</groupId>
         <artifactId>embedded-db-junit</artifactId>
         <version>0.8</version>
+      </dependency>
+      <dependency>
+        <groupId>org.zapodot</groupId>
+        <artifactId>embedded-db-junit-liquibase</artifactId>
+        <version>0.8</version>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>3.6.2</version>
       </dependency>
       <dependency>
         <!-- force version because of quasar-core -->
@@ -133,7 +156,7 @@
         <!-- force version because of dropwizard-bom and embedded-db-junit -->
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
-        <version>1.4.193</version>
+        <version>${h2.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -268,6 +291,29 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.7.9</version>
+          <executions>
+            <execution>
+            <!-- This activates the use of jacoco for recording unit and integration test coverage -->
+              <id>jacoco-prepare-agent</id>
+              <goals>
+                <goal>prepare-agent</goal>
+                <goal>prepare-agent-integration</goal>
+              </goals>
+            </execution>
+            <execution>
+            <!-- This will generate XML and HTML reports -->
+              <id>jacoco-report</id>
+              <goals>
+                <goal>report</goal>
+                <goal>report-integration</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.19.1</version>
@@ -347,81 +393,4 @@
       </plugins>
     </pluginManagement>
   </build>
-
-  <profiles>
-    <profile>
-      <!-- Continuous integration profile -->
-      <id>jacoco</id>
-      <properties>
-        <!-- These are properties that could be changed by the CI if needed -->
-        <jacoco-plugin.version>0.7.7.201606060606</jacoco-plugin.version>
-        <jacoco-listeners.version>3.14</jacoco-listeners.version>
-      </properties>
-      <dependencies>
-        <dependency>
-          <!-- Provides the JUnitListener used by surefire below -->
-          <groupId>org.sonarsource.java</groupId>
-          <artifactId>sonar-jacoco-listeners</artifactId>
-          <version>${jacoco-listeners.version}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <plugins>
-          <plugin>
-            <!-- Let's activate jacoco for unit test coverage -->
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>${jacoco-plugin.version}</version>
-            <executions>
-              <execution>
-                <!-- This activates the use of jacoco for recording unit test coverage -->
-                <id>prepare-agent</id>
-                <goals>
-                  <goal>prepare-agent</goal>
-                </goals>
-              </execution>
-              <execution>
-                <!-- This activates the use of jacoco for recording integration test coverage -->
-                <id>prepare-agent-integration</id>
-                <goals>
-                  <goal>prepare-agent-integration</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <properties>
-                  <property>
-                    <!-- Have jacoco record per-test coverage (on top of default per-file coverage) -->
-                    <name>listener</name>
-                    <value>org.sonar.java.jacoco.JUnitListener</value>
-                  </property>
-                </properties>
-              </configuration>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <properties>
-                  <property>
-                    <!-- Have jacoco record per-test coverage (on top of default per-file coverage) -->
-                    <name>listener</name>
-                    <value>org.sonar.java.jacoco.JUnitListener</value>
-                  </property>
-                </properties>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
 </project>

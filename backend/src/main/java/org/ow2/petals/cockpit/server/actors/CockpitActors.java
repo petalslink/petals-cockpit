@@ -15,15 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.ow2.petals.cockpit.server.actors;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import javax.inject.Inject;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.hk2.api.ServiceLocator;
+import org.jooq.Configuration;
+import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
 
 import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.actors.ActorRegistry;
@@ -36,12 +37,12 @@ public class CockpitActors {
 
     private final ServiceLocator serviceLocator;
 
-    private final WorkspacesDAO workspaces;
+    private final Configuration jooq;
 
     @Inject
-    public CockpitActors(ServiceLocator serviceLocator, WorkspacesDAO workspaces) {
+    public CockpitActors(ServiceLocator serviceLocator, Configuration jooq) {
         this.serviceLocator = serviceLocator;
-        this.workspaces = workspaces;
+        this.jooq = jooq;
     }
 
     public <M> ActorRef<M> getActor(CockpitActor<M> actor) {
@@ -61,12 +62,11 @@ public class CockpitActors {
         ActorRef<Msg> a = ActorRegistry.tryGetActor(name);
 
         if (a == null) {
-            DbWorkspace ws = workspaces.getWorkspaceById(wId, null);
-            if (ws == null) {
+            if (!DSL.using(jooq).fetchExists(WORKSPACES, WORKSPACES.ID.eq(wId))) {
                 return Either.left(Status.NOT_FOUND);
             } else {
                 return Either.right(ActorRegistry.getOrRegisterActor(name, () -> {
-                    WorkspaceActor workspaceActor = new WorkspaceActor(ws.id);
+                    WorkspaceActor workspaceActor = new WorkspaceActor(wId);
                     serviceLocator.inject(workspaceActor);
                     return workspaceActor;
                 }));

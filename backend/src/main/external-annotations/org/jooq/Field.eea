@@ -1,0 +1,7 @@
+class org/jooq/Field
+eq
+ (Lorg/jooq/Field<TT;>;)Lorg/jooq/Condition;
+ (Lorg/jooq/Field<TT;>;)L1org/jooq/Condition;
+eq
+ (TT;)Lorg/jooq/Condition;
+ (TT;)L1org/jooq/Condition;

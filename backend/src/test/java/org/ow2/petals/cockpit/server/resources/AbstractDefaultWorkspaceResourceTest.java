@@ -18,30 +18,26 @@ package org.ow2.petals.cockpit.server.resources;
 
 import java.util.Arrays;
 
+import org.jooq.impl.DSL;
 import org.junit.Before;
-import org.junit.Rule;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
-import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 
 import com.google.common.collect.ImmutableMap;
 
 import javaslang.Tuple;
 
-public abstract class AbstractReadOnlyResourceTest extends AbstractCockpitResourceTest {
+public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractCockpitResourceTest {
 
     protected static final String SYSINFO = "WORKSPACE TEST SYSINFO";
-
-    @Rule
-    public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
 
     protected final Domain domain = new Domain("dom");
 
@@ -74,13 +70,15 @@ public abstract class AbstractReadOnlyResourceTest extends AbstractCockpitResour
         petals.registerArtifact(component, container1);
         petals.registerArtifact(serviceAssembly, container1);
 
+        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+
         // forbidden workspace (it is NOT registered in petals admin)
         setupWorkspace(2, "test2", Arrays.asList(Tuple.of(2L, new Domain("dom2"), "", Arrays.asList(Tuple.of(2L,
                 new Container("cont2", "", ImmutableMap.of(PortType.JMX, containerPort), "", "", State.REACHABLE),
                 Arrays.asList(Tuple.of(2L, new Component("", ComponentType.SE, ArtifactState.State.STARTED),
                         Arrays.asList(Tuple.of(2L,
                                 new ServiceAssembly("", ArtifactState.State.STARTED, new ServiceUnit("", "")))))))))),
-                "anotherusers");
+                "anotheruser");
 
         // test workspace
         setupWorkspace(1, "test",
@@ -91,6 +89,6 @@ public abstract class AbstractReadOnlyResourceTest extends AbstractCockpitResour
                                                 Arrays.asList(Tuple.of(40L, serviceAssembly))))),
                                 Tuple.of(21L, container2, Arrays.asList()),
                                 Tuple.of(22L, container3, Arrays.asList())))),
-                MockProfileParamValueFactoryProvider.ADMIN.username);
+                ADMIN);
     }
 }

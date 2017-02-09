@@ -34,8 +34,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-        <groupId>io.dropwizard</groupId>
-        <artifactId>dropwizard-assets</artifactId>
+      <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-assets</artifactId>
     </dependency>
     <dependency>
       <groupId>com.palantir.indexpage</groupId>
@@ -51,6 +51,11 @@
 
   <build>
     <plugins>
+      <plugin>
+        <!-- Let's activate jacoco for unit test coverage -->
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>

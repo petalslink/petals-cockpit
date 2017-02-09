@@ -18,6 +18,8 @@ package org.ow2.petals.cockpit.server.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.sql.Connection;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
@@ -27,35 +29,62 @@ import javax.ws.rs.core.Response;
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.grizzly.http.server.util.Globals;
 import org.glassfish.jersey.client.ClientProperties;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
-import org.ow2.petals.cockpit.server.mocks.MockAuthenticator;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.UserSession.User;
 import org.ow2.petals.cockpit.server.security.CockpitExtractor.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
+import org.zapodot.junit.db.plugin.InitializationPlugin;
+import org.zapodot.junit.db.plugin.LiquibaseInitializer;
 
+import ch.qos.logback.classic.Level;
 import io.dropwizard.client.JerseyClientBuilder;
+import io.dropwizard.logging.BootstrapLogging;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
-import liquibase.Liquibase;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.exception.LiquibaseException;
-import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class UserSessionTest {
 
+    static {
+        BootstrapLogging.bootstrap(Level.INFO);
+    }
+
     public static final String SESSION_COOKIE_NAME = Globals.SESSION_COOKIE_NAME;
+
+    public static final User ADMIN = new User("admin", "Administrator", null);
 
     public static class App extends CockpitApplication<CockpitConfiguration> {
         // only needed because of generics
     }
 
+    @ClassRule
+    public static final EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder()
+            .initializedByPlugin(LiquibaseInitializer.builder().withChangelogResource("migrations.xml").build())
+            .initializedByPlugin(new InitializationPlugin() {
+                @Override
+                public void connectionMade(@Nullable String name, @Nullable Connection connection) {
+                    assert connection != null;
+                    // we must use the JDBC URL because if not the insertion is only visible when accessing the db with
+                    // connection.. https://github.com/zapodot/embedded-db-junit/issues/7
+                    try (DSLContext using = DSL.using(dbRule.getConnectionJdbcUrl())) {
+                        using.executeInsert(new UsersRecord(ADMIN.username,
+                                new BCryptPasswordEncoder().encode(ADMIN.username), ADMIN.name, ADMIN.lastWorkspace));
+                    }
+                }
+            }).build();
+
     @Rule
-    public EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder().build();
+    public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
 
     @Rule
     public final DropwizardAppRule<CockpitConfiguration> appRule = new DropwizardAppRule<>(App.class,
@@ -70,13 +99,6 @@ public class UserSessionTest {
         client = new JerseyClientBuilder(appRule.getEnvironment()).build("test client")
                 // sometimes it fails with the default value because things are lazily initialised in Jersey
                 .property(ClientProperties.READ_TIMEOUT, 4000);
-    }
-
-    @Before
-    public void setUpDb() throws LiquibaseException {
-        // we need a valid empty db for those tests
-        new Liquibase("migrations.xml", new ClassLoaderResourceAccessor(), new JdbcConnection(dbRule.getConnection()))
-                .update("");
     }
 
     public Client client() {
@@ -110,20 +132,20 @@ public class UserSessionTest {
 
         Response get = client().target(url("user")).request().cookie(cookie).get();
         assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(User.class)).isEqualToComparingFieldByField(MockAuthenticator.ADMIN);
+        assertThat(get.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
     }
 
     @Test
     public void testCorrectLogin() {
         final Response login = request().post(Entity.json(new Authentication("admin", "admin")));
-
+        
         assertThat(login.getStatus()).isEqualTo(302);
         final NewCookie cookie = login.getCookies().get(SESSION_COOKIE_NAME);
         assertThat(cookie).isNotNull();
 
         final Response get = request().cookie(cookie).get();
         assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(User.class)).isEqualToComparingFieldByField(MockAuthenticator.ADMIN);
+        assertThat(get.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
     }
 
     @Test
@@ -156,7 +178,7 @@ public class UserSessionTest {
 
         final Response get = request().cookie(cookie).get();
         assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(User.class)).isEqualToComparingFieldByField(MockAuthenticator.ADMIN);
+        assertThat(get.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
 
         final Response logout = request().cookie(cookie).delete();
         // TODO should be 204: https://github.com/pac4j/pac4j/issues/701

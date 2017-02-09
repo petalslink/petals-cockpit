@@ -28,8 +28,10 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.cockpit.server.db.UsersDAO;
-import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
+import org.jooq.Configuration;
+import org.jooq.impl.DSL;
+import org.ow2.petals.cockpit.server.db.generated.Tables;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JCallback;
 import org.pac4j.jax.rs.annotations.Pac4JLogout;
@@ -51,11 +53,11 @@ public class UserSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserSession.class);
 
-    private final UsersDAO users;
+    private final Configuration jooq;
 
     @Inject
-    public UserSession(UsersDAO users) {
-        this.users = users;
+    public UserSession(Configuration jooq) {
+        this.jooq = jooq;
     }
 
     /**
@@ -67,12 +69,9 @@ public class UserSession {
     public User getUserData(@Pac4JProfile CockpitProfile profile) {
         LOG.debug("Returning infos for {}", profile.getId());
 
-        DbUser user = profile.getUser();
+        UsersRecord user = DSL.using(jooq).fetchOne(Tables.USERS, Tables.USERS.USERNAME.eq(profile.getId()));
 
-        // it's better to query it now, since we are not sure the DbUser wasn't cached!
-        Long lastWorkspace = users.getLastWorkspace(user);
-
-        return new User(user.username, user.name, lastWorkspace);
+        return new User(user.getUsername(), user.getName(), user.getLastWorkspace());
     }
 
     @GET

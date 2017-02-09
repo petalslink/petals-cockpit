@@ -1,0 +1,4 @@
+class org/jooq/TransactionalRunnable
+run
+ (Lorg/jooq/Configuration;)V
+ (L1org/jooq/Configuration;)V

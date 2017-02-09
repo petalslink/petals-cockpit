@@ -16,6 +16,11 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,6 +28,9 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
+import org.jooq.Configuration;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
@@ -30,22 +38,17 @@ import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbBus;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusInError;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusInImport;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbComponent;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbServiceUnit;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusMin;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin.State;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin.Type;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInError;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -56,6 +59,10 @@ import com.google.common.collect.ImmutableSet;
 
 import co.paralleluniverse.fibers.Suspendable;
 
+/**
+ * TODO can I avoid transforming ids to string just for json output... maybe with a json mapper or whatever...
+ *
+ */
 public class WorkspaceContent {
 
     @Valid
@@ -106,7 +113,7 @@ public class WorkspaceContent {
      * TODO this should be done by {@link WorkspaceActor}
      */
     @Suspendable
-    public static WorkspaceContent buildAndSaveToDatabase(BusesDAO buses, long bId, Domain topology)
+    public static WorkspaceContent buildAndSaveToDatabase(Configuration jooq, long bId, Domain topology)
             throws InvalidPetalsBus {
         Map<String, BusFull> importedBuses = new HashMap<>();
         Map<String, BusInProgress> busesInProgress = new HashMap<>();
@@ -118,14 +125,23 @@ public class WorkspaceContent {
         for (Container container : topology.getContainers()) {
             Integer port = container.getPorts().get(PortType.JMX);
             assert port != null;
-            long cId = buses.createContainer(container.getContainerName(), container.getHost(), port,
-                    container.getJmxUsername(), container.getJmxPassword(), bId);
+
+            ContainersRecord cDb = new ContainersRecord(null, bId, container.getContainerName(), container.getHost(),
+                    port, container.getJmxUsername(), container.getJmxPassword());
+            cDb.attach(jooq);
+            int cDbi = cDb.insert();
+            assert cDbi == 1;
 
             Set<String> components = new HashSet<>();
             for (Component component : container.getComponents()) {
                 ComponentMin.State compState = ComponentMin.State.from(component.getState());
                 ComponentMin.Type compType = ComponentMin.Type.from(component.getComponentType());
-                long compId = buses.createComponent(component.getName(), compState, compType, cId);
+
+                ComponentsRecord compDb = new ComponentsRecord(null, cDb.getId(), component.getName(), compState.name(),
+                        compType.name());
+                compDb.attach(jooq);
+                int compDbi = compDb.insert();
+                assert compDbi == 1;
 
                 Set<String> serviceUnits = new HashSet<>();
                 for (ServiceAssembly sa : container.getServiceAssemblies()) {
@@ -137,29 +153,35 @@ public class WorkspaceContent {
                             // TODO is this information returned by admin correct? Some SUs could be in a different
                             // state in case of problems...!
                             ServiceUnitMin.State suState = ServiceUnitMin.State.from(sa.getState());
-                            long suId = buses.createServiceUnit(su.getName(), suState, compId, sa.getName());
 
-                            serviceUnits.add(Long.toString(suId));
-                            sus.put(Long.toString(suId), new ServiceUnitMin(suId, su.getName(), suState, sa.getName()));
+                            ServiceunitsRecord suDb = new ServiceunitsRecord(null, compDb.getId(), su.getName(),
+                                    suState.name(), sa.getName());
+                            suDb.attach(jooq);
+                            int suDbi = suDb.insert();
+                            assert suDbi == 1;
+
+                            serviceUnits.add(Long.toString(suDb.getId()));
+                            sus.put(Long.toString(suDb.getId()),
+                                    new ServiceUnitMin(suDb.getId(), su.getName(), suState, sa.getName()));
                         }
                     }
                 }
 
-                components.add(Long.toString(compId));
-                comps.put(Long.toString(compId), new ComponentFull(
-                        new ComponentMin(compId, component.getName(), compState, compType), serviceUnits));
+                components.add(Long.toString(compDb.getId()));
+                comps.put(Long.toString(compDb.getId()), new ComponentFull(
+                        new ComponentMin(compDb.getId(), component.getName(), compState, compType), serviceUnits));
 
             }
 
-            containers.add(Long.toString(cId));
-            cs.put(Long.toString(cId),
-                    new ContainerFull(new ContainerMin(cId, container.getContainerName()), components));
+            containers.add(Long.toString(cDb.getId()));
+            cs.put(Long.toString(cDb.getId()),
+                    new ContainerFull(new ContainerMin(cDb.getId(), container.getContainerName()), components));
         }
 
-        // TODO can I avoid transforming to string just for json output...
         importedBuses.put(Long.toString(bId), new BusFull(new BusMin(bId, topology.getName()), containers));
 
-        buses.updateBus(bId, topology.getName());
+        DSL.using(jooq).update(BUSES).set(BUSES.IMPORTED, true).set(BUSES.NAME, topology.getName())
+                .where(BUSES.ID.eq(bId)).execute();
 
         return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sus);
     }
@@ -167,42 +189,44 @@ public class WorkspaceContent {
     /**
      * TODO this should be done by {@link WorkspaceActor}
      */
-    public static WorkspaceContent buildFromDatabase(BusesDAO buses, DbWorkspace w) {
+    public static WorkspaceContent buildFromDatabase(Configuration conf, WorkspacesRecord w) {
         Map<String, BusFull> importedBuses = new HashMap<>();
         Map<String, BusInProgress> busesInProgress = new HashMap<>();
         Map<String, ContainerFull> cs = new HashMap<>();
         Map<String, ComponentFull> comps = new HashMap<>();
         Map<String, ServiceUnitMin> sus = new HashMap<>();
 
-        for (DbBus b : buses.getBusesByWorkspace(w.id)) {
-            if (b instanceof DbBusImported) {
+        DSLContext ctx = DSL.using(conf);
+        for (BusesRecord b : ctx.selectFrom(BUSES).where(BUSES.WORKSPACE_ID.eq(w.getId())).fetchInto(BUSES)) {
+            if (b.getImported()) {
                 Set<String> containers = new HashSet<>();
-                for (DbContainer c : buses.getContainersByBus(b.id)) {
+                for (ContainersRecord c : ctx.selectFrom(CONTAINERS).where(CONTAINERS.BUS_ID.eq(b.getId()))) {
                     Set<String> components = new HashSet<>();
-                    for (DbComponent comp : buses.getComponentsByContainer(c)) {
+                    for (ComponentsRecord comp : ctx.selectFrom(COMPONENTS)
+                            .where(COMPONENTS.CONTAINER_ID.eq(c.getId()))) {
                         Set<String> serviceUnits = new HashSet<>();
-                        for (DbServiceUnit su : buses.getServiceUnitByComponent(comp)) {
-                            serviceUnits.add(Long.toString(su.id));
-                            sus.put(Long.toString(su.id), new ServiceUnitMin(su.id, su.name, su.state, su.saName));
+                        for (ServiceunitsRecord su : ctx.selectFrom(SERVICEUNITS)
+                                .where(SERVICEUNITS.COMPONENT_ID.eq(comp.getId()))) {
+                            serviceUnits.add(Long.toString(su.getId()));
+                            ServiceUnitMin.State state = ServiceUnitMin.State.valueOf(su.getState());
+                            sus.put(Long.toString(su.getId()),
+                                    new ServiceUnitMin(su.getId(), su.getName(), state, su.getSaName()));
                         }
-                        components.add(Long.toString(comp.id));
-                        comps.put(Long.toString(comp.id), new ComponentFull(
-                                new ComponentMin(comp.id, comp.name, comp.state, comp.type), serviceUnits));
+                        components.add(Long.toString(comp.getId()));
+                        ComponentMin.State state = ComponentMin.State.valueOf(comp.getState());
+                        ComponentMin.Type type = ComponentMin.Type.valueOf(comp.getType());
+                        comps.put(Long.toString(comp.getId()), new ComponentFull(
+                                new ComponentMin(comp.getId(), comp.getName(), state, type), serviceUnits));
                     }
-                    containers.add(Long.toString(c.id));
-                    cs.put(Long.toString(c.id), new ContainerFull(new ContainerMin(c.id, c.name), components));
+                    containers.add(Long.toString(c.getId()));
+                    cs.put(Long.toString(c.getId()),
+                            new ContainerFull(new ContainerMin(c.getId(), c.getName()), components));
                 }
-                importedBuses.put(Long.toString(b.id),
-                        new BusFull(new BusMin(b.id, ((DbBusImported) b).name), containers));
-            } else if (b instanceof DbBusInImport) {
-                busesInProgress.put(Long.toString(b.id),
-                        new BusInProgress(b.id, b.importIp, b.importPort, b.importUsername));
-            } else if (b instanceof DbBusInError) {
-                busesInProgress.put(Long.toString(b.id),
-                        new BusInError(b.id, b.importIp, b.importPort, b.importUsername, ((DbBusInError) b).error));
+                importedBuses.put(Long.toString(b.getId()),
+                        new BusFull(new BusMin(b.getId(), b.getName()), containers));
             } else {
-                // TODO or log?
-                throw new AssertionError();
+                busesInProgress.put(Long.toString(b.getId()), new BusInProgress(b.getId(), b.getImportIp(),
+                        b.getImportPort(), b.getImportUsername(), b.getImportError()));
             }
         }
 

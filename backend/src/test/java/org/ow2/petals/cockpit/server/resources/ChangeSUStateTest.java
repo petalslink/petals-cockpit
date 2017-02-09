@@ -17,11 +17,7 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 
 import java.util.Arrays;
 
@@ -31,6 +27,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
+import org.jooq.impl.DSL;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,26 +36,22 @@ import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
-import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ChangeState;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewSUState;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 import javaslang.Tuple;
 
 public class ChangeSUStateTest extends AbstractCockpitResourceTest {
-
-    @Rule
-    public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
 
     private final Domain domain = new Domain("dom");
 
@@ -94,12 +87,11 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
                 Arrays.asList(Tuple.of(10L, domain, "phrase", Arrays.asList(Tuple.of(20L, container,
                         Arrays.asList(Tuple.of(30L, component,
                                 Arrays.asList(Tuple.of(40L, serviceAssembly1), Tuple.of(41L, serviceAssembly2)))))))),
-                MockProfileParamValueFactoryProvider.ADMIN.username);
+                ADMIN);
     }
 
     @Test
     public void changeSU1State() {
-        when(buses.updateServiceUnitState(eq(40), any())).thenReturn(1);
 
         ServiceUnitOverview get1 = resources.getJerseyTest().target("/serviceunits/40").request()
                 .get(ServiceUnitOverview.class);
@@ -117,36 +109,52 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("SU_STATE_CHANGE");
-                JsonNode data = e.readData(JsonNode.class);
-                a.assertThat(data.get("id").asText()).isEqualTo("40");
-                a.assertThat(data.get("state").asText()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+                NewSUState data = e.readData(NewSUState.class);
+                a.assertThat(data.id).isEqualTo(40);
+                a.assertThat(data.state).isEqualTo(ServiceUnitMin.State.Stopped);
             });
         }
 
-        verify(buses).updateServiceUnitState(40, ServiceUnitMin.State.Stopped);
-        verify(buses, times(0)).updateServiceUnitState(eq(41), any());
+        assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+        assertThatDbSU(41).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
     }
 
     @Test
     public void changeSU1StateForbidden() {
+
+        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+
         setupWorkspace(2, "test2",
                 Arrays.asList(Tuple.of(11L, domain, "phrase", Arrays.asList(Tuple.of(21L, container,
                         Arrays.asList(Tuple.of(31L, component,
-                                Arrays.asList(Tuple.of(41L, serviceAssembly1), Tuple.of(42L, serviceAssembly2)))))))),
+                                Arrays.asList(Tuple.of(42L, serviceAssembly1), Tuple.of(43L, serviceAssembly2)))))))),
                 "anotheruser");
 
-        Response put = resources.getJerseyTest().target("/workspaces/2/serviceunits/41").request()
+        Response put = resources.getJerseyTest().target("/workspaces/2/serviceunits/42").request()
                 .put(Entity.json(new ChangeState(ServiceUnitMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
 
-        verify(buses, times(0)).updateServiceUnitState(eq(41), any());
-        verify(buses, times(0)).updateServiceUnitState(eq(41), any());
+        assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertThatDbSU(41).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+        assertThatDbSU(42).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertThatDbSU(43).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+    }
+
+    @Test
+    public void changeSU1StateNotFound() {
+
+        Response put = resources.getJerseyTest().target("/workspaces/1/serviceunits/42").request()
+                .put(Entity.json(new ChangeState(ServiceUnitMin.State.Stopped)));
+
+        assertThat(put.getStatus()).isEqualTo(404);
+
+        assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertThatDbSU(41).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
     }
 
     @Test
     public void changeSU2StateUnload() {
-        when(buses.updateServiceUnitState(eq(40), any())).thenReturn(1);
 
         ServiceUnitOverview get1 = resources.getJerseyTest().target("/serviceunits/41").request()
                 .get(ServiceUnitOverview.class);
@@ -164,15 +172,14 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("SU_STATE_CHANGE");
-                JsonNode data = e.readData(JsonNode.class);
-                a.assertThat(data.get("id").asText()).isEqualTo("41");
-                a.assertThat(data.get("state").asText()).isEqualTo(ServiceUnitMin.State.Unloaded.name());
+                NewSUState data = e.readData(NewSUState.class);
+                a.assertThat(data.id).isEqualTo(41);
+                a.assertThat(data.state).isEqualTo(ServiceUnitMin.State.Unloaded);
             });
         }
 
-        verify(buses, times(0)).updateServiceUnitState(eq(40), any());
-        verify(buses, times(0)).updateServiceUnitState(eq(41), any());
-        verify(buses).removeServiceUnit(41);
+        assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertNoDbSU(41);
     }
 
     @Test
@@ -186,14 +193,12 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
         assertThat(put.state).isEqualTo(ServiceUnitMin.State.Started);
 
-        verify(buses, times(0)).updateServiceUnitState(eq(40), any());
-        verify(buses, times(0)).updateServiceUnitState(eq(41), any());
+        assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertThatDbSU(41).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
     }
 
     @Test
     public void changeSU1StateConflict() {
-        when(buses.updateServiceUnitState(eq(40), any())).thenReturn(1);
-
         ServiceUnitOverview get1 = resources.getJerseyTest().target("/serviceunits/40").request()
                 .get(ServiceUnitOverview.class);
         assertThat(get1.state).isEqualTo(ServiceUnitMin.State.Started);
@@ -203,7 +208,7 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
 
-        verify(buses, times(0)).updateServiceUnitState(eq(40), any());
-        verify(buses, times(0)).updateServiceUnitState(eq(41), any());
+        assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertThatDbSU(41).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
     }
 }

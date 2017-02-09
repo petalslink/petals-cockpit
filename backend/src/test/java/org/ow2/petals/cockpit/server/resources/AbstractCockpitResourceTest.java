@@ -17,16 +17,10 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
+import static org.assertj.db.api.Assertions.assertThat;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,12 +29,18 @@ import java.util.function.BiConsumer;
 import javax.inject.Singleton;
 
 import org.assertj.core.api.SoftAssertions;
-import org.eclipse.jdt.annotation.Nullable;
+import org.assertj.db.api.RequestRowAssert;
+import org.assertj.db.type.Request;
+import org.assertj.db.type.Table;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
+import org.jooq.Configuration;
+import org.jooq.conf.ParamType;
+import org.jooq.impl.DSL;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
@@ -49,28 +49,31 @@ import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
+import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbBus;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbComponent;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbServiceUnit;
-import org.ow2.petals.cockpit.server.db.UsersDAO;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
+import org.zapodot.junit.db.EmbeddedDatabaseRule;
+import org.zapodot.junit.db.plugin.LiquibaseInitializer;
 
+import ch.qos.logback.classic.Level;
 import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.common.test.TestUtil;
 import co.paralleluniverse.common.util.Debug;
+import io.dropwizard.logging.BootstrapLogging;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import io.dropwizard.testing.junit.ResourceTestRule.Builder;
 import javaslang.Tuple2;
@@ -90,40 +93,38 @@ import javaslang.Tuple4;
  */
 public class AbstractCockpitResourceTest {
 
+    static {
+        BootstrapLogging.bootstrap(Level.INFO);
+    }
+
+    public static final String ADMIN = "admin";
+
     @Rule
-    public TestRule watchman = TestUtil.WATCHMAN;
+    public final TestRule watchman = TestUtil.WATCHMAN;
 
-    protected UsersDAO users = mock(UsersDAO.class,
-            withSettings()
-                    // .verboseLogging()
-                    .defaultAnswer(CALLS_REAL_METHODS));
+    @Rule
+    public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
 
-    protected WorkspacesDAO workspaces = mock(WorkspacesDAO.class,
-            withSettings()
-                    // .verboseLogging()
-                    .defaultAnswer(CALLS_REAL_METHODS));
-
-    protected BusesDAO buses = mock(BusesDAO.class,
-            withSettings()
-                    // .verboseLogging()
-                    .defaultAnswer(CALLS_REAL_METHODS));
+    @Rule
+    public final EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder()
+            .initializedByPlugin(LiquibaseInitializer.builder().withChangelogResource("migrations.xml").build())
+            .build();
 
     protected ResourceTestRule buildResourceTest(Class<?>... resources) {
         Builder builder = ResourceTestRule.builder()
                 // in memory does not support SSE and the no-servlet one does not log...
-                .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
-                .addProvider(new MockProfileParamValueFactoryProvider.Binder()).addProvider(new AbstractBinder() {
+                .setTestContainerFactory(new GrizzlyWebTestContainerFactory()).addProvider(new AbstractBinder() {
                     @Override
                     protected void configure() {
-                        bind(workspaces).to(WorkspacesDAO.class);
-                        bind(buses).to(BusesDAO.class);
-                        bind(users).to(UsersDAO.class);
+                        bind(DSL.using(dbRule.getConnectionJdbcUrl()).configuration()).to(Configuration.class);
                         bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.BLOCKING_TASK_ES)
                                 .to(ExecutorService.class);
                         bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
                         bind(PetalsAdministrationFactory.getInstance()).to(PetalsAdministrationFactory.class);
                     }
                 });
+        // needed for @Pac4JProfile injection to work
+        builder.addProvider(new MockProfileParamValueFactoryProvider.Binder(ADMIN));
         for (Class<?> resource : resources) {
             // we pass the resource as a provider to get injection in constructor
             builder.addProvider(resource);
@@ -138,8 +139,35 @@ public class AbstractCockpitResourceTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDownQuasar() {
         ActorRegistry.clear();
+    }
+
+    @Before
+    public void setUpDb() {
+        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord(ADMIN, "...", "Administrator", null));
+    }
+
+    @After
+    public void tearDownDb() {
+        DSL.using(dbRule.getConnectionJdbcUrl()).execute("DROP ALL OBJECTS");
+    }
+
+    protected Table table(org.jooq.Table<?> table) {
+        return new Table(dbRule.getDataSource(), table.getName());
+    }
+
+    protected RequestRowAssert assertThatDbSU(long id) {
+        return assertThat(requestSU(id)).hasNumberOfRows(1).row();
+    }
+
+    protected void assertNoDbSU(long id) {
+        assertThat(requestSU(id)).hasNumberOfRows(0);
+    }
+
+    protected Request requestSU(long id) {
+        return new Request(dbRule.getDataSource(), DSL.using(dbRule.getConnectionJdbcUrl())
+                .selectFrom(SERVICEUNITS).where(SERVICEUNITS.ID.eq(id)).getSQL(ParamType.INLINED));
     }
 
     /**
@@ -149,76 +177,62 @@ public class AbstractCockpitResourceTest {
             List<Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>>>>> data,
             String... users) {
 
-        List<DbBus> bs = new ArrayList<>();
+        List<BusesRecord> bs = new ArrayList<>();
+        List<ContainersRecord> cs = new ArrayList<>();
+        List<ComponentsRecord> comps = new ArrayList<>();
+        List<ServiceunitsRecord> sus = new ArrayList<>();
+
         for (Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>>>> bus : data) {
-            Domain domain = bus._2;
+            long bId = bus._1;
             String passphrase = bus._3;
             List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>>> containers = bus._4;
             Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>> entry = containers
                     .iterator().next();
-            DbBusImported bDb = new DbBusImported(bus._1, entry._2.getHost(), getPort(entry._2),
-                    entry._2.getJmxUsername(), entry._2.getJmxPassword(), passphrase, domain.getName(), null);
 
-            List<DbContainer> cs = new ArrayList<>();
+            bs.add(new BusesRecord(bId, wsId, true, entry._2.getHost(), getPort(entry._2), entry._2.getJmxUsername(),
+                    entry._2.getJmxPassword(), passphrase, null, bus._2.getName()));
+
             for (Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>> c : containers) {
 
+                long cId = c._1;
                 c._2.addProperty("petals.topology.passphrase", passphrase);
 
-                DbContainer cDb = new DbContainer(c._1, bus._1, c._2.getContainerName(), c._2.getHost(), getPort(c._2),
-                        c._2.getJmxUsername(), c._2.getJmxPassword(), null);
+                // TODO handle also artifacts
+                cs.add(new ContainersRecord(cId, bId, c._2.getContainerName(), c._2.getHost(), getPort(c._2),
+                        c._2.getJmxUsername(), c._2.getJmxPassword()));
 
-                List<DbComponent> comps = new ArrayList<>();
                 for (Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>> comp : c._3) {
-                    DbComponent compDb = new DbComponent(comp._1, comp._2.getName(),
-                            ComponentMin.State.from(comp._2.getState()),
-                            ComponentMin.Type.from(comp._2.getComponentType()), null);
 
-                    List<DbServiceUnit> sus = new ArrayList<>();
+                    long compId = comp._1;
+
+                    comps.add(new ComponentsRecord(compId, cId, comp._2.getName(),
+                            ComponentMin.State.from(comp._2.getState()).name(),
+                            ComponentMin.Type.from(comp._2.getComponentType()).name()));
+
                     for (Tuple2<Long, ServiceAssembly> su : comp._3) {
+                        long suId = su._1;
                         List<ServiceUnit> sasus = su._2.getServiceUnits();
                         assert sasus.size() == 1;
                         ServiceUnit sasu = sasus.get(0);
                         assert sasu != null;
-                        DbServiceUnit suDb = new DbServiceUnit(su._1, sasu.getName(),
-                                ServiceUnitMin.State.from(su._2.getState()), su._2.getName(), c._1, null);
 
-                        sus.add(suDb);
-                        when(buses.getServiceUnitById(eq(suDb.id), any()))
-                                .thenAnswer(i -> new DbServiceUnit(suDb.id, suDb.name, suDb.state, suDb.saName,
-                                        suDb.containerId, username(i.getArgument(1), users)));
+                        sus.add(new ServiceunitsRecord(suId, compId, sasu.getName(),
+                                ServiceUnitMin.State.from(su._2.getState()).name(), su._2.getName()));
                     }
-
-                    comps.add(compDb);
-                    when(buses.getComponentsById(eq(compDb.id), any())).thenAnswer(i -> new DbComponent(compDb.id,
-                            compDb.name, compDb.state, compDb.type, username(i.getArgument(1), users)));
-                    when(buses.getServiceUnitByComponent(compDb)).thenReturn(sus);
                 }
-
-                // TODO handle also artifacts
-                cs.add(cDb);
-                when(buses.getContainerById(eq(cDb.id), any())).thenAnswer(i -> new DbContainer(cDb.id, cDb.busId,
-                        cDb.name, cDb.ip, cDb.port, cDb.username, cDb.password, username(i.getArgument(1), users)));
-                when(buses.getComponentsByContainer(cDb)).thenReturn(comps);
             }
-
-            bs.add(bDb);
-            when(buses.getBusById(eq(bDb.id), any()))
-                    .thenAnswer(i -> new DbBusImported(bDb.id, bDb.importIp, bDb.importPort, bDb.importUsername,
-                            bDb.importPassword, bDb.importPassphrase, bDb.name, username(i.getArgument(1), users)));
-            when(buses.getContainersByBus(bDb.id)).thenReturn(cs);
         }
 
-        DbWorkspace wDb = new DbWorkspace(wsId, wsName, null);
-
-        doAnswer(i -> new DbWorkspace(wDb.id, wDb.name, username(i.getArgument(1), users))).when(workspaces)
-                .getWorkspaceById(eq(wDb.id), any());
-        when(buses.getBusesByWorkspace(wDb.id)).thenReturn(bs);
-
-    }
-
-    @Nullable
-    private static String username(String username, String... users) {
-        return Arrays.asList(users).contains(username) ? username : null;
+        DSL.using(dbRule.getConnectionJdbcUrl()).transaction(conf -> {
+            DSL.using(conf).executeInsert(new WorkspacesRecord(wsId, wsName));
+            DSL.using(conf).batchInsert(bs).execute();
+            DSL.using(conf).batchInsert(cs).execute();
+            DSL.using(conf).batchInsert(comps).execute();
+            DSL.using(conf).batchInsert(sus).execute();
+            for (String user : users) {
+                DSL.using(conf).executeInsert(new UsersWorkspacesRecord(wsId, user));
+            }
+        });
     }
 
     protected static int getPort(Container container) {
@@ -227,8 +241,29 @@ public class AbstractCockpitResourceTest {
         return port;
     }
 
+    protected static void assertEquivalent(ContainersRecord record, Container container) {
+        assertThat(record.getIp()).isEqualTo(container.getHost());
+        assertThat(record.getPort()).isEqualTo(getPort(container));
+        assertThat(record.getUsername()).isEqualTo(container.getJmxUsername());
+        assertThat(record.getPassword()).isEqualTo(container.getJmxPassword());
+        assertThat(record.getName()).isEqualTo(container.getContainerName());
+    }
+
+    protected static void assertEquivalent(ComponentsRecord record, Component component) {
+        assertThat(record.getName()).isEqualTo(component.getName());
+        assertThat(record.getState()).isEqualTo(ComponentMin.State.from(component.getState()).name());
+        assertThat(record.getType()).isEqualTo(ComponentMin.Type.from(component.getComponentType()).name());
+    }
+
+    protected static void assertEquivalent(ServiceunitsRecord record, ServiceAssembly sa) {
+        assertThat(sa.getServiceUnits()).hasSize(1);
+        ServiceUnit su = sa.getServiceUnits().iterator().next();
+        assertThat(record.getName()).isEqualTo(su.getName());
+        assertThat(record.getState()).isEqualTo(ServiceUnitMin.State.from(sa.getState()).name());
+        assertThat(record.getSaName()).isEqualTo(sa.getName());
+    }
+
     protected static void expectEvent(EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {
-        SoftAssertions sa = new SoftAssertions();
         assertThat(eventInput.isClosed()).isEqualTo(false);
 
         // TODO add timeout
@@ -236,9 +271,9 @@ public class AbstractCockpitResourceTest {
 
         assertThat(inboundEvent).isNotNull();
 
-        c.accept(inboundEvent, sa);
-
-        sa.assertAll();
+        SoftAssertions.assertSoftly(sa -> {
+            c.accept(inboundEvent, sa);
+        });
     }
 
     protected static void expectWorkspaceContent(EventInput eventInput) {

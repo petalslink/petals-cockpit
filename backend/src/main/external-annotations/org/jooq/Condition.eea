@@ -1,0 +1,4 @@
+class org/jooq/Condition
+and
+ (Lorg/jooq/Condition;)Lorg/jooq/Condition;
+ (Lorg/jooq/Condition;)L1org/jooq/Condition;

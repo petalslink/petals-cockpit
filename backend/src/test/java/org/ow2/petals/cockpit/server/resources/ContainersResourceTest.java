@@ -27,7 +27,7 @@ import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerOverv
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 
-public class ContainersResourceTest extends AbstractReadOnlyResourceTest {
+public class ContainersResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     @Rule
     public final ResourceTestRule resources = buildResourceTest(ContainersResource.class);

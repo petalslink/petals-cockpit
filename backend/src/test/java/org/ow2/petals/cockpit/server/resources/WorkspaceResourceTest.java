@@ -17,7 +17,8 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
+import static org.assertj.db.api.Assertions.assertThat;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 
 import javax.ws.rs.core.Response;
 
@@ -25,7 +26,6 @@ import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Rule;
 import org.junit.Test;
-import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.BusFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.ComponentFull;
@@ -34,14 +34,13 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullCo
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 
-public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
+public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     @Rule
     public final ResourceTestRule resources = buildResourceTest(WorkspaceResource.class);
 
     @Test
     public void getNonExistingWorkspaceNotFound() {
-        // TODO check assumptions
         Response get = resources.getJerseyTest().target("/workspaces/3").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
@@ -49,7 +48,6 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
 
     @Test
     public void getNonExistingWorkspaceNotFoundEvent() {
-        // TODO check assumptions
         Response get = resources.getJerseyTest().target("/workspaces/3").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
                 .get();
 
@@ -58,7 +56,6 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
 
     @Test
     public void getWorkspaceForbidden() {
-        // TODO check assumptions
         Response get = resources.getJerseyTest().target("/workspaces/2").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
@@ -66,7 +63,6 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
 
     @Test
     public void getWorkspaceForbiddenEvent() {
-        // TODO check assumptions
         Response get = resources.getJerseyTest().target("/workspaces/2").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
                 .get();
 
@@ -75,18 +71,20 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
 
     @Test
     public void getExistingWorkspace() {
-        // TODO check assumptions
+        assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
+
         WorkspaceFullContent tree = resources.getJerseyTest().target("/workspaces/1").request()
                 .get(WorkspaceFullContent.class);
 
         assertContent(tree);
 
         // ensure that calling get workspace tree set the last workspace in the db
-        verify(users).saveLastWorkspace(MockProfileParamValueFactoryProvider.ADMIN, 1);
+        assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isEqualTo(1);
     }
 
     @Test
     public void getExistingWorkspaceEvent() {
+        assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
 
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
@@ -94,7 +92,7 @@ public class WorkspaceResourceTest extends AbstractReadOnlyResourceTest {
         }
 
         // ensure that calling get workspace tree set the last workspace in the db
-        verify(users).saveLastWorkspace(MockProfileParamValueFactoryProvider.ADMIN, 1);
+        assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isEqualTo(1);
     }
 
     private void assertContent(WorkspaceFullContent content) {

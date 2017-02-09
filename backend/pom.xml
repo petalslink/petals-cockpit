@@ -31,6 +31,7 @@
     <cockpit.exec.command>server</cockpit.exec.command>
     <petals-admin.version>2.0.0-SNAPSHOT</petals-admin.version>
     <enunciate.version>2.8.0</enunciate.version>
+    <codegen.db.url>jdbc:h2:file:${project.build.directory}/db</codegen.db.url>
   </properties>
 
   <dependencies>
@@ -43,8 +44,9 @@
       <artifactId>dropwizard-migrations</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-jdbi</artifactId>
+      <groupId>com.bendb.dropwizard</groupId>
+      <artifactId>dropwizard-jooq</artifactId>
+      <version>1.0.0-2</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
@@ -57,7 +59,7 @@
     <dependency>
       <groupId>org.pac4j</groupId>
       <artifactId>dropwizard-pac4j</artifactId>
-      <version>1.1.0</version>
+      <version>1.1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.javaslang</groupId>
@@ -127,6 +129,17 @@
       <artifactId>embedded-db-junit</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.zapodot</groupId>
+      <artifactId>embedded-db-junit-liquibase</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-db</artifactId>
+      <version>1.1.1</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Code quality dependencies -->
     <dependency>
       <groupId>org.eclipse.jdt</groupId>
@@ -143,6 +156,88 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-maven-plugin</artifactId>
+        <version>${liquibase.version}</version>
+        <executions>
+          <execution>
+            <!-- this will be executed just before jooq codegen -->
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>update</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <changeLogFile>${basedir}/src/main/resources/migrations.xml</changeLogFile>
+          <driver>org.h2.Driver</driver>
+          <url>${codegen.db.url}</url>
+          <username>u</username>
+          <password></password>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jooq</groupId>
+        <artifactId>jooq-codegen-maven</artifactId>
+        <version>${jooq.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+          </dependency>
+        </dependencies>
+
+        <configuration>
+          <jdbc>
+            <driver>org.h2.Driver</driver>
+            <url>${codegen.db.url}</url>
+            <user>u</user>
+            <password></password>
+          </jdbc>
+          <generator>
+            <name>org.jooq.util.JavaGenerator</name>
+            <generate>
+               <!-- see section 6.2 of docs for additional options -->
+              <deprecated>false</deprecated>
+            </generate>
+            <database>
+              <name>org.jooq.util.h2.H2Database</name>
+              <includes>.*</includes>
+              <inputSchema>PUBLIC</inputSchema>
+            </database>
+            <target>
+              <packageName>org.ow2.petals.cockpit.server.db.generated</packageName>
+              <directory>target/generated-sources/jooq</directory>
+            </target>
+          </generator>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!-- Let's activate jacoco for unit test coverage -->
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>org/ow2/petals/cockpit/server/db/generated/**/*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -226,6 +321,54 @@
         </dependencies>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.jooq</groupId>
+                    <artifactId>jooq-codegen-maven</artifactId>
+                    <versionRange>[3.8.4,)</versionRange>
+                    <goals>
+                      <goal>generate</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>false</runOnIncremental>
+                      <runOnConfiguration>true</runOnConfiguration>
+                    </execute>
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.liquibase</groupId>
+                    <artifactId>liquibase-maven-plugin</artifactId>
+                    <versionRange>[3.5.1,)</versionRange>
+                    <goals>
+                      <goal>update</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>false</runOnIncremental>
+                      <runOnConfiguration>true</runOnConfiguration>
+                    </execute>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <profiles>

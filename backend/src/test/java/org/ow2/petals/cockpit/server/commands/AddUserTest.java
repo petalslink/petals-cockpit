@@ -16,13 +16,15 @@
  */
 package org.ow2.petals.cockpit.server.commands;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.db.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 
 import java.util.Optional;
 
 import org.assertj.core.api.SoftAssertions;
+import org.assertj.db.type.Table;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -32,9 +34,6 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
-import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.Handle;
-import org.skife.jdbi.v2.util.StringColumnMapper;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
 
 import com.codahale.metrics.MetricFilter;
@@ -122,12 +121,9 @@ public class AddUserTest {
         softly.assertThat(systemErrRule.getLog()).as("stderr").isEmpty();
         softly.assertAll();
 
-        final DBI dbi = new DBI(dbRule.getDataSource());
-        try (Handle handle = dbi.open()) {
-            String found = handle.createQuery("select name from users where username = :username")
-                    .bind("username", "admin").map(StringColumnMapper.INSTANCE).first();
-            assertThat(found).as("admin's name").isEqualTo("Admin");
-        }
+        assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
+                .column(USERS.USERNAME.getName()).value().isEqualTo("admin")
+                .column(USERS.NAME.getName()).value().isEqualTo("Admin");
     }
 
     @Test
@@ -147,5 +143,9 @@ public class AddUserTest {
         softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").doesNotContain("Added user");
         softly.assertThat(systemErrRule.getLog()).as("stderr").contains("User admin already exists");
         softly.assertAll();
+        
+        assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
+                .column(USERS.USERNAME.getName()).value().isEqualTo("admin")
+                .column(USERS.NAME.getName()).value().isEqualTo("Admin");
     }
 }

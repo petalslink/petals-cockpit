@@ -17,90 +17,85 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
+
+import java.util.Iterator;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
+import org.jooq.Result;
+import org.jooq.impl.DSL;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
-import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbBusImported;
-import org.ow2.petals.cockpit.server.db.BusesDAO.DbContainer;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
-import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
+import org.ow2.petals.cockpit.server.resources.WorkspaceContent.BusFull;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
 public class ImportBusTest extends AbstractCockpitResourceTest {
 
-    @Rule
-    public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
-
     private final Domain domain = new Domain("dom");
 
-    private final int containerPort = 7700;
-
-    private final Container container = new Container("cont", "host1", ImmutableMap.of(PortType.JMX, containerPort),
+    private final Container container = new Container("cont", "host1", ImmutableMap.of(PortType.JMX, 7700),
             "user", "pass", State.REACHABLE);
+
+    private final Container container2 = new Container("cont2", "host2", ImmutableMap.of(PortType.JMX, 7700),
+            "user", "pass", State.REACHABLE);
+
+    private final Component component = new Component("comp", ComponentType.SE, ArtifactState.State.STARTED);
+
+    private final ServiceUnit serviceUnit = new ServiceUnit("su", component.getName());
+
+    private final ServiceAssembly serviceAssembly = new ServiceAssembly("sa", ArtifactState.State.STARTED, serviceUnit);
 
     @Rule
     public final ResourceTestRule resources = buildResourceTest(WorkspaceResource.class);
 
-    @SuppressWarnings("null")
     @Before
     public void setUp() {
         // petals
         container.addProperty("petals.topology.passphrase", "phrase");
         petals.registerDomain(domain);
         petals.registerContainer(container);
+        petals.registerContainer(container2);
+        petals.registerArtifact(component, container);
+        petals.registerArtifact(serviceAssembly, container);
 
-        // mocks
-        DbWorkspace w = new DbWorkspace(1, "test", MockProfileParamValueFactoryProvider.ADMIN.username);
-
-        doReturn(w).when(workspaces).getWorkspaceById(eq(w.id), any());
-
-        long busId = 4;
-        when(buses.createBus(container.getHost(), containerPort, container.getJmxUsername(), container.getJmxPassword(),
-                "phrase", w.id)).thenReturn(busId);
-        when(buses.createBus("host2", containerPort, container.getJmxUsername(), container.getJmxPassword(), "phrase",
-                w.id)).thenReturn(busId + 1);
-
-        when(buses.getBusById(eq(busId), any())).thenAnswer(
-                i -> new DbBusImported(busId, container.getHost(), containerPort, container.getJmxUsername(),
-                        container.getJmxPassword(), "phrase", domain.getName(), i.getArgument(1)));
-
-        long containerId = 45;
-        when(buses.createContainer(container.getContainerName(), container.getHost(), containerPort,
-                container.getJmxUsername(), container.getJmxPassword(), busId)).thenReturn(containerId);
-        when(buses.getContainerById(eq(containerId), any()))
-                .thenAnswer(i -> new DbContainer(containerId, busId, container.getContainerName(), container.getHost(),
-                        containerPort, container.getJmxUsername(), container.getJmxPassword(), i.getArgument(1)));
-
+        DSL.using(dbRule.getConnectionJdbcUrl()).transaction(conf -> {
+            DSL.using(conf).executeInsert(new WorkspacesRecord(1L, "test"));
+            DSL.using(conf).executeInsert(new UsersWorkspacesRecord(1L, ADMIN));
+        });
     }
 
     @Test
     public void testImportBusOk() {
+        long busId;
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
@@ -108,68 +103,181 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             BusInProgress post = resources.getJerseyTest()
                     .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),
-                            containerPort, container.getJmxUsername(), container.getJmxPassword(), "phrase")),
+                            getPort(container), container.getJmxUsername(), container.getJmxPassword(), "phrase")),
                             BusInProgress.class);
 
-            assertThat(post.id).isEqualTo(4);
+            assertThat(post.ip).isEqualTo(container.getHost());
+            assertThat(post.port).isEqualTo(getPort(container));
+            assertThat(post.username).isEqualTo(container.getJmxUsername());
+            assertThat(post.importError).isNull();
 
+            // there should be only one!
+            Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
+            assertThat(buses).hasSize(1);
+            BusesRecord bus = buses.iterator().next();
+
+            // we can't really check for the temporary state because it is executed concurrently
+            assertThat(bus.getImportIp()).isEqualTo(container.getHost());
+            assertThat(bus.getImportPort()).isEqualTo(getPort(container));
+            assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
+            assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
+            assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
+            assertThat(bus.getWorkspaceId()).isEqualTo(1);
+            assertThat(post.id).isEqualTo(bus.getId());
+            busId = bus.getId();
+
+            // TODO verify all the content!
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("BUS_IMPORT_OK");
-                JsonNode data = e.readData(JsonNode.class);
-                JsonNode bus = data.get("buses").get("4");
-                a.assertThat(bus.get("id").asText()).isEqualTo(post.getId());
-                a.assertThat(bus.get("name").asText()).isEqualTo(domain.getName());
+                WorkspaceContent data = e.readData(WorkspaceContent.class);
+                BusFull busData = data.buses.get(post.getId());
+                a.assertThat(busData.bus.id).isEqualTo(busId);
+                a.assertThat(busData.bus.name).isEqualTo(domain.getName());
             });
         }
 
-        // let's just ensure that the bus is created,
-        // then that the container is also created
-        // and finally the bus is updated in the db
-        verify(buses).createBus(container.getHost(), containerPort, container.getJmxUsername(),
-                container.getJmxPassword(), "phrase", 1);
-        verify(buses).createContainer(container.getContainerName(), container.getHost(), containerPort,
-                container.getJmxUsername(), container.getJmxPassword(), 4);
-        verify(buses).updateBus(4, domain.getName());
+        Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).where(BUSES.ID.eq(busId))
+                .fetch();
+        assertThat(buses).hasSize(1);
+        BusesRecord bus = buses.iterator().next();
+
+        // these shouldn't have changed
+        assertThat(bus.getImportIp()).isEqualTo(container.getHost());
+        assertThat(bus.getImportPort()).isEqualTo(getPort(container));
+        assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
+        assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
+        assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
+        assertThat(bus.getWorkspaceId()).isEqualTo(1);
+        // these should have been set now
+        assertThat(bus.getImported()).isEqualTo(true);
+        assertThat(bus.getImportError()).isNull();
+        assertThat(bus.getName()).isEqualTo(domain.getName());
+
+        Result<ContainersRecord> containers = DSL.using(dbRule.getConnection()).selectFrom(CONTAINERS)
+                .where(CONTAINERS.BUS_ID.eq(busId)).fetch();
+        assertThat(containers).hasSize(2);
+        Iterator<ContainersRecord> iterator = containers.iterator();
+        ContainersRecord cDb = iterator.next();
+        ContainersRecord cDb2 = iterator.next();
+        assertEquivalent(cDb, container);
+        assertEquivalent(cDb2, container2);
+
+        Result<ComponentsRecord> components = DSL.using(dbRule.getConnection()).selectFrom(COMPONENTS)
+                .where(COMPONENTS.CONTAINER_ID.eq(cDb.getId())).fetch();
+        assertThat(components).hasSize(1);
+        ComponentsRecord compDb = components.iterator().next();
+        assertEquivalent(compDb, component);
+
+        Result<ServiceunitsRecord> sus = DSL.using(dbRule.getConnection()).selectFrom(SERVICEUNITS)
+                .where(SERVICEUNITS.COMPONENT_ID.eq(compDb.getId())).fetch();
+        assertThat(sus).hasSize(1);
+        ServiceunitsRecord suDb = sus.iterator().next();
+        assertEquivalent(suDb, serviceAssembly);
     }
 
     @Test
     public void testImportBusForbidden() {
 
-        doReturn(new DbWorkspace(2, "test2", null)).when(workspaces).getWorkspaceById(eq(2L), any());
+        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(2L, "test2"));
 
         Response post = resources.getJerseyTest().target("/workspaces/2/buses").request()
-                .post(Entity.json(new NewBus(container.getHost(), containerPort, container.getJmxUsername(),
+                .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
                         container.getJmxPassword(), "phrase")));
 
         assertThat(post.getStatus()).isEqualTo(403);
     }
 
     @Test
-    public void testImportBusError() {
-        String incorrectHost = "host2";
+    public void testImportBusNotFound() {
 
+        Response post = resources.getJerseyTest().target("/workspaces/2/buses").request()
+                .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
+                        container.getJmxPassword(), "phrase")));
+
+        assertThat(post.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void testImportBusErrorAndDelete() {
+        String incorrectHost = "wrong-host";
+        int incorrectPort = 7700;
+
+        final long busId;
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
             BusInProgress post = resources.getJerseyTest().target("/workspaces/1/buses").request()
-                    .post(Entity.json(new NewBus(incorrectHost, containerPort, container.getJmxUsername(),
+                    .post(Entity.json(new NewBus(incorrectHost, incorrectPort, container.getJmxUsername(),
                             container.getJmxPassword(), "phrase")), BusInProgress.class);
 
-            assertThat(post.id).isEqualTo(5);
+            assertThat(post.ip).isEqualTo(incorrectHost);
+            assertThat(post.port).isEqualTo(incorrectPort);
+            assertThat(post.username).isEqualTo(container.getJmxUsername());
+            assertThat(post.importError).isNull();
+
+            // there should be only one!
+            Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
+            assertThat(buses).hasSize(1);
+            BusesRecord bus = buses.iterator().next();
+
+            // we can't really check for the temporary state because it is executed concurrently
+            assertThat(bus.getImportIp()).isEqualTo(incorrectHost);
+            assertThat(bus.getImportPort()).isEqualTo(incorrectPort);
+            assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
+            assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
+            assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
+            assertThat(bus.getWorkspaceId()).isEqualTo(1);
+            assertThat(bus.getImported()).isEqualTo(false);
+            assertThat(post.id).isEqualTo(bus.getId());
+            busId = bus.getId();
 
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("BUS_IMPORT_ERROR");
-                JsonNode data = e.readData(JsonNode.class);
-                a.assertThat(data.get("importError").asText()).isEqualTo("Unknown Host");
+                BusInProgress data = e.readData(BusInProgress.class);
+                a.assertThat(data.id).isEqualTo(busId);
+                a.assertThat(data.importError).isEqualTo("Unknown Host");
             });
         }
 
-        // let's just ensure that the bus is created and updated in the db
-        verify(buses).createBus(incorrectHost, containerPort, container.getJmxUsername(), container.getJmxPassword(),
-                "phrase", 1);
-        verify(buses).saveError(5, "Unknown Host");
+        Result<BusesRecord> busesDb = DSL.using(dbRule.getConnection()).selectFrom(BUSES).where(BUSES.ID.eq(busId))
+                .fetch();
+        assertThat(busesDb).hasSize(1);
+        BusesRecord busDb = busesDb.iterator().next();
+
+        // these shouldn't have changed
+        assertThat(busDb.getImportIp()).isEqualTo(incorrectHost);
+        assertThat(busDb.getImportPort()).isEqualTo(incorrectPort);
+        assertThat(busDb.getImportUsername()).isEqualTo(container.getJmxUsername());
+        assertThat(busDb.getImportPassword()).isEqualTo(container.getJmxPassword());
+        assertThat(busDb.getImportPassphrase()).isEqualTo("phrase");
+        assertThat(busDb.getWorkspaceId()).isEqualTo(1);
+        // these should have been set now
+        assertThat(busDb.getImported()).isEqualTo(false);
+        assertThat(busDb.getImportError()).isEqualTo("Unknown Host");
+        assertThat(busDb.getName()).isNull();
+
+        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+
+            expectWorkspaceContent(eventInput, (c, a) -> {
+                a.assertThat(c.content.busesInProgress).containsOnlyKeys(String.valueOf(busId));
+            });
+
+            Response delete = resources.getJerseyTest().target("/workspaces/1/buses/" + busId).request().delete();
+
+            assertThat(delete.getStatus()).isEqualTo(204);
+
+            Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
+            assertThat(buses).hasSize(0);
+
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("BUS_DELETED");
+                BusDeleted data = e.readData(BusDeleted.class);
+                a.assertThat(data.id).isEqualTo(busId);
+            });
+        }
     }
 
     @Test
@@ -178,6 +286,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         petals.registerArtifact(
                 new ServiceAssembly("sa", new ServiceUnit("su1", "comp"), new ServiceUnit("su2", "comp")), container);
 
+        long busId;
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
@@ -185,18 +294,53 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             BusInProgress post = resources.getJerseyTest()
                     .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),
-                            containerPort, container.getJmxUsername(), container.getJmxPassword(), "phrase")),
+                            getPort(container), container.getJmxUsername(), container.getJmxPassword(), "phrase")),
                             BusInProgress.class);
 
-            assertThat(post.id).isEqualTo(4);
+            assertThat(post.ip).isEqualTo(container.getHost());
+            assertThat(post.port).isEqualTo(getPort(container));
+            assertThat(post.username).isEqualTo(container.getJmxUsername());
+            assertThat(post.importError).isNull();
+
+            Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
+            assertThat(buses).hasSize(1);
+            BusesRecord bus = buses.iterator().next();
+
+            // we can't really check for the temporary state because it is executed concurrently
+            assertThat(bus.getImportIp()).isEqualTo(container.getHost());
+            assertThat(bus.getImportPort()).isEqualTo(getPort(container));
+            assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
+            assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
+            assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
+            assertThat(bus.getWorkspaceId()).isEqualTo(1);
+            assertThat(bus.getImported()).isEqualTo(false);
+            assertThat(post.id).isEqualTo(bus.getId());
+            busId = bus.getId();
 
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("BUS_IMPORT_ERROR");
-                JsonNode data = e.readData(JsonNode.class);
-                a.assertThat(data.get("importError").asText())
-                        .contains("Buses with not-single SU SAs are not supported");
+                BusInProgress data = e.readData(BusInProgress.class);
+                a.assertThat(data.id).isEqualTo(busId);
+                a.assertThat(data.importError).contains("Buses with not-single SU SAs are not supported");
             });
         }
+
+        Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).where(BUSES.ID.eq(busId))
+                .fetch();
+        assertThat(buses).hasSize(1);
+        BusesRecord bus = buses.iterator().next();
+
+        // these shouldn't have changed
+        assertThat(bus.getImportIp()).isEqualTo(container.getHost());
+        assertThat(bus.getImportPort()).isEqualTo(getPort(container));
+        assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
+        assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
+        assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
+        assertThat(bus.getWorkspaceId()).isEqualTo(1);
+        // these should have been set now
+        assertThat(bus.getImported()).isEqualTo(false);
+        assertThat(bus.getImportError()).contains("Buses with not-single SU SAs are not supported");
+        assertThat(bus.getName()).isNull();
     }
 }
 

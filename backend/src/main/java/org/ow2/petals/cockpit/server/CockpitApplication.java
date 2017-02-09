@@ -21,17 +21,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import javax.inject.Singleton;
+import javax.ws.rs.ext.ContextResolver;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.jooq.Configuration;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
-import org.ow2.petals.cockpit.server.db.UsersDAO;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
 import org.ow2.petals.cockpit.server.resources.BusesResource;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource;
 import org.ow2.petals.cockpit.server.resources.ContainersResource;
@@ -40,25 +40,22 @@ import org.ow2.petals.cockpit.server.resources.UserSession;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
-import org.ow2.petals.cockpit.server.security.CockpitAuthenticator;
 import org.pac4j.core.client.Client;
-import org.pac4j.core.config.Config;
 import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
 import org.pac4j.dropwizard.Pac4jFactory.FilterConfiguration;
-import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bendb.dropwizard.jooq.JooqBundle;
+import com.bendb.dropwizard.jooq.JooqFactory;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import io.dropwizard.Application;
 import io.dropwizard.db.PooledDataSourceFactory;
-import io.dropwizard.jdbi.DBIFactory;
-import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.jetty.BiDiGzipHandler;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.migrations.MigrationsBundle;
@@ -128,6 +125,20 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
     };
 
+    public final JooqBundle<C> jooq = new JooqBundle<C>() {
+
+        @Override
+        public PooledDataSourceFactory getDataSourceFactory(C configuration) {
+            return configuration.getDataSourceFactory();
+        }
+
+        @Override
+        public JooqFactory getJooqFactory(C configuration) {
+            return configuration.getJooqFactory();
+        }
+
+    };
+
     public static void main(String[] args) throws Exception {
         new CockpitApplication<>().run(args);
     }
@@ -140,19 +151,13 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
     @Override
     public void initialize(Bootstrap<C> bootstrap) {
         bootstrap.addBundle(migrations);
+        bootstrap.addBundle(jooq);
         bootstrap.addBundle(pac4j);
-        // ease debugging of exceptions thrown by JDBI!
-        bootstrap.addBundle(new DBIExceptionsBundle());
         bootstrap.addCommand(new AddUserCommand<>());
     }
 
     @Override
     public void run(C configuration, Environment environment) throws Exception {
-        final DBIFactory factory = new DBIFactory();
-        final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "cockpit");
-        final UsersDAO users = jdbi.onDemand(UsersDAO.class);
-        final WorkspacesDAO workspaces = jdbi.onDemand(WorkspacesDAO.class);
-        final BusesDAO buses = jdbi.onDemand(BusesDAO.class);
 
         // use bytecode instrumentation to improve performance of json
         // serialization/deserialization
@@ -184,21 +189,26 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
             }
         });
 
+        Configuration jooqConf = jooq.getConfiguration();
+
         environment.jersey().register(new AbstractBinder() {
             @Override
             protected void configure() {
                 bind(configuration).to(CockpitConfiguration.class);
                 bind(jdbcExec).named(BLOCKING_TASK_ES).to(ExecutorService.class);
-                bind(users).to(UsersDAO.class);
-                bind(workspaces).to(WorkspacesDAO.class);
-                bind(buses).to(BusesDAO.class);
-                bind(jdbi).to(DBI.class);
                 bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
                 bind(adminFactory).to(PetalsAdministrationFactory.class);
+                bind(jooqConf).to(Configuration.class);
             }
         });
 
-        setupPac4J(users);
+        // used by CockpitAuthenticator
+        environment.jersey().register(new ContextResolver<Configuration>() {
+            @Override
+            public Configuration getContext(@Nullable Class<?> type) {
+                return jooqConf;
+            }
+        });
 
         environment.jersey().register(UserSession.class);
         environment.jersey().register(WorkspacesResource.class);
@@ -220,22 +230,5 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 }
             }
         });
-    }
-
-    private void setupPac4J(UsersDAO users) {
-
-        Config conf = pac4j.getConfig();
-
-        if (conf != null) {
-            CockpitAuthClient cac = conf.getClients().findClient(CockpitAuthClient.class);
-
-            // if it's already set, either we are in a test, or another backend is used
-            if (cac.getAuthenticator() == null) {
-                // this can't be set from the configuration because we rely on the UserDAO
-                // TODO can something be done about that? for example with injection...
-                final CockpitAuthenticator auth = new CockpitAuthenticator(users);
-                cac.setAuthenticator(auth);
-            }
-        }
     }
 }

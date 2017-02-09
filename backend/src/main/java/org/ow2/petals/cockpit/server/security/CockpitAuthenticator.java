@@ -16,8 +16,13 @@
  */
 package org.ow2.petals.cockpit.server.security;
 
-import org.ow2.petals.cockpit.server.db.UsersDAO;
-import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
+
+import javax.ws.rs.core.MediaType;
+
+import org.jooq.Configuration;
+import org.jooq.Record1;
+import org.jooq.impl.DSL;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.AbstractUsernamePasswordAuthenticator;
@@ -25,20 +30,17 @@ import org.pac4j.core.credentials.password.SpringSecurityPasswordEncoder;
 import org.pac4j.core.exception.AccountNotFoundException;
 import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.exception.HttpAction;
+import org.pac4j.jax.rs.pac4j.JaxRsContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class CockpitAuthenticator extends AbstractUsernamePasswordAuthenticator {
 
-    protected final UsersDAO users;
-
-    public CockpitAuthenticator(UsersDAO users) {
-        this.users = users;
-    }
-
     @Override
     protected void internalInit(WebContext context) {
         setPasswordEncoder(new SpringSecurityPasswordEncoder(new BCryptPasswordEncoder()));
-        
+
+        assert context instanceof JaxRsContext;
+
         super.internalInit(context);
     }
 
@@ -51,13 +53,17 @@ public class CockpitAuthenticator extends AbstractUsernamePasswordAuthenticator 
         // can't be null according to CockpitExtractor!
         assert username != null;
 
-        final DbUser user = users.findByUsername(username);
+        Configuration conf = ((JaxRsContext) context).getProviders()
+                .getContextResolver(Configuration.class, MediaType.WILDCARD_TYPE).getContext(null);
 
-        if (user != null) {
-            if (!getPasswordEncoder().matches(credentials.getPassword(), user.password)) {
+        Record1<String> pw = DSL.using(conf).select(USERS.PASSWORD).from(USERS).where(USERS.USERNAME.eq(username))
+                .fetchOne();
+
+        if (pw != null) {
+            if (!getPasswordEncoder().matches(credentials.getPassword(), pw.value1())) {
                 throw new BadCredentialsException("Bad credentials for: " + username);
             } else {
-                credentials.setUserProfile(new CockpitProfile(user));
+                credentials.setUserProfile(new CockpitProfile(username));
             }
         } else {
             throw new AccountNotFoundException("No account found for: " + username);

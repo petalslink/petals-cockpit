@@ -17,6 +17,7 @@
 package org.ow2.petals.cockpit.server.mocks;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -30,19 +31,19 @@ import org.glassfish.jersey.server.internal.inject.MultivaluedParameterExtractor
 import org.glassfish.jersey.server.internal.inject.ParamInjectionResolver;
 import org.glassfish.jersey.server.model.Parameter;
 import org.glassfish.jersey.server.spi.internal.ValueFactoryProvider;
-import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 public class MockProfileParamValueFactoryProvider extends AbstractValueFactoryProvider {
 
-    public static final DbUser ADMIN = new DbUser(MockAuthenticator.ADMIN.username, "...",
-            MockAuthenticator.ADMIN.name);
+    private final String username;
 
     @Inject
-    public MockProfileParamValueFactoryProvider(MultivaluedParameterExtractorProvider mpep, ServiceLocator locator) {
+    public MockProfileParamValueFactoryProvider(UsernameProvider username, MultivaluedParameterExtractorProvider mpep,
+            ServiceLocator locator) {
         super(mpep, locator, Parameter.Source.UNKNOWN);
+        this.username = username.get();
     }
 
     @Override
@@ -54,7 +55,7 @@ public class MockProfileParamValueFactoryProvider extends AbstractValueFactoryPr
             return new Factory<CommonProfile>() {
                 @Override
                 public CommonProfile provide() {
-                    return new CockpitProfile(ADMIN);
+                    return new CockpitProfile(username);
                 }
 
                 @Override
@@ -66,6 +67,21 @@ public class MockProfileParamValueFactoryProvider extends AbstractValueFactoryPr
         return null;
     }
 
+    public static class UsernameProvider implements Provider<String> {
+
+        private final String username;
+
+        public UsernameProvider(String username) {
+            this.username = username;
+        }
+
+        @Override
+        public String get() {
+            return username;
+        }
+
+    }
+
     public static class MockProfileParamInjectionResolver extends ParamInjectionResolver<Pac4JProfile> {
         public MockProfileParamInjectionResolver() {
             super(MockProfileParamValueFactoryProvider.class);
@@ -73,8 +89,16 @@ public class MockProfileParamValueFactoryProvider extends AbstractValueFactoryPr
     }
 
     public static class Binder extends AbstractBinder {
+
+        private final String username;
+
+        public Binder(String username) {
+            this.username = username;
+        }
+
         @Override
         protected void configure() {
+            bind(new UsernameProvider(username)).to(UsernameProvider.class);
             bind(MockProfileParamValueFactoryProvider.class).to(ValueFactoryProvider.class).in(Singleton.class);
             bind(MockProfileParamInjectionResolver.class).to(new TypeLiteral<InjectionResolver<Pac4JProfile>>() {
             }).in(Singleton.class);

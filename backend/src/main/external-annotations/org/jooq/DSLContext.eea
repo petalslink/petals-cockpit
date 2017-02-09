@@ -1,0 +1,10 @@
+class org/jooq/DSLContext
+select
+ <T1:Ljava/lang/Object;>(Lorg/jooq/SelectField<TT1;>;)Lorg/jooq/SelectSelectStep<Lorg/jooq/Record1<TT1;>;>;
+ <T1:Ljava/lang/Object;>(Lorg/jooq/SelectField<TT1;>;)L1org/jooq/SelectSelectStep<Lorg/jooq/Record1<TT1;>;>;
+selectFrom
+ <R::Lorg/jooq/Record;>(Lorg/jooq/Table<TR;>;)Lorg/jooq/SelectWhereStep<TR;>;
+ <R::Lorg/jooq/Record;>(Lorg/jooq/Table<TR;>;)L1org/jooq/SelectWhereStep<TR;>;
+transactionResult
+ <T:Ljava/lang/Object;>(Lorg/jooq/TransactionalCallable<TT;>;)TT;
+ <T:Ljava/lang/Object;>(L1org/jooq/TransactionalCallable<TT;>;)TT;

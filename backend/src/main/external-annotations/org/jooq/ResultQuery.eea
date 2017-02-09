@@ -1,0 +1,34 @@
+class org/jooq/ResultQuery
+fetch
+ ()Lorg/jooq/Result<TR;>;
+ ()L1org/jooq/Result<T1R;>;
+fetchInto
+ <E:Ljava/lang/Object;>(Ljava/lang/Class<+TE;>;)Ljava/util/List<TE;>;
+ <E:Ljava/lang/Object;>(Ljava/lang/Class<+TE;>;)L1java/util/List<TE;>;
+fetchInto
+ <Z::Lorg/jooq/Record;>(Lorg/jooq/Table<TZ;>;)Lorg/jooq/Result<TZ;>;
+ <Z::Lorg/jooq/Record;>(Lorg/jooq/Table<TZ;>;)L1org/jooq/Result<T1Z;>;
+fetchLazy
+ ()Lorg/jooq/Cursor<TR;>;
+ ()Lorg/jooq/Cursor<T1R;>;
+fetchOne
+ ()TR;
+ ()T0R;
+fetchOne
+ <U:Ljava/lang/Object;>(Lorg/jooq/Name;Lorg/jooq/Converter<*TU;>;)TU;
+ <U:Ljava/lang/Object;>(Lorg/jooq/Name;Lorg/jooq/Converter<*TU;>;)T0U;
+fetchOneInto
+ <Z::Lorg/jooq/Record;>(Lorg/jooq/Table<TZ;>;)TZ;
+ <Z::Lorg/jooq/Record;>(Lorg/jooq/Table<TZ;>;)T0Z;
+fetchOptional
+ ()Ljava/util/Optional<TR;>;
+ ()Ljava/util/Optional<T1R;>;
+fetchStream
+ ()Ljava/util/stream/Stream<TR;>;
+ ()Ljava/util/stream/Stream<T1R;>;
+iterator
+ ()Ljava/util/Iterator<TR;>;
+ ()Ljava/util/Iterator<T1R;>;
+stream
+ ()Ljava/util/stream/Stream<TR;>;
+ ()L1java/util/stream/Stream<T1R;>;

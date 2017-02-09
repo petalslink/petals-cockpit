@@ -1,0 +1,10 @@
+class org/jooq/SelectWhereStep
+where
+ (Ljava/util/Collection<+Lorg/jooq/Condition;>;)Lorg/jooq/SelectConditionStep<TR;>;
+ (Ljava/util/Collection<+Lorg/jooq/Condition;>;)L1org/jooq/SelectConditionStep<TR;>;
+where
+ (Lorg/jooq/Field<Ljava/lang/Boolean;>;)Lorg/jooq/SelectConditionStep<TR;>;
+ (Lorg/jooq/Field<Ljava/lang/Boolean;>;)L1org/jooq/SelectConditionStep<TR;>;
+where
+ ([Lorg/jooq/Condition;)Lorg/jooq/SelectConditionStep<TR;>;
+ ([Lorg/jooq/Condition;)L1org/jooq/SelectConditionStep<TR;>;

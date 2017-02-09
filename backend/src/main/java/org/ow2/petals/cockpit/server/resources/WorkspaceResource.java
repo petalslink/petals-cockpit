@@ -16,6 +16,11 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_USERNAME;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -35,20 +40,21 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.jooq.Configuration;
+import org.jooq.Record;
+import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeServiceUnitState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
-import org.ow2.petals.cockpit.server.db.BusesDAO;
-import org.ow2.petals.cockpit.server.db.UsersDAO;
-import org.ow2.petals.cockpit.server.db.UsersDAO.DbUser;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO;
-import org.ow2.petals.cockpit.server.db.WorkspacesDAO.DbWorkspace;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin.State;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
@@ -58,6 +64,8 @@ import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableList;
@@ -69,45 +77,46 @@ public class WorkspaceResource {
 
     private final CockpitActors as;
 
-    private final UsersDAO users;
-
-    private final WorkspacesDAO workspaces;
-
-    private final BusesDAO buses;
-
     private final long wsId;
 
+    private final Configuration jooq;
+
     @Inject
-    public WorkspaceResource(@PathParam("wsId") @Min(1) long wsId, CockpitActors as, WorkspacesDAO workspaces,
-            BusesDAO buses, UsersDAO users) {
+    public WorkspaceResource(@PathParam("wsId") @Min(1) long wsId, CockpitActors as, Configuration jooq) {
         this.as = as;
-        this.workspaces = workspaces;
-        this.users = users;
-        this.buses = buses;
         this.wsId = wsId;
+        this.jooq = jooq;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";qs=1")
     @Valid
     public WorkspaceFullContent get(@Pac4JProfile CockpitProfile profile) {
+        return DSL.using(jooq).transactionResult(conf -> {
+            WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId)).fetchOne();
 
-        DbWorkspace ws = workspaces.getWorkspaceById(wsId, profile.getUser().username);
+            if (ws == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
 
-        if (ws == null) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
+            Record user = DSL.using(conf).selectFrom(USERS_WORKSPACES)
+                    .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId())))
+                    .fetchOne();
 
-        if (ws.acl == null) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
+            if (user == null) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
 
-        WorkspaceContent content = WorkspaceContent.buildFromDatabase(buses, ws);
-        List<DbUser> wsUsers = workspaces.getWorkspaceUsers(wsId);
+            WorkspaceContent content = WorkspaceContent.buildFromDatabase(conf, ws);
 
-        users.saveLastWorkspace(profile.getUser(), ws.id);
+            List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
+                    .onKey(FK_USERS_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(ws.getId())).fetchInto(USERS);
 
-        return new WorkspaceFullContent(ws, wsUsers, content);
+            DSL.using(conf).update(USERS).set(USERS.LAST_WORKSPACE, wsId).where(USERS.USERNAME.eq(profile.getId()))
+                    .execute();
+
+            return new WorkspaceFullContent(ws, wsUsers, content);
+        });
     }
 
     /**
@@ -117,12 +126,8 @@ public class WorkspaceResource {
     @Produces(SseFeature.SERVER_SENT_EVENTS + ";qs=0.5")
     public EventOutput sse(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
         // TODO ACL is done by actor for now
-        EventOutput eo = as.call(wsId, new NewWorkspaceClient(profile.getUser().getUsername()))
+        return as.call(wsId, new NewWorkspaceClient(profile.getId()))
                 .getOrElseThrow(s -> new WebApplicationException(s));
-
-        users.saveLastWorkspace(profile.getUser(), wsId);
-
-        return eo;
     }
 
     @POST
@@ -130,39 +135,49 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
-    public BusInProgress addBus(@Pac4JProfile CockpitProfile profile, @Valid NewBus nb) throws InterruptedException {
+    public BusInProgress addBus(@Pac4JProfile CockpitProfile profile, @Valid NewBus nb) {
+        return DSL.using(jooq).transactionResult(conf -> {
+            // TODO simplify requests?
+            WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId)).fetchOne();
 
-        DbWorkspace ws = workspaces.getWorkspaceById(wsId, profile.getUser().username);
+            if (ws == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
 
-        if (ws == null) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
+            Record user = DSL.using(conf).selectFrom(USERS_WORKSPACES)
+                    .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId())))
+                    .fetchOne();
 
-        if (ws.acl == null) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
+            if (user == null) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
 
-        return as.call(wsId, new ImportBus(profile.getUser().getUsername(), nb))
-                .getOrElseThrow(s -> new WebApplicationException(s));
+            return as.call(wsId, new ImportBus(profile.getId(), nb))
+                    .getOrElseThrow(s -> new WebApplicationException(s));
+        });
     }
 
     @DELETE
     @Path("/buses/{bId}")
-    public void delete(@PathParam("bId") @Min(1) long bId, @Pac4JProfile CockpitProfile profile)
-            throws InterruptedException {
+    public void delete(@PathParam("bId") @Min(1) long bId, @Pac4JProfile CockpitProfile profile) {
+        DSL.using(jooq).transaction(conf -> {
+            // TODO simplify requests?
+            WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId)).fetchOne();
 
-        DbWorkspace ws = workspaces.getWorkspaceById(wsId, profile.getUser().username);
+            if (ws == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
 
-        if (ws == null) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
+            Record user = DSL.using(conf).selectFrom(USERS_WORKSPACES)
+                    .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId())))
+                    .fetchOne();
 
-        if (ws.acl == null) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
+            if (user == null) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
 
-        as.call(wsId, new DeleteBus(profile.getUser().getUsername(), bId))
-                .getOrElseThrow(s -> new WebApplicationException(s));
+            as.call(wsId, new DeleteBus(profile.getId(), bId)).getOrElseThrow(s -> new WebApplicationException(s));
+        });
     }
 
     @PUT
@@ -172,7 +187,7 @@ public class WorkspaceResource {
     public ServiceUnitOverview changeSUState(@PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile,
             @Valid ChangeState action) throws InterruptedException {
         // TODO ACL is done by actor for now
-        return as.call(wsId, new ChangeServiceUnitState(profile.getUser().getUsername(), suId, action.state))
+        return as.call(wsId, new ChangeServiceUnitState(profile.getId(), suId, action.state))
                 .getOrElseThrow(s -> new WebApplicationException(s));
     }
 
@@ -228,17 +243,28 @@ public class WorkspaceResource {
         @Min(1)
         public final long id;
 
+        @Nullable
+        @JsonProperty
+        @JsonInclude(Include.NON_EMPTY)
+        public final String importError;
+
         @JsonCreator
         private BusInProgress(@JsonProperty("id") String id, @JsonProperty("ip") String ip,
-                @JsonProperty("port") int port, @JsonProperty("username") String username) {
-            this(Long.valueOf(id), ip, port, username);
+                @JsonProperty("port") int port, @JsonProperty("username") String username,
+                @Nullable @JsonProperty("importError") String importError) {
+            this(Long.valueOf(id), ip, port, username, importError);
         }
 
         public BusInProgress(long id, String ip, int port, String username) {
+            this(id, ip, port, username, null);
+        }
+
+        public BusInProgress(long id, String ip, int port, String username, @Nullable String importError) {
             this.id = id;
             this.ip = ip;
             this.port = port;
             this.username = username;
+            this.importError = importError;
         }
 
         @JsonProperty
@@ -246,17 +272,6 @@ public class WorkspaceResource {
             return Long.toString(id);
         }
 
-    }
-
-    public static class BusInError extends BusInProgress {
-
-        @JsonProperty
-        public final String importError;
-
-        public BusInError(long id, String ip, int port, String username, String error) {
-            super(id, ip, port, username);
-            this.importError = error;
-        }
     }
 
     public static class NewSUState {
@@ -310,11 +325,12 @@ public class WorkspaceResource {
         @JsonUnwrapped
         public final WorkspaceContent content;
 
-        public WorkspaceFullContent(DbWorkspace ws, List<DbUser> users, WorkspaceContent content) {
-            this.users = users.stream()
-                    .collect(ImmutableMap.toImmutableMap(DbUser::getUsername, u -> new UserMin(u.username, u.name)));
-            List<String> wsUsernames = users.stream().map(DbUser::getUsername).collect(ImmutableList.toImmutableList());
-            this.workspace = new Workspace(ws.id, ws.name, wsUsernames);
+        public WorkspaceFullContent(WorkspacesRecord ws, List<UsersRecord> users, WorkspaceContent content) {
+            this.users = users.stream().collect(ImmutableMap.toImmutableMap(UsersRecord::getUsername,
+                    u -> new UserMin(u.getUsername(), u.getName())));
+            List<String> wsUsernames = users.stream().map(UsersRecord::getUsername)
+                    .collect(ImmutableList.toImmutableList());
+            this.workspace = new Workspace(ws.getId(), ws.getName(), wsUsernames);
             this.content = content;
         }
 
@@ -345,7 +361,8 @@ public class WorkspaceResource {
             this.data = data;
         }
 
-        public static WorkspaceChange busImportError(BusInError bus) {
+        public static WorkspaceChange busImportError(BusInProgress bus) {
+            assert bus.importError != null && !bus.importError.isEmpty();
             return new WorkspaceChange(Type.BUS_IMPORT_ERROR, bus);
         }
 
