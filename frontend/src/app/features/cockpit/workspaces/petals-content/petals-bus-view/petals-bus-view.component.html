@@ -15,14 +15,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="wrapper-content">
   <md-toolbar>
-    <md-icon color="primary">grade</md-icon>
+    <div class="prefix-toolbar-title">
+      <md-icon color="primary" *ngIf="!(bus$ | async).isFetchingDetails">grade</md-icon>
+
+      <md-spinner *ngIf="(bus$ | async).isFetchingDetails"></md-spinner>
+    </div>
+
     {{ (bus$ | async)?.name }}
   </md-toolbar>
 
-    <md-tab-group fxFlex>
-      <md-tab label="Overview">
-        <!-- TODO: Create a component for every tab -->
-        <app-petals-bus-overview [bus]="bus$ | async" fxFill></app-petals-bus-overview>
-      </md-tab>
-    </md-tab-group>
+  <md-tab-group fxFlex>
+    <md-tab label="Overview">
+      <!-- TODO: Create a component for every tab -->
+      <app-petals-bus-overview [bus]="bus$ | async" fxFill></app-petals-bus-overview>
+    </md-tab>
+  </md-tab-group>
 </div>

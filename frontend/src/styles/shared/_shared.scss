@@ -181,3 +181,14 @@ pre {
 ::-webkit-scrollbar-track:horizontal:active {
   border-top: 1px solid rgba(0,0,0,0.20);
 }
+
+.prefix-toolbar-title {
+  width: 40px;
+  text-align: center;
+
+  md-spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+  }
+}
