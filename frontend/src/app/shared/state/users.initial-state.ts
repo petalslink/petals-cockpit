@@ -17,12 +17,14 @@
 
 import { IUsersTable } from '../interfaces/users.interface';
 
+import { environment } from './../../../environments/environment';
+
 export function usersState(): IUsersTable {
   return {
     connectedUserId: '',
 
     isConnecting: false,
-    isConnected: true,
+    isConnected: environment.alreadyConnected,
     isDisconnecting: false,
     connectionFailed: false,
 
