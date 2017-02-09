@@ -135,31 +135,8 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
-    public BusInProgress addBus(@Pac4JProfile CockpitProfile profile, @Valid NewBus nb) {
-        return DSL.using(jooq).transactionResult(conf -> {
-            // TODO simplify requests?
-            WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId)).fetchOne();
-
-            if (ws == null) {
-                throw new WebApplicationException(Status.NOT_FOUND);
-            }
-
-            Record user = DSL.using(conf).selectFrom(USERS_WORKSPACES)
-                    .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId())))
-                    .fetchOne();
-
-            if (user == null) {
-                throw new WebApplicationException(Status.FORBIDDEN);
-            }
-
-            return as.call(wsId, new ImportBus(profile.getId(), nb))
-                    .getOrElseThrow(s -> new WebApplicationException(s));
-        });
-    }
-
-    @DELETE
-    @Path("/buses/{bId}")
-    public void delete(@PathParam("bId") @Min(1) long bId, @Pac4JProfile CockpitProfile profile) {
+    public BusInProgress addBus(@Pac4JProfile CockpitProfile profile, @Valid NewBus nb)
+            throws WebApplicationException, InterruptedException {
         DSL.using(jooq).transaction(conf -> {
             // TODO simplify requests?
             WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId)).fetchOne();
@@ -175,9 +152,34 @@ public class WorkspaceResource {
             if (user == null) {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
-
-            as.call(wsId, new DeleteBus(profile.getId(), bId)).getOrElseThrow(s -> new WebApplicationException(s));
         });
+
+        return as.call(wsId, new ImportBus(profile.getId(), nb)).getOrElseThrow(s -> new WebApplicationException(s));
+    }
+    }
+
+    @DELETE
+    @Path("/buses/{bId}")
+    public void delete(@PathParam("bId") @Min(1) long bId, @Pac4JProfile CockpitProfile profile)
+            throws WebApplicationException, InterruptedException {
+        DSL.using(jooq).transaction(conf -> {
+            // TODO simplify requests?
+            WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId)).fetchOne();
+
+            if (ws == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
+
+            Record user = DSL.using(conf).selectFrom(USERS_WORKSPACES)
+                    .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId())))
+                    .fetchOne();
+
+            if (user == null) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
+        });
+
+        as.call(wsId, new DeleteBus(profile.getId(), bId)).getOrElseThrow(s -> new WebApplicationException(s));
     }
 
     @PUT
