@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 
 import { IStore } from './../../shared/interfaces/store.interface';
 import { Users } from './../../shared/state/users.reducer';
@@ -29,9 +30,11 @@ import { IUsersTable } from './../../shared/interfaces/users.interface';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   public loginForm: FormGroup;
-  public users$: Observable<IUsersTable>;
+  private users$: Observable<IUsersTable>;
+  private usersSub: Subscription;
+  public users: IUsersTable;
 
   constructor(private _store$: Store<IStore>, private _fb: FormBuilder) { }
 
@@ -42,6 +45,30 @@ export class LoginComponent implements OnInit {
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
+
+    this.usersSub = this
+      .users$
+      .distinctUntilChanged((p, n) =>
+        p.isConnected === n.isConnected &&
+        p.isConnecting === n.isConnecting &&
+        p.connectionFailed === n.connectionFailed
+      )
+      .map(users => {
+        this.users = users;
+
+        if (users.isConnecting || users.isConnected) {
+          this.loginForm.disable();
+          this.loginForm.disable();
+        } else {
+          this.loginForm.enable();
+          this.loginForm.enable();
+        }
+      })
+      .subscribe();
+  }
+
+  ngOnDestroy() {
+    this.usersSub.unsubscribe();
   }
 
   onSubmit({value}) {

@@ -29,17 +29,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <input mdInput type="password" placeholder="Password" formControlName="password" required>
     </md-input-container>
 
-    <div fxLayout="row" fxFlex="100%" fxLayoutAlign="start center" class="form-error" *ngIf="(users$ | async).connectionFailed">
+    <div fxLayout="row" fxFlex="100%" fxLayoutAlign="start center" class="form-error" *ngIf="users.connectionFailed">
       <md-icon color="warn">error</md-icon>
       <p>Username and password do not match</p>
     </div>
 
-    <button md-raised-button color="primary" class="margin-top-x1" [disabled]="loginForm.invalid || (users$ | async).isConnecting || (users$ | async).isConnected">
-      <span *ngIf="!(users$ | async).isConnecting && !(users$ | async).isConnected">
+    <button md-raised-button color="primary" class="margin-top-x1" [disabled]="loginForm.invalid || users.isConnecting || users.isConnected">
+      <span *ngIf="!users.isConnecting && !users.isConnected">
         Log in
       </span>
 
-      <span *ngIf="(users$ | async).isConnecting || (users$ | async).isConnected" fxLayout="row" fxLayoutAlign="center center">
+      <span *ngIf="users.isConnecting || users.isConnected" fxLayout="row" fxLayoutAlign="center center">
         Logging in <md-spinner></md-spinner>
       </span>
     </button>
