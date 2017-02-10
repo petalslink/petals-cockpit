@@ -21,6 +21,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -47,6 +48,7 @@ import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.ContainerAdministration;
 import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
+import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
@@ -54,9 +56,8 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 
-import javaslang.Tuple;
 import javaslang.control.Option;
 
 @Singleton
@@ -108,16 +109,17 @@ public class ContainersResource {
                     ids = s.collect(Collectors.toMap(ContainersRecord::getName, ContainersRecord::getId));
                 }
 
-                Map<String, String> reachabilities = javaslang.collection.List.ofAll(domain.getContainers())
+                List<String> reachabilities = javaslang.collection.List.ofAll(domain.getContainers())
                         // remove myself
                         .filter(c -> !Objects.equals(container.getName(), c.getContainerName()))
+                        // keep the reachable containers
+                        .filter(c -> c.getState() == Container.State.REACHABLE)
                         // get the ids (if they exist) TODO what do I do with unknown container names?
-                        .flatMap(c -> Option.of(ids.get(c.getContainerName())).map(i -> Tuple.of(i, c)))
-                        // transform to a reachability information
-                        .toJavaMap(p -> p.map((i, c) -> Tuple.of(Long.toString(i), c.getState().name())));
+                        .flatMap(c -> Option.of(ids.get(c.getContainerName())))
+                        // convert it to strings
+                        .map(String::valueOf).toJavaList();
                 return new ContainerOverview(container.getId(), container.getName(), container.getIp(),
-                        container.getPort(), reachabilities,
-                        sysInfo);
+                        container.getPort(), reachabilities, sysInfo);
             } finally {
                 if (petals.isConnected()) {
                     petals.disconnect();
@@ -159,7 +161,7 @@ public class ContainersResource {
         public final int port;
 
         @JsonProperty
-        public final ImmutableMap<String, String> reachabilities;
+        public final ImmutableList<String> reachabilities;
 
         @NotNull
         @JsonProperty
@@ -168,12 +170,12 @@ public class ContainersResource {
         @JsonCreator
         public ContainerOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
                 @JsonProperty("ip") String ip, @JsonProperty("port") int port,
-                @JsonProperty("reachabilities") Map<String, String> reachabilities,
+                @JsonProperty("reachabilities") List<String> reachabilities,
                 @JsonProperty("systemInfo") String systemInfo) {
             super(id, name);
             this.ip = ip;
             this.port = port;
-            this.reachabilities = ImmutableMap.copyOf(reachabilities);
+            this.reachabilities = ImmutableList.copyOf(reachabilities);
             this.systemInfo = systemInfo;
         }
     }

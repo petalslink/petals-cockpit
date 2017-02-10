@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.ws.rs.core.Response;
 
-import org.assertj.core.data.MapEntry;
 import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerOverview;
@@ -50,8 +49,7 @@ public class ContainersResourceTest extends AbstractDefaultWorkspaceResourceTest
         assertThat(get.name).isEqualTo(container2.getContainerName());
         assertThat(get.ip).isEqualTo(container2.getHost());
         assertThat(get.port).isEqualTo(containerPort);
-        assertThat(get.reachabilities).containsOnly(MapEntry.entry("20", container1.getState().name()),
-                MapEntry.entry("22", container3.getState().name()));
+        assertThat(get.reachabilities).containsOnly("20");
         assertThat(get.systemInfo).isEqualTo(SYSINFO);
     }
 
