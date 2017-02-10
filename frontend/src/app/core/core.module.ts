@@ -15,13 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
+import { NgModule, ModuleWithProviders } from '@angular/core';
 import { Http } from '@angular/http';
+import { MaterialModule } from '@angular/material';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { TranslateModule, TranslateLoader } from 'ng2-translate';
+import { TranslateModule, TranslateLoader, TranslateStaticLoader } from 'ng2-translate';
 
 import './rxjs-operators';
 import { createTranslateLoader } from '../shared/helpers/aot.helper';
@@ -96,38 +97,26 @@ export const providers = [
   }
 ];
 
-
-export const importsDev = [
-  StoreDevtoolsModule.instrumentOnlyWithExtension(),
-];
-
-export const importsProd = [
-  FlexLayoutModule.forRoot(),
-  // TODO : Keep an eye on ngrx V3 to have lazy loaded reducers
-  // https://github.com/ngrx/store/pull/269
-  StoreModule.provideStore(getRootReducer),
-  EffectsModule.run(WorkspacesEffects),
-  EffectsModule.run(BusesInProgressEffects),
-  EffectsModule.run(UsersEffects),
-  EffectsModule.run(BusesEffects),
-  EffectsModule.run(ContainersEffects),
-  EffectsModule.run(ComponentsEffects),
-  EffectsModule.run(ServiceUnitsEffects),
-  TranslateModule.forRoot({
-    provide: TranslateLoader,
-    useFactory: (createTranslateLoader),
-    deps: [Http]
-  })
-];
-
-export const imports = importsProd;
-
-if (!environment.production) {
-  imports.push(...importsDev);
-}
-
 @NgModule({
-  imports,
+  imports: [
+    FlexLayoutModule.forRoot(),
+    // TODO : Keep an eye on ngrx V3 to have lazy loaded reducers
+    // https://github.com/ngrx/store/pull/269
+    StoreModule.provideStore(getRootReducer),
+    EffectsModule.run(WorkspacesEffects),
+    EffectsModule.run(BusesInProgressEffects),
+    EffectsModule.run(UsersEffects),
+    EffectsModule.run(BusesEffects),
+    EffectsModule.run(ContainersEffects),
+    EffectsModule.run(ComponentsEffects),
+    EffectsModule.run(ServiceUnitsEffects),
+    StoreDevtoolsModule.instrumentOnlyWithExtension(),
+    TranslateModule.forRoot({
+      provide: TranslateLoader,
+      useFactory: (createTranslateLoader),
+      deps: [Http]
+    })
+  ],
   providers
 })
 export class CoreModule { }

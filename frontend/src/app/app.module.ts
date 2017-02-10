@@ -20,6 +20,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import 'hammerjs';
 
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';

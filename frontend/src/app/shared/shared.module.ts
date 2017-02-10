@@ -20,23 +20,16 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
-import {
-  MdInputModule,
-  MdSidenavModule,
-  MdToolbarModule,
-  MdListModule,
-  MdCardModule,
-  MdTabsModule,
-  MdButtonModule,
-  MdIconModule,
-  MdDialogModule,
-  MdProgressSpinnerModule,
-  MdTooltipModule
-} from '@angular/material';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { MaterialModule } from '@angular/material';
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { TranslateModule } from 'ng2-translate';
 import { PrettyJsonModule } from 'angular2-prettyjson';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
+import { environment } from './../../environments/environment';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive'
 
 export const modules = [
@@ -44,17 +37,11 @@ export const modules = [
   ReactiveFormsModule,
   HttpModule,
   RouterModule,
-  MdInputModule,
-  MdSidenavModule,
-  MdToolbarModule,
-  MdListModule,
-  MdCardModule,
-  MdTabsModule,
-  MdButtonModule,
-  MdIconModule,
-  MdDialogModule,
-  MdProgressSpinnerModule,
-  MdTooltipModule,
+  MaterialModule,
+  FlexLayoutModule,
+  StoreModule,
+  StoreDevtoolsModule,
+  TranslateModule,
   PrettyJsonModule,
   SimpleNotificationsModule
 ];
