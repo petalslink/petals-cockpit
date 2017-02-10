@@ -75,20 +75,17 @@ build-frontend:
     - /^back\/.*$/
   script:
     - "cd frontend"
-    # broken for now, see https://github.com/angular/angular-cli/issues/4350
+    # broken for now, see https://github.com/mgechev/codelyzer/issues/190
     # - "time ng lint"
-    # also broken for now, see https://github.com/angular/angular-cli/issues/4351
-    # - time tslint "src/**/*.ts" --project src/tsconfig.json && tslint "e2e/**/*.ts" --project e2e/tsconfig.json
     - "time node generate-headers.js --dry"
     - "nohup $XVFB &"
     - "XVFBPID=$!"
     - "time ng test --progress=false --single-run --code-coverage"
-    - "nohup ng serve --progress=false -e=prod-e2e &"
-    - "NGPID=$!"
-    - "time ng e2e"
-    - "kill $NGPID"
+    # remove when https://github.com/angular/angular-cli/issues/4596 is fixed
+    - "webdriver-manager update --standalone false --gecko false"
+    - "time ng e2e --progress=false -e=prod-e2e --webdriver-update=false"
     - "kill $XVFBPID"
-    - "time ng build --progress=false --prod"
+    - "time yarn run prod-silent"
   artifacts:
     paths:
       - frontend/dist
@@ -130,4 +127,6 @@ e2e-product:
     - "nohup $COCKPIT server $COCKPIT_CONFIG &"
     - "nohup $XVFB &"
     - "cd frontend"
-    - yarn run e2e -- --exclude "e2e/*needspetals*.ts"
+    # remove when https://github.com/angular/angular-cli/issues/4596 is fixed
+    - "webdriver-manager update --standalone false --gecko false"
+    - yarn run e2e --serve=false --webdriver-update=false -- --exclude "e2e/*needspetals*.ts"

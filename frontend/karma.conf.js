@@ -10,7 +10,7 @@ module.exports = function (config) {
       require('karma-jasmine-diff-reporter'),
       require('karma-clear-screen-reporter'),
       require('karma-chrome-launcher'),
-      require('karma-remap-istanbul'),
+      require('karma-coverage-istanbul-reporter'),
       require('@angular/cli/plugins/karma')
     ],
     files: [
@@ -22,18 +22,16 @@ module.exports = function (config) {
     mime: {
       'text/x-typescript': ['ts','tsx']
     },
-    remapIstanbulReporter: {
-      reports: {
-        html: 'coverage',
-        lcovonly: './coverage/coverage.lcov'
-      }
+    coverageIstanbulReporter: {
+      reports: [ 'html', 'lcovonly' ],
+      fixWebpackSourcePaths: true
     },
     angularCli: {
       config: './angular-cli.json',
       environment: 'dev'
     },
     reporters: config.angularCli && config.angularCli.codeCoverage
-              ? ['jasmine-diff', 'progress', 'karma-remap-istanbul', 'clear-screen']
+              ? ['jasmine-diff', 'progress', 'coverage-istanbul', 'clear-screen']
               : ['jasmine-diff', 'progress', 'clear-screen'],
     jasmineDiffReporter: {
       pretty: true

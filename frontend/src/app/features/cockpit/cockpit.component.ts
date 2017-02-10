@@ -20,9 +20,7 @@ import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { MdDialog, MdDialogRef } from '@angular/material';
 import { MediaChange } from '@angular/flex-layout';
 import { MdSidenav } from '@angular/material';
-// this line will be replaced to @angular/flex-layout as expected in beta.5
-// see https://github.com/angular/flex-layout/issues/144
-import { ObservableMediaService } from '@angular/flex-layout/media-query/observable-media-service';
+import { ObservableMedia } from '@angular/flex-layout';
 import { Observable } from 'rxjs/Observable';
 import { TranslateService } from 'ng2-translate';
 import { Subscription } from 'rxjs/Subscription';
@@ -63,7 +61,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     private _store$: Store<IStore>,
     @Inject(LANGUAGES) public languages: any,
     public dialog: MdDialog,
-    @Inject(ObservableMediaService) public media$: any,
+    public media$: ObservableMedia,
     private _router: Router
   ) { }
 
@@ -106,10 +104,10 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
       .map((change: MediaChange) => {
         const screenSize = change.mqAlias;
 
-        if (screenSize === 'md' || screenSize === 'gt-md' || screenSize === 'lg' || screenSize === 'gt-lg') {
-          return `side`;
-        } else {
+        if (screenSize === 'xs' || screenSize === 'gt-xs' || screenSize === 'sm') {
           return `over`;
+        } else {
+          return `side`;
         }
       });
   }
