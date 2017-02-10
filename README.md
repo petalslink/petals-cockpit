@@ -30,7 +30,7 @@ In order to create an executable product, simply build the frontend, the backend
 
 - Build the frontend
 ```
-$ cd frontend && ng build && cd ..
+$ cd frontend && yarn run prod && cd ..
 ```
 - Build Petals Cockpit (it will also build the backend)
 ```

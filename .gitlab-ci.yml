@@ -9,17 +9,17 @@ variables:
   M2_CACHED_REPOSITORY: m2cache
   YARN_CACHE_DIRECTORY: yarncache
   DISPLAY: ":99"
-  XVFB: "Xvfb $DISPLAY -ac -screen 0 1920x1080x24 -nolisten tcp"
+  XVFB: Xvfb $DISPLAY -ac -screen 0 1920x1080x24 -nolisten tcp
 
 .mvn-java-8: &mvn-java-8
   image: maven:3.3-jdk-8-alpine
   before_script:
-    - "source ci/mvn-helpers.sh"
+    - source ci/mvn-helpers.sh
   after_script:
-    - "source ci/mvn-helpers.sh"
-    - "maven ch.ringler.tools:m2cachecleanup:1.0.4:cleanup-cache"
+    - source ci/mvn-helpers.sh
+    - maven ch.ringler.tools:m2cachecleanup:1.0.4:cleanup-cache
   cache:
-    key: "mvn-java-8"
+    key: mvn-java-8
     paths:
       - $M2_CACHED_REPOSITORY
 
@@ -27,15 +27,15 @@ variables:
   image: registry.gitlab.com/victornoel/node-java-yarn-docker:n7.5.0-j8-y0.20.0
   before_script:
     # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
-    - "yarn config set cache-folder $PWD/$YARN_CACHE_DIRECTORY --global"
-    - "du -hs $PWD/$YARN_CACHE_DIRECTORY || true"
-    - "cd frontend"
-    - "export PATH=`yarn bin`:$PATH"
+    - yarn config set cache-folder $PWD/$YARN_CACHE_DIRECTORY --global
+    - du -hs $PWD/$YARN_CACHE_DIRECTORY || true
+    - cd frontend
+    - export PATH=`yarn bin`:$PATH
     # see https://github.com/yarnpkg/yarn/issues/1682 for segfault problems (hence the ||)
-    - "time yarn --frozen-lockfile || yarn --frozen-lockfile"
-    - "cd .."
+    - time yarn --frozen-lockfile || yarn --frozen-lockfile
+    - cd ..
   cache:
-    key: "node-yarn"
+    key: node-yarn
     paths:
       - $YARN_CACHE_DIRECTORY
 
@@ -44,9 +44,9 @@ variables:
   <<: *node-java-yarn
   stage: package
   script:
-    - "cd frontend"
-    - "ng build --progress=false --prod -e=gitlab-pages -bh=/petals-cockpit/"
-    - "mv dist ../public"
+    - cd frontend
+    - ng build --progress=false --prod -e=gitlab-pages -bh=/petals-cockpit/
+    - mv dist ../public
   artifacts:
     paths:
       - public
@@ -62,8 +62,8 @@ build-backend:
   script:
       # let's lock the version used for SNAPSHOT dependencies to
       # ensure they are the same in the other jobs
-    - "maven -pl backend -am versions:lock-snapshots"
-    - "maven_build -pl backend -am deploy"
+    - maven -pl backend -am versions:lock-snapshots
+    - maven_build -pl backend -am deploy
   artifacts:
     paths:
       - $M2_STAGING_DIRECTORY
@@ -74,21 +74,18 @@ build-frontend:
   except:
     - /^back\/.*$/
   script:
-    - "cd frontend"
-    # broken for now, see https://github.com/angular/angular-cli/issues/4350
-    # - "time ng lint"
-    # also broken for now, see https://github.com/angular/angular-cli/issues/4351
-    # - time tslint "src/**/*.ts" --project src/tsconfig.json && tslint "e2e/**/*.ts" --project e2e/tsconfig.json
-    - "time node generate-headers.js --dry"
-    - "nohup $XVFB &"
-    - "XVFBPID=$!"
-    - "time ng test --progress=false --single-run --code-coverage"
-    - "nohup ng serve --progress=false -e=prod-e2e &"
-    - "NGPID=$!"
-    - "time ng e2e"
-    - "kill $NGPID"
-    - "kill $XVFBPID"
-    - "time ng build --progress=false --prod"
+    - cd frontend
+    # broken for now, see https://github.com/mgechev/codelyzer/issues/190
+    # - time ng lint
+    - time node generate-headers.js --dry
+    - nohup $XVFB &
+    - XVFBPID=$!
+    - time ng test --progress=false --single-run --code-coverage
+    # remove when https://github.com/angular/angular-cli/issues/4596 is fixed
+    - webdriver-manager update --standalone false --gecko false
+    - time ng e2e --progress=false -e=prod-e2e --webdriver-update=false
+    - kill $XVFBPID
+    - time yarn run prod-silent
   artifacts:
     paths:
       - frontend/dist
@@ -103,12 +100,12 @@ build-product:
     - build-backend
     - build-frontend
   script:
-    - 'maven dependency:purge-local-repository --non-recursive -DmanualInclude="org.ow2.petals:petals-cockpit-server,org.ow2.petals:petals-cockpit-parent" -DreResolve=false -DsnapshotsOnly=true'
-    - "maven -pl cockpit verify"
+    - maven dependency:purge-local-repository --non-recursive -DmanualInclude="org.ow2.petals:petals-cockpit-server,org.ow2.petals:petals-cockpit-parent" -DreResolve=false -DsnapshotsOnly=true
+    - maven -pl cockpit verify
     - export VC=`ls cockpit/target/petals-cockpit-*-capsule.jar | sed -E 's/.*petals-cockpit-(.*)-capsule.jar/\1/'`
-    - "mkdir -p dist/$VC"
-    - "cp cockpit/target/petals-cockpit-*-capsule.jar dist/$VC/petals-cockpit.jar"
-    - "cp cockpit/default.yml dist/$VC/config.yml"
+    - mkdir -p dist/$VC
+    - cp cockpit/target/petals-cockpit-*-capsule.jar dist/$VC/petals-cockpit.jar
+    - cp cockpit/default.yml dist/$VC/config.yml
   artifacts:
     paths:
       - dist
@@ -123,11 +120,13 @@ e2e-product:
   dependencies:
     - build-product
   variables:
-    COCKPIT: "java -jar dist/*/petals-cockpit.jar"
-    COCKPIT_CONFIG: "e2e/default.yml"
+    COCKPIT: java -jar dist/*/petals-cockpit.jar
+    COCKPIT_CONFIG: e2e/default.yml
   script:
-    - "$COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml"
-    - "nohup $COCKPIT server $COCKPIT_CONFIG &"
-    - "nohup $XVFB &"
-    - "cd frontend"
-    - yarn run e2e -- --exclude "e2e/*needspetals*.ts"
+    - $COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml
+    - nohup $COCKPIT server $COCKPIT_CONFIG &
+    - nohup $XVFB &
+    - cd frontend
+    # remove when https://github.com/angular/angular-cli/issues/4596 is fixed
+    - webdriver-manager update --standalone false --gecko false
+    - yarn run e2e --serve=false --webdriver-update=false -- --exclude "e2e/*needspetals*.ts"
