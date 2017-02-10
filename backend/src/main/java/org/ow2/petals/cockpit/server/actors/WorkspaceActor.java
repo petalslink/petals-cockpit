@@ -53,6 +53,7 @@ import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
@@ -192,39 +193,73 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         if (content.isLeft()) {
             return Either.left(content.getLeft());
-        } else {
-            EventOutput eo = new EventOutput();
-
-            eo.write(new OutboundEvent.Builder().name(WorkspaceChange.Type.WORKSPACE_CONTENT.name())
-                    .mediaType(MediaType.APPLICATION_JSON_TYPE).data(content.get()).build());
-
-            broadcaster.add(eo);
-
-            return Either.right(eo);
         }
+
+        EventOutput eo = new EventOutput();
+
+        eo.write(new OutboundEvent.Builder().name(WorkspaceChange.Type.WORKSPACE_CONTENT.name())
+                .mediaType(MediaType.APPLICATION_JSON_TYPE).data(content.get()).build());
+
+        broadcaster.add(eo);
+
+        return Either.right(eo);
     }
 
     private Either<Status, @Nullable Void> handleDeleteBus(DeleteBus bus) throws SuspendExecution {
-        final int deleted = runBlocking(() -> DSL.using(jooq).deleteFrom(BUSES).where(BUSES.ID.eq(bus.bId)).execute());
-        if (deleted < 1) {
-            return Either.left(Status.NOT_FOUND);
-        } else {
-            broadcast(WorkspaceChange.busDeleted(new BusDeleted(bus.bId)));
+        final Either<Status, @Nullable Void> mDeleted = runTransaction(conf -> {
+            // TODO merge queries
+            // TODO is the case where the bus does not exist covered? (no!)
+            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
+                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).where(BUSES.ID.eq(bus.bId)
+                            .and(USERS_WORKSPACES.USERNAME.eq(bus.user)).and(USERS_WORKSPACES.WORKSPACE_ID.eq(wId)))
+                    .fetchOne();
+
+            if (user == null) {
+                return Either.left(Status.FORBIDDEN);
+            }
+
+            int deleted = DSL.using(conf).deleteFrom(BUSES).where(BUSES.ID.eq(bus.bId)).execute();
+
+            if (deleted < 1) {
+                return Either.left(Status.NOT_FOUND);
+            }
+
             return Either.right(null);
-        }
+        });
+
+        mDeleted.forEach(v -> broadcast(WorkspaceChange.busDeleted(new BusDeleted(bus.bId))));
+
+        return mDeleted;
     }
 
-    // TODO verify access rights? access is verified in resource for now...
     private Either<Status, BusInProgress> handleImportBus(ImportBus bus) throws SuspendExecution {
         final NewBus nb = bus.nb;
 
-        final long bId = runBlocking(() -> DSL.using(jooq).insertInto(BUSES)
-                .columns(BUSES.IMPORT_IP, BUSES.IMPORT_PORT, BUSES.IMPORT_USERNAME, BUSES.IMPORT_PASSWORD,
-                        BUSES.IMPORT_PASSPHRASE, BUSES.WORKSPACE_ID)
-                .values(nb.ip, nb.port, nb.username, nb.password, nb.passphrase, wId).returning(BUSES.ID).fetchOne()
-                .getId());
+        final Either<Status, Long> mbId = runTransaction(conf -> {
+            // TODO merge queries
+            Record user = DSL.using(conf).selectFrom(USERS_WORKSPACES)
+                    .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wId).and(USERS_WORKSPACES.USERNAME.eq(bus.user)))
+                    .fetchOne();
+
+            if (user == null) {
+                return Either.left(Status.FORBIDDEN);
+            }
+
+            BusesRecord br = new BusesRecord(null, wId, false, nb.ip, nb.port, nb.username, nb.password, nb.passphrase,
+                    null, null);
+            br.attach(conf);
+            br.insert();
+
+            return Either.right(br.getId());
+        });
 
         // we use a fiber to let the actor handles other message during bus import
+        mbId.forEach(bId -> importBusInFiber(nb, bId));
+
+        return mbId.map(bId -> new BusInProgress(bId, nb.ip, nb.port, nb.username));
+    }
+
+    private void importBusInFiber(final NewBus nb, final long bId) {
         new Fiber<>(() -> {
             // this can be interrupted by Fiber.cancel
             final Either<String, Domain> res = doImportExistingBus(nb);
@@ -246,8 +281,6 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                                 .busImportError(new BusInProgress(bId, nb.ip, nb.port, nb.username, error));
                     }, content -> WorkspaceChange.busImportOk(content))));
         }).start();
-
-        return Either.right(new BusInProgress(bId, nb.ip, nb.port, nb.username));
     }
 
     // TODO in the future, there should be multiple methods like this for multiple type of imports
@@ -275,55 +308,62 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             // TODO merge queries
             ServiceunitsRecord su = DSL.using(conf).selectFrom(SERVICEUNITS).where(SERVICEUNITS.ID.eq(change.suId))
                     .fetchOne();
+
             if (su == null) {
                 return Either.left(Status.NOT_FOUND);
-            } else {
-                Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
-                        .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
-                        .onKey(FK_CONTAINERS_BUSES_ID).join(COMPONENTS).onKey(FK_COMPONENTS_CONTAINERS_ID)
-                        .join(SERVICEUNITS).onKey(FK_SERVICEUNITS_COMPONENTS_ID)
-                        .where(SERVICEUNITS.ID.eq(change.suId).and(USERS_WORKSPACES.USERNAME.eq(change.user)))
-                        .fetchOne();
-                if (user == null) {
-                    return Either.left(Status.FORBIDDEN);
-                } else {
-                    return handleSUStateChange(change, su, conf);
-                }
             }
+
+            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
+                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
+                    .onKey(FK_CONTAINERS_BUSES_ID).join(COMPONENTS).onKey(FK_COMPONENTS_CONTAINERS_ID)
+                    .join(SERVICEUNITS)
+                    .onKey(FK_SERVICEUNITS_COMPONENTS_ID).where(SERVICEUNITS.ID.eq(change.suId)
+                            .and(USERS_WORKSPACES.USERNAME.eq(change.user)).and(USERS_WORKSPACES.WORKSPACE_ID.eq(wId)))
+                    .fetchOne();
+
+            if (user == null) {
+                return Either.left(Status.FORBIDDEN);
+            }
+
+            return handleSUStateChange(change, su, conf);
         });
     }
 
     private Either<Status, ServiceUnitOverview> handleSUStateChange(ChangeServiceUnitState change,
             ServiceunitsRecord su, Configuration conf) throws InterruptedException, Exception {
+
         ServiceUnitMin.State currentState = ServiceUnitMin.State.valueOf(su.getState());
+
         if (currentState.equals(change.newState)) {
             return Either.right(new ServiceUnitOverview(su.getId(), su.getName(), currentState, su.getSaName()));
-        } else if (!isSAStateTransitionOk(su, currentState, change.newState)) {
+        }
+
+        if (!isSAStateTransitionOk(su, currentState, change.newState)) {
             // TODO or should I rely on the information from the container instead of my own?
             return Either.left(Status.CONFLICT);
-        } else {
-            // TODO merge with previous request...
-            ContainersRecord cont = DSL.using(conf).select().from(CONTAINERS).join(COMPONENTS)
-                    .onKey(FK_COMPONENTS_CONTAINERS_ID).where(COMPONENTS.ID.eq(su.getComponentId()))
-                    .fetchOneInto(CONTAINERS);
-            assert cont != null;
-
-            // we already are in a thread pool
-            ServiceUnitOverview res = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
-                    petals -> {
-                        ArtifactAdministration aa = petals.newArtifactAdministration();
-                        Artifact a = aa.getArtifact(ServiceAssembly.TYPE, su.getSaName(), null);
-                        assert a instanceof ServiceAssembly;
-                        ServiceAssembly sa = (ServiceAssembly) a;
-                        State newState = changeSAState(petals, sa, change.newState);
-                        return new ServiceUnitOverview(su.getId(), su.getName(), newState, su.getSaName());
-                    });
-            assert res != null;
-
-            serviceUnitStateUpdated(res, conf);
-
-            return Either.right(res);
         }
+
+        // TODO merge with previous request...
+        ContainersRecord cont = DSL.using(conf).select().from(CONTAINERS).join(COMPONENTS)
+                .onKey(FK_COMPONENTS_CONTAINERS_ID).where(COMPONENTS.ID.eq(su.getComponentId()))
+                .fetchOneInto(CONTAINERS);
+        assert cont != null;
+
+        // we already are in a thread pool
+        ServiceUnitOverview res = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
+                petals -> {
+                    ArtifactAdministration aa = petals.newArtifactAdministration();
+                    Artifact a = aa.getArtifact(ServiceAssembly.TYPE, su.getSaName(), null);
+                    assert a instanceof ServiceAssembly;
+                    ServiceAssembly sa = (ServiceAssembly) a;
+                    State newState = changeSAState(petals, sa, change.newState);
+                    return new ServiceUnitOverview(su.getId(), su.getName(), newState, su.getSaName());
+                });
+        assert res != null;
+
+        serviceUnitStateUpdated(res, conf);
+
+        return Either.right(res);
     }
 
     private void serviceUnitStateUpdated(ServiceUnitMin su, Configuration conf) throws SuspendExecution {

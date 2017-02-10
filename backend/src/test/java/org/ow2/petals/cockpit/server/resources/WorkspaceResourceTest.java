@@ -40,13 +40,6 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public final ResourceTestRule resources = buildResourceTest(WorkspaceResource.class);
 
     @Test
-    public void getNonExistingWorkspaceNotFound() {
-        Response get = resources.getJerseyTest().target("/workspaces/3").request().get();
-
-        assertThat(get.getStatus()).isEqualTo(404);
-    }
-
-    @Test
     public void getNonExistingWorkspaceNotFoundEvent() {
         Response get = resources.getJerseyTest().target("/workspaces/3").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
                 .get();
@@ -55,31 +48,11 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     @Test
-    public void getWorkspaceForbidden() {
-        Response get = resources.getJerseyTest().target("/workspaces/2").request().get();
-
-        assertThat(get.getStatus()).isEqualTo(403);
-    }
-
-    @Test
     public void getWorkspaceForbiddenEvent() {
         Response get = resources.getJerseyTest().target("/workspaces/2").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
                 .get();
 
         assertThat(get.getStatus()).isEqualTo(403);
-    }
-
-    @Test
-    public void getExistingWorkspace() {
-        assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
-
-        WorkspaceFullContent tree = resources.getJerseyTest().target("/workspaces/1").request()
-                .get(WorkspaceFullContent.class);
-
-        assertContent(tree);
-
-        // ensure that calling get workspace tree set the last workspace in the db
-        assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isEqualTo(1);
     }
 
     @Test

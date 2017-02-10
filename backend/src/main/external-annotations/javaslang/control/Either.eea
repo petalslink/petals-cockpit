@@ -2,6 +2,9 @@ class javaslang/control/Either
 left
  <L:Ljava/lang/Object;R:Ljava/lang/Object;>(TL;)Ljavaslang/control/Either<TL;TR;>;
  <L:Ljava/lang/Object;R:Ljava/lang/Object;>(TL;)L1javaslang/control/Either<TL;TR;>;
+map
+ <U:Ljava/lang/Object;>(Ljava/util/function/Function<-TR;+TU;>;)Ljavaslang/control/Either<TL;TU;>;
+ <U:Ljava/lang/Object;>(Ljava/util/function/Function<-TR;+TU;>;)L1javaslang/control/Either<TL;TU;>;
 narrow
  <L:Ljava/lang/Object;R:Ljava/lang/Object;>(Ljavaslang/control/Either<+TL;+TR;>;)Ljavaslang/control/Either<TL;TR;>;
  <L:Ljava/lang/Object;R:Ljava/lang/Object;>(L1javaslang/control/Either<+TL;+TR;>;)L1javaslang/control/Either<TL;TR;>;
