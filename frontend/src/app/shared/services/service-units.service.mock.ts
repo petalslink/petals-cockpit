@@ -27,7 +27,7 @@ import { serviceUnitsService } from '../../../mocks/service-units-mock';
 export class ServiceUnitsMockService {
   constructor() { }
 
-  getDetailsServiceUnit(idWorkspace: string, serviceUnitId: string) {
+  getDetailsServiceUnit(serviceUnitId: string) {
     const detailsServiceUnit = serviceUnitsService.read(serviceUnitId).getDetails();
 
     const response: Response = <Response>{

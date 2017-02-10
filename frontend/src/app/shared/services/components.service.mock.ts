@@ -27,7 +27,7 @@ import { componentsService } from '../../../mocks/components-mock';
 export class ComponentsMockService {
   constructor() { }
 
-  getDetailsComponent(idWorkspace: string, componentId: string) {
+  getDetailsComponent(componentId: string) {
     const detailsComponent = componentsService.read(componentId).getDetails();
 
     const response: Response = <Response>{
