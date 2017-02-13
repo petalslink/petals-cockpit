@@ -39,20 +39,23 @@ variables:
     paths:
       - $YARN_CACHE_DIRECTORY
 
-# disable pages for now
-.pages:
-  <<: *node-java-yarn
+pages:
+  image: alpine:3.5
+  variables:
+    GIT_STRATEGY: none
   stage: package
-  script:
-    - cd frontend
-    - ng build --progress=false --prod -e=gitlab-pages -bh=/petals-cockpit/
-    - mv dist ../public
-  artifacts:
-    paths:
-      - public
   allow_failure: true
   only:
     - master
+  dependencies:
+    - build-backend
+    - build-frontend
+  script:
+    - mv frontend-demo public
+    - mv backend-apidocs public/
+  artifacts:
+    paths:
+      - public
 
 build-backend:
   <<: *mvn-java-8
@@ -60,12 +63,16 @@ build-backend:
   except:
     - /^front\/.*$/
   script:
-      # let's lock the version used for SNAPSHOT dependencies to
-      # ensure they are the same in the other jobs
+    # let's lock the version used for SNAPSHOT dependencies to
+    # ensure they are the same in the other jobs
     - maven -pl backend -am versions:lock-snapshots
+    # deploy to the staging directory
     - maven_build -pl backend -am deploy
+    # build the docs
+    - maven -pl backend -am com.webcohesion.enunciate:enunciate-slim-maven-plugin:docs && mv backend/target/site/apidocs backend-apidocs || true # this can fail
   artifacts:
     paths:
+      - backend-apidocs
       - $M2_STAGING_DIRECTORY
 
 build-frontend:
@@ -85,10 +92,14 @@ build-frontend:
     - webdriver-manager update --standalone false --gecko false
     - time ng e2e --progress=false -e=prod-e2e --webdriver-update=false
     - kill $XVFBPID
-    - time yarn run prod-silent
+    # build the final frontend for the product
+    - time yarn run prod-silent && mv dist ../frontend-dist
+    # build the demo for the gitlab pages
+    - time yarn run prod-demo && mv dist ../frontend-demo || true # this can fail
   artifacts:
     paths:
-      - frontend/dist
+      - frontend-dist
+      - frontend-demo
 
 build-product:
   <<: *mvn-java-8
@@ -100,6 +111,7 @@ build-product:
     - build-backend
     - build-frontend
   script:
+    - mv frontend-dist frontend/dist
     - maven dependency:purge-local-repository --non-recursive -DmanualInclude="org.ow2.petals:petals-cockpit-server,org.ow2.petals:petals-cockpit-parent" -DreResolve=false -DsnapshotsOnly=true
     - maven -pl cockpit verify
     - export VC=`ls cockpit/target/petals-cockpit-*-capsule.jar | sed -E 's/.*petals-cockpit-(.*)-capsule.jar/\1/'`

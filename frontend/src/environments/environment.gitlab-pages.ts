@@ -39,7 +39,7 @@ export const environment = {
   // http://some-domain#/your/app/routes (true)
   // or
   // http://some-domain/your/app/routes (false)
-  hashLocationStrategy: false,
+  hashLocationStrategy: true,
 
   // DEBUG
   // wether to display debug informations or not

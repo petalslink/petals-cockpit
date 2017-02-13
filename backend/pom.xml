@@ -294,14 +294,6 @@
         <groupId>com.webcohesion.enunciate</groupId>
         <artifactId>enunciate-slim-maven-plugin</artifactId>
         <version>${enunciate.version}</version>
-        <executions>
-          <execution>
-            <phase>site</phase>
-            <goals>
-              <goal>docs</goal>
-            </goals>
-          </execution>
-        </executions>
         <dependencies>
           <dependency>
             <groupId>com.webcohesion.enunciate</groupId>

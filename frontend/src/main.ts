@@ -35,7 +35,7 @@ setTimeout(bootstrapApp, 100);
 declare const navigator: any;
 
 if ('serviceWorker' in navigator && environment.production) {
-  navigator.serviceWorker.register(`/service-worker.js`)
+  navigator.serviceWorker.register(`./service-worker.js`)
     .then(registration => {
       // registration was successful
       if (environment.debug) {
