@@ -1,5 +1,5 @@
 # Petals Cockpit
-Running demo (mock) [https://victornoel.gitlab.io/petals-cockpit](https://victornoel.gitlab.io/petals-cockpit)
+Running demo (mock) [https://linagora.gitlab.io/petals-cockpit](https://linagora.gitlab.io/petals-cockpit)
 - Username: admin
 - Password: admin
 
@@ -8,8 +8,8 @@ Running demo (mock) [https://victornoel.gitlab.io/petals-cockpit](https://victor
 ### Running the pre-compiled JAR
 
 1. Download the latest compiled petals-cockpit:
- - [Version 0.4.0](https://gitlab.com/victornoel/petals-cockpit/builds/artifacts/v0.4.0/download?job=build-product)
- - [Version Latest](https://gitlab.com/victornoel/petals-cockpit/builds/artifacts/master/download?job=build-product)
+ - [Version 0.4.0](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/v0.4.0/download?job=build-product)
+ - [Version Latest](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/master/download?job=build-product)
 2. Unpack it and go into the directory
 3. Initialize the database (or update it if you already had one from a previous version):
 ```
