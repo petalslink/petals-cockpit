@@ -57,7 +57,7 @@ export class BusesMockService {
       .subscribe();
   }
 
-  getDetailsBus(idWorkspace: string, busId: string) {
+  getDetailsBus(busId: string) {
     const detailsBus = busesService.read(busId).getDetails();
 
     const response: Response = <Response>{

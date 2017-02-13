@@ -31,16 +31,19 @@ export class GuardLoginService implements CanLoad {
     return this._userService.getUserInformations()
       .map((res: Response) => {
         // if already connected, redirect to the app
-        if (res.ok) {
-          if (environment.debug) {
-            console.debug(`Guard Login : User's already logged. Redirecting to /workspaces.`);
-          }
-
-          this._router.navigate(['/workspaces']);
-          return false;
+        if (environment.debug) {
+          console.debug(`Guard Login : User already logged. Redirecting to /workspaces.`);
         }
 
-        return true;
+        this._router.navigate(['/workspaces']);
+
+        return false;
+      }).catch((res: Response) => {
+        if (environment.debug) {
+          console.debug(`Guard Login : User not logged. Continuing to /login.`);
+        }
+
+        return Observable.of(true);
       });
   }
 }

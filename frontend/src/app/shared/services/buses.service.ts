@@ -47,7 +47,7 @@ export class BusesService {
       .subscribe();
   }
 
-  getDetailsBus(idWorkspace: string, busId: string) {
-    return this._http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${busId}`);
+  getDetailsBus(busId: string) {
+    return this._http.get(`${environment.urlBackend}/buses/${busId}`);
   }
 }

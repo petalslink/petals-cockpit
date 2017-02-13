@@ -30,17 +30,20 @@ export class GuardAppService implements CanLoad {
   canLoad() {
     return this._userService.getUserInformations()
       .map((res: Response) => {
-        // if not already connected, redirect to login
-        if (!res.ok) {
-          if (environment.debug) {
-            console.debug(`Guard App : User's not logged. Redirecting to /login.`);
-          }
-
-          this._router.navigate(['/login']);
-          return false;
+        if (environment.debug) {
+          console.debug(`Guard App : User already logged. Continuing to /workspaces.`);
         }
 
         return true;
+      }).catch((res: Response) => {
+        // if not already connected, redirect to login
+        if (environment.debug) {
+          console.debug(`Guard App : User's not logged. Redirecting to /login.`);
+        }
+
+        this._router.navigate(['/login']);
+
+        return Observable.of(false);
       });
   }
 }

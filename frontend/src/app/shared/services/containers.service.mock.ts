@@ -27,7 +27,7 @@ import { containersService } from '../../../mocks/containers-mock';
 export class ContainersMockService {
   constructor() { }
 
-  getDetailsContainer(idWorkspace: string, containerId: string) {
+  getDetailsContainer(containerId: string) {
     const detailsContainer = containersService.read(containerId).getDetails();
 
     const response: Response = <Response>{

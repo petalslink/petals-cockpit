@@ -26,7 +26,7 @@ import { environment } from './../../../environments/environment';
 export class ServiceUnitsService {
   constructor(private _http: Http) { }
 
-  getDetailsServiceUnit(idWorkspace: string, serviceUnitId: string) {
-    return this._http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/containers/${serviceUnitId}`);
+  getDetailsServiceUnit(serviceUnitId: string) {
+    return this._http.get(`${environment.urlBackend}/serviceunits/${serviceUnitId}`);
   }
 }

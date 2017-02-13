@@ -26,7 +26,7 @@ import { environment } from './../../../environments/environment';
 export class ComponentsService {
   constructor(private _http: Http) { }
 
-  getDetailsComponent(idWorkspace: string, componentId: string) {
-    return this._http.get(`${environment.urlBackend}/workspaces/${idWorkspace}/containers/${componentId}`);
+  getDetailsComponent(componentId: string) {
+    return this._http.get(`${environment.urlBackend}/components/${componentId}`);
   }
 }
