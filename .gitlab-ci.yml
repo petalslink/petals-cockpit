@@ -52,7 +52,7 @@ pages:
     - build-frontend
   script:
     - mv frontend-demo public
-    - mv backend-apidocs public/
+    - mv backend-apidocs public/apidocs
   artifacts:
     paths:
       - public
