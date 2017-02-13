@@ -40,12 +40,13 @@ public class PetalsCockpitApplication extends CockpitApplication<PetalsCockpitCo
 
         super.initialize(bootstrap);
 
-        bootstrap.addBundle(new AssetsBundle("/frontend", "/", "index.html"));
         // TODO this is not the best because every new prefix must be added... if not, the static asset servlet will
         // take over instead of returning index.html
         // Improve when https://github.com/palantir/dropwizard-index-page/issues/38 is fixed
         bootstrap.addBundle(
-                new IndexPageBundle("frontend/index.html", ImmutableSet.of("/login", "/workspaces", "/workspaces/*")));
+                new IndexPageBundle("frontend/index.html",
+                        ImmutableSet.of("/", "/index.html", "/login", "/workspaces", "/workspaces/*")));
+        bootstrap.addBundle(new AssetsBundle("/frontend", "/", "lol"));
     }
 }
 
