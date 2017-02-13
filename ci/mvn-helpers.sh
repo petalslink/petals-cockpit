@@ -8,5 +8,5 @@ maven() {
 }
 
 maven_build() {
-  maven -Pjacoco -DaltDeploymentRepository=$M2_STAGING_REPOSITORY $@
+  maven -DaltDeploymentRepository=$M2_STAGING_REPOSITORY $@
 }
