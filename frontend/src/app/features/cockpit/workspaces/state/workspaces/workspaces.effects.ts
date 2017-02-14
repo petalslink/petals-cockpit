@@ -71,8 +71,8 @@ export class WorkspacesEffects {
           console.groupEnd();
         }
 
-        // TODO : Define the FETCH_WORKSPACES_FAILED
-        return Observable.of({ type: Workspaces.FETCH_WORKSPACES_FAILED, payload: action.payload });
+        this._notification.error(`Loading workspaces failed !`, `Error server.`);
+        return Observable.of({ type: Workspaces.FETCH_WORKSPACES_FAILED, payload: action.payload, error: true });
       })
     );
 
