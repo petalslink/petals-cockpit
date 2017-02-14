@@ -204,6 +204,9 @@
             <configuration>
               <failBuildInCaseOfDifferentContentConflict>true</failBuildInCaseOfDifferentContentConflict>
               <printEqualFiles>true</printEqualFiles>
+              <ignoredResourcePatterns>
+                <ignoredResourcePattern>^about\.html$</ignoredResourcePattern>
+              </ignoredResourcePatterns>
             </configuration>
           </execution>
         </executions>
