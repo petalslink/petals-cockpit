@@ -125,7 +125,10 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
 
     if (re.test(url)) {
       const workspaceId = url.match(re)[1];
-      this._store$.dispatch({ type: Workspaces.FETCH_WORKSPACE, payload: workspaceId });
+      this._store$.dispatch({ type: Workspaces.FETCH_WORKSPACE, payload: {
+        id: workspaceId,
+        changeUrl: false
+      } });
     } else {
       this.openWorkspacesDialog();
     }

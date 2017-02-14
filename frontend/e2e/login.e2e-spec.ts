@@ -53,7 +53,7 @@ describe(`Login`, () => {
 
     element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
 
-    // expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/idWks0$/);
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/idWks0$/);
 
     const logout = element(by.css(`app-menu-user-panel .wrapper-disconnect md-icon`));
     browser.wait(EC.elementToBeClickable(logout), 1000);

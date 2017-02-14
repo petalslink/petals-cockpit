@@ -42,7 +42,7 @@ import { BusesService } from './../../../../../shared/services/buses.service';
 @Injectable()
 export class WorkspacesEffects {
   constructor(
-    private _router$: Router,
+    private _router: Router,
     private _actions$: Actions,
     private _store$: Store<IStore>,
     private _workspacesService: WorkspacesService,
@@ -77,7 +77,7 @@ export class WorkspacesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchWorkspace$: Observable<Action> = this._actions$
     .ofType(Workspaces.FETCH_WORKSPACE)
-    .switchMap((action: Action) => this._sseService.watchWorkspaceRealTime(action.payload)
+    .switchMap((action: Action) => this._sseService.watchWorkspaceRealTime(action.payload.id)
       .map(_ => {
         this._busesService.watchEventBusDeleted();
         return { type: Workspaces.FETCH_WORKSPACE_WAIT_SSE, payload: action.payload };
@@ -91,10 +91,9 @@ export class WorkspacesEffects {
     .do((action: Action) => setTimeout(() => this._sseService.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, action.payload), 500))
     .switchMap((action: Action) => this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
       .switchMap((data: any) => {
-        // TODO : Temp commented because if we're reloading a page, we loose that page
-        // needs some more logic
-        // this._router$.navigate(['/workspaces', action.payload]);
-
+        if (action.payload.changeUrl) {
+          this._router.navigate(['/workspaces', action.payload.id]);
+        }
         return Observable.of(batchActions([
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
           { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap(data.users) },

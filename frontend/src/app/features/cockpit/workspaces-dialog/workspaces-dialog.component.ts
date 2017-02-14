@@ -41,6 +41,11 @@ export class WorkspacesDialogComponent implements OnInit {
 
   // TODO use good type
   fetchWorkspace(workspace: IWorkspace) {
-    this._store$.dispatch({ type: Workspaces.FETCH_WORKSPACE, payload: workspace.id });
+    this._store$.dispatch({
+      type: Workspaces.FETCH_WORKSPACE, payload: {
+        id: workspace.id,
+        changeUrl: true
+      }
+    });
   }
 }
