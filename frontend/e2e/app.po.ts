@@ -22,6 +22,18 @@ export class PetalsCockpitPage {
     return browser.get('/');
   }
 
+  login(user: string, pass: string) {
+    // to login we should be on the correct page
+    expect(browser.getCurrentUrl()).toMatch(/\/login$/);
+
+    element(by.css(`app-login input[formcontrolname="username"]`)).sendKeys(user);
+    element(by.css(`app-login input[formcontrolname="password"]`)).sendKeys(pass);
+
+    expect(element(by.css(`app-login button`)).isEnabled()).toBe(true);
+
+    element(by.css(`app-login button`)).click();
+  }
+
   getParagraphText() {
     return element(by.css('app-root h1')).getText();
   }
