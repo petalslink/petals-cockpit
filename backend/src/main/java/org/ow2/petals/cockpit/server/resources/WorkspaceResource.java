@@ -80,7 +80,7 @@ public class WorkspaceResource {
      * Produces {@link WorkspaceChange}
      */
     @GET
-    @Produces(SseFeature.SERVER_SENT_EVENTS + ";qs=0.5")
+    @Produces(SseFeature.SERVER_SENT_EVENTS)
     public EventOutput sse(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
         // TODO ACL is done by actor for now
         return as.call(wsId, new NewWorkspaceClient(profile.getId()))
