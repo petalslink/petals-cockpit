@@ -38,6 +38,7 @@ import { BusesInProgress } from '../buses-in-progress/buses-in-progress.reducer'
 import { SseService, SseWorkspaceEvent } from './../../../../../shared/services/sse.service';
 import { toJavascriptMap } from '../../../../../shared/helpers/shared.helper';
 import { BusesService } from './../../../../../shared/services/buses.service';
+import { NotificationsService } from 'angular2-notifications';
 
 @Injectable()
 export class WorkspacesEffects {
@@ -47,7 +48,8 @@ export class WorkspacesEffects {
     private _store$: Store<IStore>,
     private _workspacesService: WorkspacesService,
     private _sseService: SseService,
-    private _busesService: BusesService
+    private _busesService: BusesService,
+    private _notification: NotificationsService
   ) { }
 
   // tslint:disable-next-line:member-ordering
@@ -69,8 +71,8 @@ export class WorkspacesEffects {
           console.groupEnd();
         }
 
-        // TODO : Define the FETCH_WORKSPACES_ERROR
-        return Observable.of({ type: Workspaces.FETCH_WORKSPACES_ERROR, payload: action.payload });
+        // TODO : Define the FETCH_WORKSPACES_FAILED
+        return Observable.of({ type: Workspaces.FETCH_WORKSPACES_FAILED, payload: action.payload });
       })
     );
 
@@ -116,8 +118,8 @@ export class WorkspacesEffects {
           console.groupEnd();
         }
 
-        // TODO : Define the FETCH_WORKSPACE_ERROR
-        return Observable.of({ type: 'TODO Workspaces.FETCH_WORKSPACE_ERROR', payload: action.payload });
+        this._notification.error(`Loading workspace failed !`, `You have no workspace created yet.`);
+        return Observable.of({ type: Workspaces.FETCH_WORKSPACE_FAILED, payload: action.payload });
       })
     );
 }
