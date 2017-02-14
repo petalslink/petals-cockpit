@@ -16,11 +16,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { IUser } from './../interfaces/user.interface';
 import { environment } from './../../../environments/environment';
+import * as helper from './../helpers/mock.helper';
 
 @Injectable()
 export class UsersMockService {
@@ -38,50 +39,35 @@ export class UsersMockService {
   }
 
   public connectUser(user: IUser): Observable<Response> {
-    let response: Response;
+    let response$: Observable<Response>;
 
     if (user.username === 'admin' && user.password === 'admin') {
       this._userIsConnected = true;
-
-      response = <Response>{
-        ok: true,
-        json: () => {
-          return user;
-        }
-      };
+      response$ = helper.responseBody(user);
     } else {
-      response = <Response>{ ok: false };
+      response$ = helper.response(401);
     }
 
-    return Observable
-      .of(response)
-      .delay(environment.httpDelay);
+    return response$.delay(environment.httpDelay);
   }
 
   public disconnectUser(): Observable<Response> {
-    const response = <Response>{ ok: true };
     this._userIsConnected = false;
 
-    return Observable
-      .of(response)
+    return helper
+      .response(204)
       .delay(environment.httpDelay);
   }
 
   public getUserInformations() {
-    let response: Response;
+    let response$: Observable<Response>;
 
     if (this._userIsConnected) {
-      response = <Response>{
-        ok: true,
-        json: () => {
-          return this.adminUser;
-        }
-      };
+      response$ = helper.responseBody(this.adminUser);
     } else {
-      response = <Response>{ ok: false };
+      response$ = helper.response(401);
     }
-    return Observable
-      .of(response)
-      .delay(environment.httpDelay);
+
+    return response$.delay(environment.httpDelay);
   }
 }

@@ -29,6 +29,7 @@ import { NotificationsService } from 'angular2-notifications';
 import { IBus } from './../../features/cockpit/workspaces/state/buses/bus.interface';
 import { busesService } from './../../../mocks/buses-mock';
 import { environment } from './../../../environments/environment';
+import * as helper from './../helpers/mock.helper';
 
 @Injectable()
 export class BusesMockService {
@@ -60,15 +61,8 @@ export class BusesMockService {
   getDetailsBus(busId: string) {
     const detailsBus = busesService.read(busId).getDetails();
 
-    const response: Response = <Response>{
-      ok: true,
-      json: () => {
-        return detailsBus;
-      }
-    };
-
-    return Observable
-      .of(response)
+    return helper
+      .responseBody(detailsBus)
       .delay(environment.httpDelay);
   }
 }
