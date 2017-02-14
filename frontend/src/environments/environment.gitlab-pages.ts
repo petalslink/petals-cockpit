@@ -18,11 +18,7 @@ export const environment = {
   // SSEDELAY
   // when using mocked data, you can use that
   // variable with .delay to simulate a network latency
-  get sseDelay(): number {
-    const rand = (Math.floor(Math.random() * (1 + 15 - 10)) + 10) * 1000;
-    console.debug(`sse random timer : ${rand}`);
-    return rand;
-  },
+  sseDelay: 500,
 
   // MOCK
   // should you keep mocks when building the app
