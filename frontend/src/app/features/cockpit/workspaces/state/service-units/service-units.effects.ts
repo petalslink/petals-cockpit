@@ -38,7 +38,14 @@ export class ServiceUnitsEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchServiceUnitDetails$: Observable<Action> = this._actions$
     .ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)
-    .switchMap((action: { type: string, payload: { serviceUnitId: string } }) =>
+    .combineLatest(this
+      // wait the first workspace to be fetched
+      ._store$
+      .select(state => state.workspaces.firstWorkspaceFetched)
+      .filter(b => b === true)
+      .first()
+    )
+    .switchMap(([action, _]: [{ type: string, payload: { serviceUnitId: string } }, boolean]) =>
       this._serviceUnitsService.getDetailsServiceUnit(action.payload.serviceUnitId)
         .map((res: Response) => {
           if (!res.ok) {

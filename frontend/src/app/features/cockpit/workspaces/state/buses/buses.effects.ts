@@ -38,7 +38,14 @@ export class BusesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchBusDetails$: Observable<Action> = this._actions$
     .ofType(Buses.FETCH_BUS_DETAILS)
-    .switchMap((action: { type: string, payload: { busId: string } }) =>
+    .combineLatest(this
+      // wait the first workspace to be fetched
+      ._store$
+      .select(state => state.workspaces.firstWorkspaceFetched)
+      .filter(b => b === true)
+      .first()
+    )
+    .switchMap(([action, _]: [{ type: string, payload: { busId: string } }, boolean]) =>
       this._busesService.getDetailsBus(action.payload.busId)
         .map((res: Response) => {
           if (!res.ok) {
