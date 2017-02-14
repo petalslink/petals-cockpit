@@ -33,7 +33,7 @@ export class UsersMockService extends UsersService {
     super();
     this.adminUser = {
       id: 'admin',
-      name: 'Bertrand ESCUDIE',
+      name: 'Administrator',
       username: 'admin',
       lastWorkspace: '',
       password: ''

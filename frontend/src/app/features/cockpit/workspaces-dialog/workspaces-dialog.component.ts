@@ -17,6 +17,7 @@
 
 import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TooltipPosition } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
@@ -28,6 +29,9 @@ import { getWorkspacesList } from '../workspaces/state/workspaces/workspaces.sel
 import { IWorkspaces } from '../workspaces/state/workspaces/workspaces.interface';
 import { IWorkspace } from '../workspaces/state/workspaces/workspace.interface';
 import { Ui } from './../../../shared/state/ui.reducer';
+import { IUser } from './../../../shared/interfaces/user.interface';
+import { IUsersTable } from './../../../shared/interfaces/users.interface';
+import { getCurrentUser } from './../../../shared/state/users.selectors';
 
 @Component({
   selector: 'app-workspaces-dialog',
@@ -39,6 +43,11 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
   public newWksForm: FormGroup;
   public isAddingWorkspaceSub: Subscription;
   public btnSubmitDisabled = true;
+  public position: TooltipPosition = 'below';
+  public showDelay = 0;
+  public hideDelay = 600;
+  public user: IUser;
+  private user$: Observable<IUser>;
 
   constructor(
     private _store$: Store<IStore>,
@@ -47,6 +56,12 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.workspaces$ = this._store$.let(getWorkspacesList());
+    this.user$ = this
+      ._store$
+      .let(getCurrentUser())
+      .do(u => {
+        this.user = u;
+      });
 
     this.newWksForm = this._fb.group({
       name: ['', Validators.required]
@@ -101,5 +116,12 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
 
   onSubmit({ value }) {
     this._store$.dispatch({ type: Workspaces.POST_WORKSPACE, payload: value.name });
+  }
+
+  getUsersNames(users: Array<IUser>) {
+    return users
+      .filter(u => this.user ? u.id !== this.user.id : true)
+      .map(user => user.name)
+      .join(', ');
   }
 }

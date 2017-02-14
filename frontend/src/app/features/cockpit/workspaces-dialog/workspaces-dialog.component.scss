@@ -58,3 +58,13 @@ md-dialog-content {
 .info-add-workspace md-icon {
   padding-right: 5px;
 }
+
+.dotted {
+  border-bottom: 1px dotted black;
+}
+
+md-spinner {
+  width: 20px;
+  height: 48px;
+  display: inline-block;
+}

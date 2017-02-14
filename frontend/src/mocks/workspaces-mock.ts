@@ -37,7 +37,7 @@ export class Workspace {
     return {
       id: this.getIdFormatted(),
       name: this._name || `Workspace ${this._id}`,
-      users: [`bescudie`]
+      users: (this.getIdFormatted() === 'idWks0' ? ['admin'] : ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel', 'sgarcia', 'lduzan', 'gtraore'])
     };
   }
 
