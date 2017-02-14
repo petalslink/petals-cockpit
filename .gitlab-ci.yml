@@ -89,7 +89,7 @@ build-frontend:
     - XVFBPID=$!
     - time ng test --progress=false --single-run --code-coverage
     # remove when https://github.com/angular/angular-cli/issues/4596 is fixed
-    - webdriver-manager update --standalone false --gecko false
+    - time webdriver-manager update --standalone false --gecko false
     - time ng e2e --progress=false -e=prod-e2e --webdriver-update=false
     - kill $XVFBPID
     # build the final frontend for the product
@@ -135,10 +135,10 @@ e2e-product:
     COCKPIT: java -jar dist/*/petals-cockpit.jar
     COCKPIT_CONFIG: e2e/default.yml
   script:
-    - $COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml
+    - time $COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml
     - nohup $COCKPIT server $COCKPIT_CONFIG &
     - nohup $XVFB &
     - cd frontend
     # remove when https://github.com/angular/angular-cli/issues/4596 is fixed
-    - webdriver-manager update --standalone false --gecko false
-    - yarn run e2e --serve=false --webdriver-update=false -- --exclude "e2e/*needspetals*.ts"
+    - time webdriver-manager update --standalone false --gecko false
+    - time ng e2e --serve=false --webdriver-update=false -- --exclude "e2e/*needspetals*.ts"
