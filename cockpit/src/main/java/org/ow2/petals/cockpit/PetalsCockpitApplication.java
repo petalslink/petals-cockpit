@@ -46,7 +46,8 @@ public class PetalsCockpitApplication extends CockpitApplication<PetalsCockpitCo
         bootstrap.addBundle(
                 new IndexPageBundle("frontend/index.html",
                         ImmutableSet.of("/", "/index.html", "/login", "/workspaces", "/workspaces/*")));
-        bootstrap.addBundle(new AssetsBundle("/frontend", "/", "lol"));
+        // no index file parameter because index is served by IndexPageBundle
+        bootstrap.addBundle(new AssetsBundle("/frontend", "/", null));
     }
 }
 
