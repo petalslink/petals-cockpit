@@ -62,6 +62,16 @@ export class Workspaces {
     );
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_WORKSPACES_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACES_FAILED`;
+  private static fetchWorkspacesFailed(workspacesTable: IWorkspacesTable, payload) {
+    return <IWorkspacesTable>Object.assign({}, workspacesTable,
+      <IWorkspacesTable>{
+        isFetchingWorkspaces: false
+      }
+    );
+  }
+
   // only used in effect, no point to handle that action
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_WAIT_SSE = `${Workspaces.reducerName}_FETCH_WORKSPACE_WAIT_SSE`;
@@ -114,6 +124,16 @@ export class Workspaces {
   }
 
   // tslint:disable-next-line:member-ordering
+  public static FETCH_WORKSPACE_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACE_FAILED`;
+  private static fetchWorkspaceFailed(workspacesTable: IWorkspacesTable, payload) {
+    return <IWorkspacesTable>Object.assign({}, workspacesTable,
+      <IWorkspacesTable>{
+        fetchingWorkspaceWithId: null
+      }
+    );
+  }
+
+  // tslint:disable-next-line:member-ordering
   public static SET_SEARCH = `${Workspaces.reducerName}_SET_SEARCH`;
   private static setSearch(workspacesTable: IWorkspacesTable, payload) {
     return <IWorkspacesTable>Object.assign({}, workspacesTable,
@@ -131,12 +151,17 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod = {
+    // Workspaces
     [Workspaces.FETCH_WORKSPACES]: Workspaces.fetchWorkspaces,
     [Workspaces.FETCH_WORKSPACES_SUCCESS]: Workspaces.fetchWorkspacesSuccess,
+    [Workspaces.FETCH_WORKSPACES_FAILED]: Workspaces.fetchWorkspacesFailed,
+    // Workspace
     [Workspaces.FETCH_WORKSPACE]: Workspaces.fetchWorkspace,
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Workspaces.fetchWorkspaceSuccess,
+    [Workspaces.FETCH_WORKSPACE_FAILED]: Workspaces.fetchWorkspaceFailed,
+    // Search
     [Workspaces.SET_SEARCH]: Workspaces.setSearch,
-
+    // Disconnect
     [Users.DISCONNECT_USER_SUCCESS]: Workspaces.disconnectUserSuccess
   };
 }
