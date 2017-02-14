@@ -22,6 +22,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
 import { serviceUnitsService } from '../../../mocks/service-units-mock';
+import * as helper from './../helpers/mock.helper';
 
 @Injectable()
 export class ServiceUnitsMockService {
@@ -30,15 +31,8 @@ export class ServiceUnitsMockService {
   getDetailsServiceUnit(serviceUnitId: string) {
     const detailsServiceUnit = serviceUnitsService.read(serviceUnitId).getDetails();
 
-    const response: Response = <Response>{
-      ok: true,
-      json: () => {
-        return detailsServiceUnit;
-      }
-    };
-
-    return Observable
-      .of(response)
+    return helper
+      .responseBody(detailsServiceUnit)
       .delay(environment.httpDelay);
   }
 }

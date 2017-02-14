@@ -38,7 +38,14 @@ export class ContainersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchContainersDetails$: Observable<Action> = this._actions$
     .ofType(Containers.FETCH_CONTAINER_DETAILS)
-    .switchMap((action: { type: string, payload: { containerId: string } }) =>
+    .combineLatest(this
+      // wait the first workspace to be fetched
+      ._store$
+      .select(state => state.workspaces.firstWorkspaceFetched)
+      .filter(b => b === true)
+      .first()
+    )
+    .switchMap(([action, _]: [{ type: string, payload: { containerId: string } }, boolean]) =>
       this._containersService.getDetailsContainer(action.payload.containerId)
         .map((res: Response) => {
           if (!res.ok) {

@@ -15,24 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
-import { Store } from '@ngrx/store';
+import { ResponseOptions, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
-import { environment } from './../../../environments/environment';
-import { containersService } from '../../../mocks/containers-mock';
-import * as helper from './../helpers/mock.helper';
+/**
+ * This simulates the behaviour of Angular's http module:
+ * if the status code is not a 2XX, it will return a failing Observable
+ */
+export function response(status: number): Observable<Response> {
+  return responseBody(null, status);
+}
 
-@Injectable()
-export class ContainersMockService {
-  constructor() { }
-
-  getDetailsContainer(containerId: string) {
-    const detailsContainer = containersService.read(containerId).getDetails();
-
-    return helper
-      .responseBody(detailsContainer)
-      .delay(environment.httpDelay);
+/**
+ * This simulates the behaviour of Angular's http module:
+ * if the status code is not a 2XX, it will return a failing Observable
+ */
+export function responseBody(body: string | Object | FormData | ArrayBuffer | Blob, status = 200): Observable<Response> {
+  const response = new Response(new ResponseOptions({ status, body }));
+  if (status >= 200 && status < 300) {
+    return Observable.of(response);
+  } else {
+    return Observable.throw(response);
   }
 }

@@ -22,6 +22,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
 import { componentsService } from '../../../mocks/components-mock';
+import * as helper from './../helpers/mock.helper';
 
 @Injectable()
 export class ComponentsMockService {
@@ -30,15 +31,8 @@ export class ComponentsMockService {
   getDetailsComponent(componentId: string) {
     const detailsComponent = componentsService.read(componentId).getDetails();
 
-    const response: Response = <Response>{
-      ok: true,
-      json: () => {
-        return detailsComponent;
-      }
-    };
-
-    return Observable
-      .of(response)
+    return helper
+      .responseBody(detailsComponent)
       .delay(environment.httpDelay);
   }
 }
