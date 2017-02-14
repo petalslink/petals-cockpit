@@ -71,8 +71,8 @@ export class WorkspacesEffects {
           console.groupEnd();
         }
 
-        this._notification.error(`Loading workspaces failed !`, `Error server.`);
-        return Observable.of({ type: Workspaces.FETCH_WORKSPACES_FAILED, payload: action.payload, error: true });
+        this._notification.error(`Workspaces`, `An error occured while loading the workspaces.`);
+        return Observable.of({ type: Workspaces.FETCH_WORKSPACES_FAILED, payload: action.payload });
       })
     );
 
@@ -118,7 +118,7 @@ export class WorkspacesEffects {
           console.groupEnd();
         }
 
-        this._notification.error(`Loading workspace failed !`, `You have no workspace created yet.`);
+        this._notification.error(`Workspace`, `An error occured while loading the workspace.`);
         return Observable.of({ type: Workspaces.FETCH_WORKSPACE_FAILED, payload: action.payload });
       })
     );

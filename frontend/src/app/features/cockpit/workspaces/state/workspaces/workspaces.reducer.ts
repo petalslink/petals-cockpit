@@ -66,7 +66,6 @@ export class Workspaces {
   public static FETCH_WORKSPACES_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACES_FAILED`;
   private static fetchWorkspacesFailed(workspacesTable: IWorkspacesTable, payload) {
     return <IWorkspacesTable>Object.assign({}, workspacesTable,
-      payload,
       <IWorkspacesTable>{
         isFetchingWorkspaces: false
       }
@@ -128,7 +127,6 @@ export class Workspaces {
   public static FETCH_WORKSPACE_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACE_FAILED`;
   private static fetchWorkspaceFailed(workspacesTable: IWorkspacesTable, payload) {
     return <IWorkspacesTable>Object.assign({}, workspacesTable,
-      payload,
       <IWorkspacesTable>{
         fetchingWorkspaceWithId: null
       }
