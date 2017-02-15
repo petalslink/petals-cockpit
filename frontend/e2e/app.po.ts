@@ -18,7 +18,13 @@
 import { browser, element, by } from 'protractor';
 
 export class PetalsCockpitPage {
-  navigateTo() {
+  navigateTo(clearSession = true) {
+    if (clearSession) {
+       browser.get('/');
+      // this command applies only when we are already connected to the host
+      // so we needed first to connect with get!
+       browser.manage().deleteAllCookies();
+    }
     return browser.get('/');
   }
 
@@ -32,6 +38,9 @@ export class PetalsCockpitPage {
     expect(element(by.css(`app-login button`)).isEnabled()).toBe(true);
 
     element(by.css(`app-login button`)).click();
+
+    // let's be sure angular has finished loading after login!
+    browser.waitForAngular();
   }
 
   getParagraphText() {

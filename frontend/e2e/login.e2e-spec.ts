@@ -51,9 +51,13 @@ describe(`Login`, () => {
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
 
+    // TODO remove until ENDTODO when the logout button will be visible even on the workspaces list
     element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
 
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/idWks0$/);
+    browser.waitForAngular();
+
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w*$/);
+    // ENDTODO
 
     const logout = element(by.css(`app-menu-user-panel .wrapper-disconnect md-icon`));
     browser.wait(EC.elementToBeClickable(logout), 1000);
