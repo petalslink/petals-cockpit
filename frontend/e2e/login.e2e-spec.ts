@@ -63,6 +63,8 @@ describe(`Login`, () => {
     browser.wait(EC.elementToBeClickable(logout), 1000);
     logout.click();
 
+    browser.waitForAngular();
+
     expect(browser.getCurrentUrl()).toMatch(/\/login$/);
   });
 });
