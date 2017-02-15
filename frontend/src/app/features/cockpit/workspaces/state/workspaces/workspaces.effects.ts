@@ -18,13 +18,11 @@
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Router } from '@angular/router';
-import { Store, Action } from '@ngrx/store';
+import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
 import { batchActions } from 'redux-batched-actions';
 
-import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Workspaces } from './workspaces.reducer';
 import { WorkspacesService } from './../../../../../shared/services/workspaces.service';
 import { Users } from '../../../../../shared/state/users.reducer';
@@ -45,7 +43,6 @@ export class WorkspacesEffects {
   constructor(
     private _router: Router,
     private _actions$: Actions,
-    private _store$: Store<IStore>,
     private _workspacesService: WorkspacesService,
     private _sseService: SseService,
     private _busesService: BusesService,
@@ -81,7 +78,9 @@ export class WorkspacesEffects {
     .ofType(Workspaces.FETCH_WORKSPACE)
     .switchMap((action: Action) => this._sseService.watchWorkspaceRealTime(action.payload.id)
       .map(_ => {
+        // TODO shouldn't we keep the Subscriptions and close them when we change workspace?
         this._busesService.watchEventBusDeleted();
+        this._busesService.watchEventBusImportOk();
         return { type: Workspaces.FETCH_WORKSPACE_WAIT_SSE, payload: action.payload };
       })
     );

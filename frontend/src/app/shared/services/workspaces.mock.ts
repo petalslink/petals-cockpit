@@ -16,8 +16,6 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
 
 import { WorkspacesService } from './workspaces.service';
 import { fetchWorkspaces } from '../../../mocks/workspaces';

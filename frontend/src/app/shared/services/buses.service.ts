@@ -20,17 +20,23 @@ import { Http, Response } from '@angular/http';
 import { Store } from '@ngrx/store';
 import { batchActions } from 'redux-batched-actions';
 import { Observable } from 'rxjs/Observable';
+import { NotificationsService } from 'angular2-notifications';
 
 import { IStore } from './../interfaces/store.interface';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { Buses } from './../../features/cockpit/workspaces/state/buses/buses.reducer';
 import { BusesInProgress } from './../../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
+import { ServiceUnits } from './../../features/cockpit/workspaces/state/service-units/service-units.reducer';
+import { Components } from './../../features/cockpit/workspaces/state/components/components.reducer';
+import { Containers } from './../../features/cockpit/workspaces/state/containers/containers.reducer';
 import { environment } from './../../../environments/environment';
-import { IBus } from './../../features/cockpit/workspaces/state/buses/bus.interface';
+import { toJavascriptMap } from '../helpers/shared.helper';
 
 
 export abstract class BusesService {
   abstract watchEventBusDeleted(): void;
+
+  abstract watchEventBusImportOk(): void;
 
   abstract getDetailsBus(busId: string): Observable<Response>;
 }
@@ -40,7 +46,8 @@ export class BusesServiceImpl extends BusesService {
   constructor(
     private _http: Http,
     private _store$: Store<IStore>,
-    private _sseService: SseService
+    private _sseService: SseService,
+    private _notifications: NotificationsService
   ) {
     super();
   }
@@ -52,6 +59,29 @@ export class BusesServiceImpl extends BusesService {
         this._store$.dispatch(batchActions([
           { type: Buses.REMOVE_BUS, payload: { busId: id } },
           { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: id } },
+        ]));
+      })
+      .subscribe();
+  }
+
+  watchEventBusImportOk() {
+    this._sseService
+      .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_OK)
+      .map((data: any) => {
+
+        const buses = toJavascriptMap(data.buses);
+
+        // there should be only one element in there!
+        const busInProgress = buses.byId[buses.allIds[0]];
+
+        this._notifications.success(`Bus imported`, `The bus with the IP ${busInProgress.ip} has been imported`);
+
+        this._store$.dispatch(batchActions([
+          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: busInProgress.id } },
+          { type: Buses.FETCH_BUSES_SUCCESS, payload: buses },
+          { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap(data.containers) },
+          { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap(data.components) },
+          { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap(data.serviceUnits) },
         ]));
       })
       .subscribe();
