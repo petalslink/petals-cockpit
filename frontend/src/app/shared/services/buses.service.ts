@@ -47,7 +47,7 @@ export class BusesServiceImpl extends BusesService {
 
   watchEventBusDeleted() {
     this._sseService
-      .subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
+      .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_DELETED)
       .map(({ id }) => {
         this._store$.dispatch(batchActions([
           { type: Buses.REMOVE_BUS, payload: { busId: id } },
