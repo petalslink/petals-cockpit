@@ -16,14 +16,21 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 
 import { IBusInProgress } from './../../features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { environment } from './../../../environments/environment';
 
+export abstract class BusesInProgressService {
+  abstract postBus(idWorkspace: string, bus: IBusInProgress): Observable<Response>;
+}
+
 @Injectable()
-export class BusesInProgressService {
-  constructor(private _http: Http) { }
+export class BusesInProgressServiceImpl extends BusesInProgressService {
+  constructor(private _http: Http) {
+    super();
+  }
 
   postBus(idWorkspace: string, bus: IBusInProgress) {
     return this._http.post(`${environment.urlBackend}/workspaces/${idWorkspace}/buses`, bus);

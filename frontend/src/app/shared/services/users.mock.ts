@@ -19,16 +19,18 @@ import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
+import { UsersService } from './users.service';
 import { IUser } from './../interfaces/user.interface';
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 
 @Injectable()
-export class UsersMockService {
+export class UsersMockService extends UsersService {
   private _userIsConnected: boolean = environment.alreadyConnected;
   private adminUser: IUser;
 
   constructor() {
+    super();
     this.adminUser = {
       id: 'admin',
       name: 'Bertrand ESCUDIE',
@@ -38,7 +40,7 @@ export class UsersMockService {
     };
   }
 
-  public connectUser(user: IUser): Observable<Response> {
+  public connectUser(user: IUser) {
     let response$: Observable<Response>;
 
     if (user.username === 'admin' && user.password === 'admin') {
@@ -51,7 +53,7 @@ export class UsersMockService {
     return response$.delay(environment.httpDelay);
   }
 
-  public disconnectUser(): Observable<Response> {
+  public disconnectUser() {
     this._userIsConnected = false;
 
     return helper

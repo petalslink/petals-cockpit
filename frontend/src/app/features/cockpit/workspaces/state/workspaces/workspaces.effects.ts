@@ -89,8 +89,6 @@ export class WorkspacesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchWorkspaceWaitSse$: Observable<Action> = this._actions$
     .ofType(Workspaces.FETCH_WORKSPACE_WAIT_SSE)
-    // TODO there must be a way to improve the following line without setTimeout
-    .do((action: Action) => setTimeout(() => this._sseService.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, action.payload), 500))
     .switchMap((action: Action) => this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
       .switchMap((data: any) => {
         if (action.payload.changeUrl) {

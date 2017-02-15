@@ -16,15 +16,22 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Response } from '@angular/http';
 import { Store } from '@ngrx/store';
 import { batchActions } from 'redux-batched-actions';
+import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
 
+export abstract class ComponentsService {
+  abstract getDetailsComponent(componentId: string): Observable<Response>;
+}
+
 @Injectable()
-export class ComponentsService {
-  constructor(private _http: Http) { }
+export class ComponentsServiceImpl extends ComponentsService {
+  constructor(private _http: Http) {
+    super();
+  }
 
   getDetailsComponent(componentId: string) {
     return this._http.get(`${environment.urlBackend}/components/${componentId}`);

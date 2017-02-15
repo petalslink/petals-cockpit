@@ -80,10 +80,6 @@ export class BusesInProgressEffects {
     .do(({idWorkspace, busInProgress}: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
       this._router.navigate(['/workspaces', idWorkspace, 'petals', 'buses-in-progress', busInProgress.id])
     )
-    .do(({ idWorkspace }: { idWorkspace: string }) =>
-      // if dev env, this will simulate an SSE event, in prod it won't do anything as triggerSseEvent is empty
-      setTimeout(() => this._sseService.triggerSseEvent(SseWorkspaceEvent.BUS_IMPORT_OK, idWorkspace), environment.sseDelay)
-    )
     .switchMap(({ idWorkspace, busInProgress }: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
       this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_OK)
         .map((data: any) => {

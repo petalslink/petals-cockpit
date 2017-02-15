@@ -41,8 +41,35 @@ export class SseWorkspaceEvent {
   }
 }
 
+export abstract class SseService {
+
+  /**
+   * watchWorkspaceRealTime
+   *
+   * when the user selects a workspace, this method will be call to subscribe
+   * to the sse stream of that workspace. It will automatically close the previous
+   * connection if another workspace was selected
+   *
+   * @param {string} workspaceId
+   *
+   * @return {function} Call the function to close the SSE stream if needed
+   */
+  abstract watchWorkspaceRealTime(workspaceId: string): Observable<void>;
+
+  /**
+   * subscribeToWorkspaceEvent
+   *
+   * return an observable to observe a certain type of SSE event
+   *
+   * @param {string} eventName : The name event to observe
+   *
+   * @return {Observable} Observable which is triggered every time there's the event `eventName`
+   */
+  abstract subscribeToWorkspaceEvent(eventName: string): Observable<any>;
+}
+
 @Injectable()
-export class SseService {
+export class SseServiceImpl extends SseService {
   /**
    * _currentSse
    *
@@ -65,23 +92,7 @@ export class SseService {
    */
   private _registeredEvents: Map<string, { eventListener: any, subject$: Subject<any> }> = new Map();
 
-  constructor() { }
-
-  // for mock only
-  public triggerSseEvent(eventName: string, data?: any) { }
-
-  /**
-   * watchWorkspaceRealTime
-   *
-   * when the user selects a workspace, this method will be call to subscribe
-   * to the sse stream of that workspace. It will automatically close the previous
-   * connection if another workspace was selected
-   *
-   * @param {string} workspaceId
-   *
-   * @return {function} Call the function to close the SSE stream if needed
-   */
-  public watchWorkspaceRealTime(workspaceId: string) {
+  watchWorkspaceRealTime(workspaceId: string) {
     if (typeof this._currentSse$ !== 'undefined' && this._currentSse$ !== null) {
       if (environment.debug) {
         console.debug('closing previous sse connection');
@@ -123,16 +134,7 @@ export class SseService {
     return Observable.of(null);
   }
 
-  /**
-   * subscribeToWorkspaceEvent
-   *
-   * return an observable to observe a certain type of SSE event
-   *
-   * @param {string} eventName : The name event to observe
-   *
-   * @return {Observable} Observable which is triggered every time there's the event `eventName`
-   */
-  public subscribeToWorkspaceEvent(eventName: string) {
+  subscribeToWorkspaceEvent(eventName: string) {
     if (this._registeredEvents.has(eventName)) {
       return this._registeredEvents.get(eventName).subject$.asObservable();
     }

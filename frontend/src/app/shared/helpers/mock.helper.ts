@@ -32,6 +32,7 @@ export function response(status: number): Observable<Response> {
  */
 export function responseBody(body: string | Object | FormData | ArrayBuffer | Blob, status = 200): Observable<Response> {
   const response = new Response(new ResponseOptions({ status, body }));
+
   if (status >= 200 && status < 300) {
     return Observable.of(response);
   } else {

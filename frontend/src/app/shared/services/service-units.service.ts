@@ -16,15 +16,22 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Response } from '@angular/http';
 import { Store } from '@ngrx/store';
 import { batchActions } from 'redux-batched-actions';
+import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
 
+export abstract class ServiceUnitsService {
+  abstract getDetailsServiceUnit(serviceUnitId: string): Observable<Response>;
+}
+
 @Injectable()
-export class ServiceUnitsService {
-  constructor(private _http: Http) { }
+export class ServiceUnitsServiceImpl extends ServiceUnitsService {
+  constructor(private _http: Http) {
+    super();
+  }
 
   getDetailsServiceUnit(serviceUnitId: string) {
     return this._http.get(`${environment.urlBackend}/serviceunits/${serviceUnitId}`);

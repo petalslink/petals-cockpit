@@ -16,15 +16,22 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Response } from '@angular/http';
 import { Store } from '@ngrx/store';
 import { batchActions } from 'redux-batched-actions';
+import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
 
+export abstract class ContainersService {
+  abstract getDetailsContainer(containerId: string): Observable<Response>;
+}
+
 @Injectable()
-export class ContainersService {
-  constructor(private _http: Http) { }
+export class ContainersServiceImpl extends ContainersService {
+  constructor(private _http: Http) {
+    super();
+  }
 
   getDetailsContainer(containerId: string) {
     return this._http.get(`${environment.urlBackend}/containers/${containerId}`);

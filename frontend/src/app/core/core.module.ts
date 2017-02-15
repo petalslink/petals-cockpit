@@ -37,23 +37,23 @@ import { BusesEffects } from './../features/cockpit/workspaces/state/buses/buses
 import { ContainersEffects } from './../features/cockpit/workspaces/state/containers/containers.effects';
 import { ComponentsEffects } from './../features/cockpit/workspaces/state/components/components.effects';
 import { ServiceUnitsEffects } from './../features/cockpit/workspaces/state/service-units/service-units.effects';
-import { SseService } from '../shared/services/sse.service';
+import { SseService, SseServiceImpl } from '../shared/services/sse.service';
 import { SseServiceMock } from '../shared/services/sse.service.mock';
-import { BusesInProgressService } from '../shared/services/buses-in-progress.service';
+import { BusesInProgressService, BusesInProgressServiceImpl } from '../shared/services/buses-in-progress.service';
 import { BusesInProgressMockService } from '../shared/services/buses-in-progress-mock.service';
-import { WorkspacesService } from '../shared/services/workspaces.service';
+import { WorkspacesService, WorkspacesServiceImpl } from '../shared/services/workspaces.service';
 import { WorkspacesMockService } from '../shared/services/workspaces.mock';
 import { UsersMockService } from '../shared/services/users.mock';
-import { UsersService } from '../shared/services/users.service';
+import { UsersService, UsersServiceImpl } from '../shared/services/users.service';
 import { GuardLoginService } from '../shared/services/guard-login.service';
 import { GuardAppService } from '../shared/services/guard-app.service';
-import { BusesService } from '../shared/services/buses.service';
+import { BusesService, BusesServiceImpl } from '../shared/services/buses.service';
 import { BusesMockService } from '../shared/services/buses.service.mock';
-import { ContainersService } from './../shared/services/containers.service';
+import { ContainersService, ContainersServiceImpl } from './../shared/services/containers.service';
 import { ContainersMockService } from './../shared/services/containers.service.mock';
-import { ComponentsService } from './../shared/services/components.service';
+import { ComponentsService, ComponentsServiceImpl } from './../shared/services/components.service';
 import { ComponentsMockService } from './../shared/services/components.service.mock';
-import { ServiceUnitsService } from './../shared/services/service-units.service';
+import { ServiceUnitsService, ServiceUnitsServiceImpl } from './../shared/services/service-units.service';
 import { ServiceUnitsMockService } from './../shared/services/service-units.service.mock';
 
 export const providers = [
@@ -66,35 +66,35 @@ export const providers = [
   GuardAppService,
   {
     provide: SseService,
-    useClass: (environment.mock ? SseServiceMock : SseService)
+    useClass: (environment.mock ? SseServiceMock : SseServiceImpl)
   },
   {
     provide: BusesInProgressService,
-    useClass: (environment.mock ? BusesInProgressMockService : BusesInProgressService)
+    useClass: (environment.mock ? BusesInProgressMockService : BusesInProgressServiceImpl)
   },
   {
     provide: BusesService,
-    useClass: (environment.mock ? BusesMockService : BusesService)
+    useClass: (environment.mock ? BusesMockService : BusesServiceImpl)
   },
   {
     provide: ContainersService,
-    useClass: (environment.mock ? ContainersMockService : ContainersService)
+    useClass: (environment.mock ? ContainersMockService : ContainersServiceImpl)
   },
   {
     provide: ComponentsService,
-    useClass: (environment.mock ? ComponentsMockService : ComponentsService)
+    useClass: (environment.mock ? ComponentsMockService : ComponentsServiceImpl)
   },
   {
     provide: ServiceUnitsService,
-    useClass: (environment.mock ? ServiceUnitsMockService : ServiceUnitsService)
+    useClass: (environment.mock ? ServiceUnitsMockService : ServiceUnitsServiceImpl)
   },
   {
     provide: WorkspacesService,
-    useClass: (environment.mock ? WorkspacesMockService : WorkspacesService)
+    useClass: (environment.mock ? WorkspacesMockService : WorkspacesServiceImpl)
   },
   {
     provide: UsersService,
-    useClass: (environment.mock ? UsersMockService : UsersService)
+    useClass: (environment.mock ? UsersMockService : UsersServiceImpl)
   }
 ];
 
