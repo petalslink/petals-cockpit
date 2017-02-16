@@ -20,22 +20,31 @@ import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
-
 import { IUser } from './../interfaces/user.interface';
 
-@Injectable()
-export class UsersService {
-  constructor(private _http: Http) { }
+export abstract class UsersService {
+  abstract connectUser(user: IUser): Observable<Response>;
 
-  public connectUser(user: IUser): Observable<Response> {
+  abstract disconnectUser(): Observable<Response>;
+
+  abstract getUserInformations(): Observable<Response>;
+}
+
+@Injectable()
+export class UsersServiceImpl extends UsersService {
+  constructor(private _http: Http) {
+    super();
+  }
+
+  connectUser(user: IUser) {
     return this._http.post(`${environment.urlBackend}/user/session`, <any>user);
   }
 
-  public disconnectUser(): Observable<Response> {
+  disconnectUser() {
     return this._http.delete(`${environment.urlBackend}/user/session`);
   }
 
-  public getUserInformations() {
+  getUserInformations() {
     return this._http.get(`${environment.urlBackend}/user/session`);
   }
 }

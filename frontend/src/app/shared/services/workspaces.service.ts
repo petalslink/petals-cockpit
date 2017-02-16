@@ -16,13 +16,21 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
 
+export abstract class WorkspacesService {
+  abstract fetchWorkspaces(): Observable<Response>;
+}
+
 @Injectable()
-export class WorkspacesService {
-  constructor(private _http: Http) { }
+export class WorkspacesServiceImpl extends WorkspacesService {
+
+  constructor(private _http: Http) {
+    super();
+  }
 
   fetchWorkspaces() {
     return this._http.get(`${environment.urlBackend}/workspaces`);

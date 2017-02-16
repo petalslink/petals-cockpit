@@ -19,15 +19,15 @@ import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
+import { WorkspacesService } from './workspaces.service';
 import { fetchWorkspaces } from '../../../mocks/workspaces';
 import { environment } from '../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 
 @Injectable()
-export class WorkspacesMockService {
-  constructor() { }
+export class WorkspacesMockService extends WorkspacesService {
 
-  fetchWorkspaces(): Observable<Response> {
+  fetchWorkspaces() {
     return helper
       .responseBody(fetchWorkspaces())
       .delay(environment.httpDelay);

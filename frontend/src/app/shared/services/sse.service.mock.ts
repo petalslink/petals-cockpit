@@ -24,14 +24,17 @@ import { Subscription } from 'rxjs/Subscription';
 import { environment } from '../../../environments/environment';
 import { SseWorkspaceEvent } from './sse.service';
 import { workspacesService } from '../../../mocks/workspaces-mock';
+import { SseService } from './sse.service';
 
 @Injectable()
-export class SseServiceMock {
+export class SseServiceMock extends SseService {
   private _isSseOpened = false;
 
   private _registeredEvents: Map<string, Subject<any>> = new Map();
 
-  constructor() { }
+  constructor() {
+    super();
+  }
 
   // call that method from another mock to simulate an SSE event
   public triggerSseEvent(eventName: string, data?: any) {
@@ -45,8 +48,8 @@ export class SseServiceMock {
         const newBus = workspacesService.getWorkspace(idWorkspace).addBus();
 
         this._registeredEvents.get(eventName).next(newBus);
-        break;
       }
+        break;
 
       case SseWorkspaceEvent.BUS_DELETED:
         this._registeredEvents.get(eventName).next({ id: data.id });
@@ -77,6 +80,9 @@ export class SseServiceMock {
 
       this._registeredEvents.set(eventName, this._registeredEvents.get(eventName));
     });
+
+    // simulate the backend sending the first event of the SSE
+    setTimeout(() => this.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, workspaceId), 500);
 
     return Observable.of(null);
   }

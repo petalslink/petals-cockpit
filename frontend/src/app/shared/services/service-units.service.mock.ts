@@ -20,13 +20,13 @@ import { Response } from '@angular/http';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
+import { ServiceUnitsService } from './service-units.service';
 import { environment } from './../../../environments/environment';
 import { serviceUnitsService } from '../../../mocks/service-units-mock';
 import * as helper from './../helpers/mock.helper';
 
 @Injectable()
-export class ServiceUnitsMockService {
-  constructor() { }
+export class ServiceUnitsMockService extends ServiceUnitsService {
 
   getDetailsServiceUnit(serviceUnitId: string) {
     const detailsServiceUnit = serviceUnitsService.read(serviceUnitId).getDetails();

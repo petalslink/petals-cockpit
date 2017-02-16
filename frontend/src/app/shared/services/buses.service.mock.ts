@@ -20,6 +20,7 @@ import { Response } from '@angular/http';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
+import { BusesService } from './buses.service';
 import { IStore } from './../interfaces/store.interface';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { Buses } from './../../features/cockpit/workspaces/state/buses/buses.reducer';
@@ -32,12 +33,14 @@ import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 
 @Injectable()
-export class BusesMockService {
+export class BusesMockService extends BusesService {
   private _watchingEventBusDeleted = false;
 
-  constructor(private _store$: Store<IStore>, private _sseService: SseService, private _notifications: NotificationsService) { }
+  constructor(private _store$: Store<IStore>, private _sseService: SseService, private _notifications: NotificationsService) {
+    super();
+  }
 
-  public watchEventBusDeleted() {
+  watchEventBusDeleted() {
     if (this._watchingEventBusDeleted) {
       return;
     }

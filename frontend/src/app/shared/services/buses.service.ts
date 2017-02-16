@@ -16,9 +16,10 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Response } from '@angular/http';
 import { Store } from '@ngrx/store';
 import { batchActions } from 'redux-batched-actions';
+import { Observable } from 'rxjs/Observable';
 
 import { IStore } from './../interfaces/store.interface';
 import { SseService, SseWorkspaceEvent } from './sse.service';
@@ -27,15 +28,24 @@ import { BusesInProgress } from './../../features/cockpit/workspaces/state/buses
 import { environment } from './../../../environments/environment';
 import { IBus } from './../../features/cockpit/workspaces/state/buses/bus.interface';
 
+
+export abstract class BusesService {
+  abstract watchEventBusDeleted(): void;
+
+  abstract getDetailsBus(busId: string): Observable<Response>;
+}
+
 @Injectable()
-export class BusesService {
+export class BusesServiceImpl extends BusesService {
   constructor(
     private _http: Http,
     private _store$: Store<IStore>,
     private _sseService: SseService
-  ) { }
+  ) {
+    super();
+  }
 
-  public watchEventBusDeleted() {
+  watchEventBusDeleted() {
     this._sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
       .map(({ id }) => {
