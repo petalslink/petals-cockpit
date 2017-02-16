@@ -29,12 +29,18 @@ import { toJavascriptMap } from '../helpers/shared.helper';
 @Injectable()
 export class BusesInProgressMockService extends BusesInProgressService {
 
+  private firstErrorSent = false;
+
   constructor(private _sseService: SseService) {
     super();
   }
 
   postBus(idWorkspace: string, bus: IBusInProgress) {
-
+    // when mocking, we make the first test fail with an HTTP error
+    if (!this.firstErrorSent) {
+      this.firstErrorSent = true;
+      return helper.responseBody('Error backend', 500);
+    }
     const newBus = workspacesService.getWorkspace(idWorkspace).addBus();
     const detailsBus = Object.assign({}, bus, { id: toJavascriptMap(newBus.buses).allIds[0] });
 

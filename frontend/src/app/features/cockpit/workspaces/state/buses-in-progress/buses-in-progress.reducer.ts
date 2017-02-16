@@ -67,7 +67,8 @@ export class BusesInProgress {
   public static POST_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS`;
   private static postBusInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
     return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
-      isImportingBus: true
+      isImportingBus: true,
+      importBusError: ''
     });
   }
 
@@ -84,11 +85,22 @@ export class BusesInProgress {
     });
   }
 
+  // once the http request is done but failed
+  // tslint:disable-next-line:member-ordering
+  public static POST_BUS_IN_PROGRESS_ERROR = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS_ERROR`;
+  private static postBusInProgressError(busesInProgressTable: IBusesInProgressTable, payload) {
+    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
+      isImportingBus: false,
+      importBusError: payload
+    });
+  }
+
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_REMOVE_BUS_IN_PROGRESS`;
   private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { busInProgressId: string }) {
+    // TODO why test this? it should be there...
     if (typeof busesInProgressTable.byId[payload.busInProgressId] !== 'undefined') {
-      return Object.assign({}, omit(busesInProgressTable, 'byId'), <IBusesInProgressTable>{
+      return <IBusesInProgressTable>Object.assign({}, omit(busesInProgressTable, 'byId'), <IBusesInProgressTable>{
         byId: omit(busesInProgressTable.byId, payload.busInProgressId),
         allIds: busesInProgressTable.allIds.filter(id => id !== payload.busInProgressId)
       });
@@ -113,6 +125,7 @@ export class BusesInProgress {
     [BusesInProgress.SET_SELECTED_BUS_IN_PROGRESS]: BusesInProgress.setSelectedBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS]: BusesInProgress.postBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]: BusesInProgress.postBusInProgressSuccess,
+    [BusesInProgress.POST_BUS_IN_PROGRESS_ERROR]: BusesInProgress.postBusInProgressError,
     [BusesInProgress.REMOVE_BUS_IN_PROGRESS]: BusesInProgress.removeBusInProgress,
 
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: BusesInProgress.fetchWorkspaceSuccess,
