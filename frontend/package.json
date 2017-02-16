@@ -10,7 +10,7 @@
     "precache-silent": "sw-precache --config=sw-precache-config.js",
     "build": "ng build --prod --aot --no-sourcemap",
     "build-silent": "yarn run build -- --progress=false",
-    "prod": "yarn run build && yarn run precache",
+    "prod": "yarn run build -- -bh='{{baseUrl}}' && yarn run precache",
     "prod-silent": "yarn run build-silent -- -bh='{{baseUrl}}' && yarn run precache-silent",
     "prod-mock": "yarn run build -- --e=prod-e2e && yarn run precache",
     "prod-demo": "yarn run build-silent -- -e=gitlab-pages -bh=/petals-cockpit/ && yarn run precache-silent",
