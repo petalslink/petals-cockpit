@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <!-- is fixed, replace fxFlex="45" to 50 -->
               <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
                 <md-input-container #ipInput fxFill>
-                  <input mdInput placeholder="IP or domain name" formControlName="ip" required>
+                  <input mdInput placeholder="IP or hostname" formControlName="ip" required>
                   <span mdPrefix><md-icon color="primary">star_half</md-icon></span>
                   <md-hint *ngIf="formErrors.ip" class="form-error">
                     {{ formErrors.ip }}
