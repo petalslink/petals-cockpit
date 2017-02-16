@@ -13,18 +13,18 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div class="wrapper">
+<div class="wrapper" *ngIf="user$ | async">
   <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="25px" fxFill>
-    <app-generate-icon [size]="35" [text]="user.username"></app-generate-icon>
+    <app-generate-icon [size]="35" [text]="(user$ | async).username"></app-generate-icon>
 
     <div>
-      <div class="username">{{ user.username }}</div>
-      <div class="name">{{ user.name }}</div>
+      <div class="username">{{ (user$ | async).username }}</div>
+      <div class="name">{{ (user$ | async).name }}</div>
     </div>
 
     <div class="wrapper-disconnect" fxLayout="row" fxLayoutAlign="center center">
-      <md-icon *ngIf="!user.isDisconnecting" class="cursor-pointer" mdTooltip="Disconnect" mdTooltipPosition="below" (click)="disconnect()">power_settings_new</md-icon>
-      <md-spinner *ngIf="user.isDisconnecting"></md-spinner>
+      <md-icon *ngIf="!(isDisconnecting$ | async)" class="cursor-pointer" mdTooltip="Disconnect" mdTooltipPosition="below" (click)="disconnect()">power_settings_new</md-icon>
+      <md-spinner *ngIf="(isDisconnecting$ | async)"></md-spinner>
     </div>
   </div>
 </div>

@@ -66,7 +66,7 @@ export class Workspaces {
   private _currentWorkspace;
 
   // map to cache the created workspaces
-  private _memoizedWorkspaces = new Map<string, {wks: Workspace, composedWks: any}>();
+  private _memoizedWorkspaces = new Map<string, { wks: Workspace, composedWks: any }>();
 
   constructor() { }
 
@@ -113,8 +113,9 @@ export class Workspaces {
       workspace: newWorkspace.toObj(),
 
       users: {
-        bescudie: {
-          name: `Bertrand ESCUDIE`
+        admin: {
+          name: 'Administrator',
+          username: 'admin'
         }
       },
 
@@ -129,7 +130,7 @@ export class Workspaces {
       serviceUnits: serviceUnits.reduce((acc, serviceUnit) => Object.assign(acc, serviceUnit.toObj()), {})
     };
 
-    this._memoizedWorkspaces.set(idWks, {wks: newWorkspace, composedWks});
+    this._memoizedWorkspaces.set(idWks, { wks: newWorkspace, composedWks });
 
     return <Workspace>Object.assign({}, composedWks);
   };

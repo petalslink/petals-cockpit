@@ -17,10 +17,12 @@
 
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 
 import { IUser } from './../../../shared/interfaces/user.interface';
 import { IStore } from './../../../shared/interfaces/store.interface';
 import { Users } from './../../../shared/state/users.reducer';
+import { getCurrentUser } from './../../../shared/state/users.selectors';
 
 @Component({
   selector: 'app-menu-user-panel',
@@ -28,12 +30,13 @@ import { Users } from './../../../shared/state/users.reducer';
   styleUrls: ['./menu-user-panel.component.scss']
 })
 export class MenuUserPanelComponent implements OnInit {
-  public user = <IUser>{
-    name: 'Chuck NORRIS',
-    username: 'Admin'
-  };
+  public user$: Observable<IUser>;
+  public isDisconnecting$: Observable<boolean>;
 
-  constructor(private _store$: Store<IStore>) { }
+  constructor(private _store$: Store<IStore>) {
+    this.user$ = this._store$.let(getCurrentUser());
+    this.isDisconnecting$ = this._store$.select(state => state.users.isDisconnecting);
+  }
 
   ngOnInit() {
   }

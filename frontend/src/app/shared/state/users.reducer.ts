@@ -35,7 +35,10 @@ export class Users {
   // tslint:disable-next-line:member-ordering
   public static FETCH_USERS_SUCCESS = `${Users.reducerName}_FETCH_USERS_SUCCESS`;
   private static fetchUsersSuccess(users: IUsersTable, payload) {
-    return Object.assign(<IUsersTable>{}, users, payload);
+    return Object.assign(<IUsersTable>{}, users, {
+      byId: Object.assign({}, users.byId, payload.byId),
+      allIds: [...Array.of(new Set([...users.allIds, ...payload.allIds]))]
+    });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -51,7 +54,14 @@ export class Users {
       isConnecting: false,
       isConnected: true,
       connectionFailed: false,
-      connectedUserId: payload.id
+      connectedUserId: payload.user.username,
+
+      byId: Object.assign({}, users.byId, {
+        [payload.user.username]: Object.assign({},
+          users.byId[payload.user.username],
+          payload.user
+        )
+      })
     });
   }
 
@@ -73,7 +83,7 @@ export class Users {
   // tslint:disable-next-line:member-ordering
   public static DISCONNECT_USER_SUCCESS = `${Users.reducerName}_DISCONNECT_USER_SUCCESS`;
   private static disconnectUserSuccess(users: IUsersTable, payload) {
-    return Object.assign(<IUsersTable>{}, users, <IUsersTable>{
+    return Object.assign(<IUsersTable>{}, users, usersState(), <IUsersTable>{
       isDisconnecting: false,
       isConnected: false,
       connectedUserId: ''
