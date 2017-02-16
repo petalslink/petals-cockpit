@@ -21,6 +21,7 @@ import { IComponentsTable } from './components.interface';
 import { IComponentRow } from './component.interface';
 import { componentsTableFactory } from './components.initial-state';
 import { Users } from './../../../../../shared/state/users.reducer';
+import { Workspaces } from '../workspaces/workspaces.reducer';
 
 export class Components {
   private static reducerName = 'COMPONENTS_REDUCER';
@@ -150,6 +151,10 @@ export class Components {
     });
   }
 
+  private static fetchWorkspaceSuccess(componentsTable: IComponentsTable, payload) {
+    return componentsTableFactory();
+  }
+
   private static disconnectUserSuccess(componentsTable: IComponentsTable, payload) {
     return componentsTableFactory();
   }
@@ -167,6 +172,7 @@ export class Components {
     [Components.FETCH_COMPONENT_DETAILS_SUCCESS]: Components.fetchComponentDetailsSuccess,
     [Components.FETCH_COMPONENT_DETAILS_ERROR]: Components.fetchComponentDetailsError,
 
+    [Workspaces.FETCH_WORKSPACE_SUCCESS]: Components.fetchWorkspaceSuccess,
     [Users.DISCONNECT_USER_SUCCESS]: Components.disconnectUserSuccess
   };
 }

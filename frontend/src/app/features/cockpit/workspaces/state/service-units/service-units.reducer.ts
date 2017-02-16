@@ -20,6 +20,7 @@ import { Action } from '@ngrx/store';
 import { IserviceUnitsTable } from './service-units.interface';
 import { serviceUnitsTableFactory } from './service-units.initial-state';
 import { Users } from './../../../../../shared/state/users.reducer';
+import { Workspaces } from '../workspaces/workspaces.reducer';
 
 export class ServiceUnits {
   private static reducerName = 'SERVICE_UNITS_REDUCER';
@@ -93,6 +94,10 @@ export class ServiceUnits {
     });
   }
 
+  private static fetchWorkspaceSuccess(serviceUnitsTable: IserviceUnitsTable, payload) {
+    return serviceUnitsTableFactory();
+  }
+
   private static disconnectUserSuccess(serviceUnitsTable: IserviceUnitsTable, payload) {
     return serviceUnitsTableFactory();
   }
@@ -107,6 +112,7 @@ export class ServiceUnits {
     [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS]: ServiceUnits.fetchServiceUnitDetailsSuccess,
     [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR]: ServiceUnits.fetchServiceUnitDetailsError,
 
+    [Workspaces.FETCH_WORKSPACE_SUCCESS]: ServiceUnits.fetchWorkspaceSuccess,
     [Users.DISCONNECT_USER_SUCCESS]: ServiceUnits.disconnectUserSuccess
   };
 }
