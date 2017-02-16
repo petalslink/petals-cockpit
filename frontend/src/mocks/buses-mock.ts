@@ -1,3 +1,4 @@
+import { IBusInProgress } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { containersService, Container } from './containers-mock';
 
 export class Buses {
@@ -23,8 +24,8 @@ export class BusesInProgress {
 
   constructor() { }
 
-  create() {
-    const busInProgress = new BusInProgress();
+  create(bus?: IBusInProgress) {
+    const busInProgress = new BusInProgress(bus);
     this._busesInProgress.set(busInProgress.getIdFormatted(), busInProgress);
     return busInProgress;
   }
@@ -77,16 +78,31 @@ export class Bus extends BusBase {
 }
 
 export class BusInProgress extends BusBase {
-  constructor() {
+
+  private ip: string;
+  private port: number;
+  private username: string;
+
+  constructor(bus?: IBusInProgress) {
     super();
+    if (bus) {
+      this.ip = bus.ip;
+      this.port = bus.port;
+      this.username = bus.username;
+    } else {
+      this.ip = `192.168.0.${this._id}`;
+      this.port = 4250 + this._id;
+      this.username = `petals`;
+    }
   }
 
   toObj() {
     return {
       [this.getIdFormatted()]: {
-        ip: `192.168.0.${this._id}`,
-        port: 4250 + this._id,
-        username: `petals`
+        id: this.getIdFormatted(),
+        ip: this.ip,
+        port: this.port,
+        username: this.username
       }
     };
   }

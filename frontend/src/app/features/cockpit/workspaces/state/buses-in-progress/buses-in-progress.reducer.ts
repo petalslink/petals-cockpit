@@ -109,6 +109,18 @@ export class BusesInProgress {
     return busesInProgressTable;
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static UPDATE_ERROR_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_UPDATE_ERROR_BUS_IN_PROGRESS`;
+  private static updateErrorBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { id: string, importError: string }) {
+    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
+      byId: Object.assign({}, busesInProgressTable.byId, {
+        [payload.id]: Object.assign({}, busesInProgressTable.byId[payload.id], {
+          importError: payload.importError
+        })
+      })
+    });
+  }
+
   private static fetchWorkspaceSuccess(busesInProgressTable: IBusesInProgressTable, payload) {
     return busesInProgressTableFactory();
   }
@@ -127,6 +139,7 @@ export class BusesInProgress {
     [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]: BusesInProgress.postBusInProgressSuccess,
     [BusesInProgress.POST_BUS_IN_PROGRESS_ERROR]: BusesInProgress.postBusInProgressError,
     [BusesInProgress.REMOVE_BUS_IN_PROGRESS]: BusesInProgress.removeBusInProgress,
+    [BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS]: BusesInProgress.updateErrorBusInProgress,
 
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: BusesInProgress.fetchWorkspaceSuccess,
     [Users.DISCONNECT_USER_SUCCESS]: BusesInProgress.disconnectUserSuccess

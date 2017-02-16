@@ -38,6 +38,8 @@ export abstract class BusesService {
 
   abstract watchEventBusImportOk(): void;
 
+  abstract watchEventBusImportError(): void;
+
   abstract getDetailsBus(busId: string): Observable<Response>;
 }
 
@@ -74,7 +76,8 @@ export class BusesServiceImpl extends BusesService {
         // there should be only one element in there!
         const busInProgress = buses.byId[buses.allIds[0]];
 
-        this._notifications.success(`Bus imported`, `The bus with the IP ${busInProgress.ip} has been imported`);
+        this._notifications.success(`Bus import success`,
+          `The import of a bus from the IP ${busInProgress.ip}:${busInProgress.port} succeeded`);
 
         this._store$.dispatch(batchActions([
           { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: busInProgress.id } },
@@ -83,6 +86,19 @@ export class BusesServiceImpl extends BusesService {
           { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap(data.components) },
           { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap(data.serviceUnits) },
         ]));
+      })
+      .subscribe();
+  }
+
+  watchEventBusImportError() {
+    this._sseService
+      .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_ERROR)
+      .map((busInError: any) => {
+
+        this._notifications.alert(`Bus import error`,
+          `The import of a bus from the IP ${busInError.ip}:${busInError.port} failed`);
+
+        this._store$.dispatch({ type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS, payload: busInError });
       })
       .subscribe();
   }

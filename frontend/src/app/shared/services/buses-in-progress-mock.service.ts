@@ -24,6 +24,7 @@ import { IBusInProgress } from './../../features/cockpit/workspaces/state/buses-
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 import { workspacesService } from '../../../mocks/workspaces-mock';
+import { BusInProgress } from './../../../mocks/buses-mock';
 import { toJavascriptMap } from '../helpers/shared.helper';
 
 @Injectable()
@@ -41,15 +42,23 @@ export class BusesInProgressMockService extends BusesInProgressService {
       this.firstErrorSent = true;
       return helper.responseBody('Error backend', 500);
     }
-    const newBus = workspacesService.getWorkspace(idWorkspace).addBus();
-    const detailsBus = Object.assign({}, bus, { id: toJavascriptMap(newBus.buses).allIds[0] });
 
+    const newBus = workspacesService.getWorkspace(idWorkspace).addBus(bus);
+
+    let event;
+    if (newBus.eventData.importError) {
+      event = SseWorkspaceEvent.BUS_IMPORT_ERROR;
+    } else {
+      event = SseWorkspaceEvent.BUS_IMPORT_OK;
+    }
+
+    const detailsBus = Object.assign({}, bus, { id: newBus.id });
     return helper
       .responseBody(detailsBus)
       .do(_ => {
         // simulate the backend sending the answer on the SSE
         setTimeout(() => (this._sseService as SseServiceMock)
-          .triggerSseEvent(SseWorkspaceEvent.BUS_IMPORT_OK, newBus), environment.sseDelay);
+          .triggerSseEvent(event, newBus.eventData), environment.sseDelay);
       });
   }
 }

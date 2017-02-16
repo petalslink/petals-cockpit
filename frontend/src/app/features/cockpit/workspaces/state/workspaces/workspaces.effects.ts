@@ -81,6 +81,7 @@ export class WorkspacesEffects {
         // TODO shouldn't we keep the Subscriptions and close them when we change workspace?
         this._busesService.watchEventBusDeleted();
         this._busesService.watchEventBusImportOk();
+        this._busesService.watchEventBusImportError();
         return { type: Workspaces.FETCH_WORKSPACE_WAIT_SSE, payload: action.payload };
       })
     );

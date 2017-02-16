@@ -1,3 +1,6 @@
+import { omit } from 'underscore';
+
+import { IBusInProgress } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { Bus, BusInProgress, busesService, busesInProgressService } from './buses-mock';
 import { containersService, Container } from './containers-mock';
 import { Component } from './components-mock';
@@ -8,6 +11,8 @@ export class Workspace {
   private _id: number;
   private _buses: Bus[] = [];
   private _busesInProgress: BusInProgress[] = [];
+
+  private firstErrorSent = false;
 
   constructor() {
     this._id = Workspace._cpt++;
@@ -40,25 +45,43 @@ export class Workspace {
     return this._busesInProgress;
   }
 
-  public addBus() {
+  public addBus(busInProgress: IBusInProgress): {id: string, eventData: any} {
+    // we fail the first time, for the demo
+    if (!this.firstErrorSent) {
+      this.firstErrorSent = true;
+
+      const bus = busesInProgressService.create(busInProgress);
+
+      return {
+        id: bus.getIdFormatted(),
+        eventData: Object.assign({}, bus.toObj()[bus.getIdFormatted()], {
+          importError: `Can't connect to bus`
+        })
+      };
+    }
+
     const bus = busesService.create();
+
     this._buses.push(bus);
 
     const containers = bus.getContainers();
     const components = containers.reduce((acc: Component[], container) => [...acc, ...container.getComponents()], []);
     const serviceUnits = components.reduce((acc: ServiceUnit[], component) => [...acc, ...component.getServiceUnits()], []);
 
-    const composedBus = {
+    const eventData = {
       buses: bus.toObj(),
 
-      containers: containers.reduce((acc, container) => Object.assign(acc, container.toObj()), {}),
+      containers: containers.reduce((acc, container) => Object.assign({}, acc, container.toObj()), {}),
 
-      components: components.reduce((acc, component) => Object.assign(acc, component.toObj()), {}),
+      components: components.reduce((acc, component) => Object.assign({}, acc, component.toObj()), {}),
 
-      serviceUnits: serviceUnits.reduce((acc, serviceUnit) => Object.assign(acc, serviceUnit.toObj()), {})
+      serviceUnits: serviceUnits.reduce((acc, serviceUnit) => Object.assign({}, acc, serviceUnit.toObj()), {})
     };
 
-    return composedBus;
+    return {
+      id: bus.getIdFormatted(),
+      eventData
+    };
   }
 }
 
