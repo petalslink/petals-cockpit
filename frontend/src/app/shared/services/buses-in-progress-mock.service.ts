@@ -40,7 +40,6 @@ export class BusesInProgressMockService extends BusesInProgressService {
 
     return helper
       .responseBody(detailsBus)
-      .delay(environment.httpDelay)
       .do(_ => {
         // simulate the backend sending the answer on the SSE
         setTimeout(() => (this._sseService as SseServiceMock)

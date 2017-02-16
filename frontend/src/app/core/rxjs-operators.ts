@@ -30,6 +30,8 @@ import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/combineLatest';
+import 'rxjs/add/operator/materialize';
+import 'rxjs/add/operator/dematerialize';
 
 // observables
 import 'rxjs/add/observable/empty';

@@ -28,8 +28,6 @@ export class ContainersMockService extends ContainersService {
   getDetailsContainer(containerId: string) {
     const detailsContainer = containersService.read(containerId).getDetails();
 
-    return helper
-      .responseBody(detailsContainer)
-      .delay(environment.httpDelay);
+    return helper.responseBody(detailsContainer);
   }
 }

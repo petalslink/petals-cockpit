@@ -43,8 +43,6 @@ export class BusesMockService extends BusesServiceImpl {
   getDetailsBus(busId: string) {
     const detailsBus = busesService.read(busId).getDetails();
 
-    return helper
-      .responseBody(detailsBus)
-      .delay(environment.httpDelay);
+    return helper.responseBody(detailsBus);
   }
 }

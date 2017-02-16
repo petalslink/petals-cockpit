@@ -26,8 +26,6 @@ import * as helper from './../helpers/mock.helper';
 export class WorkspacesMockService extends WorkspacesService {
 
   fetchWorkspaces() {
-    return helper
-      .responseBody(fetchWorkspaces())
-      .delay(environment.httpDelay);
+    return helper.responseBody(fetchWorkspaces());
   }
 }

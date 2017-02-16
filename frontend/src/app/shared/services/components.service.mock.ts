@@ -27,8 +27,6 @@ export class ComponentsMockService extends ComponentsService {
   getDetailsComponent(componentId: string) {
     const detailsComponent = componentsService.read(componentId).getDetails();
 
-    return helper
-      .responseBody(detailsComponent)
-      .delay(environment.httpDelay);
+    return helper.responseBody(detailsComponent);
   }
 }

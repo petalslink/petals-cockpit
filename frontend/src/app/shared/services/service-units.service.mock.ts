@@ -28,8 +28,6 @@ export class ServiceUnitsMockService extends ServiceUnitsService {
   getDetailsServiceUnit(serviceUnitId: string) {
     const detailsServiceUnit = serviceUnitsService.read(serviceUnitId).getDetails();
 
-    return helper
-      .responseBody(detailsServiceUnit)
-      .delay(environment.httpDelay);
+    return helper.responseBody(detailsServiceUnit);
   }
 }
