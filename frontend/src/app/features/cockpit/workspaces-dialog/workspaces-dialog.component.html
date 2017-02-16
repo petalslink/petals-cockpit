@@ -41,8 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <span md-line>You don't have any workspace yet</span>
           </div>
 
-          <h3 class="color-primary-light-bold margin-top-x1" *ngIf="(workspaces$ | async).list.length !== 0">Select the workspace</h3>
-
+          <h3 class="color-primary-light-bold margin-top-x1 no-workspace-selected" *ngIf="(workspaces$ | async).list.length !== 0">Select the workspace</h3>
           <md-card fxLayout="row" fxFlex="100%" class="background-color-hover-light-green-x2 cursor-pointer" *ngFor="let workspace of (workspaces$ | async).list"
             (click)="fetchWorkspace(workspace)">
             <!-- https://github.com/angular/flex-layout/issues/132 -->
@@ -55,7 +54,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </md-card-subtitle>
               <p md-line>You're the only one to use this workspace</p>
             </div>
-          </md-card>
+            </md-card>
         </div>
       </div>
     </md-dialog-content>
