@@ -25,7 +25,7 @@ interface IWorkspaceCommon {
   name: string;
 
   // when a bus is in import
-  isImporting: true;
+  isImporting: boolean;
   importIp?: string;
   importPort?: number;
   importUsername?: string;

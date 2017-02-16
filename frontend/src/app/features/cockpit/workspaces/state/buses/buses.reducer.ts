@@ -22,6 +22,7 @@ import { IBusRow } from './bus.interface';
 import { IBusesTable } from './buses.interface';
 import { busesTableFactory } from './buses.initial-state';
 import { Users } from './../../../../../shared/state/users.reducer';
+import { Workspaces } from '../workspaces/workspaces.reducer';
 
 export class Buses {
   private static reducerName = 'BUSES_REDUCER';
@@ -164,6 +165,10 @@ export class Buses {
     });
   }
 
+  private static fetchWorkspaceSuccess(busesTable: IBusesTable, payload) {
+    return busesTableFactory();
+  }
+
   private static disconnectUserSuccess(busesTable: IBusesTable, payload) {
     return busesTableFactory();
   }
@@ -182,6 +187,7 @@ export class Buses {
     [Buses.FETCH_BUS_DETAILS_SUCCESS]: Buses.fetchBusDetailsSuccess,
     [Buses.FETCH_BUS_DETAILS_ERROR]: Buses.fetchBusDetailsError,
 
+    [Workspaces.FETCH_WORKSPACE_SUCCESS]: Buses.fetchWorkspaceSuccess,
     [Users.DISCONNECT_USER_SUCCESS]: Buses.disconnectUserSuccess
   };
 }

@@ -22,6 +22,7 @@ import { busesInProgressTableFactory } from './buses-in-progress.initial-state';
 import { IBusesInProgressTable } from './buses-in-progress.interface';
 import { IBusInProgressRow } from './bus-in-progress.interface';
 import { Users } from './../../../../../shared/state/users.reducer';
+import { Workspaces } from '../workspaces/workspaces.reducer';
 
 export class BusesInProgress {
   private static reducerName = 'BUSES_IN_PROGRESS_REDUCER';
@@ -96,6 +97,10 @@ export class BusesInProgress {
     return busesInProgressTable;
   }
 
+  private static fetchWorkspaceSuccess(busesInProgressTable: IBusesInProgressTable, payload) {
+    return busesInProgressTableFactory();
+  }
+
   private static disconnectUserSuccess(busesInProgressTable: IBusesInProgressTable, payload) {
     return busesInProgressTableFactory();
   }
@@ -110,6 +115,7 @@ export class BusesInProgress {
     [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]: BusesInProgress.postBusInProgressSuccess,
     [BusesInProgress.REMOVE_BUS_IN_PROGRESS]: BusesInProgress.removeBusInProgress,
 
+    [Workspaces.FETCH_WORKSPACE_SUCCESS]: BusesInProgress.fetchWorkspaceSuccess,
     [Users.DISCONNECT_USER_SUCCESS]: BusesInProgress.disconnectUserSuccess
   };
 }

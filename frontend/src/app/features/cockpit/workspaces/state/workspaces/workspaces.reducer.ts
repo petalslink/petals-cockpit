@@ -19,6 +19,7 @@ import { Action } from '@ngrx/store';
 
 import { IWorkspacesTable } from './workspaces.interface';
 import { workspacesTableFactory } from './workspaces.initial-state';
+import { workspaceRowFactory } from './workspace.initial-state';
 import { IWorkspaceRow } from './workspace.interface';
 import { Users } from './../../../../../shared/state/users.reducer';
 
@@ -101,13 +102,30 @@ export class Workspaces {
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_SUCCESS = `${Workspaces.reducerName}_FETCH_WORKSPACE_SUCCESS`;
   private static fetchWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload) {
+    const cleanWorkspaces = workspacesTable
+      .allIds
+      .reduce((acc, workspaceId) =>
+        Object.assign(acc, {
+          byId: Object.assign(acc.byId, {
+            [workspaceId]: Object.assign({},
+              workspacesTable.byId[workspaceId],
+              workspaceRowFactory(
+                workspacesTable.byId[workspaceId].id,
+                workspacesTable.byId[workspaceId].name
+              )
+            )
+          }),
+          allIds: [...acc.allIds, workspaceId]
+        }), { byId: {}, allIds: [] }
+      )
+
     return <IWorkspacesTable>Object.assign({}, workspacesTable,
       <IWorkspacesTable>{
         firstWorkspaceFetched: true,
         selectedWorkspaceId: payload.id,
         byId: Object.assign(
           {},
-          workspacesTable.byId,
+          cleanWorkspaces.byId,
           {
             [payload.id]: <IWorkspaceRow>Object.assign(
               {},
@@ -118,7 +136,8 @@ export class Workspaces {
               }
             )
           }
-        )
+        ),
+        allIds: cleanWorkspaces.allIds
       }
     );
   }
