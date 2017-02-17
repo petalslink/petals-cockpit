@@ -30,19 +30,21 @@ export class ColorSearchedLettersDirective implements OnInit {
   constructor(private el: ElementRef, private renderer: Renderer) { }
 
   ngOnInit() {
-    if (typeof this.classToApply === 'undefined') {
+    if (!this.classToApply) {
       this.classToApply = '';
     }
-    if (typeof this.search === 'undefined') {
+
+    if (!this.search || !this.search.trim()) {
       this.renderer.setElementProperty(this.el.nativeElement, 'innerHTML', this.text);
       return;
     }
-    let search = escapeStringRegexp(this.search.trim());
+
+    const search = escapeStringRegexp(this.search.trim());
     this.renderer.setElementProperty(this.el.nativeElement, 'innerHTML', this.replace(this.text, search));
   }
 
   replace(txt = '', search: string) {
-    let searchRgx = new RegExp(`(${search})`, 'gi');
+    const searchRgx = new RegExp(`(${search})`, 'gi');
     return txt.replace(searchRgx, `<span class="${this.classToApply}">$1</span>`);
   }
 }
