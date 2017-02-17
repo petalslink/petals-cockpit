@@ -24,6 +24,8 @@ import { environment } from './../../../environments/environment';
 
 export abstract class BusesInProgressService {
   abstract postBus(idWorkspace: string, bus: IBusInProgress): Observable<Response>;
+
+  abstract deleteBus(idWorkspace: string, id: string): Observable<Response>;
 }
 
 @Injectable()
@@ -34,5 +36,9 @@ export class BusesInProgressServiceImpl extends BusesInProgressService {
 
   postBus(idWorkspace: string, bus: IBusInProgress) {
     return this._http.post(`${environment.urlBackend}/workspaces/${idWorkspace}/buses`, bus);
+  }
+
+  deleteBus(idWorkspace: string, id: string) {
+    return this._http.delete(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${id}`);
   }
 }

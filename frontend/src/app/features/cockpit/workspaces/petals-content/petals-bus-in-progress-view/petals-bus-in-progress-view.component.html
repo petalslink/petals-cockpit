@@ -84,7 +84,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 <md-icon color="warn">warning</md-icon> {{ (busInProgress && busInProgress.importError) ? busInProgress.importError : (busesInProgressTable$ | async).importBusError }}
               </div>
               <div fxFlex></div>
-              <button md-raised-button color="warn" type="submit" *ngIf="busInProgress && busInProgress.importError" class="margin-right-x1">Discard</button>
+              <button md-raised-button color="warn" type="button" *ngIf="busInProgress && busInProgress.importError" (click)="discard(busInProgress)" [disabled]="busInProgress && busInProgress.removing" class="margin-right-x1">Discard</button>
               <button md-raised-button color="primary" fxLayout="row" fxLayoutAlign="center center" type="submit" [disabled]="busImportForm.invalid || (busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError)">
                 <span *ngIf="!(busesInProgressTable$ | async).isImportingBus">Import</span>
 
