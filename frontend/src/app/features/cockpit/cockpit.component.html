@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFill>
+<div class="page-cockpit" fxLayout="column" fxFill>
   <md-toolbar color="primary">
     <div class="toolbar-logo">
       <img class="logo-toolbar" [src]="logoByScreenSize$ | async">
@@ -46,11 +46,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <app-menu-user-panel></app-menu-user-panel>
 
       <div fxLayout="row">
-        <button fxFlex="100" md-raised-button [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId]" class="width-full no-border-radius" color="accent">
+        <button fxFlex="100" md-raised-button [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId]" class="workspace-name width-full no-border-radius" color="accent">
           {{ (workspace$ | async)?.name }}
         </button>
 
-        <button fxFlex md-raised-button (click)="openWorkspacesDialog()" class="width-full no-border-radius" color="accent">
+        <button fxFlex md-raised-button (click)="openWorkspacesDialog()" class="change-workspace width-full no-border-radius" color="accent">
           <md-icon>view_list</md-icon>
         </button>
       </div>
