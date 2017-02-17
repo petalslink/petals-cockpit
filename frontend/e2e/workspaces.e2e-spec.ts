@@ -31,6 +31,7 @@ describe(`Workspaces`, () => {
 
   it(`should not have any workspace selected`, () => {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
+
     // check there's a warning saying that no workspace is selected
     expect(element(by.css(`app-workspaces-dialog .no-workspace-selected`)).getText()).toEqual(`Select the workspace`);
 
@@ -47,12 +48,8 @@ describe(`Workspaces`, () => {
     let cardsText = element.all(by.css(`app-workspaces-dialog md-card`))
       .getText()
       .then((txt: any) => txt.join('\n'));
+
     expect(cardsText).toEqual(workspacesAndOwners.join(`\n`));
-
-    // select the first workspace
-    element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
-
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w*$/);
   });
 
   it(`should select a workspace when clicking on his card`, () => {
@@ -73,19 +70,12 @@ describe(`Workspaces`, () => {
 
     // check that the page displayed has a title with the workspace name
     expect(element.all(by.css(`app-cockpit .md-button-wrapper`)).get(1).getText()).toEqual(`Workspace 0`);
+  });
 
-    /// and that the first bus has the 'highlight' class to highlight it
-    let itemWithoutIcons = element.all(by.css(`app-cockpit md-sidenav app-material-tree md-nav-list .md-list-item > span[classtoapply="highlight"]`))
-      .first()
-      .getText()
-      .then((txt: any) => txt
-          .split(`\n`)
-          .filter((t: string) => t !== 'arrow_drop_down')
-          .join());
-    expect(itemWithoutIcons).toEqual(`Bus 0`);
+  it(`should contain the correct buses`, () => {
 
-    // there shouldn't be a title 'buses in progress'
-    expect(element(by.css(`.buses-in-progress h3`)).isPresent()).toBe(false);
+    // select the first workspace
+    element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
 
     // check that buses/container/component/su are available
     let availableBuses = [
@@ -97,7 +87,7 @@ describe(`Workspaces`, () => {
           `Comp 1`,
             `SU 2`,
             `SU 3`,
-          `Cont 1`,
+        `Cont 1`,
           `Comp 2`,
             `SU 4`,
             `SU 5`,
@@ -105,14 +95,40 @@ describe(`Workspaces`, () => {
             `SU 6`,
             `SU 7`
     ];
+
     // angular-material icon's name are displayed
     let listWithoutIcons = element.all(by.css(`app-cockpit md-sidenav app-material-tree`))
       .first()
       .getText()
       .then((txt: any) => txt
-          .split(`\n`)
-          .filter((t: string) => t !== 'arrow_drop_down'));
+        .split(`\n`)
+        .filter((t: string) => t !== 'arrow_drop_down'));
+
     expect(listWithoutIcons).toEqual(availableBuses);
+  });
+
+  it(`should contain the correct buses in progress`, () => {
+
+    // select the first workspace
+    element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
+
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w*$/);
+
+    // check that 2 bus in progress are displayed
+    expect(element.all(by.css(`app-petals-menu-view app-buses-in-progress a.buses-in-progress div.md-list-item`)).count()).toEqual(2);
+
+    // check that buses/container/component/su are available
+    let availableBusesInProgress = [
+      `192.168.0.1`,
+      `192.168.0.2`
+    ];
+
+    // angular-material icon's name are displayed
+    let importBusesText = element.all(by.css(`app-petals-menu-view app-buses-in-progress a.buses-in-progress div.md-list-item`))
+      .getText()
+      .then((txt: any) => txt.join('\n'));
+
+    expect(importBusesText).toEqual(availableBusesInProgress.join(`\n`));
   });
 
   // TODO : Make a test when the feature for add a new workspace will be available
