@@ -19,13 +19,21 @@ import { Injectable } from '@angular/core';
 import { CanLoad, Router } from '@angular/router';
 import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+import { Store } from '@ngrx/store';
 
+import { IStore } from './../interfaces/store.interface';
 import { UsersService } from './users.service';
 import { environment } from './../../../environments/environment';
+import { Users } from './../state/users.reducer';
+import { IUser } from './../interfaces/user.interface';
 
 @Injectable()
 export class GuardAppService implements CanLoad {
-  constructor(private _router: Router, private _userService: UsersService) { }
+  constructor(
+    private _router: Router,
+    private _userService: UsersService,
+    private _store$: Store<IStore>
+  ) { }
 
   canLoad() {
     return this._userService.getUserInformations()
@@ -33,6 +41,8 @@ export class GuardAppService implements CanLoad {
         if (environment.debug) {
           console.debug(`Guard App : User already logged. Continuing to /workspaces.`);
         }
+
+        this._store$.dispatch({ type: Users.CONNECT_USER_SUCCESS, payload: { user: <IUser>res.json(), redirectWorkspace: false } });
 
         return true;
       }).catch((res: Response) => {

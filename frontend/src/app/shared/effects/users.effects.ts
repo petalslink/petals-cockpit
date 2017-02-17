@@ -53,7 +53,7 @@ export class UsersEffects {
 
           return {
             type: Users.CONNECT_USER_SUCCESS,
-            payload: <IUser>res.json()
+            payload: { user: <IUser>res.json() }
           };
         })
         .catch((err) => {
@@ -71,6 +71,10 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false }) connectUserSuccess$: Observable<void> = this._actions$
     .ofType(Users.CONNECT_USER_SUCCESS)
+    .filter((action: Action) =>
+      typeof action.payload.redirectWorkspace === 'undefined' ||
+      action.payload.redirectWorkspace === true
+    )
     .map((action: Action) => {
       this._router.navigate(['/workspaces']);
     });
