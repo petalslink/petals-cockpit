@@ -16,33 +16,49 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
 
 import { BusesInProgressService } from './buses-in-progress.service';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
-import { generateUuidV4 } from '../helpers/shared.helper';
 import { IBusInProgress } from './../../features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
+import { workspacesService } from '../../../mocks/workspaces-mock';
+import { BusInProgress } from './../../../mocks/buses-mock';
+import { toJavascriptMap } from '../helpers/shared.helper';
 
 @Injectable()
 export class BusesInProgressMockService extends BusesInProgressService {
+
+  private firstErrorSent = false;
+
   constructor(private _sseService: SseService) {
     super();
   }
 
   postBus(idWorkspace: string, bus: IBusInProgress) {
-    const detailsBus = Object.assign({}, bus, { id: generateUuidV4() });
+    // when mocking, we make the first test fail with an HTTP error
+    if (!this.firstErrorSent) {
+      this.firstErrorSent = true;
+      return helper.responseBody('Error backend', 500);
+    }
 
+    const newBus = workspacesService.getWorkspace(idWorkspace).addBus(bus);
+
+    let event;
+    if (newBus.eventData.importError) {
+      event = SseWorkspaceEvent.BUS_IMPORT_ERROR;
+    } else {
+      event = SseWorkspaceEvent.BUS_IMPORT_OK;
+    }
+
+    const detailsBus = Object.assign({}, bus, { id: newBus.id });
     return helper
       .responseBody(detailsBus)
-      .delay(environment.httpDelay)
       .do(_ => {
         // simulate the backend sending the answer on the SSE
         setTimeout(() => (this._sseService as SseServiceMock)
-          .triggerSseEvent(SseWorkspaceEvent.BUS_IMPORT_OK, idWorkspace), environment.sseDelay);
+          .triggerSseEvent(event, newBus.eventData), environment.sseDelay);
       });
   }
 }

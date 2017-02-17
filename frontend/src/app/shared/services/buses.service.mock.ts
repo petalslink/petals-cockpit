@@ -16,56 +16,33 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
+import { Http } from '@angular/http';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
 
-import { BusesService } from './buses.service';
+import { BusesServiceImpl } from './buses.service';
 import { IStore } from './../interfaces/store.interface';
-import { SseService, SseWorkspaceEvent } from './sse.service';
-import { Buses } from './../../features/cockpit/workspaces/state/buses/buses.reducer';
-import { batchActions } from 'redux-batched-actions';
-import { BusesInProgress } from './../../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
+import { SseService } from './sse.service';
 import { NotificationsService } from 'angular2-notifications';
-import { IBus } from './../../features/cockpit/workspaces/state/buses/bus.interface';
 import { busesService } from './../../../mocks/buses-mock';
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 
 @Injectable()
-export class BusesMockService extends BusesService {
+export class BusesMockService extends BusesServiceImpl {
   private _watchingEventBusDeleted = false;
+  private _watchingEventBusImportOk = false;
 
-  constructor(private _store$: Store<IStore>, private _sseService: SseService, private _notifications: NotificationsService) {
-    super();
-  }
-
-  watchEventBusDeleted() {
-    if (this._watchingEventBusDeleted) {
-      return;
-    }
-
-    this._watchingEventBusDeleted = true;
-
-    this._sseService
-      .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_DELETED)
-      .filter(({ id }) => typeof id !== 'undefined')
-      .map(({ id }) => {
-        this._store$.dispatch(batchActions([
-          { type: Buses.REMOVE_BUS, payload: { busId: id } },
-          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: id } }
-        ]));
-
-        this._notifications.info(`Bus removed`, `A bus has been removed`);
-      })
-      .subscribe();
+  constructor(
+    private __http: Http,
+    private __store$: Store<IStore>,
+    private __sseService: SseService,
+    private __notifications: NotificationsService) {
+    super(__http, __store$, __sseService, __notifications);
   }
 
   getDetailsBus(busId: string) {
     const detailsBus = busesService.read(busId).getDetails();
 
-    return helper
-      .responseBody(detailsBus)
-      .delay(environment.httpDelay);
+    return helper.responseBody(detailsBus);
   }
 }

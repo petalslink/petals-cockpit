@@ -16,9 +16,6 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
 
 import { ComponentsService } from './components.service';
 import { environment } from './../../../environments/environment';
@@ -30,8 +27,6 @@ export class ComponentsMockService extends ComponentsService {
   getDetailsComponent(componentId: string) {
     const detailsComponent = componentsService.read(componentId).getDetails();
 
-    return helper
-      .responseBody(detailsComponent)
-      .delay(environment.httpDelay);
+    return helper.responseBody(detailsComponent);
   }
 }

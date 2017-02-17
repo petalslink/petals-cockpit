@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <!-- is fixed, replace fxFlex="45" to 50 -->
               <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
                 <md-input-container #ipInput fxFill>
-                  <input mdInput placeholder="IP or domain name" formControlName="ip" required>
+                  <input mdInput placeholder="IP or hostname" formControlName="ip" required>
                   <span mdPrefix><md-icon color="primary">star_half</md-icon></span>
                   <md-hint *ngIf="formErrors.ip" class="form-error">
                     {{ formErrors.ip }}
@@ -80,6 +80,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </div>
 
             <div class="margin-top-x2" fxLayout="row" fxLayoutAlign="end center">
+              <div *ngIf="(busesInProgressTable$ | async).importBusError || (busInProgress && busInProgress.importError)" class="color-red-x1" fxLayout="row" fxLayoutAlign="center center">
+                <md-icon color="warn">warning</md-icon> {{ (busInProgress && busInProgress.importError) ? busInProgress.importError : (busesInProgressTable$ | async).importBusError }}
+              </div>
+              <div fxFlex></div>
               <button md-raised-button color="warn" type="submit" *ngIf="busInProgress && busInProgress.importError" class="margin-right-x1">Discard</button>
               <button md-raised-button color="primary" fxLayout="row" fxLayoutAlign="center center" type="submit" [disabled]="busImportForm.invalid || (busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError)">
                 <span *ngIf="!(busesInProgressTable$ | async).isImportingBus">Import</span>

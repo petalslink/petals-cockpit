@@ -18,8 +18,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
-import { Observer } from 'rxjs/Observer';
-import { Subscription } from 'rxjs/Subscription';
 
 import { environment } from '../../../environments/environment';
 import { SseWorkspaceEvent } from './sse.service';
@@ -37,23 +35,14 @@ export class SseServiceMock extends SseService {
   }
 
   // call that method from another mock to simulate an SSE event
-  public triggerSseEvent(eventName: string, data?: any) {
-    switch (eventName) {
-      case SseWorkspaceEvent.WORKSPACE_CONTENT:
-        this._registeredEvents.get(eventName).next(workspacesService.getWorkspaceComposed(data));
-        break;
-
-      case SseWorkspaceEvent.BUS_IMPORT_OK: {
-        const idWorkspace = data;
-        const newBus = workspacesService.getWorkspace(idWorkspace).addBus();
-
-        this._registeredEvents.get(eventName).next(newBus);
-      }
-        break;
-
-      case SseWorkspaceEvent.BUS_DELETED:
-        this._registeredEvents.get(eventName).next({ id: data.id });
-        break;
+  public triggerSseEvent(eventName: string, data: any) {
+    if (this._registeredEvents.has(eventName)) {
+      this._registeredEvents.get(eventName).next(data);
+    } else if (environment.debug) {
+      console.error(`
+        Tried to triggerSseEvent for ${eventName}, but no event of this name was watching the SSE.
+        Did you call watchWorkspaceRealTime first? Is the event listed in SseWorkspaceEvent class?
+      `);
     }
   }
 
@@ -74,6 +63,7 @@ export class SseServiceMock extends SseService {
         this._registeredEvents.set(eventName, new Subject());
       }
 
+      // TODO there is something uterly wrong here...
       const eventListener = ({ data }: { data: string }) => {
         this._registeredEvents.get(eventName).next(data);
       };
@@ -81,8 +71,10 @@ export class SseServiceMock extends SseService {
       this._registeredEvents.set(eventName, this._registeredEvents.get(eventName));
     });
 
+    const workspaceContent = workspacesService.getWorkspaceComposed(workspaceId);
+
     // simulate the backend sending the first event of the SSE
-    setTimeout(() => this.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, workspaceId), 500);
+    setTimeout(() => this.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, workspaceContent), 500);
 
     return Observable.of(null);
   }
@@ -94,8 +86,8 @@ export class SseServiceMock extends SseService {
 
     if (environment.debug) {
       console.error(`
-        try to subscribeToWorkspaceEvent with an event name ${eventName} but no event of this name was watching the SSE.
-        Have you call watchWorkspaceRealTime first ? Is the event listed in SseWorkspaceEvent class ?
+        Tried to subscribeToWorkspaceEvent for ${eventName}, but no event of this name was watching the SSE.
+        Did you call watchWorkspaceRealTime first? Is the event listed in SseWorkspaceEvent class?
       `);
     }
 

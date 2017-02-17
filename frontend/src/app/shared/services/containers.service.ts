@@ -17,8 +17,6 @@
 
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { Store } from '@ngrx/store';
-import { batchActions } from 'redux-batched-actions';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';

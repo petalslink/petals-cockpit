@@ -16,9 +16,6 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
 
 import { ServiceUnitsService } from './service-units.service';
 import { environment } from './../../../environments/environment';
@@ -31,8 +28,6 @@ export class ServiceUnitsMockService extends ServiceUnitsService {
   getDetailsServiceUnit(serviceUnitId: string) {
     const detailsServiceUnit = serviceUnitsService.read(serviceUnitId).getDetails();
 
-    return helper
-      .responseBody(detailsServiceUnit)
-      .delay(environment.httpDelay);
+    return helper.responseBody(detailsServiceUnit);
   }
 }

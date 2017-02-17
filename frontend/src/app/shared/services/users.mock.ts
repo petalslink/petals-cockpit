@@ -40,36 +40,26 @@ export class UsersMockService extends UsersService {
     };
   }
 
-  public connectUser(user: IUser) {
-    let response$: Observable<Response>;
-
+  connectUser(user: IUser) {
     if (user.username === 'admin' && user.password === 'admin') {
       this._userIsConnected = true;
-      response$ = helper.responseBody(user);
-    } else {
-      response$ = helper.response(401);
+      return helper.responseBody(user);
     }
 
-    return response$.delay(environment.httpDelay);
+    return helper.response(401);
   }
 
-  public disconnectUser() {
+  disconnectUser() {
     this._userIsConnected = false;
 
-    return helper
-      .response(204)
-      .delay(environment.httpDelay);
+    return helper.response(204);
   }
 
-  public getUserInformations() {
-    let response$: Observable<Response>;
-
+  getUserInformations() {
     if (this._userIsConnected) {
-      response$ = helper.responseBody(this.adminUser);
-    } else {
-      response$ = helper.response(401);
+      return helper.responseBody(this.adminUser);
     }
 
-    return response$.delay(environment.httpDelay);
+    return helper.response(401);
   }
 }
