@@ -45,7 +45,7 @@ describe(`Workspaces`, () => {
     ];
 
     // the element() cannot be directly resolved with then()
-    let cardsText = element.all(by.css(`app-workspaces-dialog md-card`))
+    const cardsText = element.all(by.css(`app-workspaces-dialog md-card`))
       .getText()
       .then((txt: any) => txt.join('\n'));
 
@@ -78,7 +78,7 @@ describe(`Workspaces`, () => {
     element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
 
     // check that buses/container/component/su are available
-    let availableBuses = [
+    const availableBuses = [
       `Bus 0`,
         `Cont 0`,
           `Comp 0`,
@@ -97,7 +97,7 @@ describe(`Workspaces`, () => {
     ];
 
     // angular-material icon's name are displayed
-    let listWithoutIcons = element.all(by.css(`app-cockpit md-sidenav app-material-tree`))
+    const listWithoutIcons = element.all(by.css(`app-cockpit md-sidenav app-material-tree`))
       .first()
       .getText()
       .then((txt: any) => txt
@@ -124,7 +124,7 @@ describe(`Workspaces`, () => {
     ];
 
     // angular-material icon's name are displayed
-    let importBusesText = element.all(by.css(`app-petals-menu-view app-buses-in-progress a.buses-in-progress div.md-list-item`))
+    const importBusesText = element.all(by.css(`app-petals-menu-view app-buses-in-progress a.buses-in-progress div.md-list-item`))
       .getText()
       .then((txt: any) => txt.join('\n'));
 
