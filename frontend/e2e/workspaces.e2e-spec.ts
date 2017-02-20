@@ -118,9 +118,9 @@ describe(`Workspaces`, () => {
     expect(element.all(by.css(`app-petals-menu-view app-buses-in-progress a.buses-in-progress div.md-list-item`)).count()).toEqual(2);
 
     // check that buses/container/component/su are available
-    let availableBusesInProgress = [
-      `192.168.0.1`,
-      `192.168.0.2`
+    const availableBusesInProgress = [
+      `192.168.0.1:7700`,
+      `192.168.0.2:7700`
     ];
 
     // angular-material icon's name are displayed

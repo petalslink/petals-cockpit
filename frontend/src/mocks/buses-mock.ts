@@ -91,7 +91,7 @@ export class BusInProgress extends BusBase {
       this.username = bus.username;
     } else {
       this.ip = `192.168.0.${this._id}`;
-      this.port = 4250 + this._id;
+      this.port = 7700;
       this.username = `petals`;
     }
   }
