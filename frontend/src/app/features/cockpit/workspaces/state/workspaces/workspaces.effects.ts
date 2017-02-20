@@ -98,7 +98,7 @@ export class WorkspacesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchWorkspace$: Observable<Action> = this._actions$
     .ofType(Workspaces.FETCH_WORKSPACE)
-    .switchMap((action: Action) => this._sseService.watchWorkspaceRealTime(action.payload.id)
+    .switchMap((action: Action) => this._sseService.watchWorkspaceRealTime(action.payload)
       .map(_ => {
         // TODO shouldn't we keep the Subscriptions and close them when we change workspace?
         this._busesService.watchEventBusDeleted();
@@ -113,9 +113,6 @@ export class WorkspacesEffects {
     .ofType(Workspaces.FETCH_WORKSPACE_WAIT_SSE)
     .switchMap((action: Action) => this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
       .switchMap((data: any) => {
-        if (action.payload.changeUrl) {
-          this._router.navigate(['/workspaces', action.payload.id]);
-        }
         return Observable.of(batchActions([
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
           { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap(data.users) },

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { browser, element, by } from 'protractor';
+import { browser, element, by, ExpectedConditions as EC } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
 
@@ -27,6 +27,8 @@ describe(`Workspaces Tree`, () => {
     page.navigateTo();
     page.login(`admin`, `admin`);
     element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
+    // let's be sure everything is loaded and visible
+    browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 1000);
   });
 
   it(`should filter by bus, container, component and su when searching in Petals menu`, () => {

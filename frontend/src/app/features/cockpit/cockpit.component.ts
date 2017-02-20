@@ -72,17 +72,19 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.ui$ = this._store$.select(state => state.ui);
 
+    // it is needed to use subscribe(...) instead of do(...).subscribe()
+    // if not it won't work. TODO this should be solved or clarified...
     this._uiSub = this.ui$
       .map(ui => ui.isPopupListWorkspacesVisible)
       .distinctUntilChanged()
-      .map(isPopupListWorkspacesVisible => {
+      .subscribe(isPopupListWorkspacesVisible => {
         if (isPopupListWorkspacesVisible) {
           this._openWorkspacesDialog();
-        } else if (typeof this.workspacesDialogRef !== 'undefined') {
+        } else if (this.workspacesDialogRef) {
           this.workspacesDialogRef.close();
+          this.workspacesDialogRef = null;
         }
-      })
-      .subscribe();
+      });
 
     this.logoByScreenSize$ = this.media$
       .asObservable()
@@ -117,21 +119,17 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit() {
+
+    // TODO move that in its rightful place
     // if there's no workspace selected
     // display the popup to select one
-    // otherwise just fetch data
     const re = /workspaces\/([a-zA-Z0-9]+)(\/)?/;
     const url = this._router.url;
 
-    if (re.test(url)) {
-      const workspaceId = url.match(re)[1];
-      this._store$.dispatch({ type: Workspaces.FETCH_WORKSPACE, payload: {
-        id: workspaceId,
-        changeUrl: false
-      } });
-    } else {
+    if (!re.test(url)) {
       this.openWorkspacesDialog();
     }
+
     // TODO : cf If hook available for handling escape
     // https://github.com/angular/material2/pull/2501
     // Handles the keyboard events ->
