@@ -24,6 +24,7 @@ export interface IBusInProgressCommon {
 
   // for UI
   importError: string;
+  isRemoving: boolean;
 
   password: string;
   passphrase: string;

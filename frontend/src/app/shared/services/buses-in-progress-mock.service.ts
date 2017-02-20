@@ -61,4 +61,14 @@ export class BusesInProgressMockService extends BusesInProgressService {
           .triggerSseEvent(event, newBus.eventData), environment.sseDelay);
       });
   }
+
+  deleteBus(idWorkspace: string, id: string) {
+    return helper
+      .response(204)
+      .do(_ => {
+        // simulate the backend sending the answer on the SSE
+        setTimeout(() => (this._sseService as SseServiceMock)
+          .triggerSseEvent(SseWorkspaceEvent.BUS_DELETED, { id }), environment.sseDelay);
+      });
+  }
 }

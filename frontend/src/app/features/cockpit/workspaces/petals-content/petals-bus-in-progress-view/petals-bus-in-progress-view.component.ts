@@ -136,9 +136,11 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
   }
 
   onSubmit({value, valid}: { value: IBusInProgressImport, valid: boolean }) {
-    if (this.busImportForm.valid) {
-      this._store$.dispatch({ type: BusesInProgress.POST_BUS_IN_PROGRESS, payload: value });
-    }
+    this._store$.dispatch({ type: BusesInProgress.POST_BUS_IN_PROGRESS, payload: value });
+  }
+
+  discard(busInProgress: IBusInProgressRow) {
+    this._store$.dispatch({ type: BusesInProgress.DELETE_BUS_IN_PROGRESS, payload: busInProgress });
   }
 
   reset() {

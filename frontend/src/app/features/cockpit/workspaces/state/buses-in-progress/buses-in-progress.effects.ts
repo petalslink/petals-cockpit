@@ -67,4 +67,32 @@ export class BusesInProgressEffects {
     .do(({idWorkspace, busInProgress}: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
       this._router.navigate(['/workspaces', idWorkspace, 'petals', 'buses-in-progress', busInProgress.id])
     );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) deleteBusInProgress$: Observable<Action> = this._actions$
+    .ofType(BusesInProgress.DELETE_BUS_IN_PROGRESS)
+    .combineLatest(this._store$.select(state => state.workspaces.selectedWorkspaceId))
+    .switchMap(([action, idWorkspace]) =>
+      this._busesInProgressService.deleteBus(idWorkspace, action.payload.id)
+        .map((res: Response) => {
+          return {
+            type: BusesInProgress.DELETE_BUS_IN_PROGRESS_SUCCESS,
+            payload: {
+              idWorkspace,
+              busInProgress: action.payload
+            }
+          };
+        })
+        // TODO catch error?
+    );
+
+  // No need to actually delete it in the store because it will be handled from the SSE event
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: false }) deleteBusSuccess$: Observable<Action> = this._actions$
+    .ofType(BusesInProgress.DELETE_BUS_IN_PROGRESS_SUCCESS)
+    .map((action: Action) => action.payload)
+    .do(({idWorkspace, busInProgress}: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
+      // TODO improve that, what if we changed ws inbetween the delete and its success?!
+      this._router.navigate(['/workspaces', idWorkspace])
+    );
 }

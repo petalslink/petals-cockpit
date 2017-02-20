@@ -96,6 +96,20 @@ export class BusesInProgress {
   }
 
   // tslint:disable-next-line:member-ordering
+  public static DELETE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_DELETE_BUS_IN_PROGRESS`;
+  private static deleteBusInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
+    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
+      byId: Object.assign({}, busesInProgressTable.byId, {
+        [payload]: <IBusInProgressRow>Object.assign({}, { isRemoving: true })
+      })
+    });
+  }
+
+  // once the http request is done, no particular modification of the store, since it will be deleted
+  // tslint:disable-next-line:member-ordering
+  public static DELETE_BUS_IN_PROGRESS_SUCCESS = `${BusesInProgress.reducerName}_DELETE_BUS_IN_PROGRESS_SUCCESS`;
+
+  // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_REMOVE_BUS_IN_PROGRESS`;
   private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { busInProgressId: string }) {
     // TODO why test this? it should be there...
