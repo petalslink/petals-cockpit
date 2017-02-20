@@ -1,9 +1,9 @@
 id,container_id,name,state,type
-1,1,Component 0,Started,BC
-2,1,Component 1,Started,SE
-3,2,Component 2,Started,BC
-4,2,Component 3,Started,SE
-5,3,Component 4,Started,BC
-6,3,Component 5,Started,SE
-7,4,Component 6,Started,BC
-8,4,Component 7,Started,SE
+1,1,Comp 0,Started,BC
+2,1,Comp 1,Started,SE
+3,2,Comp 2,Started,BC
+4,2,Comp 3,Started,SE
+5,3,Comp 4,Started,BC
+6,3,Comp 5,Started,SE
+7,4,Comp 6,Started,BC
+8,4,Comp 7,Started,SE

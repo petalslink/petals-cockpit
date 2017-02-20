@@ -6,7 +6,7 @@ var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 
 exports.config = {
   getPageTimeout: 60000,
-  allScriptsTimeout: 20000,
+  allScriptsTimeout: 30000,
   specs: [
     './e2e/**/*.e2e-spec.ts'
   ],
@@ -21,10 +21,9 @@ exports.config = {
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,
-    defaultTimeoutInterval: 360000,
+    defaultTimeoutInterval: 60000,
     print: function() {}
   },
-  useAllAngular2AppRoots: true,
   beforeLaunch: function() {
     require('ts-node').register({
       project: 'e2e'

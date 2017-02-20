@@ -4,9 +4,9 @@ id,component_id,name,state,sa_name
 3,2,SU 2,Started,SA2
 4,2,SU 3,Started,SA3
 5,3,SU 4,Started,SA4
-6,4,SU 5,Started,SA5
+6,3,SU 5,Started,SA5
 7,4,SU 6,Started,SA6
-8,5,SU 7,Started,SA7
+8,4,SU 7,Started,SA7
 9,6,SU 8,Started,SA8
 10,6,SU 9,Started,SA9
 11,7,SU 10,Started,SA10

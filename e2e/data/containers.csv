@@ -1,5 +1,5 @@
 id,bus_id,name,ip,port,username,password
-1,1,Container 0,192.168.0.1,7700,petals,petals
-2,1,Container 1,192.168.0.11,7700,petals,petals
-3,4,Container 2,192.168.0.4,7700,petals,petals
-4,4,Container 3,192.168.0.44,7700,petals,petals
+1,1,Cont 0,192.168.0.1,7700,petals,petals
+2,1,Cont 1,192.168.0.11,7700,petals,petals
+3,4,Cont 2,192.168.0.4,7700,petals,petals
+4,4,Cont 3,192.168.0.44,7700,petals,petals
