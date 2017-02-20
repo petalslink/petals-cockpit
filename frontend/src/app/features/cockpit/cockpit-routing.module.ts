@@ -19,7 +19,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { CockpitComponent } from './cockpit.component';
-// import { EmptyMenuComponent } from './empty-menu/empty-menu.component';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 // import { PetalsContentModule } from './workspaces/petals-content/petals-content.module';
 
