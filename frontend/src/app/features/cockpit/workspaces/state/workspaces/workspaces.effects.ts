@@ -74,6 +74,28 @@ export class WorkspacesEffects {
     );
 
   // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) postWorkspace$: Observable<Action> = this._actions$
+    .ofType(Workspaces.POST_WORKSPACE)
+    .switchMap((action: Action) => this._workspacesService.postWorkspace(action.payload)
+      .map((res: Response) => {
+        const workspace = res.json();
+
+        return { type: Workspaces.POST_WORKSPACE_SUCCESS, payload: workspace };
+      })
+      .catch(err => {
+        if (environment.debug) {
+          console.group();
+          console.debug(`Error in workspaces.effects : ${Workspaces.POST_WORKSPACE}`);
+          console.error(err);
+          console.groupEnd();
+        }
+
+        this._notification.error(`Workspaces`, `An error occured while adding a new workspace.`);
+        return Observable.of({ type: Workspaces.POST_WORKSPACE_FAILED });
+      })
+    );
+
+  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchWorkspace$: Observable<Action> = this._actions$
     .ofType(Workspaces.FETCH_WORKSPACE)
     .switchMap((action: Action) => this._sseService.watchWorkspaceRealTime(action.payload.id)

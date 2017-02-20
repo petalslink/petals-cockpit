@@ -23,16 +23,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <md-dialog-content>
       <div fxLayout="column" fxFill>
         <div fxFlex>
-          <div fxLayout="row" fxFlex fxLayoutGap="10px">
+          <form [formGroup]="newWksForm" (ngSubmit)="onSubmit(newWksForm)" fxLayout="row" fxFlex fxLayoutGap="10px">
             <md-input-container fxFlex>
-              <input mdInput placeholder="New workspace name">
+              <input mdInput placeholder="New workspace name" formControlName="name">
               <span mdPrefix><md-icon color="primary">edit</md-icon></span>
             </md-input-container>
 
-            <button md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace" mdTooltipPosition="below">
-              <md-icon class="md-24">add</md-icon>
-          </button>
-          </div>
+            <button type="submit" [disabled]="btnSubmitDisabled" md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace" mdTooltipPosition="below">
+                <md-icon class="md-24">add</md-icon>
+            </button>
+          </form>
         </div>
 
         <div fxFlexFill class="margin-bottom-x1">

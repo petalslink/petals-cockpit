@@ -15,8 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
 
 import { Workspaces } from '../workspaces/state/workspaces/workspaces.reducer';
@@ -30,13 +32,53 @@ import { IWorkspace } from '../workspaces/state/workspaces/workspace.interface';
   templateUrl: './workspaces-dialog.component.html',
   styleUrls: ['./workspaces-dialog.component.scss']
 })
-export class WorkspacesDialogComponent implements OnInit {
+export class WorkspacesDialogComponent implements OnInit, OnDestroy {
   public workspaces$: Observable<IWorkspaces>;
+  public newWksForm: FormGroup;
+  public isAddingWorkspaceSub: Subscription;
+  public btnSubmitDisabled = true;
 
-  constructor(private _store$: Store<IStore>) { }
+  constructor(private _store$: Store<IStore>, private _fb: FormBuilder) {
+    this.workspaces$ = this._store$.let(getWorkspacesList());
+
+    this.newWksForm = this._fb.group({
+      name: ['', Validators.required]
+    });
+
+    this.isAddingWorkspaceSub = this
+      ._store$
+      .select(state => state.workspaces.isAddingWorkspace)
+      .distinctUntilChanged()
+      .combineLatest(Observable
+        .empty()
+        .concat(this
+          .newWksForm
+          .valueChanges
+          .map(values => values.name)
+          .distinctUntilChanged()
+        )
+      )
+      .do(([isAddingWorkspace, _]) => {
+        if (this.newWksForm.invalid || isAddingWorkspace) {
+          this.btnSubmitDisabled = true;
+        } else {
+          this.btnSubmitDisabled = false;
+        }
+
+        if (isAddingWorkspace) {
+          this.newWksForm.disable();
+        } else {
+          this.newWksForm.enable();
+        }
+      })
+      .subscribe();
+  }
 
   ngOnInit() {
-    this.workspaces$ = this._store$.let(getWorkspacesList());
+  }
+
+  ngOnDestroy() {
+    this.isAddingWorkspaceSub.unsubscribe();
   }
 
   // TODO use good type
@@ -47,5 +89,9 @@ export class WorkspacesDialogComponent implements OnInit {
         changeUrl: true
       }
     });
+  }
+
+  onSubmit({ value }) {
+    this._store$.dispatch({ type: Workspaces.POST_WORKSPACE, payload: value.name });
   }
 }

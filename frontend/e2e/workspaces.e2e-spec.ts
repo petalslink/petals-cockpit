@@ -73,7 +73,6 @@ describe(`Workspaces`, () => {
   });
 
   it(`should contain the correct buses`, () => {
-
     // select the first workspace
     element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
 
@@ -100,7 +99,6 @@ describe(`Workspaces`, () => {
   });
 
   it(`should contain the correct buses in progress`, () => {
-
     // select the first workspace
     element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
 
@@ -120,9 +118,26 @@ describe(`Workspaces`, () => {
     expect(importBusesText).toEqual(availableBusesInProgress);
   });
 
-  // TODO : Make a test when the feature for add a new workspace will be available
-  xit(`should create a new workspace and this workspace shouldn't have any bus`, () => {
-    element(by.css(`button.change-workspace`)).click();
+  it(`should create a new workspace`, () => {
+    element(by.css(`app-workspaces-dialog form input`)).sendKeys(`New workspace`);
+    element(by.css(`app-workspaces-dialog form button`)).click();
+
+    expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(3);
+
+    const workspacesAndOwners = [
+      `Workspace 0`,
+      `You're the only one to use this workspace`,
+      `Workspace 1`,
+      `You're the only one to use this workspace`,
+      `New workspace`,
+      `You're the only one to use this workspace`
+    ];
+
+    const cardsText = element.all(by.css(`app-workspaces-dialog md-card`))
+      .getText()
+      .then((txt: any) => txt.join('\n'));
+
+    expect(cardsText).toEqual(workspacesAndOwners.join(`\n`));
   });
 
 });
