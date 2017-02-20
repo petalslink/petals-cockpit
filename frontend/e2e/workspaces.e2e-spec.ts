@@ -96,15 +96,7 @@ describe(`Workspaces`, () => {
             `SU 7`
     ];
 
-    // angular-material icon's name are displayed
-    const listWithoutIcons = element.all(by.css(`app-cockpit md-sidenav app-material-tree`))
-      .first()
-      .getText()
-      .then((txt: any) => txt
-        .split(`\n`)
-        .filter((t: string) => t !== 'arrow_drop_down'));
-
-    expect(listWithoutIcons).toEqual(availableBuses);
+    expect(page.getWorkspaceTree()).toEqual(availableBuses);
   });
 
   it(`should contain the correct buses in progress`, () => {
@@ -114,8 +106,10 @@ describe(`Workspaces`, () => {
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w*$/);
 
+    const importBusesText = page.getBusesInProgress();
+
     // check that 2 bus in progress are displayed
-    expect(element.all(by.css(`app-petals-menu-view app-buses-in-progress a.buses-in-progress div.md-list-item`)).count()).toEqual(2);
+    expect(importBusesText.then(e => e.length)).toEqual(2);
 
     // check that buses/container/component/su are available
     const availableBusesInProgress = [
@@ -123,12 +117,7 @@ describe(`Workspaces`, () => {
       `192.168.0.2:7700`
     ];
 
-    // angular-material icon's name are displayed
-    const importBusesText = element.all(by.css(`app-petals-menu-view app-buses-in-progress a.buses-in-progress div.md-list-item`))
-      .getText()
-      .then((txt: any) => txt.join('\n'));
-
-    expect(importBusesText).toEqual(availableBusesInProgress.join(`\n`));
+    expect(importBusesText).toEqual(availableBusesInProgress);
   });
 
   // TODO : Make a test when the feature for add a new workspace will be available

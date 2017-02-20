@@ -18,12 +18,13 @@
 import { browser, element, by } from 'protractor';
 
 export class PetalsCockpitPage {
+
   navigateTo(clearSession = true) {
     if (clearSession) {
-       browser.get('/');
+      browser.get('/');
       // this command applies only when we are already connected to the host
       // so we needed first to connect with get!
-       browser.manage().deleteAllCookies();
+      browser.manage().deleteAllCookies();
     }
     return browser.get('/');
   }
@@ -43,7 +44,51 @@ export class PetalsCockpitPage {
     browser.waitForAngular();
   }
 
-  getParagraphText() {
-    return element(by.css('app-root h1')).getText();
+  search(search: string) {
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
+
+    const input = element(by.css(`input.search`));
+    input.clear();
+    input.sendKeys(search);
+  }
+
+  getWorkspaceTree() {
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
+
+    // angular-material icon's name are displayed
+    // in getText() method, remove them
+    return element.all(by.css(`app-cockpit md-sidenav app-material-tree div.md-list-item`))
+      .getText()
+      // getText on element.all is wrongly type, it should be a string[]
+      .then((elements: any) => elements
+        .map(e => e.replace('arrow_drop_down\n', '')));
+  }
+
+  getBusesInProgress() {
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
+
+    return element.all(by.css(`app-cockpit md-sidenav app-buses-in-progress a.buses-in-progress div.md-list-item`))
+      .getText()
+      // getText on element.all is wrongly type, it should be a string[]
+      .then((elements: any) => elements
+        .map(e => e.replace('arrow_drop_down\n', '')));
+  }
+
+  getHighlightedElement() {
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
+
+    return element.all(by.css(`app-cockpit md-sidenav app-material-tree div.md-list-item .highlight`))
+      .getText()
+      // getText on element.all is wrongly type, it should be a string[]
+      .then((elements: any) => elements as string[]);
+  }
+
+  getWorkspaceTreeFolder(level: number, index = 0) {
+    expect(level).toBeGreaterThanOrEqual(1);
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
+
+    return element
+      .all(by.css(`app-cockpit md-sidenav ${(`app-material-tree ` as any).repeat(level)}md-icon[aria-label="arrow_drop_down"]`))
+      .get(index);
   }
 }
