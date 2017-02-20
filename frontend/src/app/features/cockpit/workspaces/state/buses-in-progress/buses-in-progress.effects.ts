@@ -83,7 +83,7 @@ export class BusesInProgressEffects {
             }
           };
         })
-        // TODO catch error?
+    // TODO catch error?
     );
 
   // No need to actually delete it in the store because it will be handled from the SSE event
@@ -95,4 +95,18 @@ export class BusesInProgressEffects {
       // TODO improve that, what if we changed ws inbetween the delete and its success?!
       this._router.navigate(['/workspaces', idWorkspace])
     );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: false }) removeBusInProgress$: Observable<Action> = this._actions$
+    .ofType(BusesInProgress.REMOVE_BUS_IN_PROGRESS)
+    .combineLatest(
+      this._store$.select(state => state.workspaces.selectedWorkspaceId),
+      this._store$.select(state => state.busesInProgress.selectedBusInProgressId)
+    )
+    .map(([action, wsId, sId]) => Object.assign({}, action.payload, { wsId, sId }))
+    .do(({busInProgressId, importOk, wsId, sId}: { busInProgressId: string, importOk: boolean, wsId: string, sId: string }) => {
+      if (importOk && this._router.url.match(/\/buses-in-progress\//) && sId === busInProgressId) {
+        this._router.navigate(['/workspaces', wsId, 'petals', 'buses', busInProgressId]);
+      }
+    });
 }

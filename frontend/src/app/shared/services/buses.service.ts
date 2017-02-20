@@ -60,7 +60,7 @@ export class BusesServiceImpl extends BusesService {
       .map(({ id }) => {
         this._store$.dispatch(batchActions([
           { type: Buses.REMOVE_BUS, payload: { busId: id } },
-          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: id } },
+          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: id, importOk: false } },
         ]));
       })
       .subscribe();
@@ -80,12 +80,18 @@ export class BusesServiceImpl extends BusesService {
           `The import of a bus from the IP ${busInProgress.ip}:${busInProgress.port} succeeded`);
 
         this._store$.dispatch(batchActions([
-          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: busInProgress.id } },
           { type: Buses.FETCH_BUSES_SUCCESS, payload: buses },
           { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap(data.containers) },
           { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap(data.components) },
           { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap(data.serviceUnits) },
         ]));
+
+        // this dispatch is separated from the batchActions on purpose
+        // TODO see #230
+        this._store$.dispatch({
+          type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
+          payload: { busInProgressId: busInProgress.id, importOk: true }
+        });
       })
       .subscribe();
   }
