@@ -37,10 +37,10 @@ describe(`Workspaces`, () => {
 
     // even if no selected, check that 2 workspaces are displayed
     expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(2);
-    let workspacesAndOwners = [
-      `Workspace idWks0`,
+    const workspacesAndOwners = [
+      `Workspace 0`,
       `You're the only one to use this workspace`,
-      `Workspace idWks1`,
+      `Workspace 1`,
       `You're the only one to use this workspace`
     ];
 

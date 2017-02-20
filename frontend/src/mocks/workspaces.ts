@@ -3,12 +3,12 @@ export function fetchWorkspaces() {
     workspaces: {
       'idWks0': {
         id: 'idWks0',
-        name: 'Workspace idWks0',
+        name: 'Workspace 0',
         users: ['admin']
       },
       'idWks1': {
         id: 'idWks1',
-        name: 'Workspace idWks1',
+        name: 'Workspace 1',
         users: ['bescudie', 'mrobert']
       }
     },
