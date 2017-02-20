@@ -90,7 +90,7 @@ build-frontend:
     - time ng test --progress=false --single-run --code-coverage
     # remove when https://github.com/angular/angular-cli/issues/4596 is fixed
     - time webdriver-manager update --standalone false --gecko false
-    - time ng e2e --progress=false -e=prod-e2e --webdriver-update=false
+    - time ng e2e --prod --progress=false -e=prod-e2e --webdriver-update=false
     - kill $XVFBPID
     # build the final frontend for the product
     - time yarn run prod-silent && mv dist ../frontend-dist
