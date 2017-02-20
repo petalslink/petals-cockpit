@@ -23,16 +23,21 @@ import { environment } from './../../../environments/environment';
 
 export abstract class WorkspacesService {
   abstract fetchWorkspaces(): Observable<Response>;
+
+  abstract postWorkspace(workspaceName: string): Observable<Response>;
 }
 
 @Injectable()
 export class WorkspacesServiceImpl extends WorkspacesService {
-
   constructor(private _http: Http) {
     super();
   }
 
   fetchWorkspaces() {
     return this._http.get(`${environment.urlBackend}/workspaces`);
+  }
+
+  postWorkspace(workspaceName: string) {
+    return this._http.post(`${environment.urlBackend}/workspaces`, { name: workspaceName });
   }
 }

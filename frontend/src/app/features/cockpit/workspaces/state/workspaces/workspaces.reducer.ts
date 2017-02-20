@@ -73,6 +73,40 @@ export class Workspaces {
     );
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static POST_WORKSPACE = `${Workspaces.reducerName}_POST_WORKSPACE`;
+  private static postWorkspace(workspacesTable: IWorkspacesTable, payload) {
+    return <IWorkspacesTable>Object.assign({}, workspacesTable,
+      <IWorkspacesTable>{
+        isAddingWorkspace: true
+      }
+    );
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static POST_WORKSPACE_SUCCESS = `${Workspaces.reducerName}_POST_WORKSPACE_SUCCESS`;
+  private static postWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload: { id: string, name: string, users: string[] }) {
+    return <IWorkspacesTable>Object.assign({}, workspacesTable,
+      <IWorkspacesTable>{
+        isAddingWorkspace: false,
+        byId: Object.assign({}, workspacesTable.byId, {
+          [payload.id]: Object.assign({}, workspacesTable.byId[payload.id], <IWorkspaceRow>payload)
+        }),
+        allIds: [...Array.from(new Set([...workspacesTable.allIds, payload.id]))]
+      }
+    );
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static POST_WORKSPACE_FAILED = `${Workspaces.reducerName}_POST_WORKSPACE_FAILED`;
+  private static postWorkspaceFailed(workspacesTable: IWorkspacesTable, payload) {
+    return <IWorkspacesTable>Object.assign({}, workspacesTable,
+      <IWorkspacesTable>{
+        isAddingWorkspace: false
+      }
+    );
+  }
+
   // only used in effect, no point to handle that action
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_WAIT_SSE = `${Workspaces.reducerName}_FETCH_WORKSPACE_WAIT_SSE`;
@@ -178,6 +212,9 @@ export class Workspaces {
     [Workspaces.FETCH_WORKSPACE]: Workspaces.fetchWorkspace,
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Workspaces.fetchWorkspaceSuccess,
     [Workspaces.FETCH_WORKSPACE_FAILED]: Workspaces.fetchWorkspaceFailed,
+    [Workspaces.POST_WORKSPACE]: Workspaces.postWorkspace,
+    [Workspaces.POST_WORKSPACE_SUCCESS]: Workspaces.postWorkspaceSuccess,
+    [Workspaces.POST_WORKSPACE_FAILED]: Workspaces.postWorkspaceFailed,
     // Search
     [Workspaces.SET_SEARCH]: Workspaces.setSearch,
     // Disconnect

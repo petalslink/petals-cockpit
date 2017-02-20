@@ -18,14 +18,21 @@
 import { Injectable } from '@angular/core';
 
 import { WorkspacesService } from './workspaces.service';
-import { fetchWorkspaces } from '../../../mocks/workspaces';
 import { environment } from '../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
+import { workspacesService } from './../../../mocks/workspaces-mock';
 
 @Injectable()
 export class WorkspacesMockService extends WorkspacesService {
-
   fetchWorkspaces() {
-    return helper.responseBody(fetchWorkspaces());
+    return helper.responseBody(workspacesService.getWorkspacesListAndUsers());
+  }
+
+  postWorkspace(workspaceName: string) {
+    const workspace = workspacesService.getNewWorkspace(workspaceName);
+
+    return helper
+      .responseBody(workspace)
+      .delay(environment.httpDelay);
   }
 }
