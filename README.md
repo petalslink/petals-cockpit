@@ -43,19 +43,19 @@ Don't forget to first initialise the database (see below).
 
 Execute Petals Cockpit:
 ```
-$ java -jar cockpit/target/petals-cockpit-0.5.0-capsule.jar server cockpit/default.yml
+$ java -jar cockpit/target/petals-cockpit-0.6.0-SNAPSHOT-capsule.jar server cockpit/default.yml
 ```
 
 ### Available Commands
 
 A user can be added with:
 ```
-$ java -jar cockpit/target/petals-cockpit-0.5.0-capsule.jar add-user -u username -n Name -p password cockpit/default.yml
+$ java -jar cockpit/target/petals-cockpit-0.6.0-SNAPSHOT-capsule.jar add-user -u username -n Name -p password cockpit/default.yml
 ```
 
 The database can be migrated to the latest version with:
 ```
-$ java -jar cockpit/target/petals-cockpit-0.5.0-capsule.jar db migrate cockpit/default.yml
+$ java -jar cockpit/target/petals-cockpit-0.6.0-SNAPSHOT-capsule.jar db migrate cockpit/default.yml
 ```
 
 ### Working with the backend and the frontend
