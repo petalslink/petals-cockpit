@@ -28,7 +28,7 @@ describe(`Workspaces Tree`, () => {
     page.login(`admin`, `admin`);
     element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
     // let's be sure everything is loaded and visible
-    browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 1000);
+    browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
   });
 
   it(`should filter by bus, container, component and su when searching in Petals menu`, () => {

@@ -58,7 +58,7 @@ describe(`Login`, () => {
     // ENDTODO
 
     const logout = element(by.css(`app-menu-user-panel .wrapper-disconnect md-icon`));
-    browser.wait(EC.elementToBeClickable(logout), 1000);
+    browser.wait(EC.elementToBeClickable(logout), 5000);
     logout.click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/login$/);
