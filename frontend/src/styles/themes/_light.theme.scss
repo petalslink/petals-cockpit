@@ -1,11 +1,11 @@
 @import '../shared/_colors';
 
-$theme: md-light-theme($primary, $accent);
+$theme: mat-light-theme($primary, $accent);
 
 // The warn palette is optional (defaults to red).
-$theme-warn: md-palette($md-red);
+$theme-warn: mat-palette($mat-red);
 // Create the theme object (a Sass map containing all of the palettes).
-$theme: md-light-theme($theme-primary, $theme-accent, $theme-warn);
+$theme: mat-light-theme($theme-primary, $theme-accent, $theme-warn);
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.

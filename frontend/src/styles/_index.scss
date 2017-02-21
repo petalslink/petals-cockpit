@@ -8,7 +8,7 @@
 @import './styles/themes/_light.theme';
 
 div > h3, md-dialog-container > h3 {
-  background-color: md-color($theme-primary-x);
+  background-color: mat-color($theme-primary-x);
   margin: 0;
   padding: 10px;
   border-radius: 2dpi;
@@ -21,12 +21,12 @@ div > h4 {
 
 md-sidenav-container {
   background-image: url(assets/img/gray_jean.png);
-  color: md-color($theme-primary, default-contrast);
+  color: mat-color($theme-primary, default-contrast);
 }
 
 md-toolbar {
-  background-color: md-color($theme-primary-x1);
-  color: md-color($theme-primary-x2, default-contrast);
+  background-color: mat-color($theme-primary-x1);
+  color: mat-color($theme-primary-x2, default-contrast);
   h3 {
     margin: 0;
   }
@@ -34,7 +34,7 @@ md-toolbar {
 
 .active-link, .active-link:hover {
   .md-list-item {
-    background-color: md-color($theme-primary-x);
+    background-color: mat-color($theme-primary-x);
     @extend .color-primary;
     @extend .bold;
     margin: 0;
@@ -43,10 +43,10 @@ md-toolbar {
 }
 
 md-sidenav-container .md-list-item:hover, md-sidenav-container .md-list-item:focus {
-  background-color: md-color($theme-primary-x);
+  background-color: mat-color($theme-primary-x);
   @extend .light-bold;
 }
 
 .highlight {
-  background-color: md-color($theme-accent-x5);
+  background-color: mat-color($theme-accent-x5);
 }

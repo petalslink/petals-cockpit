@@ -57,7 +57,7 @@ export class PetalsCockpitPage {
 
     // angular-material icon's name are displayed
     // in getText() method, remove them
-    return element.all(by.css(`app-cockpit md-sidenav app-material-tree div.md-list-item`))
+    return element.all(by.css(`app-cockpit md-sidenav app-material-tree div.mat-list-item-content`))
       .getText()
       // getText on element.all is wrongly type, it should be a string[]
       .then((elements: any) => elements
@@ -67,7 +67,7 @@ export class PetalsCockpitPage {
   getBusesInProgress() {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
 
-    return element.all(by.css(`app-cockpit md-sidenav app-buses-in-progress a.buses-in-progress div.md-list-item`))
+    return element.all(by.css(`app-cockpit md-sidenav app-buses-in-progress a.buses-in-progress div.mat-list-item-content`))
       .getText()
       // getText on element.all is wrongly type, it should be a string[]
       .then((elements: any) => elements
@@ -77,7 +77,7 @@ export class PetalsCockpitPage {
   getHighlightedElement() {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
 
-    return element.all(by.css(`app-cockpit md-sidenav app-material-tree div.md-list-item .highlight`))
+    return element.all(by.css(`app-cockpit md-sidenav app-material-tree div.mat-list-item-content .highlight`))
       .getText()
       // getText on element.all is wrongly type, it should be a string[]
       .then((elements: any) => elements as string[]);

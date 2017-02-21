@@ -17,20 +17,20 @@
 
 @import '~@angular/material/core/theming/all-theme';
 
-@include md-core();
+@include mat-core();
 
-$primary: md-palette($md-deep-purple, 600, 500, 900);
-$accent: md-palette($md-amber, A400, A300, A600);
+$primary: mat-palette($mat-deep-purple, 600, 500, 900);
+$accent: mat-palette($mat-amber, A400, A300, A600);
 
-$theme: md-light-theme($primary, $accent);
+$theme: mat-light-theme($primary, $accent);
 
 @include angular-material-theme($theme);
 
 .cockpit-theme {
-  $dark-p: md-palette($md-deep-purple, 400);
-  $dark-a: md-palette($md-amber, 600);
+  $dark-p: mat-palette($mat-deep-purple, 400);
+  $dark-a: mat-palette($mat-amber, 600);
 
-  $dark-t: md-dark-theme($dark-p, $dark-a);
+  $dark-t: mat-dark-theme($dark-p, $dark-a);
 
   @include angular-material-theme($dark-t);
 }
