@@ -54,24 +54,15 @@ export class PetalsCockpitPage {
 
   getWorkspaceTree() {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
-
-    // angular-material icon's name are displayed
-    // in getText() method, remove them
-    return element.all(by.css(`app-cockpit md-sidenav app-material-tree div.mat-list-item-content`))
-      .getText()
-      // getText on element.all is wrongly type, it should be a string[]
-      .then((elements: any) => elements
-        .map(e => e.replace('arrow_drop_down\n', '')));
+    return element.all(by.css(`app-cockpit md-sidenav app-material-tree div.mat-list-item-content > span`))
+      .getText();
   }
 
   getBusesInProgress() {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
 
     return element.all(by.css(`app-cockpit md-sidenav app-buses-in-progress a.buses-in-progress div.mat-list-item-content`))
-      .getText()
-      // getText on element.all is wrongly type, it should be a string[]
-      .then((elements: any) => elements
-        .map(e => e.replace('arrow_drop_down\n', '')));
+      .getText();
   }
 
   getHighlightedElement() {
