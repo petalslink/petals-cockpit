@@ -15,9 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs/Subscription';
 
+import { Workspaces } from '../state/workspaces/workspaces.reducer';
 import { Ui } from '../../../../shared/state/ui.reducer';
 import { IStore } from '../../../../shared/interfaces/store.interface';
 
@@ -26,10 +29,27 @@ import { IStore } from '../../../../shared/interfaces/store.interface';
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss']
 })
-export class WorkspaceComponent implements OnInit {
-  constructor(private _store$: Store<IStore>) { }
+
+export class WorkspaceComponent implements OnInit, OnDestroy {
+
+  private workspaceIdSub: Subscription;
+
+  constructor(
+    private _store$: Store<IStore>,
+    private _route: ActivatedRoute
+  ) { }
 
   ngOnInit() {
+    this.workspaceIdSub = this._route.params
+      .map(p => p['workspaceId'])
+      .do(workspaceId => {
+        this._store$.dispatch({ type: Workspaces.FETCH_WORKSPACE, payload: workspaceId });
+      })
+      .subscribe();
     this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: '' } });
+  }
+
+  ngOnDestroy() {
+    this.workspaceIdSub.unsubscribe();
   }
 }

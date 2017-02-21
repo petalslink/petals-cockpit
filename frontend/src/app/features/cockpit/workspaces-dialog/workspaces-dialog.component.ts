@@ -20,12 +20,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
+import { Router } from '@angular/router';
 
 import { Workspaces } from '../workspaces/state/workspaces/workspaces.reducer';
 import { IStore } from '../../../shared/interfaces/store.interface';
 import { getWorkspacesList } from '../workspaces/state/workspaces/workspaces.selectors';
 import { IWorkspaces } from '../workspaces/state/workspaces/workspaces.interface';
 import { IWorkspace } from '../workspaces/state/workspaces/workspace.interface';
+import { Ui } from './../../../shared/state/ui.reducer';
 
 @Component({
   selector: 'app-workspaces-dialog',
@@ -38,7 +40,12 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
   public isAddingWorkspaceSub: Subscription;
   public btnSubmitDisabled = true;
 
-  constructor(private _store$: Store<IStore>, private _fb: FormBuilder) {
+  constructor(
+    private _store$: Store<IStore>,
+    private _router: Router,
+    private _fb: FormBuilder) { }
+
+  ngOnInit() {
     this.workspaces$ = this._store$.let(getWorkspacesList());
 
     this.newWksForm = this._fb.group({
@@ -74,21 +81,23 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  ngOnInit() {
-  }
-
   ngOnDestroy() {
     this.isAddingWorkspaceSub.unsubscribe();
   }
 
   // TODO use good type
   fetchWorkspace(workspace: IWorkspace) {
-    this._store$.dispatch({
-      type: Workspaces.FETCH_WORKSPACE, payload: {
-        id: workspace.id,
-        changeUrl: true
-      }
-    });
+    this._store$
+      .select(state => state.workspaces.selectedWorkspaceId)
+      .first()
+      .subscribe(wsId => {
+        // if no workspace is open, it will simply navigate too
+        if (wsId === workspace.id) {
+          this._store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
+        } else {
+          this._router.navigate(['/workspaces', workspace.id]);
+        }
+      });
   }
 
   onSubmit({ value }) {

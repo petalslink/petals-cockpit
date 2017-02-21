@@ -120,9 +120,9 @@ export class Workspaces {
           {},
           workspacesTable.byId,
           {
-            [payload.id]: <IWorkspaceRow>Object.assign(
+            [payload]: <IWorkspaceRow>Object.assign(
               {},
-              workspacesTable.byId[payload.id],
+              workspacesTable.byId[payload],
               <IWorkspaceRow>{
                 isImporting: true
               }
