@@ -38,7 +38,7 @@ export const validationMessages = {
 };
 
 export function getFormErrors(form: FormGroup, formFields: { [key: string]: string }, data?: any): any {
-  const formFieldsTmp = Object.assign({}, formFields);
+  const formFieldsTmp = { ...formFields };
 
   for (const field in formFieldsTmp) {
     if (formFieldsTmp.hasOwnProperty(field)) {

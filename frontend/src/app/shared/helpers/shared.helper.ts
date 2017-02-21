@@ -28,9 +28,12 @@ export function toJavascriptMap(map: any) {
 
   const byId = {};
 
-  allIds.forEach(id =>
-    byId[id] = Object.assign({}, map[id], { id })
-  );
+  allIds.forEach(id => {
+    byId[id] = {
+      ...map[id],
+      id
+    }
+  });
 
   return { byId, allIds };
 }

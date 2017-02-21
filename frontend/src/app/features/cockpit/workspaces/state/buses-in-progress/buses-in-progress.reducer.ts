@@ -46,63 +46,83 @@ export class BusesInProgress {
       }
     });
 
-    return <IBusesInProgressTable>Object.assign({},
-      busesInProgressTable,
-      {
-        byId: Object.assign({}, busesInProgressTable.byId, payload.byId),
-        allIds
-      }
-    );
+    return <IBusesInProgressTable>{
+      ...busesInProgressTable,
+      byId: {
+        ...busesInProgressTable.byId,
+        ...payload.byId
+      },
+      allIds
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static SET_SELECTED_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_SET_SELECTED_BUS_IN_PROGRESS`;
   private static setSelectedBusInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
-    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
-      selectedBusInProgressId: payload
-    });
+    return <IBusesInProgressTable>{
+      ...busesInProgressTable,
+      ...<IBusesInProgressTable>{
+        selectedBusInProgressId: payload
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS`;
   private static postBusInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
-    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
-      isImportingBus: true,
-      importBusError: ''
-    });
+    return <IBusesInProgressTable>{
+      ...busesInProgressTable,
+      ...<IBusesInProgressTable>{
+        isImportingBus: true,
+        importBusError: ''
+      }
+    };
   }
 
   // once the http request is done
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS_SUCCESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS_SUCCESS`;
   private static postBusInProgressSuccess(busesInProgressTable: IBusesInProgressTable, payload) {
-    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
-      isImportingBus: false,
-      byId: Object.assign({}, busesInProgressTable.byId, {
-        [payload.busInProgress.id]: <IBusInProgressRow>Object.assign({}, payload.busInProgress)
-      }),
-      allIds: [...busesInProgressTable.allIds, payload.busInProgress.id]
-    });
+    return <IBusesInProgressTable>{
+      ...busesInProgressTable,
+      ...<IBusesInProgressTable>{
+        isImportingBus: false,
+        byId: {
+          ...busesInProgressTable.byId,
+          [payload.busInProgress.id]: <IBusInProgressRow>payload.busInProgress
+        },
+        allIds: [...busesInProgressTable.allIds, payload.busInProgress.id]
+      }
+    };
   }
 
   // once the http request is done but failed
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS_ERROR = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS_ERROR`;
   private static postBusInProgressError(busesInProgressTable: IBusesInProgressTable, payload) {
-    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
-      isImportingBus: false,
-      importBusError: payload
-    });
+    return <IBusesInProgressTable>{
+      ...busesInProgressTable,
+      ...<IBusesInProgressTable>{
+        isImportingBus: false,
+        importBusError: payload
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static DELETE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_DELETE_BUS_IN_PROGRESS`;
   private static deleteBusInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
-    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
-      byId: Object.assign({}, busesInProgressTable.byId, {
-        [payload]: <IBusInProgressRow>Object.assign({}, { isRemoving: true })
-      })
-    });
+    return <IBusesInProgressTable>{
+      ...busesInProgressTable,
+      ...<IBusesInProgressTable>{
+        byId: {
+          ...busesInProgressTable.byId,
+          // TODO : There might be a problem here !
+          // we probably want to merge isRemoving with the previous value
+          [payload]: <IBusInProgressRow>{ isRemoving: true }
+        }
+      }
+    };
   }
 
   // once the http request is done, no particular modification of the store, since it will be deleted
@@ -112,22 +132,30 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_REMOVE_BUS_IN_PROGRESS`;
   private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { busInProgressId: string }) {
-    return <IBusesInProgressTable>Object.assign({}, omit(busesInProgressTable, 'byId'), <IBusesInProgressTable>{
-      byId: omit(busesInProgressTable.byId, payload.busInProgressId),
-      allIds: busesInProgressTable.allIds.filter(id => id !== payload.busInProgressId)
-    });
+    return <IBusesInProgressTable>{
+      ...omit(busesInProgressTable, 'byId'),
+      ...<IBusesInProgressTable>{
+        byId: omit(busesInProgressTable.byId, payload.busInProgressId),
+        allIds: busesInProgressTable.allIds.filter(id => id !== payload.busInProgressId)
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static UPDATE_ERROR_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_UPDATE_ERROR_BUS_IN_PROGRESS`;
   private static updateErrorBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { id: string, importError: string }) {
-    return <IBusesInProgressTable>Object.assign({}, busesInProgressTable, <IBusesInProgressTable>{
-      byId: Object.assign({}, busesInProgressTable.byId, {
-        [payload.id]: Object.assign({}, busesInProgressTable.byId[payload.id], {
-          importError: payload.importError
-        })
-      })
-    });
+    return <IBusesInProgressTable>{
+      ...busesInProgressTable,
+      ...<IBusesInProgressTable>{
+        byId: {
+          ...busesInProgressTable.byId,
+          [payload.id]: {
+            ...busesInProgressTable.byId[payload.id],
+            importError: payload.importError
+          }
+        }
+      }
+    };
   }
 
   private static fetchWorkspaceSuccess(busesInProgressTable: IBusesInProgressTable, payload) {

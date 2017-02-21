@@ -45,57 +45,50 @@ export class Containers {
       }
     });
 
-    return <IContainersTable>Object.assign({},
-      containersTable,
-      {
-        byId: Object.assign({}, containersTable.byId, payload.byId),
+    return <IContainersTable>{
+      ...containersTable,
+      ...<IContainersTable>{
+        byId: {
+          ...containersTable.byId,
+          ...payload.byId
+        },
         allIds
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FOLD_CONTAINER = `${Containers.reducerName}_FOLD_CONTAINER`;
   private static foldContainers(containersTable: IContainersTable, payload: { containerId: string }) {
-    return <IContainersTable>Object.assign(
-      {},
-      containersTable,
-      {
-        byId: Object.assign(
-          {},
-          containersTable.byId,
-          {
-            [payload.containerId]: <IContainerRow>Object.assign(
-              {},
-              containersTable.byId[payload.containerId],
-              { isFolded: true }
-            )
+    return <IContainersTable>{
+      ...containersTable,
+      ...<IContainersTable>{
+        byId: {
+          ...containersTable.byId,
+          [payload.containerId]: <IContainerRow>{
+            ...containersTable.byId[payload.containerId],
+            isFolded: true
           }
-        )
+        }
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static UNFOLD_CONTAINER = `${Containers.reducerName}_UNFOLD_CONTAINER`;
   private static unfoldContainer(containersTable: IContainersTable, payload: { containerId: string }) {
-    return <IContainersTable>Object.assign(
-      {},
-      containersTable,
-      {
-        byId: Object.assign(
-          {},
-          containersTable.byId,
-          {
-            [payload.containerId]: <IContainerRow>Object.assign(
-              {},
-              containersTable.byId[payload.containerId],
-              { isFolded: false }
-            )
+    return <IContainersTable>{
+      ...containersTable,
+      ...<IContainersTable>{
+        byId: {
+          ...containersTable.byId,
+          [payload.containerId]: <IContainerRow>{
+            ...containersTable.byId[payload.containerId],
+            isFolded: false
           }
-        )
+        }
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
@@ -113,9 +106,12 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_CONTAINER = `${Containers.reducerName}_SET_CURRENT_CONTAINER`;
   private static setCurrentContainer(containersTable: IContainersTable, payload: { containerId: string }) {
-    return Object.assign({}, containersTable, <IContainersTable>{
-      selectedContainerId: payload.containerId
-    });
+    return {
+      ...containersTable,
+      ...<IContainersTable>{
+        selectedContainerId: payload.containerId
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
@@ -123,32 +119,54 @@ export class Containers {
   private static fetchContainerDetails(containersTable: IContainersTable, payload: { containerId: string }) {
     const allIds = (typeof containersTable.byId[payload.containerId] !== 'undefined' ? containersTable.allIds : [...containersTable.allIds, payload.containerId]);
 
-    return Object.assign({}, containersTable, <IContainersTable>{
-      byId: Object.assign({}, containersTable.byId, {
-        [payload.containerId]: Object.assign({}, containersTable.byId[payload.containerId], { isFetchingDetails: true })
-      }),
-      allIds
-    });
+    return {
+      ...containersTable,
+      ...<IContainersTable>{
+        byId: {
+          ...containersTable.byId,
+          [payload.containerId]: {
+            ...containersTable.byId[payload.containerId],
+            isFetchingDetails: true
+          }
+        },
+        allIds
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINER_DETAILS_SUCCESS = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS_SUCCESS`;
   private static fetchContainerDetailsSuccess(containersTable: IContainersTable, payload: { containerId: string, data: any }) {
-    return Object.assign({}, containersTable, <IContainersTable>{
-      byId: Object.assign({}, containersTable.byId, {
-        [payload.containerId]: Object.assign({}, containersTable.byId[payload.containerId], payload.data, { isFetchingDetails: false })
-      })
-    });
+    return {
+      ...containersTable,
+      ...<IContainersTable>{
+        byId: {
+          ...containersTable.byId,
+          [payload.containerId]: {
+            ...containersTable.byId[payload.containerId],
+            ...payload.data,
+            isFetchingDetails: false
+          }
+        }
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINER_DETAILS_ERROR = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS_ERROR`;
   private static fetchContainerDetailsError(containersTable: IContainersTable, payload: { containerId: string }) {
-    return Object.assign({}, containersTable, <IContainersTable>{
-      byId: Object.assign({}, containersTable.byId, {
-        [payload.containerId]: Object.assign({}, containersTable.byId[payload.containerId], { isFetchingDetails: false })
-      })
-    });
+    return {
+      ...containersTable,
+      ...<IContainersTable>{
+        byId: {
+          ...containersTable.byId,
+          [payload.containerId]: {
+            ...containersTable.byId[payload.containerId],
+            isFetchingDetails: false
+          }
+        }
+      }
+    };
   }
 
   private static fetchWorkspaceSuccess(containersTable: IContainersTable, payload) {

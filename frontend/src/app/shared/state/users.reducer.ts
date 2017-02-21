@@ -35,67 +35,91 @@ export class Users {
   // tslint:disable-next-line:member-ordering
   public static FETCH_USERS_SUCCESS = `${Users.reducerName}_FETCH_USERS_SUCCESS`;
   private static fetchUsersSuccess(users: IUsersTable, payload) {
-    return Object.assign(<IUsersTable>{}, users, {
-      byId: Object.assign({}, users.byId, payload.byId),
+    return {
+      ...users,
+      byId: {
+        ...users.byId,
+        ...payload.byId
+      },
       allIds: [...Array.of(new Set([...users.allIds, ...payload.allIds]))]
-    });
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static CONNECT_USER = `${Users.reducerName}_CONNECT_USER`;
   private static connectUser(users: IUsersTable, payload) {
-    return Object.assign(<IUsersTable>{}, users, <IUsersTable>{ isConnecting: true });
+    return {
+      ...users,
+      ...<IUsersTable>{ isConnecting: true }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static CONNECT_USER_SUCCESS = `${Users.reducerName}_CONNECT_USER_SUCCESS`;
   private static connectUserSuccess(users: IUsersTable, payload) {
-    return Object.assign(<IUsersTable>{}, users, <IUsersTable>{
-      isConnecting: false,
-      isConnected: true,
-      connectionFailed: false,
-      connectedUserId: payload.user.username,
+    return {
+      ...users,
+      ...<IUsersTable>{
+        isConnecting: false,
+        isConnected: true,
+        connectionFailed: false,
+        connectedUserId: payload.user.username,
 
-      byId: Object.assign({}, users.byId, {
-        [payload.user.username]: Object.assign({},
-          users.byId[payload.user.username],
-          payload.user
-        )
-      })
-    });
+        byId: {
+          ...users.byId,
+          [payload.user.username]: {
+            ...users.byId[payload.user.username],
+            ...payload.user
+          }
+        }
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static CONNECT_USER_FAILED = `${Users.reducerName}_CONNECT_USER_FAILED`;
   private static connectUserFailed(users: IUsersTable, payload) {
-    return Object.assign(<IUsersTable>{}, users, <IUsersTable>{
-      isConnecting: false,
-      connectionFailed: true
-    });
+    return {
+      ...users,
+      ...<IUsersTable>{
+        isConnecting: false,
+        connectionFailed: true
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static DISCONNECT_USER = `${Users.reducerName}_DISCONNECT_USER`;
   private static disconnectUser(users: IUsersTable, payload) {
-    return Object.assign(<IUsersTable>{}, users, <IUsersTable>{ isDisconnecting: true });
+    return {
+      ...users,
+      ...<IUsersTable>{ isDisconnecting: true }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static DISCONNECT_USER_SUCCESS = `${Users.reducerName}_DISCONNECT_USER_SUCCESS`;
   private static disconnectUserSuccess(users: IUsersTable, payload) {
-    return Object.assign(<IUsersTable>{}, users, usersState(), <IUsersTable>{
-      isDisconnecting: false,
-      isConnected: false,
-      connectedUserId: ''
-    });
+    return {
+      ...users,
+      ...usersState(),
+      ...<IUsersTable>{
+        isDisconnecting: false,
+        isConnected: false,
+        connectedUserId: ''
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static DISCONNECT_USER_FAILED = `${Users.reducerName}_DISCONNECT_USER_FAILED`;
   private static disconnectUserFailed(users: IUsersTable, payload) {
-    return Object.assign(<IUsersTable>{}, users, <IUsersTable>{
-      isDisconnecting: false
-    });
+    return {
+      ...users,
+      ...<IUsersTable>{
+        isDisconnecting: false
+      }
+    };
   }
 
   // -------------------------------------------------------------------------------------------

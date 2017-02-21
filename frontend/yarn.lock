@@ -4809,13 +4809,9 @@ type-is@~1.6.14:
     media-typer "0.3.0"
     mime-types "~2.1.13"
 
-typescript@2.0.8, "typescript@>=2.0.0 <2.2.0":
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.0.8.tgz#c249f530890e0f992e71733b2e0554d792cb8970"
-
-typescript@>=2.1.4:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.2.0.tgz#626f2fc70087d2480f21ebb12c1888288c8614e3"
+typescript@2.1.6, "typescript@>=2.0.0 <2.2.0", typescript@>=2.1.4:
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.1.6.tgz#40c7e6e9e5da7961b7718b55505f9cac9487a607"
 
 uglify-js@2.7.x, uglify-js@^2.6, uglify-js@^2.7.5:
   version "2.7.5"

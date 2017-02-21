@@ -44,21 +44,27 @@ export class ServiceUnits {
       }
     });
 
-    return <IserviceUnitsTable>Object.assign({},
-      serviceUnitsTable,
-      {
-        byId: Object.assign({}, serviceUnitsTable.byId, payload.byId),
+    return <IserviceUnitsTable>{
+      ...serviceUnitsTable,
+      ...<IserviceUnitsTable>{
+        byId: {
+          ...serviceUnitsTable.byId,
+          ...payload.byId
+        },
         allIds
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_SERVICE_UNIT = `${ServiceUnits.reducerName}_SET_CURRENT_SERVICE_UNIT`;
   private static setCurrentServiceUnit(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
-    return Object.assign({}, serviceUnitsTable, <IserviceUnitsTable>{
-      selectedServiceUnitId: payload.serviceUnitId
-    });
+    return {
+      ...serviceUnitsTable,
+      ...<IserviceUnitsTable>{
+        selectedServiceUnitId: payload.serviceUnitId
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
@@ -66,32 +72,54 @@ export class ServiceUnits {
   private static fetchServiceUnitDetails(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
     const allIds = (typeof serviceUnitsTable.byId[payload.serviceUnitId] !== 'undefined' ? serviceUnitsTable.allIds : [...serviceUnitsTable.allIds, payload.serviceUnitId]);
 
-    return Object.assign({}, serviceUnitsTable, <IserviceUnitsTable>{
-      byId: Object.assign({}, serviceUnitsTable.byId, {
-        [payload.serviceUnitId]: Object.assign({}, serviceUnitsTable.byId[payload.serviceUnitId], { isFetchingDetails: true })
-      }),
-      allIds
-    });
+    return {
+      ...serviceUnitsTable,
+      ...<IserviceUnitsTable>{
+        byId: {
+          ...serviceUnitsTable.byId,
+          [payload.serviceUnitId]: {
+            ...serviceUnitsTable.byId[payload.serviceUnitId],
+            isFetchingDetails: true
+          }
+        },
+        allIds
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS_SUCCESS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS_SUCCESS`;
   private static fetchServiceUnitDetailsSuccess(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string, data: any }) {
-    return Object.assign({}, serviceUnitsTable, <IserviceUnitsTable>{
-      byId: Object.assign({}, serviceUnitsTable.byId, {
-        [payload.serviceUnitId]: Object.assign({}, serviceUnitsTable.byId[payload.serviceUnitId], payload.data, { isFetchingDetails: false })
-      })
-    });
+    return {
+      ...serviceUnitsTable,
+      ...<IserviceUnitsTable>{
+        byId: {
+          ...serviceUnitsTable.byId,
+          [payload.serviceUnitId]: {
+            ...serviceUnitsTable.byId[payload.serviceUnitId],
+            ...payload.data,
+            isFetchingDetails: false
+          }
+        }
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS_ERROR = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS_ERROR`;
   private static fetchServiceUnitDetailsError(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
-    return Object.assign({}, serviceUnitsTable, <IserviceUnitsTable>{
-      byId: Object.assign({}, serviceUnitsTable.byId, {
-        [payload.serviceUnitId]: Object.assign({}, serviceUnitsTable.byId[payload.serviceUnitId], { isFetchingDetails: false })
-      })
-    });
+    return {
+      ...serviceUnitsTable,
+      ...<IserviceUnitsTable>{
+        byId: {
+          ...serviceUnitsTable.byId,
+          [payload.serviceUnitId]: {
+            ...serviceUnitsTable.byId[payload.serviceUnitId],
+            isFetchingDetails: false
+          }
+        }
+      }
+    };
   }
 
   private static fetchWorkspaceSuccess(serviceUnitsTable: IserviceUnitsTable, payload) {

@@ -45,57 +45,50 @@ export class Components {
       }
     });
 
-    return <IComponentsTable>Object.assign({},
-      componentsTable,
-      {
-        byId: Object.assign({}, componentsTable.byId, payload.byId),
+    return <IComponentsTable>{
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          ...payload.byId
+        },
         allIds
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FOLD_COMPONENT = `${Components.reducerName}_FOLD_COMPONENT`;
   private static foldComponent(componentsTable: IComponentsTable, payload: { componentId: string }) {
-    return <IComponentsTable>Object.assign(
-      {},
-      componentsTable,
-      {
-        byId: Object.assign(
-          {},
-          componentsTable.byId,
-          {
-            [payload.componentId]: <IComponentRow>Object.assign(
-              {},
-              componentsTable.byId[payload.componentId],
-              { isFolded: true }
-            )
+    return <IComponentsTable>{
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          [payload.componentId]: <IComponentRow>{
+            ...componentsTable.byId[payload.componentId],
+            isFolded: true
           }
-        )
+        }
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static UNFOLD_COMPONENT = `${Components.reducerName}_UNFOLD_COMPONENT`;
   private static unfoldComponent(componentsTable: IComponentsTable, payload: { componentId: string }) {
-    return <IComponentsTable>Object.assign(
-      {},
-      componentsTable,
-      {
-        byId: Object.assign(
-          {},
-          componentsTable.byId,
-          {
-            [payload.componentId]: <IComponentRow>Object.assign(
-              {},
-              componentsTable.byId[payload.componentId],
-              { isFolded: false }
-            )
+    return <IComponentsTable>{
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          [payload.componentId]: <IComponentRow>{
+            ...componentsTable.byId[payload.componentId],
+            isFolded: false
           }
-        )
+        }
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
@@ -113,9 +106,12 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_COMPONENT = `${Components.reducerName}_SET_CURRENT_COMPONENT`;
   private static setCurrentComponent(componentsTable: IComponentsTable, payload: { componentId: string }) {
-    return Object.assign({}, componentsTable, <IComponentsTable>{
-      selectedComponentId: payload.componentId
-    });
+    return {
+      ...componentsTable,
+      ...<IComponentsTable>{
+        selectedComponentId: payload.componentId
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
@@ -123,32 +119,54 @@ export class Components {
   private static fetchComponentDetails(componentsTable: IComponentsTable, payload: { componentId: string }) {
     const allIds = (typeof componentsTable.byId[payload.componentId] !== 'undefined' ? componentsTable.allIds : [...componentsTable.allIds, payload.componentId]);
 
-    return Object.assign({}, componentsTable, <IComponentsTable>{
-      byId: Object.assign({}, componentsTable.byId, {
-        [payload.componentId]: Object.assign({}, componentsTable.byId[payload.componentId], { isFetchingDetails: true })
-      }),
-      allIds
-    });
+    return {
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          [payload.componentId]: {
+            ...componentsTable.byId[payload.componentId],
+            isFetchingDetails: true
+          }
+        },
+        allIds
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_COMPONENT_DETAILS_SUCCESS = `${Components.reducerName}_FETCH_COMPONENT_DETAILS_SUCCESS`;
   private static fetchComponentDetailsSuccess(componentsTable: IComponentsTable, payload: { componentId: string, data: any }) {
-    return Object.assign({}, componentsTable, <IComponentsTable>{
-      byId: Object.assign({}, componentsTable.byId, {
-        [payload.componentId]: Object.assign({}, componentsTable.byId[payload.componentId], payload.data, { isFetchingDetails: false })
-      })
-    });
+    return {
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          [payload.componentId]: {
+            ...componentsTable.byId[payload.componentId],
+            ...payload.data,
+            isFetchingDetails: false
+          }
+        }
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_COMPONENT_DETAILS_ERROR = `${Components.reducerName}_FETCH_COMPONENT_DETAILS_ERROR`;
   private static fetchComponentDetailsError(componentsTable: IComponentsTable, payload: { componentId: string }) {
-    return Object.assign({}, componentsTable, <IComponentsTable>{
-      byId: Object.assign({}, componentsTable.byId, {
-        [payload.componentId]: Object.assign({}, componentsTable.byId[payload.componentId], { isFetchingDetails: false })
-      })
-    });
+    return {
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          [payload.componentId]: {
+            ...componentsTable.byId[payload.componentId],
+            isFetchingDetails: false
+          }
+        }
+      }
+    };
   }
 
   private static fetchWorkspaceSuccess(componentsTable: IComponentsTable, payload) {

@@ -58,9 +58,10 @@ export class Workspace {
 
       return {
         id: bus.getIdFormatted(),
-        eventData: Object.assign({}, bus.toObj()[bus.getIdFormatted()], {
-          importError: `Can't connect to bus`
-        })
+        eventData: {
+          ...bus.toObj()[bus.getIdFormatted()],
+          ...{ importError: `Can't connect to bus` }
+        }
       };
     }
 
@@ -75,11 +76,26 @@ export class Workspace {
     const eventData = {
       buses: bus.toObj(),
 
-      containers: containers.reduce((acc, container) => Object.assign({}, acc, container.toObj()), {}),
+      containers: containers.reduce((acc, container) => {
+        return {
+          ...acc,
+          ...container.toObj()
+        };
+      }, {}),
 
-      components: components.reduce((acc, component) => Object.assign({}, acc, component.toObj()), {}),
+      components: components.reduce((acc, component) => {
+        return {
+          ...acc,
+          ...component.toObj()
+        };
+      }, {}),
 
-      serviceUnits: serviceUnits.reduce((acc, serviceUnit) => Object.assign({}, acc, serviceUnit.toObj()), {})
+      serviceUnits: serviceUnits.reduce((acc, serviceUnit) => {
+        return {
+          ...acc,
+          ...serviceUnit.toObj()
+        };
+      }, {})
     };
 
     return {
@@ -143,9 +159,10 @@ export class Workspaces {
     const workspacesIds = Array.from(this._memoizedWorkspaces.keys());
 
     return workspacesIds.reduce((acc, workspaceId) => {
-      return Object.assign({}, acc, {
+      return {
+        ...acc,
         [workspaceId]: this.getWorkspace(workspaceId).toObj()
-      });
+      };
     }, {});
   }
 
@@ -158,7 +175,7 @@ export class Workspaces {
   getWorkspacesListAndUsers() {
     const workspaces = this.getWorkspaces();
 
-    return Object.assign({ workspaces, users });
+    return { workspaces, users };
   }
 
   /**
@@ -175,7 +192,7 @@ export class Workspaces {
   getWorkspaceComposed(idWks?: string, name?: string) {
     if (idWks) {
       if (this._memoizedWorkspaces.has(idWks)) {
-        return Object.assign({}, this._memoizedWorkspaces.get(idWks).composedWks);
+        return { ...this._memoizedWorkspaces.get(idWks).composedWks };
       }
     }
 
@@ -197,20 +214,45 @@ export class Workspaces {
         }
       },
 
-      busesInProgress: busesInProgress.reduce((acc, busInProgress) => Object.assign(acc, busInProgress.toObj()), {}),
+      busesInProgress: busesInProgress.reduce((acc, busInProgress) => {
+        return {
+          ...acc,
+          ...busInProgress.toObj()
+        };
+      }, {}),
 
-      buses: buses.reduce((acc, bus) => Object.assign(acc, bus.toObj()), {}),
+      buses: buses.reduce((acc, bus) => {
+        return {
+          ...acc,
+          ...bus.toObj()
+        };
+      }, {}),
 
-      containers: containers.reduce((acc, container) => Object.assign(acc, container.toObj()), {}),
+      containers: containers.reduce((acc, container) => {
+        return {
+          ...acc,
+          ...container.toObj()
+        };
+      }, {}),
 
-      components: components.reduce((acc, component) => Object.assign(acc, component.toObj()), {}),
+      components: components.reduce((acc, component) => {
+        return {
+          ...acc,
+          ...component.toObj()
+        };
+      }, {}),
 
-      serviceUnits: serviceUnits.reduce((acc, serviceUnit) => Object.assign(acc, serviceUnit.toObj()), {})
+      serviceUnits: serviceUnits.reduce((acc, serviceUnit) => {
+        return {
+          ...acc,
+          ...serviceUnit.toObj()
+        };
+      }, {})
     };
 
     this._memoizedWorkspaces.set(newWorkspace.getIdFormatted(), { wks: newWorkspace, composedWks });
 
-    return Object.assign({}, composedWks);
+    return { ...composedWks };
   };
 
   getNewWorkspace(name: string) {

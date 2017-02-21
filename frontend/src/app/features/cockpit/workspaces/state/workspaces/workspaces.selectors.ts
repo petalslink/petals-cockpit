@@ -43,18 +43,22 @@ export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspace
   return sWorkspaces
     .withLatestFrom(sUsers, sBuses, sContainers, sComponents, sServiceUnits)
     .map(([workspaces, users, buses, containers, components, serviceUnits]) => {
-      return <IWorkspaces>Object.assign({}, workspaces, <IWorkspaces>{
-        list: workspaces.allIds.map(workspaceId => {
-          return <IWorkspace>Object.assign({},
-            workspaces.byId[workspaceId],
-            <IWorkspace>{
-              users: {
-                list: workspaces.byId[workspaceId].users.map(userId => users.byId[userId])
+      return <IWorkspaces>{
+        ...workspaces,
+        ...<IWorkspaces>{
+          list: workspaces.allIds.map(workspaceId => {
+            return <IWorkspace>{
+              ...workspaces.byId[workspaceId],
+              ...<IWorkspace>{
+                users: {
+                  list: workspaces.byId[workspaceId].users.map(userId => users.byId[userId])
+                }
               }
-            }
-          );
-        })
-      });
+            };
+          }
+          )
+        }
+      };
     });
 }
 
@@ -224,9 +228,10 @@ export function filterElement(filter: string, element: any): any {
     if (es.length === 0) {
       return null;
     } else {
-      return Object.assign({}, element, {
+      return {
+        ...element,
         children: es
-      });
+      };
     }
   }
 }
