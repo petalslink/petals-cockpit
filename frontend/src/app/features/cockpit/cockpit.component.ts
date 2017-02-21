@@ -94,7 +94,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
 
         const screenSize = change.mqAlias;
 
-        if (screenSize === 'lg' || screenSize === 'gt-lg') {
+        if (screenSize === 'lg' || screenSize === 'gt-lg' || screenSize === 'xl' ) {
           return `${imgSrcBase}/logo-petals-cockpit.${imgSrcExt}`;
         } else {
           return `${imgSrcBase}/logo-petals-cockpit-without-text.${imgSrcExt}`;
