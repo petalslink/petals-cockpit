@@ -122,6 +122,31 @@ const users = {
     id: 'mrobert',
     name: 'Maxime ROBERT',
     username: 'mrobert'
+  },
+  cchevalier: {
+    id: 'cchevalier',
+    name: 'Christophe CHEVALIER',
+    username: 'cchevalier'
+  },
+  vnoel: {
+    id: 'vnoel',
+    name: 'Victor NOEL',
+    username: 'vnoel'
+  },
+  sgarcia: {
+    id: 'sgarcia',
+    name: 'Sebastien GARCIA',
+    username: 'sgarcia'
+  },
+  lduzan: {
+    id: 'lduzan',
+    name: 'Luc DUZAN',
+    username: 'lduzan'
+  },
+  gtraore: {
+    id: 'gtraore',
+    name: 'Grahmy TRAORE',
+    username: 'gtraore'
   }
 };
 
@@ -207,12 +232,7 @@ export class Workspaces {
     const composedWks = {
       workspace: newWorkspace.toObj(),
 
-      users: {
-        admin: {
-          name: 'Administrator',
-          username: 'admin'
-        }
-      },
+      users,
 
       busesInProgress: busesInProgress.reduce((acc, busInProgress) => {
         return {
