@@ -55,7 +55,6 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
     this.isAddingWorkspaceSub = this
       ._store$
       .select(state => state.workspaces.isAddingWorkspace)
-      .distinctUntilChanged()
       .combineLatest(Observable
         .empty()
         .concat(this

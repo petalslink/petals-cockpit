@@ -49,8 +49,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <span fxFlex></span>
             <div fxLayout="column" fxLayoutAlign="start end">
               <md-card-subtitle>{{ workspace.name }}
-                <!--TODO : Display green led only if workspace selected-->
-                <span class="green-led"></span>
+                <div class="icon-slot">
+                  <span class="green-led" *ngIf="(workspaces$ | async).selectedWorkspaceId === workspace.id"></span>
+                </div>
               </md-card-subtitle>
               <p md-line>You're the only one to use this workspace</p>
             </div>
