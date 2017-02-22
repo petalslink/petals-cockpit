@@ -144,6 +144,24 @@ div > .md-dialog-container {
   font-size: 12px;
 }
 
+.error{
+  padding: 12px;
+  background-color: rgba(255, 0, 0, 0.2);
+  color: mat-color($mat-red, 500, 1);
+}
+
+.info {
+  @extend .error;
+  background-color: rgba(206, 227, 255, 0.4) !important;
+  color: #4c83ef !important;
+}
+
+.warning {
+  @extend .error;
+  background-color: rgba(255, 234, 206, 0.4) !important;
+  color: orange !important;
+}
+
 // lib to have a pretty json display
 // use <prettyjson [obj]="someObj"></prettyjson>
 // instead of json pipe to have a pretty debug
