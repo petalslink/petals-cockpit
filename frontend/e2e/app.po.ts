@@ -82,4 +82,10 @@ export class PetalsCockpitPage {
       .all(by.css(`app-cockpit md-sidenav ${(`app-material-tree ` as any).repeat(level)}md-icon[aria-label="arrow_drop_down"]`))
       .get(index);
   }
+
+  toggleSidenav() {
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
+
+    return element.all(by.css(`app-cockpit md-toolbar-row button`)).click();
+  }
 }
