@@ -29,8 +29,6 @@
 
   <properties>
     <cockpit.exec.command>server</cockpit.exec.command>
-    <petals-admin.version>2.0.0-SNAPSHOT</petals-admin.version>
-    <enunciate.version>2.8.0</enunciate.version>
     <codegen.db.url>jdbc:h2:file:${project.build.directory}/db</codegen.db.url>
     <m2e.jdt.annotationpath>src/main/external-annotations/</m2e.jdt.annotationpath>
   </properties>
@@ -65,13 +63,12 @@
     <dependency>
       <groupId>io.javaslang</groupId>
       <artifactId>javaslang</artifactId>
-      <version>2.0.5</version>
     </dependency>
     <dependency>
       <!-- Needed for pac4j's password encoder -->
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-crypto</artifactId>
-      <version>4.2.0.RELEASE</version>
+      <version>4.2.1.RELEASE</version>
     </dependency>
     <!-- Quasar instrumentation dependencies -->
     <dependency>
@@ -89,12 +86,10 @@
     <dependency>
       <groupId>org.ow2.petals</groupId>
       <artifactId>petals-admin-api</artifactId>
-      <version>${petals-admin.version}</version>
     </dependency>
     <dependency>
       <groupId>org.ow2.petals</groupId>
       <artifactId>petals-admin-jmx</artifactId>
-      <version>${petals-admin.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- Test dependencies -->
@@ -111,7 +106,6 @@
     <dependency>
       <groupId>org.ow2.petals</groupId>
       <artifactId>petals-admin-mock</artifactId>
-      <version>${petals-admin.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -148,9 +142,6 @@
     <dependency>
       <groupId>com.webcohesion.enunciate</groupId>
       <artifactId>enunciate-core-annotations</artifactId>
-      <version>${enunciate.version}</version>
-      <!-- Prevent the dependency from being included in distributions -->
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 
