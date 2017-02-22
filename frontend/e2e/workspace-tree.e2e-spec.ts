@@ -38,10 +38,10 @@ describe(`Workspaces Tree`, () => {
 
     const availableBusesFilteredComp0 = [
       `Bus 0`,
-      `Cont 0`,
-      `Comp 0`,
-      `SU 0`,
-      `SU 1`
+        `Cont 0`,
+          `Comp 0`,
+            `SU 0`,
+            `SU 1`
     ];
 
     // check the list content
@@ -56,20 +56,20 @@ describe(`Workspaces Tree`, () => {
 
     const availableBusesFilteredU = [
       `Bus 0`,
-      `Cont 0`,
-      `Comp 0`,
-      `SU 0`,
-      `SU 1`,
-      `Comp 1`,
-      `SU 2`,
-      `SU 3`,
-      `Cont 1`,
-      `Comp 2`,
-      `SU 4`,
-      `SU 5`,
-      `Comp 3`,
-      `SU 6`,
-      `SU 7`
+        `Cont 0`,
+          `Comp 0`,
+            `SU 0`,
+            `SU 1`,
+          `Comp 1`,
+            `SU 2`,
+            `SU 3`,
+        `Cont 1`,
+          `Comp 2`,
+            `SU 4`,
+            `SU 5`,
+          `Comp 3`,
+            `SU 6`,
+            `SU 7`
     ];
 
     expect(page.getWorkspaceTree()).toEqual(availableBusesFilteredU);
@@ -80,6 +80,9 @@ describe(`Workspaces Tree`, () => {
     // ---------------------------------------
     // test 3 : When no match, should display a message and search bar should still be enabled
     page.search(`Some random search`);
+
+    expect(element(by.css(`app-cockpit md-sidenav .info.no-match`)).getText())
+      .toEqual(`There is no match with "Some random search".`);
 
     // there shouldn't be any match
     expect(page.getWorkspaceTree()).toEqual([]);
@@ -100,20 +103,20 @@ describe(`Workspaces Tree`, () => {
 
     const availableBuses = [
       `Bus 0`,
-      `Cont 0`,
-      `Comp 0`,
-      `SU 0`,
-      `SU 1`,
-      `Comp 1`,
-      `SU 2`,
-      `SU 3`,
-      `Cont 1`,
-      `Comp 2`,
-      `SU 4`,
-      `SU 5`,
-      `Comp 3`,
-      `SU 6`,
-      `SU 7`
+        `Cont 0`,
+          `Comp 0`,
+            `SU 0`,
+            `SU 1`,
+          `Comp 1`,
+            `SU 2`,
+            `SU 3`,
+        `Cont 1`,
+          `Comp 2`,
+            `SU 4`,
+            `SU 5`,
+          `Comp 3`,
+            `SU 6`,
+            `SU 7`
     ];
 
     expect(page.getWorkspaceTree()).toEqual(availableBuses);
@@ -126,14 +129,14 @@ describe(`Workspaces Tree`, () => {
 
     let availableBusesFolded = [
       `Bus 0`,
-      `Cont 0`,
-      `Cont 1`,
-      `Comp 2`,
-      `SU 4`,
-      `SU 5`,
-      `Comp 3`,
-      `SU 6`,
-      `SU 7`
+        `Cont 0`,
+        `Cont 1`,
+          `Comp 2`,
+            `SU 4`,
+            `SU 5`,
+          `Comp 3`,
+            `SU 6`,
+            `SU 7`
     ];
 
     expect(page.getWorkspaceTree()).toEqual(availableBusesFolded);
@@ -149,18 +152,18 @@ describe(`Workspaces Tree`, () => {
 
     availableBusesFolded = [
       `Bus 0`,
-      `Cont 0`,
-      `Comp 0`,
-      `Comp 1`,
-      `SU 2`,
-      `SU 3`,
-      `Cont 1`,
-      `Comp 2`,
-      `SU 4`,
-      `SU 5`,
-      `Comp 3`,
-      `SU 6`,
-      `SU 7`
+        `Cont 0`,
+          `Comp 0`,
+          `Comp 1`,
+            `SU 2`,
+            `SU 3`,
+        `Cont 1`,
+          `Comp 2`,
+            `SU 4`,
+            `SU 5`,
+          `Comp 3`,
+            `SU 6`,
+            `SU 7`
     ];
 
     expect(page.getWorkspaceTree()).toEqual(availableBusesFolded);
