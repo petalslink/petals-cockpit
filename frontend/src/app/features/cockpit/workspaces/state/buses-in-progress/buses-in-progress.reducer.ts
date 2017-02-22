@@ -117,9 +117,10 @@ export class BusesInProgress {
       ...<IBusesInProgressTable>{
         byId: {
           ...busesInProgressTable.byId,
-          // TODO : There might be a problem here !
-          // we probably want to merge isRemoving with the previous value
-          [payload]: <IBusInProgressRow>{ isRemoving: true }
+          [payload]: <IBusInProgressRow>{
+            ...busesInProgressTable.byId[payload],
+            ...<IBusInProgressRow>{ isRemoving: true }
+          }
         }
       }
     };
