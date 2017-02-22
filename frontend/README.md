@@ -37,23 +37,7 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 ## Dev comments
 
 - Auxiliary routes are not working within lazy loaded modules
-  See https://github.com/angular/angular/issues/13807#issuecomment-270880382
+  See
+  https://github.com/angular/angular/issues/13807#issuecomment-270880382
+  https://github.com/angular/angular/issues/10981
   When it work, it would be nice to have a separated URL for the left menu (this way we could be lazy loading menu components too)
-
-- Layout are bugged when using fxLayoutGap https://github.com/angular/flex-layout/issues/106 (should be merged in master soon)
-
-- Can't have md-tab working well with router : https://github.com/angular/material2/issues/524 (should be released soon)
-
-- AOT is not working because of : https://github.com/angular/angular/issues/14005 (see also https://github.com/angular/angular/issues/13909)
-
-- Due to error in build we have that in package.json
-    "build-electron": "ng build --prod -bh='./'; node ./electron/generate-package-json.js; cp ./electron/electron.js dist/",
-    "electron": "npm run build-electron; electron dist/"
-When everything is stable, replace it by
-    "build-electron": "ng build --prod --aot --no-sourcemap -bh='./' && node ./electron/generate-package-json.js && cp ./electron/electron.js dist/",
-    "electron": "npm run build-electron && electron dist/"
-
-- Material design popup do not work with lazy loaded routes and the whole app is broken
-Temp fix : Setup material2-builds while waiting for the new release :
-"@angular/material": "https://github.com/angular/material2-builds.git"
-Once solved, restore the original @angular/material

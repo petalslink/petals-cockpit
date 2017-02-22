@@ -50,6 +50,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
   private _busImportFormSubscription: Subscription;
 
   private _routeSub: Subscription;
+  private busInProgressSub: Subscription;
 
   private formErrors = {
     'ip': '',
@@ -71,27 +72,20 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
 
     this._routeSub = this._route
       .params
-      .map(({ busInProgressId }: { busInProgressId: string }) => {
+      .do(({ busInProgressId }: { busInProgressId: string }) => {
         // displays the last thing in url if no params (bug ?)
+        // TODO clean that, it's not the correct way to handle empty form versus completed form
         busInProgressId = (busInProgressId === 'buses-in-progress' ? '' : busInProgressId);
 
         this._store$.dispatch({ type: BusesInProgress.SET_SELECTED_BUS_IN_PROGRESS, payload: busInProgressId });
       })
       .subscribe();
 
-    // TODO : there's a small bug when retrieving values :
-    // the label is not floating and is in front of our text
-    // there's a PR ongoing to fix that : https://github.com/angular/material2/pull/2443
-    // and an issue https://github.com/angular/material2/issues/2441
-    // TODO : Unsubscribe
-    this.busInProgress$
-      .filter(busInProgress => typeof busInProgress !== 'undefined')
-      .map(busInProgress => {
+    this.busInProgressSub = this.busInProgress$
+      .do(busInProgress => {
         this.busInProgress = busInProgress;
 
-        if (environment.mock && this.busInProgress === null) {
-          enableAllFormFields(this.busImportForm);
-        } else if (this.busInProgress !== null) {
+        if (this.busInProgress !== null) {
           this.busImportForm.patchValue({
             ip: busInProgress.ip,
             port: busInProgress.port,
@@ -118,7 +112,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
     this._busImportFormSubscription = this
       .busImportForm
       .valueChanges
-      .map(data => {
+      .do(data => {
         this.formErrors = getFormErrors(this.busImportForm, this.formErrors, data);
       })
       .subscribe();
@@ -133,6 +127,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
   ngOnDestroy() {
     this._routeSub.unsubscribe();
     this._busImportFormSubscription.unsubscribe();
+    this.busInProgressSub.unsubscribe();
   }
 
   onSubmit({value, valid}: { value: IBusInProgressImport, valid: boolean }) {
