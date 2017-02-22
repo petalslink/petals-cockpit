@@ -35,7 +35,7 @@ describe(`Workspaces`, () => {
     // check there's a warning saying that no workspace is selected
     expect(element(by.css(`app-workspaces-dialog .no-workspace-selected`)).getText()).toEqual(`Select the workspace`);
 
-    // even if no selected, check that 2 workspaces are displayed
+    // check that 2 workspaces are displayed
     expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(2);
     const workspacesAndOwners = [
       `Workspace 0`,
@@ -44,7 +44,9 @@ describe(`Workspaces`, () => {
       `You're the only one to use this workspace`
     ];
 
-    // the element() cannot be directly resolved with then()
+    // check that no workspace have a green-led yet
+    expect(element.all(by.css(`app-workspaces-dialog md-card div.icon-slot span.green-led`)).count()).toEqual(0);
+
     const cardsText = element.all(by.css(`app-workspaces-dialog md-card`))
       .getText()
       .then((txt: any) => txt.join('\n'));
@@ -52,24 +54,24 @@ describe(`Workspaces`, () => {
     expect(cardsText).toEqual(workspacesAndOwners.join(`\n`));
   });
 
-  it(`should select a workspace when clicking on his card`, () => {
+  it(`should have a workspace selected`, () => {
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
+
     // select the first workspace
     element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w*$/);
 
-    // check that the page displayed the message selected workspace
+    // check the page content
     expect(element.all(by.css(`app-workspace > p`)).first().getText()).toEqual(`Selected workspace !`);
 
-    // check that the buttons showing :
-    // - the current workspace
-    // - the button to choose a workspace
-    // are shown
+    // does the button to show current workspace have the name of current workspace
     expect(element(by.css(`app-cockpit md-sidenav .workspace-name`)).isPresent()).toEqual(true);
-    expect(element(by.css(`app-cockpit md-sidenav .change-workspace`)).isPresent()).toEqual(true);
-
-    // check that the page displayed has a title with the workspace name
     expect(element(by.css(`app-cockpit md-sidenav .workspace-name`)).getText()).toEqual(`Workspace 0`);
+
+    // check that he now have a green led into the workspaces list
+    expect(element(by.css(`app-cockpit md-sidenav .change-workspace`)).click());
+    expect(element.all(by.css(`app-workspaces-dialog md-card div.icon-slot span.green-led`)).count()).toEqual(1);
   });
 
   it(`should contain the correct buses`, () => {
@@ -79,20 +81,20 @@ describe(`Workspaces`, () => {
     // check that buses/container/component/su are available
     const availableBuses = [
       `Bus 0`,
-        `Cont 0`,
-          `Comp 0`,
-            `SU 0`,
-            `SU 1`,
-          `Comp 1`,
-            `SU 2`,
-            `SU 3`,
-        `Cont 1`,
-          `Comp 2`,
-            `SU 4`,
-            `SU 5`,
-          `Comp 3`,
-            `SU 6`,
-            `SU 7`
+      `Cont 0`,
+      `Comp 0`,
+      `SU 0`,
+      `SU 1`,
+      `Comp 1`,
+      `SU 2`,
+      `SU 3`,
+      `Cont 1`,
+      `Comp 2`,
+      `SU 4`,
+      `SU 5`,
+      `Comp 3`,
+      `SU 6`,
+      `SU 7`
     ];
 
     expect(page.getWorkspaceTree()).toEqual(availableBuses);
@@ -139,5 +141,4 @@ describe(`Workspaces`, () => {
 
     expect(cardsText).toEqual(workspacesAndOwners.join(`\n`));
   });
-
 });
