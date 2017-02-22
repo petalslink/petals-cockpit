@@ -1,3 +1,20 @@
+/**
+ * Copyright (C) 2017 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 // shared
 @import './shared/_shared';
 
@@ -8,7 +25,7 @@
 @import './styles/themes/_light.theme';
 
 div > h3, md-dialog-container > h3 {
-  background-color: md-color($theme-primary-x);
+  background-color: mat-color($theme-primary-x);
   margin: 0;
   padding: 10px;
   border-radius: 2dpi;
@@ -20,13 +37,13 @@ div > h4 {
 }
 
 md-sidenav-container {
-  background-image: url(assets/img/gray_jean.png);
-  color: md-color($theme-primary, default-contrast);
+  background-image: url(/assets/img/gray_jean.png);
+  color: mat-color($theme-primary, default-contrast);
 }
 
 md-toolbar {
-  background-color: md-color($theme-primary-x1);
-  color: md-color($theme-primary-x2, default-contrast);
+  background-color: mat-color($theme-primary-x1);
+  color: mat-color($theme-primary-x2, default-contrast);
   h3 {
     margin: 0;
   }
@@ -34,7 +51,7 @@ md-toolbar {
 
 .active-link, .active-link:hover {
   .md-list-item {
-    background-color: md-color($theme-primary-x);
+    background-color: mat-color($theme-primary-x);
     @extend .color-primary;
     @extend .bold;
     margin: 0;
@@ -43,10 +60,10 @@ md-toolbar {
 }
 
 md-sidenav-container .md-list-item:hover, md-sidenav-container .md-list-item:focus {
-  background-color: md-color($theme-primary-x);
+  background-color: mat-color($theme-primary-x);
   @extend .light-bold;
 }
 
 .highlight {
-  background-color: md-color($theme-accent-x5);
+  background-color: mat-color($theme-accent-x5);
 }

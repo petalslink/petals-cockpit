@@ -69,7 +69,7 @@ describe(`Workspaces`, () => {
     expect(element(by.css(`app-cockpit md-sidenav .change-workspace`)).isPresent()).toEqual(true);
 
     // check that the page displayed has a title with the workspace name
-    expect(element.all(by.css(`app-cockpit .md-button-wrapper`)).get(1).getText()).toEqual(`Workspace 0`);
+    expect(element(by.css(`app-cockpit md-sidenav .workspace-name`)).getText()).toEqual(`Workspace 0`);
   });
 
   it(`should contain the correct buses`, () => {

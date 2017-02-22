@@ -25,11 +25,12 @@ import { IBusInProgressRow } from './bus-in-progress.interface';
 export function _getBusesInProgress(store$: Store<IStore>): Observable<IBusesInProgress> {
   return store$.select(state => state.busesInProgress)
     .map(busesInProgressTable => {
-      return <IBusesInProgress>Object.assign({}, busesInProgressTable, {
+      return <IBusesInProgress>{
+        ...busesInProgressTable,
         list: busesInProgressTable.allIds.map(busInProgressId => {
           return busesInProgressTable.byId[busInProgressId];
         })
-      });
+      };
     });
 }
 

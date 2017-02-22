@@ -46,57 +46,50 @@ export class Buses {
       }
     });
 
-    return <IBusesTable>Object.assign({},
-      busesTable,
-      {
-        byId: Object.assign({}, busesTable.byId, payload.byId),
+    return <IBusesTable>{
+      ...busesTable,
+      ...<IBusesTable>{
+        byId: {
+          ...busesTable.byId,
+          ...payload.byId
+        },
         allIds
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FOLD_BUS = `${Buses.reducerName}_FOLD_BUS`;
   private static foldBus(busesTable: IBusesTable, payload: { busId: string }) {
-    return <IBusesTable>Object.assign(
-      {},
-      busesTable,
-      {
-        byId: Object.assign(
-          {},
-          busesTable.byId,
-          {
-            [payload.busId]: <IBusRow>Object.assign(
-              {},
-              busesTable.byId[payload.busId],
-              { isFolded: true }
-            )
+    return <IBusesTable>{
+      ...busesTable,
+      ...<IBusesTable>{
+        byId: {
+          ...busesTable.byId,
+          [payload.busId]: <IBusRow>{
+            ...busesTable.byId[payload.busId],
+            isFolded: true
           }
-        )
+        }
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static UNFOLD_BUS = `${Buses.reducerName}_UNFOLD_BUS`;
   private static unfoldBus(busesTable: IBusesTable, payload: { busId: string }) {
-    return <IBusesTable>Object.assign(
-      {},
-      busesTable,
-      {
-        byId: Object.assign(
-          {},
-          busesTable.byId,
-          {
-            [payload.busId]: <IBusRow>Object.assign(
-              {},
-              busesTable.byId[payload.busId],
-              { isFolded: false }
-            )
+    return <IBusesTable>{
+      ...busesTable,
+      ...<IBusesTable>{
+        byId: {
+          ...busesTable.byId,
+          [payload.busId]: <IBusRow>{
+            ...busesTable.byId[payload.busId],
+            isFolded: false
           }
-        )
+        }
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
@@ -114,19 +107,25 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_BUS = `${Buses.reducerName}_SET_CURRENT_BUS`;
   private static setCurrentBus(busesTable: IBusesTable, payload: { busId: string }) {
-    return Object.assign({}, busesTable, <IBusesTable>{
-      selectedBusId: payload.busId
-    });
+    return {
+      ...busesTable,
+      ...<IBusesTable>{
+        selectedBusId: payload.busId
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS = `${Buses.reducerName}_REMOVE_BUS`;
   private static removeBus(busesTable: IBusesTable, payload: { busId: string }) {
     if (typeof busesTable.byId[payload.busId] !== 'undefined') {
-      return Object.assign({}, omit(busesTable, 'byId'), <IBusesTable>{
-        byId: omit(busesTable.byId, payload.busId),
-        allIds: busesTable.allIds.filter(id => id !== payload.busId)
-      });
+      return {
+        ...omit(busesTable, 'byId'),
+        ...<IBusesTable>{
+          byId: omit(busesTable.byId, payload.busId),
+          allIds: busesTable.allIds.filter(id => id !== payload.busId)
+        }
+      };
     }
 
     return busesTable;
@@ -137,32 +136,54 @@ export class Buses {
   private static fetchBusDetails(busesTable: IBusesTable, payload: { busId: string }) {
     const allIds = (typeof busesTable.byId[payload.busId] !== 'undefined' ? busesTable.allIds : [...busesTable.allIds, payload.busId]);
 
-    return Object.assign({}, busesTable, <IBusesTable>{
-      byId: Object.assign({}, busesTable.byId, {
-        [payload.busId]: Object.assign({}, busesTable.byId[payload.busId], { isFetchingDetails: true })
-      }),
-      allIds
-    });
+    return {
+      ...busesTable,
+      ...<IBusesTable>{
+        byId: {
+          ...busesTable.byId,
+          [payload.busId]: {
+            ...busesTable.byId[payload.busId],
+            isFetchingDetails: true
+          }
+        },
+        allIds
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS_SUCCESS = `${Buses.reducerName}_FETCH_BUS_DETAILS_SUCCESS`;
   private static fetchBusDetailsSuccess(busesTable: IBusesTable, payload: { busId: string, data: any }) {
-    return Object.assign({}, busesTable, <IBusesTable>{
-      byId: Object.assign({}, busesTable.byId, {
-        [payload.busId]: Object.assign({}, busesTable.byId[payload.busId], payload.data, { isFetchingDetails: false })
-      })
-    });
+    return {
+      ...busesTable,
+      ...<IBusesTable>{
+        byId: {
+          ...busesTable.byId,
+          [payload.busId]: {
+            ...busesTable.byId[payload.busId],
+            ...payload.data,
+            isFetchingDetails: false
+          }
+        }
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS_ERROR = `${Buses.reducerName}_FETCH_BUS_DETAILS_ERROR`;
   private static fetchBusDetailsError(busesTable: IBusesTable, payload: { busId: string }) {
-    return Object.assign({}, busesTable, <IBusesTable>{
-      byId: Object.assign({}, busesTable.byId, {
-        [payload.busId]: Object.assign({}, busesTable.byId[payload.busId], { isFetchingDetails: false })
-      })
-    });
+    return {
+      ...busesTable,
+      ...<IBusesTable>{
+        byId: {
+          ...busesTable.byId,
+          [payload.busId]: {
+            ...busesTable.byId[payload.busId],
+            isFetchingDetails: false
+          }
+        }
+      }
+    };
   }
 
   private static fetchWorkspaceSuccess(busesTable: IBusesTable, payload) {

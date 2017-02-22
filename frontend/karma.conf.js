@@ -10,9 +10,13 @@ module.exports = function (config) {
       require('karma-jasmine-diff-reporter'),
       require('karma-clear-screen-reporter'),
       require('karma-chrome-launcher'),
+      require('karma-jasmine-html-reporter'),
       require('karma-coverage-istanbul-reporter'),
       require('@angular/cli/plugins/karma')
     ],
+    client:{
+      clearContext: false // leave Jasmine Spec Runner output visible in browser
+    },
     files: [
       { pattern: './src/test.ts', watched: false }
     ],
@@ -27,12 +31,12 @@ module.exports = function (config) {
       fixWebpackSourcePaths: true
     },
     angularCli: {
-      config: './angular-cli.json',
+      config: './.angular-cli.json',
       environment: 'dev'
     },
     reporters: config.angularCli && config.angularCli.codeCoverage
               ? ['jasmine-diff', 'progress', 'coverage-istanbul', 'clear-screen']
-              : ['jasmine-diff', 'progress', 'clear-screen'],
+              : ['jasmine-diff', 'progress', 'kjhtml', 'clear-screen'],
     jasmineDiffReporter: {
       pretty: true
     },

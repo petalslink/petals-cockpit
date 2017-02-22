@@ -1,36 +1,53 @@
+/**
+ * Copyright (C) 2017 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 @import '~@angular/material/core/theming/all-theme';
-@include md-core();
+@include mat-core();
 
-$primary: md-palette($md-deep-purple, 700);
-$accent: md-palette($md-amber, 500);
+$primary: mat-palette($mat-deep-purple, 700);
+$accent: mat-palette($mat-amber, 500);
 
-$theme-primary: md-palette($md-deep-purple, 700);
-$theme-primary-x: md-palette($md-deep-purple, 50);
-$theme-primary-x1: md-palette($md-deep-purple, 100);
-$theme-primary-x2: md-palette($md-deep-purple, 200);
-$theme-primary-x3: md-palette($md-deep-purple, 300);
-$theme-primary-x4: md-palette($md-deep-purple, 400);
-$theme-primary-x5: md-palette($md-deep-purple, 500);
-$theme-primary-x6: md-palette($md-deep-purple, 600);
-$theme-primary-x7: md-palette($md-deep-purple, 700);
-$theme-primary-x8: md-palette($md-deep-purple, 800);
-$theme-primary-x9: md-palette($md-deep-purple, 900);
+$theme-primary: mat-palette($mat-deep-purple, 700);
+$theme-primary-x: mat-palette($mat-deep-purple, 50);
+$theme-primary-x1: mat-palette($mat-deep-purple, 100);
+$theme-primary-x2: mat-palette($mat-deep-purple, 200);
+$theme-primary-x3: mat-palette($mat-deep-purple, 300);
+$theme-primary-x4: mat-palette($mat-deep-purple, 400);
+$theme-primary-x5: mat-palette($mat-deep-purple, 500);
+$theme-primary-x6: mat-palette($mat-deep-purple, 600);
+$theme-primary-x7: mat-palette($mat-deep-purple, 700);
+$theme-primary-x8: mat-palette($mat-deep-purple, 800);
+$theme-primary-x9: mat-palette($mat-deep-purple, 900);
 
-$theme-accent: md-palette($md-amber, 500);
-$theme-accent-x: md-palette($md-amber, 50);
-$theme-accent-x1: md-palette($md-amber, 100);
-$theme-accent-x2: md-palette($md-amber, 200);
-$theme-accent-x3: md-palette($md-amber, 300);
-$theme-accent-x4: md-palette($md-amber, 400);
-$theme-accent-x5: md-palette($md-amber, 500);
-$theme-accent-x6: md-palette($md-amber, 600);
-$theme-accent-x7: md-palette($md-amber, 700);
-$theme-accent-x8: md-palette($md-amber, 800);
-$theme-accent-x9: md-palette($md-amber, 900);
+$theme-accent: mat-palette($mat-amber, 500);
+$theme-accent-x: mat-palette($mat-amber, 50);
+$theme-accent-x1: mat-palette($mat-amber, 100);
+$theme-accent-x2: mat-palette($mat-amber, 200);
+$theme-accent-x3: mat-palette($mat-amber, 300);
+$theme-accent-x4: mat-palette($mat-amber, 400);
+$theme-accent-x5: mat-palette($mat-amber, 500);
+$theme-accent-x6: mat-palette($mat-amber, 600);
+$theme-accent-x7: mat-palette($mat-amber, 700);
+$theme-accent-x8: mat-palette($mat-amber, 800);
+$theme-accent-x9: mat-palette($mat-amber, 900);
 
-$theme-warn: md-palette($md-red);
+$theme-warn: mat-palette($mat-red);
 // Create the theme object (a Sass map containing all of the palettes).
-$theme: md-light-theme($theme-primary, $theme-accent, $theme-warn);
+$theme: mat-light-theme($theme-primary, $theme-accent, $theme-warn);
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.

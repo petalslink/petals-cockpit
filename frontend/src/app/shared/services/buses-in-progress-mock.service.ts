@@ -52,7 +52,11 @@ export class BusesInProgressMockService extends BusesInProgressService {
       event = SseWorkspaceEvent.BUS_IMPORT_OK;
     }
 
-    const detailsBus = Object.assign({}, bus, { id: newBus.id });
+    const detailsBus = {
+      ...bus,
+      id: newBus.id
+    };
+
     return helper
       .responseBody(detailsBus)
       .do(_ => {

@@ -6,6 +6,7 @@ const readline = require('readline');
 // folders
 const sourceFolders = [
   './src/app',
+  './src/styles',
   './e2e'
 ];
 
@@ -17,9 +18,7 @@ const sourceFiles = {
   ],
 
   scss: [
-    './src/styles.scss',
-    './src/custom-theme.scss',
-    './src/_libs.scss'
+    './src/styles.scss'
   ],
 
   html: []

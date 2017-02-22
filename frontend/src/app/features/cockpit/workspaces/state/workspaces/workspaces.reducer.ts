@@ -37,74 +37,93 @@ export class Workspaces {
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES = `${Workspaces.reducerName}_FETCH_WORKSPACES`;
   private static fetchWorkspaces(workspacesTable: IWorkspacesTable, payload) {
-    return <IWorkspacesTable>Object.assign({}, workspacesTable, <IWorkspacesTable>{ isFetchingWorkspaces: true });
+    return <IWorkspacesTable>{
+      ...workspacesTable,
+      ...<IWorkspacesTable>{
+        isFetchingWorkspaces: true
+      }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES_SUCCESS = `${Workspaces.reducerName}_FETCH_WORKSPACES_SUCCESS`;
   private static fetchWorkspacesSuccess(workspacesTable: IWorkspacesTable, payload) {
     payload.allIds.forEach(workspaceId => {
-      payload = Object.assign({}, payload, {
-        byId: Object.assign({}, payload.byId, {
-          [workspaceId]: Object.assign({}, payload.byId[workspaceId], {
-            buses: (typeof workspacesTable.byId[workspaceId] === 'undefined' ? [] : workspacesTable.byId[workspaceId].buses)
-          })
-        })
-      });
+      payload = {
+        ...payload,
+        ...{
+          byId: {
+            ...payload.byId,
+            [workspaceId]: {
+              ...payload.byId[workspaceId],
+              buses: (typeof workspacesTable.byId[workspaceId] === 'undefined' ? [] : workspacesTable.byId[workspaceId].buses)
+            }
+          }
+        }
+      };
 
       return;
     });
 
-    return <IWorkspacesTable>Object.assign({}, workspacesTable,
-      payload,
-      <IWorkspacesTable>{
+    return <IWorkspacesTable>{
+      ...workspacesTable,
+      ...payload,
+      ...<IWorkspacesTable>{
         isFetchingWorkspaces: false
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACES_FAILED`;
   private static fetchWorkspacesFailed(workspacesTable: IWorkspacesTable, payload) {
-    return <IWorkspacesTable>Object.assign({}, workspacesTable,
-      <IWorkspacesTable>{
+    return <IWorkspacesTable>{
+      ...workspacesTable,
+      ...<IWorkspacesTable>{
         isFetchingWorkspaces: false
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static POST_WORKSPACE = `${Workspaces.reducerName}_POST_WORKSPACE`;
   private static postWorkspace(workspacesTable: IWorkspacesTable, payload) {
-    return <IWorkspacesTable>Object.assign({}, workspacesTable,
-      <IWorkspacesTable>{
+    return <IWorkspacesTable>{
+      ...workspacesTable,
+      ...<IWorkspacesTable>{
         isAddingWorkspace: true
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static POST_WORKSPACE_SUCCESS = `${Workspaces.reducerName}_POST_WORKSPACE_SUCCESS`;
   private static postWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload: { id: string, name: string, users: string[] }) {
-    return <IWorkspacesTable>Object.assign({}, workspacesTable,
-      <IWorkspacesTable>{
+    return <IWorkspacesTable>{
+      ...workspacesTable,
+      ...<IWorkspacesTable>{
         isAddingWorkspace: false,
-        byId: Object.assign({}, workspacesTable.byId, {
-          [payload.id]: Object.assign({}, workspacesTable.byId[payload.id], <IWorkspaceRow>payload)
-        }),
+        byId: {
+          ...workspacesTable.byId,
+          [payload.id]: {
+            ...workspacesTable.byId[payload.id],
+            ...<IWorkspaceRow>payload
+          }
+        },
         allIds: [...Array.from(new Set([...workspacesTable.allIds, payload.id]))]
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static POST_WORKSPACE_FAILED = `${Workspaces.reducerName}_POST_WORKSPACE_FAILED`;
   private static postWorkspaceFailed(workspacesTable: IWorkspacesTable, payload) {
-    return <IWorkspacesTable>Object.assign({}, workspacesTable,
-      <IWorkspacesTable>{
+    return <IWorkspacesTable>{
+      ...workspacesTable,
+      ...<IWorkspacesTable>{
         isAddingWorkspace: false
       }
-    );
+    };
   }
 
   // only used in effect, no point to handle that action
@@ -114,23 +133,18 @@ export class Workspaces {
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE = `${Workspaces.reducerName}_FETCH_WORKSPACE`;
   private static fetchWorkspace(workspacesTable: IWorkspacesTable, payload) {
-    return <IWorkspacesTable>Object.assign({}, workspacesTable,
-      <IWorkspacesTable>{
-        byId: Object.assign(
-          {},
-          workspacesTable.byId,
-          {
-            [payload]: <IWorkspaceRow>Object.assign(
-              {},
-              workspacesTable.byId[payload],
-              <IWorkspaceRow>{
-                isImporting: true
-              }
-            )
+    return <IWorkspacesTable>{
+      ...workspacesTable,
+      ...<IWorkspacesTable>{
+        byId: {
+          ...workspacesTable.byId,
+          [payload]: <IWorkspaceRow>{
+            ...workspacesTable.byId[payload],
+            ...<IWorkspaceRow>{ isImporting: true }
           }
-        )
+        }
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
@@ -138,62 +152,59 @@ export class Workspaces {
   private static fetchWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload) {
     const cleanWorkspaces = workspacesTable
       .allIds
-      .reduce((acc, workspaceId) =>
-        Object.assign(acc, {
-          byId: Object.assign(acc.byId, {
-            [workspaceId]: Object.assign({},
-              workspacesTable.byId[workspaceId],
-              workspaceRowFactory(
+      .reduce((acc, workspaceId) => {
+        return {
+          ...acc,
+          byId: {
+            ...acc.byId,
+            [workspaceId]: {
+              ...workspacesTable.byId[workspaceId],
+              ...workspaceRowFactory(
                 workspacesTable.byId[workspaceId].id,
                 workspacesTable.byId[workspaceId].name
               )
-            )
-          }),
+            }
+          },
           allIds: [...acc.allIds, workspaceId]
-        }), { byId: {}, allIds: [] }
-      )
+        }
+      }, { byId: {}, allIds: [] })
 
-    return <IWorkspacesTable>Object.assign({}, workspacesTable,
-      <IWorkspacesTable>{
+    return <IWorkspacesTable>{
+      ...workspacesTable,
+      ...<IWorkspacesTable>{
         firstWorkspaceFetched: true,
         selectedWorkspaceId: payload.id,
-        byId: Object.assign(
-          {},
-          cleanWorkspaces.byId,
-          {
-            [payload.id]: <IWorkspaceRow>Object.assign(
-              {},
-              workspacesTable.byId[payload],
-              payload,
-              {
-                isImporting: false
-              }
-            )
+        byId: {
+          ...cleanWorkspaces.byId,
+          [payload.id]: <IWorkspaceRow>{
+            ...workspacesTable.byId[payload],
+            ...payload,
+            ...<IWorkspaceRow>{ isImporting: false }
           }
-        ),
+        },
         allIds: cleanWorkspaces.allIds
       }
-    );
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACE_FAILED`;
   private static fetchWorkspaceFailed(workspacesTable: IWorkspacesTable, payload) {
-    return <IWorkspacesTable>Object.assign({}, workspacesTable,
-      <IWorkspacesTable>{
-        fetchingWorkspaceWithId: null
-      }
-    );
+    return <IWorkspacesTable>{
+      ...workspacesTable,
+      ...<IWorkspacesTable>{ fetchingWorkspaceWithId: null }
+    };
   }
 
   // tslint:disable-next-line:member-ordering
   public static SET_SEARCH = `${Workspaces.reducerName}_SET_SEARCH`;
   private static setSearch(workspacesTable: IWorkspacesTable, payload) {
-    return <IWorkspacesTable>Object.assign({}, workspacesTable,
-      <IWorkspacesTable>{
+    return <IWorkspacesTable>{
+      ...workspacesTable,
+      ...<IWorkspacesTable>{
         searchPetals: payload
       }
-    );
+    };
   }
 
   private static disconnectUserSuccess(workspacesTable: IWorkspacesTable, payload) {
