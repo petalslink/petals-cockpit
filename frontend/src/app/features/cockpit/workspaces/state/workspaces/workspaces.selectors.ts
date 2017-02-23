@@ -203,7 +203,7 @@ export function _getCurrentTree(store$: Store<IStore>) {
     })
     .withLatestFrom(store$.select(s => s.workspaces.searchPetals))
     .map(([tree, search]) => {
-      if (typeof search !== 'string' || search.trim() === '') {
+      if (typeof search !== 'string' || search === '') {
         return tree;
       }
 
@@ -216,7 +216,7 @@ export function _getCurrentTree(store$: Store<IStore>) {
 }
 
 export function filterElement(filter: string, element: any): any {
-  if (element.name.toLowerCase().trim().match(filter.trim())) {
+  if (element.name.toLowerCase().trim().match(filter)) {
     return element;
   } else if (!element.children) {
     return null;
@@ -230,6 +230,7 @@ export function filterElement(filter: string, element: any): any {
     } else {
       return {
         ...element,
+        isFolded: false,
         children: es
       };
     }
