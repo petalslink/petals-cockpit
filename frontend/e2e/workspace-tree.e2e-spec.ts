@@ -19,7 +19,6 @@ import { browser, element, by, ExpectedConditions as EC } from 'protractor';
 import { PetalsCockpitPage } from './app.po';
 
 describe(`Workspaces Tree`, () => {
-
   let page: PetalsCockpitPage;
 
   beforeEach(() => {
@@ -32,7 +31,6 @@ describe(`Workspaces Tree`, () => {
   });
 
   it(`should filter by bus, container, component and su when searching in Petals menu`, () => {
-
     // test 1 : Display only parents and children, regardless of the case
     page.search(`CoMp 0`);
 
@@ -86,7 +84,6 @@ describe(`Workspaces Tree`, () => {
   });
 
   it(`should fold and unfold Petals Buses/Containers/Components/SUs`, () => {
-
     const firstBusFolder = page.getWorkspaceTreeFolder(1);
 
     // 1) fold the bus 0
@@ -169,5 +166,22 @@ describe(`Workspaces Tree`, () => {
     firstCompFolder.click();
 
     expect(page.getWorkspaceTree()).toEqual(availableBuses);
+  });
+
+  it(`should unfold found element when searching in Petals menu`, () => {
+    const firstBusFolder = page.getWorkspaceTreeFolder(1);
+
+    firstBusFolder.click();
+
+    page.search(`su 0`);
+
+    const availableBusesFiltered = [
+      `Bus 0`,
+      `Cont 0`,
+      `Comp 0`,
+      `SU 0`
+    ];
+
+    expect(page.getWorkspaceTree()).toEqual(availableBusesFiltered);
   });
 });

@@ -20,7 +20,6 @@ import { browser, element, by } from 'protractor';
 import { PetalsCockpitPage } from './app.po';
 
 describe(`Workspaces`, () => {
-
   let page: PetalsCockpitPage;
 
   beforeEach(() => {
