@@ -24,7 +24,7 @@ variables:
       - $M2_CACHED_REPOSITORY
 
 .node-6: &node-java-yarn
-  image: registry.gitlab.com/victornoel/node-java-yarn-docker:n6.9.5-j8-y0.20.3
+  image: registry.gitlab.com/victornoel/node-java-yarn-docker:n6.10.0-j8-y0.18.1
   before_script:
     # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
     - yarn config set cache-folder $PWD/$YARN_CACHE_DIRECTORY --global
