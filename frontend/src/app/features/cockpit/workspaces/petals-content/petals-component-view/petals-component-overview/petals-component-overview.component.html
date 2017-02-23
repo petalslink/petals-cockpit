@@ -18,7 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <div fxLayoutWrap fxLayoutGap="10px">
       <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="background-color-hover-light-green-x2 cursor-pointer">
         <md-card-title-group>
-          <div md-card-sm-image class="img-card-state"></div>
+          <div
+          md-card-sm-image
+          *ngIf="component.state"
+          [ngClass]="(component.state === 'Started') ? 'img-card-state-start' : 'img-card-state-stop'">
+          </div>
           <div fxFlex fxLayout="column" fxLayoutAlign="end end">
             <md-card-subtitle>State</md-card-subtitle>
             <md-card-title>{{ component.state }}</md-card-title>
