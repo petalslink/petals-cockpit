@@ -31,8 +31,7 @@ variables:
     - du -hs $PWD/$YARN_CACHE_DIRECTORY || true
     - cd frontend
     - export PATH=`yarn bin`:$PATH
-    # see https://github.com/yarnpkg/yarn/issues/1682 for segfault problems (hence the ||)
-    - time yarn --frozen-lockfile || yarn --frozen-lockfile
+    - time yarn --pure-lockfile
     - cd ..
   cache:
     key: node-yarn
