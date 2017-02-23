@@ -41,3 +41,10 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
   https://github.com/angular/angular/issues/13807#issuecomment-270880382
   https://github.com/angular/angular/issues/10981
   When it work, it would be nice to have a separated URL for the left menu (this way we could be lazy loading menu components too)
+
+- TEMPORARILY NOT USING YARN
+  Migrating to angular 4 when using angular/cli (1.0.0-beta.32.3) break the app when using yarn.
+  See
+    https://github.com/angular/angular-cli/issues/4787
+    https://github.com/angular/angular-cli/issues/4611
+  Once this is solved, use yarn again in gitlab-ci
