@@ -48,3 +48,6 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
     https://github.com/angular/angular-cli/issues/4787
     https://github.com/angular/angular-cli/issues/4611
   Once this is solved, use yarn again in gitlab-ci
+  In tsconfig.json, I had to add : "exclude": [ "**/*.spec.ts" ]
+  See https://github.com/angular/angular-cli/issues/4821#issuecomment-281860936
+  This should be removed once solved
