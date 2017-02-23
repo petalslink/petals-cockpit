@@ -56,7 +56,7 @@ export class MaterialTreeComponent implements OnInit {
   }
 
   toggleFold(treeEvent: TreeEvent) {
-    this.onToggleFold.emit(treeEvent);
+    this.search === '' && this.onToggleFold.emit(treeEvent);
 
     return false;
   }

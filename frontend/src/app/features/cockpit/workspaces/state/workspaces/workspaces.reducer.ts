@@ -202,7 +202,7 @@ export class Workspaces {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
-        searchPetals: payload
+        searchPetals: payload.trim()
       }
     };
   }
