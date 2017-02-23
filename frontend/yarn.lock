@@ -73,7 +73,7 @@
   version "4.0.0-beta.8"
   resolved "https://registry.yarnpkg.com/@angular/common/-/common-4.0.0-beta.8.tgz#567b39107753ef0e97a07daae533afa0bd6dc038"
 
-"@angular/compiler-cli@4.0.0-beta.8":
+"@angular/compiler-cli@4.0.0-beta.8", "@angular/compiler-cli@>=2.3.1 <5.0.0":
   version "4.0.0-beta.8"
   resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-4.0.0-beta.8.tgz#aae7ff5b52205f790cd2993d5cf368a63981ca3f"
   dependencies:
@@ -81,29 +81,13 @@
     minimist "^1.2.0"
     reflect-metadata "^0.1.2"
 
-"@angular/compiler-cli@>=2.3.1 <5.0.0":
-  version "2.4.8"
-  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-2.4.8.tgz#6dad3b467243166bf2515d21993d2d1a4700a161"
-  dependencies:
-    "@angular/tsc-wrapped" "0.5.2"
-    minimist "^1.2.0"
-    reflect-metadata "^0.1.2"
-
-"@angular/compiler@4.0.0-beta.8":
+"@angular/compiler@4.0.0-beta.8", "@angular/compiler@>=2.3.1 <5.0.0":
   version "4.0.0-beta.8"
   resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-4.0.0-beta.8.tgz#66cdf7e3f1812e4a4e8704129511e9eac3d60529"
 
-"@angular/compiler@>=2.3.1 <5.0.0":
-  version "2.4.8"
-  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-2.4.8.tgz#fa788fc8bed9f322b040af2b9a06a70991390e23"
-
-"@angular/core@4.0.0-beta.8":
+"@angular/core@4.0.0-beta.8", "@angular/core@>=2.3.1 <5.0.0", "@angular/core@^2.0.0":
   version "4.0.0-beta.8"
   resolved "https://registry.yarnpkg.com/@angular/core/-/core-4.0.0-beta.8.tgz#8d9c8a64e7c26ff7208404e716deea94bb509cd7"
-
-"@angular/core@>=2.3.1 <5.0.0", "@angular/core@^2.0.0":
-  version "2.4.8"
-  resolved "https://registry.yarnpkg.com/@angular/core/-/core-2.4.8.tgz#bf1a4fc324827516e6c3222047a9b2cbdaee6976"
 
 "@angular/flex-layout@2.0.0-beta.5":
   version "2.0.0-beta.5"
@@ -133,13 +117,7 @@
   version "4.0.0-beta.8"
   resolved "https://registry.yarnpkg.com/@angular/router/-/router-4.0.0-beta.8.tgz#9571842d3bbd6d5892d763d34649d3d7e619bd54"
 
-"@angular/tsc-wrapped@0.5.2", "@angular/tsc-wrapped@>=0.5.0 <5.0.0":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@angular/tsc-wrapped/-/tsc-wrapped-0.5.2.tgz#2eddf472c467fcb334ea94deddaaa71990c5a482"
-  dependencies:
-    tsickle "^0.2"
-
-"@angular/tsc-wrapped@4.0.0-beta.8":
+"@angular/tsc-wrapped@4.0.0-beta.8", "@angular/tsc-wrapped@>=0.5.0 <5.0.0":
   version "4.0.0-beta.8"
   resolved "https://registry.yarnpkg.com/@angular/tsc-wrapped/-/tsc-wrapped-4.0.0-beta.8.tgz#96e007c1e5c731d98a3856257fa0b1063bcb5a4f"
   dependencies:
@@ -4793,15 +4771,6 @@ tsconfig@^5.0.2:
     parse-json "^2.2.0"
     strip-bom "^2.0.0"
     strip-json-comments "^2.0.0"
-
-tsickle@^0.2:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.2.6.tgz#ad4abf92e74ebdf3fb5aa187ca85b02066fe1a1b"
-  dependencies:
-    minimist "^1.2.0"
-    mkdirp "^0.5.1"
-    source-map "^0.5.6"
-    source-map-support "^0.4.2"
 
 tsickle@^0.21.0:
   version "0.21.4"
