@@ -39,3 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 </md-toolbar>
 <app-material-tree fxFill [tree]="tree$ | async" [search]="(workspaces$ | async).searchPetals" [marginLeft]="18" (onToggleFold)="onTreeToggleFold($event)"
   (onSelect)="onTreeSelect($event)"></app-material-tree>
+
+<div *ngIf="(tree$ | async)?.length === 0 && (workspaces$ | async).searchPetals" class="info no-match">
+  There is <b><i>no match</i></b> with <b><i>"{{ (workspaces$ | async).searchPetals }}</i></b>".
+</div>
