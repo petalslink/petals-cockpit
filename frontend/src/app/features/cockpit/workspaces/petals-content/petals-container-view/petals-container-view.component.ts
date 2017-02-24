@@ -23,7 +23,7 @@ import { Observable } from 'rxjs/Observable';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Containers } from '../../state/containers/containers.reducer';
 import { Ui } from '../../../../../shared/state/ui.reducer';
-import { IContainerRow } from '../../state/containers/container.interface';
+import { IContainer } from '../../state/containers/container.interface';
 import { getCurrentContainer } from '../../state/containers/containers.selectors';
 
 @Component({
@@ -32,7 +32,7 @@ import { getCurrentContainer } from '../../state/containers/containers.selectors
   styleUrls: ['./petals-container-view.component.scss']
 })
 export class PetalsContainerViewComponent implements OnInit, OnDestroy {
-  public container$: Observable<IContainerRow>;
+  public container$: Observable<IContainer>;
 
   constructor(private _store$: Store<IStore>, private _route: ActivatedRoute) { }
 

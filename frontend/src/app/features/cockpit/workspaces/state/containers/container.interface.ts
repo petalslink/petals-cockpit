@@ -24,7 +24,6 @@ export interface IContainerCommon {
   ip: string;
   port: number;
   systemInfo: string;
-  reachabilities: string[];
 
   // for UI
   isFolded: boolean;
@@ -33,14 +32,11 @@ export interface IContainerCommon {
 
 export interface IContainerRow extends IContainerCommon {
   // from server
-  components: Array<string>;
-  // id of the containers available in the bus
-  // only contains reachable containers but in order to
-  // improve perfs, do not use an array (so we can avoid `find` later)
-  // reachabilitiesId: { [key: string]: null };
+  components: string[];
+  reachabilities: string[];
 }
 
 export interface IContainer extends IContainerCommon {
   components: IComponents;
-  // reachabilities: Array<???> // not made yet
+  reachabilities: IContainerCommon[];
 }
