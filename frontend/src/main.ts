@@ -31,20 +31,3 @@ export function bootstrapApp() {
 
 // some lags are noticed at startup if no delay
 setTimeout(bootstrapApp, 100);
-
-declare const navigator: any;
-
-if ('serviceWorker' in navigator && environment.production) {
-  navigator.serviceWorker.register(`./service-worker.js`)
-    .then(registration => {
-      // registration was successful
-      if (environment.debug) {
-        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-      }
-    }).catch(err => {
-      // registration failed
-      if (environment.debug) {
-        console.error('ServiceWorker registration failed: ', err);
-      }
-    });
-}
