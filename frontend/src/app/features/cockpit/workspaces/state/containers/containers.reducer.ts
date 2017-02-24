@@ -37,22 +37,26 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINERS_SUCCESS = `${Containers.reducerName}_FETCH_CONTAINERS_SUCCESS`;
   private static fetchContainersSuccess(containersTable: IContainersTable, payload) {
-    let allIds = containersTable.allIds;
-
-    payload.allIds.forEach(containerId => {
-      if (!containersTable.byId[containerId]) {
-        allIds = [...allIds, containerId];
-      }
-    });
+    const byId = payload.allIds.reduce((acc, containerId) => {
+      return {
+        ...acc,
+        [containerId]: {
+          ...payload.byId[containerId],
+          // when we fetch containers, server don't add reachabilites
+          // set it to empty array by default
+          reachabilities: []
+        }
+      };
+    }, payload.byId);
 
     return <IContainersTable>{
       ...containersTable,
       ...<IContainersTable>{
         byId: {
           ...containersTable.byId,
-          ...payload.byId
+          ...byId
         },
-        allIds
+        allIds: [...Array.from(new Set([...containersTable.allIds, ...payload.allIds]))]
       }
     };
   }

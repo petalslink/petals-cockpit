@@ -20,13 +20,19 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { _getCurrentWorkspace } from '../workspaces/workspaces.selectors';
-import { IContainerRow } from './container.interface';
+import { IContainer } from './container.interface';
 
-export function _getCurrentContainer(store$: Store<IStore>): Observable<IContainerRow> {
+export function _getCurrentContainer(store$: Store<IStore>): Observable<IContainer> {
   return store$.select(state => state.containers)
     .filter(containers => containers.selectedContainerId !== '')
     .map(containers => {
-      const container = containers.byId[containers.selectedContainerId];
+      const container = {
+        ...<any>containers.byId[containers.selectedContainerId],
+        reachabilities: containers
+          .byId[containers.selectedContainerId]
+          .reachabilities
+          .map(containerId => containers.byId[containerId])
+      };
 
       return container;
     });
