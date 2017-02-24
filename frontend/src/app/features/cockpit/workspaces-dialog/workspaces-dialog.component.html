@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <md-toolbar fxLayout="column" fxLayoutAlign="center start">
     <md-icon color="primary">folder</md-icon>
     <h3 class="color-primary-bold margin-top-x0 md-dialog-title margin-left-x1">WORKSPACES</h3>
+    <md-spinner class="margin-left-x1" *ngIf="(workspaces$ | async).isFetchingWorkspaces"></md-spinner>
   </md-toolbar>
 
   <div class="central-content">
@@ -41,21 +42,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <span md-line>You don't have any workspace yet</span>
           </div>
 
-          <h3 class="color-primary-light-bold margin-top-x1 no-workspace-selected" *ngIf="(workspaces$ | async).list.length !== 0">Select the workspace</h3>
-          <md-card fxLayout="row" fxFlex="100%" class="background-color-hover-light-green-x2 cursor-pointer" *ngFor="let workspace of (workspaces$ | async).list"
-            (click)="fetchWorkspace(workspace)">
-            <!-- https://github.com/angular/flex-layout/issues/132 -->
-            <img md-card-avatar fxShow fxHide.xs class="img-card-workspace">
-            <span fxFlex></span>
-            <div fxLayout="column" fxLayoutAlign="start end">
-              <md-card-subtitle>{{ workspace.name }}
-                <div class="icon-slot">
-                  <span class="green-led" *ngIf="(workspaces$ | async).selectedWorkspaceId === workspace.id"></span>
-                </div>
-              </md-card-subtitle>
-              <p md-line>You're the only one to use this workspace</p>
-            </div>
-          </md-card>
+          <p class="color-primary-light-bold margin-top-x1 no-workspace-selected" *ngIf="(workspaces$ | async).list.length !== 0">Select the workspace</p>
+
+          <div *ngIf="user$ | async">
+            <md-card fxLayout="row" fxFlex="100%" class="background-color-hover-light-green-x2 cursor-pointer" *ngFor="let workspace of (workspaces$ | async).list"
+              (click)="fetchWorkspace(workspace)">
+              <!-- https://github.com/angular/flex-layout/issues/132 -->
+              <img md-card-avatar fxShow fxHide.xs class="img-card-workspace">
+              <span fxFlex></span>
+              <div fxLayout="column" fxLayoutAlign="start end">
+                <md-card-subtitle>{{ workspace.name }}
+                  <div class="icon-slot">
+                    <span class="green-led" *ngIf="(workspaces$ | async).selectedWorkspaceId === workspace.id"></span>
+                  </div>
+                </md-card-subtitle>
+                <span *ngIf="workspace.users.list.length === 1" md-line>You are the only one using this workspace.</span>
+                <span *ngIf="workspace.users.list.length > 1" md-line>Shared with you and
+                  <span
+                  class="color-primary-bold dotted"
+                  [mdTooltip]="getUsersNames(workspace.users.list)"
+                  [mdTooltipShowDelay]="showDelay"
+                  [mdTooltipHideDelay]="hideDelay"
+                  [mdTooltipPosition]="position"
+                  >
+                    {{ workspace.users.list.length - 1 }} other{{ (workspace.users.list.length - 1) >= 2 ? 's' : '' }}
+                  </span>.
+                </span>
+              </div>
+            </md-card>
+          </div>
         </div>
       </div>
     </md-dialog-content>

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, element, by } from 'protractor';
+import { browser, element, by, ExpectedConditions as EC } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
 
@@ -34,23 +34,27 @@ describe(`Workspaces`, () => {
     // check there's a warning saying that no workspace is selected
     expect(element(by.css(`app-workspaces-dialog .no-workspace-selected`)).getText()).toEqual(`Select the workspace`);
 
-    // check that 2 workspaces are displayed
+    // even if no selected, check that 2 workspaces are displayed
     expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(2);
-    const workspacesAndOwners = [
-      `Workspace 0`,
-      `You're the only one to use this workspace`,
-      `Workspace 1`,
-      `You're the only one to use this workspace`
-    ];
 
     // check that no workspace have a green-led yet
     expect(element.all(by.css(`app-workspaces-dialog md-card div.icon-slot span.green-led`)).count()).toEqual(0);
 
-    const cardsText = element.all(by.css(`app-workspaces-dialog md-card`))
-      .getText()
-      .then((txt: any) => txt.join('\n'));
+    const availableUsersList = 'Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER, Victor NOEL, Sebastien GARCIA, Luc DUZAN, Grahmy TRAORE';
 
-    expect(cardsText).toEqual(workspacesAndOwners.join(`\n`));
+    // check the current list content
+    browser.actions().mouseMove(element(by.css('app-workspaces-dialog md-card span.dotted'))).perform();
+    expect(element(by.css('md-tooltip-component')).getText()).toEqual(availableUsersList);
+
+    // the element() cannot be directly resolved with then()
+    const cardsText = element.all(by.css(`app-workspaces-dialog md-card`)).getText();
+
+    const workspacesAndOwners = [
+      `Workspace 0\nYou are the only one using this workspace.`,
+      `Workspace 1\nShared with you and 7 others .`
+    ];
+
+    expect(cardsText).toEqual(workspacesAndOwners);
   });
 
   it(`should have a workspace selected`, () => {
@@ -76,24 +80,26 @@ describe(`Workspaces`, () => {
   it(`should contain the correct buses`, () => {
     // select the first workspace
     element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
+    // let's be sure everything is loaded and visible
+    browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
 
     // check that buses/container/component/su are available
     const availableBuses = [
       `Bus 0`,
-      `Cont 0`,
-      `Comp 0`,
-      `SU 0`,
-      `SU 1`,
-      `Comp 1`,
-      `SU 2`,
-      `SU 3`,
-      `Cont 1`,
-      `Comp 2`,
-      `SU 4`,
-      `SU 5`,
-      `Comp 3`,
-      `SU 6`,
-      `SU 7`
+        `Cont 0`,
+          `Comp 0`,
+            `SU 0`,
+            `SU 1`,
+          `Comp 1`,
+            `SU 2`,
+            `SU 3`,
+        `Cont 1`,
+          `Comp 2`,
+            `SU 4`,
+            `SU 5`,
+          `Comp 3`,
+            `SU 6`,
+            `SU 7`
     ];
 
     expect(page.getWorkspaceTree()).toEqual(availableBuses);
@@ -123,21 +129,22 @@ describe(`Workspaces`, () => {
     element(by.css(`app-workspaces-dialog form input`)).sendKeys(`New workspace`);
     element(by.css(`app-workspaces-dialog form button`)).click();
 
-    expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(3);
+    expect(element.all(by.css(`app-workspaces-dialog div md-card-subtitle`)).count()).toEqual(3);
 
     const workspacesAndOwners = [
-      `Workspace 0`,
-      `You're the only one to use this workspace`,
-      `Workspace 1`,
-      `You're the only one to use this workspace`,
-      `New workspace`,
-      `You're the only one to use this workspace`
+      `Workspace 0\nYou are the only one using this workspace.`,
+      `Workspace 1\nShared with you and 7 others .`,
+      `New workspace\nShared with you and 7 others .`
     ];
 
-    const cardsText = element.all(by.css(`app-workspaces-dialog md-card`))
-      .getText()
-      .then((txt: any) => txt.join('\n'));
+    const cardsText = element.all(by.css(`app-workspaces-dialog md-card`)).getText();
 
-    expect(cardsText).toEqual(workspacesAndOwners.join(`\n`));
+    expect(cardsText).toEqual(workspacesAndOwners);
+
+    const availableUsersList = 'Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER, Victor NOEL, Sebastien GARCIA, Luc DUZAN, Grahmy TRAORE';
+
+    // check the new list content
+    browser.actions().mouseMove(element.all(by.css('app-workspaces-dialog md-card span.dotted')).get(1)).perform();
+    expect(element(by.css('md-tooltip-component')).getText()).toEqual(availableUsersList);
   });
 });
