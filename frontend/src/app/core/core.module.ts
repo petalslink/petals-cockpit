@@ -100,7 +100,6 @@ export const providers = [
 
 @NgModule({
   imports: [
-    FlexLayoutModule,
     // TODO : Keep an eye on ngrx V3 to have lazy loaded reducers
     // https://github.com/ngrx/store/pull/269
     StoreModule.provideStore(getRootReducer),
