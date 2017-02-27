@@ -28,6 +28,8 @@ export interface IServiceUnitCommon {
   isUpdatingState: boolean;
 }
 
+// tslint:disable-next-line:no-empty-interface
 export interface IServiceUnitRow extends IServiceUnitCommon { }
 
+// tslint:disable-next-line:no-empty-interface
 export interface IServiceUnit extends IServiceUnitCommon { }

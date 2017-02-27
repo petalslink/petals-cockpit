@@ -104,7 +104,7 @@ export class BusesInProgressEffects {
     this._store$.select(state => state.busesInProgress.selectedBusInProgressId)
     )
     .map(([action, wsId, sId]) => {
-      return { ...action.payload, wsId, sId }
+      return { ...action.payload, wsId, sId };
     })
     .do(({busInProgressId, importOk, wsId, sId}: { busInProgressId: string, importOk: boolean, wsId: string, sId: string }) => {
       if (importOk && this._router.url.match(/\/buses-in-progress\//) && sId === busInProgressId) {

@@ -166,8 +166,8 @@ export class Workspaces {
             }
           },
           allIds: [...acc.allIds, workspaceId]
-        }
-      }, { byId: {}, allIds: [] })
+        };
+      }, { byId: {}, allIds: [] });
 
     return <IWorkspacesTable>{
       ...workspacesTable,
