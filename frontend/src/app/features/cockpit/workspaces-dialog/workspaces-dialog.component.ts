@@ -120,7 +120,7 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
 
   getUsersNames(users: Array<IUser>) {
     return users
-      .filter(u => this.user ? u.id !== this.user.id : true)
+      .filter(u => u.id !== this.user.id)
       .map(user => user.name)
       .join(', ');
   }
