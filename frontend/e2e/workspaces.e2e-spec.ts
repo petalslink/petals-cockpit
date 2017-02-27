@@ -40,7 +40,8 @@ describe(`Workspaces`, () => {
     // check that no workspace have a green-led yet
     expect(element.all(by.css(`app-workspaces-dialog md-card div.icon-slot span.green-led`)).count()).toEqual(0);
 
-    const availableUsersList = 'Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER, Victor NOEL, Sebastien GARCIA, Luc DUZAN, Grahmy TRAORE';
+    const availableUsersList =
+      'Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER, Victor NOEL, Sebastien GARCIA, Luc DUZAN, Grahmy TRAORE';
 
     // check the current list content
     browser.actions().mouseMove(element(by.css('app-workspaces-dialog md-card span.dotted'))).perform();
@@ -63,7 +64,7 @@ describe(`Workspaces`, () => {
     // select the first workspace
     element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
 
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w*$/);
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
 
     // check the page content
     expect(element.all(by.css(`app-workspace > p`)).first().getText()).toEqual(`Selected workspace !`);
@@ -109,7 +110,7 @@ describe(`Workspaces`, () => {
     // select the first workspace
     element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
 
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w*$/);
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
 
     const importBusesText = page.getBusesInProgress();
 
@@ -141,7 +142,8 @@ describe(`Workspaces`, () => {
 
     expect(cardsText).toEqual(workspacesAndOwners);
 
-    const availableUsersList = 'Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER, Victor NOEL, Sebastien GARCIA, Luc DUZAN, Grahmy TRAORE';
+    const availableUsersList =
+      'Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER, Victor NOEL, Sebastien GARCIA, Luc DUZAN, Grahmy TRAORE';
 
     // check the new list content
     browser.actions().mouseMove(element.all(by.css('app-workspaces-dialog md-card span.dotted')).get(1)).perform();

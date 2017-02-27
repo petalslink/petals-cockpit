@@ -39,13 +39,10 @@ export class PetalsCockpitPage {
     expect(element(by.css(`app-login button`)).isEnabled()).toBe(true);
 
     element(by.css(`app-login button`)).click();
-
-    // let's be sure angular has finished loading after login!
-    browser.waitForAngular();
   }
 
   search(search: string) {
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 
     const input = element(by.css(`input.search`));
     input.clear();
@@ -53,20 +50,20 @@ export class PetalsCockpitPage {
   }
 
   getWorkspaceTree() {
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
     return element.all(by.css(`app-cockpit md-sidenav app-material-tree div.mat-list-item-content > span`))
       .getText();
   }
 
   getBusesInProgress() {
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 
     return element.all(by.css(`app-cockpit md-sidenav app-buses-in-progress a.buses-in-progress div.mat-list-item-content`))
       .getText();
   }
 
   getHighlightedElement() {
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 
     return element.all(by.css(`app-cockpit md-sidenav app-material-tree div.mat-list-item-content .highlight`))
       .getText()
@@ -76,7 +73,7 @@ export class PetalsCockpitPage {
 
   getWorkspaceTreeFolder(level: number, index = 0) {
     expect(level).toBeGreaterThanOrEqual(1);
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces/);
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 
     return element
       .all(by.css(`app-cockpit md-sidenav ${(`app-material-tree ` as any).repeat(level)}md-icon[aria-label="arrow_drop_down"]`))
