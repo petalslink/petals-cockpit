@@ -57,9 +57,13 @@ export class Users {
   // tslint:disable-next-line:member-ordering
   public static CONNECT_USER_SUCCESS = `${Users.reducerName}_CONNECT_USER_SUCCESS`;
   private static connectUserSuccess(users: IUsersTable, payload) {
+    const user = {
+      ...payload.user,
+      id: payload.user.username
+    };
     return {
       ...users,
-      ...<IUsersTable>{
+      ...{
         isConnecting: false,
         isConnected: true,
         connectionFailed: false,
@@ -67,11 +71,12 @@ export class Users {
 
         byId: {
           ...users.byId,
-          [payload.user.username]: {
-            ...users.byId[payload.user.username],
-            ...payload.user
+          [user.id]: {
+            ...users.byId[user.id],
+            ...user
           }
-        }
+        },
+        allIds: [...Array.of(new Set([...users.allIds, user.id]))]
       }
     };
   }

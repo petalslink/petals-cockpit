@@ -39,6 +39,9 @@ export class PetalsCockpitPage {
     expect(element(by.css(`app-login button`)).isEnabled()).toBe(true);
 
     element(by.css(`app-login button`)).click();
+
+    // let's be sure angular has finished loading after login!
+    browser.waitForAngular();
   }
 
   search(search: string) {
