@@ -21,10 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </md-input-container>
   </form>
 
-  <button md-mini-fab class="btn-add-bus" color="primary" fxFlex="40px" mdTooltip="Import a bus" mdTooltipPosition="below"
+  <a md-mini-fab class="btn-add-bus" color="primary" fxFlex="40px" mdTooltip="Import a bus" mdTooltipPosition="below"
     [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId, 'petals', 'buses-in-progress']">
     <md-icon class="md-24">add</md-icon>
-  </button>
+  </a>
 </div>
 
 <md-toolbar fxLayout="column" *ngIf="(busesInProgress$ | async).list.length > 0" fxLayoutAlign="center start">
