@@ -27,7 +27,9 @@ interface IUserCommon {
 }
 
 // used within table
+// tslint:disable-next-line:no-empty-interface
 export interface IUserRow extends IUserCommon { }
 
 // used in generated views
+// tslint:disable-next-line:no-empty-interface
 export interface IUser extends IUserCommon { }

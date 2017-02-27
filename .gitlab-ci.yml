@@ -82,8 +82,7 @@ build-frontend:
     - /^back\/.*$/
   script:
     - cd frontend
-    # broken for now, see https://github.com/mgechev/codelyzer/issues/190
-    # - time ng lint
+    - time ng lint
     - time node generate-headers.js --dry
     - nohup $XVFB &
     - XVFBPID=$!

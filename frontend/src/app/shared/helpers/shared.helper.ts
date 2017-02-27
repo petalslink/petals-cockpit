@@ -32,7 +32,7 @@ export function toJavascriptMap(map: any) {
     byId[id] = {
       ...map[id],
       id
-    }
+    };
   });
 
   return { byId, allIds };

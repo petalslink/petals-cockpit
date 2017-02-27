@@ -26,7 +26,7 @@ import { Workspaces } from '../workspaces/workspaces.reducer';
 export class Containers {
   private static reducerName = 'CONTAINERS_REDUCER';
 
-  public static reducer(containersTable = containersTableFactory(), {type, payload}: Action) {
+  public static reducer(containersTable = containersTableFactory(), { type, payload }: Action) {
     if (!Containers.mapActionsToMethod[type]) {
       return containersTable;
     }
@@ -121,7 +121,10 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINER_DETAILS = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS`;
   private static fetchContainerDetails(containersTable: IContainersTable, payload: { containerId: string }) {
-    const allIds = (typeof containersTable.byId[payload.containerId] !== 'undefined' ? containersTable.allIds : [...containersTable.allIds, payload.containerId]);
+    const allIds =
+      (typeof containersTable.byId[payload.containerId] !== 'undefined'
+        ? containersTable.allIds
+        : [...containersTable.allIds, payload.containerId]);
 
     return {
       ...containersTable,

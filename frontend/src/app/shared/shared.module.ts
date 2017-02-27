@@ -29,8 +29,7 @@ import { PrettyJsonModule } from 'angular2-prettyjson';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
-import { environment } from './../../environments/environment';
-import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive'
+import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
 
 export const modules = [
   CommonModule,

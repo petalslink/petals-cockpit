@@ -21,7 +21,7 @@ export const componentsService = new Components();
 export class Component {
   private static _cpt = 0;
   protected _id: number;
-  private _serviceUnits: ServiceUnit[] = []
+  private _serviceUnits: ServiceUnit[] = [];
 
   constructor() {
     this._id = Component._cpt++;

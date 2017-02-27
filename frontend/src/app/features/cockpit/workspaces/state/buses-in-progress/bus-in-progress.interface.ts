@@ -31,11 +31,13 @@ export interface IBusInProgressCommon {
 }
 
 // used within table
+// tslint:disable-next-line:no-empty-interface
 export interface IBusInProgressRow extends IBusInProgressCommon {
   // from server
 }
 
 // used in generated views
+// tslint:disable-next-line:no-empty-interface
 export interface IBusInProgress extends IBusInProgressCommon { }
 
 // used when we import a bus

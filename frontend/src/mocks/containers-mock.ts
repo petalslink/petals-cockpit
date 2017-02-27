@@ -20,10 +20,10 @@ export class Containers {
 export const containersService = new Containers();
 
 export class Container {
-  private _bus: Bus;
   private static _cpt = 0;
+  private _bus: Bus;
   protected _id: number;
-  private _components: Component[] = []
+  private _components: Component[] = [];
 
   constructor(bus: Bus) {
     this._id = Container._cpt++;
@@ -61,7 +61,12 @@ export class Container {
         .getContainers()
         .map(container => container.getIdFormatted())
         .filter(containerId => containerId !== id),
-      systemInfo: 'Petals ESB µKernel 4.0.2 Petals Standalone Shared Memory 4.0.2 OpenJDK Runtime Environment 1.7.0_111-b01 Oracle Corporation Linux 3.16.0-4-amd64 amd64'
+      systemInfo: [
+        'Petals ESB µKernel 4.0.2',
+        'Petals Standalone Shared Memory 4.0.2',
+        'OpenJDK Runtime Environment 1.7.0_111-b01 Oracle Corporation',
+        'Linux 3.16.0-4-amd64 amd64'
+      ].join('\n')
     };
   }
 }
