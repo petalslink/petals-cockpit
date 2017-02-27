@@ -37,8 +37,15 @@ export class Workspace {
     return {
       id: this.getIdFormatted(),
       name: this._name || `Workspace ${this._id}`,
-      users: (this.getIdFormatted() === 'idWks0' ? ['admin'] : ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel', 'sgarcia', 'lduzan', 'gtraore'])
+      users: this.workspaceUsers()
     };
+  }
+
+  private workspaceUsers() {
+    switch (this.getIdFormatted()) {
+      case 'idWks1': return ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'];
+      default: return ['admin'];
+    }
   }
 
   public getBuses() {
@@ -132,21 +139,6 @@ const users = {
     id: 'vnoel',
     name: 'Victor NOEL',
     username: 'vnoel'
-  },
-  sgarcia: {
-    id: 'sgarcia',
-    name: 'Sebastien GARCIA',
-    username: 'sgarcia'
-  },
-  lduzan: {
-    id: 'lduzan',
-    name: 'Luc DUZAN',
-    username: 'lduzan'
-  },
-  gtraore: {
-    id: 'gtraore',
-    name: 'Grahmy TRAORE',
-    username: 'gtraore'
   }
 };
 

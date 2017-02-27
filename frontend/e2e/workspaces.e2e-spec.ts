@@ -40,8 +40,7 @@ describe(`Workspaces`, () => {
     // check that no workspace have a green-led yet
     expect(element.all(by.css(`app-workspaces-dialog md-card div.icon-slot span.green-led`)).count()).toEqual(0);
 
-    const availableUsersList =
-      'Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER, Victor NOEL, Sebastien GARCIA, Luc DUZAN, Grahmy TRAORE';
+    const availableUsersList = 'Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER, Victor NOEL';
 
     // check the current list content
     browser.actions().mouseMove(element(by.css('app-workspaces-dialog md-card span.dotted'))).perform();
@@ -52,7 +51,7 @@ describe(`Workspaces`, () => {
 
     const workspacesAndOwners = [
       `Workspace 0\nYou are the only one using this workspace.`,
-      `Workspace 1\nShared with you and 7 others .`
+      `Workspace 1\nShared with you and 4 others.`
     ];
 
     expect(cardsText).toEqual(workspacesAndOwners);
@@ -69,9 +68,11 @@ describe(`Workspaces`, () => {
     // check the page content
     expect(element.all(by.css(`app-workspace > p`)).first().getText()).toEqual(`Selected workspace !`);
 
+    const wsButton = element(by.css(`app-cockpit md-sidenav .workspace-name`));
+
     // does the button to show current workspace have the name of current workspace
-    expect(element(by.css(`app-cockpit md-sidenav .workspace-name`)).isPresent()).toEqual(true);
-    expect(element(by.css(`app-cockpit md-sidenav .workspace-name`)).getText()).toEqual(`Workspace 0`);
+    browser.wait(EC.elementToBeClickable(wsButton), 5000);
+    expect(wsButton.getText()).toEqual(`Workspace 0`);
 
     // check that he now have a green led into the workspaces list
     expect(element(by.css(`app-cockpit md-sidenav .change-workspace`)).click());
@@ -134,19 +135,12 @@ describe(`Workspaces`, () => {
 
     const workspacesAndOwners = [
       `Workspace 0\nYou are the only one using this workspace.`,
-      `Workspace 1\nShared with you and 7 others .`,
-      `New workspace\nShared with you and 7 others .`
+      `Workspace 1\nShared with you and 4 others.`,
+      `New workspace\nYou are the only one using this workspace.`
     ];
 
     const cardsText = element.all(by.css(`app-workspaces-dialog md-card`)).getText();
 
     expect(cardsText).toEqual(workspacesAndOwners);
-
-    const availableUsersList =
-      'Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER, Victor NOEL, Sebastien GARCIA, Luc DUZAN, Grahmy TRAORE';
-
-    // check the new list content
-    browser.actions().mouseMove(element.all(by.css('app-workspaces-dialog md-card span.dotted')).get(1)).perform();
-    expect(element(by.css('md-tooltip-component')).getText()).toEqual(availableUsersList);
   });
 });
