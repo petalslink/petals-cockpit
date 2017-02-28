@@ -14,10 +14,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" class="content content-max-width">
-  <md-toolbar fxLayout="column" fxLayoutAlign="center start">
-    <md-icon color="primary">folder</md-icon>
-    <h3 class="color-primary-bold margin-top-x0 md-dialog-title margin-left-x1">WORKSPACES</h3>
-    <md-spinner class="margin-left-x1" *ngIf="(workspaces$ | async).isFetchingWorkspaces"></md-spinner>
+  <md-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+    <h3 class="md-dialog-title margin-left-x1">SELECT THE WORKSPACE</h3>
   </md-toolbar>
 
   <div class="central-content">
@@ -30,8 +28,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <span mdPrefix><md-icon color="primary">edit</md-icon></span>
             </md-input-container>
 
-            <button type="submit" [disabled]="btnSubmitDisabled" md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace" mdTooltipPosition="below">
-                <md-icon class="md-24">add</md-icon>
+            <button type="submit" [disabled]="btnSubmitDisabled" md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace"
+              mdTooltipPosition="below">
+              <md-icon class="md-24">create_new_folder</md-icon>
             </button>
           </form>
         </div>
@@ -42,30 +41,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <span md-line>You don't have any workspace yet</span>
           </div>
 
-          <p class="color-primary-light-bold margin-top-x1 no-workspace-selected" *ngIf="(workspaces$ | async).list.length !== 0">Select the workspace</p>
-
           <div *ngIf="user$ | async">
-            <md-card fxLayout="row" fxFlex="100%" class="background-color-hover-light-green-x2 cursor-pointer" *ngFor="let workspace of (workspaces$ | async).list"
-              (click)="fetchWorkspace(workspace)">
-              <!-- https://github.com/angular/flex-layout/issues/132 -->
-              <img md-card-avatar fxShow fxHide.xs class="img-card-workspace">
-              <span fxFlex></span>
-              <div fxLayout="column" fxLayoutAlign="start end">
-                <md-card-subtitle>{{ workspace.name }}
-                  <div class="icon-slot">
-                    <span class="green-led" *ngIf="(workspaces$ | async).selectedWorkspaceId === workspace.id"></span>
+            <md-card>
+              <md-card-content>
+                <div fxLayout="row" fxFlex="100%">
+                  <label>Workspaces</label>
+                  <md-spinner class="margin-left-x1" *ngIf="(workspaces$ | async).isFetchingWorkspaces"></md-spinner>
+                  <div fxFlex></div>
+                  <div fxLayoutAlign="end center">
+                    <span *ngIf="(workspaces$ | async).list.length === 0" md-line>No workspace exist !</span>
+                    <span class="subtitle" *ngIf="(workspaces$ | async).list.length >= 1" md-line>
+                      {{ (workspaces$ | async).list.length }} item{{ ((workspaces$ | async).list.length) >= 2 ? 's' : '' }}
+                    </span>
                   </div>
-                </md-card-subtitle>
-                <span *ngIf="workspace.users.list.length === 1" md-line>You are the only one using this workspace.</span>
-                <span *ngIf="workspace.users.list.length > 1" md-line>Shared with you and
-                  <span
-                  class="color-primary-bold dotted"
-                  [mdTooltip]="getUsersNames(workspace.users.list)"
-                  [mdTooltipShowDelay]="showDelay"
-                  [mdTooltipHideDelay]="hideDelay"
-                  [mdTooltipPosition]="position"
-                  >{{ workspace.users.list.length - 1 }} other{{ (workspace.users.list.length - 1) >= 2 ? 's' : '' }}</span>.
-                </span>
+                </div>
+              </md-card-content>
+            </md-card>
+            <md-divider></md-divider>
+            <md-card class="card-workspace">
+              <div fxLayout="row" class="cursor-pointer background-color-hover-light-green-x2"
+                *ngFor="let workspace of (workspaces$ | async).list" (click)="fetchWorkspace(workspace)"
+                [class.background-color-light-green-x2]="(workspaces$ | async).selectedWorkspaceId === workspace.id"
+              >
+                <div fxLayoutAlign="center start">
+                  <md-icon color="primary" *ngIf="!(workspaces$ | async).selectedWorkspaceId && (workspaces$ | async).list.length !== 0 && workspace.users.list.length >= 1">folder</md-icon>
+                  <md-icon color="primary" *ngIf="(workspaces$ | async).selectedWorkspaceId === workspace.id && workspace.users.list.length === 1">folder_open</md-icon>
+                  <md-icon color="primary" *ngIf="(workspaces$ | async).selectedWorkspaceId === workspace.id && workspace.users.list.length > 1">folder_shared</md-icon>
+                </div>
+                <md-card-title-group>
+                  <div fxLayout="column" fxLayoutAlign="center start">
+                    <md-card-title>{{ workspace.name }}</md-card-title>
+                    <md-card-subtitle>
+                      <span *ngIf="workspace.users.list.length === 1" md-line>You are the only one using this workspace.</span>
+                      <span *ngIf="workspace.users.list.length > 1" md-line>Shared with you and
+                        <span
+                          class="color-primary-bold dotted"
+                          [mdTooltip]="getUsersNames(workspace.users.list)"
+                          [mdTooltipShowDelay]="showDelay"
+                          [mdTooltipHideDelay]="hideDelay"
+                          [mdTooltipPosition]="position"
+                        >{{ workspace.users.list.length - 1 }} other{{ (workspace.users.list.length - 1) >= 2 ? 's' : '' }}</span>.
+                      </span>
+                    </md-card-subtitle>
+                  </div>
+                </md-card-title-group>
               </div>
             </md-card>
           </div>
