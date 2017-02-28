@@ -25,6 +25,7 @@ import { PetalsMenuModule } from './petals-menu/petals-menu.module';
 import { environment } from './../../../../environments/environment';
 import { BusesInProgressService } from './../../../shared/services/buses-in-progress.service';
 import { BusesInProgressMockService } from './../../../shared/services/buses-in-progress-mock.service';
+import { WorkspaceResolver } from './workspace-resolver';
 
 @NgModule({
   imports: [
@@ -42,6 +43,7 @@ import { BusesInProgressMockService } from './../../../shared/services/buses-in-
     // were we should instead use a router-outlet
     // (in order to lazy load only what's needed)
     PetalsMenuModule
-  ]
+  ],
+  providers: [WorkspaceResolver]
 })
 export class WorkspacesModule { }

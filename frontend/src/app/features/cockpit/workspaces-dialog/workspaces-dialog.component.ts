@@ -105,7 +105,7 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
       .select(state => state.workspaces.selectedWorkspaceId)
       .first()
       .subscribe(wsId => {
-        // if no workspace is open, it will simply navigate too
+        // if no workspace is open, it will simply navigate to the required one
         if (wsId === workspace.id) {
           this._store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
         } else {

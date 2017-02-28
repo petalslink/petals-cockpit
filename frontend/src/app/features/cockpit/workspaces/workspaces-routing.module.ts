@@ -21,6 +21,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { WorkspacesComponent } from './workspaces.component';
 import { PetalsContentModule } from './petals-content/petals-content.module';
 import { WorkspaceComponent } from './workspace/workspace.component';
+import { WorkspaceResolver } from './workspace-resolver';
 
 export function loadPetalsContentModule() {
   return PetalsContentModule;
@@ -34,12 +35,21 @@ const routes: Routes = [
   },
   {
     path: ':workspaceId',
-    component: WorkspaceComponent
-  },
-  {
-    path: ':workspaceId/petals',
-    // loadChildren: loadPetalsContentModule
-    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule'
+    // as we use the store to retrieve our data, no need to pass them
+    // using resolve, but we still need to call the resolver to make sure
+    // they're available before displaying the view
+    resolve: { _: WorkspaceResolver },
+    children: [
+      {
+        path: '',
+        component: WorkspaceComponent
+      },
+      {
+        path: 'petals',
+        // loadChildren: loadPetalsContentModule
+        loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule'
+      }
+    ]
   }
 ];
 

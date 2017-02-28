@@ -48,23 +48,6 @@ export class Workspaces {
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES_SUCCESS = `${Workspaces.reducerName}_FETCH_WORKSPACES_SUCCESS`;
   private static fetchWorkspacesSuccess(workspacesTable: IWorkspacesTable, payload) {
-    payload.allIds.forEach(workspaceId => {
-      payload = {
-        ...payload,
-        ...{
-          byId: {
-            ...payload.byId,
-            [workspaceId]: {
-              ...payload.byId[workspaceId],
-              buses: (typeof workspacesTable.byId[workspaceId] === 'undefined' ? [] : workspacesTable.byId[workspaceId].buses)
-            }
-          }
-        }
-      };
-
-      return;
-    });
-
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...payload,
@@ -140,7 +123,7 @@ export class Workspaces {
           ...workspacesTable.byId,
           [payload]: <IWorkspaceRow>{
             ...workspacesTable.byId[payload],
-            ...<IWorkspaceRow>{ isImporting: true }
+            ...<IWorkspaceRow>{ isFetching: true }
           }
         }
       }
@@ -179,7 +162,7 @@ export class Workspaces {
           [payload.id]: <IWorkspaceRow>{
             ...workspacesTable.byId[payload],
             ...payload,
-            ...<IWorkspaceRow>{ isImporting: false }
+            ...<IWorkspaceRow>{ isFetching: false }
           }
         },
         allIds: cleanWorkspaces.allIds
