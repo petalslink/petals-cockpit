@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
     <div fxLayoutWrap fxLayoutGap="10px">
-      <md-card fxFlex.gt-sm="48%" fxFlex="100%">
+      <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="ip">
         <md-card-title-group>
           <div md-card-sm-image class="img-card-ip"></div>
           <div fxFlex fxLayout="column" fxLayoutAlign="end end">
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </div>
         </md-card-title-group>
       </md-card>
-      <md-card fxFlex.gt-sm="48%" fxFlex="100%">
+      <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="port">
         <md-card-title-group>
           <div md-card-sm-image class="img-card-port"></div>
           <div fxFlex fxLayout="column" fxLayoutAlign="end end">
@@ -40,7 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <!-- TODO : Once bugs are fixed, put 50% and maybe change size (responsive) -->
       <!-- https://github.com/angular/flex-layout/issues/106 -->
       <!-- https://github.com/angular/flex-layout/issues/108 -->
-      <md-card fxFlex.gt-sm="48%" fxFlex="100%" *ngFor="let reachableContainer of container.reachabilities" class="background-color-hover-light-green-x2 cursor-pointer"
+      <md-card fxFlex.gt-sm="48%" fxFlex="100%" *ngFor="let reachableContainer of container.reachabilities" class="reachability background-color-hover-light-green-x2 cursor-pointer"
         [routerLink]="['/workspaces', (idWorkspace$ | async), 'petals', 'containers', reachableContainer.id]">
         <md-card-title-group>
           <div md-card-sm-image class="img-card-server"></div>
@@ -54,7 +54,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </div>
     <h3 class="color-primary-light-bold margin-top-x2">System info</h3>
     <div fxLayout="row" fxLayoutWrap fxLayoutGap="10px">
-      <md-card fxFlex>{{ container.systemInfo }}</md-card>
+      <md-card fxFlex class="system-info">{{ container.systemInfo }}</md-card>
     </div>
     <!--<prettyjson fxFlex="100%" [obj]="container"></prettyjson>-->
   </div>

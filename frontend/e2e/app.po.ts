@@ -58,6 +58,17 @@ export class PetalsCockpitPage {
       .getText();
   }
 
+
+  /**
+   * getWorkspaceTreeByName
+   *
+   * @param {string} name : The [bus|container|component|servuce-unit]'s name to find in the tree
+   * @returns the element found
+   */
+  getWorkspaceTreeByName(name: string) {
+    return element.all(by.cssContainingText(`app-cockpit md-sidenav app-material-tree div.mat-list-item-content > span`, name));
+  }
+
   getBusesInProgress() {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 

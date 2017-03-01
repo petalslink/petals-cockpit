@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs/Subscription';
@@ -30,8 +30,7 @@ import { IStore } from '../../../../shared/interfaces/store.interface';
   styleUrls: ['./workspace.component.scss']
 })
 
-export class WorkspaceComponent implements OnInit, OnDestroy {
-
+export class WorkspaceComponent implements OnInit {
   private workspaceIdSub: Subscription;
 
   constructor(
@@ -40,16 +39,6 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.workspaceIdSub = this._route.params
-      .map(p => p['workspaceId'])
-      .do(workspaceId => {
-        this._store$.dispatch({ type: Workspaces.FETCH_WORKSPACE, payload: workspaceId });
-      })
-      .subscribe();
     this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: '' } });
-  }
-
-  ngOnDestroy() {
-    this.workspaceIdSub.unsubscribe();
   }
 }

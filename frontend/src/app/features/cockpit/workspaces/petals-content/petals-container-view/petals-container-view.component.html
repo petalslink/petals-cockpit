@@ -16,18 +16,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div fxLayout="column" fxFill class="wrapper-content">
   <md-toolbar>
     <div class="prefix-toolbar-title">
-      <md-icon color="primary" *ngIf="!(container$ | async).isFetchingDetails">grade</md-icon>
+      <md-icon color="primary" *ngIf="!(container$ | async)?.isFetchingDetails">grade</md-icon>
 
-      <md-spinner *ngIf="(container$ | async).isFetchingDetails"></md-spinner>
+      <md-spinner *ngIf="(container$ | async)?.isFetchingDetails"></md-spinner>
     </div>
 
-    {{ (container$ | async)?.name }}
+    <span class="title">{{ (container$ | async)?.name }}</span>
   </md-toolbar>
 
   <md-tab-group fxFlex>
     <md-tab label="Overview">
       <!-- TODO: Create a component for every tab -->
-      <app-petals-container-overview [container]="container$ | async" fxFill></app-petals-container-overview>
+      <app-petals-container-overview *ngIf="container$ | async" [container]="container$ | async" fxFill></app-petals-container-overview>
     </md-tab>
   </md-tab-group>
 </div>

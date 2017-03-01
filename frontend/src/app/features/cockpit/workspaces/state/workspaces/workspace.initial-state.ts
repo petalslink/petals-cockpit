@@ -21,13 +21,8 @@ export function workspaceRowFactory(id = '', name = ''): IWorkspaceRow {
   return {
     id,
     name,
-    isImporting: false,
-    importIp: '',
-    importPort: null,
-    importUsername: '',
-    importError: '',
+    isFetching: false,
 
-    buses: [],
     users: []
   };
 }

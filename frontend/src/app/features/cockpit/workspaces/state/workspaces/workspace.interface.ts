@@ -24,17 +24,12 @@ interface IWorkspaceCommon {
   id: string;
   name: string;
 
-  // when a bus is in import
-  isImporting: boolean;
-  importIp?: string;
-  importPort?: number;
-  importUsername?: string;
-  importError?: string;
+  // when a worspace is being fetched
+  isFetching: boolean;
 }
 
 // used within table
 export interface IWorkspaceRow extends IWorkspaceCommon {
-  buses: Array<string>;
   // this workspace is also used by the following users
   users: Array<string>;
 }
