@@ -66,7 +66,16 @@ describe(`Workspaces`, () => {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
 
     // check the page content
-    expect(element.all(by.css(`app-workspace > p`)).first().getText()).toEqual(`Selected workspace !`);
+    expect(element(by.css(`app-workspace p`)).getText()).toEqual(`Welcome to Workspace 0`);
+
+    expect(element.all(by.css(`app-workspace .users-in-workspace`)).first()
+      .getText()).toEqual(`You are the only one using this workspace.`);
+
+    const usersListText = element(by.css(`app-workspace md-list md-list-item .mat-list-text`))
+      .getText()
+      .then(t => t.split('\n'));
+
+    expect(usersListText).toEqual(['admin', 'Administrator']);
 
     const wsButton = element(by.css(`app-cockpit md-sidenav .workspace-name`));
 

@@ -15,7 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, ChangeDetectionStrategy, OnChanges, AfterViewInit, AfterViewChecked } from '@angular/core';
+import {
+  Component,
+  Input,
+  ChangeDetectionStrategy,
+  OnChanges,
+  AfterViewInit,
+  AfterViewChecked,
+  SimpleChanges
+} from '@angular/core';
 
 declare const jdenticon;
 declare const md5;
@@ -38,8 +46,10 @@ export class GenerateIconComponent implements AfterViewInit, OnChanges {
     this._updateSvg();
   }
 
-  ngOnChanges() {
-    this._updateSvg();
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['text'].currentValue !== changes['text'].previousValue) {
+      this._updateSvg();
+    }
   }
 
   private _updateSvg() {

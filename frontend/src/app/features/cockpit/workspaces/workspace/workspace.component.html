@@ -13,6 +13,28 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<p>
-  Selected workspace !
-</p>
+<div class="central-content">
+  <p>Welcome to <span class="selected-workspace color-primary">{{ (workspace$ | async).name }}</span></p>
+
+  <div *ngIf="(workspace$ | async).users.list; let users">
+    <div *ngIf="users.length === 1; else workspaceShared">
+      <p class="users-in-workspace">You are the only one using this workspace.</p>
+    </div>
+
+    <ng-template #workspaceShared>
+      <p class="users-in-workspace">{{ users.length }} people are using this workspace:</p>
+    </ng-template>
+
+    <md-list>
+      <md-list-item *ngFor="let user of users">
+        <app-generate-icon md-list-avatar [size]="35" [text]="user.username"></app-generate-icon>
+
+        <h2 md-line>{{ user.username }}</h2>
+
+        <p md-line>
+          <span>{{ user.name }}</span>
+        </p>
+      </md-list-item>
+    </md-list>
+  </div>
+</div>
