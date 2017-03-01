@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <div *ngIf="(workspace$ | async).users.list; let users">
     <div *ngIf="users.length === 1; else workspaceShared">
-      You are the only one using this workspace.
+      <p class="users-in-workspace">You are the only one using this workspace.</p>
     </div>
 
     <ng-template #workspaceShared>
-      {{ users.length }} people are using this workspace:
+      <p class="users-in-workspace">{{ users.length }} people are using this workspace:</p>
     </ng-template>
 
     <md-list>
