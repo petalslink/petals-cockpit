@@ -31,23 +31,23 @@ describe(`Workspaces`, () => {
   it(`should not have any workspace selected`, () => {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
 
-    // check there's a warning saying that no workspace is selected
-    expect(element(by.css(`app-workspaces-dialog .no-workspace-selected`)).getText()).toEqual(`Select the workspace`);
-
     // even if no selected, check that 2 workspaces are displayed
     expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(2);
 
-    // check that no workspace have a green-led yet
-    expect(element.all(by.css(`app-workspaces-dialog md-card div.icon-slot span.green-led`)).count()).toEqual(0);
+    // check that workspaces have icons
+    expect(element.all(by.css(`app-workspaces-dialog md-card md-icon`)).count()).toEqual(2);
 
     const availableUsersList = 'Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER, Victor NOEL';
 
     // check the current list content
-    browser.actions().mouseMove(element(by.css('app-workspaces-dialog md-card span.dotted'))).perform();
+    browser.actions().mouseMove(element(by.css('app-workspaces-dialog md-card-title-group span.dotted'))).perform();
     expect(element(by.css('md-tooltip-component')).getText()).toEqual(availableUsersList);
 
+    // check if no cards have a green background color
+    expect(element.all(by.css(`app-workspaces-dialog md-card div.background-color-light-green-x2`)).count()).toEqual(0);
+
     // the element() cannot be directly resolved with then()
-    const cardsText = element.all(by.css(`app-workspaces-dialog md-card`)).getText();
+    const cardsText = element.all(by.css(`app-workspaces-dialog div md-card-title-group`)).getText();
 
     const workspacesAndOwners = [
       `Workspace 0\nYou are the only one using this workspace.`,
@@ -61,7 +61,7 @@ describe(`Workspaces`, () => {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
 
     // select the first workspace
-    element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
+    element.all(by.css(`app-workspaces-dialog md-card > div`)).first().click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
 
@@ -83,14 +83,17 @@ describe(`Workspaces`, () => {
     browser.wait(EC.elementToBeClickable(wsButton), 5000);
     expect(wsButton.getText()).toEqual(`Workspace 0`);
 
-    // check that he now have a green led into the workspaces list
     expect(element(by.css(`app-cockpit md-sidenav .change-workspace`)).click());
-    expect(element.all(by.css(`app-workspaces-dialog md-card div.icon-slot span.green-led`)).count()).toEqual(1);
+
+    // check if the card selected has a green background color
+    expect(element.all(by.css(`app-workspaces-dialog md-card div.background-color-light-green-x2`)).count()).toEqual(1);
+    // check that workspace selected has icon
+    expect(element.all(by.css(`app-workspaces-dialog md-card div.background-color-light-green-x2 md-icon`)).count()).toEqual(1);
   });
 
   it(`should contain the correct buses`, () => {
     // select the first workspace
-    element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
+    element.all(by.css(`app-workspaces-dialog md-card > div`)).first().click();
     // let's be sure everything is loaded and visible
     browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
 
@@ -118,7 +121,7 @@ describe(`Workspaces`, () => {
 
   it(`should contain the correct buses in progress`, () => {
     // select the first workspace
-    element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
+    element.all(by.css(`app-workspaces-dialog md-card > div`)).first().click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
 
@@ -137,10 +140,26 @@ describe(`Workspaces`, () => {
   });
 
   it(`should create a new workspace`, () => {
-    element(by.css(`app-workspaces-dialog form input`)).sendKeys(`New workspace`);
-    element(by.css(`app-workspaces-dialog form button`)).click();
+    const inputName = element(by.css(`input[formControlName="name"]`));
+    const addNewWorkspace = element(by.css(`app-workspaces-dialog .btn-add-workspace`));
 
-    expect(element.all(by.css(`app-workspaces-dialog div md-card-subtitle`)).count()).toEqual(3);
+    // check if the input form is empty
+    expect(inputName.getText()).toEqual(``);
+
+    // check if add new workspace button is always disabled when input form is empty
+    expect(addNewWorkspace.isEnabled()).toBe(false);
+
+    inputName.sendKeys(`New workspace`);
+
+    // check if add new workspace button is enabled
+    expect(addNewWorkspace.isEnabled()).toBe(true);
+
+    addNewWorkspace.click();
+
+    expect(element.all(by.css(`app-workspaces-dialog div md-card-title-group`)).count()).toEqual(3);
+
+    // check if the input is cleared
+    expect(inputName.getText()).toEqual(``);
 
     const workspacesAndOwners = [
       `Workspace 0\nYou are the only one using this workspace.`,
@@ -148,7 +167,7 @@ describe(`Workspaces`, () => {
       `New workspace\nYou are the only one using this workspace.`
     ];
 
-    const cardsText = element.all(by.css(`app-workspaces-dialog md-card`)).getText();
+    const cardsText = element.all(by.css(`app-workspaces-dialog div md-card-title-group`)).getText();
 
     expect(cardsText).toEqual(workspacesAndOwners);
   });

@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </md-input-container>
 
             <button type="submit" [disabled]="btnSubmitDisabled" md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace"
-              mdTooltipPosition="below">
+              mdTooltipPosition="below" class="btn-add-workspace">
               <md-icon class="md-24">create_new_folder</md-icon>
             </button>
           </form>
@@ -49,7 +49,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   <md-spinner class="margin-left-x1" *ngIf="(workspaces$ | async).isFetchingWorkspaces"></md-spinner>
                   <div fxFlex></div>
                   <div fxLayoutAlign="end center">
-                    <span *ngIf="(workspaces$ | async).list.length === 0" md-line>No workspace exist !</span>
+                    <span *ngIf="(workspaces$ | async).list.length === 0" md-line>No workspace yet</span>
                     <span class="subtitle" *ngIf="(workspaces$ | async).list.length >= 1" md-line>
                       {{ (workspaces$ | async).list.length }} item{{ ((workspaces$ | async).list.length) >= 2 ? 's' : '' }}
                     </span>
