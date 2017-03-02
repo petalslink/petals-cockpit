@@ -24,20 +24,16 @@ import { IStore } from './../interfaces/store.interface';
 import { SseService } from './sse.service';
 import { NotificationsService } from 'angular2-notifications';
 import { busesService } from './../../../mocks/buses-mock';
-import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 
 @Injectable()
 export class BusesMockService extends BusesServiceImpl {
-  private _watchingEventBusDeleted = false;
-  private _watchingEventBusImportOk = false;
-
   constructor(
-    private __http: Http,
-    private __store$: Store<IStore>,
-    private __sseService: SseService,
-    private __notifications: NotificationsService) {
-    super(__http, __store$, __sseService, __notifications);
+    http: Http,
+    store$: Store<IStore>,
+    sseService: SseService,
+    notifications: NotificationsService) {
+    super(http, store$, sseService, notifications);
   }
 
   getDetailsBus(busId: string) {

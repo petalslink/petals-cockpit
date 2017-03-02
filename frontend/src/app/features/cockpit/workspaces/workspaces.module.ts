@@ -22,9 +22,6 @@ import { WorkspacesRoutingModule } from './workspaces-routing.module';
 import { WorkspacesComponent } from './workspaces.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { PetalsMenuModule } from './petals-menu/petals-menu.module';
-import { environment } from './../../../../environments/environment';
-import { BusesInProgressService } from './../../../shared/services/buses-in-progress.service';
-import { BusesInProgressMockService } from './../../../shared/services/buses-in-progress-mock.service';
 import { WorkspaceResolver } from './workspace-resolver';
 
 @NgModule({

@@ -27,7 +27,7 @@ import { Workspaces } from '../workspaces/workspaces.reducer';
 export class BusesInProgress {
   private static reducerName = 'BUSES_IN_PROGRESS_REDUCER';
 
-  public static reducer(busesInProgressTable = busesInProgressTableFactory(), {type, payload}: Action) {
+  public static reducer(busesInProgressTable = busesInProgressTableFactory(), { type, payload }: Action) {
     if (!BusesInProgress.mapActionsToMethod[type]) {
       return busesInProgressTable;
     }
@@ -176,6 +176,7 @@ export class BusesInProgress {
     [BusesInProgress.POST_BUS_IN_PROGRESS]: BusesInProgress.postBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]: BusesInProgress.postBusInProgressSuccess,
     [BusesInProgress.POST_BUS_IN_PROGRESS_ERROR]: BusesInProgress.postBusInProgressError,
+    [BusesInProgress.DELETE_BUS_IN_PROGRESS]: BusesInProgress.deleteBusInProgress,
     [BusesInProgress.REMOVE_BUS_IN_PROGRESS]: BusesInProgress.removeBusInProgress,
     [BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS]: BusesInProgress.updateErrorBusInProgress,
 

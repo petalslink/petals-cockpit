@@ -20,7 +20,6 @@ import { Response } from '@angular/http';
 import { Store, Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { environment } from './../../../../../../environments/environment';

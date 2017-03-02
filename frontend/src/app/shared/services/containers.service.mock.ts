@@ -18,7 +18,6 @@
 import { Injectable } from '@angular/core';
 
 import { ContainersService } from './containers.service';
-import { environment } from './../../../environments/environment';
 import { containersService } from '../../../mocks/containers-mock';
 import * as helper from './../helpers/mock.helper';
 

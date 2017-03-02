@@ -18,7 +18,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { PetalsContentViewComponent } from './petals-content.component';
 import { PetalsBusViewModule } from './petals-bus-view/petals-bus-view.module';
 import { PetalsBusInProgressViewModule } from './petals-bus-in-progress-view/petals-bus-in-progress-view.module';
 import { PetalsContainerViewModule } from './petals-container-view/petals-container-view.module';

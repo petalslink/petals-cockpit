@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { CanLoad, Router } from '@angular/router';
+import { CanLoad } from '@angular/router';
 import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
@@ -29,7 +29,7 @@ import { IUser } from './../interfaces/user.interface';
 
 @Injectable()
 export class GuardLoginService implements CanLoad {
-  constructor(private _router: Router, private _userService: UsersService, private _store$: Store<IStore>) { }
+  constructor(private _userService: UsersService, private _store$: Store<IStore>) { }
 
   canLoad() {
     return this._userService.getUserInformations()

@@ -16,12 +16,9 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 
-import { Workspaces } from '../state/workspaces/workspaces.reducer';
 import { Ui } from '../../../../shared/state/ui.reducer';
 import { IStore } from '../../../../shared/interfaces/store.interface';
 import { IWorkspace } from './../state/workspaces/workspace.interface';
@@ -33,13 +30,9 @@ import { getCurrentWorkspace } from '../../../cockpit/workspaces/state/workspace
   styleUrls: ['./workspace.component.scss']
 })
 export class WorkspaceComponent implements OnInit {
-  private workspaceIdSub: Subscription;
   public workspace$: Observable<IWorkspace>;
 
-  constructor(
-    private _store$: Store<IStore>,
-    private _route: ActivatedRoute
-  ) { }
+  constructor(private _store$: Store<IStore>) { }
 
   ngOnInit() {
     this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: '' } });

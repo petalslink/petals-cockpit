@@ -18,14 +18,11 @@
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Router } from '@angular/router';
-import { Store, Action } from '@ngrx/store';
+import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-import { batchActions } from 'redux-batched-actions';
 import { NotificationsService } from 'angular2-notifications';
 
-import { IStore } from './../interfaces/store.interface';
 import { Users } from './../state/users.reducer';
 import { UsersService } from './../services/users.service';
 import { IUser } from './../interfaces/user.interface';
@@ -35,7 +32,6 @@ import { environment } from './../../../environments/environment';
 export class UsersEffects {
   constructor(
     private _actions$: Actions,
-    private _store$: Store<IStore>,
     private _router: Router,
     private _usersService: UsersService,
     private _notification: NotificationsService

@@ -20,7 +20,6 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IComponentRow } from './component.interface';
-import { _getCurrentWorkspace } from '../workspaces/workspaces.selectors';
 
 export function _getCurrentComponent(store$: Store<IStore>): Observable<IComponentRow> {
   return store$.select(state => state.components)

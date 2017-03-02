@@ -15,9 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ActionReducer, Action } from '@ngrx/store';
+import { Action } from '@ngrx/store';
 
-import { IUi } from '../interfaces/ui.interface';
 import { usersState } from './users.initial-state';
 import { IUsersTable } from '../interfaces/users.interface';
 

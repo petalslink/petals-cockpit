@@ -17,12 +17,10 @@
 
 import { NgModule } from '@angular/core';
 import { Http } from '@angular/http';
-import { MaterialModule } from '@angular/material';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { TranslateModule, TranslateLoader, TranslateStaticLoader } from 'ng2-translate';
+import { TranslateModule, TranslateLoader } from 'ng2-translate';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import './rxjs-operators';

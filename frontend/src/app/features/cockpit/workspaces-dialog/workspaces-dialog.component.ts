@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TooltipPosition } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
@@ -30,7 +30,6 @@ import { IWorkspaces } from '../workspaces/state/workspaces/workspaces.interface
 import { IWorkspace } from '../workspaces/state/workspaces/workspace.interface';
 import { Ui } from './../../../shared/state/ui.reducer';
 import { IUser } from './../../../shared/interfaces/user.interface';
-import { IUsersTable } from './../../../shared/interfaces/users.interface';
 import { getCurrentUser } from './../../../shared/state/users.selectors';
 
 @Component({

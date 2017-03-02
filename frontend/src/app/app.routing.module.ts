@@ -16,7 +16,7 @@
  */
 
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
+import { Routes, RouterModule } from '@angular/router';
 
 // import { CockpitModule } from './features/cockpit/cockpit.module';
 // import { LoginModule } from './features/login/login.module';
