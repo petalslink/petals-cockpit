@@ -84,7 +84,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     this.logoByScreenSize$ = this.media$
       .asObservable()
       .map((change: MediaChange) => {
-        const imgSrcBase = `assets/img`;
+        const imgSrcBase = `./assets/img`;
         const imgSrcExt = `png`;
 
         const screenSize = change.mqAlias;

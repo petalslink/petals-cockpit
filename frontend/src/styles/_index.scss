@@ -22,7 +22,7 @@
 @import './shared/_colors';
 
 // themes
-@import './styles/themes/_light.theme';
+@import './themes/_light.theme';
 
 div > h3, md-dialog-container > h3 {
   background-color: mat-color($theme-primary-x);
@@ -37,7 +37,7 @@ div > h4 {
 }
 
 md-sidenav-container {
-  background-image: url(/assets/img/gray_jean.png);
+  background-image: url(./assets/img/gray_jean.png);
   color: mat-color($theme-primary, default-contrast);
 }
 
