@@ -186,11 +186,11 @@ export class Buses {
     };
   }
 
-  private static fetchWorkspaceSuccess(busesTable: IBusesTable, payload) {
+  private static fetchWorkspaceSuccess(_busesTable: IBusesTable, _payload) {
     return busesTableFactory();
   }
 
-  private static disconnectUserSuccess(busesTable: IBusesTable, payload) {
+  private static disconnectUserSuccess(_busesTable: IBusesTable, _payload) {
     return busesTableFactory();
   }
 

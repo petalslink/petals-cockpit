@@ -45,7 +45,7 @@ export class GuardAppService implements CanLoad {
         this._store$.dispatch({ type: Users.CONNECT_USER_SUCCESS, payload: { user: <IUser>res.json(), redirectWorkspace: false } });
 
         return true;
-      }).catch((res: Response) => {
+      }).catch(_ => {
         // if not already connected, redirect to login
         if (environment.debug) {
           console.debug(`Guard App : User's not logged. Redirecting to /login.`);

@@ -43,7 +43,7 @@ export class Ui {
 
   // tslint:disable-next-line:member-ordering
   public static TOGGLE_SIDENAV = `${Ui.reducerName}_TOGGLE_SIDENAV`;
-  private static toggleSidenav(ui: IUi, payload) {
+  private static toggleSidenav(ui: IUi, _payload) {
     return {
       ...ui,
       ...<IUi>{ isSidenavVisible: !ui.isSidenavVisible }
@@ -52,7 +52,7 @@ export class Ui {
 
   // tslint:disable-next-line:member-ordering
   public static OPEN_SIDENAV = `${Ui.reducerName}_OPEN_SIDENAV`;
-  private static openSidenav(ui: IUi, payload) {
+  private static openSidenav(ui: IUi, _payload) {
     return {
       ...ui,
       ...<IUi>{ isSidenavVisible: true }
@@ -61,7 +61,7 @@ export class Ui {
 
   // tslint:disable-next-line:member-ordering
   public static CLOSE_SIDENAV = `${Ui.reducerName}_CLOSE_SIDENAV`;
-  private static closeSidenav(ui: IUi, payload) {
+  private static closeSidenav(ui: IUi, _payload) {
     return {
       ...ui,
       ...<IUi>{ isSidenavVisible: false }
@@ -70,7 +70,7 @@ export class Ui {
 
   // tslint:disable-next-line:member-ordering
   public static OPEN_POPUP_WORKSPACES_LIST = `${Ui.reducerName}_OPEN_POPUP_WORKSPACES_LIST`;
-  private static openPopupWorkspacesList(ui: IUi, payload) {
+  private static openPopupWorkspacesList(ui: IUi, _payload) {
     return {
       ...ui,
       ...<IUi>{ isPopupListWorkspacesVisible: true }
@@ -79,7 +79,7 @@ export class Ui {
 
   // tslint:disable-next-line:member-ordering
   public static CLOSE_POPUP_WORKSPACES_LIST = `${Ui.reducerName}_CLOSE_POPUP_WORKSPACES_LIST`;
-  private static closePopupWorkspacesList(ui: IUi, payload) {
+  private static closePopupWorkspacesList(ui: IUi, _payload) {
     return {
       ...ui,
       ...<IUi>{ isPopupListWorkspacesVisible: false }
@@ -99,7 +99,7 @@ export class Ui {
     };
   }
 
-  private static disconnectUserSuccess(ui: IUi, payload) {
+  private static disconnectUserSuccess(_ui: IUi, _payload) {
     return uiState();
   }
 

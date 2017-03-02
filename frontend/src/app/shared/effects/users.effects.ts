@@ -71,14 +71,14 @@ export class UsersEffects {
       typeof action.payload.redirectWorkspace === 'undefined' ||
       action.payload.redirectWorkspace === true
     )
-    .map((action: Action) => {
+    .map(_ => {
       this._router.navigate(['/workspaces']);
     });
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) disconnectUser$: Observable<Action> = this._actions$
     .ofType(Users.DISCONNECT_USER)
-    .switchMap((action: Action) =>
+    .switchMap(_ =>
       this._usersService.disconnectUser()
         .map((res: Response) => {
           if (!res.ok) {

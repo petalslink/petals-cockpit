@@ -125,11 +125,11 @@ export class ServiceUnits {
     };
   }
 
-  private static fetchWorkspaceSuccess(serviceUnitsTable: IserviceUnitsTable, payload) {
+  private static fetchWorkspaceSuccess(_serviceUnitsTable: IserviceUnitsTable, _payload) {
     return serviceUnitsTableFactory();
   }
 
-  private static disconnectUserSuccess(serviceUnitsTable: IserviceUnitsTable, payload) {
+  private static disconnectUserSuccess(_serviceUnitsTable: IserviceUnitsTable, _payload) {
     return serviceUnitsTableFactory();
   }
 

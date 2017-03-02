@@ -43,7 +43,7 @@ export class GuardLoginService implements CanLoad {
         this._store$.dispatch({ type: Users.CONNECT_USER_SUCCESS, payload: { user: <IUser>res.json(), redirectWorkspace: true } });
 
         return false;
-      }).catch((res: Response) => {
+      }).catch(_ => {
         if (environment.debug) {
           console.debug(`Guard Login : User not logged. Continuing to /login.`);
         }

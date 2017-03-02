@@ -64,7 +64,7 @@ export class BusesInProgressMockService extends BusesInProgressService {
       });
   }
 
-  deleteBus(idWorkspace: string, id: string) {
+  deleteBus(_idWorkspace: string, id: string) {
     return helper
       .response(204)
       .do(_ => {

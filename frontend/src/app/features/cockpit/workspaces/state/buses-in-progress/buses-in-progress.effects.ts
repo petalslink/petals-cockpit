@@ -64,7 +64,7 @@ export class BusesInProgressEffects {
   @Effect({ dispatch: false }) postBusSuccess$: Observable<Action> = this._actions$
     .ofType(BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS)
     .map((action: Action) => action.payload)
-    .do(({idWorkspace, busInProgress}: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
+    .do(({ idWorkspace, busInProgress }: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
       this._router.navigate(['/workspaces', idWorkspace, 'petals', 'buses-in-progress', busInProgress.id])
     );
 
@@ -74,7 +74,7 @@ export class BusesInProgressEffects {
     .combineLatest(this._store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, idWorkspace]) =>
       this._busesInProgressService.deleteBus(idWorkspace, action.payload.id)
-        .map((res: Response) => {
+        .map(_ => {
           return {
             type: BusesInProgress.DELETE_BUS_IN_PROGRESS_SUCCESS,
             payload: {
@@ -91,7 +91,7 @@ export class BusesInProgressEffects {
   @Effect({ dispatch: false }) deleteBusSuccess$: Observable<Action> = this._actions$
     .ofType(BusesInProgress.DELETE_BUS_IN_PROGRESS_SUCCESS)
     .map((action: Action) => action.payload)
-    .do(({idWorkspace, busInProgress}: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
+    .do(({ idWorkspace }: { idWorkspace: string }) =>
       // TODO improve that, what if we changed ws inbetween the delete and its success?!
       this._router.navigate(['/workspaces', idWorkspace])
     );
@@ -106,7 +106,7 @@ export class BusesInProgressEffects {
     .map(([action, wsId, sId]) => {
       return { ...action.payload, wsId, sId };
     })
-    .do(({busInProgressId, importOk, wsId, sId}: { busInProgressId: string, importOk: boolean, wsId: string, sId: string }) => {
+    .do(({ busInProgressId, importOk, wsId, sId }: { busInProgressId: string, importOk: boolean, wsId: string, sId: string }) => {
       if (importOk && this._router.url.match(/\/buses-in-progress\//) && sId === busInProgressId) {
         this._router.navigate(['/workspaces', wsId, 'petals', 'buses', busInProgressId]);
       }

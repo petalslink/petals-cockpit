@@ -172,11 +172,11 @@ export class Components {
     };
   }
 
-  private static fetchWorkspaceSuccess(componentsTable: IComponentsTable, payload) {
+  private static fetchWorkspaceSuccess(_componentsTable: IComponentsTable, _payload) {
     return componentsTableFactory();
   }
 
-  private static disconnectUserSuccess(componentsTable: IComponentsTable, payload) {
+  private static disconnectUserSuccess(_componentsTable: IComponentsTable, _payload) {
     return componentsTableFactory();
   }
 

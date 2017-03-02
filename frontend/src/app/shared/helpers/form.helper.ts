@@ -37,7 +37,7 @@ export const validationMessages = {
   }
 };
 
-export function getFormErrors(form: FormGroup, formFields: { [key: string]: string }, data?: any): any {
+export function getFormErrors(form: FormGroup, formFields: { [key: string]: string }, _data?: any): any {
   const formFieldsTmp = { ...formFields };
 
   for (const field in formFieldsTmp) {

@@ -69,7 +69,7 @@ export class BusesInProgress {
 
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS`;
-  private static postBusInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
+  private static postBusInProgress(busesInProgressTable: IBusesInProgressTable, _payload) {
     return <IBusesInProgressTable>{
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
@@ -159,11 +159,11 @@ export class BusesInProgress {
     };
   }
 
-  private static fetchWorkspaceSuccess(busesInProgressTable: IBusesInProgressTable, payload) {
+  private static fetchWorkspaceSuccess(_busesInProgressTable: IBusesInProgressTable, _payload) {
     return busesInProgressTableFactory();
   }
 
-  private static disconnectUserSuccess(busesInProgressTable: IBusesInProgressTable, payload) {
+  private static disconnectUserSuccess(_busesInProgressTable: IBusesInProgressTable, _payload) {
     return busesInProgressTableFactory();
   }
 

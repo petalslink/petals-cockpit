@@ -30,13 +30,10 @@ export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspace
   const sWorkspaces = store$.select((state: IStore) => state.workspaces);
   const sUsers = store$.select((state: IStore) => state.users);
   const sBuses = store$.select((state: IStore) => state.buses);
-  const sContainers = store$.select((state: IStore) => state.containers);
-  const sComponents = store$.select((state: IStore) => state.components);
-  const sServiceUnits = store$.select((state: IStore) => state.serviceUnits);
 
   return sWorkspaces
-    .withLatestFrom(sUsers, sBuses, sContainers, sComponents, sServiceUnits)
-    .map(([workspaces, users, buses, containers, components, serviceUnits]) => {
+    .withLatestFrom(sUsers, sBuses)
+    .map(([workspaces, users]) => {
       return <IWorkspaces>{
         ...workspaces,
         ...<IWorkspaces>{
