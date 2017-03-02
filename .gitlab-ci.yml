@@ -24,14 +24,16 @@ variables:
       - $M2_CACHED_REPOSITORY
 
 .node-6: &node-java-yarn
-  image: registry.gitlab.com/victornoel/node-java-yarn-docker:n6-j8-y0.18
+  image: registry.gitlab.com/victornoel/node-java-yarn-docker:n6-j8-y0.21
   before_script:
     # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
     - yarn config set cache-folder $PWD/$YARN_CACHE_DIRECTORY --global
+    # see https://github.com/yarnpkg/yarn/issues/2629
+    - yarn config set network-concurrency 4 --global
     - du -hs $PWD/$YARN_CACHE_DIRECTORY || true
     - cd frontend
     - export PATH=`yarn bin`:$PATH
-    - time yarn --pure-lockfile
+    - time yarn --frozen-lockfile --link-duplicates
     - du -hs node_modules || true
     - cd ..
   cache:
