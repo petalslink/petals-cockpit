@@ -18,6 +18,7 @@ package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.db.api.Assertions.assertThat;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 
 import java.util.ArrayList;
@@ -161,13 +162,26 @@ public class AbstractCockpitResourceTest {
         return assertThat(requestSU(id)).hasNumberOfRows(1).row();
     }
 
+    protected RequestRowAssert assertThatDbComp(long id) {
+        return assertThat(requestComp(id)).hasNumberOfRows(1).row();
+    }
+
     protected void assertNoDbSU(long id) {
         assertThat(requestSU(id)).hasNumberOfRows(0);
+    }
+
+    protected void assertNoDbComp(long id) {
+        assertThat(requestComp(id)).hasNumberOfRows(0);
     }
 
     protected Request requestSU(long id) {
         return new Request(dbRule.getDataSource(), DSL.using(dbRule.getConnectionJdbcUrl())
                 .selectFrom(SERVICEUNITS).where(SERVICEUNITS.ID.eq(id)).getSQL(ParamType.INLINED));
+    }
+
+    protected Request requestComp(long id) {
+        return new Request(dbRule.getDataSource(), DSL.using(dbRule.getConnectionJdbcUrl()).selectFrom(COMPONENTS)
+                .where(COMPONENTS.ID.eq(id)).getSQL(ParamType.INLINED));
     }
 
     /**

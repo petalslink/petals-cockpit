@@ -49,14 +49,16 @@ import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeComponentState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeServiceUnitState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentOverview;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin.State;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
@@ -151,9 +153,20 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public ServiceUnitOverview changeSUState(@PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile,
-            @Valid ChangeState action) throws InterruptedException {
+            @Valid SUChangeState action) throws InterruptedException {
         // TODO ACL is done by actor for now
         return as.call(wsId, new ChangeServiceUnitState(profile.getId(), suId, action.state))
+                .getOrElseThrow(s -> new WebApplicationException(s));
+    }
+
+    @PUT
+    @Path("/components/{compId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public ComponentOverview changeComponentState(@PathParam("compId") @Min(1) long compId,
+            @Pac4JProfile CockpitProfile profile, @Valid ComponentChangeState action) throws InterruptedException {
+        // TODO ACL is done by actor for now
+        return as.call(wsId, new ChangeComponentState(profile.getId(), compId, action.state))
                 .getOrElseThrow(s -> new WebApplicationException(s));
     }
 
@@ -250,7 +263,28 @@ public class WorkspaceResource {
         public final ServiceUnitMin.State state;
 
         @JsonCreator
-        public NewSUState(@JsonProperty("id") long id, @JsonProperty("state") State state) {
+        public NewSUState(@JsonProperty("id") long id, @JsonProperty("state") ServiceUnitMin.State state) {
+            this.id = id;
+            this.state = state;
+        }
+
+        @JsonProperty
+        public String getId() {
+            return Long.toString(id);
+        }
+    }
+
+    public static class NewComponentState {
+
+        @Min(1)
+        public final long id;
+
+        @NotNull
+        @JsonProperty
+        public final ComponentMin.State state;
+
+        @JsonCreator
+        public NewComponentState(@JsonProperty("id") long id, @JsonProperty("state") ComponentMin.State state) {
             this.id = id;
             this.state = state;
         }
@@ -313,7 +347,7 @@ public class WorkspaceResource {
     public static class WorkspaceChange {
 
         public enum Type {
-            WORKSPACE_CONTENT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, BUS_DELETED
+            WORKSPACE_CONTENT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, COMPONENT_STATE_CHANGE, BUS_DELETED
         }
 
         @JsonProperty
@@ -340,6 +374,10 @@ public class WorkspaceResource {
             return new WorkspaceChange(Type.SU_STATE_CHANGE, ns);
         }
 
+        public static WorkspaceChange componentStateChange(NewComponentState ns) {
+            return new WorkspaceChange(Type.COMPONENT_STATE_CHANGE, ns);
+        }
+
         public static WorkspaceChange busDeleted(BusDeleted bd) {
             return new WorkspaceChange(Type.BUS_DELETED, bd);
         }
@@ -350,13 +388,24 @@ public class WorkspaceResource {
         }
     }
 
-    public static class ChangeState {
+    public static class SUChangeState {
 
         @NotNull
         @JsonProperty
         public final ServiceUnitMin.State state;
 
-        public ChangeState(@JsonProperty("state") ServiceUnitMin.State state) {
+        public SUChangeState(@JsonProperty("state") ServiceUnitMin.State state) {
+            this.state = state;
+        }
+    }
+
+    public static class ComponentChangeState {
+
+        @NotNull
+        @JsonProperty
+        public final ComponentMin.State state;
+
+        public ComponentChangeState(@JsonProperty("state") ComponentMin.State state) {
             this.state = state;
         }
     }
