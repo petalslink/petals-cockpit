@@ -69,7 +69,7 @@ div > .md-dialog-container {
   }
   .content {
     @extend .padding-x3;
-    background-image: url(/assets/img/gray_jean.png);
+    background-image: url(./assets/img/gray_jean.png);
     background-size: auto;
     background-repeat: repeat;
     height: 100%;
@@ -233,13 +233,13 @@ pre {
 }
 
 .img-card-state-start {
-  background-image: url(/assets/img/state-start.png);
+  background-image: url(./assets/img/state-start.png);
   background-size: cover;
   background-repeat: no-repeat;
 }
 
 .img-card-state-stop {
-  background-image: url(/assets/img/state-stop.png);
+  background-image: url(./assets/img/state-stop.png);
   background-size: cover;
   background-repeat: no-repeat;
 }
