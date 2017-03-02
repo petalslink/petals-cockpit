@@ -72,6 +72,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.webcohesion.enunciate.metadata.rs.ResponseCode;
+import com.webcohesion.enunciate.metadata.rs.Warnings;
 
 @RequestScoped
 @Path("/workspaces/{wsId}")
@@ -152,6 +154,7 @@ public class WorkspaceResource {
     @Path("/serviceunits/{suId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
     public ServiceUnitOverview changeSUState(@PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile,
             @Valid SUChangeState action) throws InterruptedException {
         // TODO ACL is done by actor for now
@@ -163,6 +166,7 @@ public class WorkspaceResource {
     @Path("/components/{compId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
     public ComponentOverview changeComponentState(@PathParam("compId") @Min(1) long compId,
             @Pac4JProfile CockpitProfile profile, @Valid ComponentChangeState action) throws InterruptedException {
         // TODO ACL is done by actor for now
