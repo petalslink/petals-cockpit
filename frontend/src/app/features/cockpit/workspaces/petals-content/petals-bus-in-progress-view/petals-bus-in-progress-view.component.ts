@@ -46,9 +46,9 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
   public busInProgress: IBusInProgressRow;
 
   public busImportForm: FormGroup;
-  private _busImportFormSubscription: Subscription;
+  private busImportFormSubscription: Subscription;
 
-  private _routeSub: Subscription;
+  private routeSub: Subscription;
   private busInProgressSub: Subscription;
 
   private formErrors = {
@@ -59,24 +59,24 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
     'passphrase': ''
   };
 
-  constructor(private _store$: Store<IStore>, private _fb: FormBuilder, private _route: ActivatedRoute) { }
+  constructor(private store$: Store<IStore>, private fb: FormBuilder, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Import bus' } });
+    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Import bus' } });
 
-    this.busesInProgressTable$ = this._store$.select(state => state.busesInProgress);
-    this.busInProgress$ = this._store$.let(getCurrentBusInProgressEvenIfNull());
+    this.busesInProgressTable$ = this.store$.select(state => state.busesInProgress);
+    this.busInProgress$ = this.store$.let(getCurrentBusInProgressEvenIfNull());
 
     this.createFormImportBus();
 
-    this._routeSub = this._route
+    this.routeSub = this.route
       .params
       .do(({ busInProgressId }: { busInProgressId: string }) => {
         // displays the last thing in url if no params (bug ?)
         // TODO clean that, it's not the correct way to handle empty form versus completed form
         busInProgressId = (busInProgressId === 'buses-in-progress' ? '' : busInProgressId);
 
-        this._store$.dispatch({ type: BusesInProgress.SET_SELECTED_BUS_IN_PROGRESS, payload: busInProgressId });
+        this.store$.dispatch({ type: BusesInProgress.SET_SELECTED_BUS_IN_PROGRESS, payload: busInProgressId });
       })
       .subscribe();
 
@@ -100,7 +100,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
   }
 
   createFormImportBus() {
-    this.busImportForm = this._fb.group({
+    this.busImportForm = this.fb.group({
       ip: ['', Validators.compose([Validators.required])],
       port: ['', Validators.compose([Validators.required, CustomValidators.isPort])],
       username: ['', [Validators.required]],
@@ -108,7 +108,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
       passphrase: ['', [Validators.required]],
     });
 
-    this._busImportFormSubscription = this
+    this.busImportFormSubscription = this
       .busImportForm
       .valueChanges
       .do(data => {
@@ -124,17 +124,17 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
   }
 
   ngOnDestroy() {
-    this._routeSub.unsubscribe();
-    this._busImportFormSubscription.unsubscribe();
+    this.routeSub.unsubscribe();
+    this.busImportFormSubscription.unsubscribe();
     this.busInProgressSub.unsubscribe();
   }
 
-  onSubmit({value, valid}: { value: IBusInProgressImport, valid: boolean }) {
-    this._store$.dispatch({ type: BusesInProgress.POST_BUS_IN_PROGRESS, payload: value });
+  onSubmit({ value }: { value: IBusInProgressImport, valid: boolean }) {
+    this.store$.dispatch({ type: BusesInProgress.POST_BUS_IN_PROGRESS, payload: value });
   }
 
   discard(busInProgress: IBusInProgressRow) {
-    this._store$.dispatch({ type: BusesInProgress.DELETE_BUS_IN_PROGRESS, payload: busInProgress });
+    this.store$.dispatch({ type: BusesInProgress.DELETE_BUS_IN_PROGRESS, payload: busInProgress });
   }
 
   reset() {

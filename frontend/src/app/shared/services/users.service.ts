@@ -32,19 +32,19 @@ export abstract class UsersService {
 
 @Injectable()
 export class UsersServiceImpl extends UsersService {
-  constructor(private _http: Http) {
+  constructor(private http: Http) {
     super();
   }
 
   connectUser(user: IUser) {
-    return this._http.post(`${environment.urlBackend}/user/session`, <any>user);
+    return this.http.post(`${environment.urlBackend}/user/session`, <any>user);
   }
 
   disconnectUser() {
-    return this._http.delete(`${environment.urlBackend}/user/session`);
+    return this.http.delete(`${environment.urlBackend}/user/session`);
   }
 
   getUserInformations() {
-    return this._http.get(`${environment.urlBackend}/user/session`);
+    return this.http.get(`${environment.urlBackend}/user/session`);
   }
 }

@@ -30,7 +30,7 @@ import { Ui } from './shared/state/ui.reducer';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  private _languageSub: Subscription;
+  private languageSub: Subscription;
   public notificationOptions = {
     position: ['bottom', 'right'],
     // this timeout doesn't make any sense
@@ -44,9 +44,9 @@ export class AppComponent implements OnInit, OnDestroy {
   };
 
   constructor(
-    private _translate: TranslateService,
+    private translate: TranslateService,
     @Inject(LANGUAGES) public languages: any,
-    private _store$: Store<IStore>
+    private store$: Store<IStore>
   ) { }
 
   ngOnInit() {
@@ -54,21 +54,21 @@ export class AppComponent implements OnInit, OnDestroy {
     // if a translation isn't found in a language,
     // it'll try to get it on the default language
     // by default here, we take the first of the array
-    this._translate.setDefaultLang(this.languages[0]);
-    this._store$.dispatch({ type: Ui.SET_LANGUAGE, payload: this.languages[0] });
+    this.translate.setDefaultLang(this.languages[0]);
+    this.store$.dispatch({ type: Ui.SET_LANGUAGE, payload: this.languages[0] });
 
     // when the language changes in store,
     // change it in translate provider
-    this._languageSub = this._store$
+    this.languageSub = this.store$
       .select(state => state.ui.language)
       .filter(language => language !== '')
       .map(language => {
-        this._translate.use(language);
+        this.translate.use(language);
       })
       .subscribe();
   }
 
   ngOnDestroy() {
-    this._languageSub.unsubscribe();
+    this.languageSub.unsubscribe();
   }
 }

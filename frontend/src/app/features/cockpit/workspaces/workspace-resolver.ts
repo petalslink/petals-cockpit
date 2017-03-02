@@ -25,15 +25,15 @@ import { Workspaces } from './state/workspaces/workspaces.reducer';
 
 @Injectable()
 export class WorkspaceResolver implements Resolve<Observable<any>> {
-  constructor(private _store$: Store<IStore>) { }
+  constructor(private store$: Store<IStore>) { }
 
   resolve(route: ActivatedRouteSnapshot) {
     const workspaceId = route.params['workspaceId'];
 
-    this._store$.dispatch({ type: Workspaces.FETCH_WORKSPACE, payload: workspaceId });
+    this.store$.dispatch({ type: Workspaces.FETCH_WORKSPACE, payload: workspaceId });
 
     return this
-      ._store$
+      .store$
       .select(state => state.workspaces.selectedWorkspaceId)
       .filter(selectedWorkspaceId => selectedWorkspaceId === workspaceId)
       .first();

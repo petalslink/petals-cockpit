@@ -34,23 +34,23 @@ import { getCurrentContainer } from '../../state/containers/containers.selectors
 export class PetalsContainerViewComponent implements OnInit, OnDestroy {
   public container$: Observable<IContainer>;
 
-  constructor(private _store$: Store<IStore>, private _route: ActivatedRoute) { }
+  constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.container$ = this._store$.let(getCurrentContainer());
+    this.container$ = this.store$.let(getCurrentContainer());
 
-    this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Container' } });
+    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Container' } });
 
-    this._route
+    this.route
       .params
       .map((params: { workspaceId: string, containerId: string }) => {
-        this._store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: params.containerId } });
-        this._store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: params.containerId } });
+        this.store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: params.containerId } });
+        this.store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: params.containerId } });
       })
       .subscribe();
   }
 
   ngOnDestroy() {
-    this._store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: '' } });
+    this.store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: '' } });
   }
 }

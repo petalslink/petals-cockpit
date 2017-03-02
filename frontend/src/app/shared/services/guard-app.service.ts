@@ -30,28 +30,28 @@ import { IUser } from './../interfaces/user.interface';
 @Injectable()
 export class GuardAppService implements CanLoad {
   constructor(
-    private _router: Router,
-    private _userService: UsersService,
-    private _store$: Store<IStore>
+    private router: Router,
+    private userService: UsersService,
+    private store$: Store<IStore>
   ) { }
 
   canLoad() {
-    return this._userService.getUserInformations()
+    return this.userService.getUserInformations()
       .map((res: Response) => {
         if (environment.debug) {
           console.debug(`Guard App : User already logged. Continuing to /workspaces.`);
         }
 
-        this._store$.dispatch({ type: Users.CONNECT_USER_SUCCESS, payload: { user: <IUser>res.json(), redirectWorkspace: false } });
+        this.store$.dispatch({ type: Users.CONNECT_USER_SUCCESS, payload: { user: <IUser>res.json(), redirectWorkspace: false } });
 
         return true;
-      }).catch((res: Response) => {
+      }).catch(_ => {
         // if not already connected, redirect to login
         if (environment.debug) {
           console.debug(`Guard App : User's not logged. Redirecting to /login.`);
         }
 
-        this._router.navigate(['/login']);
+        this.router.navigate(['/login']);
 
         return Observable.of(false);
       });

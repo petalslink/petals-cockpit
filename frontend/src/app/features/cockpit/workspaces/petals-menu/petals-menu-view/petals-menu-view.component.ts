@@ -41,12 +41,12 @@ export class PetalsMenuViewComponent implements OnInit {
   public tree$: Observable<any>;
   public busesInProgress$: Observable<IBusesInProgress>;
 
-  constructor(private _fb: FormBuilder, private _store$: Store<IStore>) { }
+  constructor(private fb: FormBuilder, private store$: Store<IStore>) { }
 
   ngOnInit() {
-    this.workspaces$ = this._store$.select(state => state.workspaces);
-    this.tree$ = this._store$.let(getCurrentTree());
-    this.busesInProgress$ = this._store$.let(getBusesInProgress());
+    this.workspaces$ = this.store$.select(state => state.workspaces);
+    this.tree$ = this.store$.let(getCurrentTree());
+    this.busesInProgress$ = this.store$.let(getBusesInProgress());
     this.formSearchPetals();
 
     this.searchForm.valueChanges.subscribe(value => {
@@ -55,7 +55,7 @@ export class PetalsMenuViewComponent implements OnInit {
   }
 
   formSearchPetals() {
-    this.searchForm = this._fb.group({
+    this.searchForm = this.fb.group({
       search: ''
     });
   }
@@ -63,23 +63,23 @@ export class PetalsMenuViewComponent implements OnInit {
   onTreeToggleFold(e) {
     switch (e.item.typeId) {
       case 'busId':
-        this._store$.dispatch({ type: Buses.TOGGLE_FOLD_BUS, payload: { busId: e.item.id } });
+        this.store$.dispatch({ type: Buses.TOGGLE_FOLD_BUS, payload: { busId: e.item.id } });
         break;
       case 'containerId':
-        this._store$.dispatch({ type: Containers.TOGGLE_FOLD_CONTAINER, payload: { containerId: e.item.id } });
+        this.store$.dispatch({ type: Containers.TOGGLE_FOLD_CONTAINER, payload: { containerId: e.item.id } });
         break;
       case 'componentId':
-        this._store$.dispatch({ type: Components.TOGGLE_FOLD_COMPONENT, payload: { componentId: e.item.id } });
+        this.store$.dispatch({ type: Components.TOGGLE_FOLD_COMPONENT, payload: { componentId: e.item.id } });
     }
   }
 
-  onTreeSelect(e) {
+  onTreeSelect() {
     // TODO: Dispatch an action to save the current bus/container/component/su
     // Instead of dispatching it from here maybe it's a better idea to dispatch it once the
     // component is loaded
   }
 
   search(search: string) {
-    this._store$.dispatch({ type: Workspaces.SET_SEARCH, payload: search });
+    this.store$.dispatch({ type: Workspaces.SET_SEARCH, payload: search });
   }
 }

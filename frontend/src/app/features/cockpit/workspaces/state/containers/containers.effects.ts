@@ -29,23 +29,23 @@ import { ContainersService } from './../../../../../shared/services/containers.s
 @Injectable()
 export class ContainersEffects {
   constructor(
-    private _actions$: Actions,
-    private _store$: Store<IStore>,
-    private _containersService: ContainersService
+    private actions$: Actions,
+    private store$: Store<IStore>,
+    private containersService: ContainersService
   ) { }
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchContainersDetails$: Observable<Action> = this._actions$
+  @Effect({ dispatch: true }) fetchContainersDetails$: Observable<Action> = this.actions$
     .ofType(Containers.FETCH_CONTAINER_DETAILS)
     .combineLatest(this
       // wait the first workspace to be fetched
-      ._store$
+      .store$
       .select(state => state.workspaces.firstWorkspaceFetched)
       .filter(b => b === true)
       .first()
     )
     .switchMap(([action, _]: [{ type: string, payload: { containerId: string } }, boolean]) =>
-      this._containersService.getDetailsContainer(action.payload.containerId)
+      this.containersService.getDetailsContainer(action.payload.containerId)
         .map((res: Response) => {
           if (!res.ok) {
             throw new Error('Error while fetching the container details');

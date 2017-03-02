@@ -29,15 +29,15 @@ export abstract class WorkspacesService {
 
 @Injectable()
 export class WorkspacesServiceImpl extends WorkspacesService {
-  constructor(private _http: Http) {
+  constructor(private http: Http) {
     super();
   }
 
   fetchWorkspaces() {
-    return this._http.get(`${environment.urlBackend}/workspaces`);
+    return this.http.get(`${environment.urlBackend}/workspaces`);
   }
 
   postWorkspace(workspaceName: string) {
-    return this._http.post(`${environment.urlBackend}/workspaces`, { name: workspaceName });
+    return this.http.post(`${environment.urlBackend}/workspaces`, { name: workspaceName });
   }
 }

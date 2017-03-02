@@ -29,10 +29,10 @@ import { IUser } from './../interfaces/user.interface';
 
 @Injectable()
 export class GuardLoginService implements CanLoad {
-  constructor(private _userService: UsersService, private _store$: Store<IStore>) { }
+  constructor(private userService: UsersService, private store$: Store<IStore>) { }
 
   canLoad() {
-    return this._userService.getUserInformations()
+    return this.userService.getUserInformations()
       .map((res: Response) => {
         // if already connected, redirect to the app
         if (environment.debug) {
@@ -40,10 +40,10 @@ export class GuardLoginService implements CanLoad {
         }
 
         // this will redirect the user to /workspaces (from the effect catching it)
-        this._store$.dispatch({ type: Users.CONNECT_USER_SUCCESS, payload: { user: <IUser>res.json(), redirectWorkspace: true } });
+        this.store$.dispatch({ type: Users.CONNECT_USER_SUCCESS, payload: { user: <IUser>res.json(), redirectWorkspace: true } });
 
         return false;
-      }).catch((res: Response) => {
+      }).catch(_ => {
         if (environment.debug) {
           console.debug(`Guard Login : User not logged. Continuing to /login.`);
         }

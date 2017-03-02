@@ -33,8 +33,8 @@ export class PetalsContainerOverviewComponent implements OnInit {
 
   @Input() container: IContainerRow;
 
-  constructor(private _store$: Store<IStore>) {
-    this.idWorkspace$ = this._store$.select(state => state.workspaces.selectedWorkspaceId);
+  constructor(private store$: Store<IStore>) {
+    this.idWorkspace$ = this.store$.select(state => state.workspaces.selectedWorkspaceId);
   }
 
   ngOnInit() {

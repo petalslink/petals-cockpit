@@ -36,7 +36,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES = `${Workspaces.reducerName}_FETCH_WORKSPACES`;
-  private static fetchWorkspaces(workspacesTable: IWorkspacesTable, payload) {
+  private static fetchWorkspaces(workspacesTable: IWorkspacesTable, _payload) {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -59,7 +59,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACES_FAILED`;
-  private static fetchWorkspacesFailed(workspacesTable: IWorkspacesTable, payload) {
+  private static fetchWorkspacesFailed(workspacesTable: IWorkspacesTable, _payload) {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -70,7 +70,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static POST_WORKSPACE = `${Workspaces.reducerName}_POST_WORKSPACE`;
-  private static postWorkspace(workspacesTable: IWorkspacesTable, payload) {
+  private static postWorkspace(workspacesTable: IWorkspacesTable, _payload) {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -100,7 +100,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static POST_WORKSPACE_FAILED = `${Workspaces.reducerName}_POST_WORKSPACE_FAILED`;
-  private static postWorkspaceFailed(workspacesTable: IWorkspacesTable, payload) {
+  private static postWorkspaceFailed(workspacesTable: IWorkspacesTable, _payload) {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -172,7 +172,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACE_FAILED`;
-  private static fetchWorkspaceFailed(workspacesTable: IWorkspacesTable, payload) {
+  private static fetchWorkspaceFailed(workspacesTable: IWorkspacesTable, _payload) {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{ fetchingWorkspaceWithId: null }
@@ -190,7 +190,7 @@ export class Workspaces {
     };
   }
 
-  private static disconnectUserSuccess(workspacesTable: IWorkspacesTable, payload) {
+  private static disconnectUserSuccess(_workspacesTable: IWorkspacesTable, _payload) {
     return workspacesTableFactory();
   }
 

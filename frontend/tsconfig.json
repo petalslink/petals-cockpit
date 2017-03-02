@@ -6,6 +6,7 @@
     "declaration": false,
     "moduleResolution": "node",
     "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": [

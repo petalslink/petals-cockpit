@@ -31,17 +31,17 @@ import { environment } from './../../../environments/environment';
 @Injectable()
 export class UsersEffects {
   constructor(
-    private _actions$: Actions,
-    private _router: Router,
-    private _usersService: UsersService,
-    private _notification: NotificationsService
+    private actions$: Actions,
+    private router: Router,
+    private usersService: UsersService,
+    private notification: NotificationsService
   ) { }
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) connectUser$: Observable<Action> = this._actions$
+  @Effect({ dispatch: true }) connectUser$: Observable<Action> = this.actions$
     .ofType(Users.CONNECT_USER)
     .switchMap((action: Action) =>
-      this._usersService.connectUser(action.payload)
+      this.usersService.connectUser(action.payload)
         .map((res: Response) => {
           if (!res.ok) {
             throw new Error('Error while connecting user');
@@ -65,21 +65,21 @@ export class UsersEffects {
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: false }) connectUserSuccess$: Observable<void> = this._actions$
+  @Effect({ dispatch: false }) connectUserSuccess$: Observable<void> = this.actions$
     .ofType(Users.CONNECT_USER_SUCCESS)
     .filter((action: Action) =>
       typeof action.payload.redirectWorkspace === 'undefined' ||
       action.payload.redirectWorkspace === true
     )
-    .map((action: Action) => {
-      this._router.navigate(['/workspaces']);
+    .map(_ => {
+      this.router.navigate(['/workspaces']);
     });
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) disconnectUser$: Observable<Action> = this._actions$
+  @Effect({ dispatch: true }) disconnectUser$: Observable<Action> = this.actions$
     .ofType(Users.DISCONNECT_USER)
-    .switchMap((action: Action) =>
-      this._usersService.disconnectUser()
+    .switchMap(_ =>
+      this.usersService.disconnectUser()
         .map((res: Response) => {
           if (!res.ok) {
             throw new Error('Error while disconnecting user');
@@ -100,10 +100,10 @@ export class UsersEffects {
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: false }) disconnectUserSuccess$: any = this._actions$
+  @Effect({ dispatch: false }) disconnectUserSuccess$: any = this.actions$
     .ofType(Users.DISCONNECT_USER_SUCCESS)
     .map(() => {
-      this._router.navigate(['/login']);
-      this._notification.success('Log out !', `You're now disconnected.`);
+      this.router.navigate(['/login']);
+      this.notification.success('Log out !', `You're now disconnected.`);
     });
 }

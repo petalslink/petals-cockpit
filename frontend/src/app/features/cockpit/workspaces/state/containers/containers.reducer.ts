@@ -176,11 +176,11 @@ export class Containers {
     };
   }
 
-  private static fetchWorkspaceSuccess(containersTable: IContainersTable, payload) {
+  private static fetchWorkspaceSuccess(_containersTable: IContainersTable, _payload) {
     return containersTableFactory();
   }
 
-  private static disconnectUserSuccess(containersTable: IContainersTable, payload) {
+  private static disconnectUserSuccess(_containersTable: IContainersTable, _payload) {
     return containersTableFactory();
   }
 

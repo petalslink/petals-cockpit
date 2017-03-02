@@ -34,23 +34,23 @@ import { getCurrentComponent } from '../../state/components/components.selectors
 export class PetalsComponentViewComponent implements OnInit, OnDestroy {
   public component$: Observable<IComponentRow>;
 
-  constructor(private _store$: Store<IStore>, private _route: ActivatedRoute) { }
+  constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.component$ = this._store$.let(getCurrentComponent());
+    this.component$ = this.store$.let(getCurrentComponent());
 
-    this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Component' } });
+    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Component' } });
 
-    this._route
+    this.route
       .params
       .map((params: { workspaceId: string, componentId: string }) => {
-        this._store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId: params.componentId } });
-        this._store$.dispatch({ type: Components.FETCH_COMPONENT_DETAILS, payload: { componentId: params.componentId } });
+        this.store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId: params.componentId } });
+        this.store$.dispatch({ type: Components.FETCH_COMPONENT_DETAILS, payload: { componentId: params.componentId } });
       })
       .subscribe();
   }
 
   ngOnDestroy() {
-    this._store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId: '' } });
+    this.store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId: '' } });
   }
 }

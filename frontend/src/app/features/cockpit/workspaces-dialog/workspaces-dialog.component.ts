@@ -49,25 +49,26 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
   private user$: Observable<IUser>;
 
   constructor(
-    private _store$: Store<IStore>,
-    private _router: Router,
-    private _fb: FormBuilder) { }
+    private store$: Store<IStore>,
+    private router: Router,
+    private fb: FormBuilder
+  ) { }
 
   ngOnInit() {
-    this.workspaces$ = this._store$.let(getWorkspacesList());
+    this.workspaces$ = this.store$.let(getWorkspacesList());
     this.user$ = this
-      ._store$
+      .store$
       .let(getCurrentUser())
       .do(u => {
         this.user = u;
       });
 
-    this.newWksForm = this._fb.group({
+    this.newWksForm = this.fb.group({
       name: ['', Validators.required]
     });
 
     this.isAddingWorkspaceSub = this
-      ._store$
+      .store$
       .select(state => state.workspaces.isAddingWorkspace)
       .combineLatest(Observable
         .empty()
@@ -100,21 +101,21 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
 
   // TODO use good type
   fetchWorkspace(workspace: IWorkspace) {
-    this._store$
+    this.store$
       .select(state => state.workspaces.selectedWorkspaceId)
       .first()
       .subscribe(wsId => {
         // if no workspace is open, it will simply navigate to the required one
         if (wsId === workspace.id) {
-          this._store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
+          this.store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
         } else {
-          this._router.navigate(['/workspaces', workspace.id]);
+          this.router.navigate(['/workspaces', workspace.id]);
         }
       });
   }
 
   onSubmit({ value }) {
-    this._store$.dispatch({ type: Workspaces.POST_WORKSPACE, payload: value.name });
+    this.store$.dispatch({ type: Workspaces.POST_WORKSPACE, payload: value.name });
   }
 
   getUsersNames(users: Array<IUser>) {

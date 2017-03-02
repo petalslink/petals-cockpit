@@ -34,23 +34,23 @@ import { IServiceUnitRow } from '../../state/service-units/service-unit.interfac
 export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
   public serviceUnit$: Observable<IServiceUnitRow>;
 
-  constructor(private _store$: Store<IStore>, private _route: ActivatedRoute) { }
+  constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.serviceUnit$ = this._store$.let(getCurrentServiceUnit());
+    this.serviceUnit$ = this.store$.let(getCurrentServiceUnit());
 
-    this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Service Unit' } });
+    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Service Unit' } });
 
-    this._route
+    this.route
       .params
       .map((params: { workspaceId: string, serviceUnitId: string }) => {
-        this._store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: params.serviceUnitId } });
-        this._store$.dispatch({ type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS, payload: { serviceUnitId: params.serviceUnitId } });
+        this.store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: params.serviceUnitId } });
+        this.store$.dispatch({ type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS, payload: { serviceUnitId: params.serviceUnitId } });
       })
       .subscribe();
   }
 
   ngOnDestroy() {
-    this._store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: '' } });
+    this.store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: '' } });
   }
 }

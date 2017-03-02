@@ -36,12 +36,12 @@ export class LoginComponent implements OnInit, OnDestroy {
   private usersSub: Subscription;
   public users: IUsersTable;
 
-  constructor(private _store$: Store<IStore>, private _fb: FormBuilder) { }
+  constructor(private store$: Store<IStore>, private fb: FormBuilder) { }
 
   ngOnInit() {
-    this.users$ = this._store$.select(state => state.users);
+    this.users$ = this.store$.select(state => state.users);
 
-    this.loginForm = this._fb.group({
+    this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
@@ -72,6 +72,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onSubmit({value}) {
-    this._store$.dispatch({ type: Users.CONNECT_USER, payload: value });
+    this.store$.dispatch({ type: Users.CONNECT_USER, payload: value });
   }
 }

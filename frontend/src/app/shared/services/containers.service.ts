@@ -27,11 +27,11 @@ export abstract class ContainersService {
 
 @Injectable()
 export class ContainersServiceImpl extends ContainersService {
-  constructor(private _http: Http) {
+  constructor(private http: Http) {
     super();
   }
 
   getDetailsContainer(containerId: string) {
-    return this._http.get(`${environment.urlBackend}/containers/${containerId}`);
+    return this.http.get(`${environment.urlBackend}/containers/${containerId}`);
   }
 }
