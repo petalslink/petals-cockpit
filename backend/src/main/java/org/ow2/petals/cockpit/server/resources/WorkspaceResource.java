@@ -16,6 +16,11 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_USERNAME;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -33,12 +38,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.jooq.Configuration;
+import org.jooq.Record;
+import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeServiceUnitState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
@@ -70,17 +79,49 @@ public class WorkspaceResource {
 
     private final long wsId;
 
+    private final Configuration jooq;
+
     @Inject
-    public WorkspaceResource(@PathParam("wsId") @Min(1) long wsId, CockpitActors as) {
+    public WorkspaceResource(@PathParam("wsId") @Min(1) long wsId, CockpitActors as, Configuration jooq) {
         this.as = as;
         this.wsId = wsId;
+        this.jooq = jooq;
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON + ";qs=1")
+    @Valid
+    public WorkspaceFullContent get(@Pac4JProfile CockpitProfile profile) {
+        return DSL.using(jooq).transactionResult(conf -> {
+            WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId)).fetchOne();
+
+            if (ws == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
+
+            Record user = DSL.using(conf).selectFrom(USERS_WORKSPACES)
+                    .where(USERS_WORKSPACES.USERNAME.eq(profile.getId())).and(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId))
+                    .fetchOne();
+
+            if (user == null) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
+
+            WorkspaceContent content = WorkspaceContent.buildFromDatabase(conf, ws);
+
+            List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
+                    .onKey(FK_USERS_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)).fetchInto(USERS);
+
+            return new WorkspaceFullContent(ws, wsUsers, content);
+
+        });
     }
 
     /**
      * Produces {@link WorkspaceChange}
      */
     @GET
-    @Produces(SseFeature.SERVER_SENT_EVENTS)
+    @Produces(SseFeature.SERVER_SENT_EVENTS + ";qs=0.5")
     public EventOutput sse(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
         // TODO ACL is done by actor for now
         return as.call(wsId, new NewWorkspaceClient(profile.getId()))
