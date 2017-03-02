@@ -29,23 +29,23 @@ import { environment } from './../../../../../../environments/environment';
 @Injectable()
 export class BusesEffects {
   constructor(
-    private _actions$: Actions,
-    private _store$: Store<IStore>,
-    private _busesService: BusesService
+    private actions$: Actions,
+    private store$: Store<IStore>,
+    private busesService: BusesService
   ) { }
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchBusDetails$: Observable<Action> = this._actions$
+  @Effect({ dispatch: true }) fetchBusDetails$: Observable<Action> = this.actions$
     .ofType(Buses.FETCH_BUS_DETAILS)
     .combineLatest(this
       // wait the first workspace to be fetched
-      ._store$
+      .store$
       .select(state => state.workspaces.firstWorkspaceFetched)
       .filter(b => b === true)
       .first()
     )
     .switchMap(([action, _]: [{ type: string, payload: { busId: string } }, boolean]) =>
-      this._busesService.getDetailsBus(action.payload.busId)
+      this.busesService.getDetailsBus(action.payload.busId)
         .map((res: Response) => {
           if (!res.ok) {
             throw new Error('Error while fetching the bus details');

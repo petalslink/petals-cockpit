@@ -46,19 +46,19 @@ export abstract class BusesService {
 @Injectable()
 export class BusesServiceImpl extends BusesService {
   constructor(
-    private _http: Http,
-    private _store$: Store<IStore>,
-    private _sseService: SseService,
-    private _notifications: NotificationsService
+    private http: Http,
+    private store$: Store<IStore>,
+    private sseService: SseService,
+    private notifications: NotificationsService
   ) {
     super();
   }
 
   watchEventBusDeleted() {
-    this._sseService
+    this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_DELETED)
       .map(({ id }) => {
-        this._store$.dispatch(batchActions([
+        this.store$.dispatch(batchActions([
           { type: Buses.REMOVE_BUS, payload: { busId: id } },
           { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: id, importOk: false } },
         ]));
@@ -67,7 +67,7 @@ export class BusesServiceImpl extends BusesService {
   }
 
   watchEventBusImportOk() {
-    this._sseService
+    this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_OK)
       .map((data: any) => {
 
@@ -76,10 +76,10 @@ export class BusesServiceImpl extends BusesService {
         // there should be only one element in there!
         const busInProgress = buses.byId[buses.allIds[0]];
 
-        this._notifications.success(`Bus import success`,
+        this.notifications.success(`Bus import success`,
           `The import of a bus from the IP ${busInProgress.ip}:${busInProgress.port} succeeded`);
 
-        this._store$.dispatch(batchActions([
+        this.store$.dispatch(batchActions([
           { type: Buses.FETCH_BUSES_SUCCESS, payload: buses },
           { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap(data.containers) },
           { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap(data.components) },
@@ -88,7 +88,7 @@ export class BusesServiceImpl extends BusesService {
 
         // this dispatch is separated from the batchActions on purpose
         // TODO see #230
-        this._store$.dispatch({
+        this.store$.dispatch({
           type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
           payload: { busInProgressId: busInProgress.id, importOk: true }
         });
@@ -97,19 +97,19 @@ export class BusesServiceImpl extends BusesService {
   }
 
   watchEventBusImportError() {
-    this._sseService
+    this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_ERROR)
       .map((busInError: any) => {
 
-        this._notifications.alert(`Bus import error`,
+        this.notifications.alert(`Bus import error`,
           `The import of a bus from the IP ${busInError.ip}:${busInError.port} failed`);
 
-        this._store$.dispatch({ type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS, payload: busInError });
+        this.store$.dispatch({ type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS, payload: busInError });
       })
       .subscribe();
   }
 
   getDetailsBus(busId: string) {
-    return this._http.get(`${environment.urlBackend}/buses/${busId}`);
+    return this.http.get(`${environment.urlBackend}/buses/${busId}`);
   }
 }

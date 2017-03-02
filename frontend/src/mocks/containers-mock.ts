@@ -2,51 +2,51 @@ import { componentsService, Component } from './components-mock';
 import { Bus } from './buses-mock';
 
 export class Containers {
-  private _containers = new Map<string, Container>();
+  private containers = new Map<string, Container>();
 
   constructor() { }
 
   create(bus: Bus) {
     const container = new Container(bus);
-    this._containers.set(container.getIdFormatted(), container);
+    this.containers.set(container.getIdFormatted(), container);
     return container;
   }
 
   read(idContainer: string) {
-    return this._containers.get(idContainer);
+    return this.containers.get(idContainer);
   }
 }
 
 export const containersService = new Containers();
 
 export class Container {
-  private static _cpt = 0;
-  private _bus: Bus;
-  protected _id: number;
-  private _components: Component[] = [];
+  private static cpt = 0;
+  private bus: Bus;
+  protected id: number;
+  private components: Component[] = [];
 
   constructor(bus: Bus) {
-    this._id = Container._cpt++;
-    this._bus = bus;
+    this.id = Container.cpt++;
+    this.bus = bus;
 
     // by default add 2 containers
-    this._components.push(componentsService.create());
-    this._components.push(componentsService.create());
+    this.components.push(componentsService.create());
+    this.components.push(componentsService.create());
   }
 
   getComponents() {
-    return this._components;
+    return this.components;
   }
 
   public getIdFormatted() {
-    return `idCont${this._id}`;
+    return `idCont${this.id}`;
   }
 
   toObj() {
     return {
       [this.getIdFormatted()]: {
-        name: `Cont ${this._id}`,
-        components: this._components.map(component => component.getIdFormatted())
+        name: `Cont ${this.id}`,
+        components: this.components.map(component => component.getIdFormatted())
       }
     };
   }
@@ -55,9 +55,9 @@ export class Container {
     const id = this.getIdFormatted();
 
     return {
-      ip: `192.168.0.${this._id}`,
-      port: 7700 + this._id,
-      reachabilities: this._bus
+      ip: `192.168.0.${this.id}`,
+      port: 7700 + this.id,
+      reachabilities: this.bus
         .getContainers()
         .map(container => container.getIdFormatted())
         .filter(containerId => containerId !== id),

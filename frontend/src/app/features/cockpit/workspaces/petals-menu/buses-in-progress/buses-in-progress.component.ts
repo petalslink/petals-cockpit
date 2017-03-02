@@ -32,10 +32,10 @@ export class BusesInProgressComponent implements OnInit {
 
   public workspaceId$: Observable<string>;
 
-  constructor(private _store$: Store<IStore>) { }
+  constructor(private store$: Store<IStore>) { }
 
   ngOnInit() {
-    this.workspaceId$ = this._store$
+    this.workspaceId$ = this.store$
       .select(state => state.workspaces)
       .map(workspaces => workspaces.selectedWorkspaceId);
   }

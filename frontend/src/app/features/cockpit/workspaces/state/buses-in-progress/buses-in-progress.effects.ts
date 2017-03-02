@@ -31,18 +31,18 @@ import { BusesInProgressService } from './../../../../../shared/services/buses-i
 export class BusesInProgressEffects {
 
   constructor(
-    private _actions$: Actions,
-    private _store$: Store<IStore>,
-    private _router: Router,
-    private _busesInProgressService: BusesInProgressService
+    private actions$: Actions,
+    private store$: Store<IStore>,
+    private router: Router,
+    private busesInProgressService: BusesInProgressService
   ) { }
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) postBus$: Observable<Action> = this._actions$
+  @Effect({ dispatch: true }) postBus$: Observable<Action> = this.actions$
     .ofType(BusesInProgress.POST_BUS_IN_PROGRESS)
-    .combineLatest(this._store$.select(state => state.workspaces.selectedWorkspaceId))
+    .combineLatest(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, idWorkspace]) =>
-      this._busesInProgressService.postBus(idWorkspace, action.payload)
+      this.busesInProgressService.postBus(idWorkspace, action.payload)
         .map((res: Response) => {
           return {
             type: BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS,
@@ -61,19 +61,19 @@ export class BusesInProgressEffects {
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: false }) postBusSuccess$: Observable<Action> = this._actions$
+  @Effect({ dispatch: false }) postBusSuccess$: Observable<Action> = this.actions$
     .ofType(BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS)
     .map((action: Action) => action.payload)
     .do(({ idWorkspace, busInProgress }: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
-      this._router.navigate(['/workspaces', idWorkspace, 'petals', 'buses-in-progress', busInProgress.id])
+      this.router.navigate(['/workspaces', idWorkspace, 'petals', 'buses-in-progress', busInProgress.id])
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) deleteBusInProgress$: Observable<Action> = this._actions$
+  @Effect({ dispatch: true }) deleteBusInProgress$: Observable<Action> = this.actions$
     .ofType(BusesInProgress.DELETE_BUS_IN_PROGRESS)
-    .combineLatest(this._store$.select(state => state.workspaces.selectedWorkspaceId))
+    .combineLatest(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, idWorkspace]) =>
-      this._busesInProgressService.deleteBus(idWorkspace, action.payload.id)
+      this.busesInProgressService.deleteBus(idWorkspace, action.payload.id)
         .map(_ => {
           return {
             type: BusesInProgress.DELETE_BUS_IN_PROGRESS_SUCCESS,
@@ -88,27 +88,27 @@ export class BusesInProgressEffects {
 
   // No need to actually delete it in the store because it will be handled from the SSE event
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: false }) deleteBusSuccess$: Observable<Action> = this._actions$
+  @Effect({ dispatch: false }) deleteBusSuccess$: Observable<Action> = this.actions$
     .ofType(BusesInProgress.DELETE_BUS_IN_PROGRESS_SUCCESS)
     .map((action: Action) => action.payload)
     .do(({ idWorkspace }: { idWorkspace: string }) =>
       // TODO improve that, what if we changed ws inbetween the delete and its success?!
-      this._router.navigate(['/workspaces', idWorkspace])
+      this.router.navigate(['/workspaces', idWorkspace])
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: false }) removeBusInProgress$: Observable<Action> = this._actions$
+  @Effect({ dispatch: false }) removeBusInProgress$: Observable<Action> = this.actions$
     .ofType(BusesInProgress.REMOVE_BUS_IN_PROGRESS)
     .combineLatest(
-    this._store$.select(state => state.workspaces.selectedWorkspaceId),
-    this._store$.select(state => state.busesInProgress.selectedBusInProgressId)
+    this.store$.select(state => state.workspaces.selectedWorkspaceId),
+    this.store$.select(state => state.busesInProgress.selectedBusInProgressId)
     )
     .map(([action, wsId, sId]) => {
       return { ...action.payload, wsId, sId };
     })
     .do(({ busInProgressId, importOk, wsId, sId }: { busInProgressId: string, importOk: boolean, wsId: string, sId: string }) => {
-      if (importOk && this._router.url.match(/\/buses-in-progress\//) && sId === busInProgressId) {
-        this._router.navigate(['/workspaces', wsId, 'petals', 'buses', busInProgressId]);
+      if (importOk && this.router.url.match(/\/buses-in-progress\//) && sId === busInProgressId) {
+        this.router.navigate(['/workspaces', wsId, 'petals', 'buses', busInProgressId]);
       }
     });
 }

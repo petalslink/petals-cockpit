@@ -32,11 +32,11 @@ import { getCurrentWorkspace } from '../../../cockpit/workspaces/state/workspace
 export class WorkspaceComponent implements OnInit {
   public workspace$: Observable<IWorkspace>;
 
-  constructor(private _store$: Store<IStore>) { }
+  constructor(private store$: Store<IStore>) { }
 
   ngOnInit() {
-    this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: '' } });
+    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: '' } });
 
-    this.workspace$ = this._store$.let(getCurrentWorkspace());
+    this.workspace$ = this.store$.let(getCurrentWorkspace());
   }
 }

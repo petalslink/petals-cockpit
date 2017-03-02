@@ -26,9 +26,9 @@ import { SseService } from './sse.service';
 
 @Injectable()
 export class SseServiceMock extends SseService {
-  private _isSseOpened = false;
+  private isSseOpened = false;
 
-  private _registeredEvents: Map<string, Subject<any>> = new Map();
+  private registeredEvents: Map<string, Subject<any>> = new Map();
 
   constructor() {
     super();
@@ -36,8 +36,8 @@ export class SseServiceMock extends SseService {
 
   // call that method from another mock to simulate an SSE event
   public triggerSseEvent(eventName: string, data: any) {
-    if (this._registeredEvents.has(eventName)) {
-      this._registeredEvents.get(eventName).next(data);
+    if (this.registeredEvents.has(eventName)) {
+      this.registeredEvents.get(eventName).next(data);
     } else if (environment.debug) {
       console.error(`
         Tried to triggerSseEvent for ${eventName}, but no event of this name was watching the SSE.
@@ -47,11 +47,11 @@ export class SseServiceMock extends SseService {
   }
 
   public watchWorkspaceRealTime(workspaceId: string) {
-    if (this._isSseOpened && environment.debug) {
+    if (this.isSseOpened && environment.debug) {
       console.debug('closing previous sse connection');
     }
 
-    this._isSseOpened = true;
+    this.isSseOpened = true;
 
     if (environment.debug) {
       console.debug('subscribing to a new sse connection');
@@ -59,11 +59,11 @@ export class SseServiceMock extends SseService {
 
     // foreach event
     SseWorkspaceEvent.allEvents.forEach(eventName => {
-      if (!this._registeredEvents.has(eventName)) {
-        this._registeredEvents.set(eventName, new Subject());
+      if (!this.registeredEvents.has(eventName)) {
+        this.registeredEvents.set(eventName, new Subject());
       }
 
-      this._registeredEvents.set(eventName, this._registeredEvents.get(eventName));
+      this.registeredEvents.set(eventName, this.registeredEvents.get(eventName));
     });
 
     const workspaceContent = workspacesService.getWorkspaceComposed(workspaceId);
@@ -75,8 +75,8 @@ export class SseServiceMock extends SseService {
   }
 
   public subscribeToWorkspaceEvent(eventName: string) {
-    if (this._registeredEvents.has(eventName)) {
-      return this._registeredEvents.get(eventName).asObservable().delay(environment.sseDelay);
+    if (this.registeredEvents.has(eventName)) {
+      return this.registeredEvents.get(eventName).asObservable().delay(environment.sseDelay);
     }
 
     if (environment.debug) {

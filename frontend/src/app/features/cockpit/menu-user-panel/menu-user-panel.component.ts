@@ -33,15 +33,15 @@ export class MenuUserPanelComponent implements OnInit {
   public user$: Observable<IUser>;
   public isDisconnecting$: Observable<boolean>;
 
-  constructor(private _store$: Store<IStore>) {
-    this.user$ = this._store$.let(getCurrentUser());
-    this.isDisconnecting$ = this._store$.select(state => state.users.isDisconnecting);
+  constructor(private store$: Store<IStore>) {
+    this.user$ = this.store$.let(getCurrentUser());
+    this.isDisconnecting$ = this.store$.select(state => state.users.isDisconnecting);
   }
 
   ngOnInit() {
   }
 
   disconnect() {
-    this._store$.dispatch({ type: Users.DISCONNECT_USER });
+    this.store$.dispatch({ type: Users.DISCONNECT_USER });
   }
 }

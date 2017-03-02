@@ -44,7 +44,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   private workspacesDialogRef: MdDialogRef<WorkspacesDialogComponent>;
 
   public ui$: Observable<IUi>;
-  public _uiSub: Subscription;
+  private uiSub: Subscription;
   public sidenavMode$: Observable<string>;
   public workspace$: Observable<IWorkspace>;
   public workspaces$: Observable<IWorkspacesTable>;
@@ -53,23 +53,23 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(MdSidenav) sidenav: MdSidenav;
 
   constructor(
-    private _store$: Store<IStore>,
+    private store$: Store<IStore>,
     @Inject(LANGUAGES) public languages: any,
     public dialog: MdDialog,
     public media$: ObservableMedia,
-    private _router: Router
+    private router: Router
   ) { }
 
   ngOnInit() {
-    this.workspaces$ = this._store$.select(state => state.workspaces);
+    this.workspaces$ = this.store$.select(state => state.workspaces);
 
-    this.workspace$ = this._store$.let(getCurrentWorkspace());
+    this.workspace$ = this.store$.let(getCurrentWorkspace());
 
-    this.ui$ = this._store$.select(state => state.ui);
+    this.ui$ = this.store$.select(state => state.ui);
 
     // it is needed to use subscribe(...) instead of do(...).subscribe()
     // if not it won't work. TODO this should be solved or clarified...
-    this._uiSub = this.ui$
+    this.uiSub = this.ui$
       .map(ui => ui.isPopupListWorkspacesVisible)
       .distinctUntilChanged()
       .subscribe(isPopupListWorkspacesVisible => {
@@ -110,7 +110,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy() {
-    this._uiSub.unsubscribe();
+    this.uiSub.unsubscribe();
   }
 
   ngAfterViewInit() {
@@ -119,7 +119,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     // if there's no workspace selected
     // display the popup to select one
     const re = /workspaces\/([a-zA-Z0-9]+)(\/)?/;
-    const url = this._router.url;
+    const url = this.router.url;
 
     if (!re.test(url)) {
       this.openWorkspacesDialog();
@@ -141,28 +141,28 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
     this.workspacesDialogRef.afterClosed().subscribe(_ => {
-      this._store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
+      this.store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
       this.workspacesDialogRef = null;
     });
   }
 
   openWorkspacesDialog() {
-    this._store$.dispatch({ type: Ui.OPEN_POPUP_WORKSPACES_LIST });
+    this.store$.dispatch({ type: Ui.OPEN_POPUP_WORKSPACES_LIST });
   }
 
   openSidenav() {
-    this._store$.dispatch({ type: Ui.OPEN_SIDENAV });
+    this.store$.dispatch({ type: Ui.OPEN_SIDENAV });
   }
 
   closeSidenav() {
-    this._store$.dispatch({ type: Ui.CLOSE_SIDENAV });
+    this.store$.dispatch({ type: Ui.CLOSE_SIDENAV });
   }
 
   toggleSidenav() {
-    this._store$.dispatch({ type: Ui.TOGGLE_SIDENAV });
+    this.store$.dispatch({ type: Ui.TOGGLE_SIDENAV });
   }
 
   private fetchWorkspaces() {
-    this._store$.dispatch({ type: Workspaces.FETCH_WORKSPACES });
+    this.store$.dispatch({ type: Workspaces.FETCH_WORKSPACES });
   }
 }

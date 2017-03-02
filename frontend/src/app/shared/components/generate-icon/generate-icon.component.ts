@@ -42,16 +42,16 @@ export class GenerateIconComponent implements AfterViewInit, OnChanges {
   constructor() { }
 
   ngAfterViewInit() {
-    this._updateSvg();
+    this.updateSvg();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['text'].currentValue !== changes['text'].previousValue) {
-      this._updateSvg();
+      this.updateSvg();
     }
   }
 
-  private _updateSvg() {
+  private updateSvg() {
     this.hashMd5 = md5(this.text);
 
     // use a setTimeout otherwise jdenticon's called **before**

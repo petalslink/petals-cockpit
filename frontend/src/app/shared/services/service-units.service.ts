@@ -27,11 +27,11 @@ export abstract class ServiceUnitsService {
 
 @Injectable()
 export class ServiceUnitsServiceImpl extends ServiceUnitsService {
-  constructor(private _http: Http) {
+  constructor(private http: Http) {
     super();
   }
 
   getDetailsServiceUnit(serviceUnitId: string) {
-    return this._http.get(`${environment.urlBackend}/serviceunits/${serviceUnitId}`);
+    return this.http.get(`${environment.urlBackend}/serviceunits/${serviceUnitId}`);
   }
 }

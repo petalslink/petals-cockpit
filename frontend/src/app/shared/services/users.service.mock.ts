@@ -24,7 +24,7 @@ import * as helper from './../helpers/mock.helper';
 
 @Injectable()
 export class UsersMockService extends UsersService {
-  private _userIsConnected: boolean = environment.alreadyConnected;
+  private userIsConnected: boolean = environment.alreadyConnected;
   private adminUser: IUser;
 
   constructor() {
@@ -40,7 +40,7 @@ export class UsersMockService extends UsersService {
 
   connectUser(user: IUser) {
     if (user.username === 'admin' && user.password === 'admin') {
-      this._userIsConnected = true;
+      this.userIsConnected = true;
       return helper.responseBody(user);
     }
 
@@ -48,13 +48,13 @@ export class UsersMockService extends UsersService {
   }
 
   disconnectUser() {
-    this._userIsConnected = false;
+    this.userIsConnected = false;
 
     return helper.response(204);
   }
 
   getUserInformations() {
-    if (this._userIsConnected) {
+    if (this.userIsConnected) {
       return helper.responseBody(this.adminUser);
     }
 

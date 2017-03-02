@@ -30,15 +30,15 @@ export abstract class BusesInProgressService {
 
 @Injectable()
 export class BusesInProgressServiceImpl extends BusesInProgressService {
-  constructor(private _http: Http) {
+  constructor(private http: Http) {
     super();
   }
 
   postBus(idWorkspace: string, bus: IBusInProgress) {
-    return this._http.post(`${environment.urlBackend}/workspaces/${idWorkspace}/buses`, bus);
+    return this.http.post(`${environment.urlBackend}/workspaces/${idWorkspace}/buses`, bus);
   }
 
   deleteBus(idWorkspace: string, id: string) {
-    return this._http.delete(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${id}`);
+    return this.http.delete(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${id}`);
   }
 }

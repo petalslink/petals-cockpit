@@ -5,35 +5,35 @@ import { Component } from './components-mock';
 import { ServiceUnit } from './service-units-mock';
 
 export class Workspace {
-  private static _cpt = 0;
-  private _id: number;
-  private _name: string;
-  private _buses: Bus[] = [];
-  private _busesInProgress: BusInProgress[] = [];
+  private static cpt = 0;
+  private id: number;
+  private name: string;
+  private buses: Bus[] = [];
+  private busesInProgress: BusInProgress[] = [];
 
   private firstErrorSent = false;
 
   constructor(name?: string) {
-    this._id = Workspace._cpt++;
+    this.id = Workspace.cpt++;
 
-    this._name = name;
+    this.name = name;
 
     // by default add 1 bus
-    this._buses.push(busesService.create());
+    this.buses.push(busesService.create());
 
     // and 2 buses in progress
-    this._busesInProgress.push(busesInProgressService.create());
-    this._busesInProgress.push(busesInProgressService.create());
+    this.busesInProgress.push(busesInProgressService.create());
+    this.busesInProgress.push(busesInProgressService.create());
   }
 
   public getIdFormatted() {
-    return `idWks${this._id}`;
+    return `idWks${this.id}`;
   }
 
   public toObj() {
     return {
       id: this.getIdFormatted(),
-      name: this._name || `Workspace ${this._id}`,
+      name: this.name || `Workspace ${this.id}`,
       users: this.workspaceUsers()
     };
   }
@@ -46,11 +46,11 @@ export class Workspace {
   }
 
   public getBuses() {
-    return this._buses;
+    return this.buses;
   }
 
   public getBusesInProgress() {
-    return this._busesInProgress;
+    return this.busesInProgress;
   }
 
   public addBus(busInProgress: IBusInProgress): { id: string, eventData: any } {
@@ -71,7 +71,7 @@ export class Workspace {
 
     const bus = busesService.create();
 
-    this._buses.push(bus);
+    this.buses.push(bus);
 
     const containers = bus.getContainers();
     const components = containers.reduce((acc: Component[], container) => [...acc, ...container.getComponents()], []);
@@ -141,7 +141,7 @@ const users = {
 
 export class Workspaces {
   // map to cache the created workspaces
-  private _memoizedWorkspaces = new Map<string, { wks: Workspace, composedWks: any }>();
+  private memoizedWorkspaces = new Map<string, { wks: Workspace, composedWks: any }>();
 
   constructor() {
     // generate 2 workspaces by default
@@ -160,7 +160,7 @@ export class Workspaces {
    * @returns {any} the workspace
    */
   getWorkspace(idWks: string) {
-    return this._memoizedWorkspaces.get(idWks).wks;
+    return this.memoizedWorkspaces.get(idWks).wks;
   }
 
   /**
@@ -170,7 +170,7 @@ export class Workspaces {
    * @returns {any} the workspaces list
    */
   getWorkspaces() {
-    const workspacesIds = Array.from(this._memoizedWorkspaces.keys());
+    const workspacesIds = Array.from(this.memoizedWorkspaces.keys());
 
     return workspacesIds.reduce((acc, workspaceId) => {
       return {
@@ -205,8 +205,8 @@ export class Workspaces {
    */
   getWorkspaceComposed(idWks?: string, name?: string) {
     if (idWks) {
-      if (this._memoizedWorkspaces.has(idWks)) {
-        return { ...this._memoizedWorkspaces.get(idWks).composedWks };
+      if (this.memoizedWorkspaces.has(idWks)) {
+        return { ...this.memoizedWorkspaces.get(idWks).composedWks };
       }
     }
 
@@ -259,7 +259,7 @@ export class Workspaces {
       }, {})
     };
 
-    this._memoizedWorkspaces.set(newWorkspace.getIdFormatted(), { wks: newWorkspace, composedWks });
+    this.memoizedWorkspaces.set(newWorkspace.getIdFormatted(), { wks: newWorkspace, composedWks });
 
     return { ...composedWks };
   };

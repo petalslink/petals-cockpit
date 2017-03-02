@@ -27,11 +27,11 @@ export abstract class ComponentsService {
 
 @Injectable()
 export class ComponentsServiceImpl extends ComponentsService {
-  constructor(private _http: Http) {
+  constructor(private http: Http) {
     super();
   }
 
   getDetailsComponent(componentId: string) {
-    return this._http.get(`${environment.urlBackend}/components/${componentId}`);
+    return this.http.get(`${environment.urlBackend}/components/${componentId}`);
   }
 }

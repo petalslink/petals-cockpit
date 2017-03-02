@@ -34,23 +34,23 @@ import { getCurrentBus } from '../../state/buses/buses.selectors';
 export class PetalsBusViewComponent implements OnInit, OnDestroy {
   public bus$: Observable<IBusRow>;
 
-  constructor(private _store$: Store<IStore>, private _route: ActivatedRoute) { }
+  constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.bus$ = this._store$.let(getCurrentBus());
+    this.bus$ = this.store$.let(getCurrentBus());
 
-    this._store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Bus' } });
+    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Bus' } });
 
-    this._route
+    this.route
       .params
       .map((params: { workspaceId: string, busId: string }) => {
-        this._store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId: params.busId } });
-        this._store$.dispatch({ type: Buses.FETCH_BUS_DETAILS, payload: { busId: params.busId } });
+        this.store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId: params.busId } });
+        this.store$.dispatch({ type: Buses.FETCH_BUS_DETAILS, payload: { busId: params.busId } });
       })
       .subscribe();
   }
 
   ngOnDestroy() {
-    this._store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId: '' } });
+    this.store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId: '' } });
   }
 }

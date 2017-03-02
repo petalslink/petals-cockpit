@@ -70,17 +70,17 @@ export abstract class SseService {
 @Injectable()
 export class SseServiceImpl extends SseService {
   /**
-   * _currentSse
+   * currentSse
    *
    * holds the current sse connection
    *
    * @private
    * @type {*}
    */
-  private _currentSse$: any;
+  private currentSse$: any;
 
   /**
-   * _registeredEvents
+   * registeredEvents
    *
    * holds a map containing all the events that we need to watch
    * in order to notify subscribers
@@ -89,53 +89,53 @@ export class SseServiceImpl extends SseService {
    * @type {Map<string, Subject<any>>}
    * @memberOf WorkspacesService
    */
-  private _registeredEvents: Map<string, { eventListener: any, subject$: Subject<any> }> = new Map();
+  private registeredEvents: Map<string, { eventListener: any, subject$: Subject<any> }> = new Map();
 
   watchWorkspaceRealTime(workspaceId: string) {
-    if (typeof this._currentSse$ !== 'undefined' && this._currentSse$ !== null) {
+    if (typeof this.currentSse$ !== 'undefined' && this.currentSse$ !== null) {
       if (environment.debug) {
         console.debug('closing previous sse connection');
       }
 
-      this._currentSse$.close();
+      this.currentSse$.close();
     }
 
     if (environment.debug) {
       console.debug('subscribing to a new sse connection');
     }
 
-    this._currentSse$ = new EventSource(`${environment.urlBackend}/workspaces/${workspaceId}`);
+    this.currentSse$ = new EventSource(`${environment.urlBackend}/workspaces/${workspaceId}`);
 
     // foreach event
     SseWorkspaceEvent.allEvents.forEach(eventName => {
-      if (this._registeredEvents.has(eventName)) {
+      if (this.registeredEvents.has(eventName)) {
         // if event already exists, remove the event listener from sse
-        const eventListenerToRemove = this._registeredEvents.get(eventName).eventListener;
-        this._currentSse$.removeEventListener(eventName, eventListenerToRemove);
+        const eventListenerToRemove = this.registeredEvents.get(eventName).eventListener;
+        this.currentSse$.removeEventListener(eventName, eventListenerToRemove);
       } else {
         // if event doesn't exist, create a subject for it ...
-        this._registeredEvents.set(eventName, { eventListener: null, subject$: new Subject() });
+        this.registeredEvents.set(eventName, { eventListener: null, subject$: new Subject() });
       }
 
       // in both cases, add the new event listener (it was either removed or didn't exist)
       const eventListener = ({ data }: { data: string }) => {
-        this._registeredEvents.get(eventName).subject$.next(JSON.parse(data));
+        this.registeredEvents.get(eventName).subject$.next(JSON.parse(data));
       };
 
-      this._registeredEvents.set(eventName, {
+      this.registeredEvents.set(eventName, {
         eventListener,
-        subject$: this._registeredEvents.get(eventName).subject$
+        subject$: this.registeredEvents.get(eventName).subject$
       });
 
-      this._currentSse$.addEventListener(eventName, eventListener);
+      this.currentSse$.addEventListener(eventName, eventListener);
     });
 
     return Observable.of(null);
   }
 
   subscribeToWorkspaceEvent(eventName: string) {
-    if (this._registeredEvents.has(eventName)) {
-      return this._registeredEvents.get(eventName).subject$.asObservable();
+    if (this.registeredEvents.has(eventName)) {
+      return this.registeredEvents.get(eventName).subject$.asObservable();
     }
 
     if (environment.debug) {

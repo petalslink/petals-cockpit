@@ -29,23 +29,23 @@ import { ServiceUnits } from './../service-units/service-units.reducer';
 @Injectable()
 export class ServiceUnitsEffects {
   constructor(
-    private _actions$: Actions,
-    private _store$: Store<IStore>,
-    private _serviceUnitsService: ServiceUnitsService
+    private actions$: Actions,
+    private store$: Store<IStore>,
+    private serviceUnitsService: ServiceUnitsService
   ) { }
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchServiceUnitDetails$: Observable<Action> = this._actions$
+  @Effect({ dispatch: true }) fetchServiceUnitDetails$: Observable<Action> = this.actions$
     .ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)
     .combineLatest(this
       // wait the first workspace to be fetched
-      ._store$
+      .store$
       .select(state => state.workspaces.firstWorkspaceFetched)
       .filter(b => b === true)
       .first()
     )
     .switchMap(([action, _]: [{ type: string, payload: { serviceUnitId: string } }, boolean]) =>
-      this._serviceUnitsService.getDetailsServiceUnit(action.payload.serviceUnitId)
+      this.serviceUnitsService.getDetailsServiceUnit(action.payload.serviceUnitId)
         .map((res: Response) => {
           if (!res.ok) {
             throw new Error('Error while fetching the service-unit details');

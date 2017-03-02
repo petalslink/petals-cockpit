@@ -40,17 +40,17 @@ import { NotificationsService } from 'angular2-notifications';
 @Injectable()
 export class WorkspacesEffects {
   constructor(
-    private _actions$: Actions,
-    private _workspacesService: WorkspacesService,
-    private _sseService: SseService,
-    private _busesService: BusesService,
-    private _notification: NotificationsService
+    private actions$: Actions,
+    private workspacesService: WorkspacesService,
+    private sseService: SseService,
+    private busesService: BusesService,
+    private notification: NotificationsService
   ) { }
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchWorkspaces$: Observable<Action> = this._actions$
+  @Effect({ dispatch: true }) fetchWorkspaces$: Observable<Action> = this.actions$
     .ofType(Workspaces.FETCH_WORKSPACES)
-    .switchMap((action: Action) => this._workspacesService.fetchWorkspaces()
+    .switchMap((action: Action) => this.workspacesService.fetchWorkspaces()
       .switchMap((res: Response) => {
         const data = res.json();
         return Observable.of(batchActions([
@@ -66,15 +66,15 @@ export class WorkspacesEffects {
           console.groupEnd();
         }
 
-        this._notification.error(`Workspaces`, `An error occured while loading the workspaces.`);
+        this.notification.error(`Workspaces`, `An error occured while loading the workspaces.`);
         return Observable.of({ type: Workspaces.FETCH_WORKSPACES_FAILED, payload: action.payload });
       })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) postWorkspace$: Observable<Action> = this._actions$
+  @Effect({ dispatch: true }) postWorkspace$: Observable<Action> = this.actions$
     .ofType(Workspaces.POST_WORKSPACE)
-    .switchMap((action: Action) => this._workspacesService.postWorkspace(action.payload)
+    .switchMap((action: Action) => this.workspacesService.postWorkspace(action.payload)
       .map((res: Response) => {
         const workspace = res.json();
 
@@ -88,28 +88,28 @@ export class WorkspacesEffects {
           console.groupEnd();
         }
 
-        this._notification.error(`Workspaces`, `An error occured while adding a new workspace.`);
+        this.notification.error(`Workspaces`, `An error occured while adding a new workspace.`);
         return Observable.of({ type: Workspaces.POST_WORKSPACE_FAILED });
       })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchWorkspace$: Observable<Action> = this._actions$
+  @Effect({ dispatch: true }) fetchWorkspace$: Observable<Action> = this.actions$
     .ofType(Workspaces.FETCH_WORKSPACE)
-    .switchMap((action: Action) => this._sseService.watchWorkspaceRealTime(action.payload)
+    .switchMap((action: Action) => this.sseService.watchWorkspaceRealTime(action.payload)
       .map(_ => {
         // TODO shouldn't we keep the Subscriptions and close them when we change workspace?
-        this._busesService.watchEventBusDeleted();
-        this._busesService.watchEventBusImportOk();
-        this._busesService.watchEventBusImportError();
+        this.busesService.watchEventBusDeleted();
+        this.busesService.watchEventBusImportOk();
+        this.busesService.watchEventBusImportError();
         return { type: Workspaces.FETCH_WORKSPACE_WAIT_SSE, payload: action.payload };
       })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchWorkspaceWaitSse$: Observable<Action> = this._actions$
+  @Effect({ dispatch: true }) fetchWorkspaceWaitSse$: Observable<Action> = this.actions$
     .ofType(Workspaces.FETCH_WORKSPACE_WAIT_SSE)
-    .switchMap((action: Action) => this._sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
+    .switchMap((action: Action) => this.sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
       .switchMap((data: any) => {
         return Observable.of(batchActions([
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
@@ -132,7 +132,7 @@ export class WorkspacesEffects {
           console.groupEnd();
         }
 
-        this._notification.error(`Workspace`, `An error occured while loading the workspace.`);
+        this.notification.error(`Workspace`, `An error occured while loading the workspace.`);
         return Observable.of({ type: Workspaces.FETCH_WORKSPACE_FAILED, payload: action.payload });
       })
     );

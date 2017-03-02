@@ -30,7 +30,7 @@ export class BusesInProgressMockService extends BusesInProgressService {
 
   private firstErrorSent = false;
 
-  constructor(private _sseService: SseService) {
+  constructor(private sseService: SseService) {
     super();
   }
 
@@ -59,7 +59,7 @@ export class BusesInProgressMockService extends BusesInProgressService {
       .responseBody(detailsBus)
       .do(_ => {
         // simulate the backend sending the answer on the SSE
-        setTimeout(() => (this._sseService as SseServiceMock)
+        setTimeout(() => (this.sseService as SseServiceMock)
           .triggerSseEvent(event, newBus.eventData), environment.sseDelay);
       });
   }
@@ -69,7 +69,7 @@ export class BusesInProgressMockService extends BusesInProgressService {
       .response(204)
       .do(_ => {
         // simulate the backend sending the answer on the SSE
-        setTimeout(() => (this._sseService as SseServiceMock)
+        setTimeout(() => (this.sseService as SseServiceMock)
           .triggerSseEvent(SseWorkspaceEvent.BUS_DELETED, { id }), environment.sseDelay);
       });
   }
