@@ -17,7 +17,6 @@
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Router } from '@angular/router';
 import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
@@ -41,7 +40,6 @@ import { NotificationsService } from 'angular2-notifications';
 @Injectable()
 export class WorkspacesEffects {
   constructor(
-    private _router: Router,
     private _actions$: Actions,
     private _workspacesService: WorkspacesService,
     private _sseService: SseService,

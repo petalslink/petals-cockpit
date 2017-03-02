@@ -1,11 +1,8 @@
-import { omit } from 'underscore';
-
 import { IBusInProgress } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { Bus, BusInProgress, busesService, busesInProgressService } from './buses-mock';
-import { containersService, Container } from './containers-mock';
+import { Container } from './containers-mock';
 import { Component } from './components-mock';
 import { ServiceUnit } from './service-units-mock';
-import { toJavascriptMap } from '../app/shared/helpers/shared.helper';
 
 export class Workspace {
   private static _cpt = 0;

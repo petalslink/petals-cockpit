@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
@@ -28,8 +28,6 @@ import { Buses } from '../../state/buses/buses.reducer';
 import { IBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
 import { getBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.selectors';
 import { IWorkspacesTable } from './../../state/workspaces/workspaces.interface';
-import { BusesService } from './../../../../../shared/services/buses.service';
-import { SseWorkspaceEvent } from './../../../../../shared/services/sse.service';
 import { Workspaces } from './../../state/workspaces/workspaces.reducer';
 
 @Component({
@@ -43,7 +41,7 @@ export class PetalsMenuViewComponent implements OnInit {
   public tree$: Observable<any>;
   public busesInProgress$: Observable<IBusesInProgress>;
 
-  constructor(private _fb: FormBuilder, private _store$: Store<IStore>, private _busesService: BusesService) { }
+  constructor(private _fb: FormBuilder, private _store$: Store<IStore>) { }
 
   ngOnInit() {
     this.workspaces$ = this._store$.select(state => state.workspaces);

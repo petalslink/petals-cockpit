@@ -21,7 +21,6 @@ import {
   ChangeDetectionStrategy,
   OnChanges,
   AfterViewInit,
-  AfterViewChecked,
   SimpleChanges
 } from '@angular/core';
 

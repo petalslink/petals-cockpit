@@ -16,8 +16,6 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
 
 import { UsersService } from './users.service';
 import { IUser } from './../interfaces/user.interface';

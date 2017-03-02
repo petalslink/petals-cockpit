@@ -24,8 +24,6 @@ import { IBusInProgress } from './../../features/cockpit/workspaces/state/buses-
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 import { workspacesService } from '../../../mocks/workspaces-mock';
-import { BusInProgress } from './../../../mocks/buses-mock';
-import { toJavascriptMap } from '../helpers/shared.helper';
 
 @Injectable()
 export class BusesInProgressMockService extends BusesInProgressService {

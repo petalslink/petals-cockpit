@@ -18,7 +18,6 @@
 import { Injectable } from '@angular/core';
 
 import { ComponentsService } from './components.service';
-import { environment } from './../../../environments/environment';
 import { componentsService } from '../../../mocks/components-mock';
 import * as helper from './../helpers/mock.helper';
 

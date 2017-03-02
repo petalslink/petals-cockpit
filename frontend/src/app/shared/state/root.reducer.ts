@@ -15,12 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { combineReducers, provideStore } from '@ngrx/store';
+import { combineReducers } from '@ngrx/store';
 import { compose } from '@ngrx/core/compose';
 import { storeFreeze } from 'ngrx-store-freeze';
 import { enableBatching } from 'redux-batched-actions';
 
-import { IStore } from '../interfaces/store.interface';
 import { environment } from '../../../environments/environment';
 import { Ui } from '../state/ui.reducer';
 import { Users } from './users.reducer';

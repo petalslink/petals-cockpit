@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Containers } from '../../features/cockpit/workspaces/state/containers/containers.reducer';
 import { IUi } from './ui.interface';
 import { IUsersTable } from './users.interface';
 import { IWorkspacesTable } from '../../features/cockpit/workspaces/state/workspaces/workspaces.interface';

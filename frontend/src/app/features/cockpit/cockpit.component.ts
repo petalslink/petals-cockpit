@@ -16,22 +16,17 @@
  */
 
 import { Component, ViewChild, Inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { MdDialog, MdDialogRef } from '@angular/material';
 import { MediaChange } from '@angular/flex-layout';
 import { MdSidenav } from '@angular/material';
 import { ObservableMedia } from '@angular/flex-layout';
 import { Observable } from 'rxjs/Observable';
-import { TranslateService } from 'ng2-translate';
 import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
 
-import { ServiceUnits } from './workspaces/state/service-units/service-units.reducer';
-import { Components } from './workspaces/state/components/components.reducer';
-import { Containers } from './workspaces/state/containers/containers.reducer';
-import { Buses } from './workspaces/state/buses/buses.reducer';
 import { IWorkspace } from './workspaces/state/workspaces/workspace.interface';
-import { IWorkspaces, IWorkspacesTable } from './workspaces/state/workspaces/workspaces.interface';
+import { IWorkspacesTable } from './workspaces/state/workspaces/workspaces.interface';
 import { Workspaces } from './workspaces/state/workspaces/workspaces.reducer';
 import { Ui } from '../../shared/state/ui.reducer';
 import { LANGUAGES } from '../../core/opaque-tokens';

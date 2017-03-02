@@ -32,7 +32,7 @@ export function response(status: number): Observable<Response> {
  * This simulates the behaviour of Angular's http module:
  * if the status code is not a 2XX, it will return a failing Observable
  */
-export function responseBody(body: string | Object | FormData | ArrayBuffer | Blob, status = 200): Observable<Response> {
+export function responseBody(body: string | Object | ArrayBuffer, status = 200): Observable<Response> {
   const response = new Response(new ResponseOptions({ status, body }));
 
   if (status >= 200 && status < 300) {

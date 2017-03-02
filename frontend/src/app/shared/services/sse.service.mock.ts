@@ -63,11 +63,6 @@ export class SseServiceMock extends SseService {
         this._registeredEvents.set(eventName, new Subject());
       }
 
-      // TODO there is something uterly wrong here...
-      const eventListener = ({ data }: { data: string }) => {
-        this._registeredEvents.get(eventName).next(data);
-      };
-
       this._registeredEvents.set(eventName, this._registeredEvents.get(eventName));
     });
 

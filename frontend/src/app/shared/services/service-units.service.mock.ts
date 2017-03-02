@@ -18,7 +18,6 @@
 import { Injectable } from '@angular/core';
 
 import { ServiceUnitsService } from './service-units.service';
-import { environment } from './../../../environments/environment';
 import { serviceUnitsService } from '../../../mocks/service-units-mock';
 import * as helper from './../helpers/mock.helper';
 
