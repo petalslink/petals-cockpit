@@ -50,7 +50,7 @@ md-toolbar {
 }
 
 .active-link, .active-link:hover {
-  .md-list-item {
+  .mat-list-item-content {
     background-color: mat-color($theme-primary-x);
     @extend .color-primary;
     @extend .bold;
@@ -59,7 +59,7 @@ md-toolbar {
   }
 }
 
-md-sidenav-container .md-list-item:hover, md-sidenav-container .md-list-item:focus {
+md-sidenav-container .mat-list-item-content:hover, md-sidenav-container .mat-list-item-content:focus {
   background-color: mat-color($theme-primary-x);
   @extend .light-bold;
 }
