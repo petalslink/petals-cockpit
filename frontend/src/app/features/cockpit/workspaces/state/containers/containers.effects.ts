@@ -17,11 +17,10 @@
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Store, Action } from '@ngrx/store';
+import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { environment } from './../../../../../../environments/environment';
 import { Containers } from './containers.reducer';
 import { ContainersService } from './../../../../../shared/services/containers.service';
@@ -30,21 +29,13 @@ import { ContainersService } from './../../../../../shared/services/containers.s
 export class ContainersEffects {
   constructor(
     private actions$: Actions,
-    private store$: Store<IStore>,
     private containersService: ContainersService
   ) { }
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchContainersDetails$: Observable<Action> = this.actions$
     .ofType(Containers.FETCH_CONTAINER_DETAILS)
-    .combineLatest(this
-      // wait the first workspace to be fetched
-      .store$
-      .select(state => state.workspaces.firstWorkspaceFetched)
-      .filter(b => b === true)
-      .first()
-    )
-    .switchMap(([action, _]: [{ type: string, payload: { containerId: string } }, boolean]) =>
+    .switchMap((action: { type: string, payload: { containerId: string } }) =>
       this.containersService.getDetailsContainer(action.payload.containerId)
         .map((res: Response) => {
           if (!res.ok) {
