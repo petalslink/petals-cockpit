@@ -29,7 +29,7 @@ variables:
     # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
     - yarn config set cache-folder $PWD/$YARN_CACHE_DIRECTORY --global
     # see https://github.com/yarnpkg/yarn/issues/2629
-    - yarn config set network-concurrency 4 --global
+    - yarn config set network-concurrency 8 --global
     - du -hs $PWD/$YARN_CACHE_DIRECTORY || true
     - cd frontend
     - export PATH=`yarn bin`:$PATH
@@ -89,9 +89,7 @@ build-frontend:
     - nohup $XVFB &
     - XVFBPID=$!
     - time ng test --progress=false --single-run --code-coverage
-    # remove when https://github.com/angular/angular-cli/issues/4596 is fixed
-    - time webdriver-manager update --standalone false --gecko false
-    - time ng e2e --prod --progress=false -e=prod-e2e --webdriver-update=false
+    - time ng e2e --prod --progress=false -e=prod-e2e
     - kill $XVFBPID
     # build the final frontend for the product
     - time yarn run prod-silent && mv dist ../frontend-dist
@@ -140,6 +138,5 @@ e2e-product:
     - nohup $COCKPIT server $COCKPIT_CONFIG &
     - nohup $XVFB &
     - cd frontend
-    # remove when https://github.com/angular/angular-cli/issues/4596 is fixed
-    - time webdriver-manager update --standalone false --gecko false
-    - time ng e2e --serve=false --webdriver-update=false -- --exclude "e2e/*needspetals*.ts"
+    # TODO the exclude does not work, see https://github.com/angular/angular-cli/issues/5172
+    - time ng e2e --serve=false -- --exclude "e2e/*needspetals*.ts"
