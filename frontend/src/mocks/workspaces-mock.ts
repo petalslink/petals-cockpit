@@ -111,7 +111,7 @@ export class Workspace {
 
 // we don't need to manage CRUD operations on users and we don't have a class to handle them
 // it would be completely overkill to put them in a separate file
-const users = {
+export const users = {
   admin: {
     id: 'admin',
     name: 'Administrator',

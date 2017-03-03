@@ -63,4 +63,10 @@ describe(`Login`, () => {
 
     expect(browser.getCurrentUrl()).toMatch(/\/login$/);
   });
+
+  it(`should redirect to last workspace`, () => {
+    page.login(`vnoel`, `vnoel`);
+
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
+  });
 });
