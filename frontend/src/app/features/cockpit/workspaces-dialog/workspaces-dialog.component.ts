@@ -116,6 +116,11 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
 
   onSubmit({ value }) {
     this.store$.dispatch({ type: Workspaces.POST_WORKSPACE, payload: value.name });
+    this.reset();
+  }
+
+  reset() {
+    this.newWksForm.reset();
   }
 
   getUsersNames(users: Array<IUser>) {

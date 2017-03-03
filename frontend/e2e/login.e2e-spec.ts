@@ -52,7 +52,7 @@ describe(`Login`, () => {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
 
     // TODO remove until ENDTODO when the logout button will be visible even on the workspaces list
-    element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
+    element.all(by.css(`app-workspaces-dialog md-card > div`)).first().click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
     // ENDTODO

@@ -33,16 +33,11 @@ app-root {
   justify-content: center;
 }
 
-md-card {
-  padding: 20px;
-  border-radius: 2dpi;
-}
-
-md-card-subtitle {
+mat-card-subtitle {
   float: right;
 }
 
-div > .md-dialog-container {
+div > .mat-dialog-container {
   padding: 0;
   margin: 0;
 }
@@ -78,40 +73,6 @@ div > .md-dialog-container {
       max-width: 800px;
       margin: auto;
     }
-  }
-}
-
-.icon-slot {
-  width: 20px;
-  float: right;
-  .green-led {
-    float: right;
-    margin-left: 5px;
-    width: 10px;
-    height: 10px;
-    background-color: #ABFF00;
-    border-radius: 50%;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 3px 1px, inset #304701 0 -1px 3px, #89FF00 0 1px 3px;
-  }
-
-  .red-led {
-    float: right;
-    margin-left: 5px;
-    width: 10px;
-    height: 10px;
-    background-color: #F00;
-    border-radius: 50%;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
-  }
-
-  .yellow-led {
-    float: right;
-    margin-left: 5px;
-    width: 10px;
-    height: 10px;
-    background-color: #FF0;
-    border-radius: 50%;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 3px, #FF0 0 1px 3px;
   }
 }
 
@@ -243,4 +204,3 @@ pre {
   background-size: cover;
   background-repeat: no-repeat;
 }
-

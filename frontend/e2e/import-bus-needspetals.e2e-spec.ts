@@ -26,7 +26,7 @@ describe(`Import Bus`, () => {
     page = new PetalsCockpitPage();
     page.navigateTo();
     page.login(`admin`, `admin`);
-    element.all(by.css(`app-workspaces-dialog md-card`)).first().click();
+    element.all(by.css(`app-workspaces-dialog md-card > div`)).first().click();
     const addBtn = element(by.css(`app-cockpit md-sidenav a.btn-add-bus`));
     browser.wait(EC.elementToBeClickable(addBtn), 5000);
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
