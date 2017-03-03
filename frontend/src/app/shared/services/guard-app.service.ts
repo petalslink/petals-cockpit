@@ -36,24 +36,35 @@ export class GuardAppService implements CanLoad {
   ) { }
 
   canLoad() {
-    return this.userService.getUserInformations()
-      .map((res: Response) => {
-        if (environment.debug) {
-          console.debug(`Guard App : User already logged. Continuing to /workspaces.`);
+    return this.store$
+      .select(state => state.users.connectedUserId)
+      .first()
+      .switchMap(userId => {
+        // if we are already logged, let's not do the whole request again
+        // see https://github.com/angular/angular/issues/14475
+        if (userId) {
+          return Observable.of(true);
+        } else {
+          return this.userService.getUserInformations()
+            .map((res: Response) => {
+              if (environment.debug) {
+                console.debug(`Guard App : User already logged. Continuing to /workspaces.`);
+              }
+
+              this.store$.dispatch({ type: Users.CONNECT_USER_SUCCESS, payload: { user: <IUser>res.json(), redirectWorkspace: false } });
+
+              return true;
+            }).catch(_ => {
+              // if not already connected, redirect to login
+              if (environment.debug) {
+                console.debug(`Guard App : User's not logged. Redirecting to /login.`);
+              }
+
+              this.router.navigate(['/login']);
+
+              return Observable.of(false);
+            });
         }
-
-        this.store$.dispatch({ type: Users.CONNECT_USER_SUCCESS, payload: { user: <IUser>res.json(), redirectWorkspace: false } });
-
-        return true;
-      }).catch(_ => {
-        // if not already connected, redirect to login
-        if (environment.debug) {
-          console.debug(`Guard App : User's not logged. Redirecting to /login.`);
-        }
-
-        this.router.navigate(['/login']);
-
-        return Observable.of(false);
       });
   }
 }
