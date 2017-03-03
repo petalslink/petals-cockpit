@@ -20,16 +20,24 @@ interface IUserCommon {
   id: string;
   name: string;
   username: string;
-  lastWorkspace: string;
-
-  // for UI
-  password: string;
 }
 
 // used within table
 // tslint:disable-next-line:no-empty-interface
-export interface IUserRow extends IUserCommon { }
+export interface IUserRow extends IUserCommon {
+  // from server (actually only present for current user)
+  lastWorkspace: string;
+}
 
 // used in generated views
 // tslint:disable-next-line:no-empty-interface
 export interface IUser extends IUserCommon { }
+
+export interface ICurrentUser extends IUserRow, IUser { }
+
+// used for login
+export interface IUserLogin {
+  // for UI
+  username: string;
+  password: string;
+}

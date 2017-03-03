@@ -19,9 +19,9 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from './../interfaces/store.interface';
-import { IUser } from './../interfaces/user.interface';
+import { ICurrentUser } from './../interfaces/user.interface';
 
-export function _getCurrentUser(store$: Store<IStore>): Observable<IUser> {
+export function _getCurrentUser(store$: Store<IStore>): Observable<ICurrentUser> {
   return store$
     .select(state => state.users)
     .distinctUntilChanged((p, n) => p.connectedUserId === n.connectedUserId)

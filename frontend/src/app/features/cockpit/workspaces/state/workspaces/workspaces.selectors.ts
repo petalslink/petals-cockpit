@@ -25,6 +25,7 @@ import { IContainer } from '../containers/container.interface';
 import { IWorkspace } from './workspace.interface';
 import { IBus } from '../buses/bus.interface';
 import { escapeStringRegexp } from '../../../../../shared/helpers/shared.helper';
+import { IUser } from '../../../../../shared/interfaces/user.interface';
 
 export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspaces> {
   const sWorkspaces = store$.select((state: IStore) => state.workspaces);
@@ -42,7 +43,7 @@ export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspace
               ...workspaces.byId[workspaceId],
               ...<IWorkspace>{
                 users: {
-                  list: workspaces.byId[workspaceId].users.map(userId => users.byId[userId])
+                  list: workspaces.byId[workspaceId].users.map(userId => <IUser>users.byId[userId])
                 }
               }
             };
@@ -92,7 +93,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
         searchPetals: workspaces.searchPetals,
 
         users: {
-          list: workspaces.byId[workspaces.selectedWorkspaceId].users.map(userId => users.byId[userId])
+          list: workspaces.byId[workspaces.selectedWorkspaceId].users.map(userId => <IUser>users.byId[userId])
         },
 
         buses: {

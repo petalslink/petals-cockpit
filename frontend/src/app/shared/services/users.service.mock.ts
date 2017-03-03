@@ -18,14 +18,14 @@
 import { Injectable } from '@angular/core';
 
 import { UsersService } from './users.service';
-import { IUser } from './../interfaces/user.interface';
+import { IUserLogin, ICurrentUser } from './../interfaces/user.interface';
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 
 @Injectable()
 export class UsersMockService extends UsersService {
   private userIsConnected: boolean = environment.alreadyConnected;
-  private adminUser: IUser;
+  private adminUser: ICurrentUser;
 
   constructor() {
     super();
@@ -33,15 +33,14 @@ export class UsersMockService extends UsersService {
       id: 'admin',
       name: 'Administrator',
       username: 'admin',
-      lastWorkspace: '',
-      password: ''
+      lastWorkspace: 'idWks0'
     };
   }
 
-  connectUser(user: IUser) {
+  connectUser(user: IUserLogin) {
     if (user.username === 'admin' && user.password === 'admin') {
       this.userIsConnected = true;
-      return helper.responseBody(user);
+      return helper.responseBody(this.adminUser);
     }
 
     return helper.response(401);

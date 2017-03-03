@@ -19,7 +19,7 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IUser } from './../../../shared/interfaces/user.interface';
+import { ICurrentUser } from './../../../shared/interfaces/user.interface';
 import { IStore } from './../../../shared/interfaces/store.interface';
 import { Users } from './../../../shared/state/users.reducer';
 import { getCurrentUser } from './../../../shared/state/users.selectors';
@@ -30,7 +30,7 @@ import { getCurrentUser } from './../../../shared/state/users.selectors';
   styleUrls: ['./menu-user-panel.component.scss']
 })
 export class MenuUserPanelComponent implements OnInit {
-  public user$: Observable<IUser>;
+  public user$: Observable<ICurrentUser>;
   public isDisconnecting$: Observable<boolean>;
 
   constructor(private store$: Store<IStore>) {

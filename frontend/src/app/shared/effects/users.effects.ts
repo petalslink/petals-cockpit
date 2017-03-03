@@ -25,7 +25,7 @@ import { NotificationsService } from 'angular2-notifications';
 
 import { Users } from './../state/users.reducer';
 import { UsersService } from './../services/users.service';
-import { IUser } from './../interfaces/user.interface';
+import { ICurrentUser } from './../interfaces/user.interface';
 import { environment } from './../../../environments/environment';
 
 @Injectable()
@@ -49,7 +49,7 @@ export class UsersEffects {
 
           return {
             type: Users.CONNECT_USER_SUCCESS,
-            payload: { user: <IUser>res.json() }
+            payload: { user: <ICurrentUser>res.json(), redirectWorkspace: true }
           };
         })
         .catch((err) => {
@@ -67,10 +67,7 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false }) connectUserSuccess$: Observable<void> = this.actions$
     .ofType(Users.CONNECT_USER_SUCCESS)
-    .filter((action: Action) =>
-      typeof action.payload.redirectWorkspace === 'undefined' ||
-      action.payload.redirectWorkspace === true
-    )
+    .filter((action: Action) => action.payload.redirectWorkspace)
     .map(_ => {
       this.router.navigate(['/workspaces']);
     });

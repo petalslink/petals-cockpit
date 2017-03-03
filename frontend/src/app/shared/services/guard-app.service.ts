@@ -25,7 +25,7 @@ import { IStore } from './../interfaces/store.interface';
 import { UsersService } from './users.service';
 import { environment } from './../../../environments/environment';
 import { Users } from './../state/users.reducer';
-import { IUser } from './../interfaces/user.interface';
+import { ICurrentUser } from './../interfaces/user.interface';
 
 @Injectable()
 export class GuardAppService implements CanLoad {
@@ -51,7 +51,10 @@ export class GuardAppService implements CanLoad {
                 console.debug(`Guard App : User already logged. Continuing to /workspaces.`);
               }
 
-              this.store$.dispatch({ type: Users.CONNECT_USER_SUCCESS, payload: { user: <IUser>res.json(), redirectWorkspace: false } });
+              this.store$.dispatch({
+                type: Users.CONNECT_USER_SUCCESS,
+                payload: { user: <ICurrentUser>res.json(), redirectWorkspace: false }
+              });
 
               return true;
             }).catch(_ => {

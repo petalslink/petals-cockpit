@@ -25,7 +25,7 @@ import { UsersService } from './users.service';
 import { environment } from './../../../environments/environment';
 import { IStore } from './../interfaces/store.interface';
 import { Users } from './../state/users.reducer';
-import { IUser } from './../interfaces/user.interface';
+import { ICurrentUser } from './../interfaces/user.interface';
 
 @Injectable()
 export class GuardLoginService implements CanLoad {
@@ -49,7 +49,10 @@ export class GuardLoginService implements CanLoad {
               }
 
               // this will redirect the user to /workspaces (from the effect catching it)
-              this.store$.dispatch({ type: Users.CONNECT_USER_SUCCESS, payload: { user: <IUser>res.json(), redirectWorkspace: true } });
+              this.store$.dispatch({
+                type: Users.CONNECT_USER_SUCCESS,
+                payload: { user: <ICurrentUser>res.json(), redirectWorkspace: true }
+              });
 
               return false;
             }).catch(_ => {
