@@ -56,6 +56,19 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     @Test
+    public void getExistingWorkspace() {
+        assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
+
+        WorkspaceFullContent content = resources.getJerseyTest().target("/workspaces/1").request()
+                .get(WorkspaceFullContent.class);
+        
+        assertContent(content);
+
+        // with a normal GET, we don't record it as the last workspace of the user
+        assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
+    }
+
+    @Test
     public void getExistingWorkspaceEvent() {
         assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
 

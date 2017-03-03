@@ -47,24 +47,30 @@ import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.ArtifactAdministration;
 import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.artifact.Artifact;
+import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
+import org.ow2.petals.admin.api.artifact.lifecycle.ArtifactLifecycle;
+import org.ow2.petals.admin.api.artifact.lifecycle.ComponentLifecycle;
 import org.ow2.petals.admin.api.artifact.lifecycle.ServiceAssemblyLifecycle;
 import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentOverview;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin.State;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewBus;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewComponentState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewSUState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceChange;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
@@ -133,6 +139,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 answer((NewWorkspaceClient) msg, this::addBroadcastClient);
             } else if (msg instanceof ChangeServiceUnitState) {
                 answer((ChangeServiceUnitState) msg, this::handleSUStateChange);
+            } else if (msg instanceof ChangeComponentState) {
+                answer((ChangeComponentState) msg, this::handleComponentStateChange);
             } else {
                 LOG.warn("Unexpected event for workspace {}: {}", wId, msg);
             }
@@ -302,6 +310,137 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
+    private Either<Status, ComponentOverview> handleComponentStateChange(ChangeComponentState change)
+            throws SuspendExecution {
+        return runTransaction(conf -> {
+            ComponentsRecord comp = DSL.using(conf).selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(change.compId)).fetchOne();
+            
+            if (comp == null) {
+                return Either.left(Status.NOT_FOUND);
+            }
+            
+            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
+                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
+                    .onKey(FK_CONTAINERS_BUSES_ID).join(COMPONENTS)
+                    .onKey(FK_COMPONENTS_CONTAINERS_ID).where(COMPONENTS.ID.eq(change.compId)
+                            .and(USERS_WORKSPACES.USERNAME.eq(change.user)).and(USERS_WORKSPACES.WORKSPACE_ID.eq(wId)))
+                    .fetchOne();
+
+            if (user == null) {
+                return Either.left(Status.FORBIDDEN);
+            }
+            
+            return handleComponentStateChange(change, comp, conf);
+        });
+    }
+
+    private Either<Status, ComponentOverview> handleComponentStateChange(ChangeComponentState change,
+            ComponentsRecord comp, Configuration conf) throws Exception {
+
+        ComponentMin.State currentState = ComponentMin.State.valueOf(comp.getState());
+
+        if (currentState.equals(change.newState)) {
+            return Either.right(new ComponentOverview(comp.getId(), comp.getName(), currentState,
+                    ComponentMin.Type.valueOf(comp.getType())));
+        }
+
+        if (!isComponentStateTransitionOk(comp, currentState, change.newState)) {
+            // TODO or should I rely on the information from the container instead of my own?
+            return Either.left(Status.CONFLICT);
+        }
+
+        if (change.newState == ComponentMin.State.Unloaded
+                && DSL.using(conf).fetchExists(SERVICEUNITS, SERVICEUNITS.COMPONENT_ID.eq(comp.getId()))) {
+            // TODO or should I rely on the information from the container instead of my own?
+            return Either.left(Status.CONFLICT);
+        }
+
+        // TODO merge with previous requests...
+        ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(comp.getContainerId()))
+                .fetchOne();
+        assert cont != null;
+
+        // we already are in a thread pool
+        ComponentOverview res = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
+                petals -> {
+                    ArtifactAdministration aa = petals.newArtifactAdministration();
+                    Artifact a = aa.getArtifact(comp.getType(), comp.getName(), null);
+                    assert a instanceof Component;
+                    Component compo = (Component) a;
+                    ComponentMin.State newState = changeComponentState(petals, compo, change.newState);
+                    return new ComponentOverview(comp.getId(), comp.getName(), newState,
+                            ComponentMin.Type.valueOf(comp.getType()));
+                });
+        assert res != null;
+
+        componentStateUpdated(res, conf);
+
+        return Either.right(res);
+    }
+
+    /**
+     * Note : petals admin does not expose a way to go to shutdown (except from {@link ComponentMin.State#Unloaded} via
+     * {@link ArtifactLifecycle#deploy(java.net.URL)}, but we don't support it yet!)
+     */
+    private boolean isComponentStateTransitionOk(ComponentsRecord comp, ComponentMin.State from,
+            ComponentMin.State to) {
+        switch (from) {
+            case Loaded:
+                return to == ComponentMin.State.Unloaded; // via undeploy()
+            case Shutdown:
+                return to == ComponentMin.State.Unloaded // via undeploy()
+                        || to == ComponentMin.State.Started; // via start()
+            case Started:
+                return to == ComponentMin.State.Stopped; // via stop()
+            case Stopped:
+                return to == ComponentMin.State.Started // via start()
+                        || to == ComponentMin.State.Unloaded; // via undeploy()
+            default:
+                LOG.warn("Impossible case for state transition check from {} to {} for Component {} ({})", from, to,
+                        comp.getName(), comp.getId());
+                return false;
+        }
+    }
+
+    private ComponentMin.State changeComponentState(PetalsAdministration petals, Component comp,
+            ComponentMin.State desiredState) throws ArtifactAdministrationException {
+        ComponentLifecycle sal = petals.newArtifactLifecycleFactory().createComponentLifecycle(comp);
+        switch (desiredState) {
+            case Unloaded:
+                sal.undeploy();
+                break;
+            case Started:
+                sal.start();
+                break;
+            case Stopped:
+                sal.stop();
+                break;
+            default:
+                LOG.warn("Impossible case for state transition from {} to {} for Component {} ({})", comp.getState(),
+                        desiredState, comp.getName());
+        }
+        if (desiredState != ComponentMin.State.Unloaded) {
+            sal.updateState();
+            return ComponentMin.State.from(comp.getState());
+        } else {
+            // we can't call updateState for this one, it will fail since it has been unloaded
+            return ComponentMin.State.Unloaded;
+        }
+    }
+
+    private void componentStateUpdated(ComponentMin comp, Configuration conf) throws SuspendExecution {
+        // TODO error handling???
+        if (comp.state != ComponentMin.State.Unloaded) {
+            DSL.using(conf).update(COMPONENTS).set(COMPONENTS.STATE, comp.state.name()).where(COMPONENTS.ID.eq(comp.id))
+                    .execute();
+        } else {
+            DSL.using(conf).deleteFrom(COMPONENTS).where(COMPONENTS.ID.eq(comp.id)).execute();
+        }
+
+        // we want the event to be sent after we answered
+        doInActorLoop(() -> WorkspaceChange.componentStateChange(new NewComponentState(comp.id, comp.state)));
+    }
+
     private Either<Status, ServiceUnitOverview> handleSUStateChange(ChangeServiceUnitState change)
             throws SuspendExecution {
         return runTransaction(conf -> {
@@ -330,7 +469,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     }
 
     private Either<Status, ServiceUnitOverview> handleSUStateChange(ChangeServiceUnitState change,
-            ServiceunitsRecord su, Configuration conf) throws InterruptedException, Exception {
+            ServiceunitsRecord su, Configuration conf) throws Exception {
 
         ServiceUnitMin.State currentState = ServiceUnitMin.State.valueOf(su.getState());
 
@@ -356,7 +495,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                     Artifact a = aa.getArtifact(ServiceAssembly.TYPE, su.getSaName(), null);
                     assert a instanceof ServiceAssembly;
                     ServiceAssembly sa = (ServiceAssembly) a;
-                    State newState = changeSAState(petals, sa, change.newState);
+                    ServiceUnitMin.State newState = changeSAState(petals, sa, change.newState);
                     return new ServiceUnitOverview(su.getId(), su.getName(), newState, su.getSaName());
                 });
         assert res != null;
@@ -380,17 +519,19 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     }
 
     /**
-     * Note : petals admin does not expose a way to go to shutdown (except from {@link ServiceUnitMin.State#Unloaded},
-     * but we don't support it yet!)
+     * Note : petals admin does not expose a way to go to shutdown (except from {@link ServiceUnitMin.State#Unloaded}
+     * via {@link ArtifactLifecycle#deploy(java.net.URL)}, but we don't support it yet!)
      */
     private boolean isSAStateTransitionOk(ServiceunitsRecord su, ServiceUnitMin.State from, ServiceUnitMin.State to) {
         switch (from) {
             case Shutdown:
-                return to == ServiceUnitMin.State.Unloaded || to == ServiceUnitMin.State.Started;
+                return to == ServiceUnitMin.State.Unloaded // via undeploy()
+                        || to == ServiceUnitMin.State.Started; // via start()
             case Started:
-                return to == ServiceUnitMin.State.Stopped;
+                return to == ServiceUnitMin.State.Stopped; // via stop()
             case Stopped:
-                return to == ServiceUnitMin.State.Started || to == ServiceUnitMin.State.Unloaded;
+                return to == ServiceUnitMin.State.Started // via start()
+                        || to == ServiceUnitMin.State.Unloaded; // via undeploy()
             default:
                 LOG.warn("Impossible case for state transition check from {} to {} for SU {} ({})", from, to,
                         su.getName(), su.getId());
@@ -474,13 +615,28 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         private static final long serialVersionUID = 8119375036012239516L;
 
-        final State newState;
+        final ServiceUnitMin.State newState;
 
         final long suId;
 
-        public ChangeServiceUnitState(String user, long suId, State newState) {
+        public ChangeServiceUnitState(String user, long suId, ServiceUnitMin.State newState) {
             super(user);
             this.suId = suId;
+            this.newState = newState;
+        }
+    }
+
+    public static class ChangeComponentState extends WorkspaceRequest<ComponentOverview> {
+
+        private static final long serialVersionUID = 8119375036012239516L;
+
+        final ComponentMin.State newState;
+
+        final long compId;
+
+        public ChangeComponentState(String user, long compId, ComponentMin.State newState) {
+            super(user);
+            this.compId = compId;
             this.newState = newState;
         }
     }
