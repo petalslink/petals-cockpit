@@ -32,6 +32,7 @@ import org.jooq.Configuration;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.db.generated.Tables;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
+import org.ow2.petals.cockpit.server.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JCallback;
 import org.pac4j.jax.rs.annotations.Pac4JLogout;
@@ -86,8 +87,10 @@ public class UserSession {
     @POST
     @Path("/session")
     @Pac4JCallback(defaultUrl = "/user/session", renewSession = false)
-    public void login() {
+    public User login(Authentication auth) {
         // the method is never called, everything is handled by pac4j
+        // the parameter is here for documentation purpose
+        throw new AssertionError("impossible");
     }
 
     @DELETE
@@ -95,6 +98,7 @@ public class UserSession {
     @Pac4JLogout
     public void logout() {
         // the method is never called, everything is handled by pac4j
+        throw new AssertionError("impossible");
     }
 
     public static class UserMin {
