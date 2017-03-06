@@ -15,13 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export enum EServiceUnitState { Started, Stopped, Unloaded, Shutdown }
+// http://stackoverflow.com/a/41631732/2398593
+export const ServiceUnitState = {
+  Started: 'Started' as 'Started',
+  Stopped: 'Stopped' as 'Stopped',
+  Unloaded: 'Unloaded' as 'Unloaded',
+  Shutdown: 'Shutdown' as 'Shutdown'
+};
 
 export interface IServiceUnitCommon {
   // from server
   id: string;
   name: string;
-  state: EServiceUnitState;
+  state: keyof typeof ServiceUnitState;
 
   // for UI
   isFolded: boolean;

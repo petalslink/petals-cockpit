@@ -18,20 +18,47 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+import { Store } from '@ngrx/store';
 
 import { environment } from './../../../environments/environment';
+import { SseService, SseWorkspaceEvent } from './sse.service';
+import { ServiceUnits } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
+import { IStore } from '../interfaces/store.interface';
 
 export abstract class ServiceUnitsService {
   abstract getDetailsServiceUnit(serviceUnitId: string): Observable<Response>;
+
+  abstract putState(serviceUnitId: string, newState: string): Observable<Response>;
+
+  abstract watchEventSuStateChangeOk(): void;
 }
 
 @Injectable()
 export class ServiceUnitsServiceImpl extends ServiceUnitsService {
-  constructor(private http: Http) {
+  constructor(private http: Http, private sseService: SseService, private store$: Store<IStore>) {
     super();
   }
 
   getDetailsServiceUnit(serviceUnitId: string) {
     return this.http.get(`${environment.urlBackend}/serviceunits/${serviceUnitId}`);
+  }
+
+  putState(serviceUnitId: string, newState: string) {
+    return this.http.put(`${environment.urlBackend}/serviceunits/${serviceUnitId}`, { state: newState });
+  }
+
+  watchEventSuStateChangeOk() {
+    this.sseService
+      .subscribeToWorkspaceEvent(SseWorkspaceEvent.SU_STATE_CHANGE)
+      .do((data: {
+        id: string,
+        state: string
+      }) => {
+        this.store$.dispatch({
+          type: ServiceUnits.CHANGE_STATE_SUCCESS,
+          payload: { serviceUnitId: data.id, newState: data.state }
+        });
+      })
+      .subscribe();
   }
 }

@@ -48,13 +48,43 @@ export class ServiceUnitsEffects {
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in service-unit.effects.ts : ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)');
+            console.warn('Error catched in service-unit.effects : ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)');
             console.error(err);
             console.groupEnd();
           }
 
           return Observable.of({
             type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR,
+            payload: { serviceUnitId: action.payload.serviceUnitId }
+          });
+        })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) changeState$: Observable<Action> = this.actions$
+    .ofType(ServiceUnits.CHANGE_STATE)
+    .switchMap((action: { type: string, payload: { serviceUnitId: string, newState: string } }) =>
+      this.serviceUnitsService.putState(action.payload.serviceUnitId, action.payload.newState)
+        .map((res: Response) => {
+          if (!res.ok) {
+            throw new Error('Error while changing the service-unit state');
+          }
+
+          return {
+            type: ServiceUnits.CHANGE_STATE_WAIT_SSE,
+            payload: { serviceUnitId: action.payload.serviceUnitId }
+          };
+        })
+        .catch((err) => {
+          if (environment.debug) {
+            console.group();
+            console.warn('Error catched in service-unit.effects : ofType(ServiceUnits.CHANGE_STATE)');
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of({
+            type: ServiceUnits.CHANGE_STATE_ERROR,
             payload: { serviceUnitId: action.payload.serviceUnitId }
           });
         })

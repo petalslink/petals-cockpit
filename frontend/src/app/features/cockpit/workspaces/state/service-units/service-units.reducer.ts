@@ -125,6 +125,62 @@ export class ServiceUnits {
     };
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_STATE = `${ServiceUnits.reducerName}_CHANGE_STATE`;
+  private static changeState(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+    return {
+      ...serviceUnitsTable,
+      ...<IserviceUnitsTable>{
+        byId: {
+          ...serviceUnitsTable.byId,
+          [payload.serviceUnitId]: {
+            ...serviceUnitsTable.byId[payload.serviceUnitId],
+            isUpdatingState: true
+          }
+        }
+      }
+    };
+  }
+
+  // only used in effect, no point to handle that action
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_STATE_WAIT_SSE = `${ServiceUnits.reducerName}_CHANGE_STATE_WAIT_SSE`;
+
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_STATE_SUCCESS = `${ServiceUnits.reducerName}_CHANGE_STATE_SUCCESS`;
+  private static changeStateSuccess(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string, newState: string }) {
+    return {
+      ...serviceUnitsTable,
+      ...<IserviceUnitsTable>{
+        byId: {
+          ...serviceUnitsTable.byId,
+          [payload.serviceUnitId]: {
+            ...serviceUnitsTable.byId[payload.serviceUnitId],
+            isUpdatingState: false,
+            state: payload.newState
+          }
+        }
+      }
+    };
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_STATE_ERROR = `${ServiceUnits.reducerName}_CHANGE_STATE_ERROR`;
+  private static changeStateError(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+    return {
+      ...serviceUnitsTable,
+      ...<IserviceUnitsTable>{
+        byId: {
+          ...serviceUnitsTable.byId,
+          [payload.serviceUnitId]: {
+            ...serviceUnitsTable.byId[payload.serviceUnitId],
+            isUpdatingState: false
+          }
+        }
+      }
+    };
+  }
+
   private static fetchWorkspaceSuccess(_serviceUnitsTable: IserviceUnitsTable, _payload) {
     return serviceUnitsTableFactory();
   }
@@ -142,6 +198,9 @@ export class ServiceUnits {
     [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS]: ServiceUnits.fetchServiceUnitDetails,
     [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS]: ServiceUnits.fetchServiceUnitDetailsSuccess,
     [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR]: ServiceUnits.fetchServiceUnitDetailsError,
+    [ServiceUnits.CHANGE_STATE]: ServiceUnits.changeState,
+    [ServiceUnits.CHANGE_STATE_SUCCESS]: ServiceUnits.changeStateSuccess,
+    [ServiceUnits.CHANGE_STATE_ERROR]: ServiceUnits.changeStateError,
 
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: ServiceUnits.fetchWorkspaceSuccess,
     [Users.DISCONNECT_USER_SUCCESS]: ServiceUnits.disconnectUserSuccess
