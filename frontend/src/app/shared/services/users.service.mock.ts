@@ -18,44 +18,52 @@
 import { Injectable } from '@angular/core';
 
 import { UsersService } from './users.service';
-import { IUser } from './../interfaces/user.interface';
+import { IUserLogin, ICurrentUser } from './../interfaces/user.interface';
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
+import { users } from './../../../mocks/workspaces-mock';
 
 @Injectable()
 export class UsersMockService extends UsersService {
-  private userIsConnected: boolean = environment.alreadyConnected;
-  private adminUser: IUser;
+
+  private static users = {
+    admin: {
+      ...users.admin,
+      lastWorkspace: ''
+    },
+    vnoel: {
+      ...users.vnoel,
+      lastWorkspace: 'idWks0'
+    }
+  };
+
+  private currentUser: ICurrentUser = null;
 
   constructor() {
     super();
-    this.adminUser = {
-      id: 'admin',
-      name: 'Administrator',
-      username: 'admin',
-      lastWorkspace: '',
-      password: ''
-    };
+    if (environment.alreadyConnected) {
+      this.currentUser = UsersMockService.users.admin;
+    }
   }
 
-  connectUser(user: IUser) {
-    if (user.username === 'admin' && user.password === 'admin') {
-      this.userIsConnected = true;
-      return helper.responseBody(user);
+  connectUser(user: IUserLogin) {
+    if (UsersMockService.users[user.username] && user.username === user.password) {
+      this.currentUser = UsersMockService.users[user.username];
+      return helper.responseBody(this.currentUser);
     }
 
     return helper.response(401);
   }
 
   disconnectUser() {
-    this.userIsConnected = false;
+    this.currentUser = null;
 
     return helper.response(204);
   }
 
   getUserInformations() {
-    if (this.userIsConnected) {
-      return helper.responseBody(this.adminUser);
+    if (this.currentUser) {
+      return helper.responseBody(this.currentUser);
     }
 
     return helper.response(401);

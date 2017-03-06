@@ -29,7 +29,7 @@ import { getWorkspacesList } from '../workspaces/state/workspaces/workspaces.sel
 import { IWorkspaces } from '../workspaces/state/workspaces/workspaces.interface';
 import { IWorkspace } from '../workspaces/state/workspaces/workspace.interface';
 import { Ui } from './../../../shared/state/ui.reducer';
-import { IUser } from './../../../shared/interfaces/user.interface';
+import { IUser, ICurrentUser } from './../../../shared/interfaces/user.interface';
 import { getCurrentUser } from './../../../shared/state/users.selectors';
 
 @Component({
@@ -45,8 +45,8 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
   public position: TooltipPosition = 'below';
   public showDelay = 0;
   public hideDelay = 600;
-  public user: IUser;
-  private user$: Observable<IUser>;
+  public user: ICurrentUser;
+  public user$: Observable<ICurrentUser>;
 
   constructor(
     private store$: Store<IStore>,
@@ -56,8 +56,7 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.workspaces$ = this.store$.let(getWorkspacesList());
-    this.user$ = this
-      .store$
+    this.user$ = this.store$
       .let(getCurrentUser())
       .do(u => {
         this.user = u;

@@ -34,6 +34,7 @@ import { IStore } from '../../shared/interfaces/store.interface';
 import { IUi } from '../../shared/interfaces/ui.interface';
 import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog.component';
 import { getCurrentWorkspace } from '../cockpit/workspaces/state/workspaces/workspaces.selectors';
+import { getCurrentUser } from '../../shared/state/users.selectors';
 
 @Component({
   selector: 'app-cockpit',
@@ -89,7 +90,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
 
         const screenSize = change.mqAlias;
 
-        if (screenSize === 'lg' || screenSize === 'gt-lg' || screenSize === 'xl' ) {
+        if (screenSize === 'lg' || screenSize === 'gt-lg' || screenSize === 'xl') {
           return `${imgSrcBase}/logo-petals-cockpit.${imgSrcExt}`;
         } else {
           return `${imgSrcBase}/logo-petals-cockpit-without-text.${imgSrcExt}`;
@@ -122,14 +123,25 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     const url = this.router.url;
 
     if (!re.test(url)) {
-      this.openWorkspacesDialog();
+      this.store$
+        .let(getCurrentUser())
+        .first()
+        .do(u => {
+          // the lastWorkspace from the backend is always an existing workspace
+          if (u.lastWorkspace) {
+            this.router.navigate(['/workspaces', u.lastWorkspace]);
+          } else {
+            this.openWorkspacesDialog();
+          }
+        })
+        .subscribe();
     }
 
     // TODO : cf If hook available for handling escape
     // https://github.com/angular/material2/pull/2501
     // Handles the keyboard events ->
     // https://github.com/angular/material2/issues/2544
-    this.sidenav.handleKeydown = () => {};
+    this.sidenav.handleKeydown = () => { };
   }
 
   private _openWorkspacesDialog() {

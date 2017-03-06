@@ -20,10 +20,10 @@ import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
-import { IUser } from './../interfaces/user.interface';
+import { IUserLogin } from './../interfaces/user.interface';
 
 export abstract class UsersService {
-  abstract connectUser(user: IUser): Observable<Response>;
+  abstract connectUser(user: IUserLogin): Observable<Response>;
 
   abstract disconnectUser(): Observable<Response>;
 
@@ -36,7 +36,7 @@ export class UsersServiceImpl extends UsersService {
     super();
   }
 
-  connectUser(user: IUser) {
+  connectUser(user: IUserLogin) {
     return this.http.post(`${environment.urlBackend}/user/session`, <any>user);
   }
 

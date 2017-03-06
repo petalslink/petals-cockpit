@@ -25,30 +25,44 @@ import { UsersService } from './users.service';
 import { environment } from './../../../environments/environment';
 import { IStore } from './../interfaces/store.interface';
 import { Users } from './../state/users.reducer';
-import { IUser } from './../interfaces/user.interface';
+import { ICurrentUser } from './../interfaces/user.interface';
 
 @Injectable()
 export class GuardLoginService implements CanLoad {
   constructor(private userService: UsersService, private store$: Store<IStore>) { }
 
   canLoad() {
-    return this.userService.getUserInformations()
-      .map((res: Response) => {
-        // if already connected, redirect to the app
-        if (environment.debug) {
-          console.debug(`Guard Login : User already logged. Redirecting to /workspaces.`);
+    return this.store$
+      .select(state => state.users.connectedUserId)
+      .first()
+      .switchMap(userId => {
+        if (userId) {
+          // if we are already logged, let's not do the whole request again
+          // see https://github.com/angular/angular/issues/14475
+          return Observable.of(false);
+        } else {
+          return this.userService.getUserInformations()
+            .map((res: Response) => {
+              // if already connected, redirect to the app
+              if (environment.debug) {
+                console.debug(`Guard Login : User already logged. Redirecting to /workspaces.`);
+              }
+
+              // this will redirect the user to /workspaces (from the effect catching it)
+              this.store$.dispatch({
+                type: Users.CONNECT_USER_SUCCESS,
+                payload: { user: <ICurrentUser>res.json(), redirectWorkspace: true }
+              });
+
+              return false;
+            }).catch(_ => {
+              if (environment.debug) {
+                console.debug(`Guard Login : User not logged. Continuing to /login.`);
+              }
+
+              return Observable.of(true);
+            });
         }
-
-        // this will redirect the user to /workspaces (from the effect catching it)
-        this.store$.dispatch({ type: Users.CONNECT_USER_SUCCESS, payload: { user: <IUser>res.json(), redirectWorkspace: true } });
-
-        return false;
-      }).catch(_ => {
-        if (environment.debug) {
-          console.debug(`Guard Login : User not logged. Continuing to /login.`);
-        }
-
-        return Observable.of(true);
       });
   }
 }
