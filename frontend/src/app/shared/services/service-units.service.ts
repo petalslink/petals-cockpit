@@ -17,13 +17,17 @@
 
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
+import { NotificationsService } from 'angular2-notifications';
 
 import { environment } from './../../../environments/environment';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { ServiceUnits } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
 import { IStore } from '../interfaces/store.interface';
+import { ServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { IserviceUnitsTable } from '../../features/cockpit/workspaces/state/service-units/service-units.interface';
 
 export abstract class ServiceUnitsService {
   abstract getDetailsServiceUnit(serviceUnitId: string): Observable<Response>;
@@ -35,7 +39,13 @@ export abstract class ServiceUnitsService {
 
 @Injectable()
 export class ServiceUnitsServiceImpl extends ServiceUnitsService {
-  constructor(private http: Http, private sseService: SseService, private store$: Store<IStore>) {
+  constructor(
+    private http: Http,
+    private router: Router,
+    private sseService: SseService,
+    private store$: Store<IStore>,
+    private notification: NotificationsService
+  ) {
     super();
   }
 
@@ -50,14 +60,28 @@ export class ServiceUnitsServiceImpl extends ServiceUnitsService {
   watchEventSuStateChangeOk() {
     this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.SU_STATE_CHANGE)
-      .do((data: {
-        id: string,
-        state: string
-      }) => {
-        this.store$.dispatch({
-          type: ServiceUnits.CHANGE_STATE_SUCCESS,
-          payload: { serviceUnitId: data.id, newState: data.state }
-        });
+      .withLatestFrom(this
+        .store$
+        .select(state => [state.workspaces.selectedWorkspaceId, state.serviceUnits])
+      )
+      .do(([data, [selectedWorkspaceId, serviceUnits]]: [{ id: string, state: string }, [string, IserviceUnitsTable]]) => {
+        if (data.state === ServiceUnitState.Unloaded) {
+          this.router.navigate(['/workspaces', selectedWorkspaceId]);
+
+          const serviceUnit = serviceUnits.byId[data.id];
+
+          this.notification.success('Service unit unloaded', `"${serviceUnit.name}" has been unloaded`);
+
+          this.store$.dispatch({
+            type: ServiceUnits.REMOVE_SERVICE_UNIT,
+            payload: { serviceUnitId: data.id }
+          });
+        } else {
+          this.store$.dispatch({
+            type: ServiceUnits.CHANGE_STATE_SUCCESS,
+            payload: { serviceUnitId: data.id, newState: data.state }
+          });
+        }
       })
       .subscribe();
   }

@@ -77,11 +77,8 @@ export class UsersEffects {
     .ofType(Users.DISCONNECT_USER)
     .switchMap(_ =>
       this.usersService.disconnectUser()
-        .map((res: Response) => {
-          if (!res.ok) {
-            throw new Error('Error while disconnecting user');
-          }
-
+        // tslint:disable-next-line:no-shadowed-variable
+        .map(_ => {
           return { type: Users.DISCONNECT_USER_SUCCESS };
         })
         .catch((err) => {

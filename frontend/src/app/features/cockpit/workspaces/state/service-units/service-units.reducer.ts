@@ -16,6 +16,7 @@
  */
 
 import { Action } from '@ngrx/store';
+import { omit } from 'underscore';
 
 import { IserviceUnitsTable } from './service-units.interface';
 import { serviceUnitsTableFactory } from './service-units.initial-state';
@@ -181,6 +182,18 @@ export class ServiceUnits {
     };
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static REMOVE_SERVICE_UNIT = `${ServiceUnits.reducerName}_REMOVE_SERVICE_UNIT`;
+  private static removeServiceUnit(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+    return {
+      ...omit(serviceUnitsTable, 'byId', 'allIds'),
+      ...<IserviceUnitsTable>{
+        byId: omit(serviceUnitsTable.byId, payload.serviceUnitId),
+        allIds: serviceUnitsTable.allIds.filter(serviceUnitId => serviceUnitId === payload.serviceUnitId)
+      }
+    };
+  }
+
   private static fetchWorkspaceSuccess(_serviceUnitsTable: IserviceUnitsTable, _payload) {
     return serviceUnitsTableFactory();
   }
@@ -201,6 +214,7 @@ export class ServiceUnits {
     [ServiceUnits.CHANGE_STATE]: ServiceUnits.changeState,
     [ServiceUnits.CHANGE_STATE_SUCCESS]: ServiceUnits.changeStateSuccess,
     [ServiceUnits.CHANGE_STATE_ERROR]: ServiceUnits.changeStateError,
+    [ServiceUnits.REMOVE_SERVICE_UNIT]: ServiceUnits.removeServiceUnit,
 
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: ServiceUnits.fetchWorkspaceSuccess,
     [Users.DISCONNECT_USER_SUCCESS]: ServiceUnits.disconnectUserSuccess

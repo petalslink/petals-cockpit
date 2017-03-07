@@ -17,6 +17,7 @@
 
 import { ServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
 import { environment } from '../../../environments/environment';
+import { IComponentsTable } from '../../features/cockpit/workspaces/state/components/components.interface';
 
 /**
  * @param {string} state : The state you want to get the possible actions from. For example : 'Started'
@@ -52,4 +53,11 @@ export function stateNameToPossibleActions(state: string): { actionName: string,
 
       throw new Error(`SU state cannot be '${state}'`);
   }
+}
+
+export function getComponentOfServiceUnit(componentsTable: IComponentsTable, serviceUnitId: string) {
+  return componentsTable
+    .allIds
+    .map(componentId => componentsTable.byId[componentId])
+    .find(component => component.serviceUnits.includes(serviceUnitId));
 }
