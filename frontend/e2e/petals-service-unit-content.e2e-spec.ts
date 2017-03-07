@@ -39,7 +39,39 @@ describe(`Petals service-unit content`, () => {
     expect(pageTitle).toEqual('SU 0');
 
     const state = element(by.css(`app-petals-service-unit-overview md-card.state md-card-title`)).getText();
-
     expect(state).toEqual('Started');
+  });
+
+  it(`Should stop/start/stop/unload a service-unit`, () => {
+    page.getWorkspaceTreeByName('SU 0').click();
+
+    const stateElem = element(by.css(`app-petals-service-unit-overview md-card.state md-card-title`));
+
+    // the SU exists and should be present in petals tree
+    expect(page.getWorkspaceTreeByName(`SU 0`).first().isPresent()).toBe(true);
+
+    element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
+    expect(stateElem.getText()).toEqual('Stopped');
+
+    element(by.cssContainingText(`app-petals-service-unit-overview button`, `Start`)).click();
+    expect(stateElem.getText()).toEqual('Started');
+
+    element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
+    expect(stateElem.getText()).toEqual('Stopped');
+
+    // once unloaded ...
+    element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`)).click();
+
+    // we should be redirected to the workspace page ...
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
+
+    // and the SU should have been deleted from petals tree
+    // browser.wait(EC.stalenessOf(page.getWorkspaceTreeByName(`SU 0`).first()), 5000);
+    expect(page.getWorkspaceTreeByName(`SU 0`).first().isPresent()).toBe(false);
+
+    // there should be a popup saying that the SU has been deleted
+    // simple-notification .sn-title .sn-content
+    expect(element(by.css(`simple-notification .sn-title`)).getText()).toBe(`Service unit unloaded`);
+    expect(element(by.css(`simple-notification .sn-content`)).getText()).toBe(`"SU 0" has been unloaded`);
   });
 });
