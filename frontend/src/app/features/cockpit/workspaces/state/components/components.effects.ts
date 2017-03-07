@@ -17,11 +17,10 @@
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Store, Action } from '@ngrx/store';
+import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { environment } from './../../../../../../environments/environment';
 import { Components } from './components.reducer';
 import { ComponentsService } from './../../../../../shared/services/components.service';
@@ -30,34 +29,22 @@ import { ComponentsService } from './../../../../../shared/services/components.s
 export class ComponentsEffects {
   constructor(
     private actions$: Actions,
-    private store$: Store<IStore>,
     private componentsService: ComponentsService
   ) { }
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchContainersDetails$: Observable<Action> = this.actions$
     .ofType(Components.FETCH_COMPONENT_DETAILS)
-    .combineLatest(this
-      // wait the first workspace to be fetched
-      .store$
-      .select(state => state.workspaces.firstWorkspaceFetched)
-      .filter(b => b === true)
-      .first()
-    )
-    .switchMap(([action, _]: [{ type: string, payload: { componentId: string } }, boolean]) =>
+    .switchMap((action: { type: string, payload: { componentId: string } }) =>
       this.componentsService.getDetailsComponent(action.payload.componentId)
         .map((res: Response) => {
-          if (!res.ok) {
-            throw new Error('Error while fetching the component details');
-          }
-
           const data = res.json();
           return { type: Components.FETCH_COMPONENT_DETAILS_SUCCESS, payload: { componentId: action.payload.componentId, data } };
         })
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in components.effects.ts : ofType(Components.FETCH_COMPONENT_DETAILS)');
+            console.warn('Error caught in components.effects.ts : ofType(Components.FETCH_COMPONENT_DETAILS)');
             console.error(err);
             console.groupEnd();
           }

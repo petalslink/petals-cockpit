@@ -16,8 +16,12 @@
  */
 
 import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
+import { Store } from '@ngrx/store';
 
 import { IServiceUnitRow } from '../../../state/service-units/service-unit.interface';
+import { stateNameToPossibleActions } from '../../../../../../shared/helpers/service-unit.helper';
+import { IStore } from '../../../../../../shared/interfaces/store.interface';
+import { ServiceUnits } from '../../../state/service-units/service-units.reducer';
 
 @Component({
   selector: 'app-petals-service-unit-overview',
@@ -28,8 +32,15 @@ import { IServiceUnitRow } from '../../../state/service-units/service-unit.inter
 export class PetalsServiceUnitOverviewComponent implements OnInit {
   @Input() serviceUnit: IServiceUnitRow;
 
-  constructor() { }
+  constructor(private store$: Store<IStore>) { }
 
-  ngOnInit() {
+  ngOnInit() { }
+
+  getPossibleStateActions(state: string) {
+    return stateNameToPossibleActions(state);
+  }
+
+  changeState(newState: string) {
+    this.store$.dispatch({ type: ServiceUnits.CHANGE_STATE, payload: { serviceUnitId: this.serviceUnit.id, newState } });
   }
 }

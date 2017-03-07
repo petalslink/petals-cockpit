@@ -19,6 +19,7 @@ export const serviceUnitsService = new ServiceUnits();
 export class ServiceUnit {
   private static cpt = 0;
   protected id: number;
+  private state = 'Started';
 
   constructor() {
     this.id = ServiceUnit.cpt++;
@@ -40,5 +41,9 @@ export class ServiceUnit {
     return {
       state: 'Started'
     };
+  }
+
+  setState(newState: string) {
+    this.state = newState;
   }
 }

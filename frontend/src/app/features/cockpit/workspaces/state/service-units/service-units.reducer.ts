@@ -16,6 +16,7 @@
  */
 
 import { Action } from '@ngrx/store';
+import { omit } from 'underscore';
 
 import { IserviceUnitsTable } from './service-units.interface';
 import { serviceUnitsTableFactory } from './service-units.initial-state';
@@ -125,6 +126,74 @@ export class ServiceUnits {
     };
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_STATE = `${ServiceUnits.reducerName}_CHANGE_STATE`;
+  private static changeState(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+    return {
+      ...serviceUnitsTable,
+      ...<IserviceUnitsTable>{
+        byId: {
+          ...serviceUnitsTable.byId,
+          [payload.serviceUnitId]: {
+            ...serviceUnitsTable.byId[payload.serviceUnitId],
+            isUpdatingState: true
+          }
+        }
+      }
+    };
+  }
+
+  // only used in effect, no point to handle that action
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_STATE_WAIT_SSE = `${ServiceUnits.reducerName}_CHANGE_STATE_WAIT_SSE`;
+
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_STATE_SUCCESS = `${ServiceUnits.reducerName}_CHANGE_STATE_SUCCESS`;
+  private static changeStateSuccess(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string, newState: string }) {
+    return {
+      ...serviceUnitsTable,
+      ...<IserviceUnitsTable>{
+        byId: {
+          ...serviceUnitsTable.byId,
+          [payload.serviceUnitId]: {
+            ...serviceUnitsTable.byId[payload.serviceUnitId],
+            isUpdatingState: false,
+            state: payload.newState
+          }
+        }
+      }
+    };
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_STATE_ERROR = `${ServiceUnits.reducerName}_CHANGE_STATE_ERROR`;
+  private static changeStateError(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+    return {
+      ...serviceUnitsTable,
+      ...<IserviceUnitsTable>{
+        byId: {
+          ...serviceUnitsTable.byId,
+          [payload.serviceUnitId]: {
+            ...serviceUnitsTable.byId[payload.serviceUnitId],
+            isUpdatingState: false
+          }
+        }
+      }
+    };
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static REMOVE_SERVICE_UNIT = `${ServiceUnits.reducerName}_REMOVE_SERVICE_UNIT`;
+  private static removeServiceUnit(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+    return {
+      ...omit(serviceUnitsTable, 'byId', 'allIds'),
+      ...<IserviceUnitsTable>{
+        byId: omit(serviceUnitsTable.byId, payload.serviceUnitId),
+        allIds: serviceUnitsTable.allIds.filter(serviceUnitId => serviceUnitId === payload.serviceUnitId)
+      }
+    };
+  }
+
   private static fetchWorkspaceSuccess(_serviceUnitsTable: IserviceUnitsTable, _payload) {
     return serviceUnitsTableFactory();
   }
@@ -142,6 +211,10 @@ export class ServiceUnits {
     [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS]: ServiceUnits.fetchServiceUnitDetails,
     [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS]: ServiceUnits.fetchServiceUnitDetailsSuccess,
     [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR]: ServiceUnits.fetchServiceUnitDetailsError,
+    [ServiceUnits.CHANGE_STATE]: ServiceUnits.changeState,
+    [ServiceUnits.CHANGE_STATE_SUCCESS]: ServiceUnits.changeStateSuccess,
+    [ServiceUnits.CHANGE_STATE_ERROR]: ServiceUnits.changeStateError,
+    [ServiceUnits.REMOVE_SERVICE_UNIT]: ServiceUnits.removeServiceUnit,
 
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: ServiceUnits.fetchWorkspaceSuccess,
     [Users.DISCONNECT_USER_SUCCESS]: ServiceUnits.disconnectUserSuccess

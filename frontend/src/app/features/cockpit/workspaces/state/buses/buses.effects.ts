@@ -17,11 +17,10 @@
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Store, Action } from '@ngrx/store';
+import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Buses } from './buses.reducer';
 import { BusesService } from './../../../../../shared/services/buses.service';
 import { environment } from './../../../../../../environments/environment';
@@ -30,34 +29,22 @@ import { environment } from './../../../../../../environments/environment';
 export class BusesEffects {
   constructor(
     private actions$: Actions,
-    private store$: Store<IStore>,
     private busesService: BusesService
   ) { }
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchBusDetails$: Observable<Action> = this.actions$
     .ofType(Buses.FETCH_BUS_DETAILS)
-    .combineLatest(this
-      // wait the first workspace to be fetched
-      .store$
-      .select(state => state.workspaces.firstWorkspaceFetched)
-      .filter(b => b === true)
-      .first()
-    )
-    .switchMap(([action, _]: [{ type: string, payload: { busId: string } }, boolean]) =>
+    .switchMap((action: { type: string, payload: { busId: string } }) =>
       this.busesService.getDetailsBus(action.payload.busId)
         .map((res: Response) => {
-          if (!res.ok) {
-            throw new Error('Error while fetching the bus details');
-          }
-
           const rslt = res.json();
           return { type: Buses.FETCH_BUS_DETAILS_SUCCESS, payload: { busId: action.payload.busId, rslt } };
         })
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in buses.effects.ts : ofType(Buses.FETCH_BUS_DETAILS)');
+            console.warn('Error caught in buses.effects.ts : ofType(Buses.FETCH_BUS_DETAILS)');
             console.error(err);
             console.groupEnd();
           }

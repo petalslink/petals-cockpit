@@ -16,22 +16,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
     <div fxLayoutWrap fxLayoutGap="10px">
-      <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="state background-color-hover-light-green-x2 cursor-pointer">
+      <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="state">
         <md-card-title-group>
-          <div
-          md-card-sm-image
-          *ngIf="serviceUnit.state"
-          [ngClass]="(serviceUnit.state === 'Started')?'img-card-state-start':'img-card-state-stop'">
-          </div>
           <div fxFlex fxLayout="column" fxLayoutAlign="end end">
             <md-card-subtitle>State</md-card-subtitle>
             <md-card-title>{{ serviceUnit.state }}</md-card-title>
+            <md-card-content *ngIf="serviceUnit.state">
+              <!--TODO : When adding attribute "md-button", the click doesn't work anymore-->
+              <button
+                *ngFor="let possibleState of getPossibleStateActions(serviceUnit.state)"
+                (click)="changeState(possibleState.newStateAfterAction)"
+                [disabled]="serviceUnit.isUpdatingState"
+              >
+                {{ possibleState.actionName }}
+              </button>
+            </md-card-content>
           </div>
           <div class="green-led"></div>
         </md-card-title-group>
       </md-card>
     </div>
-
-    <!--<prettyjson fxFlex="100%" [obj]="serviceUnit"></prettyjson>-->
   </div>
 </div>

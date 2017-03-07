@@ -22,6 +22,8 @@ import { IComponentRow } from './component.interface';
 import { componentsTableFactory } from './components.initial-state';
 import { Users } from './../../../../../shared/state/users.reducer';
 import { Workspaces } from '../workspaces/workspaces.reducer';
+import { getComponentOfServiceUnit } from '../../../../../shared/helpers/service-unit.helper';
+import { ServiceUnits } from '../service-units/service-units.reducer';
 
 export class Components {
   private static reducerName = 'COMPONENTS_REDUCER';
@@ -172,6 +174,26 @@ export class Components {
     };
   }
 
+  private static removeServiceUnit(componentsTable: IComponentsTable, payload: { serviceUnitId: string }) {
+    const componentContainingServiceUnit = getComponentOfServiceUnit(componentsTable, payload.serviceUnitId);
+
+    return {
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          [componentContainingServiceUnit.id]: <IComponentRow>{
+            ...componentsTable.byId[componentContainingServiceUnit.id],
+            serviceUnits: componentsTable
+              .byId[componentContainingServiceUnit.id]
+              .serviceUnits
+              .filter(serviceUnitId => serviceUnitId !== payload.serviceUnitId)
+          }
+        }
+      }
+    };
+  }
+
   private static fetchWorkspaceSuccess(_componentsTable: IComponentsTable, _payload) {
     return componentsTableFactory();
   }
@@ -192,6 +214,7 @@ export class Components {
     [Components.FETCH_COMPONENT_DETAILS]: Components.fetchComponentDetails,
     [Components.FETCH_COMPONENT_DETAILS_SUCCESS]: Components.fetchComponentDetailsSuccess,
     [Components.FETCH_COMPONENT_DETAILS_ERROR]: Components.fetchComponentDetailsError,
+    [ServiceUnits.REMOVE_SERVICE_UNIT]: Components.removeServiceUnit,
 
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Components.fetchWorkspaceSuccess,
     [Users.DISCONNECT_USER_SUCCESS]: Components.disconnectUserSuccess

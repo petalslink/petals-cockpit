@@ -36,6 +36,7 @@ import { SseService, SseWorkspaceEvent } from './../../../../../shared/services/
 import { toJavascriptMap } from '../../../../../shared/helpers/shared.helper';
 import { BusesService } from './../../../../../shared/services/buses.service';
 import { NotificationsService } from 'angular2-notifications';
+import { ServiceUnitsService } from '../../../../../shared/services/service-units.service';
 
 @Injectable()
 export class WorkspacesEffects {
@@ -44,6 +45,7 @@ export class WorkspacesEffects {
     private workspacesService: WorkspacesService,
     private sseService: SseService,
     private busesService: BusesService,
+    private serviceUnitsService: ServiceUnitsService,
     private notification: NotificationsService
   ) { }
 
@@ -102,6 +104,7 @@ export class WorkspacesEffects {
         this.busesService.watchEventBusDeleted();
         this.busesService.watchEventBusImportOk();
         this.busesService.watchEventBusImportError();
+        this.serviceUnitsService.watchEventSuStateChangeOk();
         return { type: Workspaces.FETCH_WORKSPACE_WAIT_SSE, payload: action.payload };
       })
     );

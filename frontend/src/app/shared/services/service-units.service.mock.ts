@@ -16,17 +16,45 @@
  */
 
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 
-import { ServiceUnitsService } from './service-units.service';
+import { ServiceUnitsServiceImpl } from './service-units.service';
 import { serviceUnitsService } from '../../../mocks/service-units-mock';
 import * as helper from './../helpers/mock.helper';
+import { SseService, SseWorkspaceEvent } from './sse.service';
+import { SseServiceMock } from './sse.service.mock';
+import { environment } from '../../../environments/environment';
+import { IStore } from '../interfaces/store.interface';
+import { NotificationsService } from 'angular2-notifications';
 
 @Injectable()
-export class ServiceUnitsMockService extends ServiceUnitsService {
+export class ServiceUnitsMockService extends ServiceUnitsServiceImpl {
+  constructor(http: Http, router: Router, private pSseService: SseService, store$: Store<IStore>, notification: NotificationsService) {
+    super(http, router, pSseService, store$, notification);
+  }
 
   getDetailsServiceUnit(serviceUnitId: string) {
     const detailsServiceUnit = serviceUnitsService.read(serviceUnitId).getDetails();
 
     return helper.responseBody(detailsServiceUnit);
+  }
+
+  putState(serviceUnitId: string, newState: string) {
+    serviceUnitsService.read(serviceUnitId).setState(newState);
+    // when the state changes, trigger a fake SSE event
+    setTimeout(() =>
+      (this.pSseService as SseServiceMock).triggerSseEvent(
+        SseWorkspaceEvent.SU_STATE_CHANGE,
+        {
+          id: serviceUnitId,
+          state: newState
+        }
+      ),
+      environment.sseDelay
+    );
+
+    return helper.responseBody(null);
   }
 }
