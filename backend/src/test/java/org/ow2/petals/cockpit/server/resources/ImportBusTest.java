@@ -345,7 +345,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 }
 
 /**
- * We can't use {@link BusesResource.NewBus} because it won't serialize the passwords (on purpose!!)
+ * We can't use {@link BusesResource.BusImport} because it won't serialize the passwords (on purpose!!)
  */
 class NewBus {
 

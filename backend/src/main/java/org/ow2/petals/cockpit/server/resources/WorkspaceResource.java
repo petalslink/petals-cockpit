@@ -57,9 +57,7 @@ import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
-import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentOverview;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
@@ -122,7 +120,7 @@ public class WorkspaceResource {
     }
 
     /**
-     * Produces {@link WorkspaceChange}
+     * Produces {@link WorkspaceEvent}
      */
     @GET
     @Produces(SseFeature.SERVER_SENT_EVENTS + ";qs=0.5")
@@ -137,7 +135,7 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
-    public BusInProgress addBus(@Pac4JProfile CockpitProfile profile, @Valid NewBus nb) throws InterruptedException {
+    public BusInProgress addBus(@Pac4JProfile CockpitProfile profile, @Valid BusImport nb) throws InterruptedException {
         // TODO ACL is done by actor for now
         return as.call(wsId, new ImportBus(profile.getId(), nb)).getOrElseThrow(s -> new WebApplicationException(s));
     }
@@ -155,10 +153,10 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
-    public ServiceUnitOverview changeSUState(@PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile,
+    public SUStateChanged changeSUState(@PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile,
             @Valid SUChangeState action) throws InterruptedException {
         // TODO ACL is done by actor for now
-        return as.call(wsId, new ChangeServiceUnitState(profile.getId(), suId, action.state))
+        return as.call(wsId, new ChangeServiceUnitState(profile.getId(), suId, action))
                 .getOrElseThrow(s -> new WebApplicationException(s));
     }
 
@@ -167,14 +165,14 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
-    public ComponentOverview changeComponentState(@PathParam("compId") @Min(1) long compId,
+    public ComponentStateChanged changeComponentState(@PathParam("compId") @Min(1) long compId,
             @Pac4JProfile CockpitProfile profile, @Valid ComponentChangeState action) throws InterruptedException {
         // TODO ACL is done by actor for now
-        return as.call(wsId, new ChangeComponentState(profile.getId(), compId, action.state))
+        return as.call(wsId, new ChangeComponentState(profile.getId(), compId, action))
                 .getOrElseThrow(s -> new WebApplicationException(s));
     }
 
-    public static class NewBus {
+    public static class BusImport {
 
         @NotEmpty
         @JsonProperty
@@ -197,7 +195,7 @@ public class WorkspaceResource {
         @JsonProperty
         public final String passphrase;
 
-        public NewBus(@JsonProperty("ip") String ip, @JsonProperty("port") int port,
+        public BusImport(@JsonProperty("ip") String ip, @JsonProperty("port") int port,
                 @JsonProperty("username") String username, @JsonProperty("password") String password,
                 @JsonProperty("passphrase") String passphrase) {
             this.ip = ip;
@@ -208,7 +206,7 @@ public class WorkspaceResource {
         }
     }
 
-    public static class BusInProgress {
+    public static class BusInProgress implements WorkspaceEvent.Data {
 
         @NotEmpty
         @JsonProperty
@@ -257,7 +255,7 @@ public class WorkspaceResource {
 
     }
 
-    public static class NewSUState {
+    public static class SUStateChanged implements WorkspaceEvent.Data {
 
         @Min(1)
         public final long id;
@@ -267,7 +265,7 @@ public class WorkspaceResource {
         public final ServiceUnitMin.State state;
 
         @JsonCreator
-        public NewSUState(@JsonProperty("id") long id, @JsonProperty("state") ServiceUnitMin.State state) {
+        public SUStateChanged(@JsonProperty("id") long id, @JsonProperty("state") ServiceUnitMin.State state) {
             this.id = id;
             this.state = state;
         }
@@ -278,7 +276,7 @@ public class WorkspaceResource {
         }
     }
 
-    public static class NewComponentState {
+    public static class ComponentStateChanged implements WorkspaceEvent.Data {
 
         @Min(1)
         public final long id;
@@ -288,7 +286,7 @@ public class WorkspaceResource {
         public final ComponentMin.State state;
 
         @JsonCreator
-        public NewComponentState(@JsonProperty("id") long id, @JsonProperty("state") ComponentMin.State state) {
+        public ComponentStateChanged(@JsonProperty("id") long id, @JsonProperty("state") ComponentMin.State state) {
             this.id = id;
             this.state = state;
         }
@@ -299,7 +297,7 @@ public class WorkspaceResource {
         }
     }
 
-    public static class BusDeleted {
+    public static class BusDeleted implements WorkspaceEvent.Data {
 
         @Min(1)
         public final long id;
@@ -348,42 +346,46 @@ public class WorkspaceResource {
         }
     }
 
-    public static class WorkspaceChange {
+    public static class WorkspaceEvent {
 
-        public enum Type {
+        public interface Data {
+
+        }
+
+        public enum Event {
             WORKSPACE_CONTENT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, COMPONENT_STATE_CHANGE, BUS_DELETED
         }
 
         @JsonProperty
-        public final Type event;
+        public final Event event;
 
         @JsonProperty
-        public final Object data;
+        public final Data data;
 
-        private WorkspaceChange(Type event, Object data) {
+        private WorkspaceEvent(Event event, Data data) {
             this.event = event;
             this.data = data;
         }
 
-        public static WorkspaceChange busImportError(BusInProgress bus) {
+        public static WorkspaceEvent busImportError(BusInProgress bus) {
             assert bus.importError != null && !bus.importError.isEmpty();
-            return new WorkspaceChange(Type.BUS_IMPORT_ERROR, bus);
+            return new WorkspaceEvent(Event.BUS_IMPORT_ERROR, bus);
         }
 
-        public static WorkspaceChange busImportOk(WorkspaceContent bus) {
-            return new WorkspaceChange(Type.BUS_IMPORT_OK, bus);
+        public static WorkspaceEvent busImportOk(WorkspaceContent bus) {
+            return new WorkspaceEvent(Event.BUS_IMPORT_OK, bus);
         }
 
-        public static WorkspaceChange suStateChange(NewSUState ns) {
-            return new WorkspaceChange(Type.SU_STATE_CHANGE, ns);
+        public static WorkspaceEvent suStateChange(SUStateChanged ns) {
+            return new WorkspaceEvent(Event.SU_STATE_CHANGE, ns);
         }
 
-        public static WorkspaceChange componentStateChange(NewComponentState ns) {
-            return new WorkspaceChange(Type.COMPONENT_STATE_CHANGE, ns);
+        public static WorkspaceEvent componentStateChange(ComponentStateChanged ns) {
+            return new WorkspaceEvent(Event.COMPONENT_STATE_CHANGE, ns);
         }
 
-        public static WorkspaceChange busDeleted(BusDeleted bd) {
-            return new WorkspaceChange(Type.BUS_DELETED, bd);
+        public static WorkspaceEvent busDeleted(BusDeleted bd) {
+            return new WorkspaceEvent(Event.BUS_DELETED, bd);
         }
 
         @Override

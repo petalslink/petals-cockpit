@@ -43,8 +43,8 @@ import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUStateChanged;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUChangeState;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.NewSUState;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -102,14 +102,14 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
             expectWorkspaceContent(eventInput);
 
-            ServiceUnitOverview put = resources.getJerseyTest().target("/workspaces/1/serviceunits/40").request()
-                    .put(Entity.json(new SUChangeState(ServiceUnitMin.State.Stopped)), ServiceUnitOverview.class);
+            SUStateChanged put = resources.getJerseyTest().target("/workspaces/1/serviceunits/40").request()
+                    .put(Entity.json(new SUChangeState(ServiceUnitMin.State.Stopped)), SUStateChanged.class);
 
             assertThat(put.state).isEqualTo(ServiceUnitMin.State.Stopped);
 
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("SU_STATE_CHANGE");
-                NewSUState data = e.readData(NewSUState.class);
+                SUStateChanged data = e.readData(SUStateChanged.class);
                 a.assertThat(data.id).isEqualTo(40);
                 a.assertThat(data.state).isEqualTo(ServiceUnitMin.State.Stopped);
             });
@@ -165,14 +165,14 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
 
             expectWorkspaceContent(eventInput);
 
-            ServiceUnitOverview put = resources.getJerseyTest().target("/workspaces/1/serviceunits/41").request()
-                    .put(Entity.json(new SUChangeState(ServiceUnitMin.State.Unloaded)), ServiceUnitOverview.class);
+            SUStateChanged put = resources.getJerseyTest().target("/workspaces/1/serviceunits/41").request()
+                    .put(Entity.json(new SUChangeState(ServiceUnitMin.State.Unloaded)), SUStateChanged.class);
 
             assertThat(put.state).isEqualTo(ServiceUnitMin.State.Unloaded);
 
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("SU_STATE_CHANGE");
-                NewSUState data = e.readData(NewSUState.class);
+                SUStateChanged data = e.readData(SUStateChanged.class);
                 a.assertThat(data.id).isEqualTo(41);
                 a.assertThat(data.state).isEqualTo(ServiceUnitMin.State.Unloaded);
             });
@@ -188,8 +188,8 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
                 .get(ServiceUnitOverview.class);
         assertThat(get1.state).isEqualTo(ServiceUnitMin.State.Started);
 
-        ServiceUnitOverview put = resources.getJerseyTest().target("/workspaces/1/serviceunits/40").request()
-                .put(Entity.json(new SUChangeState(ServiceUnitMin.State.Started)), ServiceUnitOverview.class);
+        SUStateChanged put = resources.getJerseyTest().target("/workspaces/1/serviceunits/40").request()
+                .put(Entity.json(new SUChangeState(ServiceUnitMin.State.Started)), SUStateChanged.class);
 
         assertThat(put.state).isEqualTo(ServiceUnitMin.State.Started);
 
