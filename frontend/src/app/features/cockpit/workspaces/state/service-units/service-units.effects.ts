@@ -38,17 +38,13 @@ export class ServiceUnitsEffects {
     .switchMap((action: { type: string, payload: { serviceUnitId: string } }) =>
       this.serviceUnitsService.getDetailsServiceUnit(action.payload.serviceUnitId)
         .map((res: Response) => {
-          if (!res.ok) {
-            throw new Error('Error while fetching the service-unit details');
-          }
-
           const data = res.json();
           return { type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS, payload: { serviceUnitId: action.payload.serviceUnitId, data } };
         })
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in service-unit.effects : ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)');
+            console.warn('Error caught in service-unit.effects : ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)');
             console.error(err);
             console.groupEnd();
           }
@@ -65,11 +61,7 @@ export class ServiceUnitsEffects {
     .ofType(ServiceUnits.CHANGE_STATE)
     .switchMap((action: { type: string, payload: { serviceUnitId: string, newState: string } }) =>
       this.serviceUnitsService.putState(action.payload.serviceUnitId, action.payload.newState)
-        .map((res: Response) => {
-          if (!res.ok) {
-            throw new Error('Error while changing the service-unit state');
-          }
-
+        .map(_ => {
           return {
             type: ServiceUnits.CHANGE_STATE_WAIT_SSE,
             payload: { serviceUnitId: action.payload.serviceUnitId }
@@ -78,7 +70,7 @@ export class ServiceUnitsEffects {
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in service-unit.effects : ofType(ServiceUnits.CHANGE_STATE)');
+            console.warn('Error caught in service-unit.effects : ofType(ServiceUnits.CHANGE_STATE)');
             console.error(err);
             console.groupEnd();
           }

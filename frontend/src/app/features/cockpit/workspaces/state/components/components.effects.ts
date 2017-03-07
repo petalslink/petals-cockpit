@@ -38,17 +38,13 @@ export class ComponentsEffects {
     .switchMap((action: { type: string, payload: { componentId: string } }) =>
       this.componentsService.getDetailsComponent(action.payload.componentId)
         .map((res: Response) => {
-          if (!res.ok) {
-            throw new Error('Error while fetching the component details');
-          }
-
           const data = res.json();
           return { type: Components.FETCH_COMPONENT_DETAILS_SUCCESS, payload: { componentId: action.payload.componentId, data } };
         })
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in components.effects.ts : ofType(Components.FETCH_COMPONENT_DETAILS)');
+            console.warn('Error caught in components.effects.ts : ofType(Components.FETCH_COMPONENT_DETAILS)');
             console.error(err);
             console.groupEnd();
           }

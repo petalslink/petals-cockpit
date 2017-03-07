@@ -38,17 +38,13 @@ export class BusesEffects {
     .switchMap((action: { type: string, payload: { busId: string } }) =>
       this.busesService.getDetailsBus(action.payload.busId)
         .map((res: Response) => {
-          if (!res.ok) {
-            throw new Error('Error while fetching the bus details');
-          }
-
           const rslt = res.json();
           return { type: Buses.FETCH_BUS_DETAILS_SUCCESS, payload: { busId: action.payload.busId, rslt } };
         })
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in buses.effects.ts : ofType(Buses.FETCH_BUS_DETAILS)');
+            console.warn('Error caught in buses.effects.ts : ofType(Buses.FETCH_BUS_DETAILS)');
             console.error(err);
             console.groupEnd();
           }

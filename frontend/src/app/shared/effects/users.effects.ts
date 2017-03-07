@@ -43,19 +43,16 @@ export class UsersEffects {
     .switchMap((action: Action) =>
       this.usersService.connectUser(action.payload)
         .map((res: Response) => {
-          if (!res.ok) {
-            throw new Error('Error while connecting user');
-          }
-
+          const user = <ICurrentUser>res.json();
           return {
             type: Users.CONNECT_USER_SUCCESS,
-            payload: { user: <ICurrentUser>res.json(), redirectWorkspace: true }
+            payload: { user, redirectWorkspace: true }
           };
         })
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in users.effects.ts : ofType(Users.CONNECT_USER)');
+            console.warn('Error caught in users.effects.ts : ofType(Users.CONNECT_USER)');
             console.error(err);
             console.groupEnd();
           }
@@ -84,7 +81,7 @@ export class UsersEffects {
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in users.effects.ts : ofType(Users.DISCONNECT_USER)');
+            console.warn('Error caught in users.effects.ts : ofType(Users.DISCONNECT_USER)');
             console.error(err);
             console.groupEnd();
           }

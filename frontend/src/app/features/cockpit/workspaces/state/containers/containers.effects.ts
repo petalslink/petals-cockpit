@@ -38,17 +38,13 @@ export class ContainersEffects {
     .switchMap((action: { type: string, payload: { containerId: string } }) =>
       this.containersService.getDetailsContainer(action.payload.containerId)
         .map((res: Response) => {
-          if (!res.ok) {
-            throw new Error('Error while fetching the container details');
-          }
-
           const data = res.json();
           return { type: Containers.FETCH_CONTAINER_DETAILS_SUCCESS, payload: { containerId: action.payload.containerId, data } };
         })
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in containers.effects.ts : ofType(Containers.FETCH_CONTAINER_DETAILS)');
+            console.warn('Error caught in containers.effects.ts : ofType(Containers.FETCH_CONTAINER_DETAILS)');
             console.error(err);
             console.groupEnd();
           }
