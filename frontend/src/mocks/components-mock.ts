@@ -22,6 +22,7 @@ export class Component {
   private static cpt = 0;
   protected id: number;
   private serviceUnits: ServiceUnit[] = [];
+  private state = 'Started';
 
   constructor() {
     this.id = Component.cpt++;
@@ -29,6 +30,10 @@ export class Component {
     // by default add 2 service units
     this.serviceUnits.push(serviceUnitsService.create());
     this.serviceUnits.push(serviceUnitsService.create());
+  }
+
+  setState(newState: string) {
+    this.state = newState;
   }
 
   public getIdFormatted() {
@@ -50,7 +55,7 @@ export class Component {
 
   getDetails() {
     return {
-      state: 'Started',
+      state: this.state,
       type: 'BC'
     };
   }

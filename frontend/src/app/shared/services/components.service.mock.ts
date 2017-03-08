@@ -16,16 +16,43 @@
  */
 
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Store } from '@ngrx/store';
 
-import { ComponentsService } from './components.service';
 import { componentsService } from '../../../mocks/components-mock';
 import * as helper from './../helpers/mock.helper';
+import { ComponentsServiceImpl } from './components.service';
+import { SseService, SseWorkspaceEvent } from './sse.service';
+import { IStore } from '../interfaces/store.interface';
+import { SseServiceMock } from './sse.service.mock';
+import { environment } from '../../../environments/environment';
 
 @Injectable()
-export class ComponentsMockService extends ComponentsService {
+export class ComponentsMockService extends ComponentsServiceImpl {
+  constructor(http: Http, private pSseService: SseService, store$: Store<IStore>) {
+    super(http, pSseService, store$);
+  }
+
   getDetailsComponent(componentId: string) {
     const detailsComponent = componentsService.read(componentId).getDetails();
 
     return helper.responseBody(detailsComponent);
+  }
+
+  putState(componentId: string, newState: string) {
+    componentsService.read(componentId).setState(newState);
+    // when the state changes, trigger a fake SSE event
+    setTimeout(() =>
+      (this.pSseService as SseServiceMock).triggerSseEvent(
+        SseWorkspaceEvent.COMPONENT_STATE_CHANGE,
+        {
+          id: componentId,
+          state: newState
+        }
+      ),
+      environment.sseDelay
+    );
+
+    return helper.responseBody(null);
   }
 }
