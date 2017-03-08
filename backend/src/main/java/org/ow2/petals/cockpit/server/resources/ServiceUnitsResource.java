@@ -117,7 +117,7 @@ public class ServiceUnitsResource {
         @JsonProperty
         public final State state;
 
-        @NotNull
+        @NotEmpty
         @JsonProperty
         public final String saName;
 
