@@ -148,7 +148,6 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     }
 
     private void doInActorLoop(SuspendableCallable<WorkspaceEvent> action) throws SuspendExecution {
-        assert !isInActor();
         self().send(new WorkspaceEventAction(action));
     }
 
