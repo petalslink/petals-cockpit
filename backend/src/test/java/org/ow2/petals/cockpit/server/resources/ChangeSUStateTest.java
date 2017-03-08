@@ -43,8 +43,8 @@ import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUStateChanged;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUChangeState;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUStateChanged;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -116,7 +116,9 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
         }
 
         assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+        assertThat(serviceAssembly1.getState()).isEqualTo(ArtifactState.State.STOPPED);
         assertThatDbSU(41).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+        assertThat(serviceAssembly2.getState()).isEqualTo(ArtifactState.State.STOPPED);
     }
 
     @Test
@@ -136,7 +138,9 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
         assertThat(put.getStatus()).isEqualTo(403);
 
         assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertThat(serviceAssembly1.getState()).isEqualTo(ArtifactState.State.STARTED);
         assertThatDbSU(41).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+        assertThat(serviceAssembly2.getState()).isEqualTo(ArtifactState.State.STOPPED);
         assertThatDbSU(42).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
         assertThatDbSU(43).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
     }
@@ -150,7 +154,9 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
         assertThat(put.getStatus()).isEqualTo(404);
 
         assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertThat(serviceAssembly1.getState()).isEqualTo(ArtifactState.State.STARTED);
         assertThatDbSU(41).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+        assertThat(serviceAssembly2.getState()).isEqualTo(ArtifactState.State.STOPPED);
     }
 
     @Test
@@ -179,7 +185,9 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
         }
 
         assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertThat(serviceAssembly1.getState()).isEqualTo(ArtifactState.State.STARTED);
         assertNoDbSU(41);
+        assertThat(container.getServiceAssemblies()).doesNotContain(serviceAssembly2);
     }
 
     @Test
@@ -194,7 +202,9 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
         assertThat(put.state).isEqualTo(ServiceUnitMin.State.Started);
 
         assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertThat(serviceAssembly1.getState()).isEqualTo(ArtifactState.State.STARTED);
         assertThatDbSU(41).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+        assertThat(serviceAssembly2.getState()).isEqualTo(ArtifactState.State.STOPPED);
     }
 
     @Test
@@ -209,6 +219,8 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
 
         assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertThat(serviceAssembly1.getState()).isEqualTo(ArtifactState.State.STARTED);
         assertThatDbSU(41).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+        assertThat(serviceAssembly2.getState()).isEqualTo(ArtifactState.State.STOPPED);
     }
 }
