@@ -22,6 +22,14 @@ import { PetalsCockpitPage } from './app.po';
 describe(`Import Bus`, () => {
   let page: PetalsCockpitPage;
 
+  const inputIp = element(by.css(`input[formControlName="ip"]`));
+  const inputPort = element(by.css(`input[formControlName="port"]`));
+  const inputUsername = element(by.css(`input[formControlName="username"]`));
+  const inputPassword = element(by.css(`input[formControlName="password"]`));
+  const inputPassphrase = element(by.css(`input[formControlName="passphrase"]`));
+  const importBtn = element(by.css(`app-petals-bus-in-progress-view form .btn-import-form`));
+  const clearBtn = element(by.css(`app-petals-bus-in-progress-view form .btn-clear-form`));
+
   beforeEach(() => {
     page = new PetalsCockpitPage();
     page.navigateTo();
@@ -37,16 +45,7 @@ describe(`Import Bus`, () => {
   });
 
   it(`should be cleared when clicking on the clear button`, () => {
-
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/);
-
-    const inputIp = element(by.css(`input[formControlName="ip"]`));
-    const inputPort = element(by.css(`input[formControlName="port"]`));
-    const inputUsername = element(by.css(`input[formControlName="username"]`));
-    const inputPassword = element(by.css(`input[formControlName="password"]`));
-    const inputPassphrase = element(by.css(`input[formControlName="passphrase"]`));
-    const importBtn = element(by.css(`app-petals-bus-in-progress-view form .btn-import-form`));
-    const clearBtn = element(by.css(`app-petals-bus-in-progress-view form .btn-clear-form`));
 
     // check if the input form is empty
     expect(inputIp.getText()).toEqual(``);
@@ -90,5 +89,36 @@ describe(`Import Bus`, () => {
 
     // check if clear button is not present
     expect(clearBtn.isPresent()).toBe(false);
+  });
+
+  it(`Should fail on the first bus import`, () => {
+    // only 2 buses in progress
+    page.toggleSidenav();
+    expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(2);
+    page.toggleSidenav();
+
+    inputIp.sendKeys(`hostname`);
+    inputPort.sendKeys(`5000`);
+    inputUsername.sendKeys(`admin`);
+    inputPassword.sendKeys(`password`);
+    inputPassphrase.sendKeys(`passphrase`);
+
+    // try to import a new one
+    importBtn.click();
+
+    // the first one should fail
+    expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).getText()).toEqual('Error 500 : Error backend');
+
+    // try to re-import
+    importBtn.click();
+
+    // but cannot connect to the bus
+    expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).getText()).toEqual(`Can't connect to bus`);
+
+    page.toggleSidenav();
+    expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(3);
+    expect(element(by.css(`app-buses-in-progress md-nav-list:nth-child(3) .ip-port`)).getText()).toEqual('hostname:5000');
+    expect(element(by.cssContainingText(`app-buses-in-progress md-nav-list:nth-child(3) md-icon`, `warning`)).isDisplayed()).toEqual(true);
+    page.toggleSidenav();
   });
 });
