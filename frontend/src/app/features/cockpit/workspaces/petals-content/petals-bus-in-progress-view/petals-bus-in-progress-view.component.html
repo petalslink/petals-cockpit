@@ -80,8 +80,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </div>
 
             <div class="margin-top-x2" fxLayout="row" fxLayoutAlign="end center">
-              <div *ngIf="(busesInProgressTable$ | async).importBusError || (busInProgress && busInProgress.importError)" class="color-red-x1" fxLayout="row" fxLayoutAlign="center center">
-                <md-icon color="warn">warning</md-icon> {{ (busInProgress && busInProgress.importError) ? busInProgress.importError : (busesInProgressTable$ | async).importBusError }}
+              <div *ngIf="(busesInProgressTable$ | async).importBusError || (busInProgress && busInProgress.importError)" class="error" fxLayout="row" fxLayoutAlign="center center">
+                <md-icon color="warn">warning</md-icon> <span class="error-details">{{ (busInProgress && busInProgress.importError) ? busInProgress.importError : (busesInProgressTable$ | async).importBusError }}</span>
               </div>
               <div fxFlex></div>
               <button

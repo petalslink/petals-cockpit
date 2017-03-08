@@ -15,10 +15,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <md-nav-list dense *ngFor="let busInProgress of busesInProgress.list">
   <a class="buses-in-progress" md-list-item routerLinkActive="active-link" [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'buses-in-progress', busInProgress.id]">
-    {{ busInProgress.ip }}:{{ busInProgress.port }}
+    <span class="ip-port">{{ busInProgress.ip }}:{{ busInProgress.port }}</span>
 
     <div fxFlex></div>
 
-    <md-spinner *ngIf="!busInProgress.importError"></md-spinner>
+    <div class="wrap-icon">
+      <md-spinner *ngIf="!busInProgress.importError"></md-spinner>
+      <md-icon color="warn" *ngIf="busInProgress.importError">warning</md-icon>
+    </div>
   </a>
 </md-nav-list>

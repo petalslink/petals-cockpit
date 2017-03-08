@@ -21,7 +21,16 @@ md-nav-list {
   padding-top: 0;
 }
 
-md-spinner {
-  width: 11px;
-  height: 12px;
+.wrap-icon {
+  width: 30px;
+  text-align: center;
+
+  md-spinner {
+    width: 12px;
+    margin: auto;
+  }
+
+  md-icon {
+    margin: auto;
+  }
 }
