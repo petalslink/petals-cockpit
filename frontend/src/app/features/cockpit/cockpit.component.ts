@@ -170,6 +170,10 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     this.store$.dispatch({ type: Ui.CLOSE_SIDENAV });
   }
 
+  closeSidenavOnSmallScreen() {
+    this.store$.dispatch({ type: Ui.CLOSE_SIDENAV_ON_SMALL_SCREEN });
+  }
+
   toggleSidenav() {
     this.store$.dispatch({ type: Ui.TOGGLE_SIDENAV });
   }

@@ -21,6 +21,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { IBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { Ui } from '../../../../../shared/state/ui.reducer';
 
 @Component({
   selector: 'app-buses-in-progress',
@@ -38,5 +39,9 @@ export class BusesInProgressComponent implements OnInit {
     this.workspaceId$ = this.store$
       .select(state => state.workspaces)
       .map(workspaces => workspaces.selectedWorkspaceId);
+  }
+
+  closeSidenavOnSmallScreen() {
+    this.store$.dispatch({ type: Ui.CLOSE_SIDENAV_ON_SMALL_SCREEN });
   }
 }

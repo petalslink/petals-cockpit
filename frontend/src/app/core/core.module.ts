@@ -31,6 +31,7 @@ import { getRootReducer } from '../shared/state/root.reducer';
 import { WorkspacesEffects } from '../features/cockpit/workspaces/state/workspaces/workspaces.effects';
 import { BusesInProgressEffects } from './../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.effects';
 import { UsersEffects } from './../shared/effects/users.effects';
+import { UiEffects } from '../shared/effects/ui.effects';
 import { BusesEffects } from './../features/cockpit/workspaces/state/buses/buses.effects';
 import { ContainersEffects } from './../features/cockpit/workspaces/state/containers/containers.effects';
 import { ComponentsEffects } from './../features/cockpit/workspaces/state/components/components.effects';
@@ -104,6 +105,7 @@ export const providers = [
     EffectsModule.run(WorkspacesEffects),
     EffectsModule.run(BusesInProgressEffects),
     EffectsModule.run(UsersEffects),
+    EffectsModule.run(UiEffects),
     EffectsModule.run(BusesEffects),
     EffectsModule.run(ContainersEffects),
     EffectsModule.run(ComponentsEffects),

@@ -60,6 +60,9 @@ export class Ui {
   }
 
   // tslint:disable-next-line:member-ordering
+  public static CLOSE_SIDENAV_ON_SMALL_SCREEN = `${Ui.reducerName}_CLOSE_SIDENAV_ON_SMALL_SCREEN`;
+
+  // tslint:disable-next-line:member-ordering
   public static CLOSE_SIDENAV = `${Ui.reducerName}_CLOSE_SIDENAV`;
   private static closeSidenav(ui: IUi, _payload) {
     return {

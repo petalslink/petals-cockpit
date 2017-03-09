@@ -46,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <app-menu-user-panel></app-menu-user-panel>
 
       <div fxLayout="row">
-        <button fxFlex="100" md-raised-button [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId]" class="workspace-name width-full no-border-radius" color="accent">
+        <button fxFlex="100" md-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId]" class="workspace-name width-full no-border-radius" color="accent">
           {{ (workspace$ | async)?.name }}
         </button>
 

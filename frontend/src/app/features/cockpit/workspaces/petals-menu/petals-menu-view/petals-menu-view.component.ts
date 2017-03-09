@@ -29,6 +29,7 @@ import { IBusesInProgress } from '../../state/buses-in-progress/buses-in-progres
 import { getBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.selectors';
 import { IWorkspacesTable } from './../../state/workspaces/workspaces.interface';
 import { Workspaces } from './../../state/workspaces/workspaces.reducer';
+import { Ui } from '../../../../../shared/state/ui.reducer';
 
 @Component({
   selector: 'app-petals-menu-view',
@@ -77,9 +78,14 @@ export class PetalsMenuViewComponent implements OnInit {
     // TODO: Dispatch an action to save the current bus/container/component/su
     // Instead of dispatching it from here maybe it's a better idea to dispatch it once the
     // component is loaded
+    this.closeSidenavOnSmallScreen();
   }
 
   search(search: string) {
     this.store$.dispatch({ type: Workspaces.SET_SEARCH, payload: search });
+  }
+
+  closeSidenavOnSmallScreen() {
+    this.store$.dispatch({ type: Ui.CLOSE_SIDENAV_ON_SMALL_SCREEN });
   }
 }

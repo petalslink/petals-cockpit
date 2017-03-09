@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   </form>
 
   <a md-mini-fab class="btn-add-bus" color="primary" fxFlex="40px" mdTooltip="Import a bus" mdTooltipPosition="below"
-    [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId, 'petals', 'buses-in-progress']">
+    [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId, 'petals', 'buses-in-progress']" (click)="closeSidenavOnSmallScreen()">
     <md-icon class="md-24">add</md-icon>
   </a>
 </div>
