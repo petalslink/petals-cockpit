@@ -39,9 +39,6 @@ describe(`Import Bus`, () => {
     browser.wait(EC.elementToBeClickable(addBtn), 5000);
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
     addBtn.click();
-    // We close manually the sidenav
-    // TODO : We need to found a solution for resolve this error : "Failed : element not visible"
-    page.toggleSidenav();
   });
 
   it(`should be cleared when clicking on the clear button`, () => {
@@ -84,8 +81,6 @@ describe(`Import Bus`, () => {
     element.all(by.css(`app-cockpit md-sidenav app-buses-in-progress md-nav-list div.mat-list-item-content`)).first().click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress\/\w+$/);
-
-    page.toggleSidenav();
 
     // check if clear button is not present
     expect(clearBtn.isPresent()).toBe(false);
