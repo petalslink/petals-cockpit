@@ -68,7 +68,6 @@ describe(`Petals service-unit content`, () => {
 
     page.toggleSidenav();
     // and the SU should have been deleted from petals tree
-    // browser.wait(EC.stalenessOf(page.getWorkspaceTreeByName(`SU 0`).first()), 5000);
     expect(page.getWorkspaceTreeByName(`SU 0`).first().isPresent()).toBe(false);
 
     // there should be a popup saying that the SU has been deleted
