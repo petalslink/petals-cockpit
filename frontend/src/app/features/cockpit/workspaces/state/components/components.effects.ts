@@ -61,16 +61,10 @@ export class ComponentsEffects {
     .ofType(Components.CHANGE_STATE)
     .switchMap((action: { type: string, payload: { componentId: string, newState: string } }) =>
       this.componentsService.putState(action.payload.componentId, action.payload.newState)
-        .map((res: Response) => {
-          if (!res.ok) {
-            throw new Error('Error while changing the component state');
-          }
-
-          return {
+        .map(_ => ({
             type: Components.CHANGE_STATE_WAIT_SSE,
             payload: { componentId: action.payload.componentId }
-          };
-        })
+        }))
         .catch((err) => {
           if (environment.debug) {
             console.group();

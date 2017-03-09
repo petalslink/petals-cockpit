@@ -17,7 +17,9 @@
 
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { NotificationsService } from 'angular2-notifications';
 
 import { componentsService } from '../../../mocks/components-mock';
 import * as helper from './../helpers/mock.helper';
@@ -29,8 +31,14 @@ import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class ComponentsMockService extends ComponentsServiceImpl {
-  constructor(http: Http, private pSseService: SseService, store$: Store<IStore>) {
-    super(http, pSseService, store$);
+  constructor(
+    http: Http,
+    router: Router,
+    private pSseService: SseService,
+    store$: Store<IStore>,
+    notification: NotificationsService
+  ) {
+    super(http, router, pSseService, store$, notification);
   }
 
   getDetailsComponent(componentId: string) {

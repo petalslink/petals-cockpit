@@ -16,6 +16,7 @@
  */
 
 import { Action } from '@ngrx/store';
+import { omit } from 'underscore';
 
 import { IComponentsTable } from './components.interface';
 import { IComponentRow } from './component.interface';
@@ -230,6 +231,18 @@ export class Components {
     };
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static REMOVE_COMPONENT = `${Components.reducerName}_REMOVE_COMPONENT`;
+  private static removeComponent(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    return {
+      ...omit(componentsTable, 'byId', 'allIds'),
+      ...<IComponentsTable>{
+        byId: omit(componentsTable.byId, payload.componentId),
+        allIds: componentsTable.allIds.filter(componentId => componentId === payload.componentId)
+      }
+    };
+  }
+
   private static removeServiceUnit(componentsTable: IComponentsTable, payload: { serviceUnitId: string }) {
     const componentContainingServiceUnit = getComponentOfServiceUnit(componentsTable, payload.serviceUnitId);
 
@@ -273,6 +286,7 @@ export class Components {
     [Components.CHANGE_STATE]: Components.changeState,
     [Components.CHANGE_STATE_SUCCESS]: Components.changeStateSuccess,
     [Components.CHANGE_STATE_ERROR]: Components.changeStateError,
+    [Components.REMOVE_COMPONENT]: Components.removeComponent,
 
     [ServiceUnits.REMOVE_SERVICE_UNIT]: Components.removeServiceUnit,
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Components.fetchWorkspaceSuccess,

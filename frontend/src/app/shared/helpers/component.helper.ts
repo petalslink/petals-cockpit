@@ -17,6 +17,7 @@
 
 import { environment } from '../../../environments/environment';
 import { ComponentState } from '../../features/cockpit/workspaces/state/components/component.interface';
+import { IContainersTable } from '../../features/cockpit/workspaces/state/containers/containers.interface';
 
 /**
  * @param {string} state : The state you want to get the possible actions from. For example : 'Started'
@@ -59,10 +60,9 @@ export function stateNameToPossibleActionsComponent(state: string): { actionName
   }
 }
 
-// TODO
-// export function getComponentOfServiceUnit(componentsTable: IComponentsTable, serviceUnitId: string) {
-//   return componentsTable
-//     .allIds
-//     .map(componentId => componentsTable.byId[componentId])
-//     .find(component => component.serviceUnits.includes(serviceUnitId));
-// }
+export function getContainerOfComponent(containersTable: IContainersTable, componentId: string) {
+  return containersTable
+    .allIds
+    .map(containerId => containersTable.byId[containerId])
+    .find(container => container.components.includes(componentId));
+}
