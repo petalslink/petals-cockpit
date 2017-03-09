@@ -151,6 +151,46 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
     }
 
     @Test
+    public void changeNonExistingCompStateForbidden() {
+
+        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+
+        setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
+
+        Response put = resources.getJerseyTest().target("/workspaces/2/components/50").request()
+                .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
+
+        assertThat(put.getStatus()).isEqualTo(403);
+
+        assertThatDbComp(30).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Started.name());
+        assertThat(component1.getState()).isEqualTo(ArtifactState.State.STARTED);
+        assertThatDbComp(31).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThat(component2.getState()).isEqualTo(ArtifactState.State.STOPPED);
+        assertThatDbComp(32).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThat(component3.getState()).isEqualTo(ArtifactState.State.STOPPED);
+    }
+
+    @Test
+    public void changeWrongCompStateForbidden() {
+
+        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+
+        setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
+
+        Response put = resources.getJerseyTest().target("/workspaces/2/components/30").request()
+                .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
+
+        assertThat(put.getStatus()).isEqualTo(403);
+
+        assertThatDbComp(30).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Started.name());
+        assertThat(component1.getState()).isEqualTo(ArtifactState.State.STARTED);
+        assertThatDbComp(31).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThat(component2.getState()).isEqualTo(ArtifactState.State.STOPPED);
+        assertThatDbComp(32).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThat(component3.getState()).isEqualTo(ArtifactState.State.STOPPED);
+    }
+
+    @Test
     public void changeComp1StateNotFound() {
 
         Response put = resources.getJerseyTest().target("/workspaces/1/components/33").request()

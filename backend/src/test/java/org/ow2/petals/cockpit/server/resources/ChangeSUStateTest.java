@@ -146,6 +146,42 @@ public class ChangeSUStateTest extends AbstractCockpitResourceTest {
     }
 
     @Test
+    public void changeNonExistingSUStateForbidden() {
+
+        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+
+        setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
+
+        Response put = resources.getJerseyTest().target("/workspaces/2/serviceunits/50").request()
+                .put(Entity.json(new SUChangeState(ServiceUnitMin.State.Stopped)));
+
+        assertThat(put.getStatus()).isEqualTo(403);
+
+        assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertThat(serviceAssembly1.getState()).isEqualTo(ArtifactState.State.STARTED);
+        assertThatDbSU(41).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+        assertThat(serviceAssembly2.getState()).isEqualTo(ArtifactState.State.STOPPED);
+    }
+
+    @Test
+    public void changeWrongSUStateForbidden() {
+
+        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+
+        setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
+
+        Response put = resources.getJerseyTest().target("/workspaces/2/serviceunits/40").request()
+                .put(Entity.json(new SUChangeState(ServiceUnitMin.State.Stopped)));
+
+        assertThat(put.getStatus()).isEqualTo(403);
+
+        assertThatDbSU(40).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Started.name());
+        assertThat(serviceAssembly1.getState()).isEqualTo(ArtifactState.State.STARTED);
+        assertThatDbSU(41).value(SERVICEUNITS.STATE.getName()).isEqualTo(ServiceUnitMin.State.Stopped.name());
+        assertThat(serviceAssembly2.getState()).isEqualTo(ArtifactState.State.STOPPED);
+    }
+
+    @Test
     public void changeSU1StateNotFound() {
 
         Response put = resources.getJerseyTest().target("/workspaces/1/serviceunits/42").request()

@@ -46,7 +46,6 @@ import org.glassfish.jersey.media.sse.SseFeature;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
-import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeComponentState;
@@ -81,32 +80,39 @@ public class WorkspaceResource {
 
     private final long wsId;
 
+    private final CockpitProfile profile;
+
     private final Configuration jooq;
 
     @Inject
-    public WorkspaceResource(@PathParam("wsId") @Min(1) long wsId, CockpitActors as, Configuration jooq) {
+    public WorkspaceResource(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
+            CockpitActors as, Configuration jooq) {
+        this.profile = profile;
         this.as = as;
         this.wsId = wsId;
         this.jooq = jooq;
     }
 
+    private void checkAccess(Configuration conf) {
+        // TODO merge queries with others?
+        if (!DSL.using(conf).fetchExists(USERS_WORKSPACES,
+                USERS_WORKSPACES.USERNAME.eq(profile.getId()).and(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)))) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";qs=1")
     @Valid
-    public WorkspaceFullContent get(@Pac4JProfile CockpitProfile profile) {
+    public WorkspaceFullContent content() {
         return DSL.using(jooq).transactionResult(conf -> {
+
+            checkAccess(conf);
+
             WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId)).fetchOne();
 
             if (ws == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
-            }
-
-            Record user = DSL.using(conf).selectFrom(USERS_WORKSPACES)
-                    .where(USERS_WORKSPACES.USERNAME.eq(profile.getId())).and(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId))
-                    .fetchOne();
-
-            if (user == null) {
-                throw new WebApplicationException(Status.FORBIDDEN);
             }
 
             WorkspaceContent content = WorkspaceContent.buildFromDatabase(conf, ws);
@@ -124,8 +130,10 @@ public class WorkspaceResource {
      */
     @GET
     @Produces(SseFeature.SERVER_SENT_EVENTS + ";qs=0.5")
-    public EventOutput sse(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
-        // TODO ACL is done by actor for now
+    public EventOutput sse() throws InterruptedException {
+
+        checkAccess(jooq);
+
         return as.call(wsId, new NewWorkspaceClient(profile.getId()))
                 .getOrElseThrow(s -> new WebApplicationException(s));
     }
@@ -135,16 +143,19 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
-    public BusInProgress addBus(@Pac4JProfile CockpitProfile profile, @Valid BusImport nb) throws InterruptedException {
-        // TODO ACL is done by actor for now
+    public BusInProgress addBus(@Valid BusImport nb) throws InterruptedException {
+
+        checkAccess(jooq);
+
         return as.call(wsId, new ImportBus(profile.getId(), nb)).getOrElseThrow(s -> new WebApplicationException(s));
     }
 
     @DELETE
     @Path("/buses/{bId}")
-    public void delete(@PathParam("bId") @Min(1) long bId, @Pac4JProfile CockpitProfile profile)
-            throws InterruptedException {
-        // TODO ACL is done by actor for now
+    public void delete(@PathParam("bId") @Min(1) long bId) throws InterruptedException {
+
+        checkAccess(jooq);
+
         as.call(wsId, new DeleteBus(profile.getId(), bId)).getOrElseThrow(s -> new WebApplicationException(s));
     }
 
@@ -153,9 +164,11 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
-    public SUStateChanged changeSUState(@PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile,
-            @Valid SUChangeState action) throws InterruptedException {
-        // TODO ACL is done by actor for now
+    public SUStateChanged changeSUState(@PathParam("suId") @Min(1) long suId, @Valid SUChangeState action)
+            throws InterruptedException {
+
+        checkAccess(jooq);
+
         return as.call(wsId, new ChangeServiceUnitState(profile.getId(), suId, action))
                 .getOrElseThrow(s -> new WebApplicationException(s));
     }
@@ -166,8 +179,10 @@ public class WorkspaceResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
     public ComponentStateChanged changeComponentState(@PathParam("compId") @Min(1) long compId,
-            @Pac4JProfile CockpitProfile profile, @Valid ComponentChangeState action) throws InterruptedException {
-        // TODO ACL is done by actor for now
+            @Valid ComponentChangeState action) throws InterruptedException {
+
+        checkAccess(jooq);
+
         return as.call(wsId, new ChangeComponentState(profile.getId(), compId, action))
                 .getOrElseThrow(s -> new WebApplicationException(s));
     }
@@ -252,7 +267,6 @@ public class WorkspaceResource {
         public String getId() {
             return Long.toString(id);
         }
-
     }
 
     public static class SUStateChanged implements WorkspaceEvent.Data {

@@ -188,13 +188,13 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testImportBusNotFound() {
+    public void testImportBusNotFoundForbidden() {
 
         Response post = resources.getJerseyTest().target("/workspaces/2/buses").request()
                 .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
                         container.getJmxPassword(), "phrase")));
 
-        assertThat(post.getStatus()).isEqualTo(404);
+        assertThat(post.getStatus()).isEqualTo(403);
     }
 
     @Test

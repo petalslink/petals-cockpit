@@ -40,15 +40,15 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public final ResourceTestRule resources = buildResourceTest(WorkspaceResource.class);
 
     @Test
-    public void getNonExistingWorkspaceNotFoundEvent() {
+    public void getEventNonExistingWorkspaceForbidden() {
         Response get = resources.getJerseyTest().target("/workspaces/3").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
                 .get();
 
-        assertThat(get.getStatus()).isEqualTo(404);
+        assertThat(get.getStatus()).isEqualTo(403);
     }
 
     @Test
-    public void getWorkspaceForbiddenEvent() {
+    public void getEventWorkspaceForbidden() {
         Response get = resources.getJerseyTest().target("/workspaces/2").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
                 .get();
 
@@ -69,7 +69,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     @Test
-    public void getExistingWorkspaceEvent() {
+    public void getEventExistingWorkspace() {
         assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
 
         try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")

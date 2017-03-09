@@ -42,7 +42,6 @@ import org.glassfish.jersey.media.sse.SseBroadcaster;
 import org.glassfish.jersey.server.BroadcasterListener;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.jooq.Configuration;
-import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.ArtifactAdministration;
 import org.ow2.petals.admin.api.PetalsAdministration;
@@ -181,13 +180,6 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             // this should never happen!
             assert ws != null;
 
-            Record user = DSL.using(conf).selectFrom(USERS_WORKSPACES).where(USERS_WORKSPACES.USERNAME.eq(nc.user))
-                    .and(USERS_WORKSPACES.WORKSPACE_ID.eq(wId)).fetchOne();
-
-            if (user == null) {
-                return Either.left(Status.FORBIDDEN);
-            }
-
             WorkspaceContent c = WorkspaceContent.buildFromDatabase(conf, ws);
 
             List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
@@ -214,18 +206,9 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
     private Either<Status, @Nullable Void> handleDeleteBus(DeleteBus bus) throws SuspendExecution {
         final Either<Status, @Nullable Void> mDeleted = runTransaction(conf -> {
-            // TODO merge queries
-            // TODO is the case where the bus does not exist covered? (no!)
-            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
-                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).where(BUSES.ID.eq(bus.bId)
-                            .and(USERS_WORKSPACES.USERNAME.eq(bus.user)).and(USERS_WORKSPACES.WORKSPACE_ID.eq(wId)))
-                    .fetchOne();
 
-            if (user == null) {
-                return Either.left(Status.FORBIDDEN);
-            }
-
-            int deleted = DSL.using(conf).deleteFrom(BUSES).where(BUSES.ID.eq(bus.bId)).execute();
+            int deleted = DSL.using(conf).deleteFrom(BUSES).where(BUSES.ID.eq(bus.bId).and(BUSES.WORKSPACE_ID.eq(wId)))
+                    .execute();
 
             if (deleted < 1) {
                 return Either.left(Status.NOT_FOUND);
@@ -243,15 +226,6 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         final BusImport nb = bus.nb;
 
         final Either<Status, Long> mbId = runTransaction(conf -> {
-            // TODO merge queries
-            Record user = DSL.using(conf).selectFrom(USERS_WORKSPACES)
-                    .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wId).and(USERS_WORKSPACES.USERNAME.eq(bus.user)))
-                    .fetchOne();
-
-            if (user == null) {
-                return Either.left(Status.FORBIDDEN);
-            }
-
             BusesRecord br = new BusesRecord(null, wId, false, nb.ip, nb.port, nb.username, nb.password, nb.passphrase,
                     null, null);
             br.attach(conf);
@@ -312,24 +286,16 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     private Either<Status, ComponentStateChanged> handleComponentStateChange(ChangeComponentState change)
             throws SuspendExecution {
         return runTransaction(conf -> {
-            ComponentsRecord comp = DSL.using(conf).selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(change.compId))
-                    .fetchOne();
+
+            ComponentsRecord comp = DSL.using(conf).select(COMPONENTS.fields()).from(COMPONENTS).join(CONTAINERS)
+                    .onKey(FK_COMPONENTS_CONTAINERS_ID).join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
+                    .where(COMPONENTS.ID.eq(change.compId).and(BUSES.WORKSPACE_ID.eq(wId)))
+                    .fetchOneInto(ComponentsRecord.class);
 
             if (comp == null) {
                 return Either.left(Status.NOT_FOUND);
             }
 
-            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
-                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
-                    .onKey(FK_CONTAINERS_BUSES_ID).join(COMPONENTS)
-                    .onKey(FK_COMPONENTS_CONTAINERS_ID).where(COMPONENTS.ID.eq(change.compId)
-                            .and(USERS_WORKSPACES.USERNAME.eq(change.user)).and(USERS_WORKSPACES.WORKSPACE_ID.eq(wId)))
-                    .fetchOne();
-
-            if (user == null) {
-                return Either.left(Status.FORBIDDEN);
-            }
-            
             return handleComponentStateChange(change, comp, conf);
         });
     }
@@ -443,24 +409,14 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     private Either<Status, SUStateChanged> handleSUStateChange(ChangeServiceUnitState change)
             throws SuspendExecution {
         return runTransaction(conf -> {
-            // TODO merge queries
-            ServiceunitsRecord su = DSL.using(conf).selectFrom(SERVICEUNITS).where(SERVICEUNITS.ID.eq(change.suId))
-                    .fetchOne();
+            ServiceunitsRecord su = DSL.using(conf).select(SERVICEUNITS.fields()).from(SERVICEUNITS).join(COMPONENTS)
+                    .onKey(FK_SERVICEUNITS_COMPONENTS_ID).join(CONTAINERS).onKey(FK_COMPONENTS_CONTAINERS_ID)
+                    .join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
+                    .where(SERVICEUNITS.ID.eq(change.suId).and(BUSES.WORKSPACE_ID.eq(wId)))
+                    .fetchOneInto(ServiceunitsRecord.class);
 
             if (su == null) {
                 return Either.left(Status.NOT_FOUND);
-            }
-
-            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
-                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
-                    .onKey(FK_CONTAINERS_BUSES_ID).join(COMPONENTS).onKey(FK_COMPONENTS_CONTAINERS_ID)
-                    .join(SERVICEUNITS)
-                    .onKey(FK_SERVICEUNITS_COMPONENTS_ID).where(SERVICEUNITS.ID.eq(change.suId)
-                            .and(USERS_WORKSPACES.USERNAME.eq(change.user)).and(USERS_WORKSPACES.WORKSPACE_ID.eq(wId)))
-                    .fetchOne();
-
-            if (user == null) {
-                return Either.left(Status.FORBIDDEN);
             }
 
             return handleSUStateChange(change, su, conf);
