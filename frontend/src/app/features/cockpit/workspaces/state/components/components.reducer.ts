@@ -16,6 +16,7 @@
  */
 
 import { Action } from '@ngrx/store';
+import { omit } from 'underscore';
 
 import { IComponentsTable } from './components.interface';
 import { IComponentRow } from './component.interface';
@@ -174,6 +175,74 @@ export class Components {
     };
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_STATE = `${Components.reducerName}_CHANGE_STATE`;
+  private static changeState(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    return {
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          [payload.componentId]: {
+            ...componentsTable.byId[payload.componentId],
+            isUpdatingState: true
+          }
+        }
+      }
+    };
+  }
+
+  // only used in effect, no point to handle that action
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_STATE_WAIT_SSE = `${Components.reducerName}_CHANGE_STATE_WAIT_SSE`;
+
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_STATE_SUCCESS = `${Components.reducerName}_CHANGE_STATE_SUCCESS`;
+  private static changeStateSuccess(componentsTable: IComponentsTable, payload: { componentId: string, newState: string }) {
+    return {
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          [payload.componentId]: {
+            ...componentsTable.byId[payload.componentId],
+            isUpdatingState: false,
+            state: payload.newState
+          }
+        }
+      }
+    };
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_STATE_ERROR = `${Components.reducerName}_CHANGE_STATE_ERROR`;
+  private static changeStateError(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    return {
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          [payload.componentId]: {
+            ...componentsTable.byId[payload.componentId],
+            isUpdatingState: false
+          }
+        }
+      }
+    };
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static REMOVE_COMPONENT = `${Components.reducerName}_REMOVE_COMPONENT`;
+  private static removeComponent(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    return {
+      ...omit(componentsTable, 'byId', 'allIds'),
+      ...<IComponentsTable>{
+        byId: omit(componentsTable.byId, payload.componentId),
+        allIds: componentsTable.allIds.filter(componentId => componentId === payload.componentId)
+      }
+    };
+  }
+
   private static removeServiceUnit(componentsTable: IComponentsTable, payload: { serviceUnitId: string }) {
     const componentContainingServiceUnit = getComponentOfServiceUnit(componentsTable, payload.serviceUnitId);
 
@@ -214,8 +283,12 @@ export class Components {
     [Components.FETCH_COMPONENT_DETAILS]: Components.fetchComponentDetails,
     [Components.FETCH_COMPONENT_DETAILS_SUCCESS]: Components.fetchComponentDetailsSuccess,
     [Components.FETCH_COMPONENT_DETAILS_ERROR]: Components.fetchComponentDetailsError,
-    [ServiceUnits.REMOVE_SERVICE_UNIT]: Components.removeServiceUnit,
+    [Components.CHANGE_STATE]: Components.changeState,
+    [Components.CHANGE_STATE_SUCCESS]: Components.changeStateSuccess,
+    [Components.CHANGE_STATE_ERROR]: Components.changeStateError,
+    [Components.REMOVE_COMPONENT]: Components.removeComponent,
 
+    [ServiceUnits.REMOVE_SERVICE_UNIT]: Components.removeServiceUnit,
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Components.fetchWorkspaceSuccess,
     [Users.DISCONNECT_USER_SUCCESS]: Components.disconnectUserSuccess
   };

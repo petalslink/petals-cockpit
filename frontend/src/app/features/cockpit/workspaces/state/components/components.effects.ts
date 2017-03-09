@@ -55,4 +55,28 @@ export class ComponentsEffects {
           });
         })
     );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) changeState$: Observable<Action> = this.actions$
+    .ofType(Components.CHANGE_STATE)
+    .switchMap((action: { type: string, payload: { componentId: string, newState: string } }) =>
+      this.componentsService.putState(action.payload.componentId, action.payload.newState)
+        .map(_ => ({
+            type: Components.CHANGE_STATE_WAIT_SSE,
+            payload: { componentId: action.payload.componentId }
+        }))
+        .catch((err) => {
+          if (environment.debug) {
+            console.group();
+            console.warn('Error catched in components.effects : ofType(Components.CHANGE_STATE)');
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of({
+            type: Components.CHANGE_STATE_ERROR,
+            payload: { componentId: action.payload.componentId }
+          });
+        })
+    );
 }

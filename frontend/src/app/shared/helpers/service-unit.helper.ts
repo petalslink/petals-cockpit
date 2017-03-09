@@ -23,7 +23,7 @@ import { IComponentsTable } from '../../features/cockpit/workspaces/state/compon
  * @param {string} state : The state you want to get the possible actions from. For example : 'Started'
  * @returns {{ actionName: string, newStateAfterAction: EServiceUnitState }[]} : The possible new actions according to the state
  */
-export function stateNameToPossibleActions(state: string): { actionName: string, newStateAfterAction: string }[] {
+export function stateNameToPossibleActionsServiceUnit(state: string): { actionName: string, newStateAfterAction: string }[] {
   switch (state) {
     case ServiceUnitState.Shutdown:
       return [
@@ -48,7 +48,7 @@ export function stateNameToPossibleActions(state: string): { actionName: string,
 
     default:
       if (environment.debug) {
-        console.debug(`Error in 'service-unit.helper' file, function 'stateNameToPossibleActions'`);
+        console.debug(`Error in 'service-unit.helper' file, function 'stateNameToPossibleActionsServiceUnit'`);
       }
 
       throw new Error(`SU state cannot be '${state}'`);

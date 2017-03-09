@@ -39,7 +39,7 @@ export class ServiceUnit {
 
   getDetails() {
     return {
-      state: 'Started'
+      state: this.state
     };
   }
 

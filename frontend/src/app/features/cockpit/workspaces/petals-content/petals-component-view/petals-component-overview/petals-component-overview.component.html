@@ -16,11 +16,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div fxLayout="column" fxFill class="content content-max-width" fxLayoutWrap>
   <div class="central-content">
     <div fxLayoutWrap fxLayoutGap="10px">
-      <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="state background-color-hover-light-green-x2 cursor-pointer">
+      <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="state">
         <md-card-title-group>
           <div fxFlex fxLayout="column" fxLayoutAlign="end end">
             <md-card-subtitle>State</md-card-subtitle>
             <md-card-title>{{ component.state }}</md-card-title>
+            <md-card-content *ngIf="component.state">
+              <div fxFlexLayout="row" fxLayoutAlign="end center">
+                <!--TODO : When adding attribute "md-button", the click doesn't work anymore-->
+                <span *ngFor="let possibleState of getPossibleStateActions(component.state)" fxFlexLayout="row" fxLayoutAlign="end center">
+                  <button
+                    (click)="changeState(possibleState.newStateAfterAction)"
+                    [disabled]="component.isUpdatingState || (possibleState.actionName === 'Unload' && component.serviceUnits.length > 0)"
+                  >
+                    {{ possibleState.actionName }}
+                  </button>
+
+                  <!--TODO : The tooltip is not displayed. Potential bug with material and ng v4.-->
+                  <!--See https://github.com/angular/material2/issues/3478 for more info-->
+                  <md-icon
+                    *ngIf="possibleState.actionName === 'Unload'"
+                    mdTooltip="In order to unload a component, every service unit of this component should be unloaded"
+                    mdTooltipPosition="above"
+                  >
+                    info outline
+                  </md-icon>
+                </span>
+              </div>
+            </md-card-content>
           </div>
           <div class="green-led"></div>
         </md-card-title-group>

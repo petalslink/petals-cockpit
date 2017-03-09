@@ -19,7 +19,7 @@ import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core
 import { Store } from '@ngrx/store';
 
 import { IServiceUnitRow } from '../../../state/service-units/service-unit.interface';
-import { stateNameToPossibleActions } from '../../../../../../shared/helpers/service-unit.helper';
+import { stateNameToPossibleActionsServiceUnit } from '../../../../../../shared/helpers/service-unit.helper';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
 import { ServiceUnits } from '../../../state/service-units/service-units.reducer';
 
@@ -37,7 +37,7 @@ export class PetalsServiceUnitOverviewComponent implements OnInit {
   ngOnInit() { }
 
   getPossibleStateActions(state: string) {
-    return stateNameToPossibleActions(state);
+    return stateNameToPossibleActionsServiceUnit(state);
   }
 
   changeState(newState: string) {

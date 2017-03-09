@@ -16,8 +16,12 @@
  */
 
 import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Store } from '@ngrx/store';
 
 import { IComponentRow } from '../../../state/components/component.interface';
+import { IStore } from '../../../../../../shared/interfaces/store.interface';
+import { Components } from '../../../state/components/components.reducer';
+import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
 
 @Component({
   selector: 'app-petals-component-overview',
@@ -28,8 +32,15 @@ import { IComponentRow } from '../../../state/components/component.interface';
 export class PetalsComponentOverviewComponent implements OnInit {
   @Input() component: IComponentRow;
 
-  constructor() { }
+  constructor(private store$: Store<IStore>) { }
 
-  ngOnInit() {
+  ngOnInit() { }
+
+  getPossibleStateActions(state: string) {
+    return stateNameToPossibleActionsComponent(state);
+  }
+
+  changeState(newState: string) {
+    this.store$.dispatch({ type: Components.CHANGE_STATE, payload: { componentId: this.component.id, newState } });
   }
 }

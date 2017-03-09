@@ -22,6 +22,8 @@ import { containersTableFactory } from './containers.initial-state';
 import { IContainerRow } from './container.interface';
 import { Users } from './../../../../../shared/state/users.reducer';
 import { Workspaces } from '../workspaces/workspaces.reducer';
+import { getContainerOfComponent } from '../../../../../shared/helpers/component.helper';
+import { Components } from '../components/components.reducer';
 
 export class Containers {
   private static reducerName = 'CONTAINERS_REDUCER';
@@ -176,6 +178,27 @@ export class Containers {
     };
   }
 
+  // tslint:disable-next-line:member-ordering
+  private static removeComponent(containersTable: IContainersTable, payload: { componentId: string }) {
+    const containerContainingComponent = getContainerOfComponent(containersTable, payload.componentId);
+
+    return {
+      ...containersTable,
+      ...<IContainersTable>{
+        byId: {
+          ...containersTable.byId,
+          [containerContainingComponent.id]: <IContainerRow>{
+            ...containersTable.byId[containerContainingComponent.id],
+            components: containersTable
+              .byId[containerContainingComponent.id]
+              .components
+              .filter(componentId => componentId !== payload.componentId)
+          }
+        }
+      }
+    };
+  }
+
   private static fetchWorkspaceSuccess(_containersTable: IContainersTable, _payload) {
     return containersTableFactory();
   }
@@ -197,6 +220,7 @@ export class Containers {
     [Containers.FETCH_CONTAINER_DETAILS_SUCCESS]: Containers.fetchContainerDetailsSuccess,
     [Containers.FETCH_CONTAINER_DETAILS_ERROR]: Containers.fetchContainerDetailsError,
 
+    [Components.REMOVE_COMPONENT]: Containers.removeComponent,
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Containers.fetchWorkspaceSuccess,
     [Users.DISCONNECT_USER_SUCCESS]: Containers.disconnectUserSuccess
   };

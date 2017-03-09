@@ -17,19 +17,28 @@
 
 import { IserviceUnits } from '../service-units/service-units.interface';
 
-export enum EComponentState { Started, Stopped, Loaded, Unloaded, Shutdown }
+// http://stackoverflow.com/a/41631732/2398593
+export const ComponentState = {
+  Started: 'Started' as 'Started',
+  Stopped: 'Stopped' as 'Stopped',
+  Loaded: 'Loaded' as 'Loaded',
+  Unloaded: 'Unloaded' as 'Unloaded',
+  Shutdown: 'Shutdown' as 'Shutdown'
+};
+
 export enum EComponentType { BC, SE }
 
 export interface IComponentCommon {
   // from server
   id: string;
   name: string;
-  state: EComponentState;
+  state: keyof typeof ComponentState;
   type: EComponentType;
 
   // for UI
   isFolded: boolean;
   isFetchingDetails: boolean;
+  isUpdatingState: boolean;
 }
 
 export interface IComponentRow extends IComponentCommon {
