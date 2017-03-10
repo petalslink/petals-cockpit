@@ -8,7 +8,7 @@ Running demo (mock) [https://linagora.gitlab.io/petals-cockpit](https://linagora
 ### Running the pre-compiled JAR
 
 1. Download the latest compiled petals-cockpit:
- - [Version 0.5.0](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/v0.5.0/download?job=build-product)
+ - [Version 0.6.0](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/v0.6.0/download?job=build-product)
  - [Version Latest](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/master/download?job=build-product)
 2. Unpack it and go into the directory
 3. Initialize the database (or update it if you already had one from a previous version):
@@ -37,28 +37,29 @@ $ cd frontend && yarn run prod && cd ..
 $ mvn -s ci/settings.xml clean package
 ```
 
-### Running Petals Cockpit
+### Running
 
 Don't forget to first initialise the database (see below).
 
 Execute Petals Cockpit:
 ```
-$ java -jar cockpit/target/petals-cockpit-0.6.0-SNAPSHOT-capsule.jar server cockpit/default.yml
+$ java -jar cockpit/target/petals-cockpit-*-capsule.jar server cockpit/default.yml
 ```
 
 ### Available Commands
 
+
+The database can be initialised or migrated to the latest version with:
+```
+$ java -jar cockpit/target/petals-cockpit-*-capsule.jar db migrate cockpit/default.yml
+```
 A user can be added with:
 ```
-$ java -jar cockpit/target/petals-cockpit-0.6.0-SNAPSHOT-capsule.jar add-user -u username -n Name -p password cockpit/default.yml
+$ java -jar cockpit/target/petals-cockpit-*-capsule.jar add-user -u username -n Name -p password cockpit/default.yml
 ```
 
-The database can be migrated to the latest version with:
-```
-$ java -jar cockpit/target/petals-cockpit-0.6.0-SNAPSHOT-capsule.jar db migrate cockpit/default.yml
-```
 
-### Working with the backend and the frontend
+### Working with the backend and the frontend separately
 
 To execute backend commands, you can use:
 ```

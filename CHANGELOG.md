@@ -1,3 +1,37 @@
+<a name="0.6.0"></a>
+# [0.6.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.5.0...v0.6.0) (2017-03-10)
+
+
+### Bug Fixes
+
+* **product:** make scss work with any base href ([c265f30](https://gitlab.com/linagora/petals-cockpit/commit/c265f30)), closes [#270](https://gitlab.com/linagora/petals-cockpit/issues/270) [#260](https://gitlab.com/linagora/petals-cockpit/issues/260)
+* **frontend:** disable discard and import buttons when needed ([b3fa3fb](https://gitlab.com/linagora/petals-cockpit/commit/b3fa3fb))
+* **frontend:** Reload on a bus/container/component/su works ([2abcd57](https://gitlab.com/linagora/petals-cockpit/commit/2abcd57)), closes [#244](https://gitlab.com/linagora/petals-cockpit/issues/244)
+* **frontend:** tooltips were not disappearing ([6d8b977](https://gitlab.com/linagora/petals-cockpit/commit/6d8b977)), closes [#271](https://gitlab.com/linagora/petals-cockpit/issues/271) [#273](https://gitlab.com/linagora/petals-cockpit/issues/273)
+* **frontend:** display containers names in reachabilities ([bd68abd7](https://gitlab.com/linagora/petals-cockpit/commit/bd68abd7)), closes [#246](https://gitlab.com/linagora/petals-cockpit/issues/246)
+
+
+### Features
+
+* **product:** redirect user to its last workspace after login ([57c1b53](https://gitlab.com/linagora/petals-cockpit/commit/57c1b53)), closes [#108](https://gitlab.com/linagora/petals-cockpit/issues/108)
+* **product:** SU and Components lifecycle management, closes [#11](https://gitlab.com/linagora/petals-cockpit/issues/11) [#12](https://gitlab.com/linagora/petals-cockpit/issues/12)
+* **product:** Show basic information about workspace ([be08af87](https://gitlab.com/linagora/petals-cockpit/commit/be08af87)) [#267](https://gitlab.com/linagora/petals-cockpit/issues/267)
+* **frontend:** add a clear button to the import bus form ([951693e](https://gitlab.com/linagora/petals-cockpit/commit/951693e)), closes [#219](https://gitlab.com/linagora/petals-cockpit/issues/219)
+* **frontend:** Close sidenav on click if small screen ([7563a4a](https://gitlab.com/linagora/petals-cockpit/commit/7563a4a)), closes [#249](https://gitlab.com/linagora/petals-cockpit/issues/249)
+* **frontend:** Display green led only if workspace is selected ([cfa2c0b](https://gitlab.com/linagora/petals-cockpit/commit/cfa2c0b)), closes [#247](https://gitlab.com/linagora/petals-cockpit/issues/247)
+* **frontend:** Show a message when the search bar doesn't yield any result ([44219c31](https://gitlab.com/linagora/petals-cockpit/commit/44219c31)), closes [#228](https://gitlab.com/linagora/petals-cockpit/issues/228)
+* **frontend:** Add a warning icon next to failed bus in progress in the side bar ([0321092d](https://gitlab.com/linagora/petals-cockpit/commit/0321092d)), closes [#232](https://gitlab.com/linagora/petals-cockpit/issues/232)
+* **frontend:** During search in tree, elements hidden by fold should be made visible via unfold of their parent ([49e59999](https://gitlab.com/linagora/petals-cockpit/commit/49e59999)), closes [#248](https://gitlab.com/linagora/petals-cockpit/issues/248)
+* **frontend:** Unreachable containers should be shown too in the container overview ([165b762d](https://gitlab.com/linagora/petals-cockpit/commit/165b762d)), closes [#281](https://gitlab.com/linagora/petals-cockpit/issues/281)
+* **frontend:** Show workspaces users in workspaces list ([9334c57f](https://gitlab.com/linagora/petals-cockpit/commit/9334c57f)), closes [#217](https://gitlab.com/linagora/petals-cockpit/issues/217)
+
+
+### Performance Improvements
+
+* **frontend:** ensure guards are triggered only once ([aa02731](https://gitlab.com/linagora/petals-cockpit/commit/aa02731))
+
+
+
 <a name="0.5.0"></a>
 # [0.5.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.4.0...v0.5.0) (2017-02-21)
 
