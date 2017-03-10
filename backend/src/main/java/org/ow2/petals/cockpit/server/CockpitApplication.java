@@ -61,6 +61,7 @@ import com.google.common.collect.ImmutableMap;
 
 import io.dropwizard.Application;
 import io.dropwizard.db.PooledDataSourceFactory;
+import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.jetty.BiDiGzipHandler;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.migrations.MigrationsBundle;
@@ -157,6 +158,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
     @Override
     public void initialize(Bootstrap<C> bootstrap) {
+        bootstrap.addBundle(new MultiPartBundle());
         bootstrap.addBundle(migrations);
         bootstrap.addBundle(jooq);
         bootstrap.addBundle(pac4j);

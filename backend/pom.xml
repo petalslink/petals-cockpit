@@ -43,6 +43,10 @@
       <artifactId>dropwizard-migrations</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-forms</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.bendb.dropwizard</groupId>
       <artifactId>dropwizard-jooq</artifactId>
       <version>1.0.0-2</version>

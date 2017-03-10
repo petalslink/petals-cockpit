@@ -34,6 +34,7 @@ import org.assertj.db.api.RequestRowAssert;
 import org.assertj.db.type.Request;
 import org.assertj.db.type.Table;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
@@ -129,9 +130,10 @@ public class AbstractCockpitResourceTest {
                         bind(PetalsAdministrationFactory.getInstance()).to(PetalsAdministrationFactory.class);
                         bind(httpServer).to(ArtifactServer.class);
                     }
-                });
+                }).setClientConfigurator(cc -> cc.register(MultiPartFeature.class));
         // needed for @Pac4JProfile injection to work
         builder.addProvider(new MockProfileParamValueFactoryProvider.Binder(ADMIN));
+        builder.addProvider(MultiPartFeature.class);
         for (Class<?> resource : resources) {
             // we pass the resource as a provider to get injection in constructor
             builder.addProvider(resource);

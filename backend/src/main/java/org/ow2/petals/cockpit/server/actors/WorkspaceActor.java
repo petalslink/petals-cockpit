@@ -29,6 +29,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -48,6 +49,7 @@ import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.artifact.Artifact;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
+import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.api.artifact.lifecycle.ArtifactLifecycle;
 import org.ow2.petals.admin.api.artifact.lifecycle.ComponentLifecycle;
 import org.ow2.petals.admin.api.artifact.lifecycle.ServiceAssemblyLifecycle;
@@ -70,6 +72,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentStateChanged;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUChangeState;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUDeployed;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUStateChanged;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
@@ -140,6 +143,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 answer((ChangeServiceUnitState) msg, this::handleSUStateChange);
             } else if (msg instanceof ChangeComponentState) {
                 answer((ChangeComponentState) msg, this::handleComponentStateChange);
+            } else if (msg instanceof DeployServiceUnit) {
+                answer((DeployServiceUnit) msg, this::handleDeployServiceUnit);
             } else {
                 LOG.warn("Unexpected event for workspace {}: {}", wId, msg);
             }
@@ -521,6 +526,49 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
+    private Either<Status, SUDeployed> handleDeployServiceUnit(DeployServiceUnit su) throws SuspendExecution {
+        return runTransaction(conf -> {
+            ContainersRecord cont = DSL.using(conf).select().from(CONTAINERS).join(COMPONENTS)
+                    .onKey(FK_COMPONENTS_CONTAINERS_ID).where(COMPONENTS.ID.eq(su.compId)).fetchOneInto(CONTAINERS);
+            assert cont != null;
+
+            // we already are in a thread pool
+            ServiceAssembly deployedSA = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
+                    petals -> {
+                        // Note: since there is only one SU in it, a failure will result in the SA being removed
+                        petals.newArtifactLifecycleFactory()
+                                .createServiceAssemblyLifecycle(new ServiceAssembly(su.saName)).deploy(su.saUrl);
+                        return (ServiceAssembly) petals.newArtifactAdministration()
+                                .getArtifactInfo(ServiceAssembly.TYPE, su.saName, null);
+                    });
+
+            SUDeployed res = serviceUnitDeployed(deployedSA, su.compId, conf);
+
+            return Either.right(res);
+        });
+    }
+
+    private SUDeployed serviceUnitDeployed(ServiceAssembly deployedSA, long compId, Configuration conf)
+            throws SuspendExecution {
+        // there should be exactly one SU in it
+        ServiceUnit deployedSU = deployedSA.getServiceUnits().iterator().next();
+        ServiceUnitMin.State state = ServiceUnitMin.State.from(deployedSA.getState());
+
+        ServiceunitsRecord suDb = new ServiceunitsRecord(null, compId, deployedSU.getName(), state.name(),
+                deployedSA.getName());
+        suDb.attach(conf);
+        int suDbi = suDb.insert();
+        assert suDbi == 1;
+
+        SUDeployed res = new SUDeployed(compId,
+                new ServiceUnitMin(suDb.getId(), deployedSU.getName(), state, deployedSA.getName()));
+
+        // we want the event to be sent after we answered
+        doInActorLoop(() -> WorkspaceEvent.suDeployed(res));
+
+        return res;
+    }
+
     public interface Msg {
         // marker interface for messages to this actor
     }
@@ -594,6 +642,24 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             super(user);
             this.compId = compId;
             this.action = action;
+        }
+    }
+
+    public static class DeployServiceUnit extends WorkspaceRequest<SUDeployed> {
+
+        private static final long serialVersionUID = 3305750050657001574L;
+
+        final String saName;
+
+        final URL saUrl;
+
+        final long compId;
+
+        public DeployServiceUnit(String user, String saName, URL saUrl, long compId) {
+            super(user);
+            this.saName = saName;
+            this.saUrl = saUrl;
+            this.compId = compId;
         }
     }
 

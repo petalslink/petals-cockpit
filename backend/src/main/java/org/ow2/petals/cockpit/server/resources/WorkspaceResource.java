@@ -17,10 +17,13 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_USERNAME;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -41,6 +44,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.glassfish.jersey.process.internal.RequestScoped;
@@ -51,6 +56,7 @@ import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeComponentState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeServiceUnitState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployServiceUnit;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
@@ -60,6 +66,10 @@ import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitM
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
+import org.ow2.petals.cockpit.server.services.ArtifactServer;
+import org.ow2.petals.cockpit.server.services.ArtifactServer.ServicedArtifact;
+import org.ow2.petals.cockpit.server.utils.PetalsUtils;
+import org.ow2.petals.jbi.descriptor.JBIDescriptorException;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -84,13 +94,16 @@ public class WorkspaceResource {
 
     private final Configuration jooq;
 
+    private final ArtifactServer httpServer;
+
     @Inject
     public WorkspaceResource(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
-            CockpitActors as, Configuration jooq) {
+            CockpitActors as, Configuration jooq, ArtifactServer httpServer) {
         this.profile = profile;
         this.as = as;
         this.wsId = wsId;
         this.jooq = jooq;
+        this.httpServer = httpServer;
     }
 
     private void checkAccess(Configuration conf) {
@@ -185,6 +198,32 @@ public class WorkspaceResource {
 
         return as.call(wsId, new ChangeComponentState(profile.getId(), compId, action))
                 .getOrElseThrow(s -> new WebApplicationException(s));
+    }
+
+    @POST
+    @Path("/components/{compId}/serviceunits")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public SUDeployed deployServiceUnit(@PathParam("compId") @Min(1) long compId,
+            @FormDataParam("file") InputStream file, @FormDataParam("file") FormDataContentDisposition fileDisposition,
+            @FormDataParam("name") String name) throws IOException, InterruptedException, JBIDescriptorException {
+
+        checkAccess(jooq);
+
+        String componentName = DSL.using(jooq).selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(compId))
+                .fetchOne(COMPONENTS.NAME);
+
+        if (componentName == null) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
+        String saName = "sa-" + name;
+
+        try (ServicedArtifact sa = httpServer.serve(saName + ".zip",
+                os -> PetalsUtils.createSAfromSU(file, os, saName, name, componentName))) {
+            return as.call(wsId, new DeployServiceUnit(profile.getId(), saName, sa.getArtifactUrl(), compId))
+                    .getOrElseThrow(s -> new WebApplicationException(s));
+        }
     }
 
     public static class BusImport {
@@ -327,6 +366,29 @@ public class WorkspaceResource {
         }
     }
 
+    public static class SUDeployed implements WorkspaceEvent.Data {
+
+        @Min(1)
+        public final long compId;
+
+        @Valid
+        @NotNull
+        @JsonProperty
+        public final ServiceUnitMin serviceUnit;
+
+        @JsonCreator
+        public SUDeployed(@JsonProperty("compId") long compId,
+                @JsonProperty("serviceUnit") ServiceUnitMin serviceUnit) {
+            this.compId = compId;
+            this.serviceUnit = serviceUnit;
+        }
+
+        @JsonProperty
+        public String getCompId() {
+            return Long.toString(compId);
+        }
+    }
+
     public static class WorkspaceFullContent {
 
         @Valid
@@ -367,7 +429,8 @@ public class WorkspaceResource {
         }
 
         public enum Event {
-            WORKSPACE_CONTENT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, COMPONENT_STATE_CHANGE, BUS_DELETED
+            WORKSPACE_CONTENT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, COMPONENT_STATE_CHANGE, BUS_DELETED,
+            SU_DEPLOYED
         }
 
         @JsonProperty
@@ -400,6 +463,10 @@ public class WorkspaceResource {
 
         public static WorkspaceEvent busDeleted(BusDeleted bd) {
             return new WorkspaceEvent(Event.BUS_DELETED, bd);
+        }
+
+        public static WorkspaceEvent suDeployed(SUDeployed sud) {
+            return new WorkspaceEvent(Event.SU_DEPLOYED, sud);
         }
 
         @Override
