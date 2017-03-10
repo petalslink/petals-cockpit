@@ -20,15 +20,15 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { isNot } from '../../../../../shared/helpers/shared.helper';
 
 export function _getCurrentServiceUnit(store$: Store<IStore>): Observable<IServiceUnitRow> {
-  return store$.select(state => state.serviceUnits)
-    .filter(serviceUnits => serviceUnits.selectedServiceUnitId !== '')
-    .map(serviceUnits => {
-      const serviceUnit = serviceUnits.byId[serviceUnits.selectedServiceUnitId];
-
-      return serviceUnit;
-    });
+  return store$
+    .select(state => state.serviceUnits.selectedServiceUnitId === ''
+      ? null
+      : state.serviceUnits.byId[state.serviceUnits.selectedServiceUnitId]
+    )
+    .filter(isNot(null));
 }
 
 export function getCurrentServiceUnit() {

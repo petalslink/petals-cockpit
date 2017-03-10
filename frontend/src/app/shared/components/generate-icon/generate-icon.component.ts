@@ -46,7 +46,7 @@ export class GenerateIconComponent implements AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['text'].currentValue !== changes['text'].previousValue) {
+    if (changes['text'] && changes['text'].currentValue !== changes['text'].previousValue) {
       this.updateSvg();
     }
   }

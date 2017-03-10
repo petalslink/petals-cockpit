@@ -21,6 +21,7 @@ import { Store } from '@ngrx/store';
 
 import { IContainerRow } from '../../../state/containers/container.interface';
 import { IStore } from './../../../../../../shared/interfaces/store.interface';
+import { arrayEquals } from '../../../../../../shared/helpers/shared.helper';
 
 @Component({
   selector: 'app-petals-container-overview',
@@ -30,13 +31,26 @@ import { IStore } from './../../../../../../shared/interfaces/store.interface';
 })
 export class PetalsContainerOverviewComponent implements OnInit {
   public idWorkspace$: Observable<string>;
+  public containers$: Observable<IContainerRow[]>;
 
   @Input() container: IContainerRow;
 
-  constructor(private store$: Store<IStore>) {
-    this.idWorkspace$ = this.store$.select(state => state.workspaces.selectedWorkspaceId);
-  }
+  constructor(private store$: Store<IStore>) { }
 
   ngOnInit() {
+    this.idWorkspace$ = this.store$.select(state => state.workspaces.selectedWorkspaceId);
+    this.containers$ = this.store$
+      .select(state => {
+        const busId = state.buses.allIds
+          .find(bId => state.buses.byId[bId].containers.includes(state.containers.selectedContainerId));
+        return state.buses.byId[busId].containers
+          .filter(id => id !== state.containers.selectedContainerId)
+          .map(id => state.containers.byId[id]);
+      })
+      .distinctUntilChanged(arrayEquals);
+  }
+
+  isReachable(id: string): boolean {
+    return this.container.reachabilities.includes(id);
   }
 }
