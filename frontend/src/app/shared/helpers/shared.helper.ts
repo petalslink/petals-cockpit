@@ -46,4 +46,8 @@ export function escapeStringRegexp(str) {
   }
 
   return str.replace(matchOperatorsRe, '\\$&');
-};
+}
+
+export function arrayEquals(ps: any[], ns: any[]): boolean {
+  return ps.every((p, i) => p === ns[i]);
+}
