@@ -46,14 +46,12 @@ describe(`Petals component content`, () => {
   });
 
   it(`Should stop/start/stop/unload a component`, () => {
-    page.getWorkspaceTreeByName('Comp 0').click();
-
     const stateElem = element(by.css(`app-petals-component-overview md-card.state md-card-title`));
 
     // the component exists and should be present in petals tree
     expect(page.getWorkspaceTreeByName(`Comp 0`).first().isPresent()).toBe(true);
 
-    page.toggleSidenav();
+    page.getWorkspaceTreeByName('Comp 0').click();
 
     element(by.cssContainingText(`app-petals-component-overview button`, `Stop`)).click();
     expect(stateElem.getText()).toEqual('Stopped');
@@ -70,14 +68,12 @@ describe(`Petals component content`, () => {
     // unload the 2 SU
     page.toggleSidenav();
     page.getWorkspaceTreeByName('SU 0').click();
-    page.toggleSidenav();
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`)).click();
     element(by.css(`simple-notification`)).click();
 
     page.toggleSidenav();
     page.getWorkspaceTreeByName('SU 1').click();
-    page.toggleSidenav();
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`)).click();
     element(by.css(`simple-notification`)).click();
@@ -85,7 +81,6 @@ describe(`Petals component content`, () => {
     // we should now be able to unload the comp 0
     page.toggleSidenav();
     page.getWorkspaceTreeByName('Comp 0').click();
-    page.toggleSidenav();
     expect(element(by.cssContainingText(`app-petals-component-overview button`, `Unload`)).isEnabled()).toBe(true);
 
     // once unloaded ...
