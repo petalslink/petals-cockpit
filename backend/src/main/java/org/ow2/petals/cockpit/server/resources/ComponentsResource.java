@@ -62,7 +62,8 @@ public class ComponentsResource {
     @GET
     @Path("/{compId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentOverview getComp(@PathParam("compId") @Min(1) long compId, @Pac4JProfile CockpitProfile profile) {
+    public ComponentOverview getComp(@NotNull @PathParam("compId") @Min(1) long compId,
+            @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
             ComponentsRecord comp = DSL.using(conf).selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(compId)).fetchOne();
 

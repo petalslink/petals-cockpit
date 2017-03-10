@@ -97,7 +97,7 @@ public class WorkspaceResource {
     private final ArtifactServer httpServer;
 
     @Inject
-    public WorkspaceResource(@PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
+    public WorkspaceResource(@NotNull @PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
             CockpitActors as, Configuration jooq, ArtifactServer httpServer) {
         this.profile = profile;
         this.as = as;
@@ -156,7 +156,7 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
-    public BusInProgress addBus(@Valid BusImport nb) throws InterruptedException {
+    public BusInProgress addBus(@NotNull @Valid BusImport nb) throws InterruptedException {
 
         checkAccess(jooq);
 
@@ -165,7 +165,7 @@ public class WorkspaceResource {
 
     @DELETE
     @Path("/buses/{bId}")
-    public void delete(@PathParam("bId") @Min(1) long bId) throws InterruptedException {
+    public void delete(@NotNull @PathParam("bId") @Min(1) long bId) throws InterruptedException {
 
         checkAccess(jooq);
 
@@ -177,8 +177,8 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
-    public SUStateChanged changeSUState(@PathParam("suId") @Min(1) long suId, @Valid SUChangeState action)
-            throws InterruptedException {
+    public SUStateChanged changeSUState(@NotNull @PathParam("suId") @Min(1) long suId,
+            @NotNull @Valid SUChangeState action) throws InterruptedException {
 
         checkAccess(jooq);
 
@@ -191,8 +191,8 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
-    public ComponentStateChanged changeComponentState(@PathParam("compId") @Min(1) long compId,
-            @Valid ComponentChangeState action) throws InterruptedException {
+    public ComponentStateChanged changeComponentState(@NotNull @PathParam("compId") @Min(1) long compId,
+            @NotNull @Valid ComponentChangeState action) throws InterruptedException {
 
         checkAccess(jooq);
 
@@ -204,9 +204,11 @@ public class WorkspaceResource {
     @Path("/components/{compId}/serviceunits")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public SUDeployed deployServiceUnit(@PathParam("compId") @Min(1) long compId,
-            @FormDataParam("file") InputStream file, @FormDataParam("file") FormDataContentDisposition fileDisposition,
-            @FormDataParam("name") String name) throws IOException, InterruptedException, JBIDescriptorException {
+    public SUDeployed deployServiceUnit(@NotNull @PathParam("compId") @Min(1) long compId,
+            @NotNull @FormDataParam("file") InputStream file,
+            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
+            @NotEmpty @FormDataParam("name") String name)
+            throws IOException, InterruptedException, JBIDescriptorException {
 
         checkAccess(jooq);
 

@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.ow2.petals.cockpit.server.resources;
+
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_COMPONENTS_CONTAINERS_ID;
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_CONTAINERS_BUSES_ID;
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_SERVICEUNITS_COMPONENTS_ID;
@@ -61,7 +62,8 @@ public class ServiceUnitsResource {
     @GET
     @Path("/{suId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ServiceUnitOverview getSU(@PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile) {
+    public ServiceUnitOverview getSU(@NotNull @PathParam("suId") @Min(1) long suId,
+            @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
             ServiceunitsRecord su = DSL.using(conf).selectFrom(SERVICEUNITS).where(SERVICEUNITS.ID.eq(suId)).fetchOne();
 
