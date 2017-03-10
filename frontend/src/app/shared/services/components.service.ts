@@ -32,7 +32,7 @@ import { ComponentState } from '../../features/cockpit/workspaces/state/componen
 export abstract class ComponentsService {
   abstract getDetailsComponent(componentId: string): Observable<Response>;
 
-  abstract putState(componentId: string, newState: string): Observable<Response>;
+  abstract putState(workspaceId: string, componentId: string, newState: string): Observable<Response>;
 
   abstract watchEventComponentStateChangeOk(): void;
 }
@@ -53,8 +53,8 @@ export class ComponentsServiceImpl extends ComponentsService {
     return this.http.get(`${environment.urlBackend}/components/${componentId}`);
   }
 
-  putState(componentId: string, newState: string) {
-    return this.http.put(`${environment.urlBackend}/components/${componentId}`, { state: newState });
+  putState(workspaceId: string, componentId: string, newState: string) {
+    return this.http.put(`${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}`, { state: newState });
   }
 
   watchEventComponentStateChangeOk() {

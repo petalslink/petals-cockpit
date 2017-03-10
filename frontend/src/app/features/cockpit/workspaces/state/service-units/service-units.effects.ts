@@ -17,17 +17,19 @@
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Action } from '@ngrx/store';
+import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../../../../environments/environment';
 import { ServiceUnitsService } from './../../../../../shared/services/service-units.service';
 import { ServiceUnits } from './../service-units/service-units.reducer';
+import { IStore } from '../../../../../shared/interfaces/store.interface';
 
 @Injectable()
 export class ServiceUnitsEffects {
   constructor(
+    private store$: Store<IStore>,
     private actions$: Actions,
     private serviceUnitsService: ServiceUnitsService
   ) { }
@@ -59,8 +61,9 @@ export class ServiceUnitsEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) changeState$: Observable<Action> = this.actions$
     .ofType(ServiceUnits.CHANGE_STATE)
-    .switchMap((action: { type: string, payload: { serviceUnitId: string, newState: string } }) =>
-      this.serviceUnitsService.putState(action.payload.serviceUnitId, action.payload.newState)
+    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .switchMap(([action, workspaceId]: [{ type: string, payload: { serviceUnitId: string, newState: string } }, string]) =>
+      this.serviceUnitsService.putState(workspaceId, action.payload.serviceUnitId, action.payload.newState)
         .map(_ => {
           return {
             type: ServiceUnits.CHANGE_STATE_WAIT_SSE,

@@ -32,7 +32,7 @@ import { IserviceUnitsTable } from '../../features/cockpit/workspaces/state/serv
 export abstract class ServiceUnitsService {
   abstract getDetailsServiceUnit(serviceUnitId: string): Observable<Response>;
 
-  abstract putState(serviceUnitId: string, newState: string): Observable<Response>;
+  abstract putState(workspaceId: string, serviceUnitId: string, newState: string): Observable<Response>;
 
   abstract watchEventSuStateChangeOk(): void;
 }
@@ -53,8 +53,8 @@ export class ServiceUnitsServiceImpl extends ServiceUnitsService {
     return this.http.get(`${environment.urlBackend}/serviceunits/${serviceUnitId}`);
   }
 
-  putState(serviceUnitId: string, newState: string) {
-    return this.http.put(`${environment.urlBackend}/serviceunits/${serviceUnitId}`, { state: newState });
+  putState(workspaceId: string, serviceUnitId: string, newState: string) {
+    return this.http.put(`${environment.urlBackend}/workspaces/${workspaceId}/serviceunits/${serviceUnitId}`, { state: newState });
   }
 
   watchEventSuStateChangeOk() {

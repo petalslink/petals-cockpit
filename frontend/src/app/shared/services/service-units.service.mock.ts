@@ -41,7 +41,7 @@ export class ServiceUnitsMockService extends ServiceUnitsServiceImpl {
     return helper.responseBody(detailsServiceUnit);
   }
 
-  putState(serviceUnitId: string, newState: string) {
+  putState(_workspaceId: string, serviceUnitId: string, newState: string) {
     serviceUnitsService.read(serviceUnitId).setState(newState);
     // when the state changes, trigger a fake SSE event
     setTimeout(() =>

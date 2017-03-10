@@ -17,17 +17,19 @@
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Action } from '@ngrx/store';
+import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../../../../environments/environment';
 import { Components } from './components.reducer';
 import { ComponentsService } from './../../../../../shared/services/components.service';
+import { IStore } from '../../../../../shared/interfaces/store.interface';
 
 @Injectable()
 export class ComponentsEffects {
   constructor(
+    private store$: Store<IStore>,
     private actions$: Actions,
     private componentsService: ComponentsService
   ) { }
@@ -59,8 +61,9 @@ export class ComponentsEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) changeState$: Observable<Action> = this.actions$
     .ofType(Components.CHANGE_STATE)
-    .switchMap((action: { type: string, payload: { componentId: string, newState: string } }) =>
-      this.componentsService.putState(action.payload.componentId, action.payload.newState)
+    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .switchMap(([action, workspaceId]: [{ type: string, payload: { componentId: string, newState: string } }, string]) =>
+      this.componentsService.putState(workspaceId, action.payload.componentId, action.payload.newState)
         .map(_ => ({
             type: Components.CHANGE_STATE_WAIT_SSE,
             payload: { componentId: action.payload.componentId }
