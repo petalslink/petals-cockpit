@@ -21,6 +21,7 @@ import { Observable } from 'rxjs/Observable';
 import { IBusesInProgress } from './buses-in-progress.interface';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IBusInProgressRow } from './bus-in-progress.interface';
+import { isNot } from '../../../../../shared/helpers/shared.helper';
 
 export function _getBusesInProgress(store$: Store<IStore>): Observable<IBusesInProgress> {
   return store$.select(state => state.busesInProgress)
@@ -41,13 +42,11 @@ export function getBusesInProgress() {
 // ------------------------------------------------------------------
 
 export function _getCurrentBusInProgress(store$: Store<IStore>): Observable<IBusInProgressRow> {
-  return store$.select(state => state.busesInProgress)
-    .filter(busesInProgress => busesInProgress.selectedBusInProgressId !== '')
-    .map(busesInProgress => {
-      const busInProgress = busesInProgress.byId[busesInProgress.selectedBusInProgressId];
-
-      return busInProgress;
-    });
+  return store$
+    .select(state => state.busesInProgress.selectedBusInProgressId === ''
+      ? null
+      : state.busesInProgress.byId[state.busesInProgress.selectedBusInProgressId])
+    .filter(isNot(null));
 }
 
 export function getCurrentBusInProgress() {

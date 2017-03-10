@@ -20,15 +20,14 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IComponentRow } from './component.interface';
+import { isNot } from '../../../../../shared/helpers/shared.helper';
 
 export function _getCurrentComponent(store$: Store<IStore>): Observable<IComponentRow> {
-  return store$.select(state => state.components)
-    .filter(components => components.selectedComponentId !== '')
-    .map(components => {
-      const component = components.byId[components.selectedComponentId];
-
-      return component;
-    });
+  return store$
+    .select(state => state.components.selectedComponentId === ''
+      ? null
+      : state.components.byId[state.components.selectedComponentId])
+    .filter(isNot(null));
 }
 
 export function getCurrentComponent() {

@@ -20,16 +20,14 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from './../interfaces/store.interface';
 import { ICurrentUser } from './../interfaces/user.interface';
+import { isNot } from '../helpers/shared.helper';
 
 export function _getCurrentUser(store$: Store<IStore>): Observable<ICurrentUser> {
   return store$
-    .select(state => state.users)
-    .distinctUntilChanged((p, n) => p.connectedUserId === n.connectedUserId)
-    .filter(users => users.connectedUserId !== '')
-    .map(users => {
-      const currentUserId = users.connectedUserId;
-      return users.byId[currentUserId];
-    });
+    .select(state => state.users.connectedUserId === ''
+      ? null
+      : state.users.byId[state.users.connectedUserId])
+    .filter(isNot(null));
 }
 
 export function getCurrentUser() {

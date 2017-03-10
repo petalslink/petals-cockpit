@@ -18,13 +18,13 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IWorkspaces } from './workspaces.interface';
+import { IWorkspaces, IWorkspacesTable } from './workspaces.interface';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IComponent } from '../components/component.interface';
 import { IContainer } from '../containers/container.interface';
 import { IWorkspace } from './workspace.interface';
 import { IBus } from '../buses/bus.interface';
-import { escapeStringRegexp } from '../../../../../shared/helpers/shared.helper';
+import { escapeStringRegexp, arrayEquals } from '../../../../../shared/helpers/shared.helper';
 import { IUser } from '../../../../../shared/interfaces/user.interface';
 
 export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspaces> {
@@ -61,28 +61,19 @@ export function getWorkspacesList() {
 // -----------------------------------------------------------
 
 export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspace> {
-  return store$.select(state => {
-    return {
-      workspaces: state.workspaces,
-      users: state.users,
-      buses: state.buses,
-      containers: state.containers,
-      components: state.components,
-      serviceUnits: state.serviceUnits
-    };
-  })
+  return store$.select(state => [
+    state.workspaces,
+    state.users,
+    state.buses,
+    state.containers,
+    state.components,
+    state.serviceUnits
+  ])
+    .filter(([workspaces]: [IWorkspacesTable]) => workspaces.selectedWorkspaceId !== '')
     // as the object has a new reference every time,
     // use distinctUntilChanged for performance
-    .distinctUntilChanged((p, n) =>
-      p.workspaces === n.workspaces &&
-      p.users === n.users &&
-      p.buses === n.buses &&
-      p.containers === n.containers &&
-      p.components === n.components &&
-      p.serviceUnits === n.serviceUnits
-    )
-    .filter(({ workspaces }) => workspaces.selectedWorkspaceId !== '')
-    .map(({workspaces, users, buses, containers, components, serviceUnits}) => {
+    .distinctUntilChanged(arrayEquals)
+    .map(([workspaces, users, buses, containers, components, serviceUnits]) => {
       return {
         id: workspaces.byId[workspaces.selectedWorkspaceId].id,
         name: workspaces.byId[workspaces.selectedWorkspaceId].name,

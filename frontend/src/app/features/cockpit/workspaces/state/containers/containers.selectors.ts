@@ -20,21 +20,14 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IContainerRow } from './container.interface';
+import { isNot } from '../../../../../shared/helpers/shared.helper';
 
 export function _getCurrentContainer(store$: Store<IStore>): Observable<IContainerRow> {
-  return store$.select(state => state.containers)
-    .filter(containers => containers.selectedContainerId !== '')
-    .map(containers => {
-      const container = {
-        ...<any>containers.byId[containers.selectedContainerId],
-        reachabilities: containers
-          .byId[containers.selectedContainerId]
-          .reachabilities
-          .map(containerId => containers.byId[containerId])
-      };
-
-      return container;
-    });
+  return store$
+    .select(state => state.containers.selectedContainerId === ''
+      ? null
+      : state.containers.byId[state.containers.selectedContainerId])
+    .filter(isNot(null));
 }
 
 export function getCurrentContainer() {

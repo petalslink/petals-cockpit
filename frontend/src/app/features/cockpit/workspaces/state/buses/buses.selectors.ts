@@ -20,15 +20,14 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IBusRow } from './bus.interface';
+import { isNot } from '../../../../../shared/helpers/shared.helper';
 
 export function _getCurrentBus(store$: Store<IStore>): Observable<IBusRow> {
-  return store$.select(state => state.buses)
-    .filter(buses => buses.selectedBusId !== '')
-    .map(buses => {
-      const bus = buses.byId[buses.selectedBusId];
-
-      return bus;
-    });
+  return store$
+    .select(state => state.buses.selectedBusId === ''
+      ? null
+      : state.buses.byId[state.buses.selectedBusId])
+    .filter(isNot(null));
 }
 
 export function getCurrentBus() {
