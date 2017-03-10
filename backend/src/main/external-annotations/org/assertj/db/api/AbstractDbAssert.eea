@@ -1,0 +1,7 @@
+class org/assertj/db/api/AbstractDbAssert
+hasNumberOfRows
+ (I)TA;
+ (I)T1A;
+row
+ ()TR;
+ ()T1R;

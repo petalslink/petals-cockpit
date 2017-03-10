@@ -17,10 +17,13 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_USERNAME;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -41,28 +44,32 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
-import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeComponentState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeServiceUnitState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployServiceUnit;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
-import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentOverview;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
+import org.ow2.petals.cockpit.server.services.ArtifactServer;
+import org.ow2.petals.cockpit.server.services.ArtifactServer.ServicedArtifact;
+import org.ow2.petals.cockpit.server.utils.PetalsUtils;
+import org.ow2.petals.jbi.descriptor.JBIDescriptorException;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -83,32 +90,42 @@ public class WorkspaceResource {
 
     private final long wsId;
 
+    private final CockpitProfile profile;
+
     private final Configuration jooq;
 
+    private final ArtifactServer httpServer;
+
     @Inject
-    public WorkspaceResource(@PathParam("wsId") @Min(1) long wsId, CockpitActors as, Configuration jooq) {
+    public WorkspaceResource(@NotNull @PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
+            CockpitActors as, Configuration jooq, ArtifactServer httpServer) {
+        this.profile = profile;
         this.as = as;
         this.wsId = wsId;
         this.jooq = jooq;
+        this.httpServer = httpServer;
+    }
+
+    private void checkAccess(Configuration conf) {
+        // TODO merge queries with others?
+        if (!DSL.using(conf).fetchExists(USERS_WORKSPACES,
+                USERS_WORKSPACES.USERNAME.eq(profile.getId()).and(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)))) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";qs=1")
     @Valid
-    public WorkspaceFullContent get(@Pac4JProfile CockpitProfile profile) {
+    public WorkspaceFullContent content() {
         return DSL.using(jooq).transactionResult(conf -> {
+
+            checkAccess(conf);
+
             WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId)).fetchOne();
 
             if (ws == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
-            }
-
-            Record user = DSL.using(conf).selectFrom(USERS_WORKSPACES)
-                    .where(USERS_WORKSPACES.USERNAME.eq(profile.getId())).and(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId))
-                    .fetchOne();
-
-            if (user == null) {
-                throw new WebApplicationException(Status.FORBIDDEN);
             }
 
             WorkspaceContent content = WorkspaceContent.buildFromDatabase(conf, ws);
@@ -122,12 +139,14 @@ public class WorkspaceResource {
     }
 
     /**
-     * Produces {@link WorkspaceChange}
+     * Produces {@link WorkspaceEvent}
      */
     @GET
     @Produces(SseFeature.SERVER_SENT_EVENTS + ";qs=0.5")
-    public EventOutput sse(@Pac4JProfile CockpitProfile profile) throws InterruptedException {
-        // TODO ACL is done by actor for now
+    public EventOutput sse() throws InterruptedException {
+
+        checkAccess(jooq);
+
         return as.call(wsId, new NewWorkspaceClient(profile.getId()))
                 .getOrElseThrow(s -> new WebApplicationException(s));
     }
@@ -137,16 +156,19 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
-    public BusInProgress addBus(@Pac4JProfile CockpitProfile profile, @Valid NewBus nb) throws InterruptedException {
-        // TODO ACL is done by actor for now
+    public BusInProgress addBus(@NotNull @Valid BusImport nb) throws InterruptedException {
+
+        checkAccess(jooq);
+
         return as.call(wsId, new ImportBus(profile.getId(), nb)).getOrElseThrow(s -> new WebApplicationException(s));
     }
 
     @DELETE
     @Path("/buses/{bId}")
-    public void delete(@PathParam("bId") @Min(1) long bId, @Pac4JProfile CockpitProfile profile)
-            throws InterruptedException {
-        // TODO ACL is done by actor for now
+    public void delete(@NotNull @PathParam("bId") @Min(1) long bId) throws InterruptedException {
+
+        checkAccess(jooq);
+
         as.call(wsId, new DeleteBus(profile.getId(), bId)).getOrElseThrow(s -> new WebApplicationException(s));
     }
 
@@ -155,10 +177,12 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
-    public ServiceUnitOverview changeSUState(@PathParam("suId") @Min(1) long suId, @Pac4JProfile CockpitProfile profile,
-            @Valid SUChangeState action) throws InterruptedException {
-        // TODO ACL is done by actor for now
-        return as.call(wsId, new ChangeServiceUnitState(profile.getId(), suId, action.state))
+    public SUStateChanged changeSUState(@NotNull @PathParam("suId") @Min(1) long suId,
+            @NotNull @Valid SUChangeState action) throws InterruptedException {
+
+        checkAccess(jooq);
+
+        return as.call(wsId, new ChangeServiceUnitState(profile.getId(), suId, action))
                 .getOrElseThrow(s -> new WebApplicationException(s));
     }
 
@@ -167,14 +191,44 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
-    public ComponentOverview changeComponentState(@PathParam("compId") @Min(1) long compId,
-            @Pac4JProfile CockpitProfile profile, @Valid ComponentChangeState action) throws InterruptedException {
-        // TODO ACL is done by actor for now
-        return as.call(wsId, new ChangeComponentState(profile.getId(), compId, action.state))
+    public ComponentStateChanged changeComponentState(@NotNull @PathParam("compId") @Min(1) long compId,
+            @NotNull @Valid ComponentChangeState action) throws InterruptedException {
+
+        checkAccess(jooq);
+
+        return as.call(wsId, new ChangeComponentState(profile.getId(), compId, action))
                 .getOrElseThrow(s -> new WebApplicationException(s));
     }
 
-    public static class NewBus {
+    @POST
+    @Path("/components/{compId}/serviceunits")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public SUDeployed deployServiceUnit(@NotNull @PathParam("compId") @Min(1) long compId,
+            @NotNull @FormDataParam("file") InputStream file,
+            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
+            @NotEmpty @FormDataParam("name") String name)
+            throws IOException, InterruptedException, JBIDescriptorException {
+
+        checkAccess(jooq);
+
+        String componentName = DSL.using(jooq).selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(compId))
+                .fetchOne(COMPONENTS.NAME);
+
+        if (componentName == null) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
+        String saName = "sa-" + name;
+
+        try (ServicedArtifact sa = httpServer.serve(saName + ".zip",
+                os -> PetalsUtils.createSAfromSU(file, os, saName, name, componentName))) {
+            return as.call(wsId, new DeployServiceUnit(profile.getId(), saName, sa.getArtifactUrl(), compId))
+                    .getOrElseThrow(s -> new WebApplicationException(s));
+        }
+    }
+
+    public static class BusImport {
 
         @NotEmpty
         @JsonProperty
@@ -197,7 +251,7 @@ public class WorkspaceResource {
         @JsonProperty
         public final String passphrase;
 
-        public NewBus(@JsonProperty("ip") String ip, @JsonProperty("port") int port,
+        public BusImport(@JsonProperty("ip") String ip, @JsonProperty("port") int port,
                 @JsonProperty("username") String username, @JsonProperty("password") String password,
                 @JsonProperty("passphrase") String passphrase) {
             this.ip = ip;
@@ -208,7 +262,7 @@ public class WorkspaceResource {
         }
     }
 
-    public static class BusInProgress {
+    public static class BusInProgress implements WorkspaceEvent.Data {
 
         @NotEmpty
         @JsonProperty
@@ -254,10 +308,9 @@ public class WorkspaceResource {
         public String getId() {
             return Long.toString(id);
         }
-
     }
 
-    public static class NewSUState {
+    public static class SUStateChanged implements WorkspaceEvent.Data {
 
         @Min(1)
         public final long id;
@@ -267,7 +320,7 @@ public class WorkspaceResource {
         public final ServiceUnitMin.State state;
 
         @JsonCreator
-        public NewSUState(@JsonProperty("id") long id, @JsonProperty("state") ServiceUnitMin.State state) {
+        public SUStateChanged(@JsonProperty("id") long id, @JsonProperty("state") ServiceUnitMin.State state) {
             this.id = id;
             this.state = state;
         }
@@ -278,7 +331,7 @@ public class WorkspaceResource {
         }
     }
 
-    public static class NewComponentState {
+    public static class ComponentStateChanged implements WorkspaceEvent.Data {
 
         @Min(1)
         public final long id;
@@ -288,7 +341,7 @@ public class WorkspaceResource {
         public final ComponentMin.State state;
 
         @JsonCreator
-        public NewComponentState(@JsonProperty("id") long id, @JsonProperty("state") ComponentMin.State state) {
+        public ComponentStateChanged(@JsonProperty("id") long id, @JsonProperty("state") ComponentMin.State state) {
             this.id = id;
             this.state = state;
         }
@@ -299,7 +352,7 @@ public class WorkspaceResource {
         }
     }
 
-    public static class BusDeleted {
+    public static class BusDeleted implements WorkspaceEvent.Data {
 
         @Min(1)
         public final long id;
@@ -312,6 +365,29 @@ public class WorkspaceResource {
         @JsonProperty
         public String getId() {
             return Long.toString(id);
+        }
+    }
+
+    public static class SUDeployed implements WorkspaceEvent.Data {
+
+        @Min(1)
+        public final long compId;
+
+        @Valid
+        @NotNull
+        @JsonProperty
+        public final ServiceUnitMin serviceUnit;
+
+        @JsonCreator
+        public SUDeployed(@JsonProperty("compId") long compId,
+                @JsonProperty("serviceUnit") ServiceUnitMin serviceUnit) {
+            this.compId = compId;
+            this.serviceUnit = serviceUnit;
+        }
+
+        @JsonProperty
+        public String getCompId() {
+            return Long.toString(compId);
         }
     }
 
@@ -348,42 +424,51 @@ public class WorkspaceResource {
         }
     }
 
-    public static class WorkspaceChange {
+    public static class WorkspaceEvent {
 
-        public enum Type {
-            WORKSPACE_CONTENT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, COMPONENT_STATE_CHANGE, BUS_DELETED
+        public interface Data {
+
+        }
+
+        public enum Event {
+            WORKSPACE_CONTENT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, COMPONENT_STATE_CHANGE, BUS_DELETED,
+            SU_DEPLOYED
         }
 
         @JsonProperty
-        public final Type event;
+        public final Event event;
 
         @JsonProperty
-        public final Object data;
+        public final Data data;
 
-        private WorkspaceChange(Type event, Object data) {
+        private WorkspaceEvent(Event event, Data data) {
             this.event = event;
             this.data = data;
         }
 
-        public static WorkspaceChange busImportError(BusInProgress bus) {
+        public static WorkspaceEvent busImportError(BusInProgress bus) {
             assert bus.importError != null && !bus.importError.isEmpty();
-            return new WorkspaceChange(Type.BUS_IMPORT_ERROR, bus);
+            return new WorkspaceEvent(Event.BUS_IMPORT_ERROR, bus);
         }
 
-        public static WorkspaceChange busImportOk(WorkspaceContent bus) {
-            return new WorkspaceChange(Type.BUS_IMPORT_OK, bus);
+        public static WorkspaceEvent busImportOk(WorkspaceContent bus) {
+            return new WorkspaceEvent(Event.BUS_IMPORT_OK, bus);
         }
 
-        public static WorkspaceChange suStateChange(NewSUState ns) {
-            return new WorkspaceChange(Type.SU_STATE_CHANGE, ns);
+        public static WorkspaceEvent suStateChange(SUStateChanged ns) {
+            return new WorkspaceEvent(Event.SU_STATE_CHANGE, ns);
         }
 
-        public static WorkspaceChange componentStateChange(NewComponentState ns) {
-            return new WorkspaceChange(Type.COMPONENT_STATE_CHANGE, ns);
+        public static WorkspaceEvent componentStateChange(ComponentStateChanged ns) {
+            return new WorkspaceEvent(Event.COMPONENT_STATE_CHANGE, ns);
         }
 
-        public static WorkspaceChange busDeleted(BusDeleted bd) {
-            return new WorkspaceChange(Type.BUS_DELETED, bd);
+        public static WorkspaceEvent busDeleted(BusDeleted bd) {
+            return new WorkspaceEvent(Event.BUS_DELETED, bd);
+        }
+
+        public static WorkspaceEvent suDeployed(SUDeployed sud) {
+            return new WorkspaceEvent(Event.SU_DEPLOYED, sud);
         }
 
         @Override

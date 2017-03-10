@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -57,7 +58,7 @@ public class BusesResource {
     @Path("/{bId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
-    public BusOverview get(@PathParam("bId") @Min(1) long bId, @Pac4JProfile CockpitProfile profile) {
+    public BusOverview get(@NotNull @PathParam("bId") @Min(1) long bId, @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
 
             BusesRecord bus = DSL.using(conf).selectFrom(BUSES).where(BUSES.ID.eq(bId)).fetchOne();
@@ -66,8 +67,8 @@ public class BusesResource {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            Record user = DSL.using(conf).select()
-                    .from(USERS_WORKSPACES).join(BUSES).on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID))
+            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
+                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID))
                     .where(BUSES.ID.eq(bId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
 
             if (user == null) {

@@ -34,6 +34,7 @@ import org.assertj.db.api.RequestRowAssert;
 import org.assertj.db.type.Request;
 import org.assertj.db.type.Table;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
@@ -63,10 +64,12 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRec
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
+import org.ow2.petals.cockpit.server.mocks.MockArtifactServer;
 import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
+import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
 import org.zapodot.junit.db.plugin.LiquibaseInitializer;
 
@@ -111,6 +114,9 @@ public class AbstractCockpitResourceTest {
             .initializedByPlugin(LiquibaseInitializer.builder().withChangelogResource("migrations.xml").build())
             .build();
 
+    @Rule
+    public MockArtifactServer httpServer = new MockArtifactServer();
+
     protected ResourceTestRule buildResourceTest(Class<?>... resources) {
         Builder builder = ResourceTestRule.builder()
                 // in memory does not support SSE and the no-servlet one does not log...
@@ -122,10 +128,12 @@ public class AbstractCockpitResourceTest {
                                 .to(ExecutorService.class);
                         bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
                         bind(PetalsAdministrationFactory.getInstance()).to(PetalsAdministrationFactory.class);
+                        bind(httpServer).to(ArtifactServer.class);
                     }
-                });
+                }).setClientConfigurator(cc -> cc.register(MultiPartFeature.class));
         // needed for @Pac4JProfile injection to work
         builder.addProvider(new MockProfileParamValueFactoryProvider.Binder(ADMIN));
+        builder.addProvider(MultiPartFeature.class);
         for (Class<?> resource : resources) {
             // we pass the resource as a provider to get injection in constructor
             builder.addProvider(resource);

@@ -1,0 +1,4 @@
+class org/glassfish/jersey/media/multipart/MultiPart
+bodyPart
+ (Lorg/glassfish/jersey/media/multipart/BodyPart;)Lorg/glassfish/jersey/media/multipart/MultiPart;
+ (Lorg/glassfish/jersey/media/multipart/BodyPart;)L1org/glassfish/jersey/media/multipart/MultiPart;

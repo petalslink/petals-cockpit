@@ -8,6 +8,9 @@ emptyMap
 emptySet
  <T:Ljava/lang/Object;>()Ljava/util/Set<TT;>;
  <T:Ljava/lang/Object;>()L1java/util/Set<TT;>;
+singletonList
+ <T:Ljava/lang/Object;>(TT;)Ljava/util/List<TT;>;
+ <T:Ljava/lang/Object;>(TT;)L1java/util/List<TT;>;
 unmodifiableCollection
  <T:Ljava/lang/Object;>(Ljava/util/Collection<+TT;>;)Ljava/util/Collection<TT;>;
  <T:Ljava/lang/Object;>(Ljava/util/Collection<+TT;>;)L1java/util/Collection<TT;>;

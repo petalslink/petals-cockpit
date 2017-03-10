@@ -50,6 +50,7 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin.T
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -63,7 +64,7 @@ import co.paralleluniverse.fibers.Suspendable;
  * TODO can I avoid transforming ids to string just for json output... maybe with a json mapper or whatever...
  *
  */
-public class WorkspaceContent {
+public class WorkspaceContent implements WorkspaceEvent.Data {
 
     @Valid
     @JsonProperty

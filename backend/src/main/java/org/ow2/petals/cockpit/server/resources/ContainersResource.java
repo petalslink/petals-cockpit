@@ -78,7 +78,7 @@ public class ContainersResource {
     @Path("/{cId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Valid
-    public ContainerOverview get(@PathParam("cId") @Min(1) long cId, @Pac4JProfile CockpitProfile profile) {
+    public ContainerOverview get(@NotNull @PathParam("cId") @Min(1) long cId, @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
             ContainersRecord container = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(cId)).fetchOne();
 
@@ -86,10 +86,9 @@ public class ContainersResource {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            Record user = DSL.using(conf).select()
-                    .from(USERS_WORKSPACES)
-                    .join(BUSES).on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID))
-                    .join(CONTAINERS).onKey(FK_CONTAINERS_BUSES_ID)
+            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
+                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
+                    .onKey(FK_CONTAINERS_BUSES_ID)
                     .where(CONTAINERS.ID.eq(cId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
 
             if (user == null) {

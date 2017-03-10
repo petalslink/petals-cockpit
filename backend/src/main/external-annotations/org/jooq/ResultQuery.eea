@@ -18,6 +18,9 @@ fetchOne
  <U:Ljava/lang/Object;>(Lorg/jooq/Name;Lorg/jooq/Converter<*TU;>;)TU;
  <U:Ljava/lang/Object;>(Lorg/jooq/Name;Lorg/jooq/Converter<*TU;>;)T0U;
 fetchOneInto
+ <E:Ljava/lang/Object;>(Ljava/lang/Class<+TE;>;)TE;
+ <E:Ljava/lang/Object;>(Ljava/lang/Class<+TE;>;)T0E;
+fetchOneInto
  <Z::Lorg/jooq/Record;>(Lorg/jooq/Table<TZ;>;)TZ;
  <Z::Lorg/jooq/Record;>(Lorg/jooq/Table<TZ;>;)T0Z;
 fetchOptional
