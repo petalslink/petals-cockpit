@@ -40,7 +40,7 @@ export class BusesInProgressEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) postBus$: Observable<Action> = this.actions$
     .ofType(BusesInProgress.POST_BUS_IN_PROGRESS)
-    .combineLatest(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, idWorkspace]) =>
       this.busesInProgressService.postBus(idWorkspace, action.payload)
         .map((res: Response) => {
@@ -71,7 +71,7 @@ export class BusesInProgressEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) deleteBusInProgress$: Observable<Action> = this.actions$
     .ofType(BusesInProgress.DELETE_BUS_IN_PROGRESS)
-    .combineLatest(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, idWorkspace]) =>
       this.busesInProgressService.deleteBus(idWorkspace, action.payload.id)
         .map(_ => {
@@ -99,11 +99,8 @@ export class BusesInProgressEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false }) removeBusInProgress$: Observable<Action> = this.actions$
     .ofType(BusesInProgress.REMOVE_BUS_IN_PROGRESS)
-    .combineLatest(
-    this.store$.select(state => state.workspaces.selectedWorkspaceId),
-    this.store$.select(state => state.busesInProgress.selectedBusInProgressId)
-    )
-    .map(([action, wsId, sId]) => {
+    .withLatestFrom(this.store$.select(state => [state.workspaces.selectedWorkspaceId, state.busesInProgress.selectedBusInProgressId]))
+    .map(([action, [wsId, sId]]) => {
       return { ...action.payload, wsId, sId };
     })
     .do(({ busInProgressId, importOk, wsId, sId }: { busInProgressId: string, importOk: boolean, wsId: string, sId: string }) => {
