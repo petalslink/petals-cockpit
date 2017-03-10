@@ -16,17 +16,20 @@
  */
 package org.ow2.petals.cockpit.server;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import javax.inject.Singleton;
+import javax.servlet.ServletRegistration.Dynamic;
 import javax.ws.rs.ext.ContextResolver;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.session.SessionHandler;
+import org.eclipse.jetty.servlet.DefaultServlet;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.jooq.Configuration;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
@@ -40,6 +43,8 @@ import org.ow2.petals.cockpit.server.resources.UserSession;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
+import org.ow2.petals.cockpit.server.services.ArtifactServer;
+import org.ow2.petals.cockpit.server.services.HttpArtifactServer;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
@@ -69,6 +74,8 @@ import io.dropwizard.setup.Environment;
  *
  */
 public class CockpitApplication<C extends CockpitConfiguration> extends Application<C> {
+
+    public static final String ARTIFACTS_HTTP_SUBPATH = "jbi-artifacts";
 
     public static final String BLOCKING_TASK_ES = "quasar-blocking-exec-service";
 
@@ -195,10 +202,12 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
             @Override
             protected void configure() {
                 bind(configuration).to(CockpitConfiguration.class);
+                bind(environment).to(Environment.class);
                 bind(jdbcExec).named(BLOCKING_TASK_ES).to(ExecutorService.class);
                 bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
                 bind(adminFactory).to(PetalsAdministrationFactory.class);
                 bind(jooqConf).to(Configuration.class);
+                bind(HttpArtifactServer.class).to(ArtifactServer.class).in(Singleton.class);
             }
         });
 
@@ -220,6 +229,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
         // This is needed for SSE to work correctly!
         // See https://github.com/dropwizard/dropwizard/issues/1673
+        // Fixed in 1.1.x via setSyncFlush on GzipHandlerFactory
         environment.lifecycle().addServerLifecycleListener(server -> {
             Handler handler = server.getHandler();
             while (handler instanceof HandlerWrapper) {
@@ -230,5 +240,26 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 }
             }
         });
+
+        File artifactsTemporaryDir = new File(configuration.getArtifactTemporaryPath());
+
+        if (!artifactsTemporaryDir.exists()) {
+            artifactsTemporaryDir.mkdirs();
+        }
+
+        if (!(artifactsTemporaryDir.canWrite() && artifactsTemporaryDir.canRead())) {
+            throw new SecurityException(
+                    "Can't read or write in the artifact temporary folder " + artifactsTemporaryDir);
+        }
+
+        Dynamic petalsServlet = environment.admin().addServlet("petals-jbi-artifacts", new DefaultServlet());
+
+        petalsServlet.addMapping("/" + ARTIFACTS_HTTP_SUBPATH + "/*");
+        // apparently needed for DefaultServlet to work in a subdirectory
+        petalsServlet.setInitParameter("pathInfoOnly", "true");
+        petalsServlet.setInitParameter("resourceBase", configuration.getArtifactTemporaryPath());
+        petalsServlet.setInitParameter("dirAllowed", "false");
+        petalsServlet.setInitParameter("useFileMappedBuffer", "true");
+        petalsServlet.setInitParameter("cacheControl", "no-cache");
     }
 }

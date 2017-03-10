@@ -49,6 +49,15 @@ public class CockpitConfiguration extends Configuration {
         return security;
     }
 
+    @NotEmpty
+    @JsonProperty
+    private String artifactTemporaryPath = System.getProperty("java.io.tmpdir") + "/petals-cockpit-artifacts";
+
+    @JsonProperty
+    public String getArtifactTemporaryPath() {
+        return artifactTemporaryPath;
+    }
+
     @Valid
     @NotNull
     @JsonProperty
