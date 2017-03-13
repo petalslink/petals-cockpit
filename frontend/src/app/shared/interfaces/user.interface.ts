@@ -19,7 +19,6 @@ interface IUserCommon {
   // from server
   id: string;
   name: string;
-  username: string;
 }
 
 // used within table

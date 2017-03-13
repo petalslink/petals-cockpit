@@ -114,28 +114,23 @@ export class Workspace {
 export const users = {
   admin: {
     id: 'admin',
-    name: 'Administrator',
-    username: 'admin'
+    name: 'Administrator'
   },
   bescudie: {
     id: 'bescudie',
-    name: 'Bertrand ESCUDIE',
-    username: 'bescudie'
+    name: 'Bertrand ESCUDIE'
   },
   mrobert: {
     id: 'mrobert',
-    name: 'Maxime ROBERT',
-    username: 'mrobert'
+    name: 'Maxime ROBERT'
   },
   cchevalier: {
     id: 'cchevalier',
-    name: 'Christophe CHEVALIER',
-    username: 'cchevalier'
+    name: 'Christophe CHEVALIER'
   },
   vnoel: {
     id: 'vnoel',
-    name: 'Victor NOEL',
-    username: 'vnoel'
+    name: 'Victor NOEL'
   }
 };
 

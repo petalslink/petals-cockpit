@@ -77,8 +77,8 @@ public class UserSessionTest {
                     // we must use the JDBC URL because if not the insertion is only visible when accessing the db with
                     // connection.. https://github.com/zapodot/embedded-db-junit/issues/7
                     try (DSLContext using = DSL.using(dbRule.getConnectionJdbcUrl())) {
-                        using.executeInsert(new UsersRecord(ADMIN.username,
-                                new BCryptPasswordEncoder().encode(ADMIN.username), ADMIN.name, ADMIN.lastWorkspace));
+                        using.executeInsert(new UsersRecord(ADMIN.id,
+                                new BCryptPasswordEncoder().encode(ADMIN.id), ADMIN.name, ADMIN.lastWorkspace));
                     }
                 }
             }).build();
