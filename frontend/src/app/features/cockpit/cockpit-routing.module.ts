@@ -19,16 +19,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { CockpitComponent } from './cockpit.component';
-import { WorkspacesModule } from './workspaces/workspaces.module';
-// import { PetalsContentModule } from './workspaces/petals-content/petals-content.module';
-
-export function loadWorkspacesModule() {
-  return WorkspacesModule;
-}
-
-// export function loadPetalsContentModule() {
-//   return PetalsContentModule;
-// }
 
 const routes: Routes = [
   {
@@ -42,14 +32,8 @@ const routes: Routes = [
     children: [
       {
         path: 'workspaces',
-        // loadChildren: loadWorkspacesModule
         loadChildren: 'app/features/cockpit/workspaces/workspaces.module#WorkspacesModule'
       }
-      // {
-      //   path: '',
-      //   component: EmptyMenuComponent,
-      //   outlet: 'aux'
-      // }
     ]
   }
 ];
