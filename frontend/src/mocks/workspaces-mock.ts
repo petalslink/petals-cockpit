@@ -164,14 +164,19 @@ export class Workspaces {
    * @export
    * @returns {any} the workspaces list
    */
-  getWorkspaces() {
+  getWorkspaces(user: string) {
     const workspacesIds = Array.from(this.memoizedWorkspaces.keys());
 
     return workspacesIds.reduce((acc, workspaceId) => {
-      return {
-        ...acc,
-        [workspaceId]: this.getWorkspace(workspaceId).toObj()
-      };
+      const ws = this.getWorkspace(workspaceId).toObj();
+      if (ws.users.includes(user)) {
+        return {
+          ...acc,
+          [workspaceId]: ws
+        };
+      } else {
+        return acc;
+      }
     }, {});
   }
 
@@ -181,8 +186,8 @@ export class Workspaces {
    * @export
    * @returns {any} the workspaces list and users
    */
-  getWorkspacesListAndUsers() {
-    const workspaces = this.getWorkspaces();
+  getWorkspacesListAndUsers(user: string) {
+    const workspaces = this.getWorkspaces(user);
 
     return { workspaces, users };
   }

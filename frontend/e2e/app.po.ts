@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, element, by } from 'protractor';
+import { browser, element, by, ExpectedConditions as EC } from 'protractor';
 
 export class PetalsCockpitPage {
 
@@ -41,7 +41,9 @@ export class PetalsCockpitPage {
     element(by.css(`app-login button`)).click();
 
     // let's be sure angular has finished loading after login!
-    browser.waitForAngular();
+    // but let's not fail if it is not the right url (because we also test failing login!)
+    // TODO we should improve that but the problem is protractor not being able to wait enough...
+    browser.wait(EC.urlContains('/workspaces'), 3000).catch(_ => { });
   }
 
   search(search: string) {
@@ -58,7 +60,6 @@ export class PetalsCockpitPage {
       .getText();
   }
 
-
   /**
    * getWorkspaceTreeByName
    *
@@ -72,7 +73,7 @@ export class PetalsCockpitPage {
   getBusesInProgress() {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 
-    return element.all(by.css(`app-cockpit md-sidenav app-buses-in-progress a.buses-in-progress div.mat-list-item-content`))
+    return element.all(by.css(`app-cockpit md-sidenav app-buses-in-progress a.buses-in-progress div.mat-list-item-content > span`))
       .getText();
   }
 
@@ -94,9 +95,23 @@ export class PetalsCockpitPage {
       .get(index);
   }
 
-  toggleSidenav() {
+  openSidenav() {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 
-    return element.all(by.css(`app-cockpit md-toolbar-row button`)).click();
+    return element(by.css(`app-cockpit md-sidenav.mat-sidenav-closed`)).isPresent().then(present => {
+      if (present) {
+        return element(by.css(`app-cockpit md-toolbar-row button`)).click();
+      }
+    });
+  }
+
+  closeSidenav() {
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
+
+    return element(by.css(`app-cockpit md-sidenav.mat-sidenav-opened`)).isPresent().then(present => {
+      if (present) {
+        return element(by.css(`app-cockpit md-toolbar-row button`)).click();
+      }
+    });
   }
 }

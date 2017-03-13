@@ -34,10 +34,8 @@ describe(`Import Bus`, () => {
     page = new PetalsCockpitPage();
     page.navigateTo();
     page.login(`admin`, `admin`);
-    element.all(by.css(`app-workspaces-dialog md-card > div`)).first().click();
     const addBtn = element(by.css(`app-cockpit md-sidenav a.btn-add-bus`));
     browser.wait(EC.elementToBeClickable(addBtn), 5000);
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
     addBtn.click();
   });
 
@@ -76,7 +74,7 @@ describe(`Import Bus`, () => {
 
     // We open manually the sidenav
     // TODO : We need to found a solution for resolve this error : "Failed : element not visible"
-    page.toggleSidenav();
+    page.openSidenav();
 
     element.all(by.css(`app-cockpit md-sidenav app-buses-in-progress md-nav-list div.mat-list-item-content`)).first().click();
 
@@ -86,11 +84,11 @@ describe(`Import Bus`, () => {
     expect(clearBtn.isPresent()).toBe(false);
   });
 
-  it(`Should fail on the first bus import`, () => {
+  it(`Should fail on the first two bus imports`, () => {
     // only 2 buses in progress
-    page.toggleSidenav();
+    page.openSidenav();
     expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(2);
-    page.toggleSidenav();
+    page.closeSidenav();
 
     inputIp.sendKeys(`hostname`);
     inputPort.sendKeys(`5000`);
@@ -110,10 +108,10 @@ describe(`Import Bus`, () => {
     // but cannot connect to the bus
     expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).getText()).toEqual(`Can't connect to bus`);
 
-    page.toggleSidenav();
+    page.openSidenav();
     expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(3);
     expect(element(by.css(`app-buses-in-progress md-nav-list:nth-child(3) .ip-port`)).getText()).toEqual('hostname:5000');
     expect(element(by.cssContainingText(`app-buses-in-progress md-nav-list:nth-child(3) md-icon`, `warning`)).isDisplayed()).toEqual(true);
-    page.toggleSidenav();
+    page.closeSidenav();
   });
 });

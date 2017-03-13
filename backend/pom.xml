@@ -29,6 +29,7 @@
 
   <properties>
     <cockpit.exec.command>server</cockpit.exec.command>
+    <cockpit.exec.config>default.yml</cockpit.exec.config>
     <codegen.db.url>jdbc:h2:file:${project.build.directory}/db</codegen.db.url>
     <m2e.jdt.annotationpath>src/main/external-annotations/</m2e.jdt.annotationpath>
   </properties>
@@ -279,7 +280,7 @@
 
                 <!-- Command -->
                 <argument>${cockpit.exec.command}</argument>
-                <argument>default.yml</argument>
+                <argument>${cockpit.exec.config}</argument>
               </arguments>
             </configuration>
           </execution>

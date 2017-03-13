@@ -33,40 +33,26 @@ describe(`Login`, () => {
     expect(element(by.css(`app-login button`)).isEnabled()).toBe(false);
   });
 
-  it(`should not login if user/pwd not match`, () => {
+  it(`should not login if user/pwd do not match`, () => {
     page.login(`admin`, `randomPasswordNotWorking`);
 
     expect(browser.getCurrentUrl()).toMatch(/\/login$/);
     expect(element(by.css(`.form-error`)).isDisplayed()).toBe(true);
   });
 
-  it(`should login if user/pwd match`, () => {
+  it(`should redirect to last workspace if login/pw match`, () => {
     page.login(`admin`, `admin`);
 
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
   });
 
   it(`should logout after logging in`, () => {
     page.login(`admin`, `admin`);
-
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
-
-    // TODO remove until ENDTODO when the logout button will be visible even on the workspaces list
-    element.all(by.css(`app-workspaces-dialog md-card > div`)).first().click();
-
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
-    // ENDTODO
 
     const logout = element(by.css(`app-menu-user-panel .wrapper-disconnect md-icon`));
     browser.wait(EC.elementToBeClickable(logout), 5000);
     logout.click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/login$/);
-  });
-
-  it(`should redirect to last workspace`, () => {
-    page.login(`vnoel`, `vnoel`);
-
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
   });
 });
