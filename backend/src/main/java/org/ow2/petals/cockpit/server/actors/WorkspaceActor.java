@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
@@ -155,18 +156,20 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         self().send(new WorkspaceEventAction(action));
     }
 
+    private static OutboundEvent event(WorkspaceEvent event) {
+        return new OutboundEvent.Builder().name(event.event.name()).mediaType(MediaType.APPLICATION_JSON_TYPE)
+                .data(event.data).build();
+    }
+
     /**
      * This should only be called from inside the actor loop!
      */
     private void broadcast(WorkspaceEvent event) {
         assert isInActor();
-        OutboundEvent oe = new OutboundEvent.Builder().name(event.event.name())
-                .mediaType(MediaType.APPLICATION_JSON_TYPE).data(event.data).build();
-        broadcaster.broadcast(oe);
+        broadcaster.broadcast(event(event));
     }
 
-    private <R, T extends CockpitRequest<R>> void answer(T r, CheckedFunction1<T, Either<Status, R>> f)
-            throws SuspendExecution {
+    private <R, T extends CockpitRequest<R>> void answer(T r, CheckedFunction1<T, R> f) throws SuspendExecution {
         try {
             RequestReplyHelper.reply(r, f.apply(r));
         } catch (Throwable e) {
@@ -174,11 +177,11 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private Either<Status, EventOutput> addBroadcastClient(NewWorkspaceClient nc) throws IOException, SuspendExecution {
+    private EventOutput addBroadcastClient(NewWorkspaceClient nc) throws IOException, SuspendExecution {
 
         LOG.debug("New SSE client for workspace {}", wId);
 
-        Either<Status, WorkspaceFullContent> content = runTransaction(conf -> {
+        WorkspaceFullContent content = runBlockingTransaction(conf -> {
             // TODO merge queries
             WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wId)).fetchOne();
 
@@ -192,57 +195,53 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
             DSL.using(conf).update(USERS).set(USERS.LAST_WORKSPACE, wId).where(USERS.USERNAME.eq(nc.user)).execute();
 
-            return Either.right(new WorkspaceFullContent(ws, wsUsers, c));
+            return new WorkspaceFullContent(ws, wsUsers, c);
         });
-
-        if (content.isLeft()) {
-            return Either.left(content.getLeft());
-        }
+        assert content != null;
 
         EventOutput eo = new EventOutput();
 
-        eo.write(new OutboundEvent.Builder().name(WorkspaceEvent.Event.WORKSPACE_CONTENT.name())
-                .mediaType(MediaType.APPLICATION_JSON_TYPE).data(content.get()).build());
+        eo.write(event(WorkspaceEvent.content(content)));
 
         broadcaster.add(eo);
 
-        return Either.right(eo);
+        return eo;
     }
 
-    private Either<Status, @Nullable Void> handleDeleteBus(DeleteBus bus) throws SuspendExecution {
-        final Either<Status, @Nullable Void> mDeleted = runTransaction(conf -> {
-
+    @Nullable
+    private Void handleDeleteBus(DeleteBus bus) throws SuspendExecution {
+        runBlockingTransaction(conf -> {
             int deleted = DSL.using(conf).deleteFrom(BUSES).where(BUSES.ID.eq(bus.bId).and(BUSES.WORKSPACE_ID.eq(wId)))
                     .execute();
 
             if (deleted < 1) {
-                return Either.left(Status.NOT_FOUND);
+                throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            return Either.right(null);
+            return null;
         });
 
-        mDeleted.forEach(v -> broadcast(WorkspaceEvent.busDeleted(new BusDeleted(bus.bId))));
+        broadcast(WorkspaceEvent.busDeleted(new BusDeleted(bus.bId)));
 
-        return mDeleted;
+        return null;
     }
 
-    private Either<Status, BusInProgress> handleImportBus(ImportBus bus) throws SuspendExecution {
+    private BusInProgress handleImportBus(ImportBus bus) throws SuspendExecution {
         final BusImport nb = bus.nb;
 
-        final Either<Status, Long> mbId = runTransaction(conf -> {
+        final long bId = runBlockingTransaction(conf -> {
             BusesRecord br = new BusesRecord(null, wId, false, nb.ip, nb.port, nb.username, nb.password, nb.passphrase,
                     null, null);
             br.attach(conf);
             br.insert();
 
-            return Either.right(br.getId());
+            return br.getId();
         });
 
         // we use a fiber to let the actor handles other message during bus import
-        mbId.forEach(bId -> importBusInFiber(nb, bId));
+        importBusInFiber(nb, bId);
 
-        return mbId.map(bId -> new BusInProgress(bId, nb.ip, nb.port, nb.username));
+        return new BusInProgress(bId, nb.ip, nb.port, nb.username);
     }
 
     private void importBusInFiber(final BusImport nb, final long bId) {
@@ -253,8 +252,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             // once we got the topology, it can't be cancelled anymore
             // that's why the actions are passed back to the actor
             // (we don't want the fiber to be interrupted!)
-            doInActorLoop(
-                    () -> runTransaction(conf -> res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
+            doInActorLoop(() -> runBlockingTransaction(
+                    conf -> res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
                         try {
                             return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, bId, topology));
                         } catch (WorkspaceContent.InvalidPetalsBus e) {
@@ -275,6 +274,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         try {
             Domain topology = runBlockingAdmin(bus.ip, bus.port, bus.username, bus.password,
                     petals -> petals.newContainerAdministration().getTopology(bus.passphrase, true));
+            assert topology != null;
             return Either.right(topology);
         } catch (InterruptedException e) {
             return Either.left("Import cancelled");
@@ -288,9 +288,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private Either<Status, ComponentStateChanged> handleComponentStateChange(ChangeComponentState change)
-            throws SuspendExecution {
-        return runTransaction(conf -> {
+    private ComponentStateChanged handleComponentStateChange(ChangeComponentState change) throws SuspendExecution {
+        return runBlockingTransaction(conf -> {
 
             ComponentsRecord comp = DSL.using(conf).select(COMPONENTS.fields()).from(COMPONENTS).join(CONTAINERS)
                     .onKey(FK_COMPONENTS_CONTAINERS_ID).join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
@@ -298,32 +297,32 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                     .fetchOneInto(ComponentsRecord.class);
 
             if (comp == null) {
-                return Either.left(Status.NOT_FOUND);
+                throw new WebApplicationException(Status.NOT_FOUND);
             }
 
             return handleComponentStateChange(change, comp, conf);
         });
     }
 
-    private Either<Status, ComponentStateChanged> handleComponentStateChange(ChangeComponentState change,
-            ComponentsRecord comp, Configuration conf) throws Exception {
+    private ComponentStateChanged handleComponentStateChange(ChangeComponentState change, ComponentsRecord comp,
+            Configuration conf) throws Exception {
 
         ComponentMin.State currentState = ComponentMin.State.valueOf(comp.getState());
         ComponentMin.State newState = change.action.state;
 
         if (currentState.equals(newState)) {
-            return Either.right(new ComponentStateChanged(change.compId, currentState));
+            return new ComponentStateChanged(change.compId, currentState);
         }
 
         if (!isComponentStateTransitionOk(comp, currentState, newState)) {
             // TODO or should I rely on the information from the container instead of my own?
-            return Either.left(Status.CONFLICT);
+            throw new WebApplicationException(Status.CONFLICT);
         }
 
         if (newState == ComponentMin.State.Unloaded
                 && DSL.using(conf).fetchExists(SERVICEUNITS, SERVICEUNITS.COMPONENT_ID.eq(comp.getId()))) {
             // TODO or should I rely on the information from the container instead of my own?
-            return Either.left(Status.CONFLICT);
+            throw new WebApplicationException(Status.CONFLICT);
         }
 
         // TODO merge with previous requests...
@@ -345,7 +344,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         componentStateUpdated(res, conf);
 
-        return Either.right(res);
+        return res;
     }
 
     /**
@@ -411,9 +410,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         doInActorLoop(() -> WorkspaceEvent.componentStateChange(comp));
     }
 
-    private Either<Status, SUStateChanged> handleSUStateChange(ChangeServiceUnitState change)
-            throws SuspendExecution {
-        return runTransaction(conf -> {
+    private SUStateChanged handleSUStateChange(ChangeServiceUnitState change) throws SuspendExecution {
+        return runBlockingTransaction(conf -> {
             ServiceunitsRecord su = DSL.using(conf).select(SERVICEUNITS.fields()).from(SERVICEUNITS).join(COMPONENTS)
                     .onKey(FK_SERVICEUNITS_COMPONENTS_ID).join(CONTAINERS).onKey(FK_COMPONENTS_CONTAINERS_ID)
                     .join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
@@ -421,26 +419,26 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                     .fetchOneInto(ServiceunitsRecord.class);
 
             if (su == null) {
-                return Either.left(Status.NOT_FOUND);
+                throw new WebApplicationException(Status.NOT_FOUND);
             }
 
             return handleSUStateChange(change, su, conf);
         });
     }
 
-    private Either<Status, SUStateChanged> handleSUStateChange(ChangeServiceUnitState change,
-            ServiceunitsRecord su, Configuration conf) throws Exception {
+    private SUStateChanged handleSUStateChange(ChangeServiceUnitState change, ServiceunitsRecord su, Configuration conf)
+            throws Exception {
 
         ServiceUnitMin.State currentState = ServiceUnitMin.State.valueOf(su.getState());
         ServiceUnitMin.State newState = change.action.state;
 
         if (currentState.equals(newState)) {
-            return Either.right(new SUStateChanged(change.suId, currentState));
+            return new SUStateChanged(change.suId, currentState);
         }
 
         if (!isSAStateTransitionOk(su, currentState, newState)) {
             // TODO or should I rely on the information from the container instead of my own?
-            return Either.left(Status.CONFLICT);
+            throw new WebApplicationException(Status.CONFLICT);
         }
 
         // TODO merge with previous request...
@@ -449,21 +447,20 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 .fetchOneInto(CONTAINERS);
         assert cont != null;
 
-        // we already are in a thread pool
-        SUStateChanged res = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
-                petals -> {
-                    ArtifactAdministration aa = petals.newArtifactAdministration();
-                    Artifact a = aa.getArtifact(ServiceAssembly.TYPE, su.getSaName(), null);
-                    assert a instanceof ServiceAssembly;
-                    ServiceAssembly sa = (ServiceAssembly) a;
-                    ServiceUnitMin.State newCurrentState = changeSAState(petals, sa, newState);
-                    return new SUStateChanged(su.getId(), newCurrentState);
-                });
+        // we already are in a blocking method
+        SUStateChanged res = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(), petals -> {
+            ArtifactAdministration aa = petals.newArtifactAdministration();
+            Artifact a = aa.getArtifact(ServiceAssembly.TYPE, su.getSaName(), null);
+            assert a instanceof ServiceAssembly;
+            ServiceAssembly sa = (ServiceAssembly) a;
+            ServiceUnitMin.State newCurrentState = changeSAState(petals, sa, newState);
+            return new SUStateChanged(su.getId(), newCurrentState);
+        });
         assert res != null;
 
         serviceUnitStateUpdated(res, conf);
 
-        return Either.right(res);
+        return res;
     }
 
     private void serviceUnitStateUpdated(SUStateChanged su, Configuration conf) throws SuspendExecution {
@@ -526,13 +523,13 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private Either<Status, SUDeployed> handleDeployServiceUnit(DeployServiceUnit su) throws SuspendExecution {
-        return runTransaction(conf -> {
+    private SUDeployed handleDeployServiceUnit(DeployServiceUnit su) throws SuspendExecution {
+        return runBlockingTransaction(conf -> {
             ContainersRecord cont = DSL.using(conf).select().from(CONTAINERS).join(COMPONENTS)
                     .onKey(FK_COMPONENTS_CONTAINERS_ID).where(COMPONENTS.ID.eq(su.compId)).fetchOneInto(CONTAINERS);
             assert cont != null;
 
-            // we already are in a thread pool
+            // we already are in a blocking thread
             ServiceAssembly deployedSA = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
                     petals -> {
                         // Note: since there is only one SU in it, a failure will result in the SA being removed
@@ -541,10 +538,9 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                         return (ServiceAssembly) petals.newArtifactAdministration()
                                 .getArtifactInfo(ServiceAssembly.TYPE, su.saName, null);
                     });
+            assert deployedSA != null;
 
-            SUDeployed res = serviceUnitDeployed(deployedSA, su.compId, conf);
-
-            return Either.right(res);
+            return serviceUnitDeployed(deployedSA, su.compId, conf);
         });
     }
 

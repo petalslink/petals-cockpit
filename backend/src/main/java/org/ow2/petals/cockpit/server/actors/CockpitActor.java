@@ -37,7 +37,6 @@ import co.paralleluniverse.fibers.FiberAsync;
 import co.paralleluniverse.fibers.SuspendExecution;
 import javaslang.CheckedFunction1;
 
-@SuppressWarnings("squid:S3306")
 public abstract class CockpitActor<M> extends BasicActor<M, Void> {
 
     private static final Logger LOG = LoggerFactory.getLogger(CockpitActor.class);
@@ -72,12 +71,13 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
         }
     }
 
-    protected <R> R runTransaction(Configuration conf, TransactionalCallable<R> transaction) throws SuspendExecution {
+    protected <R> R runBlockingTransaction(Configuration conf, TransactionalCallable<R> transaction) throws SuspendExecution {
+        // TODO catch DataAccessException and handle their cause if possible? e.g. for petals admin errors!
         return runBlocking(() -> DSL.using(conf).transactionResult(transaction));
     }
 
-    protected <R> R runTransaction(TransactionalCallable<R> transaction) throws SuspendExecution {
-        return runTransaction(jooq, transaction);
+    protected <R> R runBlockingTransaction(TransactionalCallable<R> transaction) throws SuspendExecution {
+        return runBlockingTransaction(jooq, transaction);
     }
 
     protected <R> R runBlockingAdmin(String ip, int port, String username, String password,

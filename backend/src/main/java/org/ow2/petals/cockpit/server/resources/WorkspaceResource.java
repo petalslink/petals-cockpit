@@ -147,8 +147,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        return as.call(wsId, new NewWorkspaceClient(profile.getId()))
-                .getOrElseThrow(s -> new WebApplicationException(s));
+        return as.call(wsId, new NewWorkspaceClient(profile.getId()));
     }
 
     @POST
@@ -160,7 +159,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        return as.call(wsId, new ImportBus(profile.getId(), nb)).getOrElseThrow(s -> new WebApplicationException(s));
+        return as.call(wsId, new ImportBus(profile.getId(), nb));
     }
 
     @DELETE
@@ -169,7 +168,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        as.call(wsId, new DeleteBus(profile.getId(), bId)).getOrElseThrow(s -> new WebApplicationException(s));
+        as.call(wsId, new DeleteBus(profile.getId(), bId));
     }
 
     @PUT
@@ -182,8 +181,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        return as.call(wsId, new ChangeServiceUnitState(profile.getId(), suId, action))
-                .getOrElseThrow(s -> new WebApplicationException(s));
+        return as.call(wsId, new ChangeServiceUnitState(profile.getId(), suId, action));
     }
 
     @PUT
@@ -196,8 +194,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        return as.call(wsId, new ChangeComponentState(profile.getId(), compId, action))
-                .getOrElseThrow(s -> new WebApplicationException(s));
+        return as.call(wsId, new ChangeComponentState(profile.getId(), compId, action));
     }
 
     @POST
@@ -223,8 +220,7 @@ public class WorkspaceResource {
 
         try (ServicedArtifact sa = httpServer.serve(saName + ".zip",
                 os -> PetalsUtils.createSAfromSU(file, os, saName, name, componentName))) {
-            return as.call(wsId, new DeployServiceUnit(profile.getId(), saName, sa.getArtifactUrl(), compId))
-                    .getOrElseThrow(s -> new WebApplicationException(s));
+            return as.call(wsId, new DeployServiceUnit(profile.getId(), saName, sa.getArtifactUrl(), compId));
         }
     }
 
@@ -391,7 +387,7 @@ public class WorkspaceResource {
         }
     }
 
-    public static class WorkspaceFullContent {
+    public static class WorkspaceFullContent implements WorkspaceEvent.Data {
 
         @Valid
         @JsonProperty
@@ -444,6 +440,14 @@ public class WorkspaceResource {
         private WorkspaceEvent(Event event, Data data) {
             this.event = event;
             this.data = data;
+        }
+
+        public static WorkspaceEvent content(WorkspaceFullContent content) {
+            return new WorkspaceEvent(Event.WORKSPACE_CONTENT, content);
+        }
+
+        public static WorkspaceEvent content(WorkspaceContent content) {
+            return new WorkspaceEvent(Event.WORKSPACE_CONTENT, content);
         }
 
         public static WorkspaceEvent busImportError(BusInProgress bus) {
