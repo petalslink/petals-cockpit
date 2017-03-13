@@ -15,10 +15,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div class="wrapper" *ngIf="user$ | async">
   <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="25px" fxFill>
-    <app-generate-icon [size]="35" [text]="(user$ | async).username"></app-generate-icon>
+    <app-generate-icon [size]="35" [text]="(user$ | async).id"></app-generate-icon>
 
     <div>
-      <div class="username">{{ (user$ | async).username }}</div>
+      <div class="id">{{ (user$ | async).id }}</div>
       <div class="name">{{ (user$ | async).name }}</div>
     </div>
 

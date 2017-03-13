@@ -105,14 +105,14 @@ public class UserSession {
 
         @NotEmpty
         @JsonProperty
-        public final String username;
+        public final String id;
 
         @NotEmpty
         @JsonProperty
         public final String name;
 
-        public UserMin(@JsonProperty("username") String username, @JsonProperty("name") String name) {
-            this.username = username;
+        public UserMin(@JsonProperty("id") String id, @JsonProperty("name") String name) {
+            this.id = id;
             this.name = name;
         }
     }

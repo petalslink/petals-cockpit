@@ -91,9 +91,9 @@ public class WorkspacesResourceTest extends AbstractCockpitResourceTest {
         // admin and userX
         assertThat(ws.users).hasSize(2);
 
-        assertThat(ws.users.get("admin").username).isEqualTo("admin");
+        assertThat(ws.users.get("admin").id).isEqualTo("admin");
         assertThat(ws.users.get("admin").name).isEqualTo("Administrator");
-        assertThat(ws.users.get("userX").username).isEqualTo("userX");
+        assertThat(ws.users.get("userX").id).isEqualTo("userX");
         assertThat(ws.users.get("userX").name).isEqualTo("..");
         assertThat(ws.users.get("userY")).isNull();
     }
