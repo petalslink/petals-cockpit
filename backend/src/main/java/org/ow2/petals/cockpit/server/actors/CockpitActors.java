@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.ow2.petals.cockpit.server.actors;
+
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
 
@@ -31,7 +33,6 @@ import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.actors.behaviors.RequestMessage;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.SuspendExecution;
-import javaslang.control.Either;
 
 public class CockpitActors {
 
@@ -55,24 +56,23 @@ public class CockpitActors {
      * needed and then let it die... this would ensure proper concurrency handling for the db queries as well as make
      * things homogeneous w.r.t. to other actors?
      */
-    @SuppressWarnings("resource")
-    public Either<Status, ActorRef<WorkspaceActor.Msg>> getWorkspace(long wId) throws SuspendExecution {
+    public ActorRef<WorkspaceActor.Msg> getWorkspace(long wId) throws SuspendExecution {
         String name = "workspace-" + wId;
 
         ActorRef<Msg> a = ActorRegistry.tryGetActor(name);
 
         if (a == null) {
             if (!DSL.using(jooq).fetchExists(WORKSPACES, WORKSPACES.ID.eq(wId))) {
-                return Either.left(Status.NOT_FOUND);
+                throw new WebApplicationException(Status.NOT_FOUND);
             } else {
-                return Either.right(ActorRegistry.getOrRegisterActor(name, () -> {
+                return ActorRegistry.getOrRegisterActor(name, () -> {
                     WorkspaceActor workspaceActor = new WorkspaceActor(wId);
                     serviceLocator.inject(workspaceActor);
                     return workspaceActor;
-                }));
+                });
             }
         } else {
-            return Either.right(a);
+            return a;
         }
     }
 
@@ -81,15 +81,9 @@ public class CockpitActors {
      * {@link AsyncResponse}. The problem is that we would loose the static typing of each of the REST methods (as well
      * as the possibility to automatically generate documentation from it)
      */
-    public <O, I extends CockpitRequest<O> & WorkspaceActor.Msg> Either<Status, O> call(long wsId, I msg)
-            throws InterruptedException {
+    public <O, I extends CockpitRequest<O> & WorkspaceActor.Msg> O call(long wsId, I msg) throws InterruptedException {
         try {
-            Either<Status, ActorRef<Msg>> ma = getWorkspace(wsId);
-            if (ma.isRight()) {
-                return RequestReplyHelper.call(ma.get(), msg);
-            } else {
-                return Either.left(ma.getLeft());
-            }
+            return RequestReplyHelper.call(getWorkspace(wsId), msg);
         } catch (SuspendExecution e) {
             throw new AssertionError(e);
         }
@@ -98,7 +92,7 @@ public class CockpitActors {
     /**
      * This represents requests coming from the REST API (i.e. Jersey's Resources)
      */
-    public abstract static class CockpitRequest<R> extends RequestMessage<Either<Status, R>> {
+    public abstract static class CockpitRequest<R> extends RequestMessage<R> {
 
         private static final long serialVersionUID = -5915325922592086753L;
 

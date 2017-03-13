@@ -1,0 +1,4 @@
+class org/glassfish/jersey/media/sse/OutboundEvent$Builder
+build
+ ()Lorg/glassfish/jersey/media/sse/OutboundEvent;
+ ()L1org/glassfish/jersey/media/sse/OutboundEvent;
