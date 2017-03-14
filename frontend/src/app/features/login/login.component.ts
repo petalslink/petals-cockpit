@@ -17,6 +17,7 @@
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -36,7 +37,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   private usersSub: Subscription;
   public users: IUsersTable;
 
-  constructor(private store$: Store<IStore>, private fb: FormBuilder) { }
+  constructor(
+    private store$: Store<IStore>,
+    private route: ActivatedRoute,
+    private fb: FormBuilder) { }
 
   ngOnInit() {
     this.users$ = this.store$.select(state => state.users);
@@ -71,7 +75,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.usersSub.unsubscribe();
   }
 
-  onSubmit({value}) {
-    this.store$.dispatch({ type: Users.CONNECT_USER, payload: value });
+  onSubmit({ value }) {
+    this.store$.dispatch({
+      type: Users.CONNECT_USER,
+      payload: { user: value, previousUrl: this.route.snapshot.queryParams.previousUrl }
+    });
   }
 }

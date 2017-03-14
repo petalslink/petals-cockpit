@@ -45,7 +45,6 @@ import { WorkspacesMockService } from '../shared/services/workspaces.service.moc
 import { UsersMockService } from '../shared/services/users.service.mock';
 import { UsersService, UsersServiceImpl } from '../shared/services/users.service';
 import { GuardLoginService } from '../shared/services/guard-login.service';
-import { GuardAppService } from '../shared/services/guard-app.service';
 import { BusesService, BusesServiceImpl } from '../shared/services/buses.service';
 import { BusesMockService } from '../shared/services/buses.service.mock';
 import { ContainersService, ContainersServiceImpl } from './../shared/services/containers.service';
@@ -62,7 +61,6 @@ export const providers = [
     useValue: ['en', 'fr']
   },
   GuardLoginService,
-  GuardAppService,
   {
     provide: SseService,
     useClass: (environment.mock ? SseServiceMock : SseServiceImpl)
