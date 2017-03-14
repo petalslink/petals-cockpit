@@ -65,8 +65,12 @@ export class UsersEffects {
   @Effect({ dispatch: false }) connectUserSuccess$: Observable<void> = this.actions$
     .ofType(Users.CONNECT_USER_SUCCESS)
     .filter((action: Action) => action.payload.redirectWorkspace)
-    .map(_ => {
-      this.router.navigate(['/workspaces']);
+    .map((action: Action) => {
+      if (action.payload.user.lastWorkspace) {
+        this.router.navigate(['/workspaces', action.payload.user.lastWorkspace]);
+      } else {
+        this.router.navigate(['/workspaces']);
+      }
     });
 
   // tslint:disable-next-line:member-ordering

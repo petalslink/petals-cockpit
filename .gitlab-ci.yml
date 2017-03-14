@@ -139,4 +139,4 @@ e2e-product:
     - nohup $XVFB &
     - cd frontend
     # TODO the exclude does not work, see https://github.com/angular/angular-cli/issues/5172
-    - time ng e2e --serve=false -- --exclude "e2e/*needspetals*.ts"
+    - time ng e2e --serve=false --specs=e2e/login.e2e-spec.ts --specs=e2e/workspaces.e2e-spec.ts --specs=e2e/workspace-tree.e2e-spec.ts

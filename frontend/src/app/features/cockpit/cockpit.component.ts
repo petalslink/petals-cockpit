@@ -34,7 +34,6 @@ import { IStore } from '../../shared/interfaces/store.interface';
 import { IUi } from '../../shared/interfaces/ui.interface';
 import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog.component';
 import { getCurrentWorkspace } from '../cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { getCurrentUser } from '../../shared/state/users.selectors';
 
 @Component({
   selector: 'app-cockpit',
@@ -123,18 +122,7 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     const url = this.router.url;
 
     if (!re.test(url)) {
-      this.store$
-        .let(getCurrentUser())
-        .first()
-        .do(u => {
-          // the lastWorkspace from the backend is always an existing workspace
-          if (u.lastWorkspace) {
-            this.router.navigate(['/workspaces', u.lastWorkspace]);
-          } else {
-            this.openWorkspacesDialog();
-          }
-        })
-        .subscribe();
+      this.openWorkspacesDialog();
     }
 
     // TODO : cf If hook available for handling escape

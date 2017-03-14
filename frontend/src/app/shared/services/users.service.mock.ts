@@ -29,11 +29,11 @@ export class UsersMockService extends UsersService {
   private static users = {
     admin: {
       ...users.admin,
-      lastWorkspace: ''
+      lastWorkspace: 'idWks0'
     },
     vnoel: {
       ...users.vnoel,
-      lastWorkspace: 'idWks0'
+      lastWorkspace: ''
     }
   };
 
@@ -44,6 +44,10 @@ export class UsersMockService extends UsersService {
     if (environment.alreadyConnected) {
       this.currentUser = UsersMockService.users.admin;
     }
+  }
+
+  getCurrentUser() {
+    return this.currentUser;
   }
 
   connectUser(user: IUserLogin) {

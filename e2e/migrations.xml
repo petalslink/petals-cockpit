@@ -22,8 +22,8 @@
   <include file="backend/src/main/resources/migrations.xml" />
 
   <changeSet id="e2e-tests" author="vnoel">
-    <loadData tableName="users" file="e2e/data/users.csv" />
     <loadData tableName="workspaces" file="e2e/data/workspaces.csv" />
+    <loadData tableName="users" file="e2e/data/users.csv" />
     <loadData tableName="users_workspaces" file="e2e/data/users_workspaces.csv" />
     <loadData tableName="buses" file="e2e/data/buses.csv" />
     <loadData tableName="containers" file="e2e/data/containers.csv" />

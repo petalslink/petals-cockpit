@@ -25,7 +25,6 @@ describe(`Petals service-unit content`, () => {
     page = new PetalsCockpitPage();
     page.navigateTo();
     page.login(`admin`, `admin`);
-    element.all(by.css(`app-workspaces-dialog md-card > div`)).first().click();
     // let's be sure everything is loaded and visible
     browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
   });
@@ -48,9 +47,9 @@ describe(`Petals service-unit content`, () => {
     const stateElem = element(by.css(`app-petals-service-unit-overview md-card.state md-card-title`));
 
     // the SU exists and should be present in petals tree
-    page.toggleSidenav();
+    page.openSidenav();
     expect(page.getWorkspaceTreeByName(`SU 0`).first().isPresent()).toBe(true);
-    page.toggleSidenav();
+    page.closeSidenav();
 
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
     expect(stateElem.getText()).toEqual('Stopped');
@@ -72,7 +71,7 @@ describe(`Petals service-unit content`, () => {
     // we should be redirected to the workspace page ...
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 
-    page.toggleSidenav();
+    page.openSidenav();
     // and the SU should have been deleted from petals tree
     expect(page.getWorkspaceTreeByName(`SU 0`).first().isPresent()).toBe(false);
   });

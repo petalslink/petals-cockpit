@@ -25,7 +25,6 @@ describe(`Petals component content`, () => {
     page = new PetalsCockpitPage();
     page.navigateTo();
     page.login(`admin`, `admin`);
-    element.all(by.css(`app-workspaces-dialog md-card > div`)).first().click();
     // let's be sure everything is loaded and visible
     browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
   });
@@ -66,20 +65,20 @@ describe(`Petals component content`, () => {
     expect(element(by.cssContainingText(`app-petals-component-overview button`, `Unload`)).isEnabled()).toBe(false);
 
     // unload the 2 SU
-    page.toggleSidenav();
+    page.openSidenav();
     page.getWorkspaceTreeByName('SU 0').click();
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`)).click();
     element(by.css(`simple-notification`)).click();
 
-    page.toggleSidenav();
+    page.openSidenav();
     page.getWorkspaceTreeByName('SU 1').click();
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`)).click();
     element(by.css(`simple-notification`)).click();
 
     // we should now be able to unload the comp 0
-    page.toggleSidenav();
+    page.openSidenav();
     page.getWorkspaceTreeByName('Comp 0').click();
     expect(element(by.cssContainingText(`app-petals-component-overview button`, `Unload`)).isEnabled()).toBe(true);
 
@@ -91,7 +90,7 @@ describe(`Petals component content`, () => {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 
     // and the component should have been deleted from petals tree
-    page.toggleSidenav();
+    page.openSidenav();
     expect(page.getWorkspaceTreeByName(`Comp 0`).first().isPresent()).toBe(false);
   });
 });

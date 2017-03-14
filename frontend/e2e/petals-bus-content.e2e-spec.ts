@@ -25,7 +25,6 @@ describe(`Petals bus content`, () => {
     page = new PetalsCockpitPage();
     page.navigateTo();
     page.login(`admin`, `admin`);
-    element.all(by.css(`app-workspaces-dialog md-card > div`)).first().click();
     // let's be sure everything is loaded and visible
     browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
   });
