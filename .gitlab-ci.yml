@@ -29,7 +29,7 @@ variables:
     # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
     - yarn config set cache-folder $PWD/$YARN_CACHE_DIRECTORY --global
     # see https://github.com/yarnpkg/yarn/issues/2629
-    - yarn config set network-concurrency 8 --global
+    - yarn config set network-concurrency 2 --global
     - du -hs $PWD/$YARN_CACHE_DIRECTORY || true
     - cd frontend
     - export PATH=`yarn bin`:$PATH
