@@ -34,7 +34,7 @@ export abstract class ComponentsService {
 
   abstract putState(workspaceId: string, componentId: string, newState: string): Observable<Response>;
 
-  abstract watchEventComponentStateChangeOk(): void;
+  abstract watchEventComponentStateChangeOk(): Observable<void>;
 }
 
 @Injectable()
@@ -58,7 +58,7 @@ export class ComponentsServiceImpl extends ComponentsService {
   }
 
   watchEventComponentStateChangeOk() {
-    this.sseService
+    return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.COMPONENT_STATE_CHANGE)
       .withLatestFrom(this
         .store$
@@ -83,6 +83,6 @@ export class ComponentsServiceImpl extends ComponentsService {
           });
         }
       })
-      .subscribe();
+      .map(_ => null);
   }
 }

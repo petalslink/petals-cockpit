@@ -20,7 +20,6 @@ import { omit } from 'underscore';
 
 import { IserviceUnitsTable } from './service-units.interface';
 import { serviceUnitsTableFactory } from './service-units.initial-state';
-import { Users } from './../../../../../shared/state/users.reducer';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 
 export class ServiceUnits {
@@ -194,11 +193,7 @@ export class ServiceUnits {
     };
   }
 
-  private static fetchWorkspaceSuccess(_serviceUnitsTable: IserviceUnitsTable, _payload) {
-    return serviceUnitsTableFactory();
-  }
-
-  private static disconnectUserSuccess(_serviceUnitsTable: IserviceUnitsTable, _payload) {
+  private static closeWorkspace(_serviceUnitsTable: IserviceUnitsTable, _payload) {
     return serviceUnitsTableFactory();
   }
 
@@ -216,7 +211,6 @@ export class ServiceUnits {
     [ServiceUnits.CHANGE_STATE_ERROR]: ServiceUnits.changeStateError,
     [ServiceUnits.REMOVE_SERVICE_UNIT]: ServiceUnits.removeServiceUnit,
 
-    [Workspaces.FETCH_WORKSPACE_SUCCESS]: ServiceUnits.fetchWorkspaceSuccess,
-    [Users.DISCONNECT_USER_SUCCESS]: ServiceUnits.disconnectUserSuccess
+    [Workspaces.CLOSE_WORKSPACE]: ServiceUnits.closeWorkspace
   };
 }

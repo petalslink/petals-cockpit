@@ -20,6 +20,7 @@ import { Response } from '@angular/http';
 import { Action } from '@ngrx/store';
 import { Effect } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 
 import { Workspaces } from './workspaces.reducer';
 import { WorkspacesService } from './../../../../../shared/services/workspaces.service';
@@ -97,17 +98,31 @@ export class WorkspacesEffects {
       })
     );
 
+  // TODO this is ugly!
+  // tslint:disable-next-line:member-ordering
+  private sub: Subscription;
+
+  // NOTE: this HAS TO be declared before fetchWorkspace below
+  // if not it will be trigerred after fetching the workspace and close the SSE!
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: false }) closeWorkspace$: Observable<Action> = this.actions$
+    .ofType(Workspaces.CLOSE_WORKSPACE)
+    .do(_ => this.sub && this.sub.unsubscribe())
+    .do(_ => this.sseService.stopWatchingWorkspace());
+
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchWorkspace$: Observable<Action> = this.actions$
     .ofType(Workspaces.FETCH_WORKSPACE)
+    .do(_ => this.sub && this.sub.unsubscribe())
     .switchMap((action: Action) => this.sseService.watchWorkspaceRealTime(action.payload)
       .map(_ => {
-        // TODO shouldn't we keep the Subscriptions and close them when we change workspace?
-        this.busesService.watchEventBusDeleted();
-        this.busesService.watchEventBusImportOk();
-        this.busesService.watchEventBusImportError();
-        this.serviceUnitsService.watchEventSuStateChangeOk();
-        this.componentsService.watchEventComponentStateChangeOk();
+        this.sub = new Subscription();
+        this.sub.add(this.busesService.watchEventBusDeleted().subscribe());
+        this.sub.add(this.busesService.watchEventBusImportOk().subscribe());
+        this.sub.add(this.busesService.watchEventBusImportError().subscribe());
+        this.sub.add(this.serviceUnitsService.watchEventSuStateChangeOk().subscribe());
+        this.sub.add(this.componentsService.watchEventComponentStateChangeOk().subscribe());
+
         return { type: Workspaces.FETCH_WORKSPACE_WAIT_SSE, payload: action.payload };
       })
     );

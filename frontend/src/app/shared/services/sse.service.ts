@@ -55,7 +55,9 @@ export abstract class SseService {
    *
    * @return {function} Call the function to close the SSE stream if needed
    */
-  abstract watchWorkspaceRealTime(workspaceId: string): Observable<void>;
+  abstract watchWorkspaceRealTime(workspaceId: string): Observable<any>;
+
+  abstract stopWatchingWorkspace();
 
   /**
    * subscribeToWorkspaceEvent
@@ -67,6 +69,7 @@ export abstract class SseService {
    * @return {Observable} Observable which is triggered every time there's the event `eventName`
    */
   abstract subscribeToWorkspaceEvent(eventName: string): Observable<any>;
+
 }
 
 @Injectable()
@@ -94,13 +97,7 @@ export class SseServiceImpl extends SseService {
   private registeredEvents: Map<string, { eventListener: any, subject$: Subject<any> }> = new Map();
 
   watchWorkspaceRealTime(workspaceId: string) {
-    if (typeof this.currentSse$ !== 'undefined' && this.currentSse$ !== null) {
-      if (environment.debug) {
-        console.debug('closing previous sse connection');
-      }
-
-      this.currentSse$.close();
-    }
+    this.stopWatchingWorkspace();
 
     if (environment.debug) {
       console.debug('subscribing to a new sse connection');
@@ -132,7 +129,20 @@ export class SseServiceImpl extends SseService {
       this.currentSse$.addEventListener(eventName, eventListener);
     });
 
-    return Observable.of(null);
+    return new Observable(s => {
+      s.next(null);
+      return this.stopWatchingWorkspace;
+    });
+  }
+
+  stopWatchingWorkspace() {
+    if (this.currentSse$) {
+      if (environment.debug) {
+        console.debug('closing sse connection');
+      }
+
+      this.currentSse$.close();
+    }
   }
 
   subscribeToWorkspaceEvent(eventName: string) {

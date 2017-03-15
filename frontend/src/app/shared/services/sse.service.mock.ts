@@ -47,9 +47,7 @@ export class SseServiceMock extends SseService {
   }
 
   public watchWorkspaceRealTime(workspaceId: string) {
-    if (this.isSseOpened && environment.debug) {
-      console.debug('closing previous sse connection');
-    }
+    this.stopWatchingWorkspace();
 
     this.isSseOpened = true;
 
@@ -68,6 +66,16 @@ export class SseServiceMock extends SseService {
     setTimeout(() => this.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, workspaceContent), 500);
 
     return Observable.of(null);
+  }
+
+  public stopWatchingWorkspace() {
+    if (this.isSseOpened) {
+      if (environment.debug) {
+        console.debug('closing previous sse connection');
+      }
+    }
+
+    this.isSseOpened = false;
   }
 
   public subscribeToWorkspaceEvent(eventName: string) {

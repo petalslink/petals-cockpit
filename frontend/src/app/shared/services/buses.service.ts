@@ -34,11 +34,11 @@ import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 
 
 export abstract class BusesService {
-  abstract watchEventBusDeleted(): void;
+  abstract watchEventBusDeleted(): Observable<void>;
 
-  abstract watchEventBusImportOk(): void;
+  abstract watchEventBusImportOk(): Observable<void>;
 
-  abstract watchEventBusImportError(): void;
+  abstract watchEventBusImportError(): Observable<void>;
 
   abstract getDetailsBus(busId: string): Observable<Response>;
 }
@@ -55,21 +55,20 @@ export class BusesServiceImpl extends BusesService {
   }
 
   watchEventBusDeleted() {
-    this.sseService
+    return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_DELETED)
-      .map(({ id }) => {
+      .do(({ id }) => {
         this.store$.dispatch(batchActions([
           { type: Buses.REMOVE_BUS, payload: { busId: id } },
           { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: id, importOk: false } },
         ]));
-      })
-      .subscribe();
+      });
   }
 
   watchEventBusImportOk() {
-    this.sseService
+    return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_OK)
-      .map((data: any) => {
+      .do((data: any) => {
 
         const buses = toJavascriptMap(data.buses);
 
@@ -86,21 +85,19 @@ export class BusesServiceImpl extends BusesService {
           { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap(data.components) },
           { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap(data.serviceUnits) },
         ]));
-      })
-      .subscribe();
+      });
   }
 
   watchEventBusImportError() {
-    this.sseService
+    return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_ERROR)
-      .map((busInError: any) => {
+      .do((busInError: any) => {
 
         this.notifications.alert(`Bus import error`,
           `The import of a bus from the IP ${busInError.ip}:${busInError.port} failed`);
 
         this.store$.dispatch({ type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS, payload: busInError });
-      })
-      .subscribe();
+      });
   }
 
   getDetailsBus(busId: string) {
