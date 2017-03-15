@@ -16,21 +16,10 @@
  */
 
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 
-// import { CockpitModule } from './features/cockpit/cockpit.module';
-// import { LoginModule } from './features/login/login.module';
 import { environment } from './../environments/environment';
 import { GuardLoginService } from './shared/services/guard-login.service';
-import { GuardAppService } from './shared/services/guard-app.service';
-
-// export function LoadCockpitModule() {
-//   return CockpitModule;
-// }
-
-// export function LoadLoginModule() {
-//   return LoginModule;
-// }
 
 export const routes: Routes = [
   {
@@ -40,14 +29,12 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    canLoad: [GuardLoginService],
-    // loadChildren: LoadLoginModule
+    canActivate: [GuardLoginService],
     loadChildren: 'app/features/login/login.module#LoginModule'
   },
   {
     path: '',
-    canLoad: [GuardAppService],
-    // loadChildren: LoadCockpitModule
+    canActivate: [GuardLoginService],
     loadChildren: 'app/features/cockpit/cockpit.module#CockpitModule'
   }
 ];
@@ -55,7 +42,7 @@ export const routes: Routes = [
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, {
-      // preloadingStrategy: PreloadAllModules,
+      preloadingStrategy: PreloadAllModules,
       useHash: (environment.hashLocationStrategy ? true : false),
       enableTracing: false
     }),

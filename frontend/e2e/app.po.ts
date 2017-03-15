@@ -31,7 +31,7 @@ export class PetalsCockpitPage {
 
   login(user: string, pass: string) {
     // to login we should be on the correct page
-    expect(browser.getCurrentUrl()).toMatch(/\/login$/);
+    expect(browser.getCurrentUrl()).toMatch(/\/login/);
 
     element(by.css(`app-login input[formcontrolname="username"]`)).sendKeys(user);
     element(by.css(`app-login input[formcontrolname="password"]`)).sendKeys(pass);
@@ -113,5 +113,11 @@ export class PetalsCockpitPage {
         return element(by.css(`app-cockpit md-toolbar-row button`)).click();
       }
     });
+  }
+
+  addBus() {
+    const addBtn = element(by.css(`app-cockpit md-sidenav a.btn-add-bus`));
+    browser.wait(EC.elementToBeClickable(addBtn), 5000);
+    return addBtn.click();
   }
 }

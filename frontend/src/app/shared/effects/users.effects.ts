@@ -41,12 +41,12 @@ export class UsersEffects {
   @Effect({ dispatch: true }) connectUser$: Observable<Action> = this.actions$
     .ofType(Users.CONNECT_USER)
     .switchMap((action: Action) =>
-      this.usersService.connectUser(action.payload)
+      this.usersService.connectUser(action.payload.user)
         .map((res: Response) => {
           const user = <ICurrentUser>res.json();
           return {
             type: Users.CONNECT_USER_SUCCESS,
-            payload: { user, redirectWorkspace: true }
+            payload: { user, navigate: true, previousUrl: action.payload.previousUrl }
           };
         })
         .catch((err) => {
@@ -64,9 +64,11 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false }) connectUserSuccess$: Observable<void> = this.actions$
     .ofType(Users.CONNECT_USER_SUCCESS)
-    .filter((action: Action) => action.payload.redirectWorkspace)
+    .filter((action: Action) => action.payload.navigate)
     .map((action: Action) => {
-      if (action.payload.user.lastWorkspace) {
+      if (action.payload.previousUrl) {
+        this.router.navigate([action.payload.previousUrl]);
+      } else if (action.payload.user.lastWorkspace) {
         this.router.navigate(['/workspaces', action.payload.user.lastWorkspace]);
       } else {
         this.router.navigate(['/workspaces']);

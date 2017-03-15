@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, element, by, ExpectedConditions as EC } from 'protractor';
+import { browser, element, by } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
 
@@ -34,14 +34,11 @@ describe(`Import Bus`, () => {
     page = new PetalsCockpitPage();
     page.navigateTo();
     page.login(`admin`, `admin`);
-    const addBtn = element(by.css(`app-cockpit md-sidenav a.btn-add-bus`));
-    browser.wait(EC.elementToBeClickable(addBtn), 5000);
-    addBtn.click();
+    page.addBus();
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/);
   });
 
   it(`should be cleared when clicking on the clear button`, () => {
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/);
-
     // check if the input form is empty
     expect(inputIp.getText()).toEqual(``);
     expect(inputPort.getText()).toEqual(``);

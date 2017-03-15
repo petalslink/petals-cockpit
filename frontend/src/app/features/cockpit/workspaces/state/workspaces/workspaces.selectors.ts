@@ -47,8 +47,7 @@ export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspace
                 }
               }
             };
-          }
-          )
+          })
         }
       };
     });

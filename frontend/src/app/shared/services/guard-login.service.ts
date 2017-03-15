@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { CanLoad } from '@angular/router';
+import { Router, CanActivate, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
@@ -28,39 +28,80 @@ import { Users } from './../state/users.reducer';
 import { ICurrentUser } from './../interfaces/user.interface';
 
 @Injectable()
-export class GuardLoginService implements CanLoad {
-  constructor(private userService: UsersService, private store$: Store<IStore>) { }
+export class GuardLoginService implements CanActivate {
 
-  canLoad() {
+  constructor(
+    private userService: UsersService,
+    private router: Router,
+    private store$: Store<IStore>) { }
+
+  canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     return this.store$
-      .select(state => state.users.connectedUserId)
+      .select(s => s.users.connectedUserId)
       .first()
       .switchMap(userId => {
+        const url = state.url;
+        const isLoginPage = url.match('^\/login');
+
         if (userId) {
-          // if we are already logged, let's not do the whole request again
-          // see https://github.com/angular/angular/issues/14475
-          return Observable.of(false);
+          if (isLoginPage) {
+            if (environment.debug) {
+              console.debug(`Guard Login: User already retrieved. Redirecting to /workspaces.`);
+            }
+
+            this.router.navigate(['/workspaces']);
+
+            return Observable.of(false);
+          } else {
+
+            if (environment.debug) {
+              console.debug(`Guard App: User already retrieved. Continuing to ${url}.`);
+            }
+
+            return Observable.of(true);
+          }
         } else {
           return this.userService.getUserInformations()
             .map((res: Response) => {
-              // if already connected, redirect to the app
-              if (environment.debug) {
-                console.debug(`Guard Login : User already logged. Redirecting to /workspaces.`);
+              if (isLoginPage) {
+                if (environment.debug) {
+                  console.debug(`Guard Login: User already logged. Redirecting to /workspaces.`);
+                }
+
+                this.store$.dispatch({
+                  type: Users.CONNECT_USER_SUCCESS,
+                  payload: { user: <ICurrentUser>res.json(), navigate: true }
+                });
+
+                return false;
+              } else {
+                if (environment.debug) {
+                  console.debug(`Guard App: User already logged. Continuing to ${url}.`);
+                }
+
+                this.store$.dispatch({
+                  type: Users.CONNECT_USER_SUCCESS,
+                  payload: { user: <ICurrentUser>res.json(), navigate: false }
+                });
+
+                return true;
               }
-
-              // this will redirect the user to /workspaces (from the effect catching it)
-              this.store$.dispatch({
-                type: Users.CONNECT_USER_SUCCESS,
-                payload: { user: <ICurrentUser>res.json(), redirectWorkspace: true }
-              });
-
-              return false;
             }).catch(_ => {
-              if (environment.debug) {
-                console.debug(`Guard Login : User not logged. Continuing to /login.`);
-              }
+              if (isLoginPage) {
+                if (environment.debug) {
+                  console.debug(`Guard Login: User not logged. Continuing to /login.`);
+                }
 
-              return Observable.of(true);
+                return Observable.of(true);
+              } else {
+                if (environment.debug) {
+                  console.debug(`Guard App: User not logged. Redirecting to /login (and then to ${url}).`);
+                }
+
+                this.router.navigate(['/login'], { queryParams: { previousUrl: url } });
+
+                return Observable.of(false);
+              }
             });
         }
       });

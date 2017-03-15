@@ -19,13 +19,8 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { WorkspacesComponent } from './workspaces.component';
-import { PetalsContentModule } from './petals-content/petals-content.module';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { WorkspaceResolver } from './workspace-resolver';
-
-export function loadPetalsContentModule() {
-  return PetalsContentModule;
-}
 
 // /workspaces
 const routes: Routes = [
@@ -46,7 +41,6 @@ const routes: Routes = [
       },
       {
         path: 'petals',
-        // loadChildren: loadPetalsContentModule
         loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule'
       }
     ]

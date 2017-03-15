@@ -46,6 +46,25 @@ describe(`Login`, () => {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
   });
 
+  it(`should redirect to original url after login`, () => {
+    page.login(`admin`, `admin`);
+
+    // let's go to the import bus page
+    page.addBus();
+
+    // delete session and refresh to retrigger login
+    browser.manage().deleteAllCookies();
+    browser.refresh();
+
+    // we should be redirected to login
+    expect(browser.getCurrentUrl()).toMatch(/\/login\?previousUrl=/);
+
+    page.login(`admin`, `admin`);
+
+    // we should have been redirected to the previous url!
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/);
+  });
+
   it(`should logout after logging in`, () => {
     page.login(`admin`, `admin`);
 
