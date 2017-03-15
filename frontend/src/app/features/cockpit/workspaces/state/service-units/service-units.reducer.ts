@@ -185,11 +185,11 @@ export class ServiceUnits {
   // tslint:disable-next-line:member-ordering
   public static REMOVE_SERVICE_UNIT = `${ServiceUnits.reducerName}_REMOVE_SERVICE_UNIT`;
   private static removeServiceUnit(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
-    return {
-      ...omit(serviceUnitsTable, 'byId', 'allIds'),
+    return <IserviceUnitsTable>{
+      ...serviceUnitsTable,
       ...<IserviceUnitsTable>{
         byId: omit(serviceUnitsTable.byId, payload.serviceUnitId),
-        allIds: serviceUnitsTable.allIds.filter(serviceUnitId => serviceUnitId === payload.serviceUnitId)
+        allIds: serviceUnitsTable.allIds.filter(id => id !== payload.serviceUnitId)
       }
     };
   }

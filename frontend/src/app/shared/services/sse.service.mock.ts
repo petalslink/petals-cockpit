@@ -58,13 +58,9 @@ export class SseServiceMock extends SseService {
     }
 
     // foreach event
-    SseWorkspaceEvent.allEvents.forEach(eventName => {
-      if (!this.registeredEvents.has(eventName)) {
-        this.registeredEvents.set(eventName, new Subject());
-      }
-
-      this.registeredEvents.set(eventName, this.registeredEvents.get(eventName));
-    });
+    SseWorkspaceEvent.allEvents
+      .filter(eventName => !this.registeredEvents.has(eventName))
+      .forEach(eventName => this.registeredEvents.set(eventName, new Subject()));
 
     const workspaceContent = workspacesService.getWorkspaceComposed(workspaceId);
 

@@ -134,7 +134,7 @@ export class BusesInProgress {
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_REMOVE_BUS_IN_PROGRESS`;
   private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { busInProgressId: string }) {
     return <IBusesInProgressTable>{
-      ...omit(busesInProgressTable, 'byId'),
+      ...busesInProgressTable,
       ...<IBusesInProgressTable>{
         byId: omit(busesInProgressTable.byId, payload.busInProgressId),
         allIds: busesInProgressTable.allIds.filter(id => id !== payload.busInProgressId)

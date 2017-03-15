@@ -23,9 +23,8 @@ export function workspacesTableFactory(): IWorkspacesTable {
 
     isAddingWorkspace: false,
     isFetchingWorkspaces: false,
-    fetchingWorkspaceWithId: '',
     searchPetals: '',
-    firstWorkspaceFetched: false,
+
 
     byId: {},
     allIds: []

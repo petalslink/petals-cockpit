@@ -155,7 +155,6 @@ export class Workspaces {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
-        firstWorkspaceFetched: true,
         selectedWorkspaceId: payload.id,
         byId: {
           ...cleanWorkspaces.byId,
@@ -172,12 +171,6 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACE_FAILED`;
-  private static fetchWorkspaceFailed(workspacesTable: IWorkspacesTable, _payload) {
-    return <IWorkspacesTable>{
-      ...workspacesTable,
-      ...<IWorkspacesTable>{ fetchingWorkspaceWithId: null }
-    };
-  }
 
   // tslint:disable-next-line:member-ordering
   public static SET_SEARCH = `${Workspaces.reducerName}_SET_SEARCH`;
@@ -205,7 +198,6 @@ export class Workspaces {
     // Workspace
     [Workspaces.FETCH_WORKSPACE]: Workspaces.fetchWorkspace,
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Workspaces.fetchWorkspaceSuccess,
-    [Workspaces.FETCH_WORKSPACE_FAILED]: Workspaces.fetchWorkspaceFailed,
     [Workspaces.POST_WORKSPACE]: Workspaces.postWorkspace,
     [Workspaces.POST_WORKSPACE_SUCCESS]: Workspaces.postWorkspaceSuccess,
     [Workspaces.POST_WORKSPACE_FAILED]: Workspaces.postWorkspaceFailed,
