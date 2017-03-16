@@ -27,6 +27,7 @@ import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/concat';
 import 'rxjs/add/operator/let';
+import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/withLatestFrom';
@@ -36,3 +37,4 @@ import 'rxjs/add/operator/dematerialize';
 
 // observables
 import 'rxjs/add/observable/empty';
+import 'rxjs/add/observable/from';

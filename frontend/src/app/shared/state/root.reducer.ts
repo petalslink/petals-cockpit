@@ -18,7 +18,6 @@
 import { combineReducers } from '@ngrx/store';
 import { compose } from '@ngrx/core/compose';
 import { storeFreeze } from 'ngrx-store-freeze';
-import { enableBatching } from 'redux-batched-actions';
 
 import { environment } from '../../../environments/environment';
 import { Ui } from '../state/ui.reducer';
@@ -29,6 +28,7 @@ import { BusesInProgress } from '../../features/cockpit/workspaces/state/buses-i
 import { Containers } from '../../features/cockpit/workspaces/state/containers/containers.reducer';
 import { Components } from '../../features/cockpit/workspaces/state/components/components.reducer';
 import { ServiceUnits } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
+import { enableBatching } from 'app/shared/helpers/batch-actions.helper';
 
 const reducers = {
   ui: Ui.reducer,

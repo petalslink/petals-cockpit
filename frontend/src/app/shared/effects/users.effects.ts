@@ -19,7 +19,7 @@ import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Router } from '@angular/router';
 import { Action } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
+import { Effect } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
 
@@ -27,11 +27,13 @@ import { Users } from './../state/users.reducer';
 import { UsersService } from './../services/users.service';
 import { ICurrentUser } from './../interfaces/user.interface';
 import { environment } from './../../../environments/environment';
+import { batchActions, ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 
 @Injectable()
 export class UsersEffects {
   constructor(
-    private actions$: Actions,
+    private actions$: ActionsWithBatched,
     private router: Router,
     private usersService: UsersService,
     private notification: NotificationsService
@@ -78,12 +80,12 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) disconnectUser$: Observable<Action> = this.actions$
     .ofType(Users.DISCONNECT_USER)
-    .switchMap(_ =>
+    .switchMap(() =>
       this.usersService.disconnectUser()
-        // tslint:disable-next-line:no-shadowed-variable
-        .map(_ => {
-          return { type: Users.DISCONNECT_USER_SUCCESS };
-        })
+        .map(() => batchActions([
+          { type: Users.DISCONNECT_USER_SUCCESS },
+          { type: Workspaces.CLOSE_WORKSPACE }
+        ]))
         .catch((err) => {
           if (environment.debug) {
             console.group();
@@ -99,8 +101,6 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false }) disconnectUserSuccess$: any = this.actions$
     .ofType(Users.DISCONNECT_USER_SUCCESS)
-    .map(() => {
-      this.router.navigate(['/login']);
-      this.notification.success('Log out !', `You're now disconnected.`);
-    });
+    .do(_ => this.router.navigate(['/login']))
+    .do(_ => this.notification.success('Log out !', `You're now disconnected.`));
 }

@@ -18,19 +18,20 @@
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Action, Store } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
+import { Effect } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../../../../environments/environment';
 import { Components } from './components.reducer';
 import { ComponentsService } from './../../../../../shared/services/components.service';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
 
 @Injectable()
 export class ComponentsEffects {
   constructor(
     private store$: Store<IStore>,
-    private actions$: Actions,
+    private actions$: ActionsWithBatched,
     private componentsService: ComponentsService
   ) { }
 

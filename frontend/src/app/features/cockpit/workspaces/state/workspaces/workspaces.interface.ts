@@ -20,11 +20,12 @@ import { IWorkspaceRow, IWorkspace } from './workspace.interface';
 export interface IWorkspacesCommon {
   selectedWorkspaceId: string;
 
+  // for workspaces dialog
   isAddingWorkspace: boolean;
   isFetchingWorkspaces: boolean;
-  fetchingWorkspaceWithId: string;
+
   searchPetals: string;
-  firstWorkspaceFetched: boolean;
+
 }
 
 export interface IWorkspacesTableOnly {

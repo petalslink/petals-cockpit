@@ -68,7 +68,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
     state.components,
     state.serviceUnits
   ])
-    .filter(([workspaces]: [IWorkspacesTable]) => workspaces.selectedWorkspaceId !== '')
+    .filter(([workspaces]: [IWorkspacesTable]) => !!workspaces.selectedWorkspaceId)
     // as the object has a new reference every time,
     // use distinctUntilChanged for performance
     .distinctUntilChanged(arrayEquals)
@@ -79,7 +79,6 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
         selectedWorkspaceId: workspaces.selectedWorkspaceId,
         isAddingWorkspace: workspaces.isAddingWorkspace,
         isFetchingWorkspaces: workspaces.isFetchingWorkspaces,
-        fetchingWorkspaceWithId: workspaces.fetchingWorkspaceWithId,
         searchPetals: workspaces.searchPetals,
 
         users: {

@@ -21,7 +21,6 @@ import { omit } from 'underscore';
 import { busesInProgressTableFactory } from './buses-in-progress.initial-state';
 import { IBusesInProgressTable } from './buses-in-progress.interface';
 import { IBusInProgressRow } from './bus-in-progress.interface';
-import { Users } from './../../../../../shared/state/users.reducer';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 
 export class BusesInProgress {
@@ -134,7 +133,7 @@ export class BusesInProgress {
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_REMOVE_BUS_IN_PROGRESS`;
   private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { busInProgressId: string }) {
     return <IBusesInProgressTable>{
-      ...omit(busesInProgressTable, 'byId'),
+      ...busesInProgressTable,
       ...<IBusesInProgressTable>{
         byId: omit(busesInProgressTable.byId, payload.busInProgressId),
         allIds: busesInProgressTable.allIds.filter(id => id !== payload.busInProgressId)
@@ -159,11 +158,7 @@ export class BusesInProgress {
     };
   }
 
-  private static fetchWorkspaceSuccess(_busesInProgressTable: IBusesInProgressTable, _payload) {
-    return busesInProgressTableFactory();
-  }
-
-  private static disconnectUserSuccess(_busesInProgressTable: IBusesInProgressTable, _payload) {
+  private static closeWorkspace(_busesInProgressTable: IBusesInProgressTable, _payload) {
     return busesInProgressTableFactory();
   }
 
@@ -180,7 +175,6 @@ export class BusesInProgress {
     [BusesInProgress.REMOVE_BUS_IN_PROGRESS]: BusesInProgress.removeBusInProgress,
     [BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS]: BusesInProgress.updateErrorBusInProgress,
 
-    [Workspaces.FETCH_WORKSPACE_SUCCESS]: BusesInProgress.fetchWorkspaceSuccess,
-    [Users.DISCONNECT_USER_SUCCESS]: BusesInProgress.disconnectUserSuccess
+    [Workspaces.CLOSE_WORKSPACE]: BusesInProgress.closeWorkspace
   };
 }

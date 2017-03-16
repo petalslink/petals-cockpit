@@ -19,7 +19,6 @@ import { Action } from '@ngrx/store';
 
 import { IUi } from '../interfaces/ui.interface';
 import { uiState } from './ui.state';
-import { Users } from './users.reducer';
 
 export class Ui {
   private static reducerName = 'UI_REDUCER';
@@ -102,10 +101,6 @@ export class Ui {
     };
   }
 
-  private static disconnectUserSuccess(_ui: IUi, _payload) {
-    return uiState();
-  }
-
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -116,8 +111,6 @@ export class Ui {
     [Ui.CLOSE_SIDENAV]: Ui.closeSidenav,
     [Ui.OPEN_POPUP_WORKSPACES_LIST]: Ui.openPopupWorkspacesList,
     [Ui.CLOSE_POPUP_WORKSPACES_LIST]: Ui.closePopupWorkspacesList,
-    [Ui.SET_TITLES]: Ui.setTitles,
-
-    [Users.DISCONNECT_USER_SUCCESS]: Ui.disconnectUserSuccess
+    [Ui.SET_TITLES]: Ui.setTitles
   };
 }

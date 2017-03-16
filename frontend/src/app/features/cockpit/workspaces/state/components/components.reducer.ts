@@ -21,7 +21,6 @@ import { omit } from 'underscore';
 import { IComponentsTable } from './components.interface';
 import { IComponentRow } from './component.interface';
 import { componentsTableFactory } from './components.initial-state';
-import { Users } from './../../../../../shared/state/users.reducer';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { getComponentOfServiceUnit } from '../../../../../shared/helpers/service-unit.helper';
 import { ServiceUnits } from '../service-units/service-units.reducer';
@@ -263,11 +262,7 @@ export class Components {
     };
   }
 
-  private static fetchWorkspaceSuccess(_componentsTable: IComponentsTable, _payload) {
-    return componentsTableFactory();
-  }
-
-  private static disconnectUserSuccess(_componentsTable: IComponentsTable, _payload) {
+  private static closeWorkspace(_componentsTable: IComponentsTable, _payload) {
     return componentsTableFactory();
   }
 
@@ -289,7 +284,6 @@ export class Components {
     [Components.REMOVE_COMPONENT]: Components.removeComponent,
 
     [ServiceUnits.REMOVE_SERVICE_UNIT]: Components.removeServiceUnit,
-    [Workspaces.FETCH_WORKSPACE_SUCCESS]: Components.fetchWorkspaceSuccess,
-    [Users.DISCONNECT_USER_SUCCESS]: Components.disconnectUserSuccess
+    [Workspaces.CLOSE_WORKSPACE]: Components.closeWorkspace
   };
 }

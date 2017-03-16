@@ -20,7 +20,6 @@ import { Action } from '@ngrx/store';
 import { IContainersTable } from './containers.interface';
 import { containersTableFactory } from './containers.initial-state';
 import { IContainerRow } from './container.interface';
-import { Users } from './../../../../../shared/state/users.reducer';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { getContainerOfComponent } from '../../../../../shared/helpers/component.helper';
 import { Components } from '../components/components.reducer';
@@ -199,11 +198,7 @@ export class Containers {
     };
   }
 
-  private static fetchWorkspaceSuccess(_containersTable: IContainersTable, _payload) {
-    return containersTableFactory();
-  }
-
-  private static disconnectUserSuccess(_containersTable: IContainersTable, _payload) {
+  private static closeWorkspace(_containersTable: IContainersTable, _payload) {
     return containersTableFactory();
   }
 
@@ -221,7 +216,6 @@ export class Containers {
     [Containers.FETCH_CONTAINER_DETAILS_ERROR]: Containers.fetchContainerDetailsError,
 
     [Components.REMOVE_COMPONENT]: Containers.removeComponent,
-    [Workspaces.FETCH_WORKSPACE_SUCCESS]: Containers.fetchWorkspaceSuccess,
-    [Users.DISCONNECT_USER_SUCCESS]: Containers.disconnectUserSuccess
+    [Workspaces.CLOSE_WORKSPACE]: Containers.closeWorkspace
   };
 }

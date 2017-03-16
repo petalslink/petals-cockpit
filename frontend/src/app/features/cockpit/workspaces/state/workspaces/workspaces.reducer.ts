@@ -19,14 +19,13 @@ import { Action } from '@ngrx/store';
 
 import { IWorkspacesTable } from './workspaces.interface';
 import { workspacesTableFactory } from './workspaces.initial-state';
-import { workspaceRowFactory } from './workspace.initial-state';
 import { IWorkspaceRow } from './workspace.interface';
 import { Users } from './../../../../../shared/state/users.reducer';
 
 export class Workspaces {
   private static reducerName = 'WORKSPACES_REDUCER';
 
-  public static reducer(workspacesTable = workspacesTableFactory(), {type, payload}: Action) {
+  public static reducer(workspacesTable = workspacesTableFactory(), { type, payload }: Action) {
     if (!Workspaces.mapActionsToMethod[type]) {
       return workspacesTable;
     }
@@ -133,51 +132,24 @@ export class Workspaces {
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_SUCCESS = `${Workspaces.reducerName}_FETCH_WORKSPACE_SUCCESS`;
   private static fetchWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload) {
-    const cleanWorkspaces = workspacesTable
-      .allIds
-      .reduce((acc, workspaceId) => {
-        return {
-          ...acc,
-          byId: {
-            ...acc.byId,
-            [workspaceId]: {
-              ...workspacesTable.byId[workspaceId],
-              ...workspaceRowFactory(
-                workspacesTable.byId[workspaceId].id,
-                workspacesTable.byId[workspaceId].name
-              )
-            }
-          },
-          allIds: [...acc.allIds, workspaceId]
-        };
-      }, { byId: {}, allIds: [] });
-
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
-        firstWorkspaceFetched: true,
         selectedWorkspaceId: payload.id,
         byId: {
-          ...cleanWorkspaces.byId,
+          ...workspacesTable.byId,
           [payload.id]: <IWorkspaceRow>{
-            ...workspacesTable.byId[payload],
+            ...workspacesTable.byId[payload.id],
             ...payload,
             ...<IWorkspaceRow>{ isFetching: false }
           }
-        },
-        allIds: cleanWorkspaces.allIds
+        }
       }
     };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACE_FAILED`;
-  private static fetchWorkspaceFailed(workspacesTable: IWorkspacesTable, _payload) {
-    return <IWorkspacesTable>{
-      ...workspacesTable,
-      ...<IWorkspacesTable>{ fetchingWorkspaceWithId: null }
-    };
-  }
 
   // tslint:disable-next-line:member-ordering
   public static SET_SEARCH = `${Workspaces.reducerName}_SET_SEARCH`;
@@ -190,6 +162,16 @@ export class Workspaces {
     };
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static CLOSE_WORKSPACE = `${Workspaces.reducerName}_CLOSE_WORKSPACE`;
+  private static closeWorkspace(workspacesTable: IWorkspacesTable, _payload) {
+    return {
+      ...workspacesTable,
+      selectedWorkspaceId: ''
+    };
+  }
+
+  // tslint:disable-next-line:member-ordering
   private static disconnectUserSuccess(_workspacesTable: IWorkspacesTable, _payload) {
     return workspacesTableFactory();
   }
@@ -205,10 +187,10 @@ export class Workspaces {
     // Workspace
     [Workspaces.FETCH_WORKSPACE]: Workspaces.fetchWorkspace,
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Workspaces.fetchWorkspaceSuccess,
-    [Workspaces.FETCH_WORKSPACE_FAILED]: Workspaces.fetchWorkspaceFailed,
     [Workspaces.POST_WORKSPACE]: Workspaces.postWorkspace,
     [Workspaces.POST_WORKSPACE_SUCCESS]: Workspaces.postWorkspaceSuccess,
     [Workspaces.POST_WORKSPACE_FAILED]: Workspaces.postWorkspaceFailed,
+    [Workspaces.CLOSE_WORKSPACE]: Workspaces.closeWorkspace,
     // Search
     [Workspaces.SET_SEARCH]: Workspaces.setSearch,
     // Disconnect
