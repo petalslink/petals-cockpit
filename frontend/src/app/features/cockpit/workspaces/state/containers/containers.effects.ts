@@ -18,18 +18,17 @@
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Action } from '@ngrx/store';
-import { Effect } from '@ngrx/effects';
+import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../../../../environments/environment';
 import { Containers } from './containers.reducer';
 import { ContainersService } from './../../../../../shared/services/containers.service';
-import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
 
 @Injectable()
 export class ContainersEffects {
   constructor(
-    private actions$: ActionsWithBatched,
+    private actions$: Actions,
     private containersService: ContainersService
   ) { }
 

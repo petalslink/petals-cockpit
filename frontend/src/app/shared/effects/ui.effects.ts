@@ -17,19 +17,18 @@
 
 import { Injectable } from '@angular/core';
 import { Action } from '@ngrx/store';
-import { Effect } from '@ngrx/effects';
+import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { ObservableMedia, MediaChange } from '@angular/flex-layout';
 
 import { Ui } from '../state/ui.reducer';
-import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
 
 @Injectable()
 export class UiEffects {
   private isSmallScreen;
 
   constructor(
-    private actions$: ActionsWithBatched,
+    private actions$: Actions,
     private media$: ObservableMedia
     ) {
     this

@@ -18,7 +18,7 @@
 import { NgModule } from '@angular/core';
 import { Http } from '@angular/http';
 import { StoreModule } from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
+import { EffectsModule, Actions } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { TranslateModule, TranslateLoader } from 'ng2-translate';
 import { SimpleNotificationsModule } from 'angular2-notifications';
@@ -94,7 +94,11 @@ export const providers = [
     provide: UsersService,
     useClass: (environment.mock ? UsersMockService : UsersServiceImpl)
   },
-  ActionsWithBatched
+  // we override the default one with ours aware of batch actions
+  {
+    provide: Actions,
+    useClass: ActionsWithBatched
+  }
 ];
 
 @NgModule({

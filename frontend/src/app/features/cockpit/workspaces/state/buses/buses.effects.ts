@@ -18,18 +18,17 @@
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Action } from '@ngrx/store';
-import { Effect } from '@ngrx/effects';
+import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
 import { Buses } from './buses.reducer';
 import { BusesService } from './../../../../../shared/services/buses.service';
 import { environment } from './../../../../../../environments/environment';
-import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
 
 @Injectable()
 export class BusesEffects {
   constructor(
-    private actions$: ActionsWithBatched,
+    private actions$: Actions,
     private busesService: BusesService
   ) { }
 

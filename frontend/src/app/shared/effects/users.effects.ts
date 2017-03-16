@@ -19,7 +19,7 @@ import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Router } from '@angular/router';
 import { Action } from '@ngrx/store';
-import { Effect } from '@ngrx/effects';
+import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
 
@@ -27,13 +27,13 @@ import { Users } from './../state/users.reducer';
 import { UsersService } from './../services/users.service';
 import { ICurrentUser } from './../interfaces/user.interface';
 import { environment } from './../../../environments/environment';
-import { batchActions, ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
+import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 
 @Injectable()
 export class UsersEffects {
   constructor(
-    private actions$: ActionsWithBatched,
+    private actions$: Actions,
     private router: Router,
     private usersService: UsersService,
     private notification: NotificationsService
