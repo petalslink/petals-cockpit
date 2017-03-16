@@ -21,19 +21,66 @@ import { Store } from '@ngrx/store';
 
 import { BusesServiceImpl } from './buses.service';
 import { IStore } from './../interfaces/store.interface';
-import { SseService } from './sse.service';
+import { SseService, SseWorkspaceEvent } from './sse.service';
+import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import { NotificationsService } from 'angular2-notifications';
-import { busesService } from './../../../mocks/buses-mock';
+import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
+import { busesService } from './../../../mocks/buses-mock';
+import { workspacesService } from '../../../mocks/workspaces-mock';
+import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 
 @Injectable()
 export class BusesMockService extends BusesServiceImpl {
+
+  private firstErrorSent = false;
+
   constructor(
     http: Http,
     store$: Store<IStore>,
-    sseService: SseService,
+    private pSseService: SseService,
     notifications: NotificationsService) {
-    super(http, store$, sseService, notifications);
+    super(http, store$, pSseService, notifications);
+  }
+
+  postBus(idWorkspace: string, bus: IBusInProgress) {
+    // when mocking, we make the first test fail with an HTTP error
+    if (!this.firstErrorSent) {
+      this.firstErrorSent = true;
+      return helper.responseBody('Error backend', 500);
+    }
+
+    const newBus = workspacesService.getWorkspace(idWorkspace).addBus(bus);
+
+    let event;
+    if (newBus.eventData.importError) {
+      event = SseWorkspaceEvent.BUS_IMPORT_ERROR;
+    } else {
+      event = SseWorkspaceEvent.BUS_IMPORT_OK;
+    }
+
+    const detailsBus = {
+      ...bus,
+      id: newBus.id
+    };
+
+    return helper
+      .responseBody(detailsBus)
+      .do(_ => {
+        // simulate the backend sending the answer on the SSE
+        setTimeout(() => (this.pSseService as SseServiceMock)
+          .triggerSseEvent(event, newBus.eventData), environment.sseDelay);
+      });
+  }
+
+  deleteBus(_idWorkspace: string, id: string) {
+    return helper
+      .response(204)
+      .do(_ => {
+        // simulate the backend sending the answer on the SSE
+        setTimeout(() => (this.pSseService as SseServiceMock)
+          .triggerSseEvent(SseWorkspaceEvent.BUS_DELETED, { id }), environment.sseDelay);
+      });
   }
 
   getDetailsBus(busId: string) {

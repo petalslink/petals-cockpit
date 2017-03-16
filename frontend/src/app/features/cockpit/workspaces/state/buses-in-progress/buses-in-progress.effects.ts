@@ -25,7 +25,7 @@ import { Observable } from 'rxjs/Observable';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IBusInProgressRow } from './bus-in-progress.interface';
 import { BusesInProgress } from './buses-in-progress.reducer';
-import { BusesInProgressService } from './../../../../../shared/services/buses-in-progress.service';
+import { BusesService } from 'app/shared/services/buses.service';
 
 @Injectable()
 export class BusesInProgressEffects {
@@ -34,7 +34,7 @@ export class BusesInProgressEffects {
     private actions$: Actions,
     private store$: Store<IStore>,
     private router: Router,
-    private busesInProgressService: BusesInProgressService
+    private busesService: BusesService
   ) { }
 
   // tslint:disable-next-line:member-ordering
@@ -42,7 +42,7 @@ export class BusesInProgressEffects {
     .ofType(BusesInProgress.POST_BUS_IN_PROGRESS)
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, idWorkspace]) =>
-      this.busesInProgressService.postBus(idWorkspace, action.payload)
+      this.busesService.postBus(idWorkspace, action.payload)
         .map((res: Response) => {
           return {
             type: BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS,
@@ -73,7 +73,7 @@ export class BusesInProgressEffects {
     .ofType(BusesInProgress.DELETE_BUS_IN_PROGRESS)
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, idWorkspace]) =>
-      this.busesInProgressService.deleteBus(idWorkspace, action.payload.id)
+      this.busesService.deleteBus(idWorkspace, action.payload.id)
         .map(_ => {
           return {
             type: BusesInProgress.DELETE_BUS_IN_PROGRESS_SUCCESS,

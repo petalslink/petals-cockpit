@@ -31,16 +31,21 @@ import { Containers } from './../../features/cockpit/workspaces/state/containers
 import { environment } from './../../../environments/environment';
 import { toJavascriptMap } from '../helpers/shared.helper';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
+import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 
 
 export abstract class BusesService {
+  abstract postBus(idWorkspace: string, bus: IBusInProgress): Observable<Response>;
+
+  abstract deleteBus(idWorkspace: string, id: string): Observable<Response>;
+
+  abstract getDetailsBus(busId: string): Observable<Response>;
+
   abstract watchEventBusDeleted(): Observable<void>;
 
   abstract watchEventBusImportOk(): Observable<void>;
 
   abstract watchEventBusImportError(): Observable<void>;
-
-  abstract getDetailsBus(busId: string): Observable<Response>;
 }
 
 @Injectable()
@@ -52,6 +57,18 @@ export class BusesServiceImpl extends BusesService {
     private notifications: NotificationsService
   ) {
     super();
+  }
+
+  postBus(idWorkspace: string, bus: IBusInProgress) {
+    return this.http.post(`${environment.urlBackend}/workspaces/${idWorkspace}/buses`, bus);
+  }
+
+  deleteBus(idWorkspace: string, id: string) {
+    return this.http.delete(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${id}`);
+  }
+
+  getDetailsBus(busId: string) {
+    return this.http.get(`${environment.urlBackend}/buses/${busId}`);
   }
 
   watchEventBusDeleted() {
@@ -97,9 +114,5 @@ export class BusesServiceImpl extends BusesService {
 
         this.store$.dispatch({ type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS, payload: busInError });
       });
-  }
-
-  getDetailsBus(busId: string) {
-    return this.http.get(`${environment.urlBackend}/buses/${busId}`);
   }
 }

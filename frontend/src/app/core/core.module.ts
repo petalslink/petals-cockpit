@@ -38,8 +38,6 @@ import { ComponentsEffects } from './../features/cockpit/workspaces/state/compon
 import { ServiceUnitsEffects } from './../features/cockpit/workspaces/state/service-units/service-units.effects';
 import { SseService, SseServiceImpl } from '../shared/services/sse.service';
 import { SseServiceMock } from '../shared/services/sse.service.mock';
-import { BusesInProgressService, BusesInProgressServiceImpl } from '../shared/services/buses-in-progress.service';
-import { BusesInProgressMockService } from '../shared/services/buses-in-progress-mock.service';
 import { WorkspacesService, WorkspacesServiceImpl } from '../shared/services/workspaces.service';
 import { WorkspacesMockService } from '../shared/services/workspaces.service.mock';
 import { UsersMockService } from '../shared/services/users.service.mock';
@@ -65,10 +63,6 @@ export const providers = [
   {
     provide: SseService,
     useClass: (environment.mock ? SseServiceMock : SseServiceImpl)
-  },
-  {
-    provide: BusesInProgressService,
-    useClass: (environment.mock ? BusesInProgressMockService : BusesInProgressServiceImpl)
   },
   {
     provide: BusesService,
