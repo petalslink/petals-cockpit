@@ -19,19 +19,20 @@ import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Router } from '@angular/router';
 import { Store, Action } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
+import { Effect } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IBusInProgressRow } from './bus-in-progress.interface';
 import { BusesInProgress } from './buses-in-progress.reducer';
 import { BusesInProgressService } from './../../../../../shared/services/buses-in-progress.service';
+import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
 
 @Injectable()
 export class BusesInProgressEffects {
 
   constructor(
-    private actions$: Actions,
+    private actions$: ActionsWithBatched,
     private store$: Store<IStore>,
     private router: Router,
     private busesInProgressService: BusesInProgressService

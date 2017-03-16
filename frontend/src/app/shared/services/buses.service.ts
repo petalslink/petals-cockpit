@@ -18,7 +18,6 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Store } from '@ngrx/store';
-import { batchActions } from 'redux-batched-actions';
 import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
 
@@ -31,6 +30,7 @@ import { Components } from './../../features/cockpit/workspaces/state/components
 import { Containers } from './../../features/cockpit/workspaces/state/containers/containers.reducer';
 import { environment } from './../../../environments/environment';
 import { toJavascriptMap } from '../helpers/shared.helper';
+import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 
 
 export abstract class BusesService {
@@ -80,18 +80,12 @@ export class BusesServiceImpl extends BusesService {
           `The import of a bus from the IP ${busInProgress.ip}:${busInProgress.port} succeeded`);
 
         this.store$.dispatch(batchActions([
+          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: busInProgress.id, importOk: true } },
           { type: Buses.FETCH_BUSES_SUCCESS, payload: buses },
           { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap(data.containers) },
           { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap(data.components) },
           { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap(data.serviceUnits) },
         ]));
-
-        // this dispatch is separated from the batchActions on purpose
-        // TODO see #230
-        this.store$.dispatch({
-          type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
-          payload: { busInProgressId: busInProgress.id, importOk: true }
-        });
       })
       .subscribe();
   }

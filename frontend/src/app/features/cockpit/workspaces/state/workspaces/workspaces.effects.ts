@@ -18,9 +18,8 @@
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Action } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
+import { Effect } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
-import { batchActions } from 'redux-batched-actions';
 
 import { Workspaces } from './workspaces.reducer';
 import { WorkspacesService } from './../../../../../shared/services/workspaces.service';
@@ -38,11 +37,12 @@ import { BusesService } from './../../../../../shared/services/buses.service';
 import { NotificationsService } from 'angular2-notifications';
 import { ServiceUnitsService } from '../../../../../shared/services/service-units.service';
 import { ComponentsService } from '../../../../../shared/services/components.service';
+import { batchActions, ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
 
 @Injectable()
 export class WorkspacesEffects {
   constructor(
-    private actions$: Actions,
+    private actions$: ActionsWithBatched,
     private workspacesService: WorkspacesService,
     private sseService: SseService,
     private busesService: BusesService,

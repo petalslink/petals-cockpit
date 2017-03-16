@@ -53,6 +53,7 @@ import { ComponentsService, ComponentsServiceImpl } from './../shared/services/c
 import { ComponentsMockService } from './../shared/services/components.service.mock';
 import { ServiceUnitsService, ServiceUnitsServiceImpl } from './../shared/services/service-units.service';
 import { ServiceUnitsMockService } from './../shared/services/service-units.service.mock';
+import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
 
 export const providers = [
   {
@@ -92,7 +93,8 @@ export const providers = [
   {
     provide: UsersService,
     useClass: (environment.mock ? UsersMockService : UsersServiceImpl)
-  }
+  },
+  ActionsWithBatched
 ];
 
 @NgModule({
