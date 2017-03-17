@@ -116,8 +116,8 @@ export class BusesInProgress {
       ...<IBusesInProgressTable>{
         byId: {
           ...busesInProgressTable.byId,
-          [payload]: <IBusInProgressRow>{
-            ...busesInProgressTable.byId[payload],
+          [payload.id]: <IBusInProgressRow>{
+            ...busesInProgressTable.byId[payload.id],
             ...<IBusInProgressRow>{ isRemoving: true }
           }
         }
@@ -131,12 +131,12 @@ export class BusesInProgress {
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_REMOVE_BUS_IN_PROGRESS`;
-  private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { busInProgressId: string }) {
+  private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: string) {
     return <IBusesInProgressTable>{
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
-        byId: omit(busesInProgressTable.byId, payload.busInProgressId),
-        allIds: busesInProgressTable.allIds.filter(id => id !== payload.busInProgressId)
+        byId: omit(busesInProgressTable.byId, payload),
+        allIds: busesInProgressTable.allIds.filter(id => id !== payload)
       }
     };
   }

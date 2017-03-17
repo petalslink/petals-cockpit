@@ -94,9 +94,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </button>
               <button md-raised-button color="warn" type="button" *ngIf="busInProgress && busInProgress.importError" (click)="discard(busInProgress)" [disabled]="busInProgress && busInProgress.isRemoving" class="margin-right-x1">Discard</button>
               <button md-raised-button color="primary" fxLayout="row" fxLayoutAlign="center center" type="submit" class="btn-import-form" [disabled]="busImportForm.invalid || (busesInProgressTable$ | async).isImportingBus || busInProgress">
-                <span *ngIf="!(busesInProgressTable$ | async).isImportingBus">Import</span>
-
-                <span *ngIf="(busesInProgressTable$ | async).isImportingBus" fxFill fxLayout="row" fxLayoutAlign="center center">
+                <span
+                  *ngIf="!((busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError))">
+                  Import
+                </span>
+                <span  fxFill fxLayout="row" fxLayoutAlign="center center"
+                  *ngIf="(busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError)">
                   Importing <md-spinner></md-spinner>
                 </span>
               </button>

@@ -77,7 +77,7 @@ export class BusesServiceImpl extends BusesService {
       .do(({ id }) => {
         this.store$.dispatch(batchActions([
           { type: Buses.REMOVE_BUS, payload: { busId: id } },
-          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: id, importOk: false } },
+          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: id },
         ]));
       });
   }
@@ -95,7 +95,7 @@ export class BusesServiceImpl extends BusesService {
         this.notifications.success(`Bus import success`, `The import of the bus ${bus.name} succeeded`);
 
         this.store$.dispatch(batchActions([
-          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: bus.id, importOk: true } },
+          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: bus.id },
           { type: Buses.FETCH_BUSES_SUCCESS, payload: buses },
           { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap(data.containers) },
           { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap(data.components) },
