@@ -117,6 +117,7 @@ export class WorkspacesEffects {
     .switchMap((action: Action) => this.sseService.watchWorkspaceRealTime(action.payload)
       .map(_ => {
         this.sub = new Subscription();
+        this.sub.add(this.busesService.watchEventBusImport().subscribe());
         this.sub.add(this.busesService.watchEventBusDeleted().subscribe());
         this.sub.add(this.busesService.watchEventBusImportOk().subscribe());
         this.sub.add(this.busesService.watchEventBusImportError().subscribe());

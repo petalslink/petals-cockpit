@@ -37,6 +37,9 @@ export class SseServiceMock extends SseService {
   // call that method from another mock to simulate an SSE event
   public triggerSseEvent(eventName: string, data: any) {
     if (this.registeredEvents.has(eventName)) {
+      if (environment.debug) {
+        console.debug('SSE: ', eventName, data);
+      }
       this.registeredEvents.get(eventName).next(data);
     } else if (environment.debug) {
       console.error(`

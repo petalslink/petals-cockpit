@@ -31,16 +31,23 @@ import { Containers } from './../../features/cockpit/workspaces/state/containers
 import { environment } from './../../../environments/environment';
 import { toJavascriptMap } from '../helpers/shared.helper';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
+import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 
 
 export abstract class BusesService {
+  abstract postBus(idWorkspace: string, bus: IBusInProgress): Observable<Response>;
+
+  abstract deleteBus(idWorkspace: string, id: string): Observable<Response>;
+
+  abstract getDetailsBus(busId: string): Observable<Response>;
+
+  abstract watchEventBusImport(): Observable<void>;
+
   abstract watchEventBusDeleted(): Observable<void>;
 
   abstract watchEventBusImportOk(): Observable<void>;
 
   abstract watchEventBusImportError(): Observable<void>;
-
-  abstract getDetailsBus(busId: string): Observable<Response>;
 }
 
 @Injectable()
@@ -54,13 +61,34 @@ export class BusesServiceImpl extends BusesService {
     super();
   }
 
+  postBus(idWorkspace: string, bus: IBusInProgress) {
+    return this.http.post(`${environment.urlBackend}/workspaces/${idWorkspace}/buses`, bus);
+  }
+
+  deleteBus(idWorkspace: string, id: string) {
+    return this.http.delete(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${id}`);
+  }
+
+  getDetailsBus(busId: string) {
+    return this.http.get(`${environment.urlBackend}/buses/${busId}`);
+  }
+
+  watchEventBusImport() {
+    return this.sseService
+      .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT)
+      .do(bip => this.store$.dispatch({
+        type: BusesInProgress.FETCH_BUSES_IN_PROGRESS,
+        payload: toJavascriptMap({ [bip.id]: bip })
+      }));
+  }
+
   watchEventBusDeleted() {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_DELETED)
       .do(({ id }) => {
         this.store$.dispatch(batchActions([
           { type: Buses.REMOVE_BUS, payload: { busId: id } },
-          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: id, importOk: false } },
+          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: id },
         ]));
       });
   }
@@ -78,7 +106,7 @@ export class BusesServiceImpl extends BusesService {
         this.notifications.success(`Bus import success`, `The import of the bus ${bus.name} succeeded`);
 
         this.store$.dispatch(batchActions([
-          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: bus.id, importOk: true } },
+          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: bus.id },
           { type: Buses.FETCH_BUSES_SUCCESS, payload: buses },
           { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap(data.containers) },
           { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap(data.components) },
@@ -97,9 +125,5 @@ export class BusesServiceImpl extends BusesService {
 
         this.store$.dispatch({ type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS, payload: busInError });
       });
-  }
-
-  getDetailsBus(busId: string) {
-    return this.http.get(`${environment.urlBackend}/buses/${busId}`);
   }
 }

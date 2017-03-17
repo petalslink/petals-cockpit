@@ -61,7 +61,10 @@ export class BusesInProgress {
     return <IBusesInProgressTable>{
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
-        selectedBusInProgressId: payload
+        selectedBusInProgressId: payload,
+        isImportingBus: false,
+        importBusError: '',
+        importBusId: ''
       }
     };
   }
@@ -73,7 +76,8 @@ export class BusesInProgress {
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
         isImportingBus: true,
-        importBusError: ''
+        importBusError: '',
+        importBusId: ''
       }
     };
   }
@@ -85,12 +89,7 @@ export class BusesInProgress {
     return <IBusesInProgressTable>{
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
-        isImportingBus: false,
-        byId: {
-          ...busesInProgressTable.byId,
-          [payload.busInProgress.id]: <IBusInProgressRow>payload.busInProgress
-        },
-        allIds: [...busesInProgressTable.allIds, payload.busInProgress.id]
+        importBusId: payload.id
       }
     };
   }
@@ -103,7 +102,8 @@ export class BusesInProgress {
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
         isImportingBus: false,
-        importBusError: payload
+        importBusError: payload,
+        importBusId: ''
       }
     };
   }
@@ -116,8 +116,8 @@ export class BusesInProgress {
       ...<IBusesInProgressTable>{
         byId: {
           ...busesInProgressTable.byId,
-          [payload]: <IBusInProgressRow>{
-            ...busesInProgressTable.byId[payload],
+          [payload.id]: <IBusInProgressRow>{
+            ...busesInProgressTable.byId[payload.id],
             ...<IBusInProgressRow>{ isRemoving: true }
           }
         }
@@ -131,12 +131,12 @@ export class BusesInProgress {
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_REMOVE_BUS_IN_PROGRESS`;
-  private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { busInProgressId: string }) {
+  private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: string) {
     return <IBusesInProgressTable>{
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
-        byId: omit(busesInProgressTable.byId, payload.busInProgressId),
-        allIds: busesInProgressTable.allIds.filter(id => id !== payload.busInProgressId)
+        byId: omit(busesInProgressTable.byId, payload),
+        allIds: busesInProgressTable.allIds.filter(id => id !== payload)
       }
     };
   }

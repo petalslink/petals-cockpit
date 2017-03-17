@@ -84,7 +84,7 @@ import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.SuspendExecution;
 import co.paralleluniverse.fibers.Suspendable;
-import co.paralleluniverse.strands.SuspendableCallable;
+import co.paralleluniverse.strands.SuspendableRunnable;
 import javaslang.CheckedFunction1;
 import javaslang.control.Either;
 
@@ -131,9 +131,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     protected Void doRun() throws InterruptedException, SuspendExecution {
         for (;;) {
             Msg msg = receive();
-            if (msg instanceof WorkspaceEventAction) {
-                WorkspaceEventAction action = (WorkspaceEventAction) msg;
-                broadcast(action.action.run());
+            if (msg instanceof WorkspaceActorAction) {
+                ((WorkspaceActorAction) msg).action.run();
             } else if (msg instanceof ImportBus) {
                 answer((ImportBus) msg, this::handleImportBus);
             } else if (msg instanceof DeleteBus) {
@@ -152,8 +151,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private void doInActorLoop(SuspendableCallable<WorkspaceEvent> action) throws SuspendExecution {
-        self().send(new WorkspaceEventAction(action));
+    private void doInActorLoop(SuspendableRunnable action) throws SuspendExecution {
+        self().send(new WorkspaceActorAction(action));
     }
 
     private static OutboundEvent event(WorkspaceEvent event) {
@@ -238,10 +237,14 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             return br.getId();
         });
 
+        BusInProgress bip = new BusInProgress(bId, nb.ip, nb.port, nb.username);
+
+        doInActorLoop(() -> broadcast(WorkspaceEvent.busImport(bip)));
+
         // we use a fiber to let the actor handles other message during bus import
         importBusInFiber(nb, bId);
 
-        return new BusInProgress(bId, nb.ip, nb.port, nb.username);
+        return bip;
     }
 
     private void importBusInFiber(final BusImport nb, final long bId) {
@@ -252,7 +255,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             // once we got the topology, it can't be cancelled anymore
             // that's why the actions are passed back to the actor
             // (we don't want the fiber to be interrupted!)
-            doInActorLoop(() -> runBlockingTransaction(
+            doInActorLoop(() -> broadcast(runBlockingTransaction(
                     conf -> res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
                         try {
                             return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, bId, topology));
@@ -264,7 +267,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                         DSL.using(conf).update(BUSES).set(BUSES.IMPORT_ERROR, error).where(BUSES.ID.eq(bId)).execute();
                         return WorkspaceEvent
                                 .busImportError(new BusInProgress(bId, nb.ip, nb.port, nb.username, error));
-                    }, content -> WorkspaceEvent.busImportOk(content))));
+                    }, content -> WorkspaceEvent.busImportOk(content)))));
         }).start();
     }
 
@@ -407,7 +410,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
 
         // we want the event to be sent after we answered
-        doInActorLoop(() -> WorkspaceEvent.componentStateChange(comp));
+        doInActorLoop(() -> broadcast(WorkspaceEvent.componentStateChange(comp)));
     }
 
     private SUStateChanged handleSUStateChange(ChangeServiceUnitState change) throws SuspendExecution {
@@ -473,7 +476,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
 
         // we want the event to be sent after we answered
-        doInActorLoop(() -> WorkspaceEvent.suStateChange(su));
+        doInActorLoop(() -> broadcast(WorkspaceEvent.suStateChange(su)));
     }
 
     /**
@@ -560,7 +563,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 new ServiceUnitMin(suDb.getId(), deployedSU.getName(), state, deployedSA.getName()));
 
         // we want the event to be sent after we answered
-        doInActorLoop(() -> WorkspaceEvent.suDeployed(res));
+        doInActorLoop(() -> broadcast(WorkspaceEvent.suDeployed(res)));
 
         return res;
     }
@@ -660,13 +663,13 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     }
 
     /**
-     * Uses with {@link WorkspaceActor#doInActorLoop(SuspendableCallable)}
+     * Uses with {@link WorkspaceActor#doInActorLoop(SuspendableRunnable)}
      */
-    private static class WorkspaceEventAction implements Msg {
+    private static class WorkspaceActorAction implements Msg {
 
-        final SuspendableCallable<WorkspaceEvent> action;
+        final SuspendableRunnable action;
 
-        public WorkspaceEventAction(SuspendableCallable<WorkspaceEvent> action) {
+        public WorkspaceActorAction(SuspendableRunnable action) {
             this.action = action;
         }
     }
