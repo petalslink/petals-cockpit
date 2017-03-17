@@ -74,4 +74,8 @@ describe(`Login`, () => {
 
     expect(browser.getCurrentUrl()).toMatch(/\/login$/);
   });
+
+  it(`should selected the first input`, () => {
+    element(by.css(`app-login input[formcontrolname="username"]`)).isSelected();
+  });
 });
