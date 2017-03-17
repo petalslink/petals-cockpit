@@ -22,6 +22,7 @@ export function busesInProgressTableFactory(): IBusesInProgressTable {
     selectedBusInProgressId: '',
     isImportingBus: false,
     importBusError: '',
+    importBusId: '',
 
     byId: {},
     allIds: []

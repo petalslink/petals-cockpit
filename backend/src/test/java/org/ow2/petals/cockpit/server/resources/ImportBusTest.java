@@ -111,6 +111,16 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             assertThat(post.username).isEqualTo(container.getJmxUsername());
             assertThat(post.importError).isNull();
 
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT");
+                BusInProgress data = e.readData(BusInProgress.class);
+                a.assertThat(data.id).isEqualTo(post.id);
+                a.assertThat(data.ip).isEqualTo(post.ip);
+                a.assertThat(data.port).isEqualTo(post.port);
+                a.assertThat(data.username).isEqualTo(post.username);
+                a.assertThat(data.importError).isEqualTo(post.importError);
+            });
+
             // there should be only one!
             Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
             assertThat(buses).hasSize(1);
@@ -217,6 +227,16 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             assertThat(post.username).isEqualTo(container.getJmxUsername());
             assertThat(post.importError).isNull();
 
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT");
+                BusInProgress data = e.readData(BusInProgress.class);
+                a.assertThat(data.id).isEqualTo(post.id);
+                a.assertThat(data.ip).isEqualTo(post.ip);
+                a.assertThat(data.port).isEqualTo(post.port);
+                a.assertThat(data.username).isEqualTo(post.username);
+                a.assertThat(data.importError).isEqualTo(post.importError);
+            });
+
             // there should be only one!
             Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
             assertThat(buses).hasSize(1);
@@ -301,6 +321,16 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             assertThat(post.port).isEqualTo(getPort(container));
             assertThat(post.username).isEqualTo(container.getJmxUsername());
             assertThat(post.importError).isNull();
+
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT");
+                BusInProgress data = e.readData(BusInProgress.class);
+                a.assertThat(data.id).isEqualTo(post.id);
+                a.assertThat(data.ip).isEqualTo(post.ip);
+                a.assertThat(data.port).isEqualTo(post.port);
+                a.assertThat(data.username).isEqualTo(post.username);
+                a.assertThat(data.importError).isEqualTo(post.importError);
+            });
 
             Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
             assertThat(buses).hasSize(1);

@@ -41,6 +41,8 @@ export abstract class BusesService {
 
   abstract getDetailsBus(busId: string): Observable<Response>;
 
+  abstract watchEventBusImport(): Observable<void>;
+
   abstract watchEventBusDeleted(): Observable<void>;
 
   abstract watchEventBusImportOk(): Observable<void>;
@@ -69,6 +71,15 @@ export class BusesServiceImpl extends BusesService {
 
   getDetailsBus(busId: string) {
     return this.http.get(`${environment.urlBackend}/buses/${busId}`);
+  }
+
+  watchEventBusImport() {
+    return this.sseService
+      .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT)
+      .do(bip => this.store$.dispatch({
+        type: BusesInProgress.FETCH_BUSES_IN_PROGRESS,
+        payload: toJavascriptMap({ [bip.id]: bip })
+      }));
   }
 
   watchEventBusDeleted() {

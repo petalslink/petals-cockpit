@@ -23,6 +23,7 @@ import { environment } from '../../../environments/environment';
 
 // define all the workspace events
 export class SseWorkspaceEvent {
+  public static BUS_IMPORT = 'BUS_IMPORT';
   public static BUS_IMPORT_OK = 'BUS_IMPORT_OK';
   public static WORKSPACE_CONTENT = 'WORKSPACE_CONTENT';
   public static BUS_IMPORT_ERROR = 'BUS_IMPORT_ERROR';
@@ -32,6 +33,7 @@ export class SseWorkspaceEvent {
 
   public static get allEvents() {
     return [
+      SseWorkspaceEvent.BUS_IMPORT,
       SseWorkspaceEvent.BUS_IMPORT_OK,
       SseWorkspaceEvent.WORKSPACE_CONTENT,
       SseWorkspaceEvent.BUS_IMPORT_ERROR,

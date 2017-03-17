@@ -19,8 +19,11 @@ import { IBusInProgress, IBusInProgressRow } from './bus-in-progress.interface';
 
 export interface IBusesInProgressCommon {
   selectedBusInProgressId: string;
+
+  // there can be only one import at a time
   isImportingBus: boolean;
   importBusError: string;
+  importBusId: string;
 }
 
 export interface IBusesInProgressTable extends IBusesInProgressCommon {

@@ -67,9 +67,14 @@ export class BusesMockService extends BusesServiceImpl {
     return helper
       .responseBody(detailsBus)
       .do(_ => {
-        // simulate the backend sending the answer on the SSE
-        setTimeout(() => (this.pSseService as SseServiceMock)
-          .triggerSseEvent(event, newBus.eventData), environment.sseDelay);
+        // simulate the backend sending the bus in progress on the SSE
+        setTimeout(() => {
+          (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.BUS_IMPORT, detailsBus);
+          // simulate the backend sending the imported bus on the SSE
+          setTimeout(() => (this.pSseService as SseServiceMock)
+            .triggerSseEvent(event, newBus.eventData), environment.sseDelay);
+        }, environment.sseDelay);
+
       });
   }
 

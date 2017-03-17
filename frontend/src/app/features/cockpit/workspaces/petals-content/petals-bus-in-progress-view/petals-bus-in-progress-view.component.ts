@@ -90,23 +90,34 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
     // takes care of redirecting to the right URL after the shown bus in progress is deleted
     // this is here because it only makes sense if we are on this page for the given bus
     this.redirectSub = id
-      // only if we currently are on a given bus
-      .filter(bId => !!bId)
-      .switchMap(bId => this.store$
-        // when either the bus in progress is deleted or it became a real bus
-        // (note: this can happen in two passes)
-        .select(state => [!!state.busesInProgress.byId[bId], !!state.buses.byId[bId]])
-        .distinctUntilChanged(arrayEquals)
-        // only interested in deleted bus in progress
-        .filter(([bip, _]) => !bip)
-        .do(([_, bus]) => {
-          if (bus) {
-            this.router.navigate(['/workspaces', this.route.snapshot.params.workspaceId, 'petals', 'buses', bId]);
-          } else {
-            this.router.navigate(['/workspaces', this.route.snapshot.params.workspaceId]);
-          }
-        })
-      ).subscribe();
+      .switchMap(bId => {
+        if (bId) {
+          return this.store$
+            // when either the bus in progress is deleted or it became a real bus
+            // (note: this can happen in two passes)
+            .select(state => [state.busesInProgress.byId[bId], state.buses.byId[bId]])
+            .distinctUntilChanged(arrayEquals)
+            // only interested in deleted bus in progress
+            .filter(([bip, _]) => !bip)
+            .do(([_, bus]) => {
+              if (bus) {
+                this.router.navigate(['/workspaces', this.route.snapshot.params.workspaceId, 'petals', 'buses', bus.id]);
+              } else {
+                this.router.navigate(['/workspaces', this.route.snapshot.params.workspaceId]);
+              }
+            })
+            .map(_ => null);
+        } else {
+          return this.store$
+            // when the currently imported bus becomes present
+            .select(state => state.busesInProgress.byId[state.busesInProgress.importBusId])
+            .filter(bip => !!bip)
+            .do(bip => {
+              this.router.navigate(['/workspaces', this.route.snapshot.params.workspaceId, 'petals', 'buses-in-progress', bip.id]);
+            });
+        }
+      })
+      .subscribe();
 
     this.busInProgressSub = this.busInProgress$
       .do(busInProgress => {

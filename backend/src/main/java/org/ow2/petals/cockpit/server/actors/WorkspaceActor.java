@@ -237,10 +237,14 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             return br.getId();
         });
 
+        BusInProgress bip = new BusInProgress(bId, nb.ip, nb.port, nb.username);
+
+        doInActorLoop(() -> broadcast(WorkspaceEvent.busImport(bip)));
+
         // we use a fiber to let the actor handles other message during bus import
         importBusInFiber(nb, bId);
 
-        return new BusInProgress(bId, nb.ip, nb.port, nb.username);
+        return bip;
     }
 
     private void importBusInFiber(final BusImport nb, final long bId) {

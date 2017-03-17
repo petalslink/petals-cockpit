@@ -427,8 +427,8 @@ public class WorkspaceResource {
         }
 
         public enum Event {
-            WORKSPACE_CONTENT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, COMPONENT_STATE_CHANGE, BUS_DELETED,
-            SU_DEPLOYED
+            WORKSPACE_CONTENT, BUS_IMPORT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, COMPONENT_STATE_CHANGE,
+            BUS_DELETED, SU_DEPLOYED
         }
 
         @JsonProperty
@@ -473,6 +473,10 @@ public class WorkspaceResource {
 
         public static WorkspaceEvent suDeployed(SUDeployed sud) {
             return new WorkspaceEvent(Event.SU_DEPLOYED, sud);
+        }
+
+        public static WorkspaceEvent busImport(BusInProgress bip) {
+            return new WorkspaceEvent(Event.BUS_IMPORT, bip);
         }
 
         @Override

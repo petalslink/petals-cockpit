@@ -43,29 +43,17 @@ export class BusesInProgressEffects {
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, idWorkspace]) =>
       this.busesService.postBus(idWorkspace, action.payload)
-        .map((res: Response) => {
-          return {
-            type: BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS,
-            payload: {
-              idWorkspace,
-              busInProgress: <IBusInProgressRow>res.json()
-            }
-          };
+        .map((res: Response) => ({
+          type: BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS,
+          payload: <IBusInProgressRow>res.json()
         })
+        )
         .catch((res: Response) => {
           return Observable.of({
             type: BusesInProgress.POST_BUS_IN_PROGRESS_ERROR,
             payload: `Error ${res.status} ${res.statusText ? `(${res.statusText})` : ``}: ${res.text()}`
           });
         })
-    );
-
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: false }) postBusSuccess$: Observable<Action> = this.actions$
-    .ofType(BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS)
-    .map((action: Action) => action.payload)
-    .do(({ idWorkspace, busInProgress }: { idWorkspace: string, busInProgress: IBusInProgressRow }) =>
-      this.router.navigate(['/workspaces', idWorkspace, 'petals', 'buses-in-progress', busInProgress.id])
     );
 
   // tslint:disable-next-line:member-ordering
