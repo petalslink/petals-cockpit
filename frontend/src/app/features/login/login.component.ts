@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { MdInputContainer } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -31,7 +32,9 @@ import { IUsersTable } from './../../shared/interfaces/users.interface';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('usernameInput') usernameInput: MdInputContainer;
+
   public loginForm: FormGroup;
   private users$: Observable<IUsersTable>;
   private usersSub: Subscription;
@@ -73,6 +76,10 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.usersSub.unsubscribe();
+  }
+
+  ngAfterViewInit() {
+    this.usernameInput._focusInput();
   }
 
   onSubmit({ value }) {
