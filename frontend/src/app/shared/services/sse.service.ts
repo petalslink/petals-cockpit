@@ -118,7 +118,11 @@ export class SseServiceImpl extends SseService {
 
       // in both cases, add the new event listener (it was either removed or didn't exist)
       const eventListener = ({ data }: { data: string }) => {
-        this.registeredEvents.get(eventName).subject$.next(JSON.parse(data));
+        const json = JSON.parse(data);
+        if (environment.debug) {
+          console.debug('SSE: ', eventName, json);
+        }
+        this.registeredEvents.get(eventName).subject$.next(json);
       };
 
       this.registeredEvents.set(eventName, {
