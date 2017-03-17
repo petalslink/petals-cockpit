@@ -73,13 +73,12 @@ export class BusesServiceImpl extends BusesService {
         const buses = toJavascriptMap(data.buses);
 
         // there should be only one element in there!
-        const busInProgress = buses.byId[buses.allIds[0]];
+        const bus = buses.byId[buses.allIds[0]];
 
-        this.notifications.success(`Bus import success`,
-          `The import of a bus from the IP ${busInProgress.ip}:${busInProgress.port} succeeded`);
+        this.notifications.success(`Bus import success`, `The import of the bus ${bus.name} succeeded`);
 
         this.store$.dispatch(batchActions([
-          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: busInProgress.id, importOk: true } },
+          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: { busInProgressId: bus.id, importOk: true } },
           { type: Buses.FETCH_BUSES_SUCCESS, payload: buses },
           { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap(data.containers) },
           { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap(data.components) },
