@@ -26,6 +26,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { IStore } from './../../shared/interfaces/store.interface';
 import { Users } from './../../shared/state/users.reducer';
 import { IUsersTable } from './../../shared/interfaces/users.interface';
+import { isLargeScreen } from 'app/shared/state/ui.selectors';
 
 @Component({
   selector: 'app-login',
@@ -78,7 +79,10 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.usernameInput._focusInput();
+    this.store$.let(isLargeScreen)
+      .first()
+      .filter(ss => ss)
+      .subscribe(_ => this.usernameInput._focusInput());
   }
 
   onSubmit({ value }) {

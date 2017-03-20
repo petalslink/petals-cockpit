@@ -18,9 +18,7 @@
 import { Component, ViewChild, Inject, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MdDialog, MdDialogRef } from '@angular/material';
-import { MediaChange } from '@angular/flex-layout';
 import { MdSidenav } from '@angular/material';
-import { ObservableMedia } from '@angular/flex-layout';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
@@ -37,6 +35,7 @@ import { getCurrentWorkspace } from '../cockpit/workspaces/state/workspaces/work
 import { ICurrentUser } from 'app/shared/interfaces/user.interface';
 import { getCurrentUser } from 'app/shared/state/users.selectors';
 import { Users } from 'app/shared/state/users.reducer';
+import { isSmallScreen, isLargeScreen } from 'app/shared/state/ui.selectors';
 
 @Component({
   selector: 'app-cockpit',
@@ -63,7 +62,6 @@ export class CockpitComponent implements OnInit, OnDestroy {
     private store$: Store<IStore>,
     @Inject(LANGUAGES) public languages: any,
     public dialog: MdDialog,
-    public media$: ObservableMedia,
     private router: Router
   ) { }
 
@@ -98,32 +96,22 @@ export class CockpitComponent implements OnInit, OnDestroy {
     // TODO ultimately, the sidebar should be moved to WorkspaceComponent
     this.sidenavVisible$ = this.store$.select(state => state.ui.isSidenavVisible && !!state.workspaces.selectedWorkspaceId);
 
-    this.logoByScreenSize$ = this.media$
-      .asObservable()
-      .map((change: MediaChange) => {
+    this.logoByScreenSize$ = this.store$
+      .let(isLargeScreen)
+      .map(ls => {
         const imgSrcBase = `./assets/img`;
         const imgSrcExt = `png`;
 
-        const screenSize = change.mqAlias;
-
-        if (screenSize === 'lg' || screenSize === 'gt-lg' || screenSize === 'xl') {
+        if (ls) {
           return `${imgSrcBase}/logo-petals-cockpit.${imgSrcExt}`;
         } else {
           return `${imgSrcBase}/logo-petals-cockpit-without-text.${imgSrcExt}`;
         }
       });
 
-    this.sidenavMode$ = this.media$
-      .asObservable()
-      .map((change: MediaChange) => {
-        const screenSize = change.mqAlias;
-
-        if (screenSize === 'xs' || screenSize === 'gt-xs' || screenSize === 'sm') {
-          return `over`;
-        } else {
-          return `side`;
-        }
-      });
+    this.sidenavMode$ = this.store$
+      .let(isSmallScreen)
+      .map(ss => ss ? `over` : `side`);
   }
 
   ngOnDestroy() {

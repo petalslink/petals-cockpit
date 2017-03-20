@@ -16,6 +16,7 @@
  */
 
 import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
+import { ObservableMedia, MediaChange } from '@angular/flex-layout';
 import { TranslateService } from 'ng2-translate';
 import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
@@ -31,6 +32,8 @@ import { Ui } from './shared/state/ui.reducer';
 })
 export class AppComponent implements OnInit, OnDestroy {
   private languageSub: Subscription;
+  private mediaSub: Subscription;
+
   public notificationOptions = {
     position: ['bottom', 'right'],
     timeOut: 2500,
@@ -43,7 +46,8 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private translate: TranslateService,
     @Inject(LANGUAGES) public languages: any,
-    private store$: Store<IStore>
+    private store$: Store<IStore>,
+    private media$: ObservableMedia
   ) { }
 
   ngOnInit() {
@@ -60,9 +64,16 @@ export class AppComponent implements OnInit, OnDestroy {
       .select(state => state.ui.language)
       .filter(language => language !== '')
       .subscribe(language => this.translate.use(language));
+
+    this.mediaSub = this.media$
+      .asObservable()
+      .map((change: MediaChange) => change.mqAlias)
+      .distinctUntilChanged()
+      .subscribe(screenSize => this.store$.dispatch({ type: Ui.CHANGE_SCREEN_SIZE, payload: screenSize }));
   }
 
   ngOnDestroy() {
     this.languageSub.unsubscribe();
+    this.mediaSub.unsubscribe();
   }
 }
