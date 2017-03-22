@@ -32,6 +32,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.ow2.petals.cockpit.server.AbstractTest;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
@@ -40,7 +41,6 @@ import com.codahale.metrics.MetricFilter;
 
 import io.dropwizard.cli.Cli;
 import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
-import io.dropwizard.logging.BootstrapLogging;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.util.JarLocation;
@@ -48,11 +48,7 @@ import liquibase.Liquibase;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
-public class AddUserTest {
-
-    static {
-        BootstrapLogging.bootstrap();
-    }
+public class AddUserTest extends AbstractTest {
 
     @Rule
     public EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder().build();
@@ -143,7 +139,7 @@ public class AddUserTest {
         softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").doesNotContain("Added user");
         softly.assertThat(systemErrRule.getLog()).as("stderr").contains("User admin already exists");
         softly.assertAll();
-        
+
         assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
                 .column(USERS.USERNAME.getName()).value().isEqualTo("admin")
                 .column(USERS.NAME.getName()).value().isEqualTo("Admin");

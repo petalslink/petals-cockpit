@@ -1,0 +1,4 @@
+class javax/ws/rs/client/Client
+target
+ (Ljava/lang/String;)Ljavax/ws/rs/client/WebTarget;
+ (Ljava/lang/String;)L1javax/ws/rs/client/WebTarget;

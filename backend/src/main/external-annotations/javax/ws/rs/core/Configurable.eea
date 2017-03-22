@@ -1,0 +1,4 @@
+class javax/ws/rs/core/Configurable
+property
+ (Ljava/lang/String;Ljava/lang/Object;)TC;
+ (Ljava/lang/String;Ljava/lang/Object;)T1C;

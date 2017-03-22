@@ -1,15 +1,13 @@
 # configuration for dropwizard
 ---
 server:
-  # only http on 8080
   type: simple
-  # the backend will be served via /api on 8080
   rootPath: /api
   applicationContextPath: /
-  # the admin console is served via /admin on 8080 (do not do this in production!)
   adminContextPath: /admin
   connector:
     type: http
+    # random port
     port: 0
 
 database:
@@ -17,7 +15,6 @@ database:
   # url is set by test
     
 logging:
-  level: INFO
   loggers:
     org.pac4j: DEBUG
     org.ow2.petals.cockpit: DEBUG

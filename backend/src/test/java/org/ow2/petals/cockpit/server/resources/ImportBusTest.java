@@ -62,11 +62,11 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
     private final Domain domain = new Domain("dom");
 
-    private final Container container = new Container("cont", "host1", ImmutableMap.of(PortType.JMX, 7700),
-            "user", "pass", State.REACHABLE);
+    private final Container container = new Container("cont", "host1", ImmutableMap.of(PortType.JMX, 7700), "user",
+            "pass", State.REACHABLE);
 
-    private final Container container2 = new Container("cont2", "host2", ImmutableMap.of(PortType.JMX, 7700),
-            "user", "pass", State.REACHABLE);
+    private final Container container2 = new Container("cont2", "host2", ImmutableMap.of(PortType.JMX, 7700), "user",
+            "pass", State.REACHABLE);
 
     private final Component component = new Component("comp", ComponentType.SE, ArtifactState.State.STARTED);
 
@@ -96,8 +96,8 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
     @Test
     public void testImportBusOk() {
         long busId;
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resources.target("/workspaces/1").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
+                .get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
@@ -190,7 +190,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
         DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(2L, "test2"));
 
-        Response post = resources.getJerseyTest().target("/workspaces/2/buses").request()
+        Response post = resources.target("/workspaces/2/buses").request()
                 .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
                         container.getJmxPassword(), "phrase")));
 
@@ -200,7 +200,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
     @Test
     public void testImportBusNotFoundForbidden() {
 
-        Response post = resources.getJerseyTest().target("/workspaces/2/buses").request()
+        Response post = resources.target("/workspaces/2/buses").request()
                 .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
                         container.getJmxPassword(), "phrase")));
 
@@ -213,12 +213,12 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         int incorrectPort = 7700;
 
         final long busId;
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resources.target("/workspaces/1").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
+                .get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
-            BusInProgress post = resources.getJerseyTest().target("/workspaces/1/buses").request()
+            BusInProgress post = resources.target("/workspaces/1/buses").request()
                     .post(Entity.json(new NewBus(incorrectHost, incorrectPort, container.getJmxUsername(),
                             container.getJmxPassword(), "phrase")), BusInProgress.class);
 
@@ -278,14 +278,14 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         assertThat(busDb.getImportError()).isEqualTo("Unknown Host");
         assertThat(busDb.getName()).isNull();
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resources.target("/workspaces/1").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
+                .get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput, (c, a) -> {
                 a.assertThat(c.content.busesInProgress).containsOnlyKeys(String.valueOf(busId));
             });
 
-            Response delete = resources.getJerseyTest().target("/workspaces/1/buses/" + busId).request().delete();
+            Response delete = resources.target("/workspaces/1/buses/" + busId).request().delete();
 
             assertThat(delete.getStatus()).isEqualTo(204);
 
@@ -307,8 +307,8 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
                 new ServiceAssembly("sa", new ServiceUnit("su1", "comp"), new ServiceUnit("su2", "comp")), container);
 
         long busId;
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resources.target("/workspaces/1").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
+                .get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 

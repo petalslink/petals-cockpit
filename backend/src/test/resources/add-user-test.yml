@@ -3,7 +3,6 @@ database:
   # url is set by test
 
 logging:
-  level: INFO
   loggers:
     org.pac4j: DEBUG
     org.ow2.petals.cockpit: DEBUG

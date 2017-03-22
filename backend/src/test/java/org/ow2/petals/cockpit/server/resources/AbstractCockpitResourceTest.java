@@ -55,6 +55,7 @@ import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.AbstractTest;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
@@ -73,11 +74,9 @@ import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
 import org.zapodot.junit.db.plugin.LiquibaseInitializer;
 
-import ch.qos.logback.classic.Level;
 import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.common.test.TestUtil;
 import co.paralleluniverse.common.util.Debug;
-import io.dropwizard.logging.BootstrapLogging;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import io.dropwizard.testing.junit.ResourceTestRule.Builder;
 import javaslang.Tuple2;
@@ -95,11 +94,7 @@ import javaslang.Tuple4;
  * @author vnoel
  *
  */
-public class AbstractCockpitResourceTest {
-
-    static {
-        BootstrapLogging.bootstrap(Level.INFO);
-    }
+public class AbstractCockpitResourceTest extends AbstractTest {
 
     public static final String ADMIN = "admin";
 
@@ -183,8 +178,8 @@ public class AbstractCockpitResourceTest {
     }
 
     protected Request requestSU(long id) {
-        return new Request(dbRule.getDataSource(), DSL.using(dbRule.getConnectionJdbcUrl())
-                .selectFrom(SERVICEUNITS).where(SERVICEUNITS.ID.eq(id)).getSQL(ParamType.INLINED));
+        return new Request(dbRule.getDataSource(), DSL.using(dbRule.getConnectionJdbcUrl()).selectFrom(SERVICEUNITS)
+                .where(SERVICEUNITS.ID.eq(id)).getSQL(ParamType.INLINED));
     }
 
     protected Request requestComp(long id) {

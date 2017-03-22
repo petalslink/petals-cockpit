@@ -26,9 +26,6 @@ import javax.servlet.ServletRegistration.Dynamic;
 import javax.ws.rs.ext.ContextResolver;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.handler.HandlerWrapper;
-import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.jooq.Configuration;
@@ -50,6 +47,9 @@ import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
 import org.pac4j.dropwizard.Pac4jFactory.FilterConfiguration;
+import org.pac4j.jax.rs.filters.JaxRsHttpActionAdapter;
+import org.pac4j.jax.rs.pac4j.JaxRsContext;
+import org.pac4j.jax.rs.servlet.pac4j.ServletJaxRsContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,9 +62,9 @@ import com.google.common.collect.ImmutableMap;
 import io.dropwizard.Application;
 import io.dropwizard.db.PooledDataSourceFactory;
 import io.dropwizard.forms.MultiPartBundle;
-import io.dropwizard.jetty.BiDiGzipHandler;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.migrations.MigrationsBundle;
+import io.dropwizard.server.AbstractServerFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -120,9 +120,29 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 pac4jConf.setDefaultClient(defaultClient);
             }
 
+            pac4jConf.setHttpActionAdapter(new HttpActionAdapter303());
+
             return pac4jConf;
         }
     };
+
+    /**
+     * According to the HTTP/1.1 specification, we should use 303 and not 302 when redirecting from a POST to a GET
+     */
+    public static class HttpActionAdapter303 extends JaxRsHttpActionAdapter {
+        @Override
+        @Nullable
+        public Object adapt(int code, @Nullable JaxRsContext context) {
+            assert context != null;
+            if (code == 302 && "POST".equalsIgnoreCase(context.getRequestMethod())
+                    && "HTTP/1.1".equalsIgnoreCase(((ServletJaxRsContext) context).getRequest().getProtocol())) {
+                context.setResponseStatus(303);
+                return super.adapt(303, context);
+            } else {
+                return super.adapt(code, context);
+            }
+        }
+    }
 
     public final MigrationsBundle<C> migrations = new MigrationsBundle<C>() {
 
@@ -172,11 +192,9 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         // serialization/deserialization
         environment.getObjectMapper().registerModule(new AfterburnerModule());
 
-        // activate session management in jetty
-        environment.servlets().setSessionHandler(new SessionHandler());
-
         // TODO add these ExecutorService to the metrics
         // TODO choose adequate parameters?
+        // TODO or rely on the global JVM ForkJoinPool instead (with managedBlocks)
 
         // This is needed for executing database and petals admin requests from within a fiber (actors)
         int availableProcessors = Runtime.getRuntime().availableProcessors();
@@ -231,17 +249,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
         // This is needed for SSE to work correctly!
         // See https://github.com/dropwizard/dropwizard/issues/1673
-        // Fixed in 1.1.x via setSyncFlush on GzipHandlerFactory
-        environment.lifecycle().addServerLifecycleListener(server -> {
-            Handler handler = server.getHandler();
-            while (handler instanceof HandlerWrapper) {
-                handler = ((HandlerWrapper) handler).getHandler();
-                if (handler instanceof BiDiGzipHandler) {
-                    LOG.info("Setting sync flush on gzip compression handler");
-                    ((BiDiGzipHandler) handler).setSyncFlush(true);
-                }
-            }
-        });
+        ((AbstractServerFactory) configuration.getServerFactory()).getGzipFilterFactory().setSyncFlush(true);
 
         File artifactsTemporaryDir = new File(configuration.getArtifactTemporaryPath());
 

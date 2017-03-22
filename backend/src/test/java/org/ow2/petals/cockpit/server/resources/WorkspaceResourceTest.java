@@ -41,16 +41,14 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
 
     @Test
     public void getEventNonExistingWorkspaceForbidden() {
-        Response get = resources.getJerseyTest().target("/workspaces/3").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
-                .get();
+        Response get = resources.target("/workspaces/3").request(SseFeature.SERVER_SENT_EVENTS_TYPE).get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
 
     @Test
     public void getEventWorkspaceForbidden() {
-        Response get = resources.getJerseyTest().target("/workspaces/2").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
-                .get();
+        Response get = resources.target("/workspaces/2").request(SseFeature.SERVER_SENT_EVENTS_TYPE).get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -59,9 +57,8 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void getExistingWorkspace() {
         assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
 
-        WorkspaceFullContent content = resources.getJerseyTest().target("/workspaces/1").request()
-                .get(WorkspaceFullContent.class);
-        
+        WorkspaceFullContent content = resources.target("/workspaces/1").request().get(WorkspaceFullContent.class);
+
         assertContent(content);
 
         // with a normal GET, we don't record it as the last workspace of the user
@@ -72,8 +69,8 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void getEventExistingWorkspace() {
         assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resources.target("/workspaces/1").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
+                .get(EventInput.class)) {
             expectWorkspaceContent(eventInput, (t, a) -> assertContent(t));
         }
 

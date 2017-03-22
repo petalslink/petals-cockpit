@@ -38,6 +38,17 @@
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-core</artifactId>
+      <exclusions>
+        <!-- These two are older versions of org.glassfish:javax.el already present -->
+        <exclusion>
+          <groupId>org.glassfish.web</groupId>
+          <artifactId>javax.el</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.el</groupId>
+          <artifactId>javax.el-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
@@ -73,7 +84,7 @@
       <!-- Needed for pac4j's password encoder -->
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-crypto</artifactId>
-      <version>4.2.1.RELEASE</version>
+      <version>4.2.2.RELEASE</version>
     </dependency>
     <!-- Quasar instrumentation dependencies -->
     <dependency>
@@ -99,13 +110,13 @@
     </dependency>
     <!-- Test dependencies -->
     <dependency>
-      <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-testing</artifactId>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-client</artifactId>
+      <artifactId>dropwizard-testing</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
