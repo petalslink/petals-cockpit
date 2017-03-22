@@ -8,8 +8,6 @@ variables:
   M2_STAGING_DIRECTORY: staging
   M2_CACHED_REPOSITORY: m2cache
   YARN_CACHE_DIRECTORY: yarncache
-  DISPLAY: ":99"
-  XVFB: Xvfb $DISPLAY -ac -screen 0 1920x1080x24 -nolisten tcp
 
 .mvn-java-8: &mvn-java-8
   image: maven:3.3-jdk-8-alpine
@@ -24,12 +22,10 @@ variables:
       - $M2_CACHED_REPOSITORY
 
 .node-6: &node-java-yarn
-  image: registry.gitlab.com/victornoel/node-java-yarn-docker:n6-j8-y0.21
+  image: registry.gitlab.com/victornoel/node-java-yarn-docker:n6-j8
   before_script:
     # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
     - yarn config set cache-folder $PWD/$YARN_CACHE_DIRECTORY --global
-    # see https://github.com/yarnpkg/yarn/issues/2629
-    - yarn config set network-concurrency 2 --global
     - du -hs $PWD/$YARN_CACHE_DIRECTORY || true
     - cd frontend
     - export PATH=`yarn bin`:$PATH
@@ -86,11 +82,9 @@ build-frontend:
     - cd frontend
     - time ng lint
     - time node generate-headers.js --dry
-    - nohup $XVFB &
-    - XVFBPID=$!
-    - time ng test --progress=false --single-run --code-coverage
-    - time ng e2e --prod --progress=false -e=prod-e2e
-    - kill $XVFBPID
+    # this takes 2mn, so let's not run it until we have some tests
+    #- time ng test --progress=false --single-run --code-coverage
+    - time ../ci/xrun.sh ../ci/wmrun.sh ng e2e --prod --progress=false -e=prod-e2e
     # build the final frontend for the product
     - time yarn run prod-silent && mv dist ../frontend-dist
     # build the demo for the gitlab pages
@@ -136,7 +130,6 @@ e2e-product:
   script:
     - time $COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml
     - nohup $COCKPIT server $COCKPIT_CONFIG &
-    - nohup $XVFB &
     - cd frontend
     # TODO the exclude does not work, see https://github.com/angular/angular-cli/issues/5172
-    - time ng e2e --serve=false --specs=e2e/login.e2e-spec.ts --specs=e2e/workspaces.e2e-spec.ts --specs=e2e/workspace-tree.e2e-spec.ts
+    - time ../ci/xrun.sh ../ci/wmrun.sh ng e2e --serve=false --specs=e2e/login.e2e-spec.ts --specs=e2e/workspaces.e2e-spec.ts

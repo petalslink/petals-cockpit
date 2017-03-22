@@ -47,9 +47,7 @@ describe(`Petals service-unit content`, () => {
     const stateElem = element(by.css(`app-petals-service-unit-overview md-card.state md-card-title`));
 
     // the SU exists and should be present in petals tree
-    page.openSidenav();
     expect(page.getWorkspaceTreeByName(`SU 0`).first().isPresent()).toBe(true);
-    page.closeSidenav();
 
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
     expect(stateElem.getText()).toEqual('Stopped');
@@ -71,7 +69,6 @@ describe(`Petals service-unit content`, () => {
     // we should be redirected to the workspace page ...
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 
-    page.openSidenav();
     // and the SU should have been deleted from petals tree
     expect(page.getWorkspaceTreeByName(`SU 0`).first().isPresent()).toBe(false);
   });
