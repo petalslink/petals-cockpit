@@ -43,11 +43,11 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['ChromiumNoSandbox'],
+    browsers: ['ChromiumHeadless'],
     customLaunchers: {
       ChromiumNoSandbox: {
-        base: 'Chromium',
-        flags: ['--no-sandbox']
+        base: 'ChromiumHeadless',
+        flags: ['--no-sandbox', '--headless', '--disable-gpu', '--remote-debugging-port=9222']
       }
     },
     failOnEmptyTestSuite: false,

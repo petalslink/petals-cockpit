@@ -65,20 +65,17 @@ describe(`Petals component content`, () => {
     expect(element(by.cssContainingText(`app-petals-component-overview button`, `Unload`)).isEnabled()).toBe(false);
 
     // unload the 2 SU
-    page.openSidenav();
     page.getWorkspaceTreeByName('SU 0').click();
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`)).click();
     element(by.css(`simple-notification`)).click();
 
-    page.openSidenav();
     page.getWorkspaceTreeByName('SU 1').click();
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
     element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`)).click();
     element(by.css(`simple-notification`)).click();
 
     // we should now be able to unload the comp 0
-    page.openSidenav();
     page.getWorkspaceTreeByName('Comp 0').click();
     expect(element(by.cssContainingText(`app-petals-component-overview button`, `Unload`)).isEnabled()).toBe(true);
 
@@ -90,7 +87,6 @@ describe(`Petals component content`, () => {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 
     // and the component should have been deleted from petals tree
-    page.openSidenav();
     expect(page.getWorkspaceTreeByName(`Comp 0`).first().isPresent()).toBe(false);
   });
 });
