@@ -100,6 +100,9 @@ export const providers = [
     // TODO : Keep an eye on ngrx V3 to have lazy loaded reducers
     // https://github.com/ngrx/store/pull/269
     StoreModule.provideStore(getRootReducer),
+    // Note: the order of declaration is important for batch actions
+    // all the sub-actions will be triggered first on WorkspacesEffects,
+    // then BusesInProgressEffects, and so on!
     EffectsModule.run(WorkspacesEffects),
     EffectsModule.run(BusesInProgressEffects),
     EffectsModule.run(UsersEffects),

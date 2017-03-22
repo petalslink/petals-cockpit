@@ -32,9 +32,9 @@ export function batchActions(actions: Action[]): BatchAction {
 }
 
 export function enableBatching<S>(reduce: ActionReducer<S>): ActionReducer<S> {
-  return function batchingReducer(state, action) {
+  return function batchingReducer(state, action): S {
     if (action.type === BATCH) {
-      return action.payload.reduce(batchingReducer, state);
+      return (action as BatchAction).payload.reduce(batchingReducer, state);
     } else {
       return reduce(state, action);
     }

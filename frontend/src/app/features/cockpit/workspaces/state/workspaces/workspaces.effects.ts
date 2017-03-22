@@ -108,7 +108,8 @@ export class WorkspacesEffects {
   @Effect({ dispatch: false }) closeWorkspace$: Observable<Action> = this.actions$
     .ofType(Workspaces.CLOSE_WORKSPACE)
     .do(_ => this.sub && this.sub.unsubscribe())
-    .do(_ => this.sseService.stopWatchingWorkspace());
+    .do(_ => this.sseService.stopWatchingWorkspace())
+    .do(_ => this.notification.remove());
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchWorkspace$: Observable<Action> = this.actions$
