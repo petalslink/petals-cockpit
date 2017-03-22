@@ -21,10 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <div fxFill fxLayout="column" class="content content-max-width" fxLayoutWrap>
     <div class="central-content">
-      <md-card>
-        <!--<md-card-title class="color-primary margin-bottom-x0">Description :</md-card-title>-->
-        <md-card-content>
-          <form novalidate [formGroup]="busImportForm" (ngSubmit)="onSubmit(busImportForm) && busImportForm.reset()">
+      <form novalidate [formGroup]="busImportForm" (ngSubmit)="onSubmit(busImportForm) && busImportForm.reset()">
+        <md-card>
+          <md-card-content>
             <div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="10px">
               <!-- once this issue https://github.com/angular/flex-layout/issues/108 -->
               <!-- is fixed, replace fxFlex="45" to 50 -->
@@ -78,35 +77,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </md-input-container>
               </div>
             </div>
-
-            <div class="margin-top-x2" fxLayout="row" fxLayoutAlign="end center">
-              <div *ngIf="(busesInProgressTable$ | async).importBusError || (busInProgress && busInProgress.importError)" class="error" fxLayout="row" fxLayoutAlign="center center">
-                <md-icon color="warn">warning</md-icon> <span class="error-details">{{ (busInProgress && busInProgress.importError) ? busInProgress.importError : (busesInProgressTable$ | async).importBusError }}</span>
+          </md-card-content>
+          <div fxLayout="column">
+            <md-card-actions fxLayout="row" fxLayoutWrap class="margin-x1" fxLayoutAlign="end center">
+              <div fxFlex.xs="100" fxLayout="row" class="error" fxLayoutAlign="start center" *ngIf="(busesInProgressTable$ | async).importBusError || (busInProgress && busInProgress.importError)">
+                <md-icon color="warn">warning</md-icon>
+                <span class="error-details">{{ (busInProgress && busInProgress.importError) ? busInProgress.importError : (busesInProgressTable$ | async).importBusError }}</span>
               </div>
               <div fxFlex></div>
-              <button
-              md-raised-button
-              color="accent"
-              type="button"
-              *ngIf="!busInProgress && !(busesInProgressTable$ | async).isImportingBus && !(busesInProgressTable$ | async).selectedBusInProgressId"
-              class="btn-clear-form margin-right-x1"
-              (click)="reset()">Clear
-              </button>
-              <button md-raised-button color="warn" type="button" *ngIf="busInProgress && busInProgress.importError" (click)="discard(busInProgress)" [disabled]="busInProgress && busInProgress.isRemoving" class="margin-right-x1">Discard</button>
-              <button md-raised-button color="primary" fxLayout="row" fxLayoutAlign="center center" type="submit" class="btn-import-form" [disabled]="busImportForm.invalid || (busesInProgressTable$ | async).isImportingBus || busInProgress">
-                <span
-                  *ngIf="!((busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError))">
-                  Import
-                </span>
-                <span  fxFill fxLayout="row" fxLayoutAlign="center center"
-                  *ngIf="(busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError)">
-                  Importing <md-spinner></md-spinner>
-                </span>
-              </button>
-            </div>
-          </form>
-        </md-card-content>
-      </md-card>
+              <div fxLayout="row" class="margin-top-x1 margin-bottom-x1">
+                <button
+                  md-raised-button
+                  color="accent"
+                  type="button"
+                  *ngIf="!busInProgress && !(busesInProgressTable$ | async).isImportingBus && !(busesInProgressTable$ | async).selectedBusInProgressId"
+                  class="btn-clear-form margin-right-x1"
+                  (click)="reset()">Clear
+                </button>
+                <button md-raised-button color="warn" type="button" *ngIf="busInProgress && busInProgress.importError" (click)="discard(busInProgress)" [disabled]="busInProgress && busInProgress.isRemoving" class="margin-right-x1">Discard</button>
+                <button md-raised-button color="primary" type="submit" class="btn-import-form" [disabled]="busImportForm.invalid || (busesInProgressTable$ | async).isImportingBus || busInProgress">
+                  <span
+                    *ngIf="!((busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError))">
+                    Import
+                  </span>
+                  <span  fxFill fxLayout="row" fxLayoutAlign="center center"
+                    *ngIf="(busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError)">
+                    Importing <md-spinner></md-spinner>
+                  </span>
+                </button>
+              </div>
+            </md-card-actions>
+          </div>
+        </md-card>
+      </form>
     </div>
   </div>
 </div>
