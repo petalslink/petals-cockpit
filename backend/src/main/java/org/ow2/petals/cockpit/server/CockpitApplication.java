@@ -47,6 +47,9 @@ import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
 import org.pac4j.dropwizard.Pac4jFactory.FilterConfiguration;
+import org.pac4j.jax.rs.filters.JaxRsHttpActionAdapter;
+import org.pac4j.jax.rs.pac4j.JaxRsContext;
+import org.pac4j.jax.rs.servlet.pac4j.ServletJaxRsContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,9 +120,29 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 pac4jConf.setDefaultClient(defaultClient);
             }
 
+            pac4jConf.setHttpActionAdapter(new HttpActionAdapter303());
+
             return pac4jConf;
         }
     };
+
+    /**
+     * According to the HTTP/1.1 specification, we should use 303 and not 302 when redirecting from a POST to a GET
+     */
+    public static class HttpActionAdapter303 extends JaxRsHttpActionAdapter {
+        @Override
+        @Nullable
+        public Object adapt(int code, @Nullable JaxRsContext context) {
+            assert context != null;
+            if (code == 302 && "POST".equalsIgnoreCase(context.getRequestMethod())
+                    && "HTTP/1.1".equalsIgnoreCase(((ServletJaxRsContext) context).getRequest().getProtocol())) {
+                context.setResponseStatus(303);
+                return super.adapt(303, context);
+            } else {
+                return super.adapt(code, context);
+            }
+        }
+    }
 
     public final MigrationsBundle<C> migrations = new MigrationsBundle<C>() {
 

@@ -18,22 +18,25 @@ package org.ow2.petals.cockpit.server.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.sql.Connection;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.grizzly.http.server.util.Globals;
-import org.glassfish.jersey.client.ClientProperties;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.admin.junit.PetalsAdministrationApi;
+import org.ow2.petals.cockpit.server.AbstractTest;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
@@ -44,16 +47,11 @@ import org.zapodot.junit.db.EmbeddedDatabaseRule;
 import org.zapodot.junit.db.plugin.InitializationPlugin;
 import org.zapodot.junit.db.plugin.LiquibaseInitializer;
 
-import io.dropwizard.logging.BootstrapLogging;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 
-public class UserSessionTest {
-
-    static {
-        BootstrapLogging.bootstrap();
-    }
+public class UserSessionTest extends AbstractTest {
 
     public static final String SESSION_COOKIE_NAME = Globals.SESSION_COOKIE_NAME;
 
@@ -87,86 +85,61 @@ public class UserSessionTest {
             ResourceHelpers.resourceFilePath("user-session-tests.yml"),
             ConfigOverride.config("database.url", () -> dbRule.getConnectionJdbcUrl()));
 
+    @Before
+    public void setUpCookieHandler() {
+        // Used by Jersey Client to store cookies
+        CookieHandler.setDefault(new CookieManager());
+    }
+
+    @After
+    public void cleanUpCookieHandler() {
+        CookieHandler.setDefault(null);
+    }
+
     public WebTarget target(String url) {
-        return appRule.client().target(String.format("http://localhost:%d/api/%s", appRule.getLocalPort(), url));
-    }
-
-    private WebTarget sessionTarget() {
-        return target("user/session")
-                // jersey client does not keep cookies in redirect...
-                .property(ClientProperties.FOLLOW_REDIRECTS, false);
-    }
-
-    @Test
-    public void testProtectedUserFail() {
-        Response get = target("user").request().get();
-
-        assertThat(get.getStatus()).isEqualTo(401);
+        return appRule.client().target(String.format("http://localhost:%d/api%s", appRule.getLocalPort(), url));
     }
 
     @Test
     public void testProtectedUserSucceedAfterLogin() {
-        final Response login = sessionTarget().request().post(Entity.json(new Authentication("admin", "admin")));
 
-        assertThat(login.getStatus()).isEqualTo(302);
-        final NewCookie cookie = login.getCookies().get(SESSION_COOKIE_NAME);
-        assertThat(cookie).isNotNull();
+        final Response get = target("/user").request().get();
+        assertThat(get.getStatus()).isEqualTo(401);
 
-        Response get = target("user").request().cookie(cookie).get();
-        assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
-    }
+        final Response login = target("/user/session").request()
+                .post(Entity.json(new Authentication("admin", "admin")));
 
-    @Test
-    public void testCorrectLogin() {
-        final Response login = sessionTarget().request().post(Entity.json(new Authentication("admin", "admin")));
+        assertThat(login.getStatus()).isEqualTo(200);
+        assertThat(login.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
 
-        assertThat(login.getStatus()).isEqualTo(302);
-        final NewCookie cookie = login.getCookies().get(SESSION_COOKIE_NAME);
-        assertThat(cookie).isNotNull();
+        final Response get2 = target("/user").request().get();
+        assertThat(get2.getStatus()).isEqualTo(200);
+        assertThat(get2.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
 
-        final Response get = sessionTarget().request().cookie(cookie).get();
-        assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
+        final Response get3 = target("/user/session").request().get();
+        assertThat(get3.getStatus()).isEqualTo(200);
+        assertThat(get3.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
     }
 
     @Test
     public void testWrongLogin() {
-        final Response login = sessionTarget().request().post(Entity.json(new Authentication("wrong", "admin")));
-
-        assertThat(login.getStatus()).isEqualTo(302);
-        final NewCookie cookie = login.getCookies().get(SESSION_COOKIE_NAME);
-        // even in case of failure, pac4j registers a session!
-        assertThat(cookie).isNotNull();
-
-        final Response get = sessionTarget().request().cookie(cookie).get();
-        assertThat(get.getStatus()).isEqualTo(401);
-    }
-
-    @Test
-    public void testGetNoSession() {
-        final Response get = sessionTarget().request().get();
-
-        assertThat(get.getStatus()).isEqualTo(401);
+        final Response login = target("/user/session").request()
+                .post(Entity.json(new Authentication("wrong", "admin")));
+        assertThat(login.getStatus()).isEqualTo(401);
     }
 
     @Test
     public void testLogout() {
-        final Response login = sessionTarget().request().post(Entity.json(new Authentication("admin", "admin")));
+        final Response login = target("/user/session").request()
+                .post(Entity.json(new Authentication("admin", "admin")));
+        assertThat(login.getStatus()).isEqualTo(200);
+        assertThat(login.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
 
-        assertThat(login.getStatus()).isEqualTo(302);
-        final NewCookie cookie = login.getCookies().get(SESSION_COOKIE_NAME);
-        assertThat(cookie).isNotNull();
-
-        final Response get = sessionTarget().request().cookie(cookie).get();
-        assertThat(get.getStatus()).isEqualTo(200);
-        assertThat(get.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
-
-        final Response logout = sessionTarget().request().cookie(cookie).delete();
+        final Response logout = target("/user/session").request().delete();
         // TODO should be 204: https://github.com/pac4j/pac4j/issues/701
         assertThat(logout.getStatus()).isEqualTo(200);
 
-        final Response getWrong = sessionTarget().request().cookie(cookie).get();
+        final Response getWrong = target("/user/session").request().get();
         assertThat(getWrong.getStatus()).isEqualTo(401);
     }
 }

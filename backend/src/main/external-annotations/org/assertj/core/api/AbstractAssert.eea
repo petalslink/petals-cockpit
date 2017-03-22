@@ -4,4 +4,4 @@ as
  (Ljava/lang/String;[Ljava/lang/Object;)T1S;
 isNotNull
  ()TS;
- ()TS;
+ ()T1S;
