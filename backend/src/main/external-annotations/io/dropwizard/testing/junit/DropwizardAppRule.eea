@@ -1,0 +1,4 @@
+class io/dropwizard/testing/junit/DropwizardAppRule
+client
+ ()Ljavax/ws/rs/client/Client;
+ ()L1javax/ws/rs/client/Client;

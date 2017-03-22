@@ -34,7 +34,7 @@ public class BusesResourceTest extends AbstractDefaultWorkspaceResourceTest {
     @Test
     public void getExistingBusForbidden() {
         // TODO check assumptions
-        Response get = resources.getJerseyTest().target("/buses/2").request().get();
+        Response get = resources.target("/buses/2").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -42,7 +42,7 @@ public class BusesResourceTest extends AbstractDefaultWorkspaceResourceTest {
     @Test
     public void getNonExistingBusNotFound() {
         // TODO check assumptions
-        Response get = resources.getJerseyTest().target("/buses/1").request().get();
+        Response get = resources.target("/buses/1").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }
@@ -50,7 +50,7 @@ public class BusesResourceTest extends AbstractDefaultWorkspaceResourceTest {
     @Test
     public void getExistingBus() {
         // TODO check assumptions
-        BusOverview get = resources.getJerseyTest().target("/buses/10").request().get(BusOverview.class);
+        BusOverview get = resources.target("/buses/10").request().get(BusOverview.class);
 
         assertThat(get.id).isEqualTo(10);
         assertThat(get.name).isEqualTo(domain.getName());

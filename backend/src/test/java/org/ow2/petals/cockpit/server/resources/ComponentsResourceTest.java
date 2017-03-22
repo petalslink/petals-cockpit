@@ -34,7 +34,7 @@ public class ComponentsResourceTest extends AbstractDefaultWorkspaceResourceTest
     @Test
     public void getExistingComponentForbidden() {
         // TODO check assumptions
-        Response get = resources.getJerseyTest().target("/components/2").request().get();
+        Response get = resources.target("/components/2").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -42,8 +42,7 @@ public class ComponentsResourceTest extends AbstractDefaultWorkspaceResourceTest
     @Test
     public void getExistingComponent() {
         // TODO check assumptions
-        ComponentOverview get = resources.getJerseyTest().target("/components/30").request()
-                .get(ComponentOverview.class);
+        ComponentOverview get = resources.target("/components/30").request().get(ComponentOverview.class);
 
         assertThat(get.id).isEqualTo(30);
         assertThat(get.name).isEqualTo(component.getName());
@@ -54,7 +53,7 @@ public class ComponentsResourceTest extends AbstractDefaultWorkspaceResourceTest
     @Test
     public void getNonExistingComponentNotFound() {
         // TODO check assumptions
-        Response get = resources.getJerseyTest().target("/components/31").request().get();
+        Response get = resources.target("/components/31").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }

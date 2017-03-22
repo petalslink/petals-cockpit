@@ -34,7 +34,7 @@ public class ContainersResourceTest extends AbstractDefaultWorkspaceResourceTest
     @Test
     public void getExistingContainerForbidden() {
         // TODO check assumptions
-        Response get = resources.getJerseyTest().target("/containers/2").request().get();
+        Response get = resources.target("/containers/2").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -42,8 +42,7 @@ public class ContainersResourceTest extends AbstractDefaultWorkspaceResourceTest
     @Test
     public void getExistingContainer() {
         // TODO check assumptions
-        ContainerOverview get = resources.getJerseyTest().target("/containers/21").request()
-                .get(ContainerOverview.class);
+        ContainerOverview get = resources.target("/containers/21").request().get(ContainerOverview.class);
 
         assertThat(get.id).isEqualTo(21);
         assertThat(get.name).isEqualTo(container2.getContainerName());
@@ -56,7 +55,7 @@ public class ContainersResourceTest extends AbstractDefaultWorkspaceResourceTest
     @Test
     public void getNonExistingContainerNotFound() {
         // TODO check assumptions
-        Response get = resources.getJerseyTest().target("/containers/1").request().get();
+        Response get = resources.target("/containers/1").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }

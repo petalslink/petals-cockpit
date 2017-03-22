@@ -100,7 +100,7 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
 
         MultiPart mpe = getSUMultiPart();
 
-        Response post = resources.getJerseyTest().target("/workspaces/2/components/31/serviceunits").request()
+        Response post = resources.target("/workspaces/2/components/31/serviceunits").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(403);
@@ -117,7 +117,7 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
 
         MultiPart mpe = getSUMultiPart();
 
-        Response post = resources.getJerseyTest().target("/workspaces/2/components/31/serviceunits").request()
+        Response post = resources.target("/workspaces/2/components/31/serviceunits").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(403);
@@ -134,7 +134,7 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
 
         MultiPart mpe = getSUMultiPart();
 
-        Response post = resources.getJerseyTest().target("/workspaces/2/components/30/serviceunits").request()
+        Response post = resources.target("/workspaces/2/components/30/serviceunits").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(403);
@@ -147,7 +147,7 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
     public void deploySUButComponentNotFound() throws Exception {
         final MultiPart mpe = getSUMultiPart();
 
-        Response post = resources.getJerseyTest().target("/workspaces/1/components/31/serviceunits").request()
+        Response post = resources.target("/workspaces/1/components/31/serviceunits").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(404);
@@ -158,13 +158,13 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
 
     @Test
     public void deploySU() throws Exception {
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resources.target("/workspaces/1").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
+                .get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
             MultiPart mpe = getSUMultiPart();
-            SUDeployed post = resources.getJerseyTest().target("/workspaces/1/components/30/serviceunits").request()
+            SUDeployed post = resources.target("/workspaces/1/components/30/serviceunits").request()
                     .post(Entity.entity(mpe, mpe.getMediaType()), SUDeployed.class);
 
             assertThat(post.compId).isEqualTo(30);
@@ -194,8 +194,8 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
             assertThat(su.getName()).isEqualTo(post.serviceUnit.name);
             assertThat(su.getTargetComponent()).isEqualTo(component1.getName());
 
-            ServiceUnitOverview overview = resources.getJerseyTest().target("/serviceunits/" + post.serviceUnit.id)
-                    .request().get(ServiceUnitOverview.class);
+            ServiceUnitOverview overview = resources.target("/serviceunits/" + post.serviceUnit.id).request()
+                    .get(ServiceUnitOverview.class);
 
             assertThat(overview.id).isEqualTo(post.serviceUnit.id);
             assertThat(overview.name).isEqualTo(post.serviceUnit.name);

@@ -143,7 +143,7 @@ public class AddUserTest {
         softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").doesNotContain("Added user");
         softly.assertThat(systemErrRule.getLog()).as("stderr").contains("User admin already exists");
         softly.assertAll();
-        
+
         assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
                 .column(USERS.USERNAME.getName()).value().isEqualTo("admin")
                 .column(USERS.NAME.getName()).value().isEqualTo("Admin");

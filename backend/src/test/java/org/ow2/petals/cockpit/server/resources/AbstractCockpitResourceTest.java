@@ -73,7 +73,6 @@ import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
 import org.zapodot.junit.db.plugin.LiquibaseInitializer;
 
-import ch.qos.logback.classic.Level;
 import co.paralleluniverse.actors.ActorRegistry;
 import co.paralleluniverse.common.test.TestUtil;
 import co.paralleluniverse.common.util.Debug;
@@ -98,7 +97,7 @@ import javaslang.Tuple4;
 public class AbstractCockpitResourceTest {
 
     static {
-        BootstrapLogging.bootstrap(Level.INFO);
+        BootstrapLogging.bootstrap();
     }
 
     public static final String ADMIN = "admin";
@@ -183,8 +182,8 @@ public class AbstractCockpitResourceTest {
     }
 
     protected Request requestSU(long id) {
-        return new Request(dbRule.getDataSource(), DSL.using(dbRule.getConnectionJdbcUrl())
-                .selectFrom(SERVICEUNITS).where(SERVICEUNITS.ID.eq(id)).getSQL(ParamType.INLINED));
+        return new Request(dbRule.getDataSource(), DSL.using(dbRule.getConnectionJdbcUrl()).selectFrom(SERVICEUNITS)
+                .where(SERVICEUNITS.ID.eq(id)).getSQL(ParamType.INLINED));
     }
 
     protected Request requestComp(long id) {

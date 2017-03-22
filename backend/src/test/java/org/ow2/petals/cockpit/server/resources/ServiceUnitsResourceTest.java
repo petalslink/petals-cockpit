@@ -34,7 +34,7 @@ public class ServiceUnitsResourceTest extends AbstractDefaultWorkspaceResourceTe
     @Test
     public void getExistingSUForbidden() {
         // TODO check assumptions
-        Response get = resources.getJerseyTest().target("/serviceunits/2").request().get();
+        Response get = resources.target("/serviceunits/2").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -42,8 +42,7 @@ public class ServiceUnitsResourceTest extends AbstractDefaultWorkspaceResourceTe
     @Test
     public void getExistingSU() {
         // TODO check assumptions
-        ServiceUnitOverview get = resources.getJerseyTest().target("/serviceunits/40").request()
-                .get(ServiceUnitOverview.class);
+        ServiceUnitOverview get = resources.target("/serviceunits/40").request().get(ServiceUnitOverview.class);
 
         assertThat(get.id).isEqualTo(40);
         assertThat(get.name).isEqualTo(serviceUnit.getName());
@@ -54,7 +53,7 @@ public class ServiceUnitsResourceTest extends AbstractDefaultWorkspaceResourceTe
     @Test
     public void getNonExistingServiceUnitNotFound() {
         // TODO check assumptions
-        Response get = resources.getJerseyTest().target("/serviceunits/41").request().get();
+        Response get = resources.target("/serviceunits/41").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }

@@ -95,17 +95,16 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
     @Test
     public void changeComp1State() {
 
-        ComponentOverview get1 = resources.getJerseyTest().target("/components/30").request()
-                .get(ComponentOverview.class);
+        ComponentOverview get1 = resources.target("/components/30").request().get(ComponentOverview.class);
         assertThat(get1.state).isEqualTo(ComponentMin.State.Started);
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resources.target("/workspaces/1").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
+                .get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
-            ComponentStateChanged put = resources.getJerseyTest().target("/workspaces/1/components/30").request()
-                    .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)), ComponentStateChanged.class);
+            ComponentStateChanged put = resources.target("/workspaces/1/components/30").request().put(
+                    Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)), ComponentStateChanged.class);
 
             assertThat(put.state).isEqualTo(ComponentMin.State.Stopped);
 
@@ -136,7 +135,7 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
                                 Tuple.of(21L, container, Arrays.asList(Tuple.of(33L, component1, Arrays.asList())))))),
                 "anotheruser");
 
-        Response put = resources.getJerseyTest().target("/workspaces/2/components/33").request()
+        Response put = resources.target("/workspaces/2/components/33").request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
@@ -157,7 +156,7 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
-        Response put = resources.getJerseyTest().target("/workspaces/2/components/50").request()
+        Response put = resources.target("/workspaces/2/components/50").request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
@@ -177,7 +176,7 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
-        Response put = resources.getJerseyTest().target("/workspaces/2/components/30").request()
+        Response put = resources.target("/workspaces/2/components/30").request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
@@ -193,7 +192,7 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
     @Test
     public void changeComp1StateNotFound() {
 
-        Response put = resources.getJerseyTest().target("/workspaces/1/components/33").request()
+        Response put = resources.target("/workspaces/1/components/33").request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(404);
@@ -209,17 +208,16 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
     @Test
     public void changeComp2StateUnload() {
 
-        ComponentOverview get1 = resources.getJerseyTest().target("/components/31").request()
-                .get(ComponentOverview.class);
+        ComponentOverview get1 = resources.target("/components/31").request().get(ComponentOverview.class);
         assertThat(get1.state).isEqualTo(ComponentMin.State.Stopped);
 
-        try (EventInput eventInput = resources.getJerseyTest().target("/workspaces/1")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resources.target("/workspaces/1").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
+                .get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
-            ComponentStateChanged put = resources.getJerseyTest().target("/workspaces/1/components/31").request()
-                    .put(Entity.json(new ComponentChangeState(ComponentMin.State.Unloaded)), ComponentStateChanged.class);
+            ComponentStateChanged put = resources.target("/workspaces/1/components/31").request().put(
+                    Entity.json(new ComponentChangeState(ComponentMin.State.Unloaded)), ComponentStateChanged.class);
 
             assertThat(put.state).isEqualTo(ComponentMin.State.Unloaded);
 
@@ -241,11 +239,10 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeComp1StateNoChange() {
-        ComponentOverview get1 = resources.getJerseyTest().target("/components/30").request()
-                .get(ComponentOverview.class);
+        ComponentOverview get1 = resources.target("/components/30").request().get(ComponentOverview.class);
         assertThat(get1.state).isEqualTo(ComponentMin.State.Started);
 
-        ComponentStateChanged put = resources.getJerseyTest().target("/workspaces/1/components/30").request()
+        ComponentStateChanged put = resources.target("/workspaces/1/components/30").request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Started)), ComponentStateChanged.class);
 
         assertThat(put.state).isEqualTo(ComponentMin.State.Started);
@@ -260,11 +257,10 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeComp1StateConflict() {
-        ComponentOverview get1 = resources.getJerseyTest().target("/components/30").request()
-                .get(ComponentOverview.class);
+        ComponentOverview get1 = resources.target("/components/30").request().get(ComponentOverview.class);
         assertThat(get1.state).isEqualTo(ComponentMin.State.Started);
 
-        Response put = resources.getJerseyTest().target("/workspaces/1/components/30").request()
+        Response put = resources.target("/workspaces/1/components/30").request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Unloaded)));
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
@@ -279,11 +275,10 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeComp3StateConflictUnloaded() {
-        ComponentOverview get1 = resources.getJerseyTest().target("/components/32").request()
-                .get(ComponentOverview.class);
+        ComponentOverview get1 = resources.target("/components/32").request().get(ComponentOverview.class);
         assertThat(get1.state).isEqualTo(ComponentMin.State.Stopped);
 
-        Response put = resources.getJerseyTest().target("/workspaces/1/components/32").request()
+        Response put = resources.target("/workspaces/1/components/32").request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Unloaded)));
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());

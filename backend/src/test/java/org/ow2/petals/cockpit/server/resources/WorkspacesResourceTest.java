@@ -43,20 +43,17 @@ public class WorkspacesResourceTest extends AbstractCockpitResourceTest {
     @Test
     public void createWorkspace() {
         NewWorkspace newWs = new NewWorkspace("test");
-        Workspace post = resources.getJerseyTest().target("/workspaces").request().post(Entity.json(newWs),
-                Workspace.class);
+        Workspace post = resources.target("/workspaces").request().post(Entity.json(newWs), Workspace.class);
 
         assertThat(post.id).isGreaterThan(0);
         assertThat(post.name).isEqualTo(newWs.name);
 
         // there should be only one!
-        assertThat(table(WORKSPACES)).hasNumberOfRows(1)
-                .column(WORKSPACES.ID.getName()).value().isEqualTo(post.id)
+        assertThat(table(WORKSPACES)).hasNumberOfRows(1).column(WORKSPACES.ID.getName()).value().isEqualTo(post.id)
                 .column(WORKSPACES.NAME.getName()).value().isEqualTo(post.name);
 
-        assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(1)
-                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo(ADMIN)
-                .column(USERS_WORKSPACES.WORKSPACE_ID.getName()).value().isEqualTo(post.id);
+        assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(1).column(USERS_WORKSPACES.USERNAME.getName()).value()
+                .isEqualTo(ADMIN).column(USERS_WORKSPACES.WORKSPACE_ID.getName()).value().isEqualTo(post.id);
     }
 
     @Test
@@ -74,7 +71,7 @@ public class WorkspacesResourceTest extends AbstractCockpitResourceTest {
         DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersWorkspacesRecord(2L, "userX"));
         DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersWorkspacesRecord(3L, "admin"));
 
-        Workspaces ws = resources.getJerseyTest().target("/workspaces").request().get(Workspaces.class);
+        Workspaces ws = resources.target("/workspaces").request().get(Workspaces.class);
 
         // ws 1 and 3
         assertThat(ws.workspaces).hasSize(2);
