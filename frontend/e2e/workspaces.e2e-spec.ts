@@ -34,9 +34,6 @@ describe(`Workspaces`, () => {
     // check that 1 workspace is displayed
     expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(1);
 
-    // check that workspaces have icons
-    expect(element.all(by.css(`app-workspaces-dialog md-card md-icon`)).count()).toEqual(1);
-
     const availableUsersList = 'Administrator, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER';
 
     // check the current list content
