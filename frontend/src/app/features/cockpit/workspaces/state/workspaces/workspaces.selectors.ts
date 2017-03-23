@@ -81,6 +81,8 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
         isAddingWorkspace: workspaces.isAddingWorkspace,
         isFetchingWorkspaces: workspaces.isFetchingWorkspaces,
         searchPetals: workspaces.searchPetals,
+        isRemovingWorkspace: workspaces.isRemovingWorkspace,
+        deletedWorkspace: workspaces.deletedWorkspace,
 
         users: {
           list: workspaces.byId[workspaces.selectedWorkspaceId].users.map(userId => <IUser>users.byId[userId])

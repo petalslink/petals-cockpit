@@ -16,19 +16,24 @@
  */
 
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Store } from '@ngrx/store';
 
-import { WorkspacesService } from './workspaces.service';
+import { WorkspacesServiceImpl } from './workspaces.service';
 import { UsersService } from './users.service';
 import { UsersMockService } from './users.service.mock';
-import { environment } from '../../../environments/environment';
+import { SseService, SseWorkspaceEvent } from './sse.service';
+import { SseServiceMock } from './sse.service.mock';
+import { workspacesService } from '../../../mocks/workspaces-mock';
 import * as helper from './../helpers/mock.helper';
-import { workspacesService } from './../../../mocks/workspaces-mock';
+import { environment } from '../../../environments/environment';
+import { IStore } from '../interfaces/store.interface';
 
 @Injectable()
-export class WorkspacesMockService extends WorkspacesService {
+export class WorkspacesMockService extends WorkspacesServiceImpl {
 
-  constructor(private usersService: UsersService) {
-    super();
+  constructor(http: Http, store$: Store<IStore>, private pSseService: SseService, private usersService: UsersService) {
+    super(http, store$, pSseService);
   }
 
   fetchWorkspaces() {
@@ -42,5 +47,17 @@ export class WorkspacesMockService extends WorkspacesService {
     return helper
       .responseBody(workspace)
       .delay(environment.httpDelay);
+  }
+
+  deleteWorkspace(id: string) {
+    return helper
+      .response(204)
+      .do(_ => {
+        // simulate the backend sending the answer on the SSE
+        setTimeout(() => {
+          workspacesService.deleteWorkspace(id);
+          (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.WORKSPACE_DELETED, { id });
+        }, environment.sseDelay);
+      });
   }
 }

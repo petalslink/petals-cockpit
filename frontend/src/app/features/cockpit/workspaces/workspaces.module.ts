@@ -20,19 +20,19 @@ import { NgModule } from '@angular/core';
 import { SharedModule } from '../../../shared/shared.module';
 import { WorkspacesRoutingModule } from './workspaces-routing.module';
 import { WorkspacesComponent } from './workspaces.component';
-import { WorkspaceComponent } from './workspace/workspace.component';
 import { PetalsMenuModule } from './petals-menu/petals-menu.module';
 import { WorkspaceResolver } from './workspace-resolver';
+import { WorkspaceModule } from 'app/features/cockpit/workspaces/workspace/workspace.module';
 
 @NgModule({
   imports: [
     SharedModule,
     WorkspacesRoutingModule,
-    PetalsMenuModule
+    PetalsMenuModule,
+    WorkspaceModule
   ],
   declarations: [
-    WorkspacesComponent,
-    WorkspaceComponent
+    WorkspacesComponent
   ],
   exports: [
     // TODO : Remove this line when aux route becomes available in lazy loaded module

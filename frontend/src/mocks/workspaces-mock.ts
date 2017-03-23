@@ -268,6 +268,10 @@ export class Workspaces {
     const wksComposed = this.getWorkspaceComposed(undefined, name);
     return wksComposed.workspace;
   }
+
+  deleteWorkspace(id: string) {
+    this.memoizedWorkspaces.delete(id);
+  }
 }
 
 export const workspacesService = new Workspaces();
