@@ -27,9 +27,23 @@ describe(`Workspaces`, () => {
     page.navigateTo();
   });
 
+  it(`should always keep the header above any modal`, () => {
+    page.login(`admin`, `admin`);
+
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
+
+    // let's open the workspace list and ensure we can still click on the sidenav button
+    element(by.css(`app-cockpit md-sidenav .change-workspace`)).click();
+
+    page.closeSidenav();
+  });
+
   it(`should not have any workspace selected`, () => {
     // vnoel has no lastWorkspace, so it will be redirected to /workspaces with no workspace selected
     page.login(`vnoel`, `vnoel`, true, false);
+
+    // the sidebar button should not be visible
+    expect(element(by.css(`app-cockpit .menu-icon`)).isPresent()).toBe(false);
 
     // check that 1 workspace is displayed
     expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(1);
