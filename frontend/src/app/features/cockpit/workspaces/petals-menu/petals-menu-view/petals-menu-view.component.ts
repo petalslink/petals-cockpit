@@ -74,7 +74,7 @@ export class PetalsMenuViewComponent implements OnInit {
     }
   }
 
-  onTreeSelect() {
+  onTreeSelect(_) {
     // TODO: Dispatch an action to save the current bus/container/component/su
     // Instead of dispatching it from here maybe it's a better idea to dispatch it once the
     // component is loaded

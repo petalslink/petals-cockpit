@@ -53,7 +53,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
   private redirectSub: Subscription;
   private busInProgressSub: Subscription;
 
-  private formErrors = {
+  public formErrors = {
     'ip': '',
     'port': '',
     'username': '',
@@ -76,8 +76,8 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
 
     this.createFormImportBus();
 
-    const id = this.route.params
-      .map(({ busInProgressId }: { busInProgressId: string }) => busInProgressId)
+    const id = this.route.paramMap
+      .map(paramMap => paramMap.get('busInProgressId'))
       // displays the last thing in url if no params (bug ?)
       // TODO clean that, it's not the correct way to handle empty form versus completed form
       .map(bId => bId === 'buses-in-progress' ? '' : bId)
@@ -101,9 +101,9 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
             .filter(([bip, _]) => !bip)
             .do(([_, bus]) => {
               if (bus) {
-                this.router.navigate(['/workspaces', this.route.snapshot.params.workspaceId, 'petals', 'buses', bus.id]);
+                this.router.navigate(['/workspaces', this.route.snapshot.paramMap.get('workspaceId'), 'petals', 'buses', bus.id]);
               } else {
-                this.router.navigate(['/workspaces', this.route.snapshot.params.workspaceId]);
+                this.router.navigate(['/workspaces', this.route.snapshot.paramMap.get('workspaceId')]);
               }
             })
             .map(_ => null);
@@ -113,7 +113,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
             .select(state => state.busesInProgress.byId[state.busesInProgress.importBusId])
             .filter(bip => !!bip)
             .do(bip => {
-              this.router.navigate(['/workspaces', this.route.snapshot.params.workspaceId, 'petals', 'buses-in-progress', bip.id]);
+              this.router.navigate(['/workspaces', this.route.snapshot.paramMap.get('workspaceId'), 'petals', 'buses-in-progress', bip.id]);
             });
         }
       })

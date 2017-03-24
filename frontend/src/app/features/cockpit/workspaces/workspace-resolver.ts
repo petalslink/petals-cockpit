@@ -29,7 +29,7 @@ export class WorkspaceResolver implements Resolve<Observable<any>> {
   constructor(private store$: Store<IStore>) { }
 
   resolve(route: ActivatedRouteSnapshot) {
-    const workspaceId = route.params['workspaceId'];
+    const workspaceId = route.paramMap.get('workspaceId');
 
     this.store$.dispatch(batchActions([
       { type: Workspaces.CLOSE_WORKSPACE },

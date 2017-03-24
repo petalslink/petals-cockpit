@@ -42,10 +42,10 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
     this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Service Unit' } });
 
     this.route
-      .params
-      .map((params: { workspaceId: string, serviceUnitId: string }) => {
-        this.store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: params.serviceUnitId } });
-        this.store$.dispatch({ type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS, payload: { serviceUnitId: params.serviceUnitId } });
+      .paramMap
+      .map(paramMap => {
+        this.store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: paramMap.get('serviceUnitId') } });
+        this.store$.dispatch({ type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS, payload: { serviceUnitId: paramMap.get('serviceUnitId') } });
       })
       .subscribe();
   }

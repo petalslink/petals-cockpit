@@ -37,6 +37,7 @@ target/
 # misc
 /frontend/.sass-cache
 /frontend/connect.lock
+/frontend/coverage
 /frontend/coverage/*
 /frontend/libpeerconnection.log
 /frontend/npm-debug.log

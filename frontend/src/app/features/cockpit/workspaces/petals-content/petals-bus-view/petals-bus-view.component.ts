@@ -42,10 +42,10 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
     this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Bus' } });
 
     this.route
-      .params
-      .map((params: { workspaceId: string, busId: string }) => {
-        this.store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId: params.busId } });
-        this.store$.dispatch({ type: Buses.FETCH_BUS_DETAILS, payload: { busId: params.busId } });
+      .paramMap
+      .map(paramMap => {
+        this.store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId: paramMap.get('busId') } });
+        this.store$.dispatch({ type: Buses.FETCH_BUS_DETAILS, payload: { busId: paramMap.get('busId') } });
       })
       .subscribe();
   }
