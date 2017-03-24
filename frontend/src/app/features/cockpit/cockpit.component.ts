@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, ViewChild, Inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, Inject, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MdDialog, MdDialogRef } from '@angular/material';
 import { MediaChange } from '@angular/flex-layout';
@@ -40,11 +40,12 @@ import { getCurrentWorkspace } from '../cockpit/workspaces/state/workspaces/work
   templateUrl: './cockpit.component.html',
   styleUrls: ['./cockpit.component.scss']
 })
-export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
+export class CockpitComponent implements OnInit, OnDestroy {
   private workspacesDialogRef: MdDialogRef<WorkspacesDialogComponent>;
 
   public ui$: Observable<IUi>;
   private uiSub: Subscription;
+  public sidenavVisible$: Observable<boolean>;
   public sidenavMode$: Observable<string>;
   public workspace$: Observable<IWorkspace>;
   public workspaces$: Observable<IWorkspacesTable>;
@@ -68,18 +69,22 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     this.ui$ = this.store$.select(state => state.ui);
 
     // it is needed to use subscribe(...) instead of do(...).subscribe()
-    // if not it won't work. TODO this should be solved or clarified...
+    // if not it won't work. TODO this will be fixed in rxjs >5.2.0
     this.uiSub = this.ui$
       .map(ui => ui.isPopupListWorkspacesVisible)
       .distinctUntilChanged()
       .subscribe(isPopupListWorkspacesVisible => {
         if (isPopupListWorkspacesVisible) {
-          this._openWorkspacesDialog();
+          this.doOpenWorkspacesDialog();
         } else if (this.workspacesDialogRef) {
           this.workspacesDialogRef.close();
           this.workspacesDialogRef = null;
         }
       });
+
+    // TODO ultimately, the sidebar should be moved to WorkspaceComponent
+    this.sidenavVisible$ = this.store$
+      .select(state => state.ui.isSidenavVisible && /\/workspaces\/\w+/.test(this.router.url));
 
     this.logoByScreenSize$ = this.media$
       .asObservable()
@@ -113,27 +118,8 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
     this.uiSub.unsubscribe();
   }
 
-  ngAfterViewInit() {
-
-    // TODO move that in its rightful place
-    // if there's no workspace selected
-    // display the popup to select one
-    const re = /workspaces\/([a-zA-Z0-9]+)(\/)?/;
-    const url = this.router.url;
-
-    if (!re.test(url)) {
-      this.openWorkspacesDialog();
-    }
-
-    // TODO : cf If hook available for handling escape
-    // https://github.com/angular/material2/pull/2501
-    // Handles the keyboard events ->
-    // https://github.com/angular/material2/issues/2544
-    this.sidenav.handleKeydown = () => { };
-  }
-
-  private _openWorkspacesDialog() {
-    this.fetchWorkspaces();
+  private doOpenWorkspacesDialog() {
+    this.store$.dispatch({ type: Workspaces.FETCH_WORKSPACES });
 
     this.workspacesDialogRef = this.dialog.open(WorkspacesDialogComponent, {
       // TODO : If a workspace is already selected, we should be able to close it
@@ -164,9 +150,5 @@ export class CockpitComponent implements OnInit, OnDestroy, AfterViewInit {
 
   toggleSidenav() {
     this.store$.dispatch({ type: Ui.TOGGLE_SIDENAV });
-  }
-
-  private fetchWorkspaces() {
-    this.store$.dispatch({ type: Workspaces.FETCH_WORKSPACES });
   }
 }

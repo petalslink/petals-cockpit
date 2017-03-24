@@ -29,7 +29,7 @@ export class PetalsCockpitPage {
     return browser.get('/');
   }
 
-  login(user: string, pass: string) {
+  login(user: string, pass: string, checkRedirect = true, hasLastWorkspace = true) {
     // to login we should be on the correct page
     expect(browser.getCurrentUrl()).toMatch(/\/login/);
 
@@ -40,10 +40,24 @@ export class PetalsCockpitPage {
 
     element(by.css(`app-login button`)).click();
 
-    // let's be sure angular has finished loading after login!
-    // but let's not fail if it is not the right url (because we also test failing login!)
-    // TODO we should improve that but the problem is protractor not being able to wait enough...
-    browser.wait(EC.urlContains('/workspaces'), 3000).catch(_ => { });
+    if (checkRedirect) {
+      // let's be sure angular has finished loading after login!
+      browser.wait(EC.urlContains('/workspaces'), 3000);
+
+      if (hasLastWorkspace) {
+        expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
+        return browser.wait(EC.visibilityOf(element(by.css(`app-cockpit md-sidenav.mat-sidenav-opened`))), 2000);
+      } else {
+        expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
+        // the sidenav is visible in HTML terms, but not really visible in practice
+        return browser.wait(EC.presenceOf(element(by.css(`app-cockpit md-sidenav.mat-sidenav-closed`))), 2000);
+      }
+    } else {
+      // let's be sure angular has finished loading after login!
+      // but let's not fail if it is not the right url (because we also test failing login!)
+      // TODO we should improve that but the problem is protractor not being able to wait enough...
+      return browser.wait(EC.urlContains('/workspaces'), 3000).catch(_ => { });
+    }
   }
 
   search(search: string) {

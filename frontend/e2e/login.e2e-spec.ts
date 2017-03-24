@@ -34,7 +34,7 @@ describe(`Login`, () => {
   });
 
   it(`should not login if user/pwd do not match`, () => {
-    page.login(`admin`, `randomPasswordNotWorking`);
+    page.login(`admin`, `randomPasswordNotWorking`, false);
 
     expect(browser.getCurrentUrl()).toMatch(/\/login$/);
     expect(element(by.css(`.form-error`)).isDisplayed()).toBe(true);
@@ -59,7 +59,7 @@ describe(`Login`, () => {
     // we should be redirected to login
     expect(browser.getCurrentUrl()).toMatch(/\/login\?previousUrl=/);
 
-    page.login(`admin`, `admin`);
+    page.login(`admin`, `admin`, false);
 
     // we should have been redirected to the previous url!
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/);
@@ -73,6 +73,14 @@ describe(`Login`, () => {
     logout.click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/login$/);
+
+    // now let's see if we can relogin with another user and disconnect again
+    page.login(`vnoel`, `vnoel`, true, false);
+
+    element(by.css(`app-workspaces-dialog md-card-subtitle`)).click();
+
+    browser.wait(EC.elementToBeClickable(logout), 5000);
+    logout.click();
   });
 
   it(`should selected the first input`, () => {
