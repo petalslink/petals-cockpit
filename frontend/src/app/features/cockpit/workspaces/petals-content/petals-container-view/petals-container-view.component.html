@@ -27,7 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <md-tab-group fxFlex>
     <md-tab label="Overview">
       <!-- TODO: Create a component for every tab -->
-      <app-petals-container-overview *ngIf="container$ | async" [container]="container$ | async" fxFill></app-petals-container-overview>
+      <app-petals-container-overview *ngIf="container$ | async" [workspaceId]="(workspaceId$ | async)" [container]="container$ | async"
+        [otherContainers]="otherContainers$ | async" fxFill></app-petals-container-overview>
     </md-tab>
   </md-tab-group>
 </div>

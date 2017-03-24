@@ -29,7 +29,7 @@ describe(`Petals container content`, () => {
     browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
   });
 
-  it(`Should open the content page`, () => {
+  it(`should open the content page`, () => {
     page.getWorkspaceTreeByName('Cont 0').click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/containers\/\w+/);
@@ -49,5 +49,17 @@ describe(`Petals container content`, () => {
       'Petals ESB µKernel 4.0.2 Petals Standalone Shared Memory 4.0.2 OpenJDK',
       'Runtime Environment 1.7.0_111-b01 Oracle Corporation Linux 3.16.0-4-amd64 amd64'
     ].join(' '));
+  });
+
+  it('should navigate to another container of the bus', () => {
+    page.getWorkspaceTreeByName('Cont 0').click();
+
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/containers\/\w+/);
+
+    expect(element(by.css(`app-petals-container-view md-toolbar-row .title`)).getText()).toEqual('Cont 0');
+
+    element(by.css(`app-petals-container-overview md-card.reachability`)).click();
+
+    expect(element(by.css(`app-petals-container-view md-toolbar-row .title`)).getText()).toEqual('Cont 1');
   });
 });
