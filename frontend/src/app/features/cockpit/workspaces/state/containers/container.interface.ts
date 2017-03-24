@@ -38,5 +38,4 @@ export interface IContainerRow extends IContainerCommon {
 
 export interface IContainer extends IContainerCommon {
   components: IComponents;
-  reachabilities: IContainerCommon[];
 }

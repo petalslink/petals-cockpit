@@ -19,12 +19,13 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Containers } from '../../state/containers/containers.reducer';
 import { Ui } from '../../../../../shared/state/ui.reducer';
 import { IContainerRow } from '../../state/containers/container.interface';
-import { getCurrentContainer } from '../../state/containers/containers.selectors';
+import { getSiblingContainers } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 
 @Component({
   selector: 'app-petals-container-view',
@@ -32,25 +33,40 @@ import { getCurrentContainer } from '../../state/containers/containers.selectors
   styleUrls: ['./petals-container-view.component.scss']
 })
 export class PetalsContainerViewComponent implements OnInit, OnDestroy {
+  public workspaceId$: Observable<string>;
+  public containerId$: Observable<string>;
   public container$: Observable<IContainerRow>;
+  public otherContainers$: Observable<IContainerRow[]>;
+
+  private sub: Subscription;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.container$ = this.store$.let(getCurrentContainer());
-
     this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Container' } });
 
-    this.route
-      .paramMap
-      .map(paramMap => {
-        this.store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: paramMap.get('containerId') } });
-        this.store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: paramMap.get('containerId') } });
+    this.workspaceId$ = this.route.paramMap
+      .map(p => p.get('workspaceId'))
+      .distinctUntilChanged();
+
+    this.containerId$ = this.route.paramMap
+      .map(p => p.get('containerId'))
+      .distinctUntilChanged();
+
+    this.sub = this.containerId$
+      .do(id => {
+        this.store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: id } });
+        this.store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: id } });
       })
       .subscribe();
+
+    this.container$ = this.containerId$.switchMap(id => this.store$.select(state => state.containers.byId[id]));
+
+    this.otherContainers$ = this.containerId$.switchMap(id => this.store$.let(getSiblingContainers(id)));
   }
 
   ngOnDestroy() {
+    this.sub.unsubscribe();
     this.store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: '' } });
   }
 }

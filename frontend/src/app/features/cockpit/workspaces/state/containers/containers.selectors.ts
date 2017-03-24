@@ -20,7 +20,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IContainerRow } from './container.interface';
-import { isNot } from '../../../../../shared/helpers/shared.helper';
+import { isNot, arrayEquals } from '../../../../../shared/helpers/shared.helper';
 
 export function _getCurrentContainer(store$: Store<IStore>): Observable<IContainerRow> {
   return store$
@@ -33,3 +33,22 @@ export function _getCurrentContainer(store$: Store<IStore>): Observable<IContain
 export function getCurrentContainer() {
   return _getCurrentContainer;
 }
+
+/**
+ * Returns the other containers in the bus of the container with id containerId.
+ * @param containerId the id of the concerned container (not in the resulting array)
+ */
+export function getSiblingContainers(containerId: string): (store$: Store<IStore>) => Observable<IContainerRow[]> {
+  return store$ => {
+    return store$
+      .select(state => {
+        // TODO not the best in term of performances...
+        const busId = state.buses.allIds.find(bId => state.buses.byId[bId].containers.includes(containerId));
+        return state.buses.byId[busId].containers
+          .filter(cid => cid !== containerId)
+          .map(cid => state.containers.byId[cid]);
+      })
+      .distinctUntilChanged(arrayEquals);
+  };
+}
+
