@@ -26,6 +26,7 @@ import { IWorkspace } from './workspace.interface';
 import { IBus } from '../buses/bus.interface';
 import { escapeStringRegexp, arrayEquals } from '../../../../../shared/helpers/shared.helper';
 import { IUser } from '../../../../../shared/interfaces/user.interface';
+import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 
 export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspaces> {
   const sWorkspaces = store$.select((state: IStore) => state.workspaces);
@@ -138,14 +139,24 @@ export function getCurrentWorkspace() {
 
 // -----------------------------------------------------------
 
-export function _getCurrentTree(store$: Store<IStore>) {
+export enum WorkspaceElementType {
+  BUS, CONTAINER, COMPONENT, SERVICEUNIT
+}
+
+export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
+  id: string;
+  type: WorkspaceElementType;
+  name: string;
+}
+
+export function _getCurrentTree(store$: Store<IStore>): Observable<WorkspaceElement[]> {
   return _getCurrentWorkspace(store$)
     .map(workspace => {
       const baseUrl = `/workspaces/${workspace.selectedWorkspaceId}/petals`;
       return workspace.buses.list.map(bus => {
-        return {
+        return <WorkspaceElement>{
           id: bus.id,
-          typeId: 'busId',
+          type: WorkspaceElementType.BUS,
           name: bus.name,
           link: `${baseUrl}/buses/${bus.id}`,
           isFolded: bus.isFolded,
@@ -153,7 +164,7 @@ export function _getCurrentTree(store$: Store<IStore>) {
           children: bus.containers.list.map(container => {
             return {
               id: container.id,
-              typeId: 'containerId',
+              type: WorkspaceElementType.CONTAINER,
               name: container.name,
               link: `${baseUrl}/containers/${container.id}`,
               isFolded: container.isFolded,
@@ -161,7 +172,7 @@ export function _getCurrentTree(store$: Store<IStore>) {
               children: container.components.list.map(component => {
                 return {
                   id: component.id,
-                  typeId: 'componentId',
+                  type: WorkspaceElementType.COMPONENT,
                   name: component.name,
                   link: `${baseUrl}/components/${component.id}`,
                   isFolded: component.isFolded,
@@ -169,7 +180,7 @@ export function _getCurrentTree(store$: Store<IStore>) {
                   children: component.serviceUnits.list.map(serviceUnit => {
                     return {
                       id: serviceUnit.id,
-                      typeId: 'serviceUnitId',
+                      type: WorkspaceElementType.SERVICEUNIT,
                       name: serviceUnit.name,
                       link: `${baseUrl}/service-units/${serviceUnit.id}`,
                       isFolded: serviceUnit.isFolded
