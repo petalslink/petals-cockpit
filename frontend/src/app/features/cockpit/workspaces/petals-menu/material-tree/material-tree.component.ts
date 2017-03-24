@@ -17,10 +17,16 @@
 
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 
-interface TreeEvent {
+export interface TreeElement<T extends TreeElement<T>> {
+  link: string;
+  isFolded: boolean;
+  children: T[];
+}
+
+export interface TreeEvent<T extends TreeElement<T>> {
   deepLevel: number;
   index: number;
-  item: any;
+  item: T;
 }
 
 @Component({
@@ -29,7 +35,7 @@ interface TreeEvent {
   styleUrls: ['./material-tree.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MaterialTreeComponent implements OnInit {
+export class MaterialTreeComponent<TE extends TreeElement<TE>> implements OnInit {
   // pass the tree to display
   @Input() tree;
   // pass the search to display
@@ -39,9 +45,9 @@ export class MaterialTreeComponent implements OnInit {
   // only used internally
   @Input() deepLevel? = 0;
   // event when the user select a line
-  @Output() onSelect = new EventEmitter();
+  @Output() onSelect = new EventEmitter<TreeEvent<TE>>();
   // event when the user toggle a line
-  @Output() onToggleFold = new EventEmitter();
+  @Output() onToggleFold = new EventEmitter<TreeEvent<TE>>();
 
   constructor() { }
 
@@ -51,11 +57,11 @@ export class MaterialTreeComponent implements OnInit {
     return this.deepLevel === 0 ? 0 : this.marginLeft;
   }
 
-  select(treeEvent: TreeEvent) {
+  select(treeEvent: TreeEvent<TE>) {
     this.onSelect.emit(treeEvent);
   }
 
-  toggleFold(treeEvent: TreeEvent) {
+  toggleFold(treeEvent: TreeEvent<TE>) {
     if (this.search === '') {
       this.onToggleFold.emit(treeEvent);
     }
