@@ -23,7 +23,6 @@ import { RouterModule } from '@angular/router';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MaterialModule } from '@angular/material';
 import { StoreModule } from '@ngrx/store';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { TranslateModule } from 'ng2-translate';
 import { PrettyJsonModule } from 'angular2-prettyjson';
 import { SimpleNotificationsModule } from 'angular2-notifications';
@@ -39,7 +38,6 @@ export const modules = [
   MaterialModule,
   FlexLayoutModule,
   StoreModule,
-  StoreDevtoolsModule,
   TranslateModule,
   PrettyJsonModule,
   SimpleNotificationsModule

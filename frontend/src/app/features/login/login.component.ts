@@ -85,7 +85,7 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   onSubmit({ value }) {
     this.store$.dispatch({
       type: Users.CONNECT_USER,
-      payload: { user: value, previousUrl: this.route.snapshot.queryParams.previousUrl }
+      payload: { user: value, previousUrl: this.route.snapshot.queryParamMap.get('previousUrl') }
     });
   }
 }

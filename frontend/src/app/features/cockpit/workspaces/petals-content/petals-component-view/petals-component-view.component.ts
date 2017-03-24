@@ -42,10 +42,10 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
     this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Component' } });
 
     this.route
-      .params
-      .map((params: { workspaceId: string, componentId: string }) => {
-        this.store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId: params.componentId } });
-        this.store$.dispatch({ type: Components.FETCH_COMPONENT_DETAILS, payload: { componentId: params.componentId } });
+      .paramMap
+      .map(paramMap => {
+        this.store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId: paramMap.get('componentId') } });
+        this.store$.dispatch({ type: Components.FETCH_COMPONENT_DETAILS, payload: { componentId: paramMap.get('componentId') } });
       })
       .subscribe();
   }
