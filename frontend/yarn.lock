@@ -86,7 +86,7 @@
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-4.0.0.tgz#e1aa061a6f8ef269f9748af1a7bc290f9d37ed6c"
 
-"@angular/core@4.0.0", "@angular/core@^2.0.0":
+"@angular/core@4.0.0", "@angular/core@^2.0.0 || ^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@angular/core/-/core-4.0.0.tgz#fd877e074b29dfa9c63b96a21995fc7556d423a3"
 
@@ -244,12 +244,11 @@ angular2-notifications@0.4.53:
   version "0.4.53"
   resolved "https://registry.yarnpkg.com/angular2-notifications/-/angular2-notifications-0.4.53.tgz#d308f1a10a58723a7fa68b488b855473b6d12f32"
 
-angular2-prettyjson@2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/angular2-prettyjson/-/angular2-prettyjson-2.0.4.tgz#e4556062219a6e48514392f49875f0ee97d5fe01"
+angular2-prettyjson@2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/angular2-prettyjson/-/angular2-prettyjson-2.0.5.tgz#cd37aec8d8d84d9afee5289162d26c5d1e776e9f"
   dependencies:
-    "@angular/core" "^2.0.0"
-    rxjs "^5.0.0-rc.4"
+    "@angular/core" "^2.0.0 || ^4.0.0"
 
 ansi-align@^1.1.0:
   version "1.1.0"
@@ -4107,7 +4106,7 @@ rx@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/rx/-/rx-4.1.0.tgz#a5f13ff79ef3b740fe30aa803fb09f98805d4782"
 
-rxjs@5.2.0, rxjs@^5.0.0-rc.4, rxjs@^5.0.1:
+rxjs@5.2.0, rxjs@^5.0.1:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.2.0.tgz#db537de8767c05fa73721587a29e0085307d318b"
   dependencies:
