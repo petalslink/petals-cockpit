@@ -33,6 +33,38 @@ md-sidenav {
   width: $sidenavSize;
 }
 
+/*
+TODO
+While the issue on material **https://github.com/angular/material2/issues/3221** is still open,
+let's make something hacky by putting the header on top of the rest
+
+This should be cleaned as soon as the new feature is ready
+*/
+.header-toolbar {
+  position: fixed;
+  z-index: 2000;
+}
+
+// values are coming from material toolbar.scss
+md-sidenav-container {
+
+  // default value
+  margin-top: 64px;
+
+  // mobile landscape (tablet)
+  @media (max-width: 960px) and (orientation: landscape) {
+    margin-top: 48px;
+  }
+
+  // mobile portrait (phone)
+  @media (max-width: 600px) and (orientation: portrait) {
+    margin-top: 56px;
+  }
+}
+/*
+END TODO
+*/
+
 @media (max-width: 1279px) {
   md-toolbar {
     .toolbar-logo {
