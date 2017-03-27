@@ -45,10 +45,7 @@ export const routes: Routes = [
       preloadingStrategy: PreloadAllModules,
       useHash: (environment.hashLocationStrategy ? true : false),
       enableTracing: false
-    }),
-    // LoginModule,
-    // TODO removing CockpitModule breaks the app in AOT with lazy loading ...
-    // CockpitModule
+    })
   ]
 })
 export class AppRoutingModule { }

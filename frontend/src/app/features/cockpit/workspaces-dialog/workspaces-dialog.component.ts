@@ -98,7 +98,6 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
     this.isAddingWorkspaceSub.unsubscribe();
   }
 
-  // TODO use good type
   fetchWorkspace(workspace: IWorkspace) {
     this.store$
       .select(state => state.workspaces.selectedWorkspaceId)
