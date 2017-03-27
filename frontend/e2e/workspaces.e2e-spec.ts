@@ -29,11 +29,9 @@ describe(`Workspaces`, () => {
 
   it(`should not have any workspace selected`, () => {
     // vnoel has no lastWorkspace, so it will be redirected to /workspaces with no workspace selected
-    page.login(`vnoel`, `vnoel`);
+    page.login(`vnoel`, `vnoel`, true, false);
 
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
-
-    // even if no selected, check that 2 workspaces are displayed
+    // check that 1 workspace is displayed
     expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(1);
 
     // check that workspaces have icons
@@ -60,8 +58,6 @@ describe(`Workspaces`, () => {
 
   it(`should have a workspace selected`, () => {
     page.login(`admin`, `admin`);
-
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
 
     // check the page content
     expect(element.all(by.css(`app-workspace p`)).first().getText()).toEqual(`Welcome to Workspace 0`);

@@ -16,6 +16,10 @@
  */
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Store } from '@ngrx/store';
+
+import { IStore } from 'app/shared/interfaces/store.interface';
+import { Ui } from 'app/shared/state/ui.reducer';
 
 @Component({
   selector: 'app-workspaces',
@@ -23,9 +27,14 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
   styleUrls: ['./workspaces.component.scss']
 })
 export class WorkspacesComponent implements OnInit, OnDestroy {
-  constructor() { }
 
-  ngOnInit() { }
+  constructor(
+    private store$: Store<IStore>
+  ) { }
+
+  ngOnInit() {
+    this.store$.dispatch({ type: Ui.OPEN_POPUP_WORKSPACES_LIST });
+  }
 
   ngOnDestroy() { }
 }
