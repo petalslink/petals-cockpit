@@ -34,6 +34,9 @@ import { IStore } from '../../shared/interfaces/store.interface';
 import { IUi } from '../../shared/interfaces/ui.interface';
 import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog.component';
 import { getCurrentWorkspace } from '../cockpit/workspaces/state/workspaces/workspaces.selectors';
+import { ICurrentUser } from 'app/shared/interfaces/user.interface';
+import { getCurrentUser } from 'app/shared/state/users.selectors';
+import { Users } from 'app/shared/state/users.reducer';
 
 @Component({
   selector: 'app-cockpit',
@@ -51,6 +54,8 @@ export class CockpitComponent implements OnInit, OnDestroy {
   public workspace$: Observable<IWorkspace>;
   public workspaces$: Observable<IWorkspacesTable>;
   public logoByScreenSize$: Observable<string>;
+  public user$: Observable<ICurrentUser>;
+  public isDisconnecting$: Observable<boolean>;
 
   @ViewChild(MdSidenav) sidenav: MdSidenav;
 
@@ -68,6 +73,10 @@ export class CockpitComponent implements OnInit, OnDestroy {
     this.workspace$ = this.store$.let(getCurrentWorkspace());
 
     this.ui$ = this.store$.select(state => state.ui);
+
+    this.user$ = this.store$.let(getCurrentUser());
+
+    this.isDisconnecting$ = this.store$.select(state => state.users.isDisconnecting);
 
     // it is needed to use subscribe(...) instead of do(...).subscribe()
     // if not it won't work. TODO this will be fixed in rxjs >5.2.0
@@ -166,6 +175,10 @@ export class CockpitComponent implements OnInit, OnDestroy {
 
   toggleSidenav() {
     this.store$.dispatch({ type: Ui.TOGGLE_SIDENAV });
+  }
+
+  disconnect() {
+    this.store$.dispatch({ type: Users.DISCONNECT_USER });
   }
 }
 

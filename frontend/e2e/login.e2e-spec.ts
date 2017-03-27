@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, element, by, ExpectedConditions as EC } from 'protractor';
+import { browser, element, by } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
 
@@ -68,9 +68,7 @@ describe(`Login`, () => {
   it(`should logout after logging in`, () => {
     page.login(`admin`, `admin`);
 
-    const logout = element(by.css(`app-menu-user-panel .wrapper-disconnect md-icon`));
-    browser.wait(EC.elementToBeClickable(logout), 5000);
-    logout.click();
+    page.logout();
 
     expect(browser.getCurrentUrl()).toMatch(/\/login$/);
 
@@ -79,8 +77,15 @@ describe(`Login`, () => {
 
     element(by.css(`app-workspaces-dialog md-card-subtitle`)).click();
 
-    browser.wait(EC.elementToBeClickable(logout), 5000);
-    logout.click();
+    page.logout();
+  });
+
+  it(`should display the current username in the user menu`, () => {
+    page.login(`admin`, `admin`);
+
+    element(by.css(`app-cockpit md-toolbar .btn-open-menu`)).click();
+
+    expect(element(by.css(`.btn-menu-username div span`)).getText()).toEqual('Administrator');
   });
 
   it(`should selected the first input`, () => {
