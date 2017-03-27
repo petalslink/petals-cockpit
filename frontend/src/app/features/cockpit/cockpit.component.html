@@ -33,6 +33,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
     <div fxFlex></div>
 
+    <button md-icon-button [mdMenuTriggerFor]="menu" class="btn-open-menu">
+      <app-generate-icon md-list-avatar [size]="35" [text]="(user$ | async).id"></app-generate-icon>
+      <span>{{ (user$ | async).name }}</span>
+    </button>
+    <md-menu #menu="mdMenu">
+      <button md-menu-item disabled class="btn-menu-username">
+        <div fxLayout="row" color="primary" fxLayoutAlign="start center">
+          <md-icon>account_circle</md-icon> <span>{{ (user$ | async).name }}</span>
+        </div>
+      </button>
+      <button [disabled]="(isDisconnecting$ | async)" md-menu-item (click)="disconnect()" class="btn-menu-logout">
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <md-icon>power_settings_new</md-icon> <span class="color-primary-light-bold">Sign out</span>
+        </div>
+      </button>
+    </md-menu>
+
     <!--
     TODO: Find a way to handle immutability with md-select
     <md-select id="language" name="language" [(ngModel)]="language">
@@ -43,8 +60,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <md-sidenav-container fxLayout="column" fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">
     <md-sidenav fxLayout="column" [opened]="sidenavVisible$ | async" [mode]="sidenavMode$ | async">
-      <app-menu-user-panel></app-menu-user-panel>
-
       <div fxLayout="row">
         <button fxFlex="100" md-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId]" class="workspace-name width-full no-border-radius" color="accent">
           {{ (workspace$ | async)?.name }}

@@ -49,6 +49,10 @@ md-toolbar {
   }
 }
 
+.mat-menu-item .mat-icon {
+  color: mat-color($theme-primary-x7);
+}
+
 .active-link, .active-link:hover {
   .mat-list-item-content {
     background-color: mat-color($theme-primary-x);

@@ -60,6 +60,15 @@ export class PetalsCockpitPage {
     }
   }
 
+  logout() {
+    // open the user menu
+    element(by.css(`app-cockpit md-toolbar .btn-open-menu`)).click();
+    // and logout
+    const logout = element(by.css(`.btn-menu-logout`));
+    browser.wait(EC.elementToBeClickable(logout), 1000);
+    logout.click();
+  }
+
   search(search: string) {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 

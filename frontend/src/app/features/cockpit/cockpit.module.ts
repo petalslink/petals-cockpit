@@ -22,7 +22,6 @@ import { CockpitRoutingModule } from './cockpit-routing.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { CockpitComponent, DeletedWorkspaceDialogComponent } from './cockpit.component';
 import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog.component';
-import { MenuUserPanelComponent } from './menu-user-panel/menu-user-panel.component';
 
 @NgModule({
   imports: [
@@ -33,8 +32,7 @@ import { MenuUserPanelComponent } from './menu-user-panel/menu-user-panel.compon
   declarations: [
     CockpitComponent,
     WorkspacesDialogComponent,
-    DeletedWorkspaceDialogComponent,
-    MenuUserPanelComponent
+    DeletedWorkspaceDialogComponent
   ],
   entryComponents: [WorkspacesDialogComponent, DeletedWorkspaceDialogComponent]
 })
