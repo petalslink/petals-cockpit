@@ -18,18 +18,30 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+import { Store } from '@ngrx/store';
 
+import { IStore } from './../interfaces/store.interface';
+import { SseService, SseWorkspaceEvent } from './sse.service';
+import { Workspaces } from './../../features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 import { environment } from './../../../environments/environment';
 
 export abstract class WorkspacesService {
   abstract fetchWorkspaces(): Observable<Response>;
 
   abstract postWorkspace(workspaceName: string): Observable<Response>;
+
+  abstract deleteWorkspace(workspaceId: string): Observable<Response>;
+
+  abstract watchEventWorkspaceDeleted(): Observable<void>;
 }
 
 @Injectable()
 export class WorkspacesServiceImpl extends WorkspacesService {
-  constructor(private http: Http) {
+  constructor(
+    private http: Http,
+    private store$: Store<IStore>,
+    private sseService: SseService
+  ) {
     super();
   }
 
@@ -39,5 +51,20 @@ export class WorkspacesServiceImpl extends WorkspacesService {
 
   postWorkspace(workspaceName: string) {
     return this.http.post(`${environment.urlBackend}/workspaces`, { name: workspaceName });
+  }
+
+  deleteWorkspace(workspaceId: string) {
+    return this.http.delete(`${environment.urlBackend}/workspaces/${workspaceId}`);
+  }
+
+  watchEventWorkspaceDeleted() {
+    return this.sseService
+      .subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_DELETED)
+      .do((data: { id: string }) => {
+        this.sseService.stopWatchingWorkspace();
+        this.store$.dispatch({
+          type: Workspaces.REMOVE_WORKSPACE, payload: { workspaceId: data.id }
+        });
+      });
   }
 }

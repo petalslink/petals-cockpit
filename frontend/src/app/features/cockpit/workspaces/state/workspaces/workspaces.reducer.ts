@@ -16,6 +16,7 @@
  */
 
 import { Action } from '@ngrx/store';
+import { omit } from 'underscore';
 
 import { IWorkspacesTable } from './workspaces.interface';
 import { workspacesTableFactory } from './workspaces.initial-state';
@@ -163,12 +164,71 @@ export class Workspaces {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static CLOSE_WORKSPACE = `${Workspaces.reducerName}_CLOSE_WORKSPACE`;
-  private static closeWorkspace(workspacesTable: IWorkspacesTable, _payload) {
-    return {
+  public static DELETE_WORKSPACE = `${Workspaces.reducerName}_DELETE_WORKSPACE`;
+  private static deleteWorkspace(workspacesTable: IWorkspacesTable, _payload) {
+    return <IWorkspacesTable>{
       ...workspacesTable,
-      selectedWorkspaceId: ''
+      ...<IWorkspacesTable>{
+        isRemovingWorkspace: true
+      }
     };
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DELETE_WORKSPACE_SUCCESS = `${Workspaces.reducerName}_DELETE_WORKSPACE_SUCCESS`;
+  private static deleteWorkspaceSuccess(workspacesTable: IWorkspacesTable, _payload) {
+    return <IWorkspacesTable>{
+      ...workspacesTable,
+      ...<IWorkspacesTable>{
+        deletedWorkspace: true
+      }
+    };
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DELETE_WORKSPACE_FAILED = `${Workspaces.reducerName}_DELETE_WORKSPACE_FAILED`;
+  private static deleteWorkspaceFailed(workspacesTable: IWorkspacesTable, _payload) {
+    return <IWorkspacesTable>{
+      ...workspacesTable,
+      ...<IWorkspacesTable>{
+        isRemovingWorkspace: false
+      }
+    };
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static REMOVE_WORKSPACE = `${Workspaces.reducerName}_REMOVE_WORKSPACE`;
+  private static removeWorkspace(workspacesTable: IWorkspacesTable, payload) {
+    if (workspacesTable.selectedWorkspaceId === payload.workspaceId) {
+      return <IWorkspacesTable>{
+        ...workspacesTable,
+        ...<IWorkspacesTable>{
+          deletedWorkspace: true
+        }
+      };
+    } else {
+      return workspacesTable;
+    }
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static CLOSE_WORKSPACE = `${Workspaces.reducerName}_CLOSE_WORKSPACE`;
+  private static closeWorkspace(workspacesTable: IWorkspacesTable, payload) {
+    if (workspacesTable.selectedWorkspaceId && payload && payload.delete) {
+      return <IWorkspacesTable>{
+        ...workspacesTable,
+        byId: omit(workspacesTable.byId, workspacesTable.selectedWorkspaceId),
+        allIds: workspacesTable.allIds.filter(id => id !== workspacesTable.selectedWorkspaceId),
+        selectedWorkspaceId: '',
+        deletedWorkspace: false,
+        isRemovingWorkspace: false
+      };
+    } else {
+      return {
+        ...workspacesTable,
+        selectedWorkspaceId: ''
+      };
+    }
   }
 
   // tslint:disable-next-line:member-ordering
@@ -190,6 +250,10 @@ export class Workspaces {
     [Workspaces.POST_WORKSPACE]: Workspaces.postWorkspace,
     [Workspaces.POST_WORKSPACE_SUCCESS]: Workspaces.postWorkspaceSuccess,
     [Workspaces.POST_WORKSPACE_FAILED]: Workspaces.postWorkspaceFailed,
+    [Workspaces.DELETE_WORKSPACE]: Workspaces.deleteWorkspace,
+    [Workspaces.DELETE_WORKSPACE_SUCCESS]: Workspaces.deleteWorkspaceSuccess,
+    [Workspaces.DELETE_WORKSPACE_FAILED]: Workspaces.deleteWorkspaceFailed,
+    [Workspaces.REMOVE_WORKSPACE]: Workspaces.removeWorkspace,
     [Workspaces.CLOSE_WORKSPACE]: Workspaces.closeWorkspace,
     // Search
     [Workspaces.SET_SEARCH]: Workspaces.setSearch,

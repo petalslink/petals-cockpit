@@ -34,9 +34,6 @@ describe(`Workspaces`, () => {
     // check that 1 workspace is displayed
     expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(1);
 
-    // check that workspaces have icons
-    expect(element.all(by.css(`app-workspaces-dialog md-card md-icon`)).count()).toEqual(1);
-
     const availableUsersList = 'Administrator, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER';
 
     // check the current list content
@@ -165,5 +162,42 @@ describe(`Workspaces`, () => {
     const cardsText = element.all(by.css(`app-workspaces-dialog div md-card-title-group`)).getText();
 
     expect(cardsText).toEqual(workspacesAndOwners);
+  });
+
+  it(`should delete a current workspace`, () => {
+    page.login(`admin`, `admin`);
+
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
+
+    const btnDeleteWks = element(by.css(`app-workspace .btn-delete-wks`));
+    // let's delete the workspace
+    btnDeleteWks.click();
+
+    // a dialog is shown
+    const confirmText = element(by.css(`app-workspace-deletion-dialog .mat-dialog-content`));
+    expect(confirmText.getText()).toEqual(`Everything in the workspace will be deleted!\nAre you sure you want to delete Workspace 0?`);
+
+    // let's confirm the deletion
+    element(by.css(`app-workspace-deletion-dialog .btn-confirm-delete-wks`)).click();
+
+    // the button should be disabled once we confirmed deletion
+    // and shouldn't be clickable anymore (except in case of HTTP error)
+    expect(btnDeleteWks.isEnabled()).toBe(false);
+
+    // now we get a notification saying the workspace is deleted
+    const deletedText = element(by.css(`app-workspace-deleted-dialog .mat-dialog-content`));
+    expect(deletedText.getText()).toEqual(`This workspace was deleted, click on OK to go back to the workspaces list.`);
+
+    // ensure we are stil on the same workspace until we click
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
+
+    // let's get redirected
+    element(by.css(`app-workspace-deleted-dialog button`)).click();
+
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
+    browser.wait(EC.invisibilityOf(element(by.css(`app-cockpit md-sidenav`))), 5000);
+
+    // now that the previous workspace is deleted, check that only 1 workspace is displayed
+    expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(1);
   });
 });

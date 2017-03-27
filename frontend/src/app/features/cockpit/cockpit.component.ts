@@ -45,6 +45,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
 
   public ui$: Observable<IUi>;
   private uiSub: Subscription;
+  private deleteSub: Subscription;
   public sidenavVisible$: Observable<boolean>;
   public sidenavMode$: Observable<string>;
   public workspace$: Observable<IWorkspace>;
@@ -82,6 +83,12 @@ export class CockpitComponent implements OnInit, OnDestroy {
         }
       });
 
+    this.deleteSub = this.store$
+      .select(state => state.workspaces.deletedWorkspace)
+      .filter(d => d)
+      .do(_ => this.openDeletedWorkspaceDialog())
+      .subscribe();
+
     // TODO ultimately, the sidebar should be moved to WorkspaceComponent
     this.sidenavVisible$ = this.store$
       .select(state => state.ui.isSidenavVisible && /\/workspaces\/\w+/.test(this.router.url));
@@ -116,6 +123,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.uiSub.unsubscribe();
+    this.deleteSub.unsubscribe();
   }
 
   private doOpenWorkspacesDialog() {
@@ -130,6 +138,14 @@ export class CockpitComponent implements OnInit, OnDestroy {
       this.store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
       this.workspacesDialogRef = null;
     });
+  }
+
+  openDeletedWorkspaceDialog() {
+    this.dialog.open(DeletedWorkspaceDialogComponent)
+      .afterClosed()
+      .subscribe(() => {
+        this.store$.dispatch({ type: Workspaces.CLOSE_WORKSPACE, payload: { delete: true } });
+      });
   }
 
   openWorkspacesDialog() {
@@ -152,3 +168,29 @@ export class CockpitComponent implements OnInit, OnDestroy {
     this.store$.dispatch({ type: Ui.TOGGLE_SIDENAV });
   }
 }
+
+@Component({
+  selector: 'app-workspace-deleted-dialog',
+  template: `
+    <div fxLayout="column" class="content content-max-width">
+      <div class="central-content">
+        <div fxLayout="row" md-dialog-title fxLayoutAlign="start start">
+          <span fxLayoutAlign="start center">
+            <md-icon color="primary">check_circle</md-icon>
+            <span class="margin-left-x1">Workspace deleted!</span>
+          </span>
+        </div>
+        <md-dialog-content>
+          <div fxLayout="column" fxFill>
+              <p>This workspace was deleted, <b>click on OK</b> to go back to the workspaces list.</p>
+          </div>
+        </md-dialog-content>
+        <md-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
+          <button md-raised-button md-dialog-close color="primary">OK</button>
+        </md-dialog-actions>
+      </div>
+    </div>
+  `,
+  styles: ['md-dialog-content { height: 100%; } .central-content { padding: 24px; }']
+})
+export class DeletedWorkspaceDialogComponent { }

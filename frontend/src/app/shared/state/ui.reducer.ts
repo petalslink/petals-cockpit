@@ -19,6 +19,7 @@ import { Action } from '@ngrx/store';
 
 import { IUi } from '../interfaces/ui.interface';
 import { uiState } from './ui.state';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 
 export class Ui {
   private static reducerName = 'UI_REDUCER';
@@ -101,6 +102,18 @@ export class Ui {
     };
   }
 
+  private static closeWorkspace(ui: IUi, payload) {
+    if (payload && payload.delete) {
+      return {
+        ...ui,
+        isSidenavVisible: false,
+        isPopupListWorkspacesVisible: true
+      };
+    } else {
+      return ui;
+    }
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -111,6 +124,8 @@ export class Ui {
     [Ui.CLOSE_SIDENAV]: Ui.closeSidenav,
     [Ui.OPEN_POPUP_WORKSPACES_LIST]: Ui.openPopupWorkspacesList,
     [Ui.CLOSE_POPUP_WORKSPACES_LIST]: Ui.closePopupWorkspacesList,
-    [Ui.SET_TITLES]: Ui.setTitles
+    [Ui.SET_TITLES]: Ui.setTitles,
+
+    [Workspaces.CLOSE_WORKSPACE]: Ui.closeWorkspace
   };
 }

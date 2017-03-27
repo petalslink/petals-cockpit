@@ -15,20 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IWorkspacesTable } from './workspaces.interface';
+import { NgModule } from '@angular/core';
 
-export function workspacesTableFactory(): IWorkspacesTable {
-  return {
-    selectedWorkspaceId: '',
+import { WorkspaceComponent, WorkspaceDeleteDialogComponent } from 'app/features/cockpit/workspaces/workspace/workspace.component';
+import { SharedModule } from 'app/shared/shared.module';
 
-    isAddingWorkspace: false,
-    isFetchingWorkspaces: false,
-    searchPetals: '',
-
-    isRemovingWorkspace: false,
-    deletedWorkspace: false,
-
-    byId: {},
-    allIds: []
-  };
-}
+@NgModule({
+  imports: [
+    SharedModule
+  ],
+  declarations: [
+    WorkspaceComponent,
+    WorkspaceDeleteDialogComponent
+  ],
+  entryComponents: [WorkspaceDeleteDialogComponent]
+})
+export class WorkspaceModule { }

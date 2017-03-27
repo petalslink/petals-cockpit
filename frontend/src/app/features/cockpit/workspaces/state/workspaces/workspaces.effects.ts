@@ -17,7 +17,8 @@
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Action } from '@ngrx/store';
+import { Router } from '@angular/router';
+import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -39,11 +40,14 @@ import { NotificationsService } from 'angular2-notifications';
 import { ServiceUnitsService } from '../../../../../shared/services/service-units.service';
 import { ComponentsService } from '../../../../../shared/services/components.service';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
+import { IStore } from 'app/shared/interfaces/store.interface';
 
 @Injectable()
 export class WorkspacesEffects {
   constructor(
     private actions$: Actions,
+    private store$: Store<IStore>,
+    private router: Router,
     private workspacesService: WorkspacesService,
     private sseService: SseService,
     private busesService: BusesService,
@@ -109,7 +113,12 @@ export class WorkspacesEffects {
     .ofType(Workspaces.CLOSE_WORKSPACE)
     .do(_ => this.sub && this.sub.unsubscribe())
     .do(_ => this.sseService.stopWatchingWorkspace())
-    .do(_ => this.notification.remove());
+    .do(_ => this.notification.remove())
+    .do((action: Action) => {
+      if (action.payload && action.payload.delete) {
+        this.router.navigate(['/workspaces']);
+      }
+    });
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchWorkspace$: Observable<Action> = this.actions$
@@ -124,6 +133,7 @@ export class WorkspacesEffects {
         this.sub.add(this.busesService.watchEventBusImportError().subscribe());
         this.sub.add(this.serviceUnitsService.watchEventSuStateChangeOk().subscribe());
         this.sub.add(this.componentsService.watchEventComponentStateChangeOk().subscribe());
+        this.sub.add(this.workspacesService.watchEventWorkspaceDeleted().subscribe());
 
         return { type: Workspaces.FETCH_WORKSPACE_WAIT_SSE, payload: action.payload };
       })
@@ -158,5 +168,25 @@ export class WorkspacesEffects {
         this.notification.error(`Workspace`, `An error occured while loading the workspace.`);
         return Observable.of({ type: Workspaces.FETCH_WORKSPACE_FAILED, payload: action.payload });
       })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) deleteWorkspace$: Observable<Action> = this.actions$
+    .ofType(Workspaces.DELETE_WORKSPACE)
+    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .switchMap(([_, wsId]) =>
+      this.workspacesService
+        .deleteWorkspace(wsId)
+        .map(__ => ({ type: Workspaces.DELETE_WORKSPACE_SUCCESS }))
+        .catch(err => {
+          if (environment.debug) {
+            console.group();
+            console.warn('Error catched in workspace.effects : ofType(Workspaces.DELETE_WORKSPACE)');
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of({ type: Workspaces.DELETE_WORKSPACE_FAILED });
+        })
     );
 }

@@ -26,6 +26,11 @@ export interface IWorkspacesCommon {
 
   searchPetals: string;
 
+  // for the action of deleting
+  isRemovingWorkspace: boolean;
+
+  // for all users of the workspace that was deleted
+  deletedWorkspace: boolean;
 }
 
 export interface IWorkspacesTableOnly {

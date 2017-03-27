@@ -64,7 +64,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 [class.background-color-light-green-x2]="(workspaces$ | async).selectedWorkspaceId === workspace.id"
               >
                 <div fxLayoutAlign="center start">
-                  <md-icon color="primary" *ngIf="!(workspaces$ | async).selectedWorkspaceId && (workspaces$ | async).list.length !== 0 && workspace.users.list.length >= 1">folder</md-icon>
                   <md-icon color="primary" *ngIf="(workspaces$ | async).selectedWorkspaceId === workspace.id && workspace.users.list.length === 1">folder_open</md-icon>
                   <md-icon color="primary" *ngIf="(workspaces$ | async).selectedWorkspaceId === workspace.id && workspace.users.list.length > 1">folder_shared</md-icon>
                 </div>
