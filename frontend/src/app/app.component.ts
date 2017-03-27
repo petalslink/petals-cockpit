@@ -33,9 +33,6 @@ export class AppComponent implements OnInit, OnDestroy {
   private languageSub: Subscription;
   public notificationOptions = {
     position: ['bottom', 'right'],
-    // this timeout doesn't make any sense
-    // should open an issue on Github
-    // https://github.com/flauc/angular2-notifications
     timeOut: 2500,
     lastOnBottom: true,
     showProgressBar: true,

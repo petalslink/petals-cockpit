@@ -48,8 +48,7 @@ const productionReducer = compose(enableBatching, combineReducers)(reducers);
 
 // enableBatching allows us to dispatch multiple actions
 // without letting the subscribers being warned between the actions
-// only at the end : https://github.com/tshelburne/redux-batched-actions
-// can be very handy when normalizing HTTP response
+// only at the end. It is very handy when normalizing HTTP response
 export function getRootReducer(state: any, action: any) {
   if (environment.production) {
     return productionReducer(state, action);

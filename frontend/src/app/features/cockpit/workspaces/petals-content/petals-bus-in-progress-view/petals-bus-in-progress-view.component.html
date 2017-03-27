@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <md-card>
           <md-card-content>
             <div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="10px">
-              <!-- once this issue https://github.com/angular/flex-layout/issues/108 -->
-              <!-- is fixed, replace fxFlex="45" to 50 -->
+              <!-- To have more deterministic behavour, we should be able to set 50 to say 2 per line
+                   See: https://github.com/angular/flex-layout/issues/235 -->
               <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
                 <md-input-container #ipInput fxFill>
                   <input mdInput placeholder="IP or hostname" formControlName="ip" required>
