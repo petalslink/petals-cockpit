@@ -185,7 +185,7 @@ export class Buses {
     };
   }
 
-  private static closeWorkspace(_busesTable: IBusesTable, _payload) {
+  private static cleanWorkspace(_busesTable: IBusesTable, _payload) {
     return busesTableFactory();
   }
 
@@ -203,6 +203,6 @@ export class Buses {
     [Buses.FETCH_BUS_DETAILS_SUCCESS]: Buses.fetchBusDetailsSuccess,
     [Buses.FETCH_BUS_DETAILS_ERROR]: Buses.fetchBusDetailsError,
 
-    [Workspaces.CLOSE_WORKSPACE]: Buses.closeWorkspace
+    [Workspaces.CLEAN_WORKSPACE]: Buses.cleanWorkspace
   };
 }

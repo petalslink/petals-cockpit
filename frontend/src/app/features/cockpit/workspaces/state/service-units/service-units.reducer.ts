@@ -193,7 +193,7 @@ export class ServiceUnits {
     };
   }
 
-  private static closeWorkspace(_serviceUnitsTable: IserviceUnitsTable, _payload) {
+  private static cleanWorkspace(_serviceUnitsTable: IserviceUnitsTable, _payload) {
     return serviceUnitsTableFactory();
   }
 
@@ -211,6 +211,6 @@ export class ServiceUnits {
     [ServiceUnits.CHANGE_STATE_ERROR]: ServiceUnits.changeStateError,
     [ServiceUnits.REMOVE_SERVICE_UNIT]: ServiceUnits.removeServiceUnit,
 
-    [Workspaces.CLOSE_WORKSPACE]: ServiceUnits.closeWorkspace
+    [Workspaces.CLEAN_WORKSPACE]: ServiceUnits.cleanWorkspace
   };
 }

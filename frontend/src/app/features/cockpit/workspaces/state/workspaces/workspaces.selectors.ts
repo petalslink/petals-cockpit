@@ -18,7 +18,7 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IWorkspaces, IWorkspacesTable } from './workspaces.interface';
+import { IWorkspaces } from './workspaces.interface';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IComponent } from '../components/component.interface';
 import { IContainer } from '../containers/container.interface';
@@ -61,15 +61,19 @@ export function getWorkspacesList() {
 // -----------------------------------------------------------
 
 export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspace> {
-  return store$.select(state => [
-    state.workspaces,
-    state.users,
-    state.buses,
-    state.containers,
-    state.components,
-    state.serviceUnits
-  ])
-    .filter(([workspaces]: [IWorkspacesTable]) => !!workspaces.selectedWorkspaceId)
+  return store$
+    .filter(state =>
+      state.workspaces.selectedWorkspaceId
+      && state.workspaces.byId[state.workspaces.selectedWorkspaceId]
+      && state.workspaces.byId[state.workspaces.selectedWorkspaceId].isFetched)
+    .map(state => [
+      state.workspaces,
+      state.users,
+      state.buses,
+      state.containers,
+      state.components,
+      state.serviceUnits
+    ])
     // as the object has a new reference every time,
     // use distinctUntilChanged for performance
     .distinctUntilChanged(arrayEquals)

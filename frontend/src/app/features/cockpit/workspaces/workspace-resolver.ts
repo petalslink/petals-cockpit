@@ -22,7 +22,6 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from './../../../shared/interfaces/store.interface';
 import { Workspaces } from './state/workspaces/workspaces.reducer';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 
 @Injectable()
 export class WorkspaceResolver implements Resolve<Observable<any>> {
@@ -31,15 +30,12 @@ export class WorkspaceResolver implements Resolve<Observable<any>> {
   resolve(route: ActivatedRouteSnapshot) {
     const workspaceId = route.paramMap.get('workspaceId');
 
-    this.store$.dispatch(batchActions([
-      { type: Workspaces.CLOSE_WORKSPACE },
-      { type: Workspaces.FETCH_WORKSPACE, payload: workspaceId }
-    ]));
+    this.store$.dispatch({ type: Workspaces.FETCH_WORKSPACE, payload: workspaceId });
 
     return this
       .store$
-      .select(state => state.workspaces.selectedWorkspaceId)
-      .filter(selectedWorkspaceId => selectedWorkspaceId === workspaceId)
+      .select(state => state.workspaces.byId[workspaceId])
+      .filter(ws => ws && ws.isFetching)
       .first();
   }
 }

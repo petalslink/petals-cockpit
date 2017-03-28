@@ -142,7 +142,10 @@ export class Workspaces {
           [payload.id]: <IWorkspaceRow>{
             ...workspacesTable.byId[payload.id],
             ...payload,
-            ...<IWorkspaceRow>{ isFetching: false }
+            ...<IWorkspaceRow>{
+              isFetching: false,
+              isFetched: true
+            }
           }
         }
       }
@@ -210,6 +213,9 @@ export class Workspaces {
       return workspacesTable;
     }
   }
+
+  // tslint:disable-next-line:member-ordering
+  public static CLEAN_WORKSPACE = `${Workspaces.reducerName}_CLEAN_WORKSPACE`;
 
   // tslint:disable-next-line:member-ordering
   public static CLOSE_WORKSPACE = `${Workspaces.reducerName}_CLOSE_WORKSPACE`;
