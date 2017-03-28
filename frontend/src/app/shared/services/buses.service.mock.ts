@@ -29,6 +29,8 @@ import * as helper from './../helpers/mock.helper';
 import { busesService } from './../../../mocks/buses-mock';
 import { workspacesService } from '../../../mocks/workspaces-mock';
 import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
+import { UsersService } from 'app/shared/services/users.service';
+import { UsersMockService } from 'app/shared/services/users.service.mock';
 
 @Injectable()
 export class BusesMockService extends BusesServiceImpl {
@@ -39,6 +41,7 @@ export class BusesMockService extends BusesServiceImpl {
     http: Http,
     store$: Store<IStore>,
     private pSseService: SseService,
+    private userService: UsersService,
     notifications: NotificationsService) {
     super(http, store$, pSseService, notifications);
   }
@@ -84,7 +87,10 @@ export class BusesMockService extends BusesServiceImpl {
       .do(_ => {
         // simulate the backend sending the answer on the SSE
         setTimeout(() => (this.pSseService as SseServiceMock)
-          .triggerSseEvent(SseWorkspaceEvent.BUS_DELETED, { id }), environment.sseDelay);
+          .triggerSseEvent(SseWorkspaceEvent.BUS_DELETED, {
+            id,
+            reason: `bus deleted by ${(this.userService as UsersMockService).getCurrentUser().id}`
+          }), environment.sseDelay);
       });
   }
 
