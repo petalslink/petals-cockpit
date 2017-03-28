@@ -154,7 +154,6 @@ public class WorkspaceResource {
     @Path("/buses")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Valid
     public BusInProgress addBus(@NotNull @Valid BusImport nb) throws InterruptedException {
 
         checkAccess(jooq);
@@ -164,11 +163,12 @@ public class WorkspaceResource {
 
     @DELETE
     @Path("/buses/{bId}")
-    public void delete(@NotNull @PathParam("bId") @Min(1) long bId) throws InterruptedException {
+    @Produces(MediaType.APPLICATION_JSON)
+    public BusDeleted delete(@NotNull @PathParam("bId") @Min(1) long bId) throws InterruptedException {
 
         checkAccess(jooq);
 
-        as.call(wsId, new DeleteBus(bId));
+        return as.call(wsId, new DeleteBus(bId));
     }
 
     @PUT

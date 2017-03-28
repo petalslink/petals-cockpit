@@ -36,7 +36,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.io.EofException;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.OutboundEvent;
@@ -207,8 +206,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         return eo;
     }
 
-    @Nullable
-    private Void handleDeleteBus(DeleteBus bus) throws SuspendExecution {
+    private BusDeleted handleDeleteBus(DeleteBus bus) throws SuspendExecution {
         runBlockingTransaction(conf -> {
             int deleted = DSL.using(conf).deleteFrom(BUSES).where(BUSES.ID.eq(bus.bId).and(BUSES.WORKSPACE_ID.eq(wId)))
                     .execute();
@@ -220,9 +218,11 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             return null;
         });
 
-        broadcast(WorkspaceEvent.busDeleted(new BusDeleted(bus.bId)));
+        BusDeleted bd = new BusDeleted(bus.bId);
 
-        return null;
+        doInActorLoop(() -> broadcast(WorkspaceEvent.busDeleted(bd)));
+
+        return bd;
     }
 
     private BusInProgress handleImportBus(ImportBus bus) throws SuspendExecution {
@@ -599,7 +599,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    public static class DeleteBus extends WorkspaceRequest<@Nullable Void> {
+    public static class DeleteBus extends WorkspaceRequest<BusDeleted> {
 
         private static final long serialVersionUID = 1L;
 

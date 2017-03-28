@@ -93,6 +93,18 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         });
     }
 
+    private void expectImportBusEvent(EventInput eventInput, BusInProgress post) {
+        expectEvent(eventInput, (e, a) -> {
+            a.assertThat(e.getName()).isEqualTo("BUS_IMPORT");
+            BusInProgress data = e.readData(BusInProgress.class);
+            a.assertThat(data.id).isEqualTo(post.id);
+            a.assertThat(data.ip).isEqualTo(post.ip);
+            a.assertThat(data.port).isEqualTo(post.port);
+            a.assertThat(data.username).isEqualTo(post.username);
+            a.assertThat(data.importError).isEqualTo(post.importError);
+        });
+    }
+
     @Test
     public void testImportBusOk() {
         long busId;
@@ -111,15 +123,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             assertThat(post.username).isEqualTo(container.getJmxUsername());
             assertThat(post.importError).isNull();
 
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT");
-                BusInProgress data = e.readData(BusInProgress.class);
-                a.assertThat(data.id).isEqualTo(post.id);
-                a.assertThat(data.ip).isEqualTo(post.ip);
-                a.assertThat(data.port).isEqualTo(post.port);
-                a.assertThat(data.username).isEqualTo(post.username);
-                a.assertThat(data.importError).isEqualTo(post.importError);
-            });
+            expectImportBusEvent(eventInput, post);
 
             // there should be only one!
             Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
@@ -227,15 +231,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             assertThat(post.username).isEqualTo(container.getJmxUsername());
             assertThat(post.importError).isNull();
 
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT");
-                BusInProgress data = e.readData(BusInProgress.class);
-                a.assertThat(data.id).isEqualTo(post.id);
-                a.assertThat(data.ip).isEqualTo(post.ip);
-                a.assertThat(data.port).isEqualTo(post.port);
-                a.assertThat(data.username).isEqualTo(post.username);
-                a.assertThat(data.importError).isEqualTo(post.importError);
-            });
+            expectImportBusEvent(eventInput, post);
 
             // there should be only one!
             Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
@@ -285,9 +281,9 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
                 a.assertThat(c.content.busesInProgress).containsOnlyKeys(String.valueOf(busId));
             });
 
-            Response delete = resources.target("/workspaces/1/buses/" + busId).request().delete();
+            BusDeleted delete = resources.target("/workspaces/1/buses/" + busId).request().delete(BusDeleted.class);
 
-            assertThat(delete.getStatus()).isEqualTo(204);
+            assertThat(delete.id).isEqualTo(busId);
 
             Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
             assertThat(buses).hasSize(0);
@@ -295,7 +291,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("BUS_DELETED");
                 BusDeleted data = e.readData(BusDeleted.class);
-                a.assertThat(data.id).isEqualTo(busId);
+                a.assertThat(data.id).isEqualTo(delete.id);
             });
         }
     }
