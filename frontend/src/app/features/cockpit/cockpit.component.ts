@@ -133,6 +133,12 @@ export class CockpitComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.uiSub.unsubscribe();
     this.deleteSub.unsubscribe();
+    // since the dialog is not really attached to the cockpit component in the DOM
+    // it can stay even if the component is destroyed!
+    if (this.workspacesDialogRef != null) {
+      this.workspacesDialogRef.close();
+      this.workspacesDialogRef = null;
+    }
   }
 
   private doOpenWorkspacesDialog() {
