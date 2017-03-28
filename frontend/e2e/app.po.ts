@@ -62,9 +62,9 @@ export class PetalsCockpitPage {
 
   logout() {
     // open the user menu
-    element(by.css(`app-cockpit md-toolbar .btn-open-menu`)).click();
+    element(by.css(`app-cockpit md-toolbar .btn-avatar-user`)).click();
     // and logout
-    const logout = element(by.css(`.btn-menu-logout`));
+    const logout = element(by.css(`.btn-logout-user`));
     browser.wait(EC.elementToBeClickable(logout), 1000);
     logout.click();
   }
