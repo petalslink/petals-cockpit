@@ -168,7 +168,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        return as.call(wsId, new DeleteBus(bId));
+        return as.call(wsId, new DeleteBus(profile.getId(), bId));
     }
 
     @PUT
@@ -353,9 +353,13 @@ public class WorkspaceResource {
         @Min(1)
         public final long id;
 
+        @NotEmpty
+        public final String reason;
+
         @JsonCreator
-        public BusDeleted(@JsonProperty("id") long id) {
+        public BusDeleted(@JsonProperty("id") long id, @JsonProperty("reason") String reason) {
             this.id = id;
+            this.reason = reason;
         }
 
         @JsonProperty

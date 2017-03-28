@@ -30,7 +30,9 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -103,6 +105,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     private static final long serialVersionUID = -2202357041789526859L;
 
     private final SseBroadcaster broadcaster = new SseBroadcaster();
+
+    private final Map<Long, Fiber<?>> importsInProgress = new HashMap<>();
 
     private final long wId;
 
@@ -218,7 +222,17 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             return null;
         });
 
-        BusDeleted bd = new BusDeleted(bus.bId);
+        Fiber<?> fiber = importsInProgress.remove(bus.bId);
+
+        String reason;
+        if (fiber == null) {
+            reason = "Bus deleted by " + bus.user;
+        } else {
+            fiber.cancel(true);
+            reason = "Import cancelled by " + bus.user;
+        }
+
+        BusDeleted bd = new BusDeleted(bus.bId, reason);
 
         doInActorLoop(() -> broadcast(WorkspaceEvent.busDeleted(bd)));
 
@@ -248,39 +262,59 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     }
 
     private void importBusInFiber(final BusImport nb, final long bId) {
-        new Fiber<>(() -> {
-            // this can be interrupted by Fiber.cancel
+        Fiber<?> importFiber = new Fiber<>(() -> {
+            // this can be interrupted by Fiber.cancel: if it happens, the fiber will simply be stopped
+            // and removed from the map by the delete handling
             final Either<String, Domain> res = doImportExistingBus(nb);
 
             // once we got the topology, it can't be cancelled anymore
             // that's why the actions are passed back to the actor
-            // (we don't want the fiber to be interrupted!)
-            doInActorLoop(() -> broadcast(runBlockingTransaction(
-                    conf -> res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
-                        try {
-                            return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, bId, topology));
-                        } catch (WorkspaceContent.InvalidPetalsBus e) {
-                            return Either.left(e.getMessage());
-                        }
-                    }).fold(error -> {
-                        LOG.info("Can't import bus from container {}:{}: {}", nb.ip, nb.port, error);
-                        DSL.using(conf).update(BUSES).set(BUSES.IMPORT_ERROR, error).where(BUSES.ID.eq(bId)).execute();
-                        return WorkspaceEvent
-                                .busImportError(new BusInProgress(bId, nb.ip, nb.port, nb.username, error));
-                    }, content -> WorkspaceEvent.busImportOk(content)))));
-        }).start();
+            // so that the fiber terminate and can't be cancelled
+            doInActorLoop(() -> {
+                // in any case we now remove it if it's there
+                Fiber<?> f = importsInProgress.remove(bId);
+
+                // if it's null, it has been cancelled!
+                if (f != null) {
+                    broadcast(runBlockingTransaction(conf -> {
+                        return res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
+                            try {
+                                return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, bId, topology));
+                            } catch (WorkspaceContent.InvalidPetalsBus e) {
+                                return Either.left(e.getMessage());
+                            }
+                        }).fold(error -> {
+                            LOG.info("Can't import bus from container {}:{}: {}", nb.ip, nb.port, error);
+                            DSL.using(conf).update(BUSES).set(BUSES.IMPORT_ERROR, error).where(BUSES.ID.eq(bId))
+                                    .execute();
+                            return WorkspaceEvent
+                                    .busImportError(new BusInProgress(bId, nb.ip, nb.port, nb.username, error));
+                        }, WorkspaceEvent::busImportOk);
+                    }));
+                }
+            });
+        });
+
+        // store it before starting to prevent race condition
+        importsInProgress.put(bId, importFiber);
+
+        importFiber.start();
     }
 
     // TODO in the future, there should be multiple methods like this for multiple type of imports
     @Suspendable
-    private Either<String, Domain> doImportExistingBus(BusImport bus) {
+    private Either<String, Domain> doImportExistingBus(BusImport bus) throws InterruptedException {
         try {
+            // TODO even though runBlocking can be interrupted, the petals admin code is based on RMI which cannot be
+            // interrupted, so it will continue to be executed even after InterruptedException is thrown. There is
+            // nothing we can do for this until petals admin is changed.
             Domain topology = runBlockingAdmin(bus.ip, bus.port, bus.username, bus.password,
                     petals -> petals.newContainerAdministration().getTopology(bus.passphrase, true));
             assert topology != null;
             return Either.right(topology);
         } catch (InterruptedException e) {
-            return Either.left("Import cancelled");
+            // let's let it propagate up to the fiber and be swallowed
+            throw e;
         } catch (Exception e) {
             String m = e.getMessage();
             String message = m != null ? m : e.getClass().getName();
@@ -603,9 +637,12 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         private static final long serialVersionUID = 1L;
 
+        final String user;
+
         final long bId;
 
-        public DeleteBus(long bId) {
+        public DeleteBus(String user, long bId) {
+            this.user = user;
             this.bId = bId;
         }
     }

@@ -71,7 +71,8 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
         }
     }
 
-    protected <R> R runBlockingTransaction(Configuration conf, TransactionalCallable<R> transaction) throws SuspendExecution {
+    protected <R> R runBlockingTransaction(Configuration conf, TransactionalCallable<R> transaction)
+            throws SuspendExecution {
         // TODO catch DataAccessException and handle their cause if possible? e.g. for petals admin errors!
         return runBlocking(() -> DSL.using(conf).transactionResult(transaction));
     }
@@ -81,19 +82,13 @@ public abstract class CockpitActor<M> extends BasicActor<M, Void> {
     }
 
     protected <R> R runBlockingAdmin(String ip, int port, String username, String password,
-            CheckedFunction1<PetalsAdministration, R> f) throws Exception, SuspendExecution {
-        try {
-            return FiberAsync.runBlocking(executor, new CheckedCallable<R, Exception>() {
-                @Override
-                public R call() throws Exception {
-                    return runAdmin(ip, port, username, password, f);
-                }
-            });
-        } catch (InterruptedException e) {
-            // TODO until https://github.com/puniverse/quasar/issues/245 is fixed, we shouldn't interrupt
-            // runBlocking because the actual behaviour is not the expected one!
-            throw new AssertionError("This should not be interrupted!", e);
-        }
+            CheckedFunction1<PetalsAdministration, R> f) throws Exception, SuspendExecution, InterruptedException {
+        return FiberAsync.runBlocking(executor, new CheckedCallable<R, Exception>() {
+            @Override
+            public R call() throws Exception {
+                return runAdmin(ip, port, username, password, f);
+            }
+        });
     }
 
     protected <R> R runAdmin(String ip, int port, String username, String password,
