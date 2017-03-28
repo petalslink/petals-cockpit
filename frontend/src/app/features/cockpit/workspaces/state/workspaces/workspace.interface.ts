@@ -26,6 +26,7 @@ interface IWorkspaceCommon {
 
   // when a worspace is being fetched
   isFetching: boolean;
+  isFetched: boolean;
 }
 
 // used within table

@@ -198,7 +198,7 @@ export class Containers {
     };
   }
 
-  private static closeWorkspace(_containersTable: IContainersTable, _payload) {
+  private static cleanWorkspace(_containersTable: IContainersTable, _payload) {
     return containersTableFactory();
   }
 
@@ -216,6 +216,6 @@ export class Containers {
     [Containers.FETCH_CONTAINER_DETAILS_ERROR]: Containers.fetchContainerDetailsError,
 
     [Components.REMOVE_COMPONENT]: Containers.removeComponent,
-    [Workspaces.CLOSE_WORKSPACE]: Containers.closeWorkspace
+    [Workspaces.CLEAN_WORKSPACE]: Containers.cleanWorkspace
   };
 }

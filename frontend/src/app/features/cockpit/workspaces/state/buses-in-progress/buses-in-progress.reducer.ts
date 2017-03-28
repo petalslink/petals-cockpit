@@ -158,7 +158,7 @@ export class BusesInProgress {
     };
   }
 
-  private static closeWorkspace(_busesInProgressTable: IBusesInProgressTable, _payload) {
+  private static cleanWorkspace(_busesInProgressTable: IBusesInProgressTable, _payload) {
     return busesInProgressTableFactory();
   }
 
@@ -175,6 +175,6 @@ export class BusesInProgress {
     [BusesInProgress.REMOVE_BUS_IN_PROGRESS]: BusesInProgress.removeBusInProgress,
     [BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS]: BusesInProgress.updateErrorBusInProgress,
 
-    [Workspaces.CLOSE_WORKSPACE]: BusesInProgress.closeWorkspace
+    [Workspaces.CLEAN_WORKSPACE]: BusesInProgress.cleanWorkspace
   };
 }

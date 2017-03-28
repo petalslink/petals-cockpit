@@ -22,6 +22,7 @@ export function workspaceRowFactory(id = '', name = ''): IWorkspaceRow {
     id,
     name,
     isFetching: false,
+    isFetched: false,
 
     users: []
   };

@@ -262,7 +262,7 @@ export class Components {
     };
   }
 
-  private static closeWorkspace(_componentsTable: IComponentsTable, _payload) {
+  private static cleanWorkspace(_componentsTable: IComponentsTable, _payload) {
     return componentsTableFactory();
   }
 
@@ -284,6 +284,6 @@ export class Components {
     [Components.REMOVE_COMPONENT]: Components.removeComponent,
 
     [ServiceUnits.REMOVE_SERVICE_UNIT]: Components.removeServiceUnit,
-    [Workspaces.CLOSE_WORKSPACE]: Components.closeWorkspace
+    [Workspaces.CLEAN_WORKSPACE]: Components.cleanWorkspace
   };
 }

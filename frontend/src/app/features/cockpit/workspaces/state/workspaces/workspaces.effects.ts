@@ -106,19 +106,22 @@ export class WorkspacesEffects {
   // tslint:disable-next-line:member-ordering
   private sub: Subscription;
 
-  // NOTE: this HAS TO be declared before fetchWorkspace below
-  // if not it will be trigerred after fetching the workspace and close the SSE!
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: false }) closeWorkspace$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true }) closeWorkspace$: Observable<Action> = this.actions$
     .ofType(Workspaces.CLOSE_WORKSPACE)
     .do(_ => this.sub && this.sub.unsubscribe())
     .do(_ => this.sseService.stopWatchingWorkspace())
-    .do(_ => this.notification.remove())
     .do((action: Action) => {
       if (action.payload && action.payload.delete) {
         this.router.navigate(['/workspaces']);
       }
-    });
+    })
+    .map(_ => ({ type: Workspaces.CLEAN_WORKSPACE }));
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: false }) cleanWorkspace$: Observable<Action> = this.actions$
+    .ofType(Workspaces.CLEAN_WORKSPACE)
+    .do(_ => this.notification.remove());
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchWorkspace$: Observable<Action> = this.actions$
@@ -145,6 +148,7 @@ export class WorkspacesEffects {
     .switchMap((action: Action) => this.sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
       .switchMap((data: any) => {
         return Observable.of(batchActions([
+          { type: Workspaces.CLEAN_WORKSPACE },
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
           { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap(data.users) },
           { type: BusesInProgress.FETCH_BUSES_IN_PROGRESS, payload: toJavascriptMap(data.busesInProgress) },
