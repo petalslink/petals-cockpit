@@ -80,12 +80,18 @@ describe(`Login`, () => {
     page.logout();
   });
 
-  it(`should display the current username in the user menu`, () => {
+  it(`should display the current username`, () => {
     page.login(`admin`, `admin`);
 
-    element(by.css(`app-cockpit md-toolbar .btn-open-menu`)).click();
+    // let's open the workspace list and ensure we can still click on the logout button
+    element(by.css(`app-cockpit md-sidenav .change-workspace`)).click();
 
-    expect(element(by.css(`.btn-menu-username div span`)).getText()).toEqual('Administrator');
+    // the logout button should be visible
+    expect(element(by.css(`app-cockpit .menu-icon`)).isEnabled()).toBe(true);
+
+    // check the name of current user logged
+    browser.actions().mouseMove(element(by.css('app-generate-icon.btn-avatar-user'))).perform();
+    expect(element(by.css('md-tooltip-component')).getText()).toEqual('Administrator');
   });
 
   it(`should selected the first input`, () => {

@@ -32,23 +32,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </span>
 
     <div fxFlex></div>
-
-    <button md-icon-button [mdMenuTriggerFor]="menu" class="btn-open-menu">
-      <app-generate-icon md-list-avatar [size]="35" [text]="(user$ | async).id"></app-generate-icon>
-      <span>{{ (user$ | async).name }}</span>
+    
+    <button md-icon-button class="margin-right-x2 btn-logout-user" [disabled]="(isDisconnecting$ | async)" (click)="disconnect()">
+      <md-icon>power_settings_new</md-icon>
     </button>
-    <md-menu #menu="mdMenu">
-      <button md-menu-item disabled class="btn-menu-username">
-        <div fxLayout="row" color="primary" fxLayoutAlign="start center">
-          <md-icon>account_circle</md-icon> <span>{{ (user$ | async).name }}</span>
-        </div>
-      </button>
-      <button [disabled]="(isDisconnecting$ | async)" md-menu-item (click)="disconnect()" class="btn-menu-logout">
-        <div fxLayout="row" fxLayoutAlign="start center">
-          <md-icon>power_settings_new</md-icon> <span class="color-primary-light-bold">Sign out</span>
-        </div>
-      </button>
-    </md-menu>
+
+    <app-generate-icon class="margin-right-x0 btn-avatar-user" [mdTooltip]="(user$ | async).name" mdTooltipPosition="below" [size]="24" [text]="(user$ | async).id"></app-generate-icon>
 
     <!--
     TODO: Find a way to handle immutability with md-select
