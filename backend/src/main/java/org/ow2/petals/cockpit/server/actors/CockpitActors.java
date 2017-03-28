@@ -95,11 +95,5 @@ public class CockpitActors {
     public abstract static class CockpitRequest<R> extends RequestMessage<R> {
 
         private static final long serialVersionUID = -5915325922592086753L;
-
-        final String user;
-
-        public CockpitRequest(String user) {
-            this.user = user;
-        }
     }
 }

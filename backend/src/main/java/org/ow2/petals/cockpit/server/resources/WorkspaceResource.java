@@ -159,7 +159,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        return as.call(wsId, new ImportBus(profile.getId(), nb));
+        return as.call(wsId, new ImportBus(nb));
     }
 
     @DELETE
@@ -168,7 +168,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        as.call(wsId, new DeleteBus(profile.getId(), bId));
+        as.call(wsId, new DeleteBus(bId));
     }
 
     @PUT
@@ -181,7 +181,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        return as.call(wsId, new ChangeServiceUnitState(profile.getId(), suId, action));
+        return as.call(wsId, new ChangeServiceUnitState(suId, action));
     }
 
     @PUT
@@ -194,7 +194,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        return as.call(wsId, new ChangeComponentState(profile.getId(), compId, action));
+        return as.call(wsId, new ChangeComponentState(compId, action));
     }
 
     @POST
@@ -220,7 +220,7 @@ public class WorkspaceResource {
 
         try (ServicedArtifact sa = httpServer.serve(saName + ".zip",
                 os -> PetalsUtils.createSAfromSU(file, os, saName, name, componentName))) {
-            return as.call(wsId, new DeployServiceUnit(profile.getId(), saName, sa.getArtifactUrl(), compId));
+            return as.call(wsId, new DeployServiceUnit(saName, sa.getArtifactUrl(), compId));
         }
     }
 

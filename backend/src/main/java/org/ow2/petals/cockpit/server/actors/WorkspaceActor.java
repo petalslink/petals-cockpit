@@ -575,18 +575,16 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     public static class WorkspaceRequest<T> extends CockpitRequest<T> implements Msg {
 
         private static final long serialVersionUID = -564899978996631515L;
-
-        public WorkspaceRequest(String user) {
-            super(user);
-        }
     }
 
     public static class NewWorkspaceClient extends WorkspaceRequest<EventOutput> {
 
         private static final long serialVersionUID = 1L;
 
+        private final String user;
+
         public NewWorkspaceClient(String user) {
-            super(user);
+            this.user = user;
         }
     }
 
@@ -596,8 +594,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         final BusImport nb;
 
-        public ImportBus(String user, BusImport nb) {
-            super(user);
+        public ImportBus(BusImport nb) {
             this.nb = nb;
         }
     }
@@ -608,8 +605,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         final long bId;
 
-        public DeleteBus(String user, long bId) {
-            super(user);
+        public DeleteBus(long bId) {
             this.bId = bId;
         }
     }
@@ -622,8 +618,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         final long suId;
 
-        public ChangeServiceUnitState(String user, long suId, SUChangeState action) {
-            super(user);
+        public ChangeServiceUnitState(long suId, SUChangeState action) {
             this.suId = suId;
             this.action = action;
         }
@@ -637,8 +632,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         final long compId;
 
-        public ChangeComponentState(String user, long compId, ComponentChangeState action) {
-            super(user);
+        public ChangeComponentState(long compId, ComponentChangeState action) {
             this.compId = compId;
             this.action = action;
         }
@@ -654,8 +648,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         final long compId;
 
-        public DeployServiceUnit(String user, String saName, URL saUrl, long compId) {
-            super(user);
+        public DeployServiceUnit(String saName, URL saUrl, long compId) {
             this.saName = saName;
             this.saUrl = saUrl;
             this.compId = compId;
