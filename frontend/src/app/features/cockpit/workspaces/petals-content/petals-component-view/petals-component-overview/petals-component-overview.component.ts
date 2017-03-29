@@ -43,4 +43,8 @@ export class PetalsComponentOverviewComponent implements OnInit {
   changeState(newState: string) {
     this.store$.dispatch({ type: Components.CHANGE_STATE, payload: { componentId: this.component.id, newState } });
   }
+
+  componentState(index, item) {
+    return this.component ? this.component.state : null;
+  }
 }

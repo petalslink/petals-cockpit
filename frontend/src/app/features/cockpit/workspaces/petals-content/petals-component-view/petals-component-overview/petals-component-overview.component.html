@@ -23,20 +23,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <md-card-title>{{ component.state }}</md-card-title>
             <md-card-content *ngIf="component.state">
               <div fxFlexLayout="row" fxLayoutAlign="end center">
-                <!--TODO : When adding attribute "md-button", the click doesn't work anymore-->
-                <span *ngFor="let possibleState of getPossibleStateActions(component.state)" fxFlexLayout="row" fxLayoutAlign="end center">
+                <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:componentState"
+                  fxFlexLayout="row"
+                  class="margin-right-x1-no-last"
+                  fxLayoutAlign="end center">
                   <button
+                    md-raised-button
+                    color="primary"
                     (click)="changeState(possibleState.newStateAfterAction)"
                     [disabled]="component.isUpdatingState || (possibleState.actionName === 'Unload' && component.serviceUnits.length > 0)"
                   >
                     {{ possibleState.actionName }}
                   </button>
 
-                  <!--TODO : The tooltip is not displayed. Potential bug with material and ng v4.-->
-                  <!--See https://github.com/angular/material2/issues/3478 for more info-->
                   <md-icon
                     *ngIf="possibleState.actionName === 'Unload'"
-                    mdTooltip="In order to unload a component, every service unit of this component should be unloaded"
+                    mdTooltip="To unload a component, all service units of the component should be unloaded first"
                     mdTooltipPosition="above"
                   >
                     info outline

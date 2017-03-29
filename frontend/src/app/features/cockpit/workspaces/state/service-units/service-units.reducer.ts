@@ -70,10 +70,9 @@ export class ServiceUnits {
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS`;
   private static fetchServiceUnitDetails(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
-    const allIds =
-      (typeof serviceUnitsTable.byId[payload.serviceUnitId] !== 'undefined'
-        ? serviceUnitsTable.allIds
-        : [...serviceUnitsTable.allIds, payload.serviceUnitId]);
+    const allIds = serviceUnitsTable.byId[payload.serviceUnitId]
+      ? serviceUnitsTable.allIds
+      : [...serviceUnitsTable.allIds, payload.serviceUnitId];
 
     return {
       ...serviceUnitsTable,

@@ -79,6 +79,10 @@ $directions: '', '-left', '-right', '-top', '-bottom';
     .margin#{$dir}-#{$keySize} {
       margin#{$dir}: #{$valueSize}px !important;
     }
+
+    .margin#{$dir}-#{$keySize}-no-last:not(:last-child) {
+      margin#{$dir}: #{$valueSize}px !important;
+    }
   }
 }
 
