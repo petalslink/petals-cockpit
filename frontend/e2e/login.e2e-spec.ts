@@ -75,9 +75,13 @@ describe(`Login`, () => {
     // now let's see if we can relogin with another user and disconnect again
     page.login(`vnoel`, `vnoel`, true, false);
 
-    element(by.css(`app-workspaces-dialog md-card-subtitle`)).click();
+    expect(element(by.css(`app-workspaces-dialog`)).isDisplayed()).toBe(true);
 
+    // we can logout even if there is the workspaces dialog
     page.logout();
+
+    // ensure dialogs are properly cleaned on component change (material attaches them to the root of the DOM)
+    expect(element(by.css(`app-workspaces-dialog`)).isPresent()).toBe(false);
   });
 
   it(`should display the current username`, () => {
