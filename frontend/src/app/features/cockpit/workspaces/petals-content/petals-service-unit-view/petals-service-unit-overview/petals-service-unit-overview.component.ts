@@ -40,6 +40,10 @@ export class PetalsServiceUnitOverviewComponent implements OnInit {
     return stateNameToPossibleActionsServiceUnit(state);
   }
 
+  suState(index, item) {
+    return this.serviceUnit ? this.serviceUnit.state : null;
+  }
+
   changeState(newState: string) {
     this.store$.dispatch({ type: ServiceUnits.CHANGE_STATE, payload: { serviceUnitId: this.serviceUnit.id, newState } });
   }

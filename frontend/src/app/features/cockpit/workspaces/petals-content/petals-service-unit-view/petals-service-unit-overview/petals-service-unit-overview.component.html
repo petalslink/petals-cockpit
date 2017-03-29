@@ -22,9 +22,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <md-card-subtitle>State</md-card-subtitle>
             <md-card-title>{{ serviceUnit.state }}</md-card-title>
             <md-card-content *ngIf="serviceUnit.state">
-              <!--TODO : When adding attribute "md-button", the click doesn't work anymore-->
               <button
-                *ngFor="let possibleState of getPossibleStateActions(serviceUnit.state)"
+                md-raised-button
+                color="primary"
+                class="margin-right-x1-no-last"
+                *ngFor="let possibleState of getPossibleStateActions(serviceUnit.state); trackBy:suState"
                 (click)="changeState(possibleState.newStateAfterAction)"
                 [disabled]="serviceUnit.isUpdatingState"
               >
