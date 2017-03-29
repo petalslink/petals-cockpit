@@ -108,7 +108,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
                 this.router.navigate(['/workspaces', this.route.snapshot.paramMap.get('workspaceId')]);
               }
             })
-            .map(_ => null);
+            .mapTo(null);
         } else {
           return this.store$
             // when the currently imported bus becomes present

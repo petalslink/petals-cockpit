@@ -23,9 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <md-card-title>{{ component.state }}</md-card-title>
             <md-card-content *ngIf="component.state">
               <div fxFlexLayout="row" fxLayoutAlign="end center">
-                <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:componentState"
-                  fxFlexLayout="row"
-                  class="margin-right-x1-no-last"
+                <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:componentState" fxFlexLayout="row" class="margin-right-x1-no-last"
                   fxLayoutAlign="end center">
                   <button
                     md-raised-button
@@ -47,7 +45,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </div>
             </md-card-content>
           </div>
-          <div class="green-led"></div>
         </md-card-title-group>
       </md-card>
 
@@ -58,11 +55,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <md-card-subtitle>Type</md-card-subtitle>
             <md-card-title>{{ component.type }}</md-card-title>
           </div>
-          <div class="green-led"></div>
         </md-card-title-group>
       </md-card>
     </div>
 
-    <!--<prettyjson fxFlex="100%" [obj]="component"></prettyjson>-->
+    <md-card fxFlex class="deploy margin-top-x1">
+      <md-card-title-group>
+        <div fxFlex fxLayout="column" fxLayoutAlign="end end">
+          <md-card-subtitle>SU deployment</md-card-subtitle>
+          <!--<md-card-titfle>-->
+            <!-- Material doesn't support inputs of type file -->
+            <!-- https://github.com/angular/material2/issues/3262 -->
+            <!-- https://github.com/angular/material2/issues/3758 -->
+            <!--the trick here consists in hiding the input, and bind the click on a button to that input-->
+          <!--</md-card-title>-->
+
+          <md-card-content>
+            <input class="hidden" type="file" accept=".zip">
+
+            <div *ngIf="fileToDeploy" class="selected-file" fxFlexLayout="row" fxLayoutAlign="end center">
+              <span>Selected file :</span> <span class="file-name">{{ fileToDeploy.name }}</span>
+            </div>
+
+            <button md-raised-button (click)="deploySu.click()" class="choose-file">
+              <span *ngIf="!fileToDeploy; else changeFile">Choose a file to upload</span>
+              <ng-template #changeFile>Change the file</ng-template>
+            </button>
+            
+            <form (ngSubmit)="deploy(fileToDeploy, serviceUnitName)">
+              <input #deploySu class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="component.isDeployingServiceUnit">
+
+              <md-input-container *ngIf="fileToDeploy" class="service-unit-name">
+                <input mdInput type="text" [(ngModel)]="serviceUnitName" name="serviceUnitName" placeholder="Service unit name">
+              </md-input-container>
+
+              <button md-raised-button color="primary" type="submit" *ngIf="fileToDeploy" [disabled]="serviceUnitName.trim().length === 0">
+                Deploy
+              </button>
+            </form>
+          </md-card-content>
+        </div>
+      </md-card-title-group>
+    </md-card>
   </div>
 </div>

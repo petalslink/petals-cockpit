@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IserviceUnits } from '../service-units/service-units.interface';
+import { IServiceUnits } from '../service-units/service-units.interface';
 
 // http://stackoverflow.com/a/41631732/2398593
 export const ComponentState = {
@@ -39,6 +39,7 @@ export interface IComponentCommon {
   isFolded: boolean;
   isFetchingDetails: boolean;
   isUpdatingState: boolean;
+  isDeployingServiceUnit: boolean;
 }
 
 export interface IComponentRow extends IComponentCommon {
@@ -48,5 +49,5 @@ export interface IComponentRow extends IComponentCommon {
 
 export interface IComponent extends IComponentCommon {
   // from server
-  serviceUnits: IserviceUnits;
+  serviceUnits: IServiceUnits;
 }

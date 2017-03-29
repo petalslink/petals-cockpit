@@ -17,7 +17,7 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -33,6 +33,7 @@ import { ColorSearchedLettersDirective } from './directives/color-searched-lette
 export const modules = [
   CommonModule,
   ReactiveFormsModule,
+  FormsModule,
   HttpModule,
   RouterModule,
   MaterialModule,

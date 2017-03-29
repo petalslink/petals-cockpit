@@ -27,7 +27,7 @@ import { SseService, SseWorkspaceEvent } from './sse.service';
 import { ServiceUnits } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
 import { IStore } from '../interfaces/store.interface';
 import { ServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
-import { IserviceUnitsTable } from '../../features/cockpit/workspaces/state/service-units/service-units.interface';
+import { IServiceUnitsTable } from '../../features/cockpit/workspaces/state/service-units/service-units.interface';
 
 export abstract class ServiceUnitsService {
   abstract getDetailsServiceUnit(serviceUnitId: string): Observable<Response>;
@@ -64,7 +64,7 @@ export class ServiceUnitsServiceImpl extends ServiceUnitsService {
         .store$
         .select(state => [state.workspaces.selectedWorkspaceId, state.serviceUnits])
       )
-      .do(([data, [selectedWorkspaceId, serviceUnits]]: [{ id: string, state: string }, [string, IserviceUnitsTable]]) => {
+      .do(([data, [selectedWorkspaceId, serviceUnits]]: [{ id: string, state: string }, [string, IServiceUnitsTable]]) => {
         if (data.state === ServiceUnitState.Unloaded) {
           this.router.navigate(['/workspaces', selectedWorkspaceId]);
 
@@ -83,6 +83,6 @@ export class ServiceUnitsServiceImpl extends ServiceUnitsService {
           });
         }
       })
-      .map(_ => null);
+      .mapTo(null);
   }
 }

@@ -16,6 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Response } from '@angular/http';
 import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
@@ -25,13 +26,16 @@ import { environment } from './../../../../../../environments/environment';
 import { Components } from './components.reducer';
 import { ComponentsService } from './../../../../../shared/services/components.service';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { NotificationsService } from 'angular2-notifications';
 
 @Injectable()
 export class ComponentsEffects {
   constructor(
+    private router: Router,
     private store$: Store<IStore>,
     private actions$: Actions,
-    private componentsService: ComponentsService
+    private componentsService: ComponentsService,
+    private notification: NotificationsService
   ) { }
 
   // tslint:disable-next-line:member-ordering
@@ -65,8 +69,8 @@ export class ComponentsEffects {
     .switchMap(([action, workspaceId]: [{ type: string, payload: { componentId: string, newState: string } }, string]) =>
       this.componentsService.putState(workspaceId, action.payload.componentId, action.payload.newState)
         .map(_ => ({
-            type: Components.CHANGE_STATE_WAIT_SSE,
-            payload: { componentId: action.payload.componentId }
+          type: Components.CHANGE_STATE_WAIT_SSE,
+          payload: { componentId: action.payload.componentId }
         }))
         .catch((err) => {
           if (environment.debug) {
@@ -82,4 +86,40 @@ export class ComponentsEffects {
           });
         })
     );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) deployServiceUnit$: Observable<Action> = this.actions$
+    .ofType(Components.DEPLOY_SERVICE_UNIT)
+    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .switchMap(([action, workspaceId]: [{ type: string, payload: { file: File, componentId: string, serviceUnitName: string } }, string]) =>
+      this.componentsService.deploySu(workspaceId, action.payload.componentId, action.payload.file, action.payload.serviceUnitName)
+        .ignoreElements()
+        .catch((err) => {
+          if (environment.debug) {
+            console.group();
+            console.warn('Error caught in components.effects : ofType(Components.DEPLOY_SERVICE_UNIT)');
+            console.error(err);
+            console.groupEnd();
+          }
+
+          this.notification.error(
+            'Deploy Service-Unit failed',
+            `An error occured when trying to deploy the file "${action.payload.file.name}"`
+          );
+
+          return Observable.of({
+            type: Components.DEPLOY_SERVICE_UNIT_ERROR,
+            payload: { componentId: action.payload.componentId }
+          });
+        })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: false }) deployServiceUnitSuccess$: Observable<void> = this.actions$
+    .ofType(Components.DEPLOY_SERVICE_UNIT_SUCCESS)
+    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .do(([{ payload }, workspaceId]: [{ payload: { serviceUnit: { id: string, name: string } } }, string]) => {
+      this.router.navigate(['workspaces', workspaceId, 'petals', 'service-units', payload.serviceUnit.id]);
+    })
+    .mapTo(null);
 }

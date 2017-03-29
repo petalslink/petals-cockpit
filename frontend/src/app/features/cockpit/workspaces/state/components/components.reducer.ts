@@ -242,6 +242,61 @@ export class Components {
     };
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static DEPLOY_SERVICE_UNIT = `${Components.reducerName}_DEPLOY_SERVICE_UNIT`;
+  private static deployServiceUnit(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    return {
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          [payload.componentId]: {
+            ...componentsTable.byId[payload.componentId],
+            isDeployingServiceUnit: true
+          }
+        }
+      }
+    };
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DEPLOY_SERVICE_UNIT_ERROR = `${Components.reducerName}_DEPLOY_SERVICE_UNIT_ERROR`;
+  private static deployServiceUnitError(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    return {
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          [payload.componentId]: {
+            ...componentsTable.byId[payload.componentId],
+            isDeployingServiceUnit: false
+          }
+        }
+      }
+    };
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DEPLOY_SERVICE_UNIT_SUCCESS = `${Components.reducerName}_DEPLOY_SERVICE_UNIT_SUCCESS`;
+  private static deployServiceUnitSuccess(
+    componentsTable: IComponentsTable,
+    payload: { componentId: string, serviceUnit: { id: string, name: string, state: string } }
+  ) {
+    return {
+      ...componentsTable,
+      ...<IComponentsTable>{
+        byId: {
+          ...componentsTable.byId,
+          [payload.componentId]: <IComponentRow>{
+            ...componentsTable.byId[payload.componentId],
+            isDeployingServiceUnit: false,
+            serviceUnits: [...componentsTable.byId[payload.componentId].serviceUnits, payload.serviceUnit.id]
+          }
+        }
+      }
+    };
+  }
+
   private static removeServiceUnit(componentsTable: IComponentsTable, payload: { serviceUnitId: string }) {
     const componentContainingServiceUnit = getComponentOfServiceUnit(componentsTable, payload.serviceUnitId);
 
@@ -282,6 +337,9 @@ export class Components {
     [Components.CHANGE_STATE_SUCCESS]: Components.changeStateSuccess,
     [Components.CHANGE_STATE_ERROR]: Components.changeStateError,
     [Components.REMOVE_COMPONENT]: Components.removeComponent,
+    [Components.DEPLOY_SERVICE_UNIT]: Components.deployServiceUnit,
+    [Components.DEPLOY_SERVICE_UNIT_SUCCESS]: Components.deployServiceUnitSuccess,
+    [Components.DEPLOY_SERVICE_UNIT_ERROR]: Components.deployServiceUnitError,
 
     [ServiceUnits.REMOVE_SERVICE_UNIT]: Components.removeServiceUnit,
     [Workspaces.CLEAN_WORKSPACE]: Components.cleanWorkspace

@@ -17,16 +17,16 @@
 
 import { IServiceUnitRow, IServiceUnit } from './service-unit.interface';
 
-interface IserviceUnitsCommon {
+interface IServiceUnitsCommon {
   selectedServiceUnitId: string;
   isFetchingDetails: boolean;
 }
 
-export interface IserviceUnitsTable extends IserviceUnitsCommon {
+export interface IServiceUnitsTable extends IServiceUnitsCommon {
   byId: { [key: string]: IServiceUnitRow };
   allIds: Array<string>;
 }
 
-export interface IserviceUnits extends IserviceUnitsCommon {
+export interface IServiceUnits extends IServiceUnitsCommon {
   list: Array<IServiceUnit>;
 }
