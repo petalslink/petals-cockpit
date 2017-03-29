@@ -154,21 +154,21 @@ public class WorkspaceResource {
     @Path("/buses")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Valid
     public BusInProgress addBus(@NotNull @Valid BusImport nb) throws InterruptedException {
 
         checkAccess(jooq);
 
-        return as.call(wsId, new ImportBus(profile.getId(), nb));
+        return as.call(wsId, new ImportBus(nb));
     }
 
     @DELETE
     @Path("/buses/{bId}")
-    public void delete(@NotNull @PathParam("bId") @Min(1) long bId) throws InterruptedException {
+    @Produces(MediaType.APPLICATION_JSON)
+    public BusDeleted delete(@NotNull @PathParam("bId") @Min(1) long bId) throws InterruptedException {
 
         checkAccess(jooq);
 
-        as.call(wsId, new DeleteBus(profile.getId(), bId));
+        return as.call(wsId, new DeleteBus(profile.getId(), bId));
     }
 
     @PUT
@@ -181,7 +181,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        return as.call(wsId, new ChangeServiceUnitState(profile.getId(), suId, action));
+        return as.call(wsId, new ChangeServiceUnitState(suId, action));
     }
 
     @PUT
@@ -194,7 +194,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        return as.call(wsId, new ChangeComponentState(profile.getId(), compId, action));
+        return as.call(wsId, new ChangeComponentState(compId, action));
     }
 
     @POST
@@ -220,7 +220,7 @@ public class WorkspaceResource {
 
         try (ServicedArtifact sa = httpServer.serve(saName + ".zip",
                 os -> PetalsUtils.createSAfromSU(file, os, saName, name, componentName))) {
-            return as.call(wsId, new DeployServiceUnit(profile.getId(), saName, sa.getArtifactUrl(), compId));
+            return as.call(wsId, new DeployServiceUnit(saName, sa.getArtifactUrl(), compId));
         }
     }
 
@@ -353,9 +353,13 @@ public class WorkspaceResource {
         @Min(1)
         public final long id;
 
+        @NotEmpty
+        public final String reason;
+
         @JsonCreator
-        public BusDeleted(@JsonProperty("id") long id) {
+        public BusDeleted(@JsonProperty("id") long id, @JsonProperty("reason") String reason) {
             this.id = id;
+            this.reason = reason;
         }
 
         @JsonProperty

@@ -85,12 +85,19 @@ export class BusesServiceImpl extends BusesService {
   watchEventBusDeleted() {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_DELETED)
-      .do(({ id }) => {
-        this.store$.dispatch(batchActions([
-          { type: Buses.REMOVE_BUS, payload: { busId: id } },
-          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: id },
-        ]));
-      });
+      .withLatestFrom(this.store$)
+      .do(([{ id, reason }, state]) => {
+        const bus = state.buses.byId[id];
+        if (bus) {
+          this.notifications.info(bus.name, reason);
+          this.store$.dispatch({ type: Buses.REMOVE_BUS, payload: { busId: id } });
+        } else {
+          const bip = state.busesInProgress.byId[id];
+          this.notifications.info(`${bip.ip}:${bip.port}`, reason);
+          this.store$.dispatch({ type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: id });
+        }
+      })
+      .mapTo(null);
   }
 
   watchEventBusImportOk() {

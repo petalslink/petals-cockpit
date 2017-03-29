@@ -30,13 +30,14 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.io.EofException;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.OutboundEvent;
@@ -104,6 +105,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     private static final long serialVersionUID = -2202357041789526859L;
 
     private final SseBroadcaster broadcaster = new SseBroadcaster();
+
+    private final Map<Long, Fiber<?>> importsInProgress = new HashMap<>();
 
     private final long wId;
 
@@ -207,8 +210,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         return eo;
     }
 
-    @Nullable
-    private Void handleDeleteBus(DeleteBus bus) throws SuspendExecution {
+    private BusDeleted handleDeleteBus(DeleteBus bus) throws SuspendExecution {
         runBlockingTransaction(conf -> {
             int deleted = DSL.using(conf).deleteFrom(BUSES).where(BUSES.ID.eq(bus.bId).and(BUSES.WORKSPACE_ID.eq(wId)))
                     .execute();
@@ -220,9 +222,21 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             return null;
         });
 
-        broadcast(WorkspaceEvent.busDeleted(new BusDeleted(bus.bId)));
+        Fiber<?> fiber = importsInProgress.remove(bus.bId);
 
-        return null;
+        String reason;
+        if (fiber == null) {
+            reason = "Bus deleted by " + bus.user;
+        } else {
+            fiber.cancel(true);
+            reason = "Import cancelled by " + bus.user;
+        }
+
+        BusDeleted bd = new BusDeleted(bus.bId, reason);
+
+        doInActorLoop(() -> broadcast(WorkspaceEvent.busDeleted(bd)));
+
+        return bd;
     }
 
     private BusInProgress handleImportBus(ImportBus bus) throws SuspendExecution {
@@ -248,39 +262,59 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     }
 
     private void importBusInFiber(final BusImport nb, final long bId) {
-        new Fiber<>(() -> {
-            // this can be interrupted by Fiber.cancel
+        Fiber<?> importFiber = new Fiber<>(() -> {
+            // this can be interrupted by Fiber.cancel: if it happens, the fiber will simply be stopped
+            // and removed from the map by the delete handling
             final Either<String, Domain> res = doImportExistingBus(nb);
 
             // once we got the topology, it can't be cancelled anymore
             // that's why the actions are passed back to the actor
-            // (we don't want the fiber to be interrupted!)
-            doInActorLoop(() -> broadcast(runBlockingTransaction(
-                    conf -> res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
-                        try {
-                            return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, bId, topology));
-                        } catch (WorkspaceContent.InvalidPetalsBus e) {
-                            return Either.left(e.getMessage());
-                        }
-                    }).fold(error -> {
-                        LOG.info("Can't import bus from container {}:{}: {}", nb.ip, nb.port, error);
-                        DSL.using(conf).update(BUSES).set(BUSES.IMPORT_ERROR, error).where(BUSES.ID.eq(bId)).execute();
-                        return WorkspaceEvent
-                                .busImportError(new BusInProgress(bId, nb.ip, nb.port, nb.username, error));
-                    }, content -> WorkspaceEvent.busImportOk(content)))));
-        }).start();
+            // so that the fiber terminate and can't be cancelled
+            doInActorLoop(() -> {
+                // in any case we now remove it if it's there
+                Fiber<?> f = importsInProgress.remove(bId);
+
+                // if it's null, it has been cancelled!
+                if (f != null) {
+                    broadcast(runBlockingTransaction(conf -> {
+                        return res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
+                            try {
+                                return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, bId, topology));
+                            } catch (WorkspaceContent.InvalidPetalsBus e) {
+                                return Either.left(e.getMessage());
+                            }
+                        }).fold(error -> {
+                            LOG.info("Can't import bus from container {}:{}: {}", nb.ip, nb.port, error);
+                            DSL.using(conf).update(BUSES).set(BUSES.IMPORT_ERROR, error).where(BUSES.ID.eq(bId))
+                                    .execute();
+                            return WorkspaceEvent
+                                    .busImportError(new BusInProgress(bId, nb.ip, nb.port, nb.username, error));
+                        }, WorkspaceEvent::busImportOk);
+                    }));
+                }
+            });
+        });
+
+        // store it before starting to prevent race condition
+        importsInProgress.put(bId, importFiber);
+
+        importFiber.start();
     }
 
     // TODO in the future, there should be multiple methods like this for multiple type of imports
     @Suspendable
-    private Either<String, Domain> doImportExistingBus(BusImport bus) {
+    private Either<String, Domain> doImportExistingBus(BusImport bus) throws InterruptedException {
         try {
+            // TODO even though runBlocking can be interrupted, the petals admin code is based on RMI which cannot be
+            // interrupted, so it will continue to be executed even after InterruptedException is thrown. There is
+            // nothing we can do for this until petals admin is changed.
             Domain topology = runBlockingAdmin(bus.ip, bus.port, bus.username, bus.password,
                     petals -> petals.newContainerAdministration().getTopology(bus.passphrase, true));
             assert topology != null;
             return Either.right(topology);
         } catch (InterruptedException e) {
-            return Either.left("Import cancelled");
+            // let's let it propagate up to the fiber and be swallowed
+            throw e;
         } catch (Exception e) {
             String m = e.getMessage();
             String message = m != null ? m : e.getClass().getName();
@@ -575,18 +609,16 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     public static class WorkspaceRequest<T> extends CockpitRequest<T> implements Msg {
 
         private static final long serialVersionUID = -564899978996631515L;
-
-        public WorkspaceRequest(String user) {
-            super(user);
-        }
     }
 
     public static class NewWorkspaceClient extends WorkspaceRequest<EventOutput> {
 
         private static final long serialVersionUID = 1L;
 
+        private final String user;
+
         public NewWorkspaceClient(String user) {
-            super(user);
+            this.user = user;
         }
     }
 
@@ -596,20 +628,21 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         final BusImport nb;
 
-        public ImportBus(String user, BusImport nb) {
-            super(user);
+        public ImportBus(BusImport nb) {
             this.nb = nb;
         }
     }
 
-    public static class DeleteBus extends WorkspaceRequest<@Nullable Void> {
+    public static class DeleteBus extends WorkspaceRequest<BusDeleted> {
 
         private static final long serialVersionUID = 1L;
+
+        final String user;
 
         final long bId;
 
         public DeleteBus(String user, long bId) {
-            super(user);
+            this.user = user;
             this.bId = bId;
         }
     }
@@ -622,8 +655,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         final long suId;
 
-        public ChangeServiceUnitState(String user, long suId, SUChangeState action) {
-            super(user);
+        public ChangeServiceUnitState(long suId, SUChangeState action) {
             this.suId = suId;
             this.action = action;
         }
@@ -637,8 +669,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         final long compId;
 
-        public ChangeComponentState(String user, long compId, ComponentChangeState action) {
-            super(user);
+        public ChangeComponentState(long compId, ComponentChangeState action) {
             this.compId = compId;
             this.action = action;
         }
@@ -654,8 +685,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
         final long compId;
 
-        public DeployServiceUnit(String user, String saName, URL saUrl, long compId) {
-            super(user);
+        public DeployServiceUnit(String saName, URL saUrl, long compId) {
             this.saName = saName;
             this.saUrl = saUrl;
             this.compId = compId;

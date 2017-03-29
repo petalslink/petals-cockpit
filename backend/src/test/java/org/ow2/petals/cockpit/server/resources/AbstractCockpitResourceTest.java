@@ -119,7 +119,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                     @Override
                     protected void configure() {
                         bind(DSL.using(dbRule.getConnectionJdbcUrl()).configuration()).to(Configuration.class);
-                        bind(Executors.newSingleThreadExecutor()).named(CockpitApplication.BLOCKING_TASK_ES)
+                        bind(Executors.newFixedThreadPool(4)).named(CockpitApplication.BLOCKING_TASK_ES)
                                 .to(ExecutorService.class);
                         bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
                         bind(PetalsAdministrationFactory.getInstance()).to(PetalsAdministrationFactory.class);

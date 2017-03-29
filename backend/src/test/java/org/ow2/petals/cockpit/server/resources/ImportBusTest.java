@@ -23,10 +23,12 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 
 import java.util.Iterator;
+import java.util.concurrent.CountDownLatch;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.jooq.Result;
@@ -93,6 +95,23 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         });
     }
 
+    private void expectImportBusEvent(EventInput eventInput, BusInProgress post) {
+        expectEvent(eventInput, (e, a) -> {
+            a.assertThat(e.getName()).isEqualTo("BUS_IMPORT");
+            BusInProgress data = e.readData(BusInProgress.class);
+            a.assertThat(data.id).isEqualTo(post.id);
+            a.assertThat(data.ip).isEqualTo(post.ip);
+            a.assertThat(data.port).isEqualTo(post.port);
+            a.assertThat(data.username).isEqualTo(post.username);
+            a.assertThat(data.importError).isEqualTo(post.importError);
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E extends @Nullable Exception> void doThrow0(Exception e) throws E {
+        throw (E) e;
+    }
+
     @Test
     public void testImportBusOk() {
         long busId;
@@ -111,15 +130,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             assertThat(post.username).isEqualTo(container.getJmxUsername());
             assertThat(post.importError).isNull();
 
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT");
-                BusInProgress data = e.readData(BusInProgress.class);
-                a.assertThat(data.id).isEqualTo(post.id);
-                a.assertThat(data.ip).isEqualTo(post.ip);
-                a.assertThat(data.port).isEqualTo(post.port);
-                a.assertThat(data.username).isEqualTo(post.username);
-                a.assertThat(data.importError).isEqualTo(post.importError);
-            });
+            expectImportBusEvent(eventInput, post);
 
             // there should be only one!
             Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
@@ -208,6 +219,76 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
     }
 
     @Test
+    public void testImportBusCancel() {
+        CountDownLatch doneSignal = new CountDownLatch(1);
+        Container slowContainer = new Container("cont3", "host3", ImmutableMap.of(PortType.JMX, 7700), "user", "pass",
+                State.REACHABLE) {
+            @Override
+            public State getState() {
+                try {
+                    doneSignal.await();
+                } catch (InterruptedException e) {
+                    // TODO for now interruption are not propagated but it's ok, the result will be ignored anyway
+                    // see https://github.com/puniverse/quasar/issues/245
+                    ImportBusTest.<@Nullable RuntimeException> doThrow0(e);
+                }
+                return State.REACHABLE;
+            }
+        };
+
+        petals.registerContainer(slowContainer);
+
+        try (EventInput eventInput = resources.target("/workspaces/1").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
+                .get(EventInput.class)) {
+
+            expectWorkspaceContent(eventInput);
+
+            BusInProgress post = resources.target("/workspaces/1/buses").request()
+                    .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
+                            container.getJmxPassword(), "phrase")), BusInProgress.class);
+
+            assertThat(post.ip).isEqualTo(container.getHost());
+            assertThat(post.port).isEqualTo(getPort(container));
+            assertThat(post.username).isEqualTo(container.getJmxUsername());
+            assertThat(post.importError).isNull();
+
+            expectImportBusEvent(eventInput, post);
+
+            // there should be only one!
+            Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
+            assertThat(buses).hasSize(1);
+            BusesRecord bus = buses.iterator().next();
+
+            // we can't really check for the temporary state because it is executed concurrently
+            assertThat(bus.getImportIp()).isEqualTo(container.getHost());
+            assertThat(bus.getImportPort()).isEqualTo(getPort(container));
+            assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
+            assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
+            assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
+            assertThat(bus.getWorkspaceId()).isEqualTo(1);
+            assertThat(post.id).isEqualTo(bus.getId());
+
+            BusDeleted delete = resources.target("/workspaces/1/buses/" + post.id).request().delete(BusDeleted.class);
+
+            assertThat(delete.id).isEqualTo(post.id);
+            assertThat(delete.reason).isEqualTo("Import cancelled by admin");
+
+            doneSignal.countDown();
+
+            // TODO verify all the content!
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("BUS_DELETED");
+                BusDeleted data = e.readData(BusDeleted.class);
+                a.assertThat(data.id).isEqualTo(post.id);
+                a.assertThat(data.reason).isEqualTo(delete.reason);
+            });
+
+            Result<BusesRecord> buses2 = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
+            assertThat(buses2).hasSize(0);
+        }
+    }
+
+    @Test
     public void testImportBusErrorAndDelete() {
         String incorrectHost = "wrong-host";
         int incorrectPort = 7700;
@@ -227,15 +308,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             assertThat(post.username).isEqualTo(container.getJmxUsername());
             assertThat(post.importError).isNull();
 
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT");
-                BusInProgress data = e.readData(BusInProgress.class);
-                a.assertThat(data.id).isEqualTo(post.id);
-                a.assertThat(data.ip).isEqualTo(post.ip);
-                a.assertThat(data.port).isEqualTo(post.port);
-                a.assertThat(data.username).isEqualTo(post.username);
-                a.assertThat(data.importError).isEqualTo(post.importError);
-            });
+            expectImportBusEvent(eventInput, post);
 
             // there should be only one!
             Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
@@ -285,9 +358,10 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
                 a.assertThat(c.content.busesInProgress).containsOnlyKeys(String.valueOf(busId));
             });
 
-            Response delete = resources.target("/workspaces/1/buses/" + busId).request().delete();
+            BusDeleted delete = resources.target("/workspaces/1/buses/" + busId).request().delete(BusDeleted.class);
 
-            assertThat(delete.getStatus()).isEqualTo(204);
+            assertThat(delete.id).isEqualTo(busId);
+            assertThat(delete.reason).isEqualTo("Bus deleted by admin");
 
             Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
             assertThat(buses).hasSize(0);
@@ -295,7 +369,8 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("BUS_DELETED");
                 BusDeleted data = e.readData(BusDeleted.class);
-                a.assertThat(data.id).isEqualTo(busId);
+                a.assertThat(data.id).isEqualTo(delete.id);
+                a.assertThat(data.reason).isEqualTo(delete.reason);
             });
         }
     }

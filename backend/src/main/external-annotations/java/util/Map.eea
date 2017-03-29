@@ -11,6 +11,9 @@ keySet
 put
  (TK;TV;)TV;
  (TK;TV;)T0V;
+remove
+ (Ljava/lang/Object;)TV;
+ (Ljava/lang/Object;)T0V;
 values
  ()Ljava/util/Collection<TV;>;
  ()L1java/util/Collection<TV;>;
