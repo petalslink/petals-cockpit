@@ -99,8 +99,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
       .subscribe();
 
     // TODO ultimately, the sidebar should be moved to WorkspaceComponent
-    this.sidenavVisible$ = this.store$
-      .select(state => state.ui.isSidenavVisible && /\/workspaces\/\w+/.test(this.router.url));
+    this.sidenavVisible$ = this.store$.select(state => state.ui.isSidenavVisible && !!state.workspaces.selectedWorkspaceId);
 
     this.logoByScreenSize$ = this.media$
       .asObservable()
@@ -144,15 +143,20 @@ export class CockpitComponent implements OnInit, OnDestroy {
   private doOpenWorkspacesDialog() {
     this.store$.dispatch({ type: Workspaces.FETCH_WORKSPACES });
 
-    this.workspacesDialogRef = this.dialog.open(WorkspacesDialogComponent, {
-      // TODO : If a workspace is already selected, we should be able to close it
-      disableClose: true
-    });
+    this.store$
+      .select(state => !!state.workspaces.selectedWorkspaceId)
+      .first()
+      .subscribe(ws => {
+        this.workspacesDialogRef = this.dialog.open(WorkspacesDialogComponent, {
+          disableClose: !ws
+        });
 
-    this.workspacesDialogRef.afterClosed().subscribe(_ => {
-      this.store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
-      this.workspacesDialogRef = null;
-    });
+        this.workspacesDialogRef.afterClosed().subscribe(_ => {
+          this.store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
+          this.workspacesDialogRef = null;
+        });
+      });
+
   }
 
   openDeletedWorkspaceDialog() {
