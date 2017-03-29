@@ -262,7 +262,7 @@ export class Workspaces {
     this.memoizedWorkspaces.set(newWorkspace.getIdFormatted(), { wks: newWorkspace, composedWks });
 
     return { ...composedWks };
-  };
+  }
 
   getNewWorkspace(name: string) {
     const wksComposed = this.getWorkspaceComposed(undefined, name);
