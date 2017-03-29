@@ -25,7 +25,7 @@ import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Containers } from '../../state/containers/containers.reducer';
 import { Ui } from '../../../../../shared/state/ui.reducer';
 import { IContainerRow } from '../../state/containers/container.interface';
-import { getSiblingContainers } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
+import { getCurrentContainer, getCurrentContainerSiblings } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 
 @Component({
   selector: 'app-petals-container-view',
@@ -34,7 +34,6 @@ import { getSiblingContainers } from 'app/features/cockpit/workspaces/state/cont
 })
 export class PetalsContainerViewComponent implements OnInit, OnDestroy {
   public workspaceId$: Observable<string>;
-  public containerId$: Observable<string>;
   public container$: Observable<IContainerRow>;
   public otherContainers$: Observable<IContainerRow[]>;
 
@@ -49,20 +48,16 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
       .map(p => p.get('workspaceId'))
       .distinctUntilChanged();
 
-    this.containerId$ = this.route.paramMap
+    this.sub = this.route.paramMap
       .map(p => p.get('containerId'))
-      .distinctUntilChanged();
-
-    this.sub = this.containerId$
-      .do(id => {
+      .subscribe(id => {
         this.store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: id } });
         this.store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: id } });
-      })
-      .subscribe();
+      });
 
-    this.container$ = this.containerId$.switchMap(id => this.store$.select(state => state.containers.byId[id]));
+    this.container$ = this.store$.let(getCurrentContainer);
 
-    this.otherContainers$ = this.containerId$.switchMap(id => this.store$.let(getSiblingContainers(id)));
+    this.otherContainers$ = this.store$.let(getCurrentContainerSiblings);
   }
 
   ngOnDestroy() {

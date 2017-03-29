@@ -60,7 +60,7 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
         p.isConnecting === n.isConnecting &&
         p.connectionFailed === n.connectionFailed
       )
-      .map(users => {
+      .subscribe(users => {
         this.users = users;
 
         if (users.isConnecting || users.isConnected) {
@@ -70,8 +70,7 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
           this.loginForm.enable();
           this.loginForm.enable();
         }
-      })
-      .subscribe();
+      });
   }
 
   ngOnDestroy() {

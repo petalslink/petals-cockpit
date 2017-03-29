@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <md-icon color="primary">import_export</md-icon>
   <h3 class="color-primary margin-left-x1">IMPORT IN PROGRESS</h3>
 </md-toolbar>
-<app-buses-in-progress [busesInProgress]="busesInProgress$ | async"></app-buses-in-progress>
+<app-buses-in-progress [busesInProgress]="busesInProgress$ | async" [workspaceId]="(workspaces$ | async).selectedWorkspaceId"></app-buses-in-progress>
 
 <md-toolbar fxLayout="column" *ngIf="(busesInProgress$ | async).list.length > 0" fxLayoutAlign="center start">
   <md-icon color="primary">star</md-icon>
@@ -40,6 +40,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <app-material-tree fxFill [tree]="tree$ | async" [search]="(workspaces$ | async).searchPetals" [marginLeft]="18" (onToggleFold)="onTreeToggleFold($event)"
   (onSelect)="onTreeSelect($event)"></app-material-tree>
 
-<div *ngIf="(tree$ | async)?.length === 0 && (workspaces$ | async).searchPetals" class="info no-match">
+<div *ngIf="(tree$ | async).length === 0 && (workspaces$ | async).searchPetals" class="info no-match">
   There is <b><i>no match</i></b> with <b><i>"{{ (workspaces$ | async).searchPetals }}</i></b>".
 </div>

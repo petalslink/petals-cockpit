@@ -20,17 +20,11 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { isNot } from '../../../../../shared/helpers/shared.helper';
+import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
-export function _getCurrentServiceUnit(store$: Store<IStore>): Observable<IServiceUnitRow> {
-  return store$
-    .select(state => state.serviceUnits.selectedServiceUnitId === ''
-      ? null
-      : state.serviceUnits.byId[state.serviceUnits.selectedServiceUnitId]
-    )
-    .filter(isNot(null));
-}
-
-export function getCurrentServiceUnit() {
-  return _getCurrentServiceUnit;
+export function getCurrentServiceUnit(store$: Store<IStore>): Observable<IServiceUnitRow> {
+  return filterWorkspaceFetched(store$)
+    .filter(state => !!state.serviceUnits.selectedServiceUnitId)
+    .map(state => state.serviceUnits.byId[state.serviceUnits.selectedServiceUnitId])
+    .distinctUntilChanged();
 }

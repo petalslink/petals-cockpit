@@ -78,7 +78,7 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
           .distinctUntilChanged()
         )
       )
-      .do(([isAddingWorkspace, _]) => {
+      .subscribe(([isAddingWorkspace, _]) => {
         if (this.newWksForm.invalid || isAddingWorkspace) {
           this.btnSubmitDisabled = true;
         } else {
@@ -90,8 +90,7 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
         } else {
           this.newWksForm.enable();
         }
-      })
-      .subscribe();
+      });
   }
 
   ngOnDestroy() {

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MdInputContainer } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -28,7 +28,7 @@ import { IBusesInProgressTable } from './../../state/buses-in-progress/buses-in-
 import { IBusInProgressRow, IBusInProgressImport } from './../../state/buses-in-progress/bus-in-progress.interface';
 import { Ui } from './../../../../../shared/state/ui.reducer';
 import { BusesInProgress } from './../../state/buses-in-progress/buses-in-progress.reducer';
-import { getCurrentBusInProgressEvenIfNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
+import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
 import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
 import { getFormErrors, disableAllFormFields } from './../../../../../shared/helpers/form.helper';
 import { arrayEquals } from 'app/shared/helpers/shared.helper';
@@ -39,11 +39,11 @@ import { arrayEquals } from 'app/shared/helpers/shared.helper';
   styleUrls: ['./petals-bus-in-progress-view.component.scss']
 })
 export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, AfterViewInit {
-  @Input() isImportingBus = false;
   @ViewChild('ipInput') ipInput: MdInputContainer;
 
   public busesInProgressTable$: Observable<IBusesInProgressTable>;
   public busInProgress$: Observable<IBusInProgressRow>;
+  // needed because it is so much easier to use that than an async object in the html
   public busInProgress: IBusInProgressRow;
 
   public busImportForm: FormGroup;
@@ -72,7 +72,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
     this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Import bus' } });
 
     this.busesInProgressTable$ = this.store$.select(state => state.busesInProgress);
-    this.busInProgress$ = this.store$.let(getCurrentBusInProgressEvenIfNull());
+    this.busInProgress$ = this.store$.let(getCurrentBusInProgressOrNull);
 
     this.createFormImportBus();
 
@@ -84,8 +84,9 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
       .distinctUntilChanged();
 
     this.routeSub = id
-      .do(bId => this.store$.dispatch({ type: BusesInProgress.SET_SELECTED_BUS_IN_PROGRESS, payload: bId }))
-      .subscribe();
+      .subscribe(busInProgressId =>
+        this.store$.dispatch({ type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS, payload: { busInProgressId } })
+      );
 
     // takes care of redirecting to the right URL after the shown bus in progress is deleted
     // this is here because it only makes sense if we are on this page for the given bus
@@ -120,7 +121,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
       .subscribe();
 
     this.busInProgressSub = this.busInProgress$
-      .do(busInProgress => {
+      .subscribe(busInProgress => {
         this.busInProgress = busInProgress;
 
         if (this.busInProgress) {
@@ -134,8 +135,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
 
           disableAllFormFields(this.busImportForm);
         }
-      })
-      .subscribe();
+      });
   }
 
   createFormImportBus() {
@@ -150,16 +150,13 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
     this.busImportFormSubscription = this
       .busImportForm
       .valueChanges
-      .do(data => {
+      .subscribe(data => {
         this.formErrors = getFormErrors(this.busImportForm, this.formErrors, data);
-      })
-      .subscribe();
+      });
   }
 
   ngAfterViewInit() {
-    if (!this.isImportingBus) {
-      this.ipInput._focusInput();
-    }
+    this.ipInput._focusInput();
   }
 
   ngOnDestroy() {

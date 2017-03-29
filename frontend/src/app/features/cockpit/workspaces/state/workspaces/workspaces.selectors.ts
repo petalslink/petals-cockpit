@@ -60,12 +60,19 @@ export function getWorkspacesList() {
 
 // -----------------------------------------------------------
 
-export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspace> {
+/**
+ * filter the store to only get the state if the current workspace is fetched.
+ */
+export function filterWorkspaceFetched(store$: Store<IStore>): Observable<IStore> {
   return store$
     .filter(state =>
       state.workspaces.selectedWorkspaceId
       && state.workspaces.byId[state.workspaces.selectedWorkspaceId]
-      && state.workspaces.byId[state.workspaces.selectedWorkspaceId].isFetched)
+      && state.workspaces.byId[state.workspaces.selectedWorkspaceId].isFetched);
+}
+
+export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspace> {
+  return filterWorkspaceFetched(store$)
     .map(state => [
       state.workspaces,
       state.users,

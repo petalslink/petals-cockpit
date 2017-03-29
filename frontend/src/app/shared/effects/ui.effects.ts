@@ -34,7 +34,7 @@ export class UiEffects {
     this
       .media$
       .asObservable()
-      .do((change: MediaChange) => {
+      .subscribe((change: MediaChange) => {
         const screenSize = change.mqAlias;
 
         if (screenSize === 'xs' || screenSize === 'gt-xs' || screenSize === 'sm') {
@@ -42,9 +42,7 @@ export class UiEffects {
         } else {
           this.isSmallScreen = false;
         }
-
-      })
-      .subscribe();
+      });
   }
 
   // tslint:disable-next-line:member-ordering

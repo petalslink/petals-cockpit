@@ -56,12 +56,12 @@ export class BusesInProgress {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static SET_SELECTED_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_SET_SELECTED_BUS_IN_PROGRESS`;
-  private static setSelectedBusInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
+  public static SET_CURRENT_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_SET_CURRENT_BUS_IN_PROGRESS`;
+  private static setCurrentBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { busInProgressId: string } ) {
     return <IBusesInProgressTable>{
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
-        selectedBusInProgressId: payload,
+        selectedBusInProgressId: payload.busInProgressId,
         isImportingBus: false,
         importBusError: '',
         importBusId: ''
@@ -167,7 +167,7 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod = {
     [BusesInProgress.FETCH_BUSES_IN_PROGRESS]: BusesInProgress.fetchBusesInProgress,
-    [BusesInProgress.SET_SELECTED_BUS_IN_PROGRESS]: BusesInProgress.setSelectedBusInProgress,
+    [BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS]: BusesInProgress.setCurrentBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS]: BusesInProgress.postBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]: BusesInProgress.postBusInProgressSuccess,
     [BusesInProgress.POST_BUS_IN_PROGRESS_ERROR]: BusesInProgress.postBusInProgressError,

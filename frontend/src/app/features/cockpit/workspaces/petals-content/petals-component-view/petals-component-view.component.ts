@@ -19,6 +19,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 
 import { Components } from '../../state/components/components.reducer';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
@@ -34,23 +35,25 @@ import { getCurrentComponent } from '../../state/components/components.selectors
 export class PetalsComponentViewComponent implements OnInit, OnDestroy {
   public component$: Observable<IComponentRow>;
 
+  private sub: Subscription;
+
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.component$ = this.store$.let(getCurrentComponent());
-
     this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Component' } });
 
-    this.route
-      .paramMap
-      .map(paramMap => {
-        this.store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId: paramMap.get('componentId') } });
-        this.store$.dispatch({ type: Components.FETCH_COMPONENT_DETAILS, payload: { componentId: paramMap.get('componentId') } });
-      })
-      .subscribe();
+    this.sub = this.route.paramMap
+      .map(pm => pm.get('componentId'))
+      .subscribe(componentId => {
+        this.store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId } });
+        this.store$.dispatch({ type: Components.FETCH_COMPONENT_DETAILS, payload: { componentId } });
+      });
+
+    this.component$ = this.store$.let(getCurrentComponent);
   }
 
   ngOnDestroy() {
+    this.sub.unsubscribe();
     this.store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId: '' } });
   }
 }

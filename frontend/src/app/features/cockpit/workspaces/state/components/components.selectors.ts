@@ -20,16 +20,11 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IComponentRow } from './component.interface';
-import { isNot } from '../../../../../shared/helpers/shared.helper';
+import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
-export function _getCurrentComponent(store$: Store<IStore>): Observable<IComponentRow> {
-  return store$
-    .select(state => state.components.selectedComponentId === ''
-      ? null
-      : state.components.byId[state.components.selectedComponentId])
-    .filter(isNot(null));
-}
-
-export function getCurrentComponent() {
-  return _getCurrentComponent;
+export function getCurrentComponent(store$: Store<IStore>): Observable<IComponentRow> {
+  return filterWorkspaceFetched(store$)
+    .filter(state => !!state.components.selectedComponentId)
+    .map(state => state.components.byId[state.components.selectedComponentId])
+    .distinctUntilChanged();
 }

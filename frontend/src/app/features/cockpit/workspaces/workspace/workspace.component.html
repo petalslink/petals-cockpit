@@ -13,18 +13,18 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFill class="wrapper-content">
+<div *ngIf="workspace$ | async as workspace" fxLayout="column" fxFill class="wrapper-content">
   <md-toolbar>
     <div class="prefix-toolbar-title">
       <md-icon color="primary">folder_special</md-icon>
     </div>
 
-    <span class="title">{{ (workspace$ | async)?.name }}</span>
+    <span class="title">{{ workspace.name }}</span>
   </md-toolbar>
 
   <div fxFill fxLayout="column" class="content content-max-width" fxLayoutWrap>
     <div fxLayout="row">
-      <p>Welcome to <span class="selected-workspace color-primary">{{ (workspace$ | async)?.name }}</span></p>
+      <p>Welcome to <span class="selected-workspace color-primary">{{ workspace.name }}</span></p>
 
       <button color="warn" type="button" class="btn-delete-wks margin-left-x1" (click)="openDeletionDialog()"
         md-mini-fab mdTooltip="Delete the workspace" mdTooltipPosition="after" [disabled]="isRemovingWorkspace$ | async">
@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </button>
     </div>
 
-    <div *ngIf="(workspace$ | async)?.users.list as users">
+    <div *ngIf="workspace.users.list as users">
       <div *ngIf="users.length === 1; else workspaceShared">
         <p class="users-in-workspace">You are the only one using this workspace.</p>
       </div>

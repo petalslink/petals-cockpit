@@ -20,16 +20,11 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IBusRow } from './bus.interface';
-import { isNot } from '../../../../../shared/helpers/shared.helper';
+import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
-export function _getCurrentBus(store$: Store<IStore>): Observable<IBusRow> {
-  return store$
-    .select(state => state.buses.selectedBusId === ''
-      ? null
-      : state.buses.byId[state.buses.selectedBusId])
-    .filter(isNot(null));
-}
-
-export function getCurrentBus() {
-  return _getCurrentBus;
+export function getCurrentBus(store$: Store<IStore>): Observable<IBusRow> {
+  return filterWorkspaceFetched(store$)
+    .filter(state => !!state.buses.selectedBusId)
+    .map(state => state.buses.byId[state.buses.selectedBusId])
+    .distinctUntilChanged();
 }

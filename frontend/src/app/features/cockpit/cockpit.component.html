@@ -19,12 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <img class="logo-toolbar" [src]="logoByScreenSize$ | async">
     </div>
 
-    <button *ngIf="(workspaces$ | async).selectedWorkspaceId" md-icon-button (click)="toggleSidenav()" class="menu-icon">
+    <button *ngIf="workspace$ | async" md-icon-button (click)="toggleSidenav()" class="menu-icon">
       <md-icon>menu</md-icon>
     </button>
 
     <span fxLayout="row">
-      {{ (ui$ | async)?.titleMainPart1 }}
+      {{ (ui$ | async).titleMainPart1 }}
 
       <span *ngIf="(ui$ | async).titleMainPart2" fxLayoutAlign="center center">
         <md-icon>chevron_right</md-icon> <span class="color-accent-bold">{{ (ui$ | async).titleMainPart2 }}</span>
@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </span>
 
     <div fxFlex></div>
-    
+
     <button md-icon-button class="margin-right-x2 btn-logout-user" [disabled]="(isDisconnecting$ | async)" (click)="disconnect()">
       <md-icon>power_settings_new</md-icon>
     </button>
@@ -48,10 +48,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   </md-toolbar>
 
   <md-sidenav-container fxLayout="column" fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">
-    <md-sidenav fxLayout="column" [opened]="sidenavVisible$ | async" [mode]="sidenavMode$ | async">
+    <md-sidenav *ngIf="workspace$ | async as workspace"  fxLayout="column" [opened]="sidenavVisible$ | async" [mode]="sidenavMode$ | async">
       <div fxLayout="row">
-        <button fxFlex="100" md-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId]" class="workspace-name width-full no-border-radius" color="accent">
-          {{ (workspace$ | async)?.name }}
+        <button fxFlex="100" md-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', workspace.id]" class="workspace-name width-full no-border-radius" color="accent">
+          {{ workspace.name }}
         </button>
 
         <button fxFlex md-raised-button (click)="openWorkspacesDialog()" class="change-workspace width-full no-border-radius" color="accent">
