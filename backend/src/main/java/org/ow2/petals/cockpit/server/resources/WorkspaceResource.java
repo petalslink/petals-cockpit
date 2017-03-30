@@ -16,7 +16,7 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
-import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_USERNAME;
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_WORKSPACES_USERNAME;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
@@ -131,7 +131,7 @@ public class WorkspaceResource {
             WorkspaceContent content = WorkspaceContent.buildFromDatabase(conf, ws);
 
             List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
-                    .onKey(FK_USERS_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)).fetchInto(USERS);
+                    .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)).fetchInto(USERS);
 
             return new WorkspaceFullContent(ws, wsUsers, content);
 

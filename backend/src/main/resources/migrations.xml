@@ -187,4 +187,17 @@
     <addForeignKeyConstraint constraintName="fk_users_last_workspace" baseTableName="users"
       baseColumnNames="last_workspace" referencedTableName="workspaces" referencedColumnNames="id" onDelete="SET DEFAULT" />
   </changeSet>
+
+  <changeSet id="v0.7.0-1" author="vnoel">
+    <dropForeignKeyConstraint baseTableName="users_workspaces" constraintName="fk_workspaces_id" />
+    <addForeignKeyConstraint constraintName="fk_users_workspaces_workspace_id"
+      baseTableName="users_workspaces"  baseColumnNames="workspace_id"
+      referencedTableName="workspaces" referencedColumnNames="id"
+      onDelete="CASCADE" />
+    <dropForeignKeyConstraint baseTableName="users_workspaces" constraintName="fk_users_username" />
+    <addForeignKeyConstraint constraintName="fk_users_workspaces_username"
+      baseTableName="users_workspaces"  baseColumnNames="username"
+      referencedTableName="users" referencedColumnNames="username"
+      onDelete="CASCADE" />
+  </changeSet>
 </databaseChangeLog>

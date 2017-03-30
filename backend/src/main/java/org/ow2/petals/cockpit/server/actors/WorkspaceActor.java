@@ -19,7 +19,7 @@ package org.ow2.petals.cockpit.server.actors;
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_COMPONENTS_CONTAINERS_ID;
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_CONTAINERS_BUSES_ID;
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_SERVICEUNITS_COMPONENTS_ID;
-import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_USERNAME;
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_WORKSPACES_USERNAME;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
@@ -193,7 +193,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             WorkspaceContent c = WorkspaceContent.buildFromDatabase(conf, ws);
 
             List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
-                    .onKey(FK_USERS_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wId)).fetchInto(USERS);
+                    .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wId)).fetchInto(USERS);
 
             DSL.using(conf).update(USERS).set(USERS.LAST_WORKSPACE, wId).where(USERS.USERNAME.eq(nc.user)).execute();
 
