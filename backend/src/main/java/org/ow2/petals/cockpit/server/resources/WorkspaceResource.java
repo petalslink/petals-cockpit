@@ -402,7 +402,7 @@ public class WorkspaceResource {
 
         @NotNull
         @Min(1)
-        public final long compId;
+        public final long componentId;
 
         @Valid
         @NotNull
@@ -410,15 +410,15 @@ public class WorkspaceResource {
         public final ServiceUnitMin serviceUnit;
 
         @JsonCreator
-        public SUDeployed(@JsonProperty("compId") long compId,
+        public SUDeployed(@JsonProperty("componentId") long componentId,
                 @JsonProperty("serviceUnit") ServiceUnitMin serviceUnit) {
-            this.compId = compId;
+            this.componentId = componentId;
             this.serviceUnit = serviceUnit;
         }
 
         @JsonProperty
-        public String getCompId() {
-            return Long.toString(compId);
+        public String getComponentId() {
+            return Long.toString(componentId);
         }
     }
 
