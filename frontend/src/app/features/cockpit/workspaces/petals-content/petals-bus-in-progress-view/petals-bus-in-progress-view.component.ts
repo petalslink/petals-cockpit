@@ -32,6 +32,7 @@ import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/b
 import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
 import { getFormErrors, disableAllFormFields } from './../../../../../shared/helpers/form.helper';
 import { arrayEquals } from 'app/shared/helpers/shared.helper';
+import { isLargeScreen } from 'app/shared/state/ui.selectors';
 
 @Component({
   selector: 'app-petals-bus-in-progress-view',
@@ -156,7 +157,10 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
   }
 
   ngAfterViewInit() {
-    this.ipInput._focusInput();
+    this.store$.let(isLargeScreen)
+      .first()
+      .filter(ss => ss)
+      .subscribe(_ => this.ipInput._focusInput());
   }
 
   ngOnDestroy() {

@@ -15,16 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IUi } from '../interfaces/ui.interface';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 
-export function uiState(): IUi {
-  return {
-    language: '',
-    isSidenavVisible: false,
-    screenSize: '',
-    isPopupListWorkspacesVisible: false,
-    titleMainPart1: 'Petals Cockpit',
-    titleMainPart2: '',
-    titleSubPart: ''
-  };
+import { IStore } from './../interfaces/store.interface';
+
+export function isSmallScreen(store$: Store<IStore>): Observable<boolean> {
+  return store$
+    .select(state => state.ui.screenSize)
+    .map(ss => ss === 'xs' || ss === 'gt-xs' || ss === 'sm')
+    .distinctUntilChanged();
+}
+
+export function isLargeScreen(store$: Store<IStore>): Observable<boolean> {
+  return store$
+    .select(state => state.ui.screenSize)
+    .map(ss => ss === 'md' || ss === 'lg' || ss === 'gt-lg' || ss === 'xl')
+    .distinctUntilChanged();
 }

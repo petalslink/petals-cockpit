@@ -16,38 +16,27 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Action } from '@ngrx/store';
+import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
-import { ObservableMedia, MediaChange } from '@angular/flex-layout';
 
 import { Ui } from '../state/ui.reducer';
+import { IStore } from 'app/shared/interfaces/store.interface';
+import { isSmallScreen } from 'app/shared/state/ui.selectors';
+
 
 @Injectable()
 export class UiEffects {
-  private isSmallScreen;
 
   constructor(
     private actions$: Actions,
-    private media$: ObservableMedia
-    ) {
-    this
-      .media$
-      .asObservable()
-      .subscribe((change: MediaChange) => {
-        const screenSize = change.mqAlias;
-
-        if (screenSize === 'xs' || screenSize === 'gt-xs' || screenSize === 'sm') {
-          this.isSmallScreen = true;
-        } else {
-          this.isSmallScreen = false;
-        }
-      });
-  }
+    private store$: Store<IStore>
+  ) { }
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) closeSidenavOnSmallScreen$: Observable<Action> = this.actions$
     .ofType(Ui.CLOSE_SIDENAV_ON_SMALL_SCREEN)
-    .filter(_ => this.isSmallScreen)
+    .withLatestFrom(this.store$.let(isSmallScreen))
+    .filter(([_, ss]) => ss)
     .map(_ => ({ type: Ui.CLOSE_SIDENAV }));
 }

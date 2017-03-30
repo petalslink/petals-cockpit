@@ -114,6 +114,15 @@ export class Ui {
     }
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static CHANGE_SCREEN_SIZE = `${Ui.reducerName}_CHANGE_SCREEN_SIZE`;
+  private static changeScreenSize(ui: IUi, payload) {
+    return {
+      ...ui,
+      ...<IUi>{ screenSize: payload }
+    };
+  }
+
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
@@ -125,6 +134,7 @@ export class Ui {
     [Ui.OPEN_POPUP_WORKSPACES_LIST]: Ui.openPopupWorkspacesList,
     [Ui.CLOSE_POPUP_WORKSPACES_LIST]: Ui.closePopupWorkspacesList,
     [Ui.SET_TITLES]: Ui.setTitles,
+    [Ui.CHANGE_SCREEN_SIZE]: Ui.changeScreenSize,
 
     [Workspaces.CLOSE_WORKSPACE]: Ui.closeWorkspace
   };

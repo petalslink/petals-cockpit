@@ -18,6 +18,7 @@
 export interface IUi {
   language: string;
   isSidenavVisible: boolean;
+  screenSize: string;
   isPopupListWorkspacesVisible: boolean;
   titleMainPart1: string;
   titleMainPart2: string;
