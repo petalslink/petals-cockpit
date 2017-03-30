@@ -18,8 +18,12 @@ package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.db.api.Assertions.assertThat;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +43,8 @@ import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.jooq.Configuration;
+import org.jooq.Record;
+import org.jooq.TableField;
 import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
 import org.junit.After;
@@ -177,14 +183,37 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         assertThat(requestComp(id)).hasNumberOfRows(0);
     }
 
+    protected <R extends Record, T> Request requestBy(TableField<R, T> field, T id) {
+        return new Request(dbRule.getDataSource(), DSL.using(dbRule.getConnectionJdbcUrl()).selectFrom(field.getTable())
+                .where(field.eq(id)).getSQL(ParamType.INLINED));
+    }
+
+    protected Request requestWorkspace(long id) {
+        return requestBy(WORKSPACES.ID, id);
+    }
+
+    protected Request requestUser(String username) {
+        return requestBy(USERS.USERNAME, username);
+    }
+
+    protected Request requestBus(long id) {
+        return requestBy(BUSES.ID, id);
+    }
+
+    protected Request requestContainer(long id) {
+        return requestBy(CONTAINERS.ID, id);
+    }
+
+    protected Request requestComponent(long id) {
+        return requestBy(COMPONENTS.ID, id);
+    }
+
     protected Request requestSU(long id) {
-        return new Request(dbRule.getDataSource(), DSL.using(dbRule.getConnectionJdbcUrl()).selectFrom(SERVICEUNITS)
-                .where(SERVICEUNITS.ID.eq(id)).getSQL(ParamType.INLINED));
+        return requestBy(SERVICEUNITS.ID, id);
     }
 
     protected Request requestComp(long id) {
-        return new Request(dbRule.getDataSource(), DSL.using(dbRule.getConnectionJdbcUrl()).selectFrom(COMPONENTS)
-                .where(COMPONENTS.ID.eq(id)).getSQL(ParamType.INLINED));
+        return requestBy(COMPONENTS.ID, id);
     }
 
     /**

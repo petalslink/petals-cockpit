@@ -34,6 +34,10 @@ export class UsersMockService extends UsersService {
     vnoel: {
       ...users.vnoel,
       lastWorkspace: ''
+    },
+    mrobert: {
+      ...users.mrobert,
+      lastWorkspace: ''
     }
   };
 

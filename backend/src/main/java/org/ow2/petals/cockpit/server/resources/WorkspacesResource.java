@@ -16,8 +16,8 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
-import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_USERNAME;
-import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_WORKSPACES_ID;
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_WORKSPACES_USERNAME;
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_WORKSPACES_WORKSPACE_ID;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
@@ -91,12 +91,13 @@ public class WorkspacesResource {
             Map<String, UserMin> users = new HashMap<>();
 
             for (WorkspacesRecord w : DSL.using(conf).select().from(WORKSPACES).join(USERS_WORKSPACES)
-                    .onKey(FK_WORKSPACES_ID).where(USERS_WORKSPACES.USERNAME.eq(profile.getId()))
+                    .onKey(FK_USERS_WORKSPACES_WORKSPACE_ID).where(USERS_WORKSPACES.USERNAME.eq(profile.getId()))
                     .fetchInto(WORKSPACES)) {
 
                 ImmutableList.Builder<String> wsUsers = ImmutableList.builder();
                 for (UsersRecord u : DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
-                        .onKey(FK_USERS_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(w.getId())).fetchInto(USERS)) {
+                        .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(w.getId()))
+                        .fetchInto(USERS)) {
                     wsUsers.add(u.getUsername());
                     users.put(u.getUsername(), new UserMin(u.getUsername(), u.getName()));
                 }

@@ -54,7 +54,10 @@ export class WorkspacesServiceImpl extends WorkspacesService {
   }
 
   deleteWorkspace(workspaceId: string) {
-    return this.http.delete(`${environment.urlBackend}/workspaces/${workspaceId}`);
+    // TODO it is needed to add an extra parameter to the request just so that the
+    // browser does not think the opened SSE stream is a potential cached response
+    // for the delete request... that's strange but that's life!
+    return this.http.delete(`${environment.urlBackend}/workspaces/${workspaceId}?d`);
   }
 
   watchEventWorkspaceDeleted() {

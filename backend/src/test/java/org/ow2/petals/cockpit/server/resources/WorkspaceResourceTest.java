@@ -19,6 +19,7 @@ package org.ow2.petals.cockpit.server.resources;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.db.api.Assertions.assertThat;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import javax.ws.rs.core.Response;
 
@@ -30,6 +31,7 @@ import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitM
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.BusFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.ContainerFull;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
@@ -38,6 +40,35 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
 
     @Rule
     public final ResourceTestRule resources = buildResourceTest(WorkspaceResource.class);
+
+    @Test
+    public void deleteWorkspace() {
+        assertThat(table(WORKSPACES)).hasNumberOfRows(2);
+
+        WorkspaceDeleted delete = resources.target("/workspaces/1").request().delete(WorkspaceDeleted.class);
+
+        assertThat(delete.id).isEqualTo(1);
+
+        // only the second workspace is still present
+        assertThat(table(WORKSPACES)).hasNumberOfRows(1);
+
+        assertThat(requestWorkspace(1)).hasNumberOfRows(0);
+        assertThat(requestWorkspace(2)).hasNumberOfRows(1);
+
+        assertThat(requestBus(10)).hasNumberOfRows(0);
+        assertThat(requestBus(2)).hasNumberOfRows(1);
+
+        assertThat(requestContainer(20)).hasNumberOfRows(0);
+        assertThat(requestContainer(21)).hasNumberOfRows(0);
+        assertThat(requestContainer(22)).hasNumberOfRows(0);
+        assertThat(requestContainer(2)).hasNumberOfRows(1);
+
+        assertThat(requestComponent(30)).hasNumberOfRows(0);
+        assertThat(requestComponent(2)).hasNumberOfRows(1);
+
+        assertThat(requestSU(40)).hasNumberOfRows(0);
+        assertThat(requestSU(2)).hasNumberOfRows(1);
+    }
 
     @Test
     public void getEventNonExistingWorkspaceForbidden() {

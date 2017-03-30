@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.jooq.Configuration;
 import org.jooq.TransactionalCallable;
 import org.jooq.impl.DSL;
@@ -37,7 +38,7 @@ import co.paralleluniverse.fibers.FiberAsync;
 import co.paralleluniverse.fibers.SuspendExecution;
 import javaslang.CheckedFunction1;
 
-public abstract class CockpitActor<M> extends BasicActor<M, Void> {
+public abstract class CockpitActor<M> extends BasicActor<M, @Nullable Void> {
 
     private static final Logger LOG = LoggerFactory.getLogger(CockpitActor.class);
 

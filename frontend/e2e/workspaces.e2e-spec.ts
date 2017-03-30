@@ -142,9 +142,7 @@ describe(`Workspaces`, () => {
   });
 
   it(`should create a new workspace`, () => {
-    page.login(`admin`, `admin`);
-
-    expect(element(by.css(`app-cockpit md-sidenav .change-workspace`)).click());
+    page.login(`mrobert`, `mrobert`, true, false);
 
     const inputName = element(by.css(`input[formControlName="name"]`));
     const addNewWorkspace = element(by.css(`app-workspaces-dialog .btn-add-workspace`));
@@ -162,13 +160,12 @@ describe(`Workspaces`, () => {
 
     addNewWorkspace.click();
 
-    expect(element.all(by.css(`app-workspaces-dialog div md-card-title-group`)).count()).toEqual(3);
+    expect(element.all(by.css(`app-workspaces-dialog div md-card-title-group`)).count()).toEqual(2);
 
     // check if the input is cleared
     expect(inputName.getText()).toEqual(``);
 
     const workspacesAndOwners = [
-      `Workspace 0\nYou are the only one using this workspace.`,
       `Workspace 1\nShared with you and 4 others.`,
       `New workspace\nYou are the only one using this workspace.`
     ];
