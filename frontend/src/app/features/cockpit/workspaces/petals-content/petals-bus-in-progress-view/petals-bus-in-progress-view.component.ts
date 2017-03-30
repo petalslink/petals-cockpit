@@ -176,5 +176,6 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
 
   reset() {
     this.busImportForm.reset();
+    this.store$.dispatch({ type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS, payload: '' });
   }
 }

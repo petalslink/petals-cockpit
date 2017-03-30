@@ -93,6 +93,18 @@ describe(`Import Bus`, () => {
     // the first one should fail
     expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).getText()).toEqual('Error 500 : Error backend');
 
+    // clear the form and the error
+    clearBtn.click();
+
+    // check if the error for import bus is not displayed
+    expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).isPresent()).toBe(false);
+
+    inputIp.sendKeys(`hostname`);
+    inputPort.sendKeys(`5000`);
+    inputUsername.sendKeys(`admin`);
+    inputPassword.sendKeys(`password`);
+    inputPassphrase.sendKeys(`passphrase`);
+
     // try to re-import
     importBtn.click();
 
