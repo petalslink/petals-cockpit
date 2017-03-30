@@ -24,6 +24,7 @@ describe(`Login`, () => {
 
   beforeEach(() => {
     page = new PetalsCockpitPage();
+    page.setDesktopSize();
     page.navigateTo();
   });
 
@@ -50,7 +51,7 @@ describe(`Login`, () => {
     page.login(`admin`, `admin`);
 
     // let's go to the import bus page
-    page.addBus();
+    page.openImportBus();
 
     // delete session and refresh to retrigger login
     browser.manage().deleteAllCookies();
@@ -98,7 +99,7 @@ describe(`Login`, () => {
     expect(element(by.css('md-tooltip-component')).getText()).toEqual('Administrator');
   });
 
-  it(`should selected the first input`, () => {
+  it(`should select the first input of the login form on desktop`, () => {
     element(by.css(`app-login input[formcontrolname="username"]`)).isSelected();
   });
 });

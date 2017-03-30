@@ -14,28 +14,41 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { browser, element, by, ExpectedConditions as EC } from 'protractor';
+
+import { browser, element, by } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
 
-describe(`Petals bus content`, () => {
+describe(`Import Bus`, () => {
   let page: PetalsCockpitPage;
+
+  const inputIp = element(by.css(`input[formControlName="ip"]`));
+  const inputUsername = element(by.css(`input[formControlName="username"]`));
 
   beforeEach(() => {
     page = new PetalsCockpitPage();
-    page.setDesktopSize();
+    page.setMobileSize();
     page.navigateTo();
     page.login(`admin`, `admin`);
-    // let's be sure everything is loaded and visible
-    browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
   });
 
-  it(`should open the content page`, () => {
-    page.getWorkspaceTreeByName('Bus 0').click();
+  it(`should not select the first input of import bus form on mobile`, () => {
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
 
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses\/\w+/);
+    page.openImportBus();
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/);
 
-    const pageTitle = element(by.css(`app-petals-bus-view md-toolbar-row .title`)).getText();
-    expect(pageTitle).toEqual('Bus 0');
+    inputIp.isSelected();
+  });
+
+
+  it(`should not select the first input of the login form on mobile`, () => {
+    page.logout();
+    expect(browser.getCurrentUrl()).toMatch(/\/login/);
+
+    inputUsername.isSelected();
+
+    page.login(`admin`, `admin`);
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
   });
 });

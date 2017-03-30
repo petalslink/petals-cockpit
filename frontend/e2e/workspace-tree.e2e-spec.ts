@@ -23,6 +23,7 @@ describe(`Workspaces Tree`, () => {
 
   beforeEach(() => {
     page = new PetalsCockpitPage();
+    page.setDesktopSize();
     page.navigateTo();
     page.login(`admin`, `admin`);
     // let's be sure everything is loaded and visible
