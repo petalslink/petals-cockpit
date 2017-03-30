@@ -15,9 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
 
 import { IBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
@@ -26,20 +25,16 @@ import { Ui } from '../../../../../shared/state/ui.reducer';
 @Component({
   selector: 'app-buses-in-progress',
   templateUrl: './buses-in-progress.component.html',
-  styleUrls: ['./buses-in-progress.component.scss']
+  styleUrls: ['./buses-in-progress.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BusesInProgressComponent implements OnInit {
   @Input() busesInProgress: IBusesInProgress;
-
-  public workspaceId$: Observable<string>;
+  @Input() workspaceId: string;
 
   constructor(private store$: Store<IStore>) { }
 
-  ngOnInit() {
-    this.workspaceId$ = this.store$
-      .select(state => state.workspaces)
-      .map(workspaces => workspaces.selectedWorkspaceId);
-  }
+  ngOnInit() { }
 
   closeSidenavOnSmallScreen() {
     this.store$.dispatch({ type: Ui.CLOSE_SIDENAV_ON_SMALL_SCREEN });

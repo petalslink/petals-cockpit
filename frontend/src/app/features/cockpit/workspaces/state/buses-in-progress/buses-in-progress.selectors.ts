@@ -22,6 +22,7 @@ import { IBusesInProgress } from './buses-in-progress.interface';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IBusInProgressRow } from './bus-in-progress.interface';
 import { isNot } from '../../../../../shared/helpers/shared.helper';
+import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
 export function _getBusesInProgress(store$: Store<IStore>): Observable<IBusesInProgress> {
   return store$.select(state => state.busesInProgress)
@@ -41,34 +42,16 @@ export function getBusesInProgress() {
 
 // ------------------------------------------------------------------
 
-export function _getCurrentBusInProgress(store$: Store<IStore>): Observable<IBusInProgressRow> {
-  return store$
-    .select(state => state.busesInProgress.selectedBusInProgressId === ''
-      ? null
-      : state.busesInProgress.byId[state.busesInProgress.selectedBusInProgressId])
-    .filter(isNot(null));
-}
-
-export function getCurrentBusInProgress() {
-  return _getCurrentBusInProgress;
+export function getCurrentBusInProgress(store$: Store<IStore>): Observable<IBusInProgressRow> {
+  return getCurrentBusInProgressOrNull(store$).filter(isNot(null));
 }
 
 // ------------------------------------------------------------------
 
-export function _getCurrentBusInProgressEvenIfNull(store$: Store<IStore>): Observable<IBusInProgressRow> {
-  return store$.select(state => state.busesInProgress)
-    .filter(busesInProgress => busesInProgress.allIds.length > 0)
-    .map(busesInProgress => {
-      if (busesInProgress.selectedBusInProgressId === '') {
-        return null;
-      }
-
-      const busInProgress = busesInProgress.byId[busesInProgress.selectedBusInProgressId];
-
-      return busInProgress;
-    });
-}
-
-export function getCurrentBusInProgressEvenIfNull() {
-  return _getCurrentBusInProgressEvenIfNull;
+export function getCurrentBusInProgressOrNull(store$: Store<IStore>): Observable<IBusInProgressRow> {
+  return filterWorkspaceFetched(store$)
+    .map(state => state.busesInProgress.selectedBusInProgressId === ''
+      ? null
+      : state.busesInProgress.byId[state.busesInProgress.selectedBusInProgressId])
+    .distinctUntilChanged();
 }

@@ -78,8 +78,6 @@ export class CockpitComponent implements OnInit, OnDestroy {
 
     this.isDisconnecting$ = this.store$.select(state => state.users.isDisconnecting);
 
-    // it is needed to use subscribe(...) instead of do(...).subscribe()
-    // if not it won't work. TODO this will be fixed in rxjs >5.2.0
     this.uiSub = this.ui$
       .map(ui => ui.isPopupListWorkspacesVisible)
       .distinctUntilChanged()
@@ -95,8 +93,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
     this.deleteSub = this.store$
       .select(state => state.workspaces.deletedWorkspace)
       .filter(d => d)
-      .do(_ => this.openDeletedWorkspaceDialog())
-      .subscribe();
+      .subscribe(_ => this.openDeletedWorkspaceDialog());
 
     // TODO ultimately, the sidebar should be moved to WorkspaceComponent
     this.sidenavVisible$ = this.store$.select(state => state.ui.isSidenavVisible && !!state.workspaces.selectedWorkspaceId);

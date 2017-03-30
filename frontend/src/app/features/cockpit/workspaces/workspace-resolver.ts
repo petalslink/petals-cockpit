@@ -22,6 +22,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from './../../../shared/interfaces/store.interface';
 import { Workspaces } from './state/workspaces/workspaces.reducer';
+import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
 @Injectable()
 export class WorkspaceResolver implements Resolve<Observable<any>> {
@@ -32,10 +33,6 @@ export class WorkspaceResolver implements Resolve<Observable<any>> {
 
     this.store$.dispatch({ type: Workspaces.FETCH_WORKSPACE, payload: workspaceId });
 
-    return this
-      .store$
-      .select(state => state.workspaces.byId[workspaceId])
-      .filter(ws => ws && ws.isFetching)
-      .first();
+    return this.store$.let(filterWorkspaceFetched).first();
   }
 }

@@ -49,8 +49,7 @@ export class PetalsCockpitPage {
         return browser.wait(EC.visibilityOf(element(by.css(`app-cockpit md-sidenav.mat-sidenav-opened`))), 2000);
       } else {
         expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
-        // the sidenav is visible in HTML terms, but not really visible in practice
-        return browser.wait(EC.presenceOf(element(by.css(`app-cockpit md-sidenav.mat-sidenav-closed`))), 2000);
+        return browser.wait(EC.visibilityOf(element(by.css(`app-workspaces-dialog`))), 2000);
       }
     } else {
       // let's be sure angular has finished loading after login!

@@ -20,35 +20,31 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { IContainerRow } from './container.interface';
-import { isNot, arrayEquals } from '../../../../../shared/helpers/shared.helper';
+import { arrayEquals } from '../../../../../shared/helpers/shared.helper';
+import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
-export function _getCurrentContainer(store$: Store<IStore>): Observable<IContainerRow> {
-  return store$
-    .select(state => state.containers.selectedContainerId === ''
-      ? null
-      : state.containers.byId[state.containers.selectedContainerId])
-    .filter(isNot(null));
-}
-
-export function getCurrentContainer() {
-  return _getCurrentContainer;
+export function getCurrentContainer(store$: Store<IStore>): Observable<IContainerRow> {
+  return filterWorkspaceFetched(store$)
+    .filter(state => !!state.containers.selectedContainerId)
+    .map(state => state.containers.byId[state.containers.selectedContainerId])
+    .distinctUntilChanged();
 }
 
 /**
  * Returns the other containers in the bus of the container with id containerId.
  * @param containerId the id of the concerned container (not in the resulting array)
  */
-export function getSiblingContainers(containerId: string): (store$: Store<IStore>) => Observable<IContainerRow[]> {
-  return store$ => {
-    return store$
-      .select(state => {
-        // TODO not the best in term of performances...
-        const busId = state.buses.allIds.find(bId => state.buses.byId[bId].containers.includes(containerId));
-        return state.buses.byId[busId].containers
-          .filter(cid => cid !== containerId)
-          .map(cid => state.containers.byId[cid]);
-      })
-      .distinctUntilChanged(arrayEquals);
-  };
+export function getCurrentContainerSiblings(store$: Store<IStore>): Observable<IContainerRow[]> {
+  return filterWorkspaceFetched(store$)
+    .filter(state => !!state.containers.selectedContainerId)
+    .map(state => {
+      const containerId = state.containers.selectedContainerId;
+      // TODO not the best in term of performances...
+      const busId = state.buses.allIds.find(bId => state.buses.byId[bId].containers.includes(containerId));
+      return state.buses.byId[busId].containers
+        .filter(cid => cid !== containerId)
+        .map(cid => state.containers.byId[cid]);
+    })
+    .distinctUntilChanged(arrayEquals);
 }
 

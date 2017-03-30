@@ -59,10 +59,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.languageSub = this.store$
       .select(state => state.ui.language)
       .filter(language => language !== '')
-      .map(language => {
-        this.translate.use(language);
-      })
-      .subscribe();
+      .subscribe(language => this.translate.use(language));
   }
 
   ngOnDestroy() {

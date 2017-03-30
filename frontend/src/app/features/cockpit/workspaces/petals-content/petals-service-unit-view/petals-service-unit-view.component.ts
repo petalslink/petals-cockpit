@@ -19,6 +19,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Ui } from '../../../../../shared/state/ui.reducer';
@@ -34,23 +35,29 @@ import { IServiceUnitRow } from '../../state/service-units/service-unit.interfac
 export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
   public serviceUnit$: Observable<IServiceUnitRow>;
 
+  private sub: Subscription;
+
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.serviceUnit$ = this.store$.let(getCurrentServiceUnit());
+
+    const serviceUnitId$ = this.route.paramMap
+      .map(pm => pm.get('serviceUnitId'))
+      .distinctUntilChanged();
+
+    this.serviceUnit$ = this.store$.let(getCurrentServiceUnit);
 
     this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Service Unit' } });
 
-    this.route
-      .paramMap
-      .map(paramMap => {
-        this.store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: paramMap.get('serviceUnitId') } });
-        this.store$.dispatch({ type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS, payload: { serviceUnitId: paramMap.get('serviceUnitId') } });
-      })
-      .subscribe();
+    this.sub = serviceUnitId$
+      .subscribe(serviceUnitId => {
+        this.store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId } });
+        this.store$.dispatch({ type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS, payload: { serviceUnitId } });
+      });
   }
 
   ngOnDestroy() {
+    this.sub.unsubscribe();
     this.store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: '' } });
   }
 }

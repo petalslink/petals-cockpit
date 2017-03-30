@@ -13,21 +13,21 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFill class="wrapper-content">
+<div *ngIf="bus$ | async as bus" fxLayout="column" fxFill class="wrapper-content">
   <md-toolbar>
     <div class="prefix-toolbar-title">
-      <md-icon color="primary" *ngIf="!(bus$ | async)?.isFetchingDetails">grade</md-icon>
+      <md-icon color="primary" *ngIf="!bus.isFetchingDetails">grade</md-icon>
 
-      <md-spinner *ngIf="(bus$ | async)?.isFetchingDetails"></md-spinner>
+      <md-spinner *ngIf="bus.isFetchingDetails"></md-spinner>
     </div>
 
-    <span class="title">{{ (bus$ | async)?.name }}</span>
+    <span class="title">{{ bus.name }}</span>
   </md-toolbar>
 
   <md-tab-group fxFlex>
     <md-tab label="Overview">
       <!-- TODO: Create a component for every tab -->
-      <app-petals-bus-overview *ngIf="bus$ | async" [bus]="bus$ | async" fxFill></app-petals-bus-overview>
+      <app-petals-bus-overview [bus]="bus" fxFill></app-petals-bus-overview>
     </md-tab>
   </md-tab-group>
 </div>

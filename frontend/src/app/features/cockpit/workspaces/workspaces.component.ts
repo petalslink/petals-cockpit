@@ -33,6 +33,7 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals Cockpit', titleMainPart2: '' } });
     this.store$.dispatch({ type: Ui.OPEN_POPUP_WORKSPACES_LIST });
   }
 
