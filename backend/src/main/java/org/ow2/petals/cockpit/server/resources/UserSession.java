@@ -17,7 +17,6 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -66,7 +65,6 @@ public class UserSession {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Valid
     public User getUserData(@Pac4JProfile CockpitProfile profile) {
         LOG.debug("Returning infos for {}", profile.getId());
 
@@ -79,7 +77,6 @@ public class UserSession {
     @Path("/session")
     @Produces(MediaType.APPLICATION_JSON)
     @Pac4JSecurity(authorizers = "isAuthenticated")
-    @Valid
     public User status(@Pac4JProfile CockpitProfile profile) {
         return getUserData(profile);
     }

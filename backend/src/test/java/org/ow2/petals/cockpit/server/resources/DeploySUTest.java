@@ -167,7 +167,7 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
             SUDeployed post = resources.target("/workspaces/1/components/30/serviceunits").request()
                     .post(Entity.entity(mpe, mpe.getMediaType()), SUDeployed.class);
 
-            assertThat(post.compId).isEqualTo(30);
+            assertThat(post.componentId).isEqualTo(30);
             assertThat(post.serviceUnit.name).isEqualTo(SU_NAME);
             assertThat(post.serviceUnit.saName).isEqualTo("sa-" + SU_NAME);
             assertThat(post.serviceUnit.state).isEqualTo(ServiceUnitMin.State.Shutdown);
@@ -175,7 +175,7 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("SU_DEPLOYED");
                 SUDeployed data = e.readData(SUDeployed.class);
-                a.assertThat(data.compId).isEqualTo(post.compId);
+                a.assertThat(data.componentId).isEqualTo(post.componentId);
                 a.assertThat(data.serviceUnit.id).isEqualTo(post.serviceUnit.id);
                 a.assertThat(data.serviceUnit.name).isEqualTo(post.serviceUnit.name);
                 a.assertThat(data.serviceUnit.saName).isEqualTo(post.serviceUnit.saName);

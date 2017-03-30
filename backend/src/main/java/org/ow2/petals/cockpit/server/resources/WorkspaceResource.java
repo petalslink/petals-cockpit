@@ -117,7 +117,6 @@ public class WorkspaceResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";qs=1")
-    @Valid
     public WorkspaceFullContent content() {
         return DSL.using(jooq).transactionResult(conf -> {
 
@@ -236,6 +235,7 @@ public class WorkspaceResource {
 
     public static class WorkspaceDeleted implements WorkspaceEvent.Data {
 
+        @NotNull
         @Min(1)
         public final long id;
 
@@ -298,6 +298,7 @@ public class WorkspaceResource {
         @JsonProperty
         public final String username;
 
+        @NotNull
         @Min(1)
         public final long id;
 
@@ -333,6 +334,7 @@ public class WorkspaceResource {
 
     public static class SUStateChanged implements WorkspaceEvent.Data {
 
+        @NotNull
         @Min(1)
         public final long id;
 
@@ -354,6 +356,7 @@ public class WorkspaceResource {
 
     public static class ComponentStateChanged implements WorkspaceEvent.Data {
 
+        @NotNull
         @Min(1)
         public final long id;
 
@@ -375,6 +378,7 @@ public class WorkspaceResource {
 
     public static class BusDeleted implements WorkspaceEvent.Data {
 
+        @NotNull
         @Min(1)
         public final long id;
 
@@ -395,8 +399,9 @@ public class WorkspaceResource {
 
     public static class SUDeployed implements WorkspaceEvent.Data {
 
+        @NotNull
         @Min(1)
-        public final long compId;
+        public final long componentId;
 
         @Valid
         @NotNull
@@ -404,15 +409,15 @@ public class WorkspaceResource {
         public final ServiceUnitMin serviceUnit;
 
         @JsonCreator
-        public SUDeployed(@JsonProperty("compId") long compId,
+        public SUDeployed(@JsonProperty("componentId") long componentId,
                 @JsonProperty("serviceUnit") ServiceUnitMin serviceUnit) {
-            this.compId = compId;
+            this.componentId = componentId;
             this.serviceUnit = serviceUnit;
         }
 
         @JsonProperty
-        public String getCompId() {
-            return Long.toString(compId);
+        public String getComponentId() {
+            return Long.toString(componentId);
         }
     }
 

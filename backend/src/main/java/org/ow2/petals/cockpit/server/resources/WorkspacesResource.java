@@ -67,7 +67,6 @@ public class WorkspacesResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Valid
     public Workspace create(@NotNull @Valid NewWorkspace ws, @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
             WorkspacesRecord wsDb = new WorkspacesRecord(null, ws.name);
@@ -82,7 +81,6 @@ public class WorkspacesResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Valid
     public Workspaces workspaces(@Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
             ImmutableMap.Builder<String, Workspace> wss = ImmutableMap.builder();
@@ -123,6 +121,7 @@ public class WorkspacesResource {
 
     public static class Workspace {
 
+        @NotNull
         @Min(1)
         public final long id;
 
