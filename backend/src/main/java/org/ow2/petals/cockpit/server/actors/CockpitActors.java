@@ -25,8 +25,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.hk2.api.ServiceLocator;
 import org.jooq.Configuration;
+import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
 
 import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.actors.ActorRegistry;
@@ -57,22 +57,25 @@ public class CockpitActors {
      * things homogeneous w.r.t. to other actors?
      */
     public ActorRef<WorkspaceActor.Msg> getWorkspace(long wId) throws SuspendExecution {
-        String name = "workspace-" + wId;
+        try {
+            return DSL.using(jooq).transactionResult(conf -> {
+                // we check everytime to avoid race conditions during actor deletion
+                if (!DSL.using(jooq).fetchExists(WORKSPACES, WORKSPACES.ID.eq(wId))) {
+                    throw new WebApplicationException(Status.NOT_FOUND);
+                }
 
-        ActorRef<Msg> a = ActorRegistry.tryGetActor(name);
-
-        if (a == null) {
-            if (!DSL.using(jooq).fetchExists(WORKSPACES, WORKSPACES.ID.eq(wId))) {
-                throw new WebApplicationException(Status.NOT_FOUND);
-            } else {
-                return ActorRegistry.getOrRegisterActor(name, () -> {
+                return ActorRegistry.getOrRegisterActor("workspace-" + wId, () -> {
                     WorkspaceActor workspaceActor = new WorkspaceActor(wId);
                     serviceLocator.inject(workspaceActor);
                     return workspaceActor;
                 });
+            });
+        } catch (DataAccessException e) {
+            if (e.getCause() instanceof SuspendExecution) {
+                throw (SuspendExecution) e.getCause();
+            } else {
+                throw e;
             }
-        } else {
-            return a;
         }
     }
 

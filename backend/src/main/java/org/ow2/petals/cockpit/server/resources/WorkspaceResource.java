@@ -56,6 +56,7 @@ import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeComponentState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeServiceUnitState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteWorkspace;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployServiceUnit;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
@@ -150,6 +151,15 @@ public class WorkspaceResource {
         return as.call(wsId, new NewWorkspaceClient(profile.getId()));
     }
 
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public WorkspaceDeleted delete() throws InterruptedException {
+
+        checkAccess(jooq);
+
+        return as.call(wsId, new DeleteWorkspace());
+    }
+
     @POST
     @Path("/buses")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -221,6 +231,21 @@ public class WorkspaceResource {
         try (ServicedArtifact sa = httpServer.serve(saName + ".zip",
                 os -> PetalsUtils.createSAfromSU(file, os, saName, name, componentName))) {
             return as.call(wsId, new DeployServiceUnit(saName, sa.getArtifactUrl(), compId));
+        }
+    }
+
+    public static class WorkspaceDeleted implements WorkspaceEvent.Data {
+
+        @Min(1)
+        public final long id;
+
+        public WorkspaceDeleted(@JsonProperty("id") long id) {
+            this.id = id;
+        }
+
+        @JsonProperty
+        public String getId() {
+            return Long.toString(id);
         }
     }
 
@@ -432,7 +457,7 @@ public class WorkspaceResource {
 
         public enum Event {
             WORKSPACE_CONTENT, BUS_IMPORT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, COMPONENT_STATE_CHANGE,
-            BUS_DELETED, SU_DEPLOYED
+            BUS_DELETED, SU_DEPLOYED, WORKSPACE_DELETED
         }
 
         @JsonProperty
@@ -452,6 +477,10 @@ public class WorkspaceResource {
 
         public static WorkspaceEvent content(WorkspaceContent content) {
             return new WorkspaceEvent(Event.WORKSPACE_CONTENT, content);
+        }
+
+        public static WorkspaceEvent workspaceDeleted(WorkspaceDeleted wd) {
+            return new WorkspaceEvent(Event.WORKSPACE_DELETED, wd);
         }
 
         public static WorkspaceEvent busImportError(BusInProgress bus) {

@@ -38,6 +38,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.io.EofException;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.OutboundEvent;
@@ -76,6 +77,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentStateC
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUDeployed;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUStateChanged;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.slf4j.Logger;
@@ -131,11 +133,16 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
     @Override
     @SuppressWarnings("squid:S2189")
+    @Nullable
     protected Void doRun() throws InterruptedException, SuspendExecution {
         for (;;) {
             Msg msg = receive();
             if (msg instanceof WorkspaceActorAction) {
                 ((WorkspaceActorAction) msg).action.run();
+            } else if (msg instanceof DeleteWorkspace) {
+                answer((DeleteWorkspace) msg, this::handleDeleteWorkspace);
+                // the actor will die!
+                return null;
             } else if (msg instanceof ImportBus) {
                 answer((ImportBus) msg, this::handleImportBus);
             } else if (msg instanceof DeleteBus) {
@@ -210,6 +217,39 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         return eo;
     }
 
+    private WorkspaceDeleted handleDeleteWorkspace(DeleteWorkspace dw) throws SuspendExecution {
+        runBlockingTransaction(conf -> {
+            // remove from db (it will propagate to all its contained elements!)
+            DSL.using(conf).deleteFrom(WORKSPACES).where(WORKSPACES.ID.eq(wId)).execute();
+
+            // unregister while still in the transaction!
+            this.unregister();
+
+            return null;
+        });
+
+        // now we are sure nobody can get a hold of this actor!
+
+        // let's cancel current imports
+        for (Fiber<?> f : importsInProgress.values()) {
+            f.cancel(true);
+        }
+
+        this.importsInProgress.clear();
+
+        WorkspaceDeleted wd = new WorkspaceDeleted(wId);
+
+        // this is the only case where we broadcast directly
+        broadcast(WorkspaceEvent.workspaceDeleted(wd));
+
+        // now we close all connection (and if they reconnect they will get a 404,
+        // but anyway the frontend should have stopped the connection as soon as
+        // it got the deleted workspace event.
+        broadcaster.closeAll();
+
+        return wd;
+    }
+
     private BusDeleted handleDeleteBus(DeleteBus bus) throws SuspendExecution {
         runBlockingTransaction(conf -> {
             int deleted = DSL.using(conf).deleteFrom(BUSES).where(BUSES.ID.eq(bus.bId).and(BUSES.WORKSPACE_ID.eq(wId)))
@@ -228,6 +268,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         if (fiber == null) {
             reason = "Bus deleted by " + bus.user;
         } else {
+            // TODO if it returns false, is there something specific to do?
+            // I don't think so because we delete the bus in that case
             fiber.cancel(true);
             reason = "Import cancelled by " + bus.user;
         }
@@ -620,6 +662,12 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         public NewWorkspaceClient(String user) {
             this.user = user;
         }
+    }
+
+    public static class DeleteWorkspace extends WorkspaceRequest<WorkspaceDeleted> {
+
+        private static final long serialVersionUID = 9055119816237335262L;
+
     }
 
     public static class ImportBus extends WorkspaceRequest<BusInProgress> {
