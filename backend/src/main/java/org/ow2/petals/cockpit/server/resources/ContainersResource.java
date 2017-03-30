@@ -129,6 +129,7 @@ public class ContainersResource {
 
     public static class ContainerMin {
 
+        @NotNull
         @Min(1)
         public final long id;
 

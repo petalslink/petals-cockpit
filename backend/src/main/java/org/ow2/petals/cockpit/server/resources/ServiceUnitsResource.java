@@ -108,6 +108,7 @@ public class ServiceUnitsResource {
             }
         }
 
+        @NotNull
         @Min(1)
         public final long id;
 

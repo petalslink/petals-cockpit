@@ -123,6 +123,7 @@ public class WorkspacesResource {
 
     public static class Workspace {
 
+        @NotNull
         @Min(1)
         public final long id;
 

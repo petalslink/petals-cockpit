@@ -81,6 +81,7 @@ public class BusesResource {
 
     public static class BusMin {
 
+        @NotNull
         @Min(1)
         public final long id;
 

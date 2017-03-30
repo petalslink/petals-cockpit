@@ -236,6 +236,7 @@ public class WorkspaceResource {
 
     public static class WorkspaceDeleted implements WorkspaceEvent.Data {
 
+        @NotNull
         @Min(1)
         public final long id;
 
@@ -298,6 +299,7 @@ public class WorkspaceResource {
         @JsonProperty
         public final String username;
 
+        @NotNull
         @Min(1)
         public final long id;
 
@@ -333,6 +335,7 @@ public class WorkspaceResource {
 
     public static class SUStateChanged implements WorkspaceEvent.Data {
 
+        @NotNull
         @Min(1)
         public final long id;
 
@@ -354,6 +357,7 @@ public class WorkspaceResource {
 
     public static class ComponentStateChanged implements WorkspaceEvent.Data {
 
+        @NotNull
         @Min(1)
         public final long id;
 
@@ -375,6 +379,7 @@ public class WorkspaceResource {
 
     public static class BusDeleted implements WorkspaceEvent.Data {
 
+        @NotNull
         @Min(1)
         public final long id;
 
@@ -395,6 +400,7 @@ public class WorkspaceResource {
 
     public static class SUDeployed implements WorkspaceEvent.Data {
 
+        @NotNull
         @Min(1)
         public final long compId;
 

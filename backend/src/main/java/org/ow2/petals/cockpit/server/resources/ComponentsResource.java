@@ -123,6 +123,7 @@ public class ComponentsResource {
             }
         }
 
+        @NotNull
         @Min(1)
         public final long id;
 
