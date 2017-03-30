@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -77,7 +76,6 @@ public class ContainersResource {
     @GET
     @Path("/{cId}")
     @Produces(MediaType.APPLICATION_JSON)
-    @Valid
     public ContainerOverview get(@NotNull @PathParam("cId") @Min(1) long cId, @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
             ContainersRecord container = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(cId)).fetchOne();

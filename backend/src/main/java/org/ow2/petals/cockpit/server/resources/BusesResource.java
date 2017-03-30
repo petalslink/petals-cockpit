@@ -21,7 +21,6 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
@@ -57,7 +56,6 @@ public class BusesResource {
     @GET
     @Path("/{bId}")
     @Produces(MediaType.APPLICATION_JSON)
-    @Valid
     public BusOverview get(@NotNull @PathParam("bId") @Min(1) long bId, @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
 

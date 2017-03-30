@@ -117,7 +117,6 @@ public class WorkspaceResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";qs=1")
-    @Valid
     public WorkspaceFullContent content() {
         return DSL.using(jooq).transactionResult(conf -> {
 
