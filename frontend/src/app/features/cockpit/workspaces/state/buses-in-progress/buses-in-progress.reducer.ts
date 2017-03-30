@@ -98,14 +98,19 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS_ERROR = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS_ERROR`;
   private static postBusInProgressError(busesInProgressTable: IBusesInProgressTable, payload) {
-    return <IBusesInProgressTable>{
-      ...busesInProgressTable,
-      ...<IBusesInProgressTable>{
-        isImportingBus: false,
-        importBusError: payload,
-        importBusId: ''
-      }
-    };
+    // if it's false, it means we changed bus (with SET_CURRENT_BUS_IN_PROGRESS)
+    if (busesInProgressTable.isImportingBus) {
+      return <IBusesInProgressTable>{
+        ...busesInProgressTable,
+        ...<IBusesInProgressTable>{
+          isImportingBus: false,
+          importBusError: payload,
+          importBusId: ''
+        }
+      };
+    } else {
+      return busesInProgressTable;
+    }
   }
 
   // tslint:disable-next-line:member-ordering
