@@ -24,9 +24,9 @@ export interface IComponentsCommon {
 
 export interface IComponentsTable extends IComponentsCommon {
   byId: { [key: string]: IComponentRow };
-  allIds: Array<string>;
+  allIds: string[];
 }
 
 export interface IComponents extends IComponentsCommon {
-  list: Array<IComponent>;
+  list: IComponent[];
 }

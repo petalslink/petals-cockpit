@@ -20,11 +20,8 @@ import { Observable } from 'rxjs/Observable';
 
 import { IWorkspaces } from './workspaces.interface';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { IComponent } from '../components/component.interface';
-import { IContainer } from '../containers/container.interface';
 import { IWorkspace } from './workspace.interface';
-import { IBus } from '../buses/bus.interface';
-import { escapeStringRegexp, arrayEquals } from '../../../../../shared/helpers/shared.helper';
+import { escapeStringRegexp, arrayEquals, tuple } from '../../../../../shared/helpers/shared.helper';
 import { IUser } from '../../../../../shared/interfaces/user.interface';
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 
@@ -36,11 +33,11 @@ export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspace
   return sWorkspaces
     .withLatestFrom(sUsers, sBuses)
     .map(([workspaces, users]) => {
-      return <IWorkspaces>{
+      return {
         ...workspaces,
         ...<IWorkspaces>{
           list: workspaces.allIds.map(workspaceId => {
-            return <IWorkspace>{
+            return {
               ...workspaces.byId[workspaceId],
               ...<IWorkspace>{
                 users: {
@@ -73,63 +70,86 @@ export function filterWorkspaceFetched(store$: Store<IStore>): Observable<IStore
 
 export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspace> {
   return filterWorkspaceFetched(store$)
-    .map(state => [
+    .map(state => tuple([
       state.workspaces,
       state.users,
       state.buses,
       state.containers,
       state.components,
       state.serviceUnits
-    ])
+    ]))
     // as the object has a new reference every time,
     // use distinctUntilChanged for performance
     .distinctUntilChanged(arrayEquals)
     .map(([workspaces, users, buses, containers, components, serviceUnits]) => {
+      const workspace = workspaces.byId[workspaces.selectedWorkspaceId];
       return {
-        id: workspaces.byId[workspaces.selectedWorkspaceId].id,
-        name: workspaces.byId[workspaces.selectedWorkspaceId].name,
-        selectedWorkspaceId: workspaces.selectedWorkspaceId,
-        isAddingWorkspace: workspaces.isAddingWorkspace,
-        isFetchingWorkspaces: workspaces.isFetchingWorkspaces,
-        searchPetals: workspaces.searchPetals,
-        isRemovingWorkspace: workspaces.isRemovingWorkspace,
-        deletedWorkspace: workspaces.deletedWorkspace,
+        id: workspace.id,
+        name: workspace.name,
+        isFetched: workspace.isFetched,
 
         users: {
-          list: workspaces.byId[workspaces.selectedWorkspaceId].users.map(userId => <IUser>users.byId[userId])
+          connectedUserId: users.connectedUserId,
+          isConnecting: users.isConnecting,
+          isConnected: users.isConnected,
+          isDisconnecting: users.isDisconnecting,
+          connectionFailed: users.connectionFailed,
+          list: workspace.users.map(userId => users.byId[userId])
         },
 
         buses: {
           selectedBusId: buses.selectedBusId,
           list: buses.allIds.map(busId => {
-            return <IBus>{
-              id: buses.byId[busId].id,
-              name: buses.byId[busId].name,
-              isFolded: buses.byId[busId].isFolded || false,
+            const bus = buses.byId[busId];
+            return {
+              id: bus.id,
+              name: bus.name,
+              importError: bus.importError,
+              isDiscarding: bus.isDiscarding,
+              isFetchingDetails: bus.isFetchingDetails,
+              isBeingRemoved: bus.isBeingRemoved,
+              isFolded: bus.isFolded || false,
 
               containers: {
                 selectedContainerId: containers.selectedContainerId,
-                list: buses.byId[busId].containers.map(containerId => {
-                  return <IContainer>{
-                    id: containers.byId[containerId].id,
-                    name: containers.byId[containerId].name,
-                    isFolded: containers.byId[containerId].isFolded || false,
+                isFetchingDetails: containers.isFetchingDetails,
+                list: bus.containers.map(containerId => {
+                  const container = containers.byId[containerId];
+                  return {
+                    id: container.id,
+                    name: container.name,
+                    ip: container.ip,
+                    port: container.port,
+                    systemInfo: container.systemInfo,
+                    isFetchingDetail: container.isFetchingDetail,
+                    isFolded: container.isFolded || false,
 
                     components: {
                       selectedComponentId: components.selectedComponentId,
-                      list: containers.byId[containerId].components.map(componentId => {
-                        return <IComponent>{
-                          id: components.byId[componentId].id,
-                          name: components.byId[componentId].name,
-                          isFolded: components.byId[componentId].isFolded || false,
+                      isFetchingDetails: components.isFetchingDetails,
+                      list: container.components.map(componentId => {
+                        const component = components.byId[componentId];
+                        return {
+                          id: component.id,
+                          name: component.name,
+                          state: component.state,
+                          type: component.type,
+                          isFetchingDetails: component.isFetchingDetails,
+                          isUpdatingState: component.isUpdatingState,
+                          isDeployingServiceUnit: component.isDeployingServiceUnit,
+                          isFolded: component.isFolded || false,
 
                           serviceUnits: {
                             selectedServiceUnitId: serviceUnits.selectedServiceUnitId,
-                            list: components.byId[componentId].serviceUnits.map(serviceUnitId => {
+                            isFetchingDetails: serviceUnits.isFetchingDetails,
+                            list: component.serviceUnits.map(serviceUnitId => {
+                              const serviceUnit = serviceUnits.byId[serviceUnitId];
                               return {
-                                id: serviceUnits.byId[serviceUnitId].id,
-                                name: serviceUnits.byId[serviceUnitId].name,
-                                isFolded: serviceUnits.byId[serviceUnitId].isFolded || false
+                                id: serviceUnit.id,
+                                name: serviceUnit.name,
+                                state: serviceUnit.state,
+                                isUpdatingState: serviceUnit.isUpdatingState,
+                                isFolded: serviceUnit.isFolded || false
                               };
                             })
                           }
@@ -165,9 +185,9 @@ export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
 export function _getCurrentTree(store$: Store<IStore>): Observable<WorkspaceElement[]> {
   return _getCurrentWorkspace(store$)
     .map(workspace => {
-      const baseUrl = `/workspaces/${workspace.selectedWorkspaceId}/petals`;
+      const baseUrl = `/workspaces/${workspace.id}/petals`;
       return workspace.buses.list.map(bus => {
-        return <WorkspaceElement>{
+        return {
           id: bus.id,
           type: WorkspaceElementType.BUS,
           name: bus.name,

@@ -31,7 +31,7 @@ import { BusesInProgress } from './../../state/buses-in-progress/buses-in-progre
 import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
 import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
 import { getFormErrors, disableAllFormFields } from './../../../../../shared/helpers/form.helper';
-import { arrayEquals } from 'app/shared/helpers/shared.helper';
+import { arrayEquals, tuple } from 'app/shared/helpers/shared.helper';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 
 @Component({
@@ -95,7 +95,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
           return this.store$
             // when either the bus in progress is deleted or it became a real bus
             // (note: this can happen in two passes)
-            .select(state => [state.busesInProgress.byId[bId], state.buses.byId[bId]])
+            .select(state => tuple([state.busesInProgress.byId[bId], state.buses.byId[bId]]))
             .distinctUntilChanged(arrayEquals)
             // only interested in deleted bus in progress
             .filter(([bip, _]) => !bip)

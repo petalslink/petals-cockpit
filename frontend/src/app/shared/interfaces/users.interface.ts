@@ -28,11 +28,11 @@ interface IUsersCommon {
 
 export interface IUsersTableOnly {
   byId: { [key: string]: IUserRow };
-  allIds: Array<string>;
+  allIds: string[];
 }
 
 export interface IUsersTable extends IUsersCommon, IUsersTableOnly { }
 
 export interface IUsers extends IUsersCommon {
-  list: Array<IUser>;
+  list: IUser[];
 }
