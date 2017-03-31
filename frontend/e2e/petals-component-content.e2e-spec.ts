@@ -18,6 +18,8 @@ import { browser, element, by, ExpectedConditions as EC } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
 
+const path = require('path');
+
 describe(`Petals component content`, () => {
   let page: PetalsCockpitPage;
 
@@ -88,5 +90,28 @@ describe(`Petals component content`, () => {
 
     // and the component should have been deleted from petals tree
     expect(page.getWorkspaceTreeByName(`Comp 0`).first().isPresent()).toBe(false);
+  });
+
+  it(`Should deploy a service-unit`, () => {
+    page.getWorkspaceTreeByName('Comp 0').click();
+
+    const chooseFileBtn = element(by.css(`app-petals-component-overview .deploy .choose-file`));
+    const fileInput = element(by.css(`app-petals-component-overview .deploy input[type="file"]`));
+    const selectedFile = element(by.css(`app-petals-component-overview .deploy .selected-file .file-name`));
+    const changeSuNameInput = element(by.css(`app-petals-component-overview .deploy form input[name="serviceUnitName"]`));
+    const deployBtn = element(by.css(`app-petals-component-overview .deploy form button[type="submit"]`));
+    const filePath = path.resolve(__dirname, './resources/su.zip');
+
+    expect(chooseFileBtn.getText()).toEqual(`Choose a file to upload`);
+    // simulate the file selection
+    fileInput.sendKeys(filePath);
+
+    // once the file is selected, check that the other part of the form is displayed
+    expect(selectedFile.isDisplayed()).toBe(true);
+    expect(selectedFile.getText()).toEqual(`su.zip`);
+    expect(chooseFileBtn.getText()).toEqual(`Change the file`);
+
+    expect(changeSuNameInput.getAttribute('value')).toEqual(`su`);
+    expect(deployBtn.isEnabled()).toBe(true);
   });
 });

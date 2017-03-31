@@ -59,7 +59,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </md-card>
     </div>
 
-    <md-card fxFlex class="deploy margin-top-x1">
+    <md-card fxFlex class="deploy margin-top-x1" class="deploy">
       <md-card-title-group>
         <div fxFlex fxLayout="column" fxLayoutAlign="end end">
           <md-card-subtitle>SU deployment</md-card-subtitle>
@@ -71,8 +71,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <!--</md-card-title>-->
 
           <md-card-content>
-            <input class="hidden" type="file" accept=".zip">
-
             <div *ngIf="fileToDeploy" class="selected-file" fxFlexLayout="row" fxLayoutAlign="end center">
               <span>Selected file :</span> <span class="file-name">{{ fileToDeploy.name }}</span>
             </div>
