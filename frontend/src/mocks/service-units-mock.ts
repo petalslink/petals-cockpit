@@ -3,8 +3,8 @@ class ServiceUnits {
 
   constructor() { }
 
-  create() {
-    const serviceUnit = new ServiceUnit();
+  create(serviceUnitName?: string) {
+    const serviceUnit = new ServiceUnit(serviceUnitName);
     this.serviceUnits.set(serviceUnit.getIdFormatted(), serviceUnit);
     return serviceUnit;
   }
@@ -20,9 +20,11 @@ export class ServiceUnit {
   private static cpt = 0;
   protected id: number;
   private state = 'Started';
+  private name: string;
 
-  constructor() {
+  constructor(name?: string) {
     this.id = ServiceUnit.cpt++;
+    this.name = name ? name : `SU ${this.id}`;
   }
 
   public getIdFormatted() {
@@ -32,13 +34,14 @@ export class ServiceUnit {
   toObj() {
     return {
       [this.getIdFormatted()]: {
-        name: `SU ${this.id}`
+        name: this.name
       }
     };
   }
 
   getDetails() {
     return {
+      name: this.name,
       state: this.state
     };
   }

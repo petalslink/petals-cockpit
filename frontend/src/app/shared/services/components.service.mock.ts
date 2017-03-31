@@ -63,4 +63,24 @@ export class ComponentsMockService extends ComponentsServiceImpl {
 
     return helper.responseBody(null);
   }
+
+  deploySu(workspaceId: string, componentId: string, file: File, serviceUnitName: string) {
+    const serviceUnit = componentsService.read(componentId).addServiceUnit(serviceUnitName);
+
+    setTimeout(() =>
+      (this.pSseService as SseServiceMock).triggerSseEvent(
+        SseWorkspaceEvent.SU_DEPLOYED,
+        {
+          componentId,
+          serviceUnit: {
+            id: serviceUnit.getIdFormatted(),
+            ...serviceUnit.getDetails()
+          }
+        }
+      ),
+      environment.sseDelay
+    );
+
+    return helper.responseBody(null);
+  }
 }

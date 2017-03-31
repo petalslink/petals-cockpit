@@ -34,7 +34,11 @@ export abstract class ComponentsService {
 
   abstract putState(workspaceId: string, componentId: string, newState: string): Observable<Response>;
 
+  abstract deploySu(workspaceId: string, componentId: string, file: File, serviceUnitName: string): Observable<Response>;
+
   abstract watchEventComponentStateChangeOk(): Observable<void>;
+
+  abstract watchEventSuDeployedOk(): Observable<void>;
 }
 
 @Injectable()
@@ -55,6 +59,14 @@ export class ComponentsServiceImpl extends ComponentsService {
 
   putState(workspaceId: string, componentId: string, newState: string) {
     return this.http.put(`${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}`, { state: newState });
+  }
+
+  deploySu(workspaceId: string, componentId: string, file: File, serviceUnitName: string) {
+    const formData: FormData = new FormData();
+    formData.append('file', file, file.name);
+    formData.append('name', serviceUnitName);
+
+    return this.http.post(`${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}/serviceunits`, formData);
   }
 
   watchEventComponentStateChangeOk() {
@@ -83,6 +95,20 @@ export class ComponentsServiceImpl extends ComponentsService {
           });
         }
       })
-      .map(_ => null);
+      .mapTo(null);
+  }
+
+  watchEventSuDeployedOk() {
+    return this.sseService
+      .subscribeToWorkspaceEvent(SseWorkspaceEvent.SU_DEPLOYED)
+      .do(({ componentId, serviceUnit }: { componentId: string, serviceUnit: { id: string, name: string, state: string } }) => {
+        this.notification.success('SU deployed', `"${serviceUnit.name}" has been deployed`);
+
+        this.store$.dispatch({
+          type: Components.DEPLOY_SERVICE_UNIT_SUCCESS,
+          payload: { componentId: componentId, serviceUnit }
+        });
+      })
+      .mapTo(null);
   }
 }

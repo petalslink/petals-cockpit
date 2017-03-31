@@ -31,6 +31,8 @@ import { stateNameToPossibleActionsComponent } from '../../../../../../shared/he
 })
 export class PetalsComponentOverviewComponent implements OnInit {
   @Input() component: IComponentRow;
+  public fileToDeploy: File;
+  public serviceUnitName: string;
 
   constructor(private store$: Store<IStore>) { }
 
@@ -46,5 +48,21 @@ export class PetalsComponentOverviewComponent implements OnInit {
 
   componentState(index, item) {
     return this.component ? this.component.state : null;
+  }
+
+  fileChange(event) {
+    const fileList: FileList = event.target.files;
+
+    if (fileList.length > 0) {
+      this.fileToDeploy = fileList[0];
+      this.serviceUnitName = this.fileToDeploy.name.substring(0, this.fileToDeploy.name.length - 4);
+    }
+  }
+
+  deploy(file: File, serviceUnitName: string) {
+    this.store$.dispatch({
+      type: Components.DEPLOY_SERVICE_UNIT,
+      payload: { file, componentId: this.component.id, serviceUnitName: serviceUnitName.trim() }
+    });
   }
 }

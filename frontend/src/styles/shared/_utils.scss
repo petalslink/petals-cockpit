@@ -45,6 +45,10 @@
   font-weight: 500;
 }
 
+.hidden {
+  display: none;
+}
+
 .color-primary-light-bold {
   @extend .color-primary;
   @extend .light-bold;

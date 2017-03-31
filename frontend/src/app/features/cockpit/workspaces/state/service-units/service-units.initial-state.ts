@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IserviceUnitsTable } from './service-units.interface';
+import { IServiceUnitsTable } from './service-units.interface';
 
-export function serviceUnitsTableFactory(): IserviceUnitsTable {
+export function serviceUnitsTableFactory(): IServiceUnitsTable {
   return {
     selectedServiceUnitId: '',
     isFetchingDetails: false,

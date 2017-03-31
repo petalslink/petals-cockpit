@@ -18,7 +18,7 @@
 import { Action } from '@ngrx/store';
 import { omit } from 'underscore';
 
-import { IserviceUnitsTable } from './service-units.interface';
+import { IServiceUnitsTable } from './service-units.interface';
 import { serviceUnitsTableFactory } from './service-units.initial-state';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 
@@ -35,7 +35,7 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNITS_SUCCESS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNITS_SUCCESS`;
-  private static fetchServiceUnitsSuccess(serviceUnitsTable: IserviceUnitsTable, payload) {
+  private static fetchServiceUnitsSuccess(serviceUnitsTable: IServiceUnitsTable, payload) {
     let allIds = serviceUnitsTable.allIds;
 
     payload.allIds.forEach(busId => {
@@ -44,9 +44,9 @@ export class ServiceUnits {
       }
     });
 
-    return <IserviceUnitsTable>{
+    return <IServiceUnitsTable>{
       ...serviceUnitsTable,
-      ...<IserviceUnitsTable>{
+      ...<IServiceUnitsTable>{
         byId: {
           ...serviceUnitsTable.byId,
           ...payload.byId
@@ -58,10 +58,10 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_SERVICE_UNIT = `${ServiceUnits.reducerName}_SET_CURRENT_SERVICE_UNIT`;
-  private static setCurrentServiceUnit(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+  private static setCurrentServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
     return {
       ...serviceUnitsTable,
-      ...<IserviceUnitsTable>{
+      ...<IServiceUnitsTable>{
         selectedServiceUnitId: payload.serviceUnitId
       }
     };
@@ -69,14 +69,14 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS`;
-  private static fetchServiceUnitDetails(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+  private static fetchServiceUnitDetails(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
     const allIds = serviceUnitsTable.byId[payload.serviceUnitId]
       ? serviceUnitsTable.allIds
       : [...serviceUnitsTable.allIds, payload.serviceUnitId];
 
     return {
       ...serviceUnitsTable,
-      ...<IserviceUnitsTable>{
+      ...<IServiceUnitsTable>{
         byId: {
           ...serviceUnitsTable.byId,
           [payload.serviceUnitId]: {
@@ -91,10 +91,10 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS_SUCCESS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS_SUCCESS`;
-  private static fetchServiceUnitDetailsSuccess(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string, data: any }) {
+  private static fetchServiceUnitDetailsSuccess(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string, data: any }) {
     return {
       ...serviceUnitsTable,
-      ...<IserviceUnitsTable>{
+      ...<IServiceUnitsTable>{
         byId: {
           ...serviceUnitsTable.byId,
           [payload.serviceUnitId]: {
@@ -109,10 +109,10 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS_ERROR = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS_ERROR`;
-  private static fetchServiceUnitDetailsError(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+  private static fetchServiceUnitDetailsError(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
     return {
       ...serviceUnitsTable,
-      ...<IserviceUnitsTable>{
+      ...<IServiceUnitsTable>{
         byId: {
           ...serviceUnitsTable.byId,
           [payload.serviceUnitId]: {
@@ -126,10 +126,10 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE = `${ServiceUnits.reducerName}_CHANGE_STATE`;
-  private static changeState(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+  private static changeState(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
     return {
       ...serviceUnitsTable,
-      ...<IserviceUnitsTable>{
+      ...<IServiceUnitsTable>{
         byId: {
           ...serviceUnitsTable.byId,
           [payload.serviceUnitId]: {
@@ -147,10 +147,10 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_SUCCESS = `${ServiceUnits.reducerName}_CHANGE_STATE_SUCCESS`;
-  private static changeStateSuccess(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string, newState: string }) {
+  private static changeStateSuccess(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string, newState: string }) {
     return {
       ...serviceUnitsTable,
-      ...<IserviceUnitsTable>{
+      ...<IServiceUnitsTable>{
         byId: {
           ...serviceUnitsTable.byId,
           [payload.serviceUnitId]: {
@@ -165,10 +165,10 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_ERROR = `${ServiceUnits.reducerName}_CHANGE_STATE_ERROR`;
-  private static changeStateError(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
+  private static changeStateError(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
     return {
       ...serviceUnitsTable,
-      ...<IserviceUnitsTable>{
+      ...<IServiceUnitsTable>{
         byId: {
           ...serviceUnitsTable.byId,
           [payload.serviceUnitId]: {
@@ -182,17 +182,35 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_SERVICE_UNIT = `${ServiceUnits.reducerName}_REMOVE_SERVICE_UNIT`;
-  private static removeServiceUnit(serviceUnitsTable: IserviceUnitsTable, payload: { serviceUnitId: string }) {
-    return <IserviceUnitsTable>{
+  private static removeServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
+    return <IServiceUnitsTable>{
       ...serviceUnitsTable,
-      ...<IserviceUnitsTable>{
+      ...<IServiceUnitsTable>{
         byId: omit(serviceUnitsTable.byId, payload.serviceUnitId),
         allIds: serviceUnitsTable.allIds.filter(id => id !== payload.serviceUnitId)
       }
     };
   }
 
-  private static cleanWorkspace(_serviceUnitsTable: IserviceUnitsTable, _payload) {
+  private static deployServiceUnitSuccess(
+    serviceUnitsTable: IServiceUnitsTable,
+    payload: { serviceUnit: { id: string, name: string, state: string } }
+  ) {
+    const serviceUnitCp = { ...payload.serviceUnit };
+
+    return <IServiceUnitsTable>{
+      ...serviceUnitsTable,
+      ...<IServiceUnitsTable>{
+        byId: {
+          ...serviceUnitsTable.byId,
+          [payload.serviceUnit.id]: serviceUnitCp
+        },
+        allIds: [...serviceUnitsTable.allIds, payload.serviceUnit.id]
+      }
+    };
+  }
+
+  private static cleanWorkspace(_serviceUnitsTable: IServiceUnitsTable, _payload) {
     return serviceUnitsTableFactory();
   }
 
@@ -209,6 +227,10 @@ export class ServiceUnits {
     [ServiceUnits.CHANGE_STATE_SUCCESS]: ServiceUnits.changeStateSuccess,
     [ServiceUnits.CHANGE_STATE_ERROR]: ServiceUnits.changeStateError,
     [ServiceUnits.REMOVE_SERVICE_UNIT]: ServiceUnits.removeServiceUnit,
+    // TODO : When using Components.DEPLOY_SERVICE_UNIT_SUCCESS, there's an error at runtime
+    // [Components.DEPLOY_SERVICE_UNIT_SUCCESS]: ServiceUnits.deployServiceUnitSuccess,
+    // issue opened here: https://github.com/angular/angular-cli/issues/5736
+    ['COMPONENTS_REDUCER_DEPLOY_SERVICE_UNIT_SUCCESS']: ServiceUnits.deployServiceUnitSuccess,
 
     [Workspaces.CLEAN_WORKSPACE]: ServiceUnits.cleanWorkspace
   };

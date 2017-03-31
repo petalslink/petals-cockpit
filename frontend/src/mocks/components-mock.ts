@@ -44,6 +44,13 @@ export class Component {
     return this.serviceUnits;
   }
 
+  addServiceUnit(serviceUnitName: string) {
+    const serviceUnit = serviceUnitsService.create(serviceUnitName);
+    this.serviceUnits.push(serviceUnit);
+
+    return serviceUnit;
+  }
+
   toObj() {
     return {
       [this.getIdFormatted()]: {
