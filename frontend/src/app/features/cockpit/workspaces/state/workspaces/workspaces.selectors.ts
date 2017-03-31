@@ -86,6 +86,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
       return {
         id: workspace.id,
         name: workspace.name,
+        message: workspace.message,
         isFetched: workspace.isFetched,
 
         users: {
