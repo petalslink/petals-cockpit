@@ -25,7 +25,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { IStore } from './../../../../../shared/interfaces/store.interface';
 import { IBusesInProgressTable } from './../../state/buses-in-progress/buses-in-progress.interface';
-import { IBusInProgressRow, IBusInProgressImport } from './../../state/buses-in-progress/bus-in-progress.interface';
+import { IBusInProgressRow, IBusImport } from './../../state/buses-in-progress/bus-in-progress.interface';
 import { Ui } from './../../../../../shared/state/ui.reducer';
 import { BusesInProgress } from './../../state/buses-in-progress/buses-in-progress.reducer';
 import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
@@ -172,7 +172,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
     this.onDestroy$.complete();
   }
 
-  onSubmit({ value }: { value: IBusInProgressImport, valid: boolean }) {
+  onSubmit({ value }: { value: IBusImport, valid: boolean }) {
     this.store$.dispatch({ type: BusesInProgress.POST_BUS_IN_PROGRESS, payload: value });
   }
 

@@ -31,11 +31,11 @@ import { Containers } from './../../features/cockpit/workspaces/state/containers
 import { environment } from './../../../environments/environment';
 import { toJavascriptMap } from '../helpers/shared.helper';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
+import { IBusImport } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 
 
 export abstract class BusesService {
-  abstract postBus(idWorkspace: string, bus: IBusInProgress): Observable<Response>;
+  abstract postBus(idWorkspace: string, bus: IBusImport): Observable<Response>;
 
   abstract deleteBus(idWorkspace: string, id: string): Observable<Response>;
 
@@ -61,7 +61,7 @@ export class BusesServiceImpl extends BusesService {
     super();
   }
 
-  postBus(idWorkspace: string, bus: IBusInProgress) {
+  postBus(idWorkspace: string, bus: IBusImport) {
     return this.http.post(`${environment.urlBackend}/workspaces/${idWorkspace}/buses`, bus);
   }
 

@@ -27,15 +27,13 @@ import { NotificationsService } from 'angular2-notifications';
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 import { busesService } from './../../../mocks/buses-mock';
-import { workspacesService } from '../../../mocks/workspaces-mock';
-import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
+import { workspacesService, IMPORT_HTTP_ERROR_IP } from '../../../mocks/workspaces-mock';
+import { IBusImport } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { UsersService } from 'app/shared/services/users.service';
 import { UsersMockService } from 'app/shared/services/users.service.mock';
 
 @Injectable()
 export class BusesMockService extends BusesServiceImpl {
-
-  private firstErrorSent = false;
 
   constructor(
     http: Http,
@@ -46,14 +44,13 @@ export class BusesMockService extends BusesServiceImpl {
     super(http, store$, pSseService, notifications);
   }
 
-  postBus(idWorkspace: string, bus: IBusInProgress) {
-    // when mocking, we make the first test fail with an HTTP error
-    if (!this.firstErrorSent) {
-      this.firstErrorSent = true;
+  postBus(idWorkspace: string, bus: IBusImport) {
+    // only used by the tests to verify an error coming from the backend...
+    if (bus.ip === IMPORT_HTTP_ERROR_IP) {
       return helper.responseBody('Error backend', 500);
     }
 
-    const newBus = workspacesService.getWorkspace(idWorkspace).addBus(bus);
+    const newBus = workspacesService.getWorkspace(idWorkspace).tryAddBus(bus);
 
     let event;
     if (newBus.eventData.importError) {

@@ -41,7 +41,10 @@ export interface IBusInProgressRow extends IBusInProgressCommon {
 export interface IBusInProgress extends IBusInProgressCommon { }
 
 // used when we import a bus
-export interface IBusInProgressImport extends IBusInProgressRow {
+export interface IBusImport {
+  port: number;
+  ip: string;
+  username: string;
   password: string;
   passphrase: string;
 }

@@ -36,13 +36,13 @@ export class ServiceUnitsMockService extends ServiceUnitsServiceImpl {
   }
 
   getDetailsServiceUnit(serviceUnitId: string) {
-    const detailsServiceUnit = serviceUnitsService.read(serviceUnitId).getDetails();
+    const detailsServiceUnit = serviceUnitsService.get(serviceUnitId).getDetails();
 
     return helper.responseBody(detailsServiceUnit);
   }
 
   putState(_workspaceId: string, serviceUnitId: string, newState: string) {
-    serviceUnitsService.read(serviceUnitId).setState(newState);
+    serviceUnitsService.get(serviceUnitId).setState(newState);
     // when the state changes, trigger a fake SSE event
     setTimeout(() =>
       (this.pSseService as SseServiceMock).triggerSseEvent(

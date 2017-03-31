@@ -18,6 +18,7 @@
 import { browser, element, by, ExpectedConditions as Ec } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
+import { IMPORT_HTTP_ERROR_IP } from '../src/mocks/workspaces-mock';
 
 describe(`Import Bus`, () => {
   let page: PetalsCockpitPage;
@@ -40,11 +41,11 @@ describe(`Import Bus`, () => {
 
   it(`should be cleared when clicking on the clear button`, () => {
     // check if the input form is empty
-    expect(inputIp.getText()).toEqual(``);
-    expect(inputPort.getText()).toEqual(``);
-    expect(inputUsername.getText()).toEqual(``);
-    expect(inputPassword.getText()).toEqual(``);
-    expect(inputPassphrase.getText()).toEqual(``);
+    expect(inputIp.getAttribute('value')).toEqual(``);
+    expect(inputPort.getAttribute('value')).toEqual(``);
+    expect(inputUsername.getAttribute('value')).toEqual(``);
+    expect(inputPassword.getAttribute('value')).toEqual(``);
+    expect(inputPassphrase.getAttribute('value')).toEqual(``);
 
     // check if import button is always disable when inputs form are empty
     expect(importBtn.getText()).toMatch(`Import`);
@@ -60,10 +61,16 @@ describe(`Import Bus`, () => {
     inputPassword.sendKeys(`password`);
     inputPassphrase.sendKeys(`passphrase`);
 
+    expect(inputIp.getAttribute('value')).toEqual(`hostname`);
+    expect(inputPort.getAttribute('value')).toEqual(`5000`);
+    expect(inputUsername.getAttribute('value')).toEqual(`admin`);
+    expect(inputPassword.getAttribute('value')).toEqual(`password`);
+    expect(inputPassphrase.getAttribute('value')).toEqual(`passphrase`);
+
     clearBtn.click();
 
     // check if the input form is cleared
-    expect(inputIp.getText()).toEqual(``);
+    expect(inputIp.getAttribute('value')).toEqual(``);
     expect(inputPort.getText()).toEqual(``);
     expect(inputUsername.getText()).toEqual(``);
     expect(inputPassword.getText()).toEqual(``);
@@ -77,12 +84,12 @@ describe(`Import Bus`, () => {
     expect(clearBtn.isPresent()).toBe(false);
   });
 
-  it(`should fail on the first two bus imports`, () => {
+  it('should show the backend HTTP error', () => {
     // only 2 buses in progress
     expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(2);
 
-    inputIp.sendKeys(`hostname`);
-    inputPort.sendKeys(`5000`);
+    inputIp.sendKeys(IMPORT_HTTP_ERROR_IP);
+    inputPort.sendKeys(`7700`);
     inputUsername.sendKeys(`admin`);
     inputPassword.sendKeys(`password`);
     inputPassphrase.sendKeys(`passphrase`);
@@ -99,19 +106,27 @@ describe(`Import Bus`, () => {
     // check if the error for import bus is not displayed
     expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).isPresent()).toBe(false);
 
+    // still 2 buses in progress
+    expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(2);
+  });
+
+  it(`should show the import error`, () => {
+    // only 2 buses in progress
+    expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(2);
+
     inputIp.sendKeys(`hostname`);
-    inputPort.sendKeys(`5000`);
+    inputPort.sendKeys(`7700`);
     inputUsername.sendKeys(`admin`);
     inputPassword.sendKeys(`password`);
     inputPassphrase.sendKeys(`passphrase`);
 
-    // try to re-import
+    // try to import
     importBtn.click();
 
     // but cannot connect to the bus
-    expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).getText()).toEqual(`Can't connect to bus`);
+    expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).getText()).toEqual(`Can't connect to hostname:7700`);
     expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(3);
-    expect(element(by.css(`app-buses-in-progress md-nav-list:nth-child(3) .ip-port`)).getText()).toEqual('hostname:5000');
+    expect(element(by.css(`app-buses-in-progress md-nav-list:nth-child(3) .ip-port`)).getText()).toEqual('hostname:7700');
     expect(element(by.cssContainingText(`app-buses-in-progress md-nav-list:nth-child(3) md-icon`, `warning`)).isDisplayed()).toEqual(true);
   });
 
@@ -119,26 +134,6 @@ describe(`Import Bus`, () => {
     const simpleNotification = element(by.css(`simple-notification`));
 
     expect(element.all(by.css(`app-petals-menu-view > app-material-tree > md-nav-list`)).count()).toEqual(1);
-
-    // TODO: When working on https://gitlab.com/linagora/petals-cockpit/merge_requests/285
-    // to have a failing/successing IP instead of the first bus import failing, remove this part
-    // --------------------------------------
-    inputIp.sendKeys(`192.168.0.1`);
-    inputPort.sendKeys(`7700`);
-    inputUsername.sendKeys(`admin`);
-    inputPassword.sendKeys(`password`);
-    inputPassphrase.sendKeys(`passphrase`);
-
-    // first will fail : Error backend
-    importBtn.click();
-
-    // second will fail : Error from Petals
-    importBtn.click();
-    // wait until the error notification is closed
-    browser.wait(Ec.stalenessOf(simpleNotification), 15000);
-
-    page.addBus();
-    // --------------------------------------
 
     inputIp.sendKeys(`192.168.0.1`);
     inputPort.sendKeys(`7700`);
