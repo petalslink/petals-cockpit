@@ -44,6 +44,7 @@ export function stateNameToPossibleActionsComponent(state: string): { actionName
 
     case ComponentState.Loaded:
       return [
+        { actionName: 'Start', newStateAfterAction: ComponentState.Started },
         { actionName: 'Unload', newStateAfterAction: ComponentState.Unloaded }
       ];
 
