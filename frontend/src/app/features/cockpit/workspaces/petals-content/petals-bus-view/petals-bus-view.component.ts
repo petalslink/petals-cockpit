@@ -18,7 +18,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
 
 import { Buses } from '../../state/buses/buses.reducer';
@@ -33,17 +33,18 @@ import { getCurrentBus } from '../../state/buses/buses.selectors';
   styleUrls: ['./petals-bus-view.component.scss']
 })
 export class PetalsBusViewComponent implements OnInit, OnDestroy {
-  public bus$: Observable<IBusRow>;
+  private onDestroy$ = new Subject<void>();
 
-  private sub: Subscription;
+  public bus$: Observable<IBusRow>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Bus' } });
 
-    this.sub = this.route.paramMap
+    this.route.paramMap
       .map(pm => pm.get('busId'))
+      .takeUntil(this.onDestroy$)
       .subscribe(busId => {
         this.store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId } });
         this.store$.dispatch({ type: Buses.FETCH_BUS_DETAILS, payload: { busId } });
@@ -53,7 +54,9 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+
     this.store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId: '' } });
   }
 }

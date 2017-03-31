@@ -20,7 +20,7 @@ import { Router } from '@angular/router';
 import { MdDialog, MdDialogRef } from '@angular/material';
 import { MdSidenav } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
 
 import { IWorkspace } from './workspaces/state/workspaces/workspace.interface';
@@ -43,11 +43,11 @@ import { isSmallScreen, isLargeScreen } from 'app/shared/state/ui.selectors';
   styleUrls: ['./cockpit.component.scss']
 })
 export class CockpitComponent implements OnInit, OnDestroy {
+  private onDestroy$ = new Subject<void>();
+
   private workspacesDialogRef: MdDialogRef<WorkspacesDialogComponent>;
 
   public ui$: Observable<IUi>;
-  private uiSub: Subscription;
-  private deleteSub: Subscription;
   public sidenavVisible$: Observable<boolean>;
   public sidenavMode$: Observable<string>;
   public workspace$: Observable<IWorkspace>;
@@ -76,9 +76,10 @@ export class CockpitComponent implements OnInit, OnDestroy {
 
     this.isDisconnecting$ = this.store$.select(state => state.users.isDisconnecting);
 
-    this.uiSub = this.ui$
+    this.ui$
       .map(ui => ui.isPopupListWorkspacesVisible)
       .distinctUntilChanged()
+      .takeUntil(this.onDestroy$)
       .subscribe(isPopupListWorkspacesVisible => {
         if (isPopupListWorkspacesVisible) {
           this.doOpenWorkspacesDialog();
@@ -88,9 +89,10 @@ export class CockpitComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.deleteSub = this.store$
+    this.store$
       .select(state => state.workspaces.deletedWorkspace)
       .filter(d => d)
+      .takeUntil(this.onDestroy$)
       .subscribe(_ => this.openDeletedWorkspaceDialog());
 
     // TODO ultimately, the sidebar should be moved to WorkspaceComponent
@@ -115,14 +117,15 @@ export class CockpitComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.uiSub.unsubscribe();
-    this.deleteSub.unsubscribe();
     // since the dialog is not really attached to the cockpit component in the DOM
     // it can stay even if the component is destroyed!
     if (this.workspacesDialogRef != null) {
       this.workspacesDialogRef.close();
       this.workspacesDialogRef = null;
     }
+
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
   }
 
   private doOpenWorkspacesDialog() {

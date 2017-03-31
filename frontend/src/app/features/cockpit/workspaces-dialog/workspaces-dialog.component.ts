@@ -19,7 +19,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TooltipPosition } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 
@@ -38,9 +38,10 @@ import { getCurrentUser } from './../../../shared/state/users.selectors';
   styleUrls: ['./workspaces-dialog.component.scss']
 })
 export class WorkspacesDialogComponent implements OnInit, OnDestroy {
+  private onDestroy$ = new Subject<void>();
+
   public workspaces$: Observable<IWorkspaces>;
   public newWksForm: FormGroup;
-  public isAddingWorkspaceSub: Subscription;
   public btnSubmitDisabled = true;
   public position: TooltipPosition = 'below';
   public showDelay = 0;
@@ -66,7 +67,7 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
       name: ['', Validators.required]
     });
 
-    this.isAddingWorkspaceSub = this
+    this
       .store$
       .select(state => state.workspaces.isAddingWorkspace)
       .combineLatest(Observable
@@ -78,6 +79,7 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
           .distinctUntilChanged()
         )
       )
+      .takeUntil(this.onDestroy$)
       .subscribe(([isAddingWorkspace, _]) => {
         if (this.newWksForm.invalid || isAddingWorkspace) {
           this.btnSubmitDisabled = true;
@@ -94,7 +96,8 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.isAddingWorkspaceSub.unsubscribe();
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
   }
 
   fetchWorkspace(workspace: IWorkspace) {

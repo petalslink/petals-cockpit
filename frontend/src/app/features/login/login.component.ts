@@ -21,7 +21,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MdInputContainer } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Subject } from 'rxjs/Subject';
 
 import { IStore } from './../../shared/interfaces/store.interface';
 import { Users } from './../../shared/state/users.reducer';
@@ -34,11 +34,12 @@ import { isLargeScreen } from 'app/shared/state/ui.selectors';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
+  private onDestroy$ = new Subject<void>();
+
   @ViewChild('usernameInput') usernameInput: MdInputContainer;
 
   public loginForm: FormGroup;
   private users$: Observable<IUsersTable>;
-  private usersSub: Subscription;
   public users: IUsersTable;
 
   constructor(
@@ -54,13 +55,14 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
       password: ['', Validators.required]
     });
 
-    this.usersSub = this
+    this
       .users$
       .distinctUntilChanged((p, n) =>
         p.isConnected === n.isConnected &&
         p.isConnecting === n.isConnecting &&
         p.connectionFailed === n.connectionFailed
       )
+      .takeUntil(this.onDestroy$)
       .subscribe(users => {
         this.users = users;
 
@@ -75,7 +77,8 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy() {
-    this.usersSub.unsubscribe();
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
   }
 
   ngAfterViewInit() {

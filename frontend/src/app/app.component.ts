@@ -18,8 +18,8 @@
 import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { ObservableMedia, MediaChange } from '@angular/flex-layout';
 import { TranslateService } from 'ng2-translate';
-import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
+import { Subject } from 'rxjs/Subject';
 
 import { LANGUAGES } from './core/opaque-tokens';
 import { IStore } from './shared/interfaces/store.interface';
@@ -31,8 +31,7 @@ import { Ui } from './shared/state/ui.reducer';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  private languageSub: Subscription;
-  private mediaSub: Subscription;
+  private onDestroy$ = new Subject<void>();
 
   public notificationOptions = {
     position: ['bottom', 'right'],
@@ -60,20 +59,22 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // when the language changes in store,
     // change it in translate provider
-    this.languageSub = this.store$
+    this.store$
       .select(state => state.ui.language)
       .filter(language => language !== '')
+      .takeUntil(this.onDestroy$)
       .subscribe(language => this.translate.use(language));
 
-    this.mediaSub = this.media$
+    this.media$
       .asObservable()
       .map((change: MediaChange) => change.mqAlias)
       .distinctUntilChanged()
+      .takeUntil(this.onDestroy$)
       .subscribe(screenSize => this.store$.dispatch({ type: Ui.CHANGE_SCREEN_SIZE, payload: screenSize }));
   }
 
   ngOnDestroy() {
-    this.languageSub.unsubscribe();
-    this.mediaSub.unsubscribe();
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
   }
 }
