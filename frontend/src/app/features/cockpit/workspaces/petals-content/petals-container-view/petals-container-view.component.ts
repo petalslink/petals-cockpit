@@ -19,7 +19,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Containers } from '../../state/containers/containers.reducer';
@@ -33,11 +33,11 @@ import { getCurrentContainer, getCurrentContainerSiblings } from 'app/features/c
   styleUrls: ['./petals-container-view.component.scss']
 })
 export class PetalsContainerViewComponent implements OnInit, OnDestroy {
+  private onDestroy$ = new Subject<void>();
+
   public workspaceId$: Observable<string>;
   public container$: Observable<IContainerRow>;
   public otherContainers$: Observable<IContainerRow[]>;
-
-  private sub: Subscription;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
@@ -48,8 +48,9 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
       .map(p => p.get('workspaceId'))
       .distinctUntilChanged();
 
-    this.sub = this.route.paramMap
+    this.route.paramMap
       .map(p => p.get('containerId'))
+      .takeUntil(this.onDestroy$)
       .subscribe(id => {
         this.store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: id } });
         this.store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: id } });
@@ -61,7 +62,9 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+
     this.store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: '' } });
   }
 }

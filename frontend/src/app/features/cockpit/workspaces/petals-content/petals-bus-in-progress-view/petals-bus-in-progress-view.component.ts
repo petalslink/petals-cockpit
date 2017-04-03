@@ -20,8 +20,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MdInputContainer } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 import { IStore } from './../../../../../shared/interfaces/store.interface';
 import { IBusesInProgressTable } from './../../state/buses-in-progress/buses-in-progress.interface';
@@ -40,6 +40,8 @@ import { isLargeScreen } from 'app/shared/state/ui.selectors';
   styleUrls: ['./petals-bus-in-progress-view.component.scss']
 })
 export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, AfterViewInit {
+  private onDestroy$ = new Subject<void>();
+
   @ViewChild('ipInput') ipInput: MdInputContainer;
 
   public busesInProgressTable$: Observable<IBusesInProgressTable>;
@@ -48,11 +50,6 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
   public busInProgress: IBusInProgressRow;
 
   public busImportForm: FormGroup;
-  private busImportFormSubscription: Subscription;
-
-  private routeSub: Subscription;
-  private redirectSub: Subscription;
-  private busInProgressSub: Subscription;
 
   public formErrors = {
     'ip': '',
@@ -77,21 +74,22 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
 
     this.createFormImportBus();
 
-    const id = this.route.paramMap
+    const id$ = this.route.paramMap
       .map(paramMap => paramMap.get('busInProgressId'))
       // displays the last thing in url if no params (bug ?)
       // TODO clean that, it's not the correct way to handle empty form versus completed form
       .map(bId => bId === 'buses-in-progress' ? '' : bId)
       .distinctUntilChanged();
 
-    this.routeSub = id
+    id$
+      .takeUntil(this.onDestroy$)
       .subscribe(busInProgressId =>
         this.store$.dispatch({ type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS, payload: { busInProgressId } })
       );
 
     // takes care of redirecting to the right URL after the shown bus in progress is deleted
     // this is here because it only makes sense if we are on this page for the given bus
-    this.redirectSub = id
+    id$
       .switchMap(bId => {
         if (bId) {
           return this.store$
@@ -119,9 +117,11 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
             });
         }
       })
+      .takeUntil(this.onDestroy$)
       .subscribe();
 
-    this.busInProgressSub = this.busInProgress$
+    this.busInProgress$
+      .takeUntil(this.onDestroy$)
       .subscribe(busInProgress => {
         this.busInProgress = busInProgress;
 
@@ -148,9 +148,10 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
       passphrase: ['', [Validators.required]],
     });
 
-    this.busImportFormSubscription = this
+    this
       .busImportForm
       .valueChanges
+      .takeUntil(this.onDestroy$)
       .subscribe(data => {
         this.formErrors = getFormErrors(this.busImportForm, this.formErrors, data);
       });
@@ -164,10 +165,8 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
   }
 
   ngOnDestroy() {
-    this.redirectSub.unsubscribe();
-    this.routeSub.unsubscribe();
-    this.busImportFormSubscription.unsubscribe();
-    this.busInProgressSub.unsubscribe();
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
   }
 
   onSubmit({ value }: { value: IBusInProgressImport, valid: boolean }) {

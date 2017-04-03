@@ -19,7 +19,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Subject } from 'rxjs/Subject';
 
 import { Components } from '../../state/components/components.reducer';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
@@ -33,17 +33,18 @@ import { getCurrentComponent } from '../../state/components/components.selectors
   styleUrls: ['./petals-component-view.component.scss']
 })
 export class PetalsComponentViewComponent implements OnInit, OnDestroy {
-  public component$: Observable<IComponentRow>;
+  private onDestroy$ = new Subject<void>();
 
-  private sub: Subscription;
+  public component$: Observable<IComponentRow>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Component' } });
 
-    this.sub = this.route.paramMap
+    this.route.paramMap
       .map(pm => pm.get('componentId'))
+      .takeUntil(this.onDestroy$)
       .subscribe(componentId => {
         this.store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId } });
         this.store$.dispatch({ type: Components.FETCH_COMPONENT_DETAILS, payload: { componentId } });
@@ -53,7 +54,9 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+
     this.store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId: '' } });
   }
 }
