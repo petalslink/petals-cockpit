@@ -44,27 +44,35 @@ describe(`Petals component content`, () => {
 
     expect(state).toEqual('Started');
     expect(type).toEqual('BC');
+
+    expect(element(by.css(`button.choose-file`)).isEnabled()).toBe(true);
   });
 
   it(`Should stop/start/stop/unload a component`, () => {
     const stateElem = element(by.css(`app-petals-component-overview md-card.state md-card-title`));
+    const btnStop = element(by.cssContainingText(`app-petals-component-overview button`, `Stop`));
+    const btnStart = element(by.cssContainingText(`app-petals-component-overview button`, `Start`));
+    const btnUnload = element(by.cssContainingText(`app-petals-component-overview button`, `Unload`));
 
     // the component exists and should be present in petals tree
     expect(page.getWorkspaceTreeByName(`Comp 0`).first().isPresent()).toBe(true);
 
     page.getWorkspaceTreeByName('Comp 0').click();
 
-    element(by.cssContainingText(`app-petals-component-overview button`, `Stop`)).click();
+    btnStop.click();
     expect(stateElem.getText()).toEqual('Stopped');
-
-    element(by.cssContainingText(`app-petals-component-overview button`, `Start`)).click();
-    expect(stateElem.getText()).toEqual('Started');
-
-    element(by.cssContainingText(`app-petals-component-overview button`, `Stop`)).click();
-    expect(stateElem.getText()).toEqual('Stopped');
-
+    expect(btnStop.isPresent()).toBe(false);
+    expect(btnStart.isEnabled()).toBe(true);
     // as the comp 0 still have 2 SUs (SU 0, SU 1), we can't unload it yet
-    expect(element(by.cssContainingText(`app-petals-component-overview button`, `Unload`)).isEnabled()).toBe(false);
+    expect(btnUnload.isEnabled()).toBe(false);
+
+    btnStart.click();
+    expect(stateElem.getText()).toEqual('Started');
+    expect(btnStop.isEnabled()).toBe(true);
+    expect(btnStart.isPresent()).toBe(false);
+    expect(btnUnload.isPresent()).toBe(false);
+
+    btnStop.click();
 
     // unload the 2 SU
     page.getWorkspaceTreeByName('SU 0').click();
@@ -79,10 +87,12 @@ describe(`Petals component content`, () => {
 
     // we should now be able to unload the comp 0
     page.getWorkspaceTreeByName('Comp 0').click();
-    expect(element(by.cssContainingText(`app-petals-component-overview button`, `Unload`)).isEnabled()).toBe(true);
+    expect(btnStop.isPresent()).toBe(false);
+    expect(btnStart.isEnabled()).toBe(true);
+    expect(btnUnload.isEnabled()).toBe(true);
 
     // once unloaded ...
-    element(by.cssContainingText(`app-petals-component-overview button`, `Unload`)).click();
+    btnUnload.click();
     element(by.css(`simple-notification`)).click();
 
     // we should be redirected to the workspace page ...
