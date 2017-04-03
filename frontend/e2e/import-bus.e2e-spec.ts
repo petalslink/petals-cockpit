@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, element, by } from 'protractor';
+import { browser, element, by, ExpectedConditions as Ec } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
 
@@ -113,5 +113,45 @@ describe(`Import Bus`, () => {
     expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(3);
     expect(element(by.css(`app-buses-in-progress md-nav-list:nth-child(3) .ip-port`)).getText()).toEqual('hostname:5000');
     expect(element(by.cssContainingText(`app-buses-in-progress md-nav-list:nth-child(3) md-icon`, `warning`)).isDisplayed()).toEqual(true);
+  });
+
+  it(`should import a bus`, () => {
+    const simpleNotification = element(by.css(`simple-notification`));
+
+    expect(element.all(by.css(`app-petals-menu-view > app-material-tree > md-nav-list`)).count()).toEqual(1);
+
+    // TODO: When working on https://gitlab.com/linagora/petals-cockpit/merge_requests/285
+    // to have a failing/successing IP instead of the first bus import failing, remove this part
+    // --------------------------------------
+    inputIp.sendKeys(`192.168.0.1`);
+    inputPort.sendKeys(`7700`);
+    inputUsername.sendKeys(`admin`);
+    inputPassword.sendKeys(`password`);
+    inputPassphrase.sendKeys(`passphrase`);
+
+    // first will fail : Error backend
+    importBtn.click();
+
+    // second will fail : Error from Petals
+    importBtn.click();
+    // close the error notification
+    simpleNotification.click();
+
+    page.addBus();
+    // --------------------------------------
+
+    inputIp.sendKeys(`192.168.0.1`);
+    inputPort.sendKeys(`7700`);
+    inputUsername.sendKeys(`admin`);
+    inputPassword.sendKeys(`password`);
+    inputPassphrase.sendKeys(`passphrase`);
+
+    importBtn.click();
+
+    expect(element.all(by.css(`app-petals-menu-view > app-material-tree > md-nav-list`)).count()).toEqual(2);
+
+    browser.wait(Ec.visibilityOf(simpleNotification), 3000);
+    expect(element(by.css(`simple-notification .sn-title`)).getText()).toEqual(`Bus import success`);
+    expect(element(by.css(`simple-notification .sn-content`)).getText()).toMatch(/^The import of the bus .* succeeded$/);
   });
 });
