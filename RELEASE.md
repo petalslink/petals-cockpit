@@ -7,6 +7,7 @@
 ```
 conventional-changelog -p angular -i ../CHANGELOG.md -s
 ```
+*(conventional-changelog can be installed like that `yarn global add conventional-changelog-cli`)*
 - verify the content of CHANGELOG.md and adapt it!
 - commit all of it with message: `chore: bump version to X.X.X`
 - push with a branch name product/release-X.X.X

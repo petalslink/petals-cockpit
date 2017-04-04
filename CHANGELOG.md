@@ -1,3 +1,37 @@
+<a name="0.7.0"></a>
+# [0.7.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.6.0...v0.7.0) (2017-04-04)
+
+
+### Bug Fixes
+
+* **backend:** do not validate response bodies ([2d4dcc9](https://gitlab.com/linagora/petals-cockpit/commit/2d4dcc9)), closes [#134](https://gitlab.com/linagora/petals-cockpit/issues/134)
+* **frontend:** fix redirect after bus import ok or discard ([b016a53](https://gitlab.com/linagora/petals-cockpit/commit/b016a53)), closes [#268](https://gitlab.com/linagora/petals-cockpit/issues/268)
+* **frontend:** Import bus - If click btn clear, remove error msg ([d8bf44b](https://gitlab.com/linagora/petals-cockpit/commit/d8bf44b)), closes [#296](https://gitlab.com/linagora/petals-cockpit/issues/296)
+* **frontend:** use material buttons for SU/Comp state change ([07569fa](https://gitlab.com/linagora/petals-cockpit/commit/07569fa)), closes [#283](https://gitlab.com/linagora/petals-cockpit/issues/283)
+* **product:** broadcast new import in progress via SSE ([4d08764](https://gitlab.com/linagora/petals-cockpit/commit/4d08764)), closes [#250](https://gitlab.com/linagora/petals-cockpit/issues/250)
+* **frontend:** Ability to start component if loaded ([eebbba5](https://gitlab.com/linagora/petals-cockpit/commit/eebbba5))
+
+
+### Features
+
+* **backend:** workspace deletion API ([42ea32b](https://gitlab.com/linagora/petals-cockpit/commit/42ea32b)), closes [#240](https://gitlab.com/linagora/petals-cockpit/issues/240)
+* **frontend:** add menu with current username & logout ([35db654](https://gitlab.com/linagora/petals-cockpit/commit/35db654)), closes [#243](https://gitlab.com/linagora/petals-cockpit/issues/243)
+* **frontend:** autofocus only in non-mobile screens ([fb8a93f](https://gitlab.com/linagora/petals-cockpit/commit/fb8a93f))
+* **frontend:** ensure notifications are removed on workspace close ([499c8c4](https://gitlab.com/linagora/petals-cockpit/commit/499c8c4)), closes [#286](https://gitlab.com/linagora/petals-cockpit/issues/286)
+* **frontend:** redirected to original url after login ([436aaff](https://gitlab.com/linagora/petals-cockpit/commit/436aaff)), closes [#261](https://gitlab.com/linagora/petals-cockpit/issues/261)
+* **frontend:** show a notification on bus deleted ([7dc8fd9](https://gitlab.com/linagora/petals-cockpit/commit/7dc8fd9))
+* **frontend:** the workspace list is now closeable in a workspace ([2a6a41b](https://gitlab.com/linagora/petals-cockpit/commit/2a6a41b)), closes [#258](https://gitlab.com/linagora/petals-cockpit/issues/258)
+* **frontend:** workspace deletion ([3f02744](https://gitlab.com/linagora/petals-cockpit/commit/3f02744)), closes [#241](https://gitlab.com/linagora/petals-cockpit/issues/241)
+* **product:** allow to cancel buses in progress ([3fb5cac](https://gitlab.com/linagora/petals-cockpit/commit/3fb5cac)), closes [#123](https://gitlab.com/linagora/petals-cockpit/issues/123)
+
+
+### Performance Improvements
+
+* **frontend:** ensure subscriptions are closed when needed ([cc7f737](https://gitlab.com/linagora/petals-cockpit/commit/cc7f737))
+* **frontend:** preload javascript ([98c4bd5](https://gitlab.com/linagora/petals-cockpit/commit/98c4bd5)), closes [#179](https://gitlab.com/linagora/petals-cockpit/issues/179)
+
+
+
 <a name="0.6.0"></a>
 # [0.6.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.5.0...v0.6.0) (2017-03-10)
 
