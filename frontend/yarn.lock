@@ -4106,9 +4106,9 @@ rx@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/rx/-/rx-4.1.0.tgz#a5f13ff79ef3b740fe30aa803fb09f98805d4782"
 
-rxjs@5.2.1-smooth, rxjs@^5.0.1:
-  version "5.2.1-smooth"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.2.1-smooth.tgz#e324c92bec4bc43daf5315c888736f70b3db4e87"
+rxjs@5.3.0, rxjs@^5.0.1:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.3.0.tgz#d88ccbdd46af290cbdb97d5d8055e52453fabe2d"
   dependencies:
     symbol-observable "^1.0.1"
 

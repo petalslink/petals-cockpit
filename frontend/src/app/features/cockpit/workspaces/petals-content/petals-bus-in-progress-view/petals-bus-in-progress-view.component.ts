@@ -83,9 +83,9 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
 
     id$
       .takeUntil(this.onDestroy$)
-      .subscribe(busInProgressId =>
-        this.store$.dispatch({ type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS, payload: { busInProgressId } })
-      );
+      .do(busInProgressId =>
+        this.store$.dispatch({ type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS, payload: { busInProgressId } }))
+      .subscribe();
 
     // takes care of redirecting to the right URL after the shown bus in progress is deleted
     // this is here because it only makes sense if we are on this page for the given bus
@@ -122,7 +122,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
 
     this.busInProgress$
       .takeUntil(this.onDestroy$)
-      .subscribe(busInProgress => {
+      .do(busInProgress => {
         this.busInProgress = busInProgress;
 
         if (this.busInProgress) {
@@ -136,7 +136,8 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
 
           disableAllFormFields(this.busImportForm);
         }
-      });
+      })
+      .subscribe();
   }
 
   createFormImportBus() {
@@ -152,16 +153,18 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
       .busImportForm
       .valueChanges
       .takeUntil(this.onDestroy$)
-      .subscribe(data => {
+      .do(data => {
         this.formErrors = getFormErrors(this.busImportForm, this.formErrors, data);
-      });
+      })
+      .subscribe();
   }
 
   ngAfterViewInit() {
     this.store$.let(isLargeScreen)
       .first()
       .filter(ss => ss)
-      .subscribe(_ => this.ipInput._focusInput());
+      .do(_ => this.ipInput._focusInput())
+      .subscribe();
   }
 
   ngOnDestroy() {

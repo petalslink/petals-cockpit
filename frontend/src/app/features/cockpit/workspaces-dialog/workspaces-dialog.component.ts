@@ -80,7 +80,7 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
         )
       )
       .takeUntil(this.onDestroy$)
-      .subscribe(([isAddingWorkspace, _]) => {
+      .do(([isAddingWorkspace, _]) => {
         if (this.newWksForm.invalid || isAddingWorkspace) {
           this.btnSubmitDisabled = true;
         } else {
@@ -92,7 +92,8 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
         } else {
           this.newWksForm.enable();
         }
-      });
+      })
+      .subscribe();
   }
 
   ngOnDestroy() {
@@ -104,14 +105,15 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
     this.store$
       .select(state => state.workspaces.selectedWorkspaceId)
       .first()
-      .subscribe(wsId => {
+      .do(wsId => {
         // if no workspace is open, it will simply navigate to the required one
         if (wsId === workspace.id) {
           this.store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
         } else {
           this.router.navigate(['/workspaces', workspace.id]);
         }
-      });
+      })
+      .subscribe();
   }
 
   onSubmit({ value }) {

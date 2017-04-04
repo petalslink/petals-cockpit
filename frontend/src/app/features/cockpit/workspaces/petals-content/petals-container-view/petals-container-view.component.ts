@@ -51,10 +51,11 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
     this.route.paramMap
       .map(p => p.get('containerId'))
       .takeUntil(this.onDestroy$)
-      .subscribe(id => {
+      .do(id => {
         this.store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: id } });
         this.store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: id } });
-      });
+      })
+      .subscribe();
 
     this.container$ = this.store$.let(getCurrentContainer);
 

@@ -45,10 +45,11 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
     this.route.paramMap
       .map(pm => pm.get('busId'))
       .takeUntil(this.onDestroy$)
-      .subscribe(busId => {
+      .do(busId => {
         this.store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId } });
         this.store$.dispatch({ type: Buses.FETCH_BUS_DETAILS, payload: { busId } });
-      });
+      })
+      .subscribe();
 
     this.bus$ = this.store$.let(getCurrentBus);
   }

@@ -63,14 +63,17 @@ export class AppComponent implements OnInit, OnDestroy {
       .select(state => state.ui.language)
       .filter(language => language !== '')
       .takeUntil(this.onDestroy$)
-      .subscribe(language => this.translate.use(language));
+      .do(language => this.translate.use(language))
+      .subscribe();
 
     this.media$
       .asObservable()
       .map((change: MediaChange) => change.mqAlias)
       .distinctUntilChanged()
       .takeUntil(this.onDestroy$)
-      .subscribe(screenSize => this.store$.dispatch({ type: Ui.CHANGE_SCREEN_SIZE, payload: screenSize }));
+      .do(screenSize =>
+        this.store$.dispatch({ type: Ui.CHANGE_SCREEN_SIZE, payload: screenSize }))
+      .subscribe();
   }
 
   ngOnDestroy() {

@@ -93,7 +93,7 @@ export class ComponentsEffects {
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, workspaceId]: [{ type: string, payload: { file: File, componentId: string, serviceUnitName: string } }, string]) =>
       this.componentsService.deploySu(workspaceId, action.payload.componentId, action.payload.file, action.payload.serviceUnitName)
-        .ignoreElements()
+        .mergeMap(_ => Observable.empty())
         .catch((err) => {
           if (environment.debug) {
             console.group();

@@ -77,7 +77,7 @@ describe(`Import Bus`, () => {
     expect(clearBtn.isPresent()).toBe(false);
   });
 
-  it(`Should fail on the first two bus imports`, () => {
+  it(`should fail on the first two bus imports`, () => {
     // only 2 buses in progress
     expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(2);
 
@@ -134,8 +134,8 @@ describe(`Import Bus`, () => {
 
     // second will fail : Error from Petals
     importBtn.click();
-    // close the error notification
-    simpleNotification.click();
+    // wait until the error notification is closed
+    browser.wait(Ec.stalenessOf(simpleNotification), 15000);
 
     page.addBus();
     // --------------------------------------
