@@ -45,10 +45,11 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
     this.route.paramMap
       .map(pm => pm.get('componentId'))
       .takeUntil(this.onDestroy$)
-      .subscribe(componentId => {
+      .do(componentId => {
         this.store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId } });
         this.store$.dispatch({ type: Components.FETCH_COMPONENT_DETAILS, payload: { componentId } });
-      });
+      })
+      .subscribe();
 
     this.component$ = this.store$.let(getCurrentComponent);
   }

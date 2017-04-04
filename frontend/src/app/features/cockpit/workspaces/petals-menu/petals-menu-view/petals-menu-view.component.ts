@@ -52,9 +52,12 @@ export class PetalsMenuViewComponent implements OnInit {
     this.busesInProgress$ = this.store$.let(getBusesInProgress());
     this.formSearchPetals();
 
-    this.searchForm.valueChanges.subscribe(value => {
-      this.search(value.search);
-    });
+    this.searchForm
+      .valueChanges
+      .do(value => {
+        this.search(value.search);
+      })
+      .subscribe();
   }
 
   formSearchPetals() {

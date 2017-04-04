@@ -46,15 +46,14 @@ export class WorkspaceComponent implements OnInit {
   }
 
   openDeletionDialog() {
-    this.dialog.open(WorkspaceDeleteDialogComponent, {
-      data: { workspace$: this.workspace$ }
-    })
+    this.dialog
+      .open(WorkspaceDeleteDialogComponent, {
+        data: { workspace$: this.workspace$ }
+      })
       .afterClosed()
-      .subscribe((result: boolean) => {
-        if (result) {
-          this.store$.dispatch({ type: Workspaces.DELETE_WORKSPACE });
-        }
-      });
+      .filter((result: boolean) => result)
+      .do(_ => this.store$.dispatch({ type: Workspaces.DELETE_WORKSPACE }))
+      .subscribe();
   }
 }
 

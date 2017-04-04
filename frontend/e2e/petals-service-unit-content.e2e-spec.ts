@@ -29,7 +29,7 @@ describe(`Petals service-unit content`, () => {
     browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
   });
 
-  it(`Should open the content page`, () => {
+  it(`should open the content page`, () => {
     page.getWorkspaceTreeByName('SU 0').click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/service-units\/\w+/);
@@ -41,7 +41,7 @@ describe(`Petals service-unit content`, () => {
     expect(state).toEqual('Started');
   });
 
-  it(`Should stop/start/stop/unload a service-unit`, () => {
+  it(`should stop/start/stop/unload a service-unit`, () => {
     page.getWorkspaceTreeByName('SU 0').click();
 
     const stateElem = element(by.css(`app-petals-service-unit-overview md-card.state md-card-title`));

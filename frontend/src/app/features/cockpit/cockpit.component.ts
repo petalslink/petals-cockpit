@@ -80,20 +80,22 @@ export class CockpitComponent implements OnInit, OnDestroy {
       .map(ui => ui.isPopupListWorkspacesVisible)
       .distinctUntilChanged()
       .takeUntil(this.onDestroy$)
-      .subscribe(isPopupListWorkspacesVisible => {
+      .do(isPopupListWorkspacesVisible => {
         if (isPopupListWorkspacesVisible) {
           this.doOpenWorkspacesDialog();
         } else if (this.workspacesDialogRef) {
           this.workspacesDialogRef.close();
           this.workspacesDialogRef = null;
         }
-      });
+      })
+      .subscribe();
 
     this.store$
       .select(state => state.workspaces.deletedWorkspace)
       .filter(d => d)
       .takeUntil(this.onDestroy$)
-      .subscribe(_ => this.openDeletedWorkspaceDialog());
+      .do(_ => this.openDeletedWorkspaceDialog())
+      .subscribe();
 
     // TODO ultimately, the sidebar should be moved to WorkspaceComponent
     this.sidenavVisible$ = this.store$.select(state => state.ui.isSidenavVisible && !!state.workspaces.selectedWorkspaceId);
@@ -134,25 +136,29 @@ export class CockpitComponent implements OnInit, OnDestroy {
     this.store$
       .select(state => !!state.workspaces.selectedWorkspaceId)
       .first()
-      .subscribe(ws => {
+      .do(ws => {
         this.workspacesDialogRef = this.dialog.open(WorkspacesDialogComponent, {
           disableClose: !ws
         });
 
-        this.workspacesDialogRef.afterClosed().subscribe(_ => {
-          this.store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
-          this.workspacesDialogRef = null;
-        });
-      });
+        this.workspacesDialogRef
+          .afterClosed()
+          .do(_ => {
+            this.store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
+            this.workspacesDialogRef = null;
+          })
+          .subscribe();
+      })
+      .subscribe();
 
   }
 
   openDeletedWorkspaceDialog() {
-    this.dialog.open(DeletedWorkspaceDialogComponent)
+    this.dialog
+      .open(DeletedWorkspaceDialogComponent)
       .afterClosed()
-      .subscribe(() => {
-        this.store$.dispatch({ type: Workspaces.CLOSE_WORKSPACE, payload: { delete: true } });
-      });
+      .do(_ => this.store$.dispatch({ type: Workspaces.CLOSE_WORKSPACE, payload: { delete: true } }))
+      .subscribe();
   }
 
   openWorkspacesDialog() {

@@ -29,7 +29,7 @@ describe(`Petals bus content`, () => {
     browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
   });
 
-  it(`Should open the content page`, () => {
+  it(`should open the content page`, () => {
     page.getWorkspaceTreeByName('Bus 0').click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses\/\w+/);

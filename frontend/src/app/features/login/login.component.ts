@@ -63,7 +63,7 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
         p.connectionFailed === n.connectionFailed
       )
       .takeUntil(this.onDestroy$)
-      .subscribe(users => {
+      .do(users => {
         this.users = users;
 
         if (users.isConnecting || users.isConnected) {
@@ -73,7 +73,8 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
           this.loginForm.enable();
           this.loginForm.enable();
         }
-      });
+      })
+      .subscribe();
   }
 
   ngOnDestroy() {
@@ -82,10 +83,12 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.store$.let(isLargeScreen)
+    this.store$
+      .let(isLargeScreen)
       .first()
       .filter(ss => ss)
-      .subscribe(_ => this.usernameInput._focusInput());
+      .do(_ => this.usernameInput._focusInput())
+      .subscribe();
   }
 
   onSubmit({ value }) {

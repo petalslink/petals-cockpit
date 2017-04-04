@@ -31,7 +31,7 @@ describe(`Petals component content`, () => {
     browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
   });
 
-  it(`Should open the content page`, () => {
+  it(`should open the content page`, () => {
     page.getWorkspaceTreeByName('Comp 0').click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/components\/\w+/);
@@ -48,7 +48,7 @@ describe(`Petals component content`, () => {
     expect(element(by.css(`button.choose-file`)).isEnabled()).toBe(true);
   });
 
-  it(`Should stop/start/stop/unload a component`, () => {
+  it(`should stop/start/stop/unload a component`, () => {
     const stateElem = element(by.css(`app-petals-component-overview md-card.state md-card-title`));
     const btnStop = element(by.cssContainingText(`app-petals-component-overview button`, `Stop`));
     const btnStart = element(by.cssContainingText(`app-petals-component-overview button`, `Start`));
@@ -102,7 +102,7 @@ describe(`Petals component content`, () => {
     expect(page.getWorkspaceTreeByName(`Comp 0`).first().isPresent()).toBe(false);
   });
 
-  it(`Should deploy a service-unit`, () => {
+  it(`should deploy a service-unit`, () => {
     page.getWorkspaceTreeByName('Comp 0').click();
 
     const chooseFileBtn = element(by.css(`app-petals-component-overview .deploy .choose-file`));

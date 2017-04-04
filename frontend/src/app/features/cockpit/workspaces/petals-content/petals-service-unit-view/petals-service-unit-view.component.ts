@@ -50,10 +50,11 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
 
     serviceUnitId$
       .takeUntil(this.onDestroy$)
-      .subscribe(serviceUnitId => {
+      .do(serviceUnitId => {
         this.store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId } });
         this.store$.dispatch({ type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS, payload: { serviceUnitId } });
-      });
+      })
+      .subscribe();
   }
 
   ngOnDestroy() {
