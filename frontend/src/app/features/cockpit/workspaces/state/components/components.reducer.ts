@@ -120,7 +120,7 @@ export class Components {
   public static FETCH_COMPONENT_DETAILS = `${Components.reducerName}_FETCH_COMPONENT_DETAILS`;
   private static fetchComponentDetails(componentsTable: IComponentsTable, payload: { componentId: string }) {
     const allIds =
-      (typeof componentsTable.byId[payload.componentId] !== 'undefined'
+      (componentsTable.byId[payload.componentId] !== void 0
         ? componentsTable.allIds
         : [...componentsTable.allIds, payload.componentId]);
 

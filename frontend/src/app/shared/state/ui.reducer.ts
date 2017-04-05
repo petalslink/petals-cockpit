@@ -25,7 +25,7 @@ export class Ui {
   private static reducerName = 'UI_REDUCER';
 
   public static reducer(ui = uiState(), {type, payload}: Action) {
-    if (typeof Ui.mapActionsToMethod[type] === 'undefined') {
+    if (Ui.mapActionsToMethod[type] === void 0) {
       return ui;
     }
 
@@ -95,9 +95,9 @@ export class Ui {
     return {
       ...ui,
       ...<IUi>{
-        titleMainPart1: (typeof payload.titleMainPart1 !== 'undefined' ? payload.titleMainPart1 : ui.titleMainPart1),
-        titleMainPart2: (typeof payload.titleMainPart2 !== 'undefined' ? payload.titleMainPart2 : ui.titleMainPart2),
-        titleSubPart: (typeof payload.titleSubPart !== 'undefined' ? payload.titleSubPart : ui.titleSubPart)
+        titleMainPart1: (payload.titleMainPart1 !== void 0 ? payload.titleMainPart1 : ui.titleMainPart1),
+        titleMainPart2: (payload.titleMainPart2 !== void 0 ? payload.titleMainPart2 : ui.titleMainPart2),
+        titleSubPart: (payload.titleSubPart !== void 0 ? payload.titleSubPart : ui.titleSubPart)
       }
     };
   }
