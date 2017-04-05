@@ -24,7 +24,7 @@ export class Users {
   private static reducerName = 'USERS_REDUCER';
 
   public static reducer(users = usersState(), {type, payload}: Action) {
-    if (typeof Users.mapActionsToMethod[type] === 'undefined') {
+    if (Users.mapActionsToMethod[type] === void 0) {
       return users;
     }
 
