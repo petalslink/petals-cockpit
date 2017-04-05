@@ -33,7 +33,7 @@ export interface IBusCommon {
 // used within table
 export interface IBusRow extends IBusCommon {
   // from server
-  containers: Array<string>;
+  containers: string[];
 }
 
 // used in generated views
