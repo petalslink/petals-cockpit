@@ -45,12 +45,11 @@ module.exports = function (config) {
     autoWatch: true,
     browsers: ['ChromiumHeadless'],
     customLaunchers: {
-      ChromiumNoSandbox: {
-        base: 'ChromiumHeadless',
+      ChromiumHeadless: {
+        base: 'Chromium',
         flags: ['--no-sandbox', '--headless', '--disable-gpu', '--remote-debugging-port=9222']
       }
     },
-    failOnEmptyTestSuite: false,
     singleRun: false
   });
 };
