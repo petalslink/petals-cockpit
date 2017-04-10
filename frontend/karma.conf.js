@@ -17,6 +17,11 @@ module.exports = function (config) {
     client: {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
+    browserConsoleLogOptions: {
+      level: 'log',
+      // set terminal to true to use console.log in tests (or tested code)
+      terminal: false
+    },
     files: [
       { pattern: './src/test.ts', watched: false }
     ],
