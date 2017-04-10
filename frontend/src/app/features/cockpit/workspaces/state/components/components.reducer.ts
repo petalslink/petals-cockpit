@@ -120,7 +120,7 @@ export class Components {
   public static FETCH_COMPONENT_DETAILS = `${Components.reducerName}_FETCH_COMPONENT_DETAILS`;
   private static fetchComponentDetails(componentsTable: IComponentsTable, payload: { componentId: string }) {
     const allIds =
-      (componentsTable.byId[payload.componentId] !== void 0
+      (componentsTable.byId[payload.componentId]
         ? componentsTable.allIds
         : [...componentsTable.allIds, payload.componentId]);
 
@@ -234,7 +234,7 @@ export class Components {
   public static REMOVE_COMPONENT = `${Components.reducerName}_REMOVE_COMPONENT`;
   private static removeComponent(componentsTable: IComponentsTable, payload: { componentId: string }) {
     return {
-      ...omit(componentsTable, 'byId', 'allIds'),
+      ...componentsTable,
       ...<IComponentsTable>{
         byId: omit(componentsTable.byId, payload.componentId),
         allIds: componentsTable.allIds.filter(componentId => componentId === payload.componentId)
