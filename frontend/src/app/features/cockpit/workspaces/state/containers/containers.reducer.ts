@@ -123,7 +123,7 @@ export class Containers {
   public static FETCH_CONTAINER_DETAILS = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS`;
   private static fetchContainerDetails(containersTable: IContainersTable, payload: { containerId: string }) {
     const allIds =
-      (containersTable.byId[payload.containerId] !== void 0
+      (containersTable.byId[payload.containerId]
         ? containersTable.allIds
         : [...containersTable.allIds, payload.containerId]);
 

@@ -117,9 +117,9 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS = `${Buses.reducerName}_REMOVE_BUS`;
   private static removeBus(busesTable: IBusesTable, payload: { busId: string }) {
-    if (busesTable.byId[payload.busId] !== void 0) {
+    if (busesTable.byId[payload.busId]) {
       return {
-        ...omit(busesTable, 'byId'),
+        ...busesTable,
         ...<IBusesTable>{
           byId: omit(busesTable.byId, payload.busId),
           allIds: busesTable.allIds.filter(id => id !== payload.busId)
@@ -133,7 +133,7 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS = `${Buses.reducerName}_FETCH_BUS_DETAILS`;
   private static fetchBusDetails(busesTable: IBusesTable, payload: { busId: string }) {
-    const allIds = (busesTable.byId[payload.busId] !== void 0 ? busesTable.allIds : [...busesTable.allIds, payload.busId]);
+    const allIds = (busesTable.byId[payload.busId] ? busesTable.allIds : [...busesTable.allIds, payload.busId]);
 
     return {
       ...busesTable,

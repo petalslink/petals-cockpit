@@ -25,7 +25,7 @@ export class Ui {
   private static reducerName = 'UI_REDUCER';
 
   public static reducer(ui = uiState(), {type, payload}: Action) {
-    if (Ui.mapActionsToMethod[type] === void 0) {
+    if (!Ui.mapActionsToMethod[type]) {
       return ui;
     }
 
@@ -95,9 +95,9 @@ export class Ui {
     return {
       ...ui,
       ...<IUi>{
-        titleMainPart1: (payload.titleMainPart1 !== void 0 ? payload.titleMainPart1 : ui.titleMainPart1),
-        titleMainPart2: (payload.titleMainPart2 !== void 0 ? payload.titleMainPart2 : ui.titleMainPart2),
-        titleSubPart: (payload.titleSubPart !== void 0 ? payload.titleSubPart : ui.titleSubPart)
+        titleMainPart1: (payload.titleMainPart1 ? payload.titleMainPart1 : ui.titleMainPart1),
+        titleMainPart2: (payload.titleMainPart2 ? payload.titleMainPart2 : ui.titleMainPart2),
+        titleSubPart: (payload.titleSubPart ? payload.titleSubPart : ui.titleSubPart)
       }
     };
   }
