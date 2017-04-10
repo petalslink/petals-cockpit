@@ -24,9 +24,9 @@ interface IServiceUnitsCommon {
 
 export interface IServiceUnitsTable extends IServiceUnitsCommon {
   byId: { [key: string]: IServiceUnitRow };
-  allIds: Array<string>;
+  allIds: string[];
 }
 
 export interface IServiceUnits extends IServiceUnitsCommon {
-  list: Array<IServiceUnit>;
+  list: IServiceUnit[];
 }

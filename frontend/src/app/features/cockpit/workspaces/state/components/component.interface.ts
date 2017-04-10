@@ -44,7 +44,7 @@ export interface IComponentCommon {
 
 export interface IComponentRow extends IComponentCommon {
   // from server
-  serviceUnits: Array<string>;
+  serviceUnits: string[];
 }
 
 export interface IComponent extends IComponentCommon {

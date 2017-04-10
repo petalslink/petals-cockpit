@@ -6,14 +6,14 @@ export class Containers {
 
   constructor() { }
 
-  create(bus: Bus) {
-    const container = new Container(bus);
-    this.containers.set(container.getIdFormatted(), container);
+  create(bus: Bus, name?: string) {
+    const container = new Container(bus, name);
+    this.containers.set(container.getId(), container);
     return container;
   }
 
-  read(idContainer: string) {
-    return this.containers.get(idContainer);
+  get(id: string) {
+    return this.containers.get(id);
   }
 }
 
@@ -22,45 +22,55 @@ export const containersService = new Containers();
 export class Container {
   private static cpt = 0;
   private bus: Bus;
-  protected id: number;
-  private components: Component[] = [];
+  private id: string;
+  private name: string;
+  private components = new Map<string, Component>();
+  private ip: string;
 
-  constructor(bus: Bus) {
-    this.id = Container.cpt++;
+  constructor(bus: Bus, name?: string) {
+    const i = Container.cpt++;
+    this.id = `idCont${i}`;
+    this.name = name ? name : `Cont ${i}`;
+    this.ip = `192.168.0.${i}`;
     this.bus = bus;
 
-    // by default add 2 containers
-    this.components.push(componentsService.create());
-    this.components.push(componentsService.create());
+    // by default add 2 components
+    this.addComponent();
+    this.addComponent();
   }
 
   getComponents() {
-    return this.components;
+    return Array.from(this.components.values());
   }
 
-  public getIdFormatted() {
-    return `idCont${this.id}`;
+  getId() {
+    return this.id;
+  }
+
+  addComponent(name?: string) {
+    const component = componentsService.create(name);
+    this.components.set(component.getId(), component);
+
+    return component;
   }
 
   toObj() {
     return {
-      [this.getIdFormatted()]: {
-        name: `Cont ${this.id}`,
-        components: this.components.map(component => component.getIdFormatted())
+      [this.id]: {
+        name: this.name,
+        components: Array.from(this.components.keys())
       }
     };
   }
 
   getDetails() {
-    const id = this.getIdFormatted();
-
     return {
-      ip: `192.168.0.${this.id}`,
-      port: 7700 + this.id,
+      ip: this.ip,
+      port: 7700,
       reachabilities: this.bus
         .getContainers()
-        .map(container => container.getIdFormatted())
-        .filter(containerId => containerId !== id),
+        .map(container => container.getId())
+        .filter(id => id !== this.id),
       systemInfo: [
         'Petals ESB µKernel 4.0.2',
         'Petals Standalone Shared Memory 4.0.2',

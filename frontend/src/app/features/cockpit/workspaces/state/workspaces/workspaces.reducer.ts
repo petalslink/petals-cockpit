@@ -123,7 +123,7 @@ export class Workspaces {
           ...workspacesTable.byId,
           [payload]: <IWorkspaceRow>{
             ...workspacesTable.byId[payload],
-            ...<IWorkspaceRow>{ isFetching: true }
+            ...<IWorkspaceRow>{ isFetched: false }
           }
         }
       }
@@ -142,10 +142,7 @@ export class Workspaces {
           [payload.id]: <IWorkspaceRow>{
             ...workspacesTable.byId[payload.id],
             ...payload,
-            ...<IWorkspaceRow>{
-              isFetching: false,
-              isFetched: true
-            }
+            ...<IWorkspaceRow>{ isFetched: true }
           }
         }
       }

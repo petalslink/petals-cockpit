@@ -42,13 +42,13 @@ export class ComponentsMockService extends ComponentsServiceImpl {
   }
 
   getDetailsComponent(componentId: string) {
-    const detailsComponent = componentsService.read(componentId).getDetails();
+    const detailsComponent = componentsService.get(componentId).getDetails();
 
     return helper.responseBody(detailsComponent);
   }
 
   putState(_workspaceId: string, componentId: string, newState: string) {
-    componentsService.read(componentId).setState(newState);
+    componentsService.get(componentId).setState(newState);
     // when the state changes, trigger a fake SSE event
     setTimeout(() =>
       (this.pSseService as SseServiceMock).triggerSseEvent(
@@ -65,7 +65,7 @@ export class ComponentsMockService extends ComponentsServiceImpl {
   }
 
   deploySu(workspaceId: string, componentId: string, file: File, serviceUnitName: string) {
-    const serviceUnit = componentsService.read(componentId).addServiceUnit(serviceUnitName);
+    const serviceUnit = componentsService.get(componentId).addServiceUnit(serviceUnitName);
 
     setTimeout(() =>
       (this.pSseService as SseServiceMock).triggerSseEvent(
@@ -73,7 +73,7 @@ export class ComponentsMockService extends ComponentsServiceImpl {
         {
           componentId,
           serviceUnit: {
-            id: serviceUnit.getIdFormatted(),
+            id: serviceUnit.getId(),
             ...serviceUnit.getDetails()
           }
         }

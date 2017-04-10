@@ -112,7 +112,9 @@ div > .mat-dialog-container {
   padding: 12px;
   background-color: rgba(255, 0, 0, 0.2);
   color: mat-color($mat-red, 500, 1);
-  white-space:nowrap;
+  overflow-wrap: break-word;
+  display: inline-block !important;
+  width: 100%;
 }
 
 .info {

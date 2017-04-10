@@ -5,14 +5,14 @@ export class Components {
 
   constructor() { }
 
-  create() {
-    const component = new Component();
-    this.components.set(component.getIdFormatted(), component);
+  create(name?: string) {
+    const component = new Component(name);
+    this.components.set(component.getId(), component);
     return component;
   }
 
-  read(idComponent: string) {
-    return this.components.get(idComponent);
+  get(id: string) {
+    return this.components.get(id);
   }
 }
 
@@ -20,42 +20,45 @@ export const componentsService = new Components();
 
 export class Component {
   private static cpt = 0;
-  protected id: number;
-  private serviceUnits: ServiceUnit[] = [];
+  private id: string;
+  private serviceUnits = new Map<string, ServiceUnit>();
   private state = 'Started';
+  private name: string;
 
-  constructor() {
-    this.id = Component.cpt++;
+  constructor(name?: string) {
+    const i = Component.cpt++;
+    this.id = `idComp${i}`;
+    this.name = name ? name : `Comp ${i}`;
 
     // by default add 2 service units
-    this.serviceUnits.push(serviceUnitsService.create());
-    this.serviceUnits.push(serviceUnitsService.create());
+    this.addServiceUnit();
+    this.addServiceUnit();
   }
 
   setState(newState: string) {
     this.state = newState;
   }
 
-  public getIdFormatted() {
-    return `idComp${this.id}`;
+  public getId() {
+    return this.id;
   }
 
   getServiceUnits() {
-    return this.serviceUnits;
+    return Array.from(this.serviceUnits.values());
   }
 
-  addServiceUnit(serviceUnitName: string) {
-    const serviceUnit = serviceUnitsService.create(serviceUnitName);
-    this.serviceUnits.push(serviceUnit);
+  addServiceUnit(name?: string) {
+    const serviceUnit = serviceUnitsService.create(name);
+    this.serviceUnits.set(serviceUnit.getId(), serviceUnit);
 
     return serviceUnit;
   }
 
   toObj() {
     return {
-      [this.getIdFormatted()]: {
-        name: `Comp ${this.id}`,
-        serviceUnits: this.serviceUnits.map(serviceUnit => serviceUnit.getIdFormatted())
+      [this.id]: {
+        name: this.name,
+        serviceUnits: Array.from(this.serviceUnits.keys())
       }
     };
   }

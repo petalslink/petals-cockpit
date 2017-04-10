@@ -25,7 +25,7 @@ import * as helper from './../helpers/mock.helper';
 export class ContainersMockService extends ContainersService {
 
   getDetailsContainer(containerId: string) {
-    const detailsContainer = containersService.read(containerId).getDetails();
+    const detailsContainer = containersService.get(containerId).getDetails();
 
     return helper.responseBody(detailsContainer);
   }

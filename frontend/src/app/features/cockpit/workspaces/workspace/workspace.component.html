@@ -25,16 +25,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div fxFill fxLayout="column" class="content content-max-width" fxLayoutWrap>
     <div fxLayout="row">
       <p>Welcome to <span class="selected-workspace color-primary">{{ workspace.name }}</span></p>
-
-      <button color="warn" type="button" class="btn-delete-wks margin-left-x1" (click)="openDeletionDialog()"
-        md-mini-fab mdTooltip="Delete the workspace" mdTooltipPosition="after" [disabled]="isRemovingWorkspace$ | async">
-        <md-icon>delete</md-icon>
-      </button>
     </div>
 
-    <div *ngIf="workspace.users.list as users">
+    <div fxLayout="row" class="info" [innerHTML]="workspace.message | MarkdownToHtml"></div>
+
+    <div fxLayout="column" *ngIf="workspace.users.list as users">
       <div *ngIf="users.length === 1; else workspaceShared">
-        <p class="users-in-workspace">You are the only one using this workspace.</p>
+        <p class="users-in-workspace">You are the only one using this workspace:</p>
       </div>
 
       <ng-template #workspaceShared>
@@ -53,5 +50,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </md-list-item>
       </md-list>
     </div>
+
+    <button color="warn" type="button" class="btn-delete-wks margin-top-x3" (click)="openDeletionDialog()"
+      md-mini-fab mdTooltip="Delete the workspace" mdTooltipPosition="after" [disabled]="isRemovingWorkspace$ | async">
+      <md-icon>delete</md-icon>
+    </button>
   </div>
 </div>

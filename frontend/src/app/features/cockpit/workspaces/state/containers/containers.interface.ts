@@ -24,9 +24,9 @@ export interface IContainersCommon {
 
 export interface IContainersTable extends IContainersCommon {
   byId: { [key: string]: IContainerRow };
-  allIds: Array<string>;
+  allIds: string[];
 }
 
 export interface IContainers extends IContainersCommon {
-  list: Array<IContainer>;
+  list: IContainer[];
 }

@@ -17,15 +17,14 @@
 
 import { IUsers } from '../../../../../shared/interfaces/users.interface';
 import { IBuses } from '../buses/buses.interface';
-import { IWorkspacesCommon } from './workspaces.interface';
 
 interface IWorkspaceCommon {
   // from server
   id: string;
   name: string;
+  message: string;
 
   // when a worspace is being fetched
-  isFetching: boolean;
   isFetched: boolean;
 }
 
@@ -38,7 +37,7 @@ export interface IWorkspaceRow extends IWorkspaceCommon {
 // used in generated views
 // we import IWorkspacesCommon here because when creating a view from a selector
 // we'll inject those properties for the current workspace
-export interface IWorkspace extends IWorkspaceCommon, IWorkspacesCommon {
+export interface IWorkspace extends IWorkspaceCommon {
   buses: IBuses;
   users: IUsers;
 }

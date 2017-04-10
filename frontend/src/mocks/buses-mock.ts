@@ -1,4 +1,4 @@
-import { IBusInProgress } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
+import { IBusImport } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { containersService, Container } from './containers-mock';
 
 export class Buses {
@@ -8,12 +8,12 @@ export class Buses {
 
   create() {
     const bus = new Bus();
-    this.buses.set(bus.getIdFormatted(), bus);
+    this.buses.set(bus.getId(), bus);
     return bus;
   }
 
-  read(idBus: string) {
-    return this.buses.get(idBus);
+  read(id: string) {
+    return this.buses.get(id);
   }
 }
 
@@ -24,9 +24,9 @@ export class BusesInProgress {
 
   constructor() { }
 
-  create(bus?: IBusInProgress) {
+  create(bus?: IBusImport) {
     const busInProgress = new BusInProgress(bus);
-    this.busesInProgress.set(busInProgress.getIdFormatted(), busInProgress);
+    this.busesInProgress.set(busInProgress.getId(), busInProgress);
     return busInProgress;
   }
 }
@@ -34,40 +34,48 @@ export class BusesInProgress {
 export const busesInProgressService = new BusesInProgress();
 
 export class BusBase {
-  private static cpt = 0;
-  protected id: number;
+  protected static cpt = 0;
+  protected id: string;
+  protected name: string;
 
   constructor() {
-    this.id = BusBase.cpt++;
+    const i = BusBase.cpt++;
+    this.id = `idBus${i}`;
+    this.name = `Bus ${i}`;
   }
 
-  public getIdFormatted() {
-    return `idBus${this.id}`;
+  public getId() {
+    return this.id;
   }
 }
 
 export class Bus extends BusBase {
-  private containers: Container[] = [];
+  private containers = new Map<string, Container>();
 
   constructor() {
     super();
 
     // by default add 2 containers
-    this.containers.push(containersService.create(this));
-    this.containers.push(containersService.create(this));
+    this.addContainer();
+    this.addContainer();
   }
 
   getContainers() {
-    return this.containers;
+    return Array.from(this.containers.values());
+  }
+
+  addContainer(name?: string) {
+    const container = containersService.create(this, name);
+    this.containers.set(container.getId(), container);
   }
 
   toObj() {
     return {
-      [this.getIdFormatted()]: {
+      [this.id]: {
         isImporting: false,
-        name: `Bus ${this.id}`,
+        name: this.name,
         state: `UNDEPLOYED`,
-        containers: this.containers.map(container => container.getIdFormatted())
+        containers: Array.from(this.containers.keys())
       }
     };
   }
@@ -83,14 +91,14 @@ export class BusInProgress extends BusBase {
   private port: number;
   private username: string;
 
-  constructor(bus?: IBusInProgress) {
+  constructor(bus?: IBusImport) {
     super();
     if (bus) {
       this.ip = bus.ip;
       this.port = bus.port;
       this.username = bus.username;
     } else {
-      this.ip = `192.168.0.${this.id}`;
+      this.ip = `192.168.0.${BusBase.cpt - 1}`;
       this.port = 7700;
       this.username = `petals`;
     }
@@ -98,8 +106,7 @@ export class BusInProgress extends BusBase {
 
   toObj() {
     return {
-      [this.getIdFormatted()]: {
-        id: this.getIdFormatted(),
+      [this.id]: {
         ip: this.ip,
         port: this.port,
         username: this.username

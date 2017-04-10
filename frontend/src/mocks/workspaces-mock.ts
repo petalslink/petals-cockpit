@@ -1,113 +1,16 @@
-import { IBusInProgress } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
+import { IBusImport } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { Bus, BusInProgress, busesService, busesInProgressService } from './buses-mock';
 import { Container } from './containers-mock';
 import { Component } from './components-mock';
 import { ServiceUnit } from './service-units-mock';
 
-export class Workspace {
-  private static cpt = 0;
-  private id: number;
-  private name: string;
-  private buses: Bus[] = [];
-  private busesInProgress: BusInProgress[] = [];
+// used in buses.service.mock
+export const IMPORT_HTTP_ERROR_IP = 'IMPORT_HTTP_ERROR_IP';
 
-  private firstErrorSent = false;
-
-  constructor(name?: string) {
-    this.id = Workspace.cpt++;
-
-    this.name = name;
-
-    // by default add 1 bus
-    this.buses.push(busesService.create());
-
-    // and 2 buses in progress
-    this.busesInProgress.push(busesInProgressService.create());
-    this.busesInProgress.push(busesInProgressService.create());
-  }
-
-  public getIdFormatted() {
-    return `idWks${this.id}`;
-  }
-
-  public toObj() {
-    return {
-      id: this.getIdFormatted(),
-      name: this.name || `Workspace ${this.id}`,
-      users: this.workspaceUsers()
-    };
-  }
-
-  private workspaceUsers() {
-    switch (this.getIdFormatted()) {
-      case 'idWks1': return ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'];
-      default: return ['admin'];
-    }
-  }
-
-  public getBuses() {
-    return this.buses;
-  }
-
-  public getBusesInProgress() {
-    return this.busesInProgress;
-  }
-
-  public addBus(busInProgress: IBusInProgress): { id: string, eventData: any } {
-    // we fail the first time, for the demo
-    if (!this.firstErrorSent) {
-      this.firstErrorSent = true;
-
-      const bus = busesInProgressService.create(busInProgress);
-
-      return {
-        id: bus.getIdFormatted(),
-        eventData: {
-          ...bus.toObj()[bus.getIdFormatted()],
-          ...{ importError: `Can't connect to bus` }
-        }
-      };
-    }
-
-    const bus = busesService.create();
-
-    this.buses.push(bus);
-
-    const containers = bus.getContainers();
-    const components = containers.reduce((acc: Component[], container) => [...acc, ...container.getComponents()], []);
-    const serviceUnits = components.reduce((acc: ServiceUnit[], component) => [...acc, ...component.getServiceUnits()], []);
-
-    const eventData = {
-      buses: bus.toObj(),
-
-      containers: containers.reduce((acc, container) => {
-        return {
-          ...acc,
-          ...container.toObj()
-        };
-      }, {}),
-
-      components: components.reduce((acc, component) => {
-        return {
-          ...acc,
-          ...component.toObj()
-        };
-      }, {}),
-
-      serviceUnits: serviceUnits.reduce((acc, serviceUnit) => {
-        return {
-          ...acc,
-          ...serviceUnit.toObj()
-        };
-      }, {})
-    };
-
-    return {
-      id: bus.getIdFormatted(),
-      eventData
-    };
-  }
-}
+// buses that can be imported
+export const validContainers = [
+  '192.168.0.1:7700'
+];
 
 // we don't need to manage CRUD operations on users and we don't have a class to handle them
 // it would be completely overkill to put them in a separate file
@@ -134,6 +37,106 @@ export const users = {
   }
 };
 
+export class Workspace {
+  private static cpt = 0;
+  private id: string;
+  private name: string;
+  private buses = new Map<string, Bus>();
+  private busesInProgress = new Map<string, BusInProgress>();
+
+  constructor(name?: string) {
+    const i = Workspace.cpt++;
+    this.id = `idWks${i}`;
+    this.name = name ? name : `Workspace ${i}`;
+
+    // by default add 1 bus
+    this.addBus();
+
+    // and 2 buses in progress
+    this.addBusInProgress();
+    this.addBusInProgress();
+  }
+
+  getId() {
+    return this.id;
+  }
+
+  toObj() {
+    return {
+      id: this.id,
+      name: this.name,
+      message: 'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.',
+      users: this.workspaceUsers()
+    };
+  }
+
+  private workspaceUsers() {
+    switch (this.id) {
+      case 'idWks1': return ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'];
+      default: return ['admin'];
+    }
+  }
+
+  getBuses() {
+    return Array.from(this.buses.values());
+  }
+
+  getBusesInProgress() {
+    return Array.from(this.busesInProgress.values());
+  }
+
+  addBusInProgress(importData?: IBusImport) {
+    const bus = busesInProgressService.create(importData);
+    this.busesInProgress.set(bus.getId(), bus);
+
+    return bus;
+  }
+
+  addBus() {
+    const bus = busesService.create();
+    this.buses.set(bus.getId(), bus);
+
+    return bus;
+  }
+
+  tryAddBus(importData: IBusImport): { id: string, eventData: any } {
+    const ipPort = `${importData.ip}:${importData.port}`;
+
+    // this will return the data for the BUS_IMPORT_OK event
+    if (validContainers.includes(ipPort)) {
+      const bus = this.addBus();
+
+      const containers = bus.getContainers();
+      const components = containers.reduce((acc: Component[], container) => [...acc, ...container.getComponents()], []);
+      const serviceUnits = components.reduce((acc: ServiceUnit[], component) => [...acc, ...component.getServiceUnits()], []);
+
+      const eventData = {
+        buses: bus.toObj(),
+        containers: containers.reduce((acc, c) => ({ ...acc, ...c.toObj() }), {}),
+        components: components.reduce((acc, c) => ({ ...acc, ...c.toObj() }), {}),
+        serviceUnits: serviceUnits.reduce((acc, su) => ({ ...acc, ...su.toObj() }), {})
+      };
+
+      return {
+        id: bus.getId(),
+        eventData
+      };
+    }
+
+    // this will return the data for the BUS_IMPORT_ERROR event
+    const bus = this.addBusInProgress(importData);
+
+    return {
+      id: bus.getId(),
+      eventData: {
+        ...bus.toObj()[bus.getId()],
+        importError: `Can't connect to ${ipPort}`,
+        id: bus.getId()
+      }
+    };
+  }
+}
+
 export class Workspaces {
   // map to cache the created workspaces
   private memoizedWorkspaces = new Map<string, { wks: Workspace, composedWks: any }>();
@@ -154,8 +157,8 @@ export class Workspaces {
    * @param {string} idWks The workspace id you're looking for
    * @returns {any} the workspace
    */
-  getWorkspace(idWks: string) {
-    return this.memoizedWorkspaces.get(idWks).wks;
+  getWorkspace(id: string) {
+    return this.memoizedWorkspaces.get(id).wks;
   }
 
   /**
@@ -200,13 +203,13 @@ export class Workspaces {
    * otherwise will create it with some default values
    *
    * @export
-   * @param {string} idWks The workspace id you're looking for
+   * @param {string} id The workspace id you're looking for
    * @returns {any} the workspace composed
    */
-  getWorkspaceComposed(idWks?: string, name?: string) {
-    if (idWks) {
-      if (this.memoizedWorkspaces.has(idWks)) {
-        return { ...this.memoizedWorkspaces.get(idWks).composedWks };
+  getWorkspaceComposed(id?: string, name?: string) {
+    if (id) {
+      if (this.memoizedWorkspaces.has(id)) {
+        return { ...this.memoizedWorkspaces.get(id).composedWks };
       }
     }
 
@@ -259,7 +262,7 @@ export class Workspaces {
       }, {})
     };
 
-    this.memoizedWorkspaces.set(newWorkspace.getIdFormatted(), { wks: newWorkspace, composedWks });
+    this.memoizedWorkspaces.set(newWorkspace.getId(), { wks: newWorkspace, composedWks });
 
     return { ...composedWks };
   }

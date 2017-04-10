@@ -157,6 +157,10 @@
   version "2.5.45"
   resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.5.45.tgz#58928a621d014ce6ab59c5a9c41071f7328b0ca9"
 
+"@types/marked@^0.0.27":
+  version "0.0.27"
+  resolved "https://registry.yarnpkg.com/@types/marked/-/marked-0.0.27.tgz#c71445465f2280ee79edc83e2c3bdcd8edf53554"
+
 "@types/node@6.0.66", "@types/node@^6.0.46":
   version "6.0.66"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.66.tgz#5680b74a6135d33d4c00447e7c3dc691a4601625"
@@ -2906,6 +2910,17 @@ make-error@^1.1.1:
 map-obj@^1.0.0, map-obj@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
+
+markdown-to-html-pipe@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/markdown-to-html-pipe/-/markdown-to-html-pipe-1.2.0.tgz#1bba56d3aeb93d4b6c472b605c6891fb017c5887"
+  dependencies:
+    "@types/marked" "^0.0.27"
+    marked "^0.3.6"
+
+marked@^0.3.6:
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.6.tgz#b2c6c618fccece4ef86c4fc6cb8a7cbf5aeda8d7"
 
 matcher-collection@^1.0.0:
   version "1.0.4"

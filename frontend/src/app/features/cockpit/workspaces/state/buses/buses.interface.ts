@@ -23,9 +23,9 @@ export interface IBusesCommon {
 
 export interface IBusesTable extends IBusesCommon {
   byId: { [key: string]: IBusRow };
-  allIds: Array<string>;
+  allIds: string[];
 }
 
 export interface IBuses extends IBusesCommon {
-  list: Array<IBus>;
+  list: IBus[];
 }

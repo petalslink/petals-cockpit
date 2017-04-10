@@ -122,7 +122,7 @@ export class PetalsCockpitPage {
 
     return element(by.css(`app-cockpit md-sidenav.mat-sidenav-closed`)).isPresent().then(present => {
       if (present) {
-        return element(by.css(`app-cockpit md-toolbar-row button`)).click();
+        return element(by.css(`app-cockpit md-toolbar-row button.menu-icon`)).click();
       }
     });
   }
@@ -132,7 +132,7 @@ export class PetalsCockpitPage {
 
     return element(by.css(`app-cockpit md-sidenav.mat-sidenav-opened`)).isPresent().then(present => {
       if (present) {
-        return element(by.css(`app-cockpit md-toolbar-row button`)).click();
+        return element(by.css(`app-cockpit md-toolbar-row button.menu-icon`)).click();
       }
     });
   }
