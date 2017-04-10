@@ -144,13 +144,11 @@ export class Workspaces {
             ...payload,
             ...<IWorkspaceRow>{ isFetched: true }
           }
-        }
+        },
+        allIds: [...Array.from(new Set([...workspacesTable.allIds, payload.id]))]
       }
     };
   }
-
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_WORKSPACE_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACE_FAILED`;
 
   // tslint:disable-next-line:member-ordering
   public static SET_SEARCH = `${Workspaces.reducerName}_SET_SEARCH`;

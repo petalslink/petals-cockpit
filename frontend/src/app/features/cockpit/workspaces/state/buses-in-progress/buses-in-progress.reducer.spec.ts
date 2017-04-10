@@ -16,7 +16,6 @@
  */
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
-import { environment } from 'environments/environment';
 import { type } from 'app/shared/helpers/shared.helper';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 import { busesInProgressTableFactory } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.initial-state';

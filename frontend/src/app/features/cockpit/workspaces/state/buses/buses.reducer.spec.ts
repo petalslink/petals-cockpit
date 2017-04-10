@@ -675,10 +675,6 @@ describe(`Buses reducer`, () => {
   });
 
   describe(type(Workspaces.CLEAN_WORKSPACE), () => {
-    it(`should check action name`, () => {
-      expect(Workspaces.CLEAN_WORKSPACE).toEqual(`WORKSPACES_REDUCER_CLEAN_WORKSPACE`);
-    });
-
     it(`should return the initial value to reset the workspace`, () => {
       const initialState: any = {
         doNotKeepPreviousValues: '',
