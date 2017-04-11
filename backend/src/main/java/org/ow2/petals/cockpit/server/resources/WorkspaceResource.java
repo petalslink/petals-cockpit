@@ -242,7 +242,7 @@ public class WorkspaceResource {
     @Path("/containers/{containerId}/components")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentDeployed deployServiceUnit(@NotNull @PathParam("containerId") @Min(1) long containerId,
+    public ComponentDeployed deployComponent(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
             @NotEmpty @FormDataParam("name") String name,
