@@ -18,6 +18,7 @@ package org.ow2.petals.cockpit.server.resources;
 
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_WORKSPACES_USERNAME;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
@@ -31,6 +32,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -43,6 +45,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -57,12 +60,14 @@ import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeComponentState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeServiceUnitState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteWorkspace;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployComponent;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployServiceUnit;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin.Type;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
@@ -207,10 +212,10 @@ public class WorkspaceResource {
     }
 
     @POST
-    @Path("/components/{compId}/serviceunits")
+    @Path("/components/{componentId}/serviceunits")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public SUDeployed deployServiceUnit(@NotNull @PathParam("compId") @Min(1) long compId,
+    public SUDeployed deployServiceUnit(@NotNull @PathParam("componentId") @Min(1) long componentId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
             @NotEmpty @FormDataParam("name") String name)
@@ -218,7 +223,7 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        String componentName = DSL.using(jooq).selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(compId))
+        String componentName = DSL.using(jooq).selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(componentId))
                 .fetchOne(COMPONENTS.NAME);
 
         if (componentName == null) {
@@ -229,7 +234,35 @@ public class WorkspaceResource {
 
         try (ServicedArtifact sa = httpServer.serve(saName + ".zip",
                 os -> PetalsUtils.createSAfromSU(file, os, saName, name, componentName))) {
-            return as.call(wsId, new DeployServiceUnit(saName, sa.getArtifactUrl(), compId));
+            return as.call(wsId, new DeployServiceUnit(saName, sa.getArtifactUrl(), componentId));
+        }
+    }
+
+    @POST
+    @Path("/containers/{containerId}/components")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public ComponentDeployed deployServiceUnit(@NotNull @PathParam("containerId") @Min(1) long containerId,
+            @NotNull @FormDataParam("file") InputStream file,
+            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
+            @NotEmpty @FormDataParam("name") String name,
+            @NotEmpty @FormDataParam("type") String type)
+            throws IOException, InterruptedException {
+
+        checkAccess(jooq);
+
+        if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
+        Type ttype = ComponentMin.Type.from(type);
+
+        if (ttype == null) {
+            throw new BadRequestException("Unsupported component type " + type);
+        }
+
+        try (ServicedArtifact sa = httpServer.serve(name + ".zip", os -> IOUtils.copy(file, os))) {
+            return as.call(wsId, new DeployComponent(name, ttype, sa.getArtifactUrl(), containerId));
         }
     }
 
@@ -421,6 +454,30 @@ public class WorkspaceResource {
         }
     }
 
+    public static class ComponentDeployed implements WorkspaceEvent.Data {
+
+        @NotNull
+        @Min(1)
+        public final long containerId;
+
+        @Valid
+        @NotNull
+        @JsonProperty
+        public final ComponentMin component;
+
+        @JsonCreator
+        public ComponentDeployed(@JsonProperty("containerId") long containerId,
+                @JsonProperty("component") ComponentMin component) {
+            this.containerId = containerId;
+            this.component = component;
+        }
+
+        @JsonProperty
+        public String getContainerId() {
+            return Long.toString(containerId);
+        }
+    }
+
     public static class WorkspaceFullContent implements WorkspaceEvent.Data {
 
         @Valid
@@ -462,7 +519,7 @@ public class WorkspaceResource {
 
         public enum Event {
             WORKSPACE_CONTENT, BUS_IMPORT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, COMPONENT_STATE_CHANGE,
-            BUS_DELETED, SU_DEPLOYED, WORKSPACE_DELETED
+            BUS_DELETED, SU_DEPLOYED, WORKSPACE_DELETED, COMPONENT_DEPLOYED
         }
 
         @JsonProperty
@@ -511,6 +568,10 @@ public class WorkspaceResource {
 
         public static WorkspaceEvent suDeployed(SUDeployed sud) {
             return new WorkspaceEvent(Event.SU_DEPLOYED, sud);
+        }
+
+        public static WorkspaceEvent componentDeployed(ComponentDeployed cd) {
+            return new WorkspaceEvent(Event.COMPONENT_DEPLOYED, cd);
         }
 
         public static WorkspaceEvent busImport(BusInProgress bip) {
