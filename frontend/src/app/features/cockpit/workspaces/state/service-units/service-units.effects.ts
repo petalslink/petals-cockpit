@@ -64,12 +64,7 @@ export class ServiceUnitsEffects {
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, workspaceId]: [{ type: string, payload: { serviceUnitId: string, newState: string } }, string]) =>
       this.serviceUnitsService.putState(workspaceId, action.payload.serviceUnitId, action.payload.newState)
-        .map(_ => {
-          return {
-            type: ServiceUnits.CHANGE_STATE_WAIT_SSE,
-            payload: { serviceUnitId: action.payload.serviceUnitId }
-          };
-        })
+        .mergeMap(_ => Observable.empty())
         .catch((err) => {
           if (environment.debug) {
             console.group();
