@@ -39,14 +39,6 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static FETCH_COMPONENTS_SUCCESS = `${Components.reducerName}_FETCH_COMPONENTS_SUCCESS`;
   private static fetchComponentsSuccess(componentsTable: IComponentsTable, payload) {
-    let allIds = componentsTable.allIds;
-
-    payload.allIds.forEach(containerId => {
-      if (!componentsTable.byId[containerId]) {
-        allIds = [...allIds, containerId];
-      }
-    });
-
     return <IComponentsTable>{
       ...componentsTable,
       ...<IComponentsTable>{
@@ -54,7 +46,7 @@ export class Components {
           ...componentsTable.byId,
           ...payload.byId
         },
-        allIds
+        allIds: [...Array.from(new Set([...componentsTable.allIds, ...payload.allIds]))]
       }
     };
   }
@@ -62,6 +54,10 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static FOLD_COMPONENT = `${Components.reducerName}_FOLD_COMPONENT`;
   private static foldComponent(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    if (!componentsTable.byId[payload.componentId] || componentsTable.byId[payload.componentId].isFolded) {
+      return componentsTable;
+    }
+
     return <IComponentsTable>{
       ...componentsTable,
       ...<IComponentsTable>{
@@ -79,6 +75,10 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static UNFOLD_COMPONENT = `${Components.reducerName}_UNFOLD_COMPONENT`;
   private static unfoldComponent(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    if (!componentsTable.byId[payload.componentId] || !componentsTable.byId[payload.componentId].isFolded) {
+      return componentsTable;
+    }
+
     return <IComponentsTable>{
       ...componentsTable,
       ...<IComponentsTable>{
@@ -97,6 +97,10 @@ export class Components {
   public static TOGGLE_FOLD_COMPONENT = `${Components.reducerName}_TOGGLE_FOLD_COMPONENT`;
   private static toggleFoldComponent(componentsTable: IComponentsTable, payload: { componentId: string }) {
     const component = componentsTable.byId[payload.componentId];
+
+    if (!componentsTable.byId[payload.componentId]) {
+      return componentsTable;
+    }
 
     if (component.isFolded) {
       return Components.unfoldComponent(componentsTable, payload);
@@ -119,11 +123,6 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static FETCH_COMPONENT_DETAILS = `${Components.reducerName}_FETCH_COMPONENT_DETAILS`;
   private static fetchComponentDetails(componentsTable: IComponentsTable, payload: { componentId: string }) {
-    const allIds =
-      (componentsTable.byId[payload.componentId]
-        ? componentsTable.allIds
-        : [...componentsTable.allIds, payload.componentId]);
-
     return {
       ...componentsTable,
       ...<IComponentsTable>{
@@ -134,7 +133,7 @@ export class Components {
             isFetchingDetails: true
           }
         },
-        allIds
+        allIds: [...Array.from(new Set([...componentsTable.allIds, payload.componentId]))]
       }
     };
   }
@@ -152,7 +151,8 @@ export class Components {
             ...payload.data,
             isFetchingDetails: false
           }
-        }
+        },
+        allIds: [...Array.from(new Set([...componentsTable.allIds, payload.componentId]))]
       }
     };
   }
@@ -160,6 +160,10 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static FETCH_COMPONENT_DETAILS_ERROR = `${Components.reducerName}_FETCH_COMPONENT_DETAILS_ERROR`;
   private static fetchComponentDetailsError(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    if (!componentsTable.byId[payload.componentId]) {
+      return componentsTable;
+    }
+
     return {
       ...componentsTable,
       ...<IComponentsTable>{
@@ -186,14 +190,11 @@ export class Components {
             ...componentsTable.byId[payload.componentId],
             isUpdatingState: true
           }
-        }
+        },
+        allIds: [...Array.from(new Set([...componentsTable.allIds, payload.componentId]))]
       }
     };
   }
-
-  // only used in effect, no point to handle that action
-  // tslint:disable-next-line:member-ordering
-  public static CHANGE_STATE_WAIT_SSE = `${Components.reducerName}_CHANGE_STATE_WAIT_SSE`;
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_SUCCESS = `${Components.reducerName}_CHANGE_STATE_SUCCESS`;
@@ -208,7 +209,8 @@ export class Components {
             isUpdatingState: false,
             state: payload.newState
           }
-        }
+        },
+        allIds: [...Array.from(new Set([...componentsTable.allIds, payload.componentId]))]
       }
     };
   }
@@ -226,18 +228,23 @@ export class Components {
             isUpdatingState: false
           }
         }
-      }
+      },
+      allIds: [...Array.from(new Set([...componentsTable.allIds, payload.componentId]))]
     };
   }
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_COMPONENT = `${Components.reducerName}_REMOVE_COMPONENT`;
   private static removeComponent(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    if (!componentsTable.byId[payload.componentId]) {
+      return componentsTable;
+    }
+
     return {
       ...componentsTable,
       ...<IComponentsTable>{
         byId: omit(componentsTable.byId, payload.componentId),
-        allIds: componentsTable.allIds.filter(componentId => componentId === payload.componentId)
+        allIds: componentsTable.allIds.filter(componentId => componentId !== payload.componentId)
       }
     };
   }
@@ -245,6 +252,10 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static DEPLOY_SERVICE_UNIT = `${Components.reducerName}_DEPLOY_SERVICE_UNIT`;
   private static deployServiceUnit(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    if (!componentsTable.byId[payload.componentId]) {
+      return componentsTable;
+    }
+
     return {
       ...componentsTable,
       ...<IComponentsTable>{
@@ -262,6 +273,10 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static DEPLOY_SERVICE_UNIT_ERROR = `${Components.reducerName}_DEPLOY_SERVICE_UNIT_ERROR`;
   private static deployServiceUnitError(componentsTable: IComponentsTable, payload: { componentId: string }) {
+    if (!componentsTable.byId[payload.componentId]) {
+      return componentsTable;
+    }
+
     return {
       ...componentsTable,
       ...<IComponentsTable>{
@@ -282,23 +297,34 @@ export class Components {
     componentsTable: IComponentsTable,
     payload: { componentId: string, serviceUnit: { id: string, name: string, state: string } }
   ) {
+    let component = componentsTable.byId[payload.componentId];
+
+    if (!component) {
+      component = <IComponentRow>{ serviceUnits: [] };
+    }
+
     return {
       ...componentsTable,
       ...<IComponentsTable>{
         byId: {
           ...componentsTable.byId,
           [payload.componentId]: <IComponentRow>{
-            ...componentsTable.byId[payload.componentId],
+            ...component,
             isDeployingServiceUnit: false,
-            serviceUnits: [...componentsTable.byId[payload.componentId].serviceUnits, payload.serviceUnit.id]
+            serviceUnits: [...Array.from(new Set([...component.serviceUnits, payload.serviceUnit.id]))]
           }
-        }
+        },
+        allIds: [...Array.from(new Set([...componentsTable.allIds, payload.componentId]))]
       }
     };
   }
 
   private static removeServiceUnit(componentsTable: IComponentsTable, payload: { serviceUnitId: string }) {
     const componentContainingServiceUnit = getComponentOfServiceUnit(componentsTable, payload.serviceUnitId);
+
+    if (!componentContainingServiceUnit) {
+      return componentsTable;
+    }
 
     return {
       ...componentsTable,

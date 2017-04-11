@@ -68,10 +68,7 @@ export class ComponentsEffects {
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, workspaceId]: [{ type: string, payload: { componentId: string, newState: string } }, string]) =>
       this.componentsService.putState(workspaceId, action.payload.componentId, action.payload.newState)
-        .map(_ => ({
-          type: Components.CHANGE_STATE_WAIT_SSE,
-          payload: { componentId: action.payload.componentId }
-        }))
+        .mergeMap(_ => Observable.empty())
         .catch((err) => {
           if (environment.debug) {
             console.group();
