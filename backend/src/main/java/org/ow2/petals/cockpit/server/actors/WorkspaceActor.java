@@ -73,6 +73,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusImport;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChangeState;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentDeployed;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentStateChanged;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUDeployed;
@@ -155,6 +156,8 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 answer((ChangeComponentState) msg, this::handleComponentStateChange);
             } else if (msg instanceof DeployServiceUnit) {
                 answer((DeployServiceUnit) msg, this::handleDeployServiceUnit);
+            } else if (msg instanceof DeployComponent) {
+                answer((DeployComponent) msg, this::handleDeployComponent);
             } else {
                 LOG.warn("Unexpected event for workspace {}: {}", wId, msg);
             }
@@ -636,10 +639,52 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         assert suDbi == 1;
 
         SUDeployed res = new SUDeployed(compId,
-                new ServiceUnitMin(suDb.getId(), deployedSU.getName(), state, deployedSA.getName()));
+                new ServiceUnitMin(suDb.getId(), suDb.getName(), state, suDb.getSaName()));
 
         // we want the event to be sent after we answered
         doInActorLoop(() -> broadcast(WorkspaceEvent.suDeployed(res)));
+
+        return res;
+    }
+
+    private ComponentDeployed handleDeployComponent(DeployComponent comp) throws SuspendExecution {
+        return runBlockingTransaction(conf -> {
+            ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(comp.cId)).fetchOne();
+            assert cont != null;
+
+            // we already are in a blocking thread
+            Component deployedComp = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
+                    petals -> {
+                        petals.newArtifactLifecycleFactory()
+                                .createComponentLifecycle(new Component(comp.name, comp.type.to()))
+                                .deploy(comp.saUrl, true);
+                        // TODO is that correct for the type?
+                        return (Component) petals.newArtifactAdministration().getArtifactInfo(comp.type.to().toString(),
+                                comp.name, null);
+                    });
+            assert deployedComp != null;
+
+            return componentDeployed(deployedComp, comp.cId, conf);
+        });
+    }
+
+    private ComponentDeployed componentDeployed(Component deployedComp, long cId, Configuration conf)
+            throws SuspendExecution {
+
+        ComponentMin.State state = ComponentMin.State.from(deployedComp.getState());
+        ComponentMin.Type type = ComponentMin.Type.from(deployedComp.getType());
+        assert type != null;
+
+        ComponentsRecord compDb = new ComponentsRecord(null, cId, deployedComp.getName(), state.name(), type.name());
+        compDb.attach(conf);
+        int suDbi = compDb.insert();
+        assert suDbi == 1;
+
+        ComponentDeployed res = new ComponentDeployed(cId,
+                new ComponentMin(compDb.getId(), compDb.getName(), state, type));
+
+        // we want the event to be sent after we answered
+        doInActorLoop(() -> broadcast(WorkspaceEvent.componentDeployed(res)));
 
         return res;
     }
@@ -737,6 +782,26 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             this.saName = saName;
             this.saUrl = saUrl;
             this.compId = compId;
+        }
+    }
+
+    public static class DeployComponent extends WorkspaceRequest<ComponentDeployed> {
+
+        private static final long serialVersionUID = 3305750050657001574L;
+
+        final String name;
+
+        final ComponentMin.Type type;
+
+        final URL saUrl;
+
+        final long cId;
+
+        public DeployComponent(String name, ComponentMin.Type type, URL saUrl, long cId) {
+            this.name = name;
+            this.type = type;
+            this.saUrl = saUrl;
+            this.cId = cId;
         }
     }
 

@@ -134,6 +134,7 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
 
         MultiPart mpe = getSUMultiPart();
 
+        // the component exists but it's in another workspace
         Response post = resources.target("/workspaces/2/components/30/serviceunits").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 

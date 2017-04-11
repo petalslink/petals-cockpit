@@ -35,6 +35,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.Record;
@@ -111,12 +112,35 @@ public class ComponentsResource {
         public enum Type {
             BC, SE;
 
+            @Nullable
+            public static Type from(String type) {
+                switch (type.toUpperCase()) {
+                    case "BC":
+                        return BC;
+                    case "SE":
+                        return SE;
+                    default:
+                        return null;
+                }
+            }
+
             public static Type from(Component.ComponentType type) {
                 switch (type) {
                     case BC:
                         return BC;
                     case SE:
                         return SE;
+                    default:
+                        throw new AssertionError();
+                }
+            }
+
+            public Component.ComponentType to() {
+                switch (this) {
+                    case BC:
+                        return Component.ComponentType.BC;
+                    case SE:
+                        return Component.ComponentType.SE;
                     default:
                         throw new AssertionError();
                 }
