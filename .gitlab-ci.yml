@@ -10,7 +10,7 @@ variables:
   YARN_CACHE_DIRECTORY: yarncache
 
 .mvn-java-8: &mvn-java-8
-  image: maven:3.3-jdk-8-alpine
+  image: maven:3.5-jdk-8-alpine
   before_script:
     - source ci/mvn-helpers.sh
   after_script:
@@ -29,7 +29,7 @@ variables:
     - du -hs $PWD/$YARN_CACHE_DIRECTORY || true
     - cd frontend
     - export PATH=`yarn bin`:$PATH
-    - time yarn --frozen-lockfile --link-duplicates
+    - time yarn --frozen-lockfile --link-duplicates --non-interactive
     - du -hs node_modules || true
     - cd ..
   cache:
