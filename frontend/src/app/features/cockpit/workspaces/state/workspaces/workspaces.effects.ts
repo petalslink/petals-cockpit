@@ -146,13 +146,24 @@ export class WorkspacesEffects {
         this.sub.add(this.workspacesService.watchEventWorkspaceDeleted().subscribe());
         this.sub.add(this.componentsService.watchEventSuDeployedOk().subscribe());
 
-        return { type: Workspaces.FETCH_WORKSPACE_WAIT_SSE, payload: action.payload };
+        return { type: Workspaces.FETCH_WORKSPACE_SSE_SUCCESS, payload: action.payload };
+      })
+      .catch(err => {
+        if (environment.debug) {
+          console.group();
+          console.debug(`Error in workspaces.effects : ${Workspaces.FETCH_WORKSPACE}`);
+          console.error(err);
+          console.groupEnd();
+        }
+
+        this.notification.error(`Workspace`, `An error occured while loading the workspace.`);
+        return Observable.empty();
       })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchWorkspaceWaitSse$: Observable<Action> = this.actions$
-    .ofType(Workspaces.FETCH_WORKSPACE_WAIT_SSE)
+  @Effect({ dispatch: true }) fetchWorkspaceSseSuccess$: Observable<Action> = this.actions$
+    .ofType(Workspaces.FETCH_WORKSPACE_SSE_SUCCESS)
     .switchMap((action: Action) => this.sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
       .switchMap((data: any) => {
         return Observable.of(batchActions([
@@ -169,17 +180,7 @@ export class WorkspacesEffects {
           { type: Ui.CLOSE_POPUP_WORKSPACES_LIST }
         ]));
       })
-      .catch(err => {
-        if (environment.debug) {
-          console.group();
-          console.debug(`Error in workspaces.effects : ${Workspaces.FETCH_WORKSPACE_WAIT_SSE}`);
-          console.error(err);
-          console.groupEnd();
-        }
 
-        this.notification.error(`Workspace`, `An error occured while loading the workspace.`);
-        return Observable.empty();
-      })
     );
 
   // tslint:disable-next-line:member-ordering
