@@ -26,7 +26,7 @@ import { Workspaces } from '../workspaces/workspaces.reducer';
 export class Buses {
   private static reducerName = 'BUSES_REDUCER';
 
-  public static reducer(busesTable = busesTableFactory(), { type, payload }: Action) {
+  public static reducer(busesTable = busesTableFactory(), { type, payload }: Action): IBusesTable {
     if (!Buses.mapActionsToMethod[type]) {
       return busesTable;
     }
@@ -36,7 +36,7 @@ export class Buses {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUSES_SUCCESS = `${Buses.reducerName}_FETCH_BUSES_SUCCESS`;
-  private static fetchBusesSuccess(busesTable: IBusesTable, payload) {
+  private static fetchBusesSuccess(busesTable: IBusesTable, payload): IBusesTable {
     let allIds = busesTable.allIds;
 
     payload.allIds.forEach(busId => {
@@ -59,7 +59,7 @@ export class Buses {
 
   // tslint:disable-next-line:member-ordering
   public static FOLD_BUS = `${Buses.reducerName}_FOLD_BUS`;
-  private static foldBus(busesTable: IBusesTable, payload: { busId: string }) {
+  private static foldBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     if (!busesTable.byId[payload.busId] || busesTable.byId[payload.busId].isFolded) {
       return busesTable;
     }
@@ -80,7 +80,7 @@ export class Buses {
 
   // tslint:disable-next-line:member-ordering
   public static UNFOLD_BUS = `${Buses.reducerName}_UNFOLD_BUS`;
-  private static unfoldBus(busesTable: IBusesTable, payload: { busId: string }) {
+  private static unfoldBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     if (!busesTable.byId[payload.busId] || !busesTable.byId[payload.busId].isFolded) {
       return busesTable;
     }
@@ -101,7 +101,7 @@ export class Buses {
 
   // tslint:disable-next-line:member-ordering
   public static TOGGLE_FOLD_BUS = `${Buses.reducerName}_TOGGLE_FOLD_BUS`;
-  private static toggleFoldBus(busesTable: IBusesTable, payload: { busId: string }) {
+  private static toggleFoldBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     const bus = busesTable.byId[payload.busId];
 
     if (!bus) {
@@ -117,7 +117,7 @@ export class Buses {
 
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_BUS = `${Buses.reducerName}_SET_CURRENT_BUS`;
-  private static setCurrentBus(busesTable: IBusesTable, payload: { busId: string }) {
+  private static setCurrentBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     return {
       ...busesTable,
       ...<IBusesTable>{
@@ -128,7 +128,7 @@ export class Buses {
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS = `${Buses.reducerName}_REMOVE_BUS`;
-  private static removeBus(busesTable: IBusesTable, payload: { busId: string }) {
+  private static removeBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     if (busesTable.byId[payload.busId]) {
       return {
         ...busesTable,
@@ -144,7 +144,7 @@ export class Buses {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS = `${Buses.reducerName}_FETCH_BUS_DETAILS`;
-  private static fetchBusDetails(busesTable: IBusesTable, payload: { busId: string }) {
+  private static fetchBusDetails(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     return {
       ...busesTable,
       ...<IBusesTable>{
@@ -162,7 +162,7 @@ export class Buses {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS_SUCCESS = `${Buses.reducerName}_FETCH_BUS_DETAILS_SUCCESS`;
-  private static fetchBusDetailsSuccess(busesTable: IBusesTable, payload: { busId: string, data: any }) {
+  private static fetchBusDetailsSuccess(busesTable: IBusesTable, payload: { busId: string, data: any }): IBusesTable {
     return {
       ...busesTable,
       ...<IBusesTable>{
@@ -181,7 +181,7 @@ export class Buses {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS_ERROR = `${Buses.reducerName}_FETCH_BUS_DETAILS_ERROR`;
-  private static fetchBusDetailsError(busesTable: IBusesTable, payload: { busId: string }) {
+  private static fetchBusDetailsError(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     if (!busesTable.byId[payload.busId]) {
       return busesTable;
     }
@@ -200,14 +200,14 @@ export class Buses {
     };
   }
 
-  private static cleanWorkspace(_busesTable: IBusesTable, _payload) {
+  private static cleanWorkspace(_busesTable: IBusesTable, _payload): IBusesTable {
     return busesTableFactory();
   }
 
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod = {
+  private static mapActionsToMethod: { [type: string]: (t: IBusesTable, p: any) => IBusesTable } = {
     [Buses.FETCH_BUSES_SUCCESS]: Buses.fetchBusesSuccess,
     [Buses.FOLD_BUS]: Buses.foldBus,
     [Buses.UNFOLD_BUS]: Buses.unfoldBus,

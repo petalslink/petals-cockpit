@@ -26,7 +26,7 @@ import { Users } from './../../../../../shared/state/users.reducer';
 export class Workspaces {
   private static reducerName = 'WORKSPACES_REDUCER';
 
-  public static reducer(workspacesTable = workspacesTableFactory(), { type, payload }: Action) {
+  public static reducer(workspacesTable = workspacesTableFactory(), { type, payload }: Action): IWorkspacesTable {
     if (!Workspaces.mapActionsToMethod[type]) {
       return workspacesTable;
     }
@@ -36,7 +36,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES = `${Workspaces.reducerName}_FETCH_WORKSPACES`;
-  private static fetchWorkspaces(workspacesTable: IWorkspacesTable, _payload) {
+  private static fetchWorkspaces(workspacesTable: IWorkspacesTable, _payload): IWorkspacesTable {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -47,7 +47,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES_SUCCESS = `${Workspaces.reducerName}_FETCH_WORKSPACES_SUCCESS`;
-  private static fetchWorkspacesSuccess(workspacesTable: IWorkspacesTable, payload) {
+  private static fetchWorkspacesSuccess(workspacesTable: IWorkspacesTable, payload): IWorkspacesTable {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...payload,
@@ -59,7 +59,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACES_FAILED`;
-  private static fetchWorkspacesFailed(workspacesTable: IWorkspacesTable, _payload) {
+  private static fetchWorkspacesFailed(workspacesTable: IWorkspacesTable, _payload): IWorkspacesTable {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -70,7 +70,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static POST_WORKSPACE = `${Workspaces.reducerName}_POST_WORKSPACE`;
-  private static postWorkspace(workspacesTable: IWorkspacesTable, _payload) {
+  private static postWorkspace(workspacesTable: IWorkspacesTable, _payload): IWorkspacesTable {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -81,7 +81,9 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static POST_WORKSPACE_SUCCESS = `${Workspaces.reducerName}_POST_WORKSPACE_SUCCESS`;
-  private static postWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload: { id: string, name: string, users: string[] }) {
+  private static postWorkspaceSuccess(
+    workspacesTable: IWorkspacesTable,
+    payload: { id: string, name: string, users: string[] }): IWorkspacesTable {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -100,7 +102,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static POST_WORKSPACE_FAILED = `${Workspaces.reducerName}_POST_WORKSPACE_FAILED`;
-  private static postWorkspaceFailed(workspacesTable: IWorkspacesTable, _payload) {
+  private static postWorkspaceFailed(workspacesTable: IWorkspacesTable, _payload): IWorkspacesTable {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -115,7 +117,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE = `${Workspaces.reducerName}_FETCH_WORKSPACE`;
-  private static fetchWorkspace(workspacesTable: IWorkspacesTable, payload) {
+  private static fetchWorkspace(workspacesTable: IWorkspacesTable, payload): IWorkspacesTable {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -132,7 +134,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_SUCCESS = `${Workspaces.reducerName}_FETCH_WORKSPACE_SUCCESS`;
-  private static fetchWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload) {
+  private static fetchWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload): IWorkspacesTable {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -152,7 +154,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static SET_SEARCH = `${Workspaces.reducerName}_SET_SEARCH`;
-  private static setSearch(workspacesTable: IWorkspacesTable, payload) {
+  private static setSearch(workspacesTable: IWorkspacesTable, payload): IWorkspacesTable {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -163,7 +165,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static DELETE_WORKSPACE = `${Workspaces.reducerName}_DELETE_WORKSPACE`;
-  private static deleteWorkspace(workspacesTable: IWorkspacesTable, _payload) {
+  private static deleteWorkspace(workspacesTable: IWorkspacesTable, _payload): IWorkspacesTable {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -174,7 +176,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static DELETE_WORKSPACE_SUCCESS = `${Workspaces.reducerName}_DELETE_WORKSPACE_SUCCESS`;
-  private static deleteWorkspaceSuccess(workspacesTable: IWorkspacesTable, _payload) {
+  private static deleteWorkspaceSuccess(workspacesTable: IWorkspacesTable, _payload): IWorkspacesTable {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -185,7 +187,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static DELETE_WORKSPACE_FAILED = `${Workspaces.reducerName}_DELETE_WORKSPACE_FAILED`;
-  private static deleteWorkspaceFailed(workspacesTable: IWorkspacesTable, _payload) {
+  private static deleteWorkspaceFailed(workspacesTable: IWorkspacesTable, _payload): IWorkspacesTable {
     return <IWorkspacesTable>{
       ...workspacesTable,
       ...<IWorkspacesTable>{
@@ -196,7 +198,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_WORKSPACE = `${Workspaces.reducerName}_REMOVE_WORKSPACE`;
-  private static removeWorkspace(workspacesTable: IWorkspacesTable, payload) {
+  private static removeWorkspace(workspacesTable: IWorkspacesTable, payload): IWorkspacesTable {
     if (workspacesTable.selectedWorkspaceId === payload.workspaceId) {
       return <IWorkspacesTable>{
         ...workspacesTable,
@@ -214,7 +216,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static CLOSE_WORKSPACE = `${Workspaces.reducerName}_CLOSE_WORKSPACE`;
-  private static closeWorkspace(workspacesTable: IWorkspacesTable, payload) {
+  private static closeWorkspace(workspacesTable: IWorkspacesTable, payload): IWorkspacesTable {
     if (workspacesTable.selectedWorkspaceId && payload && payload.delete) {
       return <IWorkspacesTable>{
         ...workspacesTable,
@@ -233,14 +235,14 @@ export class Workspaces {
   }
 
   // tslint:disable-next-line:member-ordering
-  private static disconnectUserSuccess(_workspacesTable: IWorkspacesTable, _payload) {
+  private static disconnectUserSuccess(_workspacesTable: IWorkspacesTable, _payload): IWorkspacesTable {
     return workspacesTableFactory();
   }
 
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod = {
+  private static mapActionsToMethod: { [type: string]: (t: IWorkspacesTable, p: any) => IWorkspacesTable } = {
     // Workspaces
     [Workspaces.FETCH_WORKSPACES]: Workspaces.fetchWorkspaces,
     [Workspaces.FETCH_WORKSPACES_SUCCESS]: Workspaces.fetchWorkspacesSuccess,

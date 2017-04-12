@@ -23,7 +23,7 @@ import { IUsersTable } from '../interfaces/users.interface';
 export class Users {
   private static reducerName = 'USERS_REDUCER';
 
-  public static reducer(users = usersState(), {type, payload}: Action) {
+  public static reducer(users = usersState(), { type, payload }: Action): IUsersTable {
     if (!Users.mapActionsToMethod[type]) {
       return users;
     }
@@ -33,7 +33,7 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_USERS_SUCCESS = `${Users.reducerName}_FETCH_USERS_SUCCESS`;
-  private static fetchUsersSuccess(users: IUsersTable, payload) {
+  private static fetchUsersSuccess(users: IUsersTable, payload): IUsersTable {
     return {
       ...users,
       byId: {
@@ -46,7 +46,7 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static CONNECT_USER = `${Users.reducerName}_CONNECT_USER`;
-  private static connectUser(users: IUsersTable, _payload) {
+  private static connectUser(users: IUsersTable, _payload): IUsersTable {
     return {
       ...users,
       ...<IUsersTable>{ isConnecting: true }
@@ -55,7 +55,7 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static CONNECT_USER_SUCCESS = `${Users.reducerName}_CONNECT_USER_SUCCESS`;
-  private static connectUserSuccess(users: IUsersTable, payload) {
+  private static connectUserSuccess(users: IUsersTable, payload): IUsersTable {
     const id = payload.user.id;
 
     return {
@@ -81,7 +81,7 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static CONNECT_USER_FAILED = `${Users.reducerName}_CONNECT_USER_FAILED`;
-  private static connectUserFailed(users: IUsersTable, _payload) {
+  private static connectUserFailed(users: IUsersTable, _payload): IUsersTable {
     return {
       ...users,
       ...<IUsersTable>{
@@ -95,7 +95,7 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static DISCONNECT_USER = `${Users.reducerName}_DISCONNECT_USER`;
-  private static disconnectUser(users: IUsersTable, _payload) {
+  private static disconnectUser(users: IUsersTable, _payload): IUsersTable {
     return {
       ...users,
       ...<IUsersTable>{ isDisconnecting: true }
@@ -104,7 +104,7 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static DISCONNECT_USER_SUCCESS = `${Users.reducerName}_DISCONNECT_USER_SUCCESS`;
-  private static disconnectUserSuccess(users: IUsersTable, _payload) {
+  private static disconnectUserSuccess(users: IUsersTable, _payload): IUsersTable {
     return {
       ...users,
       ...usersState(),
@@ -118,7 +118,7 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static DISCONNECT_USER_FAILED = `${Users.reducerName}_DISCONNECT_USER_FAILED`;
-  private static disconnectUserFailed(users: IUsersTable, _payload) {
+  private static disconnectUserFailed(users: IUsersTable, _payload): IUsersTable {
     return {
       ...users,
       ...<IUsersTable>{
@@ -130,7 +130,7 @@ export class Users {
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod = {
+  private static mapActionsToMethod: { [type: string]: (t: IUsersTable, p: any) => IUsersTable } = {
     [Users.FETCH_USERS_SUCCESS]: Users.fetchUsersSuccess,
     [Users.CONNECT_USER]: Users.connectUser,
     [Users.CONNECT_USER_SUCCESS]: Users.connectUserSuccess,

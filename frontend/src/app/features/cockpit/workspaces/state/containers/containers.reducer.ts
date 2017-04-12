@@ -27,7 +27,7 @@ import { Components } from '../components/components.reducer';
 export class Containers {
   private static reducerName = 'CONTAINERS_REDUCER';
 
-  public static reducer(containersTable = containersTableFactory(), { type, payload }: Action) {
+  public static reducer(containersTable = containersTableFactory(), { type, payload }: Action): IContainersTable {
     if (!Containers.mapActionsToMethod[type]) {
       return containersTable;
     }
@@ -37,7 +37,7 @@ export class Containers {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINERS_SUCCESS = `${Containers.reducerName}_FETCH_CONTAINERS_SUCCESS`;
-  private static fetchContainersSuccess(containersTable: IContainersTable, payload) {
+  private static fetchContainersSuccess(containersTable: IContainersTable, payload): IContainersTable {
     const byId = payload.allIds.reduce((acc, containerId) => {
       return {
         ...acc,
@@ -64,7 +64,7 @@ export class Containers {
 
   // tslint:disable-next-line:member-ordering
   public static FOLD_CONTAINER = `${Containers.reducerName}_FOLD_CONTAINER`;
-  private static foldContainers(containersTable: IContainersTable, payload: { containerId: string }) {
+  private static foldContainers(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     if (!containersTable.byId[payload.containerId] || containersTable.byId[payload.containerId].isFolded) {
       return containersTable;
     }
@@ -85,7 +85,7 @@ export class Containers {
 
   // tslint:disable-next-line:member-ordering
   public static UNFOLD_CONTAINER = `${Containers.reducerName}_UNFOLD_CONTAINER`;
-  private static unfoldContainer(containersTable: IContainersTable, payload: { containerId: string }) {
+  private static unfoldContainer(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     if (!containersTable.byId[payload.containerId] || !containersTable.byId[payload.containerId].isFolded) {
       return containersTable;
     }
@@ -106,7 +106,7 @@ export class Containers {
 
   // tslint:disable-next-line:member-ordering
   public static TOGGLE_FOLD_CONTAINER = `${Containers.reducerName}_TOGGLE_FOLD_CONTAINER`;
-  private static toggleFoldContainer(containersTable: IContainersTable, payload: { containerId: string }) {
+  private static toggleFoldContainer(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     const container = containersTable.byId[payload.containerId];
 
     if (!container) {
@@ -122,7 +122,7 @@ export class Containers {
 
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_CONTAINER = `${Containers.reducerName}_SET_CURRENT_CONTAINER`;
-  private static setCurrentContainer(containersTable: IContainersTable, payload: { containerId: string }) {
+  private static setCurrentContainer(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     return {
       ...containersTable,
       ...<IContainersTable>{
@@ -133,7 +133,7 @@ export class Containers {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINER_DETAILS = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS`;
-  private static fetchContainerDetails(containersTable: IContainersTable, payload: { containerId: string }) {
+  private static fetchContainerDetails(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     return {
       ...containersTable,
       ...<IContainersTable>{
@@ -151,7 +151,10 @@ export class Containers {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINER_DETAILS_SUCCESS = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS_SUCCESS`;
-  private static fetchContainerDetailsSuccess(containersTable: IContainersTable, payload: { containerId: string, data: any }) {
+  private static fetchContainerDetailsSuccess(
+    containersTable: IContainersTable,
+    payload: { containerId: string, data: any }
+  ): IContainersTable {
     return {
       ...containersTable,
       ...<IContainersTable>{
@@ -170,7 +173,7 @@ export class Containers {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINER_DETAILS_ERROR = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS_ERROR`;
-  private static fetchContainerDetailsError(containersTable: IContainersTable, payload: { containerId: string }) {
+  private static fetchContainerDetailsError(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     if (!containersTable.byId[payload.containerId]) {
       return containersTable;
     }
@@ -190,7 +193,7 @@ export class Containers {
   }
 
   // tslint:disable-next-line:member-ordering
-  private static removeComponent(containersTable: IContainersTable, payload: { componentId: string }) {
+  private static removeComponent(containersTable: IContainersTable, payload: { componentId: string }): IContainersTable {
     const containerContainingComponent = getContainerOfComponent(containersTable, payload.componentId);
     if (!containerContainingComponent) {
       return containersTable;
@@ -213,14 +216,14 @@ export class Containers {
     };
   }
 
-  private static cleanWorkspace(_containersTable: IContainersTable, _payload) {
+  private static cleanWorkspace(_containersTable: IContainersTable, _payload): IContainersTable {
     return containersTableFactory();
   }
 
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod = {
+  private static mapActionsToMethod: { [type: string]: (t: IContainersTable, p: any) => IContainersTable } = {
     [Containers.FETCH_CONTAINERS_SUCCESS]: Containers.fetchContainersSuccess,
     [Containers.FOLD_CONTAINER]: Containers.foldContainers,
     [Containers.UNFOLD_CONTAINER]: Containers.unfoldContainer,
