@@ -37,27 +37,23 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUSES_IN_PROGRESS = `${BusesInProgress.reducerName}_FETCH_BUSES_IN_PROGRESS`;
   private static fetchBusesInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
-    let allIds = busesInProgressTable.allIds;
-
-    payload.allIds.forEach(busId => {
-      if (!busesInProgressTable.byId[busId]) {
-        allIds = [...allIds, busId];
-      }
-    });
-
     return <IBusesInProgressTable>{
       ...busesInProgressTable,
       byId: {
         ...busesInProgressTable.byId,
         ...payload.byId
       },
-      allIds
+      allIds: [...Array.from(new Set([...busesInProgressTable.allIds, ...payload.allIds]))]
     };
   }
 
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_SET_CURRENT_BUS_IN_PROGRESS`;
   private static setCurrentBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { busInProgressId: string } ) {
+    if (busesInProgressTable.selectedBusInProgressId === payload.busInProgressId) {
+      return busesInProgressTable;
+    }
+
     return <IBusesInProgressTable>{
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
@@ -83,6 +79,7 @@ export class BusesInProgress {
   }
 
   // once the http request is done
+  // the bus itself will be added from buses reducer
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS_SUCCESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS_SUCCESS`;
   private static postBusInProgressSuccess(busesInProgressTable: IBusesInProgressTable, payload) {
@@ -116,6 +113,10 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   public static DELETE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_DELETE_BUS_IN_PROGRESS`;
   private static deleteBusInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
+    if (!busesInProgressTable.byId[payload.id]) {
+      return busesInProgressTable;
+    }
+
     return <IBusesInProgressTable>{
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
@@ -130,13 +131,13 @@ export class BusesInProgress {
     };
   }
 
-  // once the http request is done, no particular modification of the store, since it will be deleted
-  // tslint:disable-next-line:member-ordering
-  public static DELETE_BUS_IN_PROGRESS_SUCCESS = `${BusesInProgress.reducerName}_DELETE_BUS_IN_PROGRESS_SUCCESS`;
-
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_REMOVE_BUS_IN_PROGRESS`;
   private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: string) {
+    if (!busesInProgressTable.byId[payload]) {
+      return busesInProgressTable;
+    }
+
     return <IBusesInProgressTable>{
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
@@ -149,6 +150,10 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   public static UPDATE_ERROR_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_UPDATE_ERROR_BUS_IN_PROGRESS`;
   private static updateErrorBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { id: string, importError: string }) {
+    if (!busesInProgressTable.byId[payload.id]) {
+      return busesInProgressTable;
+    }
+
     return <IBusesInProgressTable>{
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{

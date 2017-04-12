@@ -59,16 +59,9 @@ export class BusesInProgressEffects {
     .ofType(BusesInProgress.DELETE_BUS_IN_PROGRESS)
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, idWorkspace]) =>
-      this.busesService.deleteBus(idWorkspace, action.payload.id)
-        .map(_ => {
-          return {
-            type: BusesInProgress.DELETE_BUS_IN_PROGRESS_SUCCESS,
-            payload: {
-              idWorkspace,
-              busInProgress: action.payload
-            }
-          };
-        })
+      this.busesService
+        .deleteBus(idWorkspace, action.payload.id)
+        .mergeMap(_ => Observable.empty())
     // TODO catch error?
     );
 }

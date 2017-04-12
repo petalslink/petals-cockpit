@@ -65,6 +65,10 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static FOLD_CONTAINER = `${Containers.reducerName}_FOLD_CONTAINER`;
   private static foldContainers(containersTable: IContainersTable, payload: { containerId: string }) {
+    if (!containersTable.byId[payload.containerId] || containersTable.byId[payload.containerId].isFolded) {
+      return containersTable;
+    }
+
     return <IContainersTable>{
       ...containersTable,
       ...<IContainersTable>{
@@ -82,6 +86,10 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static UNFOLD_CONTAINER = `${Containers.reducerName}_UNFOLD_CONTAINER`;
   private static unfoldContainer(containersTable: IContainersTable, payload: { containerId: string }) {
+    if (!containersTable.byId[payload.containerId] || !containersTable.byId[payload.containerId].isFolded) {
+      return containersTable;
+    }
+
     return <IContainersTable>{
       ...containersTable,
       ...<IContainersTable>{
@@ -100,6 +108,10 @@ export class Containers {
   public static TOGGLE_FOLD_CONTAINER = `${Containers.reducerName}_TOGGLE_FOLD_CONTAINER`;
   private static toggleFoldContainer(containersTable: IContainersTable, payload: { containerId: string }) {
     const container = containersTable.byId[payload.containerId];
+
+    if (!container) {
+      return containersTable;
+    }
 
     if (container.isFolded) {
       return Containers.unfoldContainer(containersTable, payload);
@@ -122,11 +134,6 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINER_DETAILS = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS`;
   private static fetchContainerDetails(containersTable: IContainersTable, payload: { containerId: string }) {
-    const allIds =
-      (containersTable.byId[payload.containerId]
-        ? containersTable.allIds
-        : [...containersTable.allIds, payload.containerId]);
-
     return {
       ...containersTable,
       ...<IContainersTable>{
@@ -137,7 +144,7 @@ export class Containers {
             isFetchingDetails: true
           }
         },
-        allIds
+        allIds: [...Array.from(new Set([...containersTable.allIds, payload.containerId]))]
       }
     };
   }
@@ -155,7 +162,8 @@ export class Containers {
             ...payload.data,
             isFetchingDetails: false
           }
-        }
+        },
+        allIds: [...Array.from(new Set([...containersTable.allIds, payload.containerId]))]
       }
     };
   }
@@ -163,6 +171,10 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINER_DETAILS_ERROR = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS_ERROR`;
   private static fetchContainerDetailsError(containersTable: IContainersTable, payload: { containerId: string }) {
+    if (!containersTable.byId[payload.containerId]) {
+      return containersTable;
+    }
+
     return {
       ...containersTable,
       ...<IContainersTable>{
@@ -180,6 +192,9 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   private static removeComponent(containersTable: IContainersTable, payload: { componentId: string }) {
     const containerContainingComponent = getContainerOfComponent(containersTable, payload.componentId);
+    if (!containerContainingComponent) {
+      return containersTable;
+    }
 
     return {
       ...containersTable,

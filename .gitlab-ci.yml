@@ -82,8 +82,7 @@ build-frontend:
     - cd frontend
     - time ng lint
     - time node generate-headers.js --dry
-    # this takes 2mn, so let's not run it until we have some tests
-    #- time ng test --progress=false --single-run --code-coverage
+    - time ng test --progress=false --single-run --code-coverage
     - time ../ci/xrun.sh ../ci/wmrun.sh ng e2e --prod --progress=false -e=prod-e2e
     # build the final frontend for the product
     - time yarn run prod-silent && mv dist ../frontend-dist

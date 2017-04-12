@@ -171,7 +171,7 @@ export class WorkspacesEffects {
         }
 
         this.notification.error(`Workspace`, `An error occured while loading the workspace.`);
-        return Observable.of({ type: Workspaces.FETCH_WORKSPACE_FAILED, payload: action.payload });
+        return Observable.empty();
       })
     );
 

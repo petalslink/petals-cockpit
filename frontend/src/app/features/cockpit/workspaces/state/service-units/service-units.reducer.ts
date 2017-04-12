@@ -36,14 +36,6 @@ export class ServiceUnits {
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNITS_SUCCESS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNITS_SUCCESS`;
   private static fetchServiceUnitsSuccess(serviceUnitsTable: IServiceUnitsTable, payload) {
-    let allIds = serviceUnitsTable.allIds;
-
-    payload.allIds.forEach(busId => {
-      if (!serviceUnitsTable.byId[busId]) {
-        allIds = [...allIds, busId];
-      }
-    });
-
     return <IServiceUnitsTable>{
       ...serviceUnitsTable,
       ...<IServiceUnitsTable>{
@@ -51,7 +43,7 @@ export class ServiceUnits {
           ...serviceUnitsTable.byId,
           ...payload.byId
         },
-        allIds
+        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, ...payload.allIds]))]
       }
     };
   }
@@ -70,10 +62,6 @@ export class ServiceUnits {
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS`;
   private static fetchServiceUnitDetails(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
-    const allIds = serviceUnitsTable.byId[payload.serviceUnitId]
-      ? serviceUnitsTable.allIds
-      : [...serviceUnitsTable.allIds, payload.serviceUnitId];
-
     return {
       ...serviceUnitsTable,
       ...<IServiceUnitsTable>{
@@ -84,7 +72,7 @@ export class ServiceUnits {
             isFetchingDetails: true
           }
         },
-        allIds
+        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, payload.serviceUnitId]))]
       }
     };
   }
@@ -102,7 +90,8 @@ export class ServiceUnits {
             ...payload.data,
             isFetchingDetails: false
           }
-        }
+        },
+        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, payload.serviceUnitId]))]
       }
     };
   }
@@ -110,6 +99,10 @@ export class ServiceUnits {
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS_ERROR = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS_ERROR`;
   private static fetchServiceUnitDetailsError(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
+    if (!serviceUnitsTable.byId[payload.serviceUnitId]) {
+      return serviceUnitsTable;
+    }
+
     return {
       ...serviceUnitsTable,
       ...<IServiceUnitsTable>{
@@ -136,14 +129,11 @@ export class ServiceUnits {
             ...serviceUnitsTable.byId[payload.serviceUnitId],
             isUpdatingState: true
           }
-        }
+        },
+        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, payload.serviceUnitId]))]
       }
     };
   }
-
-  // only used in effect, no point to handle that action
-  // tslint:disable-next-line:member-ordering
-  public static CHANGE_STATE_WAIT_SSE = `${ServiceUnits.reducerName}_CHANGE_STATE_WAIT_SSE`;
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_SUCCESS = `${ServiceUnits.reducerName}_CHANGE_STATE_SUCCESS`;
@@ -158,7 +148,8 @@ export class ServiceUnits {
             isUpdatingState: false,
             state: payload.newState
           }
-        }
+        },
+        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, payload.serviceUnitId]))]
       }
     };
   }
@@ -175,7 +166,8 @@ export class ServiceUnits {
             ...serviceUnitsTable.byId[payload.serviceUnitId],
             isUpdatingState: false
           }
-        }
+        },
+        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, payload.serviceUnitId]))]
       }
     };
   }
@@ -183,6 +175,10 @@ export class ServiceUnits {
   // tslint:disable-next-line:member-ordering
   public static REMOVE_SERVICE_UNIT = `${ServiceUnits.reducerName}_REMOVE_SERVICE_UNIT`;
   private static removeServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
+    if (!serviceUnitsTable.byId[payload.serviceUnitId]) {
+      return serviceUnitsTable;
+    }
+
     return <IServiceUnitsTable>{
       ...serviceUnitsTable,
       ...<IServiceUnitsTable>{
@@ -205,7 +201,7 @@ export class ServiceUnits {
           ...serviceUnitsTable.byId,
           [payload.serviceUnit.id]: serviceUnitCp
         },
-        allIds: [...serviceUnitsTable.allIds, payload.serviceUnit.id]
+        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, payload.serviceUnit.id]))]
       }
     };
   }
@@ -230,6 +226,7 @@ export class ServiceUnits {
     // TODO : When using Components.DEPLOY_SERVICE_UNIT_SUCCESS, there's an error at runtime
     // [Components.DEPLOY_SERVICE_UNIT_SUCCESS]: ServiceUnits.deployServiceUnitSuccess,
     // issue opened here: https://github.com/angular/angular-cli/issues/5736
+    // once solved, update the tests !
     ['COMPONENTS_REDUCER_DEPLOY_SERVICE_UNIT_SUCCESS']: ServiceUnits.deployServiceUnitSuccess,
 
     [Workspaces.CLEAN_WORKSPACE]: ServiceUnits.cleanWorkspace

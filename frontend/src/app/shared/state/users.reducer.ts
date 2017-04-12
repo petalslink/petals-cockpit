@@ -40,7 +40,7 @@ export class Users {
         ...users.byId,
         ...payload.byId
       },
-      allIds: [...Array.of(new Set([...users.allIds, ...payload.allIds]))]
+      allIds: [...Array.from(new Set([...users.allIds, ...payload.allIds]))]
     };
   }
 
@@ -57,6 +57,7 @@ export class Users {
   public static CONNECT_USER_SUCCESS = `${Users.reducerName}_CONNECT_USER_SUCCESS`;
   private static connectUserSuccess(users: IUsersTable, payload) {
     const id = payload.user.id;
+
     return {
       ...users,
       ...{
@@ -64,6 +65,7 @@ export class Users {
         isConnected: true,
         connectionFailed: false,
         connectedUserId: id,
+        isDisconnecting: false,
 
         byId: {
           ...users.byId,
@@ -72,7 +74,7 @@ export class Users {
             ...payload.user
           }
         },
-        allIds: [...Array.of(new Set([...users.allIds, id]))]
+        allIds: [...Array.from(new Set([...users.allIds, id]))]
       }
     };
   }
@@ -84,7 +86,9 @@ export class Users {
       ...users,
       ...<IUsersTable>{
         isConnecting: false,
-        connectionFailed: true
+        connectionFailed: true,
+        isConnected: false,
+        connectedUserId: ''
       }
     };
   }

@@ -26,7 +26,7 @@ import { Workspaces } from '../workspaces/workspaces.reducer';
 export class Buses {
   private static reducerName = 'BUSES_REDUCER';
 
-  public static reducer(busesTable = busesTableFactory(), {type, payload}: Action) {
+  public static reducer(busesTable = busesTableFactory(), { type, payload }: Action) {
     if (!Buses.mapActionsToMethod[type]) {
       return busesTable;
     }
@@ -60,6 +60,10 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static FOLD_BUS = `${Buses.reducerName}_FOLD_BUS`;
   private static foldBus(busesTable: IBusesTable, payload: { busId: string }) {
+    if (!busesTable.byId[payload.busId] || busesTable.byId[payload.busId].isFolded) {
+      return busesTable;
+    }
+
     return <IBusesTable>{
       ...busesTable,
       ...<IBusesTable>{
@@ -77,6 +81,10 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static UNFOLD_BUS = `${Buses.reducerName}_UNFOLD_BUS`;
   private static unfoldBus(busesTable: IBusesTable, payload: { busId: string }) {
+    if (!busesTable.byId[payload.busId] || !busesTable.byId[payload.busId].isFolded) {
+      return busesTable;
+    }
+
     return <IBusesTable>{
       ...busesTable,
       ...<IBusesTable>{
@@ -95,6 +103,10 @@ export class Buses {
   public static TOGGLE_FOLD_BUS = `${Buses.reducerName}_TOGGLE_FOLD_BUS`;
   private static toggleFoldBus(busesTable: IBusesTable, payload: { busId: string }) {
     const bus = busesTable.byId[payload.busId];
+
+    if (!bus) {
+      return busesTable;
+    }
 
     if (bus.isFolded) {
       return Buses.unfoldBus(busesTable, payload);
@@ -133,8 +145,6 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS = `${Buses.reducerName}_FETCH_BUS_DETAILS`;
   private static fetchBusDetails(busesTable: IBusesTable, payload: { busId: string }) {
-    const allIds = (busesTable.byId[payload.busId] ? busesTable.allIds : [...busesTable.allIds, payload.busId]);
-
     return {
       ...busesTable,
       ...<IBusesTable>{
@@ -145,7 +155,7 @@ export class Buses {
             isFetchingDetails: true
           }
         },
-        allIds
+        allIds: [...Array.from(new Set([...busesTable.allIds, payload.busId]))]
       }
     };
   }
@@ -163,7 +173,8 @@ export class Buses {
             ...payload.data,
             isFetchingDetails: false
           }
-        }
+        },
+        allIds: [...Array.from(new Set([...busesTable.allIds, payload.busId]))]
       }
     };
   }
@@ -171,6 +182,10 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS_ERROR = `${Buses.reducerName}_FETCH_BUS_DETAILS_ERROR`;
   private static fetchBusDetailsError(busesTable: IBusesTable, payload: { busId: string }) {
+    if (!busesTable.byId[payload.busId]) {
+      return busesTable;
+    }
+
     return {
       ...busesTable,
       ...<IBusesTable>{
