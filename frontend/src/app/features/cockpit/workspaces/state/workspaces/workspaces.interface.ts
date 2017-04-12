@@ -35,11 +35,11 @@ export interface IWorkspacesCommon {
 
 export interface IWorkspacesTableOnly {
   byId: { [key: string]: IWorkspaceRow };
-  allIds: Array<string>;
+  allIds: string[];
 }
 
 export interface IWorkspacesTable extends IWorkspacesCommon, IWorkspacesTableOnly { }
 
 export interface IWorkspaces extends IWorkspacesCommon {
-  list: Array<IWorkspace>;
+  list: IWorkspace[];
 }

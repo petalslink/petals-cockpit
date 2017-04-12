@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { omit } from 'underscore';
+
 // generate a UUID
 export function generateUuidV4(a = null) {
   /* tslint:disable */
@@ -23,19 +25,105 @@ export function generateUuidV4(a = null) {
   /* tslint:enable */
 }
 
-export function toJavascriptMap(map: any) {
-  const allIds = Object.keys(map);
+// TODO replace all that with immutable maps!
+export interface JsMap<I> {
+  readonly byId: { readonly [id: string]: I };
+  readonly allIds: string[];
+}
 
-  const byId = {};
+export function emptyJavascriptMap<I>(): JsMap<I> {
+  return {
+    byId: {},
+    allIds: []
+  };
+}
+
+export function toJavascriptMap<I>(obj: object): JsMap<I> {
+  const allIds = Object.keys(obj);
+
+  const byId: { [id: string]: I } = {};
 
   allIds.forEach(id => {
-    byId[id] = {
-      ...map[id],
-      id
-    };
+    byId[id] = Object.assign({}, obj[id], { id });
   });
 
   return { byId, allIds };
+}
+
+/**
+ * This merges the fields of toMerge into map, all the elements of toMerge.byId
+ * into map.byId elements and toMerge.allIds into map.allIds.
+ */
+export function mergeInto<I, M1 extends JsMap<I>, M2 extends JsMap<I>>(map: M1, toMerge: M2): M1 & M2 {
+  return Object.assign({},
+    map,
+    toMerge,
+    {
+      // TODO should we update allIds in this case?!
+      allIds: [...Array.from(new Set([...map.allIds, ...toMerge.allIds]))],
+      byId: toMerge.allIds.reduce((acc, id) => ({
+        ...acc,
+        [id]: Object.assign<object, I, I>({}, acc[id], toMerge.byId[id])
+      }), map.byId)
+    });
+}
+
+/**
+ * This put all the elements of toMerge.byId in map.byId (overwriting the previous one).
+ */
+export function putAll<I, M extends JsMap<I>>(map: M, toMerge: JsMap<I>): M {
+  return Object.assign({},
+    map,
+    {
+      allIds: [...Array.from(new Set([...map.allIds, ...toMerge.allIds]))],
+      byId: toMerge.allIds.reduce((acc, id) => ({
+        ...acc,
+        [id]: Object.assign<object, I>({}, toMerge.byId[id])
+      }), map.byId)
+    });
+}
+
+/**
+ * This merge value into map.byId[id] and if needed adds id to map.allIds.
+ */
+export function updateById<I, M extends JsMap<I>>(map: M, id: string, value: object): M {
+  return Object.assign({},
+    map,
+    {
+      // TODO should we update allIds in this case?!
+      allIds: map.byId[id] ? map.allIds : [...map.allIds, id],
+      byId: {
+        ...map.byId,
+        [id]: Object.assign({}, map.byId[id], value)
+      }
+    });
+}
+
+/**
+ * This put value in map.byId[id] (overwriting the previous value) and if needed adds id to allIds.
+ */
+export function putById<I, M extends JsMap<I>>(map: M, id: string, value: I): M {
+  return Object.assign({},
+    map,
+    {
+      allIds: map.byId[id] ? map.allIds : [...map.allIds, id],
+      byId: {
+        ...map.byId,
+        [id]: Object.assign({}, value)
+      }
+    });
+}
+
+/**
+ * This remove map.byId[id] (and from allIds)
+ */
+export function removeById<I, M extends JsMap<I>>(map: M, id: string): M {
+  return Object.assign({},
+    map,
+    {
+      byId: omit(map.byId, id),
+      allIds: map.allIds.filter(i => i !== id)
+    });
 }
 
 const matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
@@ -51,7 +139,7 @@ export function escapeStringRegexp(str) {
 /**
  * useful to force type inference to take an array as a tuple!
  */
-export function tuple<T extends [void]|{}>(t: T): T {
+export function tuple<T extends [void] | {}>(t: T): T {
   return t;
 }
 
@@ -59,7 +147,7 @@ export function arrayEquals<T extends [void]>(ps: T, ns: T): boolean {
   return ps.every((p, i) => p === ns[i]);
 }
 
-export function isNot(e: any): (any) => boolean {
+export function isNot(e: object): (object) => boolean {
   return (e2) => e !== e2;
 }
 

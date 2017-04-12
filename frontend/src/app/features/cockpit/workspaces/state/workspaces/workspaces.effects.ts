@@ -41,6 +41,13 @@ import { ServiceUnitsService } from '../../../../../shared/services/service-unit
 import { ComponentsService } from '../../../../../shared/services/components.service';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { IStore } from 'app/shared/interfaces/store.interface';
+import { IWorkspaceRow } from 'app/features/cockpit/workspaces/state/workspaces/workspace.interface';
+import { IUserRow } from 'app/shared/interfaces/user.interface';
+import { IBusInProgressRow } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
+import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
+import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 
 @Injectable()
 export class WorkspacesEffects {
@@ -63,8 +70,8 @@ export class WorkspacesEffects {
       .switchMap((res: Response) => {
         const data = res.json();
         return Observable.of(batchActions([
-          { type: Workspaces.FETCH_WORKSPACES_SUCCESS, payload: toJavascriptMap(data.workspaces) },
-          { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap(data.users) }
+          { type: Workspaces.FETCH_WORKSPACES_SUCCESS, payload: toJavascriptMap<IWorkspaceRow>(data.workspaces) },
+          { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap<IUserRow>(data.users) }
         ]));
       })
       .catch(err => {
@@ -151,12 +158,12 @@ export class WorkspacesEffects {
         return Observable.of(batchActions([
           { type: Workspaces.CLEAN_WORKSPACE },
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
-          { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap(data.users) },
-          { type: BusesInProgress.FETCH_BUSES_IN_PROGRESS, payload: toJavascriptMap(data.busesInProgress) },
-          { type: Buses.FETCH_BUSES_SUCCESS, payload: toJavascriptMap(data.buses) },
-          { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap(data.containers) },
-          { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap(data.components) },
-          { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap(data.serviceUnits) },
+          { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap<IUserRow>(data.users) },
+          { type: BusesInProgress.FETCH_BUSES_IN_PROGRESS, payload: toJavascriptMap<IBusInProgressRow>(data.busesInProgress) },
+          { type: Buses.FETCH_BUSES_SUCCESS, payload: toJavascriptMap<IBusRow>(data.buses) },
+          { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap<IContainerRow>(data.containers) },
+          { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap<IComponentRow>(data.components) },
+          { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitRow>(data.serviceUnits) },
 
           { type: Ui.OPEN_SIDENAV },
           { type: Ui.CLOSE_POPUP_WORKSPACES_LIST }

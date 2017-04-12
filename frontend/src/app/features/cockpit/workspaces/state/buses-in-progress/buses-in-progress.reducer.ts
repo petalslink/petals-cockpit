@@ -16,17 +16,16 @@
  */
 
 import { Action } from '@ngrx/store';
-import { omit } from 'underscore';
 
 import { busesInProgressTableFactory } from './buses-in-progress.initial-state';
 import { IBusesInProgressTable } from './buses-in-progress.interface';
-import { IBusInProgressRow } from './bus-in-progress.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
+import { putAll, updateById, removeById } from 'app/shared/helpers/shared.helper';
 
 export class BusesInProgress {
   private static reducerName = 'BUSES_IN_PROGRESS_REDUCER';
 
-  public static reducer(busesInProgressTable = busesInProgressTableFactory(), { type, payload }: Action) {
+  public static reducer(busesInProgressTable = busesInProgressTableFactory(), { type, payload }: Action): IBusesInProgressTable {
     if (!BusesInProgress.mapActionsToMethod[type]) {
       return busesInProgressTable;
     }
@@ -36,25 +35,21 @@ export class BusesInProgress {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUSES_IN_PROGRESS = `${BusesInProgress.reducerName}_FETCH_BUSES_IN_PROGRESS`;
-  private static fetchBusesInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
-    return <IBusesInProgressTable>{
-      ...busesInProgressTable,
-      byId: {
-        ...busesInProgressTable.byId,
-        ...payload.byId
-      },
-      allIds: [...Array.from(new Set([...busesInProgressTable.allIds, ...payload.allIds]))]
-    };
+  private static fetchBusesInProgress(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
+    return putAll(busesInProgressTable, payload);
   }
 
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_SET_CURRENT_BUS_IN_PROGRESS`;
-  private static setCurrentBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { busInProgressId: string } ) {
+  private static setCurrentBusInProgress(
+    busesInProgressTable: IBusesInProgressTable,
+    payload: { busInProgressId: string }
+  ): IBusesInProgressTable {
     if (busesInProgressTable.selectedBusInProgressId === payload.busInProgressId) {
       return busesInProgressTable;
     }
 
-    return <IBusesInProgressTable>{
+    return {
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
         selectedBusInProgressId: payload.busInProgressId,
@@ -67,8 +62,8 @@ export class BusesInProgress {
 
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS`;
-  private static postBusInProgress(busesInProgressTable: IBusesInProgressTable, _payload) {
-    return <IBusesInProgressTable>{
+  private static postBusInProgress(busesInProgressTable: IBusesInProgressTable, _payload): IBusesInProgressTable {
+    return {
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
         isImportingBus: true,
@@ -82,8 +77,8 @@ export class BusesInProgress {
   // the bus itself will be added from buses reducer
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS_SUCCESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS_SUCCESS`;
-  private static postBusInProgressSuccess(busesInProgressTable: IBusesInProgressTable, payload) {
-    return <IBusesInProgressTable>{
+  private static postBusInProgressSuccess(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
+    return {
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
         importBusId: payload.id
@@ -94,10 +89,10 @@ export class BusesInProgress {
   // once the http request is done but failed
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS_ERROR = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS_ERROR`;
-  private static postBusInProgressError(busesInProgressTable: IBusesInProgressTable, payload) {
+  private static postBusInProgressError(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
     // if it's false, it means we changed bus (with SET_CURRENT_BUS_IN_PROGRESS)
     if (busesInProgressTable.isImportingBus) {
-      return <IBusesInProgressTable>{
+      return {
         ...busesInProgressTable,
         ...<IBusesInProgressTable>{
           isImportingBus: false,
@@ -112,70 +107,45 @@ export class BusesInProgress {
 
   // tslint:disable-next-line:member-ordering
   public static DELETE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_DELETE_BUS_IN_PROGRESS`;
-  private static deleteBusInProgress(busesInProgressTable: IBusesInProgressTable, payload) {
+  private static deleteBusInProgress(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
     if (!busesInProgressTable.byId[payload.id]) {
       return busesInProgressTable;
     }
 
-    return <IBusesInProgressTable>{
-      ...busesInProgressTable,
-      ...<IBusesInProgressTable>{
-        byId: {
-          ...busesInProgressTable.byId,
-          [payload.id]: <IBusInProgressRow>{
-            ...busesInProgressTable.byId[payload.id],
-            ...<IBusInProgressRow>{ isRemoving: true }
-          }
-        }
-      }
-    };
+    return updateById(busesInProgressTable, payload.id, { isRemoving: true });
   }
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_REMOVE_BUS_IN_PROGRESS`;
-  private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: string) {
+  private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: string): IBusesInProgressTable {
     if (!busesInProgressTable.byId[payload]) {
       return busesInProgressTable;
     }
 
-    return <IBusesInProgressTable>{
-      ...busesInProgressTable,
-      ...<IBusesInProgressTable>{
-        byId: omit(busesInProgressTable.byId, payload),
-        allIds: busesInProgressTable.allIds.filter(id => id !== payload)
-      }
-    };
+    return removeById(busesInProgressTable, payload);
   }
 
   // tslint:disable-next-line:member-ordering
   public static UPDATE_ERROR_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_UPDATE_ERROR_BUS_IN_PROGRESS`;
-  private static updateErrorBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: { id: string, importError: string }) {
+  private static updateErrorBusInProgress(
+    busesInProgressTable: IBusesInProgressTable,
+    payload: { id: string, importError: string }
+  ): IBusesInProgressTable {
     if (!busesInProgressTable.byId[payload.id]) {
       return busesInProgressTable;
     }
 
-    return <IBusesInProgressTable>{
-      ...busesInProgressTable,
-      ...<IBusesInProgressTable>{
-        byId: {
-          ...busesInProgressTable.byId,
-          [payload.id]: {
-            ...busesInProgressTable.byId[payload.id],
-            importError: payload.importError
-          }
-        }
-      }
-    };
+    return updateById(busesInProgressTable, payload.id, { importError: payload.importError });
   }
 
-  private static cleanWorkspace(_busesInProgressTable: IBusesInProgressTable, _payload) {
+  private static cleanWorkspace(_busesInProgressTable: IBusesInProgressTable, _payload): IBusesInProgressTable {
     return busesInProgressTableFactory();
   }
 
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod = {
+  private static mapActionsToMethod: { [type: string]: (t: IBusesInProgressTable, p: any) => IBusesInProgressTable } = {
     [BusesInProgress.FETCH_BUSES_IN_PROGRESS]: BusesInProgress.fetchBusesInProgress,
     [BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS]: BusesInProgress.setCurrentBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS]: BusesInProgress.postBusInProgress,

@@ -16,16 +16,16 @@
  */
 
 import { Action } from '@ngrx/store';
-import { omit } from 'underscore';
 
 import { IServiceUnitsTable } from './service-units.interface';
 import { serviceUnitsTableFactory } from './service-units.initial-state';
 import { Workspaces } from '../workspaces/workspaces.reducer';
+import { putById, putAll, updateById, removeById } from 'app/shared/helpers/shared.helper';
 
 export class ServiceUnits {
   private static reducerName = 'SERVICE_UNITS_REDUCER';
 
-  public static reducer(serviceUnitsTable = serviceUnitsTableFactory(), { type, payload }: Action) {
+  public static reducer(serviceUnitsTable = serviceUnitsTableFactory(), { type, payload }: Action): IServiceUnitsTable {
     if (!ServiceUnits.mapActionsToMethod[type]) {
       return serviceUnitsTable;
     }
@@ -35,22 +35,13 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNITS_SUCCESS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNITS_SUCCESS`;
-  private static fetchServiceUnitsSuccess(serviceUnitsTable: IServiceUnitsTable, payload) {
-    return <IServiceUnitsTable>{
-      ...serviceUnitsTable,
-      ...<IServiceUnitsTable>{
-        byId: {
-          ...serviceUnitsTable.byId,
-          ...payload.byId
-        },
-        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, ...payload.allIds]))]
-      }
-    };
+  private static fetchServiceUnitsSuccess(serviceUnitsTable: IServiceUnitsTable, payload): IServiceUnitsTable {
+    return putAll(serviceUnitsTable, payload);
   }
 
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_SERVICE_UNIT = `${ServiceUnits.reducerName}_SET_CURRENT_SERVICE_UNIT`;
-  private static setCurrentServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
+  private static setCurrentServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
     return {
       ...serviceUnitsTable,
       ...<IServiceUnitsTable>{
@@ -61,159 +52,78 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS`;
-  private static fetchServiceUnitDetails(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
-    return {
-      ...serviceUnitsTable,
-      ...<IServiceUnitsTable>{
-        byId: {
-          ...serviceUnitsTable.byId,
-          [payload.serviceUnitId]: {
-            ...serviceUnitsTable.byId[payload.serviceUnitId],
-            isFetchingDetails: true
-          }
-        },
-        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, payload.serviceUnitId]))]
-      }
-    };
+  private static fetchServiceUnitDetails(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
+    return updateById(serviceUnitsTable, payload.serviceUnitId, { isFetchingDetails: true });
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS_SUCCESS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS_SUCCESS`;
-  private static fetchServiceUnitDetailsSuccess(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string, data: any }) {
-    return {
-      ...serviceUnitsTable,
-      ...<IServiceUnitsTable>{
-        byId: {
-          ...serviceUnitsTable.byId,
-          [payload.serviceUnitId]: {
-            ...serviceUnitsTable.byId[payload.serviceUnitId],
-            ...payload.data,
-            isFetchingDetails: false
-          }
-        },
-        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, payload.serviceUnitId]))]
-      }
-    };
+  private static fetchServiceUnitDetailsSuccess(
+    serviceUnitsTable: IServiceUnitsTable,
+    payload: { serviceUnitId: string, data: any }
+  ): IServiceUnitsTable {
+    return updateById(serviceUnitsTable, payload.serviceUnitId, { ...payload.data, isFetchingDetails: false });
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS_ERROR = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS_ERROR`;
-  private static fetchServiceUnitDetailsError(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
+  private static fetchServiceUnitDetailsError(
+    serviceUnitsTable: IServiceUnitsTable,
+    payload: { serviceUnitId: string }
+  ): IServiceUnitsTable {
     if (!serviceUnitsTable.byId[payload.serviceUnitId]) {
       return serviceUnitsTable;
     }
 
-    return {
-      ...serviceUnitsTable,
-      ...<IServiceUnitsTable>{
-        byId: {
-          ...serviceUnitsTable.byId,
-          [payload.serviceUnitId]: {
-            ...serviceUnitsTable.byId[payload.serviceUnitId],
-            isFetchingDetails: false
-          }
-        }
-      }
-    };
+    return updateById(serviceUnitsTable, payload.serviceUnitId, { isFetchingDetails: false });
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE = `${ServiceUnits.reducerName}_CHANGE_STATE`;
-  private static changeState(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
-    return {
-      ...serviceUnitsTable,
-      ...<IServiceUnitsTable>{
-        byId: {
-          ...serviceUnitsTable.byId,
-          [payload.serviceUnitId]: {
-            ...serviceUnitsTable.byId[payload.serviceUnitId],
-            isUpdatingState: true
-          }
-        },
-        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, payload.serviceUnitId]))]
-      }
-    };
+  private static changeState(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
+    return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: true });
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_SUCCESS = `${ServiceUnits.reducerName}_CHANGE_STATE_SUCCESS`;
-  private static changeStateSuccess(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string, newState: string }) {
-    return {
-      ...serviceUnitsTable,
-      ...<IServiceUnitsTable>{
-        byId: {
-          ...serviceUnitsTable.byId,
-          [payload.serviceUnitId]: {
-            ...serviceUnitsTable.byId[payload.serviceUnitId],
-            isUpdatingState: false,
-            state: payload.newState
-          }
-        },
-        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, payload.serviceUnitId]))]
-      }
-    };
+  private static changeStateSuccess(
+    serviceUnitsTable: IServiceUnitsTable,
+    payload: { serviceUnitId: string, newState: string }
+  ): IServiceUnitsTable {
+    return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: false, state: payload.newState });
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_ERROR = `${ServiceUnits.reducerName}_CHANGE_STATE_ERROR`;
-  private static changeStateError(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
-    return {
-      ...serviceUnitsTable,
-      ...<IServiceUnitsTable>{
-        byId: {
-          ...serviceUnitsTable.byId,
-          [payload.serviceUnitId]: {
-            ...serviceUnitsTable.byId[payload.serviceUnitId],
-            isUpdatingState: false
-          }
-        },
-        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, payload.serviceUnitId]))]
-      }
-    };
+  private static changeStateError(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
+    return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: false });
   }
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_SERVICE_UNIT = `${ServiceUnits.reducerName}_REMOVE_SERVICE_UNIT`;
-  private static removeServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }) {
+  private static removeServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
     if (!serviceUnitsTable.byId[payload.serviceUnitId]) {
       return serviceUnitsTable;
     }
 
-    return <IServiceUnitsTable>{
-      ...serviceUnitsTable,
-      ...<IServiceUnitsTable>{
-        byId: omit(serviceUnitsTable.byId, payload.serviceUnitId),
-        allIds: serviceUnitsTable.allIds.filter(id => id !== payload.serviceUnitId)
-      }
-    };
+    return removeById(serviceUnitsTable, payload.serviceUnitId);
   }
 
   private static deployServiceUnitSuccess(
     serviceUnitsTable: IServiceUnitsTable,
     payload: { serviceUnit: { id: string, name: string, state: string } }
-  ) {
-    const serviceUnitCp = { ...payload.serviceUnit };
-
-    return <IServiceUnitsTable>{
-      ...serviceUnitsTable,
-      ...<IServiceUnitsTable>{
-        byId: {
-          ...serviceUnitsTable.byId,
-          [payload.serviceUnit.id]: serviceUnitCp
-        },
-        allIds: [...Array.from(new Set([...serviceUnitsTable.allIds, payload.serviceUnit.id]))]
-      }
-    };
+  ): IServiceUnitsTable {
+    return putById(serviceUnitsTable, payload.serviceUnit.id, payload.serviceUnit);
   }
 
-  private static cleanWorkspace(_serviceUnitsTable: IServiceUnitsTable, _payload) {
+  private static cleanWorkspace(_serviceUnitsTable: IServiceUnitsTable, _payload): IServiceUnitsTable {
     return serviceUnitsTableFactory();
   }
 
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod = {
+  private static mapActionsToMethod: { [type: string]: (t: IServiceUnitsTable, p: any) => IServiceUnitsTable } = {
     [ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS]: ServiceUnits.fetchServiceUnitsSuccess,
     [ServiceUnits.SET_CURRENT_SERVICE_UNIT]: ServiceUnits.setCurrentServiceUnit,
     [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS]: ServiceUnits.fetchServiceUnitDetails,

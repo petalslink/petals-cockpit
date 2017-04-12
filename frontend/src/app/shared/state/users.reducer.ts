@@ -19,11 +19,12 @@ import { Action } from '@ngrx/store';
 
 import { usersState } from './users.initial-state';
 import { IUsersTable } from '../interfaces/users.interface';
+import { putAll, putById } from 'app/shared/helpers/shared.helper';
 
 export class Users {
   private static reducerName = 'USERS_REDUCER';
 
-  public static reducer(users = usersState(), {type, payload}: Action) {
+  public static reducer(users = usersState(), { type, payload }: Action): IUsersTable {
     if (!Users.mapActionsToMethod[type]) {
       return users;
     }
@@ -33,20 +34,13 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_USERS_SUCCESS = `${Users.reducerName}_FETCH_USERS_SUCCESS`;
-  private static fetchUsersSuccess(users: IUsersTable, payload) {
-    return {
-      ...users,
-      byId: {
-        ...users.byId,
-        ...payload.byId
-      },
-      allIds: [...Array.from(new Set([...users.allIds, ...payload.allIds]))]
-    };
+  private static fetchUsersSuccess(users: IUsersTable, payload): IUsersTable {
+    return putAll(users, payload);
   }
 
   // tslint:disable-next-line:member-ordering
   public static CONNECT_USER = `${Users.reducerName}_CONNECT_USER`;
-  private static connectUser(users: IUsersTable, _payload) {
+  private static connectUser(users: IUsersTable, _payload): IUsersTable {
     return {
       ...users,
       ...<IUsersTable>{ isConnecting: true }
@@ -55,33 +49,22 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static CONNECT_USER_SUCCESS = `${Users.reducerName}_CONNECT_USER_SUCCESS`;
-  private static connectUserSuccess(users: IUsersTable, payload) {
+  private static connectUserSuccess(users: IUsersTable, payload): IUsersTable {
     const id = payload.user.id;
 
     return {
-      ...users,
-      ...{
-        isConnecting: false,
-        isConnected: true,
-        connectionFailed: false,
-        connectedUserId: id,
-        isDisconnecting: false,
-
-        byId: {
-          ...users.byId,
-          [id]: {
-            ...users.byId[id],
-            ...payload.user
-          }
-        },
-        allIds: [...Array.from(new Set([...users.allIds, id]))]
-      }
+      ...putById(users, id, payload.user),
+      isConnecting: false,
+      isConnected: true,
+      connectionFailed: false,
+      connectedUserId: id,
+      isDisconnecting: false
     };
   }
 
   // tslint:disable-next-line:member-ordering
   public static CONNECT_USER_FAILED = `${Users.reducerName}_CONNECT_USER_FAILED`;
-  private static connectUserFailed(users: IUsersTable, _payload) {
+  private static connectUserFailed(users: IUsersTable, _payload): IUsersTable {
     return {
       ...users,
       ...<IUsersTable>{
@@ -95,7 +78,7 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static DISCONNECT_USER = `${Users.reducerName}_DISCONNECT_USER`;
-  private static disconnectUser(users: IUsersTable, _payload) {
+  private static disconnectUser(users: IUsersTable, _payload): IUsersTable {
     return {
       ...users,
       ...<IUsersTable>{ isDisconnecting: true }
@@ -104,7 +87,7 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static DISCONNECT_USER_SUCCESS = `${Users.reducerName}_DISCONNECT_USER_SUCCESS`;
-  private static disconnectUserSuccess(users: IUsersTable, _payload) {
+  private static disconnectUserSuccess(users: IUsersTable, _payload): IUsersTable {
     return {
       ...users,
       ...usersState(),
@@ -118,7 +101,7 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static DISCONNECT_USER_FAILED = `${Users.reducerName}_DISCONNECT_USER_FAILED`;
-  private static disconnectUserFailed(users: IUsersTable, _payload) {
+  private static disconnectUserFailed(users: IUsersTable, _payload): IUsersTable {
     return {
       ...users,
       ...<IUsersTable>{
@@ -130,7 +113,7 @@ export class Users {
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod = {
+  private static mapActionsToMethod: { [type: string]: (t: IUsersTable, p: any) => IUsersTable } = {
     [Users.FETCH_USERS_SUCCESS]: Users.fetchUsersSuccess,
     [Users.CONNECT_USER]: Users.connectUser,
     [Users.CONNECT_USER_SUCCESS]: Users.connectUserSuccess,
