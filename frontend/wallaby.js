@@ -33,7 +33,9 @@ module.exports = function (wallaby) {
     },
 
     env: {
-      kind: 'electron'
+      kind: 'electron',
+      // if you are not using yarn, you need to change that line...
+      runner: require(require('os').homedir() + '/.config/yarn/global/node_modules/electron')
     },
 
     postprocessor: wallabyWebpack({
