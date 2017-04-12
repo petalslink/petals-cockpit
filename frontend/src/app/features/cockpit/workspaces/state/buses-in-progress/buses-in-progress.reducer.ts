@@ -16,12 +16,11 @@
  */
 
 import { Action } from '@ngrx/store';
-import { omit } from 'underscore';
 
 import { busesInProgressTableFactory } from './buses-in-progress.initial-state';
 import { IBusesInProgressTable } from './buses-in-progress.interface';
-import { IBusInProgressRow } from './bus-in-progress.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
+import { putAll, updateById, removeById } from 'app/shared/helpers/shared.helper';
 
 export class BusesInProgress {
   private static reducerName = 'BUSES_IN_PROGRESS_REDUCER';
@@ -37,14 +36,7 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUSES_IN_PROGRESS = `${BusesInProgress.reducerName}_FETCH_BUSES_IN_PROGRESS`;
   private static fetchBusesInProgress(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
-    return <IBusesInProgressTable>{
-      ...busesInProgressTable,
-      byId: {
-        ...busesInProgressTable.byId,
-        ...payload.byId
-      },
-      allIds: [...Array.from(new Set([...busesInProgressTable.allIds, ...payload.allIds]))]
-    };
+    return putAll(busesInProgressTable, payload);
   }
 
   // tslint:disable-next-line:member-ordering
@@ -57,7 +49,7 @@ export class BusesInProgress {
       return busesInProgressTable;
     }
 
-    return <IBusesInProgressTable>{
+    return {
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
         selectedBusInProgressId: payload.busInProgressId,
@@ -71,7 +63,7 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS`;
   private static postBusInProgress(busesInProgressTable: IBusesInProgressTable, _payload): IBusesInProgressTable {
-    return <IBusesInProgressTable>{
+    return {
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
         isImportingBus: true,
@@ -86,7 +78,7 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS_SUCCESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS_SUCCESS`;
   private static postBusInProgressSuccess(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
-    return <IBusesInProgressTable>{
+    return {
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
         importBusId: payload.id
@@ -100,7 +92,7 @@ export class BusesInProgress {
   private static postBusInProgressError(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
     // if it's false, it means we changed bus (with SET_CURRENT_BUS_IN_PROGRESS)
     if (busesInProgressTable.isImportingBus) {
-      return <IBusesInProgressTable>{
+      return {
         ...busesInProgressTable,
         ...<IBusesInProgressTable>{
           isImportingBus: false,
@@ -120,18 +112,7 @@ export class BusesInProgress {
       return busesInProgressTable;
     }
 
-    return <IBusesInProgressTable>{
-      ...busesInProgressTable,
-      ...<IBusesInProgressTable>{
-        byId: {
-          ...busesInProgressTable.byId,
-          [payload.id]: <IBusInProgressRow>{
-            ...busesInProgressTable.byId[payload.id],
-            ...<IBusInProgressRow>{ isRemoving: true }
-          }
-        }
-      }
-    };
+    return updateById(busesInProgressTable, payload.id, { isRemoving: true });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -141,13 +122,7 @@ export class BusesInProgress {
       return busesInProgressTable;
     }
 
-    return <IBusesInProgressTable>{
-      ...busesInProgressTable,
-      ...<IBusesInProgressTable>{
-        byId: omit(busesInProgressTable.byId, payload),
-        allIds: busesInProgressTable.allIds.filter(id => id !== payload)
-      }
-    };
+    return removeById(busesInProgressTable, payload);
   }
 
   // tslint:disable-next-line:member-ordering
@@ -160,18 +135,7 @@ export class BusesInProgress {
       return busesInProgressTable;
     }
 
-    return <IBusesInProgressTable>{
-      ...busesInProgressTable,
-      ...<IBusesInProgressTable>{
-        byId: {
-          ...busesInProgressTable.byId,
-          [payload.id]: {
-            ...busesInProgressTable.byId[payload.id],
-            importError: payload.importError
-          }
-        }
-      }
-    };
+    return updateById(busesInProgressTable, payload.id, { importError: payload.importError });
   }
 
   private static cleanWorkspace(_busesInProgressTable: IBusesInProgressTable, _payload): IBusesInProgressTable {

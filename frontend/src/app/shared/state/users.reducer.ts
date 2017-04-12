@@ -19,6 +19,7 @@ import { Action } from '@ngrx/store';
 
 import { usersState } from './users.initial-state';
 import { IUsersTable } from '../interfaces/users.interface';
+import { putAll, putById } from 'app/shared/helpers/shared.helper';
 
 export class Users {
   private static reducerName = 'USERS_REDUCER';
@@ -34,14 +35,7 @@ export class Users {
   // tslint:disable-next-line:member-ordering
   public static FETCH_USERS_SUCCESS = `${Users.reducerName}_FETCH_USERS_SUCCESS`;
   private static fetchUsersSuccess(users: IUsersTable, payload): IUsersTable {
-    return {
-      ...users,
-      byId: {
-        ...users.byId,
-        ...payload.byId
-      },
-      allIds: [...Array.from(new Set([...users.allIds, ...payload.allIds]))]
-    };
+    return putAll(users, payload);
   }
 
   // tslint:disable-next-line:member-ordering
@@ -59,23 +53,12 @@ export class Users {
     const id = payload.user.id;
 
     return {
-      ...users,
-      ...{
-        isConnecting: false,
-        isConnected: true,
-        connectionFailed: false,
-        connectedUserId: id,
-        isDisconnecting: false,
-
-        byId: {
-          ...users.byId,
-          [id]: {
-            ...users.byId[id],
-            ...payload.user
-          }
-        },
-        allIds: [...Array.from(new Set([...users.allIds, id]))]
-      }
+      ...putById(users, id, payload.user),
+      isConnecting: false,
+      isConnected: true,
+      connectionFailed: false,
+      connectedUserId: id,
+      isDisconnecting: false
     };
   }
 

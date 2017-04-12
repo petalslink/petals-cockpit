@@ -16,7 +16,7 @@
  */
 
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { type } from 'app/shared/helpers/shared.helper';
+import { type, emptyJavascriptMap } from 'app/shared/helpers/shared.helper';
 import { Users } from 'app/shared/state/users.reducer';
 import { workspacesTableFactory } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.initial-state';
 
@@ -65,13 +65,16 @@ describe(`Workspaces reducer`, () => {
 
     it(`should set the isFetchingWorkspaces variable to false`, () => {
       const initialState: any = {
+        ...emptyJavascriptMap(),
         keepPreviousValues: '',
         isFetchingWorkspaces: true
       };
 
       expect(Workspaces.reducer(initialState, {
         type: Workspaces.FETCH_WORKSPACES_SUCCESS,
+        payload: emptyJavascriptMap()
       })).toEqual({
+        ...emptyJavascriptMap(),
         keepPreviousValues: '',
         isFetchingWorkspaces: false
       });
@@ -79,6 +82,7 @@ describe(`Workspaces reducer`, () => {
 
     it(`should add the payload`, () => {
       const initialState: any = {
+        ...emptyJavascriptMap(),
         keepPreviousValues: '',
         isFetchingWorkspaces: true
       };

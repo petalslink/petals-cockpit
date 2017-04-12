@@ -16,12 +16,11 @@
  */
 
 import { Action } from '@ngrx/store';
-import { omit } from 'underscore';
 
-import { IBusRow } from './bus.interface';
 import { IBusesTable } from './buses.interface';
 import { busesTableFactory } from './buses.initial-state';
 import { Workspaces } from '../workspaces/workspaces.reducer';
+import { putAll, updateById, removeById } from 'app/shared/helpers/shared.helper';
 
 export class Buses {
   private static reducerName = 'BUSES_REDUCER';
@@ -37,24 +36,7 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUSES_SUCCESS = `${Buses.reducerName}_FETCH_BUSES_SUCCESS`;
   private static fetchBusesSuccess(busesTable: IBusesTable, payload): IBusesTable {
-    let allIds = busesTable.allIds;
-
-    payload.allIds.forEach(busId => {
-      if (!busesTable.byId[busId]) {
-        allIds = [...allIds, busId];
-      }
-    });
-
-    return <IBusesTable>{
-      ...busesTable,
-      ...<IBusesTable>{
-        byId: {
-          ...busesTable.byId,
-          ...payload.byId
-        },
-        allIds
-      }
-    };
+    return putAll(busesTable, payload);
   }
 
   // tslint:disable-next-line:member-ordering
@@ -64,18 +46,7 @@ export class Buses {
       return busesTable;
     }
 
-    return <IBusesTable>{
-      ...busesTable,
-      ...<IBusesTable>{
-        byId: {
-          ...busesTable.byId,
-          [payload.busId]: <IBusRow>{
-            ...busesTable.byId[payload.busId],
-            isFolded: true
-          }
-        }
-      }
-    };
+    return updateById(busesTable, payload.busId, { isFolded: true });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -85,18 +56,7 @@ export class Buses {
       return busesTable;
     }
 
-    return <IBusesTable>{
-      ...busesTable,
-      ...<IBusesTable>{
-        byId: {
-          ...busesTable.byId,
-          [payload.busId]: <IBusRow>{
-            ...busesTable.byId[payload.busId],
-            isFolded: false
-          }
-        }
-      }
-    };
+    return updateById(busesTable, payload.busId, { isFolded: false });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -130,13 +90,7 @@ export class Buses {
   public static REMOVE_BUS = `${Buses.reducerName}_REMOVE_BUS`;
   private static removeBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     if (busesTable.byId[payload.busId]) {
-      return {
-        ...busesTable,
-        ...<IBusesTable>{
-          byId: omit(busesTable.byId, payload.busId),
-          allIds: busesTable.allIds.filter(id => id !== payload.busId)
-        }
-      };
+      return removeById(busesTable, payload.busId);
     }
 
     return busesTable;
@@ -145,38 +99,13 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS = `${Buses.reducerName}_FETCH_BUS_DETAILS`;
   private static fetchBusDetails(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
-    return {
-      ...busesTable,
-      ...<IBusesTable>{
-        byId: {
-          ...busesTable.byId,
-          [payload.busId]: {
-            ...busesTable.byId[payload.busId],
-            isFetchingDetails: true
-          }
-        },
-        allIds: [...Array.from(new Set([...busesTable.allIds, payload.busId]))]
-      }
-    };
+    return updateById(busesTable, payload.busId, { isFetchingDetails: true });
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS_SUCCESS = `${Buses.reducerName}_FETCH_BUS_DETAILS_SUCCESS`;
   private static fetchBusDetailsSuccess(busesTable: IBusesTable, payload: { busId: string, data: any }): IBusesTable {
-    return {
-      ...busesTable,
-      ...<IBusesTable>{
-        byId: {
-          ...busesTable.byId,
-          [payload.busId]: {
-            ...busesTable.byId[payload.busId],
-            ...payload.data,
-            isFetchingDetails: false
-          }
-        },
-        allIds: [...Array.from(new Set([...busesTable.allIds, payload.busId]))]
-      }
-    };
+    return updateById(busesTable, payload.busId, { ...payload.data, isFetchingDetails: false });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -186,18 +115,7 @@ export class Buses {
       return busesTable;
     }
 
-    return {
-      ...busesTable,
-      ...<IBusesTable>{
-        byId: {
-          ...busesTable.byId,
-          [payload.busId]: {
-            ...busesTable.byId[payload.busId],
-            isFetchingDetails: false
-          }
-        }
-      }
-    };
+    return updateById(busesTable, payload.busId, { isFetchingDetails: false });
   }
 
   private static cleanWorkspace(_busesTable: IBusesTable, _payload): IBusesTable {

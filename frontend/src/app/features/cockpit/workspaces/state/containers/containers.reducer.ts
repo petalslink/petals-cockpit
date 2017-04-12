@@ -19,10 +19,10 @@ import { Action } from '@ngrx/store';
 
 import { IContainersTable } from './containers.interface';
 import { containersTableFactory } from './containers.initial-state';
-import { IContainerRow } from './container.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { getContainerOfComponent } from '../../../../../shared/helpers/component.helper';
 import { Components } from '../components/components.reducer';
+import { putAll, updateById } from 'app/shared/helpers/shared.helper';
 
 export class Containers {
   private static reducerName = 'CONTAINERS_REDUCER';
@@ -38,28 +38,17 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINERS_SUCCESS = `${Containers.reducerName}_FETCH_CONTAINERS_SUCCESS`;
   private static fetchContainersSuccess(containersTable: IContainersTable, payload): IContainersTable {
-    const byId = payload.allIds.reduce((acc, containerId) => {
-      return {
-        ...acc,
-        [containerId]: {
-          ...payload.byId[containerId],
-          // when we fetch containers, server don't add reachabilites
-          // set it to empty array by default
-          reachabilities: []
-        }
-      };
-    }, payload.byId);
+    const table = putAll(containersTable, payload);
 
-    return <IContainersTable>{
-      ...containersTable,
-      ...<IContainersTable>{
-        byId: {
-          ...containersTable.byId,
-          ...byId
-        },
-        allIds: [...Array.from(new Set([...containersTable.allIds, ...payload.allIds]))]
+    payload.allIds.forEach(id => {
+      // when we fetch containers, the server doesn't add reachabilites
+      // set it to empty array by default
+      if (!table.byId[id].reachabilities) {
+        table.byId[id].reachabilities = [];
       }
-    };
+    });
+
+    return table;
   }
 
   // tslint:disable-next-line:member-ordering
@@ -69,18 +58,7 @@ export class Containers {
       return containersTable;
     }
 
-    return <IContainersTable>{
-      ...containersTable,
-      ...<IContainersTable>{
-        byId: {
-          ...containersTable.byId,
-          [payload.containerId]: <IContainerRow>{
-            ...containersTable.byId[payload.containerId],
-            isFolded: true
-          }
-        }
-      }
-    };
+    return updateById(containersTable, payload.containerId, { isFolded: true });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -90,18 +68,7 @@ export class Containers {
       return containersTable;
     }
 
-    return <IContainersTable>{
-      ...containersTable,
-      ...<IContainersTable>{
-        byId: {
-          ...containersTable.byId,
-          [payload.containerId]: <IContainerRow>{
-            ...containersTable.byId[payload.containerId],
-            isFolded: false
-          }
-        }
-      }
-    };
+    return updateById(containersTable, payload.containerId, { isFolded: false });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -134,19 +101,7 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINER_DETAILS = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS`;
   private static fetchContainerDetails(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
-    return {
-      ...containersTable,
-      ...<IContainersTable>{
-        byId: {
-          ...containersTable.byId,
-          [payload.containerId]: {
-            ...containersTable.byId[payload.containerId],
-            isFetchingDetails: true
-          }
-        },
-        allIds: [...Array.from(new Set([...containersTable.allIds, payload.containerId]))]
-      }
-    };
+    return updateById(containersTable, payload.containerId, { isFetchingDetails: true });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -155,20 +110,7 @@ export class Containers {
     containersTable: IContainersTable,
     payload: { containerId: string, data: any }
   ): IContainersTable {
-    return {
-      ...containersTable,
-      ...<IContainersTable>{
-        byId: {
-          ...containersTable.byId,
-          [payload.containerId]: {
-            ...containersTable.byId[payload.containerId],
-            ...payload.data,
-            isFetchingDetails: false
-          }
-        },
-        allIds: [...Array.from(new Set([...containersTable.allIds, payload.containerId]))]
-      }
-    };
+    return updateById(containersTable, payload.containerId, { ...payload.data, isFetchingDetails: false });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -178,18 +120,7 @@ export class Containers {
       return containersTable;
     }
 
-    return {
-      ...containersTable,
-      ...<IContainersTable>{
-        byId: {
-          ...containersTable.byId,
-          [payload.containerId]: {
-            ...containersTable.byId[payload.containerId],
-            isFetchingDetails: false
-          }
-        }
-      }
-    };
+    return updateById(containersTable, payload.containerId, { isFetchingDetails: false });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -199,21 +130,12 @@ export class Containers {
       return containersTable;
     }
 
-    return {
-      ...containersTable,
-      ...<IContainersTable>{
-        byId: {
-          ...containersTable.byId,
-          [containerContainingComponent.id]: <IContainerRow>{
-            ...containersTable.byId[containerContainingComponent.id],
-            components: containersTable
-              .byId[containerContainingComponent.id]
-              .components
-              .filter(componentId => componentId !== payload.componentId)
-          }
-        }
-      }
-    };
+    return updateById(containersTable, containerContainingComponent.id, {
+      components: containersTable
+        .byId[containerContainingComponent.id]
+        .components
+        .filter(id => id !== payload.componentId)
+    });
   }
 
   private static cleanWorkspace(_containersTable: IContainersTable, _payload): IContainersTable {

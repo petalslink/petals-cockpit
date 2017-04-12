@@ -16,14 +16,14 @@
  */
 
 import { Action } from '@ngrx/store';
-import { omit } from 'underscore';
 
 import { IComponentsTable } from './components.interface';
-import { IComponentRow } from './component.interface';
 import { componentsTableFactory } from './components.initial-state';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { getComponentOfServiceUnit } from '../../../../../shared/helpers/service-unit.helper';
 import { ServiceUnits } from '../service-units/service-units.reducer';
+import { putAll, updateById, removeById } from 'app/shared/helpers/shared.helper';
+import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
 
 export class Components {
   private static reducerName = 'COMPONENTS_REDUCER';
@@ -39,16 +39,7 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static FETCH_COMPONENTS_SUCCESS = `${Components.reducerName}_FETCH_COMPONENTS_SUCCESS`;
   private static fetchComponentsSuccess(componentsTable: IComponentsTable, payload): IComponentsTable {
-    return <IComponentsTable>{
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          ...payload.byId
-        },
-        allIds: [...Array.from(new Set([...componentsTable.allIds, ...payload.allIds]))]
-      }
-    };
+    return putAll(componentsTable, payload);
   }
 
   // tslint:disable-next-line:member-ordering
@@ -58,18 +49,7 @@ export class Components {
       return componentsTable;
     }
 
-    return <IComponentsTable>{
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          [payload.componentId]: <IComponentRow>{
-            ...componentsTable.byId[payload.componentId],
-            isFolded: true
-          }
-        }
-      }
-    };
+    return updateById(componentsTable, payload.componentId, { isFolded: true });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -79,18 +59,7 @@ export class Components {
       return componentsTable;
     }
 
-    return <IComponentsTable>{
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          [payload.componentId]: <IComponentRow>{
-            ...componentsTable.byId[payload.componentId],
-            isFolded: false
-          }
-        }
-      }
-    };
+    return updateById(componentsTable, payload.componentId, { isFolded: false });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -123,19 +92,7 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static FETCH_COMPONENT_DETAILS = `${Components.reducerName}_FETCH_COMPONENT_DETAILS`;
   private static fetchComponentDetails(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
-    return {
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          [payload.componentId]: {
-            ...componentsTable.byId[payload.componentId],
-            isFetchingDetails: true
-          }
-        },
-        allIds: [...Array.from(new Set([...componentsTable.allIds, payload.componentId]))]
-      }
-    };
+    return updateById(componentsTable, payload.componentId, { isFetchingDetails: true });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -144,20 +101,7 @@ export class Components {
     componentsTable: IComponentsTable,
     payload: { componentId: string, data: any }
   ): IComponentsTable {
-    return {
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          [payload.componentId]: {
-            ...componentsTable.byId[payload.componentId],
-            ...payload.data,
-            isFetchingDetails: false
-          }
-        },
-        allIds: [...Array.from(new Set([...componentsTable.allIds, payload.componentId]))]
-      }
-    };
+    return updateById(componentsTable, payload.componentId, { ...payload.data, isFetchingDetails: false });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -167,36 +111,13 @@ export class Components {
       return componentsTable;
     }
 
-    return {
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          [payload.componentId]: {
-            ...componentsTable.byId[payload.componentId],
-            isFetchingDetails: false
-          }
-        }
-      }
-    };
+    return updateById(componentsTable, payload.componentId, { isFetchingDetails: false });
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE = `${Components.reducerName}_CHANGE_STATE`;
   private static changeState(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
-    return {
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          [payload.componentId]: {
-            ...componentsTable.byId[payload.componentId],
-            isUpdatingState: true
-          }
-        },
-        allIds: [...Array.from(new Set([...componentsTable.allIds, payload.componentId]))]
-      }
-    };
+    return updateById(componentsTable, payload.componentId, { isUpdatingState: true });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -205,38 +126,13 @@ export class Components {
     componentsTable: IComponentsTable,
     payload: { componentId: string, newState: string }
   ): IComponentsTable {
-    return {
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          [payload.componentId]: {
-            ...componentsTable.byId[payload.componentId],
-            isUpdatingState: false,
-            state: payload.newState
-          }
-        },
-        allIds: [...Array.from(new Set([...componentsTable.allIds, payload.componentId]))]
-      }
-    };
+    return updateById(componentsTable, payload.componentId, { state: payload.newState, isUpdatingState: false });
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_ERROR = `${Components.reducerName}_CHANGE_STATE_ERROR`;
   private static changeStateError(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
-    return {
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          [payload.componentId]: {
-            ...componentsTable.byId[payload.componentId],
-            isUpdatingState: false
-          }
-        }
-      },
-      allIds: [...Array.from(new Set([...componentsTable.allIds, payload.componentId]))]
-    };
+    return updateById(componentsTable, payload.componentId, { isUpdatingState: false });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -246,13 +142,7 @@ export class Components {
       return componentsTable;
     }
 
-    return {
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: omit(componentsTable.byId, payload.componentId),
-        allIds: componentsTable.allIds.filter(componentId => componentId !== payload.componentId)
-      }
-    };
+    return removeById(componentsTable, payload.componentId);
   }
 
   // tslint:disable-next-line:member-ordering
@@ -262,18 +152,7 @@ export class Components {
       return componentsTable;
     }
 
-    return {
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          [payload.componentId]: {
-            ...componentsTable.byId[payload.componentId],
-            isDeployingServiceUnit: true
-          }
-        }
-      }
-    };
+    return updateById(componentsTable, payload.componentId, { isDeployingServiceUnit: true });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -283,18 +162,7 @@ export class Components {
       return componentsTable;
     }
 
-    return {
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          [payload.componentId]: {
-            ...componentsTable.byId[payload.componentId],
-            isDeployingServiceUnit: false
-          }
-        }
-      }
-    };
+    return updateById(componentsTable, payload.componentId, { isDeployingServiceUnit: false });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -309,20 +177,10 @@ export class Components {
       component = <IComponentRow>{ serviceUnits: [] };
     }
 
-    return {
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          [payload.componentId]: <IComponentRow>{
-            ...component,
-            isDeployingServiceUnit: false,
-            serviceUnits: [...Array.from(new Set([...component.serviceUnits, payload.serviceUnit.id]))]
-          }
-        },
-        allIds: [...Array.from(new Set([...componentsTable.allIds, payload.componentId]))]
-      }
-    };
+    return updateById(componentsTable, payload.componentId, {
+      serviceUnits: [...Array.from(new Set([...component.serviceUnits, payload.serviceUnit.id]))],
+      isDeployingServiceUnit: false
+    });
   }
 
   private static removeServiceUnit(componentsTable: IComponentsTable, payload: { serviceUnitId: string }): IComponentsTable {
@@ -332,21 +190,12 @@ export class Components {
       return componentsTable;
     }
 
-    return {
-      ...componentsTable,
-      ...<IComponentsTable>{
-        byId: {
-          ...componentsTable.byId,
-          [componentContainingServiceUnit.id]: <IComponentRow>{
-            ...componentsTable.byId[componentContainingServiceUnit.id],
-            serviceUnits: componentsTable
-              .byId[componentContainingServiceUnit.id]
-              .serviceUnits
-              .filter(serviceUnitId => serviceUnitId !== payload.serviceUnitId)
-          }
-        }
-      }
-    };
+    return updateById(componentsTable, componentContainingServiceUnit.id, {
+      serviceUnits: componentsTable
+        .byId[componentContainingServiceUnit.id]
+        .serviceUnits
+        .filter(serviceUnitId => serviceUnitId !== payload.serviceUnitId)
+    });
   }
 
   private static cleanWorkspace(_componentsTable: IComponentsTable, _payload): IComponentsTable {
