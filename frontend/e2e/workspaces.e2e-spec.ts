@@ -95,52 +95,7 @@ describe(`Workspaces`, () => {
     expect(element.all(by.css(`app-workspaces-dialog md-card div.background-color-light-green-x2 md-icon`)).count()).toEqual(1);
   });
 
-  it(`should contain the correct buses`, () => {
-    page.login(`admin`, `admin`);
-
-    // let's be sure everything is loaded and visible
-    browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
-
-    // check that buses/container/component/su are available
-    const availableBuses = [
-      `Bus 0`,
-        `Cont 0`,
-          `Comp 0`,
-            `SU 0`,
-            `SU 1`,
-          `Comp 1`,
-            `SU 2`,
-            `SU 3`,
-        `Cont 1`,
-          `Comp 2`,
-            `SU 4`,
-            `SU 5`,
-          `Comp 3`,
-            `SU 6`,
-            `SU 7`
-    ];
-
-    expect(page.getWorkspaceTree()).toEqual(availableBuses);
-  });
-
-  it(`should contain the correct buses in progress`, () => {
-    page.login(`admin`, `admin`);
-
-    const importBusesText = page.getBusesInProgress();
-
-    // check that 2 bus in progress are displayed
-    expect(importBusesText.then(e => e.length)).toEqual(2);
-
-    // check that buses/container/component/su are available
-    const availableBusesInProgress = [
-      `192.168.0.1:7700`,
-      `192.168.0.2:7700`
-    ];
-
-    expect(importBusesText).toEqual(availableBusesInProgress);
-  });
-
-  it(`should create a new workspace`, () => {
+  it(`should create a new workspace and then delete it`, () => {
     page.login(`mrobert`, `mrobert`, true, false);
 
     const inputName = element(by.css(`input[formControlName="name"]`));
@@ -159,7 +114,9 @@ describe(`Workspaces`, () => {
 
     addNewWorkspace.click();
 
-    expect(element.all(by.css(`app-workspaces-dialog div md-card-title-group`)).count()).toEqual(2);
+    const cards = element.all(by.css(`app-workspaces-dialog div md-card-title-group`));
+
+    expect(cards.count()).toEqual(2);
 
     // check if the input is cleared
     expect(inputName.getText()).toEqual(``);
@@ -169,23 +126,24 @@ describe(`Workspaces`, () => {
       `New workspace\nYou are the only one using this workspace.`
     ];
 
-    const cardsText = element.all(by.css(`app-workspaces-dialog div md-card-title-group`)).getText();
+    const cardsText = cards.getText();
 
     expect(cardsText).toEqual(workspacesAndOwners);
-  });
 
-  it(`should delete a current workspace`, () => {
-    page.login(`admin`, `admin`);
+    ///// DELETION
+
+    page.selectWorkspace(1, `New workspace`);
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
 
     const btnDeleteWks = element(by.css(`app-workspace .btn-delete-wks`));
+
     // let's delete the workspace
     btnDeleteWks.click();
 
     // a dialog is shown
-    const confirmText = element(by.css(`app-workspace-deletion-dialog .mat-dialog-content`));
-    expect(confirmText.getText()).toEqual(`Everything in the workspace will be deleted!\nAre you sure you want to delete Workspace 0?`);
+    expect(element(by.css(`app-workspace-deletion-dialog .mat-dialog-content`)).getText())
+      .toEqual(`Everything in the workspace will be deleted!\nAre you sure you want to delete New Workspace?`);
 
     // let's confirm the deletion
     element(by.css(`app-workspace-deletion-dialog .btn-confirm-delete-wks`)).click();
@@ -195,8 +153,8 @@ describe(`Workspaces`, () => {
     expect(btnDeleteWks.isEnabled()).toBe(false);
 
     // now we get a notification saying the workspace is deleted
-    const deletedText = element(by.css(`app-workspace-deleted-dialog .mat-dialog-content`));
-    expect(deletedText.getText()).toEqual(`This workspace was deleted, click on OK to go back to the workspaces list.`);
+    expect(element(by.css(`app-workspace-deleted-dialog .mat-dialog-content`)).getText())
+      .toEqual(`This workspace was deleted, click on OK to go back to the workspaces list.`);
 
     // ensure we are stil on the same workspace until we click
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);

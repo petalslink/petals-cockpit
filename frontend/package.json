@@ -14,7 +14,7 @@
     "check:copyrights": "node generate-headers.js --dry",
     "e2e": "ng e2e",
     "e2e:ci": "ng e2e --prod --progress=false -e=prod-e2e",
-    "e2e:product": "ng e2e --serve=false --specs=e2e/login.e2e-spec.ts --specs=e2e/workspaces.e2e-spec.ts",
+    "e2e:product": "ng e2e --serve=false --specs=e2e/login.e2e-spec.ts --specs=e2e/workspaces.e2e-spec.ts --specs=e2e/workspace-tree.e2e-spec.ts",
     "build": "ng build --prod --aot --no-sourcemap",
     "build-silent": "yarn run build -- --progress=false",
     "prod": "yarn run build -- -bh='{{baseUrl}}'",
