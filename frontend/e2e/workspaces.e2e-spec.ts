@@ -70,24 +70,9 @@ describe(`Workspaces`, () => {
   it(`should have a workspace selected`, () => {
     page.login(`admin`, `admin`);
 
-    // check the page content
-    expect(element.all(by.css(`app-workspace p`)).first().getText()).toEqual(`Welcome to Workspace 0`);
-
-    expect(element(by.css(`app-workspace .users-in-workspace`)).getText()).toEqual(`You are the only one using this workspace:`);
-
-    const usersListText = element(by.css(`app-workspace md-list md-list-item .mat-list-text`))
-      .getText()
-      .then(t => t.split('\n'));
-
-    expect(usersListText).toEqual(['admin', 'Administrator']);
-
-    const wsButton = element(by.css(`app-cockpit md-sidenav .workspace-name`));
-
-    // does the button to show current workspace have the name of current workspace
-    browser.wait(EC.elementToBeClickable(wsButton), 5000);
-    expect(wsButton.getText()).toEqual(`Workspace 0`);
-
-    element(by.css(`app-cockpit md-sidenav .change-workspace`)).click();
+    const change = element(by.css(`app-cockpit md-sidenav .change-workspace`));
+    browser.wait(EC.elementToBeClickable(change), 5000);
+    change.click();
 
     // check if the card selected has a green background color
     expect(element.all(by.css(`app-workspaces-dialog md-card div.background-color-light-green-x2`)).count()).toEqual(1);
@@ -136,6 +121,8 @@ describe(`Workspaces`, () => {
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
 
+    expect(element(by.css(`app-workspace md-toolbar span.title`)).getText()).toEqual(`New workspace`);
+
     const btnDeleteWks = element(by.css(`app-workspace .btn-delete-wks`));
 
     // let's delete the workspace
@@ -143,7 +130,7 @@ describe(`Workspaces`, () => {
 
     // a dialog is shown
     expect(element(by.css(`app-workspace-deletion-dialog .mat-dialog-content`)).getText())
-      .toEqual(`Everything in the workspace will be deleted!\nAre you sure you want to delete New Workspace?`);
+      .toEqual(`Everything in the workspace will be deleted!\nAre you sure you want to delete New workspace?`);
 
     // let's confirm the deletion
     element(by.css(`app-workspace-deletion-dialog .btn-confirm-delete-wks`)).click();

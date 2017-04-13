@@ -146,11 +146,7 @@ export class PetalsCockpitPage {
   selectWorkspace(index: number, expectedName?: string) {
     expect(element(by.css(`app-workspaces-dialog`)).isDisplayed()).toBe(true);
 
-    const cards = element.all(by.css(`app-workspaces-dialog div md-card-title-group`));
-
-    expect(cards.count()).toBeGreaterThanOrEqual(index + 1);
-
-    cards.get(index).click();
+    element.all(by.css(`app-workspaces-dialog div md-card-title-group`)).get(index).click();
 
     const wsButton = element(by.css(`app-cockpit md-sidenav button.workspace-name`));
     let test = EC.elementToBeClickable(wsButton);

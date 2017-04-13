@@ -7,6 +7,7 @@ const readline = require('readline');
 const sourceFolders = [
   './src/app',
   './src/styles',
+  './src/mocks',
   './e2e'
 ];
 

@@ -19,18 +19,15 @@ import { IWorkspaceRow, IWorkspace } from './workspace.interface';
 
 export interface IWorkspacesCommon {
   selectedWorkspaceId: string;
+  isSelectedWorkspaceFetched: boolean;
+  // for all users of the workspace that was deleted
+  isSelectedWorkspaceDeleted: boolean;
 
   // for workspaces dialog
   isAddingWorkspace: boolean;
   isFetchingWorkspaces: boolean;
 
   searchPetals: string;
-
-  // for the action of deleting
-  isRemovingWorkspace: boolean;
-
-  // for all users of the workspace that was deleted
-  deletedWorkspace: boolean;
 }
 
 export interface IWorkspacesTableOnly {

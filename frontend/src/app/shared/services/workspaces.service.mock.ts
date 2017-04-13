@@ -41,11 +41,24 @@ export class WorkspacesMockService extends WorkspacesServiceImpl {
     return helper.responseBody(workspacesService.getWorkspacesListAndUsers(mock.getCurrentUser().id));
   }
 
-  postWorkspace(workspaceName: string) {
-    const workspace = workspacesService.getNewWorkspace(workspaceName);
+  postWorkspace(name: string) {
+    const workspace = workspacesService.getNewWorkspace(name);
 
     return helper
       .responseBody(workspace)
+      .delay(environment.httpDelay);
+  }
+
+  fetchWorkspace(id: string) {
+    return helper
+      .responseBody(workspacesService.getWorkspaceOverview(id))
+      .delay(environment.httpDelay);
+  }
+
+  setDescription(id: string, description: string) {
+    workspacesService.getWorkspace(id).description = description;
+    return helper
+      .response(204)
       .delay(environment.httpDelay);
   }
 

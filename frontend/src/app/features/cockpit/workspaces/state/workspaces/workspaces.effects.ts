@@ -180,17 +180,61 @@ export class WorkspacesEffects {
           { type: Ui.CLOSE_POPUP_WORKSPACES_LIST }
         ]));
       })
+    );
 
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) fetchWorkspaceDetails$: Observable<Action> = this.actions$
+    .ofType(Workspaces.FETCH_WORKSPACE_DETAILS)
+    .switchMap((action: Action) =>
+      this.workspacesService.fetchWorkspace(action.payload)
+        .map((res: Response) => {
+          const data = res.json();
+          return batchActions([
+            { type: Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS, payload: { id: action.payload, data: data.workspace } },
+            { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap<IUserRow>(data.users) },
+          ]);
+        })
+        .catch((err) => {
+          if (environment.debug) {
+            console.group();
+            console.warn(`Error caught in workspaces.effects : ${Workspaces.FETCH_WORKSPACE_DETAILS}`);
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of({
+            type: Workspaces.FETCH_WORKSPACE_DETAILS_FAILED,
+            payload: action.payload
+          });
+        })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) setDescription$: Observable<Action> = this.actions$
+    .ofType(Workspaces.SET_DESCRIPTION)
+    .switchMap((action: Action) =>
+      this.workspacesService
+        .setDescription(action.payload.id, action.payload.description)
+        .map(__ => ({ type: Workspaces.SET_DESCRIPTION_SUCCESS, payload: action.payload }))
+        .catch(err => {
+          if (environment.debug) {
+            console.group();
+            console.warn(`Error catched in workspaces.effects : ${Workspaces.SET_DESCRIPTION}`);
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of({ type: Workspaces.SET_DESCRIPTION_FAILED, payload: action.payload.id });
+        })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) deleteWorkspace$: Observable<Action> = this.actions$
     .ofType(Workspaces.DELETE_WORKSPACE)
-    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
-    .switchMap(([_, wsId]) =>
+    .switchMap((action: Action) =>
       this.workspacesService
-        .deleteWorkspace(wsId)
-        .map(__ => ({ type: Workspaces.DELETE_WORKSPACE_SUCCESS }))
+        .deleteWorkspace(action.payload)
+        .map(__ => ({ type: Workspaces.DELETE_WORKSPACE_SUCCESS, payload: action.payload }))
         .catch(err => {
           if (environment.debug) {
             console.group();
@@ -199,7 +243,7 @@ export class WorkspacesEffects {
             console.groupEnd();
           }
 
-          return Observable.of({ type: Workspaces.DELETE_WORKSPACE_FAILED });
+          return Observable.of({ type: Workspaces.DELETE_WORKSPACE_FAILED, payload: action.payload });
         })
     );
 }

@@ -27,7 +27,7 @@ export interface IContainerCommon {
 
   // for UI
   isFolded: boolean;
-  isFetchingDetail: boolean;
+  isFetchingDetails: boolean;
 }
 
 export interface IContainerRow extends IContainerCommon {

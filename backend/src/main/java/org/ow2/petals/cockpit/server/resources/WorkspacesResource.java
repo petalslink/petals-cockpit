@@ -48,7 +48,6 @@ import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -69,7 +68,9 @@ public class WorkspacesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Workspace create(@NotNull @Valid NewWorkspace ws, @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
-            WorkspacesRecord wsDb = new WorkspacesRecord(null, ws.name);
+            WorkspacesRecord wsDb = new WorkspacesRecord();
+            wsDb.setName(ws.name);
+            wsDb.setDescription("Put some description in **markdown** for the workspace here.");
             wsDb.attach(conf);
             wsDb.insert();
 
@@ -81,7 +82,7 @@ public class WorkspacesResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Workspaces workspaces(@Pac4JProfile CockpitProfile profile) {
+    public WorkspacesContent workspaces(@Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
             ImmutableMap.Builder<String, Workspace> wss = ImmutableMap.builder();
             // we need a normal Map because ImmutableMap does not accept duplicate put
@@ -103,7 +104,7 @@ public class WorkspacesResource {
                 wss.put(String.valueOf(w.getId()), new Workspace(w.getId(), w.getName(), wsUsers.build()));
             }
 
-            return new Workspaces(wss.build(), users);
+            return new WorkspacesContent(wss.build(), users);
         });
     }
 
@@ -113,13 +114,12 @@ public class WorkspacesResource {
         @JsonProperty
         public final String name;
 
-        @JsonCreator
         public NewWorkspace(@JsonProperty("name") String name) {
             this.name = name;
         }
     }
 
-    public static class Workspace {
+    public static class WorkspaceMin {
 
         @NotNull
         @Min(1)
@@ -129,15 +129,9 @@ public class WorkspacesResource {
         @JsonProperty
         public final String name;
 
-        @JsonProperty
-        public final ImmutableList<String> users;
-
-        @JsonCreator
-        public Workspace(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("users") List<String> users) {
+        public WorkspaceMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
             this.id = id;
             this.name = name;
-            this.users = ImmutableList.copyOf(users);
         }
 
         @JsonProperty
@@ -146,8 +140,21 @@ public class WorkspacesResource {
         }
     }
 
-    public static class Workspaces {
+    public static class Workspace extends WorkspaceMin {
 
+        @JsonProperty
+        public final ImmutableList<String> users;
+
+        public Workspace(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("users") List<String> users) {
+            super(id, name);
+            this.users = ImmutableList.copyOf(users);
+        }
+    }
+
+    public static class WorkspacesContent {
+
+        @Valid
         @JsonProperty
         public final ImmutableMap<String, Workspace> workspaces;
 
@@ -155,8 +162,7 @@ public class WorkspacesResource {
         @JsonProperty
         public final ImmutableMap<String, UserMin> users;
 
-        @JsonCreator
-        public Workspaces(@JsonProperty("workspaces") Map<String, Workspace> workspaces,
+        public WorkspacesContent(@JsonProperty("workspaces") Map<String, Workspace> workspaces,
                 @JsonProperty("users") Map<String, UserMin> users) {
             this.workspaces = ImmutableMap.copyOf(workspaces);
             this.users = ImmutableMap.copyOf(users);

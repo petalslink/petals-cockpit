@@ -26,6 +26,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -79,6 +80,7 @@ import org.ow2.petals.jbi.descriptor.JBIDescriptorException;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -120,18 +122,60 @@ public class WorkspaceResource {
         }
     }
 
+    private WorkspacesRecord get(Configuration conf) {
+        checkAccess(conf);
+
+        WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId)).fetchOne();
+
+        if (ws == null) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
+        return ws;
+    }
+
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public WorkspaceOverviewContent overview() {
+        return DSL.using(jooq).transactionResult(conf -> {
+            WorkspacesRecord ws = get(conf);
+
+            List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
+                    .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)).fetchInto(USERS);
+
+            return new WorkspaceOverviewContent(ws, wsUsers);
+        });
+    }
+
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    public WorkspaceOverviewContent put(WorkspaceUpdate update) {
+        return DSL.using(jooq).transactionResult(conf -> {
+            WorkspacesRecord ws = get(conf);
+
+            if (update.name != null) {
+                ws.setName(update.name);
+            }
+
+            if (update.description != null) {
+                ws.setDescription(update.description);
+            }
+
+            ws.store();
+
+            List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
+                    .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)).fetchInto(USERS);
+
+            return new WorkspaceOverviewContent(ws, wsUsers);
+        });
+    }
+
+    @GET
+    @Path("/content")
     @Produces(MediaType.APPLICATION_JSON + ";qs=1")
     public WorkspaceFullContent content() {
         return DSL.using(jooq).transactionResult(conf -> {
-
-            checkAccess(conf);
-
-            WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId)).fetchOne();
-
-            if (ws == null) {
-                throw new WebApplicationException(Status.NOT_FOUND);
-            }
+            WorkspacesRecord ws = get(conf);
 
             WorkspaceContent content = WorkspaceContent.buildFromDatabase(conf, ws);
 
@@ -139,7 +183,6 @@ public class WorkspaceResource {
                     .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)).fetchInto(USERS);
 
             return new WorkspaceFullContent(ws, wsUsers, content);
-
         });
     }
 
@@ -147,6 +190,7 @@ public class WorkspaceResource {
      * Produces {@link WorkspaceEvent}
      */
     @GET
+    @Path("/content")
     @Produces(SseFeature.SERVER_SENT_EVENTS + ";qs=0.5")
     public EventOutput sse() throws InterruptedException {
 
@@ -245,8 +289,7 @@ public class WorkspaceResource {
     public ComponentDeployed deployComponent(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
-            @NotEmpty @FormDataParam("name") String name,
-            @NotEmpty @FormDataParam("type") String type)
+            @NotEmpty @FormDataParam("name") String name, @NotEmpty @FormDataParam("type") String type)
             throws IOException, InterruptedException {
 
         checkAccess(jooq);
@@ -263,6 +306,62 @@ public class WorkspaceResource {
 
         try (ServicedArtifact sa = httpServer.serve(name + ".zip", os -> IOUtils.copy(file, os))) {
             return as.call(wsId, new DeployComponent(name, ttype, sa.getArtifactUrl(), containerId));
+        }
+    }
+
+    public static class WorkspaceOverviewContent {
+
+        @Valid
+        @JsonProperty
+        public final WorkspaceOverview workspace;
+
+        @Valid
+        @JsonProperty
+        public final ImmutableMap<String, UserMin> users;
+
+        public WorkspaceOverviewContent(WorkspacesRecord ws, List<UsersRecord> users) {
+            this.users = users.stream().collect(ImmutableMap.toImmutableMap(UsersRecord::getUsername,
+                    u -> new UserMin(u.getUsername(), u.getName())));
+            List<String> wsUsernames = users.stream().map(UsersRecord::getUsername)
+                    .collect(ImmutableList.toImmutableList());
+            this.workspace = new WorkspaceOverview(ws.getId(), ws.getName(), wsUsernames, ws.getDescription());
+        }
+
+        @JsonCreator
+        private WorkspaceOverviewContent(@JsonProperty("workspace") WorkspaceOverview workspace,
+                @JsonProperty("users") Map<String, UserMin> users) {
+            this.workspace = workspace;
+            this.users = ImmutableMap.copyOf(users);
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class WorkspaceUpdate {
+
+        @Nullable
+        @JsonProperty
+        private final String name;
+
+        @Nullable
+        @JsonProperty
+        private final String description;
+
+        public WorkspaceUpdate(@Nullable @JsonProperty("name") String name,
+                @Nullable @JsonProperty("description") String description) {
+            this.name = name;
+            this.description = description;
+        }
+    }
+
+    public static class WorkspaceOverview extends Workspace {
+
+        @NotNull
+        public final String description;
+
+        public WorkspaceOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("users") List<String> users, @JsonProperty("description") String description) {
+            super(id, name, users);
+            this.description = description;
         }
     }
 
@@ -482,7 +581,7 @@ public class WorkspaceResource {
 
         @Valid
         @JsonProperty
-        public final Workspace workspace;
+        public final WorkspaceOverview workspace;
 
         @Valid
         @JsonProperty
@@ -497,7 +596,7 @@ public class WorkspaceResource {
                     u -> new UserMin(u.getUsername(), u.getName())));
             List<String> wsUsernames = users.stream().map(UsersRecord::getUsername)
                     .collect(ImmutableList.toImmutableList());
-            this.workspace = new Workspace(ws.getId(), ws.getName(), wsUsernames);
+            this.workspace = new WorkspaceOverview(ws.getId(), ws.getName(), wsUsernames, ws.getDescription());
             this.content = content;
         }
 
@@ -507,7 +606,7 @@ public class WorkspaceResource {
             this.users = ImmutableMap.of();
             this.content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                     ImmutableMap.of(), ImmutableMap.of());
-            this.workspace = new Workspace(0, "", ImmutableList.of());
+            this.workspace = new WorkspaceOverview(0, "", ImmutableList.of(), "");
         }
     }
 
@@ -534,10 +633,6 @@ public class WorkspaceResource {
         }
 
         public static WorkspaceEvent content(WorkspaceFullContent content) {
-            return new WorkspaceEvent(Event.WORKSPACE_CONTENT, content);
-        }
-
-        public static WorkspaceEvent content(WorkspaceContent content) {
             return new WorkspaceEvent(Event.WORKSPACE_CONTENT, content);
         }
 

@@ -28,9 +28,13 @@ import { environment } from './../../../environments/environment';
 export abstract class WorkspacesService {
   abstract fetchWorkspaces(): Observable<Response>;
 
-  abstract postWorkspace(workspaceName: string): Observable<Response>;
+  abstract postWorkspace(name: string): Observable<Response>;
 
-  abstract deleteWorkspace(workspaceId: string): Observable<Response>;
+  abstract fetchWorkspace(id: string): Observable<Response>;
+
+  abstract deleteWorkspace(id: string): Observable<Response>;
+
+  abstract setDescription(id: string, description: string): Observable<Response>;
 
   abstract watchEventWorkspaceDeleted(): Observable<void>;
 }
@@ -49,15 +53,20 @@ export class WorkspacesServiceImpl extends WorkspacesService {
     return this.http.get(`${environment.urlBackend}/workspaces`);
   }
 
-  postWorkspace(workspaceName: string) {
-    return this.http.post(`${environment.urlBackend}/workspaces`, { name: workspaceName });
+  postWorkspace(name: string) {
+    return this.http.post(`${environment.urlBackend}/workspaces`, { name: name });
   }
 
-  deleteWorkspace(workspaceId: string) {
-    // TODO it is needed to add an extra parameter to the request just so that the
-    // browser does not think the opened SSE stream is a potential cached response
-    // for the delete request... that's strange but that's life!
-    return this.http.delete(`${environment.urlBackend}/workspaces/${workspaceId}?d`);
+  fetchWorkspace(id: string) {
+    return this.http.get(`${environment.urlBackend}/workspaces/${id}`);
+  }
+
+  deleteWorkspace(id: string) {
+    return this.http.delete(`${environment.urlBackend}/workspaces/${id}`);
+  }
+
+  setDescription(id: string, description: string) {
+    return this.http.put(`${environment.urlBackend}/workspaces/${id}`, { description });
   }
 
   watchEventWorkspaceDeleted() {

@@ -152,8 +152,8 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
 
     @Test
     public void deployComponent() throws Exception {
-        try (EventInput eventInput = resources.target("/workspaces/1").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
-                .get(EventInput.class)) {
+        try (EventInput eventInput = resources.target("/workspaces/1/content")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 

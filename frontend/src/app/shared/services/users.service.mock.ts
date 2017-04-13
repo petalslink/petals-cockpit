@@ -38,6 +38,10 @@ export class UsersMockService extends UsersService {
     mrobert: {
       ...users.mrobert,
       lastWorkspace: ''
+    },
+    bescudie: {
+      ...users.bescudie,
+      lastWorkspace: ''
     }
   };
 

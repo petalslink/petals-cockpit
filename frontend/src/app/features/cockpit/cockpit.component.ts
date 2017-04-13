@@ -91,7 +91,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
       .subscribe();
 
     this.store$
-      .select(state => state.workspaces.deletedWorkspace)
+      .select(state => state.workspaces.isSelectedWorkspaceDeleted)
       .filter(d => d)
       .takeUntil(this.onDestroy$)
       .do(_ => this.openDeletedWorkspaceDialog())
