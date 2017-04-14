@@ -80,10 +80,9 @@ build-frontend:
     - /^back\/.*$/
   script:
     - cd frontend
-    - time ng lint
-    - time node generate-headers.js --dry
-    - time ng test --progress=false --single-run --code-coverage
-    - time ../ci/xrun.sh ../ci/wmrun.sh ng e2e --prod --progress=false -e=prod-e2e
+    - time yarn run check
+    - time yarn run test:ci
+    - time ../ci/xrun.sh ../ci/wmrun.sh yarn run e2e:ci
     # build the final frontend for the product
     - time yarn run prod-silent && mv dist ../frontend-dist
     # build the demo for the gitlab pages
@@ -131,4 +130,4 @@ e2e-product:
     - nohup $COCKPIT server $COCKPIT_CONFIG &
     - cd frontend
     # TODO the exclude does not work, see https://github.com/angular/angular-cli/issues/5172
-    - time ../ci/xrun.sh ../ci/wmrun.sh ng e2e --serve=false --specs=e2e/login.e2e-spec.ts --specs=e2e/workspaces.e2e-spec.ts
+    - time ../ci/xrun.sh ../ci/wmrun.sh yarn run e2e:product

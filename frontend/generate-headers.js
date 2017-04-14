@@ -13,7 +13,6 @@ const sourceFolders = [
 // individual files
 const sourceFiles = {
   ts: [
-    './src/test.ts',
     './src/main.ts'
   ],
 

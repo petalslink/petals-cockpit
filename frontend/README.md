@@ -19,12 +19,11 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 ## Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Run `yarn run test` or `yarn run test:watch` to execute the unit tests via [Jest](https://facebook.github.io/jest/).
 
 ## Running end-to-end tests
 
 Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-Before running the tests make sure you are serving the app via `ng serve`.
 
 ## Further help
 
@@ -37,3 +36,11 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
   https://github.com/angular/angular/issues/13807#issuecomment-270880382
   https://github.com/angular/angular/issues/10981
   When it work, it would be nice to have a separated URL for the left menu (this way we could be lazy loading menu components too)
+
+## Notes about the various `tsconfig.json` files
+
+Angular-cli (configured in `.angular-cli.conf`) uses `src/tsconfig.app.json` to compile the application, `src/tsconfig.spec.json` to compile the tests and `e2e/tsconfig.e2e.json` to compile the e2e tests.
+
+Jest (configured in `package.json`) uses `src/tsconfig.spec.json` to compile the tests.
+
+The IDE will most certainly uses `src/tsconfig.json` for the files in `src/` (in particular using the jest typings) and `src/tsconfig.json` for the files in `e2e/` (in particular using the jasmine typings).
