@@ -98,8 +98,8 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
         ComponentOverview get1 = resources.target("/components/30").request().get(ComponentOverview.class);
         assertThat(get1.state).isEqualTo(ComponentMin.State.Started);
 
-        try (EventInput eventInput = resources.target("/workspaces/1").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
-                .get(EventInput.class)) {
+        try (EventInput eventInput = resources.target("/workspaces/1/content")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
@@ -211,8 +211,8 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
         ComponentOverview get1 = resources.target("/components/31").request().get(ComponentOverview.class);
         assertThat(get1.state).isEqualTo(ComponentMin.State.Stopped);
 
-        try (EventInput eventInput = resources.target("/workspaces/1").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
-                .get(EventInput.class)) {
+        try (EventInput eventInput = resources.target("/workspaces/1/content")
+                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 

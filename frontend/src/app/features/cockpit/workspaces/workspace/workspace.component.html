@@ -16,20 +16,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div *ngIf="workspace$ | async as workspace" fxLayout="column" fxFill class="wrapper-content">
   <md-toolbar>
     <div class="prefix-toolbar-title">
-      <md-icon color="primary">folder_special</md-icon>
+      <md-icon color="primary" *ngIf="!workspace.isFetchingDetails">grade</md-icon>
+      <md-spinner *ngIf="workspace.isFetchingDetails"></md-spinner>
     </div>
 
     <span class="title">{{ workspace.name }}</span>
   </md-toolbar>
 
   <div fxFill fxLayout="column" class="content content-max-width" fxLayoutWrap>
-    <div fxLayout="row">
-      <p>Welcome to <span class="selected-workspace color-primary">{{ workspace.name }}</span></p>
+    <div fxLayout="column" *ngIf="!isEditingDescription; else descriptionEdit" class="workspace-description">
+      <div class="info" [innerHTML]="workspace.description | MarkdownToHtml"></div>
+      <button md-button (click)="editDescription()">Edit</button>
     </div>
+    <ng-template #descriptionEdit>
+      <div fxLayout="column" *ngIf="description !== null" class="workspace-description-edit">
+        <textarea [disabled]="isSettingDescription" [(ngModel)]="description"></textarea>
+        <div class="warning" [innerHTML]="description | MarkdownToHtml"></div>
+        <button md-button [disabled]="isSettingDescription" (click)="validateDescription()">Submit</button>
+      </div>
+    </ng-template>
 
-    <div fxLayout="row" class="info" [innerHTML]="workspace.message | MarkdownToHtml"></div>
-
-    <div fxLayout="column" *ngIf="workspace.users.list as users">
+    <div fxLayout="column" *ngIf="workspace.users.list as users" class="workspace-users">
       <div *ngIf="users.length === 1; else workspaceShared">
         <p class="users-in-workspace">You are the only one using this workspace:</p>
       </div>
@@ -52,7 +59,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </div>
 
     <button color="warn" type="button" class="btn-delete-wks margin-top-x3" (click)="openDeletionDialog()"
-      md-mini-fab mdTooltip="Delete the workspace" mdTooltipPosition="after" [disabled]="isRemovingWorkspace$ | async">
+      md-mini-fab mdTooltip="Delete the workspace" mdTooltipPosition="after" [disabled]="workspace.isRemoving">
       <md-icon>delete</md-icon>
     </button>
   </div>

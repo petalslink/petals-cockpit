@@ -20,13 +20,12 @@ import { IWorkspacesTable } from './workspaces.interface';
 export function workspacesTableFactory(): IWorkspacesTable {
   return {
     selectedWorkspaceId: '',
+    isSelectedWorkspaceFetched: false,
+    isSelectedWorkspaceDeleted: false,
 
     isAddingWorkspace: false,
     isFetchingWorkspaces: false,
     searchPetals: '',
-
-    isRemovingWorkspace: false,
-    deletedWorkspace: false,
 
     byId: {},
     allIds: []

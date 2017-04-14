@@ -42,14 +42,14 @@ export class PetalsCockpitPage {
 
     if (checkRedirect) {
       // let's be sure angular has finished loading after login!
-      browser.wait(EC.urlContains('/workspaces'), 3000);
+      browser.wait(EC.urlContains('/workspaces'), 6000);
 
       if (hasLastWorkspace) {
         expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
-        return browser.wait(EC.visibilityOf(element(by.css(`app-cockpit md-sidenav.mat-sidenav-opened`))), 2000);
+        return browser.wait(EC.visibilityOf(element(by.css(`app-cockpit md-sidenav.mat-sidenav-opened`))), 6000);
       } else {
         expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
-        return browser.wait(EC.visibilityOf(element(by.css(`app-workspaces-dialog`))), 2000);
+        return browser.wait(EC.visibilityOf(element(by.css(`app-workspaces-dialog`))), 6000);
       }
     } else {
       // let's be sure angular has finished loading after login!
@@ -141,5 +141,19 @@ export class PetalsCockpitPage {
     const addBtn = element(by.css(`app-cockpit md-sidenav a.btn-add-bus`));
     browser.wait(EC.elementToBeClickable(addBtn), 5000);
     return addBtn.click();
+  }
+
+  selectWorkspace(index: number, expectedName?: string) {
+    expect(element(by.css(`app-workspaces-dialog`)).isDisplayed()).toBe(true);
+
+    element.all(by.css(`app-workspaces-dialog div md-card-title-group`)).get(index).click();
+
+    const wsButton = element(by.css(`app-cockpit md-sidenav button.workspace-name`));
+    let test = EC.elementToBeClickable(wsButton);
+    if (expectedName) {
+      test = EC.and(test, EC.textToBePresentInElement(wsButton, expectedName));
+    }
+
+    return browser.wait(test, 10000);
   }
 }

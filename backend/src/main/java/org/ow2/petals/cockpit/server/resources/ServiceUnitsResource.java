@@ -62,7 +62,7 @@ public class ServiceUnitsResource {
     @GET
     @Path("/{suId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ServiceUnitOverview getSU(@NotNull @PathParam("suId") @Min(1) long suId,
+    public ServiceUnitOverview overview(@NotNull @PathParam("suId") @Min(1) long suId,
             @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
             ServiceunitsRecord su = DSL.using(conf).selectFrom(SERVICEUNITS).where(SERVICEUNITS.ID.eq(suId)).fetchOne();

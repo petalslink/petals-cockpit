@@ -1,3 +1,22 @@
+/**
+ * Copyright (C) 2017 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import { omit } from 'underscore';
+
 import { IBusImport } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { Bus, BusInProgress, busesService, busesInProgressService } from './buses-mock';
 import { Container } from './containers-mock';
@@ -41,14 +60,31 @@ export class Workspace {
   private static cpt = 0;
   private id: string;
   private name: string;
+  public description: string;
+  private users: string[];
   private buses = new Map<string, Bus>();
   private busesInProgress = new Map<string, BusInProgress>();
+
+  private static workspaceUsers(i: number) {
+    switch (i) {
+      case 1: return ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'];
+      default: return ['admin'];
+    }
+  }
+
+  private static workspaceDescription(i: number) {
+    switch (i) {
+      case 0: return 'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.';
+      default: return 'Put some description in **markdown** for the workspace here.';
+    }
+  }
 
   constructor(name?: string) {
     const i = Workspace.cpt++;
     this.id = `idWks${i}`;
     this.name = name ? name : `Workspace ${i}`;
-
+    this.description = Workspace.workspaceDescription(i);
+    this.users = Workspace.workspaceUsers(i);
     // by default add 1 bus
     this.addBus();
 
@@ -65,16 +101,9 @@ export class Workspace {
     return {
       id: this.id,
       name: this.name,
-      message: 'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.',
-      users: this.workspaceUsers()
+      description: this.description,
+      users: this.users
     };
-  }
-
-  private workspaceUsers() {
-    switch (this.id) {
-      case 'idWks1': return ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'];
-      default: return ['admin'];
-    }
   }
 
   getBuses() {
@@ -167,7 +196,7 @@ export class Workspaces {
    * @export
    * @returns {any} the workspaces list
    */
-  getWorkspaces(user: string) {
+  private getWorkspaces(user: string) {
     const workspacesIds = Array.from(this.memoizedWorkspaces.keys());
 
     return workspacesIds.reduce((acc, workspaceId) => {
@@ -175,7 +204,8 @@ export class Workspaces {
       if (ws.users.includes(user)) {
         return {
           ...acc,
-          [workspaceId]: ws
+          // this is potentially big, so the backend des not return it here
+          [workspaceId]: omit(ws, 'description')
         };
       } else {
         return acc;
@@ -193,6 +223,12 @@ export class Workspaces {
     const workspaces = this.getWorkspaces(user);
 
     return { workspaces, users };
+  }
+
+  getWorkspaceOverview(id: string) {
+    const workspace = this.getWorkspace(id).toObj();
+
+    return { workspace, users };
   }
 
   /**

@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MdDialog, MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 import { Ui } from '../../../../shared/state/ui.reducer';
 import { IStore } from '../../../../shared/interfaces/store.interface';
@@ -31,9 +32,14 @@ import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/wor
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss']
 })
-export class WorkspaceComponent implements OnInit {
+export class WorkspaceComponent implements OnInit, OnDestroy {
+  private onDestroy$ = new Subject<void>();
   public isRemovingWorkspace$: Observable<boolean>;
   public workspace$: Observable<IWorkspace>;
+
+  public isEditingDescription = false;
+  public isSettingDescription = false;
+  public description: string = null;
 
   constructor(private store$: Store<IStore>, public dialog: MdDialog) { }
 
@@ -42,18 +48,73 @@ export class WorkspaceComponent implements OnInit {
 
     this.workspace$ = this.store$.let(getCurrentWorkspace());
 
-    this.isRemovingWorkspace$ = this.store$.select(state => state.workspaces.isRemovingWorkspace);
+    this.workspace$
+      .takeUntil(this.onDestroy$)
+      // only when we change workspace!
+      .map(ws => ws.id).distinctUntilChanged()
+      .do(id => {
+        // we reinit these in case one change workspace while editing
+        this.description = null;
+        this.isEditingDescription = false;
+        this.isSettingDescription = false;
+        this.store$.dispatch({ type: Workspaces.FETCH_WORKSPACE_DETAILS, payload: id });
+      })
+      .subscribe();
+
+    this.workspace$
+      .takeUntil(this.onDestroy$)
+      // only when we are setting the description and it has finished
+      .filter(ws => !ws.isSettingDescription && this.isSettingDescription)
+      .do(ws => {
+        // we reinit these, and it will show the current value of the description in the store
+        this.description = null;
+        this.isEditingDescription = false;
+        this.isSettingDescription = false;
+      })
+      .subscribe();
+  }
+
+  editDescription() {
+    this.isEditingDescription = true;
+    // note: there could be a small moment where description is not set!
+    this.workspace$
+      .first()
+      .do(ws => {
+        this.description = ws.description;
+      })
+      .subscribe();
+  }
+
+  validateDescription() {
+    this.isSettingDescription = true;
+    const desc = this.description;
+    this.workspace$
+      .first()
+      .do(ws => {
+        this.store$.dispatch({ type: Workspaces.SET_DESCRIPTION, payload: { id: ws.id, description: desc } });
+      })
+      .subscribe();
   }
 
   openDeletionDialog() {
-    this.dialog
-      .open(WorkspaceDeleteDialogComponent, {
-        data: { workspace$: this.workspace$ }
+    this.workspace$
+      .first()
+      .do(ws => {
+        this.dialog
+          .open(WorkspaceDeleteDialogComponent, {
+            data: { workspace: ws }
+          })
+          .afterClosed()
+          .filter((result: boolean) => result)
+          .do(_ => this.store$.dispatch({ type: Workspaces.DELETE_WORKSPACE, payload: ws.id }))
+          .subscribe();
       })
-      .afterClosed()
-      .filter((result: boolean) => result)
-      .do(_ => this.store$.dispatch({ type: Workspaces.DELETE_WORKSPACE }))
       .subscribe();
+  }
+
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
   }
 }
 
@@ -71,7 +132,7 @@ export class WorkspaceComponent implements OnInit {
         <md-dialog-content>
           <div fxLayout="column" fxFill>
               <label>Everything in the workspace will be deleted!</label>
-              <p>Are you sure you want to delete <b>{{ (data.workspace$ | async).name }}</b>?</p>
+              <p>Are you sure you want to delete <b>{{ data.workspace.name }}</b>?</p>
           </div>
         </md-dialog-content>
 

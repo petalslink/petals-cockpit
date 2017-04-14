@@ -76,7 +76,8 @@ public class ContainersResource {
     @GET
     @Path("/{cId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ContainerOverview get(@NotNull @PathParam("cId") @Min(1) long cId, @Pac4JProfile CockpitProfile profile) {
+    public ContainerOverview overview(@NotNull @PathParam("cId") @Min(1) long cId,
+            @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
             ContainersRecord container = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(cId)).fetchOne();
 

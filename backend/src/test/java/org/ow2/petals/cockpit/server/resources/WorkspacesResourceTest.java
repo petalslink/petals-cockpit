@@ -31,7 +31,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspaces
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.NewWorkspace;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
-import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspaces;
+import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspacesContent;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 
@@ -50,7 +50,8 @@ public class WorkspacesResourceTest extends AbstractCockpitResourceTest {
 
         // there should be only one!
         assertThat(table(WORKSPACES)).hasNumberOfRows(1).column(WORKSPACES.ID.getName()).value().isEqualTo(post.id)
-                .column(WORKSPACES.NAME.getName()).value().isEqualTo(post.name);
+                .column(WORKSPACES.NAME.getName()).value().isEqualTo(post.name).column(WORKSPACES.DESCRIPTION.getName())
+                .value().isEqualTo("Put some description in **markdown** for the workspace here.");
 
         assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(1).column(USERS_WORKSPACES.USERNAME.getName()).value()
                 .isEqualTo(ADMIN).column(USERS_WORKSPACES.WORKSPACE_ID.getName()).value().isEqualTo(post.id);
@@ -58,10 +59,10 @@ public class WorkspacesResourceTest extends AbstractCockpitResourceTest {
 
     @Test
     public void getWorkspaces() {
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(1L, "test1"));
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(2L, "test2"));
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(3L, "test3"));
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(4L, "test4"));
+        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(1L, "test1", ""));
+        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(2L, "test2", ""));
+        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(3L, "test3", ""));
+        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(4L, "test4", ""));
 
         DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("userX", "..", "..", null));
         DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("userY", "..", "..", null));
@@ -71,7 +72,7 @@ public class WorkspacesResourceTest extends AbstractCockpitResourceTest {
         DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersWorkspacesRecord(2L, "userX"));
         DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersWorkspacesRecord(3L, "admin"));
 
-        Workspaces ws = resources.target("/workspaces").request().get(Workspaces.class);
+        WorkspacesContent ws = resources.target("/workspaces").request().get(WorkspacesContent.class);
 
         // ws 1 and 3
         assertThat(ws.workspaces).hasSize(2);

@@ -54,7 +54,7 @@ export function toJavascriptMap<I>(obj: object): JsMap<I> {
  * This merges the fields of toMerge into map, all the elements of toMerge.byId
  * into map.byId elements and toMerge.allIds into map.allIds.
  */
-export function mergeInto<I, M1 extends JsMap<I>, M2 extends JsMap<I>>(map: M1, toMerge: M2): M1 & M2 {
+export function mergeInto<I, M extends JsMap<I>>(map: M, toMerge: JsMap<I>): M {
   return Object.assign({},
     map,
     toMerge,

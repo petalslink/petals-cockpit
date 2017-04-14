@@ -200,4 +200,12 @@
       referencedTableName="users" referencedColumnNames="username"
       onDelete="CASCADE" />
   </changeSet>
+
+  <changeSet id="v0.8.0-1" author="vnoel">
+    <addColumn tableName="workspaces">
+      <column name="description" type="clob" defaultValue="">
+        <constraints nullable="false" />
+      </column>
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>

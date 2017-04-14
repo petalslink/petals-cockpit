@@ -109,7 +109,7 @@ export class SseServiceImpl extends SseService {
       console.debug('subscribing to a new sse connection');
     }
 
-    this.currentSse$ = new EventSource(`${environment.urlBackend}/workspaces/${workspaceId}`);
+    this.currentSse$ = new EventSource(`${environment.urlBackend}/workspaces/${workspaceId}/content`);
 
     // foreach event
     SseWorkspaceEvent.allEvents.forEach(eventName => {

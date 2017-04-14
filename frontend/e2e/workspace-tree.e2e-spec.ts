@@ -29,6 +29,47 @@ describe(`Workspaces Tree`, () => {
     browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
   });
 
+  it(`should contain the correct buses`, () => {
+    // let's be sure everything is loaded and visible
+    browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
+
+    // check that buses/container/component/su are available
+    const availableBuses = [
+      `Bus 0`,
+        `Cont 0`,
+          `Comp 0`,
+            `SU 0`,
+            `SU 1`,
+          `Comp 1`,
+            `SU 2`,
+            `SU 3`,
+        `Cont 1`,
+          `Comp 2`,
+            `SU 4`,
+            `SU 5`,
+          `Comp 3`,
+            `SU 6`,
+            `SU 7`
+    ];
+
+    expect(page.getWorkspaceTree()).toEqual(availableBuses);
+  });
+
+  it(`should contain the correct buses in progress`, () => {
+    const importBusesText = page.getBusesInProgress();
+
+    // check that 2 bus in progress are displayed
+    expect(importBusesText.then(e => e.length)).toEqual(2);
+
+    // check that buses/container/component/su are available
+    const availableBusesInProgress = [
+      `192.168.0.1:7700`,
+      `192.168.0.2:7700`
+    ];
+
+    expect(importBusesText).toEqual(availableBusesInProgress);
+  });
+
   it(`should filter by bus, container, component and su when searching in Petals menu`, () => {
     // test 1 : Display only parents and children, regardless of the case
     page.search(`CoMp 0`);

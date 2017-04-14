@@ -270,7 +270,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         }
 
         DSL.using(dbRule.getConnectionJdbcUrl()).transaction(conf -> {
-            DSL.using(conf).executeInsert(new WorkspacesRecord(wsId, wsName));
+            DSL.using(conf).executeInsert(new WorkspacesRecord(wsId, wsName, ""));
             DSL.using(conf).batchInsert(bs).execute();
             DSL.using(conf).batchInsert(cs).execute();
             DSL.using(conf).batchInsert(comps).execute();

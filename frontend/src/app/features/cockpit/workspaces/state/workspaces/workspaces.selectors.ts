@@ -62,10 +62,7 @@ export function getWorkspacesList() {
  */
 export function filterWorkspaceFetched(store$: Store<IStore>): Observable<IStore> {
   return store$
-    .filter(state =>
-      state.workspaces.selectedWorkspaceId
-      && state.workspaces.byId[state.workspaces.selectedWorkspaceId]
-      && state.workspaces.byId[state.workspaces.selectedWorkspaceId].isFetched);
+    .filter(state => state.workspaces.selectedWorkspaceId && state.workspaces.isSelectedWorkspaceFetched);
 }
 
 export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspace> {
@@ -86,8 +83,10 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
       return {
         id: workspace.id,
         name: workspace.name,
-        message: workspace.message,
-        isFetched: workspace.isFetched,
+        description: workspace.description,
+        isRemoving: workspace.isRemoving,
+        isSettingDescription: workspace.isSettingDescription,
+        isFetchingDetails: workspace.isFetchingDetails,
 
         users: {
           connectedUserId: users.connectedUserId,
@@ -122,7 +121,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                     ip: container.ip,
                     port: container.port,
                     systemInfo: container.systemInfo,
-                    isFetchingDetail: container.isFetchingDetail,
+                    isFetchingDetails: container.isFetchingDetails,
                     isFolded: container.isFolded || false,
 
                     components: {

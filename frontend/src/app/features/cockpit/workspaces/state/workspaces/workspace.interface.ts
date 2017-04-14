@@ -22,10 +22,11 @@ interface IWorkspaceCommon {
   // from server
   id: string;
   name: string;
-  message: string;
+  description: string;
 
-  // when a worspace is being fetched
-  isFetched: boolean;
+  isRemoving: boolean;
+  isFetchingDetails: boolean;
+  isSettingDescription: boolean;
 }
 
 // used within table
