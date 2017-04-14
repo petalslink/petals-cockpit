@@ -75,7 +75,7 @@ export class WorkspacesServiceImpl extends WorkspacesService {
       .do((data: { id: string }) => {
         this.sseService.stopWatchingWorkspace();
         this.store$.dispatch({
-          type: Workspaces.REMOVE_WORKSPACE, payload: { workspaceId: data.id }
+          type: Workspaces.REMOVE_WORKSPACE, payload: data.id
         });
       });
   }

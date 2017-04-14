@@ -942,6 +942,17 @@ describe(`Workspaces reducer`, () => {
         isSelectedWorkspaceDeleted: true
       });
     });
+
+    it(`should not set the isSelectedWorkspaceDeleted variable if we are on another workspace`, () => {
+      expect(Workspaces.reducer(initialState, {
+        type: Workspaces.DELETE_WORKSPACE_SUCCESS,
+        payload: 'idWks2'
+      })).toEqual({
+        keepPreviousValues: '',
+        selectedWorkspaceId: 'idWks1',
+        isSelectedWorkspaceDeleted: false
+      });
+    });
   });
 
   describe(type(Workspaces.DELETE_WORKSPACE_FAILED), () => {
@@ -986,8 +997,32 @@ describe(`Workspaces reducer`, () => {
       expect(Workspaces.REMOVE_WORKSPACE).toEqual(`WORKSPACES_REDUCER_REMOVE_WORKSPACE`);
     });
 
-    xit('TODO', () => {
+    const initialState: any = {
+      keepPreviousValues: '',
+      selectedWorkspaceId: 'idWks1',
+      isSelectedWorkspaceDeleted: false
+    };
 
+    it('should set the deletedWorkspace to true', () => {
+      expect(Workspaces.reducer(initialState, {
+        type: Workspaces.REMOVE_WORKSPACE,
+        payload: 'idWks1'
+      })).toEqual({
+        keepPreviousValues: '',
+        selectedWorkspaceId: 'idWks1',
+        isSelectedWorkspaceDeleted: true
+      });
+    });
+
+    it('should not set the deletedWorkspace to true if we are on another workspace', () => {
+      expect(Workspaces.reducer(initialState, {
+        type: Workspaces.REMOVE_WORKSPACE,
+        payload: 'idWks2'
+      })).toEqual({
+        keepPreviousValues: '',
+        selectedWorkspaceId: 'idWks1',
+        isSelectedWorkspaceDeleted: false
+      });
     });
   });
 

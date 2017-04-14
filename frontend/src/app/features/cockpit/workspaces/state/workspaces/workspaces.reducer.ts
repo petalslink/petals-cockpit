@@ -211,10 +211,14 @@ export class Workspaces {
     return updateById(workspacesTable, payload, { isRemoving: false });
   }
 
+  /**
+   * Note: while DELETE_WORKSPACE concerns the HTTP action of deleting a workspace,
+   * REMOVE_WORKSPACE concerns the event coming from the SSE that a workspace has been deleted.
+   */
   // tslint:disable-next-line:member-ordering
   public static REMOVE_WORKSPACE = `${Workspaces.reducerName}_REMOVE_WORKSPACE`;
-  private static removeWorkspace(workspacesTable: IWorkspacesTable, payload): IWorkspacesTable {
-    if (workspacesTable.selectedWorkspaceId !== payload.workspaceId) {
+  private static removeWorkspace(workspacesTable: IWorkspacesTable, payload: string): IWorkspacesTable {
+    if (workspacesTable.selectedWorkspaceId !== payload) {
       return workspacesTable;
     }
 
