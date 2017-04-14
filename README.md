@@ -76,7 +76,7 @@ $ mvn -s ../ci/settings.xml compile dependency:properties exec:exec@server
 To work on the frontend without mock (i.e., with the backend previously started):
 ```
 $ cd frontend/
-$ yarn run start
+$ yarn run proxy
 ```
 
 ## Copyright and License
