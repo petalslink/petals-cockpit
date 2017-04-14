@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, element, by, ExpectedConditions as Ec } from 'protractor';
+import { browser, element, by, ExpectedConditions as EC } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
 import { IMPORT_HTTP_ERROR_IP } from '../src/mocks/workspaces-mock';
@@ -145,7 +145,7 @@ describe(`Import Bus`, () => {
 
     expect(element.all(by.css(`app-petals-menu-view > app-material-tree > md-nav-list`)).count()).toEqual(2);
 
-    browser.wait(Ec.visibilityOf(simpleNotification), 3000);
+    browser.wait(EC.visibilityOf(simpleNotification), 3000);
     expect(element(by.css(`simple-notification .sn-title`)).getText()).toEqual(`Bus import success`);
     expect(element(by.css(`simple-notification .sn-content`)).getText()).toMatch(/^The import of the bus .* succeeded$/);
   });
