@@ -521,6 +521,160 @@ describe(`Containers reducer`, () => {
     });
   });
 
+  describe(type(Containers.DEPLOY_COMPONENT), () => {
+    it(`should check action name`, () => {
+      expect(Containers.DEPLOY_COMPONENT).toEqual(`CONTAINERS_REDUCER_DEPLOY_COMPONENT`);
+    });
+
+    const initialState: any = {
+      keepPreviousValues: '',
+      byId: {
+        keepPreviousValues: '',
+        idCont0: {
+          keepPreviousValues: ''
+        }
+      },
+      allIds: ['idCont0']
+    };
+
+    it(`should set the isDeployingComponent variable to true for an existing container`, () => {
+      expect(Containers.reducer(initialState, {
+        type: Containers.DEPLOY_COMPONENT,
+        payload: { containerId: 'idCont0' }
+      })).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idCont0: {
+            keepPreviousValues: '',
+            isDeployingComponent: true
+          }
+        },
+        allIds: ['idCont0']
+      });
+    });
+
+    it(`should return the same object for an unknown container`, () => {
+      expect(Containers.reducer(initialState, {
+        type: Containers.DEPLOY_COMPONENT,
+        payload: { containerId: 'unknownContId' }
+      })).toBe(initialState);
+    });
+  });
+
+  describe(type(Containers.DEPLOY_COMPONENT_ERROR), () => {
+    it(`should check action name`, () => {
+      expect(Containers.DEPLOY_COMPONENT_ERROR).toEqual(`CONTAINERS_REDUCER_DEPLOY_COMPONENT_ERROR`);
+    });
+
+    const initialState: any = {
+      keepPreviousValues: '',
+      byId: {
+        keepPreviousValues: '',
+        idCont0: {
+          keepPreviousValues: '',
+          isDeployingComponent: true
+        }
+      },
+      allIds: ['idCont0']
+    };
+
+    it(`should set the isDeployingComponent variable to false for an existing container`, () => {
+      expect(Containers.reducer(initialState, {
+        type: Containers.DEPLOY_COMPONENT_ERROR,
+        payload: { containerId: 'idCont0' }
+      })).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idCont0: {
+            keepPreviousValues: '',
+            isDeployingComponent: false
+          }
+        },
+        allIds: ['idCont0']
+      });
+    });
+
+    it(`should return the same object for an unknown container`, () => {
+      expect(Containers.reducer(initialState, {
+        type: Containers.DEPLOY_COMPONENT_ERROR,
+        payload: { containerId: 'unknownContId' }
+      })).toBe(initialState);
+    });
+  });
+
+  describe(type(Containers.DEPLOY_COMPONENT_SUCCESS), () => {
+    it(`should check action name`, () => {
+      expect(Containers.DEPLOY_COMPONENT_SUCCESS).toEqual(`CONTAINERS_REDUCER_DEPLOY_COMPONENT_SUCCESS`);
+    });
+
+    const initialState: any = {
+      keepPreviousValues: '',
+      byId: {
+        keepPreviousValues: '',
+        idCont0: {
+          keepPreviousValues: '',
+          components: ['idComp0']
+        }
+      },
+      allIds: ['idCont0']
+    };
+
+    it(`should set the isDeployingComponent variable to false for an existing container and update the container`, () => {
+      expect(Containers.reducer(initialState, {
+        type: Containers.DEPLOY_COMPONENT_SUCCESS,
+        payload: {
+          containerId: 'idCont0',
+          component: {
+            id: 'idCompNew',
+            name: 'New Comp',
+            state: 'Started'
+          }
+        }
+      })).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idCont0: {
+            keepPreviousValues: '',
+            isDeployingComponent: false,
+            components: ['idComp0', 'idCompNew']
+          }
+        },
+        allIds: ['idCont0']
+      });
+    });
+
+    it(`should add the container if doesn't exists yet`, () => {
+      expect(Containers.reducer(initialState, {
+        type: Containers.DEPLOY_COMPONENT_SUCCESS,
+        payload: {
+          containerId: 'idCont1',
+          component: {
+            id: 'idComp1',
+            name: 'Comp 1',
+            state: 'Started'
+          }
+        }
+      })).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idCont0: {
+            keepPreviousValues: '',
+            components: ['idComp0']
+          },
+          idCont1: {
+            isDeployingComponent: false,
+            components: ['idComp1']
+          }
+        },
+        allIds: ['idCont0', 'idCont1']
+      });
+    });
+  });
+
   describe(type(Components.REMOVE_COMPONENT), () => {
     it(`should return the same object if the container of the component doesn't exists`, () => {
       const initialState: any = {

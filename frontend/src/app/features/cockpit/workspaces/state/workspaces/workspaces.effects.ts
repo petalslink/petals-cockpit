@@ -48,6 +48,7 @@ import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/bus.interfa
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
 import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { ContainersService } from 'app/shared/services/containers.service';
 
 @Injectable()
 export class WorkspacesEffects {
@@ -59,6 +60,7 @@ export class WorkspacesEffects {
     private sseService: SseService,
     private busesService: BusesService,
     private componentsService: ComponentsService,
+    private containersService: ContainersService,
     private serviceUnitsService: ServiceUnitsService,
     private notification: NotificationsService
   ) { }
@@ -145,6 +147,7 @@ export class WorkspacesEffects {
         this.sub.add(this.componentsService.watchEventComponentStateChangeOk().subscribe());
         this.sub.add(this.workspacesService.watchEventWorkspaceDeleted().subscribe());
         this.sub.add(this.componentsService.watchEventSuDeployedOk().subscribe());
+        this.sub.add(this.containersService.watchEventComponentDeployedOk().subscribe());
 
         return { type: Workspaces.FETCH_WORKSPACE_SSE_SUCCESS, payload: action.payload };
       })

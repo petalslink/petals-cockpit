@@ -82,6 +82,7 @@ export class Component {
 
   getDetails() {
     return {
+      name: this.name,
       state: this.state,
       type: 'BC'
     };

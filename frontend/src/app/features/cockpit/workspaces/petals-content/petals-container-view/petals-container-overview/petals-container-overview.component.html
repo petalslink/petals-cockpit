@@ -54,10 +54,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </md-card-title-group>
       </md-card>
     </div>
+
     <h3 class="color-primary-light-bold margin-top-x2">System info</h3>
     <div fxLayout="row" fxLayoutWrap fxLayoutGap="10px">
       <md-card fxFlex class="system-info">{{ container.systemInfo }}</md-card>
     </div>
-    <!--<prettyjson fxFlex="100%" [obj]="container"></prettyjson>-->
+
+    <h3 class="color-primary-light-bold margin-top-x2">Component deployment</h3>
+    <md-card fxFlex class="deploy margin-top-x1" class="deploy">
+      <md-card-title-group>
+        <div fxFlex fxLayout="column" fxLayoutAlign="end end">
+          <md-card-subtitle>Component deployment</md-card-subtitle>
+          <!--<md-card-title>-->
+          <!-- Material doesn't support inputs of type file -->
+          <!-- https://github.com/angular/material2/issues/3262 -->
+          <!-- https://github.com/angular/material2/issues/3758 -->
+          <!--the trick here consists in hiding the input, and bind the click on a button to that input-->
+          <!--</md-card-title>-->
+
+          <md-card-content>
+            <form (ngSubmit)="deploy(fileToDeploy, componentName)">
+              <div *ngIf="fileToDeploy" class="selected-file" fxFlexLayout="row" fxLayoutAlign="end center">
+                <span>Selected file :</span> <span class="file-name">{{ fileToDeploy.name }}</span>
+              </div>
+
+              <button type="button" md-raised-button (click)="deploySu.click()" class="choose-file">
+                    <span *ngIf="!fileToDeploy; else changeFile">Choose a file to upload</span>
+                    <ng-template #changeFile>Change the file</ng-template>
+                  </button>
+
+              <input #deploySu class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="container.isDeployingComponent">
+
+              <md-input-container *ngIf="fileToDeploy" class="service-unit-name">
+                <input mdInput type="text" [(ngModel)]="componentName" name="componentName" placeholder="Component name">
+              </md-input-container>
+
+              <button md-raised-button color="primary" type="submit" *ngIf="fileToDeploy" [disabled]="componentName?.trim().length === 0">
+                Deploy
+              </button>
+            </form>
+          </md-card-content>
+        </div>
+      </md-card-title-group>
+    </md-card>
   </div>
 </div>

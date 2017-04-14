@@ -18,6 +18,8 @@ import { browser, element, by, ExpectedConditions as EC } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
 
+const path = require('path');
+
 describe(`Petals container content`, () => {
   let page: PetalsCockpitPage;
 
@@ -51,7 +53,7 @@ describe(`Petals container content`, () => {
     ].join(' '));
   });
 
-  it('should navigate to another container of the bus', () => {
+  it(`should navigate to another container of the bus`, () => {
     page.getWorkspaceTreeByName('Cont 0').click();
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/containers\/\w+/);
@@ -61,5 +63,81 @@ describe(`Petals container content`, () => {
     element(by.css(`app-petals-container-overview md-card.reachability`)).click();
 
     expect(element(by.css(`app-petals-container-view md-toolbar-row .title`)).getText()).toEqual('Cont 1');
+  });
+
+  it(`should deploy a component`, () => {
+    page.getWorkspaceTreeByName('Cont 0').click();
+
+    const chooseFileBtn = element(by.css(`app-petals-container-overview .deploy .choose-file`));
+    const fileInput = element(by.css(`app-petals-container-overview .deploy input[type="file"]`));
+    const selectedFile = element(by.css(`app-petals-container-overview .deploy .selected-file .file-name`));
+    const changeComponentNameInput = element(by.css(`app-petals-container-overview .deploy form input[name="componentName"]`));
+    const deployBtn = element(by.css(`app-petals-container-overview .deploy form button[type="submit"]`));
+    const filePath = path.resolve(__dirname, './resources/component.zip');
+    const simpleNotification = element(by.css(`simple-notification`));
+
+    expect(chooseFileBtn.getText()).toEqual(`Choose a file to upload`);
+    // simulate the file selection
+    fileInput.sendKeys(filePath);
+
+    // once the file is selected, check that the other part of the form is displayed
+    expect(selectedFile.isDisplayed()).toBe(true);
+    expect(selectedFile.getText()).toEqual(`component.zip`);
+    expect(chooseFileBtn.getText()).toEqual(`Change the file`);
+
+    expect(changeComponentNameInput.getAttribute('value')).toEqual(`component`);
+    expect(deployBtn.isEnabled()).toBe(true);
+
+    const expectedTreeBeforeDeploy = [
+      `Bus 0`,
+        `Cont 0`,
+          `Comp 0`,
+            `SU 0`,
+            `SU 1`,
+          `Comp 1`,
+            `SU 2`,
+            `SU 3`,
+        `Cont 1`,
+          `Comp 2`,
+            `SU 4`,
+            `SU 5`,
+          `Comp 3`,
+            `SU 6`,
+            `SU 7`
+    ];
+
+    expect(page.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
+
+    // deploy the component
+    deployBtn.click();
+
+    // check that the component is now added to the tree and that we've been redirected to it
+    const expectedTreeAfterDeploy = [
+      `Bus 0`,
+        `Cont 0`,
+          `Comp 0`,
+            `SU 0`,
+            `SU 1`,
+          `Comp 1`,
+            `SU 2`,
+            `SU 3`,
+          // this one should have been deployed
+          `component`,
+        `Cont 1`,
+          `Comp 2`,
+            `SU 4`,
+            `SU 5`,
+          `Comp 3`,
+            `SU 6`,
+            `SU 7`
+    ];
+
+    expect(page.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
+
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/components\/\w+/);
+
+    browser.wait(EC.visibilityOf(simpleNotification), 3000);
+    expect(element(by.css(`simple-notification .sn-title`)).getText()).toEqual(`Component deployed`);
+    expect(element(by.css(`simple-notification .sn-content`)).getText()).toEqual('"component" has been deployed');
   });
 });

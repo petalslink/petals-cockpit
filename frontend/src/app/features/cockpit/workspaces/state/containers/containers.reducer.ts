@@ -23,6 +23,7 @@ import { Workspaces } from '../workspaces/workspaces.reducer';
 import { getContainerOfComponent } from '../../../../../shared/helpers/component.helper';
 import { Components } from '../components/components.reducer';
 import { putAll, updateById } from 'app/shared/helpers/shared.helper';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
 
 export class Containers {
   private static reducerName = 'CONTAINERS_REDUCER';
@@ -124,6 +125,43 @@ export class Containers {
   }
 
   // tslint:disable-next-line:member-ordering
+  public static DEPLOY_COMPONENT = `${Containers.reducerName}_DEPLOY_COMPONENT`;
+  private static deployComponent(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
+    if (!containersTable.byId[payload.containerId]) {
+      return containersTable;
+    }
+
+    return updateById(containersTable, payload.containerId, { isDeployingComponent: true });
+  }
+  // tslint:disable-next-line:member-ordering
+  public static DEPLOY_COMPONENT_ERROR = `${Containers.reducerName}_DEPLOY_COMPONENT_ERROR`;
+  private static deployComponentError(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
+    if (!containersTable.byId[payload.containerId]) {
+      return containersTable;
+    }
+
+    return updateById(containersTable, payload.containerId, { isDeployingComponent: false });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DEPLOY_COMPONENT_SUCCESS = `${Containers.reducerName}_DEPLOY_COMPONENT_SUCCESS`;
+  private static deployComponentSuccess(
+    containersTable: IContainersTable,
+    payload: { containerId: string, component: { id: string, name: string, state: string } }
+  ): IContainersTable {
+    let container = containersTable.byId[payload.containerId];
+
+    if (!container) {
+      container = <IContainerRow>{ components: [] };
+    }
+
+    return updateById(containersTable, payload.containerId, {
+      components: [...Array.from(new Set([...container.components, payload.component.id]))],
+      isDeployingComponent: false
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
   private static removeComponent(containersTable: IContainersTable, payload: { componentId: string }): IContainersTable {
     const containerContainingComponent = getContainerOfComponent(containersTable, payload.componentId);
     if (!containerContainingComponent) {
@@ -154,6 +192,9 @@ export class Containers {
     [Containers.FETCH_CONTAINER_DETAILS]: Containers.fetchContainerDetails,
     [Containers.FETCH_CONTAINER_DETAILS_SUCCESS]: Containers.fetchContainerDetailsSuccess,
     [Containers.FETCH_CONTAINER_DETAILS_ERROR]: Containers.fetchContainerDetailsError,
+    [Containers.DEPLOY_COMPONENT]: Containers.deployComponent,
+    [Containers.DEPLOY_COMPONENT_ERROR]: Containers.deployComponentError,
+    [Containers.DEPLOY_COMPONENT_SUCCESS]: Containers.deployComponentSuccess,
 
     [Components.REMOVE_COMPONENT]: Containers.removeComponent,
     [Workspaces.CLEAN_WORKSPACE]: Containers.cleanWorkspace

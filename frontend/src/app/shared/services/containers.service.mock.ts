@@ -16,17 +16,54 @@
  */
 
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Store } from '@ngrx/store';
+import { NotificationsService } from 'angular2-notifications';
 
-import { ContainersService } from './containers.service';
+import { environment } from 'environments/environment';
+import { ContainersServiceImpl } from './containers.service';
 import { containersService } from '../../../mocks/containers-mock';
 import * as helper from './../helpers/mock.helper';
+import { SseServiceMock } from 'app/shared/services/sse.service.mock';
+import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { IStore } from 'app/shared/interfaces/store.interface';
 
 @Injectable()
-export class ContainersMockService extends ContainersService {
+export class ContainersMockService extends ContainersServiceImpl {
+  constructor(
+    http: Http,
+    store$: Store<IStore>,
+    private pSseService: SseService,
+    notification: NotificationsService
+  ) {
+    super(http, store$, pSseService, notification);
+  }
 
   getDetailsContainer(containerId: string) {
     const detailsContainer = containersService.get(containerId).getDetails();
 
     return helper.responseBody(detailsContainer);
+  }
+
+  deployComponent(workspaceId: string, containerId: string, file: File, componentName: string) {
+    const component = containersService.get(containerId).addComponent(componentName);
+
+    const response = {
+      containerId,
+      component: {
+        id: component.getId(),
+        ...component.getDetails()
+      }
+    };
+
+    setTimeout(() =>
+      (this.pSseService as SseServiceMock).triggerSseEvent(
+        SseWorkspaceEvent.COMPONENT_DEPLOYED,
+        response
+      ),
+      environment.sseDelay
+    );
+
+    return helper.responseBody(response);
   }
 }
