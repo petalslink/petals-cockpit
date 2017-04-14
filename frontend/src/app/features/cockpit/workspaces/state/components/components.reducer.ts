@@ -22,8 +22,8 @@ import { componentsTableFactory } from './components.initial-state';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { getComponentOfServiceUnit } from '../../../../../shared/helpers/service-unit.helper';
 import { ServiceUnits } from '../service-units/service-units.reducer';
-import { putAll, updateById, removeById } from 'app/shared/helpers/shared.helper';
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { putAll, updateById, removeById, putById } from 'app/shared/helpers/shared.helper';
+import { IComponentRow, ComponentState, EComponentType } from 'app/features/cockpit/workspaces/state/components/component.interface';
 
 export class Components {
   private static reducerName = 'COMPONENTS_REDUCER';
@@ -198,6 +198,23 @@ export class Components {
     });
   }
 
+  private static deployComponentSuccess(
+    componentsTable: IComponentsTable,
+    payload: { component: { id: string, name: string, state: keyof typeof ComponentState, type: EComponentType } }
+  ): IComponentsTable {
+    const component: IComponentRow = {
+      ...payload.component,
+      serviceUnits: [],
+
+      isFolded: false,
+      isFetchingDetails: false,
+      isUpdatingState: false,
+      isDeployingServiceUnit: false
+    };
+
+    return putById(componentsTable, payload.component.id, component);
+  }
+
   private static cleanWorkspace(_componentsTable: IComponentsTable, _payload): IComponentsTable {
     return componentsTableFactory();
   }
@@ -221,6 +238,11 @@ export class Components {
     [Components.DEPLOY_SERVICE_UNIT]: Components.deployServiceUnit,
     [Components.DEPLOY_SERVICE_UNIT_SUCCESS]: Components.deployServiceUnitSuccess,
     [Components.DEPLOY_SERVICE_UNIT_ERROR]: Components.deployServiceUnitError,
+    // TODO : When using Containers.DEPLOY_COMPONENT_SUCCESS, there's an error at runtime
+    // [Containers.DEPLOY_COMPONENT_SUCCESS]: Components.deployComponentSuccess,
+    // issue opened here: https://github.com/angular/angular-cli/issues/5736
+    // once solved, update the tests !
+    ['CONTAINERS_REDUCER_DEPLOY_COMPONENT_SUCCESS']: Components.deployComponentSuccess,
 
     [ServiceUnits.REMOVE_SERVICE_UNIT]: Components.removeServiceUnit,
     [Workspaces.CLEAN_WORKSPACE]: Components.cleanWorkspace

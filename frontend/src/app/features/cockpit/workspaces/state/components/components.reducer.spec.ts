@@ -1065,6 +1065,82 @@ describe(`Components reducer`, () => {
     });
   });
 
+  describe(`CONTAINERS_REDUCER_DEPLOY_COMPONENT_SUCCESS`, () => {
+    const initialState: any = {
+      keepPreviousValues: '',
+      byId: {
+        keepPreviousValues: '',
+        idComp0: {
+          doNotKeepPreviousValuesIfUpdate: ''
+        }
+      },
+      allIds: ['idComp0']
+    };
+
+    it(`should replace an existing component`, () => {
+      expect(Components.reducer(initialState, {
+        type: 'CONTAINERS_REDUCER_DEPLOY_COMPONENT_SUCCESS',
+        payload: {
+          component: {
+            id: 'idComp0',
+            name: 'Comp 0 updated',
+            state: 'Unloaded'
+          }
+        }
+      })).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idComp0: {
+            id: 'idComp0',
+            name: 'Comp 0 updated',
+            state: 'Unloaded',
+            serviceUnits: [],
+
+            isFolded: false,
+            isFetchingDetails: false,
+            isUpdatingState: false,
+            isDeployingServiceUnit: false
+          }
+        },
+        allIds: ['idComp0']
+      });
+    });
+
+    it(`should add a non existing component`, () => {
+      expect(Components.reducer(initialState, {
+        type: 'CONTAINERS_REDUCER_DEPLOY_COMPONENT_SUCCESS',
+        payload: {
+          component: {
+            id: 'idComp1',
+            name: 'Comp 1',
+            state: 'Unloaded'
+          }
+        }
+      })).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idComp0: {
+            doNotKeepPreviousValuesIfUpdate: ''
+          },
+          idComp1: {
+            id: 'idComp1',
+            name: 'Comp 1',
+            state: 'Unloaded',
+            serviceUnits: [],
+
+            isFolded: false,
+            isFetchingDetails: false,
+            isUpdatingState: false,
+            isDeployingServiceUnit: false
+          }
+        },
+        allIds: ['idComp0', 'idComp1']
+      });
+    });
+  });
+
   describe(type(Workspaces.CLEAN_WORKSPACE), () => {
     it(`should return the initial value to reset the containers`, () => {
       const initialState: any = {

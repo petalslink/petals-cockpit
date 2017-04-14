@@ -32,6 +32,7 @@ export class SseWorkspaceEvent {
   public static BUS_DELETED = 'BUS_DELETED';
   public static WORKSPACE_DELETED = 'WORKSPACE_DELETED';
   public static SU_DEPLOYED = 'SU_DEPLOYED';
+  public static COMPONENT_DEPLOYED = 'COMPONENT_DEPLOYED';
 
   public static get allEvents() {
     return [
@@ -43,7 +44,8 @@ export class SseWorkspaceEvent {
       SseWorkspaceEvent.COMPONENT_STATE_CHANGE,
       SseWorkspaceEvent.BUS_DELETED,
       SseWorkspaceEvent.WORKSPACE_DELETED,
-      SseWorkspaceEvent.SU_DEPLOYED
+      SseWorkspaceEvent.SU_DEPLOYED,
+      SseWorkspaceEvent.COMPONENT_DEPLOYED
     ];
   }
 }

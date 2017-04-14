@@ -106,7 +106,7 @@ export class ComponentsServiceImpl extends ComponentsService {
 
         this.store$.dispatch({
           type: Components.DEPLOY_SERVICE_UNIT_SUCCESS,
-          payload: { componentId: componentId, serviceUnit }
+          payload: { componentId, serviceUnit }
         });
       })
       .mapTo(null);

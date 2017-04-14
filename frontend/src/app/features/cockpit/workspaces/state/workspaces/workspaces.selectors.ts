@@ -123,6 +123,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                     systemInfo: container.systemInfo,
                     isFetchingDetails: container.isFetchingDetails,
                     isFolded: container.isFolded || false,
+                    isDeployingComponent: container.isDeployingComponent,
 
                     components: {
                       selectedComponentId: components.selectedComponentId,

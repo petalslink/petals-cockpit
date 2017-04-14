@@ -17,19 +17,25 @@
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Action } from '@ngrx/store';
+import { Router } from '@angular/router';
+import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
+import { NotificationsService } from 'angular2-notifications';
 
 import { environment } from './../../../../../../environments/environment';
 import { Containers } from './containers.reducer';
 import { ContainersService } from './../../../../../shared/services/containers.service';
+import { IStore } from 'app/shared/interfaces/store.interface';
 
 @Injectable()
 export class ContainersEffects {
   constructor(
+    private router: Router,
+    private store$: Store<IStore>,
     private actions$: Actions,
-    private containersService: ContainersService
+    private containersService: ContainersService,
+    private notification: NotificationsService
   ) { }
 
   // tslint:disable-next-line:member-ordering
@@ -55,4 +61,40 @@ export class ContainersEffects {
           });
         })
     );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) deployComponent$: Observable<Action> = this.actions$
+    .ofType(Containers.DEPLOY_COMPONENT)
+    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .switchMap(([action, workspaceId]: [{ type: string, payload: { file: File, containerId: string, componentName: string } }, string]) =>
+      this.containersService.deployComponent(workspaceId, action.payload.containerId, action.payload.file, action.payload.componentName)
+        .mergeMap(_ => Observable.empty())
+        .catch((err) => {
+          if (environment.debug) {
+            console.group();
+            console.warn(`Error caught in containers.effects : ofType(${Containers.DEPLOY_COMPONENT})`);
+            console.error(err);
+            console.groupEnd();
+          }
+
+          this.notification.error(
+            'Deploy component failed',
+            `An error occured when trying to deploy the file "${action.payload.file.name}"`
+          );
+
+          return Observable.of({
+            type: Containers.DEPLOY_COMPONENT_ERROR,
+            payload: { componentId: action.payload.containerId }
+          });
+        })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: false }) deployComponentSuccess$: Observable<void> = this.actions$
+    .ofType(Containers.DEPLOY_COMPONENT_SUCCESS)
+    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .do(([{ payload }, workspaceId]: [{ payload: { component: { id: string, name: string } } }, string]) => {
+      this.router.navigate(['workspaces', workspaceId, 'petals', 'components', payload.component.id]);
+    })
+    .mapTo(null);
 }

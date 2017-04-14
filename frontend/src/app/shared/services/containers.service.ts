@@ -18,20 +18,56 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+import { NotificationsService } from 'angular2-notifications';
+import { Store } from '@ngrx/store';
 
 import { environment } from './../../../environments/environment';
+import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { IStore } from 'app/shared/interfaces/store.interface';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
 
 export abstract class ContainersService {
   abstract getDetailsContainer(containerId: string): Observable<Response>;
+
+  abstract deployComponent(workspaceId: string, containerId: string, file: File, componentName: string): Observable<Response>;
+
+  abstract watchEventComponentDeployedOk(): Observable<void>;
 }
 
 @Injectable()
 export class ContainersServiceImpl extends ContainersService {
-  constructor(private http: Http) {
+  constructor(
+    private http: Http,
+    private store$: Store<IStore>,
+    private sseService: SseService,
+    private notification: NotificationsService
+  ) {
     super();
   }
 
   getDetailsContainer(containerId: string) {
     return this.http.get(`${environment.urlBackend}/containers/${containerId}`);
+  }
+
+  deployComponent(workspaceId: string, containerId: string, file: File, componentName: string) {
+    const formData: FormData = new FormData();
+    formData.append('file', file, file.name);
+    formData.append('name', componentName);
+
+    return this.http.post(`${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/components`, formData);
+  }
+
+  watchEventComponentDeployedOk() {
+    return this.sseService
+      .subscribeToWorkspaceEvent(SseWorkspaceEvent.COMPONENT_DEPLOYED)
+      .do(({ containerId, component }: { containerId: string, component: { id: string, name: string, state: string } }) => {
+        this.notification.success('Component deployed', `"${component.name}" has been deployed`);
+
+        this.store$.dispatch({
+          type: Containers.DEPLOY_COMPONENT_SUCCESS,
+          payload: { containerId, component }
+        });
+      })
+      .mapTo(null);
   }
 }
