@@ -111,6 +111,7 @@ describe(`Petals component content`, () => {
     const changeSuNameInput = element(by.css(`app-petals-component-overview .deploy form input[name="serviceUnitName"]`));
     const deployBtn = element(by.css(`app-petals-component-overview .deploy form button[type="submit"]`));
     const filePath = path.resolve(__dirname, './resources/su.zip');
+    const simpleNotification = element(by.css(`simple-notification`));
 
     expect(chooseFileBtn.getText()).toEqual(`Choose a file to upload`);
     // simulate the file selection
@@ -123,5 +124,57 @@ describe(`Petals component content`, () => {
 
     expect(changeSuNameInput.getAttribute('value')).toEqual(`su`);
     expect(deployBtn.isEnabled()).toBe(true);
+
+    const expectedTreeBeforeDeploy = [
+      `Bus 0`,
+        `Cont 0`,
+          `Comp 0`,
+            `SU 0`,
+            `SU 1`,
+          `Comp 1`,
+            `SU 2`,
+            `SU 3`,
+        `Cont 1`,
+          `Comp 2`,
+            `SU 4`,
+            `SU 5`,
+          `Comp 3`,
+            `SU 6`,
+            `SU 7`
+    ];
+
+    expect(page.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
+
+    // deploy the service-unit
+    deployBtn.click();
+
+    // check that the service-unit is now added to the tree and that we've been redirected to it
+    const expectedTreeAfterDeploy = [
+      `Bus 0`,
+        `Cont 0`,
+          `Comp 0`,
+            `SU 0`,
+            `SU 1`,
+            // this one should have been deployed
+            `su`,
+          `Comp 1`,
+            `SU 2`,
+            `SU 3`,
+        `Cont 1`,
+          `Comp 2`,
+            `SU 4`,
+            `SU 5`,
+          `Comp 3`,
+            `SU 6`,
+            `SU 7`
+    ];
+
+    expect(page.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
+
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/service-units\/\w+/);
+
+    browser.wait(EC.visibilityOf(simpleNotification), 3000);
+    expect(element(by.css(`simple-notification .sn-title`)).getText()).toEqual(`SU deployed`);
+    expect(element(by.css(`simple-notification .sn-content`)).getText()).toEqual('"su" has been deployed');
   });
 });
