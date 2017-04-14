@@ -17,13 +17,12 @@
 
 import { Action } from '@ngrx/store';
 
-import { IContainersTable } from './containers.interface';
-import { containersTableFactory } from './containers.initial-state';
+import { IContainersTable, containersTableFactory } from './containers.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { getContainerOfComponent } from '../../../../../shared/helpers/component.helper';
 import { Components } from '../components/components.reducer';
-import { putAll, updateById } from 'app/shared/helpers/shared.helper';
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
+import { putAll, updateById } from 'app/shared/helpers/map.helper';
+import { containerRowFactory } from 'app/features/cockpit/workspaces/state/containers/container.interface';
 
 export class Containers {
   private static reducerName = 'CONTAINERS_REDUCER';
@@ -39,17 +38,7 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINERS_SUCCESS = `${Containers.reducerName}_FETCH_CONTAINERS_SUCCESS`;
   private static fetchContainersSuccess(containersTable: IContainersTable, payload): IContainersTable {
-    const table = putAll(containersTable, payload);
-
-    payload.allIds.forEach(id => {
-      // when we fetch containers, the server doesn't add reachabilites
-      // set it to empty array by default
-      if (!table.byId[id].reachabilities) {
-        table.byId[id].reachabilities = [];
-      }
-    });
-
-    return table;
+    return putAll(containersTable, payload, containerRowFactory());
   }
 
   // tslint:disable-next-line:member-ordering
@@ -117,29 +106,17 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINER_DETAILS_ERROR = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS_ERROR`;
   private static fetchContainerDetailsError(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
-    if (!containersTable.byId[payload.containerId]) {
-      return containersTable;
-    }
-
     return updateById(containersTable, payload.containerId, { isFetchingDetails: false });
   }
 
   // tslint:disable-next-line:member-ordering
   public static DEPLOY_COMPONENT = `${Containers.reducerName}_DEPLOY_COMPONENT`;
   private static deployComponent(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
-    if (!containersTable.byId[payload.containerId]) {
-      return containersTable;
-    }
-
     return updateById(containersTable, payload.containerId, { isDeployingComponent: true });
   }
   // tslint:disable-next-line:member-ordering
   public static DEPLOY_COMPONENT_ERROR = `${Containers.reducerName}_DEPLOY_COMPONENT_ERROR`;
   private static deployComponentError(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
-    if (!containersTable.byId[payload.containerId]) {
-      return containersTable;
-    }
-
     return updateById(containersTable, payload.containerId, { isDeployingComponent: false });
   }
 
@@ -149,11 +126,7 @@ export class Containers {
     containersTable: IContainersTable,
     payload: { containerId: string, component: { id: string, name: string, state: string } }
   ): IContainersTable {
-    let container = containersTable.byId[payload.containerId];
-
-    if (!container) {
-      container = <IContainerRow>{ components: [] };
-    }
+    const container = containersTable.byId[payload.containerId];
 
     return updateById(containersTable, payload.containerId, {
       components: [...Array.from(new Set([...container.components, payload.component.id]))],
@@ -164,6 +137,7 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   private static removeComponent(containersTable: IContainersTable, payload: { componentId: string }): IContainersTable {
     const containerContainingComponent = getContainerOfComponent(containersTable, payload.componentId);
+
     if (!containerContainingComponent) {
       return containersTable;
     }

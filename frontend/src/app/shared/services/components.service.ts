@@ -27,7 +27,7 @@ import { SseService, SseWorkspaceEvent } from './sse.service';
 import { IStore } from '../interfaces/store.interface';
 import { Components } from '../../features/cockpit/workspaces/state/components/components.reducer';
 import { IComponentsTable } from '../../features/cockpit/workspaces/state/components/components.interface';
-import { ComponentState } from '../../features/cockpit/workspaces/state/components/component.interface';
+import { EComponentState } from '../../features/cockpit/workspaces/state/components/component.interface';
 
 export abstract class ComponentsService {
   abstract getDetailsComponent(componentId: string): Observable<Response>;
@@ -77,7 +77,7 @@ export class ComponentsServiceImpl extends ComponentsService {
         .select(state => [state.workspaces.selectedWorkspaceId, state.components])
       )
       .do(([data, [selectedWorkspaceId, components]]: [{ id: string, state: string }, [string, IComponentsTable]]) => {
-        if (data.state === ComponentState.Unloaded) {
+        if (data.state === EComponentState.Unloaded) {
           this.router.navigate(['/workspaces', selectedWorkspaceId]);
 
           const component = components.byId[data.id];

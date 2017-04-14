@@ -17,11 +17,10 @@
 
 import { Action } from '@ngrx/store';
 
-import { IWorkspacesTable } from './workspaces.interface';
-import { workspacesTableFactory } from './workspaces.initial-state';
+import { IWorkspacesTable, workspacesTableFactory } from './workspaces.interface';
 import { Users } from './../../../../../shared/state/users.reducer';
-import { updateById, removeById, mergeInto } from 'app/shared/helpers/shared.helper';
-import { workspaceRowFactory } from 'app/features/cockpit/workspaces/state/workspaces/workspace.initial-state';
+import { updateById, removeById, mergeInto, putById } from 'app/shared/helpers/map.helper';
+import { workspaceRowFactory } from 'app/features/cockpit/workspaces/state/workspaces/workspace.interface';
 
 export class Workspaces {
   private static reducerName = 'WORKSPACES_REDUCER';
@@ -49,7 +48,7 @@ export class Workspaces {
   public static FETCH_WORKSPACES_SUCCESS = `${Workspaces.reducerName}_FETCH_WORKSPACES_SUCCESS`;
   private static fetchWorkspacesSuccess(workspacesTable: IWorkspacesTable, payload): IWorkspacesTable {
     return {
-      ...mergeInto(workspacesTable, payload),
+      ...mergeInto(workspacesTable, payload, workspaceRowFactory()),
       ...<IWorkspacesTable>{
         isFetchingWorkspaces: false
       }
@@ -84,7 +83,7 @@ export class Workspaces {
     workspacesTable: IWorkspacesTable,
     payload: { id: string, name: string, users: string[] }): IWorkspacesTable {
     return {
-      ...updateById(workspacesTable, payload.id, payload),
+      ...putById(workspacesTable, payload.id, payload, workspaceRowFactory()),
       ...<IWorkspacesTable>{
         isAddingWorkspace: false
       }
@@ -122,7 +121,10 @@ export class Workspaces {
   public static FETCH_WORKSPACE_SUCCESS = `${Workspaces.reducerName}_FETCH_WORKSPACE_SUCCESS`;
   private static fetchWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload): IWorkspacesTable {
     return {
-      ...updateById(workspacesTable, payload.id, { ...workspaceRowFactory(), ...payload }),
+      ...(workspacesTable.byId[payload.id] ?
+        updateById(workspacesTable, payload.id, payload)
+        : putById(workspacesTable, payload.id, payload, workspaceRowFactory())
+      ),
       ...<IWorkspacesTable>{
         isSelectedWorkspaceFetched: true
       }
@@ -144,10 +146,6 @@ export class Workspaces {
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_DETAILS_FAILED = `${Workspaces.reducerName}_FETCH_WORKSPACE_DETAILS_FAILED`;
   private static fetchWorkspaceDetailsFailed(workspacesTable: IWorkspacesTable, payload: string): IWorkspacesTable {
-    if (!workspacesTable.byId[payload]) {
-      return workspacesTable;
-    }
-
     return updateById(workspacesTable, payload, { isFetchingDetails: false });
   }
 
@@ -166,10 +164,6 @@ export class Workspaces {
   // tslint:disable-next-line:member-ordering
   public static SET_DESCRIPTION_FAILED = `${Workspaces.reducerName}_SET_DESCRIPTION_FAILED`;
   private static setDescriptionFailed(workspacesTable: IWorkspacesTable, payload: string): IWorkspacesTable {
-    if (!workspacesTable.byId[payload]) {
-      return workspacesTable;
-    }
-
     return updateById(workspacesTable, payload, { isSettingDescription: false });
   }
 

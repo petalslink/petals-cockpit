@@ -26,7 +26,7 @@ describe(`Users reducer`, () => {
         connectedUserId: '',
 
         isConnecting: false,
-        isConnected: environment.alreadyConnected,
+        isConnected: environment.mock.alreadyConnected,
         isDisconnecting: false,
         connectionFailed: false,
 
@@ -111,10 +111,12 @@ describe(`Users reducer`, () => {
       expect(reducer.byId).toEqual({
         keepPreviousValues: '',
         user1: {
+          keepPreviousValues: '',
           id: 'user1',
           name: 'User 1 updated name'
         },
         user2: {
+          keepPreviousValues: '',
           id: 'user2',
           name: 'User 2 updated name'
         }
@@ -137,7 +139,7 @@ describe(`Users reducer`, () => {
         connectedUserId: '',
 
         isConnecting: true,
-        isConnected: environment.alreadyConnected,
+        isConnected: environment.mock.alreadyConnected,
         isDisconnecting: false,
         connectionFailed: false,
 

@@ -34,3 +34,15 @@ export interface IBusesInProgressTable extends IBusesInProgressCommon {
 export interface IBusesInProgress extends IBusesInProgressCommon {
   list: Array<IBusInProgress>;
 }
+
+export function busesInProgressTableFactory(): IBusesInProgressTable {
+  return {
+    selectedBusInProgressId: '',
+    isImportingBus: false,
+    importBusError: '',
+    importBusId: '',
+
+    byId: {},
+    allIds: []
+  };
+}

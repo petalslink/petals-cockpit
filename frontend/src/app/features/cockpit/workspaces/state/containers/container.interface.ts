@@ -40,3 +40,20 @@ export interface IContainerRow extends IContainerCommon {
 export interface IContainer extends IContainerCommon {
   components: IComponents;
 }
+
+export function containerRowFactory(id?: string, name?: string, ip?: string, port?: number, systemInfo?: string): IContainerRow {
+  return {
+    id,
+    name,
+    ip,
+    port,
+    systemInfo,
+
+    isFolded: false,
+    isFetchingDetails: false,
+    isDeployingComponent: false,
+
+    components: [],
+    reachabilities: []
+  };
+}

@@ -16,6 +16,7 @@
  */
 
 import { IUserRow, IUser } from './user.interface';
+import { environment } from 'environments/environment';
 
 interface IUsersCommon {
   connectedUserId: string;
@@ -35,4 +36,18 @@ export interface IUsersTable extends IUsersCommon, IUsersTableOnly { }
 
 export interface IUsers extends IUsersCommon {
   list: IUser[];
+}
+
+export function usersTableFactory(): IUsersTable {
+  return {
+    connectedUserId: '',
+
+    isConnecting: false,
+    isConnected: environment.mock.alreadyConnected,
+    isDisconnecting: false,
+    connectionFailed: false,
+
+    byId: {},
+    allIds: []
+  };
 }

@@ -46,20 +46,20 @@ export class WorkspacesMockService extends WorkspacesServiceImpl {
 
     return helper
       .responseBody(workspace)
-      .delay(environment.httpDelay);
+      .delay(environment.mock.httpDelay);
   }
 
   fetchWorkspace(id: string) {
     return helper
       .responseBody(workspacesService.getWorkspaceOverview(id))
-      .delay(environment.httpDelay);
+      .delay(environment.mock.httpDelay);
   }
 
   setDescription(id: string, description: string) {
     workspacesService.getWorkspace(id).description = description;
     return helper
       .response(204)
-      .delay(environment.httpDelay);
+      .delay(environment.mock.httpDelay);
   }
 
   deleteWorkspace(id: string) {
@@ -70,7 +70,7 @@ export class WorkspacesMockService extends WorkspacesServiceImpl {
         setTimeout(() => {
           workspacesService.deleteWorkspace(id);
           (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.WORKSPACE_DELETED, { id });
-        }, environment.sseDelay);
+        }, environment.mock.sseDelay);
       });
   }
 }

@@ -40,3 +40,11 @@ export interface IUserLogin {
   username: string;
   password: string;
 }
+
+export function userRowFactory(id?: string, name?: string, lastWorkspace?: string): IUserRow {
+  return {
+    id,
+    name,
+    lastWorkspace
+  };
+}

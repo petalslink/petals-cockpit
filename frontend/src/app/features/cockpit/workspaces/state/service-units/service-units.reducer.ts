@@ -17,10 +17,10 @@
 
 import { Action } from '@ngrx/store';
 
-import { IServiceUnitsTable } from './service-units.interface';
-import { serviceUnitsTableFactory } from './service-units.initial-state';
+import { IServiceUnitsTable, serviceUnitsTableFactory } from './service-units.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
-import { putById, putAll, updateById, removeById } from 'app/shared/helpers/shared.helper';
+import { putById, putAll, updateById, removeById } from 'app/shared/helpers/map.helper';
+import { serviceUnitRowFactory } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 
 export class ServiceUnits {
   private static reducerName = 'SERVICE_UNITS_REDUCER';
@@ -36,7 +36,7 @@ export class ServiceUnits {
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNITS_SUCCESS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNITS_SUCCESS`;
   private static fetchServiceUnitsSuccess(serviceUnitsTable: IServiceUnitsTable, payload): IServiceUnitsTable {
-    return putAll(serviceUnitsTable, payload);
+    return putAll(serviceUnitsTable, payload, serviceUnitRowFactory());
   }
 
   // tslint:disable-next-line:member-ordering
@@ -71,10 +71,6 @@ export class ServiceUnits {
     serviceUnitsTable: IServiceUnitsTable,
     payload: { serviceUnitId: string }
   ): IServiceUnitsTable {
-    if (!serviceUnitsTable.byId[payload.serviceUnitId]) {
-      return serviceUnitsTable;
-    }
-
     return updateById(serviceUnitsTable, payload.serviceUnitId, { isFetchingDetails: false });
   }
 
@@ -102,10 +98,6 @@ export class ServiceUnits {
   // tslint:disable-next-line:member-ordering
   public static REMOVE_SERVICE_UNIT = `${ServiceUnits.reducerName}_REMOVE_SERVICE_UNIT`;
   private static removeServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
-    if (!serviceUnitsTable.byId[payload.serviceUnitId]) {
-      return serviceUnitsTable;
-    }
-
     return removeById(serviceUnitsTable, payload.serviceUnitId);
   }
 
@@ -113,7 +105,7 @@ export class ServiceUnits {
     serviceUnitsTable: IServiceUnitsTable,
     payload: { serviceUnit: { id: string, name: string, state: string } }
   ): IServiceUnitsTable {
-    return putById(serviceUnitsTable, payload.serviceUnit.id, payload.serviceUnit);
+    return putById(serviceUnitsTable, payload.serviceUnit.id, payload.serviceUnit, serviceUnitRowFactory());
   }
 
   private static cleanWorkspace(_serviceUnitsTable: IServiceUnitsTable, _payload): IServiceUnitsTable {

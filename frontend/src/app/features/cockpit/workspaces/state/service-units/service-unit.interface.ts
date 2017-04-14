@@ -16,7 +16,7 @@
  */
 
 // http://stackoverflow.com/a/41631732/2398593
-export const ServiceUnitState = {
+export const EServiceUnitState = {
   Started: 'Started' as 'Started',
   Stopped: 'Stopped' as 'Stopped',
   Unloaded: 'Unloaded' as 'Unloaded',
@@ -27,7 +27,7 @@ export interface IServiceUnitCommon {
   // from server
   id: string;
   name: string;
-  state: keyof typeof ServiceUnitState;
+  state: keyof typeof EServiceUnitState;
 
   // for UI
   isFolded: boolean;
@@ -39,3 +39,14 @@ export interface IServiceUnitRow extends IServiceUnitCommon { }
 
 // tslint:disable-next-line:no-empty-interface
 export interface IServiceUnit extends IServiceUnitCommon { }
+
+export function serviceUnitRowFactory(id?: string, name?: string, state?: keyof typeof EServiceUnitState): IServiceUnitRow {
+  return {
+    id,
+    name,
+    state,
+
+    isFolded: false,
+    isUpdatingState: false
+  };
+}

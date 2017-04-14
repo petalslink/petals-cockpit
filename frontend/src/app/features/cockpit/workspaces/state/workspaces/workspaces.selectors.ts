@@ -104,10 +104,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
             return {
               id: bus.id,
               name: bus.name,
-              importError: bus.importError,
-              isDiscarding: bus.isDiscarding,
               isFetchingDetails: bus.isFetchingDetails,
-              isBeingRemoved: bus.isBeingRemoved,
               isFolded: bus.isFolded || false,
 
               containers: {

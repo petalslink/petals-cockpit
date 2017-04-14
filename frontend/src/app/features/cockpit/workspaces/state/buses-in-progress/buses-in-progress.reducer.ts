@@ -17,10 +17,10 @@
 
 import { Action } from '@ngrx/store';
 
-import { busesInProgressTableFactory } from './buses-in-progress.initial-state';
-import { IBusesInProgressTable } from './buses-in-progress.interface';
+import { IBusesInProgressTable, busesInProgressTableFactory } from './buses-in-progress.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
-import { putAll, updateById, removeById } from 'app/shared/helpers/shared.helper';
+import { putAll, updateById, removeById } from 'app/shared/helpers/map.helper';
+import { busInProgressRowFactory } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 
 export class BusesInProgress {
   private static reducerName = 'BUSES_IN_PROGRESS_REDUCER';
@@ -36,7 +36,7 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUSES_IN_PROGRESS = `${BusesInProgress.reducerName}_FETCH_BUSES_IN_PROGRESS`;
   private static fetchBusesInProgress(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
-    return putAll(busesInProgressTable, payload);
+    return putAll(busesInProgressTable, payload, busInProgressRowFactory());
   }
 
   // tslint:disable-next-line:member-ordering
@@ -45,10 +45,6 @@ export class BusesInProgress {
     busesInProgressTable: IBusesInProgressTable,
     payload: { busInProgressId: string }
   ): IBusesInProgressTable {
-    if (busesInProgressTable.selectedBusInProgressId === payload.busInProgressId) {
-      return busesInProgressTable;
-    }
-
     return {
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
@@ -108,20 +104,12 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   public static DELETE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_DELETE_BUS_IN_PROGRESS`;
   private static deleteBusInProgress(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
-    if (!busesInProgressTable.byId[payload.id]) {
-      return busesInProgressTable;
-    }
-
     return updateById(busesInProgressTable, payload.id, { isRemoving: true });
   }
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_REMOVE_BUS_IN_PROGRESS`;
   private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: string): IBusesInProgressTable {
-    if (!busesInProgressTable.byId[payload]) {
-      return busesInProgressTable;
-    }
-
     return removeById(busesInProgressTable, payload);
   }
 
@@ -131,10 +119,6 @@ export class BusesInProgress {
     busesInProgressTable: IBusesInProgressTable,
     payload: { id: string, importError: string }
   ): IBusesInProgressTable {
-    if (!busesInProgressTable.byId[payload.id]) {
-      return busesInProgressTable;
-    }
-
     return updateById(busesInProgressTable, payload.id, { importError: payload.importError });
   }
 

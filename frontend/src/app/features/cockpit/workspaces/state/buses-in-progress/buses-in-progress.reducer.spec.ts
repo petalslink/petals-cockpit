@@ -18,7 +18,7 @@
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
 import { type } from 'app/shared/helpers/shared.helper';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { busesInProgressTableFactory } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.initial-state';
+import { busesInProgressTableFactory } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 
 describe(`Buses in progress reducer`, () => {
   it(`should have a default value`, () => {
@@ -107,13 +107,21 @@ describe(`Buses in progress reducer`, () => {
             id: 'idBus3',
             ip: '192.168.0.3',
             port: 7703,
-            username: 'petals3'
+            username: 'petals3',
+            importError: '',
+            isRemoving: false,
+            password: '',
+            passphrase: ''
           },
           idBus4: {
             id: 'idBus4',
             ip: '192.168.0.4',
             port: 7704,
-            username: 'petals4'
+            username: 'petals4',
+            importError: '',
+            isRemoving: false,
+            password: '',
+            passphrase: ''
           }
         },
         allIds: ['idBus1', 'idBus2', 'idBus3', 'idBus4']
@@ -153,13 +161,21 @@ describe(`Buses in progress reducer`, () => {
             id: 'idBus1',
             ip: '192.168.0.10',
             port: 7711,
-            username: 'petals1 updated'
+            username: 'petals1 updated',
+            importError: '',
+            isRemoving: false,
+            password: '',
+            passphrase: ''
           },
           idBus2: {
             id: 'idBus2',
             ip: '192.168.0.2',
             port: 7712,
-            username: 'petals2 updated'
+            username: 'petals2 updated',
+            importError: '',
+            isRemoving: false,
+            password: '',
+            passphrase: ''
           }
         },
         allIds: ['idBus1', 'idBus2']
@@ -184,11 +200,19 @@ describe(`Buses in progress reducer`, () => {
       allIds: []
     };
 
-    it(`should return the same object if previous current bus in progress is the same as the new one`, () => {
+    it(`should reset variables related to a bus in import even if previous current bus in progress is the same as the new one`, () => {
       expect(BusesInProgress.reducer(initialState, {
         type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
         payload: { busInProgressId: 'idBusInProgress1' }
-      })).toBe(initialState);
+      })).toEqual({
+        keepPreviousValues: '',
+        selectedBusInProgressId: 'idBusInProgress1',
+        isImportingBus: false,
+        importBusError: '',
+        importBusId: '',
+        byId: { keepPreviousValues: '' },
+        allIds: []
+      });
     });
 
     it(`should reset variables related to a bus in import and set the ID of the new bus`, () => {
@@ -332,19 +356,6 @@ describe(`Buses in progress reducer`, () => {
       expect(BusesInProgress.DELETE_BUS_IN_PROGRESS).toEqual(`BUSES_IN_PROGRESS_REDUCER_DELETE_BUS_IN_PROGRESS`);
     });
 
-    it(`should return the same object if the bus doesn't exists`, () => {
-      const initialState: any = {
-        byId: {},
-        allIds: []
-      };
-      const reducer = BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.DELETE_BUS_IN_PROGRESS,
-        payload: { id: 'idBus1' }
-      });
-
-      expect(reducer).toBe(initialState);
-    });
-
     it(`should set the flag isRemoving on an existing bus`, () => {
       const initialState1: any = {
         keepPreviousValues: '',
@@ -423,13 +434,6 @@ describe(`Buses in progress reducer`, () => {
       allIds: ['idBus1', 'idBus2', 'idBus3']
     };
 
-    it(`should return the same object if the bus doesn't exists`, () => {
-      expect(BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
-        payload: 'unknownId'
-      })).toBe(initialState);
-    });
-
     it(`should remove an existing bus`, () => {
       expect(BusesInProgress.reducer(initialState, {
         type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
@@ -475,23 +479,6 @@ describe(`Buses in progress reducer`, () => {
   describe(type(BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS), () => {
     it(`should check action name`, () => {
       expect(BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS).toEqual(`BUSES_IN_PROGRESS_REDUCER_UPDATE_ERROR_BUS_IN_PROGRESS`);
-    });
-
-    it(`should return the same object if bus doesn't exists`, () => {
-      const initialState: any = {
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idBus1: { keepPreviousValues: '' },
-          idBus2: { keepPreviousValues: '' }
-        },
-        allIds: ['idBus1', 'idBus2']
-      };
-
-      expect(BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS,
-        payload: { id: 'unknownId' }
-      })).toBe(initialState);
     });
 
     it(`should update a bus import error if bus exists`, () => {

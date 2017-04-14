@@ -30,3 +30,13 @@ export interface IComponentsTable extends IComponentsCommon {
 export interface IComponents extends IComponentsCommon {
   list: IComponent[];
 }
+
+export function componentsTableFactory(): IComponentsTable {
+  return {
+    selectedComponentId: '',
+    isFetchingDetails: false,
+
+    byId: {},
+    allIds: []
+  };
+}

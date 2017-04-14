@@ -26,7 +26,7 @@ import { environment } from './../../../environments/environment';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { ServiceUnits } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
 import { IStore } from '../interfaces/store.interface';
-import { ServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { EServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
 import { IServiceUnitsTable } from '../../features/cockpit/workspaces/state/service-units/service-units.interface';
 
 export abstract class ServiceUnitsService {
@@ -65,7 +65,7 @@ export class ServiceUnitsServiceImpl extends ServiceUnitsService {
         .select(state => [state.workspaces.selectedWorkspaceId, state.serviceUnits])
       )
       .do(([data, [selectedWorkspaceId, serviceUnits]]: [{ id: string, state: string }, [string, IServiceUnitsTable]]) => {
-        if (data.state === ServiceUnitState.Unloaded) {
+        if (data.state === EServiceUnitState.Unloaded) {
           this.router.navigate(['/workspaces', selectedWorkspaceId]);
 
           const serviceUnit = serviceUnits.byId[data.id];

@@ -48,3 +48,17 @@ export interface IBusImport {
   password: string;
   passphrase: string;
 }
+
+export function busInProgressRowFactory(id?: string, username?: string, port?: number, ip?: string): IBusInProgressRow {
+  return {
+    id,
+    username,
+    port,
+    ip,
+
+    importError: '',
+    isRemoving: false,
+    password: '',
+    passphrase: ''
+  };
+}

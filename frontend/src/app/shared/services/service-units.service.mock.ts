@@ -55,7 +55,7 @@ export class ServiceUnitsMockService extends ServiceUnitsServiceImpl {
         SseWorkspaceEvent.SU_STATE_CHANGE,
         response
       ),
-      environment.sseDelay
+      environment.mock.sseDelay
     );
 
     return helper.responseBody(response);

@@ -34,7 +34,6 @@ import { ServiceUnits } from '../service-units/service-units.reducer';
 import { Ui } from '../../../../../shared/state/ui.reducer';
 import { BusesInProgress } from '../buses-in-progress/buses-in-progress.reducer';
 import { SseService, SseWorkspaceEvent } from './../../../../../shared/services/sse.service';
-import { toJavascriptMap } from '../../../../../shared/helpers/shared.helper';
 import { BusesService } from './../../../../../shared/services/buses.service';
 import { NotificationsService } from 'angular2-notifications';
 import { ServiceUnitsService } from '../../../../../shared/services/service-units.service';
@@ -49,6 +48,7 @@ import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
 import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 import { ContainersService } from 'app/shared/services/containers.service';
+import { toJavascriptMap } from 'app/shared/helpers/map.helper';
 
 @Injectable()
 export class WorkspacesEffects {

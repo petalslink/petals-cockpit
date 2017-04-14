@@ -9,31 +9,15 @@ export const environment = {
   // (make more or less checks) according to an environment
   production: false,
 
+  // should throw an Error if there is incoherencs in the store for example
+  // only use for tests!
+  strictCoherence: true,
+
   // URLBACKEND
   // your backend URL
   // you can then use it for example in a service
   // `${environment.urlBackend}/some/resource`
-  urlBackend: '/api',
-
-  // HTTPDELAY
-  // when using mocked data, you can use that
-  // variable with .delay to simulate a network latency
-  httpDelay: 500,
-
-  // SSEDELAY
-  // when using mocked data, you can use that
-  // variable with .delay to simulate a network latency
-  sseDelay: 500,
-
-  // MOCK
-  // should you keep mocks when building the app
-  // or hit the real API
-  mock: true,
-
-  // ALREADYCONNECTED
-  // When using `mock: true`, define wether we should consider
-  // that the user's already logged or not
-  alreadyConnected: true,
+  urlBackend: './api',
 
   // HASHLOCATIONSTRATEGY
   // should the URL be
@@ -47,5 +31,25 @@ export const environment = {
   // TIP : Use console debug, console warn and console error
   // console log should be used only in dev and never commited
   // this way you can find every console log very easily
-  debug: true
+  debug: true,
+
+  // MOCK
+  // should you keep mocks when building the app
+  // or hit the real API
+  mock: {
+    // HTTPDELAY
+    // when using mocked data, you can use that
+    // variable with .delay to simulate a network latency
+    httpDelay: 500,
+
+    // SSEDELAY
+    // when using mocked data, you can use that
+    // variable with .delay to simulate a network latency
+    sseDelay: 500,
+
+    // ALREADYCONNECTED
+    // define wether we should consider
+    // that the user's already logged or not
+    alreadyConnected: true
+  }
 };

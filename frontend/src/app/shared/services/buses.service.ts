@@ -29,13 +29,13 @@ import { ServiceUnits } from './../../features/cockpit/workspaces/state/service-
 import { Components } from './../../features/cockpit/workspaces/state/components/components.reducer';
 import { Containers } from './../../features/cockpit/workspaces/state/containers/containers.reducer';
 import { environment } from './../../../environments/environment';
-import { toJavascriptMap } from '../helpers/shared.helper';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { IBusImport, IBusInProgressRow } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
 import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { toJavascriptMap } from 'app/shared/helpers/map.helper';
 
 
 export abstract class BusesService {
