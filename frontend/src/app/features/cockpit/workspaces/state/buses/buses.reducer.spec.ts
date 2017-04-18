@@ -17,8 +17,8 @@
 
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.reducer';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { busesTableFactory } from 'app/features/cockpit/workspaces/state/buses/buses.initial-state';
 import { type } from 'app/shared/helpers/shared.helper';
+import { busesTableFactory } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
 
 describe(`Buses reducer`, () => {
   it(`should have a default value`, () => {
@@ -42,7 +42,6 @@ describe(`Buses reducer`, () => {
           byId: {
             idBus0: {
               name: 'Bus 0',
-              state: 'UNDEPLOYED',
               containers: ['idCont0', 'idCont1'],
               id: 'idBus0'
             }
@@ -56,9 +55,10 @@ describe(`Buses reducer`, () => {
         byId: {
           idBus0: {
             name: 'Bus 0',
-            state: 'UNDEPLOYED',
             containers: ['idCont0', 'idCont1'],
-            id: 'idBus0'
+            id: 'idBus0',
+            isFolded: false,
+            isFetchingDetails: false,
           }
         },
         allIds: ['idBus0']
@@ -74,9 +74,10 @@ describe(`Buses reducer`, () => {
           idBus0: {
             keepPreviousValues: '',
             name: 'Bus 0',
-            state: 'UNDEPLOYED',
             containers: ['idCont0', 'idCont1'],
-            id: 'idBus0'
+            id: 'idBus0',
+            isFolded: false,
+            isFetchingDetails: false,
           }
         },
         allIds: ['idBus0']
@@ -88,7 +89,6 @@ describe(`Buses reducer`, () => {
           byId: {
             idBus1: {
               name: 'Bus 1',
-              state: 'UNDEPLOYED',
               containers: ['idCont2', 'idCont3'],
               id: 'idBus1'
             }
@@ -105,15 +105,17 @@ describe(`Buses reducer`, () => {
           idBus0: {
             keepPreviousValues: '',
             name: 'Bus 0',
-            state: 'UNDEPLOYED',
             containers: ['idCont0', 'idCont1'],
-            id: 'idBus0'
+            id: 'idBus0',
+            isFolded: false,
+            isFetchingDetails: false,
           },
           idBus1: {
             name: 'Bus 1',
-            state: 'UNDEPLOYED',
             containers: ['idCont2', 'idCont3'],
-            id: 'idBus1'
+            id: 'idBus1',
+            isFolded: false,
+            isFetchingDetails: false,
           }
         },
         allIds: ['idBus0', 'idBus1']
@@ -129,16 +131,18 @@ describe(`Buses reducer`, () => {
           idBus0: {
             keepPreviousValues: '',
             name: 'Bus 0',
-            state: 'UNDEPLOYED',
             containers: ['idCont0', 'idCont1'],
-            id: 'idBus0'
+            id: 'idBus0',
+            isFolded: false,
+            isFetchingDetails: false,
           },
           idBus1: {
             doNotKeepPreviousValuesIfUpdate: '',
             name: 'Bus 1',
-            state: 'UNDEPLOYED',
             containers: ['idCont2', 'idCont3'],
-            id: 'idBus1'
+            id: 'idBus1',
+            isFolded: false,
+            isFetchingDetails: false,
           }
         },
         allIds: ['idBus0', 'idBus1']
@@ -150,7 +154,6 @@ describe(`Buses reducer`, () => {
           byId: {
             idBus1: {
               name: 'Bus 1, updated name',
-              state: 'DEPLOYED',
               containers: ['idCont2-updated', 'idCont3-updated'],
               id: 'idBus1'
             }
@@ -167,15 +170,17 @@ describe(`Buses reducer`, () => {
           idBus0: {
             keepPreviousValues: '',
             name: 'Bus 0',
-            state: 'UNDEPLOYED',
             containers: ['idCont0', 'idCont1'],
-            id: 'idBus0'
+            id: 'idBus0',
+            isFolded: false,
+            isFetchingDetails: false,
           },
           idBus1: {
             name: 'Bus 1, updated name',
-            state: 'DEPLOYED',
             containers: ['idCont2-updated', 'idCont3-updated'],
-            id: 'idBus1'
+            id: 'idBus1',
+            isFolded: false,
+            isFetchingDetails: false,
           }
         },
         allIds: ['idBus0', 'idBus1']
@@ -450,15 +455,6 @@ describe(`Buses reducer`, () => {
       expect(Buses.REMOVE_BUS).toEqual(`BUSES_REDUCER_REMOVE_BUS`);
     });
 
-    it(`should return the same object when trying to remove unknow ID`, () => {
-      const reducer = Buses.reducer(initialState, {
-        type: Buses.REMOVE_BUS,
-        payload: { busId: 'unknown' }
-      });
-
-      expect(reducer).toBe(initialState);
-    });
-
     it(`should remove the first bus`, () => {
       expect(Buses.reducer(initialState, {
         type: Buses.REMOVE_BUS,
@@ -558,23 +554,6 @@ describe(`Buses reducer`, () => {
         allIds: ['idBus0']
       });
     });
-
-    it(`should add the bus if he doesn't exists yet`, () => {
-      expect(Buses.reducer(initialState, {
-        type: Buses.FETCH_BUS_DETAILS,
-        payload: { busId: 'idNewBus' }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idBus0: {
-            keepPreviousValues: ''
-          },
-          idNewBus: { isFetchingDetails: true }
-        },
-        allIds: ['idBus0', 'idNewBus']
-      });
-    });
   });
 
   describe(type(Buses.FETCH_BUS_DETAILS_SUCCESS), () => {
@@ -608,26 +587,6 @@ describe(`Buses reducer`, () => {
           }
         },
         allIds: ['idBus0']
-      });
-    });
-
-    it(`should add the bus if he doesn't exists yet`, () => {
-      expect(Buses.reducer(initialState, {
-        type: Buses.FETCH_BUS_DETAILS_SUCCESS,
-        payload: { busId: 'idNewBus', data: { someData: 'some data' } }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idBus0: {
-            keepPreviousValues: ''
-          },
-          idNewBus: {
-            isFetchingDetails: false,
-            someData: 'some data'
-          }
-        },
-        allIds: ['idBus0', 'idNewBus']
       });
     });
   });
@@ -664,13 +623,6 @@ describe(`Buses reducer`, () => {
         },
         allIds: ['idBus0']
       });
-    });
-
-    it(`should return the same object if ID is unknown`, () => {
-      expect(Buses.reducer(initialState, {
-        type: Buses.FETCH_BUS_DETAILS_ERROR,
-        payload: { busId: 'idNewBus' }
-      })).toBe(initialState);
     });
   });
 

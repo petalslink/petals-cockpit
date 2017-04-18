@@ -17,14 +17,14 @@
 
 import { Action } from '@ngrx/store';
 
-import { usersState } from './users.initial-state';
-import { IUsersTable } from '../interfaces/users.interface';
-import { putAll, putById } from 'app/shared/helpers/shared.helper';
+import { IUsersTable, usersTableFactory } from '../interfaces/users.interface';
+import { putById, updateById, mergeInto } from 'app/shared/helpers/map.helper';
+import { userRowFactory } from 'app/shared/interfaces/user.interface';
 
 export class Users {
   private static reducerName = 'USERS_REDUCER';
 
-  public static reducer(users = usersState(), { type, payload }: Action): IUsersTable {
+  public static reducer(users = usersTableFactory(), { type, payload }: Action): IUsersTable {
     if (!Users.mapActionsToMethod[type]) {
       return users;
     }
@@ -35,7 +35,7 @@ export class Users {
   // tslint:disable-next-line:member-ordering
   public static FETCH_USERS_SUCCESS = `${Users.reducerName}_FETCH_USERS_SUCCESS`;
   private static fetchUsersSuccess(users: IUsersTable, payload): IUsersTable {
-    return putAll(users, payload);
+    return mergeInto(users, payload, userRowFactory());
   }
 
   // tslint:disable-next-line:member-ordering
@@ -53,7 +53,7 @@ export class Users {
     const id = payload.user.id;
 
     return {
-      ...putById(users, id, payload.user),
+      ...(users.byId[id] ? updateById(users, id, payload.user) : putById(users, id, payload.user, userRowFactory())),
       isConnecting: false,
       isConnected: true,
       connectionFailed: false,
@@ -90,7 +90,7 @@ export class Users {
   private static disconnectUserSuccess(users: IUsersTable, _payload): IUsersTable {
     return {
       ...users,
-      ...usersState(),
+      ...usersTableFactory(),
       ...<IUsersTable>{
         isDisconnecting: false,
         isConnected: false,

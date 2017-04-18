@@ -36,8 +36,8 @@ export function responseBody(body: string | Object | ArrayBuffer, status = 200):
   const response = new Response(new ResponseOptions({ status, body }));
 
   if (status >= 200 && status < 300) {
-    return Observable.of(response).delay(environment.httpDelay);
+    return Observable.of(response).delay(environment.mock.httpDelay);
   } else {
-    return Observable.throw(response).materialize().delay(environment.httpDelay).dematerialize();
+    return Observable.throw(response).materialize().delay(environment.mock.httpDelay).dematerialize();
   }
 }

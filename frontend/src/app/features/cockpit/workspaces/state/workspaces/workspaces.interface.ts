@@ -40,3 +40,18 @@ export interface IWorkspacesTable extends IWorkspacesCommon, IWorkspacesTableOnl
 export interface IWorkspaces extends IWorkspacesCommon {
   list: IWorkspace[];
 }
+
+export function workspacesTableFactory(): IWorkspacesTable {
+  return {
+    selectedWorkspaceId: '',
+    isSelectedWorkspaceFetched: false,
+    isSelectedWorkspaceDeleted: false,
+
+    isAddingWorkspace: false,
+    isFetchingWorkspaces: false,
+    searchPetals: '',
+
+    byId: {},
+    allIds: []
+  };
+}

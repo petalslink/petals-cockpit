@@ -19,7 +19,7 @@ import { Components } from 'app/features/cockpit/workspaces/state/components/com
 import { type } from 'app/shared/helpers/shared.helper';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.reducer';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { componentsTableFactory } from 'app/features/cockpit/workspaces/state/components/components.initial-state';
+import { componentsTableFactory } from 'app/features/cockpit/workspaces/state/components/components.interface';
 
 describe(`Components reducer`, () => {
   it(`should have a default value`, () => {
@@ -104,7 +104,11 @@ describe(`Components reducer`, () => {
               'idSu0A',
               'idSu1A'
             ],
-            id: 'idComp0'
+            id: 'idComp0',
+            isFolded: false,
+            isFetchingDetails: false,
+            isUpdatingState: false,
+            isDeployingServiceUnit: false
           },
           idComp1: {
             name: 'Comp 1 updated name',
@@ -112,7 +116,11 @@ describe(`Components reducer`, () => {
               'idSu2A',
               'idSu3A'
             ],
-            id: 'idComp1'
+            id: 'idComp1',
+            isFolded: false,
+            isFetchingDetails: false,
+            isUpdatingState: false,
+            isDeployingServiceUnit: false
           }
         },
         allIds: [
@@ -177,7 +185,11 @@ describe(`Components reducer`, () => {
               'idSu4',
               'idSu5'
             ],
-            id: 'idComp2'
+            id: 'idComp2',
+            isFolded: false,
+            isFetchingDetails: false,
+            isUpdatingState: false,
+            isDeployingServiceUnit: false
           },
           idComp3: {
             name: 'Comp 3',
@@ -185,7 +197,11 @@ describe(`Components reducer`, () => {
               'idSu6',
               'idSu7'
             ],
-            id: 'idComp3'
+            id: 'idComp3',
+            isFolded: false,
+            isFetchingDetails: false,
+            isUpdatingState: false,
+            isDeployingServiceUnit: false
           }
         },
         allIds: [
@@ -478,23 +494,6 @@ describe(`Components reducer`, () => {
         allIds: ['idComp0']
       });
     });
-
-    it(`should add the component if it doesn't exists yet`, () => {
-      expect(Components.reducer(initialState, {
-        type: Components.FETCH_COMPONENT_DETAILS,
-        payload: { componentId: 'idNewComp' }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idComp0: {
-            keepPreviousValues: ''
-          },
-          idNewComp: { isFetchingDetails: true }
-        },
-        allIds: ['idComp0', 'idNewComp']
-      });
-    });
   });
 
   describe(type(Components.FETCH_COMPONENT_DETAILS_SUCCESS), () => {
@@ -528,26 +527,6 @@ describe(`Components reducer`, () => {
           }
         },
         allIds: ['idComp0']
-      });
-    });
-
-    it(`should add the component if he doesn't exists yet`, () => {
-      expect(Components.reducer(initialState, {
-        type: Components.FETCH_COMPONENT_DETAILS_SUCCESS,
-        payload: { componentId: 'idNewComp', data: { someData: 'some data' } }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idComp0: {
-            keepPreviousValues: ''
-          },
-          idNewComp: {
-            isFetchingDetails: false,
-            someData: 'some data'
-          }
-        },
-        allIds: ['idComp0', 'idNewComp']
       });
     });
   });
@@ -585,13 +564,6 @@ describe(`Components reducer`, () => {
         allIds: ['idComp0']
       });
     });
-
-    it(`should return the same object if ID is unknown`, () => {
-      expect(Components.reducer(initialState, {
-        type: Components.FETCH_COMPONENT_DETAILS_ERROR,
-        payload: { componentId: 'idNewComp' }
-      })).toBe(initialState);
-    });
   });
 
   describe(type(Components.CHANGE_STATE), () => {
@@ -624,25 +596,6 @@ describe(`Components reducer`, () => {
           }
         },
         allIds: ['idComp0']
-      });
-    });
-
-    it(`should create a component if doesn't exists yet and set the isUpdatingState variable to true`, () => {
-      expect(Components.reducer(initialState, {
-        type: Components.CHANGE_STATE,
-        payload: { componentId: 'idComp1' }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idComp0: {
-            keepPreviousValues: ''
-          },
-          idComp1: {
-            isUpdatingState: true
-          }
-        },
-        allIds: ['idComp0', 'idComp1']
       });
     });
   });
@@ -680,26 +633,6 @@ describe(`Components reducer`, () => {
         allIds: ['idComp0']
       });
     });
-
-    it(`should add a non existing component and set his state`, () => {
-      expect(Components.reducer(initialState, {
-        type: Components.CHANGE_STATE_SUCCESS,
-        payload: { componentId: 'idComp1', newState: 'Started' }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idComp0: {
-            keepPreviousValues: ''
-          },
-          idComp1: {
-            isUpdatingState: false,
-            state: 'Started'
-          }
-        },
-        allIds: ['idComp0', 'idComp1']
-      });
-    });
   });
 
   describe(type(Components.CHANGE_STATE_ERROR), () => {
@@ -732,25 +665,6 @@ describe(`Components reducer`, () => {
           }
         },
         allIds: ['idComp0']
-      });
-    });
-
-    it(`should create a component if doesn't exists yet and set the isUpdatingState variable to false`, () => {
-      expect(Components.reducer(initialState, {
-        type: Components.CHANGE_STATE_ERROR,
-        payload: { componentId: 'idComp1' }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idComp0: {
-            keepPreviousValues: ''
-          },
-          idComp1: {
-            isUpdatingState: false
-          }
-        },
-        allIds: ['idComp0', 'idComp1']
       });
     });
   });
@@ -829,13 +743,6 @@ describe(`Components reducer`, () => {
         allIds: ['idComp0', 'idComp1']
       });
     });
-
-    it(`should return the same object if the component doesn't exists`, () => {
-      expect(Components.reducer(initialState, {
-        type: Components.REMOVE_COMPONENT,
-        payload: { componentId: 'idCompUnknown' }
-      })).toBe(initialState);
-    });
   });
 
   describe(type(Components.DEPLOY_SERVICE_UNIT), () => {
@@ -869,13 +776,6 @@ describe(`Components reducer`, () => {
         },
         allIds: ['idComp0']
       });
-    });
-
-    it(`should return the same object for an unknown component`, () => {
-      expect(Components.reducer(initialState, {
-        type: Components.DEPLOY_SERVICE_UNIT,
-        payload: { componentId: 'unknownCompId' }
-      })).toBe(initialState);
     });
   });
 
@@ -911,13 +811,6 @@ describe(`Components reducer`, () => {
         },
         allIds: ['idComp0']
       });
-    });
-
-    it(`should return the same object for an unknown component`, () => {
-      expect(Components.reducer(initialState, {
-        type: Components.DEPLOY_SERVICE_UNIT_ERROR,
-        payload: { componentId: 'unknownCompId' }
-      })).toBe(initialState);
     });
   });
 
@@ -960,34 +853,6 @@ describe(`Components reducer`, () => {
           }
         },
         allIds: ['idComp0']
-      });
-    });
-
-    it(`should add the component if doesn't exists yet`, () => {
-      expect(Components.reducer(initialState, {
-        type: Components.DEPLOY_SERVICE_UNIT_SUCCESS,
-        payload: {
-          componentId: 'idComp1',
-          serviceUnit: {
-            id: 'idSu1',
-            name: 'Service unit 1',
-            state: 'Started'
-          }
-        }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idComp0: {
-            keepPreviousValues: '',
-            serviceUnits: ['idSu0']
-          },
-          idComp1: {
-            isDeployingServiceUnit: false,
-            serviceUnits: ['idSu1']
-          }
-        },
-        allIds: ['idComp0', 'idComp1']
       });
     });
   });
@@ -1076,36 +941,6 @@ describe(`Components reducer`, () => {
       },
       allIds: ['idComp0']
     };
-
-    it(`should replace an existing component`, () => {
-      expect(Components.reducer(initialState, {
-        type: 'CONTAINERS_REDUCER_DEPLOY_COMPONENT_SUCCESS',
-        payload: {
-          component: {
-            id: 'idComp0',
-            name: 'Comp 0 updated',
-            state: 'Unloaded'
-          }
-        }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idComp0: {
-            id: 'idComp0',
-            name: 'Comp 0 updated',
-            state: 'Unloaded',
-            serviceUnits: [],
-
-            isFolded: false,
-            isFetchingDetails: false,
-            isUpdatingState: false,
-            isDeployingServiceUnit: false
-          }
-        },
-        allIds: ['idComp0']
-      });
-    });
 
     it(`should add a non existing component`, () => {
       expect(Components.reducer(initialState, {

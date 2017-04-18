@@ -58,7 +58,7 @@ export class ComponentsMockService extends ComponentsServiceImpl {
           state: newState
         }
       ),
-      environment.sseDelay
+      environment.mock.sseDelay
     );
 
     return helper.responseBody(null);
@@ -78,7 +78,7 @@ export class ComponentsMockService extends ComponentsServiceImpl {
           }
         }
       ),
-      environment.sseDelay
+      environment.mock.sseDelay
     );
 
     return helper.responseBody(null);

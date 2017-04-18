@@ -72,8 +72,8 @@ export class BusesMockService extends BusesServiceImpl {
           (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.BUS_IMPORT, detailsBus);
           // simulate the backend sending the imported bus on the SSE
           setTimeout(() => (this.pSseService as SseServiceMock)
-            .triggerSseEvent(event, newBus.eventData), environment.sseDelay);
-        }, environment.sseDelay);
+            .triggerSseEvent(event, newBus.eventData), environment.mock.sseDelay);
+        }, environment.mock.sseDelay);
 
       });
   }
@@ -87,7 +87,7 @@ export class BusesMockService extends BusesServiceImpl {
           .triggerSseEvent(SseWorkspaceEvent.BUS_DELETED, {
             id,
             reason: `bus deleted by ${(this.userService as UsersMockService).getCurrentUser().id}`
-          }), environment.sseDelay);
+          }), environment.mock.sseDelay);
       });
   }
 

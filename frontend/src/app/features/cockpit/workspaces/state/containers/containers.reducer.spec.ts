@@ -19,7 +19,7 @@ import { Containers } from 'app/features/cockpit/workspaces/state/containers/con
 import { type } from 'app/shared/helpers/shared.helper';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.reducer';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { containersTableFactory } from 'app/features/cockpit/workspaces/state/containers/containers.initial-state';
+import { containersTableFactory } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 
 describe(`Containers reducer`, () => {
   it(`should have a default value`, () => {
@@ -116,7 +116,10 @@ describe(`Containers reducer`, () => {
               'idComp5'
             ],
             id: 'idCont2',
-            reachabilities: []
+            reachabilities: [],
+            isFolded: false,
+            isFetchingDetails: false,
+            isDeployingComponent: false,
           },
           idCont3: {
             name: 'Cont 3',
@@ -125,7 +128,10 @@ describe(`Containers reducer`, () => {
               'idComp7'
             ],
             id: 'idCont3',
-            reachabilities: []
+            reachabilities: [],
+            isFolded: false,
+            isFetchingDetails: false,
+            isDeployingComponent: false,
           }
         },
         allIds: [
@@ -405,23 +411,6 @@ describe(`Containers reducer`, () => {
         allIds: ['idCont0']
       });
     });
-
-    it(`should add the container if he doesn't exists yet`, () => {
-      expect(Containers.reducer(initialState, {
-        type: Containers.FETCH_CONTAINER_DETAILS,
-        payload: { containerId: 'idNewCont' }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idCont0: {
-            keepPreviousValues: ''
-          },
-          idNewCont: { isFetchingDetails: true }
-        },
-        allIds: ['idCont0', 'idNewCont']
-      });
-    });
   });
 
   describe(type(Containers.FETCH_CONTAINER_DETAILS_SUCCESS), () => {
@@ -455,26 +444,6 @@ describe(`Containers reducer`, () => {
           }
         },
         allIds: ['idCont0']
-      });
-    });
-
-    it(`should add the container if he doesn't exists yet`, () => {
-      expect(Containers.reducer(initialState, {
-        type: Containers.FETCH_CONTAINER_DETAILS_SUCCESS,
-        payload: { containerId: 'idNewCont', data: { someData: 'some data' } }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idCont0: {
-            keepPreviousValues: ''
-          },
-          idNewCont: {
-            isFetchingDetails: false,
-            someData: 'some data'
-          }
-        },
-        allIds: ['idCont0', 'idNewCont']
       });
     });
   });
@@ -512,13 +481,6 @@ describe(`Containers reducer`, () => {
         allIds: ['idCont0']
       });
     });
-
-    it(`should return the same object if ID is unknown`, () => {
-      expect(Containers.reducer(initialState, {
-        type: Containers.FETCH_CONTAINER_DETAILS_ERROR,
-        payload: { containerId: 'idNewContainer' }
-      })).toBe(initialState);
-    });
   });
 
   describe(type(Containers.DEPLOY_COMPONENT), () => {
@@ -552,13 +514,6 @@ describe(`Containers reducer`, () => {
         },
         allIds: ['idCont0']
       });
-    });
-
-    it(`should return the same object for an unknown container`, () => {
-      expect(Containers.reducer(initialState, {
-        type: Containers.DEPLOY_COMPONENT,
-        payload: { containerId: 'unknownContId' }
-      })).toBe(initialState);
     });
   });
 
@@ -594,13 +549,6 @@ describe(`Containers reducer`, () => {
         },
         allIds: ['idCont0']
       });
-    });
-
-    it(`should return the same object for an unknown container`, () => {
-      expect(Containers.reducer(initialState, {
-        type: Containers.DEPLOY_COMPONENT_ERROR,
-        payload: { containerId: 'unknownContId' }
-      })).toBe(initialState);
     });
   });
 
@@ -643,34 +591,6 @@ describe(`Containers reducer`, () => {
           }
         },
         allIds: ['idCont0']
-      });
-    });
-
-    it(`should add the container if doesn't exists yet`, () => {
-      expect(Containers.reducer(initialState, {
-        type: Containers.DEPLOY_COMPONENT_SUCCESS,
-        payload: {
-          containerId: 'idCont1',
-          component: {
-            id: 'idComp1',
-            name: 'Comp 1',
-            state: 'Started'
-          }
-        }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idCont0: {
-            keepPreviousValues: '',
-            components: ['idComp0']
-          },
-          idCont1: {
-            isDeployingComponent: false,
-            components: ['idComp1']
-          }
-        },
-        allIds: ['idCont0', 'idCont1']
       });
     });
   });

@@ -17,10 +17,10 @@
 
 import { Action } from '@ngrx/store';
 
-import { IBusesTable } from './buses.interface';
-import { busesTableFactory } from './buses.initial-state';
+import { IBusesTable, busesTableFactory } from './buses.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
-import { putAll, updateById, removeById } from 'app/shared/helpers/shared.helper';
+import { putAll, updateById, removeById } from 'app/shared/helpers/map.helper';
+import { busRowFactory } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
 
 export class Buses {
   private static reducerName = 'BUSES_REDUCER';
@@ -36,7 +36,7 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUSES_SUCCESS = `${Buses.reducerName}_FETCH_BUSES_SUCCESS`;
   private static fetchBusesSuccess(busesTable: IBusesTable, payload): IBusesTable {
-    return putAll(busesTable, payload);
+    return putAll(busesTable, payload, busRowFactory());
   }
 
   // tslint:disable-next-line:member-ordering
@@ -89,11 +89,7 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS = `${Buses.reducerName}_REMOVE_BUS`;
   private static removeBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
-    if (busesTable.byId[payload.busId]) {
-      return removeById(busesTable, payload.busId);
-    }
-
-    return busesTable;
+    return removeById(busesTable, payload.busId);
   }
 
   // tslint:disable-next-line:member-ordering
@@ -111,10 +107,6 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS_ERROR = `${Buses.reducerName}_FETCH_BUS_DETAILS_ERROR`;
   private static fetchBusDetailsError(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
-    if (!busesTable.byId[payload.busId]) {
-      return busesTable;
-    }
-
     return updateById(busesTable, payload.busId, { isFetchingDetails: false });
   }
 

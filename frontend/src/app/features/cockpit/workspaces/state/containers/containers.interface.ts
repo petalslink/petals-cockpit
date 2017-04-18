@@ -30,3 +30,13 @@ export interface IContainersTable extends IContainersCommon {
 export interface IContainers extends IContainersCommon {
   list: IContainer[];
 }
+
+export function containersTableFactory(): IContainersTable {
+  return {
+    selectedContainerId: '',
+    isFetchingDetails: false,
+
+    byId: {},
+    allIds: []
+  };
+}

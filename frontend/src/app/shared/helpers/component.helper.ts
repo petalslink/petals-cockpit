@@ -16,7 +16,7 @@
  */
 
 import { environment } from '../../../environments/environment';
-import { ComponentState } from '../../features/cockpit/workspaces/state/components/component.interface';
+import { EComponentState } from '../../features/cockpit/workspaces/state/components/component.interface';
 import { IContainersTable } from '../../features/cockpit/workspaces/state/containers/containers.interface';
 
 /**
@@ -25,30 +25,30 @@ import { IContainersTable } from '../../features/cockpit/workspaces/state/contai
  */
 export function stateNameToPossibleActionsComponent(state: string): { actionName: string, newStateAfterAction: string }[] {
   switch (state) {
-    case ComponentState.Shutdown:
+    case EComponentState.Shutdown:
       return [
-        { actionName: 'Start', newStateAfterAction: ComponentState.Started },
-        { actionName: 'Unload', newStateAfterAction: ComponentState.Unloaded }
+        { actionName: 'Start', newStateAfterAction: EComponentState.Started },
+        { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded }
       ];
 
-    case ComponentState.Started:
+    case EComponentState.Started:
       return [
-        { actionName: 'Stop', newStateAfterAction: ComponentState.Stopped }
+        { actionName: 'Stop', newStateAfterAction: EComponentState.Stopped }
       ];
 
-    case ComponentState.Stopped:
+    case EComponentState.Stopped:
       return [
-        { actionName: 'Start', newStateAfterAction: ComponentState.Started },
-        { actionName: 'Unload', newStateAfterAction: ComponentState.Unloaded }
+        { actionName: 'Start', newStateAfterAction: EComponentState.Started },
+        { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded }
       ];
 
-    case ComponentState.Loaded:
+    case EComponentState.Loaded:
       return [
-        { actionName: 'Start', newStateAfterAction: ComponentState.Started },
-        { actionName: 'Unload', newStateAfterAction: ComponentState.Unloaded }
+        { actionName: 'Start', newStateAfterAction: EComponentState.Started },
+        { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded }
       ];
 
-    case ComponentState.Unloaded:
+    case EComponentState.Unloaded:
       // no possible new state here but it exists so handle it in order to not throw an error
       break;
 

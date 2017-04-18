@@ -42,3 +42,17 @@ export interface IWorkspace extends IWorkspaceCommon {
   buses: IBuses;
   users: IUsers;
 }
+
+export function workspaceRowFactory(id?: string, name?: string, description?: string): IWorkspaceRow {
+  return {
+    id,
+    name,
+    description,
+
+    isRemoving: false,
+    isFetchingDetails: false,
+    isSettingDescription: false,
+
+    users: []
+  };
+}

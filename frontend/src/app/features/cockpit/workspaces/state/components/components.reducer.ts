@@ -17,13 +17,12 @@
 
 import { Action } from '@ngrx/store';
 
-import { IComponentsTable } from './components.interface';
-import { componentsTableFactory } from './components.initial-state';
+import { IComponentsTable, componentsTableFactory } from './components.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { getComponentOfServiceUnit } from '../../../../../shared/helpers/service-unit.helper';
 import { ServiceUnits } from '../service-units/service-units.reducer';
-import { putAll, updateById, removeById, putById } from 'app/shared/helpers/shared.helper';
-import { IComponentRow, ComponentState, EComponentType } from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { putAll, updateById, removeById, putById } from 'app/shared/helpers/map.helper';
+import { componentRowFactory, EComponentState, EComponentType } from 'app/features/cockpit/workspaces/state/components/component.interface';
 
 export class Components {
   private static reducerName = 'COMPONENTS_REDUCER';
@@ -39,7 +38,7 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static FETCH_COMPONENTS_SUCCESS = `${Components.reducerName}_FETCH_COMPONENTS_SUCCESS`;
   private static fetchComponentsSuccess(componentsTable: IComponentsTable, payload): IComponentsTable {
-    return putAll(componentsTable, payload);
+    return putAll(componentsTable, payload, componentRowFactory());
   }
 
   // tslint:disable-next-line:member-ordering
@@ -67,7 +66,7 @@ export class Components {
   private static toggleFoldComponent(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
     const component = componentsTable.byId[payload.componentId];
 
-    if (!componentsTable.byId[payload.componentId]) {
+    if (!component) {
       return componentsTable;
     }
 
@@ -107,10 +106,6 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static FETCH_COMPONENT_DETAILS_ERROR = `${Components.reducerName}_FETCH_COMPONENT_DETAILS_ERROR`;
   private static fetchComponentDetailsError(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
-    if (!componentsTable.byId[payload.componentId]) {
-      return componentsTable;
-    }
-
     return updateById(componentsTable, payload.componentId, { isFetchingDetails: false });
   }
 
@@ -138,30 +133,18 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static REMOVE_COMPONENT = `${Components.reducerName}_REMOVE_COMPONENT`;
   private static removeComponent(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
-    if (!componentsTable.byId[payload.componentId]) {
-      return componentsTable;
-    }
-
     return removeById(componentsTable, payload.componentId);
   }
 
   // tslint:disable-next-line:member-ordering
   public static DEPLOY_SERVICE_UNIT = `${Components.reducerName}_DEPLOY_SERVICE_UNIT`;
   private static deployServiceUnit(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
-    if (!componentsTable.byId[payload.componentId]) {
-      return componentsTable;
-    }
-
     return updateById(componentsTable, payload.componentId, { isDeployingServiceUnit: true });
   }
 
   // tslint:disable-next-line:member-ordering
   public static DEPLOY_SERVICE_UNIT_ERROR = `${Components.reducerName}_DEPLOY_SERVICE_UNIT_ERROR`;
   private static deployServiceUnitError(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
-    if (!componentsTable.byId[payload.componentId]) {
-      return componentsTable;
-    }
-
     return updateById(componentsTable, payload.componentId, { isDeployingServiceUnit: false });
   }
 
@@ -171,11 +154,7 @@ export class Components {
     componentsTable: IComponentsTable,
     payload: { componentId: string, serviceUnit: { id: string, name: string, state: string } }
   ): IComponentsTable {
-    let component = componentsTable.byId[payload.componentId];
-
-    if (!component) {
-      component = <IComponentRow>{ serviceUnits: [] };
-    }
+    const component = componentsTable.byId[payload.componentId];
 
     return updateById(componentsTable, payload.componentId, {
       serviceUnits: [...Array.from(new Set([...component.serviceUnits, payload.serviceUnit.id]))],
@@ -200,19 +179,9 @@ export class Components {
 
   private static deployComponentSuccess(
     componentsTable: IComponentsTable,
-    payload: { component: { id: string, name: string, state: keyof typeof ComponentState, type: EComponentType } }
+    payload: { component: { id: string, name: string, state: keyof typeof EComponentState, type: EComponentType } }
   ): IComponentsTable {
-    const component: IComponentRow = {
-      ...payload.component,
-      serviceUnits: [],
-
-      isFolded: false,
-      isFetchingDetails: false,
-      isUpdatingState: false,
-      isDeployingServiceUnit: false
-    };
-
-    return putById(componentsTable, payload.component.id, component);
+    return putById(componentsTable, payload.component.id, payload.component, componentRowFactory());
   }
 
   private static cleanWorkspace(_componentsTable: IComponentsTable, _payload): IComponentsTable {

@@ -49,7 +49,7 @@ export class UsersMockService extends UsersService {
 
   constructor() {
     super();
-    if (environment.alreadyConnected) {
+    if (environment.mock.alreadyConnected) {
       this.currentUser = UsersMockService.users.admin;
     }
   }

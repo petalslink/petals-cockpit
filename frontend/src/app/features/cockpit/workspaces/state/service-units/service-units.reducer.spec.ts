@@ -18,7 +18,7 @@
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.reducer';
 import { type } from 'app/shared/helpers/shared.helper';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { serviceUnitsTableFactory } from 'app/features/cockpit/workspaces/state/service-units/service-units.initial-state';
+import { serviceUnitsTableFactory } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 
 describe(`ServiceUnits reducer`, () => {
   it(`should have a default value`, () => {
@@ -83,11 +83,15 @@ describe(`ServiceUnits reducer`, () => {
           keepPreviousValues: '',
           idSu0: {
             name: 'SU 0 updated name',
-            id: 'idSu0'
+            id: 'idSu0',
+            isFolded: false,
+            isUpdatingState: false
           },
           idSu1: {
             name: 'SU 1 updated name',
-            id: 'idSu1'
+            id: 'idSu1',
+            isFolded: false,
+            isUpdatingState: false
           }
         },
         allIds: [
@@ -132,11 +136,15 @@ describe(`ServiceUnits reducer`, () => {
           },
           idSu2: {
             name: 'SU 2',
-            id: 'idSu2'
+            id: 'idSu2',
+            isFolded: false,
+            isUpdatingState: false
           },
           idSu3: {
             name: 'SU 3',
-            id: 'idSu3'
+            id: 'idSu3',
+            isFolded: false,
+            isUpdatingState: false
           }
         },
         allIds: [
@@ -206,23 +214,6 @@ describe(`ServiceUnits reducer`, () => {
         allIds: ['idSu0']
       });
     });
-
-    it(`should add the service-unit if he doesn't exists yet`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS,
-        payload: { serviceUnitId: 'idNewSu' }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idSu0: {
-            keepPreviousValues: ''
-          },
-          idNewSu: { isFetchingDetails: true }
-        },
-        allIds: ['idSu0', 'idNewSu']
-      });
-    });
   });
 
   describe(type(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS), () => {
@@ -256,26 +247,6 @@ describe(`ServiceUnits reducer`, () => {
           }
         },
         allIds: ['idSu0']
-      });
-    });
-
-    it(`should add the service-unit if he doesn't exists yet`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS,
-        payload: { serviceUnitId: 'idNewSu', data: { someData: 'some data' } }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idSu0: {
-            keepPreviousValues: ''
-          },
-          idNewSu: {
-            isFetchingDetails: false,
-            someData: 'some data'
-          }
-        },
-        allIds: ['idSu0', 'idNewSu']
       });
     });
   });
@@ -313,13 +284,6 @@ describe(`ServiceUnits reducer`, () => {
         allIds: ['idSu0']
       });
     });
-
-    it(`should return the same object if ID is unknown`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR,
-        payload: { serviceUnitId: 'idNewSu' }
-      })).toBe(initialState);
-    });
   });
 
   describe(type(ServiceUnits.CHANGE_STATE), () => {
@@ -352,25 +316,6 @@ describe(`ServiceUnits reducer`, () => {
           }
         },
         allIds: ['idSu0']
-      });
-    });
-
-    it(`should create a service-unit if doesn't exists yet and set the isUpdatingState variable to true`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.CHANGE_STATE,
-        payload: { serviceUnitId: 'idSu1' }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idSu0: {
-            keepPreviousValues: ''
-          },
-          idSu1: {
-            isUpdatingState: true
-          }
-        },
-        allIds: ['idSu0', 'idSu1']
       });
     });
   });
@@ -408,26 +353,6 @@ describe(`ServiceUnits reducer`, () => {
         allIds: ['idSu0']
       });
     });
-
-    it(`should add a non existing service-unit and set his state`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.CHANGE_STATE_SUCCESS,
-        payload: { serviceUnitId: 'idSu1', newState: 'Started' }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idSu0: {
-            keepPreviousValues: ''
-          },
-          idSu1: {
-            isUpdatingState: false,
-            state: 'Started'
-          }
-        },
-        allIds: ['idSu0', 'idSu1']
-      });
-    });
   });
 
   describe(type(ServiceUnits.CHANGE_STATE_ERROR), () => {
@@ -460,25 +385,6 @@ describe(`ServiceUnits reducer`, () => {
           }
         },
         allIds: ['idSu0']
-      });
-    });
-
-    it(`should create a service-unit if doesn't exists yet and set the isUpdatingState variable to false`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.CHANGE_STATE_ERROR,
-        payload: { serviceUnitId: 'idSu1' }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idSu0: {
-            keepPreviousValues: ''
-          },
-          idSu1: {
-            isUpdatingState: false
-          }
-        },
-        allIds: ['idSu0', 'idSu1']
       });
     });
   });
@@ -557,13 +463,6 @@ describe(`ServiceUnits reducer`, () => {
         allIds: ['idSu0', 'idSu1']
       });
     });
-
-    it(`should return the same object if the service-unit doesn't exists`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.REMOVE_SERVICE_UNIT,
-        payload: { serviceUnitId: 'idSuUnknown' }
-      })).toBe(initialState);
-    });
   });
 
   describe(`COMPONENTS_REDUCER_DEPLOY_SERVICE_UNIT_SUCCESS`, () => {
@@ -577,24 +476,6 @@ describe(`ServiceUnits reducer`, () => {
       },
       allIds: ['idSu0']
     };
-
-    it(`should replace an existing service-unit`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: 'COMPONENTS_REDUCER_DEPLOY_SERVICE_UNIT_SUCCESS',
-        payload: { serviceUnit: { id: 'idSu0', name: 'Su 0 updated', state: 'Started' } }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idSu0: {
-            id: 'idSu0',
-            name: 'Su 0 updated',
-            state: 'Started'
-          }
-        },
-        allIds: ['idSu0']
-      });
-    });
 
     it(`should add a non existing service-unit`, () => {
       expect(ServiceUnits.reducer(initialState, {
@@ -610,7 +491,9 @@ describe(`ServiceUnits reducer`, () => {
           idSu1: {
             id: 'idSu1',
             name: 'Su 1',
-            state: 'Started'
+            state: 'Started',
+            isFolded: false,
+            isUpdatingState: false
           }
         },
         allIds: ['idSu0', 'idSu1']

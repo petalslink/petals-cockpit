@@ -30,3 +30,13 @@ export interface IServiceUnitsTable extends IServiceUnitsCommon {
 export interface IServiceUnits extends IServiceUnitsCommon {
   list: IServiceUnit[];
 }
+
+export function serviceUnitsTableFactory(): IServiceUnitsTable {
+  return {
+    selectedServiceUnitId: '',
+    isFetchingDetails: false,
+
+    byId: {},
+    allIds: []
+  };
+}

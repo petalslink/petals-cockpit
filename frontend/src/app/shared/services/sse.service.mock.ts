@@ -83,7 +83,7 @@ export class SseServiceMock extends SseService {
 
   public subscribeToWorkspaceEvent(eventName: string) {
     if (this.registeredEvents.has(eventName)) {
-      return this.registeredEvents.get(eventName).asObservable().delay(environment.sseDelay);
+      return this.registeredEvents.get(eventName).asObservable().delay(environment.mock.sseDelay);
     }
 
     if (environment.debug) {

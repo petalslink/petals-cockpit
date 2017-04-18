@@ -29,3 +29,11 @@ export interface IBusesTable extends IBusesCommon {
 export interface IBuses extends IBusesCommon {
   list: IBus[];
 }
+
+export function busesTableFactory(): IBusesTable {
+  return {
+    selectedBusId: '',
+    byId: {},
+    allIds: []
+  };
+}

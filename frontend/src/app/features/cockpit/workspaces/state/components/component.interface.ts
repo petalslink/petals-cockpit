@@ -18,7 +18,7 @@
 import { IServiceUnits } from '../service-units/service-units.interface';
 
 // http://stackoverflow.com/a/41631732/2398593
-export const ComponentState = {
+export const EComponentState = {
   Started: 'Started' as 'Started',
   Stopped: 'Stopped' as 'Stopped',
   Loaded: 'Loaded' as 'Loaded',
@@ -32,7 +32,7 @@ export interface IComponentCommon {
   // from server
   id: string;
   name: string;
-  state: keyof typeof ComponentState;
+  state: keyof typeof EComponentState;
   type: EComponentType;
 
   // for UI
@@ -50,4 +50,22 @@ export interface IComponentRow extends IComponentCommon {
 export interface IComponent extends IComponentCommon {
   // from server
   serviceUnits: IServiceUnits;
+}
+
+export function componentRowFactory(
+  id?: string, name?: string, state?: keyof typeof EComponentState, type?: EComponentType
+): IComponentRow {
+  return {
+    id,
+    name,
+    state,
+    type,
+
+    isFolded: false,
+    isFetchingDetails: false,
+    isUpdatingState: false,
+    isDeployingServiceUnit: false,
+
+    serviceUnits: []
+  };
 }

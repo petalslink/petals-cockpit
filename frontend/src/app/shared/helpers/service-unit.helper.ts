@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { EServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
 import { environment } from '../../../environments/environment';
 import { IComponentsTable } from '../../features/cockpit/workspaces/state/components/components.interface';
 
@@ -25,24 +25,24 @@ import { IComponentsTable } from '../../features/cockpit/workspaces/state/compon
  */
 export function stateNameToPossibleActionsServiceUnit(state: string): { actionName: string, newStateAfterAction: string }[] {
   switch (state) {
-    case ServiceUnitState.Shutdown:
+    case EServiceUnitState.Shutdown:
       return [
-        { actionName: 'Start', newStateAfterAction: ServiceUnitState.Started },
-        { actionName: 'Unload', newStateAfterAction: ServiceUnitState.Unloaded }
+        { actionName: 'Start', newStateAfterAction: EServiceUnitState.Started },
+        { actionName: 'Unload', newStateAfterAction: EServiceUnitState.Unloaded }
       ];
 
-    case ServiceUnitState.Started:
+    case EServiceUnitState.Started:
       return [
-        { actionName: 'Stop', newStateAfterAction: ServiceUnitState.Stopped }
+        { actionName: 'Stop', newStateAfterAction: EServiceUnitState.Stopped }
       ];
 
-    case ServiceUnitState.Stopped:
+    case EServiceUnitState.Stopped:
       return [
-        { actionName: 'Start', newStateAfterAction: ServiceUnitState.Started },
-        { actionName: 'Unload', newStateAfterAction: ServiceUnitState.Unloaded }
+        { actionName: 'Start', newStateAfterAction: EServiceUnitState.Started },
+        { actionName: 'Unload', newStateAfterAction: EServiceUnitState.Unloaded }
       ];
 
-    case ServiceUnitState.Unloaded:
+    case EServiceUnitState.Unloaded:
       // no possible new state here but it exists so handle it in order to not throw an error
       break;
 

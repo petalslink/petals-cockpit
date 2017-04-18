@@ -61,7 +61,7 @@ export class ContainersMockService extends ContainersServiceImpl {
         SseWorkspaceEvent.COMPONENT_DEPLOYED,
         response
       ),
-      environment.sseDelay
+      environment.mock.sseDelay
     );
 
     return helper.responseBody(response);

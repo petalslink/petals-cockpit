@@ -1,46 +1,12 @@
+
+import { environment as prod } from './environment.prod';
+
 export const environment = {
-  // PRODUCTION
-  // angular can optimize some part of his code
-  // (make more or less checks) according to an environment
-  production: true,
-
-  // URLBACKEND
-  // your backend URL
-  // you can then use it for example in a service
-  // `${environment.urlBackend}/some/resource`
-  urlBackend: '/api',
-
-  // HTTPDELAY
-  // when using mocked data, you can use that
-  // variable with .delay to simulate a network latency
-  httpDelay: 0,
-
-  // SSEDELAY
-  // when using mocked data, you can use that
-  // variable with .delay to simulate a network latency
-  sseDelay: 0,
-
-  // MOCK
-  // should you keep mocks when building the app
-  // or hit the real API
-  mock: true,
-
-  // ALREADYCONNECTED
-  // When using `mock: true`, define wether we should consider
-  // that the user's already logged or not
-  alreadyConnected: false,
-
-  // HASHLOCATIONSTRATEGY
-  // should the URL be
-  // http://some-domain#/your/app/routes (true)
-  // or
-  // http://some-domain/your/app/routes (false)
-  hashLocationStrategy: false,
-
-  // DEBUG
-  // wether to display debug informations or not
-  // TIP : Use console debug, console warn and console error
-  // console log should be used only in dev and never commited
-  // this way you can find every console log very easily
-  debug: false
+  ...prod,
+  strictCoherence: true,
+  mock: {
+    httpDelay: 0,
+    sseDelay: 0,
+    alreadyConnected: false
+  }
 };

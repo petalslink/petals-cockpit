@@ -16,9 +16,10 @@
  */
 
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { type, emptyJavascriptMap } from 'app/shared/helpers/shared.helper';
+import { type } from 'app/shared/helpers/shared.helper';
 import { Users } from 'app/shared/state/users.reducer';
-import { workspacesTableFactory } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.initial-state';
+import { workspacesTableFactory } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
+import { emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 
 describe(`Workspaces reducer`, () => {
   it(`should have a default value`, () => {
@@ -124,7 +125,10 @@ describe(`Workspaces reducer`, () => {
             name: 'Workspace 0',
             users: [
               'admin'
-            ]
+            ],
+            isRemoving: false,
+            isFetchingDetails: false,
+            isSettingDescription: false
           },
           idWks1: {
             id: 'idWks1',
@@ -135,7 +139,10 @@ describe(`Workspaces reducer`, () => {
               'mrobert',
               'cchevalier',
               'vnoel'
-            ]
+            ],
+            isRemoving: false,
+            isFetchingDetails: false,
+            isSettingDescription: false
           }
         },
         allIds: [
@@ -225,7 +232,10 @@ describe(`Workspaces reducer`, () => {
                 'idUser1',
                 'idUser2',
                 'idUser3'
-              ]
+              ],
+              isRemoving: false,
+              isFetchingDetails: false,
+              isSettingDescription: false
             }
           },
           allIds: ['idWorkspace1']
@@ -255,7 +265,10 @@ describe(`Workspaces reducer`, () => {
                 'idUser1',
                 'idUser2',
                 'idUser3'
-              ]
+              ],
+              isRemoving: false,
+              isFetchingDetails: false,
+              isSettingDescription: false
             },
             idWorkspace2: {
               id: 'idWorkspace2',
@@ -264,68 +277,14 @@ describe(`Workspaces reducer`, () => {
                 'idUser4',
                 'idUser5',
                 'idUser6'
-              ]
+              ],
+              isRemoving: false,
+              isFetchingDetails: false,
+              isSettingDescription: false
             }
           },
           allIds: ['idWorkspace1', 'idWorkspace2']
         });
-    });
-
-    it(`should update a workspace if it's an existing one`, () => {
-      const initialState: any = {
-        keepPreviousValues: '',
-        isAddingWorkspace: true,
-        byId: {
-          keepPreviousValues: '',
-          idWorkspace1: {
-            keepPreviousValues: '',
-            id: 'idWorkspace1',
-            name: 'Workspace 1',
-            users: [
-              'idUser1',
-              'idUser2',
-              'idUser3'
-            ]
-          }
-        },
-        allIds: ['idWorkspace1']
-      };
-
-      const reducer = Workspaces.reducer(initialState, {
-        type: Workspaces.POST_WORKSPACE_SUCCESS,
-        payload: {
-          id: 'idWorkspace1',
-          name: 'Workspace 1 new name',
-          users: [
-            'idUser1',
-            'idUser2',
-            'idUser3',
-            'idUser4',
-            'idUser5'
-          ]
-        }
-      });
-
-      expect(reducer).toEqual({
-        keepPreviousValues: '',
-        isAddingWorkspace: false,
-        byId: {
-          keepPreviousValues: '',
-          idWorkspace1: {
-            keepPreviousValues: '',
-            id: 'idWorkspace1',
-            name: 'Workspace 1 new name',
-            users: [
-              'idUser1',
-              'idUser2',
-              'idUser3',
-              'idUser4',
-              'idUser5'
-            ]
-          }
-        },
-        allIds: ['idWorkspace1']
-      });
     });
   });
 
@@ -514,13 +473,19 @@ describe(`Workspaces reducer`, () => {
               'mrobert',
               'cchevalier',
               'vnoel'
-            ]
+            ],
+            isRemoving: false,
+            isFetchingDetails: false,
+            isSettingDescription: false
           },
           idWks2: {
             keepPreviousValues: '',
             id: 'idWks2',
             name: 'Workspace 2',
-            users: ['admin2']
+            users: ['admin2'],
+            isRemoving: false,
+            isFetchingDetails: false,
+            isSettingDescription: false
           }
         },
         allIds: ['idWks1', 'idWks2']
@@ -556,7 +521,10 @@ describe(`Workspaces reducer`, () => {
             keepPreviousValues: '',
             id: 'idWks2',
             name: 'Workspace 2',
-            users: ['admin2']
+            users: ['admin2'],
+            isRemoving: false,
+            isFetchingDetails: false,
+            isSettingDescription: false
           }
         },
         allIds: ['idWks1', 'idWks2']
@@ -596,23 +564,6 @@ describe(`Workspaces reducer`, () => {
         allIds: ['idWks1']
       });
     });
-
-    it(`should add the workspace if it doesn't exists yet`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.FETCH_WORKSPACE_DETAILS,
-        payload: 'idWks2'
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idWks1: {
-            keepPreviousValues: ''
-          },
-          idWks2: { isFetchingDetails: true }
-        },
-        allIds: ['idWks1', 'idWks2']
-      });
-    });
   });
 
   describe(type(Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS), () => {
@@ -646,26 +597,6 @@ describe(`Workspaces reducer`, () => {
           }
         },
         allIds: ['idWks1']
-      });
-    });
-
-    it(`should add the workspace if it doesn't exists yet`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS,
-        payload: { id: 'idWks2', data: { someData: 'some data' } }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idWks1: {
-            keepPreviousValues: ''
-          },
-          idWks2: {
-            someData: 'some data',
-            isFetchingDetails: false
-          }
-        },
-        allIds: ['idWks1', 'idWks2']
       });
     });
   });
@@ -703,13 +634,6 @@ describe(`Workspaces reducer`, () => {
         allIds: ['idWks1']
       });
     });
-
-    it(`should return the same object if ID is unknown`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.FETCH_WORKSPACE_DETAILS_FAILED,
-        payload: 'idWks2'
-      })).toBe(initialState);
-    });
   });
 
   describe(type(Workspaces.SET_DESCRIPTION), () => {
@@ -742,23 +666,6 @@ describe(`Workspaces reducer`, () => {
           },
         },
         allIds: ['idWks1']
-      });
-    });
-
-    it(`should add the workspace if it doesn't exists yet`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.SET_DESCRIPTION,
-        payload: { id: 'idWks2', description: 'desc' }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idWks1: {
-            keepPreviousValues: ''
-          },
-          idWks2: { isSettingDescription: true }
-        },
-        allIds: ['idWks1', 'idWks2']
       });
     });
   });
@@ -796,26 +703,6 @@ describe(`Workspaces reducer`, () => {
         allIds: ['idWks1']
       });
     });
-
-    it(`should add the workspace if it doesn't exists yet`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.SET_DESCRIPTION_SUCCESS,
-        payload: { id: 'idWks2', description: 'desc' }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idWks1: {
-            keepPreviousValues: ''
-          },
-          idWks2: {
-            description: 'desc',
-            isSettingDescription: false
-          }
-        },
-        allIds: ['idWks1', 'idWks2']
-      });
-    });
   });
 
   describe(type(Workspaces.SET_DESCRIPTION_FAILED), () => {
@@ -850,13 +737,6 @@ describe(`Workspaces reducer`, () => {
         },
         allIds: ['idWks1']
       });
-    });
-
-    it(`should return the same object if ID is unknown`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.SET_DESCRIPTION_FAILED,
-        payload: 'idWks2'
-      })).toBe(initialState);
     });
   });
 
