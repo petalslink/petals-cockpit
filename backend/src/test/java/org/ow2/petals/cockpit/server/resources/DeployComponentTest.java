@@ -78,7 +78,7 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
     private static MultiPart getComponentMultiPart() throws URISyntaxException {
         // fake-jbi-component-soap only contains the jbi file
         // so it's ok for tests (until we test with a real petals container)
-        return new FormDataMultiPart().field("name", COMP_NAME).field("type", "BC").bodyPart(new FileDataBodyPart(
+        return new FormDataMultiPart().bodyPart(new FileDataBodyPart(
                 "file", new File(DeployComponentTest.class.getResource("/fake-jbi-component-soap.zip").toURI())));
     }
 

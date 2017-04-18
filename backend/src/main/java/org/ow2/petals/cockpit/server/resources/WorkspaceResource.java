@@ -23,8 +23,10 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +35,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -47,6 +48,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -68,7 +70,6 @@ import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
-import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin.Type;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
@@ -77,6 +78,8 @@ import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.ArtifactServer.ServicedArtifact;
 import org.ow2.petals.cockpit.server.utils.PetalsUtils;
 import org.ow2.petals.jbi.descriptor.JBIDescriptorException;
+import org.ow2.petals.jbi.descriptor.original.JBIDescriptorBuilder;
+import org.ow2.petals.jbi.descriptor.original.generated.Jbi;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -288,9 +291,8 @@ public class WorkspaceResource {
     @Produces(MediaType.APPLICATION_JSON)
     public ComponentDeployed deployComponent(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
-            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
-            @NotEmpty @FormDataParam("name") String name, @NotEmpty @FormDataParam("type") String type)
-            throws IOException, InterruptedException {
+            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition)
+            throws IOException, InterruptedException, JBIDescriptorException {
 
         checkAccess(jooq);
 
@@ -298,14 +300,17 @@ public class WorkspaceResource {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        Type ttype = ComponentMin.Type.from(type);
+        String filename = StringUtils.isEmpty(fileDisposition.getFileName()) ? "component.zip"
+                : fileDisposition.getFileName();
 
-        if (ttype == null) {
-            throw new BadRequestException("Unsupported component type " + type);
-        }
+        try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
+            Jbi descriptor = JBIDescriptorBuilder.getInstance()
+                    .buildJavaJBIDescriptorFromArchive(new File(sa.getArtifactUrl().toURI()));
 
-        try (ServicedArtifact sa = httpServer.serve(name + ".zip", os -> IOUtils.copy(file, os))) {
-            return as.call(wsId, new DeployComponent(name, ttype, sa.getArtifactUrl(), containerId));
+            return as.call(wsId, new DeployComponent(descriptor.getComponent().getIdentification().getName(),
+                    ComponentMin.Type.from(descriptor.getComponent().getType()), sa.getArtifactUrl(), containerId));
+        } catch (URISyntaxException e) {
+            throw new AssertionError("impossible", e);
         }
     }
 

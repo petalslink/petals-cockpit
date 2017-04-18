@@ -29,7 +29,7 @@ import { Containers } from 'app/features/cockpit/workspaces/state/containers/con
 export abstract class ContainersService {
   abstract getDetailsContainer(containerId: string): Observable<Response>;
 
-  abstract deployComponent(workspaceId: string, containerId: string, file: File, componentName: string): Observable<Response>;
+  abstract deployComponent(workspaceId: string, containerId: string, file: File): Observable<Response>;
 
   abstract watchEventComponentDeployedOk(): Observable<void>;
 }
@@ -49,10 +49,9 @@ export class ContainersServiceImpl extends ContainersService {
     return this.http.get(`${environment.urlBackend}/containers/${containerId}`);
   }
 
-  deployComponent(workspaceId: string, containerId: string, file: File, componentName: string) {
+  deployComponent(workspaceId: string, containerId: string, file: File) {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
-    formData.append('name', componentName);
 
     return this.http.post(`${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/components`, formData);
   }

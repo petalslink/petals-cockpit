@@ -71,7 +71,6 @@ describe(`Petals container content`, () => {
     const chooseFileBtn = element(by.css(`app-petals-container-overview .deploy .choose-file`));
     const fileInput = element(by.css(`app-petals-container-overview .deploy input[type="file"]`));
     const selectedFile = element(by.css(`app-petals-container-overview .deploy .selected-file .file-name`));
-    const changeComponentNameInput = element(by.css(`app-petals-container-overview .deploy form input[name="componentName"]`));
     const deployBtn = element(by.css(`app-petals-container-overview .deploy form button[type="submit"]`));
     const filePath = path.resolve(__dirname, './resources/component.zip');
     const simpleNotification = element(by.css(`simple-notification`));
@@ -85,7 +84,6 @@ describe(`Petals container content`, () => {
     expect(selectedFile.getText()).toEqual(`component.zip`);
     expect(chooseFileBtn.getText()).toEqual(`Change the file`);
 
-    expect(changeComponentNameInput.getAttribute('value')).toEqual(`component`);
     expect(deployBtn.isEnabled()).toBe(true);
 
     const expectedTreeBeforeDeploy = [
