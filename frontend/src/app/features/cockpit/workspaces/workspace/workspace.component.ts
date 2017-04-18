@@ -85,6 +85,12 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
+  cancelDescription() {
+    this.description = null;
+    this.isEditingDescription = false;
+    this.isSettingDescription = false;
+  }
+
   validateDescription() {
     this.isSettingDescription = true;
     const desc = this.description;

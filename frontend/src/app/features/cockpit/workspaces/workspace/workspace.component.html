@@ -31,8 +31,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <ng-template #descriptionEdit>
       <div fxLayout="column" *ngIf="description !== null" class="workspace-description-edit">
         <textarea [disabled]="isSettingDescription" [(ngModel)]="description"></textarea>
-        <div class="warning" [innerHTML]="description | MarkdownToHtml"></div>
-        <button md-button [disabled]="isSettingDescription" (click)="validateDescription()">Submit</button>
+        <div class="workspace-description-preview warning" [innerHTML]="description | MarkdownToHtml"></div>
+        <div fxLayout="row">
+          <button class="workspace-description-edit-cancel" md-button [disabled]="isSettingDescription" (click)="cancelDescription()">Cancel</button>
+          <button class="workspace-description-edit-submit" md-button [disabled]="isSettingDescription" (click)="validateDescription()">Submit</button>
+        </div>
       </div>
     </ng-template>
 

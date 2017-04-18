@@ -102,19 +102,19 @@ describe(`Workspace Overview`, () => {
     // edition
     element(by.css(`app-workspace .workspace-description button`)).click();
 
-    expect(element(by.css(`app-workspace .workspace-description-edit > div`)).getText())
+    expect(element(by.css(`app-workspace .workspace-description-edit > div.workspace-description-preview`)).getText())
       .toEqual(`Put some description in markdown for the workspace here.`);
-    expect(element(by.css(`app-workspace .workspace-description-edit > div`)).getAttribute('class'))
+    expect(element(by.css(`app-workspace .workspace-description-edit > div.workspace-description-preview`)).getAttribute('class'))
       .toContain('warning');
 
     element(by.css(`app-workspace .workspace-description-edit textarea`))
       .sendKeys(' And some ~~more~~.');
-    expect(element(by.css(`app-workspace .workspace-description-edit > div`)).getText())
+    expect(element(by.css(`app-workspace .workspace-description-edit > div.workspace-description-preview`)).getText())
       .toEqual(`Put some description in markdown for the workspace here. And some more.`);
 
-    expect(element(by.css(`app-workspace .workspace-description-edit > div strong`)).getText())
+    expect(element(by.css(`app-workspace .workspace-description-edit > div.workspace-description-preview strong`)).getText())
       .toEqual(`markdown`);
-    expect(element(by.css(`app-workspace .workspace-description-edit > div del`)).getText())
+    expect(element(by.css(`app-workspace .workspace-description-edit > div.workspace-description-preview del`)).getText())
       .toEqual(`more`);
 
     // and go back to the first one (for last workspace to be valid in other tests...)
@@ -140,9 +140,25 @@ describe(`Workspace Overview`, () => {
 
     element(by.css(`app-workspace .workspace-description button`)).click();
 
-    element(by.css(`app-workspace .workspace-description-edit textarea`)).sendKeys(' And some more.');
+    // cancel
+    element(by.css(`app-workspace .workspace-description-edit textarea`))
+      .sendKeys(' Will disappear.');
+    expect(element(by.css(`app-workspace .workspace-description-edit > div.workspace-description-preview`)).getText())
+      .toEqual(`Put some description in markdown for the workspace here. Will disappear.`);
 
-    element(by.css(`app-workspace .workspace-description-edit button`)).click();
+    element(by.css(`app-workspace .workspace-description-edit button.workspace-description-edit-cancel`)).click();
+
+    expect(description.getText())
+      .toEqual(`Put some description in markdown for the workspace here.`);
+
+    // edit again
+
+    element(by.css(`app-workspace .workspace-description button`)).click();
+
+    element(by.css(`app-workspace .workspace-description-edit textarea`))
+      .sendKeys(' And some more.');
+
+    element(by.css(`app-workspace .workspace-description-edit button.workspace-description-edit-submit`)).click();
 
     browser.wait(EC.visibilityOf(description), 5000);
 
