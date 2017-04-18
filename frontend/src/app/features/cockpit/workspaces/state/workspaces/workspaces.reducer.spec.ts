@@ -16,7 +16,6 @@
  */
 
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { type } from 'app/shared/helpers/shared.helper';
 import { Users } from 'app/shared/state/users.reducer';
 import { workspacesTableFactory } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { emptyJavascriptMap } from 'app/shared/helpers/map.helper';
@@ -39,9 +38,9 @@ describe(`Workspaces reducer`, () => {
       });
   });
 
-  describe(type(Workspaces.FETCH_WORKSPACES), () => {
+  describe(Workspaces.FETCH_WORKSPACES, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACES).toEqual(`WORKSPACES_REDUCER_FETCH_WORKSPACES`);
+      expect(Workspaces.FETCH_WORKSPACES).toEqual(`[Workspaces] Fetch workspaces`);
     });
 
     it(`should set the isFetchingWorkspaces variable to true`, () => {
@@ -59,9 +58,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.FETCH_WORKSPACES_SUCCESS), () => {
+  describe(Workspaces.FETCH_WORKSPACES_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACES_SUCCESS).toEqual(`WORKSPACES_REDUCER_FETCH_WORKSPACES_SUCCESS`);
+      expect(Workspaces.FETCH_WORKSPACES_SUCCESS).toEqual(`[Workspaces] Fetch workspaces success`);
     });
 
     it(`should set the isFetchingWorkspaces variable to false`, () => {
@@ -153,9 +152,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.FETCH_WORKSPACES_FAILED), () => {
+  describe(Workspaces.FETCH_WORKSPACES_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACES_FAILED).toEqual(`WORKSPACES_REDUCER_FETCH_WORKSPACES_FAILED`);
+      expect(Workspaces.FETCH_WORKSPACES_FAILED).toEqual(`[Workspaces] Fetch workspaces failed`);
     });
 
     it(`should set the isFetchingWorkspaces variable to false`, () => {
@@ -173,9 +172,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.POST_WORKSPACE), () => {
+  describe(Workspaces.POST_WORKSPACE, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.POST_WORKSPACE).toEqual(`WORKSPACES_REDUCER_POST_WORKSPACE`);
+      expect(Workspaces.POST_WORKSPACE).toEqual(`[Workspaces] Post workspace`);
     });
 
     const initialState: any = {
@@ -193,9 +192,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.POST_WORKSPACE_SUCCESS), () => {
+  describe(Workspaces.POST_WORKSPACE_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.POST_WORKSPACE_SUCCESS).toEqual(`WORKSPACES_REDUCER_POST_WORKSPACE_SUCCESS`);
+      expect(Workspaces.POST_WORKSPACE_SUCCESS).toEqual(`[Workspaces] Post workspace success`);
     });
 
     it(`should add a workspace if it's a new one`, () => {
@@ -288,9 +287,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.POST_WORKSPACE_FAILED), () => {
+  describe(Workspaces.POST_WORKSPACE_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.POST_WORKSPACE_FAILED).toEqual(`WORKSPACES_REDUCER_POST_WORKSPACE_FAILED`);
+      expect(Workspaces.POST_WORKSPACE_FAILED).toEqual(`[Workspaces] Post workspace failed`);
     });
 
     const initialState: any = {
@@ -308,9 +307,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.FETCH_WORKSPACE), () => {
+  describe(Workspaces.FETCH_WORKSPACE, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACE).toEqual(`WORKSPACES_REDUCER_FETCH_WORKSPACE`);
+      expect(Workspaces.FETCH_WORKSPACE).toEqual(`[Workspaces] Fetch workspace`);
     });
 
     it(`should select the workspace if it's a new one and mark it as not fetched`, () => {
@@ -354,9 +353,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.FETCH_WORKSPACE_SUCCESS), () => {
+  describe(Workspaces.FETCH_WORKSPACE_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACE_SUCCESS).toEqual(`WORKSPACES_REDUCER_FETCH_WORKSPACE_SUCCESS`);
+      expect(Workspaces.FETCH_WORKSPACE_SUCCESS).toEqual(`[Workspaces] Fetch workspace success`);
     });
 
     it(`should add a workspace if it's a new one (also in allIds variable) and set correct variables`, () => {
@@ -532,9 +531,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.FETCH_WORKSPACE_DETAILS), () => {
+  describe(Workspaces.FETCH_WORKSPACE_DETAILS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACE_DETAILS).toEqual(`WORKSPACES_REDUCER_FETCH_WORKSPACE_DETAILS`);
+      expect(Workspaces.FETCH_WORKSPACE_DETAILS).toEqual(`[Workspaces] Fetch workspace details`);
     });
 
     const initialState: any = {
@@ -566,9 +565,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS), () => {
+  describe(Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS).toEqual(`WORKSPACES_REDUCER_FETCH_WORKSPACE_DETAILS_SUCCESS`);
+      expect(Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS).toEqual(`[Workspaces] Fetch workspace details success`);
     });
 
     const initialState: any = {
@@ -601,9 +600,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.FETCH_WORKSPACE_DETAILS_FAILED), () => {
+  describe(Workspaces.FETCH_WORKSPACE_DETAILS_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACE_DETAILS_FAILED).toEqual(`WORKSPACES_REDUCER_FETCH_WORKSPACE_DETAILS_FAILED`);
+      expect(Workspaces.FETCH_WORKSPACE_DETAILS_FAILED).toEqual(`[Workspaces] Fetch workspace details failed`);
     });
 
     const initialState: any = {
@@ -636,9 +635,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.SET_DESCRIPTION), () => {
+  describe(Workspaces.SET_DESCRIPTION, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.SET_DESCRIPTION).toEqual(`WORKSPACES_REDUCER_SET_DESCRIPTION`);
+      expect(Workspaces.SET_DESCRIPTION).toEqual(`[Workspaces] Set description`);
     });
 
     const initialState: any = {
@@ -670,9 +669,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.SET_DESCRIPTION_SUCCESS), () => {
+  describe(Workspaces.SET_DESCRIPTION_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.SET_DESCRIPTION_SUCCESS).toEqual(`WORKSPACES_REDUCER_SET_DESCRIPTION_SUCCESS`);
+      expect(Workspaces.SET_DESCRIPTION_SUCCESS).toEqual(`[Workspaces] Set description success`);
     });
 
     const initialState: any = {
@@ -705,9 +704,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.SET_DESCRIPTION_FAILED), () => {
+  describe(Workspaces.SET_DESCRIPTION_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.SET_DESCRIPTION_FAILED).toEqual(`WORKSPACES_REDUCER_SET_DESCRIPTION_FAILED`);
+      expect(Workspaces.SET_DESCRIPTION_FAILED).toEqual(`[Workspaces] Set description failed`);
     });
 
     const initialState: any = {
@@ -740,9 +739,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.SET_SEARCH), () => {
+  describe(Workspaces.SET_SEARCH, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.SET_SEARCH).toEqual(`WORKSPACES_REDUCER_SET_SEARCH`);
+      expect(Workspaces.SET_SEARCH).toEqual(`[Workspaces] Set search`);
     });
 
     it(`should set the searchPetals variable`, () => {
@@ -764,9 +763,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.DELETE_WORKSPACE), () => {
+  describe(Workspaces.DELETE_WORKSPACE, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.DELETE_WORKSPACE).toEqual(`WORKSPACES_REDUCER_DELETE_WORKSPACE`);
+      expect(Workspaces.DELETE_WORKSPACE).toEqual(`[Workspaces] Delete workspace`);
     });
 
     const initialState: any = {
@@ -801,9 +800,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.DELETE_WORKSPACE_SUCCESS), () => {
+  describe(Workspaces.DELETE_WORKSPACE_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.DELETE_WORKSPACE_SUCCESS).toEqual(`WORKSPACES_REDUCER_DELETE_WORKSPACE_SUCCESS`);
+      expect(Workspaces.DELETE_WORKSPACE_SUCCESS).toEqual(`[Workspaces] Delete workspace success`);
     });
 
     const initialState: any = {
@@ -835,9 +834,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.DELETE_WORKSPACE_FAILED), () => {
+  describe(Workspaces.DELETE_WORKSPACE_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.DELETE_WORKSPACE_FAILED).toEqual(`WORKSPACES_REDUCER_DELETE_WORKSPACE_FAILED`);
+      expect(Workspaces.DELETE_WORKSPACE_FAILED).toEqual(`[Workspaces] Delete workspace failed`);
     });
 
     const initialState: any = {
@@ -872,9 +871,9 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.REMOVE_WORKSPACE), () => {
+  describe(Workspaces.REMOVE_WORKSPACE, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.REMOVE_WORKSPACE).toEqual(`WORKSPACES_REDUCER_REMOVE_WORKSPACE`);
+      expect(Workspaces.REMOVE_WORKSPACE).toEqual(`[Workspaces] Remove workspace`);
     });
 
     const initialState: any = {
@@ -906,15 +905,15 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.CLEAN_WORKSPACE), () => {
+  describe(Workspaces.CLEAN_WORKSPACE, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.CLEAN_WORKSPACE).toEqual(`WORKSPACES_REDUCER_CLEAN_WORKSPACE`);
+      expect(Workspaces.CLEAN_WORKSPACE).toEqual(`[Workspaces] Clean workspace`);
     });
   });
 
-  describe(type(Workspaces.CLOSE_WORKSPACE), () => {
+  describe(Workspaces.CLOSE_WORKSPACE, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.CLOSE_WORKSPACE).toEqual(`WORKSPACES_REDUCER_CLOSE_WORKSPACE`);
+      expect(Workspaces.CLOSE_WORKSPACE).toEqual(`[Workspaces] Close workspace`);
     });
 
     it(`should close the workspace only if there's a workspace selected and a truthy payload.delete`, () => {
@@ -981,7 +980,7 @@ describe(`Workspaces reducer`, () => {
     });
   });
 
-  describe(type(Users.DISCONNECT_USER_SUCCESS), () => {
+  describe(Users.DISCONNECT_USER_SUCCESS, () => {
     it(`should return the initial value of the reducer`, () => {
       expect(Workspaces.reducer(<any>{}, {
         type: Users.DISCONNECT_USER_SUCCESS

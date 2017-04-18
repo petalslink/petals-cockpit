@@ -47,17 +47,3 @@ export function arrayEquals<T extends [void]>(ps: T, ns: T): boolean {
 export function isNot(e: object): (object) => boolean {
   return (e2) => e !== e2;
 }
-
-const reActionName = /.*REDUCER_(.*)/;
-/**
- * take an action type and remove the reducer name prefix
- */
-export function type(actionName: string) {
-  const arr = reActionName.exec(actionName);
-
-  if (arr.length === 2) {
-    return arr[1];
-  }
-
-  return actionName;
-}

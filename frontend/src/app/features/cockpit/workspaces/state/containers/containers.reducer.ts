@@ -25,7 +25,7 @@ import { putAll, updateById } from 'app/shared/helpers/map.helper';
 import { containerRowFactory } from 'app/features/cockpit/workspaces/state/containers/container.interface';
 
 export class Containers {
-  private static reducerName = 'CONTAINERS_REDUCER';
+  private static reducerName = '[Containers]';
 
   public static reducer(containersTable = containersTableFactory(), { type, payload }: Action): IContainersTable {
     if (!Containers.mapActionsToMethod[type]) {
@@ -36,13 +36,13 @@ export class Containers {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_CONTAINERS_SUCCESS = `${Containers.reducerName}_FETCH_CONTAINERS_SUCCESS`;
+  public static FETCH_CONTAINERS_SUCCESS = `${Containers.reducerName} Fetch containers success`;
   private static fetchContainersSuccess(containersTable: IContainersTable, payload): IContainersTable {
     return putAll(containersTable, payload, containerRowFactory());
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FOLD_CONTAINER = `${Containers.reducerName}_FOLD_CONTAINER`;
+  public static FOLD_CONTAINER = `${Containers.reducerName} Fold container`;
   private static foldContainers(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     if (!containersTable.byId[payload.containerId] || containersTable.byId[payload.containerId].isFolded) {
       return containersTable;
@@ -52,7 +52,7 @@ export class Containers {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static UNFOLD_CONTAINER = `${Containers.reducerName}_UNFOLD_CONTAINER`;
+  public static UNFOLD_CONTAINER = `${Containers.reducerName} Unfold container`;
   private static unfoldContainer(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     if (!containersTable.byId[payload.containerId] || !containersTable.byId[payload.containerId].isFolded) {
       return containersTable;
@@ -62,7 +62,7 @@ export class Containers {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static TOGGLE_FOLD_CONTAINER = `${Containers.reducerName}_TOGGLE_FOLD_CONTAINER`;
+  public static TOGGLE_FOLD_CONTAINER = `${Containers.reducerName} Toggle fold container`;
   private static toggleFoldContainer(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     const container = containersTable.byId[payload.containerId];
 
@@ -78,7 +78,7 @@ export class Containers {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static SET_CURRENT_CONTAINER = `${Containers.reducerName}_SET_CURRENT_CONTAINER`;
+  public static SET_CURRENT_CONTAINER = `${Containers.reducerName} Set current container`;
   private static setCurrentContainer(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     return {
       ...containersTable,
@@ -89,13 +89,13 @@ export class Containers {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_CONTAINER_DETAILS = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS`;
+  public static FETCH_CONTAINER_DETAILS = `${Containers.reducerName} Fetch container details`;
   private static fetchContainerDetails(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     return updateById(containersTable, payload.containerId, { isFetchingDetails: true });
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_CONTAINER_DETAILS_SUCCESS = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS_SUCCESS`;
+  public static FETCH_CONTAINER_DETAILS_SUCCESS = `${Containers.reducerName} Fetch container details success`;
   private static fetchContainerDetailsSuccess(
     containersTable: IContainersTable,
     payload: { containerId: string, data: any }
@@ -104,24 +104,24 @@ export class Containers {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_CONTAINER_DETAILS_ERROR = `${Containers.reducerName}_FETCH_CONTAINER_DETAILS_ERROR`;
+  public static FETCH_CONTAINER_DETAILS_ERROR = `${Containers.reducerName} Fetch container details error`;
   private static fetchContainerDetailsError(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     return updateById(containersTable, payload.containerId, { isFetchingDetails: false });
   }
 
   // tslint:disable-next-line:member-ordering
-  public static DEPLOY_COMPONENT = `${Containers.reducerName}_DEPLOY_COMPONENT`;
+  public static DEPLOY_COMPONENT = `${Containers.reducerName} Deploy component`;
   private static deployComponent(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     return updateById(containersTable, payload.containerId, { isDeployingComponent: true });
   }
   // tslint:disable-next-line:member-ordering
-  public static DEPLOY_COMPONENT_ERROR = `${Containers.reducerName}_DEPLOY_COMPONENT_ERROR`;
+  public static DEPLOY_COMPONENT_ERROR = `${Containers.reducerName} Deploy component error`;
   private static deployComponentError(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
     return updateById(containersTable, payload.containerId, { isDeployingComponent: false });
   }
 
   // tslint:disable-next-line:member-ordering
-  public static DEPLOY_COMPONENT_SUCCESS = `${Containers.reducerName}_DEPLOY_COMPONENT_SUCCESS`;
+  public static DEPLOY_COMPONENT_SUCCESS = `${Containers.reducerName} Deploy component success`;
   private static deployComponentSuccess(
     containersTable: IContainersTable,
     payload: { containerId: string, component: { id: string, name: string, state: string } }

@@ -16,7 +16,6 @@
  */
 
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.reducer';
-import { type } from 'app/shared/helpers/shared.helper';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 import { serviceUnitsTableFactory } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 
@@ -32,9 +31,9 @@ describe(`ServiceUnits reducer`, () => {
       });
   });
 
-  describe(type(ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS), () => {
+  describe(ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS).toEqual(`SERVICE_UNITS_REDUCER_FETCH_SERVICE_UNITS_SUCCESS`);
+      expect(ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS).toEqual(`[Service units] Fetch service units success`);
     });
 
     const initialState: any = {
@@ -157,9 +156,9 @@ describe(`ServiceUnits reducer`, () => {
     });
   });
 
-  describe(type(ServiceUnits.SET_CURRENT_SERVICE_UNIT), () => {
+  describe(ServiceUnits.SET_CURRENT_SERVICE_UNIT, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.SET_CURRENT_SERVICE_UNIT).toEqual(`SERVICE_UNITS_REDUCER_SET_CURRENT_SERVICE_UNIT`);
+      expect(ServiceUnits.SET_CURRENT_SERVICE_UNIT).toEqual(`[Service units] Set current service unit`);
     });
 
     it(`should set the current service-unit`, () => {
@@ -182,9 +181,9 @@ describe(`ServiceUnits reducer`, () => {
     });
   });
 
-  describe(type(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS), () => {
+  describe(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS).toEqual(`SERVICE_UNITS_REDUCER_FETCH_SERVICE_UNIT_DETAILS`);
+      expect(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS).toEqual(`[Service units] Fetch service unit details`);
     });
 
     const initialState: any = {
@@ -216,9 +215,9 @@ describe(`ServiceUnits reducer`, () => {
     });
   });
 
-  describe(type(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS), () => {
+  describe(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS).toEqual(`SERVICE_UNITS_REDUCER_FETCH_SERVICE_UNIT_DETAILS_SUCCESS`);
+      expect(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS).toEqual(`[Service units] Fetch service unit details success`);
     });
 
     const initialState: any = {
@@ -251,9 +250,9 @@ describe(`ServiceUnits reducer`, () => {
     });
   });
 
-  describe(type(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR), () => {
+  describe(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR).toEqual(`SERVICE_UNITS_REDUCER_FETCH_SERVICE_UNIT_DETAILS_ERROR`);
+      expect(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR).toEqual(`[Service units] Fetch service unit details error`);
     });
 
     const initialState: any = {
@@ -286,9 +285,9 @@ describe(`ServiceUnits reducer`, () => {
     });
   });
 
-  describe(type(ServiceUnits.CHANGE_STATE), () => {
+  describe(ServiceUnits.CHANGE_STATE, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.CHANGE_STATE).toEqual(`SERVICE_UNITS_REDUCER_CHANGE_STATE`);
+      expect(ServiceUnits.CHANGE_STATE).toEqual(`[Service units] Change state`);
     });
 
     const initialState: any = {
@@ -320,9 +319,9 @@ describe(`ServiceUnits reducer`, () => {
     });
   });
 
-  describe(type(ServiceUnits.CHANGE_STATE_SUCCESS), () => {
+  describe(ServiceUnits.CHANGE_STATE_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.CHANGE_STATE_SUCCESS).toEqual(`SERVICE_UNITS_REDUCER_CHANGE_STATE_SUCCESS`);
+      expect(ServiceUnits.CHANGE_STATE_SUCCESS).toEqual(`[Service units] Change state success`);
     });
 
     const initialState: any = {
@@ -355,9 +354,9 @@ describe(`ServiceUnits reducer`, () => {
     });
   });
 
-  describe(type(ServiceUnits.CHANGE_STATE_ERROR), () => {
+  describe(ServiceUnits.CHANGE_STATE_ERROR, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.CHANGE_STATE_ERROR).toEqual(`SERVICE_UNITS_REDUCER_CHANGE_STATE_ERROR`);
+      expect(ServiceUnits.CHANGE_STATE_ERROR).toEqual(`[Service units] Change state error`);
     });
 
     const initialState: any = {
@@ -389,9 +388,9 @@ describe(`ServiceUnits reducer`, () => {
     });
   });
 
-  describe(type(ServiceUnits.REMOVE_SERVICE_UNIT), () => {
+  describe(ServiceUnits.REMOVE_SERVICE_UNIT, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.REMOVE_SERVICE_UNIT).toEqual(`SERVICE_UNITS_REDUCER_REMOVE_SERVICE_UNIT`);
+      expect(ServiceUnits.REMOVE_SERVICE_UNIT).toEqual(`[Service units] Remove service unit`);
     });
 
     const initialState: any = {
@@ -465,7 +464,7 @@ describe(`ServiceUnits reducer`, () => {
     });
   });
 
-  describe(`COMPONENTS_REDUCER_DEPLOY_SERVICE_UNIT_SUCCESS`, () => {
+  describe(`[Components] Deploy service unit success`, () => {
     const initialState: any = {
       keepPreviousValues: '',
       byId: {
@@ -479,7 +478,7 @@ describe(`ServiceUnits reducer`, () => {
 
     it(`should add a non existing service-unit`, () => {
       expect(ServiceUnits.reducer(initialState, {
-        type: 'COMPONENTS_REDUCER_DEPLOY_SERVICE_UNIT_SUCCESS',
+        type: '[Components] Deploy service unit success',
         payload: { serviceUnit: { id: 'idSu1', name: 'Su 1', state: 'Started' } }
       })).toEqual({
         keepPreviousValues: '',
@@ -501,7 +500,7 @@ describe(`ServiceUnits reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.CLEAN_WORKSPACE), () => {
+  describe(Workspaces.CLEAN_WORKSPACE, () => {
     it(`should return the initial value to reset the service-units`, () => {
       const initialState: any = {
         doNotKeepPreviousValues: '',

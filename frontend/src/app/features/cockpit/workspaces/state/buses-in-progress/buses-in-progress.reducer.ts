@@ -23,7 +23,7 @@ import { putAll, updateById, removeById } from 'app/shared/helpers/map.helper';
 import { busInProgressRowFactory } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 
 export class BusesInProgress {
-  private static reducerName = 'BUSES_IN_PROGRESS_REDUCER';
+  private static reducerName = '[Buses In Prog]';
 
   public static reducer(busesInProgressTable = busesInProgressTableFactory(), { type, payload }: Action): IBusesInProgressTable {
     if (!BusesInProgress.mapActionsToMethod[type]) {
@@ -34,13 +34,13 @@ export class BusesInProgress {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_BUSES_IN_PROGRESS = `${BusesInProgress.reducerName}_FETCH_BUSES_IN_PROGRESS`;
+  public static FETCH_BUSES_IN_PROGRESS = `${BusesInProgress.reducerName} Fetch buses in progress`;
   private static fetchBusesInProgress(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
     return putAll(busesInProgressTable, payload, busInProgressRowFactory());
   }
 
   // tslint:disable-next-line:member-ordering
-  public static SET_CURRENT_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_SET_CURRENT_BUS_IN_PROGRESS`;
+  public static SET_CURRENT_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Set current bus in progress`;
   private static setCurrentBusInProgress(
     busesInProgressTable: IBusesInProgressTable,
     payload: { busInProgressId: string }
@@ -57,7 +57,7 @@ export class BusesInProgress {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static POST_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS`;
+  public static POST_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Post bus in progress`;
   private static postBusInProgress(busesInProgressTable: IBusesInProgressTable, _payload): IBusesInProgressTable {
     return {
       ...busesInProgressTable,
@@ -72,7 +72,7 @@ export class BusesInProgress {
   // once the http request is done
   // the bus itself will be added from buses reducer
   // tslint:disable-next-line:member-ordering
-  public static POST_BUS_IN_PROGRESS_SUCCESS = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS_SUCCESS`;
+  public static POST_BUS_IN_PROGRESS_SUCCESS = `${BusesInProgress.reducerName} Post bus in progress success`;
   private static postBusInProgressSuccess(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
     return {
       ...busesInProgressTable,
@@ -84,7 +84,7 @@ export class BusesInProgress {
 
   // once the http request is done but failed
   // tslint:disable-next-line:member-ordering
-  public static POST_BUS_IN_PROGRESS_ERROR = `${BusesInProgress.reducerName}_POST_BUS_IN_PROGRESS_ERROR`;
+  public static POST_BUS_IN_PROGRESS_ERROR = `${BusesInProgress.reducerName} Post bus in progress error`;
   private static postBusInProgressError(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
     // if it's false, it means we changed bus (with SET_CURRENT_BUS_IN_PROGRESS)
     if (busesInProgressTable.isImportingBus) {
@@ -102,19 +102,19 @@ export class BusesInProgress {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static DELETE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_DELETE_BUS_IN_PROGRESS`;
+  public static DELETE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Delete bus in progress`;
   private static deleteBusInProgress(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
     return updateById(busesInProgressTable, payload.id, { isRemoving: true });
   }
 
   // tslint:disable-next-line:member-ordering
-  public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_REMOVE_BUS_IN_PROGRESS`;
+  public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Remove bus in progress`;
   private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: string): IBusesInProgressTable {
     return removeById(busesInProgressTable, payload);
   }
 
   // tslint:disable-next-line:member-ordering
-  public static UPDATE_ERROR_BUS_IN_PROGRESS = `${BusesInProgress.reducerName}_UPDATE_ERROR_BUS_IN_PROGRESS`;
+  public static UPDATE_ERROR_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Update error bus in progress`;
   private static updateErrorBusInProgress(
     busesInProgressTable: IBusesInProgressTable,
     payload: { id: string, importError: string }
