@@ -18,3 +18,15 @@
 .selected-workspace {
   font-weight: bold;
 }
+
+.description-wks {
+  resize: none;
+  border: none;
+  overflow: auto;
+}
+
+.btn-edit {
+  position: absolute;
+  right: 16px;
+  top: -21px;
+}
