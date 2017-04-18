@@ -45,8 +45,8 @@ export class ContainersMockService extends ContainersServiceImpl {
     return helper.responseBody(detailsContainer);
   }
 
-  deployComponent(workspaceId: string, containerId: string, file: File, componentName: string) {
-    const component = containersService.get(containerId).addComponent(componentName);
+  deployComponent(workspaceId: string, containerId: string, file: File) {
+    const component = containersService.get(containerId).addComponent(file.name.replace(/\.zip$/, ''));
 
     const response = {
       containerId,

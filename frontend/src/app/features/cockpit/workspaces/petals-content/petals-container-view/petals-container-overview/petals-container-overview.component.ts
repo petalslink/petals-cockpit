@@ -34,7 +34,6 @@ export class PetalsContainerOverviewComponent implements OnInit {
   @Input() workspaceId: string;
 
   public fileToDeploy: File;
-  public componentName: string;
 
   constructor(private store$: Store<IStore>) { }
 
@@ -46,14 +45,13 @@ export class PetalsContainerOverviewComponent implements OnInit {
 
     if (fileList.length > 0) {
       this.fileToDeploy = fileList[0];
-      this.componentName = this.fileToDeploy.name.substring(0, this.fileToDeploy.name.length - 4);
     }
   }
 
-  deploy(file: File, componentName: string) {
+  deploy(file: File) {
     this.store$.dispatch({
       type: Containers.DEPLOY_COMPONENT,
-      payload: { file, containerId: this.container.id, componentName: componentName.trim() }
+      payload: { file, containerId: this.container.id }
     });
   }
 }

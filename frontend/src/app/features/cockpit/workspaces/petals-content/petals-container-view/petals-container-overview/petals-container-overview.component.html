@@ -73,7 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <!--</md-card-title>-->
 
           <md-card-content>
-            <form (ngSubmit)="deploy(fileToDeploy, componentName)">
+            <form (ngSubmit)="deploy(fileToDeploy)">
               <div *ngIf="fileToDeploy" class="selected-file" fxFlexLayout="row" fxLayoutAlign="end center">
                 <span>Selected file :</span> <span class="file-name">{{ fileToDeploy.name }}</span>
               </div>
@@ -85,11 +85,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
               <input #deploySu class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="container.isDeployingComponent">
 
-              <md-input-container *ngIf="fileToDeploy" class="service-unit-name">
-                <input mdInput type="text" [(ngModel)]="componentName" name="componentName" placeholder="Component name">
-              </md-input-container>
-
-              <button md-raised-button color="primary" type="submit" *ngIf="fileToDeploy" [disabled]="componentName?.trim().length === 0">
+              <button md-raised-button color="primary" type="submit" *ngIf="fileToDeploy">
                 Deploy
               </button>
             </form>

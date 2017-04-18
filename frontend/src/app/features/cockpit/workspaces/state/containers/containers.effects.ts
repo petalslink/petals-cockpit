@@ -66,8 +66,8 @@ export class ContainersEffects {
   @Effect({ dispatch: true }) deployComponent$: Observable<Action> = this.actions$
     .ofType(Containers.DEPLOY_COMPONENT)
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
-    .switchMap(([action, workspaceId]: [{ type: string, payload: { file: File, containerId: string, componentName: string } }, string]) =>
-      this.containersService.deployComponent(workspaceId, action.payload.containerId, action.payload.file, action.payload.componentName)
+    .switchMap(([action, workspaceId]: [{ type: string, payload: { file: File, containerId: string } }, string]) =>
+      this.containersService.deployComponent(workspaceId, action.payload.containerId, action.payload.file)
         .mergeMap(_ => Observable.empty())
         .catch((err) => {
           if (environment.debug) {

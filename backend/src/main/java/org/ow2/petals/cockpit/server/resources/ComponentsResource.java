@@ -44,6 +44,7 @@ import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
+import org.ow2.petals.jbi.descriptor.original.generated.ComponentType;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -111,6 +112,17 @@ public class ComponentsResource {
 
         public enum Type {
             BC, SE;
+
+            public static Type from(ComponentType type) {
+                switch (type) {
+                    case BINDING_COMPONENT:
+                        return BC;
+                    case SERVICE_ENGINE:
+                        return SE;
+                    default:
+                        throw new AssertionError();
+                }
+            }
 
             @Nullable
             public static Type from(String type) {
