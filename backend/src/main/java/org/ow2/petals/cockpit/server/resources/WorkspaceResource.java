@@ -23,10 +23,8 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -281,7 +279,7 @@ public class WorkspaceResource {
 
         try (ServicedArtifact sa = httpServer.serve(saName + ".zip",
                 os -> PetalsUtils.createSAfromSU(file, os, saName, name, componentName))) {
-            return as.call(wsId, new DeployServiceUnit(saName, sa.getArtifactUrl(), componentId));
+            return as.call(wsId, new DeployServiceUnit(saName, sa.getArtifactExternalUrl(), componentId));
         }
     }
 
@@ -305,12 +303,11 @@ public class WorkspaceResource {
 
         try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
             Jbi descriptor = JBIDescriptorBuilder.getInstance()
-                    .buildJavaJBIDescriptorFromArchive(new File(sa.getArtifactUrl().toURI()));
+                    .buildJavaJBIDescriptorFromArchive(sa.getFile());
 
             return as.call(wsId, new DeployComponent(descriptor.getComponent().getIdentification().getName(),
-                    ComponentMin.Type.from(descriptor.getComponent().getType()), sa.getArtifactUrl(), containerId));
-        } catch (URISyntaxException e) {
-            throw new AssertionError("impossible", e);
+                    ComponentMin.Type.from(descriptor.getComponent().getType()), sa.getArtifactExternalUrl(),
+                    containerId));
         }
     }
 

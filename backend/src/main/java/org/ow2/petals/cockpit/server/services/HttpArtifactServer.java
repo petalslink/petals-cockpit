@@ -110,8 +110,13 @@ public class HttpArtifactServer implements ArtifactServer {
         }
 
         @Override
-        public URL getArtifactUrl() {
+        public URL getArtifactExternalUrl() {
             return url;
+        }
+
+        @Override
+        public File getFile() {
+            return artifact;
         }
 
         @Override
