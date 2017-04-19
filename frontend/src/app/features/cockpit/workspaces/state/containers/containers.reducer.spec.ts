@@ -16,7 +16,6 @@
  */
 
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
-import { type } from 'app/shared/helpers/shared.helper';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.reducer';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 import { containersTableFactory } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
@@ -33,9 +32,9 @@ describe(`Containers reducer`, () => {
       });
   });
 
-  describe(type(Containers.FETCH_CONTAINERS_SUCCESS), () => {
+  describe(Containers.FETCH_CONTAINERS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Containers.FETCH_CONTAINERS_SUCCESS).toEqual(`CONTAINERS_REDUCER_FETCH_CONTAINERS_SUCCESS`);
+      expect(Containers.FETCH_CONTAINERS_SUCCESS).toEqual(`[Containers] Fetch containers success`);
     });
 
     const payload = {
@@ -143,9 +142,9 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(type(Containers.FOLD_CONTAINER), () => {
+  describe(Containers.FOLD_CONTAINER, () => {
     it(`should check action name`, () => {
-      expect(Containers.FOLD_CONTAINER).toEqual(`CONTAINERS_REDUCER_FOLD_CONTAINER`);
+      expect(Containers.FOLD_CONTAINER).toEqual(`[Containers] Fold container`);
     });
 
     const initialState: any = {
@@ -208,9 +207,9 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(type(Containers.UNFOLD_CONTAINER), () => {
+  describe(Containers.UNFOLD_CONTAINER, () => {
     it(`should check action name`, () => {
-      expect(Containers.UNFOLD_CONTAINER).toEqual(`CONTAINERS_REDUCER_UNFOLD_CONTAINER`);
+      expect(Containers.UNFOLD_CONTAINER).toEqual(`[Containers] Unfold container`);
     });
 
     const initialState: any = {
@@ -273,9 +272,9 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(type(Containers.TOGGLE_FOLD_CONTAINER), () => {
+  describe(Containers.TOGGLE_FOLD_CONTAINER, () => {
     it(`should check action name`, () => {
-      expect(Containers.TOGGLE_FOLD_CONTAINER).toEqual(`CONTAINERS_REDUCER_TOGGLE_FOLD_CONTAINER`);
+      expect(Containers.TOGGLE_FOLD_CONTAINER).toEqual(`[Containers] Toggle fold container`);
     });
 
     const initialState: any = {
@@ -354,9 +353,9 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(type(Containers.SET_CURRENT_CONTAINER), () => {
+  describe(Containers.SET_CURRENT_CONTAINER, () => {
     it(`should check action name`, () => {
-      expect(Containers.SET_CURRENT_CONTAINER).toEqual(`CONTAINERS_REDUCER_SET_CURRENT_CONTAINER`);
+      expect(Containers.SET_CURRENT_CONTAINER).toEqual(`[Containers] Set current container`);
     });
 
     it(`should set the current container`, () => {
@@ -379,9 +378,9 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(type(Containers.FETCH_CONTAINER_DETAILS), () => {
+  describe(Containers.FETCH_CONTAINER_DETAILS, () => {
     it(`should check action name`, () => {
-      expect(Containers.FETCH_CONTAINER_DETAILS).toEqual(`CONTAINERS_REDUCER_FETCH_CONTAINER_DETAILS`);
+      expect(Containers.FETCH_CONTAINER_DETAILS).toEqual(`[Containers] Fetch container details`);
     });
 
     const initialState: any = {
@@ -413,9 +412,9 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(type(Containers.FETCH_CONTAINER_DETAILS_SUCCESS), () => {
+  describe(Containers.FETCH_CONTAINER_DETAILS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Containers.FETCH_CONTAINER_DETAILS_SUCCESS).toEqual(`CONTAINERS_REDUCER_FETCH_CONTAINER_DETAILS_SUCCESS`);
+      expect(Containers.FETCH_CONTAINER_DETAILS_SUCCESS).toEqual(`[Containers] Fetch container details success`);
     });
 
     const initialState: any = {
@@ -448,9 +447,9 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(type(Containers.FETCH_CONTAINER_DETAILS_ERROR), () => {
+  describe(Containers.FETCH_CONTAINER_DETAILS_ERROR, () => {
     it(`should check action name`, () => {
-      expect(Containers.FETCH_CONTAINER_DETAILS_ERROR).toEqual(`CONTAINERS_REDUCER_FETCH_CONTAINER_DETAILS_ERROR`);
+      expect(Containers.FETCH_CONTAINER_DETAILS_ERROR).toEqual(`[Containers] Fetch container details error`);
     });
 
     const initialState: any = {
@@ -483,9 +482,9 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(type(Containers.DEPLOY_COMPONENT), () => {
+  describe(Containers.DEPLOY_COMPONENT, () => {
     it(`should check action name`, () => {
-      expect(Containers.DEPLOY_COMPONENT).toEqual(`CONTAINERS_REDUCER_DEPLOY_COMPONENT`);
+      expect(Containers.DEPLOY_COMPONENT).toEqual(`[Containers] Deploy component`);
     });
 
     const initialState: any = {
@@ -517,9 +516,9 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(type(Containers.DEPLOY_COMPONENT_ERROR), () => {
+  describe(Containers.DEPLOY_COMPONENT_ERROR, () => {
     it(`should check action name`, () => {
-      expect(Containers.DEPLOY_COMPONENT_ERROR).toEqual(`CONTAINERS_REDUCER_DEPLOY_COMPONENT_ERROR`);
+      expect(Containers.DEPLOY_COMPONENT_ERROR).toEqual(`[Containers] Deploy component error`);
     });
 
     const initialState: any = {
@@ -552,9 +551,9 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(type(Containers.DEPLOY_COMPONENT_SUCCESS), () => {
+  describe(Containers.DEPLOY_COMPONENT_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Containers.DEPLOY_COMPONENT_SUCCESS).toEqual(`CONTAINERS_REDUCER_DEPLOY_COMPONENT_SUCCESS`);
+      expect(Containers.DEPLOY_COMPONENT_SUCCESS).toEqual(`[Containers] Deploy component success`);
     });
 
     const initialState: any = {
@@ -595,7 +594,7 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(type(Components.REMOVE_COMPONENT), () => {
+  describe(Components.REMOVE_COMPONENT, () => {
     it(`should return the same object if the container of the component doesn't exists`, () => {
       const initialState: any = {
         keepPreviousValues: '',
@@ -658,7 +657,7 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.CLEAN_WORKSPACE), () => {
+  describe(Workspaces.CLEAN_WORKSPACE, () => {
     it(`should return the initial value to reset the workspace`, () => {
       const initialState: any = {
         doNotKeepPreviousValues: '',

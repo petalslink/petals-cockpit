@@ -22,7 +22,7 @@ import { uiState } from './ui.state';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 
 export class Ui {
-  private static reducerName = 'UI_REDUCER';
+  private static reducerName = '[Ui]';
 
   public static reducer(ui = uiState(), {type, payload}: Action): IUi {
     if (!Ui.mapActionsToMethod[type]) {
@@ -33,7 +33,7 @@ export class Ui {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static SET_LANGUAGE = `${Ui.reducerName}_SET_LANGUAGE`;
+  public static SET_LANGUAGE = `${Ui.reducerName} Set language`;
   private static setLanguage(ui: IUi, payload): IUi {
     return {
       ...ui,
@@ -42,7 +42,7 @@ export class Ui {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static TOGGLE_SIDENAV = `${Ui.reducerName}_TOGGLE_SIDENAV`;
+  public static TOGGLE_SIDENAV = `${Ui.reducerName} Toggle sidenav`;
   private static toggleSidenav(ui: IUi, _payload): IUi {
     return {
       ...ui,
@@ -51,7 +51,7 @@ export class Ui {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static OPEN_SIDENAV = `${Ui.reducerName}_OPEN_SIDENAV`;
+  public static OPEN_SIDENAV = `${Ui.reducerName} Open sidenav`;
   private static openSidenav(ui: IUi, _payload): IUi {
     return {
       ...ui,
@@ -60,10 +60,10 @@ export class Ui {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static CLOSE_SIDENAV_ON_SMALL_SCREEN = `${Ui.reducerName}_CLOSE_SIDENAV_ON_SMALL_SCREEN`;
+  public static CLOSE_SIDENAV_ON_SMALL_SCREEN = `${Ui.reducerName} Close sidenav on small screen`;
 
   // tslint:disable-next-line:member-ordering
-  public static CLOSE_SIDENAV = `${Ui.reducerName}_CLOSE_SIDENAV`;
+  public static CLOSE_SIDENAV = `${Ui.reducerName} Close sidenav`;
   private static closeSidenav(ui: IUi, _payload): IUi {
     return {
       ...ui,
@@ -72,7 +72,7 @@ export class Ui {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static OPEN_POPUP_WORKSPACES_LIST = `${Ui.reducerName}_OPEN_POPUP_WORKSPACES_LIST`;
+  public static OPEN_POPUP_WORKSPACES_LIST = `${Ui.reducerName} Open popup workspaces list`;
   private static openPopupWorkspacesList(ui: IUi, _payload): IUi {
     return {
       ...ui,
@@ -81,7 +81,7 @@ export class Ui {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static CLOSE_POPUP_WORKSPACES_LIST = `${Ui.reducerName}_CLOSE_POPUP_WORKSPACES_LIST`;
+  public static CLOSE_POPUP_WORKSPACES_LIST = `${Ui.reducerName} Close popup workspaces list`;
   private static closePopupWorkspacesList(ui: IUi, _payload): IUi {
     return {
       ...ui,
@@ -90,7 +90,7 @@ export class Ui {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static SET_TITLES = `${Ui.reducerName}_SET_TITLES`;
+  public static SET_TITLES = `${Ui.reducerName} Set titles`;
   private static setTitles(ui: IUi, payload: { titleMainPart1: number, titleMainPart2: number, titleSubPart: number }): IUi {
     return {
       ...ui,
@@ -115,7 +115,7 @@ export class Ui {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static CHANGE_SCREEN_SIZE = `${Ui.reducerName}_CHANGE_SCREEN_SIZE`;
+  public static CHANGE_SCREEN_SIZE = `${Ui.reducerName} Change screen size`;
   private static changeScreenSize(ui: IUi, payload): IUi {
     return {
       ...ui,

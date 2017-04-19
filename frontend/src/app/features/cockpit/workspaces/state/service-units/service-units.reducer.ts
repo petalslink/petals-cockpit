@@ -23,7 +23,7 @@ import { putById, putAll, updateById, removeById } from 'app/shared/helpers/map.
 import { serviceUnitRowFactory } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 
 export class ServiceUnits {
-  private static reducerName = 'SERVICE_UNITS_REDUCER';
+  private static reducerName = '[Service units]';
 
   public static reducer(serviceUnitsTable = serviceUnitsTableFactory(), { type, payload }: Action): IServiceUnitsTable {
     if (!ServiceUnits.mapActionsToMethod[type]) {
@@ -34,13 +34,13 @@ export class ServiceUnits {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_SERVICE_UNITS_SUCCESS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNITS_SUCCESS`;
+  public static FETCH_SERVICE_UNITS_SUCCESS = `${ServiceUnits.reducerName} Fetch service units success`;
   private static fetchServiceUnitsSuccess(serviceUnitsTable: IServiceUnitsTable, payload): IServiceUnitsTable {
     return putAll(serviceUnitsTable, payload, serviceUnitRowFactory());
   }
 
   // tslint:disable-next-line:member-ordering
-  public static SET_CURRENT_SERVICE_UNIT = `${ServiceUnits.reducerName}_SET_CURRENT_SERVICE_UNIT`;
+  public static SET_CURRENT_SERVICE_UNIT = `${ServiceUnits.reducerName} Set current service unit`;
   private static setCurrentServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
     return {
       ...serviceUnitsTable,
@@ -51,13 +51,13 @@ export class ServiceUnits {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_SERVICE_UNIT_DETAILS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS`;
+  public static FETCH_SERVICE_UNIT_DETAILS = `${ServiceUnits.reducerName} Fetch service unit details`;
   private static fetchServiceUnitDetails(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
     return updateById(serviceUnitsTable, payload.serviceUnitId, { isFetchingDetails: true });
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_SERVICE_UNIT_DETAILS_SUCCESS = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS_SUCCESS`;
+  public static FETCH_SERVICE_UNIT_DETAILS_SUCCESS = `${ServiceUnits.reducerName} Fetch service unit details success`;
   private static fetchServiceUnitDetailsSuccess(
     serviceUnitsTable: IServiceUnitsTable,
     payload: { serviceUnitId: string, data: any }
@@ -66,7 +66,7 @@ export class ServiceUnits {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_SERVICE_UNIT_DETAILS_ERROR = `${ServiceUnits.reducerName}_FETCH_SERVICE_UNIT_DETAILS_ERROR`;
+  public static FETCH_SERVICE_UNIT_DETAILS_ERROR = `${ServiceUnits.reducerName} Fetch service unit details error`;
   private static fetchServiceUnitDetailsError(
     serviceUnitsTable: IServiceUnitsTable,
     payload: { serviceUnitId: string }
@@ -75,13 +75,13 @@ export class ServiceUnits {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static CHANGE_STATE = `${ServiceUnits.reducerName}_CHANGE_STATE`;
+  public static CHANGE_STATE = `${ServiceUnits.reducerName} Change state`;
   private static changeState(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
     return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: true });
   }
 
   // tslint:disable-next-line:member-ordering
-  public static CHANGE_STATE_SUCCESS = `${ServiceUnits.reducerName}_CHANGE_STATE_SUCCESS`;
+  public static CHANGE_STATE_SUCCESS = `${ServiceUnits.reducerName} Change state success`;
   private static changeStateSuccess(
     serviceUnitsTable: IServiceUnitsTable,
     payload: { serviceUnitId: string, newState: string }
@@ -90,13 +90,13 @@ export class ServiceUnits {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static CHANGE_STATE_ERROR = `${ServiceUnits.reducerName}_CHANGE_STATE_ERROR`;
+  public static CHANGE_STATE_ERROR = `${ServiceUnits.reducerName} Change state error`;
   private static changeStateError(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
     return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: false });
   }
 
   // tslint:disable-next-line:member-ordering
-  public static REMOVE_SERVICE_UNIT = `${ServiceUnits.reducerName}_REMOVE_SERVICE_UNIT`;
+  public static REMOVE_SERVICE_UNIT = `${ServiceUnits.reducerName} Remove service unit`;
   private static removeServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
     return removeById(serviceUnitsTable, payload.serviceUnitId);
   }
@@ -129,7 +129,7 @@ export class ServiceUnits {
     // [Components.DEPLOY_SERVICE_UNIT_SUCCESS]: ServiceUnits.deployServiceUnitSuccess,
     // issue opened here: https://github.com/angular/angular-cli/issues/5736
     // once solved, update the tests !
-    ['COMPONENTS_REDUCER_DEPLOY_SERVICE_UNIT_SUCCESS']: ServiceUnits.deployServiceUnitSuccess,
+    ['[Components] Deploy service unit success']: ServiceUnits.deployServiceUnitSuccess,
 
     [Workspaces.CLEAN_WORKSPACE]: ServiceUnits.cleanWorkspace
   };

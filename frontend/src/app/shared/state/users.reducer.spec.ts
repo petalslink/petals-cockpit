@@ -17,7 +17,6 @@
 
 import { Users } from 'app/shared/state/users.reducer';
 import { environment } from 'environments/environment';
-import { type } from 'app/shared/helpers/shared.helper';
 
 describe(`Users reducer`, () => {
   it(`should have a default value`, () => {
@@ -35,9 +34,9 @@ describe(`Users reducer`, () => {
       });
   });
 
-  describe(type(Users.FETCH_USERS_SUCCESS), () => {
+  describe(Users.FETCH_USERS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Users.FETCH_USERS_SUCCESS).toEqual(`USERS_REDUCER_FETCH_USERS_SUCCESS`);
+      expect(Users.FETCH_USERS_SUCCESS).toEqual(`[Users] Fetch users success`);
     });
 
     it(`should add new users`, () => {
@@ -126,9 +125,9 @@ describe(`Users reducer`, () => {
     });
   });
 
-  describe(type(Users.CONNECT_USER), () => {
+  describe(Users.CONNECT_USER, () => {
     it(`should check action name`, () => {
-      expect(Users.CONNECT_USER).toEqual(`USERS_REDUCER_CONNECT_USER`);
+      expect(Users.CONNECT_USER).toEqual(`[Users] Connect user`);
     });
 
     it(`should set isConnecting to true from initial state no matter the payload`, () => {
@@ -158,9 +157,9 @@ describe(`Users reducer`, () => {
     });
   });
 
-  describe(type(Users.CONNECT_USER_SUCCESS), () => {
+  describe(Users.CONNECT_USER_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Users.CONNECT_USER_SUCCESS).toEqual(`USERS_REDUCER_CONNECT_USER_SUCCESS`);
+      expect(Users.CONNECT_USER_SUCCESS).toEqual(`[Users] Connect user success`);
     });
 
     const initialState: any = {
@@ -223,9 +222,9 @@ describe(`Users reducer`, () => {
     });
   });
 
-  describe(type(Users.CONNECT_USER_FAILED), () => {
+  describe(Users.CONNECT_USER_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Users.CONNECT_USER_FAILED).toEqual(`USERS_REDUCER_CONNECT_USER_FAILED`);
+      expect(Users.CONNECT_USER_FAILED).toEqual(`[Users] Connect user failed`);
     });
 
     const initialState: any = {
@@ -265,9 +264,9 @@ describe(`Users reducer`, () => {
     });
   });
 
-  describe(type(Users.DISCONNECT_USER), () => {
+  describe(Users.DISCONNECT_USER, () => {
     it(`should check action name`, () => {
-      expect(Users.DISCONNECT_USER).toEqual(`USERS_REDUCER_DISCONNECT_USER`);
+      expect(Users.DISCONNECT_USER).toEqual(`[Users] Disconnect user`);
     });
 
     const initialState: any = {
@@ -325,9 +324,9 @@ describe(`Users reducer`, () => {
     });
   });
 
-  describe(type(Users.DISCONNECT_USER_SUCCESS), () => {
+  describe(Users.DISCONNECT_USER_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Users.DISCONNECT_USER_SUCCESS).toEqual(`USERS_REDUCER_DISCONNECT_USER_SUCCESS`);
+      expect(Users.DISCONNECT_USER_SUCCESS).toEqual(`[Users] Disconnect user success`);
     });
 
     const initialState: any = {
@@ -371,9 +370,9 @@ describe(`Users reducer`, () => {
     });
   });
 
-  describe(type(Users.DISCONNECT_USER_FAILED), () => {
+  describe(Users.DISCONNECT_USER_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Users.DISCONNECT_USER_FAILED).toEqual(`USERS_REDUCER_DISCONNECT_USER_FAILED`);
+      expect(Users.DISCONNECT_USER_FAILED).toEqual(`[Users] Disconnect user failed`);
     });
 
     const initialState: any = {

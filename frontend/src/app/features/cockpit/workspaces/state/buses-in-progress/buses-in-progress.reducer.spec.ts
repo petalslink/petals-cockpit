@@ -16,7 +16,6 @@
  */
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
-import { type } from 'app/shared/helpers/shared.helper';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 import { busesInProgressTableFactory } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 
@@ -33,9 +32,9 @@ describe(`Buses in progress reducer`, () => {
       });
   });
 
-  describe(type(BusesInProgress.FETCH_BUSES_IN_PROGRESS), () => {
+  describe(BusesInProgress.FETCH_BUSES_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.FETCH_BUSES_IN_PROGRESS).toEqual(`BUSES_IN_PROGRESS_REDUCER_FETCH_BUSES_IN_PROGRESS`);
+      expect(BusesInProgress.FETCH_BUSES_IN_PROGRESS).toEqual(`[Buses In Prog] Fetch buses in progress`);
     });
 
     const initialState: any = {
@@ -183,9 +182,9 @@ describe(`Buses in progress reducer`, () => {
     });
   });
 
-  describe(type(BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS), () => {
+  describe(BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS).toEqual(`BUSES_IN_PROGRESS_REDUCER_SET_CURRENT_BUS_IN_PROGRESS`);
+      expect(BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS).toEqual(`[Buses In Prog] Set current bus in progress`);
     });
 
     const initialState: any = {
@@ -231,9 +230,9 @@ describe(`Buses in progress reducer`, () => {
     });
   });
 
-  describe(type(BusesInProgress.POST_BUS_IN_PROGRESS), () => {
+  describe(BusesInProgress.POST_BUS_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.POST_BUS_IN_PROGRESS).toEqual(`BUSES_IN_PROGRESS_REDUCER_POST_BUS_IN_PROGRESS`);
+      expect(BusesInProgress.POST_BUS_IN_PROGRESS).toEqual(`[Buses In Prog] Post bus in progress`);
     });
 
     const initialState: any = {
@@ -260,9 +259,9 @@ describe(`Buses in progress reducer`, () => {
     });
   });
 
-  describe(type(BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS), () => {
+  describe(BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS).toEqual(`BUSES_IN_PROGRESS_REDUCER_POST_BUS_IN_PROGRESS_SUCCESS`);
+      expect(BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS).toEqual(`[Buses In Prog] Post bus in progress success`);
     });
 
     const initialState: any = {
@@ -296,9 +295,9 @@ describe(`Buses in progress reducer`, () => {
     });
   });
 
-  describe(type(BusesInProgress.POST_BUS_IN_PROGRESS_ERROR), () => {
+  describe(BusesInProgress.POST_BUS_IN_PROGRESS_ERROR, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.POST_BUS_IN_PROGRESS_ERROR).toEqual(`BUSES_IN_PROGRESS_REDUCER_POST_BUS_IN_PROGRESS_ERROR`);
+      expect(BusesInProgress.POST_BUS_IN_PROGRESS_ERROR).toEqual(`[Buses In Prog] Post bus in progress error`);
     });
 
     it(`should return the same object if we're currently importing a bus`, () => {
@@ -351,9 +350,9 @@ describe(`Buses in progress reducer`, () => {
     });
   });
 
-  describe(type(BusesInProgress.DELETE_BUS_IN_PROGRESS), () => {
+  describe(BusesInProgress.DELETE_BUS_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.DELETE_BUS_IN_PROGRESS).toEqual(`BUSES_IN_PROGRESS_REDUCER_DELETE_BUS_IN_PROGRESS`);
+      expect(BusesInProgress.DELETE_BUS_IN_PROGRESS).toEqual(`[Buses In Prog] Delete bus in progress`);
     });
 
     it(`should set the flag isRemoving on an existing bus`, () => {
@@ -418,9 +417,9 @@ describe(`Buses in progress reducer`, () => {
     });
   });
 
-  describe(type(BusesInProgress.REMOVE_BUS_IN_PROGRESS), () => {
+  describe(BusesInProgress.REMOVE_BUS_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.REMOVE_BUS_IN_PROGRESS).toEqual(`BUSES_IN_PROGRESS_REDUCER_REMOVE_BUS_IN_PROGRESS`);
+      expect(BusesInProgress.REMOVE_BUS_IN_PROGRESS).toEqual(`[Buses In Prog] Remove bus in progress`);
     });
 
     const initialState: any = {
@@ -476,9 +475,9 @@ describe(`Buses in progress reducer`, () => {
     });
   });
 
-  describe(type(BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS), () => {
+  describe(BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS).toEqual(`BUSES_IN_PROGRESS_REDUCER_UPDATE_ERROR_BUS_IN_PROGRESS`);
+      expect(BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS).toEqual(`[Buses In Prog] Update error bus in progress`);
     });
 
     it(`should update a bus import error if bus exists`, () => {
@@ -532,7 +531,7 @@ describe(`Buses in progress reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.CLEAN_WORKSPACE), () => {
+  describe(Workspaces.CLEAN_WORKSPACE, () => {
     it(`should return the initial state`, () => {
       const initialState: any = {
         noMatter: 'the state'

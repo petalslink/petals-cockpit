@@ -17,7 +17,6 @@
 
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.reducer';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { type } from 'app/shared/helpers/shared.helper';
 import { busesTableFactory } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
 
 describe(`Buses reducer`, () => {
@@ -30,9 +29,9 @@ describe(`Buses reducer`, () => {
       });
   });
 
-  describe(type(Buses.FETCH_BUSES_SUCCESS), () => {
+  describe(Buses.FETCH_BUSES_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Buses.FETCH_BUSES_SUCCESS).toEqual(`BUSES_REDUCER_FETCH_BUSES_SUCCESS`);
+      expect(Buses.FETCH_BUSES_SUCCESS).toEqual(`[Buses] Fetch buses success`);
     });
 
     it(`should add one bus`, () => {
@@ -188,9 +187,9 @@ describe(`Buses reducer`, () => {
     });
   });
 
-  describe(type(Buses.FOLD_BUS), () => {
+  describe(Buses.FOLD_BUS, () => {
     it(`should check action name`, () => {
-      expect(Buses.FOLD_BUS).toEqual(`BUSES_REDUCER_FOLD_BUS`);
+      expect(Buses.FOLD_BUS).toEqual(`[Buses] Fold bus`);
     });
 
     const initialState: any = {
@@ -258,9 +257,9 @@ describe(`Buses reducer`, () => {
     });
   });
 
-  describe(type(Buses.UNFOLD_BUS), () => {
+  describe(Buses.UNFOLD_BUS, () => {
     it(`should check action name`, () => {
-      expect(Buses.UNFOLD_BUS).toEqual(`BUSES_REDUCER_UNFOLD_BUS`);
+      expect(Buses.UNFOLD_BUS).toEqual(`[Buses] Unfold bus`);
     });
 
     const initialState: any = {
@@ -323,9 +322,9 @@ describe(`Buses reducer`, () => {
     });
   });
 
-  describe(type(Buses.TOGGLE_FOLD_BUS), () => {
+  describe(Buses.TOGGLE_FOLD_BUS, () => {
     it(`should check action name`, () => {
-      expect(Buses.TOGGLE_FOLD_BUS).toEqual(`BUSES_REDUCER_TOGGLE_FOLD_BUS`);
+      expect(Buses.TOGGLE_FOLD_BUS).toEqual(`[Buses] Toggle fold bus`);
     });
 
     const initialState: any = {
@@ -404,9 +403,9 @@ describe(`Buses reducer`, () => {
     });
   });
 
-  describe(type(Buses.SET_CURRENT_BUS), () => {
+  describe(Buses.SET_CURRENT_BUS, () => {
     it(`should check action name`, () => {
-      expect(Buses.SET_CURRENT_BUS).toEqual(`BUSES_REDUCER_SET_CURRENT_BUS`);
+      expect(Buses.SET_CURRENT_BUS).toEqual(`[Buses] Set current bus`);
     });
 
     it(`should set the current bus`, () => {
@@ -429,7 +428,7 @@ describe(`Buses reducer`, () => {
     });
   });
 
-  describe(type(Buses.REMOVE_BUS), () => {
+  describe(Buses.REMOVE_BUS, () => {
     const initialState: any = {
       keepPreviousValues: '',
       selectedBusId: '',
@@ -452,7 +451,7 @@ describe(`Buses reducer`, () => {
     };
 
     it(`should check action name`, () => {
-      expect(Buses.REMOVE_BUS).toEqual(`BUSES_REDUCER_REMOVE_BUS`);
+      expect(Buses.REMOVE_BUS).toEqual(`[Buses] Remove bus`);
     });
 
     it(`should remove the first bus`, () => {
@@ -522,9 +521,9 @@ describe(`Buses reducer`, () => {
     });
   });
 
-  describe(type(Buses.FETCH_BUS_DETAILS), () => {
+  describe(Buses.FETCH_BUS_DETAILS, () => {
     it(`should check action name`, () => {
-      expect(Buses.FETCH_BUS_DETAILS).toEqual(`BUSES_REDUCER_FETCH_BUS_DETAILS`);
+      expect(Buses.FETCH_BUS_DETAILS).toEqual(`[Buses] Fetch bus details`);
     });
 
     const initialState: any = {
@@ -556,9 +555,9 @@ describe(`Buses reducer`, () => {
     });
   });
 
-  describe(type(Buses.FETCH_BUS_DETAILS_SUCCESS), () => {
+  describe(Buses.FETCH_BUS_DETAILS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Buses.FETCH_BUS_DETAILS_SUCCESS).toEqual(`BUSES_REDUCER_FETCH_BUS_DETAILS_SUCCESS`);
+      expect(Buses.FETCH_BUS_DETAILS_SUCCESS).toEqual(`[Buses] Fetch bus details success`);
     });
 
     const initialState: any = {
@@ -591,9 +590,9 @@ describe(`Buses reducer`, () => {
     });
   });
 
-  describe(type(Buses.FETCH_BUS_DETAILS_ERROR), () => {
+  describe(Buses.FETCH_BUS_DETAILS_ERROR, () => {
     it(`should check action name`, () => {
-      expect(Buses.FETCH_BUS_DETAILS_ERROR).toEqual(`BUSES_REDUCER_FETCH_BUS_DETAILS_ERROR`);
+      expect(Buses.FETCH_BUS_DETAILS_ERROR).toEqual(`[Buses] Fetch bus details error`);
     });
 
     const initialState: any = {
@@ -626,7 +625,7 @@ describe(`Buses reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.CLEAN_WORKSPACE), () => {
+  describe(Workspaces.CLEAN_WORKSPACE, () => {
     it(`should return the initial value to reset the workspace`, () => {
       const initialState: any = {
         doNotKeepPreviousValues: '',

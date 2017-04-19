@@ -16,7 +16,6 @@
  */
 
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.reducer';
-import { type } from 'app/shared/helpers/shared.helper';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.reducer';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 import { componentsTableFactory } from 'app/features/cockpit/workspaces/state/components/components.interface';
@@ -33,9 +32,9 @@ describe(`Components reducer`, () => {
       });
   });
 
-  describe(type(Components.FETCH_COMPONENTS_SUCCESS), () => {
+  describe(Components.FETCH_COMPONENTS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Components.FETCH_COMPONENTS_SUCCESS).toEqual(`COMPONENTS_REDUCER_FETCH_COMPONENTS_SUCCESS`);
+      expect(Components.FETCH_COMPONENTS_SUCCESS).toEqual(`[Components] Fetch components success`);
     });
 
     const initialState: any = {
@@ -214,9 +213,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.FOLD_COMPONENT), () => {
+  describe(Components.FOLD_COMPONENT, () => {
     it(`should check action name`, () => {
-      expect(Components.FOLD_COMPONENT).toEqual(`COMPONENTS_REDUCER_FOLD_COMPONENT`);
+      expect(Components.FOLD_COMPONENT).toEqual(`[Components] Fold component`);
     });
 
     const initialState: any = {
@@ -277,9 +276,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.UNFOLD_COMPONENT), () => {
+  describe(Components.UNFOLD_COMPONENT, () => {
     it(`should check action name`, () => {
-      expect(Components.UNFOLD_COMPONENT).toEqual(`COMPONENTS_REDUCER_UNFOLD_COMPONENT`);
+      expect(Components.UNFOLD_COMPONENT).toEqual(`[Components] Unfold component`);
     });
 
     const initialState: any = {
@@ -360,9 +359,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.TOGGLE_FOLD_COMPONENT), () => {
+  describe(Components.TOGGLE_FOLD_COMPONENT, () => {
     it(`should check action name`, () => {
-      expect(Components.TOGGLE_FOLD_COMPONENT).toEqual(`COMPONENTS_REDUCER_TOGGLE_FOLD_COMPONENT`);
+      expect(Components.TOGGLE_FOLD_COMPONENT).toEqual(`[Components] Toggle fold component`);
     });
 
     const initialState: any = {
@@ -437,9 +436,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.SET_CURRENT_COMPONENT), () => {
+  describe(Components.SET_CURRENT_COMPONENT, () => {
     it(`should check action name`, () => {
-      expect(Components.SET_CURRENT_COMPONENT).toEqual(`COMPONENTS_REDUCER_SET_CURRENT_COMPONENT`);
+      expect(Components.SET_CURRENT_COMPONENT).toEqual(`[Components] Set current component`);
     });
 
     it(`should set the current component`, () => {
@@ -462,9 +461,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.FETCH_COMPONENT_DETAILS), () => {
+  describe(Components.FETCH_COMPONENT_DETAILS, () => {
     it(`should check action name`, () => {
-      expect(Components.FETCH_COMPONENT_DETAILS).toEqual(`COMPONENTS_REDUCER_FETCH_COMPONENT_DETAILS`);
+      expect(Components.FETCH_COMPONENT_DETAILS).toEqual(`[Components] Fetch component details`);
     });
 
     const initialState: any = {
@@ -496,9 +495,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.FETCH_COMPONENT_DETAILS_SUCCESS), () => {
+  describe(Components.FETCH_COMPONENT_DETAILS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Components.FETCH_COMPONENT_DETAILS_SUCCESS).toEqual(`COMPONENTS_REDUCER_FETCH_COMPONENT_DETAILS_SUCCESS`);
+      expect(Components.FETCH_COMPONENT_DETAILS_SUCCESS).toEqual(`[Components] Fetch component details success`);
     });
 
     const initialState: any = {
@@ -531,9 +530,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.FETCH_COMPONENT_DETAILS_ERROR), () => {
+  describe(Components.FETCH_COMPONENT_DETAILS_ERROR, () => {
     it(`should check action name`, () => {
-      expect(Components.FETCH_COMPONENT_DETAILS_ERROR).toEqual(`COMPONENTS_REDUCER_FETCH_COMPONENT_DETAILS_ERROR`);
+      expect(Components.FETCH_COMPONENT_DETAILS_ERROR).toEqual(`[Components] Fetch component details error`);
     });
 
     const initialState: any = {
@@ -566,9 +565,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.CHANGE_STATE), () => {
+  describe(Components.CHANGE_STATE, () => {
     it(`should check action name`, () => {
-      expect(Components.CHANGE_STATE).toEqual(`COMPONENTS_REDUCER_CHANGE_STATE`);
+      expect(Components.CHANGE_STATE).toEqual(`[Components] Change state`);
     });
 
     const initialState: any = {
@@ -600,9 +599,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.CHANGE_STATE_SUCCESS), () => {
+  describe(Components.CHANGE_STATE_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Components.CHANGE_STATE_SUCCESS).toEqual(`COMPONENTS_REDUCER_CHANGE_STATE_SUCCESS`);
+      expect(Components.CHANGE_STATE_SUCCESS).toEqual(`[Components] Change state success`);
     });
 
     const initialState: any = {
@@ -635,9 +634,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.CHANGE_STATE_ERROR), () => {
+  describe(Components.CHANGE_STATE_ERROR, () => {
     it(`should check action name`, () => {
-      expect(Components.CHANGE_STATE_ERROR).toEqual(`COMPONENTS_REDUCER_CHANGE_STATE_ERROR`);
+      expect(Components.CHANGE_STATE_ERROR).toEqual(`[Components] Change state error`);
     });
 
     const initialState: any = {
@@ -669,9 +668,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.REMOVE_COMPONENT), () => {
+  describe(Components.REMOVE_COMPONENT, () => {
     it(`should check action name`, () => {
-      expect(Components.REMOVE_COMPONENT).toEqual(`COMPONENTS_REDUCER_REMOVE_COMPONENT`);
+      expect(Components.REMOVE_COMPONENT).toEqual(`[Components] Remove component`);
     });
 
     const initialState: any = {
@@ -745,9 +744,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.DEPLOY_SERVICE_UNIT), () => {
+  describe(Components.DEPLOY_SERVICE_UNIT, () => {
     it(`should check action name`, () => {
-      expect(Components.DEPLOY_SERVICE_UNIT).toEqual(`COMPONENTS_REDUCER_DEPLOY_SERVICE_UNIT`);
+      expect(Components.DEPLOY_SERVICE_UNIT).toEqual(`[Components] Deploy service unit`);
     });
 
     const initialState: any = {
@@ -779,9 +778,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.DEPLOY_SERVICE_UNIT_ERROR), () => {
+  describe(Components.DEPLOY_SERVICE_UNIT_ERROR, () => {
     it(`should check action name`, () => {
-      expect(Components.DEPLOY_SERVICE_UNIT_ERROR).toEqual(`COMPONENTS_REDUCER_DEPLOY_SERVICE_UNIT_ERROR`);
+      expect(Components.DEPLOY_SERVICE_UNIT_ERROR).toEqual(`[Components] Deploy service unit error`);
     });
 
     const initialState: any = {
@@ -814,9 +813,9 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Components.DEPLOY_SERVICE_UNIT_SUCCESS), () => {
+  describe(Components.DEPLOY_SERVICE_UNIT_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Components.DEPLOY_SERVICE_UNIT_SUCCESS).toEqual(`COMPONENTS_REDUCER_DEPLOY_SERVICE_UNIT_SUCCESS`);
+      expect(Components.DEPLOY_SERVICE_UNIT_SUCCESS).toEqual(`[Components] Deploy service unit success`);
     });
 
     const initialState: any = {
@@ -857,7 +856,7 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(ServiceUnits.REMOVE_SERVICE_UNIT), () => {
+  describe(ServiceUnits.REMOVE_SERVICE_UNIT, () => {
     const initialState: any = {
       keepPreviousValues: '',
       byId: {
@@ -930,7 +929,7 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(`CONTAINERS_REDUCER_DEPLOY_COMPONENT_SUCCESS`, () => {
+  describe(`[Containers] Deploy component success`, () => {
     const initialState: any = {
       keepPreviousValues: '',
       byId: {
@@ -944,7 +943,7 @@ describe(`Components reducer`, () => {
 
     it(`should add a non existing component`, () => {
       expect(Components.reducer(initialState, {
-        type: 'CONTAINERS_REDUCER_DEPLOY_COMPONENT_SUCCESS',
+        type: '[Containers] Deploy component success',
         payload: {
           component: {
             id: 'idComp1',
@@ -976,7 +975,7 @@ describe(`Components reducer`, () => {
     });
   });
 
-  describe(type(Workspaces.CLEAN_WORKSPACE), () => {
+  describe(Workspaces.CLEAN_WORKSPACE, () => {
     it(`should return the initial value to reset the containers`, () => {
       const initialState: any = {
         byId: {

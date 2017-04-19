@@ -23,7 +23,7 @@ import { putAll, updateById, removeById } from 'app/shared/helpers/map.helper';
 import { busRowFactory } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
 
 export class Buses {
-  private static reducerName = 'BUSES_REDUCER';
+  private static reducerName = '[Buses]';
 
   public static reducer(busesTable = busesTableFactory(), { type, payload }: Action): IBusesTable {
     if (!Buses.mapActionsToMethod[type]) {
@@ -34,13 +34,13 @@ export class Buses {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_BUSES_SUCCESS = `${Buses.reducerName}_FETCH_BUSES_SUCCESS`;
+  public static FETCH_BUSES_SUCCESS = `${Buses.reducerName} Fetch buses success`;
   private static fetchBusesSuccess(busesTable: IBusesTable, payload): IBusesTable {
     return putAll(busesTable, payload, busRowFactory());
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FOLD_BUS = `${Buses.reducerName}_FOLD_BUS`;
+  public static FOLD_BUS = `${Buses.reducerName} Fold bus`;
   private static foldBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     if (!busesTable.byId[payload.busId] || busesTable.byId[payload.busId].isFolded) {
       return busesTable;
@@ -50,7 +50,7 @@ export class Buses {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static UNFOLD_BUS = `${Buses.reducerName}_UNFOLD_BUS`;
+  public static UNFOLD_BUS = `${Buses.reducerName} Unfold bus`;
   private static unfoldBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     if (!busesTable.byId[payload.busId] || !busesTable.byId[payload.busId].isFolded) {
       return busesTable;
@@ -60,7 +60,7 @@ export class Buses {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static TOGGLE_FOLD_BUS = `${Buses.reducerName}_TOGGLE_FOLD_BUS`;
+  public static TOGGLE_FOLD_BUS = `${Buses.reducerName} Toggle fold bus`;
   private static toggleFoldBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     const bus = busesTable.byId[payload.busId];
 
@@ -76,7 +76,7 @@ export class Buses {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static SET_CURRENT_BUS = `${Buses.reducerName}_SET_CURRENT_BUS`;
+  public static SET_CURRENT_BUS = `${Buses.reducerName} Set current bus`;
   private static setCurrentBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     return {
       ...busesTable,
@@ -87,25 +87,25 @@ export class Buses {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static REMOVE_BUS = `${Buses.reducerName}_REMOVE_BUS`;
+  public static REMOVE_BUS = `${Buses.reducerName} Remove bus`;
   private static removeBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     return removeById(busesTable, payload.busId);
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_BUS_DETAILS = `${Buses.reducerName}_FETCH_BUS_DETAILS`;
+  public static FETCH_BUS_DETAILS = `${Buses.reducerName} Fetch bus details`;
   private static fetchBusDetails(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     return updateById(busesTable, payload.busId, { isFetchingDetails: true });
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_BUS_DETAILS_SUCCESS = `${Buses.reducerName}_FETCH_BUS_DETAILS_SUCCESS`;
+  public static FETCH_BUS_DETAILS_SUCCESS = `${Buses.reducerName} Fetch bus details success`;
   private static fetchBusDetailsSuccess(busesTable: IBusesTable, payload: { busId: string, data: any }): IBusesTable {
     return updateById(busesTable, payload.busId, { ...payload.data, isFetchingDetails: false });
   }
 
   // tslint:disable-next-line:member-ordering
-  public static FETCH_BUS_DETAILS_ERROR = `${Buses.reducerName}_FETCH_BUS_DETAILS_ERROR`;
+  public static FETCH_BUS_DETAILS_ERROR = `${Buses.reducerName} Fetch bus details error`;
   private static fetchBusDetailsError(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     return updateById(busesTable, payload.busId, { isFetchingDetails: false });
   }
