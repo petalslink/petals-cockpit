@@ -18,6 +18,7 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Store } from '@ngrx/store';
+import { Router } from '@angular/router';
 
 import { BusesServiceImpl } from './buses.service';
 import { IStore } from './../interfaces/store.interface';
@@ -38,10 +39,11 @@ export class BusesMockService extends BusesServiceImpl {
   constructor(
     http: Http,
     store$: Store<IStore>,
+    router: Router,
     private pSseService: SseService,
     private userService: UsersService,
     notifications: NotificationsService) {
-    super(http, store$, pSseService, notifications);
+    super(http, store$, router, pSseService, notifications);
   }
 
   postBus(idWorkspace: string, bus: IBusImport) {

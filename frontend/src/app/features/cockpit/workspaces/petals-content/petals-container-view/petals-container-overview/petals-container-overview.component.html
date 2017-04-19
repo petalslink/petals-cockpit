@@ -79,9 +79,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </div>
 
               <button type="button" md-raised-button (click)="deploySu.click()" class="choose-file">
-                    <span *ngIf="!fileToDeploy; else changeFile">Choose a file to upload</span>
-                    <ng-template #changeFile>Change the file</ng-template>
-                  </button>
+                <span *ngIf="!fileToDeploy; else changeFile">Choose a file to upload</span>
+                <ng-template #changeFile>Change the file</ng-template>
+              </button>
 
               <input #deploySu class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="container.isDeployingComponent">
 

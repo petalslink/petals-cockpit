@@ -21,10 +21,11 @@ import { Store, Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { IStore } from 'app/shared/interfaces/store.interface';
 import { IBusInProgressRow } from './bus-in-progress.interface';
 import { BusesInProgress } from './buses-in-progress.reducer';
 import { BusesService } from 'app/shared/services/buses.service';
+import { environment } from 'environments/environment';
 
 @Injectable()
 export class BusesInProgressEffects {
@@ -62,6 +63,15 @@ export class BusesInProgressEffects {
       this.busesService
         .deleteBus(idWorkspace, action.payload.id)
         .mergeMap(_ => Observable.empty())
-    // TODO catch error?
+        .catch(err => {
+          if (environment.debug) {
+            console.group();
+            console.warn('Error catched in buses-in-progress.effects : ofType(Buses.DELETE_BUS_IN_PROGRESS)');
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of({ type: BusesInProgress.DELETE_BUS_IN_PROGRESS_FAILED, payload: action.payload });
+        })
     );
 }

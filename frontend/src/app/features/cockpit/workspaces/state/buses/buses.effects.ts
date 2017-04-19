@@ -17,18 +17,22 @@
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Action } from '@ngrx/store';
+import { Router } from '@angular/router';
+import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
 import { Buses } from './buses.reducer';
-import { BusesService } from './../../../../../shared/services/buses.service';
-import { environment } from './../../../../../../environments/environment';
+import { IStore } from 'app/shared/interfaces/store.interface';
+import { BusesService } from 'app/shared/services/buses.service';
+import { environment } from 'environments/environment';
 
 @Injectable()
 export class BusesEffects {
   constructor(
     private actions$: Actions,
+    private store$: Store<IStore>,
+    private router: Router,
     private busesService: BusesService
   ) { }
 
@@ -53,6 +57,26 @@ export class BusesEffects {
             type: Buses.FETCH_BUS_DETAILS_ERROR,
             payload: { busId: action.payload.busId }
           });
+        })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) deleteBus$: Observable<Action> = this.actions$
+    .ofType(Buses.DELETE_BUS)
+    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .switchMap(([action, idWorkspace]) =>
+      this.busesService
+        .deleteBus(idWorkspace, action.payload)
+        .mergeMap(_ => Observable.empty())
+        .catch(err => {
+          if (environment.debug) {
+            console.group();
+            console.warn('Error catched in buses.effects : ofType(Buses.DELETE_BUS)');
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of({ type: Buses.DELETE_BUS_FAILED, payload: action.payload });
         })
     );
 }

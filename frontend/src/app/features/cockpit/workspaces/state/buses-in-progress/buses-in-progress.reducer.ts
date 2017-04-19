@@ -108,6 +108,12 @@ export class BusesInProgress {
   }
 
   // tslint:disable-next-line:member-ordering
+  public static DELETE_BUS_IN_PROGRESS_FAILED = `${BusesInProgress.reducerName} Delete bus in progress failed`;
+  private static deleteBusInProgressFailed(busesInProgressTable: IBusesInProgressTable, payload: string): IBusesInProgressTable {
+    return updateById(busesInProgressTable, payload, { isRemoving: false });
+  }
+
+  // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Remove bus in progress`;
   private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: string): IBusesInProgressTable {
     return removeById(busesInProgressTable, payload);
@@ -136,6 +142,7 @@ export class BusesInProgress {
     [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]: BusesInProgress.postBusInProgressSuccess,
     [BusesInProgress.POST_BUS_IN_PROGRESS_ERROR]: BusesInProgress.postBusInProgressError,
     [BusesInProgress.DELETE_BUS_IN_PROGRESS]: BusesInProgress.deleteBusInProgress,
+    [BusesInProgress.DELETE_BUS_IN_PROGRESS_FAILED]: BusesInProgress.deleteBusInProgressFailed,
     [BusesInProgress.REMOVE_BUS_IN_PROGRESS]: BusesInProgress.removeBusInProgress,
     [BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS]: BusesInProgress.updateErrorBusInProgress,
 
