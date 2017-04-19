@@ -51,6 +51,7 @@ import org.ow2.petals.admin.api.ArtifactAdministration;
 import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.artifact.Artifact;
 import org.ow2.petals.admin.api.artifact.Component;
+import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.api.artifact.lifecycle.ArtifactLifecycle;
@@ -419,7 +420,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                     Artifact a = aa.getArtifact(comp.getType(), comp.getName(), null);
                     assert a instanceof Component;
                     Component compo = (Component) a;
-                    ComponentMin.State newCurrentstate = changeComponentState(petals, compo, newState);
+                    ComponentMin.State newCurrentstate = changeComponentState(petals, compo, currentState, newState);
                     return new ComponentStateChanged(comp.getId(), newCurrentstate);
                 });
         assert res != null;
@@ -454,13 +455,16 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     }
 
     private ComponentMin.State changeComponentState(PetalsAdministration petals, Component comp,
-            ComponentMin.State desiredState) throws ArtifactAdministrationException {
+            ComponentMin.State currentState, ComponentMin.State desiredState) throws ArtifactAdministrationException {
         ComponentLifecycle sal = petals.newArtifactLifecycleFactory().createComponentLifecycle(comp);
         switch (desiredState) {
             case Unloaded:
                 sal.undeploy();
                 break;
             case Started:
+                if (currentState == ComponentMin.State.Loaded) {
+                    sal.install();
+                }
                 sal.start();
                 break;
             case Stopped:
@@ -655,11 +659,12 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             // we already are in a blocking thread
             Component deployedComp = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
                     petals -> {
+                        ComponentType type = comp.type.to();
                         petals.newArtifactLifecycleFactory()
-                                .createComponentLifecycle(new Component(comp.name, comp.type.to()))
+                                .createComponentLifecycle(new Component(comp.name, type))
                                 .deploy(comp.saUrl, true);
                         // TODO is that correct for the type?
-                        return (Component) petals.newArtifactAdministration().getArtifactInfo(comp.type.to().toString(),
+                        return (Component) petals.newArtifactAdministration().getArtifactInfo(type.toString(),
                                 comp.name, null);
                     });
             assert deployedComp != null;

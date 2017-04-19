@@ -16,6 +16,7 @@
  */
 package org.ow2.petals.cockpit.server.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
@@ -30,7 +31,9 @@ public interface ArtifactServer {
     }
 
     public interface ServicedArtifact extends AutoCloseable {
-        URL getArtifactUrl();
+        URL getArtifactExternalUrl();
+
+        File getFile();
 
         @Override
         void close();

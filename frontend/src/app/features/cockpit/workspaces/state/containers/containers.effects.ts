@@ -84,7 +84,7 @@ export class ContainersEffects {
 
           return Observable.of({
             type: Containers.DEPLOY_COMPONENT_ERROR,
-            payload: { componentId: action.payload.containerId }
+            payload: { containerId: action.payload.containerId }
           });
         })
     );

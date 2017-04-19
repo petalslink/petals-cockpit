@@ -43,7 +43,7 @@ export function usersTableFactory(): IUsersTable {
     connectedUserId: '',
 
     isConnecting: false,
-    isConnected: environment.mock.alreadyConnected,
+    isConnected: environment.mock ? environment.mock.alreadyConnected : false,
     isDisconnecting: false,
     connectionFailed: false,
 

@@ -76,8 +76,13 @@ public class MockArtifactServer extends ExternalResource implements ArtifactServ
         return new ServicedArtifact() {
 
             @Override
-            public URL getArtifactUrl() {
+            public URL getArtifactExternalUrl() {
                 return url;
+            }
+
+            @Override
+            public File getFile() {
+                return file;
             }
 
             @Override
