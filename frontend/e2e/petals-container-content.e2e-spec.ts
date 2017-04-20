@@ -76,6 +76,11 @@ describe(`Petals container content`, () => {
     const filePath = path.resolve(__dirname, './resources/component.zip');
     const simpleNotification = element(by.css(`simple-notification`));
 
+    // component
+    const btnStart = element(by.cssContainingText(`app-petals-component-overview button`, `Start`));
+    const btnInstall = element(by.cssContainingText(`app-petals-component-overview button`, `Install`));
+    const btnUnload = element(by.cssContainingText(`app-petals-component-overview button`, `Unload`));
+
     expect(chooseFileBtn.getText()).toEqual(`Choose a file to upload`);
     // simulate the file selection
     fileInput.sendKeys(filePath);
@@ -138,5 +143,25 @@ describe(`Petals container content`, () => {
     browser.wait(EC.visibilityOf(simpleNotification), 3000);
     expect(element(by.css(`simple-notification .sn-title`)).getText()).toEqual(`Component deployed`);
     expect(element(by.css(`simple-notification .sn-content`)).getText()).toEqual('"component" has been deployed');
+    element(by.css(`simple-notification`)).click();
+
+    const state = element(by.css(`app-petals-component-overview md-card.state md-card-title`)).getText();
+    expect(state).toEqual('Loaded');
+
+    const parametersTitle = element(by.css(`app-petals-component-overview .parameters h3`));
+    const parametersFormInputs = element.all(by.css(`app-petals-component-overview .parameters form input`));
+
+    expect(parametersTitle.isDisplayed()).toBe(true);
+    expect(parametersTitle.getText()).toEqual('Install parameters');
+
+    expect(parametersFormInputs.get(0).getAttribute('placeholder')).toEqual('http-port');
+    expect(parametersFormInputs.get(1).getAttribute('placeholder')).toEqual('enable-https');
+
+    expect(parametersFormInputs.get(0).getAttribute('value')).toEqual('8080');
+    expect(parametersFormInputs.get(1).getAttribute('value')).toEqual('false');
+
+    expect(btnStart.isEnabled()).toBe(true);
+    expect(btnInstall.isEnabled()).toBe(true);
+    expect(btnUnload.isEnabled()).toBe(true);
   });
 });
