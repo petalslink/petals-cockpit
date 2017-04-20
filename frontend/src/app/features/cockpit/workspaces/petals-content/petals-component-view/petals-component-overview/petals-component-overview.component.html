@@ -22,6 +22,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <md-card-subtitle>State</md-card-subtitle>
             <md-card-title>{{ component.state }}</md-card-title>
             <md-card-content *ngIf="component.state">
+              <!-- TODO : Move that into a modal ? -->
+              <div *ngIf="component.state === 'Loaded'" class="parameters">
+                <h3 class="color-primary">Install parameters</h3>
+                <form *ngIf="parametersForm" [formGroup]="parametersForm">
+                  <div *ngFor="let param of parametersForm.controls | keys">
+                    <md-input-container floatPlaceholder="always">
+                      <input mdInput [placeholder]="param" type="text" [formControlName]="param">
+                    </md-input-container>
+                  </div>
+                </form>
+              </div>
+
               <div fxFlexLayout="row" fxLayoutAlign="end center">
                 <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:componentState" fxFlexLayout="row" class="margin-right-x1-no-last"
                   fxLayoutAlign="end center">

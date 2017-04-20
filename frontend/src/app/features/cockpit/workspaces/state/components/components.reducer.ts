@@ -119,9 +119,13 @@ export class Components {
   public static CHANGE_STATE_SUCCESS = `${Components.reducerName} Change state success`;
   private static changeStateSuccess(
     componentsTable: IComponentsTable,
-    payload: { componentId: string, newState: string }
+    payload: { componentId: string, newState: string, parameters: { [key: string]: string } }
   ): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, { state: payload.newState, isUpdatingState: false });
+    // if the parameters are not given here, simply set them to an empty object as
+    // it wouldn't be accurate until next get details
+    const parameters = payload.parameters || {};
+
+    return updateById(componentsTable, payload.componentId, { state: payload.newState, isUpdatingState: false, parameters });
   }
 
   // tslint:disable-next-line:member-ordering

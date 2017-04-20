@@ -53,6 +53,7 @@
     "material-design-icons-iconfont": "3.0.3",
     "ng2-translate": "5.0.0",
     "ngrx-store-freeze": "0.1.9",
+    "ngx-pipes": "1.5.10",
     "rxjs": "5.3.0",
     "ts-helpers": "1.1.2",
     "underscore": "1.8.3",
@@ -78,7 +79,17 @@
   "jest": {
     "preset": "jest-preset-angular",
     "setupTestFrameworkScriptFile": "<rootDir>/src/setup-jest.ts",
-    "collectCoverageFrom": ["src/**/*.ts", "!src/**/*.spec.ts", "!src/environment/**", "!src/**/*.mock.ts", "!src/mocks/**", "!src/**/*.d.ts"],
-    "coveragePathIgnorePatterns": ["<rootDir>/src/environment", "<rootDir>/src/mocks"]
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.spec.ts",
+      "!src/environment/**",
+      "!src/**/*.mock.ts",
+      "!src/mocks/**",
+      "!src/**/*.d.ts"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/src/environment",
+      "<rootDir>/src/mocks"
+    ]
   }
 }

@@ -32,7 +32,12 @@ import { EComponentState } from '../../features/cockpit/workspaces/state/compone
 export abstract class ComponentsService {
   abstract getDetailsComponent(componentId: string): Observable<Response>;
 
-  abstract putState(workspaceId: string, componentId: string, newState: string): Observable<Response>;
+  abstract putState(
+    workspaceId: string,
+    componentId: string,
+    newState: string,
+    parameters: { [key: string]: string }
+  ): Observable<Response>;
 
   abstract deploySu(workspaceId: string, componentId: string, file: File, serviceUnitName: string): Observable<Response>;
 
@@ -57,8 +62,8 @@ export class ComponentsServiceImpl extends ComponentsService {
     return this.http.get(`${environment.urlBackend}/components/${componentId}`);
   }
 
-  putState(workspaceId: string, componentId: string, newState: string) {
-    return this.http.put(`${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}`, { state: newState });
+  putState(workspaceId: string, componentId: string, newState: string, parameters: any) {
+    return this.http.put(`${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}`, { state: newState, parameters });
   }
 
   deploySu(workspaceId: string, componentId: string, file: File, serviceUnitName: string) {

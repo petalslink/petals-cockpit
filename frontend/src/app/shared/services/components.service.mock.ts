@@ -47,8 +47,13 @@ export class ComponentsMockService extends ComponentsServiceImpl {
     return helper.responseBody(detailsComponent);
   }
 
-  putState(_workspaceId: string, componentId: string, newState: string) {
+  putState(_workspaceId: string, componentId: string, newState: string, parameters: any) {
     componentsService.get(componentId).setState(newState);
+
+    if (parameters) {
+      componentsService.get(componentId).setParameters(parameters);
+    }
+
     // when the state changes, trigger a fake SSE event
     setTimeout(() =>
       (this.pSseService as SseServiceMock).triggerSseEvent(

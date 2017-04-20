@@ -41,11 +41,16 @@ export class Component {
   private serviceUnits = new Map<string, ServiceUnit>();
   private state = 'Started';
   private name: string;
+  private parameters: { [key: string]: string };
 
   constructor(name?: string) {
     const i = Component.cpt++;
     this.id = `idComp${i}`;
     this.name = name ? name : `Comp ${i}`;
+    this.parameters = {
+      'http-port': '8080',
+      'enable-https': 'false'
+    };
 
     // by default add 2 service units
     this.addServiceUnit();
@@ -54,6 +59,10 @@ export class Component {
 
   setState(newState: string) {
     this.state = newState;
+  }
+
+  setParameters(parameters: { [key: string]: string }) {
+    this.parameters = parameters;
   }
 
   public getId() {
@@ -84,7 +93,8 @@ export class Component {
     return {
       name: this.name,
       state: this.state,
-      type: 'BC'
+      type: 'BC',
+      parameters: this.parameters
     };
   }
 }

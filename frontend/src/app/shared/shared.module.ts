@@ -26,6 +26,7 @@ import { StoreModule } from '@ngrx/store';
 import { TranslateModule } from 'ng2-translate';
 import { PrettyJsonModule } from 'angular2-prettyjson';
 import { SimpleNotificationsModule } from 'angular2-notifications';
+import { NgObjectPipesModule } from 'ngx-pipes';
 
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
@@ -41,7 +42,8 @@ export const modules = [
   StoreModule,
   TranslateModule,
   PrettyJsonModule,
-  SimpleNotificationsModule
+  SimpleNotificationsModule,
+  NgObjectPipesModule
 ];
 
 export const declarations = [GenerateIconComponent, ColorSearchedLettersDirective];
