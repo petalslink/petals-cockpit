@@ -22,8 +22,9 @@ export class Components {
 
   constructor() { }
 
-  create(name?: string) {
-    const component = new Component(name);
+  create(name?: string, state?: string) {
+    const component = new Component(name, state);
+
     this.components.set(component.getId(), component);
     return component;
   }
@@ -39,14 +40,15 @@ export class Component {
   private static cpt = 0;
   private id: string;
   private serviceUnits = new Map<string, ServiceUnit>();
-  private state = 'Started';
   private name: string;
+  private state: string;
   private parameters: { [key: string]: string };
 
-  constructor(name?: string) {
+  constructor(name?: string, state = 'Started') {
     const i = Component.cpt++;
     this.id = `idComp${i}`;
     this.name = name ? name : `Comp ${i}`;
+    this.state = state;
     this.parameters = {
       'http-port': '8080',
       'enable-https': 'false'
@@ -90,11 +92,19 @@ export class Component {
   }
 
   getDetails() {
-    return {
+    const details = {
       name: this.name,
       state: this.state,
-      type: 'BC',
-      parameters: this.parameters
+      type: 'BC'
     };
+
+    if (this.state === 'Loaded') {
+      return {
+        ...details,
+        parameters: this.parameters
+      };
+    }
+
+    return details;
   }
 }

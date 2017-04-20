@@ -47,7 +47,7 @@ export class ComponentsMockService extends ComponentsServiceImpl {
     return helper.responseBody(detailsComponent);
   }
 
-  putState(_workspaceId: string, componentId: string, newState: string, parameters: any) {
+  putState(_workspaceId: string, componentId: string, newState: string, parameters: { [key: string]: string }) {
     componentsService.get(componentId).setState(newState);
 
     if (parameters) {

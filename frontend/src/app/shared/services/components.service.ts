@@ -62,7 +62,7 @@ export class ComponentsServiceImpl extends ComponentsService {
     return this.http.get(`${environment.urlBackend}/components/${componentId}`);
   }
 
-  putState(workspaceId: string, componentId: string, newState: string, parameters: any) {
+  putState(workspaceId: string, componentId: string, newState: string, parameters: { [key: string]: string }) {
     return this.http.put(`${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}`, { state: newState, parameters });
   }
 
