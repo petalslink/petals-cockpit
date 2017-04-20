@@ -130,7 +130,7 @@ describe(`Workspaces`, () => {
 
     // a dialog is shown
     expect(element(by.css(`app-workspace-deletion-dialog .mat-dialog-content`)).getText())
-      .toEqual(`Everything in the workspace will be deleted!\nAre you sure you want to delete New workspace?`);
+      .toEqual(`Everything in the workspace will be deleted! Please, be certain.\nAre you sure you want to delete New workspace?`);
 
     // let's confirm the deletion
     element(by.css(`app-workspace-deletion-dialog .btn-confirm-delete-wks`)).click();

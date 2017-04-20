@@ -37,4 +37,26 @@ describe(`Petals bus content`, () => {
     const pageTitle = element(by.css(`app-petals-bus-view md-toolbar-row .title`)).getText();
     expect(pageTitle).toEqual('Bus 0');
   });
+
+  it(`should delete a bus and redirect to the current workspace`, () => {
+    page.getWorkspaceTreeByName('Bus 0').click();
+
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses\/\w+/);
+
+    const btnDeleteBus = element(by.css(`app-petals-bus-view md-toolbar-row .btn-delete-bus`));
+
+    // let's delete the bus
+    btnDeleteBus.click();
+
+    // a dialog is shown
+    expect(element(by.css(`app-bus-deletion-dialog .mat-dialog-content`)).getText())
+      .toEqual(`Are you sure you want to delete Bus 0?`);
+
+    // let's confirm the deletion
+    element(by.css(`app-bus-deletion-dialog .btn-confirm-delete-bus`)).click();
+
+    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
+
+    expect(page.getWorkspaceTree()).toEqual([]);
+  });
 });
