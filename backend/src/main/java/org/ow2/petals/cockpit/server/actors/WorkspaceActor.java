@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -47,17 +48,10 @@ import org.glassfish.jersey.server.BroadcasterListener;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.jooq.Configuration;
 import org.jooq.impl.DSL;
-import org.ow2.petals.admin.api.ArtifactAdministration;
-import org.ow2.petals.admin.api.PetalsAdministration;
-import org.ow2.petals.admin.api.artifact.Artifact;
 import org.ow2.petals.admin.api.artifact.Component;
-import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.api.artifact.lifecycle.ArtifactLifecycle;
-import org.ow2.petals.admin.api.artifact.lifecycle.ComponentLifecycle;
-import org.ow2.petals.admin.api.artifact.lifecycle.ServiceAssemblyLifecycle;
-import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
@@ -68,6 +62,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRec
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin.State;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
@@ -82,9 +77,13 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUStateChanged;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
+import org.ow2.petals.cockpit.server.services.PetalsAdmin;
+import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
+import org.ow2.petals.cockpit.server.services.PetalsDb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import co.paralleluniverse.actors.BasicActor;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.SuspendExecution;
@@ -102,7 +101,7 @@ import javaslang.control.Either;
  * @author vnoel
  *
  */
-public class WorkspaceActor extends CockpitActor<Msg> {
+public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkspaceActor.class);
 
@@ -113,6 +112,12 @@ public class WorkspaceActor extends CockpitActor<Msg> {
     private final Map<Long, Fiber<?>> importsInProgress = new HashMap<>();
 
     private final long wId;
+
+    @Inject
+    protected PetalsAdmin petals;
+
+    @Inject
+    protected PetalsDb db;
 
     public WorkspaceActor(long wId) {
         this.wId = wId;
@@ -165,8 +170,13 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private void doInActorLoop(SuspendableRunnable action) throws SuspendExecution {
-        self().send(new WorkspaceActorAction(action));
+    @Suspendable
+    private void doInActorLoop(SuspendableRunnable action) {
+        try {
+            self().send(new WorkspaceActorAction(action));
+        } catch (SuspendExecution e) {
+            throw new AssertionError(e);
+        }
     }
 
     private static OutboundEvent event(WorkspaceEvent event) {
@@ -190,11 +200,12 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private EventOutput addBroadcastClient(NewWorkspaceClient nc) throws IOException, SuspendExecution {
+    private EventOutput addBroadcastClient(NewWorkspaceClient nc)
+            throws IOException, SuspendExecution, InterruptedException {
 
         LOG.debug("New SSE client for workspace {}", wId);
 
-        WorkspaceFullContent content = runBlockingTransaction(conf -> {
+        WorkspaceFullContent content = db.runTransaction(conf -> {
             // TODO merge queries
             WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wId)).fetchOne();
 
@@ -221,15 +232,14 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         return eo;
     }
 
-    private WorkspaceDeleted handleDeleteWorkspace(DeleteWorkspace dw) throws SuspendExecution {
-        runBlockingTransaction(conf -> {
+    private WorkspaceDeleted handleDeleteWorkspace(DeleteWorkspace dw)
+            throws SuspendExecution, InterruptedException, RuntimeException {
+        db.runTransaction(conf -> {
             // remove from db (it will propagate to all its contained elements!)
             DSL.using(conf).deleteFrom(WORKSPACES).where(WORKSPACES.ID.eq(wId)).execute();
 
             // unregister while still in the transaction!
             this.unregister();
-
-            return null;
         });
 
         // now we are sure nobody can get a hold of this actor!
@@ -254,16 +264,14 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         return wd;
     }
 
-    private BusDeleted handleDeleteBus(DeleteBus bus) throws SuspendExecution {
-        runBlockingTransaction(conf -> {
+    private BusDeleted handleDeleteBus(DeleteBus bus) throws SuspendExecution, InterruptedException {
+        db.runTransaction(conf -> {
             int deleted = DSL.using(conf).deleteFrom(BUSES).where(BUSES.ID.eq(bus.bId).and(BUSES.WORKSPACE_ID.eq(wId)))
                     .execute();
 
             if (deleted < 1) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
-
-            return null;
         });
 
         Fiber<?> fiber = importsInProgress.remove(bus.bId);
@@ -285,16 +293,19 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         return bd;
     }
 
-    private BusInProgress handleImportBus(ImportBus bus) throws SuspendExecution {
+    private BusInProgress handleImportBus(ImportBus bus) throws SuspendExecution, InterruptedException {
         final BusImport nb = bus.nb;
 
-        final long bId = runBlockingTransaction(conf -> {
+        final long bId = db.runTransaction(conf -> {
             BusesRecord br = new BusesRecord(null, wId, false, nb.ip, nb.port, nb.username, nb.password, nb.passphrase,
                     null, null);
             br.attach(conf);
             br.insert();
 
-            return br.getId();
+            Long id = br.getId();
+            assert id != null;
+
+            return id;
         });
 
         BusInProgress bip = new BusInProgress(bId, nb.ip, nb.port, nb.username);
@@ -322,7 +333,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
 
                 // if it's null, it has been cancelled!
                 if (f != null) {
-                    broadcast(runBlockingTransaction(conf -> {
+                    broadcast(db.runTransaction(conf -> {
                         return res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
                             try {
                                 return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, bId, topology));
@@ -354,15 +365,13 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             // TODO even though runBlocking can be interrupted, the petals admin code is based on RMI which cannot be
             // interrupted, so it will continue to be executed even after InterruptedException is thrown. There is
             // nothing we can do for this until petals admin is changed.
-            Domain topology = runBlockingAdmin(bus.ip, bus.port, bus.username, bus.password,
-                    petals -> petals.newContainerAdministration().getTopology(bus.passphrase, true));
-            assert topology != null;
+            Domain topology = petals.getTopology(bus.ip, bus.port, bus.username, bus.password, bus.passphrase);
             return Either.right(topology);
         } catch (InterruptedException e) {
             // let's let it propagate up to the fiber and be swallowed
             throw e;
         } catch (Exception e) {
-            String m = e.getMessage();
+            String m = e instanceof PetalsAdminException ? e.getCause().getMessage() : e.getMessage();
             String message = m != null ? m : e.getClass().getName();
 
             LOG.debug("Can't import bus from container {}:{}", bus.ip, bus.port, e);
@@ -371,8 +380,9 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private ComponentStateChanged handleComponentStateChange(ChangeComponentState change) throws SuspendExecution {
-        return runBlockingTransaction(conf -> {
+    private ComponentStateChanged handleComponentStateChange(ChangeComponentState change)
+            throws SuspendExecution, InterruptedException {
+        return db.runTransaction(conf -> {
 
             ComponentsRecord comp = DSL.using(conf).select(COMPONENTS.fields()).from(COMPONENTS).join(CONTAINERS)
                     .onKey(FK_COMPONENTS_CONTAINERS_ID).join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
@@ -383,51 +393,39 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            return handleComponentStateChange(change, comp, conf);
+            ComponentMin.State currentState = ComponentMin.State.valueOf(comp.getState());
+            ComponentMin.State newState = change.action.state;
+
+            if (currentState.equals(newState)) {
+                return new ComponentStateChanged(change.compId, currentState);
+            }
+
+            if (!isComponentStateTransitionOk(comp, currentState, newState)) {
+                // TODO or should I rely on the information from the container instead of my own?
+                throw new WebApplicationException(Status.CONFLICT);
+            }
+
+            if (newState == ComponentMin.State.Unloaded
+                    && DSL.using(conf).fetchExists(SERVICEUNITS, SERVICEUNITS.COMPONENT_ID.eq(comp.getId()))) {
+                // TODO or should I rely on the information from the container instead of my own?
+                throw new WebApplicationException(Status.CONFLICT);
+            }
+
+            // TODO merge with previous requests...
+            ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS)
+                    .where(CONTAINERS.ID.eq(comp.getContainerId())).fetchOne();
+            assert cont != null;
+
+            State newCurrentState = petals.changeState(cont.getIp(), cont.getPort(), cont.getUsername(),
+                    cont.getPassword(), comp.getType(), comp.getName(), currentState, newState,
+                    change.action.parameters);
+
+            ComponentStateChanged res = new ComponentStateChanged(comp.getId(), newCurrentState);
+
+            componentStateUpdated(res, conf);
+
+            return res;
         });
-    }
-
-    private ComponentStateChanged handleComponentStateChange(ChangeComponentState change, ComponentsRecord comp,
-            Configuration conf) throws Exception {
-
-        ComponentMin.State currentState = ComponentMin.State.valueOf(comp.getState());
-        ComponentMin.State newState = change.action.state;
-
-        if (currentState.equals(newState)) {
-            return new ComponentStateChanged(change.compId, currentState);
-        }
-
-        if (!isComponentStateTransitionOk(comp, currentState, newState)) {
-            // TODO or should I rely on the information from the container instead of my own?
-            throw new WebApplicationException(Status.CONFLICT);
-        }
-
-        if (newState == ComponentMin.State.Unloaded
-                && DSL.using(conf).fetchExists(SERVICEUNITS, SERVICEUNITS.COMPONENT_ID.eq(comp.getId()))) {
-            // TODO or should I rely on the information from the container instead of my own?
-            throw new WebApplicationException(Status.CONFLICT);
-        }
-
-        // TODO merge with previous requests...
-        ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(comp.getContainerId()))
-                .fetchOne();
-        assert cont != null;
-
-        // we already are in a thread pool
-        ComponentStateChanged res = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
-                petals -> {
-                    ArtifactAdministration aa = petals.newArtifactAdministration();
-                    Artifact a = aa.getArtifact(comp.getType(), comp.getName(), null);
-                    assert a instanceof Component;
-                    Component compo = (Component) a;
-                    ComponentMin.State newCurrentstate = changeComponentState(petals, compo, currentState, newState);
-                    return new ComponentStateChanged(comp.getId(), newCurrentstate);
-                });
-        assert res != null;
-
-        componentStateUpdated(res, conf);
-
-        return res;
     }
 
     /**
@@ -438,7 +436,9 @@ public class WorkspaceActor extends CockpitActor<Msg> {
             ComponentMin.State to) {
         switch (from) {
             case Loaded:
-                return to == ComponentMin.State.Unloaded; // via undeploy()
+                return to == ComponentMin.State.Started // via start()
+                        || to == ComponentMin.State.Shutdown // via install()
+                        || to == ComponentMin.State.Unloaded; // via undeploy()
             case Shutdown:
                 return to == ComponentMin.State.Unloaded // via undeploy()
                         || to == ComponentMin.State.Started; // via start()
@@ -454,36 +454,7 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private ComponentMin.State changeComponentState(PetalsAdministration petals, Component comp,
-            ComponentMin.State currentState, ComponentMin.State desiredState) throws ArtifactAdministrationException {
-        ComponentLifecycle sal = petals.newArtifactLifecycleFactory().createComponentLifecycle(comp);
-        switch (desiredState) {
-            case Unloaded:
-                sal.undeploy();
-                break;
-            case Started:
-                if (currentState == ComponentMin.State.Loaded) {
-                    sal.install();
-                }
-                sal.start();
-                break;
-            case Stopped:
-                sal.stop();
-                break;
-            default:
-                LOG.warn("Impossible case for state transition from {} to {} for Component {} ({})", comp.getState(),
-                        desiredState, comp.getName());
-        }
-        if (desiredState != ComponentMin.State.Unloaded) {
-            sal.updateState();
-            return ComponentMin.State.from(comp.getState());
-        } else {
-            // we can't call updateState for this one, it will fail since it has been unloaded
-            return ComponentMin.State.Unloaded;
-        }
-    }
-
-    private void componentStateUpdated(ComponentStateChanged comp, Configuration conf) throws SuspendExecution {
+    private void componentStateUpdated(ComponentStateChanged comp, Configuration conf) {
         // TODO error handling???
         if (comp.state != ComponentMin.State.Unloaded) {
             DSL.using(conf).update(COMPONENTS).set(COMPONENTS.STATE, comp.state.name()).where(COMPONENTS.ID.eq(comp.id))
@@ -496,8 +467,9 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         doInActorLoop(() -> broadcast(WorkspaceEvent.componentStateChange(comp)));
     }
 
-    private SUStateChanged handleSUStateChange(ChangeServiceUnitState change) throws SuspendExecution {
-        return runBlockingTransaction(conf -> {
+    private SUStateChanged handleSUStateChange(ChangeServiceUnitState change)
+            throws SuspendExecution, InterruptedException {
+        return db.runTransaction(conf -> {
             ServiceunitsRecord su = DSL.using(conf).select(SERVICEUNITS.fields()).from(SERVICEUNITS).join(COMPONENTS)
                     .onKey(FK_SERVICEUNITS_COMPONENTS_ID).join(CONTAINERS).onKey(FK_COMPONENTS_CONTAINERS_ID)
                     .join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
@@ -508,48 +480,36 @@ public class WorkspaceActor extends CockpitActor<Msg> {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            return handleSUStateChange(change, su, conf);
+            ServiceUnitMin.State currentState = ServiceUnitMin.State.valueOf(su.getState());
+            ServiceUnitMin.State newState = change.action.state;
+
+            if (currentState.equals(newState)) {
+                return new SUStateChanged(change.suId, currentState);
+            }
+
+            if (!isSAStateTransitionOk(su, currentState, newState)) {
+                // TODO or should I rely on the information from the container instead of my own?
+                throw new WebApplicationException(Status.CONFLICT);
+            }
+
+            // TODO merge with previous request...
+            ContainersRecord cont = DSL.using(conf).select().from(CONTAINERS).join(COMPONENTS)
+                    .onKey(FK_COMPONENTS_CONTAINERS_ID).where(COMPONENTS.ID.eq(su.getComponentId()))
+                    .fetchOneInto(CONTAINERS);
+            assert cont != null;
+
+            ServiceUnitMin.State newCurrentState = petals.changeState(cont.getIp(), cont.getPort(), cont.getUsername(),
+                    cont.getPassword(), su.getSaName(), newState);
+
+            SUStateChanged res = new SUStateChanged(su.getId(), newCurrentState);
+
+            serviceUnitStateUpdated(res, conf);
+
+            return res;
         });
     }
 
-    private SUStateChanged handleSUStateChange(ChangeServiceUnitState change, ServiceunitsRecord su, Configuration conf)
-            throws Exception {
-
-        ServiceUnitMin.State currentState = ServiceUnitMin.State.valueOf(su.getState());
-        ServiceUnitMin.State newState = change.action.state;
-
-        if (currentState.equals(newState)) {
-            return new SUStateChanged(change.suId, currentState);
-        }
-
-        if (!isSAStateTransitionOk(su, currentState, newState)) {
-            // TODO or should I rely on the information from the container instead of my own?
-            throw new WebApplicationException(Status.CONFLICT);
-        }
-
-        // TODO merge with previous request...
-        ContainersRecord cont = DSL.using(conf).select().from(CONTAINERS).join(COMPONENTS)
-                .onKey(FK_COMPONENTS_CONTAINERS_ID).where(COMPONENTS.ID.eq(su.getComponentId()))
-                .fetchOneInto(CONTAINERS);
-        assert cont != null;
-
-        // we already are in a blocking method
-        SUStateChanged res = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(), petals -> {
-            ArtifactAdministration aa = petals.newArtifactAdministration();
-            Artifact a = aa.getArtifact(ServiceAssembly.TYPE, su.getSaName(), null);
-            assert a instanceof ServiceAssembly;
-            ServiceAssembly sa = (ServiceAssembly) a;
-            ServiceUnitMin.State newCurrentState = changeSAState(petals, sa, newState);
-            return new SUStateChanged(su.getId(), newCurrentState);
-        });
-        assert res != null;
-
-        serviceUnitStateUpdated(res, conf);
-
-        return res;
-    }
-
-    private void serviceUnitStateUpdated(SUStateChanged su, Configuration conf) throws SuspendExecution {
+    private void serviceUnitStateUpdated(SUStateChanged su, Configuration conf) {
         // TODO error handling???
         if (su.state != ServiceUnitMin.State.Unloaded) {
             DSL.using(conf).update(SERVICEUNITS).set(SERVICEUNITS.STATE, su.state.name())
@@ -583,55 +543,20 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         }
     }
 
-    private ServiceUnitMin.State changeSAState(PetalsAdministration petals, ServiceAssembly sa,
-            ServiceUnitMin.State desiredState) throws ArtifactAdministrationException {
-        ServiceAssemblyLifecycle sal = petals.newArtifactLifecycleFactory().createServiceAssemblyLifecycle(sa);
-        switch (desiredState) {
-            case Unloaded:
-                sal.undeploy();
-                break;
-            case Started:
-                sal.start();
-                break;
-            case Stopped:
-                sal.stop();
-                break;
-            default:
-                LOG.warn("Impossible case for state transition from {} to {} for SA {} ({})", sa.getState(),
-                        desiredState, sa.getName());
-        }
-        if (desiredState != ServiceUnitMin.State.Unloaded) {
-            sal.updateState();
-            return ServiceUnitMin.State.from(sa.getState());
-        } else {
-            // we can't call updateState for this one, it will fail since it has been unloaded
-            return ServiceUnitMin.State.Unloaded;
-        }
-    }
-
-    private SUDeployed handleDeployServiceUnit(DeployServiceUnit su) throws SuspendExecution {
-        return runBlockingTransaction(conf -> {
+    private SUDeployed handleDeployServiceUnit(DeployServiceUnit su) throws SuspendExecution, InterruptedException {
+        return db.runTransaction(conf -> {
             ContainersRecord cont = DSL.using(conf).select().from(CONTAINERS).join(COMPONENTS)
                     .onKey(FK_COMPONENTS_CONTAINERS_ID).where(COMPONENTS.ID.eq(su.compId)).fetchOneInto(CONTAINERS);
             assert cont != null;
 
-            // we already are in a blocking thread
-            ServiceAssembly deployedSA = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
-                    petals -> {
-                        // Note: since there is only one SU in it, a failure will result in the SA being removed
-                        petals.newArtifactLifecycleFactory()
-                                .createServiceAssemblyLifecycle(new ServiceAssembly(su.saName)).deploy(su.saUrl);
-                        return (ServiceAssembly) petals.newArtifactAdministration()
-                                .getArtifactInfo(ServiceAssembly.TYPE, su.saName, null);
-                    });
-            assert deployedSA != null;
+            ServiceAssembly deployedSA = petals.deploy(cont.getIp(), cont.getPort(), cont.getUsername(),
+                    cont.getPassword(), su.saName, su.saUrl);
 
             return serviceUnitDeployed(deployedSA, su.compId, conf);
         });
     }
 
-    private SUDeployed serviceUnitDeployed(ServiceAssembly deployedSA, long compId, Configuration conf)
-            throws SuspendExecution {
+    private SUDeployed serviceUnitDeployed(ServiceAssembly deployedSA, long compId, Configuration conf) {
         // there should be exactly one SU in it
         ServiceUnit deployedSU = deployedSA.getServiceUnits().iterator().next();
         ServiceUnitMin.State state = ServiceUnitMin.State.from(deployedSA.getState());
@@ -651,30 +576,20 @@ public class WorkspaceActor extends CockpitActor<Msg> {
         return res;
     }
 
-    private ComponentDeployed handleDeployComponent(DeployComponent comp) throws SuspendExecution {
-        return runBlockingTransaction(conf -> {
+    private ComponentDeployed handleDeployComponent(DeployComponent comp)
+            throws SuspendExecution, InterruptedException {
+        return db.runTransaction(conf -> {
             ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(comp.cId)).fetchOne();
             assert cont != null;
 
-            // we already are in a blocking thread
-            Component deployedComp = runAdmin(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
-                    petals -> {
-                        ComponentType type = comp.type.to();
-                        petals.newArtifactLifecycleFactory()
-                                .createComponentLifecycle(new Component(comp.name, type))
-                                .deploy(comp.saUrl, true);
-                        // TODO is that correct for the type?
-                        return (Component) petals.newArtifactAdministration().getArtifactInfo(type.toString(),
-                                comp.name, null);
-                    });
-            assert deployedComp != null;
+            Component deployedComp = petals.deploy(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
+                    comp.type.to(), comp.name, comp.saUrl);
 
             return componentDeployed(deployedComp, comp.cId, conf);
         });
     }
 
-    private ComponentDeployed componentDeployed(Component deployedComp, long cId, Configuration conf)
-            throws SuspendExecution {
+    private ComponentDeployed componentDeployed(Component deployedComp, long cId, Configuration conf) {
 
         ComponentMin.State state = ComponentMin.State.from(deployedComp.getState());
         ComponentMin.Type type = ComponentMin.Type.from(deployedComp.getType());

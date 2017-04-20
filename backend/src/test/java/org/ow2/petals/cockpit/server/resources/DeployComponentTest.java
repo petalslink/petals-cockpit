@@ -42,6 +42,9 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentDeployed;
+import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule;
+import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule.ComponentType;
+import org.ow2.petals.jmx.api.mock.junit.configuration.component.InstallationConfigurationServiceClientMock;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -57,16 +60,22 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
 
     private final int containerPort = 7700;
 
-    private final Container container = new Container("cont1", "host1",
+    private final Container container = new Container("cont1", "localhost",
             ImmutableMap.of(Container.PortType.JMX, containerPort), "user", "pass", Container.State.REACHABLE);
 
     @Rule
     public final ResourceTestRule resources = buildResourceTest(ComponentsResource.class, WorkspaceResource.class);
 
+    @Rule
+    public final PetalsJmxApiJunitRule jmx = new PetalsJmxApiJunitRule("localhost", containerPort, "user", "pass");
+
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         petals.registerDomain(domain);
         petals.registerContainer(container);
+
+        jmx.addComponentInstallerClient(COMP_NAME, ComponentType.BINDING,
+                new InstallationConfigurationServiceClientMock(), null);
 
         setupWorkspace(1, "test",
                 Arrays.asList(
@@ -78,8 +87,8 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
     private static MultiPart getComponentMultiPart() throws URISyntaxException {
         // fake-jbi-component-soap only contains the jbi file
         // so it's ok for tests (until we test with a real petals container)
-        return new FormDataMultiPart().bodyPart(new FileDataBodyPart(
-                "file", new File(DeployComponentTest.class.getResource("/fake-jbi-component-soap.zip").toURI())));
+        return new FormDataMultiPart().bodyPart(new FileDataBodyPart("file",
+                new File(DeployComponentTest.class.getResource("/fake-jbi-component-soap.zip").toURI())));
     }
 
     @Test

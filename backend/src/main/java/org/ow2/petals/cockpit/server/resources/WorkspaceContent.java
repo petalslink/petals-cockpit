@@ -30,6 +30,7 @@ import javax.validation.Valid;
 
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
+import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
@@ -57,8 +58,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-
-import co.paralleluniverse.fibers.Suspendable;
 
 /**
  * TODO can I avoid transforming ids to string just for json output... maybe with a json mapper or whatever...
@@ -113,8 +112,20 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
      * 
      * TODO this should be done by {@link WorkspaceActor}
      */
-    @Suspendable
     public static WorkspaceContent buildAndSaveToDatabase(Configuration jooq, long bId, Domain topology)
+            throws InvalidPetalsBus {
+        try {
+            return DSL.using(jooq).transactionResult(c -> doBuildAndSaveToDatabase(c, bId, topology));
+        } catch (DataAccessException e) {
+            if (e.getCause() instanceof InvalidPetalsBus) {
+                throw (InvalidPetalsBus) e.getCause();
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    private static WorkspaceContent doBuildAndSaveToDatabase(Configuration jooq, long bId, Domain topology)
             throws InvalidPetalsBus {
         Map<String, BusFull> importedBuses = new HashMap<>();
         Map<String, BusInProgress> busesInProgress = new HashMap<>();

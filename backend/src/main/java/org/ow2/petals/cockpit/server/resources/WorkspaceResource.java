@@ -81,7 +81,6 @@ import org.ow2.petals.jbi.descriptor.original.generated.Jbi;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -337,7 +336,7 @@ public class WorkspaceResource {
         }
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonInclude(Include.NON_NULL)
     public static class WorkspaceUpdate {
 
         @Nullable
@@ -698,8 +697,18 @@ public class WorkspaceResource {
         @JsonProperty
         public final ComponentMin.State state;
 
-        public ComponentChangeState(@JsonProperty("state") ComponentMin.State state) {
+        @NotNull
+        @JsonProperty
+        public final ImmutableMap<String, String> parameters;
+
+        public ComponentChangeState(@JsonProperty("state") ComponentMin.State state,
+                @Nullable @JsonProperty("parameters") Map<String, String> parameters) {
             this.state = state;
+            this.parameters = parameters != null ? ImmutableMap.copyOf(parameters) : ImmutableMap.of();
+        }
+
+        public ComponentChangeState(ComponentMin.State state) {
+            this(state, null);
         }
     }
 }

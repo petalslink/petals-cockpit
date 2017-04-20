@@ -29,7 +29,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.jooq.Configuration;
-import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.resources.BusesResource;
@@ -42,6 +41,8 @@ import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.HttpArtifactServer;
+import org.ow2.petals.cockpit.server.services.PetalsAdmin;
+import org.ow2.petals.cockpit.server.services.PetalsDb;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.matching.ExcludedPathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
@@ -62,7 +63,6 @@ import com.google.common.collect.ImmutableMap;
 import io.dropwizard.Application;
 import io.dropwizard.db.PooledDataSourceFactory;
 import io.dropwizard.forms.MultiPartBundle;
-import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.server.AbstractServerFactory;
 import io.dropwizard.setup.Bootstrap;
@@ -201,21 +201,6 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         ExecutorService jdbcExec = environment.lifecycle().executorService("quasar-blocking-worker-%d")
                 .minThreads(availableProcessors).maxThreads(availableProcessors).build();
 
-        final PetalsAdministrationFactory adminFactory = PetalsAdministrationFactory.getInstance();
-
-        environment.lifecycle().manage(new Managed() {
-            @Override
-            public void start() throws Exception {
-                // the factory is already created at that point
-            }
-
-            @Override
-            public void stop() throws Exception {
-                // this ensure things are properly freed if needed
-                PetalsAdministrationFactory.close();
-            }
-        });
-
         Configuration jooqConf = jooq.getConfiguration();
 
         environment.jersey().register(new AbstractBinder() {
@@ -225,9 +210,10 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 bind(environment).to(Environment.class);
                 bind(jdbcExec).named(BLOCKING_TASK_ES).to(ExecutorService.class);
                 bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
-                bind(adminFactory).to(PetalsAdministrationFactory.class);
                 bind(jooqConf).to(Configuration.class);
                 bind(HttpArtifactServer.class).to(ArtifactServer.class).in(Singleton.class);
+                bind(PetalsAdmin.class).to(PetalsAdmin.class).in(Singleton.class);
+                bind(PetalsDb.class).to(PetalsDb.class).in(Singleton.class);
             }
         });
 

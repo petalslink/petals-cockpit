@@ -23,6 +23,8 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.constraints.Min;
@@ -43,12 +45,15 @@ import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
+import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.jbi.descriptor.original.generated.ComponentType;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableMap;
 
 @Singleton
 @Path("/components")
@@ -56,9 +61,12 @@ public class ComponentsResource {
 
     private final Configuration jooq;
 
+    private final PetalsAdmin petals;
+
     @Inject
-    public ComponentsResource(Configuration jooq) {
+    public ComponentsResource(Configuration jooq, PetalsAdmin petals) {
         this.jooq = jooq;
+        this.petals = petals;
     }
 
     @GET
@@ -82,8 +90,20 @@ public class ComponentsResource {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
 
+            final Map<String, String> parameters;
+            if (ComponentMin.State.valueOf(comp.getState()) == ComponentMin.State.Loaded) {
+                ContainersRecord container = DSL.using(conf).selectFrom(CONTAINERS)
+                        .where(CONTAINERS.ID.eq(comp.getContainerId())).fetchOne();
+                assert container != null;
+
+                parameters = petals.getInstallParameters(container.getIp(), container.getPort(),
+                        container.getUsername(), container.getPassword(), comp.getName());
+            } else {
+                parameters = ImmutableMap.of();
+            }
+
             return new ComponentOverview(comp.getId(), comp.getName(), ComponentMin.State.valueOf(comp.getState()),
-                    ComponentMin.Type.valueOf(comp.getType()));
+                    ComponentMin.Type.valueOf(comp.getType()), parameters);
         });
     }
 
@@ -192,10 +212,16 @@ public class ComponentsResource {
 
     public static class ComponentOverview extends ComponentMin {
 
+        @NotNull
+        @JsonProperty
+        public final ImmutableMap<String, String> parameters;
+
         @JsonCreator
         public ComponentOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("state") State state, @JsonProperty("type") Type type) {
+                @JsonProperty("state") State state, @JsonProperty("type") Type type,
+                @JsonProperty("parameters") Map<String, String> parameters) {
             super(id, name, state, type);
+            this.parameters = ImmutableMap.copyOf(parameters);
         }
     }
 }

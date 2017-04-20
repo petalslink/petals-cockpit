@@ -53,7 +53,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.mockito.Mockito;
-import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
@@ -77,6 +76,9 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
+import org.ow2.petals.cockpit.server.services.PetalsAdmin;
+import org.ow2.petals.cockpit.server.services.PetalsDb;
+import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
 import org.zapodot.junit.db.plugin.LiquibaseInitializer;
 
@@ -108,6 +110,9 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     public final TestRule watchman = TestUtil.WATCHMAN;
 
     @Rule
+    public final PetalsJmxApiJunitRule jmx = new PetalsJmxApiJunitRule();
+
+    @Rule
     public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
 
     @Rule
@@ -128,8 +133,9 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                         bind(Executors.newFixedThreadPool(4)).named(CockpitApplication.BLOCKING_TASK_ES)
                                 .to(ExecutorService.class);
                         bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
-                        bind(PetalsAdministrationFactory.getInstance()).to(PetalsAdministrationFactory.class);
                         bind(httpServer).to(ArtifactServer.class);
+                        bind(PetalsAdmin.class).to(PetalsAdmin.class).in(Singleton.class);
+                        bind(PetalsDb.class).to(PetalsDb.class).in(Singleton.class);
                     }
                 }).setClientConfigurator(cc -> cc.register(MultiPartFeature.class));
         // needed for @Pac4JProfile injection to work
