@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { environment } from '../../../environments/environment';
 import { EComponentState } from '../../features/cockpit/workspaces/state/components/component.interface';
 import { IContainersTable } from '../../features/cockpit/workspaces/state/containers/containers.interface';
 
@@ -49,15 +48,16 @@ export function stateNameToPossibleActionsComponent(state: string): { actionName
         { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded }
       ];
 
+    case EComponentState.Unknown:
+      return [
+        { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded }
+      ];
+
     case EComponentState.Unloaded:
       // no possible new state here but it exists so handle it in order to not throw an error
       break;
 
     default:
-      if (environment.debug) {
-        console.debug(`Error in 'component.helper' file, function 'stateNameToPossibleActionsComponent'`);
-      }
-
       throw new Error(`Component state cannot be '${state}'`);
   }
 }

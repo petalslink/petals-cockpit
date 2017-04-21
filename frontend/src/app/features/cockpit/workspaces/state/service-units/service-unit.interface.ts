@@ -20,7 +20,8 @@ export const EServiceUnitState = {
   Started: 'Started' as 'Started',
   Stopped: 'Stopped' as 'Stopped',
   Unloaded: 'Unloaded' as 'Unloaded',
-  Shutdown: 'Shutdown' as 'Shutdown'
+  Shutdown: 'Shutdown' as 'Shutdown',
+  Unknown: 'Unknown' as 'Unknown'
 };
 
 export interface IServiceUnitCommon {

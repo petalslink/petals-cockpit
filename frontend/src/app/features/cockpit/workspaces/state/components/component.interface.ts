@@ -23,7 +23,8 @@ export const EComponentState = {
   Stopped: 'Stopped' as 'Stopped',
   Loaded: 'Loaded' as 'Loaded',
   Unloaded: 'Unloaded' as 'Unloaded',
-  Shutdown: 'Shutdown' as 'Shutdown'
+  Shutdown: 'Shutdown' as 'Shutdown',
+  Unknown: 'Unknown' as 'Unknown'
 };
 
 export enum EComponentType { BC, SE }
