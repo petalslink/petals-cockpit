@@ -24,6 +24,7 @@ describe(`Workspaces`, () => {
 
   beforeEach(() => {
     page = new PetalsCockpitPage();
+    page.setDesktopSize();
     page.navigateTo();
   });
 

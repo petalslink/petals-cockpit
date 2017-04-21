@@ -29,6 +29,14 @@ export class PetalsCockpitPage {
     return browser.get('/');
   }
 
+  setMobileSize() {
+    browser.manage().window().setSize(412, 732);
+  }
+
+  setDesktopSize() {
+    browser.manage().window().maximize();
+  }
+
   login(user: string, pass: string, checkRedirect = true, hasLastWorkspace = true) {
     // to login we should be on the correct page
     expect(browser.getCurrentUrl()).toMatch(/\/login/);
@@ -137,7 +145,7 @@ export class PetalsCockpitPage {
     });
   }
 
-  addBus() {
+  openImportBus() {
     const addBtn = element(by.css(`app-cockpit md-sidenav a.btn-add-bus`));
     browser.wait(EC.elementToBeClickable(addBtn), 5000);
     return addBtn.click();

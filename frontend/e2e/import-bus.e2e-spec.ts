@@ -33,9 +33,10 @@ describe(`Import Bus`, () => {
 
   beforeEach(() => {
     page = new PetalsCockpitPage();
+    page.setDesktopSize();
     page.navigateTo();
     page.login(`admin`, `admin`);
-    page.addBus();
+    page.openImportBus();
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/);
   });
 
@@ -148,5 +149,9 @@ describe(`Import Bus`, () => {
     browser.wait(EC.visibilityOf(simpleNotification), 3000);
     expect(element(by.css(`simple-notification .sn-title`)).getText()).toEqual(`Bus import success`);
     expect(element(by.css(`simple-notification .sn-content`)).getText()).toMatch(/^The import of the bus .* succeeded$/);
+  });
+
+  it(`should select the first input of import bus form on desktop`, () => {
+    inputIp.isSelected();
   });
 });
