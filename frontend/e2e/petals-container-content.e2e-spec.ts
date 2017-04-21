@@ -74,7 +74,6 @@ describe(`Petals container content`, () => {
     const selectedFile = element(by.css(`app-petals-container-overview .deploy .selected-file .file-name`));
     const deployBtn = element(by.css(`app-petals-container-overview .deploy form button[type="submit"]`));
     const filePath = path.resolve(__dirname, './resources/component.zip');
-    const simpleNotification = element(by.css(`simple-notification`));
 
     // component
     const btnStart = element(by.cssContainingText(`app-petals-component-overview button`, `Start`));
@@ -113,7 +112,7 @@ describe(`Petals container content`, () => {
     expect(page.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
 
     // deploy the component
-    deployBtn.click();
+    page.clickAndExpectNotification(deployBtn, 'Component deployed', '"component" has been deployed');
 
     // check that the component is now added to the tree and that we've been redirected to it
     const expectedTreeAfterDeploy = [
@@ -139,11 +138,6 @@ describe(`Petals container content`, () => {
     expect(page.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/components\/\w+/);
-
-    browser.wait(EC.visibilityOf(simpleNotification), 3000);
-    expect(element(by.css(`simple-notification .sn-title`)).getText()).toEqual(`Component deployed`);
-    expect(element(by.css(`simple-notification .sn-content`)).getText()).toEqual('"component" has been deployed');
-    element(by.css(`simple-notification`)).click();
 
     const state = element(by.css(`app-petals-component-overview md-card.state md-card-title`)).getText();
     expect(state).toEqual('Loaded');

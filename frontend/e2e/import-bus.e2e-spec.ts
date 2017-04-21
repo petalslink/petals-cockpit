@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, element, by, ExpectedConditions as EC } from 'protractor';
+import { browser, element, by } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
 import { IMPORT_HTTP_ERROR_IP } from '../src/mocks/workspaces-mock';
@@ -132,8 +132,6 @@ describe(`Import Bus`, () => {
   });
 
   it(`should import a bus`, () => {
-    const simpleNotification = element(by.css(`simple-notification`));
-
     expect(element.all(by.css(`app-petals-menu-view > app-material-tree > md-nav-list`)).count()).toEqual(1);
 
     inputIp.sendKeys(`192.168.0.1`);
@@ -142,13 +140,9 @@ describe(`Import Bus`, () => {
     inputPassword.sendKeys(`password`);
     inputPassphrase.sendKeys(`passphrase`);
 
-    importBtn.click();
+    page.clickAndExpectNotification(importBtn, 'Bus import success', /^The import of the bus .* succeeded$/);
 
     expect(element.all(by.css(`app-petals-menu-view > app-material-tree > md-nav-list`)).count()).toEqual(2);
-
-    browser.wait(EC.visibilityOf(simpleNotification), 3000);
-    expect(element(by.css(`simple-notification .sn-title`)).getText()).toEqual(`Bus import success`);
-    expect(element(by.css(`simple-notification .sn-content`)).getText()).toMatch(/^The import of the bus .* succeeded$/);
   });
 
   it(`should select the first input of import bus form on desktop`, () => {

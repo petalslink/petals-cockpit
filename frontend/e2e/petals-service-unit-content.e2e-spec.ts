@@ -60,12 +60,10 @@ describe(`Petals service-unit content`, () => {
     expect(stateElem.getText()).toEqual('Stopped');
 
     // once unloaded ...
-    element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`)).click();
-
     // there should be a popup saying that the SU has been deleted
-    expect(element(by.css(`simple-notification .sn-title`)).getText()).toBe(`Service unit unloaded`);
-    expect(element(by.css(`simple-notification .sn-content`)).getText()).toBe(`"SU 0" has been unloaded`);
-    element(by.css(`simple-notification`)).click();
+    page.clickAndExpectNotification(
+      element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`)),
+      'Service unit unloaded', '"SU 0" has been unloaded');
 
     // we should be redirected to the workspace page ...
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
