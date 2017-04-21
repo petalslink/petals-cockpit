@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, element, by } from 'protractor';
+import { browser, element, by, ExpectedConditions as EC } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
 
@@ -67,6 +67,8 @@ describe(`Login`, () => {
   });
 
   it(`should logout after logging in`, () => {
+    const workspacesDialog = element(by.css(`app-workspaces-dialog`));
+
     page.login(`admin`, `admin`);
 
     page.logout();
@@ -76,13 +78,14 @@ describe(`Login`, () => {
     // now let's see if we can relogin with another user and disconnect again
     page.login(`vnoel`, `vnoel`, true, false);
 
-    expect(element(by.css(`app-workspaces-dialog`)).isDisplayed()).toBe(true);
+    expect(workspacesDialog.isDisplayed()).toBe(true);
 
     // we can logout even if there is the workspaces dialog
     page.logout();
 
     // ensure dialogs are properly cleaned on component change (material attaches them to the root of the DOM)
-    expect(element(by.css(`app-workspaces-dialog`)).isPresent()).toBe(false);
+    browser.wait(EC.stalenessOf(workspacesDialog), 5000);
+    expect(workspacesDialog.isPresent()).toBe(false);
   });
 
   it(`should display the current username`, () => {

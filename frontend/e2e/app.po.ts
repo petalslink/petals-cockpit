@@ -75,6 +75,8 @@ export class PetalsCockpitPage {
     const logout = element(by.css(`.btn-logout-user`));
     browser.wait(EC.elementToBeClickable(logout), 1000);
     logout.click();
+
+    return browser.wait(urlToMatch(/\/login$/), 3000);
   }
 
   search(search: string) {
@@ -186,10 +188,13 @@ export class PetalsCockpitPage {
     }
 
     browser.ignoreSynchronization = true;
-    return browser.wait(test, 10000).then(() => {
-      browser.ignoreSynchronization = false;
-      return browser.wait(EC.invisibilityOf(simpleNotification), 10000);
-    });
+    return browser.wait(test, 10000)
+      .then(() => {
+        browser.ignoreSynchronization = false;
+        return browser.wait(EC.invisibilityOf(simpleNotification), 10000);
+      }).catch(_ => {
+        browser.ignoreSynchronization = false;
+      });
   }
 }
 
@@ -202,6 +207,10 @@ export function match(text: string, matcher: Matcher): boolean {
     // careful, match does not return a boolean!
     return !!text.match(matcher);
   }
+}
+
+export function urlToMatch(matcher: Matcher): Function {
+  return () => browser.getCurrentUrl().then(url => match(url, matcher));
 }
 
 export function textToMatchInElement(elementFinder: ElementFinder, matcher: Matcher): Function {
