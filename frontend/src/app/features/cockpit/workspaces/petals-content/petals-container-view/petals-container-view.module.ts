@@ -21,12 +21,17 @@ import { SharedModule } from '../../../../../shared/shared.module';
 import { PetalsContainerViewRoutingModule } from './petals-container-view-routing.module';
 import { PetalsContainerViewComponent } from './petals-container-view.component';
 import { PetalsContainerOverviewComponent } from './petals-container-overview/petals-container-overview.component';
+import { PetalsContainerOperationsComponent } from './petals-container-operations/petals-container-operations.component';
 
 @NgModule({
   imports: [
     SharedModule,
     PetalsContainerViewRoutingModule
   ],
-  declarations: [PetalsContainerViewComponent, PetalsContainerOverviewComponent]
+  declarations: [
+    PetalsContainerViewComponent,
+    PetalsContainerOverviewComponent,
+    PetalsContainerOperationsComponent
+  ]
 })
 export class PetalsContainerViewModule { }

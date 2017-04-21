@@ -26,8 +26,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <md-tab-group fxFlex>
     <md-tab label="Overview">
-      <!-- TODO: Create a component for every tab -->
       <app-petals-component-overview [component]="component" fxFill></app-petals-component-overview>
+    </md-tab>
+    <md-tab label="Operations">
+      <app-petals-component-operations [component]="component" fxFill></app-petals-component-operations>
     </md-tab>
   </md-tab-group>
 </div>

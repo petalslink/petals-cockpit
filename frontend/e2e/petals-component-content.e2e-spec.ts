@@ -45,8 +45,6 @@ describe(`Petals component content`, () => {
 
     expect(state).toEqual('Started');
     expect(type).toEqual('BC');
-
-    expect(element(by.css(`button.choose-file`)).isEnabled()).toBe(true);
   });
 
   it(`should stop/start/stop/unload a component`, () => {
@@ -107,12 +105,16 @@ describe(`Petals component content`, () => {
   it(`should deploy a service-unit`, () => {
     page.getWorkspaceTreeByName('Comp 0').click();
 
-    const chooseFileBtn = element(by.css(`app-petals-component-overview .deploy .choose-file`));
-    const fileInput = element(by.css(`app-petals-component-overview .deploy input[type="file"]`));
-    const selectedFile = element(by.css(`app-petals-component-overview .deploy .selected-file .file-name`));
-    const changeSuNameInput = element(by.css(`app-petals-component-overview .deploy form input[name="serviceUnitName"]`));
-    const deployBtn = element(by.css(`app-petals-component-overview .deploy form button[type="submit"]`));
+    element(by.cssContainingText(`app-petals-component-view md-tab-header .mat-tab-label`, 'Operations')).click();
+
+    const chooseFileBtn = element(by.css(`app-petals-component-operations .deploy .choose-file`));
+    const fileInput = element(by.css(`app-petals-component-operations .deploy input[type="file"]`));
+    const selectedFile = element(by.css(`app-petals-component-operations .deploy .selected-file .file-name`));
+    const changeSuNameInput = element(by.css(`app-petals-component-operations .deploy form input[name="serviceUnitName"]`));
+    const deployBtn = element(by.css(`app-petals-component-operations .deploy form button[type="submit"]`));
     const filePath = path.resolve(__dirname, './resources/su.zip');
+
+    browser.wait(EC.elementToBeClickable(chooseFileBtn), 3000);
 
     expect(chooseFileBtn.getText()).toEqual(`Choose a file to upload`);
     // simulate the file selection

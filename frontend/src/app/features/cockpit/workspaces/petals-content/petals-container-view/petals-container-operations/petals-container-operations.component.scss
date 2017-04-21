@@ -14,23 +14,3 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import { Component, Input, ChangeDetectionStrategy, OnInit } from '@angular/core';
-
-import { IContainerRow } from '../../../state/containers/container.interface';
-
-@Component({
-  selector: 'app-petals-container-overview',
-  templateUrl: './petals-container-overview.component.html',
-  styleUrls: ['./petals-container-overview.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-export class PetalsContainerOverviewComponent implements OnInit {
-  @Input() container: IContainerRow;
-  @Input() otherContainers: IContainerRow[];
-  @Input() workspaceId: string;
-
-  constructor() { }
-
-  ngOnInit() { }
-}
