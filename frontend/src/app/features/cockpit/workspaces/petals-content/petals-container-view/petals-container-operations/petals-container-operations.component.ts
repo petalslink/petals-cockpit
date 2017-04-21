@@ -16,21 +16,39 @@
  */
 
 import { Component, Input, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
 
 import { IContainerRow } from '../../../state/containers/container.interface';
+import { IStore } from 'app/shared/interfaces/store.interface';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
 
 @Component({
-  selector: 'app-petals-container-overview',
-  templateUrl: './petals-container-overview.component.html',
-  styleUrls: ['./petals-container-overview.component.scss'],
+  selector: 'app-petals-container-operations',
+  templateUrl: './petals-container-operations.component.html',
+  styleUrls: ['./petals-container-operations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PetalsContainerOverviewComponent implements OnInit {
+export class PetalsContainerOperationsComponent implements OnInit {
   @Input() container: IContainerRow;
-  @Input() otherContainers: IContainerRow[];
-  @Input() workspaceId: string;
 
-  constructor() { }
+  public fileToDeploy: File;
+
+  constructor(private store$: Store<IStore>) { }
 
   ngOnInit() { }
+
+  fileChange(event) {
+    const fileList: FileList = event.target.files;
+
+    if (fileList.length > 0) {
+      this.fileToDeploy = fileList[0];
+    }
+  }
+
+  deploy(file: File) {
+    this.store$.dispatch({
+      type: Containers.DEPLOY_COMPONENT,
+      payload: { file, containerId: this.container.id }
+    });
+  }
 }

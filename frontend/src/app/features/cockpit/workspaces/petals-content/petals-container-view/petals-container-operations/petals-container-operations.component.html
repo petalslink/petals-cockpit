@@ -1,0 +1,53 @@
+<!-- Copyright (C) 2017 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<div fxLayout="column" fxFill class="content content-max-width">
+  <div class="central-content">
+
+    <h3 class="color-primary-light-bold margin-top-x2">Deployment</h3>
+    <md-card fxFlex class="deploy margin-top-x1" class="deploy">
+      <md-card-title-group>
+        <div fxFlex fxLayout="column" fxLayoutAlign="end end">
+          <md-card-subtitle>Component</md-card-subtitle>
+          <!--<md-card-title>-->
+          <!-- Material doesn't support inputs of type file -->
+          <!-- https://github.com/angular/material2/issues/3262 -->
+          <!-- https://github.com/angular/material2/issues/3758 -->
+          <!--the trick here consists in hiding the input, and bind the click on a button to that input-->
+          <!--</md-card-title>-->
+
+          <md-card-content>
+            <form (ngSubmit)="deploy(fileToDeploy)">
+              <div *ngIf="fileToDeploy" class="selected-file" fxFlexLayout="row" fxLayoutAlign="end center">
+                <span>Selected file :</span> <span class="file-name">{{ fileToDeploy.name }}</span>
+              </div>
+
+              <button type="button" md-raised-button (click)="deploySu.click()" class="choose-file">
+                <span *ngIf="!fileToDeploy; else changeFile">Choose a file to upload</span>
+                <ng-template #changeFile>Change the file</ng-template>
+              </button>
+
+              <input #deploySu class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="container.isDeployingComponent">
+
+              <button md-raised-button color="primary" type="submit" *ngIf="fileToDeploy">
+                Deploy
+              </button>
+            </form>
+          </md-card-content>
+        </div>
+      </md-card-title-group>
+    </md-card>
+  </div>
+</div>

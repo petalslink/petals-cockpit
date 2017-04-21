@@ -69,11 +69,15 @@ describe(`Petals container content`, () => {
   it(`should deploy a component`, () => {
     page.getWorkspaceTreeByName('Cont 0').click();
 
-    const chooseFileBtn = element(by.css(`app-petals-container-overview .deploy .choose-file`));
-    const fileInput = element(by.css(`app-petals-container-overview .deploy input[type="file"]`));
-    const selectedFile = element(by.css(`app-petals-container-overview .deploy .selected-file .file-name`));
-    const deployBtn = element(by.css(`app-petals-container-overview .deploy form button[type="submit"]`));
+    element(by.cssContainingText(`app-petals-container-view md-tab-header .mat-tab-label`, 'Operations')).click();
+
+    const chooseFileBtn = element(by.css(`app-petals-container-operations .deploy .choose-file`));
+    const fileInput = element(by.css(`app-petals-container-operations .deploy input[type="file"]`));
+    const selectedFile = element(by.css(`app-petals-container-operations .deploy .selected-file .file-name`));
+    const deployBtn = element(by.css(`app-petals-container-operations .deploy form button[type="submit"]`));
     const filePath = path.resolve(__dirname, './resources/component.zip');
+
+    browser.wait(EC.elementToBeClickable(chooseFileBtn), 3000);
 
     // component
     const btnStart = element(by.cssContainingText(`app-petals-component-overview button`, `Start`));
