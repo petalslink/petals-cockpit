@@ -71,49 +71,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </md-card-title-group>
       </md-card>
     </div>
-
-    <md-card fxFlex class="deploy margin-top-x1" class="deploy">
-      <md-card-title-group>
-        <div fxFlex fxLayout="column" fxLayoutAlign="end end">
-          <md-card-subtitle>SU deployment</md-card-subtitle>
-          <!--<md-card-titfle>-->
-            <!-- Material doesn't support inputs of type file -->
-            <!-- https://github.com/angular/material2/issues/3262 -->
-            <!-- https://github.com/angular/material2/issues/3758 -->
-            <!--the trick here consists in hiding the input, and bind the click on a button to that input-->
-          <!--</md-card-title>-->
-
-          <md-card-content>
-            <form (ngSubmit)="deploy(fileToDeploy, serviceUnitName)" *ngIf="component.state && component.state !== 'Loaded'">
-              <div *ngIf="fileToDeploy && component.state && component.state !== 'Loaded'" class="selected-file" fxFlexLayout="row" fxLayoutAlign="end center">
-                <span>Selected file :</span> <span class="file-name">{{ fileToDeploy.name }}</span>
-              </div>
-
-              <button type="button" md-raised-button (click)="deploySu.click()" class="choose-file" [disabled]="!component.state || component.state === 'Loaded'">
-                <span *ngIf="!fileToDeploy; else changeFile">Choose a file to upload</span>
-                <ng-template #changeFile>Change the file</ng-template>
-
-                <md-icon
-                  *ngIf="component.state && component.state === 'Loaded'"
-                  mdTooltip="To deploy a service-unit, the component should be started or shutdown"
-                  mdTooltipPosition="above" class="margin-left-x1">
-                  info outline
-                </md-icon>
-              </button>
-
-              <input #deploySu class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="component.isDeployingServiceUnit">
-
-              <md-input-container *ngIf="fileToDeploy" class="service-unit-name">
-                <input mdInput type="text" [(ngModel)]="serviceUnitName" name="serviceUnitName" placeholder="Service unit name">
-              </md-input-container>
-
-              <button md-raised-button color="primary" type="submit" *ngIf="fileToDeploy" [disabled]="serviceUnitName?.trim().length === 0">
-                Deploy
-              </button>
-            </form>
-          </md-card-content>
-        </div>
-      </md-card-title-group>
-    </md-card>
   </div>
 </div>
