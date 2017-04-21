@@ -447,6 +447,8 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
             case Stopped:
                 return to == ComponentMin.State.Started // via start()
                         || to == ComponentMin.State.Unloaded; // via undeploy()
+            case Unknown:
+                return to == ComponentMin.State.Unloaded; // via undeploy()
             default:
                 LOG.warn("Impossible case for state transition check from {} to {} for Component {} ({})", from, to,
                         comp.getName(), comp.getId());
@@ -536,6 +538,8 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
             case Stopped:
                 return to == ServiceUnitMin.State.Started // via start()
                         || to == ServiceUnitMin.State.Unloaded; // via undeploy()
+            case Unknown:
+                return to == ServiceUnitMin.State.Unloaded; // via undeploy()
             default:
                 LOG.warn("Impossible case for state transition check from {} to {} for SU {} ({})", from, to,
                         su.getName(), su.getId());

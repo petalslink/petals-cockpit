@@ -16,7 +16,6 @@
  */
 
 import { EServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
-import { environment } from '../../../environments/environment';
 import { IComponentsTable } from '../../features/cockpit/workspaces/state/components/components.interface';
 
 /**
@@ -42,15 +41,16 @@ export function stateNameToPossibleActionsServiceUnit(state: string): { actionNa
         { actionName: 'Unload', newStateAfterAction: EServiceUnitState.Unloaded }
       ];
 
+    case EServiceUnitState.Unknown:
+      return [
+        { actionName: 'Unload', newStateAfterAction: EServiceUnitState.Unloaded }
+      ];
+
     case EServiceUnitState.Unloaded:
       // no possible new state here but it exists so handle it in order to not throw an error
       break;
 
     default:
-      if (environment.debug) {
-        console.debug(`Error in 'service-unit.helper' file, function 'stateNameToPossibleActionsServiceUnit'`);
-      }
-
       throw new Error(`SU state cannot be '${state}'`);
   }
 }
