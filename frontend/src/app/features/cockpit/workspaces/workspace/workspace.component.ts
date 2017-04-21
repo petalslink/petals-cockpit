@@ -34,7 +34,6 @@ import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/wor
 })
 export class WorkspaceComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
-  public isRemovingWorkspace$: Observable<boolean>;
   public workspace$: Observable<IWorkspace>;
 
   public isEditingDescription = false;
@@ -105,7 +104,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   openDeletionDialog() {
     this.workspace$
       .first()
-      .do(ws => {
+      .switchMap(ws =>
         this.dialog
           .open(WorkspaceDeleteDialogComponent, {
             data: { workspace: ws }
@@ -113,8 +112,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
           .afterClosed()
           .filter((result: boolean) => result)
           .do(_ => this.store$.dispatch({ type: Workspaces.DELETE_WORKSPACE, payload: ws.id }))
-          .subscribe();
-      })
+      )
       .subscribe();
   }
 
@@ -136,10 +134,10 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
           </span>
         </div>
         <md-dialog-content>
-          <div fxLayout="column" fxFill>
-              <label>Everything in the workspace will be deleted!</label>
-              <p>Are you sure you want to delete <b>{{ data.workspace.name }}</b>?</p>
-          </div>
+          <p fxLayout="column">
+            <span>Everything in the workspace will be deleted! <b>Please, be certain</b>.</span>
+            <span class="margin-top-x1">Are you sure you want to delete <b>{{ data.workspace.name }}</b>?</span>
+          </p>
         </md-dialog-content>
 
         <md-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">

@@ -17,6 +17,7 @@
 
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
@@ -59,6 +60,7 @@ export class BusesServiceImpl extends BusesService {
   constructor(
     private http: Http,
     private store$: Store<IStore>,
+    private router: Router,
     private sseService: SseService,
     private notifications: NotificationsService
   ) {
@@ -95,6 +97,8 @@ export class BusesServiceImpl extends BusesService {
         if (bus) {
           this.notifications.info(bus.name, reason);
           this.store$.dispatch({ type: Buses.REMOVE_BUS, payload: { busId: id } });
+          // redirect to current workspace
+          this.router.navigate(['/workspaces', state.workspaces.selectedWorkspaceId]);
         } else {
           const bip = state.busesInProgress.byId[id];
           this.notifications.info(`${bip.ip}:${bip.port}`, reason);

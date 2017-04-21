@@ -21,7 +21,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <md-spinner *ngIf="bus.isFetchingDetails"></md-spinner>
     </div>
 
-    <span class="title">{{ bus.name }}</span>
+    <span class="title" fxFlex>{{ bus.name }}</span>
+
+    <button color="warn" type="button" class="btn-delete-bus" (click)="openDeletionDialog()" md-mini-fab mdTooltip="Delete the bus"
+      mdTooltipPosition="below" [disabled]="bus.isRemoving">
+      <md-icon>delete</md-icon>
+    </button>
   </md-toolbar>
 
   <md-tab-group fxFlex>

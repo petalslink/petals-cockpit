@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { MdDialog, MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
@@ -37,7 +38,11 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
 
   public bus$: Observable<IBusRow>;
 
-  constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
+  constructor(
+    private store$: Store<IStore>,
+    private route: ActivatedRoute,
+    public dialog: MdDialog
+  ) { }
 
   ngOnInit() {
     this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Bus' } });
@@ -60,4 +65,51 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
 
     this.store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId: '' } });
   }
+
+  openDeletionDialog() {
+    this.bus$
+      .first()
+      .switchMap(b =>
+        this.dialog
+          .open(BusDeleteDialogComponent, {
+            data: { bus: b }
+          })
+          .afterClosed()
+          .filter((result: boolean) => result)
+          .do(_ => this.store$.dispatch({ type: Buses.DELETE_BUS, payload: b.id }))
+      )
+      .subscribe();
+  }
+}
+
+@Component({
+  selector: 'app-bus-deletion-dialog',
+  template: `
+    <div fxLayout="column" class="content content-max-width">
+      <div class="central-content">
+        <div fxLayout="row" md-dialog-title fxLayoutAlign="start start">
+          <span fxLayoutAlign="start center">
+            <md-icon color="warn">warning</md-icon>
+            <span class="margin-left-x1">Delete bus?</span>
+          </span>
+        </div>
+        <md-dialog-content>
+          <p>Are you sure you want to delete <b>{{ data.bus.name }}</b>?</p>
+        </md-dialog-content>
+
+        <md-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
+          <button md-button md-dialog-close class="margin-right-x1">Cancel</button>
+          <button md-raised-button color="warn" class="btn-confirm-delete-bus" (click)="dialogRef.close(true)">Delete</button>
+        </md-dialog-actions>
+      </div>
+    </div>
+  `,
+  styles: ['md-dialog-content { height: 100%; } .central-content { padding: 24px; }']
+})
+export class BusDeleteDialogComponent {
+  constructor(
+    public dialogRef: MdDialogRef<BusDeleteDialogComponent>,
+    // TODO add some type for data when https://github.com/angular/angular/issues/15424 is fixed
+    @Inject(MD_DIALOG_DATA) public data: any
+  ) { }
 }

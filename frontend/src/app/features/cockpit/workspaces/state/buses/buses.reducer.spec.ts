@@ -643,4 +643,102 @@ describe(`Buses reducer`, () => {
         .toEqual(busesTableFactory());
     });
   });
+
+  describe(Buses.DELETE_BUS, () => {
+    it(`should check action name`, () => {
+      expect(Buses.DELETE_BUS).toEqual(`[Buses] Delete bus`);
+    });
+
+    const initialState: any = {
+      keepPreviousValues: '',
+      selectedBusId: 'idBus0',
+      byId: {
+        keepPreviousValues: '',
+        idBus0: {
+          keepPreviousValues: '',
+          isRemoving: false,
+          isFolded: true
+        },
+        idBus1: {
+          keepPreviousValues: '',
+          isRemoving: false,
+          isFolded: true
+        }
+      },
+      allIds: ['idBus0', 'idBus1']
+    };
+
+    it(`should set the isSelectedBusRemoving variable to true on the first bus`, () => {
+      expect(Buses.reducer(initialState, {
+        type: Buses.DELETE_BUS,
+        payload: 'idBus0'
+      })).toEqual({
+        keepPreviousValues: '',
+        selectedBusId: 'idBus0',
+        byId: {
+          keepPreviousValues: '',
+          idBus0: {
+            keepPreviousValues: '',
+            isRemoving: true,
+            isFolded: true
+          },
+          idBus1: {
+            keepPreviousValues: '',
+            isRemoving: false,
+            isFolded: true
+          }
+        },
+        allIds: ['idBus0', 'idBus1']
+      });
+    });
+  });
+
+  describe(Buses.DELETE_BUS_FAILED, () => {
+    it(`should check action name`, () => {
+      expect(Buses.DELETE_BUS_FAILED).toEqual(`[Buses] Delete bus failed`);
+    });
+
+    const initialState: any = {
+      keepPreviousValues: '',
+      selectedBusId: 'idBus0',
+      byId: {
+        keepPreviousValues: '',
+        idBus0: {
+          keepPreviousValues: '',
+          isRemoving: true,
+          isFolded: true
+        },
+        idBus1: {
+          keepPreviousValues: '',
+          isRemoving: false,
+          isFolded: true
+        }
+      },
+      allIds: ['idBus0', 'idBus1']
+    };
+
+    it(`should set the isSelectedBusRemoving variable to false`, () => {
+      expect(Buses.reducer(initialState, {
+        type: Buses.DELETE_BUS_FAILED,
+        payload: 'idBus0'
+      })).toEqual({
+        keepPreviousValues: '',
+        selectedBusId: 'idBus0',
+        byId: {
+          keepPreviousValues: '',
+          idBus0: {
+            keepPreviousValues: '',
+            isRemoving: false,
+            isFolded: true
+          },
+          idBus1: {
+            keepPreviousValues: '',
+            isRemoving: false,
+            isFolded: true
+          }
+        },
+        allIds: ['idBus0', 'idBus1']
+      });
+    });
+  });
 });

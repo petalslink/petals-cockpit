@@ -87,12 +87,6 @@ export class Buses {
   }
 
   // tslint:disable-next-line:member-ordering
-  public static REMOVE_BUS = `${Buses.reducerName} Remove bus`;
-  private static removeBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
-    return removeById(busesTable, payload.busId);
-  }
-
-  // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS = `${Buses.reducerName} Fetch bus details`;
   private static fetchBusDetails(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
     return updateById(busesTable, payload.busId, { isFetchingDetails: true });
@@ -110,6 +104,28 @@ export class Buses {
     return updateById(busesTable, payload.busId, { isFetchingDetails: false });
   }
 
+  // tslint:disable-next-line:member-ordering
+  public static DELETE_BUS = `${Buses.reducerName} Delete bus`;
+  private static deleteBus(busesTable: IBusesTable, payload: string): IBusesTable {
+    return updateById(busesTable, payload, { isRemoving: true });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DELETE_BUS_FAILED = `${Buses.reducerName} Delete bus failed`;
+  private static deleteBusFailed(busesTable: IBusesTable, payload: string): IBusesTable {
+    return updateById(busesTable, payload, { isRemoving: false });
+  }
+
+  /**
+   * Note: while DELETE_BUS concerns the HTTP action of deleting a bus,
+   * REMOVE_BUS concerns the event coming from the SSE that a bus has been deleted.
+   */
+  // tslint:disable-next-line:member-ordering
+  public static REMOVE_BUS = `${Buses.reducerName} Remove bus`;
+  private static removeBus(busesTable: IBusesTable, payload: { busId: string }): IBusesTable {
+    return removeById(busesTable, payload.busId);
+  }
+
   private static cleanWorkspace(_busesTable: IBusesTable, _payload): IBusesTable {
     return busesTableFactory();
   }
@@ -123,10 +139,12 @@ export class Buses {
     [Buses.UNFOLD_BUS]: Buses.unfoldBus,
     [Buses.TOGGLE_FOLD_BUS]: Buses.toggleFoldBus,
     [Buses.SET_CURRENT_BUS]: Buses.setCurrentBus,
-    [Buses.REMOVE_BUS]: Buses.removeBus,
     [Buses.FETCH_BUS_DETAILS]: Buses.fetchBusDetails,
     [Buses.FETCH_BUS_DETAILS_SUCCESS]: Buses.fetchBusDetailsSuccess,
     [Buses.FETCH_BUS_DETAILS_ERROR]: Buses.fetchBusDetailsError,
+    [Buses.DELETE_BUS]: Buses.deleteBus,
+    [Buses.DELETE_BUS_FAILED]: Buses.deleteBusFailed,
+    [Buses.REMOVE_BUS]: Buses.removeBus,
 
     [Workspaces.CLEAN_WORKSPACE]: Buses.cleanWorkspace
   };
