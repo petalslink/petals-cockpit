@@ -37,8 +37,7 @@ export class PetalsContainerOverviewComponent implements OnInit {
 
   constructor(private store$: Store<IStore>) { }
 
-  ngOnInit() {
-  }
+  ngOnInit() { }
 
   fileChange(event) {
     const fileList: FileList = event.target.files;

@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, element, by, ExpectedConditions as EC } from 'protractor';
+import { browser, element, by, ExpectedConditions as EC, ElementFinder } from 'protractor';
+import * as util from 'protractor/built/util';
 
 export class PetalsCockpitPage {
 
@@ -151,7 +152,7 @@ export class PetalsCockpitPage {
     return addBtn.click();
   }
 
-  selectWorkspace(index: number, expectedName?: string) {
+  selectWorkspace(index: number, expectedName?: Matcher) {
     expect(element(by.css(`app-workspaces-dialog`)).isDisplayed()).toBe(true);
 
     element.all(by.css(`app-workspaces-dialog div md-card-title-group`)).get(index).click();
@@ -159,9 +160,51 @@ export class PetalsCockpitPage {
     const wsButton = element(by.css(`app-cockpit md-sidenav button.workspace-name`));
     let test = EC.elementToBeClickable(wsButton);
     if (expectedName) {
-      test = EC.and(test, EC.textToBePresentInElement(wsButton, expectedName));
+      test = EC.and(test, textToMatchInElement(wsButton, expectedName));
     }
 
     return browser.wait(test, 10000);
   }
+
+  clickAndExpectNotification(el: ElementFinder, title?: Matcher, content?: Matcher) {
+    return el.click().then(() => {
+
+      const simpleNotification = element(by.css(`simple-notification`));
+
+      let test = EC.visibilityOf(simpleNotification);
+
+      if (title) {
+        const titleE = simpleNotification.element(by.css(`.sn-title`));
+        test = EC.and(test, textToMatchInElement(titleE, title));
+      }
+
+      if (content) {
+        const contentE = simpleNotification.element(by.css(`.sn-content`));
+        test = EC.and(test, textToMatchInElement(contentE, content));
+      }
+
+
+      browser.ignoreSynchronization = true;
+
+      return browser.wait(test, 10000).then(() => {
+        browser.ignoreSynchronization = false;
+        return browser.wait(EC.invisibilityOf(simpleNotification), 10000);
+      });
+    });
+  }
+}
+
+type Matcher = { [Symbol.match](string: string): RegExpMatchArray } | string;
+
+export function match(text: string, matcher: Matcher): boolean {
+  if (typeof matcher === 'string') {
+    return text === matcher;
+  } else {
+    // careful, match does not return a boolean!
+    return !!text.match(matcher);
+  }
+}
+
+export function textToMatchInElement(elementFinder: ElementFinder, matcher: Matcher): Function {
+  return () => elementFinder.getText().then(text => match(text, matcher), util.falseIfMissing);
 }

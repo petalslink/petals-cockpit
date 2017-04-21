@@ -66,8 +66,9 @@ export class ComponentsEffects {
   @Effect({ dispatch: true }) changeState$: Observable<Action> = this.actions$
     .ofType(Components.CHANGE_STATE)
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
-    .switchMap(([action, workspaceId]: [{ type: string, payload: { componentId: string, newState: string } }, string]) =>
-      this.componentsService.putState(workspaceId, action.payload.componentId, action.payload.newState)
+    .switchMap(([action, workspaceId]:
+      [{ type: string, payload: { componentId: string, newState: string, parameters: { [key: string]: string } } }, string]) =>
+      this.componentsService.putState(workspaceId, action.payload.componentId, action.payload.newState, action.payload.parameters)
         .mergeMap(_ => Observable.empty())
         .catch((err) => {
           if (environment.debug) {

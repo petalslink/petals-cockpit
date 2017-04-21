@@ -64,8 +64,8 @@ export class Container {
     return this.id;
   }
 
-  addComponent(name?: string) {
-    const component = componentsService.create(name);
+  addComponent(name?: string, state?: string) {
+    const component = componentsService.create(name, state);
     this.components.set(component.getId(), component);
 
     return component;

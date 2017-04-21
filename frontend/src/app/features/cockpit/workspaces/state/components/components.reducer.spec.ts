@@ -107,7 +107,8 @@ describe(`Components reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isUpdatingState: false,
-            isDeployingServiceUnit: false
+            isDeployingServiceUnit: false,
+            parameters: {}
           },
           idComp1: {
             name: 'Comp 1 updated name',
@@ -119,7 +120,8 @@ describe(`Components reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isUpdatingState: false,
-            isDeployingServiceUnit: false
+            isDeployingServiceUnit: false,
+            parameters: {}
           }
         },
         allIds: [
@@ -188,7 +190,8 @@ describe(`Components reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isUpdatingState: false,
-            isDeployingServiceUnit: false
+            isDeployingServiceUnit: false,
+            parameters: {}
           },
           idComp3: {
             name: 'Comp 3',
@@ -200,7 +203,8 @@ describe(`Components reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isUpdatingState: false,
-            isDeployingServiceUnit: false
+            isDeployingServiceUnit: false,
+            parameters: {}
           }
         },
         allIds: [
@@ -626,7 +630,46 @@ describe(`Components reducer`, () => {
           idComp0: {
             keepPreviousValues: '',
             isUpdatingState: false,
-            state: 'Started'
+            state: 'Started',
+            parameters: {}
+          }
+        },
+        allIds: ['idComp0']
+      });
+    });
+
+    it(`should update the parameters if any and set them to empty object otherwise`, () => {
+      // without parameters
+      expect(Components.reducer(initialState, {
+        type: Components.CHANGE_STATE_SUCCESS,
+        payload: { componentId: 'idComp0', newState: 'Shutdown' }
+      })).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idComp0: {
+            keepPreviousValues: '',
+            isUpdatingState: false,
+            state: 'Shutdown',
+            parameters: {}
+          }
+        },
+        allIds: ['idComp0']
+      });
+
+      // with parameters
+      expect(Components.reducer(initialState, {
+        type: Components.CHANGE_STATE_SUCCESS,
+        payload: { componentId: 'idComp0', newState: 'Shutdown', parameters: { someParam: '' } }
+      })).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idComp0: {
+            keepPreviousValues: '',
+            isUpdatingState: false,
+            state: 'Shutdown',
+            parameters: { someParam: '' }
           }
         },
         allIds: ['idComp0']
@@ -963,6 +1006,7 @@ describe(`Components reducer`, () => {
             name: 'Comp 1',
             state: 'Unloaded',
             serviceUnits: [],
+            parameters: {},
 
             isFolded: false,
             isFetchingDetails: false,

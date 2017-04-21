@@ -132,6 +132,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                           name: component.name,
                           state: component.state,
                           type: component.type,
+                          parameters: component.parameters,
                           isFetchingDetails: component.isFetchingDetails,
                           isUpdatingState: component.isUpdatingState,
                           isDeployingServiceUnit: component.isDeployingServiceUnit,

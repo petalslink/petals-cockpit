@@ -76,15 +76,17 @@ describe(`Petals component content`, () => {
     btnStop.click();
 
     // unload the 2 SU
+    const suStop = element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`));
+    const suUnload = element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`));
     page.getWorkspaceTreeByName('SU 0').click();
-    element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
-    element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`)).click();
-    element(by.css(`simple-notification`)).click();
+    suStop.click();
+
+    page.clickAndExpectNotification(suUnload);
 
     page.getWorkspaceTreeByName('SU 1').click();
-    element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
-    element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`)).click();
-    element(by.css(`simple-notification`)).click();
+    suStop.click();
+
+    page.clickAndExpectNotification(suUnload);
 
     // we should now be able to unload the comp 0
     page.getWorkspaceTreeByName('Comp 0').click();
@@ -93,8 +95,7 @@ describe(`Petals component content`, () => {
     expect(btnUnload.isEnabled()).toBe(true);
 
     // once unloaded ...
-    btnUnload.click();
-    element(by.css(`simple-notification`)).click();
+    page.clickAndExpectNotification(btnUnload);
 
     // we should be redirected to the workspace page ...
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
@@ -112,7 +113,6 @@ describe(`Petals component content`, () => {
     const changeSuNameInput = element(by.css(`app-petals-component-overview .deploy form input[name="serviceUnitName"]`));
     const deployBtn = element(by.css(`app-petals-component-overview .deploy form button[type="submit"]`));
     const filePath = path.resolve(__dirname, './resources/su.zip');
-    const simpleNotification = element(by.css(`simple-notification`));
 
     expect(chooseFileBtn.getText()).toEqual(`Choose a file to upload`);
     // simulate the file selection
@@ -147,7 +147,7 @@ describe(`Petals component content`, () => {
     expect(page.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
 
     // deploy the service-unit
-    deployBtn.click();
+    page.clickAndExpectNotification(deployBtn, 'SU deployed', '"su" has been deployed');
 
     // check that the service-unit is now added to the tree and that we've been redirected to it
     const expectedTreeAfterDeploy = [
@@ -173,9 +173,5 @@ describe(`Petals component content`, () => {
     expect(page.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/service-units\/\w+/);
-
-    browser.wait(EC.visibilityOf(simpleNotification), 3000);
-    expect(element(by.css(`simple-notification .sn-title`)).getText()).toEqual(`SU deployed`);
-    expect(element(by.css(`simple-notification .sn-content`)).getText()).toEqual('"su" has been deployed');
   });
 });

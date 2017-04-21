@@ -34,6 +34,7 @@ export interface IComponentCommon {
   name: string;
   state: keyof typeof EComponentState;
   type: EComponentType;
+  parameters: { [key: string]: string };
 
   // for UI
   isFolded: boolean;
@@ -60,6 +61,7 @@ export function componentRowFactory(
     name,
     state,
     type,
+    parameters: {},
 
     isFolded: false,
     isFetchingDetails: false,

@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy, SimpleChanges, OnChanges } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
-import { IComponentRow } from '../../../state/components/component.interface';
+import { IComponentRow, EComponentState } from '../../../state/components/component.interface';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
 import { Components } from '../../../state/components/components.reducer';
 import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
@@ -29,21 +30,38 @@ import { stateNameToPossibleActionsComponent } from '../../../../../../shared/he
   styleUrls: ['./petals-component-overview.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PetalsComponentOverviewComponent implements OnInit {
+export class PetalsComponentOverviewComponent implements OnInit, OnChanges {
   @Input() component: IComponentRow;
   public fileToDeploy: File;
   public serviceUnitName: string;
+  public parametersForm: FormGroup;
 
   constructor(private store$: Store<IStore>) { }
 
   ngOnInit() { }
+
+  ngOnChanges(changes: SimpleChanges) {
+    const parameters = changes.component.currentValue.parameters;
+    const keysParameters = Object.keys(parameters);
+
+    this.parametersForm = new FormGroup(
+      keysParameters
+        .reduce((acc, key) => ({ ...acc, [key]: new FormControl(parameters[key]) }), {})
+    );
+  }
 
   getPossibleStateActions(state: string) {
     return stateNameToPossibleActionsComponent(state);
   }
 
   changeState(newState: string) {
-    this.store$.dispatch({ type: Components.CHANGE_STATE, payload: { componentId: this.component.id, newState } });
+    let parameters = null;
+
+    if (this.component.state === EComponentState.Loaded && newState !== EComponentState.Unloaded) {
+      parameters = this.parametersForm.value;
+    }
+
+    this.store$.dispatch({ type: Components.CHANGE_STATE, payload: { componentId: this.component.id, newState, parameters } });
   }
 
   componentState(index, item) {
