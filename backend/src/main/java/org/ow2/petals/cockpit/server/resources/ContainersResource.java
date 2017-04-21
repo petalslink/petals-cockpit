@@ -44,19 +44,17 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
-import org.ow2.petals.admin.api.ContainerAdministration;
-import org.ow2.petals.admin.api.PetalsAdministration;
-import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.admin.topology.Container;
-import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
+import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
+import javaslang.Tuple2;
 import javaslang.control.Option;
 
 @Singleton
@@ -65,12 +63,12 @@ public class ContainersResource {
 
     private final Configuration jooq;
 
-    private final PetalsAdministrationFactory adminFactory;
+    private final PetalsAdmin petals;
 
     @Inject
-    public ContainersResource(Configuration jooq, PetalsAdministrationFactory adminFactory) {
+    public ContainersResource(Configuration jooq, PetalsAdmin petals) {
         this.jooq = jooq;
-        this.adminFactory = adminFactory;
+        this.petals = petals;
     }
 
     @GET
@@ -94,35 +92,27 @@ public class ContainersResource {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
 
-            PetalsAdministration petals = adminFactory.newPetalsAdministrationAPI();
-            petals.connect(container.getIp(), container.getPort(), container.getUsername(), container.getPassword());
-            try {
-                ContainerAdministration admin = petals.newContainerAdministration();
-                Domain domain = admin.getTopology(null, false);
-                String sysInfo = admin.getSystemInfo();
+            Tuple2<List<Container>, String> infos = petals.getContainerInfos(container.getIp(), container.getPort(),
+                    container.getUsername(), container.getPassword());
 
-                Map<String, Long> ids;
-                try (Stream<ContainersRecord> s = DSL.using(conf).selectFrom(CONTAINERS)
-                        .where(CONTAINERS.BUS_ID.eq(container.getBusId())).stream()) {
-                    ids = s.collect(Collectors.toMap(ContainersRecord::getName, ContainersRecord::getId));
-                }
-
-                List<String> reachabilities = javaslang.collection.List.ofAll(domain.getContainers())
-                        // remove myself
-                        .filter(c -> !Objects.equals(container.getName(), c.getContainerName()))
-                        // keep the reachable containers
-                        .filter(c -> c.getState() == Container.State.REACHABLE)
-                        // get the ids (if they exist) TODO what do I do with unknown container names?
-                        .flatMap(c -> Option.of(ids.get(c.getContainerName())))
-                        // convert it to strings
-                        .map(String::valueOf).toJavaList();
-                return new ContainerOverview(container.getId(), container.getName(), container.getIp(),
-                        container.getPort(), reachabilities, sysInfo);
-            } finally {
-                if (petals.isConnected()) {
-                    petals.disconnect();
-                }
+            Map<String, Long> ids;
+            try (Stream<ContainersRecord> s = DSL.using(conf).selectFrom(CONTAINERS)
+                    .where(CONTAINERS.BUS_ID.eq(container.getBusId())).stream()) {
+                ids = s.collect(Collectors.toMap(ContainersRecord::getName, ContainersRecord::getId));
             }
+
+            List<String> reachabilities = javaslang.collection.List.ofAll(infos._1())
+                    // remove myself
+                    .filter(c -> !Objects.equals(container.getName(), c.getContainerName()))
+                    // keep the reachable containers
+                    .filter(c -> c.getState() == Container.State.REACHABLE)
+                    // get the ids (if they exist) TODO what do I do with unknown container names?
+                    .flatMap(c -> Option.of(ids.get(c.getContainerName())))
+                    // convert it to strings
+                    .map(String::valueOf).toJavaList();
+
+            return new ContainerOverview(container.getId(), container.getName(), container.getIp(), container.getPort(),
+                    reachabilities, infos._2());
         });
     }
 

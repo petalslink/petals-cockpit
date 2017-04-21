@@ -46,11 +46,6 @@ public class CockpitActors {
         this.jooq = jooq;
     }
 
-    public <M> ActorRef<M> getActor(CockpitActor<M> actor) {
-        serviceLocator.inject(actor);
-        return actor.spawn();
-    }
-
     /**
      * TODO instead of doing this, we could always create the actor and let it answer with {@link Status#NOT_FOUND} if
      * needed and then let it die... this would ensure proper concurrency handling for the db queries as well as make

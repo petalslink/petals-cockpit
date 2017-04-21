@@ -46,6 +46,7 @@
     <h2.version>1.4.194</h2.version>
     <jooq.version>3.9.1</jooq.version>
     <petals-admin.version>2.0.0-SNAPSHOT</petals-admin.version>
+    <petals-jmx-api.version>1.1.0-SNAPSHOT</petals-jmx-api.version>
     <enunciate.version>2.8.1</enunciate.version>
   </properties>
 
@@ -112,10 +113,25 @@
         <artifactId>petals-admin-jmx</artifactId>
         <version>${petals-admin.version}</version>
       </dependency>
-        <dependency>
+      <dependency>
         <groupId>org.ow2.petals</groupId>
         <artifactId>petals-admin-mock</artifactId>
         <version>${petals-admin.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.petals</groupId>
+        <artifactId>petals-jmx-api-api</artifactId>
+        <version>${petals-jmx-api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.petals</groupId>
+        <artifactId>petals-jmx-api-impl</artifactId>
+        <version>${petals-jmx-api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.petals</groupId>
+        <artifactId>petals-jmx-api-mock</artifactId>
+        <version>${petals-jmx-api.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jdt</groupId>

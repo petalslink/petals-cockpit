@@ -16,11 +16,12 @@
  */
 package org.ow2.petals.cockpit.server;
 
+import ch.qos.logback.classic.Level;
 import io.dropwizard.logging.BootstrapLogging;
 
 public class AbstractTest {
 
     static {
-        BootstrapLogging.bootstrap();
+        BootstrapLogging.bootstrap(Level.INFO);
     }
 }
