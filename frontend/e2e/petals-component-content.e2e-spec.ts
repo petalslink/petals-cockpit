@@ -125,6 +125,8 @@ describe(`Petals component content`, () => {
     expect(selectedFile.getText()).toEqual(`su.zip`);
     expect(chooseFileBtn.getText()).toEqual(`Change the file`);
 
+    expect(deployBtn.getText()).toMatch(`Deploy`);
+
     expect(changeSuNameInput.getAttribute('value')).toEqual(`su`);
     expect(deployBtn.isEnabled()).toBe(true);
 
