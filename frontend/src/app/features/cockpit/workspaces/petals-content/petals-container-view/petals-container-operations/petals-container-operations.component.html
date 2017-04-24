@@ -34,14 +34,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 <span>Selected file :</span> <span class="file-name">{{ fileToDeploy.name }}</span>
               </div>
 
-              <button type="button" md-raised-button (click)="deploySu.click()" class="choose-file">
+              <button type="button" md-raised-button (click)="deployComponent.click()" class="choose-file">
                 <span *ngIf="!fileToDeploy; else changeFile">Choose a file to upload</span>
                 <ng-template #changeFile>Change the file</ng-template>
               </button>
 
-              <input #deploySu class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="container.isDeployingComponent">
+              <input #deployComponent class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="container.isDeployingComponent">
 
-              <button md-raised-button color="primary" type="submit" *ngIf="fileToDeploy">
+              <button md-raised-button color="primary" type="submit" *ngIf="fileToDeploy" [disabled]="container.isDeployingComponent">
                 Deploy
               </button>
             </form>

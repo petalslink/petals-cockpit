@@ -30,7 +30,6 @@ import { Containers } from 'app/features/cockpit/workspaces/state/containers/con
 })
 export class PetalsContainerOperationsComponent implements OnInit {
   @Input() container: IContainerRow;
-
   public fileToDeploy: File;
 
   constructor(private store$: Store<IStore>) { }

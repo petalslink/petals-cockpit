@@ -93,6 +93,7 @@ describe(`Petals container content`, () => {
     expect(selectedFile.getText()).toEqual(`component.zip`);
     expect(chooseFileBtn.getText()).toEqual(`Change the file`);
 
+    expect(deployBtn.getText()).toMatch(`Deploy`);
     expect(deployBtn.isEnabled()).toBe(true);
 
     const expectedTreeBeforeDeploy = [

@@ -49,10 +49,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <input #deploySu class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="component.isDeployingServiceUnit">
 
               <md-input-container *ngIf="fileToDeploy" class="service-unit-name">
-                <input mdInput type="text" [(ngModel)]="serviceUnitName" name="serviceUnitName" placeholder="Service unit name">
+                <input mdInput type="text" [(ngModel)]="serviceUnitName" name="serviceUnitName" placeholder="Service unit name" [disabled]="component.isDeployingServiceUnit">
               </md-input-container>
 
-              <button md-raised-button color="primary" type="submit" *ngIf="fileToDeploy" [disabled]="serviceUnitName?.trim().length === 0">
+              <button md-raised-button color="primary" type="submit" *ngIf="fileToDeploy" [disabled]="serviceUnitName?.trim().length === 0 || component.isDeployingServiceUnit">
                 Deploy
               </button>
             </form>
