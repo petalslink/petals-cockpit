@@ -436,16 +436,17 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
             ComponentMin.State to) {
         switch (from) {
             case Loaded:
-                return to == ComponentMin.State.Started // via start()
-                        || to == ComponentMin.State.Shutdown // via install()
+                return to == ComponentMin.State.Shutdown // via install()
                         || to == ComponentMin.State.Unloaded; // via undeploy()
             case Shutdown:
                 return to == ComponentMin.State.Unloaded // via undeploy()
+                        || to == ComponentMin.State.Loaded // via uninstall()
                         || to == ComponentMin.State.Started; // via start()
             case Started:
                 return to == ComponentMin.State.Stopped; // via stop()
             case Stopped:
                 return to == ComponentMin.State.Started // via start()
+                        || to == ComponentMin.State.Loaded // via uninstall()
                         || to == ComponentMin.State.Unloaded; // via undeploy()
             case Unknown:
                 return to == ComponentMin.State.Unloaded; // via undeploy()

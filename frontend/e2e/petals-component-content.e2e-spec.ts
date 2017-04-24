@@ -51,6 +51,8 @@ describe(`Petals component content`, () => {
     const stateElem = element(by.css(`app-petals-component-overview md-card.state md-card-title`));
     const btnStop = element(by.cssContainingText(`app-petals-component-overview button`, `Stop`));
     const btnStart = element(by.cssContainingText(`app-petals-component-overview button`, `Start`));
+    const btnInstall = element(by.cssContainingText(`app-petals-component-overview button`, `Install`));
+    const btnUninstall = element(by.cssContainingText(`app-petals-component-overview button`, `Uninstall`));
     const btnUnload = element(by.cssContainingText(`app-petals-component-overview button`, `Unload`));
 
     // the component exists and should be present in petals tree
@@ -62,7 +64,9 @@ describe(`Petals component content`, () => {
     expect(stateElem.getText()).toEqual('Stopped');
     expect(btnStop.isPresent()).toBe(false);
     expect(btnStart.isEnabled()).toBe(true);
+    expect(btnInstall.isPresent()).toBe(false);
     // as the comp 0 still have 2 SUs (SU 0, SU 1), we can't unload it yet
+    expect(btnUninstall.isEnabled()).toBe(false);
     expect(btnUnload.isEnabled()).toBe(false);
 
     btnStart.click();
@@ -70,6 +74,8 @@ describe(`Petals component content`, () => {
     expect(btnStop.isEnabled()).toBe(true);
     expect(btnStart.isPresent()).toBe(false);
     expect(btnUnload.isPresent()).toBe(false);
+    expect(btnInstall.isPresent()).toBe(false);
+    expect(btnUninstall.isPresent()).toBe(false);
 
     btnStop.click();
 
@@ -88,9 +94,33 @@ describe(`Petals component content`, () => {
 
     // we should now be able to unload the comp 0
     page.getWorkspaceTreeByName('Comp 0').click();
+
+    expect(stateElem.getText()).toEqual('Stopped');
     expect(btnStop.isPresent()).toBe(false);
     expect(btnStart.isEnabled()).toBe(true);
+    expect(btnInstall.isPresent()).toBe(false);
+    expect(btnUninstall.isEnabled()).toBe(true);
     expect(btnUnload.isEnabled()).toBe(true);
+
+    // uninstall
+    btnUninstall.click();
+    expect(stateElem.getText()).toEqual('Loaded');
+    expect(btnStop.isPresent()).toBe(false);
+    expect(btnStart.isPresent()).toBe(false);
+    expect(btnInstall.isEnabled()).toBe(true);
+    expect(btnUninstall.isPresent()).toBe(false);
+    expect(btnUnload.isEnabled()).toBe(true);
+
+    // install
+    btnInstall.click();
+    expect(stateElem.getText()).toEqual('Shutdown');
+    expect(btnStop.isPresent()).toBe(false);
+    expect(btnStart.isEnabled()).toBe(true);
+    expect(btnInstall.isPresent()).toBe(false);
+    expect(btnUninstall.isEnabled()).toBe(true);
+    expect(btnUnload.isEnabled()).toBe(true);
+
+    btnUninstall.click();
 
     // once unloaded ...
     page.clickAndExpectNotification(btnUnload);

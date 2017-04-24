@@ -27,6 +27,7 @@ export function stateNameToPossibleActionsComponent(state: string): { actionName
     case EComponentState.Shutdown:
       return [
         { actionName: 'Start', newStateAfterAction: EComponentState.Started },
+        { actionName: 'Uninstall', newStateAfterAction: EComponentState.Loaded },
         { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded }
       ];
 
@@ -38,12 +39,12 @@ export function stateNameToPossibleActionsComponent(state: string): { actionName
     case EComponentState.Stopped:
       return [
         { actionName: 'Start', newStateAfterAction: EComponentState.Started },
+        { actionName: 'Uninstall', newStateAfterAction: EComponentState.Loaded },
         { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded }
       ];
 
     case EComponentState.Loaded:
       return [
-        { actionName: 'Start', newStateAfterAction: EComponentState.Started },
         { actionName: 'Install', newStateAfterAction: EComponentState.Shutdown },
         { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded }
       ];

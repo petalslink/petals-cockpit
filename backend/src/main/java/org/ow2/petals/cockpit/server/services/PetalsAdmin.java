@@ -211,29 +211,29 @@ public class PetalsAdmin {
 
     private ComponentMin.State changeComponentState(PetalsAdministration petals, Component comp,
             ComponentMin.State currentState, ComponentMin.State desiredState) throws ArtifactAdministrationException {
-        ComponentLifecycle sal = petals.newArtifactLifecycleFactory().createComponentLifecycle(comp);
+        ComponentLifecycle cl = petals.newArtifactLifecycleFactory().createComponentLifecycle(comp);
         switch (desiredState) {
+            case Loaded:
+                cl.uninstall();
+                break;
             case Shutdown:
-                sal.install();
+                cl.install();
                 break;
             case Unloaded:
-                sal.undeploy();
+                cl.undeploy();
                 break;
             case Started:
-                if (currentState == ComponentMin.State.Loaded) {
-                    sal.install();
-                }
-                sal.start();
+                cl.start();
                 break;
             case Stopped:
-                sal.stop();
+                cl.stop();
                 break;
             default:
                 LOG.warn("Impossible case for state transition from {} to {} for Component {} ({})", comp.getState(),
                         desiredState, comp.getName());
         }
         if (desiredState != ComponentMin.State.Unloaded) {
-            sal.updateState();
+            cl.updateState();
             return ComponentMin.State.from(comp.getState());
         } else {
             // we can't call updateState for this one, it will fail since it has been unloaded
