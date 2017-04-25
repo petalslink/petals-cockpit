@@ -86,6 +86,13 @@ export class ComponentsEffects {
     );
 
   // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) changeStateSuccess$: Observable<Action> = this.actions$
+    .ofType(Components.CHANGE_STATE_SUCCESS)
+    .map((action: { type: string, payload: { componentId: string, newState: string } }) =>
+      ({ type: Components.FETCH_COMPONENT_DETAILS, payload: { componentId: action.payload.componentId } })
+    );
+
+  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) deployServiceUnit$: Observable<Action> = this.actions$
     .ofType(Components.DEPLOY_SERVICE_UNIT)
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))

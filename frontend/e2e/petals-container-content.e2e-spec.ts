@@ -80,7 +80,6 @@ describe(`Petals container content`, () => {
     browser.wait(EC.elementToBeClickable(chooseFileBtn), 3000);
 
     // component
-    const btnStart = element(by.cssContainingText(`app-petals-component-overview button`, `Start`));
     const btnInstall = element(by.cssContainingText(`app-petals-component-overview button`, `Install`));
     const btnUnload = element(by.cssContainingText(`app-petals-component-overview button`, `Unload`));
 
@@ -159,7 +158,6 @@ describe(`Petals container content`, () => {
     expect(parametersFormInputs.get(0).getAttribute('value')).toEqual('8080');
     expect(parametersFormInputs.get(1).getAttribute('value')).toEqual('false');
 
-    expect(btnStart.isEnabled()).toBe(true);
     expect(btnInstall.isEnabled()).toBe(true);
     expect(btnUnload.isEnabled()).toBe(true);
   });

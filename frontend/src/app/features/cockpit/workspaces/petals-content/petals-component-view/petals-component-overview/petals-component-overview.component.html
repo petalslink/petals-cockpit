@@ -41,13 +41,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     md-raised-button
                     color="primary"
                     (click)="changeState(possibleState.newStateAfterAction)"
-                    [disabled]="component.isUpdatingState || (possibleState.actionName === 'Unload' && component.serviceUnits.length > 0)"
+                    [disabled]="component.isFetchingDetails || component.isUpdatingState || ((possibleState.actionName === 'Unload' || possibleState.actionName === 'Uninstall') && component.serviceUnits.length > 0)"
                   >
                     {{ possibleState.actionName }}
 
                     <md-icon
                       *ngIf="possibleState.actionName === 'Unload' && component.serviceUnits.length > 0"
                       mdTooltip="To unload a component, all service units of the component should be unloaded first"
+                      mdTooltipPosition="above"
+                      class="margin-left-x1"
+                    >
+                      info outline
+                    </md-icon>
+                    <md-icon
+                      *ngIf="possibleState.actionName === 'Uninstall' && component.serviceUnits.length > 0"
+                      mdTooltip="To uninstall a component, all service units of the component should be unloaded first"
                       mdTooltipPosition="above"
                       class="margin-left-x1"
                     >
