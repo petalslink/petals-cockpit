@@ -84,13 +84,15 @@ describe(`ServiceUnits reducer`, () => {
             name: 'SU 0 updated name',
             id: 'idSu0',
             isFolded: false,
-            isUpdatingState: false
+            isUpdatingState: false,
+            errorChangeState: ''
           },
           idSu1: {
             name: 'SU 1 updated name',
             id: 'idSu1',
             isFolded: false,
-            isUpdatingState: false
+            isUpdatingState: false,
+            errorChangeState: ''
           }
         },
         allIds: [
@@ -137,13 +139,15 @@ describe(`ServiceUnits reducer`, () => {
             name: 'SU 2',
             id: 'idSu2',
             isFolded: false,
-            isUpdatingState: false
+            isUpdatingState: false,
+            errorChangeState: ''
           },
           idSu3: {
             name: 'SU 3',
             id: 'idSu3',
             isFolded: false,
-            isUpdatingState: false
+            isUpdatingState: false,
+            errorChangeState: ''
           }
         },
         allIds: [
@@ -329,7 +333,8 @@ describe(`ServiceUnits reducer`, () => {
       byId: {
         keepPreviousValues: '',
         idSu0: {
-          keepPreviousValues: ''
+          keepPreviousValues: '',
+          errorChangeState: 'some previous error'
         }
       },
       allIds: ['idSu0']
@@ -346,7 +351,8 @@ describe(`ServiceUnits reducer`, () => {
           idSu0: {
             keepPreviousValues: '',
             isUpdatingState: false,
-            state: 'Started'
+            state: 'Started',
+            errorChangeState: ''
           }
         },
         allIds: ['idSu0']
@@ -364,7 +370,8 @@ describe(`ServiceUnits reducer`, () => {
       byId: {
         keepPreviousValues: '',
         idSu0: {
-          keepPreviousValues: ''
+          keepPreviousValues: '',
+          errorChangeState: ''
         }
       },
       allIds: ['idSu0']
@@ -373,14 +380,15 @@ describe(`ServiceUnits reducer`, () => {
     it(`should change the isUpdatingState variable of an existing service-unit to false`, () => {
       expect(ServiceUnits.reducer(initialState, {
         type: ServiceUnits.CHANGE_STATE_ERROR,
-        payload: { serviceUnitId: 'idSu0' }
+        payload: { serviceUnitId: 'idSu0', errorChangeState: 'some error' }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSu0: {
             keepPreviousValues: '',
-            isUpdatingState: false
+            isUpdatingState: false,
+            errorChangeState: 'some error'
           }
         },
         allIds: ['idSu0']
@@ -492,7 +500,8 @@ describe(`ServiceUnits reducer`, () => {
             name: 'Su 1',
             state: 'Started',
             isFolded: false,
-            isUpdatingState: false
+            isUpdatingState: false,
+            errorChangeState: ''
           }
         },
         allIds: ['idSu0', 'idSu1']

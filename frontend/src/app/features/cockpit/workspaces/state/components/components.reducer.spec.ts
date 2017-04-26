@@ -108,7 +108,8 @@ describe(`Components reducer`, () => {
             isFetchingDetails: false,
             isUpdatingState: false,
             isDeployingServiceUnit: false,
-            parameters: {}
+            parameters: {},
+            errorChangeState: ''
           },
           idComp1: {
             name: 'Comp 1 updated name',
@@ -121,7 +122,8 @@ describe(`Components reducer`, () => {
             isFetchingDetails: false,
             isUpdatingState: false,
             isDeployingServiceUnit: false,
-            parameters: {}
+            parameters: {},
+            errorChangeState: ''
           }
         },
         allIds: [
@@ -191,7 +193,8 @@ describe(`Components reducer`, () => {
             isFetchingDetails: false,
             isUpdatingState: false,
             isDeployingServiceUnit: false,
-            parameters: {}
+            parameters: {},
+            errorChangeState: ''
           },
           idComp3: {
             name: 'Comp 3',
@@ -204,7 +207,8 @@ describe(`Components reducer`, () => {
             isFetchingDetails: false,
             isUpdatingState: false,
             isDeployingServiceUnit: false,
-            parameters: {}
+            parameters: {},
+            errorChangeState: ''
           }
         },
         allIds: [
@@ -631,7 +635,8 @@ describe(`Components reducer`, () => {
             keepPreviousValues: '',
             isUpdatingState: false,
             state: 'Started',
-            parameters: {}
+            parameters: {},
+            errorChangeState: ''
           }
         },
         allIds: ['idComp0']
@@ -651,7 +656,8 @@ describe(`Components reducer`, () => {
             keepPreviousValues: '',
             isUpdatingState: false,
             state: 'Shutdown',
-            parameters: {}
+            parameters: {},
+            errorChangeState: ''
           }
         },
         allIds: ['idComp0']
@@ -669,7 +675,8 @@ describe(`Components reducer`, () => {
             keepPreviousValues: '',
             isUpdatingState: false,
             state: 'Shutdown',
-            parameters: { someParam: '' }
+            parameters: { someParam: '' },
+            errorChangeState: ''
           }
         },
         allIds: ['idComp0']
@@ -1011,7 +1018,8 @@ describe(`Components reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isUpdatingState: false,
-            isDeployingServiceUnit: false
+            isDeployingServiceUnit: false,
+            errorChangeState: ''
           }
         },
         allIds: ['idComp0', 'idComp1']

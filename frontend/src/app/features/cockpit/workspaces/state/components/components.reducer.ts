@@ -125,13 +125,19 @@ export class Components {
     // it wouldn't be accurate until next get details
     const parameters = payload.parameters || {};
 
-    return updateById(componentsTable, payload.componentId, { state: payload.newState, isUpdatingState: false, parameters });
+    return updateById(
+      componentsTable,
+      payload.componentId,
+      { state: payload.newState, isUpdatingState: false, parameters, errorChangeState: '' }
+    );
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_ERROR = `${Components.reducerName} Change state error`;
-  private static changeStateError(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, { isUpdatingState: false });
+  private static changeStateError(
+    componentsTable: IComponentsTable,
+    payload: { componentId: string, errorChangeState: string }): IComponentsTable {
+    return updateById(componentsTable, payload.componentId, { isUpdatingState: false, errorChangeState: payload.errorChangeState });
   }
 
   // tslint:disable-next-line:member-ordering

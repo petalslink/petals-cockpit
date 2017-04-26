@@ -17,8 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="central-content">
     <div fxLayoutWrap fxLayoutGap="10px">
       <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="state">
-        <md-card-title-group>
-          <div fxFlex fxLayout="column" fxLayoutAlign="end end">
+        <md-card-title-group fxLayout="column">
+          <div fxLayout="column" fxLayoutAlign="end end">
             <md-card-subtitle>State</md-card-subtitle>
             <md-card-title>{{ component.state }}</md-card-title>
             <md-card-content *ngIf="component.state">
@@ -65,6 +65,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </span>
               </div>
             </md-card-content>
+          </div>
+
+          <div *ngIf="component.errorChangeState" fxFlex class="error">
+            <div class="bold margin-bottom-x1">An error occured :</div>
+            <span class="italic">{{ component.errorChangeState }}</span>
           </div>
         </md-card-title-group>
       </md-card>

@@ -80,7 +80,7 @@ export class ComponentsEffects {
 
           return Observable.of({
             type: Components.CHANGE_STATE_ERROR,
-            payload: { componentId: action.payload.componentId }
+            payload: { componentId: action.payload.componentId, errorChangeState: err._body }
           });
         })
     );

@@ -137,6 +137,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                           isUpdatingState: component.isUpdatingState,
                           isDeployingServiceUnit: component.isDeployingServiceUnit,
                           isFolded: component.isFolded || false,
+                          errorChangeState: '',
 
                           serviceUnits: {
                             selectedServiceUnitId: serviceUnits.selectedServiceUnitId,
@@ -148,7 +149,8 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                                 name: serviceUnit.name,
                                 state: serviceUnit.state,
                                 isUpdatingState: serviceUnit.isUpdatingState,
-                                isFolded: serviceUnit.isFolded || false
+                                isFolded: serviceUnit.isFolded || false,
+                                errorChangeState: ''
                               };
                             })
                           }

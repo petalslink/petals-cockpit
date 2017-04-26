@@ -86,13 +86,15 @@ export class ServiceUnits {
     serviceUnitsTable: IServiceUnitsTable,
     payload: { serviceUnitId: string, newState: string }
   ): IServiceUnitsTable {
-    return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: false, state: payload.newState });
+    return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: false, state: payload.newState, errorChangeState: '' });
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_ERROR = `${ServiceUnits.reducerName} Change state error`;
-  private static changeStateError(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
-    return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: false });
+  private static changeStateError(
+    serviceUnitsTable: IServiceUnitsTable,
+    payload: { serviceUnitId: string, errorChangeState: string }): IServiceUnitsTable {
+    return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: false, errorChangeState: payload.errorChangeState });
   }
 
   // tslint:disable-next-line:member-ordering

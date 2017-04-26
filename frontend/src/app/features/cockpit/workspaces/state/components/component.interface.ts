@@ -42,6 +42,7 @@ export interface IComponentCommon {
   isFetchingDetails: boolean;
   isUpdatingState: boolean;
   isDeployingServiceUnit: boolean;
+  errorChangeState: string;
 }
 
 export interface IComponentRow extends IComponentCommon {
@@ -68,6 +69,7 @@ export function componentRowFactory(
     isFetchingDetails: false,
     isUpdatingState: false,
     isDeployingServiceUnit: false,
+    errorChangeState: '',
 
     serviceUnits: []
   };
