@@ -132,6 +132,44 @@ describe(`Petals component content`, () => {
     expect(page.getWorkspaceTreeByName(`Comp 0`).first().isPresent()).toBe(false);
   });
 
+  it(`should show a detailed error if the SU deployment fails`, () => {
+    page.getWorkspaceTreeByName('Cont 0').click();
+
+    element(by.cssContainingText(`app-petals-component-view md-tab-header .mat-tab-label`, 'Operations')).click();
+
+    const chooseFileBtn = element(by.css(`app-petals-component-operations .deploy .choose-file`));
+    const fileInput = element(by.css(`app-petals-component-operations .deploy input[type="file"]`));
+    const selectedFile = element(by.css(`app-petals-component-operations .deploy .selected-file .file-name`));
+    const deployBtn = element(by.css(`app-petals-component-operations .deploy form button[type="submit"]`));
+    const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
+    const errorDetailsTitle = element(by.css(`app-petals-component-operations .deploy .error-deploy .title`));
+    const errorDetailsMessage = element(by.css(`app-petals-component-operations .deploy .error-deploy .message`));
+
+    browser.wait(EC.elementToBeClickable(chooseFileBtn), 3000);
+
+    expect(chooseFileBtn.getText()).toEqual(`Choose a file to upload`);
+    // simulate the file selection
+    fileInput.sendKeys(filePath);
+
+    // once the file is selected, check that the other part of the form is displayed
+    expect(selectedFile.isDisplayed()).toBe(true);
+    expect(selectedFile.getText()).toEqual(`error-deploy.zip`);
+    expect(chooseFileBtn.getText()).toEqual(`Change the file`);
+
+    expect(deployBtn.getText()).toMatch(`Deploy`);
+    expect(deployBtn.isEnabled()).toBe(true);
+
+    // deploy the component
+    page.clickAndExpectNotification(
+      deployBtn,
+      'Deployed Service-Unit failed',
+      'An error occured when trying to deploy the file "error-deploy.zip"'
+    );
+
+    expect(errorDetailsTitle.getText()).toEqual('An error occured :');
+    expect(errorDetailsMessage.getText()).toEqual('[Mock message] An error happened when trying to deploy the service-unit');
+  });
+
   it(`should deploy a service-unit`, () => {
     page.getWorkspaceTreeByName('Comp 0').click();
 
@@ -162,20 +200,20 @@ describe(`Petals component content`, () => {
 
     const expectedTreeBeforeDeploy = [
       `Bus 0`,
-        `Cont 0`,
-          `Comp 0`,
-            `SU 0`,
-            `SU 1`,
-          `Comp 1`,
-            `SU 2`,
-            `SU 3`,
-        `Cont 1`,
-          `Comp 2`,
-            `SU 4`,
-            `SU 5`,
-          `Comp 3`,
-            `SU 6`,
-            `SU 7`
+      `Cont 0`,
+      `Comp 0`,
+      `SU 0`,
+      `SU 1`,
+      `Comp 1`,
+      `SU 2`,
+      `SU 3`,
+      `Cont 1`,
+      `Comp 2`,
+      `SU 4`,
+      `SU 5`,
+      `Comp 3`,
+      `SU 6`,
+      `SU 7`
     ];
 
     expect(page.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
@@ -186,26 +224,56 @@ describe(`Petals component content`, () => {
     // check that the service-unit is now added to the tree and that we've been redirected to it
     const expectedTreeAfterDeploy = [
       `Bus 0`,
-        `Cont 0`,
-          `Comp 0`,
-            `SU 0`,
-            `SU 1`,
-            // this one should have been deployed
-            `su`,
-          `Comp 1`,
-            `SU 2`,
-            `SU 3`,
-        `Cont 1`,
-          `Comp 2`,
-            `SU 4`,
-            `SU 5`,
-          `Comp 3`,
-            `SU 6`,
-            `SU 7`
+      `Cont 0`,
+      `Comp 0`,
+      `SU 0`,
+      `SU 1`,
+      // this one should have been deployed
+      `su`,
+      `Comp 1`,
+      `SU 2`,
+      `SU 3`,
+      `Cont 1`,
+      `Comp 2`,
+      `SU 4`,
+      `SU 5`,
+      `Comp 3`,
+      `SU 6`,
+      `SU 7`
     ];
 
     expect(page.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/service-units\/\w+/);
+  });
+
+  it(`should display an error if component change state (install) fails`, () => {
+    // in container view
+    const fileInput = element(by.css(`app-petals-container-operations .deploy input[type="file"]`));
+    const filePath = path.resolve(__dirname, './resources/component.zip');
+    const deployBtn = element(by.css(`app-petals-container-operations .deploy form button[type="submit"]`));
+
+    // in component view
+    const btnInstall = element(by.cssContainingText(`app-petals-component-overview button`, `Install`));
+    const inputHttpPort = element(by.css(`app-petals-component-overview .parameters form input[placeholder="http-port"]`));
+    const inputEnableHttps = element(by.css(`app-petals-component-overview .parameters form input[placeholder="enable-https"]`));
+    const txtErrorChangeState = element(by.css(`app-petals-component-overview md-card.state .error .italic`));
+
+    // deploy a component (already tested in containers E2E tests)
+    page.getWorkspaceTreeByName('Cont 0').click();
+    element(by.cssContainingText(`app-petals-container-view md-tab-header .mat-tab-label`, 'Operations')).click();
+    fileInput.sendKeys(filePath);
+    page.clickAndExpectNotification(deployBtn, 'Component deployed', '"component" has been deployed');
+
+    // change state to install with some parameters (with error in http-port to make it fail)
+    inputHttpPort.sendKeys('error');
+    btnInstall.click();
+
+    // check if the error is displayed
+    expect(txtErrorChangeState.getText()).toEqual(`[Mock message] An error happened when trying to change the state of that component`);
+
+    // make sure the form isn't reset
+    expect(inputHttpPort.getAttribute('value')).toEqual(`8080error`);
+    expect(inputEnableHttps.getAttribute('value')).toEqual(`false`);
   });
 });

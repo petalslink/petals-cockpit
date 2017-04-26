@@ -48,9 +48,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </md-card-content>
         </div>
 
-        <div *ngIf="container.errorDeployment" fxFlex class="error">
-          <div class="bold margin-bottom-x1">An error occured :</div>
-          <span class="italic">{{ container.errorDeployment }}</span>
+        <div *ngIf="container.errorDeployment" fxFlex class="error error-deploy">
+          <div class="title bold margin-bottom-x1">An error occured :</div>
+          <span class="message italic">{{ container.errorDeployment }}</span>
         </div>
       </md-card-title-group>
     </md-card>

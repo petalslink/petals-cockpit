@@ -48,6 +48,10 @@ export class ContainersMockService extends ContainersServiceImpl {
   deployComponent(workspaceId: string, containerId: string, file: File) {
     const component = containersService.get(containerId).addComponent(file.name.replace(/\.zip$/, ''), 'Loaded');
 
+    if (file.name.includes('error')) {
+      return helper.responseBody('[Mock message] An error happened when trying to deploy the component', 400);
+    }
+
     const response = {
       containerId,
       component: {
