@@ -42,11 +42,20 @@ export class ServiceUnits {
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_SERVICE_UNIT = `${ServiceUnits.reducerName} Set current service unit`;
   private static setCurrentServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
+    const res = <IServiceUnitsTable>{
+      selectedServiceUnitId: payload.serviceUnitId
+    };
+
+    if (payload.serviceUnitId) {
+      return {
+        ...updateById(serviceUnitsTable, payload.serviceUnitId, { errorChangeState: '' }),
+        ...res
+      };
+    }
+
     return {
       ...serviceUnitsTable,
-      ...<IServiceUnitsTable>{
-        selectedServiceUnitId: payload.serviceUnitId
-      }
+      ...res
     };
   }
 

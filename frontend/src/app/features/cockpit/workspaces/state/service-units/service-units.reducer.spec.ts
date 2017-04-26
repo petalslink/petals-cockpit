@@ -165,22 +165,26 @@ describe(`ServiceUnits reducer`, () => {
       expect(ServiceUnits.SET_CURRENT_SERVICE_UNIT).toEqual(`[Service units] Set current service unit`);
     });
 
-    it(`should set the current service-unit`, () => {
+    it(`should set the current service-unit and reset its errors`, () => {
       const initialState: any = {
         keepPreviousValues: '',
-        selectedServiceUnitId: ''
+        selectedServiceUnitId: '',
+        byId: {
+          idSu0: { errorChangeState: 'some error' }
+        }
       };
 
-      // setting the current service-unit to an unknown service-unit (so far) should work
-      // because we'll be trying to fetch it right after
       const reducer = ServiceUnits.reducer(initialState, {
         type: ServiceUnits.SET_CURRENT_SERVICE_UNIT,
-        payload: { serviceUnitId: 'unknown' }
+        payload: { serviceUnitId: 'idSu0' }
       });
 
       expect(reducer).toEqual({
         keepPreviousValues: '',
-        selectedServiceUnitId: 'unknown'
+        selectedServiceUnitId: 'idSu0',
+        byId: {
+          idSu0: { errorChangeState: '' }
+        }
       });
     });
   });

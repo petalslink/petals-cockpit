@@ -43,6 +43,7 @@ export interface IComponentCommon {
   isUpdatingState: boolean;
   isDeployingServiceUnit: boolean;
   errorChangeState: string;
+  errorDeployment: string;
 }
 
 export interface IComponentRow extends IComponentCommon {
@@ -70,6 +71,7 @@ export function componentRowFactory(
     isUpdatingState: false,
     isDeployingServiceUnit: false,
     errorChangeState: '',
+    errorDeployment: '',
 
     serviceUnits: []
   };

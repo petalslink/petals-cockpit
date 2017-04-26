@@ -121,6 +121,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                     isFetchingDetails: container.isFetchingDetails,
                     isFolded: container.isFolded || false,
                     isDeployingComponent: container.isDeployingComponent,
+                    errorDeployment: '',
 
                     components: {
                       selectedComponentId: components.selectedComponentId,
@@ -138,6 +139,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                           isDeployingServiceUnit: component.isDeployingServiceUnit,
                           isFolded: component.isFolded || false,
                           errorChangeState: '',
+                          errorDeployment: '',
 
                           serviceUnits: {
                             selectedServiceUnitId: serviceUnits.selectedServiceUnitId,

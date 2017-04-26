@@ -86,7 +86,7 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
-          idCont1: { keepPreviousValues: '', reachabilities: [] },
+          idCont1: { keepPreviousValues: '', reachabilities: [], errorDeployment: 'some previous error' },
           idCont2: {
             name: 'Cont 2 old name',
             components: [
@@ -94,7 +94,8 @@ describe(`Containers reducer`, () => {
               'idComp5 old',
               'thisComponentIdShouldBeRemoved'
             ],
-            id: 'idCont2'
+            id: 'idCont2',
+            errorDeployment: 'some previous error'
           },
         },
         allIds: ['idCont1']
@@ -107,7 +108,7 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
-          idCont1: { keepPreviousValues: '', reachabilities: [] },
+          idCont1: { keepPreviousValues: '', reachabilities: [], errorDeployment: 'some previous error' },
           idCont2: {
             name: 'Cont 2',
             components: [
@@ -119,6 +120,7 @@ describe(`Containers reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isDeployingComponent: false,
+            errorDeployment: '',
           },
           idCont3: {
             name: 'Cont 3',
@@ -131,6 +133,7 @@ describe(`Containers reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isDeployingComponent: false,
+            errorDeployment: ''
           }
         },
         allIds: [
@@ -358,22 +361,26 @@ describe(`Containers reducer`, () => {
       expect(Containers.SET_CURRENT_CONTAINER).toEqual(`[Containers] Set current container`);
     });
 
-    it(`should set the current container`, () => {
+    it(`should set the current container and reset its errors`, () => {
       const initialState: any = {
         keepPreviousValues: '',
-        selectedContainerId: ''
+        selectedContainerId: '',
+        byId: {
+          idCont0: { errorDeployment: 'some error' }
+        }
       };
 
-      // setting the current container to an unknown container (so far) should work
-      // because we'll be trying to fetch that container right after
       const reducer = Containers.reducer(initialState, {
         type: Containers.SET_CURRENT_CONTAINER,
-        payload: { containerId: 'unknown' }
+        payload: { containerId: 'idCont0' }
       });
 
       expect(reducer).toEqual({
         keepPreviousValues: '',
-        selectedContainerId: 'unknown'
+        selectedContainerId: 'idCont0',
+        byId: {
+          idCont0: { errorDeployment: '' }
+        }
       });
     });
   });
@@ -536,14 +543,15 @@ describe(`Containers reducer`, () => {
     it(`should set the isDeployingComponent variable to false for an existing container`, () => {
       expect(Containers.reducer(initialState, {
         type: Containers.DEPLOY_COMPONENT_ERROR,
-        payload: { containerId: 'idCont0' }
+        payload: { containerId: 'idCont0', errorDeployment: 'some error' }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idCont0: {
             keepPreviousValues: '',
-            isDeployingComponent: false
+            isDeployingComponent: false,
+            errorDeployment: 'some error'
           }
         },
         allIds: ['idCont0']
@@ -586,7 +594,8 @@ describe(`Containers reducer`, () => {
           idCont0: {
             keepPreviousValues: '',
             isDeployingComponent: false,
-            components: ['idComp0', 'idCompNew']
+            components: ['idComp0', 'idCompNew'],
+            errorDeployment: ''
           }
         },
         allIds: ['idCont0']

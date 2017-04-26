@@ -109,7 +109,8 @@ describe(`Components reducer`, () => {
             isUpdatingState: false,
             isDeployingServiceUnit: false,
             parameters: {},
-            errorChangeState: ''
+            errorChangeState: '',
+            errorDeployment: ''
           },
           idComp1: {
             name: 'Comp 1 updated name',
@@ -123,7 +124,8 @@ describe(`Components reducer`, () => {
             isUpdatingState: false,
             isDeployingServiceUnit: false,
             parameters: {},
-            errorChangeState: ''
+            errorChangeState: '',
+            errorDeployment: ''
           }
         },
         allIds: [
@@ -194,7 +196,8 @@ describe(`Components reducer`, () => {
             isUpdatingState: false,
             isDeployingServiceUnit: false,
             parameters: {},
-            errorChangeState: ''
+            errorChangeState: '',
+            errorDeployment: ''
           },
           idComp3: {
             name: 'Comp 3',
@@ -208,7 +211,8 @@ describe(`Components reducer`, () => {
             isUpdatingState: false,
             isDeployingServiceUnit: false,
             parameters: {},
-            errorChangeState: ''
+            errorChangeState: '',
+            errorDeployment: ''
           }
         },
         allIds: [
@@ -449,22 +453,26 @@ describe(`Components reducer`, () => {
       expect(Components.SET_CURRENT_COMPONENT).toEqual(`[Components] Set current component`);
     });
 
-    it(`should set the current component`, () => {
+    it(`should set the current component and reset its errors`, () => {
       const initialState: any = {
         keepPreviousValues: '',
-        selectedComponentId: ''
+        selectedComponentId: '',
+        byId: {
+          idComp0: { errorDeployment: 'some deployment error', errorChangeState: 'some change state error' }
+        }
       };
 
-      // setting the current component to an unknown component (so far) should work
-      // because we'll be trying to fetch that component right after
       const reducer = Components.reducer(initialState, {
         type: Components.SET_CURRENT_COMPONENT,
-        payload: { componentId: 'unknown' }
+        payload: { componentId: 'idComp0' }
       });
 
       expect(reducer).toEqual({
         keepPreviousValues: '',
-        selectedComponentId: 'unknown'
+        selectedComponentId: 'idComp0',
+        byId: {
+          idComp0: { errorDeployment: '', errorChangeState: '' }
+        }
       });
     });
   });
@@ -848,14 +856,15 @@ describe(`Components reducer`, () => {
     it(`should set the isDeployingServiceUnit variable to false for an existing component`, () => {
       expect(Components.reducer(initialState, {
         type: Components.DEPLOY_SERVICE_UNIT_ERROR,
-        payload: { componentId: 'idComp0' }
+        payload: { componentId: 'idComp0', errorDeployment: 'some error' }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idComp0: {
             keepPreviousValues: '',
-            isDeployingServiceUnit: false
+            isDeployingServiceUnit: false,
+            errorDeployment: 'some error'
           }
         },
         allIds: ['idComp0']
@@ -898,7 +907,8 @@ describe(`Components reducer`, () => {
           idComp0: {
             keepPreviousValues: '',
             isDeployingServiceUnit: false,
-            serviceUnits: ['idSu0', 'idSuNew']
+            serviceUnits: ['idSu0', 'idSuNew'],
+            errorDeployment: ''
           }
         },
         allIds: ['idComp0']
@@ -1019,7 +1029,8 @@ describe(`Components reducer`, () => {
             isFetchingDetails: false,
             isUpdatingState: false,
             isDeployingServiceUnit: false,
-            errorChangeState: ''
+            errorChangeState: '',
+            errorDeployment: ''
           }
         },
         allIds: ['idComp0', 'idComp1']

@@ -114,7 +114,7 @@ export class ComponentsEffects {
 
           return Observable.of({
             type: Components.DEPLOY_SERVICE_UNIT_ERROR,
-            payload: { componentId: action.payload.componentId }
+            payload: { componentId: action.payload.componentId, errorDeployment: err._body }
           });
         })
     );
