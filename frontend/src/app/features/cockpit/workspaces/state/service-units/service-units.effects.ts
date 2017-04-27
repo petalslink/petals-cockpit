@@ -46,7 +46,7 @@ export class ServiceUnitsEffects {
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in service-unit.effects : ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)');
+            console.warn('Error caught in service-unit.effects: ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)');
             console.error(err);
             console.groupEnd();
           }
@@ -68,7 +68,7 @@ export class ServiceUnitsEffects {
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in service-unit.effects : ofType(ServiceUnits.CHANGE_STATE)');
+            console.warn('Error caught in service-unit.effects: ofType(ServiceUnits.CHANGE_STATE)');
             console.error(err);
             console.groupEnd();
           }

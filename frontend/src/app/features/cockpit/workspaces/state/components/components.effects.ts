@@ -50,7 +50,7 @@ export class ComponentsEffects {
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in components.effects.ts : ofType(Components.FETCH_COMPONENT_DETAILS)');
+            console.warn('Error caught in components.effects.ts: ofType(Components.FETCH_COMPONENT_DETAILS)');
             console.error(err);
             console.groupEnd();
           }
@@ -73,7 +73,7 @@ export class ComponentsEffects {
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in components.effects : ofType(Components.CHANGE_STATE)');
+            console.warn('Error catched in components.effects: ofType(Components.CHANGE_STATE)');
             console.error(err);
             console.groupEnd();
           }
@@ -102,14 +102,14 @@ export class ComponentsEffects {
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in components.effects : ofType(Components.DEPLOY_SERVICE_UNIT)');
+            console.warn('Error caught in components.effects: ofType(Components.DEPLOY_SERVICE_UNIT)');
             console.error(err);
             console.groupEnd();
           }
 
           this.notification.error(
             'Deploy Service-Unit failed',
-            `An error occured when trying to deploy the file "${action.payload.file.name}"`
+            `An error occurred when trying to deploy the file "${action.payload.file.name}"`
           );
 
           return Observable.of({

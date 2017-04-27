@@ -96,11 +96,11 @@ describe(`Petals container content`, () => {
     // deploy the component
     page.clickAndExpectNotification(
       deployBtn,
-      'Deployed component failed',
-      'An error occured when trying to deploy the file "error-deploy.zip"'
+      'Deploy component failed',
+      'An error occurred when trying to deploy the file "error-deploy.zip"'
     );
 
-    expect(errorDetailsTitle.getText()).toEqual('An error occured :');
+    expect(errorDetailsTitle.getText()).toEqual('An error occurred:');
     expect(errorDetailsMessage.getText()).toEqual('[Mock message] An error happened when trying to deploy the component');
   });
 

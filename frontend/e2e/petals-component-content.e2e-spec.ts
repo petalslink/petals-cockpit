@@ -133,7 +133,7 @@ describe(`Petals component content`, () => {
   });
 
   it(`should show a detailed error if the SU deployment fails`, () => {
-    page.getWorkspaceTreeByName('Cont 0').click();
+    page.getWorkspaceTreeByName('Comp 0').click();
 
     element(by.cssContainingText(`app-petals-component-view md-tab-header .mat-tab-label`, 'Operations')).click();
 
@@ -162,11 +162,11 @@ describe(`Petals component content`, () => {
     // deploy the component
     page.clickAndExpectNotification(
       deployBtn,
-      'Deployed Service-Unit failed',
-      'An error occured when trying to deploy the file "error-deploy.zip"'
+      'Deploy Service-Unit failed',
+      'An error occurred when trying to deploy the file "error-deploy.zip"'
     );
 
-    expect(errorDetailsTitle.getText()).toEqual('An error occured :');
+    expect(errorDetailsTitle.getText()).toEqual('An error occurred:');
     expect(errorDetailsMessage.getText()).toEqual('[Mock message] An error happened when trying to deploy the service-unit');
   });
 

@@ -50,7 +50,7 @@ export class BusesInProgressEffects {
         .catch((res: Response) => {
           return Observable.of({
             type: BusesInProgress.POST_BUS_IN_PROGRESS_ERROR,
-            payload: `Error ${res.status} ${res.statusText ? `(${res.statusText})` : ``}: ${res.text()}`
+            payload: `Error ${res.status}${res.statusText ? ` (${res.statusText})` : ``}: ${res.text()}`
           });
         })
     );
@@ -66,7 +66,7 @@ export class BusesInProgressEffects {
         .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in buses-in-progress.effects : ofType(Buses.DELETE_BUS_IN_PROGRESS)');
+            console.warn('Error catched in buses-in-progress.effects: ofType(Buses.DELETE_BUS_IN_PROGRESS)');
             console.error(err);
             console.groupEnd();
           }

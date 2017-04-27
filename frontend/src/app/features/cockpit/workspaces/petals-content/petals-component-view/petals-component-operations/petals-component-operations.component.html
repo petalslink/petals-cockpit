@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <md-card-content>
             <form (ngSubmit)="deploy(fileToDeploy, serviceUnitName)" *ngIf="component.state && component.state !== 'Loaded'">
               <div *ngIf="fileToDeploy && component.state && component.state !== 'Loaded'" class="selected-file" fxFlexLayout="row" fxLayoutAlign="end center">
-                <span>Selected file :</span> <span class="file-name">{{ fileToDeploy.name }}</span>
+                <span>Selected file:</span> <span class="file-name">{{ fileToDeploy.name }}</span>
               </div>
 
               <button type="button" md-raised-button (click)="deploySu.click()" class="choose-file" [disabled]="!component.state || component.state === 'Loaded'">
@@ -60,7 +60,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </div>
 
         <div *ngIf="component.errorDeployment" fxFlex class="error error-deploy">
-          <div class="title bold margin-bottom-x1">An error occured :</div>
+          <div class="title bold margin-bottom-x1">An error occurred:</div>
           <span class="message italic">{{ component.errorDeployment }}</span>
         </div>
       </md-card-title-group>

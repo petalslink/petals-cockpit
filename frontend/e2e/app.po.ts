@@ -19,7 +19,6 @@ import { browser, element, by, ExpectedConditions as EC, ElementFinder } from 'p
 import * as util from 'protractor/built/util';
 
 export class PetalsCockpitPage {
-
   navigateTo(clearSession = true) {
     if (clearSession) {
       browser.get('/');
@@ -27,6 +26,7 @@ export class PetalsCockpitPage {
       // so we needed first to connect with get!
       browser.manage().deleteAllCookies();
     }
+
     return browser.get('/');
   }
 
@@ -168,7 +168,6 @@ export class PetalsCockpitPage {
 
   clickAndExpectNotification(el: ElementFinder, title?: Matcher, content?: Matcher) {
     return el.click().then(() => {
-
       const simpleNotification = element(by.css(`simple-notification`));
 
       let test = EC.visibilityOf(simpleNotification);
@@ -182,7 +181,6 @@ export class PetalsCockpitPage {
         const contentE = simpleNotification.element(by.css(`.sn-content`));
         test = EC.and(test, textToMatchInElement(contentE, content));
       }
-
 
       browser.ignoreSynchronization = true;
 
