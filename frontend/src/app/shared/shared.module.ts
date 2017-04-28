@@ -28,6 +28,8 @@ import { PrettyJsonModule } from 'angular2-prettyjson';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { NgObjectPipesModule } from 'ngx-pipes';
 
+import { SwiperModule } from 'angular2-useful-swiper';
+
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
 
@@ -43,7 +45,8 @@ export const modules = [
   TranslateModule,
   PrettyJsonModule,
   SimpleNotificationsModule,
-  NgObjectPipesModule
+  NgObjectPipesModule,
+  SwiperModule
 ];
 
 export const declarations = [GenerateIconComponent, ColorSearchedLettersDirective];

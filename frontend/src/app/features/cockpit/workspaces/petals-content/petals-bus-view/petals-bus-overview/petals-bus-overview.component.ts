@@ -18,6 +18,7 @@
 import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 
 import { IBusRow } from '../../../state/buses/bus.interface';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
 
 @Component({
   selector: 'app-petals-bus-overview',
@@ -27,6 +28,25 @@ import { IBusRow } from '../../../state/buses/bus.interface';
 })
 export class PetalsBusOverviewComponent implements OnInit {
   @Input() bus: IBusRow;
+  @Input() containers: IContainerRow[];
+  @Input() workspaceId: string;
+
+  public config: any = {
+    pagination: '.swiper-pagination',
+    nextButton: '.swiper-button-next',
+    prevButton: '.swiper-button-prev',
+    direction: 'horizontal',
+    mousewheelControl: true,
+    slidesPerView: 'auto',
+    centeredSlides: false,
+    paginationClickable: true,
+    keyboardControl: true,
+    spaceBetween: 4,
+    freeMode: true,
+    grabCursor: true,
+    paginationHide: false,
+    paginationType: 'fraction',
+  };
 
   constructor() { }
 
