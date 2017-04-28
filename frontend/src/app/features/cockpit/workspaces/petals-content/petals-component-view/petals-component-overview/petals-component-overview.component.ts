@@ -40,7 +40,7 @@ export class PetalsComponentOverviewComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     // if an error happen, without that control the form will be reset to the values in store
-    if (changes.component.previousValue && changes.component.previousValue.id === changes.component.currentValue.id) {
+    if (changes.component.previousValue && changes.component.previousValue.parameters === changes.component.currentValue.parameters) {
       return;
     }
 
