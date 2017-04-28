@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
     <h3 class="color-primary-light-bold margin-top-x2">Deployment</h3>
     <md-card fxFlex class="deploy margin-top-x1" class="deploy">
-      <md-card-title-group>
-        <div fxFlex fxLayout="column" fxLayoutAlign="end end">
+      <md-card-title-group fxLayout="column">
+        <div fxLayout="column" fxLayoutAlign="end end">
           <md-card-subtitle>Component</md-card-subtitle>
           <!--<md-card-title>-->
           <!-- Material doesn't support inputs of type file -->
@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <md-card-content>
             <form (ngSubmit)="deploy(fileToDeploy)">
               <div *ngIf="fileToDeploy" class="selected-file" fxFlexLayout="row" fxLayoutAlign="end center">
-                <span>Selected file :</span> <span class="file-name">{{ fileToDeploy.name }}</span>
+                <span>Selected file:</span> <span class="file-name">{{ fileToDeploy.name }}</span>
               </div>
 
               <button type="button" md-raised-button (click)="deployComponent.click()" class="choose-file">
@@ -46,6 +46,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </button>
             </form>
           </md-card-content>
+        </div>
+
+        <div *ngIf="container.errorDeployment" fxFlex class="error error-deploy">
+          <div class="title bold margin-bottom-x1">An error occurred:</div>
+          <span class="message italic">{{ container.errorDeployment }}</span>
         </div>
       </md-card-title-group>
     </md-card>

@@ -48,7 +48,7 @@ export class BusesEffects {
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in buses.effects.ts : ofType(Buses.FETCH_BUS_DETAILS)');
+            console.warn('Error caught in buses.effects.ts: ofType(Buses.FETCH_BUS_DETAILS)');
             console.error(err);
             console.groupEnd();
           }
@@ -71,7 +71,7 @@ export class BusesEffects {
         .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in buses.effects : ofType(Buses.DELETE_BUS)');
+            console.warn('Error catched in buses.effects: ofType(Buses.DELETE_BUS)');
             console.error(err);
             console.groupEnd();
           }

@@ -29,6 +29,7 @@ export interface IContainerCommon {
   isFolded: boolean;
   isFetchingDetails: boolean;
   isDeployingComponent: boolean;
+  errorDeployment: string;
 }
 
 export interface IContainerRow extends IContainerCommon {
@@ -52,6 +53,7 @@ export function containerRowFactory(id?: string, name?: string, ip?: string, por
     isFolded: false,
     isFetchingDetails: false,
     isDeployingComponent: false,
+    errorDeployment: '',
 
     components: [],
     reachabilities: []

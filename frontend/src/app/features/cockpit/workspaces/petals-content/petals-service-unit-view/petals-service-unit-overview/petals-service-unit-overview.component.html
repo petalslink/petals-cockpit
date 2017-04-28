@@ -17,8 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="central-content">
     <div fxLayoutWrap fxLayoutGap="10px">
       <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="state">
-        <md-card-title-group>
-          <div fxFlex fxLayout="column" fxLayoutAlign="end end">
+        <md-card-title-group fxLayout="column">
+          <div fxLayout="column" fxLayoutAlign="end end">
             <md-card-subtitle>State</md-card-subtitle>
             <md-card-title>{{ serviceUnit.state }}</md-card-title>
             <md-card-content *ngIf="serviceUnit.state">
@@ -35,6 +35,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </md-card-content>
           </div>
           <div class="green-led"></div>
+
+          <div *ngIf="serviceUnit.errorChangeState" fxFlex class="error">
+            <div class="bold margin-bottom-x1">An error occurred:</div>
+            <span class="italic">{{ serviceUnit.errorChangeState }}</span>
+          </div>
         </md-card-title-group>
       </md-card>
     </div>

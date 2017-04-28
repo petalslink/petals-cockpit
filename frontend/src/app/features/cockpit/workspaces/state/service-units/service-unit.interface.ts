@@ -33,6 +33,7 @@ export interface IServiceUnitCommon {
   // for UI
   isFolded: boolean;
   isUpdatingState: boolean;
+  errorChangeState: string;
 }
 
 // tslint:disable-next-line:no-empty-interface
@@ -48,6 +49,7 @@ export function serviceUnitRowFactory(id?: string, name?: string, state?: keyof 
     state,
 
     isFolded: false,
-    isUpdatingState: false
+    isUpdatingState: false,
+    errorChangeState: ''
   };
 }

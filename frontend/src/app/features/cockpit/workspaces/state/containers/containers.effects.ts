@@ -50,7 +50,7 @@ export class ContainersEffects {
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in containers.effects.ts : ofType(Containers.FETCH_CONTAINER_DETAILS)');
+            console.warn('Error caught in containers.effects.ts: ofType(Containers.FETCH_CONTAINER_DETAILS)');
             console.error(err);
             console.groupEnd();
           }
@@ -72,19 +72,19 @@ export class ContainersEffects {
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn(`Error caught in containers.effects : ofType(${Containers.DEPLOY_COMPONENT})`);
+            console.warn(`Error caught in containers.effects: ofType(${Containers.DEPLOY_COMPONENT})`);
             console.error(err);
             console.groupEnd();
           }
 
           this.notification.error(
             'Deploy component failed',
-            `An error occured when trying to deploy the file "${action.payload.file.name}"`
+            `An error occurred when trying to deploy the file "${action.payload.file.name}"`
           );
 
           return Observable.of({
             type: Containers.DEPLOY_COMPONENT_ERROR,
-            payload: { containerId: action.payload.containerId }
+            payload: { containerId: action.payload.containerId, errorDeployment: err._body }
           });
         })
     );

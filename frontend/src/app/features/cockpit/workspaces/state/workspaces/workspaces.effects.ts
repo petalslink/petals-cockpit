@@ -79,12 +79,12 @@ export class WorkspacesEffects {
       .catch(err => {
         if (environment.debug) {
           console.group();
-          console.debug(`Error in workspaces.effects : ${Workspaces.FETCH_WORKSPACES}`);
+          console.debug(`Error in workspaces.effects: ${Workspaces.FETCH_WORKSPACES}`);
           console.error(err);
           console.groupEnd();
         }
 
-        this.notification.error(`Workspaces`, `An error occured while loading the workspaces.`);
+        this.notification.error(`Workspaces`, `An error occurred while loading the workspaces.`);
         return Observable.of({ type: Workspaces.FETCH_WORKSPACES_FAILED, payload: action.payload });
       })
     );
@@ -101,12 +101,12 @@ export class WorkspacesEffects {
       .catch(err => {
         if (environment.debug) {
           console.group();
-          console.debug(`Error in workspaces.effects : ${Workspaces.POST_WORKSPACE}`);
+          console.debug(`Error in workspaces.effects: ${Workspaces.POST_WORKSPACE}`);
           console.error(err);
           console.groupEnd();
         }
 
-        this.notification.error(`Workspaces`, `An error occured while adding a new workspace.`);
+        this.notification.error(`Workspaces`, `An error occurred while adding a new workspace.`);
         return Observable.of({ type: Workspaces.POST_WORKSPACE_FAILED });
       })
     );
@@ -154,12 +154,12 @@ export class WorkspacesEffects {
       .catch(err => {
         if (environment.debug) {
           console.group();
-          console.debug(`Error in workspaces.effects : ${Workspaces.FETCH_WORKSPACE}`);
+          console.debug(`Error in workspaces.effects: ${Workspaces.FETCH_WORKSPACE}`);
           console.error(err);
           console.groupEnd();
         }
 
-        this.notification.error(`Workspace`, `An error occured while loading the workspace.`);
+        this.notification.error(`Workspace`, `An error occurred while loading the workspace.`);
         return Observable.empty();
       })
     );
@@ -200,7 +200,7 @@ export class WorkspacesEffects {
         .catch((err) => {
           if (environment.debug) {
             console.group();
-            console.warn(`Error caught in workspaces.effects : ${Workspaces.FETCH_WORKSPACE_DETAILS}`);
+            console.warn(`Error caught in workspaces.effects: ${Workspaces.FETCH_WORKSPACE_DETAILS}`);
             console.error(err);
             console.groupEnd();
           }
@@ -222,7 +222,7 @@ export class WorkspacesEffects {
         .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn(`Error catched in workspaces.effects : ${Workspaces.SET_DESCRIPTION}`);
+            console.warn(`Error catched in workspaces.effects: ${Workspaces.SET_DESCRIPTION}`);
             console.error(err);
             console.groupEnd();
           }
@@ -241,7 +241,7 @@ export class WorkspacesEffects {
         .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in workspace.effects : ofType(Workspaces.DELETE_WORKSPACE)');
+            console.warn('Error catched in workspace.effects: ofType(Workspaces.DELETE_WORKSPACE)');
             console.error(err);
             console.groupEnd();
           }

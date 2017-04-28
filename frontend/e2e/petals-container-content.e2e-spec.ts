@@ -66,6 +66,44 @@ describe(`Petals container content`, () => {
     expect(element(by.css(`app-petals-container-view md-toolbar-row .title`)).getText()).toEqual('Cont 1');
   });
 
+  it(`should show a detailed error if the component deployment fails`, () => {
+    page.getWorkspaceTreeByName('Cont 0').click();
+
+    element(by.cssContainingText(`app-petals-container-view md-tab-header .mat-tab-label`, 'Operations')).click();
+
+    const chooseFileBtn = element(by.css(`app-petals-container-operations .deploy .choose-file`));
+    const fileInput = element(by.css(`app-petals-container-operations .deploy input[type="file"]`));
+    const selectedFile = element(by.css(`app-petals-container-operations .deploy .selected-file .file-name`));
+    const deployBtn = element(by.css(`app-petals-container-operations .deploy form button[type="submit"]`));
+    const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
+    const errorDetailsTitle = element(by.css(`app-petals-container-operations .deploy .error-deploy .title`));
+    const errorDetailsMessage = element(by.css(`app-petals-container-operations .deploy .error-deploy .message`));
+
+    browser.wait(EC.elementToBeClickable(chooseFileBtn), 3000);
+
+    expect(chooseFileBtn.getText()).toEqual(`Choose a file to upload`);
+    // simulate the file selection
+    fileInput.sendKeys(filePath);
+
+    // once the file is selected, check that the other part of the form is displayed
+    expect(selectedFile.isDisplayed()).toBe(true);
+    expect(selectedFile.getText()).toEqual(`error-deploy.zip`);
+    expect(chooseFileBtn.getText()).toEqual(`Change the file`);
+
+    expect(deployBtn.getText()).toMatch(`Deploy`);
+    expect(deployBtn.isEnabled()).toBe(true);
+
+    // deploy the component
+    page.clickAndExpectNotification(
+      deployBtn,
+      'Deploy component failed',
+      'An error occurred when trying to deploy the file "error-deploy.zip"'
+    );
+
+    expect(errorDetailsTitle.getText()).toEqual('An error occurred:');
+    expect(errorDetailsMessage.getText()).toEqual('[Mock message] An error happened when trying to deploy the component');
+  });
+
   it(`should deploy a component`, () => {
     page.getWorkspaceTreeByName('Cont 0').click();
 
@@ -97,20 +135,20 @@ describe(`Petals container content`, () => {
 
     const expectedTreeBeforeDeploy = [
       `Bus 0`,
-        `Cont 0`,
-          `Comp 0`,
-            `SU 0`,
-            `SU 1`,
-          `Comp 1`,
-            `SU 2`,
-            `SU 3`,
-        `Cont 1`,
-          `Comp 2`,
-            `SU 4`,
-            `SU 5`,
-          `Comp 3`,
-            `SU 6`,
-            `SU 7`
+      `Cont 0`,
+      `Comp 0`,
+      `SU 0`,
+      `SU 1`,
+      `Comp 1`,
+      `SU 2`,
+      `SU 3`,
+      `Cont 1`,
+      `Comp 2`,
+      `SU 4`,
+      `SU 5`,
+      `Comp 3`,
+      `SU 6`,
+      `SU 7`
     ];
 
     expect(page.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
@@ -121,22 +159,22 @@ describe(`Petals container content`, () => {
     // check that the component is now added to the tree and that we've been redirected to it
     const expectedTreeAfterDeploy = [
       `Bus 0`,
-        `Cont 0`,
-          `Comp 0`,
-            `SU 0`,
-            `SU 1`,
-          `Comp 1`,
-            `SU 2`,
-            `SU 3`,
-          // this one should have been deployed
-          `component`,
-        `Cont 1`,
-          `Comp 2`,
-            `SU 4`,
-            `SU 5`,
-          `Comp 3`,
-            `SU 6`,
-            `SU 7`
+      `Cont 0`,
+      `Comp 0`,
+      `SU 0`,
+      `SU 1`,
+      `Comp 1`,
+      `SU 2`,
+      `SU 3`,
+      // this one should have been deployed
+      `component`,
+      `Cont 1`,
+      `Comp 2`,
+      `SU 4`,
+      `SU 5`,
+      `Comp 3`,
+      `SU 6`,
+      `SU 7`
     ];
 
     expect(page.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);

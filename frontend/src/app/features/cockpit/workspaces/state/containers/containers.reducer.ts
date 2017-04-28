@@ -80,11 +80,20 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_CONTAINER = `${Containers.reducerName} Set current container`;
   private static setCurrentContainer(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
+    const res = <IContainersTable>{
+      selectedContainerId: payload.containerId
+    };
+
+    if (payload.containerId) {
+      return {
+        ...updateById(containersTable, payload.containerId, { errorDeployment: '' }),
+        ...res
+      };
+    }
+
     return {
       ...containersTable,
-      ...<IContainersTable>{
-        selectedContainerId: payload.containerId
-      }
+      ...res
     };
   }
 
@@ -116,8 +125,10 @@ export class Containers {
   }
   // tslint:disable-next-line:member-ordering
   public static DEPLOY_COMPONENT_ERROR = `${Containers.reducerName} Deploy component error`;
-  private static deployComponentError(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
-    return updateById(containersTable, payload.containerId, { isDeployingComponent: false });
+  private static deployComponentError(
+    containersTable: IContainersTable,
+    payload: { containerId: string, errorDeployment: string }): IContainersTable {
+    return updateById(containersTable, payload.containerId, { isDeployingComponent: false, errorDeployment: payload.errorDeployment });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -130,7 +141,8 @@ export class Containers {
 
     return updateById(containersTable, payload.containerId, {
       components: [...Array.from(new Set([...container.components, payload.component.id]))],
-      isDeployingComponent: false
+      isDeployingComponent: false,
+      errorDeployment: ''
     });
   }
 

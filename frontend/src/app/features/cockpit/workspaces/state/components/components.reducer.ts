@@ -80,11 +80,20 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_COMPONENT = `${Components.reducerName} Set current component`;
   private static setCurrentComponent(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
+    const res = <IComponentsTable>{
+      selectedComponentId: payload.componentId
+    };
+
+    if (payload.componentId) {
+      return {
+        ...updateById(componentsTable, payload.componentId, { errorChangeState: '', errorDeployment: '' }),
+        ...res
+      };
+    }
+
     return {
       ...componentsTable,
-      ...<IComponentsTable>{
-        selectedComponentId: payload.componentId
-      }
+      ...res
     };
   }
 
@@ -125,13 +134,19 @@ export class Components {
     // it wouldn't be accurate until next get details
     const parameters = payload.parameters || {};
 
-    return updateById(componentsTable, payload.componentId, { state: payload.newState, isUpdatingState: false, parameters });
+    return updateById(
+      componentsTable,
+      payload.componentId,
+      { state: payload.newState, isUpdatingState: false, parameters, errorChangeState: '' }
+    );
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_ERROR = `${Components.reducerName} Change state error`;
-  private static changeStateError(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, { isUpdatingState: false });
+  private static changeStateError(
+    componentsTable: IComponentsTable,
+    payload: { componentId: string, errorChangeState: string }): IComponentsTable {
+    return updateById(componentsTable, payload.componentId, { isUpdatingState: false, errorChangeState: payload.errorChangeState });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -148,8 +163,10 @@ export class Components {
 
   // tslint:disable-next-line:member-ordering
   public static DEPLOY_SERVICE_UNIT_ERROR = `${Components.reducerName} Deploy service unit error`;
-  private static deployServiceUnitError(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, { isDeployingServiceUnit: false });
+  private static deployServiceUnitError(
+    componentsTable: IComponentsTable,
+    payload: { componentId: string, errorDeployment: string }): IComponentsTable {
+    return updateById(componentsTable, payload.componentId, { isDeployingServiceUnit: false, errorDeployment: payload.errorDeployment });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -162,7 +179,8 @@ export class Components {
 
     return updateById(componentsTable, payload.componentId, {
       serviceUnits: [...Array.from(new Set([...component.serviceUnits, payload.serviceUnit.id]))],
-      isDeployingServiceUnit: false
+      isDeployingServiceUnit: false,
+      errorDeployment: ''
     });
   }
 

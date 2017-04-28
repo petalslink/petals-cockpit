@@ -99,7 +99,7 @@ describe(`Import Bus`, () => {
     importBtn.click();
 
     // the first one should fail
-    expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).getText()).toEqual('Error 500 : Error backend');
+    expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).getText()).toEqual('Error 500: Error backend');
 
     // clear the form and the error
     clearBtn.click();
