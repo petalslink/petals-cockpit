@@ -44,16 +44,8 @@ export class ComponentOverviewPage extends ComponentPage {
   public static readonly overview = ComponentPage.component.$(`app-petals-component-overview`);
 
   public readonly overview = ComponentOverviewPage.overview;
-  public readonly stateCard = this.overview.$(`md-card.state`);
-  public readonly state = this.stateCard.$(`md-card-title`);
-  public readonly type = this.overview.$(`md-card.type md-card-title`);
-  public readonly stopButton = this.stateCard.element(by.cssContainingText(`button`, `Stop`));
-  public readonly startButton = this.stateCard.element(by.cssContainingText(`button`, `Start`));
-  public readonly installButton = this.stateCard.element(by.cssContainingText(`button`, `Install`));
-  public readonly uninstallButton = this.stateCard.element(by.cssContainingText(`button`, `Uninstall`));
-  public readonly unloadButton = this.stateCard.element(by.cssContainingText(`button`, `Unload`));
-  public readonly changeStateError = this.stateCard.$(`.error .italic`);
-  public readonly parameters = this.stateCard.$(`.parameters`);
+  public readonly state = this.overview.$(`md-card .component-state`);
+  public readonly type = this.overview.$(`md-card .component-type`);
 
   static waitAndGet() {
     super.wait();
@@ -64,10 +56,6 @@ export class ComponentOverviewPage extends ComponentPage {
   private constructor() {
     super();
   }
-
-  parameter(name: string) {
-    return this.parameters.$(`input[placeholder="${name}"]`);
-  }
 }
 
 export class ComponentOperationPage extends ComponentPage {
@@ -75,6 +63,21 @@ export class ComponentOperationPage extends ComponentPage {
   public static readonly operations = ComponentPage.component.$(`app-petals-component-operations`);
 
   public readonly operations = ComponentOperationPage.operations;
+
+  public readonly lifecycleCard = this.operations.$(`md-card.component-lifecycle`);
+
+  public readonly state = this.lifecycleCard.$(`md-card-subtitle span.component-state`);
+  public readonly stopButton = this.lifecycleCard.element(by.cssContainingText(`button`, `Stop`));
+  public readonly startButton = this.lifecycleCard.element(by.cssContainingText(`button`, `Start`));
+  public readonly installButton = this.lifecycleCard.element(by.cssContainingText(`button`, `Install`));
+  public readonly uninstallButton = this.lifecycleCard.element(by.cssContainingText(`button`, `Uninstall`));
+  public readonly unloadButton = this.lifecycleCard.element(by.cssContainingText(`button`, `Unload`));
+  public readonly changeStateError = this.lifecycleCard.$(`.error .italic`);
+  public readonly parameters = this.lifecycleCard.$(`.parameters`);
+
+  public readonly deploys = this.operations.$(`.deploys`);
+
+  // deploy a su
 
   static waitAndGet() {
     super.wait();
@@ -88,5 +91,9 @@ export class ComponentOperationPage extends ComponentPage {
 
   getSUUpload() {
     return UploadComponentPage.waitAndGet('deploy-service-unit');
+  }
+
+  parameter(name: string) {
+    return this.parameters.$(`input[placeholder="${name}"]`);
   }
 }

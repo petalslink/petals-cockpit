@@ -15,18 +15,82 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="content content-max-width" fxLayoutWrap>
   <div class="central-content">
+    <md-card fxLayout="column" class="component-lifecycle">
 
-    <h3 class="color-primary-light-bold margin-top-x2">Deployment</h3>
-    <div fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="10px">
+      <md-card-title fxLayout="row">
+        <span fxFlex class="text-upper">Lifecycle</span>
+        <md-icon color="primary">play_for_work</md-icon>
+      </md-card-title>
+
+      <div fxLayout="column">
+        <md-card-subtitle>State: <b><span class="component-state">{{ component.state }}</span></b></md-card-subtitle>
+
+        <md-divider></md-divider>
+
+        <md-card-subtitle class="margin-top-x1 component-parameters" fxFlexLayout="row" fxLayoutAlign="start center" *ngIf="component.state === 'Loaded'">
+          <span fxFlex>Install parameters</span>
+          <md-icon class="margin-left-x1">build</md-icon>
+        </md-card-subtitle>
+
+        <!-- TODO : Move that into a modal ? -->
+        <md-card-content fxLayout="column" *ngIf="component.state === 'Loaded'" class="parameters">
+          <form *ngIf="parametersForm" [formGroup]="parametersForm">
+            <div *ngFor="let param of parametersForm.controls | keys">
+              <md-input-container floatPlaceholder="always">
+                <input mdInput [placeholder]="param" type="text" [formControlName]="param">
+              </md-input-container>
+            </div>
+          </form>
+        </md-card-content>
+      </div>
+
+      <md-card-content class="margin-top-x1" *ngIf="component.state">
+        <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:componentState">
+          <button
+            class="text-upper"
+            md-button
+            color="primary"
+            (click)="changeState(possibleState.newStateAfterAction)"
+            [disabled]="component.isFetchingDetails || component.isUpdatingState || ((possibleState.actionName === 'Unload' || possibleState.actionName === 'Uninstall') && component.serviceUnits.length > 0)"
+          >
+            {{ possibleState.actionName }}
+
+            <md-icon
+              *ngIf="possibleState.actionName === 'Unload' && component.serviceUnits.length > 0"
+              mdTooltip="To unload a component, all service units of the component should be unloaded first"
+              mdTooltipPosition="above"
+              class="margin-left-x1"
+            >
+              info
+            </md-icon>
+            <md-icon
+              *ngIf="possibleState.actionName === 'Uninstall' && component.serviceUnits.length > 0"
+              mdTooltip="To uninstall a component, all service units of the component should be unloaded first"
+              mdTooltipPosition="above"
+              class="margin-left-x1"
+            >
+              info
+            </md-icon>
+          </button>
+        </span>
+      </md-card-content>
+
+      <md-card-content fxLayout="column" *ngIf="component.errorChangeState" class="error">
+        <div class="bold margin-bottom-x1">An error occurred:</div>
+        <span class="italic">{{ component.errorChangeState }}</span>
+      </md-card-content>
+    </md-card>
+
+    <div fxLayout="row" fxLayout.lt-lg="column" class="deploys">
       <app-upload
-        [title]="'SU'"
-        [disabled]="component.isDeployingServiceUnit"
+        [style.opacity]="component.state && component.state === 'Loaded' ? 0.5 : 1"
+        [title]="'Service Unit Deployment'"
+        [disabled]="component.isDeployingServiceUnit || (component.state && component.state === 'Loaded')"
         [error]="component.errorDeployment"
         [placeholderChangeFileName]="'Service unit name'"
         (onDeploy)="deploy($event.file, $event.name)"
         class="deploy-service-unit"
         fxFlexFill></app-upload>
     </div>
-
   </div>
 </div>

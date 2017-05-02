@@ -55,14 +55,14 @@ describe(`Petals container content`, () => {
   it('should have a correct component deployment form', () => {
     const upload = workspace.openContainer('Cont 0').openOperations().getCompUpload();
 
-    expect(upload.chooseFileButton.getText()).toEqual(`Choose a file to upload`);
+    expect(upload.chooseFileButton.getText()).toEqual(`CHOOSE A FILE TO UPLOAD`);
     upload.fileInput.sendKeys('/test.zip');
 
     expect(upload.fileNameInput.isPresent()).toBe(false);
     expect(upload.fileName.getText()).toEqual(`test.zip`);
-    expect(upload.chooseFileButton.getText()).toEqual(`Change the file`);
+    expect(upload.chooseFileButton.getText()).toEqual(`CHANGE THE FILE`);
 
-    expect(upload.deployButton.getText()).toMatch(`Deploy`);
+    expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
     expect(upload.deployButton.isEnabled()).toBe(true);
   });
 
@@ -150,17 +150,17 @@ describe(`Petals container content`, () => {
 
     expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
-    // we should get redirected
-    const comp = ComponentOverviewPage.waitAndGet();
+    // we should be redirected
+    const ops = ComponentOverviewPage.waitAndGet().openOperations();
 
-    expect(comp.state.getText()).toEqual('Loaded');
+    expect(ops.state.getText()).toEqual('Loaded');
 
-    expect(comp.parameters.$('h3').getText()).toEqual('Install parameters');
-    expect(comp.parameters.$$('input').count()).toBe(2);
-    expect(comp.parameter('http-port').getAttribute('value')).toEqual('8080');
-    expect(comp.parameter('enable-https').getAttribute('value')).toEqual('false');
+    expect(ops.lifecycleCard.$('.component-parameters span').getText()).toEqual('Install parameters');
+    expect(ops.parameters.$$('input').count()).toBe(2);
+    expect(ops.parameter('http-port').getAttribute('value')).toEqual('8080');
+    expect(ops.parameter('enable-https').getAttribute('value')).toEqual('false');
 
-    expect(comp.installButton.isEnabled()).toBe(true);
-    expect(comp.unloadButton.isEnabled()).toBe(true);
+    expect(ops.installButton.isEnabled()).toBe(true);
+    expect(ops.unloadButton.isEnabled()).toBe(true);
   });
 });

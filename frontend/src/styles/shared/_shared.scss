@@ -217,3 +217,27 @@ md-sidenav {
     width: 33%;
   }
 }
+
+@mixin led($bg, $shadow1, $shadow2) {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: $bg;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 3px 1px, inset $shadow1 0 -1px 3px, $shadow2 0 1px 3px;
+}
+
+.green-led {
+  @include led(#ABFF00, #304701, #89FF00);
+}
+
+.red-led {
+  @include led(#F00, #441313, rgba(255, 0, 0, 0.5));
+}
+
+.yellow-led {
+  @include led(#FF0, #808002, #FF0);
+}
+
+.grey-led {
+  @include led(#DDD, #444, #DDD);
+}

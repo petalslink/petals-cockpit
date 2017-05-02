@@ -15,12 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy, SimpleChanges, OnChanges } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
-import { IComponentRow } from '../../../state/components/component.interface';
+import { IComponentRow, ComponentState, EComponentState } from '../../../state/components/component.interface';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
 import { Components } from '../../../state/components/components.reducer';
+import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
 
 @Component({
   selector: 'app-petals-component-operations',
@@ -28,14 +30,48 @@ import { Components } from '../../../state/components/components.reducer';
   styleUrls: ['./petals-component-operations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PetalsComponentOperationsComponent implements OnInit {
+export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
   @Input() component: IComponentRow;
   public fileToDeploy: File;
   public serviceUnitName: string;
+  public parametersForm: FormGroup;
 
   constructor(private store$: Store<IStore>) { }
 
   ngOnInit() { }
+
+  ngOnChanges(changes: SimpleChanges) {
+    // if an error happen, without that control the form will be reset to the values in store
+    if (changes.component.previousValue && changes.component.previousValue.parameters === changes.component.currentValue.parameters) {
+      return;
+    }
+
+    const parameters = changes.component.currentValue.parameters;
+    const keysParameters = Object.keys(parameters);
+
+    this.parametersForm = new FormGroup(
+      keysParameters
+        .reduce((acc, key) => ({ ...acc, [key]: new FormControl(parameters[key]) }), {})
+    );
+  }
+
+  getPossibleStateActions(state: ComponentState) {
+    return stateNameToPossibleActionsComponent(state);
+  }
+
+  changeState(newState: ComponentState) {
+    let parameters = null;
+
+    if (this.component.state === EComponentState.Loaded && newState !== EComponentState.Unloaded) {
+      parameters = this.parametersForm.value;
+    }
+
+    this.store$.dispatch({ type: Components.CHANGE_STATE, payload: { componentId: this.component.id, newState, parameters } });
+  }
+
+  componentState(index, item) {
+    return item.actionName;
+  }
 
   deploy(file: File, serviceUnitName: string) {
     this.store$.dispatch({
