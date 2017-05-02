@@ -27,16 +27,36 @@ export const EComponentState = {
   Unknown: 'Unknown' as 'Unknown'
 };
 
-export enum EComponentType { BC, SE }
+export type ComponentState = keyof typeof EComponentState;
 
-export interface IComponentCommon {
-  // from server
+export const EComponentType = {
+  BC: 'BC' as 'BC',
+  SE: 'SE' as 'SE'
+};
+
+export type ComponentType = keyof typeof EComponentType;
+
+export interface IComponentBackendSSECommon {
   id: string;
   name: string;
-  state: keyof typeof EComponentState;
-  type: EComponentType;
-  parameters: { [key: string]: string };
+  state: ComponentState;
+  type: ComponentType;
+  containerId: string;
+}
 
+export interface IComponentBackendDetailsCommon {
+  parameters: { [key: string]: string };
+}
+
+export interface IComponentBackendSSE extends IComponentBackendSSECommon {
+  // from server (sse)
+  serviceUnits: string[];
+}
+
+// tslint:disable-next-line:no-empty-interface
+export interface IComponentBackendDetails extends IComponentBackendDetailsCommon {}
+
+export interface IComponentUI {
   // for UI
   isFolded: boolean;
   isFetchingDetails: boolean;
@@ -46,24 +66,20 @@ export interface IComponentCommon {
   errorDeployment: string;
 }
 
-export interface IComponentRow extends IComponentCommon {
-  // from server
-  serviceUnits: string[];
+export interface IComponentRow extends IComponentUI, IComponentBackendSSE, IComponentBackendDetails {
 }
 
-export interface IComponent extends IComponentCommon {
-  // from server
+export interface IComponent extends IComponentUI, IComponentBackendSSECommon, IComponentBackendDetailsCommon {
   serviceUnits: IServiceUnits;
 }
 
-export function componentRowFactory(
-  id?: string, name?: string, state?: keyof typeof EComponentState, type?: EComponentType
-): IComponentRow {
+export function componentRowFactory(): IComponentRow {
   return {
-    id,
-    name,
-    state,
-    type,
+    id: null,
+    name: null,
+    state: null,
+    type: null,
+    containerId: null,
     parameters: {},
 
     isFolded: false,

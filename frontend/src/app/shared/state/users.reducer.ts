@@ -18,8 +18,8 @@
 import { Action } from '@ngrx/store';
 
 import { IUsersTable, usersTableFactory } from '../interfaces/users.interface';
-import { putById, updateById, mergeInto } from 'app/shared/helpers/map.helper';
-import { userRowFactory } from 'app/shared/interfaces/user.interface';
+import { putById, updateById, mergeInto, JsMap } from 'app/shared/helpers/map.helper';
+import { userRowFactory, IUserBackend } from 'app/shared/interfaces/user.interface';
 
 export class Users {
   private static reducerName = '[Users]';
@@ -34,7 +34,7 @@ export class Users {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_USERS_SUCCESS = `${Users.reducerName} Fetch users success`;
-  private static fetchUsersSuccess(users: IUsersTable, payload): IUsersTable {
+  private static fetchUsersSuccess(users: IUsersTable, payload: JsMap<IUserBackend>): IUsersTable {
     return mergeInto(users, payload, userRowFactory());
   }
 

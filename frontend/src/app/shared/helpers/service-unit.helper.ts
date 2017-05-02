@@ -15,14 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { EServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
-import { IComponentsTable } from '../../features/cockpit/workspaces/state/components/components.interface';
+import { ServiceUnitState, EServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
 
 /**
- * @param {string} state : The state you want to get the possible actions from. For example : 'Started'
- * @returns {{ actionName: string, newStateAfterAction: EServiceUnitState }[]} : The possible new actions according to the state
+ * @param state : The state you want to get the possible actions from. For example : 'Started'
+ * @returns The possible new actions according to the state
  */
-export function stateNameToPossibleActionsServiceUnit(state: string): { actionName: string, newStateAfterAction: string }[] {
+export function stateNameToPossibleActionsServiceUnit(
+  state: ServiceUnitState
+): { actionName: string, newStateAfterAction: ServiceUnitState }[] {
   switch (state) {
     case EServiceUnitState.Shutdown:
       return [
@@ -53,11 +54,4 @@ export function stateNameToPossibleActionsServiceUnit(state: string): { actionNa
     default:
       throw new Error(`SU state cannot be '${state}'`);
   }
-}
-
-export function getComponentOfServiceUnit(componentsTable: IComponentsTable, serviceUnitId: string) {
-  return componentsTable
-    .allIds
-    .map(componentId => componentsTable.byId[componentId])
-    .find(component => component.serviceUnits.includes(serviceUnitId));
 }

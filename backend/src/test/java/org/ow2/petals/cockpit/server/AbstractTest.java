@@ -16,12 +16,21 @@
  */
 package org.ow2.petals.cockpit.server;
 
+import org.slf4j.LoggerFactory;
+
 import ch.qos.logback.classic.Level;
 import io.dropwizard.logging.BootstrapLogging;
 
 public class AbstractTest {
 
     static {
-        BootstrapLogging.bootstrap(Level.INFO);
+        // the level parameter corresponds to the maximum level to be printed on the console
+        BootstrapLogging.bootstrap(Level.ALL);
+
+        // by default everything is set to INFO
+        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME))
+                .setLevel(Level.INFO);
+        // if needed, use this to set more specific log levels
+        // ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(LoggerListener.class)).setLevel(Level.DEBUG);
     }
 }

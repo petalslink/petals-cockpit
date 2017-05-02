@@ -21,12 +21,14 @@ import static org.assertj.db.api.Assertions.assertThat;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
@@ -66,6 +68,7 @@ import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
@@ -73,7 +76,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecor
 import org.ow2.petals.cockpit.server.mocks.MockArtifactServer;
 import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
+import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
@@ -88,8 +91,6 @@ import co.paralleluniverse.common.util.Debug;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import io.dropwizard.testing.junit.ResourceTestRule.Builder;
 import javaslang.Tuple2;
-import javaslang.Tuple3;
-import javaslang.Tuple4;
 
 /**
  * Note: to override one of the already implemented method in {@link #workspaces} or {@link #buses}, it is needed to use
@@ -122,6 +123,8 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
     @Rule
     public MockArtifactServer httpServer = new MockArtifactServer();
+
+    private final Map<Object, Long> ids = new HashMap<>();
 
     protected ResourceTestRule buildResourceTest(Class<?>... resources) {
         Builder builder = ResourceTestRule.builder()
@@ -169,6 +172,20 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         DSL.using(dbRule.getConnectionJdbcUrl()).execute("DROP ALL OBJECTS");
     }
 
+    protected long getId(Object o) {
+        assertThat(o).isNotNull();
+        Long id = ids.get(o);
+        assertThat(id).isNotNull();
+        assert id != null;
+        return id;
+    }
+
+    private void setId(Object o, long id) {
+        assertThat(o).isNotNull();
+        Long old = ids.putIfAbsent(o, id);
+        assertThat(old).isNull();
+    }
+
     protected Table table(org.jooq.Table<?> table) {
         return new Table(dbRule.getDataSource(), table.getName());
     }
@@ -177,12 +194,20 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         return assertThat(requestSU(id)).hasNumberOfRows(1).row();
     }
 
+    protected RequestRowAssert assertThatDbSA(long id) {
+        return assertThat(requestSA(id)).hasNumberOfRows(1).row();
+    }
+
     protected RequestRowAssert assertThatDbComp(long id) {
         return assertThat(requestComp(id)).hasNumberOfRows(1).row();
     }
 
     protected void assertNoDbSU(long id) {
         assertThat(requestSU(id)).hasNumberOfRows(0);
+    }
+
+    protected void assertNoDbSA(long id) {
+        assertThat(requestSA(id)).hasNumberOfRows(0);
     }
 
     protected void assertNoDbComp(long id) {
@@ -218,6 +243,10 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         return requestBy(SERVICEUNITS.ID, id);
     }
 
+    protected Request requestSA(long id) {
+        return requestBy(SERVICEASSEMBLIES.ID, id);
+    }
+
     protected Request requestComp(long id) {
         return requestBy(COMPONENTS.ID, id);
     }
@@ -225,64 +254,65 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     /**
      * TODO generate id automatically? but then we need some kind of way to query this data after that!
      */
-    protected void setupWorkspace(long wsId, String wsName,
-            List<Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>>>>> data,
-            String... users) {
-
-        List<BusesRecord> bs = new ArrayList<>();
-        List<ContainersRecord> cs = new ArrayList<>();
-        List<ComponentsRecord> comps = new ArrayList<>();
-        List<ServiceunitsRecord> sus = new ArrayList<>();
-
-        for (Tuple4<Long, Domain, String, List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>>>> bus : data) {
-            long bId = bus._1;
-            String passphrase = bus._3;
-            List<Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>>> containers = bus._4;
-            Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>> entry = containers
-                    .iterator().next();
-
-            bs.add(new BusesRecord(bId, wsId, true, entry._2.getHost(), getPort(entry._2), entry._2.getJmxUsername(),
-                    entry._2.getJmxPassword(), passphrase, null, bus._2.getName()));
-
-            for (Tuple3<Long, Container, List<Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>>>> c : containers) {
-
-                long cId = c._1;
-                c._2.addProperty("petals.topology.passphrase", passphrase);
-
-                // TODO handle also artifacts
-                cs.add(new ContainersRecord(cId, bId, c._2.getContainerName(), c._2.getHost(), getPort(c._2),
-                        c._2.getJmxUsername(), c._2.getJmxPassword()));
-
-                for (Tuple3<Long, Component, List<Tuple2<Long, ServiceAssembly>>> comp : c._3) {
-
-                    long compId = comp._1;
-
-                    comps.add(new ComponentsRecord(compId, cId, comp._2.getName(),
-                            ComponentMin.State.from(comp._2.getState()).name(),
-                            ComponentMin.Type.from(comp._2.getComponentType()).name()));
-
-                    for (Tuple2<Long, ServiceAssembly> su : comp._3) {
-                        long suId = su._1;
-                        List<ServiceUnit> sasus = su._2.getServiceUnits();
-                        assert sasus.size() == 1;
-                        ServiceUnit sasu = sasus.get(0);
-                        assert sasu != null;
-
-                        sus.add(new ServiceunitsRecord(suId, compId, sasu.getName(),
-                                ServiceUnitMin.State.from(su._2.getState()).name(), su._2.getName()));
-                    }
-                }
-            }
-        }
-
+    protected void setupWorkspace(long wsId, String wsName, List<Tuple2<Domain, String>> data, String... users) {
         DSL.using(dbRule.getConnectionJdbcUrl()).transaction(conf -> {
+
             DSL.using(conf).executeInsert(new WorkspacesRecord(wsId, wsName, ""));
-            DSL.using(conf).batchInsert(bs).execute();
-            DSL.using(conf).batchInsert(cs).execute();
-            DSL.using(conf).batchInsert(comps).execute();
-            DSL.using(conf).batchInsert(sus).execute();
+
             for (String user : users) {
                 DSL.using(conf).executeInsert(new UsersWorkspacesRecord(wsId, user));
+            }
+
+            for (Tuple2<Domain, String> d : data) {
+                Domain bus = d._1;
+                String passphrase = d._2;
+                List<Container> containers = bus.getContainers();
+                Container entry = containers.iterator().next();
+
+                BusesRecord busDb = new BusesRecord(null, wsId, true, entry.getHost(), getPort(entry),
+                        entry.getJmxUsername(), entry.getJmxPassword(), passphrase, null, bus.getName());
+                busDb.attach(conf);
+                busDb.insert();
+                setId(bus, busDb.getId());
+
+                for (Container c : containers) {
+                    c.addProperty("petals.topology.passphrase", passphrase);
+
+                    // TODO handle also artifacts
+                    ContainersRecord cDb = new ContainersRecord(null, busDb.getId(), c.getContainerName(), c.getHost(),
+                            getPort(c), c.getJmxUsername(), c.getJmxPassword());
+                    cDb.attach(conf);
+                    cDb.insert();
+                    setId(c, cDb.getId());
+
+                    for (Component comp : c.getComponents()) {
+                        ComponentsRecord compDb = new ComponentsRecord(null, cDb.getId(), comp.getName(),
+                                ComponentMin.State.from(comp.getState()).name(),
+                                ComponentMin.Type.from(comp.getComponentType()).name());
+                        compDb.attach(conf);
+                        compDb.insert();
+                        setId(comp, compDb.getId());
+                    }
+
+                    for (ServiceAssembly sa : c.getServiceAssemblies()) {
+                        ServiceassembliesRecord saDb = new ServiceassembliesRecord(null, cDb.getId(), sa.getName(),
+                                ServiceAssemblyMin.State.from(sa.getState()).name());
+                        saDb.attach(conf);
+                        saDb.insert();
+                        setId(sa, saDb.getId());
+
+                        for (ServiceUnit su : sa.getServiceUnits()) {
+                            Long compId = ids.get(c.getComponents().stream()
+                                    .filter(comp -> comp.getName().equals(su.getTargetComponent())).findFirst().get());
+
+                            ServiceunitsRecord suDb = new ServiceunitsRecord(null, compId, su.getName(), saDb.getId(),
+                                    cDb.getId());
+                            suDb.attach(conf);
+                            suDb.insert();
+                            setId(su, suDb.getId());
+                        }
+                    }
+                }
             }
         });
     }
@@ -307,12 +337,13 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         assertThat(record.getType()).isEqualTo(ComponentMin.Type.from(component.getComponentType()).name());
     }
 
-    protected static void assertEquivalent(ServiceunitsRecord record, ServiceAssembly sa) {
-        assertThat(sa.getServiceUnits()).hasSize(1);
-        ServiceUnit su = sa.getServiceUnits().iterator().next();
+    protected static void assertEquivalent(ServiceassembliesRecord record, ServiceAssembly sa) {
+        assertThat(record.getName()).isEqualTo(sa.getName());
+        assertThat(record.getState()).isEqualTo(ServiceAssemblyMin.State.from(sa.getState()).name());
+    }
+
+    protected static void assertEquivalent(ServiceunitsRecord record, ServiceUnit su) {
         assertThat(record.getName()).isEqualTo(su.getName());
-        assertThat(record.getState()).isEqualTo(ServiceUnitMin.State.from(sa.getState()).name());
-        assertThat(record.getSaName()).isEqualTo(sa.getName());
     }
 
     protected static void expectEvent(EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {

@@ -17,14 +17,26 @@
 
 import { IComponents } from '../components/components.interface';
 
-export interface IContainerCommon {
-  // from server
+export interface IContainerBackendSSECommon {
   id: string;
   name: string;
+  busId: string;
+}
+export interface IContainerBackendDetailsCommon {
   ip: string;
   port: number;
   systemInfo: string;
+}
 
+export interface IContainerBackendSSE extends IContainerBackendSSECommon {
+  components: string[];
+}
+
+export interface IContainerBackendDetails extends IContainerBackendDetailsCommon {
+  reachabilities: string[];
+}
+
+export interface IContainerUI {
   // for UI
   isFolded: boolean;
   isFetchingDetails: boolean;
@@ -32,23 +44,20 @@ export interface IContainerCommon {
   errorDeployment: string;
 }
 
-export interface IContainerRow extends IContainerCommon {
-  // from server
-  components: string[];
-  reachabilities: string[];
-}
+export interface IContainerRow extends IContainerUI, IContainerBackendSSE, IContainerBackendDetails { }
 
-export interface IContainer extends IContainerCommon {
+export interface IContainer extends IContainerUI, IContainerBackendSSECommon, IContainerBackendDetailsCommon {
   components: IComponents;
 }
 
-export function containerRowFactory(id?: string, name?: string, ip?: string, port?: number, systemInfo?: string): IContainerRow {
+export function containerRowFactory(): IContainerRow {
   return {
-    id,
-    name,
-    ip,
-    port,
-    systemInfo,
+    id: null,
+    name: null,
+    busId: null,
+    ip: undefined,
+    port: undefined,
+    systemInfo: undefined,
 
     isFolded: false,
     isFetchingDetails: false,

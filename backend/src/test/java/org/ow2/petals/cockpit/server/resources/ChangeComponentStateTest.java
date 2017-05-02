@@ -42,7 +42,6 @@ import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
-import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentStateChanged;
 
@@ -83,27 +82,17 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
         petals.registerArtifact(component3, container);
         petals.registerArtifact(serviceAssembly1, container);
 
-        setupWorkspace(1, "test",
-                Arrays.asList(Tuple.of(10L, domain, "phrase",
-                        Arrays.asList(Tuple.of(20L, container,
-                                Arrays.asList(Tuple.of(30L, component1, Arrays.asList()),
-                                        Tuple.of(31L, component2, Arrays.asList()), Tuple.of(32L, component3,
-                                                Arrays.asList(Tuple.of(40L, serviceAssembly1)))))))),
-                ADMIN);
+        setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
     }
 
     @Test
     public void changeComp1State() {
-
-        ComponentOverview get1 = resources.target("/components/30").request().get(ComponentOverview.class);
-        assertThat(get1.state).isEqualTo(ComponentMin.State.Started);
-
         try (EventInput eventInput = resources.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
-            ComponentStateChanged put = resources.target("/workspaces/1/components/30").request().put(
+            ComponentStateChanged put = resources.target("/workspaces/1/components/" + getId(component1)).request().put(
                     Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)), ComponentStateChanged.class);
 
             assertThat(put.state).isEqualTo(ComponentMin.State.Stopped);
@@ -111,16 +100,19 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("COMPONENT_STATE_CHANGE");
                 ComponentStateChanged data = e.readData(ComponentStateChanged.class);
-                a.assertThat(data.id).isEqualTo(30);
+                a.assertThat(data.id).isEqualTo(getId(component1));
                 a.assertThat(data.state).isEqualTo(ComponentMin.State.Stopped);
             });
         }
 
-        assertThatDbComp(30).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component1)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component1.getState()).isEqualTo(ArtifactState.State.STOPPED);
-        assertThatDbComp(31).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component2)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component2.getState()).isEqualTo(ArtifactState.State.STOPPED);
-        assertThatDbComp(32).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component3)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component3.getState()).isEqualTo(ArtifactState.State.STOPPED);
     }
 
@@ -129,24 +121,30 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
         DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
-        setupWorkspace(2, "test2",
-                Arrays.asList(Tuple.of(11L, domain, "phrase",
-                        Arrays.asList(
-                                Tuple.of(21L, container, Arrays.asList(Tuple.of(33L, component1, Arrays.asList())))))),
-                "anotheruser");
+        Domain fDomain = new Domain("domf");
+        Container fContainer = new Container("contf", "host1", ImmutableMap.of(PortType.JMX, containerPort), "user",
+                "pass", State.REACHABLE);
+        fDomain.addContainers(fContainer);
+        Component fComponent = new Component("compf", ComponentType.SE, ArtifactState.State.STARTED);
+        fContainer.addComponent(fComponent);
+        setupWorkspace(2, "test2", Arrays.asList(Tuple.of(fDomain, "phrase")), "anotheruser");
 
-        Response put = resources.target("/workspaces/2/components/33").request()
+        Response put = resources.target("/workspaces/2/components/" + getId(fComponent)).request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
 
-        assertThatDbComp(30).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Started.name());
+        assertThatDbComp(getId(component1)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Started.name());
         assertThat(component1.getState()).isEqualTo(ArtifactState.State.STARTED);
-        assertThatDbComp(31).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component2)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component2.getState()).isEqualTo(ArtifactState.State.STOPPED);
-        assertThatDbComp(32).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component3)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component3.getState()).isEqualTo(ArtifactState.State.STOPPED);
-        assertThatDbComp(33).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Started.name());
+        assertThatDbComp(getId(fComponent)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Started.name());
     }
 
     @Test
@@ -156,16 +154,19 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
-        Response put = resources.target("/workspaces/2/components/50").request()
+        Response put = resources.target("/workspaces/2/components/32342342").request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
 
-        assertThatDbComp(30).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Started.name());
+        assertThatDbComp(getId(component1)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Started.name());
         assertThat(component1.getState()).isEqualTo(ArtifactState.State.STARTED);
-        assertThatDbComp(31).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component2)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component2.getState()).isEqualTo(ArtifactState.State.STOPPED);
-        assertThatDbComp(32).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component3)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component3.getState()).isEqualTo(ArtifactState.State.STOPPED);
     }
 
@@ -176,47 +177,49 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
-        Response put = resources.target("/workspaces/2/components/30").request()
+        Response put = resources.target("/workspaces/2/components/" + getId(component1)).request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
 
-        assertThatDbComp(30).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Started.name());
+        assertThatDbComp(getId(component1)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Started.name());
         assertThat(component1.getState()).isEqualTo(ArtifactState.State.STARTED);
-        assertThatDbComp(31).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component2)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component2.getState()).isEqualTo(ArtifactState.State.STOPPED);
-        assertThatDbComp(32).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component3)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component3.getState()).isEqualTo(ArtifactState.State.STOPPED);
     }
 
     @Test
     public void changeComp1StateNotFound() {
 
-        Response put = resources.target("/workspaces/1/components/33").request()
+        Response put = resources.target("/workspaces/1/components/339879").request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(404);
 
-        assertThatDbComp(30).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Started.name());
+        assertThatDbComp(getId(component1)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Started.name());
         assertThat(component1.getState()).isEqualTo(ArtifactState.State.STARTED);
-        assertThatDbComp(31).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component2)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component2.getState()).isEqualTo(ArtifactState.State.STOPPED);
-        assertThatDbComp(32).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component3)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component3.getState()).isEqualTo(ArtifactState.State.STOPPED);
     }
 
     @Test
     public void changeComp2StateUnload() {
-
-        ComponentOverview get1 = resources.target("/components/31").request().get(ComponentOverview.class);
-        assertThat(get1.state).isEqualTo(ComponentMin.State.Stopped);
-
         try (EventInput eventInput = resources.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
-            ComponentStateChanged put = resources.target("/workspaces/1/components/31").request().put(
+            ComponentStateChanged put = resources.target("/workspaces/1/components/" + getId(component2)).request().put(
                     Entity.json(new ComponentChangeState(ComponentMin.State.Unloaded)), ComponentStateChanged.class);
 
             assertThat(put.state).isEqualTo(ComponentMin.State.Unloaded);
@@ -224,70 +227,72 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("COMPONENT_STATE_CHANGE");
                 ComponentStateChanged data = e.readData(ComponentStateChanged.class);
-                a.assertThat(data.id).isEqualTo(31);
+                a.assertThat(data.id).isEqualTo(getId(component2));
                 a.assertThat(data.state).isEqualTo(ComponentMin.State.Unloaded);
             });
         }
 
-        assertThatDbComp(30).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Started.name());
+        assertThatDbComp(getId(component1)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Started.name());
         assertThat(component1.getState()).isEqualTo(ArtifactState.State.STARTED);
-        assertNoDbComp(31);
+        assertNoDbComp(getId(component2));
         assertThat(container.getComponents()).doesNotContain(component2);
-        assertThatDbComp(32).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component3)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component3.getState()).isEqualTo(ArtifactState.State.STOPPED);
     }
 
     @Test
     public void changeComp1StateNoChange() {
-        ComponentOverview get1 = resources.target("/components/30").request().get(ComponentOverview.class);
-        assertThat(get1.state).isEqualTo(ComponentMin.State.Started);
-
-        ComponentStateChanged put = resources.target("/workspaces/1/components/30").request()
+        ComponentStateChanged put = resources.target("/workspaces/1/components/" + getId(component1)).request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Started)), ComponentStateChanged.class);
 
         assertThat(put.state).isEqualTo(ComponentMin.State.Started);
 
-        assertThatDbComp(30).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Started.name());
+        assertThatDbComp(getId(component1)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Started.name());
         assertThat(component1.getState()).isEqualTo(ArtifactState.State.STARTED);
-        assertThatDbComp(31).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component2)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component2.getState()).isEqualTo(ArtifactState.State.STOPPED);
-        assertThatDbComp(32).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component3)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component3.getState()).isEqualTo(ArtifactState.State.STOPPED);
     }
 
     @Test
     public void changeComp1StateConflict() {
-        ComponentOverview get1 = resources.target("/components/30").request().get(ComponentOverview.class);
-        assertThat(get1.state).isEqualTo(ComponentMin.State.Started);
-
-        Response put = resources.target("/workspaces/1/components/30").request()
+        Response put = resources.target("/workspaces/1/components/" + getId(component1)).request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Unloaded)));
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
 
-        assertThatDbComp(30).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Started.name());
+        assertThatDbComp(getId(component1)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Started.name());
         assertThat(component1.getState()).isEqualTo(ArtifactState.State.STARTED);
-        assertThatDbComp(31).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component2)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component2.getState()).isEqualTo(ArtifactState.State.STOPPED);
-        assertThatDbComp(32).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component3)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component3.getState()).isEqualTo(ArtifactState.State.STOPPED);
     }
 
     @Test
     public void changeComp3StateConflictUnloaded() {
-        ComponentOverview get1 = resources.target("/components/32").request().get(ComponentOverview.class);
-        assertThat(get1.state).isEqualTo(ComponentMin.State.Stopped);
-
-        Response put = resources.target("/workspaces/1/components/32").request()
+        Response put = resources.target("/workspaces/1/components/" + getId(component3)).request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Unloaded)));
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
 
-        assertThatDbComp(30).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Started.name());
+        assertThatDbComp(getId(component1)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Started.name());
         assertThat(component1.getState()).isEqualTo(ArtifactState.State.STARTED);
-        assertThatDbComp(31).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component2)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component2.getState()).isEqualTo(ArtifactState.State.STOPPED);
-        assertThatDbComp(32).value(COMPONENTS.STATE.getName()).isEqualTo(ComponentMin.State.Stopped.name());
+        assertThatDbComp(getId(component3)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
         assertThat(component3.getState()).isEqualTo(ArtifactState.State.STOPPED);
     }
 }

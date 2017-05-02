@@ -17,31 +17,41 @@
 
 import { IContainers } from '../containers/containers.interface';
 
-export interface IBusCommon {
-  // from server
+export interface IBusBackendSSECommon {
   id: string;
   name: string;
+  workspaceId: string;
+}
 
+// tslint:disable-next-line:no-empty-interface
+export interface IBusBackendDetailsCommon { }
+
+export interface IBusBackendSSE extends IBusBackendSSECommon {
+  containers: string[];
+}
+
+// tslint:disable-next-line:no-empty-interface
+export interface IBusBackendDetails extends IBusBackendDetailsCommon { }
+
+export interface IBusUI {
   // for UI
   isFolded: boolean;
   isFetchingDetails: boolean;
 }
 
 // used within table
-export interface IBusRow extends IBusCommon {
-  // from server
-  containers: string[];
-}
+export interface IBusRow extends IBusUI, IBusBackendSSE, IBusBackendDetails { }
 
 // used in generated views
-export interface IBus extends IBusCommon {
+export interface IBus extends IBusUI, IBusBackendSSECommon, IBusBackendDetailsCommon {
   containers: IContainers;
 }
 
-export function busRowFactory(id?: string, name?: string): IBusRow {
+export function busRowFactory(): IBusRow {
   return {
-    id,
-    name,
+    id: null,
+    name: null,
+    workspaceId: null,
 
     isFolded: false,
     isFetchingDetails: false,

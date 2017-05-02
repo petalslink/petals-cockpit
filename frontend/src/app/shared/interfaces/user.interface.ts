@@ -15,22 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-interface IUserCommon {
+export interface IUserBackendCommon {
   // from server
   id: string;
   name: string;
 }
 
-// used within table
-// tslint:disable-next-line:no-empty-interface
-export interface IUserRow extends IUserCommon {
+export interface IUserBackend extends IUserBackendCommon {
   // from server (actually only present for current user)
   lastWorkspace: string;
 }
 
+// tslint:disable-next-line:no-empty-interface
+export interface IUserUI { }
+
+// used within table
+// tslint:disable-next-line:no-empty-interface
+export interface IUserRow extends IUserUI, IUserBackend { }
+
 // used in generated views
 // tslint:disable-next-line:no-empty-interface
-export interface IUser extends IUserCommon { }
+export interface IUser extends IUserBackendCommon { }
 
 export interface ICurrentUser extends IUserRow, IUser { }
 
@@ -41,10 +46,10 @@ export interface IUserLogin {
   password: string;
 }
 
-export function userRowFactory(id?: string, name?: string, lastWorkspace?: string): IUserRow {
+export function userRowFactory(): IUserRow {
   return {
-    id,
-    name,
-    lastWorkspace
+    id: null,
+    name: null,
+    lastWorkspace: undefined
   };
 }

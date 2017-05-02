@@ -31,11 +31,11 @@ import { Components } from './../../features/cockpit/workspaces/state/components
 import { Containers } from './../../features/cockpit/workspaces/state/containers/containers.reducer';
 import { environment } from './../../../environments/environment';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { IBusImport, IBusInProgressRow } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
-import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
-import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { IBusImport, IBusInProgressBackend } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
+import { IBusBackendSSE } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
+import { IContainerBackendSSE } from 'app/features/cockpit/workspaces/state/containers/container.interface';
+import { IServiceUnitBackendSSE } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { IComponentBackendSSE } from 'app/features/cockpit/workspaces/state/components/component.interface';
 import { toJavascriptMap } from 'app/shared/helpers/map.helper';
 
 
@@ -83,8 +83,8 @@ export class BusesServiceImpl extends BusesService {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT)
       .do(bip => this.store$.dispatch({
-        type: BusesInProgress.FETCH_BUSES_IN_PROGRESS,
-        payload: toJavascriptMap<IBusInProgressRow>({ [bip.id]: bip })
+        type: BusesInProgress.ADD_BUSES_IN_PROGRESS,
+        payload: toJavascriptMap<IBusInProgressBackend>({ [bip.id]: bip })
       }));
   }
 
@@ -113,7 +113,7 @@ export class BusesServiceImpl extends BusesService {
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_OK)
       .do((data: any) => {
 
-        const buses = toJavascriptMap<IBusRow>(data.buses);
+        const buses = toJavascriptMap<IBusBackendSSE>(data.buses);
 
         // there should be only one element in there!
         const bus = buses.byId[buses.allIds[0]];
@@ -122,10 +122,10 @@ export class BusesServiceImpl extends BusesService {
 
         this.store$.dispatch(batchActions([
           { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: bus.id },
-          { type: Buses.FETCH_BUSES_SUCCESS, payload: buses },
-          { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap<IContainerRow>(data.containers) },
-          { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap<IComponentRow>(data.components) },
-          { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitRow>(data.serviceUnits) },
+          { type: Buses.ADD_BUSES_SUCCESS, payload: buses },
+          { type: Containers.ADD_CONTAINERS_SUCCESS, payload: toJavascriptMap<IContainerBackendSSE>(data.containers) },
+          { type: Components.ADD_COMPONENTS_SUCCESS, payload: toJavascriptMap<IComponentBackendSSE>(data.components) },
+          { type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits) },
         ]));
       });
   }

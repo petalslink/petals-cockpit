@@ -28,6 +28,7 @@
     <loadData tableName="buses" file="e2e/data/buses.csv" />
     <loadData tableName="containers" file="e2e/data/containers.csv" />
     <loadData tableName="components" file="e2e/data/components.csv" />
+    <loadData tableName="serviceassemblies" file="e2e/data/serviceassemblies.csv" />
     <loadData tableName="serviceunits" file="e2e/data/serviceunits.csv" />
   </changeSet>
 

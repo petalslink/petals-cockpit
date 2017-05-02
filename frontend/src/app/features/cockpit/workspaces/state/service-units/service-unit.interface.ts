@@ -24,29 +24,45 @@ export const EServiceUnitState = {
   Unknown: 'Unknown' as 'Unknown'
 };
 
-export interface IServiceUnitCommon {
-  // from server
+export type ServiceUnitState = keyof typeof EServiceUnitState;
+
+export interface IServiceUnitBackendSSECommon {
   id: string;
   name: string;
-  state: keyof typeof EServiceUnitState;
+  containerId: string;
+  componentId: string;
+  serviceAssemblyId: string;
+  state: ServiceUnitState;
+}
 
+// tslint:disable-next-line:no-empty-interface
+export interface IServiceUnitBackendDetailsCommon { }
+
+// tslint:disable-next-line:no-empty-interface
+export interface IServiceUnitBackendSSE extends IServiceUnitBackendSSECommon { }
+
+// tslint:disable-next-line:no-empty-interface
+export interface IServiceUnitBackendDetails extends IServiceUnitBackendDetailsCommon { }
+
+export interface IServiceUnitUI {
   // for UI
   isFolded: boolean;
   isUpdatingState: boolean;
   errorChangeState: string;
 }
 
-// tslint:disable-next-line:no-empty-interface
-export interface IServiceUnitRow extends IServiceUnitCommon { }
+export interface IServiceUnitRow extends IServiceUnitUI, IServiceUnitBackendSSE, IServiceUnitBackendDetails { }
 
-// tslint:disable-next-line:no-empty-interface
-export interface IServiceUnit extends IServiceUnitCommon { }
+export interface IServiceUnit extends IServiceUnitUI, IServiceUnitBackendSSECommon, IServiceUnitBackendSSECommon { }
 
-export function serviceUnitRowFactory(id?: string, name?: string, state?: keyof typeof EServiceUnitState): IServiceUnitRow {
+export function serviceUnitRowFactory(): IServiceUnitRow {
   return {
-    id,
-    name,
-    state,
+    id: null,
+    name: null,
+    state: null,
+    containerId: null,
+    componentId: null,
+    serviceAssemblyId: null,
 
     isFolded: false,
     isUpdatingState: false,

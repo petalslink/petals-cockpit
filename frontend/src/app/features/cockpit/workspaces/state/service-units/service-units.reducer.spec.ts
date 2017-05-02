@@ -41,12 +41,12 @@ describe(`ServiceUnits reducer`, () => {
       byId: {
         keepPreviousValues: '',
         idSu0: {
-          doNotKeepPreviousValuesIfUpdate: '',
+          keepPreviousValues: '',
           name: 'SU 0',
           id: 'idSu0'
         },
         idSu1: {
-          doNotKeepPreviousValuesIfUpdate: '',
+          keepPreviousValues: '',
           name: 'SU 1',
           id: 'idSu1'
         }
@@ -57,39 +57,55 @@ describe(`ServiceUnits reducer`, () => {
       ]
     };
 
-    it(`should replace a service-unit if already existing (not update)`, () => {
+    it(`should replace existing service unit while keeping extra values`, () => {
       expect(ServiceUnits.reducer(initialState, {
         type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS,
         payload: {
           byId: {
             idSu0: {
               name: 'SU 0 updated name',
-              id: 'idSu0'
+              id: 'idSu0',
+              componentId: 'idComp0',
+              containerId: 'idCont0',
+              serviceAssemblyId: 'idSa0',
+              state: 'Loaded'
             },
-            idSu1: {
-              name: 'SU 1 updated name',
-              id: 'idSu1'
+            idSu2: {
+              name: 'SU 2',
+              id: 'idSu2',
+              componentId: 'idComp0',
+              containerId: 'idCont0',
+              serviceAssemblyId: 'idSa0',
+              state: 'Loaded'
             }
           },
           allIds: [
             'idSu0',
-            'idSu1'
+            'idSu2'
           ]
         }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
-          keepPreviousValues: '',
           idSu0: {
+            keepPreviousValues: '',
             name: 'SU 0 updated name',
             id: 'idSu0',
+            componentId: 'idComp0',
+            containerId: 'idCont0',
+            serviceAssemblyId: 'idSa0',
+            state: 'Loaded',
             isFolded: false,
             isUpdatingState: false,
             errorChangeState: ''
           },
-          idSu1: {
-            name: 'SU 1 updated name',
-            id: 'idSu1',
+          idSu2: {
+            name: 'SU 2',
+            id: 'idSu2',
+            componentId: 'idComp0',
+            containerId: 'idCont0',
+            serviceAssemblyId: 'idSa0',
+            state: 'Loaded',
             isFolded: false,
             isUpdatingState: false,
             errorChangeState: ''
@@ -97,23 +113,62 @@ describe(`ServiceUnits reducer`, () => {
         },
         allIds: [
           'idSu0',
-          'idSu1'
+          'idSu2'
         ]
       });
     });
 
+
+  });
+
+
+  describe(ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, () => {
+    it(`should check action name`, () => {
+      expect(ServiceUnits.ADD_SERVICE_UNITS_SUCCESS).toEqual(`[Service units] Add service units success`);
+    });
+
     it(`should add a service-unit if doesn't exists yet`, () => {
+
+      const initialState: any = {
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idSu0: {
+            keepPreviousValues: '',
+            name: 'SU 0',
+            id: 'idSu0'
+          },
+          idSu1: {
+            keepPreviousValues: '',
+            name: 'SU 1',
+            id: 'idSu1'
+          }
+        },
+        allIds: [
+          'idSu0',
+          'idSu1'
+        ]
+      };
+
       expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS,
+        type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS,
         payload: {
           byId: {
             idSu2: {
               name: 'SU 2',
-              id: 'idSu2'
+              id: 'idSu2',
+              componentId: 'idComp0',
+              containerId: 'idCont0',
+              serviceAssemblyId: 'idSa0',
+              state: 'Loaded'
             },
             idSu3: {
               name: 'SU 3',
-              id: 'idSu3'
+              id: 'idSu3',
+              componentId: 'idComp0',
+              containerId: 'idCont0',
+              serviceAssemblyId: 'idSa0',
+              state: 'Loaded'
             }
           },
           allIds: [
@@ -126,18 +181,22 @@ describe(`ServiceUnits reducer`, () => {
         byId: {
           keepPreviousValues: '',
           idSu0: {
-            doNotKeepPreviousValuesIfUpdate: '',
+            keepPreviousValues: '',
             name: 'SU 0',
             id: 'idSu0'
           },
           idSu1: {
-            doNotKeepPreviousValuesIfUpdate: '',
+            keepPreviousValues: '',
             name: 'SU 1',
             id: 'idSu1'
           },
           idSu2: {
             name: 'SU 2',
             id: 'idSu2',
+            componentId: 'idComp0',
+            containerId: 'idCont0',
+            serviceAssemblyId: 'idSa0',
+            state: 'Loaded',
             isFolded: false,
             isUpdatingState: false,
             errorChangeState: ''
@@ -145,6 +204,10 @@ describe(`ServiceUnits reducer`, () => {
           idSu3: {
             name: 'SU 3',
             id: 'idSu3',
+            componentId: 'idComp0',
+            containerId: 'idCont0',
+            serviceAssemblyId: 'idSa0',
+            state: 'Loaded',
             isFolded: false,
             isUpdatingState: false,
             errorChangeState: ''
@@ -159,6 +222,7 @@ describe(`ServiceUnits reducer`, () => {
       });
     });
   });
+
 
   describe(ServiceUnits.SET_CURRENT_SERVICE_UNIT, () => {
     it(`should check action name`, () => {
@@ -425,7 +489,7 @@ describe(`ServiceUnits reducer`, () => {
     it(`should remove an existing service-unit`, () => {
       expect(ServiceUnits.reducer(initialState, {
         type: ServiceUnits.REMOVE_SERVICE_UNIT,
-        payload: { serviceUnitId: 'idSu0' }
+        payload: { componentId: 'idComp0', serviceUnitId: 'idSu0' }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
@@ -442,7 +506,7 @@ describe(`ServiceUnits reducer`, () => {
 
       expect(ServiceUnits.reducer(initialState, {
         type: ServiceUnits.REMOVE_SERVICE_UNIT,
-        payload: { serviceUnitId: 'idSu1' }
+        payload: { componentId: 'idComp0', serviceUnitId: 'idSu1' }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
@@ -459,7 +523,7 @@ describe(`ServiceUnits reducer`, () => {
 
       expect(ServiceUnits.reducer(initialState, {
         type: ServiceUnits.REMOVE_SERVICE_UNIT,
-        payload: { serviceUnitId: 'idSu2' }
+        payload: { componentId: 'idComp0', serviceUnitId: 'idSu2' }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
@@ -469,43 +533,6 @@ describe(`ServiceUnits reducer`, () => {
           },
           idSu1: {
             keepPreviousValues: ''
-          }
-        },
-        allIds: ['idSu0', 'idSu1']
-      });
-    });
-  });
-
-  describe(`[Components] Deploy service unit success`, () => {
-    const initialState: any = {
-      keepPreviousValues: '',
-      byId: {
-        keepPreviousValues: '',
-        idSu0: {
-          doNotKeepPreviousValuesIfUpdate: ''
-        }
-      },
-      allIds: ['idSu0']
-    };
-
-    it(`should add a non existing service-unit`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: '[Components] Deploy service unit success',
-        payload: { serviceUnit: { id: 'idSu1', name: 'Su 1', state: 'Started' } }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idSu0: {
-            doNotKeepPreviousValuesIfUpdate: ''
-          },
-          idSu1: {
-            id: 'idSu1',
-            name: 'Su 1',
-            state: 'Started',
-            isFolded: false,
-            isUpdatingState: false,
-            errorChangeState: ''
           }
         },
         allIds: ['idSu0', 'idSu1']

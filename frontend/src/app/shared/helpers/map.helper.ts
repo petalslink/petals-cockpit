@@ -18,7 +18,7 @@
 import { omit } from 'underscore';
 import { environment } from 'environments/environment';
 
-// TODO replace all of this with robustly implemented immutable maps!
+// TODO replace all of this with robustly implemented immutable maps?
 
 export interface JsMap<I> {
   readonly byId: { readonly [id: string]: I };
@@ -47,6 +47,7 @@ export function toJavascriptMap<I>(obj: object): JsMap<I> {
 /**
  * This merges the fields of toMerge into map, all the elements of toMerge.byId
  * into map.byId elements and toMerge.allIds into map.allIds.
+ * And also ensure elements are fully initialised.
  */
 export function mergeInto<I, M extends JsMap<I>>(map: M, toMerge: JsMap<I>, initializer: I): M {
   return Object.assign({},
@@ -66,13 +67,56 @@ export function mergeInto<I, M extends JsMap<I>>(map: M, toMerge: JsMap<I>, init
 }
 
 /**
- * This put all the elements of toMerge.byId in map.byId (overwriting the previous one).
+ * This merges the fields of toMerge into map, put only the elements of toMerge.byId
+ * into map.byId elements, and only toMerge.allIds into map.allIds.
+ * But this keep the previous data of map.byId associated to the elements in toMerge.byId
+ */
+export function mergeOnly<I, M extends JsMap<I>>(map: M, toMerge: JsMap<I>, initializer: I): M {
+  return Object.assign(
+    {},
+    map,
+    toMerge,
+    {
+      allIds: [...toMerge.allIds],
+      byId: toMerge.allIds.reduce((acc, id) => ({
+        ...acc,
+        [id]: Object.assign<object, I, I, I>(
+          {},
+          initializer,
+          map.byId[id],
+          toMerge.byId[id]
+        )
+      }), {})
+    });
+}
+
+/**
+ * This put all the elements of toMerge.byId in map.byId.
  */
 export function putAll<I, M extends JsMap<I>>(map: M, toMerge: JsMap<I>, initializer: I): M {
+  // normally there shouldn't be any duplicate, so it's cheaper to check that now
+  // than to use a Set below.
+  let duplicate = false;
+  toMerge.allIds.forEach(id => {
+    if (map.byId[id]) {
+      duplicate = true;
+      if (!environment.strictCoherence) {
+        if (environment.debug) {
+          console.debug(`putAll called on an already existing element ${id} on: ${map}`);
+        } else {
+          console.warn(`putAll called on an already existing element ${id}`);
+        }
+        return map;
+      } else {
+        throw Error(`${id} already exists in this map! This is a bug!`);
+      }
+    }
+  });
+
   return Object.assign({},
     map,
     {
-      allIds: [...Array.from(new Set([...map.allIds, ...toMerge.allIds]))],
+      allIds: duplicate ? [...Array.from(new Set([...map.allIds, ...toMerge.allIds]))] : [...map.allIds, ...toMerge.allIds],
       byId: toMerge.allIds.reduce((acc, id) => ({
         ...acc,
         [id]: Object.assign<object, I, I>({}, initializer, toMerge.byId[id])
@@ -108,7 +152,7 @@ export function updateById<I, M extends JsMap<I>>(map: M, id: string, value: obj
 }
 
 /**
- * This put value in map.byId[id] (overwriting the previous value) and if needed adds id to allIds.
+ * This put value in map.byId[id] and adds id to allIds.
  */
 export function putById<I, M extends JsMap<I>>(map: M, id: string, value: I, initializer: I): M {
   if (map.byId[id]) {
@@ -127,7 +171,7 @@ export function putById<I, M extends JsMap<I>>(map: M, id: string, value: I, ini
   return Object.assign({},
     map,
     {
-      allIds: [...map.allIds, id],
+      allIds: map.byId[id] ? [...Array.from(new Set([...map.allIds, id]))] : [...map.allIds, id],
       byId: {
         ...map.byId,
         [id]: Object.assign({}, initializer, value)

@@ -103,6 +103,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
             const bus = buses.byId[busId];
             return {
               id: bus.id,
+              workspaceId: bus.workspaceId,
               name: bus.name,
               isFetchingDetails: bus.isFetchingDetails,
               isFolded: bus.isFolded || false,
@@ -114,6 +115,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                   const container = containers.byId[containerId];
                   return {
                     id: container.id,
+                    busId: container.busId,
                     name: container.name,
                     ip: container.ip,
                     port: container.port,
@@ -130,6 +132,7 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                         const component = components.byId[componentId];
                         return {
                           id: component.id,
+                          containerId: component.containerId,
                           name: component.name,
                           state: component.state,
                           type: component.type,
@@ -148,6 +151,9 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                               const serviceUnit = serviceUnits.byId[serviceUnitId];
                               return {
                                 id: serviceUnit.id,
+                                containerId: serviceUnit.containerId,
+                                componentId: serviceUnit.componentId,
+                                serviceAssemblyId: serviceUnit.serviceAssemblyId,
                                 name: serviceUnit.name,
                                 state: serviceUnit.state,
                                 isUpdatingState: serviceUnit.isUpdatingState,

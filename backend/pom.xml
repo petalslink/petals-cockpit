@@ -204,6 +204,7 @@
           <url>${codegen.db.url}</url>
           <username>u</username>
           <password></password>
+          <dropFirst>true</dropFirst>
         </configuration>
       </plugin>
       <plugin>

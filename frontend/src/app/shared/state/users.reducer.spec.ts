@@ -178,7 +178,7 @@ describe(`Users reducer`, () => {
       const reducer = Users.reducer(initialState, {
         type: Users.CONNECT_USER_SUCCESS,
         payload: {
-          user: { id: 'user1' }
+          user: { id: 'user1', name: 'name' }
         }
       });
 
@@ -191,7 +191,7 @@ describe(`Users reducer`, () => {
         isDisconnecting: false,
         byId: {
           keepPreviousValues: '',
-          user1: { id: 'user1' }
+          user1: { id: 'user1', name: 'name' }
         },
         allIds: ['user1']
       });

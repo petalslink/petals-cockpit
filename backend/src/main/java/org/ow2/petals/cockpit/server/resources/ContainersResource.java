@@ -24,11 +24,13 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -52,7 +54,9 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import javaslang.Tuple2;
 import javaslang.control.Option;
@@ -111,8 +115,7 @@ public class ContainersResource {
                     // convert it to strings
                     .map(String::valueOf).toJavaList();
 
-            return new ContainerOverview(container.getId(), container.getName(), container.getIp(), container.getPort(),
-                    reachabilities, infos._2());
+            return new ContainerOverview(container.getIp(), container.getPort(), reachabilities, infos._2());
         });
     }
 
@@ -138,7 +141,43 @@ public class ContainersResource {
         }
     }
 
-    public static class ContainerOverview extends ContainerMin {
+    public static class ContainerFull {
+
+        @Valid
+        @JsonUnwrapped
+        public final ContainerMin container;
+
+        @NotNull
+        @Min(1)
+        public final long busId;
+
+        @JsonProperty
+        public final ImmutableSet<String> components;
+
+        @JsonProperty
+        public final ImmutableSet<String> serviceAssemblies;
+
+        public ContainerFull(ContainerMin container, long busId, Set<String> components,
+                Set<String> serviceAssemblies) {
+            this.container = container;
+            this.busId = busId;
+            this.components = ImmutableSet.copyOf(components);
+            this.serviceAssemblies = ImmutableSet.copyOf(serviceAssemblies);
+        }
+
+        @JsonCreator
+        private ContainerFull() {
+            // jackson will inject values itself (because of @JsonUnwrapped)
+            this(new ContainerMin(0, ""), 0, ImmutableSet.of(), ImmutableSet.of());
+        }
+
+        @JsonProperty
+        public String getBusId() {
+            return Long.toString(busId);
+        }
+    }
+
+    public static class ContainerOverview {
 
         @NotEmpty
         @JsonProperty
@@ -157,11 +196,9 @@ public class ContainersResource {
         public final String systemInfo;
 
         @JsonCreator
-        public ContainerOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("ip") String ip, @JsonProperty("port") int port,
+        public ContainerOverview(@JsonProperty("ip") String ip, @JsonProperty("port") int port,
                 @JsonProperty("reachabilities") List<String> reachabilities,
                 @JsonProperty("systemInfo") String systemInfo) {
-            super(id, name);
             this.ip = ip;
             this.port = port;
             this.reachabilities = ImmutableList.copyOf(reachabilities);

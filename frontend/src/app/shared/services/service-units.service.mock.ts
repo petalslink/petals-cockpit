@@ -21,13 +21,15 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 
 import { ServiceUnitsServiceImpl } from './service-units.service';
-import { serviceUnitsService } from '../../../mocks/service-units-mock';
+import { serviceUnitsService } from 'mocks/service-units-mock';
+import { serviceAssembliesService } from 'mocks/service-assemblies-mock';
 import * as helper from './../helpers/mock.helper';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
 import { environment } from '../../../environments/environment';
 import { IStore } from '../interfaces/store.interface';
 import { NotificationsService } from 'angular2-notifications';
+import { ServiceUnitState } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 
 @Injectable()
 export class ServiceUnitsMockService extends ServiceUnitsServiceImpl {
@@ -41,20 +43,19 @@ export class ServiceUnitsMockService extends ServiceUnitsServiceImpl {
     return helper.responseBody(detailsServiceUnit);
   }
 
-  putState(_workspaceId: string, serviceUnitId: string, newState: string) {
-    serviceUnitsService.get(serviceUnitId).setState(newState);
+  putState(_workspaceId: string, serviceAssemblyId: string, newState: ServiceUnitState) {
+    const serviceAssembly = serviceAssembliesService.get(serviceAssemblyId);
+
+    serviceAssembly.state = newState;
 
     const response = {
-      id: serviceUnitId,
+      id: serviceAssemblyId,
       state: newState
     };
 
     // when the state changes, trigger a fake SSE event
     setTimeout(() =>
-      (this.pSseService as SseServiceMock).triggerSseEvent(
-        SseWorkspaceEvent.SU_STATE_CHANGE,
-        response
-      ),
+      (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.SA_STATE_CHANGE, response),
       environment.mock.sseDelay
     );
 

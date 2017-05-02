@@ -1,14 +1,17 @@
-id,component_id,name,state,sa_name
-1,1,SU 0,Started,SA0
-2,1,SU 1,Started,SA1
-3,2,SU 2,Started,SA2
-4,2,SU 3,Started,SA3
-5,3,SU 4,Started,SA4
-6,3,SU 5,Started,SA5
-7,4,SU 6,Started,SA6
-8,4,SU 7,Started,SA7
-9,6,SU 8,Started,SA8
-10,6,SU 9,Started,SA9
-11,7,SU 10,Started,SA10
-12,8,SU 11,Started,SA11
-13,8,SU 12,Started,SA12
+id,component_id,name,serviceassembly_id,container_id
+1,1,SU 0,1,1
+2,1,SU 1,2,1
+3,2,SU 2,3,1
+4,2,SU 3,4,1
+5,3,SU 4,5,2
+6,3,SU 5,6,2
+7,4,SU 6,7,2
+8,4,SU 7,8,2
+9,5,SU 8,9,3
+10,5,SU 9,10,3
+11,6,SU 10,11,3
+12,6,SU 11,12,3
+13,7,SU 12,13,4
+14,7,SU 13,14,4
+15,8,SU 14,15,4
+16,8,SU 15,16,4

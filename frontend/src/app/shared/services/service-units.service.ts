@@ -26,13 +26,13 @@ import { environment } from './../../../environments/environment';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { ServiceUnits } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
 import { IStore } from '../interfaces/store.interface';
-import { EServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
-import { IServiceUnitsTable } from '../../features/cockpit/workspaces/state/service-units/service-units.interface';
+import { EServiceUnitState, ServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 
 export abstract class ServiceUnitsService {
   abstract getDetailsServiceUnit(serviceUnitId: string): Observable<Response>;
 
-  abstract putState(workspaceId: string, serviceUnitId: string, newState: string): Observable<Response>;
+  abstract putState(workspaceId: string, serviceAssemblyId: string, newState: ServiceUnitState): Observable<Response>;
 
   abstract watchEventSuStateChangeOk(): Observable<void>;
 }
@@ -53,34 +53,37 @@ export class ServiceUnitsServiceImpl extends ServiceUnitsService {
     return this.http.get(`${environment.urlBackend}/serviceunits/${serviceUnitId}`);
   }
 
-  putState(workspaceId: string, serviceUnitId: string, newState: string) {
-    return this.http.put(`${environment.urlBackend}/workspaces/${workspaceId}/serviceunits/${serviceUnitId}`, { state: newState });
+  putState(workspaceId: string, serviceAssemblyId: string, newState: ServiceUnitState) {
+    return this.http.put(`${environment.urlBackend}/workspaces/${workspaceId}/serviceassemblies/${serviceAssemblyId}`, { state: newState });
   }
 
   watchEventSuStateChangeOk() {
     return this.sseService
-      .subscribeToWorkspaceEvent(SseWorkspaceEvent.SU_STATE_CHANGE)
-      .withLatestFrom(this
-        .store$
-        .select(state => [state.workspaces.selectedWorkspaceId, state.serviceUnits])
-      )
-      .do(([data, [selectedWorkspaceId, serviceUnits]]: [{ id: string, state: string }, [string, IServiceUnitsTable]]) => {
-        if (data.state === EServiceUnitState.Unloaded) {
-          this.router.navigate(['/workspaces', selectedWorkspaceId]);
+      .subscribeToWorkspaceEvent(SseWorkspaceEvent.SA_STATE_CHANGE)
+      .withLatestFrom(this.store$)
+      .do(([data, store]: [{ id: string, state: ServiceUnitState }, IStore]) => {
+        const sus = store.serviceUnits.allIds
+          .map(id => store.serviceUnits.byId[id])
+          .filter(su => su.serviceAssemblyId === data.id);
+        if (data.state === EServiceUnitState.Unloaded && sus.length > 0) {
+          this.router.navigate(['/workspaces', store.workspaces.selectedWorkspaceId]);
 
-          const serviceUnit = serviceUnits.byId[data.id];
+          // we should notify about the SA, not the SU
+          this.notification.success('Service unit unloaded', `"${sus[0].name}" has been unloaded`);
 
-          this.notification.success('Service unit unloaded', `"${serviceUnit.name}" has been unloaded`);
-
-          this.store$.dispatch({
+          const actions = sus.map(su => ({
             type: ServiceUnits.REMOVE_SERVICE_UNIT,
-            payload: { serviceUnitId: data.id }
-          });
+            payload: { componentId: su.componentId, serviceUnitId: su.id }
+          }));
+
+          this.store$.dispatch(batchActions(actions));
         } else {
-          this.store$.dispatch({
+          const actions = sus.map(su => ({
             type: ServiceUnits.CHANGE_STATE_SUCCESS,
-            payload: { serviceUnitId: data.id, newState: data.state }
-          });
+            payload: { newState: data.state, serviceUnitId: su.id }
+          }));
+
+          this.store$.dispatch(batchActions(actions));
         }
       })
       .mapTo(null);

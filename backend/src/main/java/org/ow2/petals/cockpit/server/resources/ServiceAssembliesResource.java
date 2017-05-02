@@ -17,11 +17,13 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_CONTAINERS_BUSES_ID;
-import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_SERVICEUNITS_CONTAINER_ID;
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_SERVICEASSEMBLIES_CONTAINER_ID;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
+
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -40,7 +42,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
+import org.ow2.petals.admin.api.artifact.ArtifactState;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -48,44 +51,66 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.collect.ImmutableSet;
 
 @Singleton
-@Path("/serviceunits")
-public class ServiceUnitsResource {
+@Path("/serviceassemblies")
+public class ServiceAssembliesResource {
 
     private final Configuration jooq;
 
     @Inject
-    public ServiceUnitsResource(Configuration jooq) {
+    public ServiceAssembliesResource(Configuration jooq) {
         this.jooq = jooq;
     }
 
     @GET
-    @Path("/{suId}")
+    @Path("/{saId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ServiceUnitOverview overview(@NotNull @PathParam("suId") @Min(1) long suId,
+    public ServiceAssemblyOverview overview(@NotNull @PathParam("saId") @Min(1) long saId,
             @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
-            ServiceunitsRecord su = DSL.using(conf).selectFrom(SERVICEUNITS).where(SERVICEUNITS.ID.eq(suId)).fetchOne();
+            ServiceassembliesRecord sa = DSL.using(conf).selectFrom(SERVICEASSEMBLIES)
+                    .where(SERVICEASSEMBLIES.ID.eq(saId)).fetchOne();
 
-            if (su == null) {
+            if (sa == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
             Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
                     .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
-                    .onKey(FK_CONTAINERS_BUSES_ID).join(SERVICEUNITS).onKey(FK_SERVICEUNITS_CONTAINER_ID)
-                    .where(SERVICEUNITS.ID.eq(suId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
+                    .onKey(FK_CONTAINERS_BUSES_ID).join(SERVICEASSEMBLIES).onKey(FK_SERVICEASSEMBLIES_CONTAINER_ID)
+                    .where(SERVICEASSEMBLIES.ID.eq(saId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
 
             if (user == null) {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
 
-            return new ServiceUnitOverview();
+            return new ServiceAssemblyOverview();
         });
     }
 
-    public static class ServiceUnitMin {
+    public static class ServiceAssemblyMin {
+        public enum State {
+            Unloaded, Started, Stopped, Shutdown, Unknown;
+
+            public static State from(ArtifactState.State state) {
+                switch (state) {
+                    case STARTED:
+                        return Started;
+                    case STOPPED:
+                        return Stopped;
+                    case SHUTDOWN:
+                        return Shutdown;
+                    case UNKNOWN:
+                        return Unknown;
+                    case LOADED:
+                        throw new AssertionError("Loaded state does not exist for SAs");
+                    default:
+                        throw new AssertionError("impossible");
+                }
+            }
+        }
 
         @NotNull
         @Min(1)
@@ -95,7 +120,7 @@ public class ServiceUnitsResource {
         @JsonProperty
         public final String name;
 
-        public ServiceUnitMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+        public ServiceAssemblyMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
             this.id = id;
             this.name = name;
         }
@@ -106,55 +131,45 @@ public class ServiceUnitsResource {
         }
     }
 
-    public static class ServiceUnitFull {
+    public static class ServiceAssemblyFull {
 
         @Valid
         @JsonUnwrapped
-        public final ServiceUnitMin serviceUnit;
+        public final ServiceAssemblyMin serviceAssembly;
 
         @NotNull
         @Min(1)
         public final long containerId;
 
         @NotNull
-        @Min(1)
-        public final long componentId;
+        @JsonProperty
+        public final ServiceAssemblyMin.State state;
 
-        @NotNull
-        @Min(1)
-        public final long serviceAssemblyId;
+        @JsonProperty
+        public final ImmutableSet<String> serviceUnits;
 
-        public ServiceUnitFull(ServiceUnitMin serviceUnit, long containerId, long componentId, long serviceAssemblyId) {
-            this.serviceUnit = serviceUnit;
+        public ServiceAssemblyFull(ServiceAssemblyMin serviceAssembly, long containerId, ServiceAssemblyMin.State state,
+                Set<String> serviceUnits) {
+            this.serviceAssembly = serviceAssembly;
             this.containerId = containerId;
-            this.componentId = componentId;
-            this.serviceAssemblyId = serviceAssemblyId;
+            this.state = state;
+            this.serviceUnits = ImmutableSet.copyOf(serviceUnits);
         }
 
         @JsonCreator
-        private ServiceUnitFull() {
+        private ServiceAssemblyFull() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new ServiceUnitMin(0, ""), 0, 0, 0);
+            this(new ServiceAssemblyMin(0, ""), 0, ServiceAssemblyMin.State.Unknown, ImmutableSet.of());
         }
 
         @JsonProperty
         public String getContainerId() {
             return Long.toString(containerId);
         }
-
-        @JsonProperty
-        public String getComponentId() {
-            return Long.toString(componentId);
-        }
-
-        @JsonProperty
-        public String getServiceAssemblyId() {
-            return Long.toString(serviceAssemblyId);
-        }
     }
 
     @JsonSerialize
-    public static class ServiceUnitOverview {
+    public static class ServiceAssemblyOverview {
         // TODO remove annotation when there will be data
     }
 }

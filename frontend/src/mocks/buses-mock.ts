@@ -15,17 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IBusImport } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
+import { IBusImport, IBusInProgressBackend } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { containersService, Container } from './containers-mock';
+import { Workspace } from './workspaces-mock';
+import { IBusBackendSSE, IBusBackendDetails } from './../app/features/cockpit/workspaces/state/buses/bus.interface';
 
 export class Buses {
-  private buses = new Map<string, Bus>();
+  private readonly buses = new Map<string, Bus>();
 
   constructor() { }
 
-  create() {
-    const bus = new Bus();
-    this.buses.set(bus.getId(), bus);
+  create(workspace: Workspace) {
+    const bus = new Bus(workspace);
+    this.buses.set(bus.id, bus);
     return bus;
   }
 
@@ -37,13 +39,13 @@ export class Buses {
 export const busesService = new Buses();
 
 export class BusesInProgress {
-  private busesInProgress = new Map<string, BusInProgress>();
+  private readonly busesInProgress = new Map<string, BusInProgress>();
 
   constructor() { }
 
-  create(bus?: IBusImport) {
-    const busInProgress = new BusInProgress(bus);
-    this.busesInProgress.set(busInProgress.getId(), busInProgress);
+  create(workspace: Workspace, bus?: IBusImport) {
+    const busInProgress = new BusInProgress(workspace, bus);
+    this.busesInProgress.set(busInProgress.id, busInProgress);
     return busInProgress;
   }
 }
@@ -52,25 +54,23 @@ export const busesInProgressService = new BusesInProgress();
 
 export class BusBase {
   protected static cpt = 0;
-  protected id: string;
-  protected name: string;
+  public readonly id: string;
+  public readonly name: string;
+  public readonly workspace: Workspace;
 
-  constructor() {
+  constructor(workspace: Workspace) {
     const i = BusBase.cpt++;
     this.id = `idBus${i}`;
     this.name = `Bus ${i}`;
-  }
-
-  public getId() {
-    return this.id;
+    this.workspace = workspace;
   }
 }
 
 export class Bus extends BusBase {
-  private containers = new Map<string, Container>();
+  private readonly containers = new Map<string, Container>();
 
-  constructor() {
-    super();
+  constructor(workspace: Workspace) {
+    super(workspace);
 
     // by default add 2 containers
     this.addContainer();
@@ -83,33 +83,33 @@ export class Bus extends BusBase {
 
   addContainer(name?: string) {
     const container = containersService.create(this, name);
-    this.containers.set(container.getId(), container);
+    this.containers.set(container.id, container);
   }
 
-  toObj() {
+  toObj(): { [id: string]: IBusBackendSSE } {
     return {
       [this.id]: {
-        isImporting: false,
+        id: this.id,
         name: this.name,
-        state: `UNDEPLOYED`,
+        workspaceId: this.workspace.id,
         containers: Array.from(this.containers.keys())
       }
     };
   }
 
-  getDetails() {
+  getDetails(): IBusBackendDetails {
     return {};
   }
 }
 
 export class BusInProgress extends BusBase {
 
-  private ip: string;
-  private port: number;
-  private username: string;
+  public readonly ip: string;
+  public readonly port: number;
+  public readonly username: string;
 
-  constructor(bus?: IBusImport) {
-    super();
+  constructor(workspace: Workspace, bus?: IBusImport) {
+    super(workspace);
     if (bus) {
       this.ip = bus.ip;
       this.port = bus.port;
@@ -121,12 +121,14 @@ export class BusInProgress extends BusBase {
     }
   }
 
-  toObj() {
+  toObj(): { [id: string]: IBusInProgressBackend } {
     return {
       [this.id]: {
+        id: this.id,
         ip: this.ip,
         port: this.port,
-        username: this.username
+        username: this.username,
+        importError: undefined
       }
     };
   }

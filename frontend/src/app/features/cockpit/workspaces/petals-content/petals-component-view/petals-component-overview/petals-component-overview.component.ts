@@ -19,7 +19,7 @@ import { Component, OnInit, Input, ChangeDetectionStrategy, SimpleChanges, OnCha
 import { FormGroup, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
-import { IComponentRow, EComponentState } from '../../../state/components/component.interface';
+import { IComponentRow, ComponentState, EComponentState } from '../../../state/components/component.interface';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
 import { Components } from '../../../state/components/components.reducer';
 import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
@@ -53,11 +53,11 @@ export class PetalsComponentOverviewComponent implements OnInit, OnChanges {
     );
   }
 
-  getPossibleStateActions(state: string) {
+  getPossibleStateActions(state: ComponentState) {
     return stateNameToPossibleActionsComponent(state);
   }
 
-  changeState(newState: string) {
+  changeState(newState: ComponentState) {
     let parameters = null;
 
     if (this.component.state === EComponentState.Loaded && newState !== EComponentState.Unloaded) {

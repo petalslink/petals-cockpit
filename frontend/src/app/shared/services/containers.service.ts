@@ -25,6 +25,10 @@ import { environment } from './../../../environments/environment';
 import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/interfaces/store.interface';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
+import { toJavascriptMap } from 'app/shared/helpers/map.helper';
+import { IComponentBackendSSE } from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { batchActions } from 'app/shared/helpers/batch-actions.helper';
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.reducer';
 
 export abstract class ContainersService {
   abstract getDetailsContainer(containerId: string): Observable<Response>;
@@ -59,13 +63,20 @@ export class ContainersServiceImpl extends ContainersService {
   watchEventComponentDeployedOk() {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.COMPONENT_DEPLOYED)
-      .do(({ containerId, component }: { containerId: string, component: { id: string, name: string, state: string } }) => {
+      .do((data: any) => {
+        const components = toJavascriptMap<IComponentBackendSSE>(data.components);
+
+        // there is only one component deployed here
+        const component = components.byId[components.allIds[0]];
+
         this.notification.success('Component deployed', `"${component.name}" has been deployed`);
 
-        this.store$.dispatch({
-          type: Containers.DEPLOY_COMPONENT_SUCCESS,
-          payload: { containerId, component }
-        });
+        this.store$.dispatch(batchActions([
+          // add the component
+          { type: Components.ADD_COMPONENTS_SUCCESS, payload: components },
+          // add it to the container
+          { type: Containers.DEPLOY_COMPONENT_SUCCESS, payload: component }
+        ]));
       })
       .mapTo(null);
   }

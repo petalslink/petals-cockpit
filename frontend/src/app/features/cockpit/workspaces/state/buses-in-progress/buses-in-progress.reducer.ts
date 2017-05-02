@@ -19,8 +19,11 @@ import { Action } from '@ngrx/store';
 
 import { IBusesInProgressTable, busesInProgressTableFactory } from './buses-in-progress.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
-import { putAll, updateById, removeById } from 'app/shared/helpers/map.helper';
-import { busInProgressRowFactory } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
+import { putAll, updateById, removeById, mergeOnly, JsMap } from 'app/shared/helpers/map.helper';
+import {
+  busInProgressRowFactory,
+  IBusInProgressBackend
+} from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 
 export class BusesInProgress {
   private static reducerName = '[Buses In Prog]';
@@ -35,7 +38,19 @@ export class BusesInProgress {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUSES_IN_PROGRESS = `${BusesInProgress.reducerName} Fetch buses in progress`;
-  private static fetchBusesInProgress(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
+  private static fetchBusesInProgress(
+    busesInProgressTable: IBusesInProgressTable,
+    payload: JsMap<IBusInProgressBackend>
+  ): IBusesInProgressTable {
+    return mergeOnly(busesInProgressTable, payload, busInProgressRowFactory());
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static ADD_BUSES_IN_PROGRESS = `${BusesInProgress.reducerName} Add buses in progress`;
+  private static addBusesInProgress(
+    busesInProgressTable: IBusesInProgressTable,
+    payload: JsMap<IBusInProgressBackend>
+  ): IBusesInProgressTable {
     return putAll(busesInProgressTable, payload, busInProgressRowFactory());
   }
 
@@ -137,6 +152,7 @@ export class BusesInProgress {
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod: { [type: string]: (t: IBusesInProgressTable, p: any) => IBusesInProgressTable } = {
     [BusesInProgress.FETCH_BUSES_IN_PROGRESS]: BusesInProgress.fetchBusesInProgress,
+    [BusesInProgress.ADD_BUSES_IN_PROGRESS]: BusesInProgress.addBusesInProgress,
     [BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS]: BusesInProgress.setCurrentBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS]: BusesInProgress.postBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]: BusesInProgress.postBusInProgressSuccess,

@@ -42,7 +42,7 @@ import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
+import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.jmx.api.api.InstallerComponentClient;
 import org.ow2.petals.jmx.api.api.JMXClient;
 import org.ow2.petals.jmx.api.api.PetalsJmxApiFactory;
@@ -141,8 +141,8 @@ public class PetalsAdmin {
     }
 
     @Suspendable
-    public ServiceUnitMin.State changeState(String ip, int port, String username, String password, String saName,
-            ServiceUnitMin.State next) {
+    public ServiceAssemblyMin.State changeState(String ip, int port, String username, String password, String saName,
+            ServiceAssemblyMin.State next) {
         return runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
             try {
                 ArtifactAdministration aa = petals.newArtifactAdministration();
@@ -241,8 +241,8 @@ public class PetalsAdmin {
         }
     }
 
-    private ServiceUnitMin.State changeSAState(PetalsAdministration petals, ServiceAssembly sa,
-            ServiceUnitMin.State desiredState) throws ArtifactAdministrationException {
+    private ServiceAssemblyMin.State changeSAState(PetalsAdministration petals, ServiceAssembly sa,
+            ServiceAssemblyMin.State desiredState) throws ArtifactAdministrationException {
         ServiceAssemblyLifecycle sal = petals.newArtifactLifecycleFactory().createServiceAssemblyLifecycle(sa);
         switch (desiredState) {
             case Unloaded:
@@ -258,12 +258,12 @@ public class PetalsAdmin {
                 LOG.warn("Impossible case for state transition from {} to {} for SA {} ({})", sa.getState(),
                         desiredState, sa.getName());
         }
-        if (desiredState != ServiceUnitMin.State.Unloaded) {
+        if (desiredState != ServiceAssemblyMin.State.Unloaded) {
             sal.updateState();
-            return ServiceUnitMin.State.from(sa.getState());
+            return ServiceAssemblyMin.State.from(sa.getState());
         } else {
             // we can't call updateState for this one, it will fail since it has been unloaded
-            return ServiceUnitMin.State.Unloaded;
+            return ServiceAssemblyMin.State.Unloaded;
         }
     }
 

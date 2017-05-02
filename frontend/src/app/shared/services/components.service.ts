@@ -26,8 +26,11 @@ import { environment } from './../../../environments/environment';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { IStore } from '../interfaces/store.interface';
 import { Components } from '../../features/cockpit/workspaces/state/components/components.reducer';
-import { IComponentsTable } from '../../features/cockpit/workspaces/state/components/components.interface';
-import { EComponentState } from '../../features/cockpit/workspaces/state/components/component.interface';
+import { EComponentState, ComponentState } from '../../features/cockpit/workspaces/state/components/component.interface';
+import { toJavascriptMap } from 'app/shared/helpers/map.helper';
+import { IServiceUnitBackendSSE } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { batchActions } from 'app/shared/helpers/batch-actions.helper';
+import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.reducer';
 
 export abstract class ComponentsService {
   abstract getDetailsComponent(componentId: string): Observable<Response>;
@@ -35,7 +38,7 @@ export abstract class ComponentsService {
   abstract putState(
     workspaceId: string,
     componentId: string,
-    newState: string,
+    newState: ComponentState,
     parameters: { [key: string]: string }
   ): Observable<Response>;
 
@@ -62,7 +65,7 @@ export class ComponentsServiceImpl extends ComponentsService {
     return this.http.get(`${environment.urlBackend}/components/${componentId}`);
   }
 
-  putState(workspaceId: string, componentId: string, newState: string, parameters: { [key: string]: string }) {
+  putState(workspaceId: string, componentId: string, newState: ComponentState, parameters: { [key: string]: string }) {
     return this.http.put(`${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}`, { state: newState, parameters });
   }
 
@@ -77,21 +80,19 @@ export class ComponentsServiceImpl extends ComponentsService {
   watchEventComponentStateChangeOk() {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.COMPONENT_STATE_CHANGE)
-      .withLatestFrom(this
-        .store$
-        .select(state => [state.workspaces.selectedWorkspaceId, state.components])
-      )
-      .do(([data, [selectedWorkspaceId, components]]: [{ id: string, state: string }, [string, IComponentsTable]]) => {
+      .withLatestFrom(this.store$)
+      .do(([data, store]: [{ id: string, state: ComponentState }, IStore]) => {
         if (data.state === EComponentState.Unloaded) {
-          this.router.navigate(['/workspaces', selectedWorkspaceId]);
+          const component = store.components.byId[data.id];
+          const container = store.containers.byId[component.containerId];
 
-          const component = components.byId[data.id];
+          this.router.navigate(['/workspaces', store.workspaces.selectedWorkspaceId]);
 
           this.notification.success('Component unloaded', `"${component.name}" has been unloaded`);
 
           this.store$.dispatch({
             type: Components.REMOVE_COMPONENT,
-            payload: { componentId: data.id }
+            payload: { containerId: container.id, componentId: data.id }
           });
         } else {
           this.store$.dispatch({
@@ -105,14 +106,32 @@ export class ComponentsServiceImpl extends ComponentsService {
 
   watchEventSuDeployedOk() {
     return this.sseService
-      .subscribeToWorkspaceEvent(SseWorkspaceEvent.SU_DEPLOYED)
-      .do(({ componentId, serviceUnit }: { componentId: string, serviceUnit: { id: string, name: string, state: string } }) => {
+      .subscribeToWorkspaceEvent(SseWorkspaceEvent.SA_DEPLOYED)
+      .do((data: any) => {
+        // TODO const serviceAssemblies = toJavascriptMap<IServiceAssemblyBackend>(data.serviceAssemblies);
+        const serviceUnits = toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits);
+
+        // TODO for now there is only one, but expect the SA to hold many
+        const serviceUnit = serviceUnits.byId[serviceUnits.allIds[0]];
+
+        // TODO we should notify about the SA, not the SU
         this.notification.success('SU deployed', `"${serviceUnit.name}" has been deployed`);
 
-        this.store$.dispatch({
-          type: Components.DEPLOY_SERVICE_UNIT_SUCCESS,
-          payload: { componentId, serviceUnit }
-        });
+        const actions = serviceUnits.allIds
+          .map(id => serviceUnits.byId[id])
+          .map(su => ({
+            // add it to the component
+            // TODO we should add the SA to the container
+            // TODO why not rely on ADD_SERVICE_UNITS_SUCCESS?
+            type: Components.DEPLOY_SERVICE_UNIT_SUCCESS,
+            payload: su
+          }));
+
+        this.store$.dispatch(batchActions([
+          // TODO we should call ADD_SERVICE_ASSEMBLIES_SUCCESS also
+          { type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, payload: serviceUnits },
+          ...actions
+        ]));
       })
       .mapTo(null);
   }

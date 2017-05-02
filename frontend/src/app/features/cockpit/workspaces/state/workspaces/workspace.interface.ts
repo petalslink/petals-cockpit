@@ -18,36 +18,46 @@
 import { IUsers } from '../../../../../shared/interfaces/users.interface';
 import { IBuses } from '../buses/buses.interface';
 
-interface IWorkspaceCommon {
-  // from server
+export interface IWorkspaceBackendCommon {
   id: string;
   name: string;
-  description: string;
+}
 
+export interface IWorkspaceBackendDetailsCommon {
+  description: string;
+}
+
+export interface IWorkspaceBackend extends IWorkspaceBackendCommon {
+  // from server (sse)
+  users: Array<string>;
+}
+
+// tslint:disable-next-line:no-empty-interface
+export interface IWorkspaceBackendDetails extends IWorkspaceBackendDetailsCommon { }
+
+export interface IWorkspaceUI {
+  // from UI
   isRemoving: boolean;
   isFetchingDetails: boolean;
   isSettingDescription: boolean;
 }
 
+
 // used within table
-export interface IWorkspaceRow extends IWorkspaceCommon {
-  // this workspace is also used by the following users
-  users: Array<string>;
-}
+export interface IWorkspaceRow extends IWorkspaceUI, IWorkspaceBackend, IWorkspaceBackendDetails { }
 
 // used in generated views
-// we import IWorkspacesCommon here because when creating a view from a selector
-// we'll inject those properties for the current workspace
-export interface IWorkspace extends IWorkspaceCommon {
+export interface IWorkspace extends IWorkspaceUI, IWorkspaceBackendCommon, IWorkspaceBackendDetailsCommon {
   buses: IBuses;
   users: IUsers;
 }
 
-export function workspaceRowFactory(id?: string, name?: string, description?: string): IWorkspaceRow {
+export function workspaceRowFactory(): IWorkspaceRow {
   return {
-    id,
-    name,
-    description,
+    id: null,
+    name: null,
+
+    description: undefined,
 
     isRemoving: false,
     isFetchingDetails: false,

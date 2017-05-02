@@ -58,17 +58,18 @@ import org.jooq.Configuration;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeComponentState;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeServiceUnitState;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeServiceAssemblyState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteWorkspace;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployComponent;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployServiceUnit;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployServiceAssembly;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
+import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
@@ -230,16 +231,16 @@ public class WorkspaceResource {
     }
 
     @PUT
-    @Path("/serviceunits/{suId}")
+    @Path("/serviceassemblies/{saId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
-    public SUStateChanged changeSUState(@NotNull @PathParam("suId") @Min(1) long suId,
-            @NotNull @Valid SUChangeState action) throws InterruptedException {
+    public SAStateChanged changeSUState(@NotNull @PathParam("saId") @Min(1) long saId,
+            @NotNull @Valid SAChangeState action) throws InterruptedException {
 
         checkAccess(jooq);
 
-        return as.call(wsId, new ChangeServiceUnitState(suId, action));
+        return as.call(wsId, new ChangeServiceAssemblyState(saId, action));
     }
 
     @PUT
@@ -259,7 +260,7 @@ public class WorkspaceResource {
     @Path("/components/{componentId}/serviceunits")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public SUDeployed deployServiceUnit(@NotNull @PathParam("componentId") @Min(1) long componentId,
+    public WorkspaceContent deployServiceUnit(@NotNull @PathParam("componentId") @Min(1) long componentId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
             @NotEmpty @FormDataParam("name") String name)
@@ -267,18 +268,19 @@ public class WorkspaceResource {
 
         checkAccess(jooq);
 
-        String componentName = DSL.using(jooq).selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(componentId))
-                .fetchOne(COMPONENTS.NAME);
+        ComponentsRecord component = DSL.using(jooq).selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(componentId))
+                .fetchOne();
 
-        if (componentName == null) {
+        if (component == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
         String saName = "sa-" + name;
 
         try (ServicedArtifact sa = httpServer.serve(saName + ".zip",
-                os -> PetalsUtils.createSAfromSU(file, os, saName, name, componentName))) {
-            return as.call(wsId, new DeployServiceUnit(saName, sa.getArtifactExternalUrl(), componentId));
+                os -> PetalsUtils.createSAfromSU(file, os, saName, name, component.getName()))) {
+            return as.call(wsId,
+                    new DeployServiceAssembly(saName, sa.getArtifactExternalUrl(), component.getContainerId()));
         }
     }
 
@@ -286,7 +288,7 @@ public class WorkspaceResource {
     @Path("/containers/{containerId}/components")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentDeployed deployComponent(@NotNull @PathParam("containerId") @Min(1) long containerId,
+    public WorkspaceContent deployComponent(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition)
             throws IOException, InterruptedException, JBIDescriptorException {
@@ -301,12 +303,38 @@ public class WorkspaceResource {
                 : fileDisposition.getFileName();
 
         try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
-            Jbi descriptor = JBIDescriptorBuilder.getInstance()
-                    .buildJavaJBIDescriptorFromArchive(sa.getFile());
+            Jbi descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptorFromArchive(sa.getFile());
 
-            return as.call(wsId, new DeployComponent(descriptor.getComponent().getIdentification().getName(),
-                    ComponentMin.Type.from(descriptor.getComponent().getType()), sa.getArtifactExternalUrl(),
-                    containerId));
+            return as.call(wsId,
+                    new DeployComponent(descriptor.getComponent().getIdentification().getName(),
+                            ComponentMin.Type.from(descriptor.getComponent().getType()), sa.getArtifactExternalUrl(),
+                            containerId));
+        }
+    }
+
+    @POST
+    @Path("/containers/{containerId}/serviceassemblies")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public WorkspaceContent deployServiceAssembly(@NotNull @PathParam("containerId") @Min(1) long containerId,
+            @NotNull @FormDataParam("file") InputStream file,
+            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition)
+            throws IOException, InterruptedException, JBIDescriptorException {
+
+        checkAccess(jooq);
+
+        if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
+        String filename = StringUtils.isEmpty(fileDisposition.getFileName()) ? "sa.zip" : fileDisposition.getFileName();
+
+        try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
+            Jbi descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptorFromArchive(sa.getFile());
+
+            return as.call(wsId,
+                    new DeployServiceAssembly(descriptor.getServiceAssembly().getIdentification().getName(),
+                            sa.getArtifactExternalUrl(), containerId));
         }
     }
 
@@ -465,7 +493,7 @@ public class WorkspaceResource {
         }
     }
 
-    public static class SUStateChanged implements WorkspaceEvent.Data {
+    public static class SAStateChanged implements WorkspaceEvent.Data {
 
         @NotNull
         @Min(1)
@@ -473,10 +501,10 @@ public class WorkspaceResource {
 
         @NotNull
         @JsonProperty
-        public final ServiceUnitMin.State state;
+        public final ServiceAssemblyMin.State state;
 
         @JsonCreator
-        public SUStateChanged(@JsonProperty("id") long id, @JsonProperty("state") ServiceUnitMin.State state) {
+        public SAStateChanged(@JsonProperty("id") long id, @JsonProperty("state") ServiceAssemblyMin.State state) {
             this.id = id;
             this.state = state;
         }
@@ -530,54 +558,6 @@ public class WorkspaceResource {
         }
     }
 
-    public static class SUDeployed implements WorkspaceEvent.Data {
-
-        @NotNull
-        @Min(1)
-        public final long componentId;
-
-        @Valid
-        @NotNull
-        @JsonProperty
-        public final ServiceUnitMin serviceUnit;
-
-        @JsonCreator
-        public SUDeployed(@JsonProperty("componentId") long componentId,
-                @JsonProperty("serviceUnit") ServiceUnitMin serviceUnit) {
-            this.componentId = componentId;
-            this.serviceUnit = serviceUnit;
-        }
-
-        @JsonProperty
-        public String getComponentId() {
-            return Long.toString(componentId);
-        }
-    }
-
-    public static class ComponentDeployed implements WorkspaceEvent.Data {
-
-        @NotNull
-        @Min(1)
-        public final long containerId;
-
-        @Valid
-        @NotNull
-        @JsonProperty
-        public final ComponentMin component;
-
-        @JsonCreator
-        public ComponentDeployed(@JsonProperty("containerId") long containerId,
-                @JsonProperty("component") ComponentMin component) {
-            this.containerId = containerId;
-            this.component = component;
-        }
-
-        @JsonProperty
-        public String getContainerId() {
-            return Long.toString(containerId);
-        }
-    }
-
     public static class WorkspaceFullContent implements WorkspaceEvent.Data {
 
         @Valid
@@ -606,7 +586,7 @@ public class WorkspaceResource {
             // jackson will inject values itself (because of @JsonUnwrapped)
             this.users = ImmutableMap.of();
             this.content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
-                    ImmutableMap.of(), ImmutableMap.of());
+                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
             this.workspace = new WorkspaceOverview(0, "", ImmutableList.of(), "");
         }
     }
@@ -618,8 +598,8 @@ public class WorkspaceResource {
         }
 
         public enum Event {
-            WORKSPACE_CONTENT, BUS_IMPORT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SU_STATE_CHANGE, COMPONENT_STATE_CHANGE,
-            BUS_DELETED, SU_DEPLOYED, WORKSPACE_DELETED, COMPONENT_DEPLOYED
+            WORKSPACE_CONTENT, BUS_IMPORT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SA_STATE_CHANGE, COMPONENT_STATE_CHANGE,
+            BUS_DELETED, SA_DEPLOYED, WORKSPACE_DELETED, COMPONENT_DEPLOYED
         }
 
         @JsonProperty
@@ -650,8 +630,8 @@ public class WorkspaceResource {
             return new WorkspaceEvent(Event.BUS_IMPORT_OK, bus);
         }
 
-        public static WorkspaceEvent suStateChange(SUStateChanged ns) {
-            return new WorkspaceEvent(Event.SU_STATE_CHANGE, ns);
+        public static WorkspaceEvent saStateChange(SAStateChanged ns) {
+            return new WorkspaceEvent(Event.SA_STATE_CHANGE, ns);
         }
 
         public static WorkspaceEvent componentStateChange(ComponentStateChanged ns) {
@@ -662,11 +642,11 @@ public class WorkspaceResource {
             return new WorkspaceEvent(Event.BUS_DELETED, bd);
         }
 
-        public static WorkspaceEvent suDeployed(SUDeployed sud) {
-            return new WorkspaceEvent(Event.SU_DEPLOYED, sud);
+        public static WorkspaceEvent saDeployed(WorkspaceContent sud) {
+            return new WorkspaceEvent(Event.SA_DEPLOYED, sud);
         }
 
-        public static WorkspaceEvent componentDeployed(ComponentDeployed cd) {
+        public static WorkspaceEvent componentDeployed(WorkspaceContent cd) {
             return new WorkspaceEvent(Event.COMPONENT_DEPLOYED, cd);
         }
 
@@ -680,13 +660,13 @@ public class WorkspaceResource {
         }
     }
 
-    public static class SUChangeState {
+    public static class SAChangeState {
 
         @NotNull
         @JsonProperty
-        public final ServiceUnitMin.State state;
+        public final ServiceAssemblyMin.State state;
 
-        public SUChangeState(@JsonProperty("state") ServiceUnitMin.State state) {
+        public SAChangeState(@JsonProperty("state") ServiceAssemblyMin.State state) {
             this.state = state;
         }
     }

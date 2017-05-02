@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 
 import java.util.Iterator;
@@ -48,10 +49,11 @@ import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
-import org.ow2.petals.cockpit.server.resources.WorkspaceContent.BusFull;
+import org.ow2.petals.cockpit.server.resources.BusesResource.BusFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 
@@ -189,11 +191,17 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         ComponentsRecord compDb = components.iterator().next();
         assertEquivalent(compDb, component);
 
+        Result<ServiceassembliesRecord> sas = DSL.using(dbRule.getConnection()).selectFrom(SERVICEASSEMBLIES)
+                .where(SERVICEASSEMBLIES.CONTAINER_ID.eq(cDb.getId())).fetch();
+        assertThat(sas).hasSize(1);
+        ServiceassembliesRecord saDb = sas.iterator().next();
+        assertEquivalent(saDb, serviceAssembly);
+
         Result<ServiceunitsRecord> sus = DSL.using(dbRule.getConnection()).selectFrom(SERVICEUNITS)
                 .where(SERVICEUNITS.COMPONENT_ID.eq(compDb.getId())).fetch();
         assertThat(sus).hasSize(1);
         ServiceunitsRecord suDb = sus.iterator().next();
-        assertEquivalent(suDb, serviceAssembly);
+        assertEquivalent(suDb, serviceUnit);
     }
 
     @Test
@@ -373,79 +381,6 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
                 a.assertThat(data.reason).isEqualTo(delete.reason);
             });
         }
-    }
-
-    @Test
-    public void importBusErrorSA() {
-        petals.registerArtifact(new Component("comp", ComponentType.BC), container);
-        petals.registerArtifact(
-                new ServiceAssembly("sa", new ServiceUnit("su1", "comp"), new ServiceUnit("su2", "comp")), container);
-
-        long busId;
-        try (EventInput eventInput = resources.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
-
-            expectWorkspaceContent(eventInput);
-
-            BusInProgress post = resources.getJerseyTest()
-                    .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),
-                            getPort(container), container.getJmxUsername(), container.getJmxPassword(), "phrase")),
-                            BusInProgress.class);
-
-            assertThat(post.ip).isEqualTo(container.getHost());
-            assertThat(post.port).isEqualTo(getPort(container));
-            assertThat(post.username).isEqualTo(container.getJmxUsername());
-            assertThat(post.importError).isNull();
-
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT");
-                BusInProgress data = e.readData(BusInProgress.class);
-                a.assertThat(data.id).isEqualTo(post.id);
-                a.assertThat(data.ip).isEqualTo(post.ip);
-                a.assertThat(data.port).isEqualTo(post.port);
-                a.assertThat(data.username).isEqualTo(post.username);
-                a.assertThat(data.importError).isEqualTo(post.importError);
-            });
-
-            Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
-            assertThat(buses).hasSize(1);
-            BusesRecord bus = buses.iterator().next();
-
-            // we can't really check for the temporary state because it is executed concurrently
-            assertThat(bus.getImportIp()).isEqualTo(container.getHost());
-            assertThat(bus.getImportPort()).isEqualTo(getPort(container));
-            assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
-            assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
-            assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
-            assertThat(bus.getWorkspaceId()).isEqualTo(1);
-            assertThat(bus.getImported()).isEqualTo(false);
-            assertThat(post.id).isEqualTo(bus.getId());
-            busId = bus.getId();
-
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT_ERROR");
-                BusInProgress data = e.readData(BusInProgress.class);
-                a.assertThat(data.id).isEqualTo(busId);
-                a.assertThat(data.importError).contains("Buses with not-single SU SAs are not supported");
-            });
-        }
-
-        Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).where(BUSES.ID.eq(busId))
-                .fetch();
-        assertThat(buses).hasSize(1);
-        BusesRecord bus = buses.iterator().next();
-
-        // these shouldn't have changed
-        assertThat(bus.getImportIp()).isEqualTo(container.getHost());
-        assertThat(bus.getImportPort()).isEqualTo(getPort(container));
-        assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
-        assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
-        assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
-        assertThat(bus.getWorkspaceId()).isEqualTo(1);
-        // these should have been set now
-        assertThat(bus.getImported()).isEqualTo(false);
-        assertThat(bus.getImportError()).contains("Buses with not-single SU SAs are not supported");
-        assertThat(bus.getName()).isNull();
     }
 }
 

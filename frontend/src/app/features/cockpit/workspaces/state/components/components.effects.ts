@@ -21,12 +21,14 @@ import { Response } from '@angular/http';
 import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
+import { NotificationsService } from 'angular2-notifications';
 
 import { environment } from './../../../../../../environments/environment';
 import { Components } from './components.reducer';
 import { ComponentsService } from './../../../../../shared/services/components.service';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { NotificationsService } from 'angular2-notifications';
+import { ComponentState } from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { IServiceUnitBackendSSE } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 
 @Injectable()
 export class ComponentsEffects {
@@ -67,7 +69,10 @@ export class ComponentsEffects {
     .ofType(Components.CHANGE_STATE)
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .switchMap(([action, workspaceId]:
-      [{ type: string, payload: { componentId: string, newState: string, parameters: { [key: string]: string } } }, string]) =>
+      [
+        { type: string, payload: { componentId: string, newState: ComponentState, parameters: { [key: string]: string } } },
+        string
+      ]) =>
       this.componentsService.putState(workspaceId, action.payload.componentId, action.payload.newState, action.payload.parameters)
         .mergeMap(_ => Observable.empty())
         .catch((err) => {
@@ -123,8 +128,8 @@ export class ComponentsEffects {
   @Effect({ dispatch: false }) deployServiceUnitSuccess$: Observable<void> = this.actions$
     .ofType(Components.DEPLOY_SERVICE_UNIT_SUCCESS)
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
-    .do(([{ payload }, workspaceId]: [{ payload: { serviceUnit: { id: string, name: string } } }, string]) => {
-      this.router.navigate(['workspaces', workspaceId, 'petals', 'service-units', payload.serviceUnit.id]);
+    .do(([{ payload }, workspaceId]: [{ payload: IServiceUnitBackendSSE }, string]) => {
+      this.router.navigate(['workspaces', workspaceId, 'petals', 'service-units', payload.id]);
     })
     .mapTo(null);
 }

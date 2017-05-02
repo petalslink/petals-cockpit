@@ -42,7 +42,8 @@ describe(`Buses reducer`, () => {
             idBus0: {
               name: 'Bus 0',
               containers: ['idCont0', 'idCont1'],
-              id: 'idBus0'
+              id: 'idBus0',
+              workspaceId: 'wsId0'
             }
           },
           allIds: ['idBus0']
@@ -56,6 +57,7 @@ describe(`Buses reducer`, () => {
             name: 'Bus 0',
             containers: ['idCont0', 'idCont1'],
             id: 'idBus0',
+            workspaceId: 'wsId0',
             isFolded: false,
             isFetchingDetails: false,
           }
@@ -64,43 +66,12 @@ describe(`Buses reducer`, () => {
       });
     });
 
-    it(`should add a second bus after the previous one`, () => {
+    it(`should replace existing buses while keeping extra values`, () => {
       const initialState: any = {
         keepPreviousValues: '',
         selectedBusId: '',
         byId: {
-          keepPreviousValues: '',
-          idBus0: {
-            keepPreviousValues: '',
-            name: 'Bus 0',
-            containers: ['idCont0', 'idCont1'],
-            id: 'idBus0',
-            isFolded: false,
-            isFetchingDetails: false,
-          }
-        },
-        allIds: ['idBus0']
-      };
-
-      const reducer = Buses.reducer(initialState, {
-        type: Buses.FETCH_BUSES_SUCCESS,
-        payload: {
-          byId: {
-            idBus1: {
-              name: 'Bus 1',
-              containers: ['idCont2', 'idCont3'],
-              id: 'idBus1'
-            }
-          },
-          allIds: ['idBus1']
-        }
-      });
-
-      expect(reducer).toEqual({
-        keepPreviousValues: '',
-        selectedBusId: '',
-        byId: {
-          keepPreviousValues: '',
+          doNotKeepPreviousValues: '',
           idBus0: {
             keepPreviousValues: '',
             name: 'Bus 0',
@@ -110,33 +81,7 @@ describe(`Buses reducer`, () => {
             isFetchingDetails: false,
           },
           idBus1: {
-            name: 'Bus 1',
-            containers: ['idCont2', 'idCont3'],
-            id: 'idBus1',
-            isFolded: false,
-            isFetchingDetails: false,
-          }
-        },
-        allIds: ['idBus0', 'idBus1']
-      });
-    });
-
-    it(`should replace an existing bus`, () => {
-      const initialState: any = {
-        keepPreviousValues: '',
-        selectedBusId: '',
-        byId: {
-          keepPreviousValues: '',
-          idBus0: {
             keepPreviousValues: '',
-            name: 'Bus 0',
-            containers: ['idCont0', 'idCont1'],
-            id: 'idBus0',
-            isFolded: false,
-            isFetchingDetails: false,
-          },
-          idBus1: {
-            doNotKeepPreviousValuesIfUpdate: '',
             name: 'Bus 1',
             containers: ['idCont2', 'idCont3'],
             id: 'idBus1',
@@ -154,7 +99,66 @@ describe(`Buses reducer`, () => {
             idBus1: {
               name: 'Bus 1, updated name',
               containers: ['idCont2-updated', 'idCont3-updated'],
-              id: 'idBus1'
+              id: 'idBus1',
+              workspaceId: 'wsId0',
+            }
+          },
+          allIds: ['idBus1']
+        }
+      });
+
+      expect(reducer).toEqual({
+        keepPreviousValues: '',
+        selectedBusId: '',
+        byId: {
+          idBus1: {
+            keepPreviousValues: '',
+            name: 'Bus 1, updated name',
+            containers: ['idCont2-updated', 'idCont3-updated'],
+            id: 'idBus1',
+            workspaceId: 'wsId0',
+            isFolded: false,
+            isFetchingDetails: false,
+          }
+        },
+        allIds: ['idBus1']
+      });
+    });
+  });
+
+  describe(Buses.ADD_BUSES_SUCCESS, () => {
+    it(`should check action name`, () => {
+      expect(Buses.ADD_BUSES_SUCCESS).toEqual(`[Buses] Add buses success`);
+    });
+
+    it(`should add a second bus after the previous one`, () => {
+      const initialState: any = {
+        keepPreviousValues: '',
+        selectedBusId: '',
+        byId: {
+          keepPreviousValues: '',
+          idBus0: {
+            keepPreviousValues: '',
+            name: 'Bus 0',
+            containers: ['idCont0', 'idCont1'],
+            id: 'idBus0',
+            workspaceId: 'wsId0',
+            isFolded: false,
+            isFetchingDetails: false,
+          }
+        },
+        allIds: ['idBus0']
+      };
+
+      const reducer = Buses.reducer(initialState, {
+        type: Buses.ADD_BUSES_SUCCESS,
+        payload: {
+          byId: {
+            idBus1: {
+              name: 'Bus 1',
+              containers: ['idCont2', 'idCont3'],
+              id: 'idBus1',
+              workspaceId: 'wsId0'
             }
           },
           allIds: ['idBus1']
@@ -171,13 +175,15 @@ describe(`Buses reducer`, () => {
             name: 'Bus 0',
             containers: ['idCont0', 'idCont1'],
             id: 'idBus0',
+            workspaceId: 'wsId0',
             isFolded: false,
             isFetchingDetails: false,
           },
           idBus1: {
-            name: 'Bus 1, updated name',
-            containers: ['idCont2-updated', 'idCont3-updated'],
+            name: 'Bus 1',
+            containers: ['idCont2', 'idCont3'],
             id: 'idBus1',
+            workspaceId: 'wsId0',
             isFolded: false,
             isFetchingDetails: false,
           }
