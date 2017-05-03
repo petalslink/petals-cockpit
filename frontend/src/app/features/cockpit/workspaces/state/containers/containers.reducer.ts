@@ -19,10 +19,14 @@ import { Action } from '@ngrx/store';
 
 import { IContainersTable, containersTableFactory } from './containers.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
-import { getContainerOfComponent } from '../../../../../shared/helpers/component.helper';
 import { Components } from '../components/components.reducer';
-import { putAll, updateById } from 'app/shared/helpers/map.helper';
-import { containerRowFactory } from 'app/features/cockpit/workspaces/state/containers/container.interface';
+import { putAll, updateById, mergeOnly, JsMap } from 'app/shared/helpers/map.helper';
+import {
+  containerRowFactory,
+  IContainerBackendSSE,
+  IContainerBackendDetails
+} from 'app/features/cockpit/workspaces/state/containers/container.interface';
+import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
 
 export class Containers {
   private static reducerName = '[Containers]';
@@ -37,7 +41,13 @@ export class Containers {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_CONTAINERS_SUCCESS = `${Containers.reducerName} Fetch containers success`;
-  private static fetchContainersSuccess(containersTable: IContainersTable, payload): IContainersTable {
+  private static fetchContainersSuccess(containersTable: IContainersTable, payload: JsMap<IContainerBackendSSE>): IContainersTable {
+    return mergeOnly(containersTable, payload, containerRowFactory());
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static ADD_CONTAINERS_SUCCESS = `${Containers.reducerName} Add containers success`;
+  private static addContainersSuccess(containersTable: IContainersTable, payload: JsMap<IContainerBackendSSE>): IContainersTable {
     return putAll(containersTable, payload, containerRowFactory());
   }
 
@@ -107,7 +117,7 @@ export class Containers {
   public static FETCH_CONTAINER_DETAILS_SUCCESS = `${Containers.reducerName} Fetch container details success`;
   private static fetchContainerDetailsSuccess(
     containersTable: IContainersTable,
-    payload: { containerId: string, data: any }
+    payload: { containerId: string, data: IContainerBackendDetails }
   ): IContainersTable {
     return updateById(containersTable, payload.containerId, { ...payload.data, isFetchingDetails: false });
   }
@@ -133,30 +143,25 @@ export class Containers {
 
   // tslint:disable-next-line:member-ordering
   public static DEPLOY_COMPONENT_SUCCESS = `${Containers.reducerName} Deploy component success`;
-  private static deployComponentSuccess(
-    containersTable: IContainersTable,
-    payload: { containerId: string, component: { id: string, name: string, state: string } }
-  ): IContainersTable {
+  private static deployComponentSuccess(containersTable: IContainersTable, payload: IComponentRow): IContainersTable {
     const container = containersTable.byId[payload.containerId];
 
     return updateById(containersTable, payload.containerId, {
-      components: [...Array.from(new Set([...container.components, payload.component.id]))],
+      components: [...Array.from(new Set([...container.components, payload.id]))],
       isDeployingComponent: false,
       errorDeployment: ''
     });
   }
 
   // tslint:disable-next-line:member-ordering
-  private static removeComponent(containersTable: IContainersTable, payload: { componentId: string }): IContainersTable {
-    const containerContainingComponent = getContainerOfComponent(containersTable, payload.componentId);
+  private static removeComponent(
+    containersTable: IContainersTable,
+    payload: { containerId: string, componentId: string }
+  ): IContainersTable {
 
-    if (!containerContainingComponent) {
-      return containersTable;
-    }
-
-    return updateById(containersTable, containerContainingComponent.id, {
+    return updateById(containersTable, payload.containerId, {
       components: containersTable
-        .byId[containerContainingComponent.id]
+        .byId[payload.containerId]
         .components
         .filter(id => id !== payload.componentId)
     });
@@ -171,6 +176,7 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod: { [type: string]: (t: IContainersTable, p: any) => IContainersTable } = {
     [Containers.FETCH_CONTAINERS_SUCCESS]: Containers.fetchContainersSuccess,
+    [Containers.ADD_CONTAINERS_SUCCESS]: Containers.addContainersSuccess,
     [Containers.FOLD_CONTAINER]: Containers.foldContainers,
     [Containers.UNFOLD_CONTAINER]: Containers.unfoldContainer,
     [Containers.TOGGLE_FOLD_CONTAINER]: Containers.toggleFoldContainer,

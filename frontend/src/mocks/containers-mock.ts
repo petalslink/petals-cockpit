@@ -17,15 +17,18 @@
 
 import { componentsService, Component } from './components-mock';
 import { Bus } from './buses-mock';
+import { ServiceAssembly, serviceAssembliesService } from './service-assemblies-mock';
+import { IContainerBackendSSE, IContainerBackendDetails } from './../app/features/cockpit/workspaces/state/containers/container.interface';
+import { ComponentState } from './../app/features/cockpit/workspaces/state/components/component.interface';
 
 export class Containers {
-  private containers = new Map<string, Container>();
+  private readonly containers = new Map<string, Container>();
 
   constructor() { }
 
   create(bus: Bus, name?: string) {
     const container = new Container(bus, name);
-    this.containers.set(container.getId(), container);
+    this.containers.set(container.id, container);
     return container;
   }
 
@@ -38,11 +41,12 @@ export const containersService = new Containers();
 
 export class Container {
   private static cpt = 0;
-  private bus: Bus;
-  private id: string;
-  private name: string;
-  private components = new Map<string, Component>();
-  private ip: string;
+  public readonly bus: Bus;
+  public readonly id: string;
+  public readonly name: string;
+  private readonly components = new Map<string, Component>();
+  private readonly serviceAssemblies = new Map<string, ServiceAssembly>();
+  public readonly ip: string;
 
   constructor(bus: Bus, name?: string) {
     const i = Container.cpt++;
@@ -52,41 +56,70 @@ export class Container {
     this.bus = bus;
 
     // by default add 2 components
-    this.addComponent();
-    this.addComponent();
+    const c1 = this.addComponent();
+    const c2 = this.addComponent();
+
+
+    // by default add 2 service units to each
+    this.addServiceUnit(c1);
+    this.addServiceUnit(c1);
+
+    this.addServiceUnit(c2);
+    this.addServiceUnit(c2);
   }
 
   getComponents() {
     return Array.from(this.components.values());
   }
 
-  getId() {
-    return this.id;
+  getServiceAssemblies() {
+    return Array.from(this.serviceAssemblies.values());
   }
 
-  addComponent(name?: string, state?: string) {
-    const component = componentsService.create(name, state);
-    this.components.set(component.getId(), component);
+  addComponent(name?: string, state?: ComponentState) {
+    const component = componentsService.create(this, name, state);
+    this.components.set(component.id, component);
 
     return component;
   }
 
-  toObj() {
+  addServiceAssembly(name?: string) {
+    const serviceAssembly = serviceAssembliesService.create(this, name);
+
+    this.serviceAssemblies.set(serviceAssembly.id, serviceAssembly);
+
+    return serviceAssembly;
+  }
+
+  addServiceUnit(component: Component, name?: string) {
+    const serviceAssembly = serviceAssembliesService.create(this, name ? `sa-${name}` : undefined);
+    const serviceUnit = serviceAssembly.addServiceUnit(component, name);
+
+    component.addServiceUnit(serviceUnit);
+    this.serviceAssemblies.set(serviceAssembly.id, serviceAssembly);
+
+    return [serviceAssembly, serviceUnit];
+  }
+
+  toObj(): { [id: string]: IContainerBackendSSE } {
     return {
       [this.id]: {
+        id: this.id,
         name: this.name,
-        components: Array.from(this.components.keys())
+        busId: this.bus.id,
+        components: Array.from(this.components.keys()),
+        // serviceAssemblies: Array.from(this.serviceAssemblies.keys())
       }
     };
   }
 
-  getDetails() {
+  getDetails(): IContainerBackendDetails {
     return {
       ip: this.ip,
       port: 7700,
       reachabilities: this.bus
         .getContainers()
-        .map(container => container.getId())
+        .map(container => container.id)
         .filter(id => id !== this.id),
       systemInfo: [
         'Petals ESB µKernel 4.0.2',

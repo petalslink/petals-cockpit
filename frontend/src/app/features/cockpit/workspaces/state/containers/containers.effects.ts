@@ -27,6 +27,7 @@ import { environment } from './../../../../../../environments/environment';
 import { Containers } from './containers.reducer';
 import { ContainersService } from './../../../../../shared/services/containers.service';
 import { IStore } from 'app/shared/interfaces/store.interface';
+import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
 
 @Injectable()
 export class ContainersEffects {
@@ -93,8 +94,8 @@ export class ContainersEffects {
   @Effect({ dispatch: false }) deployComponentSuccess$: Observable<void> = this.actions$
     .ofType(Containers.DEPLOY_COMPONENT_SUCCESS)
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
-    .do(([{ payload }, workspaceId]: [{ payload: { component: { id: string, name: string } } }, string]) => {
-      this.router.navigate(['workspaces', workspaceId, 'petals', 'components', payload.component.id]);
+    .do(([{ payload }, workspaceId]: [{ payload: IComponentRow }, string]) => {
+      this.router.navigate(['workspaces', workspaceId, 'petals', 'components', payload.id]);
     })
     .mapTo(null);
 }

@@ -18,7 +18,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import { IServiceUnitRow } from '../../../state/service-units/service-unit.interface';
+import { IServiceUnitRow, ServiceUnitState } from '../../../state/service-units/service-unit.interface';
 import { stateNameToPossibleActionsServiceUnit } from '../../../../../../shared/helpers/service-unit.helper';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
 import { ServiceUnits } from '../../../state/service-units/service-units.reducer';
@@ -36,7 +36,7 @@ export class PetalsServiceUnitOverviewComponent implements OnInit {
 
   ngOnInit() { }
 
-  getPossibleStateActions(state: string) {
+  getPossibleStateActions(state: ServiceUnitState) {
     return stateNameToPossibleActionsServiceUnit(state);
   }
 
@@ -44,7 +44,7 @@ export class PetalsServiceUnitOverviewComponent implements OnInit {
     return this.serviceUnit ? this.serviceUnit.state : null;
   }
 
-  changeState(newState: string) {
+  changeState(newState: ServiceUnitState) {
     this.store$.dispatch({ type: ServiceUnits.CHANGE_STATE, payload: { serviceUnitId: this.serviceUnit.id, newState } });
   }
 }

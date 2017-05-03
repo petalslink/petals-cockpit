@@ -34,6 +34,7 @@ import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.resources.BusesResource;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource;
 import org.ow2.petals.cockpit.server.resources.ContainersResource;
+import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource;
 import org.ow2.petals.cockpit.server.resources.UserSession;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
@@ -231,6 +232,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         environment.jersey().register(BusesResource.class);
         environment.jersey().register(ContainersResource.class);
         environment.jersey().register(ComponentsResource.class);
+        environment.jersey().register(ServiceAssembliesResource.class);
         environment.jersey().register(ServiceUnitsResource.class);
 
         // This is needed for SSE to work correctly!

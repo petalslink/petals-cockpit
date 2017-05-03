@@ -27,11 +27,11 @@ export class SseWorkspaceEvent {
   public static BUS_IMPORT_OK = 'BUS_IMPORT_OK';
   public static WORKSPACE_CONTENT = 'WORKSPACE_CONTENT';
   public static BUS_IMPORT_ERROR = 'BUS_IMPORT_ERROR';
-  public static SU_STATE_CHANGE = 'SU_STATE_CHANGE';
+  public static SA_STATE_CHANGE = 'SA_STATE_CHANGE';
   public static COMPONENT_STATE_CHANGE = 'COMPONENT_STATE_CHANGE';
   public static BUS_DELETED = 'BUS_DELETED';
   public static WORKSPACE_DELETED = 'WORKSPACE_DELETED';
-  public static SU_DEPLOYED = 'SU_DEPLOYED';
+  public static SA_DEPLOYED = 'SA_DEPLOYED';
   public static COMPONENT_DEPLOYED = 'COMPONENT_DEPLOYED';
 
   public static get allEvents() {
@@ -40,11 +40,11 @@ export class SseWorkspaceEvent {
       SseWorkspaceEvent.BUS_IMPORT_OK,
       SseWorkspaceEvent.WORKSPACE_CONTENT,
       SseWorkspaceEvent.BUS_IMPORT_ERROR,
-      SseWorkspaceEvent.SU_STATE_CHANGE,
+      SseWorkspaceEvent.SA_STATE_CHANGE,
       SseWorkspaceEvent.COMPONENT_STATE_CHANGE,
       SseWorkspaceEvent.BUS_DELETED,
       SseWorkspaceEvent.WORKSPACE_DELETED,
-      SseWorkspaceEvent.SU_DEPLOYED,
+      SseWorkspaceEvent.SA_DEPLOYED,
       SseWorkspaceEvent.COMPONENT_DEPLOYED
     ];
   }

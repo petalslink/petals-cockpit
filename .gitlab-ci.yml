@@ -26,10 +26,11 @@ variables:
   before_script:
     # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
     - yarn config set cache-folder $PWD/$YARN_CACHE_DIRECTORY --global
+    - yarn config set network-concurrency 1
     - du -hs $PWD/$YARN_CACHE_DIRECTORY || true
     - cd frontend
     - export PATH=`yarn bin`:$PATH
-    - time yarn --frozen-lockfile --link-duplicates --non-interactive
+    - time yarn --frozen-lockfile --link-duplicates --non-interactive || yarn --frozen-lockfile --link-duplicates --non-interactive
     - du -hs node_modules || true
     - cd ..
   cache:

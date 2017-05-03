@@ -19,8 +19,8 @@ import { Action } from '@ngrx/store';
 
 import { IBusesTable, busesTableFactory } from './buses.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
-import { putAll, updateById, removeById } from 'app/shared/helpers/map.helper';
-import { busRowFactory } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
+import { updateById, removeById, mergeOnly, putAll, JsMap } from 'app/shared/helpers/map.helper';
+import { busRowFactory, IBusBackendSSE, IBusBackendDetails } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
 
 export class Buses {
   private static reducerName = '[Buses]';
@@ -35,7 +35,13 @@ export class Buses {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUSES_SUCCESS = `${Buses.reducerName} Fetch buses success`;
-  private static fetchBusesSuccess(busesTable: IBusesTable, payload): IBusesTable {
+  private static fetchBusesSuccess(busesTable: IBusesTable, payload: JsMap<IBusBackendSSE>): IBusesTable {
+    return mergeOnly(busesTable, payload, busRowFactory());
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static ADD_BUSES_SUCCESS = `${Buses.reducerName} Add buses success`;
+  private static addBusesSuccess(busesTable: IBusesTable, payload: JsMap<IBusBackendSSE>): IBusesTable {
     return putAll(busesTable, payload, busRowFactory());
   }
 
@@ -94,7 +100,7 @@ export class Buses {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_BUS_DETAILS_SUCCESS = `${Buses.reducerName} Fetch bus details success`;
-  private static fetchBusDetailsSuccess(busesTable: IBusesTable, payload: { busId: string, data: any }): IBusesTable {
+  private static fetchBusDetailsSuccess(busesTable: IBusesTable, payload: { busId: string, data: IBusBackendDetails }): IBusesTable {
     return updateById(busesTable, payload.busId, { ...payload.data, isFetchingDetails: false });
   }
 
@@ -135,6 +141,7 @@ export class Buses {
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod: { [type: string]: (t: IBusesTable, p: any) => IBusesTable } = {
     [Buses.FETCH_BUSES_SUCCESS]: Buses.fetchBusesSuccess,
+    [Buses.ADD_BUSES_SUCCESS]: Buses.addBusesSuccess,
     [Buses.FOLD_BUS]: Buses.foldBus,
     [Buses.UNFOLD_BUS]: Buses.unfoldBus,
     [Buses.TOGGLE_FOLD_BUS]: Buses.toggleFoldBus,

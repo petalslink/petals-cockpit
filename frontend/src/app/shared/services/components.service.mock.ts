@@ -28,6 +28,7 @@ import { SseService, SseWorkspaceEvent } from './sse.service';
 import { IStore } from '../interfaces/store.interface';
 import { SseServiceMock } from './sse.service.mock';
 import { environment } from '../../../environments/environment';
+import { ComponentState } from 'app/features/cockpit/workspaces/state/components/component.interface';
 
 @Injectable()
 export class ComponentsMockService extends ComponentsServiceImpl {
@@ -47,54 +48,50 @@ export class ComponentsMockService extends ComponentsServiceImpl {
     return helper.responseBody(detailsComponent);
   }
 
-  putState(_workspaceId: string, componentId: string, newState: string, parameters: { [key: string]: string }) {
+  putState(_workspaceId: string, componentId: string, newState: ComponentState, parameters: { [key: string]: string }) {
     // in order to simulate an error, at least for E2E tests, if the http-port contains 'error', throw an error
     if (parameters && parameters['http-port'] && parameters['http-port'].includes('error')) {
       return helper.responseBody('[Mock message] An error happened when trying to change the state of that component', 400);
     }
 
-    componentsService.get(componentId).setState(newState);
+    componentsService.get(componentId).state = newState;
 
     if (parameters) {
-      componentsService.get(componentId).setParameters(parameters);
+      componentsService.get(componentId).parameters = parameters;
     }
+
+    const response = {
+      id: componentId,
+      state: newState
+    };
 
     // when the state changes, trigger a fake SSE event
     setTimeout(() =>
-      (this.pSseService as SseServiceMock).triggerSseEvent(
-        SseWorkspaceEvent.COMPONENT_STATE_CHANGE,
-        {
-          id: componentId,
-          state: newState
-        }
-      ),
+      (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.COMPONENT_STATE_CHANGE, response),
       environment.mock.sseDelay
     );
 
-    return helper.responseBody(null);
+    return helper.responseBody(response);
   }
 
   deploySu(workspaceId: string, componentId: string, file: File, serviceUnitName: string) {
-    const serviceUnit = componentsService.get(componentId).addServiceUnit(serviceUnitName);
-
     if (serviceUnitName.includes('error')) {
       return helper.responseBody('[Mock message] An error happened when trying to deploy the service-unit', 400);
     }
 
+    const component = componentsService.get(componentId);
+    const [serviceAssembly, serviceUnit] = component.container.addServiceUnit(component, serviceUnitName);
+
+    const response = {
+      serviceAssemblies: serviceAssembly.toObj(),
+      serviceUnits: serviceUnit.toObj()
+    };
+
     setTimeout(() =>
-      (this.pSseService as SseServiceMock).triggerSseEvent(
-        SseWorkspaceEvent.SU_DEPLOYED,
-        {
-          componentId,
-          serviceUnit: {
-            id: serviceUnit.getId(),
-            ...serviceUnit.getDetails()
-          }
-        }
-      ),
+      (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.SA_DEPLOYED, response),
       environment.mock.sseDelay
     );
 
-    return helper.responseBody(null);
+    return helper.responseBody(response);
   }
 }

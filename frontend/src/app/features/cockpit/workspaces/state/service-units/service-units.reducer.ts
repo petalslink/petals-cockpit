@@ -19,8 +19,12 @@ import { Action } from '@ngrx/store';
 
 import { IServiceUnitsTable, serviceUnitsTableFactory } from './service-units.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
-import { putById, putAll, updateById, removeById } from 'app/shared/helpers/map.helper';
-import { serviceUnitRowFactory } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { putAll, updateById, removeById, mergeOnly, JsMap } from 'app/shared/helpers/map.helper';
+import {
+  serviceUnitRowFactory,
+  IServiceUnitBackendSSE,
+  IServiceUnitBackendDetails
+} from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 
 export class ServiceUnits {
   private static reducerName = '[Service units]';
@@ -35,7 +39,19 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNITS_SUCCESS = `${ServiceUnits.reducerName} Fetch service units success`;
-  private static fetchServiceUnitsSuccess(serviceUnitsTable: IServiceUnitsTable, payload): IServiceUnitsTable {
+  private static fetchServiceUnitsSuccess(
+    serviceUnitsTable: IServiceUnitsTable,
+    payload: JsMap<IServiceUnitBackendSSE>
+  ): IServiceUnitsTable {
+    return mergeOnly(serviceUnitsTable, payload, serviceUnitRowFactory());
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static ADD_SERVICE_UNITS_SUCCESS = `${ServiceUnits.reducerName} Add service units success`;
+  private static addServiceUnitsSuccess(
+    serviceUnitsTable: IServiceUnitsTable,
+    payload: JsMap<IServiceUnitBackendSSE>
+  ): IServiceUnitsTable {
     return putAll(serviceUnitsTable, payload, serviceUnitRowFactory());
   }
 
@@ -69,7 +85,7 @@ export class ServiceUnits {
   public static FETCH_SERVICE_UNIT_DETAILS_SUCCESS = `${ServiceUnits.reducerName} Fetch service unit details success`;
   private static fetchServiceUnitDetailsSuccess(
     serviceUnitsTable: IServiceUnitsTable,
-    payload: { serviceUnitId: string, data: any }
+    payload: { serviceUnitId: string, data: IServiceUnitBackendDetails }
   ): IServiceUnitsTable {
     return updateById(serviceUnitsTable, payload.serviceUnitId, { ...payload.data, isFetchingDetails: false });
   }
@@ -102,21 +118,18 @@ export class ServiceUnits {
   public static CHANGE_STATE_ERROR = `${ServiceUnits.reducerName} Change state error`;
   private static changeStateError(
     serviceUnitsTable: IServiceUnitsTable,
-    payload: { serviceUnitId: string, errorChangeState: string }): IServiceUnitsTable {
+    payload: { serviceUnitId: string, errorChangeState: string }
+  ): IServiceUnitsTable {
     return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: false, errorChangeState: payload.errorChangeState });
   }
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_SERVICE_UNIT = `${ServiceUnits.reducerName} Remove service unit`;
-  private static removeServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
-    return removeById(serviceUnitsTable, payload.serviceUnitId);
-  }
-
-  private static deployServiceUnitSuccess(
+  private static removeServiceUnit(
     serviceUnitsTable: IServiceUnitsTable,
-    payload: { serviceUnit: { id: string, name: string, state: string } }
+    payload: { componentId: string, serviceUnitId: string }
   ): IServiceUnitsTable {
-    return putById(serviceUnitsTable, payload.serviceUnit.id, payload.serviceUnit, serviceUnitRowFactory());
+    return removeById(serviceUnitsTable, payload.serviceUnitId);
   }
 
   private static cleanWorkspace(_serviceUnitsTable: IServiceUnitsTable, _payload): IServiceUnitsTable {
@@ -128,6 +141,7 @@ export class ServiceUnits {
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod: { [type: string]: (t: IServiceUnitsTable, p: any) => IServiceUnitsTable } = {
     [ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS]: ServiceUnits.fetchServiceUnitsSuccess,
+    [ServiceUnits.ADD_SERVICE_UNITS_SUCCESS]: ServiceUnits.addServiceUnitsSuccess,
     [ServiceUnits.SET_CURRENT_SERVICE_UNIT]: ServiceUnits.setCurrentServiceUnit,
     [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS]: ServiceUnits.fetchServiceUnitDetails,
     [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS]: ServiceUnits.fetchServiceUnitDetailsSuccess,
@@ -136,11 +150,6 @@ export class ServiceUnits {
     [ServiceUnits.CHANGE_STATE_SUCCESS]: ServiceUnits.changeStateSuccess,
     [ServiceUnits.CHANGE_STATE_ERROR]: ServiceUnits.changeStateError,
     [ServiceUnits.REMOVE_SERVICE_UNIT]: ServiceUnits.removeServiceUnit,
-    // TODO : When using Components.DEPLOY_SERVICE_UNIT_SUCCESS, there's an error at runtime
-    // [Components.DEPLOY_SERVICE_UNIT_SUCCESS]: ServiceUnits.deployServiceUnitSuccess,
-    // issue opened here: https://github.com/angular/angular-cli/issues/5736
-    // once solved, update the tests !
-    ['[Components] Deploy service unit success']: ServiceUnits.deployServiceUnitSuccess,
 
     [Workspaces.CLEAN_WORKSPACE]: ServiceUnits.cleanWorkspace
   };

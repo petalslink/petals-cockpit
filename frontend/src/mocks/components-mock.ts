@@ -15,17 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { serviceUnitsService, ServiceUnit } from './service-units-mock';
+import { ServiceUnit } from './service-units-mock';
+import { Container } from './containers-mock';
+import {
+  IComponentBackendSSE,
+  IComponentBackendDetails,
+  ComponentState,
+  EComponentType
+} from './../app/features/cockpit/workspaces/state/components/component.interface';
 
 export class Components {
-  private components = new Map<string, Component>();
+  private readonly components = new Map<string, Component>();
 
   constructor() { }
 
-  create(name?: string, state?: string) {
-    const component = new Component(name, state);
+  create(container: Container, name?: string, state?: ComponentState) {
+    const component = new Component(container, name, state);
 
-    this.components.set(component.getId(), component);
+    this.components.set(component.id, component);
     return component;
   }
 
@@ -38,14 +45,16 @@ export const componentsService = new Components();
 
 export class Component {
   private static cpt = 0;
-  private id: string;
-  private serviceUnits = new Map<string, ServiceUnit>();
-  private name: string;
-  private state: string;
-  private parameters: { [key: string]: string };
+  public readonly id: string;
+  public readonly container: Container;
+  private readonly serviceUnits = new Map<string, ServiceUnit>();
+  public readonly name: string;
+  public state: ComponentState;
+  public parameters: { [key: string]: string };
 
-  constructor(name?: string, state = 'Started') {
+  constructor(container: Container, name?: string, state: ComponentState = 'Started') {
     const i = Component.cpt++;
+    this.container = container;
     this.id = `idComp${i}`;
     this.name = name ? name : `Comp ${i}`;
     this.state = state;
@@ -53,58 +62,38 @@ export class Component {
       'http-port': '8080',
       'enable-https': 'false'
     };
-
-    // by default add 2 service units
-    this.addServiceUnit();
-    this.addServiceUnit();
-  }
-
-  setState(newState: string) {
-    this.state = newState;
-  }
-
-  setParameters(parameters: { [key: string]: string }) {
-    this.parameters = parameters;
-  }
-
-  public getId() {
-    return this.id;
   }
 
   getServiceUnits() {
     return Array.from(this.serviceUnits.values());
   }
 
-  addServiceUnit(name?: string) {
-    const serviceUnit = serviceUnitsService.create(name);
-    this.serviceUnits.set(serviceUnit.getId(), serviceUnit);
-
-    return serviceUnit;
+  addServiceUnit(serviceUnit: ServiceUnit) {
+    this.serviceUnits.set(serviceUnit.id, serviceUnit);
   }
 
-  toObj() {
+  toObj(): { [id: string]: IComponentBackendSSE } {
     return {
       [this.id]: {
+        id: this.id,
         name: this.name,
+        type: EComponentType.BC,
+        state: this.state,
+        containerId: this.container.id,
         serviceUnits: Array.from(this.serviceUnits.keys())
       }
     };
   }
 
-  getDetails() {
-    const details = {
-      name: this.name,
-      state: this.state,
-      type: 'BC'
-    };
-
+  getDetails(): IComponentBackendDetails {
     if (this.state === 'Loaded') {
       return {
-        ...details,
         parameters: this.parameters
       };
     }
 
-    return details;
+    return {
+      parameters: {}
+    };
   }
 }

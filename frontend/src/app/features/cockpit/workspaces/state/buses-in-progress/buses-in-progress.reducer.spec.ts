@@ -42,14 +42,14 @@ describe(`Buses in progress reducer`, () => {
       byId: {
         keepPreviousValues: '',
         idBus1: {
-          doNotKeepPreviousValuesIfUpdate: '',
+          keepPreviousValues: '',
           id: 'idBus1',
           ip: '192.168.0.1',
           port: 7701,
           username: 'petals1'
         },
         idBus2: {
-          doNotKeepPreviousValuesIfUpdate: '',
+          keepPreviousValues: '',
           id: 'idBus2',
           ip: '192.168.0.2',
           port: 7702,
@@ -59,9 +59,91 @@ describe(`Buses in progress reducer`, () => {
       allIds: ['idBus1', 'idBus2']
     };
 
-    it(`should add a bus if doesn't exists yet`, () => {
+    it(`should replace existing buses while keeping extra values`, () => {
       const reducer = BusesInProgress.reducer(initialState, {
         type: BusesInProgress.FETCH_BUSES_IN_PROGRESS,
+        payload: {
+          byId: {
+            idBus1: {
+              id: 'idBus1',
+              ip: '192.168.0.10',
+              port: 7711,
+              username: 'petals1 updated'
+            },
+            idBus3: {
+              id: 'idBus3',
+              ip: '192.168.0.3',
+              port: 7712,
+              username: 'petals3'
+            }
+          },
+          allIds: [
+            'idBus1',
+            'idBus3'
+          ]
+        }
+      });
+
+      expect(reducer).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          idBus1: {
+            id: 'idBus1',
+            ip: '192.168.0.10',
+            port: 7711,
+            keepPreviousValues: '',
+            username: 'petals1 updated',
+            importError: '',
+            isRemoving: false,
+            password: '',
+            passphrase: ''
+          },
+          idBus3: {
+            id: 'idBus3',
+            ip: '192.168.0.3',
+            port: 7712,
+            username: 'petals3',
+            importError: '',
+            isRemoving: false,
+            password: '',
+            passphrase: ''
+          }
+        },
+        allIds: ['idBus1', 'idBus3']
+      });
+    });
+  });
+
+  describe(BusesInProgress.ADD_BUSES_IN_PROGRESS, () => {
+    it(`should check action name`, () => {
+      expect(BusesInProgress.ADD_BUSES_IN_PROGRESS).toEqual(`[Buses In Prog] Add buses in progress`);
+    });
+
+    it(`should add a bus if doesn't exists yet`, () => {
+      const initialState: any = {
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idBus1: {
+            keepPreviousValues: '',
+            id: 'idBus1',
+            ip: '192.168.0.1',
+            port: 7701,
+            username: 'petals1'
+          },
+          idBus2: {
+            keepPreviousValues: '',
+            id: 'idBus2',
+            ip: '192.168.0.2',
+            port: 7702,
+            username: 'petals2'
+          }
+        },
+        allIds: ['idBus1', 'idBus2']
+      };
+
+      const reducer = BusesInProgress.reducer(initialState, {
+        type: BusesInProgress.ADD_BUSES_IN_PROGRESS,
         payload: {
           byId: {
             idBus3: {
@@ -89,14 +171,14 @@ describe(`Buses in progress reducer`, () => {
         byId: {
           keepPreviousValues: '',
           idBus1: {
-            doNotKeepPreviousValuesIfUpdate: '',
+            keepPreviousValues: '',
             id: 'idBus1',
             ip: '192.168.0.1',
             port: 7701,
             username: 'petals1'
           },
           idBus2: {
-            doNotKeepPreviousValuesIfUpdate: '',
+            keepPreviousValues: '',
             id: 'idBus2',
             ip: '192.168.0.2',
             port: 7702,
@@ -124,60 +206,6 @@ describe(`Buses in progress reducer`, () => {
           }
         },
         allIds: ['idBus1', 'idBus2', 'idBus3', 'idBus4']
-      });
-    });
-
-    it(`should replace a bus if already exists`, () => {
-      const reducer = BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.FETCH_BUSES_IN_PROGRESS,
-        payload: {
-          byId: {
-            idBus1: {
-              id: 'idBus1',
-              ip: '192.168.0.10',
-              port: 7711,
-              username: 'petals1 updated'
-            },
-            idBus2: {
-              id: 'idBus2',
-              ip: '192.168.0.2',
-              port: 7712,
-              username: 'petals2 updated'
-            }
-          },
-          allIds: [
-            'idBus1',
-            'idBus2'
-          ]
-        }
-      });
-
-      expect(reducer).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idBus1: {
-            id: 'idBus1',
-            ip: '192.168.0.10',
-            port: 7711,
-            username: 'petals1 updated',
-            importError: '',
-            isRemoving: false,
-            password: '',
-            passphrase: ''
-          },
-          idBus2: {
-            id: 'idBus2',
-            ip: '192.168.0.2',
-            port: 7712,
-            username: 'petals2 updated',
-            importError: '',
-            isRemoving: false,
-            password: '',
-            passphrase: ''
-          }
-        },
-        allIds: ['idBus1', 'idBus2']
       });
     });
   });

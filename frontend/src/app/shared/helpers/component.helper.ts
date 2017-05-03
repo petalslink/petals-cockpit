@@ -15,14 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { EComponentState } from '../../features/cockpit/workspaces/state/components/component.interface';
-import { IContainersTable } from '../../features/cockpit/workspaces/state/containers/containers.interface';
+import { EComponentState, ComponentState } from '../../features/cockpit/workspaces/state/components/component.interface';
 
 /**
- * @param {string} state : The state you want to get the possible actions from. For example : 'Started'
- * @returns {{ actionName: string, newStateAfterAction: EComponentState }[]} : The possible new actions according to the state
+ * @param state : the state you want to get the possible actions from. For example : 'Started'
+ * @returns the possible new actions according to the state
  */
-export function stateNameToPossibleActionsComponent(state: string): { actionName: string, newStateAfterAction: string }[] {
+export function stateNameToPossibleActionsComponent(state: ComponentState): { actionName: string, newStateAfterAction: ComponentState }[] {
   switch (state) {
     case EComponentState.Shutdown:
       return [
@@ -61,11 +60,4 @@ export function stateNameToPossibleActionsComponent(state: string): { actionName
     default:
       throw new Error(`Component state cannot be '${state}'`);
   }
-}
-
-export function getContainerOfComponent(containersTable: IContainersTable, componentId: string) {
-  return containersTable
-    .allIds
-    .map(containerId => containersTable.byId[containerId])
-    .find(container => container.components.includes(componentId));
 }

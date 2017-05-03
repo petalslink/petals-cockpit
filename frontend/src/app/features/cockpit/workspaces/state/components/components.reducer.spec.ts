@@ -37,6 +37,54 @@ describe(`Components reducer`, () => {
       expect(Components.FETCH_COMPONENTS_SUCCESS).toEqual(`[Components] Fetch components success`);
     });
 
+    it(`should add one component`, () => {
+      const reducer = Components.reducer(undefined, {
+        type: Components.FETCH_COMPONENTS_SUCCESS,
+        payload: {
+          byId: {
+            idComp1: {
+              name: 'Comp 1',
+              serviceUnits: [
+                'idSu2A',
+                'idSu3A'
+              ],
+              id: 'idComp1',
+              containerId: 'idCont0',
+              state: 'Started',
+              type: 'BC'
+            }
+          },
+          allIds: ['idComp1']
+        }
+      });
+
+      expect(reducer).toEqual({
+        selectedComponentId: '',
+        isFetchingDetails: false,
+        byId: {
+          idComp1: {
+            name: 'Comp 1',
+            serviceUnits: [
+              'idSu2A',
+              'idSu3A'
+            ],
+            id: 'idComp1',
+            containerId: 'idCont0',
+            state: 'Started',
+            type: 'BC',
+            isFolded: false,
+            isFetchingDetails: false,
+            isUpdatingState: false,
+            isDeployingServiceUnit: false,
+            parameters: {},
+            errorChangeState: '',
+            errorDeployment: ''
+          }
+        },
+        allIds: ['idComp1']
+      });
+    });
+
     const initialState: any = {
       keepPreviousValues: '',
       byId: {
@@ -51,7 +99,7 @@ describe(`Components reducer`, () => {
           id: 'idComp0'
         },
         idComp1: {
-          doNotKeepPreviousValuesIfUpdate: '',
+          keepPreviousValues: '',
           name: 'Comp 1',
           serviceUnits: [
             'idSu2',
@@ -66,59 +114,39 @@ describe(`Components reducer`, () => {
       ]
     };
 
-    it(`should replace a component if already existing (not update)`, () => {
+    it(`should replace existing components while keeping extra values`, () => {
       expect(Components.reducer(initialState, {
         type: Components.FETCH_COMPONENTS_SUCCESS,
         payload: {
           byId: {
-            idComp0: {
-              name: 'Comp 0 updated name',
-              serviceUnits: [
-                'idSu0A',
-                'idSu1A'
-              ],
-              id: 'idComp0'
-            },
             idComp1: {
               name: 'Comp 1 updated name',
               serviceUnits: [
                 'idSu2A',
                 'idSu3A'
               ],
-              id: 'idComp1'
+              id: 'idComp1',
+              containerId: 'idCont0',
+              state: 'Started',
+              type: 'BC',
             }
           },
-          allIds: [
-            'idComp0',
-            'idComp1'
-          ]
+          allIds: ['idComp1']
         }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
-          keepPreviousValues: '',
-          idComp0: {
-            name: 'Comp 0 updated name',
-            serviceUnits: [
-              'idSu0A',
-              'idSu1A'
-            ],
-            id: 'idComp0',
-            isFolded: false,
-            isFetchingDetails: false,
-            isUpdatingState: false,
-            isDeployingServiceUnit: false,
-            parameters: {},
-            errorChangeState: '',
-            errorDeployment: ''
-          },
           idComp1: {
+            keepPreviousValues: '',
             name: 'Comp 1 updated name',
             serviceUnits: [
               'idSu2A',
               'idSu3A'
             ],
             id: 'idComp1',
+            containerId: 'idCont0',
+            state: 'Started',
+            type: 'BC',
             isFolded: false,
             isFetchingDetails: false,
             isUpdatingState: false,
@@ -128,16 +156,48 @@ describe(`Components reducer`, () => {
             errorDeployment: ''
           }
         },
-        allIds: [
-          'idComp0',
-          'idComp1'
-        ]
+        allIds: ['idComp1']
       });
     });
+  });
+
+  describe(Components.ADD_COMPONENTS_SUCCESS, () => {
+    it(`should check action name`, () => {
+      expect(Components.ADD_COMPONENTS_SUCCESS).toEqual(`[Components] Add components success`);
+    });
+
+    const initialState: any = {
+      keepPreviousValues: '',
+      byId: {
+        keepPreviousValues: '',
+        idComp0: {
+          doNotKeepPreviousValuesIfUpdate: '',
+          name: 'Comp 0',
+          serviceUnits: [
+            'idSu0',
+            'idSu1'
+          ],
+          id: 'idComp0'
+        },
+        idComp1: {
+          keepPreviousValues: '',
+          name: 'Comp 1',
+          serviceUnits: [
+            'idSu2',
+            'idSu3'
+          ],
+          id: 'idComp1'
+        }
+      },
+      allIds: [
+        'idComp0',
+        'idComp1'
+      ]
+    };
 
     it(`should add a component if doesn't exists yet`, () => {
       expect(Components.reducer(initialState, {
-        type: Components.FETCH_COMPONENTS_SUCCESS,
+        type: Components.ADD_COMPONENTS_SUCCESS,
         payload: {
           byId: {
             idComp2: {
@@ -146,7 +206,10 @@ describe(`Components reducer`, () => {
                 'idSu4',
                 'idSu5'
               ],
-              id: 'idComp2'
+              id: 'idComp2',
+              containerId: 'idCont0',
+              state: 'Started',
+              type: 'BC',
             },
             idComp3: {
               name: 'Comp 3',
@@ -154,7 +217,10 @@ describe(`Components reducer`, () => {
                 'idSu6',
                 'idSu7'
               ],
-              id: 'idComp3'
+              id: 'idComp3',
+              containerId: 'idCont0',
+              state: 'Started',
+              type: 'BC',
             }
           },
           allIds: [
@@ -176,7 +242,7 @@ describe(`Components reducer`, () => {
             id: 'idComp0'
           },
           idComp1: {
-            doNotKeepPreviousValuesIfUpdate: '',
+            keepPreviousValues: '',
             name: 'Comp 1',
             serviceUnits: [
               'idSu2',
@@ -191,6 +257,9 @@ describe(`Components reducer`, () => {
               'idSu5'
             ],
             id: 'idComp2',
+            containerId: 'idCont0',
+            state: 'Started',
+            type: 'BC',
             isFolded: false,
             isFetchingDetails: false,
             isUpdatingState: false,
@@ -206,6 +275,9 @@ describe(`Components reducer`, () => {
               'idSu7'
             ],
             id: 'idComp3',
+            containerId: 'idCont0',
+            state: 'Started',
+            type: 'BC',
             isFolded: false,
             isFetchingDetails: false,
             isUpdatingState: false,
@@ -751,7 +823,7 @@ describe(`Components reducer`, () => {
     it(`should remove an existing component`, () => {
       expect(Components.reducer(initialState, {
         type: Components.REMOVE_COMPONENT,
-        payload: { componentId: 'idComp0' }
+        payload: { containerId: 'idCont0', componentId: 'idComp0' }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
@@ -768,7 +840,7 @@ describe(`Components reducer`, () => {
 
       expect(Components.reducer(initialState, {
         type: Components.REMOVE_COMPONENT,
-        payload: { componentId: 'idComp1' }
+        payload: { containerId: 'idCont0', componentId: 'idComp1' }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
@@ -785,7 +857,7 @@ describe(`Components reducer`, () => {
 
       expect(Components.reducer(initialState, {
         type: Components.REMOVE_COMPONENT,
-        payload: { componentId: 'idComp2' }
+        payload: { containerId: 'idCont0', componentId: 'idComp2' }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
@@ -893,12 +965,10 @@ describe(`Components reducer`, () => {
       expect(Components.reducer(initialState, {
         type: Components.DEPLOY_SERVICE_UNIT_SUCCESS,
         payload: {
-          componentId: 'idComp0',
-          serviceUnit: {
-            id: 'idSuNew',
-            name: 'New Su',
-            state: 'Started'
-          }
+          id: 'idSuNew',
+          name: 'New Su',
+          state: 'Started',
+          componentId: 'idComp0'
         }
       })).toEqual({
         keepPreviousValues: '',
@@ -938,7 +1008,7 @@ describe(`Components reducer`, () => {
     it(`should remove the service-unit from it's component if the service-unit belongs to a component`, () => {
       const reducer = Components.reducer(initialState, {
         type: ServiceUnits.REMOVE_SERVICE_UNIT,
-        payload: { serviceUnitId: 'idSu1' }
+        payload: { componentId: 'idComp0', serviceUnitId: 'idSu1' }
       });
 
       expect(reducer).toEqual({
@@ -961,7 +1031,7 @@ describe(`Components reducer`, () => {
 
       expect(Components.reducer(reducer, {
         type: ServiceUnits.REMOVE_SERVICE_UNIT,
-        payload: { serviceUnitId: 'idSu0' }
+        payload: { componentId: 'idComp0', serviceUnitId: 'idSu0' }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
@@ -975,62 +1045,6 @@ describe(`Components reducer`, () => {
             keepPreviousValues: '',
             id: 'idComp1',
             serviceUnits: ['idSu2', 'idSu3']
-          }
-        },
-        allIds: ['idComp0', 'idComp1']
-      });
-    });
-
-    it(`should return the same object if the service-unit doesn't belong to any component`, () => {
-      expect(Components.reducer(initialState, {
-        type: ServiceUnits.REMOVE_SERVICE_UNIT,
-        payload: { serviceUnitId: 'unknownSuId' }
-      })).toBe(initialState);
-    });
-  });
-
-  describe(`[Containers] Deploy component success`, () => {
-    const initialState: any = {
-      keepPreviousValues: '',
-      byId: {
-        keepPreviousValues: '',
-        idComp0: {
-          doNotKeepPreviousValuesIfUpdate: ''
-        }
-      },
-      allIds: ['idComp0']
-    };
-
-    it(`should add a non existing component`, () => {
-      expect(Components.reducer(initialState, {
-        type: '[Containers] Deploy component success',
-        payload: {
-          component: {
-            id: 'idComp1',
-            name: 'Comp 1',
-            state: 'Unloaded'
-          }
-        }
-      })).toEqual({
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idComp0: {
-            doNotKeepPreviousValuesIfUpdate: ''
-          },
-          idComp1: {
-            id: 'idComp1',
-            name: 'Comp 1',
-            state: 'Unloaded',
-            serviceUnits: [],
-            parameters: {},
-
-            isFolded: false,
-            isFetchingDetails: false,
-            isUpdatingState: false,
-            isDeployingServiceUnit: false,
-            errorChangeState: '',
-            errorDeployment: ''
           }
         },
         allIds: ['idComp0', 'idComp1']

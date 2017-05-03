@@ -22,6 +22,7 @@ import { Bus, BusInProgress, busesService, busesInProgressService } from './buse
 import { Container } from './containers-mock';
 import { Component } from './components-mock';
 import { ServiceUnit } from './service-units-mock';
+import { ServiceAssembly } from './service-assemblies-mock';
 
 // used in buses.service.mock
 export const IMPORT_HTTP_ERROR_IP = 'IMPORT_HTTP_ERROR_IP';
@@ -58,12 +59,12 @@ export const users = {
 
 export class Workspace {
   private static cpt = 0;
-  private id: string;
-  private name: string;
+  public readonly id: string;
+  public readonly name: string;
   public description: string;
-  private users: string[];
-  private buses = new Map<string, Bus>();
-  private busesInProgress = new Map<string, BusInProgress>();
+  private readonly users: string[];
+  private readonly buses = new Map<string, Bus>();
+  private readonly busesInProgress = new Map<string, BusInProgress>();
 
   private static workspaceUsers(i: number) {
     switch (i) {
@@ -93,10 +94,6 @@ export class Workspace {
     this.addBusInProgress();
   }
 
-  getId() {
-    return this.id;
-  }
-
   toObj() {
     return {
       id: this.id,
@@ -115,15 +112,15 @@ export class Workspace {
   }
 
   addBusInProgress(importData?: IBusImport) {
-    const bus = busesInProgressService.create(importData);
-    this.busesInProgress.set(bus.getId(), bus);
+    const bus = busesInProgressService.create(this, importData);
+    this.busesInProgress.set(bus.id, bus);
 
     return bus;
   }
 
   addBus() {
-    const bus = busesService.create();
-    this.buses.set(bus.getId(), bus);
+    const bus = busesService.create(this);
+    this.buses.set(bus.id, bus);
 
     return bus;
   }
@@ -147,7 +144,7 @@ export class Workspace {
       };
 
       return {
-        id: bus.getId(),
+        id: bus.id,
         eventData
       };
     }
@@ -156,11 +153,11 @@ export class Workspace {
     const bus = this.addBusInProgress(importData);
 
     return {
-      id: bus.getId(),
+      id: bus.id,
       eventData: {
-        ...bus.toObj()[bus.getId()],
+        ...bus.toObj()[bus.id],
         importError: `Can't connect to ${ipPort}`,
-        id: bus.getId()
+        id: bus.id
       }
     };
   }
@@ -168,7 +165,7 @@ export class Workspace {
 
 export class Workspaces {
   // map to cache the created workspaces
-  private memoizedWorkspaces = new Map<string, { wks: Workspace, composedWks: any }>();
+  private readonly memoizedWorkspaces = new Map<string, { wks: Workspace, composedWks: any }>();
 
   constructor() {
     // generate 2 workspaces by default
@@ -255,6 +252,7 @@ export class Workspaces {
     const buses = newWorkspace.getBuses();
     const containers = buses.reduce((acc: Container[], bus) => [...acc, ...bus.getContainers()], []);
     const components = containers.reduce((acc: Component[], container) => [...acc, ...container.getComponents()], []);
+    const serviceAssemblies = containers.reduce((acc: ServiceAssembly[], container) => [...acc, ...container.getServiceAssemblies()], []);
     const serviceUnits = components.reduce((acc: ServiceUnit[], component) => [...acc, ...component.getServiceUnits()], []);
 
     const composedWks = {
@@ -290,15 +288,22 @@ export class Workspaces {
         };
       }, {}),
 
+      serviceAssemblies: serviceAssemblies.reduce((acc, serviceAssembly) => {
+        return {
+          ...acc,
+          ...serviceAssembly.toObj(),
+        };
+      }, {}),
+
       serviceUnits: serviceUnits.reduce((acc, serviceUnit) => {
         return {
           ...acc,
-          ...serviceUnit.toObj()
+          ...serviceUnit.toObj(),
         };
       }, {})
     };
 
-    this.memoizedWorkspaces.set(newWorkspace.getId(), { wks: newWorkspace, composedWks });
+    this.memoizedWorkspaces.set(newWorkspace.id, { wks: newWorkspace, composedWks });
 
     return { ...composedWks };
   }

@@ -19,8 +19,11 @@ package org.ow2.petals.cockpit.server.resources;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
@@ -41,6 +44,9 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.collect.ImmutableSet;
 
 @Singleton
 @Path("/buses")
@@ -73,7 +79,7 @@ public class BusesResource {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
 
-            return new BusOverview(bus.getId(), bus.getName());
+            return new BusOverview();
         });
     }
 
@@ -99,11 +105,39 @@ public class BusesResource {
         }
     }
 
-    public static class BusOverview extends BusMin {
+    public static class BusFull {
+
+        @Valid
+        @JsonUnwrapped
+        public final BusMin bus;
+
+        @NotNull
+        @Min(1)
+        public final long workspaceId;
+
+        @JsonProperty
+        public final ImmutableSet<String> containers;
+
+        public BusFull(BusMin bus, long workspaceId, Set<String> containers) {
+            this.bus = bus;
+            this.workspaceId = workspaceId;
+            this.containers = ImmutableSet.copyOf(containers);
+        }
 
         @JsonCreator
-        public BusOverview(@JsonProperty("id") long id, @JsonProperty("name") String name) {
-            super(id, name);
+        private BusFull() {
+            // jackson will inject values itself (because of @JsonUnwrapped)
+            this(new BusMin(0, ""), 0, ImmutableSet.of());
         }
+
+        @JsonProperty
+        public String getWorkspaceId() {
+            return Long.toString(workspaceId);
+        }
+    }
+
+    @JsonSerialize
+    public static class BusOverview {
+        // TODO remove annotation when there will be data
     }
 }

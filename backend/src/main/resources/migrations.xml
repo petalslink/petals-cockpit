@@ -190,15 +190,11 @@
 
   <changeSet id="v0.7.0-1" author="vnoel">
     <dropForeignKeyConstraint baseTableName="users_workspaces" constraintName="fk_workspaces_id" />
-    <addForeignKeyConstraint constraintName="fk_users_workspaces_workspace_id"
-      baseTableName="users_workspaces"  baseColumnNames="workspace_id"
-      referencedTableName="workspaces" referencedColumnNames="id"
-      onDelete="CASCADE" />
+    <addForeignKeyConstraint constraintName="fk_users_workspaces_workspace_id" baseTableName="users_workspaces"
+      baseColumnNames="workspace_id" referencedTableName="workspaces" referencedColumnNames="id" onDelete="CASCADE" />
     <dropForeignKeyConstraint baseTableName="users_workspaces" constraintName="fk_users_username" />
-    <addForeignKeyConstraint constraintName="fk_users_workspaces_username"
-      baseTableName="users_workspaces"  baseColumnNames="username"
-      referencedTableName="users" referencedColumnNames="username"
-      onDelete="CASCADE" />
+    <addForeignKeyConstraint constraintName="fk_users_workspaces_username" baseTableName="users_workspaces"
+      baseColumnNames="username" referencedTableName="users" referencedColumnNames="username" onDelete="CASCADE" />
   </changeSet>
 
   <changeSet id="v0.8.0-1" author="vnoel">
@@ -207,5 +203,53 @@
         <constraints nullable="false" />
       </column>
     </addColumn>
+  </changeSet>
+
+  <changeSet id="v0.9.0-1" author="vnoel">
+    <createTable tableName="serviceassemblies">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+      <column name="container_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_serviceassemblies_container_id"
+          referencedTableName="containers" referencedColumnNames="id" deleteCascade="true" />
+      </column>
+      <column name="name" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="state" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+
+    <createIndex tableName="serviceassemblies" indexName="idx_serviceassemblies_container">
+      <column name="container_id" />
+    </createIndex>
+
+    <addColumn tableName="serviceunits">
+      <column name="serviceassembly_id" type="bigint">
+        <constraints nullable="false" />
+      </column>
+      <column name="container_id" type="bigint">
+        <constraints nullable="false" />
+      </column>
+    </addColumn>
+    
+    <!-- we need to do that outside of the addColumn because of https://liquibase.jira.com/browse/CORE-3058 -->
+    <addForeignKeyConstraint constraintName="fk_serviceunits_serviceassembly_id" baseTableName="serviceunits"
+      baseColumnNames="serviceassembly_id" referencedTableName="serviceassemblies" referencedColumnNames="id" onDelete="CASCADE" />
+    <addForeignKeyConstraint constraintName="fk_serviceunits_container_id" baseTableName="serviceunits"
+      baseColumnNames="container_id" referencedTableName="containers" referencedColumnNames="id" onDelete="CASCADE" />
+
+    <createIndex tableName="serviceunits" indexName="idx_serviceunits_serviceassembly">
+      <column name="serviceassembly_id" />
+    </createIndex>
+
+    <createIndex tableName="serviceunits" indexName="idx_serviceunits_container">
+      <column name="container_id" />
+    </createIndex>
+
+    <dropColumn tableName="serviceunits" columnName="sa_name" />
+    <dropColumn tableName="serviceunits" columnName="state" />
   </changeSet>
 </databaseChangeLog>

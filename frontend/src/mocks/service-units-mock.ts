@@ -15,14 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { Component } from './components-mock';
+import { ServiceAssembly } from './service-assemblies-mock';
+import {
+  IServiceUnitBackendSSE,
+  IServiceUnitBackendDetails
+} from './../app/features/cockpit/workspaces/state/service-units/service-unit.interface';
+
 class ServiceUnits {
-  private serviceUnits = new Map<string, ServiceUnit>();
+  private readonly serviceUnits = new Map<string, ServiceUnit>();
 
   constructor() { }
 
-  create(name?: string) {
-    const serviceUnit = new ServiceUnit(name);
-    this.serviceUnits.set(serviceUnit.getId(), serviceUnit);
+  create(component: Component, serviceAssembly: ServiceAssembly, name?: string) {
+    const serviceUnit = new ServiceUnit(component, serviceAssembly, name);
+    this.serviceUnits.set(serviceUnit.id, serviceUnit);
     return serviceUnit;
   }
 
@@ -35,36 +42,35 @@ export const serviceUnitsService = new ServiceUnits();
 
 export class ServiceUnit {
   private static cpt = 0;
-  private id: string;
-  private state = 'Started';
-  private name: string;
 
-  constructor(name?: string) {
+  public readonly id: string;
+  public readonly name: string;
+  public readonly component: Component;
+  public readonly serviceAssembly: ServiceAssembly;
+
+  constructor(component: Component, serviceAssembly: ServiceAssembly, name?: string) {
     const i = ServiceUnit.cpt++;
     this.id = `idSu${i}`;
     this.name = name ? name : `SU ${i}`;
+    this.component = component;
+    this.serviceAssembly = serviceAssembly;
   }
 
-  public getId() {
-    return this.id;
-  }
-
-  toObj() {
+  toObj(): { [id: string]: IServiceUnitBackendSSE } {
     return {
       [this.id]: {
-        name: this.name
+        id: this.id,
+        name: this.name,
+        containerId: this.component.container.id,
+        componentId: this.component.id,
+        serviceAssemblyId: this.serviceAssembly.id,
+        // TODO for now, the effect sets it as expected
+        state: undefined
       }
     };
   }
 
-  getDetails() {
-    return {
-      name: this.name,
-      state: this.state
-    };
-  }
-
-  setState(newState: string) {
-    this.state = newState;
+  getDetails(): IServiceUnitBackendDetails {
+    return {};
   }
 }

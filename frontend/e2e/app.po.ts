@@ -167,27 +167,28 @@ export class PetalsCockpitPage {
   }
 
   clickAndExpectNotification(el: ElementFinder, title?: Matcher, content?: Matcher) {
-    return el.click().then(() => {
-      const simpleNotification = element(by.css(`simple-notification`));
+    browser.wait(EC.elementToBeClickable(el), 3000);
 
-      let test = EC.visibilityOf(simpleNotification);
+    el.click();
 
-      if (title) {
-        const titleE = simpleNotification.element(by.css(`.sn-title`));
-        test = EC.and(test, textToMatchInElement(titleE, title));
-      }
+    const simpleNotification = element(by.css(`simple-notification`));
 
-      if (content) {
-        const contentE = simpleNotification.element(by.css(`.sn-content`));
-        test = EC.and(test, textToMatchInElement(contentE, content));
-      }
+    let test = EC.visibilityOf(simpleNotification);
 
-      browser.ignoreSynchronization = true;
+    if (title) {
+      const titleE = simpleNotification.element(by.css(`.sn-title`));
+      test = EC.and(test, textToMatchInElement(titleE, title));
+    }
 
-      return browser.wait(test, 10000).then(() => {
-        browser.ignoreSynchronization = false;
-        return browser.wait(EC.invisibilityOf(simpleNotification), 10000);
-      });
+    if (content) {
+      const contentE = simpleNotification.element(by.css(`.sn-content`));
+      test = EC.and(test, textToMatchInElement(contentE, content));
+    }
+
+    browser.ignoreSynchronization = true;
+    return browser.wait(test, 10000).then(() => {
+      browser.ignoreSynchronization = false;
+      return browser.wait(EC.invisibilityOf(simpleNotification), 10000);
     });
   }
 }

@@ -24,9 +24,11 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
@@ -46,6 +48,8 @@ import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin.State;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin.Type;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.jbi.descriptor.original.generated.ComponentType;
@@ -53,7 +57,9 @@ import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 @Singleton
 @Path("/components")
@@ -102,8 +108,7 @@ public class ComponentsResource {
                 parameters = ImmutableMap.of();
             }
 
-            return new ComponentOverview(comp.getId(), comp.getName(), ComponentMin.State.valueOf(comp.getState()),
-                    ComponentMin.Type.valueOf(comp.getType()), parameters);
+            return new ComponentOverview(parameters);
         });
     }
 
@@ -189,18 +194,13 @@ public class ComponentsResource {
 
         @NotNull
         @JsonProperty
-        public final State state;
-
-        @NotNull
-        @JsonProperty
         public final Type type;
 
         @JsonCreator
         public ComponentMin(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("state") State state, @JsonProperty("type") Type type) {
+                @JsonProperty("type") Type type) {
             this.id = id;
             this.name = name;
-            this.state = state;
             this.type = type;
         }
 
@@ -210,17 +210,50 @@ public class ComponentsResource {
         }
     }
 
-    public static class ComponentOverview extends ComponentMin {
+    public static class ComponentFull {
+
+        @Valid
+        @JsonUnwrapped
+        public final ComponentMin component;
+
+        @NotNull
+        @Min(1)
+        public final long containerId;
+
+        @NotNull
+        @JsonProperty
+        public final State state;
+
+        @JsonProperty
+        public final ImmutableSet<String> serviceUnits;
+
+        public ComponentFull(ComponentMin component, long containerId, State state, Set<String> serviceUnits) {
+            this.component = component;
+            this.containerId = containerId;
+            this.state = state;
+            this.serviceUnits = ImmutableSet.copyOf(serviceUnits);
+        }
+
+        @JsonCreator
+        private ComponentFull() {
+            // jackson will inject values itself (because of @JsonUnwrapped)
+            this(new ComponentMin(0, "", Type.BC), 0, ComponentMin.State.Unknown, ImmutableSet.of());
+        }
+
+        @JsonProperty
+        public String getContainerId() {
+            return Long.toString(containerId);
+        }
+    }
+
+    public static class ComponentOverview {
 
         @NotNull
         @JsonProperty
         public final ImmutableMap<String, String> parameters;
 
         @JsonCreator
-        public ComponentOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("state") State state, @JsonProperty("type") Type type,
-                @JsonProperty("parameters") Map<String, String> parameters) {
-            super(id, name, state, type);
+        public ComponentOverview(@JsonProperty("parameters") Map<String, String> parameters) {
             this.parameters = ImmutableMap.copyOf(parameters);
         }
     }

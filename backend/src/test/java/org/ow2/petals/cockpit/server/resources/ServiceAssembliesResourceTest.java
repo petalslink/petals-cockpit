@@ -22,34 +22,35 @@ import javax.ws.rs.core.Response;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.ow2.petals.cockpit.server.resources.BusesResource.BusOverview;
+import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyOverview;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 
-public class BusesResourceTest extends AbstractDefaultWorkspaceResourceTest {
+public class ServiceAssembliesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     @Rule
-    public final ResourceTestRule resources = buildResourceTest(BusesResource.class);
+    public final ResourceTestRule resources = buildResourceTest(ServiceAssembliesResource.class);
 
     @Test
-    public void getExistingBusForbidden() {
+    public void getExistingSAForbidden() {
         // TODO check assumptions
-        Response get = resources.target("/buses/" + getId(fDomain)).request().get();
+        Response get = resources.target("/serviceassemblies/" + getId(fServiceAssembly)).request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
 
     @Test
-    public void getNonExistingBusNotFound() {
+    public void getExistingSA() {
         // TODO check assumptions
-        Response get = resources.target("/buses/32432").request().get();
-
-        assertThat(get.getStatus()).isEqualTo(404);
+        ServiceAssemblyOverview get = resources.target("/serviceassemblies/" + getId(serviceAssembly)).request()
+                .get(ServiceAssemblyOverview.class);
     }
 
     @Test
-    public void getExistingBus() {
+    public void getNonExistingSANotFound() {
         // TODO check assumptions
-        BusOverview get = resources.target("/buses/" + getId(domain)).request().get(BusOverview.class);
+        Response get = resources.target("/serviceassemblies/4139439").request().get();
+
+        assertThat(get.getStatus()).isEqualTo(404);
     }
 }

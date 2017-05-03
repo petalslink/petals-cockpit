@@ -41,12 +41,12 @@ import { ComponentsService } from '../../../../../shared/services/components.ser
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { IStore } from 'app/shared/interfaces/store.interface';
 import { IWorkspaceRow } from 'app/features/cockpit/workspaces/state/workspaces/workspace.interface';
-import { IUserRow } from 'app/shared/interfaces/user.interface';
-import { IBusInProgressRow } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
-import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
-import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { IUserRow, IUserBackend } from 'app/shared/interfaces/user.interface';
+import { IBusInProgressBackend } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
+import { IBusBackendSSE } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
+import { IContainerBackendSSE } from 'app/features/cockpit/workspaces/state/containers/container.interface';
+import { IComponentBackendSSE } from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { IServiceUnitBackendSSE } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 import { ContainersService } from 'app/shared/services/containers.service';
 import { toJavascriptMap } from 'app/shared/helpers/map.helper';
 
@@ -169,15 +169,22 @@ export class WorkspacesEffects {
     .ofType(Workspaces.FETCH_WORKSPACE_SSE_SUCCESS)
     .switchMap((action: Action) => this.sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
       .switchMap((data: any) => {
+
+        const sus = toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits);
+        sus.allIds.forEach(id => {
+          const su = sus.byId[id];
+          su.state = data.serviceAssemblies[su.serviceAssemblyId].state;
+        });
+
         return Observable.of(batchActions([
           { type: Workspaces.CLEAN_WORKSPACE },
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
-          { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap<IUserRow>(data.users) },
-          { type: BusesInProgress.FETCH_BUSES_IN_PROGRESS, payload: toJavascriptMap<IBusInProgressRow>(data.busesInProgress) },
-          { type: Buses.FETCH_BUSES_SUCCESS, payload: toJavascriptMap<IBusRow>(data.buses) },
-          { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap<IContainerRow>(data.containers) },
-          { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap<IComponentRow>(data.components) },
-          { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitRow>(data.serviceUnits) },
+          { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap<IUserBackend>(data.users) },
+          { type: BusesInProgress.FETCH_BUSES_IN_PROGRESS, payload: toJavascriptMap<IBusInProgressBackend>(data.busesInProgress) },
+          { type: Buses.FETCH_BUSES_SUCCESS, payload: toJavascriptMap<IBusBackendSSE>(data.buses) },
+          { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap<IContainerBackendSSE>(data.containers) },
+          { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap<IComponentBackendSSE>(data.components) },
+          { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: sus },
 
           { type: Ui.OPEN_SIDENAV },
           { type: Ui.CLOSE_POPUP_WORKSPACES_LIST }

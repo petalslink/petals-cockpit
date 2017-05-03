@@ -15,30 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface IBusInProgressCommon {
-  // from server
+export interface IBusInProgressBackendCommon {
   id: string;
   username: string;
   port: number;
   ip: string;
-
-  // for UI
   importError: string;
+}
+
+// tslint:disable-next-line:no-empty-interface
+export interface IBusInProgressBackend extends IBusInProgressBackendCommon { }
+
+export interface IBusInProgressUI {
+  // for UI
   isRemoving: boolean;
 
+  // TODO is it really meant to be here?
   password: string;
   passphrase: string;
 }
 
 // used within table
-// tslint:disable-next-line:no-empty-interface
-export interface IBusInProgressRow extends IBusInProgressCommon {
-  // from server
-}
+export interface IBusInProgressRow extends IBusInProgressUI, IBusInProgressBackend { }
 
 // used in generated views
-// tslint:disable-next-line:no-empty-interface
-export interface IBusInProgress extends IBusInProgressCommon { }
+export interface IBusInProgress extends IBusInProgressUI, IBusInProgressBackendCommon { }
 
 // used when we import a bus
 export interface IBusImport {
@@ -49,12 +50,12 @@ export interface IBusImport {
   passphrase: string;
 }
 
-export function busInProgressRowFactory(id?: string, username?: string, port?: number, ip?: string): IBusInProgressRow {
+export function busInProgressRowFactory(): IBusInProgressRow {
   return {
-    id,
-    username,
-    port,
-    ip,
+    id: null,
+    username: null,
+    port: null,
+    ip: null,
 
     importError: '',
     isRemoving: false,

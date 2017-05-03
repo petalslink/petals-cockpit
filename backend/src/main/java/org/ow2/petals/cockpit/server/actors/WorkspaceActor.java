@@ -18,11 +18,11 @@ package org.ow2.petals.cockpit.server.actors;
 
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_COMPONENTS_CONTAINERS_ID;
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_CONTAINERS_BUSES_ID;
-import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_SERVICEUNITS_COMPONENTS_ID;
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_WORKSPACES_USERNAME;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
@@ -58,22 +58,25 @@ import org.ow2.petals.cockpit.server.actors.WorkspaceActor.Msg;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin.State;
+import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
+import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusImport;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChangeState;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentDeployed;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentStateChanged;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUChangeState;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUDeployed;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SUStateChanged;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAChangeState;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAStateChanged;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
@@ -82,6 +85,9 @@ import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import co.paralleluniverse.actors.BasicActor;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
@@ -156,12 +162,12 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                 answer((DeleteBus) msg, this::handleDeleteBus);
             } else if (msg instanceof NewWorkspaceClient) {
                 answer((NewWorkspaceClient) msg, this::addBroadcastClient);
-            } else if (msg instanceof ChangeServiceUnitState) {
-                answer((ChangeServiceUnitState) msg, this::handleSUStateChange);
+            } else if (msg instanceof ChangeServiceAssemblyState) {
+                answer((ChangeServiceAssemblyState) msg, this::handleSAStateChange);
             } else if (msg instanceof ChangeComponentState) {
                 answer((ChangeComponentState) msg, this::handleComponentStateChange);
-            } else if (msg instanceof DeployServiceUnit) {
-                answer((DeployServiceUnit) msg, this::handleDeployServiceUnit);
+            } else if (msg instanceof DeployServiceAssembly) {
+                answer((DeployServiceAssembly) msg, this::handleDeployServiceAssembly);
             } else if (msg instanceof DeployComponent) {
                 answer((DeployComponent) msg, this::handleDeployComponent);
             } else {
@@ -335,11 +341,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                 if (f != null) {
                     broadcast(db.runTransaction(conf -> {
                         return res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
-                            try {
-                                return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, bId, topology));
-                            } catch (WorkspaceContent.InvalidPetalsBus e) {
-                                return Either.left(e.getMessage());
-                            }
+                            return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, wId, bId, topology));
                         }).fold(error -> {
                             LOG.info("Can't import bus from container {}:{}: {}", nb.ip, nb.port, error);
                             DSL.using(conf).update(BUSES).set(BUSES.IMPORT_ERROR, error).where(BUSES.ID.eq(bId))
@@ -470,119 +472,132 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         doInActorLoop(() -> broadcast(WorkspaceEvent.componentStateChange(comp)));
     }
 
-    private SUStateChanged handleSUStateChange(ChangeServiceUnitState change)
+    private SAStateChanged handleSAStateChange(ChangeServiceAssemblyState change)
             throws SuspendExecution, InterruptedException {
         return db.runTransaction(conf -> {
-            ServiceunitsRecord su = DSL.using(conf).select(SERVICEUNITS.fields()).from(SERVICEUNITS).join(COMPONENTS)
-                    .onKey(FK_SERVICEUNITS_COMPONENTS_ID).join(CONTAINERS).onKey(FK_COMPONENTS_CONTAINERS_ID)
-                    .join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
-                    .where(SERVICEUNITS.ID.eq(change.suId).and(BUSES.WORKSPACE_ID.eq(wId)))
-                    .fetchOneInto(ServiceunitsRecord.class);
+            ServiceassembliesRecord sa = DSL.using(conf).select(SERVICEASSEMBLIES.fields()).from(SERVICEASSEMBLIES)
+                    .join(CONTAINERS).onKey().join(BUSES).onKey()
+                    .where(SERVICEASSEMBLIES.ID.eq(change.saId).and(BUSES.WORKSPACE_ID.eq(wId)))
+                    .fetchOneInto(ServiceassembliesRecord.class);
 
-            if (su == null) {
+            if (sa == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            ServiceUnitMin.State currentState = ServiceUnitMin.State.valueOf(su.getState());
-            ServiceUnitMin.State newState = change.action.state;
+            ServiceAssemblyMin.State currentState = ServiceAssemblyMin.State.valueOf(sa.getState());
+            ServiceAssemblyMin.State newState = change.action.state;
 
             if (currentState.equals(newState)) {
-                return new SUStateChanged(change.suId, currentState);
+                return new SAStateChanged(change.saId, currentState);
             }
 
-            if (!isSAStateTransitionOk(su, currentState, newState)) {
+            if (!isSAStateTransitionOk(sa, currentState, newState)) {
                 // TODO or should I rely on the information from the container instead of my own?
                 throw new WebApplicationException(Status.CONFLICT);
             }
 
             // TODO merge with previous request...
-            ContainersRecord cont = DSL.using(conf).select().from(CONTAINERS).join(COMPONENTS)
-                    .onKey(FK_COMPONENTS_CONTAINERS_ID).where(COMPONENTS.ID.eq(su.getComponentId()))
-                    .fetchOneInto(CONTAINERS);
+            ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(sa.getContainerId()))
+                    .fetchOne();
             assert cont != null;
 
-            ServiceUnitMin.State newCurrentState = petals.changeState(cont.getIp(), cont.getPort(), cont.getUsername(),
-                    cont.getPassword(), su.getSaName(), newState);
+            ServiceAssemblyMin.State newCurrentState = petals.changeState(cont.getIp(), cont.getPort(),
+                    cont.getUsername(), cont.getPassword(), sa.getName(), newState);
 
-            SUStateChanged res = new SUStateChanged(su.getId(), newCurrentState);
+            SAStateChanged res = new SAStateChanged(sa.getId(), newCurrentState);
 
-            serviceUnitStateUpdated(res, conf);
+            serviceAssemblyStateUpdated(res, conf);
 
             return res;
         });
     }
 
-    private void serviceUnitStateUpdated(SUStateChanged su, Configuration conf) {
+    private void serviceAssemblyStateUpdated(SAStateChanged sa, Configuration conf) {
         // TODO error handling???
-        if (su.state != ServiceUnitMin.State.Unloaded) {
-            DSL.using(conf).update(SERVICEUNITS).set(SERVICEUNITS.STATE, su.state.name())
-                    .where(SERVICEUNITS.ID.eq(su.id)).execute();
+        if (sa.state != ServiceAssemblyMin.State.Unloaded) {
+            DSL.using(conf).update(SERVICEASSEMBLIES).set(SERVICEASSEMBLIES.STATE, sa.state.name())
+                    .where(SERVICEASSEMBLIES.ID.eq(sa.id)).execute();
         } else {
-            DSL.using(conf).deleteFrom(SERVICEUNITS).where(SERVICEUNITS.ID.eq(su.id)).execute();
+            DSL.using(conf).deleteFrom(SERVICEASSEMBLIES).where(SERVICEASSEMBLIES.ID.eq(sa.id)).execute();
         }
 
         // we want the event to be sent after we answered
-        doInActorLoop(() -> broadcast(WorkspaceEvent.suStateChange(su)));
+        doInActorLoop(() -> broadcast(WorkspaceEvent.saStateChange(sa)));
     }
 
     /**
      * Note : petals admin does not expose a way to go to shutdown (except from {@link ServiceUnitMin.State#Unloaded}
      * via {@link ArtifactLifecycle#deploy(java.net.URL)}, but we don't support it yet!)
      */
-    private boolean isSAStateTransitionOk(ServiceunitsRecord su, ServiceUnitMin.State from, ServiceUnitMin.State to) {
+    private boolean isSAStateTransitionOk(ServiceassembliesRecord sa, ServiceAssemblyMin.State from,
+            ServiceAssemblyMin.State to) {
         switch (from) {
             case Shutdown:
-                return to == ServiceUnitMin.State.Unloaded // via undeploy()
-                        || to == ServiceUnitMin.State.Started; // via start()
+                return to == ServiceAssemblyMin.State.Unloaded // via undeploy()
+                        || to == ServiceAssemblyMin.State.Started; // via start()
             case Started:
-                return to == ServiceUnitMin.State.Stopped; // via stop()
+                return to == ServiceAssemblyMin.State.Stopped; // via stop()
             case Stopped:
-                return to == ServiceUnitMin.State.Started // via start()
-                        || to == ServiceUnitMin.State.Unloaded; // via undeploy()
+                return to == ServiceAssemblyMin.State.Started // via start()
+                        || to == ServiceAssemblyMin.State.Unloaded; // via undeploy()
             case Unknown:
-                return to == ServiceUnitMin.State.Unloaded; // via undeploy()
+                return to == ServiceAssemblyMin.State.Unloaded; // via undeploy()
             default:
-                LOG.warn("Impossible case for state transition check from {} to {} for SU {} ({})", from, to,
-                        su.getName(), su.getId());
+                LOG.warn("Impossible case for state transition check from {} to {} for SA {} ({})", from, to,
+                        sa.getName(), sa.getId());
                 return false;
         }
     }
 
-    private SUDeployed handleDeployServiceUnit(DeployServiceUnit su) throws SuspendExecution, InterruptedException {
+    private WorkspaceContent handleDeployServiceAssembly(DeployServiceAssembly sa)
+            throws SuspendExecution, InterruptedException {
         return db.runTransaction(conf -> {
-            ContainersRecord cont = DSL.using(conf).select().from(CONTAINERS).join(COMPONENTS)
-                    .onKey(FK_COMPONENTS_CONTAINERS_ID).where(COMPONENTS.ID.eq(su.compId)).fetchOneInto(CONTAINERS);
+            ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(sa.cId)).fetchOne();
             assert cont != null;
 
             ServiceAssembly deployedSA = petals.deploy(cont.getIp(), cont.getPort(), cont.getUsername(),
-                    cont.getPassword(), su.saName, su.saUrl);
+                    cont.getPassword(), sa.name, sa.saUrl);
 
-            return serviceUnitDeployed(deployedSA, su.compId, conf);
+            return serviceAssemblyDeployed(deployedSA, sa.cId, conf);
         });
     }
 
-    private SUDeployed serviceUnitDeployed(ServiceAssembly deployedSA, long compId, Configuration conf) {
-        // there should be exactly one SU in it
-        ServiceUnit deployedSU = deployedSA.getServiceUnits().iterator().next();
-        ServiceUnitMin.State state = ServiceUnitMin.State.from(deployedSA.getState());
+    private WorkspaceContent serviceAssemblyDeployed(ServiceAssembly deployedSA, long cId, Configuration conf) {
 
-        ServiceunitsRecord suDb = new ServiceunitsRecord(null, compId, deployedSU.getName(), state.name(),
-                deployedSA.getName());
-        suDb.attach(conf);
-        int suDbi = suDb.insert();
-        assert suDbi == 1;
+        ServiceAssemblyMin.State state = ServiceAssemblyMin.State.from(deployedSA.getState());
+        ServiceassembliesRecord saDb = new ServiceassembliesRecord(null, cId, deployedSA.getName(), state.name());
+        saDb.attach(conf);
+        int saDbi = saDb.insert();
+        assert saDbi == 1;
 
-        SUDeployed res = new SUDeployed(compId,
-                new ServiceUnitMin(suDb.getId(), suDb.getName(), state, suDb.getSaName()));
+        Map<String, ServiceUnitFull> serviceUnitsDb = new HashMap<>();
+        for (ServiceUnit su : deployedSA.getServiceUnits()) {
+            // use ServiceunitsRecord for the typing of its constructor
+            ServiceunitsRecord suDb = new ServiceunitsRecord(null, null, su.getName(), saDb.getId(), cId);
+            ServiceunitsRecord inserted = DSL.using(conf).insertInto(SERVICEUNITS).set(suDb)
+                    .set(SERVICEUNITS.COMPONENT_ID,
+                            DSL.select(COMPONENTS.ID).from(COMPONENTS).where(
+                                    COMPONENTS.NAME.eq(su.getTargetComponent()).and(COMPONENTS.CONTAINER_ID.eq(cId))))
+                    .returning(SERVICEUNITS.ID, SERVICEUNITS.COMPONENT_ID).fetchOne();
+            long suId = inserted.get(SERVICEUNITS.ID);
+            long compId = inserted.get(COMPONENTS.ID);
+            serviceUnitsDb.put(Long.toString(suId),
+                    new ServiceUnitFull(new ServiceUnitMin(suId, suDb.getName()), cId, compId, saDb.getId()));
+        }
+
+        WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                ImmutableMap.of(),
+                ImmutableMap.of(Long.toString(saDb.getId()), new ServiceAssemblyFull(
+                        new ServiceAssemblyMin(saDb.getId(), saDb.getName()), cId, state, serviceUnitsDb.keySet())),
+                serviceUnitsDb);
 
         // we want the event to be sent after we answered
-        doInActorLoop(() -> broadcast(WorkspaceEvent.suDeployed(res)));
+        doInActorLoop(() -> broadcast(WorkspaceEvent.saDeployed(res)));
 
         return res;
     }
 
-    private ComponentDeployed handleDeployComponent(DeployComponent comp)
-            throws SuspendExecution, InterruptedException {
+    private WorkspaceContent handleDeployComponent(DeployComponent comp) throws SuspendExecution, InterruptedException {
         return db.runTransaction(conf -> {
             ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(comp.cId)).fetchOne();
             assert cont != null;
@@ -594,7 +609,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         });
     }
 
-    private ComponentDeployed componentDeployed(Component deployedComp, long cId, Configuration conf) {
+    private WorkspaceContent componentDeployed(Component deployedComp, long cId, Configuration conf) {
 
         ComponentMin.State state = ComponentMin.State.from(deployedComp.getState());
         ComponentMin.Type type = ComponentMin.Type.from(deployedComp.getType());
@@ -605,8 +620,10 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         int suDbi = compDb.insert();
         assert suDbi == 1;
 
-        ComponentDeployed res = new ComponentDeployed(cId,
-                new ComponentMin(compDb.getId(), compDb.getName(), state, type));
+        WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(
+                        new ComponentMin(compDb.getId(), compDb.getName(), type), cId, state, ImmutableSet.of())),
+                ImmutableMap.of(), ImmutableMap.of());
 
         // we want the event to be sent after we answered
         doInActorLoop(() -> broadcast(WorkspaceEvent.componentDeployed(res)));
@@ -665,16 +682,16 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         }
     }
 
-    public static class ChangeServiceUnitState extends WorkspaceRequest<SUStateChanged> {
+    public static class ChangeServiceAssemblyState extends WorkspaceRequest<SAStateChanged> {
 
         private static final long serialVersionUID = 8119375036012239516L;
 
-        final SUChangeState action;
+        final SAChangeState action;
 
-        final long suId;
+        final long saId;
 
-        public ChangeServiceUnitState(long suId, SUChangeState action) {
-            this.suId = suId;
+        public ChangeServiceAssemblyState(long saId, SAChangeState action) {
+            this.saId = saId;
             this.action = action;
         }
     }
@@ -693,24 +710,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         }
     }
 
-    public static class DeployServiceUnit extends WorkspaceRequest<SUDeployed> {
-
-        private static final long serialVersionUID = 3305750050657001574L;
-
-        final String saName;
-
-        final URL saUrl;
-
-        final long compId;
-
-        public DeployServiceUnit(String saName, URL saUrl, long compId) {
-            this.saName = saName;
-            this.saUrl = saUrl;
-            this.compId = compId;
-        }
-    }
-
-    public static class DeployComponent extends WorkspaceRequest<ComponentDeployed> {
+    public static class DeployComponent extends WorkspaceRequest<WorkspaceContent> {
 
         private static final long serialVersionUID = 3305750050657001574L;
 
@@ -725,6 +725,23 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         public DeployComponent(String name, ComponentMin.Type type, URL saUrl, long cId) {
             this.name = name;
             this.type = type;
+            this.saUrl = saUrl;
+            this.cId = cId;
+        }
+    }
+
+    public static class DeployServiceAssembly extends WorkspaceRequest<WorkspaceContent> {
+
+        private static final long serialVersionUID = 3305750050657001574L;
+
+        final String name;
+
+        final URL saUrl;
+
+        final long cId;
+
+        public DeployServiceAssembly(String name, URL saUrl, long cId) {
+            this.name = name;
             this.saUrl = saUrl;
             this.cId = cId;
         }

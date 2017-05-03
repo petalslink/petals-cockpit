@@ -19,7 +19,7 @@ import { browser, element, by } from 'protractor';
 
 import { PetalsCockpitPage } from './app.po';
 
-describe(`Import Bus`, () => {
+describe(`Mobile`, () => {
   let page: PetalsCockpitPage;
 
   const inputIp = element(by.css(`input[formControlName="ip"]`));

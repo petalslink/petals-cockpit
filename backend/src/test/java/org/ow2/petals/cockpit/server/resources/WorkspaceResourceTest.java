@@ -30,11 +30,12 @@ import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Rule;
 import org.junit.Test;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
+import org.ow2.petals.cockpit.server.resources.BusesResource.BusFull;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerFull;
+import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
-import org.ow2.petals.cockpit.server.resources.WorkspaceContent.BusFull;
-import org.ow2.petals.cockpit.server.resources.WorkspaceContent.ComponentFull;
-import org.ow2.petals.cockpit.server.resources.WorkspaceContent.ContainerFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceOverview;
@@ -79,19 +80,22 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(requestWorkspace(1)).hasNumberOfRows(0);
         assertThat(requestWorkspace(2)).hasNumberOfRows(1);
 
-        assertThat(requestBus(10)).hasNumberOfRows(0);
-        assertThat(requestBus(2)).hasNumberOfRows(1);
+        assertThat(requestBus(getId(domain))).hasNumberOfRows(0);
+        assertThat(requestBus(getId(fDomain))).hasNumberOfRows(1);
 
-        assertThat(requestContainer(20)).hasNumberOfRows(0);
-        assertThat(requestContainer(21)).hasNumberOfRows(0);
-        assertThat(requestContainer(22)).hasNumberOfRows(0);
-        assertThat(requestContainer(2)).hasNumberOfRows(1);
+        assertThat(requestContainer(getId(container1))).hasNumberOfRows(0);
+        assertThat(requestContainer(getId(container2))).hasNumberOfRows(0);
+        assertThat(requestContainer(getId(container3))).hasNumberOfRows(0);
+        assertThat(requestContainer(getId(fContainer))).hasNumberOfRows(1);
 
-        assertThat(requestComponent(30)).hasNumberOfRows(0);
-        assertThat(requestComponent(2)).hasNumberOfRows(1);
+        assertThat(requestComponent(getId(component))).hasNumberOfRows(0);
+        assertThat(requestComponent(getId(fComponent))).hasNumberOfRows(1);
 
-        assertThat(requestSU(40)).hasNumberOfRows(0);
-        assertThat(requestSU(2)).hasNumberOfRows(1);
+        assertThat(requestSA(getId(serviceAssembly))).hasNumberOfRows(0);
+        assertThat(requestSA(getId(fServiceAssembly))).hasNumberOfRows(1);
+
+        assertThat(requestSU(getId(serviceUnit))).hasNumberOfRows(0);
+        assertThat(requestSU(getId(fServiceUnit))).hasNumberOfRows(1);
     }
 
     @Test
@@ -210,52 +214,72 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(content.content.buses).hasSize(1);
         assertThat(content.content.containers).hasSize(3);
         assertThat(content.content.components).hasSize(1);
+        assertThat(content.content.serviceAssemblies).hasSize(1);
         assertThat(content.content.serviceUnits).hasSize(1);
 
         assertUsers(content.users);
 
-        BusFull b = content.content.buses.values().iterator().next();
+        BusFull b = content.content.buses.get(Long.toString(getId(domain)));
         assert b != null;
 
-        assertThat(b.bus.id).isEqualTo(10);
+        assertThat(b.bus.id).isEqualTo(getId(domain));
         assertThat(b.bus.name).isEqualTo(domain.getName());
-        assertThat(b.containers).hasSize(3);
+        assertThat(b.workspaceId).isEqualTo(content.workspace.id);
+        assertThat(b.containers).containsOnly(Long.toString(getId(container1)), Long.toString(getId(container2)),
+                Long.toString(getId(container3)));
 
-        ContainerFull c1 = content.content.containers.get("20");
+        ContainerFull c1 = content.content.containers.get(Long.toString(getId(container1)));
         assert c1 != null;
 
-        assertThat(c1.container.id).isEqualTo(20);
+        assertThat(c1.container.id).isEqualTo(getId(container1));
         assertThat(c1.container.name).isEqualTo(container1.getContainerName());
-        assertThat(c1.components).hasSize(1);
+        assertThat(c1.busId).isEqualTo(b.bus.id);
+        assertThat(c1.components).containsOnly(Long.toString(getId(component)));
+        assertThat(c1.serviceAssemblies).containsOnly(Long.toString(getId(serviceAssembly)));
 
-        ContainerFull c2 = content.content.containers.get("21");
+        ContainerFull c2 = content.content.containers.get(Long.toString(getId(container2)));
         assert c2 != null;
 
-        assertThat(c2.container.id).isEqualTo(21);
+        assertThat(c2.container.id).isEqualTo(getId(container2));
         assertThat(c2.container.name).isEqualTo(container2.getContainerName());
-        assertThat(c2.components).hasSize(0);
+        assertThat(c2.busId).isEqualTo(b.bus.id);
+        assertThat(c2.components).containsOnly();
+        assertThat(c2.serviceAssemblies).containsOnly();
 
-        ContainerFull c3 = content.content.containers.get("22");
+        ContainerFull c3 = content.content.containers.get(Long.toString(getId(container3)));
         assert c3 != null;
 
-        assertThat(c3.container.id).isEqualTo(22);
+        assertThat(c3.container.id).isEqualTo(getId(container3));
         assertThat(c3.container.name).isEqualTo(container3.getContainerName());
-        assertThat(c3.components).hasSize(0);
+        assertThat(c3.busId).isEqualTo(b.bus.id);
+        assertThat(c3.components).containsOnly();
+        assertThat(c3.serviceAssemblies).containsOnly();
 
-        ComponentFull comp = content.content.components.get("30");
+        ComponentFull comp = content.content.components.get(Long.toString(getId(component)));
         assert comp != null;
 
-        assertThat(comp.component.id).isEqualTo(30);
+        assertThat(comp.component.id).isEqualTo(getId(component));
         assertThat(comp.component.name).isEqualTo(component.getName());
-        assertThat(comp.component.state.toString()).isEqualTo(component.getState().toString());
-        assertThat(comp.serviceUnits).hasSize(1);
+        assertThat(comp.containerId).isEqualTo(c1.container.id);
+        assertThat(comp.state.toString()).isEqualTo(component.getState().toString());
+        assertThat(comp.serviceUnits).containsOnly(Long.toString(getId(serviceUnit)));
 
-        ServiceUnitMin su = content.content.serviceUnits.get("40");
+        ServiceAssemblyFull sa = content.content.serviceAssemblies.get(Long.toString(getId(serviceAssembly)));
+        assert sa != null;
+
+        assertThat(sa.serviceAssembly.id).isEqualTo(getId(serviceAssembly));
+        assertThat(sa.serviceAssembly.name).isEqualTo(serviceAssembly.getName());
+        assertThat(sa.containerId).isEqualTo(c1.container.id);
+        assertThat(sa.state.toString()).isEqualTo(serviceAssembly.getState().toString());
+        assertThat(sa.serviceUnits).containsOnly(Long.toString(getId(serviceUnit)));
+
+        ServiceUnitFull su = content.content.serviceUnits.get(Long.toString(getId(serviceUnit)));
         assert su != null;
 
-        assertThat(su.id).isEqualTo(40);
-        assertThat(su.name).isEqualTo(serviceUnit.getName());
-        assertThat(su.state.toString()).isEqualTo(serviceAssembly.getState().toString());
-        assertThat(su.saName).isEqualTo(serviceAssembly.getName());
+        assertThat(su.serviceUnit.id).isEqualTo(getId(serviceUnit));
+        assertThat(su.serviceUnit.name).isEqualTo(serviceUnit.getName());
+        assertThat(su.containerId).isEqualTo(c1.container.id);
+        assertThat(su.componentId).isEqualTo(comp.component.id);
+        assertThat(su.serviceAssemblyId).isEqualTo(sa.serviceAssembly.id);
     }
 }

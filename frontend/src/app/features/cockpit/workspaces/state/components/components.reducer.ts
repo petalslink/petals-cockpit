@@ -19,10 +19,14 @@ import { Action } from '@ngrx/store';
 
 import { IComponentsTable, componentsTableFactory } from './components.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
-import { getComponentOfServiceUnit } from '../../../../../shared/helpers/service-unit.helper';
 import { ServiceUnits } from '../service-units/service-units.reducer';
-import { putAll, updateById, removeById, putById } from 'app/shared/helpers/map.helper';
-import { componentRowFactory, EComponentState, EComponentType } from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { putAll, updateById, removeById, mergeOnly, JsMap } from 'app/shared/helpers/map.helper';
+import {
+  componentRowFactory,
+  IComponentBackendSSE,
+  IComponentBackendDetails
+} from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { IServiceUnitBackendSSE } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 
 export class Components {
   private static reducerName = '[Components]';
@@ -37,7 +41,13 @@ export class Components {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_COMPONENTS_SUCCESS = `${Components.reducerName} Fetch components success`;
-  private static fetchComponentsSuccess(componentsTable: IComponentsTable, payload): IComponentsTable {
+  private static fetchComponentsSuccess(componentsTable: IComponentsTable, payload: JsMap<IComponentBackendSSE>): IComponentsTable {
+    return mergeOnly(componentsTable, payload, componentRowFactory());
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static ADD_COMPONENTS_SUCCESS = `${Components.reducerName} Add components success`;
+  private static addComponentsSuccess(componentsTable: IComponentsTable, payload: JsMap<IComponentBackendSSE>): IComponentsTable {
     return putAll(componentsTable, payload, componentRowFactory());
   }
 
@@ -107,7 +117,7 @@ export class Components {
   public static FETCH_COMPONENT_DETAILS_SUCCESS = `${Components.reducerName} Fetch component details success`;
   private static fetchComponentDetailsSuccess(
     componentsTable: IComponentsTable,
-    payload: { componentId: string, data: any }
+    payload: { componentId: string, data: IComponentBackendDetails }
   ): IComponentsTable {
     return updateById(componentsTable, payload.componentId, { ...payload.data, isFetchingDetails: false });
   }
@@ -151,7 +161,9 @@ export class Components {
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_COMPONENT = `${Components.reducerName} Remove component`;
-  private static removeComponent(componentsTable: IComponentsTable, payload: { componentId: string }): IComponentsTable {
+  private static removeComponent(
+    componentsTable: IComponentsTable,
+    payload: { containerId: string, componentId: string }): IComponentsTable {
     return removeById(componentsTable, payload.componentId);
   }
 
@@ -171,39 +183,25 @@ export class Components {
 
   // tslint:disable-next-line:member-ordering
   public static DEPLOY_SERVICE_UNIT_SUCCESS = `${Components.reducerName} Deploy service unit success`;
-  private static deployServiceUnitSuccess(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string, serviceUnit: { id: string, name: string, state: string } }
-  ): IComponentsTable {
+  private static deployServiceUnitSuccess(componentsTable: IComponentsTable, payload: IServiceUnitBackendSSE): IComponentsTable {
     const component = componentsTable.byId[payload.componentId];
 
     return updateById(componentsTable, payload.componentId, {
-      serviceUnits: [...Array.from(new Set([...component.serviceUnits, payload.serviceUnit.id]))],
+      serviceUnits: [...Array.from(new Set([...component.serviceUnits, payload.id]))],
       isDeployingServiceUnit: false,
       errorDeployment: ''
     });
   }
 
-  private static removeServiceUnit(componentsTable: IComponentsTable, payload: { serviceUnitId: string }): IComponentsTable {
-    const componentContainingServiceUnit = getComponentOfServiceUnit(componentsTable, payload.serviceUnitId);
-
-    if (!componentContainingServiceUnit) {
-      return componentsTable;
-    }
-
-    return updateById(componentsTable, componentContainingServiceUnit.id, {
+  private static removeServiceUnit(
+    componentsTable: IComponentsTable,
+    payload: { componentId: string, serviceUnitId: string }): IComponentsTable {
+    return updateById(componentsTable, payload.componentId, {
       serviceUnits: componentsTable
-        .byId[componentContainingServiceUnit.id]
+        .byId[payload.componentId]
         .serviceUnits
         .filter(serviceUnitId => serviceUnitId !== payload.serviceUnitId)
     });
-  }
-
-  private static deployComponentSuccess(
-    componentsTable: IComponentsTable,
-    payload: { component: { id: string, name: string, state: keyof typeof EComponentState, type: EComponentType } }
-  ): IComponentsTable {
-    return putById(componentsTable, payload.component.id, payload.component, componentRowFactory());
   }
 
   private static cleanWorkspace(_componentsTable: IComponentsTable, _payload): IComponentsTable {
@@ -215,6 +213,7 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   private static mapActionsToMethod: { [type: string]: (t: IComponentsTable, p: any) => IComponentsTable } = {
     [Components.FETCH_COMPONENTS_SUCCESS]: Components.fetchComponentsSuccess,
+    [Components.ADD_COMPONENTS_SUCCESS]: Components.addComponentsSuccess,
     [Components.FOLD_COMPONENT]: Components.foldComponent,
     [Components.UNFOLD_COMPONENT]: Components.unfoldComponent,
     [Components.TOGGLE_FOLD_COMPONENT]: Components.toggleFoldComponent,
@@ -229,11 +228,6 @@ export class Components {
     [Components.DEPLOY_SERVICE_UNIT]: Components.deployServiceUnit,
     [Components.DEPLOY_SERVICE_UNIT_SUCCESS]: Components.deployServiceUnitSuccess,
     [Components.DEPLOY_SERVICE_UNIT_ERROR]: Components.deployServiceUnitError,
-    // TODO : When using Containers.DEPLOY_COMPONENT_SUCCESS, there's an error at runtime
-    // [Containers.DEPLOY_COMPONENT_SUCCESS]: Components.deployComponentSuccess,
-    // issue opened here: https://github.com/angular/angular-cli/issues/5736
-    // once solved, update the tests !
-    ['[Containers] Deploy component success']: Components.deployComponentSuccess,
 
     [ServiceUnits.REMOVE_SERVICE_UNIT]: Components.removeServiceUnit,
     [Workspaces.CLEAN_WORKSPACE]: Components.cleanWorkspace

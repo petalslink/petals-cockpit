@@ -37,7 +37,7 @@ describe(`Containers reducer`, () => {
       expect(Containers.FETCH_CONTAINERS_SUCCESS).toEqual(`[Containers] Fetch containers success`);
     });
 
-    const payload = {
+    const map = {
       byId: {
         idCont2: {
           name: 'Cont 2',
@@ -45,7 +45,8 @@ describe(`Containers reducer`, () => {
             'idComp4',
             'idComp5'
           ],
-          id: 'idCont2'
+          id: 'idCont2',
+          busId: 'idBus0'
         },
         idCont3: {
           name: 'Cont 3',
@@ -53,7 +54,8 @@ describe(`Containers reducer`, () => {
             'idComp6',
             'idComp7'
           ],
-          id: 'idCont3'
+          id: 'idCont3',
+          busId: 'idBus0'
         }
       },
       allIds: [
@@ -74,14 +76,14 @@ describe(`Containers reducer`, () => {
 
       const reducer = Containers.reducer(initialState, {
         type: Containers.FETCH_CONTAINERS_SUCCESS,
-        payload
+        payload: map
       });
 
       expect(reducer.byId.idCont2.reachabilities).toEqual([]);
       expect(reducer.byId.idCont3.reachabilities).toEqual([]);
     });
 
-    it(`should keep previous containers and update them`, () => {
+    it(`should replace existing components while keeping extra values`, () => {
       const initialState: any = {
         keepPreviousValues: '',
         byId: {
@@ -89,6 +91,7 @@ describe(`Containers reducer`, () => {
           idCont1: { keepPreviousValues: '', reachabilities: [], errorDeployment: 'some previous error' },
           idCont2: {
             name: 'Cont 2 old name',
+            keepPreviousValues: '',
             components: [
               'idComp4 old',
               'idComp5 old',
@@ -103,24 +106,24 @@ describe(`Containers reducer`, () => {
 
       expect(Containers.reducer(initialState, {
         type: Containers.FETCH_CONTAINERS_SUCCESS,
-        payload
+        payload: map
       })).toEqual({
         keepPreviousValues: '',
         byId: {
-          keepPreviousValues: '',
-          idCont1: { keepPreviousValues: '', reachabilities: [], errorDeployment: 'some previous error' },
           idCont2: {
             name: 'Cont 2',
+            keepPreviousValues: '',
             components: [
               'idComp4',
               'idComp5'
             ],
             id: 'idCont2',
+            busId: 'idBus0',
             reachabilities: [],
             isFolded: false,
             isFetchingDetails: false,
             isDeployingComponent: false,
-            errorDeployment: '',
+            errorDeployment: 'some previous error',
           },
           idCont3: {
             name: 'Cont 3',
@@ -129,6 +132,7 @@ describe(`Containers reducer`, () => {
               'idComp7'
             ],
             id: 'idCont3',
+            busId: 'idBus0',
             reachabilities: [],
             isFolded: false,
             isFetchingDetails: false,
@@ -137,13 +141,102 @@ describe(`Containers reducer`, () => {
           }
         },
         allIds: [
-          'idCont1',
           'idCont2',
           'idCont3'
         ]
       });
     });
   });
+
+  describe(Containers.ADD_CONTAINERS_SUCCESS, () => {
+    it(`should check action name`, () => {
+      expect(Containers.ADD_CONTAINERS_SUCCESS).toEqual(`[Containers] Add containers success`);
+    });
+
+    const map = {
+      byId: {
+        idCont3: {
+          name: 'Cont 3',
+          components: [
+            'idComp6',
+            'idComp7'
+          ],
+          id: 'idCont3',
+          busId: 'idBus0'
+        }
+      },
+      allIds: ['idCont3']
+    };
+
+    it(`should add component`, () => {
+      const initialState: any = {
+        keepPreviousValues: '',
+        byId: {
+          idCont2: {
+            name: 'Cont 2',
+            keepPreviousValues: '',
+            components: [
+              'idComp4',
+              'idComp5'
+            ],
+            id: 'idCont2',
+            busId: 'idBus0',
+            reachabilities: [],
+            isFolded: false,
+            isFetchingDetails: false,
+            isDeployingComponent: false,
+            errorDeployment: 'some previous error',
+          }
+        },
+        allIds: [
+          'idCont2'
+        ]
+      };
+
+      expect(Containers.reducer(initialState, {
+        type: Containers.ADD_CONTAINERS_SUCCESS,
+        payload: map
+      })).toEqual({
+          keepPreviousValues: '',
+          byId: {
+            idCont2: {
+              name: 'Cont 2',
+              keepPreviousValues: '',
+              components: [
+                'idComp4',
+                'idComp5'
+              ],
+              id: 'idCont2',
+              busId: 'idBus0',
+              reachabilities: [],
+              isFolded: false,
+              isFetchingDetails: false,
+              isDeployingComponent: false,
+              errorDeployment: 'some previous error',
+            },
+            idCont3: {
+              name: 'Cont 3',
+              components: [
+                'idComp6',
+                'idComp7'
+              ],
+              id: 'idCont3',
+              busId: 'idBus0',
+              reachabilities: [],
+              isFolded: false,
+              isFetchingDetails: false,
+              isDeployingComponent: false,
+              errorDeployment: ''
+            }
+          },
+          allIds: [
+            'idCont2',
+            'idCont3'
+          ]
+        });
+    });
+  });
+
 
   describe(Containers.FOLD_CONTAINER, () => {
     it(`should check action name`, () => {
@@ -580,12 +673,10 @@ describe(`Containers reducer`, () => {
       expect(Containers.reducer(initialState, {
         type: Containers.DEPLOY_COMPONENT_SUCCESS,
         payload: {
-          containerId: 'idCont0',
-          component: {
-            id: 'idCompNew',
-            name: 'New Comp',
-            state: 'Started'
-          }
+          id: 'idCompNew',
+          name: 'New Comp',
+          state: 'Started',
+          containerId: 'idCont0'
         }
       })).toEqual({
         keepPreviousValues: '',
@@ -604,26 +695,6 @@ describe(`Containers reducer`, () => {
   });
 
   describe(Components.REMOVE_COMPONENT, () => {
-    it(`should return the same object if the container of the component doesn't exists`, () => {
-      const initialState: any = {
-        keepPreviousValues: '',
-        byId: {
-          keepPreviousValues: '',
-          idCont0: {
-            id: 'idCont0',
-            keepPreviousValues: '',
-            components: ['idComp0']
-          }
-        },
-        allIds: ['idCont0']
-      };
-
-      expect(Containers.reducer(initialState, {
-        type: Components.REMOVE_COMPONENT,
-        payload: { componentId: 'unknownComp' }
-      })).toBe(initialState);
-    });
-
     it(`should remove a component from a container`, () => {
       const initialState: any = {
         keepPreviousValues: '',
@@ -645,7 +716,7 @@ describe(`Containers reducer`, () => {
 
       expect(Containers.reducer(initialState, {
         type: Components.REMOVE_COMPONENT,
-        payload: { componentId: 'idComp0' }
+        payload: { containerId: 'idCont0', componentId: 'idComp0' }
       })).toEqual({
         keepPreviousValues: '',
         byId: {

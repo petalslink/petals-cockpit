@@ -59,6 +59,19 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractCockp
     protected final ServiceAssembly serviceAssembly = new ServiceAssembly("sa", ArtifactState.State.STARTED,
             serviceUnit);
 
+    protected final Domain fDomain = new Domain("dom2");
+
+    protected final Container fContainer = new Container("cont2", "", ImmutableMap.of(PortType.JMX, containerPort), "",
+            "",
+            State.REACHABLE);
+    
+    protected final Component fComponent = new Component("comp2", ComponentType.SE, ArtifactState.State.STARTED);
+
+    protected final ServiceUnit fServiceUnit = new ServiceUnit("su2", "comp2");
+
+    protected final ServiceAssembly fServiceAssembly = new ServiceAssembly("", ArtifactState.State.STARTED,
+            fServiceUnit);
+    
     @Before
     public void setup() {
         // petals
@@ -73,22 +86,12 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractCockp
         DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         // forbidden workspace (it is NOT registered in petals admin)
-        setupWorkspace(2, "test2", Arrays.asList(Tuple.of(2L, new Domain("dom2"), "", Arrays.asList(Tuple.of(2L,
-                new Container("cont2", "", ImmutableMap.of(PortType.JMX, containerPort), "", "", State.REACHABLE),
-                Arrays.asList(Tuple.of(2L, new Component("", ComponentType.SE, ArtifactState.State.STARTED),
-                        Arrays.asList(Tuple.of(2L,
-                                new ServiceAssembly("", ArtifactState.State.STARTED, new ServiceUnit("", "")))))))))),
-                "anotheruser");
+        fDomain.addContainers(fContainer);
+        fContainer.addComponent(fComponent);
+        fContainer.addServiceAssembly(fServiceAssembly);
+        setupWorkspace(2, "test2", Arrays.asList(Tuple.of(fDomain, "passphrase")), "anotheruser");
 
         // test workspace
-        setupWorkspace(1, "test",
-                Arrays.asList(Tuple.of(10L, domain, "phrase",
-                        Arrays.asList(
-                                Tuple.of(20L, container1,
-                                        Arrays.asList(Tuple.of(30L, component,
-                                                Arrays.asList(Tuple.of(40L, serviceAssembly))))),
-                                Tuple.of(21L, container2, Arrays.asList()),
-                                Tuple.of(22L, container3, Arrays.asList())))),
-                ADMIN);
+        setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
     }
 }
