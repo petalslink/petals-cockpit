@@ -13,7 +13,48 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFill class="content content-max-width" fxLayoutWrap>
-  <div class="central-content">
-  </div>
+<div fxLayout="column" class="content">
+
+  <md-toolbar fxLayout="column" fxLayoutAlign="center start">
+    <md-icon color="primary">description</md-icon>
+    <h3 class="color-primary margin-left-x1">Description</h3>
+  </md-toolbar>
+  <md-card fxFlex class="bus-description">
+    <p></p>
+  </md-card>
+
+  <md-toolbar fxLayout="column" fxLayoutAlign="center start">
+    <md-icon color="primary">swap_horiz</md-icon>
+    <h3 class="color-primary margin-left-x1">Petals Servers</h3>
+  </md-toolbar>
+  <md-card fxFlex>
+    <md-card-content>
+      <swiper class="swiper-container" [config]="config">
+        <div class="swiper-wrapper">
+          <div *ngFor="let container of containers" class="swiper-slide">
+            <div fxFlex fxLayout="column" fxLayoutAlign="center center">
+              <div class="swiper-description padding-x1" fxLayout="column" fxLayoutAlign="center end">
+                <p class="swiper-border" fxLayout="column" fxFill fxLayoutAlign="center end">
+                  <span class="name"><b>{{ container.name }}</b></span>
+                </p>
+                <p fxLayout="column" fxFill fxLayoutAlign="center end" *ngIf="!container.isFetchingDetails">
+                  <span class="ip">Ip: {{ container.ip }}</span>
+                  <span class="port">Port: {{ container.port }}</span>
+                </p>
+                <p fxLayout="column" fxFill fxLayoutAlign="center center" *ngIf="container.isFetchingDetails">
+                  <md-spinner></md-spinner>
+                </p>
+              </div>
+              <div class="swiper-img-container cursor-pointer" [routerLink]="['/workspaces', workspaceId, 'petals','containers', container.id]">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-pagination" fxLayoutAlign="end center"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+      </swiper>
+    </md-card-content>
+  </md-card>
+
 </div>

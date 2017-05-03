@@ -24,9 +24,12 @@ import { Store } from '@ngrx/store';
 
 import { Buses } from '../../state/buses/buses.reducer';
 import { IBusRow } from '../../state/buses/bus.interface';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
 import { Ui } from '../../../../../shared/state/ui.reducer';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { getCurrentBus } from '../../state/buses/buses.selectors';
+import { getContainers } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
 
 @Component({
   selector: 'app-petals-bus-view',
@@ -36,7 +39,9 @@ import { getCurrentBus } from '../../state/buses/buses.selectors';
 export class PetalsBusViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
+  public workspaceId$: Observable<string>;
   public bus$: Observable<IBusRow>;
+  public containers$: Observable<IContainerRow[]>;
 
   constructor(
     private store$: Store<IStore>,
@@ -47,6 +52,13 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Bus' } });
 
+    this.workspaceId$ = this.route.paramMap
+      .map(p => p.get('workspaceId'))
+      .distinctUntilChanged();
+
+    this.bus$ = this.store$.let(getCurrentBus);
+    this.containers$ = this.store$.let(getContainers);
+
     this.route.paramMap
       .map(pm => pm.get('busId'))
       .takeUntil(this.onDestroy$)
@@ -54,9 +66,12 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
         this.store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId } });
         this.store$.dispatch({ type: Buses.FETCH_BUS_DETAILS, payload: { busId } });
       })
+      .switchMap(busId => this.containers$
+        .first()
+        .do(cs => cs.forEach(c => this.store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: c.id } })))
+        .map(_ => busId)
+      )
       .subscribe();
-
-    this.bus$ = this.store$.let(getCurrentBus);
   }
 
   ngOnDestroy() {

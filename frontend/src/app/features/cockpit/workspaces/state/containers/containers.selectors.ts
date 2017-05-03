@@ -48,3 +48,13 @@ export function getCurrentContainerSiblings(store$: Store<IStore>): Observable<I
     .distinctUntilChanged(arrayEquals);
 }
 
+export function getContainers(store$: Store<IStore>): Observable<IContainerRow[]> {
+  return filterWorkspaceFetched(store$)
+    .filter(s => !!s.buses.selectedBusId && !!s.buses.byId[s.buses.selectedBusId])
+    .map(state => {
+      const busId = state.buses.selectedBusId;
+      return state.buses.byId[busId].containers
+        .map(cid => state.containers.byId[cid]);
+    })
+    .distinctUntilChanged(arrayEquals);
+}

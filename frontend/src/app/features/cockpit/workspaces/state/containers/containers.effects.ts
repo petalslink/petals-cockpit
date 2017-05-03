@@ -42,7 +42,7 @@ export class ContainersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true }) fetchContainersDetails$: Observable<Action> = this.actions$
     .ofType(Containers.FETCH_CONTAINER_DETAILS)
-    .switchMap((action: { type: string, payload: { containerId: string } }) =>
+    .flatMap((action: { type: string, payload: { containerId: string } }) =>
       this.containersService.getDetailsContainer(action.payload.containerId)
         .map((res: Response) => {
           const data = res.json();
