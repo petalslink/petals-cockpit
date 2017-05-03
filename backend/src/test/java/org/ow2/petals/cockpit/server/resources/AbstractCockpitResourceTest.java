@@ -74,14 +74,15 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.mocks.MockArtifactServer;
-import org.ow2.petals.cockpit.server.mocks.MockProfileParamValueFactoryProvider;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
+import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
 import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule;
+import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
 import org.zapodot.junit.db.plugin.LiquibaseInitializer;
 
@@ -141,8 +142,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                         bind(PetalsDb.class).to(PetalsDb.class).in(Singleton.class);
                     }
                 }).setClientConfigurator(cc -> cc.register(MultiPartFeature.class));
-        // needed for @Pac4JProfile injection to work
-        builder.addProvider(new MockProfileParamValueFactoryProvider.Binder(ADMIN));
+        builder.addProvider(new Pac4JValueFactoryProvider.Binder(new CockpitProfile(ADMIN)));
         builder.addProvider(MultiPartFeature.class);
         for (Class<?> resource : resources) {
             // we pass the resource as a provider to get injection in constructor
