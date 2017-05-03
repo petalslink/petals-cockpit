@@ -21,21 +21,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="central-content">
     <md-dialog-content>
       <div fxLayout="column" fxFill>
-        <div fxFlex>
-          <form [formGroup]="newWksForm" (ngSubmit)="onSubmit(newWksForm)" fxLayout="row" fxFlex fxLayoutGap="10px">
-            <md-input-container fxFlex>
-              <input mdInput placeholder="New workspace name" formControlName="name">
-              <span mdPrefix><md-icon color="primary">edit</md-icon></span>
-            </md-input-container>
+        <form [formGroup]="newWksForm" (ngSubmit)="onSubmit(newWksForm)" fxLayout="row" fxLayoutGap="10px">
+          <md-input-container fxFlex>
+            <input mdInput placeholder="New workspace name" formControlName="name">
+            <span mdPrefix><md-icon color="primary">edit</md-icon></span>
+          </md-input-container>
 
-            <button cdk-focus-start type="submit" [disabled]="btnSubmitDisabled" md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace"
-              mdTooltipPosition="below" class="btn-add-workspace">
-              <md-icon class="md-24">create_new_folder</md-icon>
-            </button>
-          </form>
-        </div>
+          <button cdk-focus-start type="submit" [disabled]="btnSubmitDisabled" md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace"
+            mdTooltipPosition="below" class="btn-add-workspace">
+            <md-icon class="md-24">create_new_folder</md-icon>
+          </button>
+        </form>
 
-        <div fxFlexFill class="margin-bottom-x1">
+        <div class="margin-bottom-x1">
           <div class="info-add-workspace margin-top-x1" fxLayout="row" fxLayoutAlign="center center" *ngIf="(workspaces$ | async).list.length === 0 && !(workspaces$ | async).isFetchingWorkspaces">
             <md-icon color="primary">info</md-icon>
             <span md-line>You don't have any workspace yet</span>

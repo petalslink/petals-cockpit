@@ -39,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <div fxLayoutWrap fxLayoutGap="10px">
       <!-- To have more deterministic behavour, we should be able to set 50 to say 2 per line
            See: https://github.com/angular/flex-layout/issues/235 -->
-      <md-card fxFlex.gt-sm="48%" fxFlex="100%" *ngFor="let otherContainer of otherContainers" class="reachability background-color-hover-light-green-x2 cursor-pointer"
+      <md-card fxFlex="100%" *ngFor="let otherContainer of otherContainers" class="reachability background-color-hover-light-green-x2 cursor-pointer"
         [routerLink]="['/workspaces', workspaceId, 'petals', 'containers', otherContainer.id]">
         <md-card-title-group>
           <div md-card-sm-image class="img-card-server"></div>
@@ -56,7 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </div>
 
     <h3 class="color-primary-light-bold margin-top-x2">System info</h3>
-    <div fxLayout="row" fxLayoutWrap fxLayoutGap="10px">
+    <div fxLayout="row">
       <md-card fxFlex class="system-info">{{ container.systemInfo }}</md-card>
     </div>
   </div>
