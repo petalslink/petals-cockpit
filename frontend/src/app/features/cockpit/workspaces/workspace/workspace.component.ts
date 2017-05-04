@@ -36,6 +36,8 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
   public workspace$: Observable<IWorkspace>;
 
+  public isRemoving = false;
+
   public isEditingDescription = false;
   public isSettingDescription = false;
   public description: string = null;
@@ -104,12 +106,14 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   openDeletionDialog() {
     this.workspace$
       .first()
+      .do(_ => this.isRemoving = true)
       .switchMap(ws =>
         this.dialog
           .open(WorkspaceDeleteDialogComponent, {
             data: { workspace: ws }
           })
           .afterClosed()
+          .do((result: boolean) => this.isRemoving = result)
           .filter((result: boolean) => result)
           .do(_ => this.store$.dispatch({ type: Workspaces.DELETE_WORKSPACE, payload: ws.id }))
       )
