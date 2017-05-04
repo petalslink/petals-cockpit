@@ -9,7 +9,7 @@ Running demo (mock) [https://linagora.gitlab.io/petals-cockpit](https://linagora
 
 1. Download the latest compiled petals-cockpit:
  - [Version 0.8.0](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/v0.8.0/download?job=build-product)
- - [Version Latest](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/master/download?job=build-product)
+ - [Version Latest](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/master/download?job=package-product-master)
 2. Unpack it and go into the directory
 3. Initialize the database (or update it if you already had one from a previous version):
 ```
