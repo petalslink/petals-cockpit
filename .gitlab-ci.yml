@@ -146,11 +146,11 @@ build-frontend-pages:
     - maven -pl cockpit verify
     - export COCKPIT_VERSION=`ls cockpit/target/petals-cockpit-*-capsule.jar | sed -E 's/.*petals-cockpit-(.*)-capsule.jar/\1/'`
     - export COCKPIT=petals-cockpit-$COCKPIT_VERSION
-    - mkdir -p $COCKPIT
     # see https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/issues/1664
     - echo $COCKPIT_VERSION > version.txt
-    - cp cockpit/target/petals-cockpit-*-capsule.jar $COCKPIT/$COCKPIT.jar
-    - cp cockpit/default.yml $COCKPIT/config.yml
+    - mv cockpit/dist $COCKPIT
+    - mkdir -p $COCKPIT/{lib,db,logs}
+    - mv cockpit/target/petals-cockpit-*-capsule.jar $COCKPIT/lib/
 
 release-product:
   <<: *build-product

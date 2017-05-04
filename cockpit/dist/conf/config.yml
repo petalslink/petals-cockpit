@@ -22,9 +22,16 @@ database:
   driverClass: org.h2.Driver
   user: petals
   password: petals
-  url: jdbc:h2:./cockpit
+  url: jdbc:h2:./db/cockpit
   # see http://stackoverflow.com/a/3670000
   validationQuery: "/* Health Check */ SELECT 1"
 
 logging:
   level: INFO
+  appenders:
+    - type: file
+      currentLogFilename: ./logs/cockpit.log
+      archivedLogFilenamePattern: ./logs/cockpit-%d.log.gz
+      archivedFileCount: 5
+    - type: console
+      threshold: WARN
