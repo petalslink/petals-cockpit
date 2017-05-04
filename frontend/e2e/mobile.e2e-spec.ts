@@ -17,18 +17,14 @@
 
 import { browser, element, by } from 'protractor';
 
-import { PetalsCockpitPage } from './app.po';
+import { page } from './common';
 
 describe(`Mobile`, () => {
-  let page: PetalsCockpitPage;
-
   const inputIp = element(by.css(`input[formControlName="ip"]`));
   const inputUsername = element(by.css(`input[formControlName="username"]`));
 
   beforeEach(() => {
-    page = new PetalsCockpitPage();
-    page.setMobileSize();
-    page.navigateTo();
+    page.navigateTo(true);
     page.login(`admin`, `admin`);
   });
 

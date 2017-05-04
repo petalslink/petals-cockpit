@@ -19,23 +19,13 @@ import { browser, element, by, ExpectedConditions as EC, ElementFinder } from 'p
 import * as util from 'protractor/built/util';
 
 export class PetalsCockpitPage {
-  navigateTo(clearSession = true) {
-    if (clearSession) {
-      browser.get('/');
-      // this command applies only when we are already connected to the host
-      // so we needed first to connect with get!
-      browser.manage().deleteAllCookies();
+  navigateTo(mobile = false) {
+    if (mobile) {
+      browser.manage().window().setSize(412, 732);
+    } else {
+      browser.manage().window().maximize();
     }
-
     return browser.get('/');
-  }
-
-  setMobileSize() {
-    browser.manage().window().setSize(412, 732);
-  }
-
-  setDesktopSize() {
-    browser.manage().window().maximize();
   }
 
   login(user: string, pass: string, checkRedirect = true, hasLastWorkspace = true) {

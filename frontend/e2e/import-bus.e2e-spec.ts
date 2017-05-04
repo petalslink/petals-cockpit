@@ -17,12 +17,11 @@
 
 import { browser, element, by } from 'protractor';
 
-import { PetalsCockpitPage } from './app.po';
 import { IMPORT_HTTP_ERROR_IP } from '../src/mocks/workspaces-mock';
 
-describe(`Import Bus`, () => {
-  let page: PetalsCockpitPage;
+import { page } from './common';
 
+describe(`Import Bus`, () => {
   const inputIp = element(by.css(`input[formControlName="ip"]`));
   const inputPort = element(by.css(`input[formControlName="port"]`));
   const inputUsername = element(by.css(`input[formControlName="username"]`));
@@ -32,8 +31,6 @@ describe(`Import Bus`, () => {
   const clearBtn = element(by.css(`app-petals-bus-in-progress-view form .btn-clear-form`));
 
   beforeEach(() => {
-    page = new PetalsCockpitPage();
-    page.setDesktopSize();
     page.navigateTo();
     page.login(`admin`, `admin`);
     page.openImportBus();

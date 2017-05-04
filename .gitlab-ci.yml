@@ -1,3 +1,11 @@
+# Notes
+# Branch front/* will run test-frontend
+# Branch back/* will run build-backend
+# Branch product/* will run build-backend, build-frontend, package-product, e2e-product
+# Branch master will run build-backend, build-frontend, build-frontend-pages, test-frontend, package-product-master, e2e-product, pages
+# Other branches will run build-backend, build-frontend, package-product, e2e-product
+# Tags will run build-backend, build-frontend, release-product
+
 stages:
   - build
   - package
@@ -45,10 +53,11 @@ pages:
   stage: package
   allow_failure: true
   only:
+    # pages are only built and deployed from master
     - master
   dependencies:
     - build-backend
-    - build-frontend
+    - build-frontend-pages
   script:
     - mv frontend-demo public
     - mv backend-apidocs public/apidocs
@@ -61,6 +70,7 @@ build-backend:
   <<: *mvn-java-8
   stage: build
   except:
+    # we don't want to build nor test the backend in front/*
     - /^front\/.*$/
   script:
     # let's lock the version used for SNAPSHOT dependencies to
@@ -76,24 +86,52 @@ build-backend:
       - backend-apidocs
       - $M2_STAGING_DIRECTORY
 
+test-frontend:
+  <<: *node-java-yarn
+  stage: build
+  except:
+    # we don't want to test the frontend in back/* and product/*
+    - /^back\/.*$/
+    - /^product\/.*$/
+  script:
+    - cd frontend
+    # copyright and lint
+    - time yarn run check
+    # unit tests
+    - time yarn run test:ci
+    # e2e
+    - time ../ci/xrun.sh ../ci/wmrun.sh yarn run e2e:ci
+
 build-frontend:
   <<: *node-java-yarn
   stage: build
   except:
+    # we don't want to build the frontend, only test it (with test-frontend) in front/*
+    - /^front\/.*$/
+    # we don't want to build the frontend in back/*
     - /^back\/.*$/
   script:
     - cd frontend
-    - time yarn run check
-    - time yarn run test:ci
-    - time ../ci/xrun.sh ../ci/wmrun.sh yarn run e2e:ci
     # build the final frontend for the product
-    - time yarn run prod-silent && mv dist ../frontend-dist
-    # build the demo for the gitlab pages
-    - time yarn run prod-demo && mv dist ../frontend-demo || true # this can fail
+    - time yarn run build:product:ci && mv dist ../frontend-dist
   artifacts:
     expire_in: 1 week
     paths:
       - frontend-dist
+
+build-frontend-pages:
+  <<: *node-java-yarn
+  stage: build
+  only:
+    # pages are only built and deployed from master
+    - master
+  script:
+    - cd frontend
+    # build the demo for the gitlab pages
+    - time yarn run build:demo:ci && mv dist ../frontend-demo || true # this can fail
+  artifacts:
+    expire_in: 1 day
+    paths:
       - frontend-demo
 
 .build-product: &build-product
@@ -135,8 +173,11 @@ package-product-master:
 package-product:
   <<: *build-product
   except:
+    # covered by package-product-master
     - master
+    # covered by release-product
     - tags
+    # we don't want to build the final product in front/* and back/*
     - /^front\/.*$/
     - /^back\/.*$/
   artifacts:
@@ -150,9 +191,11 @@ e2e-product:
   stage: integration
   except:
     - tags
+    # we don't want to test the final product in front/* and back/*
     - /^front\/.*$/
     - /^back\/.*$/
   dependencies:
+    # one or the other
     - package-product
     - package-product-master
   variables:

@@ -15,17 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { browser, element, by, ExpectedConditions as EC } from 'protractor';
+import * as path from 'path';
 
-import { PetalsCockpitPage } from './app.po';
-
-const path = require('path');
+import { page } from './common';
 
 describe(`Petals container content`, () => {
-  let page: PetalsCockpitPage;
-
   beforeEach(() => {
-    page = new PetalsCockpitPage();
-    page.setDesktopSize();
     page.navigateTo();
     page.login(`admin`, `admin`);
     // let's be sure everything is loaded and visible

@@ -16,14 +16,10 @@
  */
 import { browser, element, by, ExpectedConditions as EC } from 'protractor';
 
-import { PetalsCockpitPage } from './app.po';
+import { page } from './common';
 
 describe(`Workspaces Tree`, () => {
-  let page: PetalsCockpitPage;
-
   beforeEach(() => {
-    page = new PetalsCockpitPage();
-    page.setDesktopSize();
     page.navigateTo();
     page.login(`admin`, `admin`);
     // let's be sure everything is loaded and visible

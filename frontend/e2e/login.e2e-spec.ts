@@ -17,14 +17,10 @@
 
 import { browser, element, by, ExpectedConditions as EC } from 'protractor';
 
-import { PetalsCockpitPage } from './app.po';
+import { page } from './common';
 
 describe(`Login`, () => {
-  let page: PetalsCockpitPage;
-
   beforeEach(() => {
-    page = new PetalsCockpitPage();
-    page.setDesktopSize();
     page.navigateTo();
   });
 
