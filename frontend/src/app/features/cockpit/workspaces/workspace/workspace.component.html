@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <span class="title" fxFlex>{{ workspace.name }}</span>
 
     <button color="warn" type="button" class="btn-delete-wks" (click)="openDeletionDialog()" md-mini-fab mdTooltip="Delete the workspace"
-      mdTooltipPosition="below" [disabled]="workspace.isRemoving">
+      mdTooltipPosition="below" [disabled]="workspace.isRemoving || isRemoving">
       <md-icon>delete</md-icon>
     </button>
   </md-toolbar>

@@ -24,8 +24,7 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.ow2.petals.cockpit.server.security.CockpitAuthenticator;
 
 import com.bendb.dropwizard.jooq.JooqFactory;
 
@@ -45,8 +44,6 @@ import net.sourceforge.argparse4j.inf.Subparser;
  */
 public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCommand<C> {
 
-    private static final PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
-
     public AddUserCommand() {
         super("add-user", "Add a user to the database");
     }
@@ -61,18 +58,14 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
     }
 
     @Override
-    protected void run(Bootstrap<C> bootstrap, Namespace namespace, C configuration)
-            throws Exception {
+    protected void run(Bootstrap<C> bootstrap, Namespace namespace, C configuration) throws Exception {
 
         configuration.getDataSourceFactory().asSingleConnectionPool();
-        
+
         final Environment environment = new Environment(bootstrap.getApplication().getName(),
-                bootstrap.getObjectMapper(),
-                bootstrap.getValidatorFactory().getValidator(),
-                bootstrap.getMetricRegistry(),
-                bootstrap.getClassLoader(),
-                bootstrap.getHealthCheckRegistry());
-        
+                bootstrap.getObjectMapper(), bootstrap.getValidatorFactory().getValidator(),
+                bootstrap.getMetricRegistry(), bootstrap.getClassLoader(), bootstrap.getHealthCheckRegistry());
+
         final String username = namespace.getString("username");
         // it is required
         assert username != null;
@@ -100,7 +93,8 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
                 if (DSL.using(c).fetchExists(USERS, USERS.USERNAME.eq(username))) {
                     System.err.println("User " + username + " already exists");
                 } else {
-                    DSL.using(c).executeInsert(new UsersRecord(username, pwEncoder.encode(password), name, null));
+                    DSL.using(c).executeInsert(new UsersRecord(username,
+                            CockpitAuthenticator.passwordEncoder.encode(password), name, null));
                     System.out.println("Added user " + username);
                 }
             });

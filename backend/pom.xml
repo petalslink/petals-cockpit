@@ -61,7 +61,7 @@
     <dependency>
       <groupId>com.bendb.dropwizard</groupId>
       <artifactId>dropwizard-jooq</artifactId>
-      <version>1.0.0-2</version>
+      <version>1.1.0-0</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
@@ -74,7 +74,7 @@
     <dependency>
       <groupId>org.pac4j</groupId>
       <artifactId>dropwizard-pac4j</artifactId>
-      <version>1.2.1</version>
+      <version>2.0.0-RC3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.javaslang</groupId>

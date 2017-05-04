@@ -47,9 +47,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     -->
   </md-toolbar>
 
-  <md-sidenav-container fxLayout="column" fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">
-    <md-sidenav *ngIf="workspace$ | async as workspace"  fxLayout="column" [opened]="sidenavVisible$ | async" [mode]="sidenavMode$ | async">
-      <div fxLayout="row">
+  <md-sidenav-container fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">
+    <md-sidenav fxLayout="column" *ngIf="workspace$ | async as workspace" [opened]="sidenavVisible$ | async" [mode]="sidenavMode$ | async">
+      <div fxLayout>
         <button fxFlex="100" md-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', workspace.id]" class="workspace-name width-full no-border-radius" color="accent">
           {{ workspace.name }}
         </button>
@@ -59,19 +59,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </button>
       </div>
 
-      <md-tab-group>
+      <md-tab-group fxFlex>
         <md-tab label="Petals">
           <app-petals-menu-view></app-petals-menu-view>
         </md-tab>
 
         <md-tab label="Service">
-          <h1>Some more tab content</h1>
-          <p>...</p>
+          Some more tab content
         </md-tab>
 
         <md-tab label="API">
-          <h1>Some more tab content</h1>
-          <p>...</p>
+          Some more tab content
         </md-tab>
       </md-tab-group>
       <!--<router-outlet name="aux"></router-outlet>-->

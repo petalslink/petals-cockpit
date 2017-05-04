@@ -17,7 +17,7 @@
 
 import { browser, element, by, ExpectedConditions as EC } from 'protractor';
 
-import { PetalsCockpitPage } from './app.po';
+import { PetalsCockpitPage, urlToMatch } from './app.po';
 
 describe(`Workspaces`, () => {
   let page: PetalsCockpitPage;
@@ -141,7 +141,9 @@ describe(`Workspaces`, () => {
     expect(btnDeleteWks.isEnabled()).toBe(false);
 
     // now we get a notification saying the workspace is deleted
-    expect(element(by.css(`app-workspace-deleted-dialog .mat-dialog-content`)).getText())
+    const confirm = element(by.css(`app-workspace-deleted-dialog .mat-dialog-content`));
+    browser.wait(EC.visibilityOf(confirm), 2000);
+    expect(confirm.getText())
       .toEqual(`This workspace was deleted, click on OK to go back to the workspaces list.`);
 
     // ensure we are stil on the same workspace until we click
@@ -149,6 +151,8 @@ describe(`Workspaces`, () => {
 
     // let's get redirected
     element(by.css(`app-workspace-deleted-dialog button`)).click();
+
+    browser.wait(urlToMatch(/\/workspaces$/));
 
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
     browser.wait(EC.invisibilityOf(element(by.css(`app-cockpit md-sidenav`))), 5000);

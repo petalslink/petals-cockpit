@@ -45,10 +45,10 @@ import org.ow2.petals.cockpit.server.services.HttpArtifactServer;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
 import org.pac4j.core.client.Client;
-import org.pac4j.core.matching.ExcludedPathMatcher;
+import org.pac4j.core.matching.PathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
-import org.pac4j.dropwizard.Pac4jFactory.FilterConfiguration;
+import org.pac4j.dropwizard.Pac4jFactory.JaxRsSecurityFilterConfiguration;
 import org.pac4j.jax.rs.filters.JaxRsHttpActionAdapter;
 import org.pac4j.jax.rs.pac4j.JaxRsContext;
 import org.pac4j.jax.rs.servlet.pac4j.ServletJaxRsContext;
@@ -96,10 +96,11 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
             Pac4jFactory pac4jConf = new Pac4jFactory();
 
             // this let the /user/session url be handled by the callbacks, logout, etc filters
-            pac4jConf.setMatchers(ImmutableMap.of("excludeUserSession", new ExcludedPathMatcher("^/user/session$")));
+            pac4jConf
+                    .setMatchers(ImmutableMap.of("excludeUserSession", new PathMatcher().excludePath("/user/session")));
 
             // this protects the whole application with all the declared clients
-            FilterConfiguration f = new FilterConfiguration();
+            JaxRsSecurityFilterConfiguration f = new JaxRsSecurityFilterConfiguration();
             f.setMatchers("excludeUserSession");
             f.setAuthorizers("isAuthenticated");
             f.setClients(defaultClients);

@@ -21,17 +21,36 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { MaterialModule } from '@angular/material';
 import { StoreModule } from '@ngrx/store';
 import { TranslateModule } from 'ng2-translate';
 import { PrettyJsonModule } from 'angular2-prettyjson';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { NgObjectPipesModule } from 'ngx-pipes';
+import {
+  MdButtonModule, MdCardModule, MdDialogModule, MdIconModule,
+  MdInputModule, MdListModule, MdProgressSpinnerModule, MdRippleModule,
+  MdSidenavModule, MdTabsModule, MdToolbarModule, MdTooltipModule
+} from '@angular/material';
 
 import { SwiperModule } from 'angular2-useful-swiper';
 
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
+
+export const MaterialModules = [
+  MdButtonModule,
+  MdCardModule,
+  MdDialogModule,
+  MdIconModule,
+  MdInputModule,
+  MdListModule,
+  MdProgressSpinnerModule,
+  MdRippleModule,
+  MdSidenavModule,
+  MdTabsModule,
+  MdToolbarModule,
+  MdTooltipModule
+];
 
 export const modules = [
   CommonModule,
@@ -39,13 +58,13 @@ export const modules = [
   FormsModule,
   HttpModule,
   RouterModule,
-  MaterialModule,
   FlexLayoutModule,
   StoreModule,
   TranslateModule,
   PrettyJsonModule,
   SimpleNotificationsModule,
   NgObjectPipesModule,
+  ...MaterialModules,
   SwiperModule
 ];
 

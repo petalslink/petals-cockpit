@@ -33,6 +33,7 @@ import org.ow2.petals.cockpit.server.db.generated.Tables;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
+import org.pac4j.core.context.DefaultAuthorizers;
 import org.pac4j.jax.rs.annotations.Pac4JCallback;
 import org.pac4j.jax.rs.annotations.Pac4JLogout;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
@@ -76,7 +77,7 @@ public class UserSession {
     @GET
     @Path("/session")
     @Produces(MediaType.APPLICATION_JSON)
-    @Pac4JSecurity(authorizers = "isAuthenticated")
+    @Pac4JSecurity(authorizers = DefaultAuthorizers.IS_AUTHENTICATED)
     public User status(@Pac4JProfile CockpitProfile profile) {
         return getUserData(profile);
     }
@@ -92,7 +93,7 @@ public class UserSession {
 
     @DELETE
     @Path("/session")
-    @Pac4JLogout
+    @Pac4JLogout(destroySession = true)
     public void logout() {
         // the method is never called, everything is handled by pac4j
         throw new AssertionError("impossible");

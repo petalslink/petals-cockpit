@@ -27,7 +27,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.glassfish.grizzly.http.server.util.Globals;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.After;
@@ -52,8 +51,6 @@ import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 
 public class UserSessionTest extends AbstractTest {
-
-    public static final String SESSION_COOKIE_NAME = Globals.SESSION_COOKIE_NAME;
 
     public static final User ADMIN = new User("admin", "Administrator", null);
 
@@ -108,7 +105,6 @@ public class UserSessionTest extends AbstractTest {
 
         final Response login = target("/user/session").request()
                 .post(Entity.json(new Authentication("admin", "admin")));
-
         assertThat(login.getStatus()).isEqualTo(200);
         assertThat(login.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
 
@@ -119,6 +115,20 @@ public class UserSessionTest extends AbstractTest {
         final Response get3 = target("/user/session").request().get();
         assertThat(get3.getStatus()).isEqualTo(200);
         assertThat(get3.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
+    }
+
+    @Test
+    public void testGlobalFilterWorks() {
+        final Response get = target("/workspaces").request().get();
+        assertThat(get.getStatus()).isEqualTo(401);
+
+        final Response login = target("/user/session").request()
+                .post(Entity.json(new Authentication("admin", "admin")));
+        assertThat(login.getStatus()).isEqualTo(200);
+        assertThat(login.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
+
+        final Response get2 = target("/workspaces").request().get();
+        assertThat(get2.getStatus()).isEqualTo(200);
     }
 
     @Test
@@ -134,6 +144,10 @@ public class UserSessionTest extends AbstractTest {
                 .post(Entity.json(new Authentication("admin", "admin")));
         assertThat(login.getStatus()).isEqualTo(200);
         assertThat(login.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
+
+        final Response getOk = target("/user/session").request().get();
+        assertThat(getOk.getStatus()).isEqualTo(200);
+        assertThat(getOk.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
 
         final Response logout = target("/user/session").request().delete();
         // TODO should be 204: https://github.com/pac4j/pac4j/issues/701

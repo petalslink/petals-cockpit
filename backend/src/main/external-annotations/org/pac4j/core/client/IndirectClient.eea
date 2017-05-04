@@ -1,4 +1,7 @@
 class org/pac4j/core/client/IndirectClient
+clientInit
+ (Lorg/pac4j/core/context/WebContext;)V
+ (L1org/pac4j/core/context/WebContext;)V
 internalInit
  (Lorg/pac4j/core/context/WebContext;)V
  (L1org/pac4j/core/context/WebContext;)V
