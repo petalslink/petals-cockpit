@@ -53,6 +53,7 @@ pages:
     - mv frontend-demo public
     - mv backend-apidocs public/apidocs
   artifacts:
+    expire_in: 1 day
     paths:
       - public
 
@@ -70,6 +71,7 @@ build-backend:
     # build the docs
     - maven -pl backend -am com.webcohesion.enunciate:enunciate-slim-maven-plugin:docs && mv backend/target/site/apidocs backend-apidocs || true # this can fail
   artifacts:
+    expire_in: 1 week
     paths:
       - backend-apidocs
       - $M2_STAGING_DIRECTORY
@@ -89,16 +91,14 @@ build-frontend:
     # build the demo for the gitlab pages
     - time yarn run prod-demo && mv dist ../frontend-demo || true # this can fail
   artifacts:
+    expire_in: 1 week
     paths:
       - frontend-dist
       - frontend-demo
 
-build-product:
+.build-product: &build-product
   <<: *mvn-java-8
   stage: package
-  except:
-    - /^front\/.*$/
-    - /^back\/.*$/
   dependencies:
     - build-backend
     - build-frontend
@@ -106,25 +106,57 @@ build-product:
     - mv frontend-dist frontend/dist
     - maven dependency:purge-local-repository --non-recursive -DmanualInclude="org.ow2.petals:petals-cockpit-server,org.ow2.petals:petals-cockpit-parent" -DreResolve=false -DsnapshotsOnly=true
     - maven -pl cockpit verify
-    - export VC=`ls cockpit/target/petals-cockpit-*-capsule.jar | sed -E 's/.*petals-cockpit-(.*)-capsule.jar/\1/'`
-    - mkdir -p dist/$VC
-    - cp cockpit/target/petals-cockpit-*-capsule.jar dist/$VC/petals-cockpit.jar
-    - cp cockpit/default.yml dist/$VC/config.yml
+    - export COCKPIT_VERSION=`ls cockpit/target/petals-cockpit-*-capsule.jar | sed -E 's/.*petals-cockpit-(.*)-capsule.jar/\1/'`
+    - export COCKPIT=petals-cockpit-$COCKPIT_VERSION
+    - mkdir -p $COCKPIT
+    # see https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/issues/1664
+    - echo $COCKPIT_VERSION > version.txt
+    - cp cockpit/target/petals-cockpit-*-capsule.jar $COCKPIT/$COCKPIT.jar
+    - cp cockpit/default.yml $COCKPIT/config.yml
+
+release-product:
+  <<: *build-product
+  only:
+    - tags
   artifacts:
+    name: petals-cockpit-$(cat version.txt)
     paths:
-      - dist
+      - petals-cockpit-*
+
+package-product-master:
+  <<: *build-product
+  only:
+    - master
+  artifacts:
+    name: petals-cockpit-$(cat version.txt)-${CI_BUILD_REF:0:7}
+    paths:
+      - petals-cockpit-*
+
+package-product:
+  <<: *build-product
+  except:
+    - master
+    - tags
+    - /^front\/.*$/
+    - /^back\/.*$/
+  artifacts:
+    expire_in: 1 week
+    name: petals-cockpit-$(cat version.txt)-${CI_BUILD_REF:0:7}
+    paths:
+      - petals-cockpit-*
 
 e2e-product:
   <<: *node-java-yarn
   stage: integration
-  only:
-    - master
-    - integration
-    - /^product\/.*$/
+  except:
+    - tags
+    - /^front\/.*$/
+    - /^back\/.*$/
   dependencies:
-    - build-product
+    - package-product
+    - package-product-master
   variables:
-    COCKPIT: java -jar dist/*/petals-cockpit.jar
+    COCKPIT: java -jar petals-cockpit-*/petals-cockpit-*.jar
     COCKPIT_CONFIG: e2e/default.yml
   script:
     - time $COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml
