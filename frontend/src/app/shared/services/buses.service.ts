@@ -115,6 +115,12 @@ export class BusesServiceImpl extends BusesService {
 
         const buses = toJavascriptMap<IBusBackendSSE>(data.buses);
 
+        const sus = toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits);
+        sus.allIds.forEach(id => {
+          const su = sus.byId[id];
+          su.state = data.serviceAssemblies[su.serviceAssemblyId].state;
+        });
+
         // there should be only one element in there!
         const bus = buses.byId[buses.allIds[0]];
 
@@ -125,7 +131,7 @@ export class BusesServiceImpl extends BusesService {
           { type: Buses.ADD_BUSES_SUCCESS, payload: buses },
           { type: Containers.ADD_CONTAINERS_SUCCESS, payload: toJavascriptMap<IContainerBackendSSE>(data.containers) },
           { type: Components.ADD_COMPONENTS_SUCCESS, payload: toJavascriptMap<IComponentBackendSSE>(data.components) },
-          { type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits) },
+          { type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, payload: sus },
         ]));
       });
   }
