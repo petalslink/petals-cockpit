@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { omit } from 'underscore';
+import { omit } from 'lodash';
 import { environment } from 'environments/environment';
 
 // TODO replace all of this with robustly implemented immutable maps?
