@@ -134,12 +134,14 @@ export class Workspace {
 
       const containers = bus.getContainers();
       const components = containers.reduce((acc: Component[], container) => [...acc, ...container.getComponents()], []);
+      const serviceAssemblies = containers.reduce((acc: ServiceAssembly[], container) => [...acc, ...container.getServiceAssemblies()], []);
       const serviceUnits = components.reduce((acc: ServiceUnit[], component) => [...acc, ...component.getServiceUnits()], []);
 
       const eventData = {
         buses: bus.toObj(),
         containers: containers.reduce((acc, c) => ({ ...acc, ...c.toObj() }), {}),
         components: components.reduce((acc, c) => ({ ...acc, ...c.toObj() }), {}),
+        serviceAssemblies: serviceAssemblies.reduce((acc, sa) => ({ ...acc, ...sa.toObj() }), {}),
         serviceUnits: serviceUnits.reduce((acc, su) => ({ ...acc, ...su.toObj() }), {})
       };
 
@@ -257,50 +259,13 @@ export class Workspaces {
 
     const composedWks = {
       workspace: newWorkspace.toObj(),
-
       users,
-
-      busesInProgress: busesInProgress.reduce((acc, busInProgress) => {
-        return {
-          ...acc,
-          ...busInProgress.toObj()
-        };
-      }, {}),
-
-      buses: buses.reduce((acc, bus) => {
-        return {
-          ...acc,
-          ...bus.toObj()
-        };
-      }, {}),
-
-      containers: containers.reduce((acc, container) => {
-        return {
-          ...acc,
-          ...container.toObj()
-        };
-      }, {}),
-
-      components: components.reduce((acc, component) => {
-        return {
-          ...acc,
-          ...component.toObj()
-        };
-      }, {}),
-
-      serviceAssemblies: serviceAssemblies.reduce((acc, serviceAssembly) => {
-        return {
-          ...acc,
-          ...serviceAssembly.toObj(),
-        };
-      }, {}),
-
-      serviceUnits: serviceUnits.reduce((acc, serviceUnit) => {
-        return {
-          ...acc,
-          ...serviceUnit.toObj(),
-        };
-      }, {})
+      busesInProgress: busesInProgress.reduce((acc, b) => ({ ...acc, ...b.toObj() }), {}),
+      buses: buses.reduce((acc, b) => ({ ...acc, ...b.toObj() }), {}),
+      containers: containers.reduce((acc, c) => ({ ...acc, ...c.toObj() }), {}),
+      components: components.reduce((acc, c) => ({ ...acc, ...c.toObj() }), {}),
+      serviceAssemblies: serviceAssemblies.reduce((acc, sa) => ({ ...acc, ...sa.toObj() }), {}),
+      serviceUnits: serviceUnits.reduce((acc, su) => ({ ...acc, ...su.toObj() }), {})
     };
 
     this.memoizedWorkspaces.set(newWorkspace.id, { wks: newWorkspace, composedWks });
