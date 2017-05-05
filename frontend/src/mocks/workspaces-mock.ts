@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { omit } from 'underscore';
+import { omit, flatMap, assign } from 'lodash';
 
 import { IBusImport } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { Bus, BusInProgress, busesService, busesInProgressService } from './buses-mock';
-import { Container } from './containers-mock';
-import { Component } from './components-mock';
-import { ServiceUnit } from './service-units-mock';
-import { ServiceAssembly } from './service-assemblies-mock';
+
+function toObj<A>(arr: { toObj: () => A }[]): A {
+  return assign.apply({}, arr.map(c => c.toObj()));
+}
 
 // used in buses.service.mock
 export const IMPORT_HTTP_ERROR_IP = 'IMPORT_HTTP_ERROR_IP';
@@ -133,16 +133,16 @@ export class Workspace {
       const bus = this.addBus();
 
       const containers = bus.getContainers();
-      const components = containers.reduce((acc: Component[], container) => [...acc, ...container.getComponents()], []);
-      const serviceAssemblies = containers.reduce((acc: ServiceAssembly[], container) => [...acc, ...container.getServiceAssemblies()], []);
-      const serviceUnits = components.reduce((acc: ServiceUnit[], component) => [...acc, ...component.getServiceUnits()], []);
+      const components = flatMap(containers, c => c.getComponents());
+      const serviceAssemblies = flatMap(containers, c => c.getServiceAssemblies());
+      const serviceUnits = flatMap(components, c => c.getServiceUnits());
 
       const eventData = {
         buses: bus.toObj(),
-        containers: containers.reduce((acc, c) => ({ ...acc, ...c.toObj() }), {}),
-        components: components.reduce((acc, c) => ({ ...acc, ...c.toObj() }), {}),
-        serviceAssemblies: serviceAssemblies.reduce((acc, sa) => ({ ...acc, ...sa.toObj() }), {}),
-        serviceUnits: serviceUnits.reduce((acc, su) => ({ ...acc, ...su.toObj() }), {})
+        containers: toObj(containers),
+        components: toObj(components),
+        serviceAssemblies: toObj(serviceAssemblies),
+        serviceUnits: toObj(serviceUnits)
       };
 
       return {
@@ -252,20 +252,21 @@ export class Workspaces {
 
     const busesInProgress = newWorkspace.getBusesInProgress();
     const buses = newWorkspace.getBuses();
-    const containers = buses.reduce((acc: Container[], bus) => [...acc, ...bus.getContainers()], []);
-    const components = containers.reduce((acc: Component[], container) => [...acc, ...container.getComponents()], []);
-    const serviceAssemblies = containers.reduce((acc: ServiceAssembly[], container) => [...acc, ...container.getServiceAssemblies()], []);
-    const serviceUnits = components.reduce((acc: ServiceUnit[], component) => [...acc, ...component.getServiceUnits()], []);
+
+    const containers = flatMap(buses, b => b.getContainers());
+    const components = flatMap(containers, c => c.getComponents());
+    const serviceAssemblies = flatMap(containers, c => c.getServiceAssemblies());
+    const serviceUnits = flatMap(components, c => c.getServiceUnits());
 
     const composedWks = {
       workspace: newWorkspace.toObj(),
       users,
-      busesInProgress: busesInProgress.reduce((acc, b) => ({ ...acc, ...b.toObj() }), {}),
-      buses: buses.reduce((acc, b) => ({ ...acc, ...b.toObj() }), {}),
-      containers: containers.reduce((acc, c) => ({ ...acc, ...c.toObj() }), {}),
-      components: components.reduce((acc, c) => ({ ...acc, ...c.toObj() }), {}),
-      serviceAssemblies: serviceAssemblies.reduce((acc, sa) => ({ ...acc, ...sa.toObj() }), {}),
-      serviceUnits: serviceUnits.reduce((acc, su) => ({ ...acc, ...su.toObj() }), {})
+      busesInProgress: toObj(busesInProgress),
+      buses: toObj(buses),
+      containers: toObj(containers),
+      components: toObj(components),
+      serviceAssemblies: toObj(serviceAssemblies),
+      serviceUnits: toObj(serviceUnits)
     };
 
     this.memoizedWorkspaces.set(newWorkspace.id, { wks: newWorkspace, composedWks });
