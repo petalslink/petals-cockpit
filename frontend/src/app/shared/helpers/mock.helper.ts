@@ -41,3 +41,10 @@ export function responseBody(body: string | Object | ArrayBuffer, status = 200):
     return Observable.throw(response).materialize().delay(environment.mock.httpDelay).dematerialize();
   }
 }
+
+/**
+ * The backend answers errors like this
+ */
+export function errorBackend(message: string, code: number) {
+  return responseBody({ code, message }, code);
+}

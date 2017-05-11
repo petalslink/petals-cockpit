@@ -17,7 +17,7 @@
 
 import { browser, element, by } from 'protractor';
 
-import { page } from './common';
+import { page, expectFocused, expectNotFocused } from './common';
 
 describe(`Mobile`, () => {
   beforeEach(() => {
@@ -40,6 +40,27 @@ describe(`Mobile`, () => {
     expect(browser.getCurrentUrl()).toMatch(/\/login/);
 
     expectNotFocused();
-
   });
+
+  describe('Setup', () => {
+    const tokenField = element(by.css(`input[formControlName="token"]`));
+
+    it(`should not select the first or second input`, () => {
+      page.navigateTo(true, '/setup');
+      expect(browser.getCurrentUrl()).toMatch(/\/setup/);
+
+      expectNotFocused();
+    });
+
+    it(`should not select the first or second input with a pre-filled token`, () => {
+      const tokenTest = 'TOKENTEST';
+      page.navigateTo(true, `/setup?token=${tokenTest}`);
+      expect(browser.getCurrentUrl()).toMatch(/\/setup/);
+
+      expect(tokenField.getAttribute('value')).toEqual(tokenTest);
+
+      expectNotFocused();
+    });
+  });
+
 });

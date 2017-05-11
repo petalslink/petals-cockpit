@@ -29,42 +29,28 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
-
-import javax.inject.Singleton;
 
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.db.api.RequestRowAssert;
 import org.assertj.db.type.Request;
 import org.assertj.db.type.Table;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.InboundEvent;
-import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
-import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.TableField;
 import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
-import org.junit.rules.TestRule;
 import org.mockito.Mockito;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
-import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.AbstractTest;
-import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
@@ -73,24 +59,12 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRec
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
-import org.ow2.petals.cockpit.server.mocks.MockArtifactServer;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
+import org.ow2.petals.cockpit.server.rules.CockpitResourceRule;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
-import org.ow2.petals.cockpit.server.services.ArtifactServer;
-import org.ow2.petals.cockpit.server.services.PetalsAdmin;
-import org.ow2.petals.cockpit.server.services.PetalsDb;
-import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule;
-import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
-import org.zapodot.junit.db.EmbeddedDatabaseRule;
-import org.zapodot.junit.db.plugin.LiquibaseInitializer;
 
-import co.paralleluniverse.actors.ActorRegistry;
-import co.paralleluniverse.common.test.TestUtil;
-import co.paralleluniverse.common.util.Debug;
-import io.dropwizard.testing.junit.ResourceTestRule;
-import io.dropwizard.testing.junit.ResourceTestRule.Builder;
 import javaslang.Tuple2;
 
 /**
@@ -109,67 +83,18 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     public static final String ADMIN = "admin";
 
     @Rule
-    public final TestRule watchman = TestUtil.WATCHMAN;
-
-    @Rule
-    public final PetalsJmxApiJunitRule jmx = new PetalsJmxApiJunitRule();
-
-    @Rule
-    public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
-
-    @Rule
-    public final EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder()
-            .initializedByPlugin(LiquibaseInitializer.builder().withChangelogResource("migrations.xml").build())
-            .build();
-
-    @Rule
-    public MockArtifactServer httpServer = new MockArtifactServer();
+    public final CockpitResourceRule resource;
 
     private final Map<Object, Long> ids = new HashMap<>();
 
-    protected ResourceTestRule buildResourceTest(Class<?>... resources) {
-        Builder builder = ResourceTestRule.builder()
-                // in memory does not support SSE and the no-servlet one does not log...
-                .setTestContainerFactory(new GrizzlyWebTestContainerFactory()).addProvider(new AbstractBinder() {
-                    @Override
-                    protected void configure() {
-                        bind(DSL.using(dbRule.getConnectionJdbcUrl()).configuration()).to(Configuration.class);
-                        bind(Executors.newFixedThreadPool(4)).named(CockpitApplication.BLOCKING_TASK_ES)
-                                .to(ExecutorService.class);
-                        bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
-                        bind(httpServer).to(ArtifactServer.class);
-                        bind(PetalsAdmin.class).to(PetalsAdmin.class).in(Singleton.class);
-                        bind(PetalsDb.class).to(PetalsDb.class).in(Singleton.class);
-                    }
-                }).setClientConfigurator(cc -> cc.register(MultiPartFeature.class));
-        builder.addProvider(new Pac4JValueFactoryProvider.Binder(new CockpitProfile(ADMIN)));
-        builder.addProvider(MultiPartFeature.class);
-        for (Class<?> resource : resources) {
-            // we pass the resource as a provider to get injection in constructor
-            builder.addProvider(resource);
-        }
-        return builder.build();
-    }
-
-    @BeforeClass
-    public static void setUpQuasar() {
-        // ensure this doesn't get called in a non-unit test thread and return false later when clearing the registry!
-        assertThat(Debug.isUnitTest()).isTrue();
-    }
-
-    @After
-    public void tearDownQuasar() {
-        ActorRegistry.clear();
+    public AbstractCockpitResourceTest(Class<?>... resources) {
+        this.resource = new CockpitResourceRule(resources);
     }
 
     @Before
-    public void setUpDb() {
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord(ADMIN, "...", "Administrator", null));
-    }
-
-    @After
-    public void tearDownDb() {
-        DSL.using(dbRule.getConnectionJdbcUrl()).execute("DROP ALL OBJECTS");
+    public void setUpUser() {
+        resource.setCurrentProfile(new CockpitProfile(ADMIN));
+        resource.db().executeInsert(new UsersRecord(ADMIN, "...", "Administrator", null));
     }
 
     protected long getId(Object o) {
@@ -187,7 +112,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     protected Table table(org.jooq.Table<?> table) {
-        return new Table(dbRule.getDataSource(), table.getName());
+        return new Table(resource.db.getDataSource(), table.getName());
     }
 
     protected RequestRowAssert assertThatDbSU(long id) {
@@ -215,8 +140,8 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     protected <R extends Record, T> Request requestBy(TableField<R, T> field, T id) {
-        return new Request(dbRule.getDataSource(), DSL.using(dbRule.getConnectionJdbcUrl()).selectFrom(field.getTable())
-                .where(field.eq(id)).getSQL(ParamType.INLINED));
+        return new Request(resource.db.getDataSource(),
+                resource.db().selectFrom(field.getTable()).where(field.eq(id)).getSQL(ParamType.INLINED));
     }
 
     protected Request requestWorkspace(long id) {
@@ -255,7 +180,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
      * TODO generate id automatically? but then we need some kind of way to query this data after that!
      */
     protected void setupWorkspace(long wsId, String wsName, List<Tuple2<Domain, String>> data, String... users) {
-        DSL.using(dbRule.getConnectionJdbcUrl()).transaction(conf -> {
+        resource.db().transaction(conf -> {
 
             DSL.using(conf).executeInsert(new WorkspacesRecord(wsId, wsName, ""));
 

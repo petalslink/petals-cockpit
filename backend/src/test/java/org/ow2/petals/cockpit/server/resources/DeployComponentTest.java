@@ -33,9 +33,7 @@ import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
-import org.jooq.impl.DSL;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
@@ -47,13 +45,11 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentOverview;
-import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule;
 import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule.ComponentType;
 import org.ow2.petals.jmx.api.mock.junit.configuration.component.InstallationConfigurationServiceClientMock;
 
 import com.google.common.collect.ImmutableMap;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
 import javaslang.Tuple;
 
 public class DeployComponentTest extends AbstractCockpitResourceTest {
@@ -68,18 +64,16 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
     private final Container container = new Container("cont1", "localhost",
             ImmutableMap.of(Container.PortType.JMX, containerPort), "user", "pass", Container.State.REACHABLE);
 
-    @Rule
-    public final ResourceTestRule resources = buildResourceTest(ComponentsResource.class, WorkspaceResource.class);
-
-    @Rule
-    public final PetalsJmxApiJunitRule jmx = new PetalsJmxApiJunitRule("localhost", containerPort, "user", "pass");
+    public DeployComponentTest() {
+        super(ComponentsResource.class, WorkspaceResource.class);
+    }
 
     @Before
     public void setUp() throws Exception {
-        petals.registerDomain(domain);
-        petals.registerContainer(container);
+        resource.petals.registerDomain(domain);
+        resource.petals.registerContainer(container);
 
-        jmx.addComponentInstallerClient(COMP_NAME, ComponentType.BINDING,
+        resource.jmx.addComponentInstallerClient(COMP_NAME, ComponentType.BINDING,
                 new InstallationConfigurationServiceClientMock(), null);
 
         setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
@@ -95,7 +89,7 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
 
     @Test
     public void deployComponentExistingContainerForbidden() throws Exception {
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         Domain fDomain = new Domain("domf");
         Container fContainer = new Container("contf", "host1", ImmutableMap.of(PortType.JMX, containerPort), "user",
@@ -105,18 +99,18 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
 
         MultiPart mpe = getComponentMultiPart();
 
-        Response post = resources.target("/workspaces/2/containers/" + getId(fContainer) + "/components").request()
+        Response post = resource.target("/workspaces/2/containers/" + getId(fContainer) + "/components").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(403);
 
         assertThat(container.getComponents()).isEmpty();
-        assertThat(httpServer.wasCalled()).isFalse();
+        assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
     @Test
     public void deployComponentNonExistingContainerForbidden() throws Exception {
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         // TODO THIS CAN?T WORK
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -127,55 +121,55 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
         fDomain.addContainers(fContainer);
         MultiPart mpe = getComponentMultiPart();
 
-        Response post = resources.target("/workspaces/2/containers/234242/components").request()
+        Response post = resource.target("/workspaces/2/containers/234242/components").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(403);
 
         assertThat(container.getComponents()).isEmpty();
-        assertThat(httpServer.wasCalled()).isFalse();
+        assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
     @Test
     public void deployCompnentWrongContainerForbidden() throws Exception {
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
         MultiPart mpe = getComponentMultiPart();
 
         // the container exists but it's in another workspace
-        Response post = resources.target("/workspaces/2/containers/" + getId(container) + "/components").request()
+        Response post = resource.target("/workspaces/2/containers/" + getId(container) + "/components").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(403);
 
         assertThat(container.getComponents()).isEmpty();
-        assertThat(httpServer.wasCalled()).isFalse();
+        assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
     @Test
     public void deployComponentButContainerNotFound() throws Exception {
         final MultiPart mpe = getComponentMultiPart();
 
-        Response post = resources.target("/workspaces/1/containers/29871/components").request()
+        Response post = resource.target("/workspaces/1/containers/29871/components").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(404);
 
         assertThat(container.getComponents()).isEmpty();
-        assertThat(httpServer.wasCalled()).isFalse();
+        assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
     @Test
     public void deployComponent() throws Exception {
-        try (EventInput eventInput = resources.target("/workspaces/1/content")
+        try (EventInput eventInput = resource.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
             MultiPart mpe = getComponentMultiPart();
-            WorkspaceContent post = resources.target("/workspaces/1/containers/" + getId(container) + "/components")
+            WorkspaceContent post = resource.target("/workspaces/1/containers/" + getId(container) + "/components")
                     .request().post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
 
             ComponentFull postC = assertComponentContent(post);
@@ -187,8 +181,8 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
                 assertComponentContent(a, data, post);
             });
 
-            assertThat(httpServer.wasCalled()).isEqualTo(true);
-            assertThat(httpServer.wasClosed()).isEqualTo(true);
+            assertThat(resource.httpServer.wasCalled()).isEqualTo(true);
+            assertThat(resource.httpServer.wasClosed()).isEqualTo(true);
 
             assertThat(container.getComponents()).hasSize(1);
             Component comp = container.getComponents().iterator().next();
@@ -196,7 +190,7 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
             assertThat(comp.getState()).isEqualTo(ArtifactState.State.LOADED);
             assertThat(comp.getType()).isEqualTo("BC");
 
-            ComponentOverview overview = resources.target("/components/" + postC.component.id).request()
+            ComponentOverview overview = resource.target("/components/" + postC.component.id).request()
                     .get(ComponentOverview.class);
         }
     }

@@ -1,0 +1,55 @@
+<!-- Copyright (C) 2017 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<md-card>
+  <h3 class="color-primary">Add your first user</h3>
+  <form [formGroup]="form" (ngSubmit)="onSubmit(form)" fxLayout="column" autocomplete="off">
+
+    <md-input-container #tokenInput class="margin-top-x1">
+      <input mdInput type="text" placeholder="Token" formControlName="token" required>
+    </md-input-container>
+
+    <md-input-container #usernameInput class="margin-top-x1">
+      <input mdInput type="text" placeholder="Username" formControlName="username" required>
+    </md-input-container>
+
+    <md-input-container class="margin-top-x1">
+      <input mdInput type="password" placeholder="Password" formControlName="password" required>
+    </md-input-container>
+
+    <md-input-container class="margin-top-x1">
+      <input mdInput type="text" placeholder="Name" formControlName="name" required>
+    </md-input-container>
+
+    <div fxLayout="row" fxFlex="100%" fxLayoutAlign="start center" class="form-error" *ngIf="setupFailed">
+      <md-icon color="warn">error</md-icon>
+      <p>{{setupFailed}}</p>
+    </div>
+
+    <button md-raised-button color="primary" class="margin-top-x1" [disabled]="form.invalid || settingUp">
+      <span *ngIf="!settingUp && !setupSucceeded">
+        Add
+      </span>
+
+      <span *ngIf="settingUp" fxLayout="row" fxLayoutAlign="center center">
+        Adding <md-spinner></md-spinner>
+      </span>
+
+      <span *ngIf="setupSucceeded" fxLayout="row" fxLayoutAlign="center center">
+        User added: click to login!
+      </span>
+    </button>
+  </form>
+</md-card>

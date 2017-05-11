@@ -28,7 +28,6 @@ import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
-import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
@@ -42,23 +41,22 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceOvervi
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceOverviewContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceUpdate;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
-
 public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
-    @Rule
-    public final ResourceTestRule resources = buildResourceTest(WorkspaceResource.class);
+    public WorkspaceResourceTest() {
+        super(WorkspaceResource.class);
+    }
 
     @Test
     public void deleteWorkspaceNonExistingWorkspaceForbidden() {
-        Response delete = resources.target("/workspaces/3").request().delete();
+        Response delete = resource.target("/workspaces/3").request().delete();
 
         assertThat(delete.getStatus()).isEqualTo(403);
     }
 
     @Test
     public void deleteWorkspaceWorkspaceForbidden() {
-        Response delete = resources.target("/workspaces/2").request().delete();
+        Response delete = resource.target("/workspaces/2").request().delete();
 
         assertThat(delete.getStatus()).isEqualTo(403);
 
@@ -70,7 +68,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void deleteWorkspace() {
         assertThat(table(WORKSPACES)).hasNumberOfRows(2);
 
-        WorkspaceDeleted delete = resources.target("/workspaces/1").request().delete(WorkspaceDeleted.class);
+        WorkspaceDeleted delete = resource.target("/workspaces/1").request().delete(WorkspaceDeleted.class);
 
         assertThat(delete.id).isEqualTo(1);
 
@@ -100,14 +98,14 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
 
     @Test
     public void getEventNonExistingWorkspaceForbidden() {
-        Response get = resources.target("/workspaces/3/content").request(SseFeature.SERVER_SENT_EVENTS_TYPE).get();
+        Response get = resource.target("/workspaces/3/content").request(SseFeature.SERVER_SENT_EVENTS_TYPE).get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
 
     @Test
     public void getEventWorkspaceForbidden() {
-        Response get = resources.target("/workspaces/2/content").request(SseFeature.SERVER_SENT_EVENTS_TYPE).get();
+        Response get = resource.target("/workspaces/2/content").request(SseFeature.SERVER_SENT_EVENTS_TYPE).get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -116,7 +114,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void getExistingWorkspace() {
         assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
 
-        WorkspaceFullContent content = resources.target("/workspaces/1/content").request()
+        WorkspaceFullContent content = resource.target("/workspaces/1/content").request()
                 .get(WorkspaceFullContent.class);
 
         assertContent(content);
@@ -129,7 +127,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void getEventExistingWorkspace() {
         assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
 
-        try (EventInput eventInput = resources.target("/workspaces/1/content")
+        try (EventInput eventInput = resource.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
             expectWorkspaceContent(eventInput, (t, a) -> assertContent(t));
         }
@@ -139,19 +137,19 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     public void getOverviewNonExistingWorkspaceForbidden() {
-        Response get = resources.target("/workspaces/3").request().get();
+        Response get = resource.target("/workspaces/3").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
 
     public void getOverviewWorkspaceForbidden() {
-        Response get = resources.target("/workspaces/2").request().get();
+        Response get = resource.target("/workspaces/2").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
 
     public void getOverviewWorkspace() {
-        WorkspaceOverviewContent get = resources.target("/workspaces/1").request().get(WorkspaceOverviewContent.class);
+        WorkspaceOverviewContent get = resource.target("/workspaces/1").request().get(WorkspaceOverviewContent.class);
 
         assertOverview(get.workspace);
 
@@ -159,14 +157,14 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     public void setDescriptionNonExistingWorkspaceForbidden() {
-        Response put = resources.target("/workspaces/3").request()
+        Response put = resource.target("/workspaces/3").request()
                 .put(Entity.json(new WorkspaceUpdate(null, "description")));
 
         assertThat(put.getStatus()).isEqualTo(403);
     }
 
     public void setDescriptionWorkspaceForbidden() {
-        Response put = resources.target("/workspaces/2").request()
+        Response put = resource.target("/workspaces/2").request()
                 .put(Entity.json(new WorkspaceUpdate(null, "description")));
 
         assertThat(put.getStatus()).isEqualTo(403);
@@ -178,7 +176,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void setDescription() {
         assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.DESCRIPTION.getName()).isEqualTo("");
 
-        WorkspaceOverviewContent put = resources.target("/workspaces/1").request()
+        WorkspaceOverviewContent put = resource.target("/workspaces/1").request()
                 .put(Entity.json(new WorkspaceUpdate(null, "description")), WorkspaceOverviewContent.class);
         
         assertThat(put.workspace.id).isEqualTo(1);

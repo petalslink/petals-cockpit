@@ -20,7 +20,7 @@ import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
-import { IUserLogin } from './../interfaces/user.interface';
+import { IUserLogin, IUserSetup } from './../interfaces/user.interface';
 
 export abstract class UsersService {
   abstract connectUser(user: IUserLogin): Observable<Response>;
@@ -28,6 +28,8 @@ export abstract class UsersService {
   abstract disconnectUser(): Observable<Response>;
 
   abstract getUserInformations(): Observable<Response>;
+
+  abstract setupUser(value: IUserSetup): Observable<Response>;
 }
 
 @Injectable()
@@ -46,5 +48,9 @@ export class UsersServiceImpl extends UsersService {
 
   getUserInformations() {
     return this.http.get(`${environment.urlBackend}/user/session`);
+  }
+
+  setupUser(value: IUserSetup) {
+    return this.http.post(`${environment.urlBackend}/setup`, value);
   }
 }

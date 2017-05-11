@@ -16,6 +16,8 @@
  */
 package org.ow2.petals.cockpit.server;
 
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
+
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -25,10 +27,13 @@ import javax.inject.Singleton;
 import javax.servlet.ServletRegistration.Dynamic;
 import javax.ws.rs.ext.ContextResolver;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.jooq.Configuration;
+import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.resources.BusesResource;
@@ -36,6 +41,7 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource;
 import org.ow2.petals.cockpit.server.resources.ContainersResource;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource;
+import org.ow2.petals.cockpit.server.resources.SetupResource;
 import org.ow2.petals.cockpit.server.resources.UserSession;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
@@ -45,6 +51,7 @@ import org.ow2.petals.cockpit.server.services.HttpArtifactServer;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
 import org.pac4j.core.client.Client;
+import org.pac4j.core.context.DefaultAuthorizers;
 import org.pac4j.core.matching.PathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.pac4j.dropwizard.Pac4jFactory;
@@ -64,6 +71,7 @@ import com.google.common.collect.ImmutableMap;
 import io.dropwizard.Application;
 import io.dropwizard.db.PooledDataSourceFactory;
 import io.dropwizard.forms.MultiPartBundle;
+import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.server.AbstractServerFactory;
 import io.dropwizard.setup.Bootstrap;
@@ -81,7 +89,10 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
     public static final String BLOCKING_TASK_ES = "quasar-blocking-exec-service";
 
-    private static final Logger LOG = LoggerFactory.getLogger(CockpitApplication.class);
+    public static final String PAC4J_EXCLUDE_MATCHER = "globalMatcherExcludes";
+
+    // this logger is meant to be shown in the console at the INFO level
+    protected static final Logger LOG = LoggerFactory.getLogger(CockpitApplication.class);
 
     public final Pac4jBundle<C> pac4j = new Pac4jBundle<C>() {
         @Override
@@ -96,13 +107,13 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
             Pac4jFactory pac4jConf = new Pac4jFactory();
 
             // this let the /user/session url be handled by the callbacks, logout, etc filters
-            pac4jConf
-                    .setMatchers(ImmutableMap.of("excludeUserSession", new PathMatcher().excludePath("/user/session")));
+            pac4jConf.setMatchers(ImmutableMap.of(PAC4J_EXCLUDE_MATCHER,
+                    new PathMatcher().excludePath("/user/session").excludePath("/setup")));
 
             // this protects the whole application with all the declared clients
             JaxRsSecurityFilterConfiguration f = new JaxRsSecurityFilterConfiguration();
-            f.setMatchers("excludeUserSession");
-            f.setAuthorizers("isAuthenticated");
+            f.setMatchers(PAC4J_EXCLUDE_MATCHER);
+            f.setAuthorizers(DefaultAuthorizers.IS_AUTHENTICATED);
             f.setClients(defaultClients);
             pac4jConf.setGlobalFilters(ImmutableList.of(f));
 
@@ -205,6 +216,8 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
         Configuration jooqConf = jooq.getConfiguration();
 
+        String adminConsoleToken = RandomStringUtils.randomAlphanumeric(20);
+
         environment.jersey().register(new AbstractBinder() {
             @Override
             protected void configure() {
@@ -216,6 +229,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 bind(HttpArtifactServer.class).to(ArtifactServer.class).in(Singleton.class);
                 bind(PetalsAdmin.class).to(PetalsAdmin.class).in(Singleton.class);
                 bind(PetalsDb.class).to(PetalsDb.class).in(Singleton.class);
+                bind(adminConsoleToken).to(String.class).named(SetupResource.ADMIN_TOKEN);
             }
         });
 
@@ -235,6 +249,18 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         environment.jersey().register(ComponentsResource.class);
         environment.jersey().register(ServiceAssembliesResource.class);
         environment.jersey().register(ServiceUnitsResource.class);
+        environment.jersey().register(SetupResource.class);
+
+        if (!DSL.using(jooq.getConfiguration()).fetchExists(USERS)) {
+            environment.lifecycle().addServerLifecycleListener(new ServerLifecycleListener() {
+                @Override
+                public void serverStarted(@Nullable Server server) {
+                    assert server != null;
+                    LOG.warn("No users are present in the database: setup your installation via {}setup?token={}",
+                            server.getURI(), adminConsoleToken);
+                }
+            });
+        }
 
         // This is needed for SSE to work correctly!
         // See https://github.com/dropwizard/dropwizard/issues/1673

@@ -19,13 +19,13 @@ import { browser, element, by, ExpectedConditions as EC, ElementFinder } from 'p
 import * as util from 'protractor/built/util';
 
 export class PetalsCockpitPage {
-  navigateTo(mobile = false) {
+  navigateTo(mobile = false, to = '/') {
     if (mobile) {
       browser.manage().window().setSize(412, 732);
     } else {
       browser.manage().window().maximize();
     }
-    return browser.get('/');
+    return browser.get(to);
   }
 
   login(user: string, pass: string, checkRedirect = true, hasLastWorkspace = true) {

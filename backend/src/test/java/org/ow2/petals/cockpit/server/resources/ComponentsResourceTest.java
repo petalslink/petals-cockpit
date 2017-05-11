@@ -20,21 +20,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.ws.rs.core.Response;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentOverview;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
-
 public class ComponentsResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
-    @Rule
-    public final ResourceTestRule resources = buildResourceTest(ComponentsResource.class);
+    public ComponentsResourceTest() {
+        super(ComponentsResource.class);
+    }
 
     @Test
     public void getExistingComponentForbidden() {
         // TODO check assumptions
-        Response get = resources.target("/components/" + getId(fComponent)).request().get();
+        Response get = resource.target("/components/" + getId(fComponent)).request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -42,14 +40,14 @@ public class ComponentsResourceTest extends AbstractDefaultWorkspaceResourceTest
     @Test
     public void getExistingComponent() {
         // TODO check assumptions
-        ComponentOverview get = resources.target("/components/" + getId(component)).request()
+        ComponentOverview get = resource.target("/components/" + getId(component)).request()
                 .get(ComponentOverview.class);
     }
 
     @Test
     public void getNonExistingComponentNotFound() {
         // TODO check assumptions
-        Response get = resources.target("/components/313249238").request().get();
+        Response get = resource.target("/components/313249238").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }

@@ -46,6 +46,11 @@ export interface IUserLogin {
   password: string;
 }
 
+export interface IUserSetup extends IUserLogin {
+  token: string;
+  name: string;
+}
+
 export function userRowFactory(): IUserRow {
   return {
     id: null,

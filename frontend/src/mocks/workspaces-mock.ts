@@ -19,6 +19,7 @@ import { omit, flatMap, assign } from 'lodash';
 
 import { IBusImport } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { Bus, BusInProgress, busesService, busesInProgressService } from './buses-mock';
+import { users } from './backend-mock';
 
 function toObj<A>(arr: { toObj: () => A }[]): A {
   return assign.apply({}, arr.map(c => c.toObj()));
@@ -31,31 +32,6 @@ export const IMPORT_HTTP_ERROR_IP = 'IMPORT_HTTP_ERROR_IP';
 export const validContainers = [
   '192.168.0.1:7700'
 ];
-
-// we don't need to manage CRUD operations on users and we don't have a class to handle them
-// it would be completely overkill to put them in a separate file
-export const users = {
-  admin: {
-    id: 'admin',
-    name: 'Administrator'
-  },
-  bescudie: {
-    id: 'bescudie',
-    name: 'Bertrand ESCUDIE'
-  },
-  mrobert: {
-    id: 'mrobert',
-    name: 'Maxime ROBERT'
-  },
-  cchevalier: {
-    id: 'cchevalier',
-    name: 'Christophe CHEVALIER'
-  },
-  vnoel: {
-    id: 'vnoel',
-    name: 'Victor NOEL'
-  }
-};
 
 export class Workspace {
   private static cpt = 0;

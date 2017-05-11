@@ -18,7 +18,6 @@ package org.ow2.petals.cockpit.server.resources;
 
 import java.util.Arrays;
 
-import org.jooq.impl.DSL;
 import org.junit.Before;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
@@ -62,28 +61,31 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractCockp
     protected final Domain fDomain = new Domain("dom2");
 
     protected final Container fContainer = new Container("cont2", "", ImmutableMap.of(PortType.JMX, containerPort), "",
-            "",
-            State.REACHABLE);
-    
+            "", State.REACHABLE);
+
     protected final Component fComponent = new Component("comp2", ComponentType.SE, ArtifactState.State.STARTED);
 
     protected final ServiceUnit fServiceUnit = new ServiceUnit("su2", "comp2");
 
     protected final ServiceAssembly fServiceAssembly = new ServiceAssembly("", ArtifactState.State.STARTED,
             fServiceUnit);
-    
+
+    public AbstractDefaultWorkspaceResourceTest(Class<?>... ressources) {
+        super(ressources);
+    }
+
     @Before
     public void setup() {
         // petals
-        petals.registerSystemInfo(SYSINFO);
-        petals.registerDomain(domain);
-        petals.registerContainer(container1);
-        petals.registerContainer(container2);
-        petals.registerContainer(container3);
-        petals.registerArtifact(component, container1);
-        petals.registerArtifact(serviceAssembly, container1);
+        resource.petals.registerSystemInfo(SYSINFO);
+        resource.petals.registerDomain(domain);
+        resource.petals.registerContainer(container1);
+        resource.petals.registerContainer(container2);
+        resource.petals.registerContainer(container3);
+        resource.petals.registerArtifact(component, container1);
+        resource.petals.registerArtifact(serviceAssembly, container1);
 
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         // forbidden workspace (it is NOT registered in petals admin)
         fDomain.addContainers(fContainer);

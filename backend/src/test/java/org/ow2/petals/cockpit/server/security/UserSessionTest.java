@@ -18,142 +18,89 @@ package org.ow2.petals.cockpit.server.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.sql.Connection;
-
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
-import org.eclipse.jdt.annotation.Nullable;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.cockpit.server.AbstractTest;
-import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.UserSession.User;
+import org.ow2.petals.cockpit.server.rules.CockpitApplicationRule;
 import org.ow2.petals.cockpit.server.security.CockpitExtractor.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.zapodot.junit.db.EmbeddedDatabaseRule;
-import org.zapodot.junit.db.plugin.InitializationPlugin;
-import org.zapodot.junit.db.plugin.LiquibaseInitializer;
-
-import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 
 public class UserSessionTest extends AbstractTest {
 
     public static final User ADMIN = new User("admin", "Administrator", null);
 
-    public static class App extends CockpitApplication<CockpitConfiguration> {
-        // only needed because of generics
-    }
-
-    @ClassRule
-    public static final EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder()
-            .initializedByPlugin(LiquibaseInitializer.builder().withChangelogResource("migrations.xml").build())
-            .initializedByPlugin(new InitializationPlugin() {
-                @Override
-                public void connectionMade(@Nullable String name, @Nullable Connection connection) {
-                    assert connection != null;
-                    // we must use the JDBC URL because if not the insertion is only visible when accessing the db with
-                    // connection.. https://github.com/zapodot/embedded-db-junit/issues/7
-                    try (DSLContext using = DSL.using(dbRule.getConnectionJdbcUrl())) {
-                        using.executeInsert(new UsersRecord(ADMIN.id, new BCryptPasswordEncoder().encode(ADMIN.id),
-                                ADMIN.name, ADMIN.lastWorkspace));
-                    }
-                }
-            }).build();
-
     @Rule
-    public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
-
-    @Rule
-    public final DropwizardAppRule<CockpitConfiguration> appRule = new DropwizardAppRule<>(App.class,
-            ResourceHelpers.resourceFilePath("user-session-tests.yml"),
-            ConfigOverride.config("database.url", () -> dbRule.getConnectionJdbcUrl()));
+    public final CockpitApplicationRule app = new CockpitApplicationRule();
 
     @Before
-    public void setUpCookieHandler() {
-        // Used by Jersey Client to store cookies
-        CookieHandler.setDefault(new CookieManager());
-    }
-
-    @After
-    public void cleanUpCookieHandler() {
-        CookieHandler.setDefault(null);
-    }
-
-    public WebTarget target(String url) {
-        return appRule.client().target(String.format("http://localhost:%d/api%s", appRule.getLocalPort(), url));
+    public void setUpDb() {
+        app.db().executeInsert(new UsersRecord(ADMIN.id, new BCryptPasswordEncoder().encode(ADMIN.id), ADMIN.name,
+                ADMIN.lastWorkspace));
     }
 
     @Test
     public void testProtectedUserSucceedAfterLogin() {
 
-        final Response get = target("/user").request().get();
+        final Response get = this.app.target("/user").request().get();
         assertThat(get.getStatus()).isEqualTo(401);
 
-        final Response login = target("/user/session").request()
+        final Response login = this.app.target("/user/session").request()
                 .post(Entity.json(new Authentication("admin", "admin")));
         assertThat(login.getStatus()).isEqualTo(200);
         assertThat(login.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
 
-        final Response get2 = target("/user").request().get();
+        final Response get2 = this.app.target("/user").request().get();
         assertThat(get2.getStatus()).isEqualTo(200);
         assertThat(get2.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
 
-        final Response get3 = target("/user/session").request().get();
+        final Response get3 = this.app.target("/user/session").request().get();
         assertThat(get3.getStatus()).isEqualTo(200);
         assertThat(get3.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
     }
 
     @Test
     public void testGlobalFilterWorks() {
-        final Response get = target("/workspaces").request().get();
+        final Response get = this.app.target("/workspaces").request().get();
         assertThat(get.getStatus()).isEqualTo(401);
 
-        final Response login = target("/user/session").request()
+        final Response login = this.app.target("/user/session").request()
                 .post(Entity.json(new Authentication("admin", "admin")));
         assertThat(login.getStatus()).isEqualTo(200);
         assertThat(login.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
 
-        final Response get2 = target("/workspaces").request().get();
+        final Response get2 = this.app.target("/workspaces").request().get();
         assertThat(get2.getStatus()).isEqualTo(200);
     }
 
     @Test
     public void testWrongLogin() {
-        final Response login = target("/user/session").request()
+        final Response login = this.app.target("/user/session").request()
                 .post(Entity.json(new Authentication("wrong", "admin")));
         assertThat(login.getStatus()).isEqualTo(401);
     }
 
     @Test
     public void testLogout() {
-        final Response login = target("/user/session").request()
+        final Response login = this.app.target("/user/session").request()
                 .post(Entity.json(new Authentication("admin", "admin")));
         assertThat(login.getStatus()).isEqualTo(200);
         assertThat(login.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
 
-        final Response getOk = target("/user/session").request().get();
+        final Response getOk = this.app.target("/user/session").request().get();
         assertThat(getOk.getStatus()).isEqualTo(200);
         assertThat(getOk.readEntity(User.class)).isEqualToComparingFieldByField(ADMIN);
 
-        final Response logout = target("/user/session").request().delete();
+        final Response logout = this.app.target("/user/session").request().delete();
         // TODO should be 204: https://github.com/pac4j/pac4j/issues/701
         assertThat(logout.getStatus()).isEqualTo(200);
 
-        final Response getWrong = target("/user/session").request().get();
+        final Response getWrong = this.app.target("/user/session").request().get();
         assertThat(getWrong.getStatus()).isEqualTo(401);
     }
 }

@@ -34,7 +34,7 @@ database:
 logging:
   level: INFO
   loggers:
-    org.ow2.petals.cockpit.PetalsCockpitApplication:
+    org.ow2.petals.cockpit.CockpitApplication:
       appenders:
         - type: console
           threshold: INFO

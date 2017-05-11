@@ -27,9 +27,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
-import org.jooq.impl.DSL;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
@@ -47,7 +45,6 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentStateC
 
 import com.google.common.collect.ImmutableMap;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
 import javaslang.Tuple;
 
 public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
@@ -70,29 +67,30 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
     private final ServiceAssembly serviceAssembly1 = new ServiceAssembly("sa1", ArtifactState.State.STARTED,
             serviceUnit1);
 
-    @Rule
-    public final ResourceTestRule resources = buildResourceTest(ComponentsResource.class, WorkspaceResource.class);
+    public ChangeComponentStateTest() {
+        super(ComponentsResource.class, WorkspaceResource.class);
+    }
 
     @Before
     public void setUp() {
-        petals.registerDomain(domain);
-        petals.registerContainer(container);
-        petals.registerArtifact(component1, container);
-        petals.registerArtifact(component2, container);
-        petals.registerArtifact(component3, container);
-        petals.registerArtifact(serviceAssembly1, container);
+        resource.petals.registerDomain(domain);
+        resource.petals.registerContainer(container);
+        resource.petals.registerArtifact(component1, container);
+        resource.petals.registerArtifact(component2, container);
+        resource.petals.registerArtifact(component3, container);
+        resource.petals.registerArtifact(serviceAssembly1, container);
 
         setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
     }
 
     @Test
     public void changeComp1State() {
-        try (EventInput eventInput = resources.target("/workspaces/1/content")
+        try (EventInput eventInput = resource.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
-            ComponentStateChanged put = resources.target("/workspaces/1/components/" + getId(component1)).request().put(
+            ComponentStateChanged put = resource.target("/workspaces/1/components/" + getId(component1)).request().put(
                     Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)), ComponentStateChanged.class);
 
             assertThat(put.state).isEqualTo(ComponentMin.State.Stopped);
@@ -119,7 +117,7 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
     @Test
     public void changeComp1StateForbidden() {
 
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         Domain fDomain = new Domain("domf");
         Container fContainer = new Container("contf", "host1", ImmutableMap.of(PortType.JMX, containerPort), "user",
@@ -129,7 +127,7 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
         fContainer.addComponent(fComponent);
         setupWorkspace(2, "test2", Arrays.asList(Tuple.of(fDomain, "phrase")), "anotheruser");
 
-        Response put = resources.target("/workspaces/2/components/" + getId(fComponent)).request()
+        Response put = resource.target("/workspaces/2/components/" + getId(fComponent)).request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
@@ -150,11 +148,11 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
     @Test
     public void changeNonExistingCompStateForbidden() {
 
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
-        Response put = resources.target("/workspaces/2/components/32342342").request()
+        Response put = resource.target("/workspaces/2/components/32342342").request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
@@ -173,11 +171,11 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
     @Test
     public void changeWrongCompStateForbidden() {
 
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
-        Response put = resources.target("/workspaces/2/components/" + getId(component1)).request()
+        Response put = resource.target("/workspaces/2/components/" + getId(component1)).request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
@@ -196,7 +194,7 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
     @Test
     public void changeComp1StateNotFound() {
 
-        Response put = resources.target("/workspaces/1/components/339879").request()
+        Response put = resource.target("/workspaces/1/components/339879").request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(404);
@@ -214,12 +212,12 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeComp2StateUnload() {
-        try (EventInput eventInput = resources.target("/workspaces/1/content")
+        try (EventInput eventInput = resource.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
-            ComponentStateChanged put = resources.target("/workspaces/1/components/" + getId(component2)).request().put(
+            ComponentStateChanged put = resource.target("/workspaces/1/components/" + getId(component2)).request().put(
                     Entity.json(new ComponentChangeState(ComponentMin.State.Unloaded)), ComponentStateChanged.class);
 
             assertThat(put.state).isEqualTo(ComponentMin.State.Unloaded);
@@ -244,7 +242,7 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeComp1StateNoChange() {
-        ComponentStateChanged put = resources.target("/workspaces/1/components/" + getId(component1)).request()
+        ComponentStateChanged put = resource.target("/workspaces/1/components/" + getId(component1)).request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Started)), ComponentStateChanged.class);
 
         assertThat(put.state).isEqualTo(ComponentMin.State.Started);
@@ -262,7 +260,7 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeComp1StateConflict() {
-        Response put = resources.target("/workspaces/1/components/" + getId(component1)).request()
+        Response put = resource.target("/workspaces/1/components/" + getId(component1)).request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Unloaded)));
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
@@ -280,7 +278,7 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeComp3StateConflictUnloaded() {
-        Response put = resources.target("/workspaces/1/components/" + getId(component3)).request()
+        Response put = resource.target("/workspaces/1/components/" + getId(component3)).request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Unloaded)));
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());

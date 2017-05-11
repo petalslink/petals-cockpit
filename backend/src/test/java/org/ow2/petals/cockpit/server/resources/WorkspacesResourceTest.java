@@ -23,8 +23,6 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import javax.ws.rs.client.Entity;
 
-import org.jooq.impl.DSL;
-import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
@@ -33,17 +31,16 @@ import org.ow2.petals.cockpit.server.resources.WorkspacesResource.NewWorkspace;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspacesContent;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
-
 public class WorkspacesResourceTest extends AbstractCockpitResourceTest {
 
-    @Rule
-    public final ResourceTestRule resources = buildResourceTest(WorkspacesResource.class);
+    public WorkspacesResourceTest() {
+        super(WorkspacesResource.class);
+    }
 
     @Test
     public void createWorkspace() {
         NewWorkspace newWs = new NewWorkspace("test");
-        Workspace post = resources.target("/workspaces").request().post(Entity.json(newWs), Workspace.class);
+        Workspace post = resource.target("/workspaces").request().post(Entity.json(newWs), Workspace.class);
 
         assertThat(post.id).isGreaterThan(0);
         assertThat(post.name).isEqualTo(newWs.name);
@@ -59,20 +56,20 @@ public class WorkspacesResourceTest extends AbstractCockpitResourceTest {
 
     @Test
     public void getWorkspaces() {
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(1L, "test1", ""));
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(2L, "test2", ""));
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(3L, "test3", ""));
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(4L, "test4", ""));
+        resource.db().executeInsert(new WorkspacesRecord(1L, "test1", ""));
+        resource.db().executeInsert(new WorkspacesRecord(2L, "test2", ""));
+        resource.db().executeInsert(new WorkspacesRecord(3L, "test3", ""));
+        resource.db().executeInsert(new WorkspacesRecord(4L, "test4", ""));
 
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("userX", "..", "..", null));
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("userY", "..", "..", null));
+        resource.db().executeInsert(new UsersRecord("userX", "..", "..", null));
+        resource.db().executeInsert(new UsersRecord("userY", "..", "..", null));
 
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersWorkspacesRecord(1L, "admin"));
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersWorkspacesRecord(1L, "userX"));
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersWorkspacesRecord(2L, "userX"));
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersWorkspacesRecord(3L, "admin"));
+        resource.db().executeInsert(new UsersWorkspacesRecord(1L, "admin"));
+        resource.db().executeInsert(new UsersWorkspacesRecord(1L, "userX"));
+        resource.db().executeInsert(new UsersWorkspacesRecord(2L, "userX"));
+        resource.db().executeInsert(new UsersWorkspacesRecord(3L, "admin"));
 
-        WorkspacesContent ws = resources.target("/workspaces").request().get(WorkspacesContent.class);
+        WorkspacesContent ws = resource.target("/workspaces").request().get(WorkspacesContent.class);
 
         // ws 1 and 3
         assertThat(ws.workspaces).hasSize(2);
