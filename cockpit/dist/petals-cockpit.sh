@@ -27,8 +27,8 @@ cd "$COCKPIT_DIR"
 # Set the path to the java executable
 JAVA="${JAVA_HOME:-}/bin/java"
 [ -x "$JAVA" ] || JAVA="$(which java)" || {
-    echo "ERROR: java executable not found" >&2
-    exit 1
+  echo "ERROR: java executable not found. Note that you can set JAVA_HOME to specify its location." >&2
+  exit 1
 }
 
 JAR="$(ls -1 ./lib/petals-cockpit-*.jar 2>/dev/null)"
@@ -36,24 +36,22 @@ JAR="$(ls -1 ./lib/petals-cockpit-*.jar 2>/dev/null)"
 # Adapt pathes if architecture is Cygwin (unix if read by the command line and dos if read by java)
 case "`uname`" in
   CYGWIN*)
-   JAVA="$(cygpath --unix "$JAVA")"
-   JAR="$(cygpath --unix "$JAR")"
-   ;;
+    JAVA="$(cygpath --unix "$JAVA")"
+    JAR="$(cygpath --unix "$JAR")"
+    ;;
 esac
 
 ARGS=()
-DBMIGRATE=false
-NODBCHECK=false
+DBMIGRATE=true
+DBCHECK=true
 for var in "$@"; do
-  if [[ $var == "--migrate-db" ]]; then
-    DBMIGRATE=true
-    continue
+  if [[ $var == "--no-db-migrate" ]]; then
+    DBMIGRATE=false
+  elif [[ $var == "--no-db-check" ]]; then
+    DBCHECK=false
+  else
+    ARGS[${#ARGS[@]}]="$var"
   fi
-  if [[ $var == "--no-db-check" ]]; then
-    NODBCHECK=true
-    continue
-  fi
-  ARGS[${#ARGS[@]}]="$var"
 done
 
 NBARGS=${#ARGS[@]}
@@ -64,19 +62,25 @@ else
 fi
 
 if [[ $DBMIGRATE == true ]]; then
-  echo "Migrating database schema to latest version"
-  exec "$JAVA" -jar "$JAR" db migrate ./conf/config.yml
+  echo "Migrating database schema to latest version (disable with --no-db-migrate)"
+  if "$JAVA" -jar "$JAR" db migrate ./conf/config.yml ; then
+    echo "Migration successful, see logs for details"
+  else
+    echo "Migration failed, see logs for details" >&2
+    exit 1
+  fi
 fi
 
-if [[ $NODBCHECK == false ]]; then
+if [[ $DBMIGRATE == false && $DBCHECK == true ]]; then
   echo "Checking database schema (disable with --no-db-check)"
   DBSTATUS=$("$JAVA" -jar "$JAR" db status ./conf/config.yml)
   if [[ ! $DBSTATUS =~ "is up to date" ]]; then
-    echo "ERROR: Database schema is not up to date, migrate it to latest version with --migrate-db" >&2
-    echo "$DBSTATUS"
+    echo "ERROR: Database schema is not up to date" >&2
+    echo "$DBSTATUS" >&2
     exit 1
   fi
   echo "Database schema is up to date"
 fi
 
+echo "Starting Petals Cockpit"
 exec "$JAVA" -jar "$JAR" $FARGS ./conf/config.yml

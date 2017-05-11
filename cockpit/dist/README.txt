@@ -1,17 +1,10 @@
 Needs Java 8 (set via JAVA_HOME if needed).
 
-To initialise the database:
-
-$ ./petals-cockpit.sh --migrate-db
-
-To add an user:
-
-$ ./petals-cockpit.sh add-user -u username -p password -n Name
-
-To run Petals Cockpit:
+To start:
 
 $ ./petals-cockpit.sh
 
-Access it from http://your-ip:8080
+Instructions are printed on the console to access Petals Cockpit
+and setup an administrator user the first time.
 
 Change configurations in conf/config.yml
