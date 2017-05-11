@@ -19,7 +19,7 @@ import { browser, element, by } from 'protractor';
 
 import { IMPORT_HTTP_ERROR_IP } from '../src/mocks/workspaces-mock';
 
-import { page } from './common';
+import { page, expectFocused } from './common';
 
 describe(`Import Bus`, () => {
   const inputIp = element(by.css(`input[formControlName="ip"]`));
@@ -143,6 +143,6 @@ describe(`Import Bus`, () => {
   });
 
   it(`should select the first input of import bus form on desktop`, () => {
-    inputIp.isSelected();
+    expectFocused(inputIp);
   });
 });

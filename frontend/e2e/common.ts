@@ -15,10 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser } from 'protractor';
+import { browser, ElementFinder, element, by } from 'protractor';
 import { PetalsCockpitPage } from './app.po';
 
 export let page: PetalsCockpitPage;
+
+export function expectNotFocused() {
+  return expectFocused(element(by.css('body')));
+}
+
+export function expectFocused(element: ElementFinder) {
+  return expect(browser.switchTo().activeElement().getId()).toBe(element.getId());
+}
 
 beforeEach(() => {
   page = new PetalsCockpitPage();

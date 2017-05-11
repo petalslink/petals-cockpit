@@ -17,7 +17,7 @@
 
 import { browser, element, by, ExpectedConditions as EC } from 'protractor';
 
-import { page } from './common';
+import { page, expectFocused } from './common';
 
 describe(`Login`, () => {
   beforeEach(() => {
@@ -99,6 +99,6 @@ describe(`Login`, () => {
   });
 
   it(`should select the first input of the login form on desktop`, () => {
-    element(by.css(`app-login input[formcontrolname="username"]`)).isSelected();
+    expectFocused(element(by.css(`app-login input[formcontrolname="username"]`)));
   });
 });

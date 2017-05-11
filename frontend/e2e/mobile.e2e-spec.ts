@@ -20,31 +20,26 @@ import { browser, element, by } from 'protractor';
 import { page } from './common';
 
 describe(`Mobile`, () => {
-  const inputIp = element(by.css(`input[formControlName="ip"]`));
-  const inputUsername = element(by.css(`input[formControlName="username"]`));
-
   beforeEach(() => {
     page.navigateTo(true);
-    page.login(`admin`, `admin`);
   });
 
   it(`should not select the first input of import bus form on mobile`, () => {
+    page.login(`admin`, `admin`);
+
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
 
     page.openImportBus();
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/);
 
-    inputIp.isSelected();
+    // the button is focused because of our click: the important is that nothing else is focused instead
+    expectFocused(element(by.css('app-cockpit md-sidenav a.btn-add-bus')));
   });
 
-
   it(`should not select the first input of the login form on mobile`, () => {
-    page.logout();
     expect(browser.getCurrentUrl()).toMatch(/\/login/);
 
-    inputUsername.isSelected();
+    expectNotFocused();
 
-    page.login(`admin`, `admin`);
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
   });
 });
