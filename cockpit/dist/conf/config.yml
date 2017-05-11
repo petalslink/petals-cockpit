@@ -13,6 +13,11 @@ server:
   adminContextPath: /
   # but we disable it by default
   adminConnectors: []
+  requestLog:
+    appenders:
+      - type: file
+        currentLogFilename: ./logs/cockpit-access.log
+        archivedLogFilenamePattern: ./logs/cockpit-access-%d.log.gz
 
 security:
   pac4jClients:
