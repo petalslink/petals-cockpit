@@ -33,6 +33,11 @@ database:
 
 logging:
   level: INFO
+  loggers:
+    org.ow2.petals.cockpit.PetalsCockpitApplication:
+      appenders:
+        - type: console
+          threshold: INFO
   appenders:
     - type: file
       currentLogFilename: ./logs/cockpit.log

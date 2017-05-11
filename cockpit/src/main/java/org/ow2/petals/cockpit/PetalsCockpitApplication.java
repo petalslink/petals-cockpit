@@ -17,8 +17,11 @@
 package org.ow2.petals.cockpit;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jetty.server.Server;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableSet;
@@ -26,9 +29,14 @@ import com.palantir.indexpage.IndexPageBundle;
 import com.palantir.indexpage.IndexPageConfigurable;
 
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 
 public class PetalsCockpitApplication extends CockpitApplication<PetalsCockpitConfiguration> {
+
+    // this logger is meant to be shown in the console at the INFO level
+    private static final Logger LOG = LoggerFactory.getLogger(PetalsCockpitApplication.class);
 
     public static void main(String[] args) throws Exception {
         new PetalsCockpitApplication().run(args);
@@ -48,6 +56,19 @@ public class PetalsCockpitApplication extends CockpitApplication<PetalsCockpitCo
                         ImmutableSet.of("/", "/index.html", "/login", "/workspaces", "/workspaces/*")));
         // no index file parameter because index is served by IndexPageBundle
         bootstrap.addBundle(new AssetsBundle("/frontend", "/", null));
+    }
+
+    @Override
+    public void run(PetalsCockpitConfiguration configuration, Environment environment) throws Exception {
+        super.run(configuration, environment);
+
+        environment.lifecycle().addServerLifecycleListener(new ServerLifecycleListener() {
+            @Override
+            public void serverStarted(@Nullable Server server) {
+                assert server != null;
+                LOG.info("Petals Cockpit started at {}", server.getURI());
+            }
+        });
     }
 }
 
