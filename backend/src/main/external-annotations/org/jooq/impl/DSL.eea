@@ -1,4 +1,7 @@
 class org/jooq/impl/DSL
 using
+ (Ljava/lang/String;)Lorg/jooq/DSLContext;
+ (Ljava/lang/String;)L1org/jooq/DSLContext;
+using
  (Lorg/jooq/Configuration;)Lorg/jooq/DSLContext;
  (Lorg/jooq/Configuration;)L1org/jooq/DSLContext;

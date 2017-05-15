@@ -28,6 +28,10 @@ export const routes: Routes = [
     redirectTo: 'login'
   },
   {
+    path: 'setup',
+    loadChildren: 'app/features/setup/setup.module#SetupModule'
+  },
+  {
     path: 'login',
     canActivate: [GuardLoginService],
     loadChildren: 'app/features/login/login.module#LoginModule'

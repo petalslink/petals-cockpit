@@ -33,9 +33,7 @@ import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
-import org.jooq.impl.DSL;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
@@ -54,7 +52,6 @@ import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitO
 
 import com.google.common.collect.ImmutableMap;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 
@@ -71,15 +68,15 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
 
     private final Component component1 = new Component("comp1", ComponentType.SE, ArtifactState.State.STARTED);
 
-    @Rule
-    public final ResourceTestRule resources = buildResourceTest(ServiceUnitsResource.class,
-            ServiceAssembliesResource.class, WorkspaceResource.class);
+    public DeploySUTest() {
+        super(ServiceUnitsResource.class, ServiceAssembliesResource.class, WorkspaceResource.class);
+    }
 
     @Before
     public void setUp() {
-        petals.registerDomain(domain);
-        petals.registerContainer(container);
-        petals.registerArtifact(component1, container);
+        resource.petals.registerDomain(domain);
+        resource.petals.registerContainer(container);
+        resource.petals.registerArtifact(component1, container);
 
         setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
     }
@@ -94,7 +91,7 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
 
     @Test
     public void deploySUExistingComponentForbidden() throws Exception {
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         Domain fDomain = new Domain("domf");
         Container fContainer = new Container("contf", "host1", ImmutableMap.of(PortType.JMX, containerPort), "user",
@@ -106,72 +103,72 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
 
         MultiPart mpe = getSUMultiPart();
 
-        Response post = resources.target("/workspaces/2/components/" + getId(fComponent) + "/serviceunits").request()
+        Response post = resource.target("/workspaces/2/components/" + getId(fComponent) + "/serviceunits").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(403);
 
         assertThat(container.getServiceAssemblies()).isEmpty();
-        assertThat(httpServer.wasCalled()).isFalse();
+        assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
     @Test
     public void deploySUNonExistingComponentForbidden() throws Exception {
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
         MultiPart mpe = getSUMultiPart();
 
-        Response post = resources.target("/workspaces/2/components/3198798/serviceunits").request()
+        Response post = resource.target("/workspaces/2/components/3198798/serviceunits").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(403);
 
         assertThat(container.getServiceAssemblies()).isEmpty();
-        assertThat(httpServer.wasCalled()).isFalse();
+        assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
     @Test
     public void deploySUWrongComponentForbidden() throws Exception {
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
         MultiPart mpe = getSUMultiPart();
 
         // the component exists but it's in another workspace
-        Response post = resources.target("/workspaces/2/components/" + getId(component1) + "/serviceunits").request()
+        Response post = resource.target("/workspaces/2/components/" + getId(component1) + "/serviceunits").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(403);
 
         assertThat(container.getServiceAssemblies()).isEmpty();
-        assertThat(httpServer.wasCalled()).isFalse();
+        assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
     @Test
     public void deploySUButComponentNotFound() throws Exception {
         final MultiPart mpe = getSUMultiPart();
 
-        Response post = resources.target("/workspaces/1/components/3987981/serviceunits").request()
+        Response post = resource.target("/workspaces/1/components/3987981/serviceunits").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(404);
 
         assertThat(container.getServiceAssemblies()).isEmpty();
-        assertThat(httpServer.wasCalled()).isFalse();
+        assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
     @Test
     public void deploySU() throws Exception {
-        try (EventInput eventInput = resources.target("/workspaces/1/content")
+        try (EventInput eventInput = resource.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
             MultiPart mpe = getSUMultiPart();
-            WorkspaceContent post = resources.target("/workspaces/1/components/" + getId(component1) + "/serviceunits")
+            WorkspaceContent post = resource.target("/workspaces/1/components/" + getId(component1) + "/serviceunits")
                     .request().post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
 
             Tuple2<ServiceAssemblyFull, ServiceUnitFull> postData = assertSUContent(post);
@@ -184,8 +181,8 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
 
             });
 
-            assertThat(httpServer.wasCalled()).isEqualTo(true);
-            assertThat(httpServer.wasClosed()).isEqualTo(true);
+            assertThat(resource.httpServer.wasCalled()).isEqualTo(true);
+            assertThat(resource.httpServer.wasClosed()).isEqualTo(true);
 
             assertThat(container.getServiceAssemblies()).hasSize(1);
             ServiceAssembly sa = container.getServiceAssemblies().iterator().next();
@@ -196,9 +193,9 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
             assertThat(su.getName()).isEqualTo(postData._2.serviceUnit.name);
             assertThat(su.getTargetComponent()).isEqualTo(component1.getName());
 
-            ServiceUnitOverview suOverview = resources.target("/serviceunits/" + postData._2.serviceUnit.id).request()
+            ServiceUnitOverview suOverview = resource.target("/serviceunits/" + postData._2.serviceUnit.id).request()
                     .get(ServiceUnitOverview.class);
-            ServiceUnitOverview saOverview = resources.target("/serviceassemblies/" + postData._1.serviceAssembly.id)
+            ServiceUnitOverview saOverview = resource.target("/serviceassemblies/" + postData._1.serviceAssembly.id)
                     .request().get(ServiceUnitOverview.class);
         }
     }

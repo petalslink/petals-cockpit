@@ -15,23 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ElementFinder, element, by } from 'protractor';
-import { PetalsCockpitPage } from './app.po';
+export const CORRECT_SETUP_TOKEN = 'CORRECT_SETUP_TOKEN';
+export const GONE_SETUP_TOKEN = 'GONE_SETUP_TOKEN';
 
-export let page: PetalsCockpitPage;
-
-export function expectNotFocused() {
-  return expectFocused(element(by.css('body')));
-}
-
-export function expectFocused(element: ElementFinder) {
-  return expect(browser.switchTo().activeElement().getId()).toBe(element.getId());
-}
-
-beforeEach(() => {
-  page = new PetalsCockpitPage();
-});
-
-afterEach(() => {
-  browser.manage().deleteAllCookies();
-});
+export const users = {
+  admin: {
+    id: 'admin',
+    name: 'Administrator'
+  },
+  bescudie: {
+    id: 'bescudie',
+    name: 'Bertrand ESCUDIE'
+  },
+  mrobert: {
+    id: 'mrobert',
+    name: 'Maxime ROBERT'
+  },
+  cchevalier: {
+    id: 'cchevalier',
+    name: 'Christophe CHEVALIER'
+  },
+  vnoel: {
+    id: 'vnoel',
+    name: 'Victor NOEL'
+  }
+};

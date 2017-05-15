@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 Linagora
+ * Copyright (C) 2016-2017 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -14,24 +14,5 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import { browser, ElementFinder, element, by } from 'protractor';
-import { PetalsCockpitPage } from './app.po';
-
-export let page: PetalsCockpitPage;
-
-export function expectNotFocused() {
-  return expectFocused(element(by.css('body')));
-}
-
-export function expectFocused(element: ElementFinder) {
-  return expect(browser.switchTo().activeElement().getId()).toBe(element.getId());
-}
-
-beforeEach(() => {
-  page = new PetalsCockpitPage();
-});
-
-afterEach(() => {
-  browser.manage().deleteAllCookies();
-});
+@org.eclipse.jdt.annotation.NonNullByDefault
+package org.ow2.petals.cockpit.server.rules;

@@ -20,21 +20,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.ws.rs.core.Response;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyOverview;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
-
 public class ServiceAssembliesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
-    @Rule
-    public final ResourceTestRule resources = buildResourceTest(ServiceAssembliesResource.class);
+    public ServiceAssembliesResourceTest() {
+        super(ServiceAssembliesResource.class);
+    }
 
     @Test
     public void getExistingSAForbidden() {
         // TODO check assumptions
-        Response get = resources.target("/serviceassemblies/" + getId(fServiceAssembly)).request().get();
+        Response get = resource.target("/serviceassemblies/" + getId(fServiceAssembly)).request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -42,14 +40,14 @@ public class ServiceAssembliesResourceTest extends AbstractDefaultWorkspaceResou
     @Test
     public void getExistingSA() {
         // TODO check assumptions
-        ServiceAssemblyOverview get = resources.target("/serviceassemblies/" + getId(serviceAssembly)).request()
+        ServiceAssemblyOverview get = resource.target("/serviceassemblies/" + getId(serviceAssembly)).request()
                 .get(ServiceAssemblyOverview.class);
     }
 
     @Test
     public void getNonExistingSANotFound() {
         // TODO check assumptions
-        Response get = resources.target("/serviceassemblies/4139439").request().get();
+        Response get = resource.target("/serviceassemblies/4139439").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }

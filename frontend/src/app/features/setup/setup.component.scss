@@ -15,23 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ElementFinder, element, by } from 'protractor';
-import { PetalsCockpitPage } from './app.po';
+:host {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-export let page: PetalsCockpitPage;
+  md-card {
+    margin-left: 16px;
+    margin-right: 16px;
+    max-width: 400px;
+    width: 75%;
 
-export function expectNotFocused() {
-  return expectFocused(element(by.css('body')));
+    md-icon {
+      padding-right: 10px;
+    }
+  }
+
+  md-spinner {
+    width: 12px;
+    height: 30px;
+    display: inline-block;
+    margin-left: 10px;
+  }
 }
-
-export function expectFocused(element: ElementFinder) {
-  return expect(browser.switchTo().activeElement().getId()).toBe(element.getId());
-}
-
-beforeEach(() => {
-  page = new PetalsCockpitPage();
-});
-
-afterEach(() => {
-  browser.manage().deleteAllCookies();
-});

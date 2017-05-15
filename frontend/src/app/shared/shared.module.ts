@@ -32,8 +32,6 @@ import {
   MdSidenavModule, MdTabsModule, MdToolbarModule, MdTooltipModule
 } from '@angular/material';
 
-import { SwiperModule } from 'angular2-useful-swiper';
-
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
 
@@ -64,8 +62,7 @@ export const modules = [
   PrettyJsonModule,
   SimpleNotificationsModule,
   NgObjectPipesModule,
-  ...MaterialModules,
-  SwiperModule
+  ...MaterialModules
 ];
 
 export const declarations = [GenerateIconComponent, ColorSearchedLettersDirective];

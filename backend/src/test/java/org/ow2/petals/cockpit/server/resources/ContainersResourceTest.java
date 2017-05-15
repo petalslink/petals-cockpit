@@ -20,21 +20,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.ws.rs.core.Response;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerOverview;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
-
 public class ContainersResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
-    @Rule
-    public final ResourceTestRule resources = buildResourceTest(ContainersResource.class);
+    public ContainersResourceTest() {
+        super(ContainersResource.class);
+    }
 
     @Test
     public void getExistingContainerForbidden() {
         // TODO check assumptions
-        Response get = resources.target("/containers/" + getId(fContainer)).request().get();
+        Response get = resource.target("/containers/" + getId(fContainer)).request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -42,7 +40,7 @@ public class ContainersResourceTest extends AbstractDefaultWorkspaceResourceTest
     @Test
     public void getExistingContainer() {
         // TODO check assumptions
-        ContainerOverview get = resources.target("/containers/" + getId(container2)).request()
+        ContainerOverview get = resource.target("/containers/" + getId(container2)).request()
                 .get(ContainerOverview.class);
 
         assertThat(get.ip).isEqualTo(container2.getHost());
@@ -54,7 +52,7 @@ public class ContainersResourceTest extends AbstractDefaultWorkspaceResourceTest
     @Test
     public void getNonExistingContainerNotFound() {
         // TODO check assumptions
-        Response get = resources.target("/containers/342942").request().get();
+        Response get = resource.target("/containers/342942").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }

@@ -20,21 +20,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.ws.rs.core.Response;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
-
 public class ServiceUnitsResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
-    @Rule
-    public final ResourceTestRule resources = buildResourceTest(ServiceUnitsResource.class);
+    public ServiceUnitsResourceTest() {
+        super(ServiceUnitsResource.class);
+    }
 
     @Test
     public void getExistingSUForbidden() {
         // TODO check assumptions
-        Response get = resources.target("/serviceunits/" + getId(fServiceUnit)).request().get();
+        Response get = resource.target("/serviceunits/" + getId(fServiceUnit)).request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -42,14 +40,14 @@ public class ServiceUnitsResourceTest extends AbstractDefaultWorkspaceResourceTe
     @Test
     public void getExistingSU() {
         // TODO check assumptions
-        ServiceUnitOverview get = resources.target("/serviceunits/" + getId(serviceUnit)).request()
+        ServiceUnitOverview get = resource.target("/serviceunits/" + getId(serviceUnit)).request()
                 .get(ServiceUnitOverview.class);
     }
 
     @Test
     public void getNonExistingSUNotFound() {
         // TODO check assumptions
-        Response get = resources.target("/serviceunits/419832492").request().get();
+        Response get = resource.target("/serviceunits/419832492").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }

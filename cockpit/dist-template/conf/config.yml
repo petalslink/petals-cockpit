@@ -2,6 +2,7 @@
 ---
 server:
   # the backend will be served via /api on 8080
+  # note: this is relative to applicationContextPath
   rootPath: /api
   # the frontend will be served via / on 8080
   applicationContextPath: /
@@ -10,9 +11,13 @@ server:
       port: 8080
   # the admin console will be served via / on 8082
   adminContextPath: /
-  adminConnectors:
-    - type: http
-      port: 8082
+  # but we disable it by default
+  adminConnectors: []
+  requestLog:
+    appenders:
+      - type: file
+        currentLogFilename: ./logs/cockpit-access.log
+        archivedLogFilenamePattern: ./logs/cockpit-access-%d.log.gz
 
 security:
   pac4jClients:
@@ -28,6 +33,11 @@ database:
 
 logging:
   level: INFO
+  loggers:
+    org.ow2.petals.cockpit.CockpitApplication:
+      appenders:
+        - type: console
+          threshold: INFO
   appenders:
     - type: file
       currentLogFilename: ./logs/cockpit.log

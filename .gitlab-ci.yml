@@ -145,14 +145,11 @@ build-frontend-pages:
   script:
     - mv frontend-dist frontend/dist
     - maven dependency:purge-local-repository --non-recursive -DmanualInclude="org.ow2.petals:petals-cockpit-server,org.ow2.petals:petals-cockpit-parent" -DreResolve=false -DsnapshotsOnly=true
-    - maven -pl cockpit verify
+    - maven -pl cockpit verify antrun:run@build-product-dist
     - export COCKPIT_VERSION=`ls cockpit/target/petals-cockpit-*-capsule.jar | sed -E 's/.*petals-cockpit-(.*)-capsule.jar/\1/'`
-    - export COCKPIT=petals-cockpit-$COCKPIT_VERSION
     # see https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/issues/1664
     - echo $COCKPIT_VERSION > version.txt
-    - mv cockpit/dist $COCKPIT
-    - mkdir -p $COCKPIT/{lib,db,logs}
-    - mv cockpit/target/petals-cockpit-*-capsule.jar $COCKPIT/lib/
+    - mv cockpit/target/dist petals-cockpit-$COCKPIT_VERSION
 
 release-product:
   <<: *build-product

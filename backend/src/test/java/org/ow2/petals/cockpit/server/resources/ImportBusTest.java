@@ -35,7 +35,6 @@ import org.glassfish.jersey.media.sse.SseFeature;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
@@ -59,7 +58,6 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
 public class ImportBusTest extends AbstractCockpitResourceTest {
@@ -78,20 +76,21 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
     private final ServiceAssembly serviceAssembly = new ServiceAssembly("sa", ArtifactState.State.STARTED, serviceUnit);
 
-    @Rule
-    public final ResourceTestRule resources = buildResourceTest(WorkspaceResource.class);
+    public ImportBusTest() {
+        super(WorkspaceResource.class);
+    }
 
     @Before
     public void setUp() {
         // petals
         container.addProperty("petals.topology.passphrase", "phrase");
-        petals.registerDomain(domain);
-        petals.registerContainer(container);
-        petals.registerContainer(container2);
-        petals.registerArtifact(component, container);
-        petals.registerArtifact(serviceAssembly, container);
+        resource.petals.registerDomain(domain);
+        resource.petals.registerContainer(container);
+        resource.petals.registerContainer(container2);
+        resource.petals.registerArtifact(component, container);
+        resource.petals.registerArtifact(serviceAssembly, container);
 
-        DSL.using(dbRule.getConnectionJdbcUrl()).transaction(conf -> {
+        resource.db().transaction(conf -> {
             DSL.using(conf).executeInsert(new WorkspacesRecord(1L, "test", ""));
             DSL.using(conf).executeInsert(new UsersWorkspacesRecord(1L, ADMIN));
         });
@@ -117,15 +116,14 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
     @Test
     public void testImportBusOk() {
         long busId;
-        try (EventInput eventInput = resources.target("/workspaces/1/content")
+        try (EventInput eventInput = resource.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
-            BusInProgress post = resources.getJerseyTest()
-                    .target("/workspaces/1/buses").request().post(Entity.json(new NewBus(container.getHost(),
-                            getPort(container), container.getJmxUsername(), container.getJmxPassword(), "phrase")),
-                            BusInProgress.class);
+            BusInProgress post = resource.target("/workspaces/1/buses").request()
+                    .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
+                            container.getJmxPassword(), "phrase")), BusInProgress.class);
 
             assertThat(post.ip).isEqualTo(container.getHost());
             assertThat(post.port).isEqualTo(getPort(container));
@@ -135,7 +133,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             expectImportBusEvent(eventInput, post);
 
             // there should be only one!
-            Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
+            Result<BusesRecord> buses = resource.db().selectFrom(BUSES).fetch();
             assertThat(buses).hasSize(1);
             BusesRecord bus = buses.iterator().next();
 
@@ -159,8 +157,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             });
         }
 
-        Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).where(BUSES.ID.eq(busId))
-                .fetch();
+        Result<BusesRecord> buses = resource.db().selectFrom(BUSES).where(BUSES.ID.eq(busId)).fetch();
         assertThat(buses).hasSize(1);
         BusesRecord bus = buses.iterator().next();
 
@@ -176,8 +173,8 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         assertThat(bus.getImportError()).isNull();
         assertThat(bus.getName()).isEqualTo(domain.getName());
 
-        Result<ContainersRecord> containers = DSL.using(dbRule.getConnection()).selectFrom(CONTAINERS)
-                .where(CONTAINERS.BUS_ID.eq(busId)).fetch();
+        Result<ContainersRecord> containers = resource.db().selectFrom(CONTAINERS).where(CONTAINERS.BUS_ID.eq(busId))
+                .fetch();
         assertThat(containers).hasSize(2);
         Iterator<ContainersRecord> iterator = containers.iterator();
         ContainersRecord cDb = iterator.next();
@@ -185,19 +182,19 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         assertEquivalent(cDb, container);
         assertEquivalent(cDb2, container2);
 
-        Result<ComponentsRecord> components = DSL.using(dbRule.getConnection()).selectFrom(COMPONENTS)
+        Result<ComponentsRecord> components = resource.db().selectFrom(COMPONENTS)
                 .where(COMPONENTS.CONTAINER_ID.eq(cDb.getId())).fetch();
         assertThat(components).hasSize(1);
         ComponentsRecord compDb = components.iterator().next();
         assertEquivalent(compDb, component);
 
-        Result<ServiceassembliesRecord> sas = DSL.using(dbRule.getConnection()).selectFrom(SERVICEASSEMBLIES)
+        Result<ServiceassembliesRecord> sas = resource.db().selectFrom(SERVICEASSEMBLIES)
                 .where(SERVICEASSEMBLIES.CONTAINER_ID.eq(cDb.getId())).fetch();
         assertThat(sas).hasSize(1);
         ServiceassembliesRecord saDb = sas.iterator().next();
         assertEquivalent(saDb, serviceAssembly);
 
-        Result<ServiceunitsRecord> sus = DSL.using(dbRule.getConnection()).selectFrom(SERVICEUNITS)
+        Result<ServiceunitsRecord> sus = resource.db().selectFrom(SERVICEUNITS)
                 .where(SERVICEUNITS.COMPONENT_ID.eq(compDb.getId())).fetch();
         assertThat(sus).hasSize(1);
         ServiceunitsRecord suDb = sus.iterator().next();
@@ -207,9 +204,9 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
     @Test
     public void testImportBusForbidden() {
 
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new WorkspacesRecord(2L, "test2", ""));
+        resource.db().executeInsert(new WorkspacesRecord(2L, "test2", ""));
 
-        Response post = resources.target("/workspaces/2/buses").request()
+        Response post = resource.target("/workspaces/2/buses").request()
                 .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
                         container.getJmxPassword(), "phrase")));
 
@@ -219,7 +216,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
     @Test
     public void testImportBusNotFoundForbidden() {
 
-        Response post = resources.target("/workspaces/2/buses").request()
+        Response post = resource.target("/workspaces/2/buses").request()
                 .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
                         container.getJmxPassword(), "phrase")));
 
@@ -244,14 +241,14 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             }
         };
 
-        petals.registerContainer(slowContainer);
+        resource.petals.registerContainer(slowContainer);
 
-        try (EventInput eventInput = resources.target("/workspaces/1/content")
+        try (EventInput eventInput = resource.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
-            BusInProgress post = resources.target("/workspaces/1/buses").request()
+            BusInProgress post = resource.target("/workspaces/1/buses").request()
                     .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
                             container.getJmxPassword(), "phrase")), BusInProgress.class);
 
@@ -263,7 +260,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             expectImportBusEvent(eventInput, post);
 
             // there should be only one!
-            Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
+            Result<BusesRecord> buses = resource.db().selectFrom(BUSES).fetch();
             assertThat(buses).hasSize(1);
             BusesRecord bus = buses.iterator().next();
 
@@ -276,7 +273,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             assertThat(bus.getWorkspaceId()).isEqualTo(1);
             assertThat(post.id).isEqualTo(bus.getId());
 
-            BusDeleted delete = resources.target("/workspaces/1/buses/" + post.id).request().delete(BusDeleted.class);
+            BusDeleted delete = resource.target("/workspaces/1/buses/" + post.id).request().delete(BusDeleted.class);
 
             assertThat(delete.id).isEqualTo(post.id);
             assertThat(delete.reason).isEqualTo("Import cancelled by admin");
@@ -291,7 +288,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
                 a.assertThat(data.reason).isEqualTo(delete.reason);
             });
 
-            Result<BusesRecord> buses2 = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
+            Result<BusesRecord> buses2 = resource.db().selectFrom(BUSES).fetch();
             assertThat(buses2).hasSize(0);
         }
     }
@@ -302,12 +299,12 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         int incorrectPort = 7700;
 
         final long busId;
-        try (EventInput eventInput = resources.target("/workspaces/1/content")
+        try (EventInput eventInput = resource.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
-            BusInProgress post = resources.target("/workspaces/1/buses").request()
+            BusInProgress post = resource.target("/workspaces/1/buses").request()
                     .post(Entity.json(new NewBus(incorrectHost, incorrectPort, container.getJmxUsername(),
                             container.getJmxPassword(), "phrase")), BusInProgress.class);
 
@@ -319,7 +316,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             expectImportBusEvent(eventInput, post);
 
             // there should be only one!
-            Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
+            Result<BusesRecord> buses = resource.db().selectFrom(BUSES).fetch();
             assertThat(buses).hasSize(1);
             BusesRecord bus = buses.iterator().next();
 
@@ -342,8 +339,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             });
         }
 
-        Result<BusesRecord> busesDb = DSL.using(dbRule.getConnection()).selectFrom(BUSES).where(BUSES.ID.eq(busId))
-                .fetch();
+        Result<BusesRecord> busesDb = resource.db().selectFrom(BUSES).where(BUSES.ID.eq(busId)).fetch();
         assertThat(busesDb).hasSize(1);
         BusesRecord busDb = busesDb.iterator().next();
 
@@ -359,19 +355,19 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         assertThat(busDb.getImportError()).isEqualTo("Unknown Host");
         assertThat(busDb.getName()).isNull();
 
-        try (EventInput eventInput = resources.target("/workspaces/1/content")
+        try (EventInput eventInput = resource.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput, (c, a) -> {
                 a.assertThat(c.content.busesInProgress).containsOnlyKeys(String.valueOf(busId));
             });
 
-            BusDeleted delete = resources.target("/workspaces/1/buses/" + busId).request().delete(BusDeleted.class);
+            BusDeleted delete = resource.target("/workspaces/1/buses/" + busId).request().delete(BusDeleted.class);
 
             assertThat(delete.id).isEqualTo(busId);
             assertThat(delete.reason).isEqualTo("Bus deleted by admin");
 
-            Result<BusesRecord> buses = DSL.using(dbRule.getConnection()).selectFrom(BUSES).fetch();
+            Result<BusesRecord> buses = resource.db().selectFrom(BUSES).fetch();
             assertThat(buses).hasSize(0);
 
             expectEvent(eventInput, (e, a) -> {

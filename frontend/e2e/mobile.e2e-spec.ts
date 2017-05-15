@@ -17,34 +17,50 @@
 
 import { browser, element, by } from 'protractor';
 
-import { page } from './common';
+import { page, expectFocused, expectNotFocused } from './common';
 
 describe(`Mobile`, () => {
-  const inputIp = element(by.css(`input[formControlName="ip"]`));
-  const inputUsername = element(by.css(`input[formControlName="username"]`));
-
   beforeEach(() => {
     page.navigateTo(true);
-    page.login(`admin`, `admin`);
   });
 
   it(`should not select the first input of import bus form on mobile`, () => {
+    page.login(`admin`, `admin`);
+
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
 
     page.openImportBus();
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/);
 
-    inputIp.isSelected();
+    // the button is focused because of our click: the important is that nothing else is focused instead
+    expectFocused(element(by.css('app-cockpit md-sidenav a.btn-add-bus')));
   });
-
 
   it(`should not select the first input of the login form on mobile`, () => {
-    page.logout();
     expect(browser.getCurrentUrl()).toMatch(/\/login/);
 
-    inputUsername.isSelected();
-
-    page.login(`admin`, `admin`);
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
+    expectNotFocused();
   });
+
+  describe('Setup', () => {
+    const tokenField = element(by.css(`input[formControlName="token"]`));
+
+    it(`should not select the first or second input`, () => {
+      page.navigateTo(true, '/setup');
+      expect(browser.getCurrentUrl()).toMatch(/\/setup/);
+
+      expectNotFocused();
+    });
+
+    it(`should not select the first or second input with a pre-filled token`, () => {
+      const tokenTest = 'TOKENTEST';
+      page.navigateTo(true, `/setup?token=${tokenTest}`);
+      expect(browser.getCurrentUrl()).toMatch(/\/setup/);
+
+      expect(tokenField.getAttribute('value')).toEqual(tokenTest);
+
+      expectNotFocused();
+    });
+  });
+
 });

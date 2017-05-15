@@ -16,24 +16,18 @@
  */
 
 import { NgModule } from '@angular/core';
-import { SwiperModule } from 'angular2-useful-swiper';
+import { Routes, RouterModule } from '@angular/router';
 
-import { SharedModule } from '../../../../../shared/shared.module';
-import { PetalsBusViewRoutingModule } from './petals-bus-view-routing.module';
-import { PetalsBusViewComponent, BusDeleteDialogComponent } from './petals-bus-view.component';
-import { PetalsBusOverviewComponent } from './petals-bus-overview/petals-bus-overview.component';
+import { SetupComponent } from 'app/features/setup/setup.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: SetupComponent
+  }
+];
 
 @NgModule({
-  imports: [
-    SharedModule,
-    PetalsBusViewRoutingModule,
-    SwiperModule
-  ],
-  declarations: [
-    PetalsBusViewComponent,
-    PetalsBusOverviewComponent,
-    BusDeleteDialogComponent
-  ],
-  entryComponents: [BusDeleteDialogComponent]
+  imports: [RouterModule.forChild(routes)]
 })
-export class PetalsBusViewModule { }
+export class SetupRoutingModule { }

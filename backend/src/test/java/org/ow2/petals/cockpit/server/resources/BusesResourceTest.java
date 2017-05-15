@@ -20,21 +20,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.ws.rs.core.Response;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusOverview;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
-
 public class BusesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
-    @Rule
-    public final ResourceTestRule resources = buildResourceTest(BusesResource.class);
+    public BusesResourceTest() {
+        super(BusesResource.class);
+    }
 
     @Test
     public void getExistingBusForbidden() {
         // TODO check assumptions
-        Response get = resources.target("/buses/" + getId(fDomain)).request().get();
+        Response get = resource.target("/buses/" + getId(fDomain)).request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
@@ -42,7 +40,7 @@ public class BusesResourceTest extends AbstractDefaultWorkspaceResourceTest {
     @Test
     public void getNonExistingBusNotFound() {
         // TODO check assumptions
-        Response get = resources.target("/buses/32432").request().get();
+        Response get = resource.target("/buses/32432").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }
@@ -50,6 +48,6 @@ public class BusesResourceTest extends AbstractDefaultWorkspaceResourceTest {
     @Test
     public void getExistingBus() {
         // TODO check assumptions
-        BusOverview get = resources.target("/buses/" + getId(domain)).request().get(BusOverview.class);
+        BusOverview get = resource.target("/buses/" + getId(domain)).request().get(BusOverview.class);
     }
 }

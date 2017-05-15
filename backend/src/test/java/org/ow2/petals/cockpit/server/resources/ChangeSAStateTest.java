@@ -27,9 +27,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
-import org.jooq.impl.DSL;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
@@ -47,7 +45,6 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAStateChanged;
 
 import com.google.common.collect.ImmutableMap;
 
-import io.dropwizard.testing.junit.ResourceTestRule;
 import javaslang.Tuple;
 
 public class ChangeSAStateTest extends AbstractCockpitResourceTest {
@@ -71,30 +68,29 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
     private final ServiceAssembly serviceAssembly2 = new ServiceAssembly("sa2", ArtifactState.State.STOPPED,
             serviceUnit2);
 
-    @Rule
-    public final ResourceTestRule resources = buildResourceTest(ServiceAssembliesResource.class,
-            WorkspaceResource.class);
+    public ChangeSAStateTest() {
+        super(ServiceAssembliesResource.class, WorkspaceResource.class);
+    }
 
     @Before
     public void setUp() {
-        petals.registerDomain(domain);
-        petals.registerContainer(container);
-        petals.registerArtifact(component, container);
-        petals.registerArtifact(serviceAssembly1, container);
-        petals.registerArtifact(serviceAssembly2, container);
+        resource.petals.registerDomain(domain);
+        resource.petals.registerContainer(container);
+        resource.petals.registerArtifact(component, container);
+        resource.petals.registerArtifact(serviceAssembly1, container);
+        resource.petals.registerArtifact(serviceAssembly2, container);
 
         setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
     }
 
     @Test
     public void changeSA1State() {
-        try (EventInput eventInput = resources.target("/workspaces/1/content")
+        try (EventInput eventInput = resource.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
-            SAStateChanged put = resources.target("/workspaces/1/serviceassemblies/" + getId(serviceAssembly1))
-                    .request()
+            SAStateChanged put = resource.target("/workspaces/1/serviceassemblies/" + getId(serviceAssembly1)).request()
                     .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Stopped)), SAStateChanged.class);
 
             assertThat(put.state).isEqualTo(ServiceAssemblyMin.State.Stopped);
@@ -118,7 +114,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
     @Test
     public void changeSU1StateForbidden() {
 
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         Domain fDomain = new Domain("domf");
         Container fContainer = new Container("contf", "host1", ImmutableMap.of(PortType.JMX, containerPort), "user",
@@ -131,7 +127,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
         fContainer.addServiceAssembly(fServiceAssembly);
         setupWorkspace(2, "test2", Arrays.asList(Tuple.of(fDomain, "phrase")), "anotheruser");
 
-        Response put = resources.target("/workspaces/2/serviceassemblies/42").request()
+        Response put = resource.target("/workspaces/2/serviceassemblies/42").request()
                 .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
@@ -149,11 +145,11 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
     @Test
     public void changeNonExistingSAStateForbidden() {
 
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
-        Response put = resources.target("/workspaces/2/serviceassemblies/583830").request()
+        Response put = resource.target("/workspaces/2/serviceassemblies/583830").request()
                 .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
@@ -169,11 +165,11 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
     @Test
     public void changeWrongSUStateForbidden() {
 
-        DSL.using(dbRule.getConnectionJdbcUrl()).executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
-        Response put = resources.target("/workspaces/2/serviceassemblies/" + getId(serviceAssembly1)).request()
+        Response put = resource.target("/workspaces/2/serviceassemblies/" + getId(serviceAssembly1)).request()
                 .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);
@@ -189,7 +185,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
     @Test
     public void changeSU1StateNotFound() {
 
-        Response put = resources.target("/workspaces/1/serviceassemblies/429879").request()
+        Response put = resource.target("/workspaces/1/serviceassemblies/429879").request()
                 .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(404);
@@ -204,13 +200,12 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeSU2StateUnload() {
-        try (EventInput eventInput = resources.target("/workspaces/1/content")
+        try (EventInput eventInput = resource.target("/workspaces/1/content")
                 .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
 
             expectWorkspaceContent(eventInput);
 
-            SAStateChanged put = resources.target("/workspaces/1/serviceassemblies/" + getId(serviceAssembly2))
-                    .request()
+            SAStateChanged put = resource.target("/workspaces/1/serviceassemblies/" + getId(serviceAssembly2)).request()
                     .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Unloaded)), SAStateChanged.class);
 
             assertThat(put.state).isEqualTo(ServiceAssemblyMin.State.Unloaded);
@@ -233,7 +228,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeSU1StateNoChange() {
-        SAStateChanged put = resources.target("/workspaces/1/serviceassemblies/" + getId(serviceAssembly1)).request()
+        SAStateChanged put = resource.target("/workspaces/1/serviceassemblies/" + getId(serviceAssembly1)).request()
                 .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Started)), SAStateChanged.class);
 
         assertThat(put.state).isEqualTo(ServiceAssemblyMin.State.Started);
@@ -248,7 +243,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeSU1StateConflict() {
-        Response put = resources.target("/workspaces/1/serviceassemblies/" + getId(serviceAssembly1)).request()
+        Response put = resource.target("/workspaces/1/serviceassemblies/" + getId(serviceAssembly1)).request()
                 .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Unloaded)));
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());

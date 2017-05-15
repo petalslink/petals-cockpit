@@ -18,10 +18,10 @@
 import { Injectable } from '@angular/core';
 
 import { UsersService } from './users.service';
-import { IUserLogin, ICurrentUser } from './../interfaces/user.interface';
+import { IUserLogin, ICurrentUser, IUserSetup } from './../interfaces/user.interface';
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
-import { users } from './../../../mocks/workspaces-mock';
+import { users, CORRECT_SETUP_TOKEN, GONE_SETUP_TOKEN } from './../../../mocks/backend-mock';
 
 @Injectable()
 export class UsersMockService extends UsersService {
@@ -79,5 +79,17 @@ export class UsersMockService extends UsersService {
     }
 
     return helper.response(401);
+  }
+
+  setupUser(value: IUserSetup) {
+    if (value.token === CORRECT_SETUP_TOKEN) {
+      return helper.response(204);
+    }
+
+    if (value.token === GONE_SETUP_TOKEN) {
+      return helper.errorBackend('Petals Cockpit is already setup', 404);
+    }
+
+    return helper.errorBackend('Invalid token', 403);
   }
 }

@@ -5,3 +5,6 @@ builder
 getJerseyTest
  ()Lorg/glassfish/jersey/test/JerseyTest;
  ()L1org/glassfish/jersey/test/JerseyTest;
+target
+ (Ljava/lang/String;)Ljavax/ws/rs/client/WebTarget;
+ (Ljava/lang/String;)L1javax/ws/rs/client/WebTarget;

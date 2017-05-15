@@ -17,6 +17,7 @@
 package org.ow2.petals.cockpit;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jetty.server.Server;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
 
@@ -26,7 +27,9 @@ import com.palantir.indexpage.IndexPageBundle;
 import com.palantir.indexpage.IndexPageConfigurable;
 
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 
 public class PetalsCockpitApplication extends CockpitApplication<PetalsCockpitConfiguration> {
 
@@ -43,11 +46,23 @@ public class PetalsCockpitApplication extends CockpitApplication<PetalsCockpitCo
         // TODO this is not the best because every new prefix must be added... if not, the static asset servlet will
         // take over instead of returning index.html
         // Improve when https://github.com/palantir/dropwizard-index-page/issues/38 is fixed
-        bootstrap.addBundle(
-                new IndexPageBundle("frontend/index.html",
-                        ImmutableSet.of("/", "/index.html", "/login", "/workspaces", "/workspaces/*")));
+        bootstrap.addBundle(new IndexPageBundle("frontend/index.html",
+                ImmutableSet.of("/", "/index.html", "/setup", "/login", "/workspaces", "/workspaces/*")));
         // no index file parameter because index is served by IndexPageBundle
         bootstrap.addBundle(new AssetsBundle("/frontend", "/", null));
+    }
+
+    @Override
+    public void run(PetalsCockpitConfiguration configuration, Environment environment) throws Exception {
+        super.run(configuration, environment);
+
+        environment.lifecycle().addServerLifecycleListener(new ServerLifecycleListener() {
+            @Override
+            public void serverStarted(@Nullable Server server) {
+                assert server != null;
+                LOG.info("Petals Cockpit started at {}", server.getURI());
+            }
+        });
     }
 }
 
