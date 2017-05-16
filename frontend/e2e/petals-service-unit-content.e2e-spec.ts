@@ -14,57 +14,48 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { browser, element, by, ExpectedConditions as EC } from 'protractor';
+import { browser } from 'protractor';
 
 import { page } from './common';
+import { WorkspacePage } from './pages/workspace.po';
 
 describe(`Petals service-unit content`, () => {
+  let workspace: WorkspacePage;
+
   beforeEach(() => {
-    page.navigateTo();
-    page.login(`admin`, `admin`);
-    // let's be sure everything is loaded and visible
-    browser.wait(EC.visibilityOf(page.getWorkspaceTreeFolder(1)), 5000);
+    workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
   });
 
   it(`should open the content page`, () => {
-    page.getWorkspaceTreeByName('SU 0').click();
+    const su = workspace.openServiceUnit('SU 0');
 
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/service-units\/\w+/);
-
-    const pageTitle = element(by.css(`app-petals-service-unit-view md-toolbar-row .title`)).getText();
-    expect(pageTitle).toEqual('SU 0');
-
-    const state = element(by.css(`app-petals-service-unit-overview md-card.state md-card-title`)).getText();
-    expect(state).toEqual('Started');
+    expect(su.title.getText()).toEqual('SU 0');
+    expect(su.state.getText()).toEqual('Started');
   });
 
   it(`should stop/start/stop/unload a service-unit`, () => {
-    page.getWorkspaceTreeByName('SU 0').click();
+    const su = workspace.openServiceUnit('SU 0');
 
-    const stateElem = element(by.css(`app-petals-service-unit-overview md-card.state md-card-title`));
+    su.stopButton.click();
+    expect(su.state.getText()).toEqual('Stopped');
 
-    // the SU exists and should be present in petals tree
-    expect(page.getWorkspaceTreeByName(`SU 0`).first().isPresent()).toBe(true);
+    su.startButton.click();
+    expect(su.state.getText()).toEqual('Started');
 
-    element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
-    expect(stateElem.getText()).toEqual('Stopped');
-
-    element(by.cssContainingText(`app-petals-service-unit-overview button`, `Start`)).click();
-    expect(stateElem.getText()).toEqual('Started');
-
-    element(by.cssContainingText(`app-petals-service-unit-overview button`, `Stop`)).click();
-    expect(stateElem.getText()).toEqual('Stopped');
+    su.stopButton.click();
+    expect(su.state.getText()).toEqual('Stopped');
 
     // once unloaded ...
     // there should be a popup saying that the SU has been deleted
     page.clickAndExpectNotification(
-      element(by.cssContainingText(`app-petals-service-unit-overview button`, `Unload`)),
-      'Service unit unloaded', '"SU 0" has been unloaded');
+      su.unloadButton,
+      'Service unit unloaded',
+      '"SU 0" has been unloaded');
 
     // we should be redirected to the workspace page ...
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 
     // and the SU should have been deleted from petals tree
-    expect(page.getWorkspaceTreeByName(`SU 0`).first().isPresent()).toBe(false);
+    expect(workspace.treeElement(`SU 0`, 'service-unit').isPresent()).toBe(false);
   });
 });

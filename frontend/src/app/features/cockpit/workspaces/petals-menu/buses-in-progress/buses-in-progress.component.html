@@ -14,7 +14,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <md-nav-list dense *ngFor="let busInProgress of busesInProgress.list">
-  <a class="buses-in-progress" (click)="closeSidenavOnSmallScreen()" md-list-item routerLinkActive="active-link" [routerLink]="['/workspaces', workspaceId, 'petals', 'buses-in-progress', busInProgress.id]">
+  <a class="bus-in-progress" (click)="closeSidenavOnSmallScreen()" md-list-item routerLinkActive="active-link" [routerLink]="['/workspaces', workspaceId, 'petals', 'buses-in-progress', busInProgress.id]">
     <span class="ip-port">{{ busInProgress.ip }}:{{ busInProgress.port }}</span>
 
     <div fxFlex></div>

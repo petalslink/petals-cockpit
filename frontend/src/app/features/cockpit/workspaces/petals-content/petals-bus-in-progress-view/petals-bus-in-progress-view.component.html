@@ -94,7 +94,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   class="btn-clear-form margin-right-x1"
                   (click)="reset()">Clear
                 </button>
-                <button md-raised-button color="warn" type="button" *ngIf="busInProgress" (click)="discard(busInProgress)" [disabled]="busInProgress && busInProgress.isRemoving" class="margin-right-x1">
+                <button md-raised-button color="warn" type="button" *ngIf="busInProgress" (click)="discard(busInProgress)" [disabled]="busInProgress && busInProgress.isRemoving" class="margin-right-x1 btn-discard-form">
                   <span *ngIf="busInProgress.importError; else cancel">Discard</span>
                   <ng-template #cancel><span>Cancel</span></ng-template>
                 </button>

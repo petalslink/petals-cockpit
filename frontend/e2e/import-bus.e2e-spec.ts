@@ -15,134 +15,140 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, element, by } from 'protractor';
+import { $, $$, by } from 'protractor';
 
 import { IMPORT_HTTP_ERROR_IP } from '../src/mocks/workspaces-mock';
 
-import { page, expectFocused } from './common';
+import { page } from './common';
+import { expectFocused } from './utils';
+import { WorkspacePage } from './pages/workspace.po';
 
 describe(`Import Bus`, () => {
-  const inputIp = element(by.css(`input[formControlName="ip"]`));
-  const inputPort = element(by.css(`input[formControlName="port"]`));
-  const inputUsername = element(by.css(`input[formControlName="username"]`));
-  const inputPassword = element(by.css(`input[formControlName="password"]`));
-  const inputPassphrase = element(by.css(`input[formControlName="passphrase"]`));
-  const importBtn = element(by.css(`app-petals-bus-in-progress-view form .btn-import-form`));
-  const clearBtn = element(by.css(`app-petals-bus-in-progress-view form .btn-clear-form`));
+  let workspace: WorkspacePage;
 
   beforeEach(() => {
-    page.navigateTo();
-    page.login(`admin`, `admin`);
-    page.openImportBus();
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/);
+    workspace = page.goToLogin().loginToWorkspace(`admin`, `admin`);
+  });
+
+  it('should have empty fields by default', () => {
+    const importBus = workspace.openImportBus();
+
+    expect(importBus.ip.getAttribute('value')).toEqual(``);
+    expect(importBus.port.getAttribute('value')).toEqual(``);
+    expect(importBus.username.getAttribute('value')).toEqual(``);
+    expect(importBus.password.getAttribute('value')).toEqual(``);
+    expect(importBus.passphrase.getAttribute('value')).toEqual(``);
+
+    expect(importBus.importButton.getText()).toEqual(`Import`);
+    expect(importBus.importButton.isEnabled()).toBe(false);
+
+    expect(importBus.clearButton.getText()).toEqual(`Clear`);
+    expect(importBus.clearButton.isEnabled()).toBe(true);
+
+    expect(importBus.discardButton.isPresent()).toBe(false);
   });
 
   it(`should be cleared when clicking on the clear button`, () => {
-    // check if the input form is empty
-    expect(inputIp.getAttribute('value')).toEqual(``);
-    expect(inputPort.getAttribute('value')).toEqual(``);
-    expect(inputUsername.getAttribute('value')).toEqual(``);
-    expect(inputPassword.getAttribute('value')).toEqual(``);
-    expect(inputPassphrase.getAttribute('value')).toEqual(``);
+    const importBus = workspace.openImportBus();
 
-    // check if import button is always disable when inputs form are empty
-    expect(importBtn.getText()).toMatch(`Import`);
-    expect(importBtn.isEnabled()).toBe(false);
+    importBus.ip.sendKeys(`hostname`);
+    importBus.port.sendKeys(`5000`);
+    importBus.username.sendKeys(`admin`);
+    importBus.password.sendKeys(`password`);
+    importBus.passphrase.sendKeys(`passphrase`);
 
-    // check if clear button is always enable
-    expect(clearBtn.getText()).toMatch(`Clear`);
-    expect(clearBtn.isEnabled()).toBe(true);
-
-    inputIp.sendKeys(`hostname`);
-    inputPort.sendKeys(`5000`);
-    inputUsername.sendKeys(`admin`);
-    inputPassword.sendKeys(`password`);
-    inputPassphrase.sendKeys(`passphrase`);
-
-    expect(inputIp.getAttribute('value')).toEqual(`hostname`);
-    expect(inputPort.getAttribute('value')).toEqual(`5000`);
-    expect(inputUsername.getAttribute('value')).toEqual(`admin`);
-    expect(inputPassword.getAttribute('value')).toEqual(`password`);
-    expect(inputPassphrase.getAttribute('value')).toEqual(`passphrase`);
-
-    clearBtn.click();
+    importBus.clearButton.click();
 
     // check if the input form is cleared
-    expect(inputIp.getAttribute('value')).toEqual(``);
-    expect(inputPort.getText()).toEqual(``);
-    expect(inputUsername.getText()).toEqual(``);
-    expect(inputPassword.getText()).toEqual(``);
-    expect(inputPassphrase.getText()).toEqual(``);
+    expect(importBus.ip.getAttribute('value')).toEqual(``);
+    expect(importBus.port.getAttribute('value')).toEqual(``);
+    expect(importBus.username.getAttribute('value')).toEqual(``);
+    expect(importBus.password.getAttribute('value')).toEqual(``);
+    expect(importBus.passphrase.getAttribute('value')).toEqual(``);
+  });
 
-    element.all(by.css(`app-cockpit md-sidenav app-buses-in-progress md-nav-list div.mat-list-item-content`)).first().click();
-
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress\/\w+$/);
+  it('should not have a clear button on existing bus in import', () => {
+    const otherBus = workspace.openBusInProgress(0);
 
     // check if clear button is not present
-    expect(clearBtn.isPresent()).toBe(false);
+    expect(otherBus.clearButton.isPresent()).toBe(false);
+
+    expect(otherBus.discardButton.getText()).toEqual(`Cancel`);
+    expect(otherBus.discardButton.isEnabled()).toBe(true);
   });
 
   it('should show the backend HTTP error', () => {
-    // only 2 buses in progress
-    expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(2);
+    const importBus = workspace.openImportBus();
 
-    inputIp.sendKeys(IMPORT_HTTP_ERROR_IP);
-    inputPort.sendKeys(`7700`);
-    inputUsername.sendKeys(`admin`);
-    inputPassword.sendKeys(`password`);
-    inputPassphrase.sendKeys(`passphrase`);
+    // only 2 buses in progress
+    expect(workspace.busesInProgress.count()).toEqual(2);
+
+    importBus.ip.sendKeys(IMPORT_HTTP_ERROR_IP);
+    importBus.port.sendKeys(`7700`);
+    importBus.username.sendKeys(`admin`);
+    importBus.password.sendKeys(`password`);
+    importBus.passphrase.sendKeys(`passphrase`);
 
     // try to import a new one
-    importBtn.click();
+    importBus.importButton.click();
 
     // the first one should fail
-    expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).getText()).toEqual('Error 500: Error backend');
+    expect($(`app-petals-bus-in-progress-view .error-details`).getText()).toEqual('Error 500: Error backend');
 
     // clear the form and the error
-    clearBtn.click();
+    importBus.clearButton.click();
 
     // check if the error for import bus is not displayed
-    expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).isPresent()).toBe(false);
+    expect($(`app-petals-bus-in-progress-view .error-details`).isPresent()).toBe(false);
 
     // still 2 buses in progress
-    expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(2);
+    expect(workspace.busesInProgress.count()).toEqual(2);
   });
 
   it(`should show the import error`, () => {
-    // only 2 buses in progress
-    expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(2);
+    const importBus = workspace.openImportBus();
 
-    inputIp.sendKeys(`hostname`);
-    inputPort.sendKeys(`7700`);
-    inputUsername.sendKeys(`admin`);
-    inputPassword.sendKeys(`password`);
-    inputPassphrase.sendKeys(`passphrase`);
+    // only 2 buses in progress
+    expect(workspace.busesInProgress.count()).toEqual(2);
+
+    importBus.ip.sendKeys(`hostname`);
+    importBus.port.sendKeys(`7700`);
+    importBus.username.sendKeys(`admin`);
+    importBus.password.sendKeys(`password`);
+    importBus.passphrase.sendKeys(`passphrase`);
 
     // try to import
-    importBtn.click();
+    importBus.importButton.click();
 
     // but cannot connect to the bus
-    expect(element(by.css(`app-petals-bus-in-progress-view .error-details`)).getText()).toEqual(`Can't connect to hostname:7700`);
-    expect(element.all(by.css(`app-buses-in-progress a[md-list-item]`)).count()).toEqual(3);
-    expect(element(by.css(`app-buses-in-progress md-nav-list:nth-child(3) .ip-port`)).getText()).toEqual('hostname:7700');
-    expect(element(by.cssContainingText(`app-buses-in-progress md-nav-list:nth-child(3) md-icon`, `warning`)).isDisplayed()).toEqual(true);
+    expect(importBus.error.getText()).toEqual(`Can't connect to hostname:7700`);
+    expect(workspace.busesInProgress.count()).toEqual(3);
+    expect(workspace.busesInProgress.get(2).$(`.ip-port`).getText()).toEqual('hostname:7700');
+    expect(workspace.busesInProgress.get(2).element(by.cssContainingText(`md-icon`, `warning`)).isDisplayed()).toEqual(true);
+
+    expect(importBus.discardButton.getText()).toEqual(`Discard`);
+    expect(importBus.discardButton.isEnabled()).toBe(true);
   });
 
   it(`should import a bus`, () => {
-    expect(element.all(by.css(`app-petals-menu-view > app-material-tree > md-nav-list`)).count()).toEqual(1);
+    const importBus = workspace.openImportBus();
 
-    inputIp.sendKeys(`192.168.0.1`);
-    inputPort.sendKeys(`7700`);
-    inputUsername.sendKeys(`admin`);
-    inputPassword.sendKeys(`password`);
-    inputPassphrase.sendKeys(`passphrase`);
+    expect($$(`app-petals-menu-view > app-material-tree > md-nav-list`).count()).toEqual(1);
 
-    page.clickAndExpectNotification(importBtn, 'Bus import success', /^The import of the bus .* succeeded$/);
+    importBus.ip.sendKeys(`192.168.0.1`);
+    importBus.port.sendKeys(`7700`);
+    importBus.username.sendKeys(`admin`);
+    importBus.password.sendKeys(`password`);
+    importBus.passphrase.sendKeys(`passphrase`);
 
-    expect(element.all(by.css(`app-petals-menu-view > app-material-tree > md-nav-list`)).count()).toEqual(2);
+    page.clickAndExpectNotification(importBus.importButton, 'Bus import success', /^The import of the bus .* succeeded$/);
+
+    expect($$(`app-petals-menu-view > app-material-tree > md-nav-list`).count()).toEqual(2);
   });
 
   it(`should select the first input of import bus form on desktop`, () => {
-    expectFocused(inputIp);
+    const importBus = workspace.openImportBus();
+
+    expectFocused(importBus.ip);
   });
 });

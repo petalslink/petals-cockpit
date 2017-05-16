@@ -15,51 +15,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, element, by } from 'protractor';
+import { browser } from 'protractor';
 
-import { page, expectFocused, expectNotFocused } from './common';
+import { page } from './common';
+import { expectNotFocused, expectNothingFocused } from './utils';
 
 describe(`Mobile`, () => {
+
   beforeEach(() => {
-    page.navigateTo(true);
+    browser.manage().window().setSize(412, 732);
   });
 
   it(`should not select the first input of import bus form on mobile`, () => {
-    page.login(`admin`, `admin`);
+    const workspace = page.goToLogin().loginToWorkspace(`admin`, `admin`);
 
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
+    const importBus = workspace.openImportBus();
 
-    page.openImportBus();
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/);
-
-    // the button is focused because of our click: the important is that nothing else is focused instead
-    expectFocused(element(by.css('app-cockpit md-sidenav a.btn-add-bus')));
+    // sometimes the add button is focused because of our click
+    // so we just test that username is not focused
+    expectNotFocused(importBus.username);
   });
 
   it(`should not select the first input of the login form on mobile`, () => {
-    expect(browser.getCurrentUrl()).toMatch(/\/login/);
+    page.goToLogin();
 
-    expectNotFocused();
+    expectNothingFocused();
   });
 
   describe('Setup', () => {
-    const tokenField = element(by.css(`input[formControlName="token"]`));
-
     it(`should not select the first or second input`, () => {
-      page.navigateTo(true, '/setup');
-      expect(browser.getCurrentUrl()).toMatch(/\/setup/);
-
-      expectNotFocused();
+      page.goToSetup();
+      expectNothingFocused();
     });
 
     it(`should not select the first or second input with a pre-filled token`, () => {
       const tokenTest = 'TOKENTEST';
-      page.navigateTo(true, `/setup?token=${tokenTest}`);
-      expect(browser.getCurrentUrl()).toMatch(/\/setup/);
+      const setup = page.goToSetup(tokenTest);
 
-      expect(tokenField.getAttribute('value')).toEqual(tokenTest);
+      expect(setup.token.getAttribute('value')).toEqual(tokenTest);
 
-      expectNotFocused();
+      expectNothingFocused();
     });
   });
 

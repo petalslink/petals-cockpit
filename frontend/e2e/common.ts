@@ -15,21 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ElementFinder, element, by } from 'protractor';
-import { PetalsCockpitPage } from './app.po';
+import { browser } from 'protractor';
+
+import { PetalsCockpitPage } from './pages/app.po';
 
 export let page: PetalsCockpitPage;
 
-export function expectNotFocused() {
-  return expectFocused(element(by.css('body')));
-}
-
-export function expectFocused(element: ElementFinder) {
-  return expect(browser.switchTo().activeElement().getId()).toBe(element.getId());
-}
+export let waitTimeout = 5000;
 
 beforeEach(() => {
   page = new PetalsCockpitPage();
+  browser.manage().window().maximize();
 });
 
 afterEach(() => {
