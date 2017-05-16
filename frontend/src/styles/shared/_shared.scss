@@ -33,6 +33,10 @@ app-root {
   justify-content: center;
 }
 
+body .text-upper {
+  text-transform: uppercase;
+}
+
 mat-card-subtitle {
   float: right;
 }
@@ -49,7 +53,7 @@ div > .mat-dialog-container {
   }
   .central-content {
     width: 90%;
-    max-width: 800px;
+    max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -59,15 +63,20 @@ div > .mat-dialog-container {
     }
   }
   .content {
-    @extend .padding-x3;
+    @extend .padding-x2;
     background-image: url(./assets/img/gray_jean.png);
     background-size: auto;
     background-repeat: repeat;
     height: 100%;
 
     &.content-max-width {
-      max-width: 800px;
+      max-width: 1200px;
       margin: auto;
+    }
+  }
+  @media screen and (max-width: 640px) {
+    .content {
+      padding: 10px !important;
     }
   }
 }
