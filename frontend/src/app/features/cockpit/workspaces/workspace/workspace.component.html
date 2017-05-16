@@ -30,68 +30,81 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <div fxFill fxLayout="column" class="content content-max-width">
     <div class="central-content">
+      <div fxLayout="column" fxLayout.gt-md="row">
+        <md-card fxFlex [ngClass.gt-md]="'whiteboard'">
+          <md-card-title fxLayout="row" *ngIf="!isEditingDescription">
+            <span fxFlex class="text-upper">Whiteboard</span>
+          </md-card-title>
 
-      <h3 class="color-primary-light-bold margin-top-x2">Whiteboard</h3>
-      <md-card>
-        <md-card-content>
-
-          <div fxLayout="row" *ngIf="!isEditingDescription; else descriptionEdit" class="workspace-description">
-            <button class="btn-edit" color="primary" type="button" (click)="editDescription()" md-mini-fab mdTooltip="Edit" mdTooltipPosition="below">
+          <md-card-content fxFlexLayout="row" fxLayoutAlign="center center" *ngIf="!isEditingDescription; else descriptionEdit" class="workspace-description">
+            <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml"></span>
+            <button class="btn-edit" color="primary" md-icon-button (click)="editDescription()" mdTooltip="Edit" mdTooltipPosition="below">
               <md-icon>edit</md-icon>
             </button>
-            <div class="info margin-right-x1" fxFlex [innerHTML]="workspace.description | MarkdownToHtml"></div>
-          </div>
+          </md-card-content>
 
-          <ng-template #descriptionEdit>
-            <div fxLayout="column" *ngIf="description !== null" class="workspace-description-edit">
-              <div fxLayout="row">
+          <md-card-content>
+
+            <ng-template #descriptionEdit>
+              <div fxLayout="column" *ngIf="description !== null" class="workspace-description-edit">
                 <md-input-container fxFlex class="margin-right-x1">
-                  <textarea mdInput class="description-wks" mdTextareaAutosize [disabled]="isSettingDescription"
-                    [(ngModel)]="description"></textarea>
+                  <textarea mdInput class="description-wks" mdTextareaAutosize [disabled]="isSettingDescription" [(ngModel)]="description"></textarea>
                 </md-input-container>
+                <md-card-subtitle fxFlexLayout="row" fxLayoutAlign="center center">
+                  <span fxFlex class="workspace-description-preview" [innerHTML]="description | MarkdownToHtml"></span>
+                </md-card-subtitle>
               </div>
-              <div fxLayout="row" class="workspace-description-preview warning" [innerHTML]="description | MarkdownToHtml"></div>
-            </div>
 
-            <md-card-actions align="end">
-              <button class="workspace-description-edit-cancel" md-button [disabled]="isSettingDescription" (click)="cancelDescription()">Cancel</button>
-              <button class="workspace-description-edit-submit" md-button [disabled]="isSettingDescription" (click)="validateDescription()"
-                color="accent" md-raised-button>Submit</button>
-            </md-card-actions>
-          </ng-template>
-
-        </md-card-content>
-      </md-card>
-
-      <h3 class="color-primary-light-bold margin-top-x2">User{{ (workspace.users.list.length - 1) >= 2 ? 's' : '' }}</h3>
-
-      <md-card>
-        <md-card-content>
-
-          <div fxLayout="column" *ngIf="workspace.users.list as users" class="workspace-users">
-            <div *ngIf="users.length === 1; else workspaceShared">
-              <p class="users-in-workspace">You are the only one using this workspace:</p>
-            </div>
-
-            <ng-template #workspaceShared>
-              <p class="users-in-workspace">{{ users.length }} people are using this workspace:</p>
+              <div align="end">
+                <button type="button" class="workspace-description-edit-cancel" md-button [disabled]="isSettingDescription" (click)="cancelDescription()">Cancel</button>
+                <button type="submit" class="workspace-description-edit-submit" md-button [disabled]="isSettingDescription" (click)="validateDescription()"
+                  color="accent" md-raised-button>Submit</button>
+              </div>
             </ng-template>
 
-            <md-list>
-              <md-list-item *ngFor="let user of users">
-                <app-generate-icon md-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
+          </md-card-content>
+        </md-card>
 
-                <h2 md-line>{{ user.id }}</h2>
+        <div [ngClass.gt-md]="'margin-left-x1'"></div>
 
-                <p md-line>
-                  <span>{{ user.name }}</span>
-                </p>
-              </md-list-item>
-            </md-list>
-          </div>
+        <md-card fxFlex [ngClass.lt-lg]="'margin-top-x1'">
+          <md-card-title fxLayout="row">
+            <span fxFlex class="text-upper">User{{ (workspace.users.list.length - 1) >= 2 ? 's' : '' }}</span>
+            <md-icon color="primary">supervisor_account</md-icon>
+          </md-card-title>
 
-        </md-card-content>
-      </md-card>
+          <md-card-content>
+            <div fxLayout="column" *ngIf="workspace.users.list as users" class="workspace-users">
+
+              <md-card-subtitle fxFlexLayout="row" fxLayoutAlign="start center" *ngIf="users.length === 1; else workspaceShared">
+                <md-icon class="margin-right-x1" color="primary">info</md-icon>
+                <span class="color-primary users-in-workspace" fxFlex>You are the only one using this workspace.</span>
+              </md-card-subtitle>
+
+              <ng-template #workspaceShared>
+                <md-card-subtitle fxFlexLayout="row" fxLayoutAlign="start center">
+                  <md-icon class="margin-right-x1" color="primary">info</md-icon>
+                  <span class="color-primary users-in-workspace" fxFlex>{{ users.length }} people are using this workspace.</span>
+                </md-card-subtitle>
+              </ng-template>
+
+              <md-divider></md-divider>
+
+              <md-list>
+                <md-list-item *ngFor="let user of users">
+                  <app-generate-icon md-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
+
+                  <h2 md-line>{{ user.id }}</h2>
+
+                  <p md-line>
+                    <span>{{ user.name }}</span>
+                  </p>
+                </md-list-item>
+              </md-list>
+            </div>
+          </md-card-content>
+        </md-card>
+      </div>
     </div>
   </div>
 </div>
