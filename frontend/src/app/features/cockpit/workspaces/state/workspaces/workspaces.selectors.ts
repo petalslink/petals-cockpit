@@ -195,45 +195,42 @@ export function _getCurrentTree(store$: Store<IStore>): Observable<WorkspaceElem
   return _getCurrentWorkspace(store$)
     .map(workspace => {
       const baseUrl = `/workspaces/${workspace.id}/petals`;
-      return workspace.buses.list.map(bus => {
-        return {
-          id: bus.id,
-          type: WorkspaceElementType.BUS,
-          name: bus.name,
-          link: `${baseUrl}/buses/${bus.id}`,
-          isFolded: bus.isFolded,
+      return workspace.buses.list.map<WorkspaceElement>(bus => ({
+        id: bus.id,
+        type: WorkspaceElementType.BUS,
+        name: bus.name,
+        link: `${baseUrl}/buses/${bus.id}`,
+        isFolded: bus.isFolded,
+        cssClass: `workspace-element-type-bus`,
 
-          children: bus.containers.list.map(container => {
-            return {
-              id: container.id,
-              type: WorkspaceElementType.CONTAINER,
-              name: container.name,
-              link: `${baseUrl}/containers/${container.id}`,
-              isFolded: container.isFolded,
+        children: bus.containers.list.map<WorkspaceElement>(container => ({
+          id: container.id,
+          type: WorkspaceElementType.CONTAINER,
+          name: container.name,
+          link: `${baseUrl}/containers/${container.id}`,
+          isFolded: container.isFolded,
+          cssClass: `workspace-element-type-container`,
 
-              children: container.components.list.map(component => {
-                return {
-                  id: component.id,
-                  type: WorkspaceElementType.COMPONENT,
-                  name: component.name,
-                  link: `${baseUrl}/components/${component.id}`,
-                  isFolded: component.isFolded,
+          children: container.components.list.map<WorkspaceElement>(component => ({
+            id: component.id,
+            type: WorkspaceElementType.COMPONENT,
+            name: component.name,
+            link: `${baseUrl}/components/${component.id}`,
+            isFolded: component.isFolded,
+            cssClass: `workspace-element-type-component`,
 
-                  children: component.serviceUnits.list.map(serviceUnit => {
-                    return {
-                      id: serviceUnit.id,
-                      type: WorkspaceElementType.SERVICEUNIT,
-                      name: serviceUnit.name,
-                      link: `${baseUrl}/service-units/${serviceUnit.id}`,
-                      isFolded: serviceUnit.isFolded
-                    };
-                  })
-                };
-              })
-            };
-          })
-        };
-      });
+            children: component.serviceUnits.list.map<WorkspaceElement>(serviceUnit => ({
+              id: serviceUnit.id,
+              type: WorkspaceElementType.SERVICEUNIT,
+              name: serviceUnit.name,
+              link: `${baseUrl}/service-units/${serviceUnit.id}`,
+              isFolded: serviceUnit.isFolded,
+              cssClass: `workspace-element-type-service-unit`,
+              children: []
+            }))
+          }))
+        }))
+      }));
     })
     .withLatestFrom(store$.select(s => s.workspaces.searchPetals))
     .map(([tree, search]) => {

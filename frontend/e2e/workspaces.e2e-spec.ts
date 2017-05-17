@@ -15,132 +15,117 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, element, by, ExpectedConditions as EC } from 'protractor';
+import { browser, ExpectedConditions as EC, $ } from 'protractor';
 
-import { urlToMatch } from './app.po';
-
-import { page } from './common';
+import { page, waitTimeout } from './common';
+import { WorkspacesPage } from './pages/workspaces.po';
 
 describe(`Workspaces`, () => {
-  beforeEach(() => {
-    page.navigateTo();
-  });
+  it('should clear the dialog upon logout', () => {
+    const workspaces = page.goToWorkspacesViaLogin().loginToWorkspaces('admin', 'admin');
 
-  it(`should always keep the header above any modal`, () => {
-    page.login(`admin`, `admin`);
+    page.logout();
 
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
-
-    // let's open the workspace list and ensure we can still click on the sidenav button
-    element(by.css(`app-cockpit md-sidenav .change-workspace`)).click();
-
-    page.closeSidenav();
+    // ensure dialogs are properly cleaned on component change (material attaches them to the root of the DOM)
+    browser.wait(EC.stalenessOf(workspaces.component), waitTimeout);
   });
 
   it(`should not have any workspace selected`, () => {
     // vnoel has no lastWorkspace, so it will be redirected to /workspaces with no workspace selected
-    page.login(`vnoel`, `vnoel`, true, false);
+    const workspaces = page.goToWorkspacesViaLogin().loginToWorkspaces(`vnoel`, `vnoel`);
 
     // the sidebar button should not be visible
-    expect(element(by.css(`app-cockpit .menu-icon`)).isPresent()).toBe(false);
+    expect($(`app-cockpit .menu-icon`).isPresent()).toBe(false);
 
     // check that 1 workspace is displayed
-    expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(1);
+    expect(workspaces.workspacesCards.count()).toEqual(1);
 
     const availableUsersList = 'Administrator, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER';
 
     // check the current list content
-    browser.actions().mouseMove(element(by.css('app-workspaces-dialog md-card-title-group span.dotted'))).perform();
-    expect(element(by.css('md-tooltip-component')).getText()).toEqual(availableUsersList);
+    browser.actions().mouseMove(workspaces.component.$('md-card-subtitle span.dotted')).perform();
+    expect($('md-tooltip-component').getText()).toEqual(availableUsersList);
 
-    // check if no cards have a green background color
-    expect(element.all(by.css(`app-workspaces-dialog md-card div.background-color-light-green-x2`)).count()).toEqual(0);
-
-    // the element() cannot be directly resolved with then()
-    const cardsText = element.all(by.css(`app-workspaces-dialog div md-card-title-group`)).getText();
+    // check that no cards have a green background color
+    expect(workspaces.workspacesCard.$$(`div.background-color-light-green-x2`).count()).toEqual(0);
+    expect(workspaces.workspacesCard.$$(`div.background-color-light-green-x2 md-icon`).count()).toEqual(0);
 
     const workspacesAndOwners = [
       `Workspace 1\nShared with you and 4 others.`
     ];
 
-    expect(cardsText).toEqual(workspacesAndOwners);
+    expect(workspaces.workspacesCards.getText()).toEqual(workspacesAndOwners);
+  });
+
+  it(`should always keep the header above any modal`, () => {
+    page.goToLogin().loginToWorkspace(`admin`, `admin`).openWorkspacesDialog();
+
+    // the workspace dialog hides stuffs so we must check if
+
+    // 1) the logout button should be visible
+    expect($(`app-cockpit .menu-icon`).isEnabled()).toBe(true);
+    // 2) we can still click on the sidenav button
+    page.closeSidenav();
   });
 
   it(`should have a workspace selected`, () => {
-    page.login(`admin`, `admin`);
-
-    const change = element(by.css(`app-cockpit md-sidenav .change-workspace`));
-    browser.wait(EC.elementToBeClickable(change), 5000);
-    change.click();
+    // open the workspace dialog from a workspace
+    const workspaces = page.goToLogin().loginToWorkspace(`admin`, `admin`).openWorkspacesDialog();
 
     // check if the card selected has a green background color
-    expect(element.all(by.css(`app-workspaces-dialog md-card div.background-color-light-green-x2`)).count()).toEqual(1);
+    expect(workspaces.workspacesCard.$$(`div.background-color-light-green-x2`).count()).toEqual(1);
     // check that workspace selected has icon
-    expect(element.all(by.css(`app-workspaces-dialog md-card div.background-color-light-green-x2 md-icon`)).count()).toEqual(1);
+    expect(workspaces.workspacesCard.$$(`div.background-color-light-green-x2 md-icon`).count()).toEqual(1);
   });
 
   it(`should create a new workspace and then delete it`, () => {
-    page.login(`mrobert`, `mrobert`, true, false);
-
-    const inputName = element(by.css(`input[formControlName="name"]`));
-    const addNewWorkspace = element(by.css(`app-workspaces-dialog .btn-add-workspace`));
+    let workspaces = page.goToWorkspacesViaLogin().loginToWorkspaces(`mrobert`, `mrobert`);
 
     // check if the input form is empty
-    expect(inputName.getText()).toEqual(``);
+    expect(workspaces.inputName.getText()).toEqual(``);
 
     // check if add new workspace button is always disabled when input form is empty
-    expect(addNewWorkspace.isEnabled()).toBe(false);
+    expect(workspaces.addButton.isEnabled()).toBe(false);
 
-    inputName.sendKeys(`New workspace`);
+    workspaces.inputName.sendKeys(`New workspace`);
 
     // check if add new workspace button is enabled
-    expect(addNewWorkspace.isEnabled()).toBe(true);
+    expect(workspaces.addButton.isEnabled()).toBe(true);
 
-    addNewWorkspace.click();
+    workspaces.addButton.click();
 
-    const cards = element.all(by.css(`app-workspaces-dialog div md-card-title-group`));
-
-    expect(cards.count()).toEqual(2);
+    expect(workspaces.workspacesCards.count()).toEqual(2);
 
     // check if the input is cleared
-    expect(inputName.getText()).toEqual(``);
+    expect(workspaces.inputName.getText()).toEqual(``);
 
     const workspacesAndOwners = [
       `Workspace 1\nShared with you and 4 others.`,
       `New workspace\nYou are the only one using this workspace.`
     ];
 
-    const cardsText = cards.getText();
-
-    expect(cardsText).toEqual(workspacesAndOwners);
+    expect(workspaces.workspacesCards.getText()).toEqual(workspacesAndOwners);
 
     ///// DELETION
-
-    page.selectWorkspace(1, `New workspace`);
-
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
-
-    expect(element(by.css(`app-workspace md-toolbar span.title`)).getText()).toEqual(`New workspace`);
-
-    const btnDeleteWks = element(by.css(`app-workspace .btn-delete-wks`));
+    const workspace = workspaces.selectWorkspace(1, `New workspace`);
 
     // let's delete the workspace
-    btnDeleteWks.click();
+    workspace.deleteButton.click();
 
     // a dialog is shown
-    expect(element(by.css(`app-workspace-deletion-dialog .mat-dialog-content`)).getText())
+    expect($(`app-workspace-deletion-dialog .mat-dialog-content`).getText())
       .toEqual(`Everything in the workspace will be deleted! Please, be certain.\nAre you sure you want to delete New workspace?`);
 
     // let's confirm the deletion
-    element(by.css(`app-workspace-deletion-dialog .btn-confirm-delete-wks`)).click();
+    $(`app-workspace-deletion-dialog .btn-confirm-delete-wks`).click();
 
     // the button should be disabled once we confirmed deletion
     // and shouldn't be clickable anymore (except in case of HTTP error)
-    expect(btnDeleteWks.isEnabled()).toBe(false);
+    expect(workspace.deleteButton.isEnabled()).toBe(false);
 
     // now we get a notification saying the workspace is deleted
-    const confirm = element(by.css(`app-workspace-deleted-dialog .mat-dialog-content`));
-    browser.wait(EC.visibilityOf(confirm), 2000);
+    const confirm = $(`app-workspace-deleted-dialog .mat-dialog-content`);
+    browser.wait(EC.visibilityOf(confirm), waitTimeout);
     expect(confirm.getText())
       .toEqual(`This workspace was deleted, click on OK to go back to the workspaces list.`);
 
@@ -148,14 +133,14 @@ describe(`Workspaces`, () => {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
 
     // let's get redirected
-    element(by.css(`app-workspace-deleted-dialog button`)).click();
+    $(`app-workspace-deleted-dialog button`).click();
 
-    browser.wait(urlToMatch(/\/workspaces$/));
+    workspaces = WorkspacesPage.waitAndGet();
 
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces$/);
-    browser.wait(EC.invisibilityOf(element(by.css(`app-cockpit md-sidenav`))), 5000);
+    // ensure the sidebar is closed as expected
+    browser.wait(EC.invisibilityOf($(`app-cockpit md-sidenav`)), waitTimeout);
 
     // now that the previous workspace is deleted, check that only 1 workspace is displayed
-    expect(element.all(by.css(`app-workspaces-dialog md-card-subtitle`)).count()).toEqual(1);
+    expect(workspaces.workspacesCards.count()).toEqual(1);
   });
 });

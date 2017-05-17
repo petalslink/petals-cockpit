@@ -21,6 +21,7 @@ export interface TreeElement<T extends TreeElement<T>> {
   link: string;
   isFolded: boolean;
   children: T[];
+  cssClass: string;
 }
 
 export interface TreeEvent<T extends TreeElement<T>> {

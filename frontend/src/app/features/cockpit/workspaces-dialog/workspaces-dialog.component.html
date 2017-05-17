@@ -56,8 +56,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </md-card-content>
             </md-card>
             <md-divider></md-divider>
-            <md-card class="card-workspace">
-              <div fxLayout="row" class="cursor-pointer background-color-hover-light-green-x2"
+            <md-card class="card-workspaces">
+              <div fxLayout="row" class="cursor-pointer background-color-hover-light-green-x2 card-workspace"
                 *ngFor="let workspace of (workspaces$ | async).list" (click)="fetchWorkspace(workspace)"
                 [class.background-color-light-green-x2]="(workspaces$ | async).selectedWorkspaceId === workspace.id"
               >
