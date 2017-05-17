@@ -26,15 +26,19 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.db.api.RequestRowAssert;
 import org.assertj.db.type.Request;
 import org.assertj.db.type.Table;
+import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.jooq.Record;
@@ -44,6 +48,7 @@ import org.jooq.impl.DSL;
 import org.junit.Before;
 import org.junit.Rule;
 import org.mockito.Mockito;
+import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
@@ -59,11 +64,16 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRec
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
+import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
+import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.rules.CockpitResourceRule;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
+
+import com.google.common.collect.ImmutableList;
 
 import javaslang.Tuple2;
 
@@ -296,5 +306,141 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             WorkspaceFullContent ev = e.readData(WorkspaceFullContent.class);
             c.accept(ev, a);
         });
+    }
+
+    protected ServiceAssemblyFull assertSAContent(WorkspaceContent content, Container cont, String saName,
+            List<Component> comps) {
+        SoftAssertions a = new SoftAssertions();
+        ServiceAssemblyFull res = assertSAContent(a, content, null, cont, saName, comps);
+        a.assertAll();
+        return res;
+    }
+
+    protected ServiceAssemblyFull assertSAContent(SoftAssertions a, WorkspaceContent content,
+            WorkspaceContent control) {
+        return assertSAContent(a, content, control, null, null, ImmutableList.of());
+    }
+
+    private ServiceAssemblyFull assertSAContent(SoftAssertions a, WorkspaceContent content,
+            @Nullable WorkspaceContent control, @Nullable Container cont, @Nullable String saName,
+            List<Component> comps) {
+
+        assertThat(content.buses).isEmpty();
+        assertThat(content.busesInProgress).isEmpty();
+        assertThat(content.containers).isEmpty();
+        assertThat(content.components).isEmpty();
+        assertThat(content.serviceAssemblies).hasSize(1);
+
+        if (control == null) {
+            assert cont != null;
+            assert saName != null;
+            Iterator<ServiceAssembly> iterator = cont.getServiceAssemblies().stream()
+                    .filter(sa -> saName.equals(sa.getName())).iterator();
+            assertThat(iterator.hasNext()).isTrue();
+            assertThat(content.serviceUnits).hasSameSizeAs(iterator.next().getServiceUnits());
+            a.assertThat(iterator.hasNext()).isFalse();
+        } else {
+            assertThat(content.serviceUnits).hasSameSizeAs(control.serviceUnits);
+        }
+
+        Entry<String, ServiceAssemblyFull> contentSAE = content.serviceAssemblies.entrySet().iterator().next();
+
+        ServiceAssemblyFull contentSA = contentSAE.getValue();
+
+        a.assertThat(contentSAE.getKey()).isEqualTo(Long.toString(contentSA.serviceAssembly.id));
+
+        if (control == null) {
+            assert saName != null;
+            assert cont != null;
+
+            // we already know it's present, see above
+            ServiceAssembly sa = cont.getServiceAssemblies().stream().filter(s -> saName.equals(s.getName())).iterator()
+                    .next();
+
+            assertThat(sa.getName()).isEqualTo(contentSA.serviceAssembly.name);
+            assertThat(sa.getState()).isEqualTo(ArtifactState.State.SHUTDOWN);
+            assertThat(sa.getServiceUnits()).hasSameSizeAs(comps);
+
+            // order is important
+            List<Component> components = new ArrayList<>(comps);
+            for (ServiceUnit su : sa.getServiceUnits()) {
+                Component component = components.remove(0);
+                Iterator<Entry<String, ServiceUnitFull>> iterator = content.serviceUnits.entrySet().stream()
+                        .filter(e -> su.getName().equals(e.getValue().serviceUnit.name)).iterator();
+                // there is one with this name
+                a.assertThat(iterator.hasNext()).isTrue();
+                if (iterator.hasNext()) {
+                    Entry<String, ServiceUnitFull> contentSUE = iterator.next();
+                    ServiceUnitFull contentSU = contentSUE.getValue();
+                    a.assertThat(contentSUE.getKey()).isEqualTo(Long.toString(contentSU.serviceUnit.id));
+                    a.assertThat(contentSU.componentId).isEqualTo(getId(component));
+                    // TODO if we could find the id of the created SA via getId(), then we could check that
+                    a.assertThat(contentSU.serviceAssemblyId).isEqualTo(contentSA.serviceAssembly.id);
+
+                    // there is only one with this name
+                    a.assertThat(iterator.hasNext()).isFalse();
+                }
+            }
+
+            // we consumed all the components
+            a.assertThat(components).isEmpty();
+
+            a.assertThat(contentSA.containerId).isEqualTo(getId(cont));
+            a.assertThat(contentSA.serviceAssembly.name).isEqualTo(sa.getName());
+            a.assertThat(contentSA.state).isEqualTo(ServiceAssemblyMin.State.from(sa.getState()));
+        } else {
+            ServiceAssemblyFull controlSA = control.serviceAssemblies.values().iterator().next();
+
+            for (Entry<String, ServiceUnitFull> controlSUE : control.serviceUnits.entrySet()) {
+                ServiceUnitFull contentSU = content.serviceUnits.get(controlSUE.getKey());
+                a.assertThat(contentSU).isEqualToComparingFieldByFieldRecursively(controlSUE.getValue());
+            }
+
+            a.assertThat(contentSA).isEqualToComparingFieldByFieldRecursively(controlSA);
+        }
+
+        return contentSA;
+    }
+
+    protected ComponentFull assertComponentContent(WorkspaceContent content, Container container,
+            String componentName) {
+        SoftAssertions a = new SoftAssertions();
+        ComponentFull res = assertComponentContent(a, content, null, container, componentName);
+        a.assertAll();
+        return res;
+    }
+
+    protected ComponentFull assertComponentContent(SoftAssertions a, WorkspaceContent content,
+            WorkspaceContent control) {
+        return assertComponentContent(a, content, control, null, null);
+    }
+
+    protected ComponentFull assertComponentContent(SoftAssertions a, WorkspaceContent content,
+            @Nullable WorkspaceContent control, @Nullable Container container, @Nullable String componentName) {
+        assertThat(content.buses).isEmpty();
+        assertThat(content.busesInProgress).isEmpty();
+        assertThat(content.containers).isEmpty();
+        assertThat(content.serviceAssemblies).isEmpty();
+        assertThat(content.serviceUnits).isEmpty();
+        assertThat(content.components).hasSize(1);
+
+        Entry<String, ComponentFull> contentCE = content.components.entrySet().iterator().next();
+        ComponentFull contentC = contentCE.getValue();
+
+        a.assertThat(contentCE.getKey()).isEqualTo(Long.toString(contentC.component.id));
+
+        if (control == null) {
+            assert container != null;
+            assert componentName != null;
+            a.assertThat(contentC.containerId).isEqualTo(getId(container));
+            a.assertThat(contentC.component.name).isEqualTo(componentName);
+            a.assertThat(contentC.component.type).isEqualTo(ComponentMin.Type.BC);
+            a.assertThat(contentC.state).isEqualTo(ComponentMin.State.Loaded);
+        } else {
+            ComponentFull controlC = content.components.values().iterator().next();
+            a.assertThat(contentC).isEqualToComparingFieldByFieldRecursively(controlC);
+        }
+
+        return contentC;
     }
 }

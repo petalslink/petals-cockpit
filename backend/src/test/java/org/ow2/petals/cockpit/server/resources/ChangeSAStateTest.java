@@ -25,6 +25,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Before;
@@ -34,6 +35,7 @@ import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
+import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
@@ -42,9 +44,11 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAStateChanged;
+import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
 
 import com.google.common.collect.ImmutableMap;
 
+import io.dropwizard.jersey.errors.ErrorMessage;
 import javaslang.Tuple;
 
 public class ChangeSAStateTest extends AbstractCockpitResourceTest {
@@ -66,7 +70,12 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
     private final ServiceUnit serviceUnit2 = new ServiceUnit("su2", component.getName());
 
     private final ServiceAssembly serviceAssembly2 = new ServiceAssembly("sa2", ArtifactState.State.STOPPED,
-            serviceUnit2);
+            serviceUnit2) {
+        @Override
+        public void setState(ArtifactState.@Nullable State state) {
+            throw new PetalsAdminException(new ArtifactAdministrationException("error"));
+        }
+    };
 
     public ChangeSAStateTest() {
         super(ServiceAssembliesResource.class, WorkspaceResource.class);
@@ -143,7 +152,6 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeNonExistingSAStateForbidden() {
-
         resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -243,6 +251,25 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
                 .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Unloaded)));
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
+
+        assertThatDbSA(getId(serviceAssembly1)).value(SERVICEASSEMBLIES.STATE.getName())
+                .isEqualTo(ServiceAssemblyMin.State.Started.name());
+        assertThat(serviceAssembly1.getState()).isEqualTo(ArtifactState.State.STARTED);
+        assertThatDbSA(getId(serviceAssembly2)).value(SERVICEASSEMBLIES.STATE.getName())
+                .isEqualTo(ServiceAssemblyMin.State.Stopped.name());
+        assertThat(serviceAssembly2.getState()).isEqualTo(ArtifactState.State.STOPPED);
+    }
+
+    @Test
+    public void changeSA2StateConflictContainerError() {
+        Response put = resource.target("/workspaces/1/serviceassemblies/" + getId(serviceAssembly2)).request()
+                .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Started)));
+
+        assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
+        ErrorMessage err = put.readEntity(ErrorMessage.class);
+        assertThat(err.getCode()).isEqualTo(Status.CONFLICT.getStatusCode());
+        assertThat(err.getMessage()).isEqualTo("error");
+        assertThat(err.getDetails()).contains(ChangeSAStateTest.class.getName() + "$1.setState");
 
         assertThatDbSA(getId(serviceAssembly1)).value(SERVICEASSEMBLIES.STATE.getName())
                 .isEqualTo(ServiceAssemblyMin.State.Started.name());

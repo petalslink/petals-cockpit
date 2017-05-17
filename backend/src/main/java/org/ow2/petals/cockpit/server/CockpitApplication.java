@@ -50,6 +50,7 @@ import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.HttpArtifactServer;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
+import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.context.DefaultAuthorizers;
 import org.pac4j.core.matching.PathMatcher;
@@ -240,6 +241,8 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 return jooqConf;
             }
         });
+
+        environment.jersey().register(new PetalsAdminExceptionMapper(configuration.isShowPetalsAdminStacktraces()));
 
         environment.jersey().register(UserSession.class);
         environment.jersey().register(WorkspacesResource.class);

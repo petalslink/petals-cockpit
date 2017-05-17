@@ -1,0 +1,4 @@
+class javax/ws/rs/core/Response
+status
+ (Ljavax/ws/rs/core/Response$Status;)Ljavax/ws/rs/core/Response$ResponseBuilder;
+ (Ljavax/ws/rs/core/Response$Status;)L1javax/ws/rs/core/Response$ResponseBuilder;

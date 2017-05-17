@@ -1,0 +1,10 @@
+class javax/ws/rs/core/Response$ResponseBuilder
+build
+ ()Ljavax/ws/rs/core/Response;
+ ()L1javax/ws/rs/core/Response;
+entity
+ (Ljava/lang/Object;)Ljavax/ws/rs/core/Response$ResponseBuilder;
+ (Ljava/lang/Object;)L1javax/ws/rs/core/Response$ResponseBuilder;
+type
+ (Ljavax/ws/rs/core/MediaType;)Ljavax/ws/rs/core/Response$ResponseBuilder;
+ (Ljavax/ws/rs/core/MediaType;)L1javax/ws/rs/core/Response$ResponseBuilder;
