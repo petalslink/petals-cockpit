@@ -32,7 +32,6 @@ import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.glassfish.jersey.media.sse.EventInput;
-import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
@@ -112,7 +111,6 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
     public void deployComponentNonExistingContainerForbidden() throws Exception {
         resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
-        // TODO THIS CAN?T WORK
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
         Domain fDomain = new Domain("domf");
@@ -163,8 +161,7 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
 
     @Test
     public void deployComponent() throws Exception {
-        try (EventInput eventInput = resource.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);
 

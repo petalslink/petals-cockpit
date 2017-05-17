@@ -26,6 +26,8 @@ import javax.ws.rs.client.WebTarget;
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.media.sse.EventInput;
+import org.glassfish.jersey.media.sse.SseFeature;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
@@ -119,6 +121,11 @@ public class CockpitResourceRule implements TestRule {
 
     public WebTarget target(String path) {
         return this.resource.target(path);
+    }
+
+    public EventInput sse(long workspaceId) {
+        return resource.target("/workspaces/" + workspaceId + "/content").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
+                .get(EventInput.class);
     }
 
     public DSLContext db() {

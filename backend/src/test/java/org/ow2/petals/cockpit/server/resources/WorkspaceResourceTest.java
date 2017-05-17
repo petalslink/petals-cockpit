@@ -127,8 +127,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void getEventExistingWorkspace() {
         assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
 
-        try (EventInput eventInput = resource.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resource.sse(1)) {
             expectWorkspaceContent(eventInput, (t, a) -> assertContent(t));
         }
 

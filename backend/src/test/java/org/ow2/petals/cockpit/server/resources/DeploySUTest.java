@@ -32,7 +32,6 @@ import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.glassfish.jersey.media.sse.EventInput;
-import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
@@ -162,8 +161,7 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
 
     @Test
     public void deploySU() throws Exception {
-        try (EventInput eventInput = resource.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);
 

@@ -112,8 +112,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void changeSU1StateForbidden() {
-
+    public void changeSA1StateForbidden() {
         resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         Domain fDomain = new Domain("domf");
@@ -163,8 +162,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void changeWrongSUStateForbidden() {
-
+    public void changeWrongSAStateForbidden() {
         resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -183,8 +181,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void changeSU1StateNotFound() {
-
+    public void changeSA1StateNotFound() {
         Response put = resource.target("/workspaces/1/serviceassemblies/429879").request()
                 .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Stopped)));
 
@@ -199,9 +196,8 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void changeSU2StateUnload() {
-        try (EventInput eventInput = resource.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+    public void changeSA2StateUnload() {
+        try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);
 
@@ -227,7 +223,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void changeSU1StateNoChange() {
+    public void changeSA1StateNoChange() {
         SAStateChanged put = resource.target("/workspaces/1/serviceassemblies/" + getId(serviceAssembly1)).request()
                 .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Started)), SAStateChanged.class);
 
@@ -242,7 +238,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void changeSU1StateConflict() {
+    public void changeSA1StateConflict() {
         Response put = resource.target("/workspaces/1/serviceassemblies/" + getId(serviceAssembly1)).request()
                 .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Unloaded)));
 

@@ -31,7 +31,6 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.sse.EventInput;
-import org.glassfish.jersey.media.sse.SseFeature;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.junit.Before;
@@ -116,8 +115,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
     @Test
     public void testImportBusOk() {
         long busId;
-        try (EventInput eventInput = resource.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);
 
@@ -243,8 +241,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
         resource.petals.registerContainer(slowContainer);
 
-        try (EventInput eventInput = resource.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);
 
@@ -299,8 +296,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         int incorrectPort = 7700;
 
         final long busId;
-        try (EventInput eventInput = resource.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);
 
@@ -355,8 +351,7 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         assertThat(busDb.getImportError()).isEqualTo("Unknown Host");
         assertThat(busDb.getName()).isNull();
 
-        try (EventInput eventInput = resource.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput, (c, a) -> {
                 a.assertThat(c.content.busesInProgress).containsOnlyKeys(String.valueOf(busId));
