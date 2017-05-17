@@ -580,7 +580,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                                     COMPONENTS.NAME.eq(su.getTargetComponent()).and(COMPONENTS.CONTAINER_ID.eq(cId))))
                     .returning(SERVICEUNITS.ID, SERVICEUNITS.COMPONENT_ID).fetchOne();
             long suId = inserted.get(SERVICEUNITS.ID);
-            long compId = inserted.get(COMPONENTS.ID);
+            long compId = inserted.get(SERVICEUNITS.COMPONENT_ID);
             serviceUnitsDb.put(Long.toString(suId),
                     new ServiceUnitFull(new ServiceUnitMin(suId, suDb.getName()), cId, compId, saDb.getId()));
         }
