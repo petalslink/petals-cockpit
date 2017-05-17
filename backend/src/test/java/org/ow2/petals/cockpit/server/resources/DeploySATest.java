@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
@@ -35,27 +36,32 @@ import org.junit.Before;
 import org.junit.Test;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
+import org.ow2.petals.admin.api.artifact.Component.ComponentType;
+import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
-import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
-import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentOverview;
+import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
+import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
-import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule.ComponentType;
-import org.ow2.petals.jmx.api.mock.junit.configuration.component.InstallationConfigurationServiceClientMock;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import io.dropwizard.jersey.errors.ErrorMessage;
 import javaslang.Tuple;
 
-public class DeployComponentTest extends AbstractCockpitResourceTest {
+public class DeploySATest extends AbstractCockpitResourceTest {
 
-    // this is the name declared in the zip's jbi file
-    private static final String COMP_NAME = "petals-bc-soap-provide";
+    private static final String SA_NAME = "fake-sa";
+
+    private static final String SU1_NAME = "su-provide-1";
+
+    private static final String SU2_NAME = "su-provide-2";
 
     private final Domain domain = new Domain("dom");
 
@@ -63,45 +69,47 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
 
     private boolean failDeployment = false;
 
-    private final Container container = new Container("cont1", "localhost",
+    private final Container container = new Container("cont1", "host1",
             ImmutableMap.of(Container.PortType.JMX, containerPort), "user", "pass", Container.State.REACHABLE) {
         @Override
-        public void addComponent(@Nullable Component component) {
+        public void addServiceAssembly(@Nullable ServiceAssembly serviceAssembly) {
             if (failDeployment) {
                 throw new PetalsAdminException(new ArtifactAdministrationException("error"));
             }
 
-            super.addComponent(component);
+            super.addServiceAssembly(serviceAssembly);
         }
     };
 
-    public DeployComponentTest() {
-        super(ComponentsResource.class, WorkspaceResource.class);
+    private final Component component1 = new Component("comp1", ComponentType.SE, ArtifactState.State.STARTED);
+
+    public DeploySATest() {
+        super(ServiceUnitsResource.class, ServiceAssembliesResource.class, WorkspaceResource.class);
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         resource.petals.registerDomain(domain);
         resource.petals.registerContainer(container);
-
-        resource.jmx.addComponentInstallerClient(COMP_NAME, ComponentType.BINDING,
-                new InstallationConfigurationServiceClientMock(), null);
+        resource.petals.registerArtifact(component1, container);
 
         setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
 
         failDeployment = false;
     }
 
-    @SuppressWarnings("resource")
-    private static MultiPart getComponentMultiPart() throws URISyntaxException {
-        // fake-jbi-component-soap only contains the jbi file
-        // so it's ok for tests (until we test with a real petals container)
-        return new FormDataMultiPart().bodyPart(new FileDataBodyPart("file",
-                new File(DeployComponentTest.class.getResource("/fake-jbi-component-soap.zip").toURI())));
+    private static MultiPart getSAMultiPart() throws URISyntaxException {
+        return getSAMultiPart("fakeSA.zip");
+    }
+
+    @SuppressWarnings({ "resource" })
+    private static MultiPart getSAMultiPart(String zip) throws URISyntaxException {
+        return new FormDataMultiPart().bodyPart(
+                new FileDataBodyPart("file", new File(DeploySATest.class.getResource("/" + zip).toURI())));
     }
 
     @Test
-    public void deployComponentExistingContainerForbidden() throws Exception {
+    public void deploySAExistingContainerForbidden() throws Exception {
         resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         Domain fDomain = new Domain("domf");
@@ -110,116 +118,120 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
         fDomain.addContainers(fContainer);
         setupWorkspace(2, "test2", Arrays.asList(Tuple.of(fDomain, "phrase")), "anotheruser");
 
-        MultiPart mpe = getComponentMultiPart();
+        MultiPart mpe = getSAMultiPart();
 
-        Response post = resource.target("/workspaces/2/containers/" + getId(fContainer) + "/components").request()
-                .post(Entity.entity(mpe, mpe.getMediaType()));
+        Response post = resource.target("/workspaces/2/containers/" + getId(fContainer) + "/serviceassemblies")
+                .request().post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(403);
 
-        assertThat(container.getComponents()).isEmpty();
+        assertThat(container.getServiceAssemblies()).isEmpty();
         assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
     @Test
-    public void deployComponentNonExistingContainerForbidden() throws Exception {
+    public void deploySANonExistingContainerForbidden() throws Exception {
         resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
-        Domain fDomain = new Domain("domf");
-        Container fContainer = new Container("contf", "host1", ImmutableMap.of(PortType.JMX, containerPort), "user",
-                "pass", State.REACHABLE);
-        fDomain.addContainers(fContainer);
-        MultiPart mpe = getComponentMultiPart();
+        MultiPart mpe = getSAMultiPart();
 
-        Response post = resource.target("/workspaces/2/containers/234242/components").request()
+        Response post = resource.target("/workspaces/2/containers/3198798/serviceassemblies").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(403);
 
-        assertThat(container.getComponents()).isEmpty();
+        assertThat(container.getServiceAssemblies()).isEmpty();
         assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
     @Test
-    public void deployCompnentWrongContainerForbidden() throws Exception {
+    public void deploySAWrongContainerForbidden() throws Exception {
         resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
-        MultiPart mpe = getComponentMultiPart();
+        MultiPart mpe = getSAMultiPart();
 
-        // the container exists but it's in another workspace
-        Response post = resource.target("/workspaces/2/containers/" + getId(container) + "/components").request()
+        // the component exists but it's in another workspace
+        Response post = resource.target("/workspaces/2/containers/" + getId(container) + "/serviceassemblies").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(403);
 
-        assertThat(container.getComponents()).isEmpty();
+        assertThat(container.getServiceAssemblies()).isEmpty();
         assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
     @Test
-    public void deployComponentButContainerNotFound() throws Exception {
-        final MultiPart mpe = getComponentMultiPart();
+    public void deploySAButContainerNotFound() throws Exception {
+        final MultiPart mpe = getSAMultiPart();
 
-        Response post = resource.target("/workspaces/1/containers/29871/components").request()
+        Response post = resource.target("/workspaces/1/containers/3987981/serviceassemblies").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(404);
 
-        assertThat(container.getComponents()).isEmpty();
+        assertThat(container.getServiceAssemblies()).isEmpty();
         assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
     @Test
-    public void deployComponent() throws Exception {
+    public void deploySA() throws Exception {
         try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);
 
-            MultiPart mpe = getComponentMultiPart();
-            WorkspaceContent post = resource.target("/workspaces/1/containers/" + getId(container) + "/components")
-                    .request().post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
+            MultiPart mpe = getSAMultiPart();
+            WorkspaceContent post = resource
+                    .target("/workspaces/1/containers/" + getId(container) + "/serviceassemblies").request()
+                    .post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
 
-            ComponentFull postC = assertComponentContent(post, container, COMP_NAME);
+            ServiceAssemblyFull postDataSA = assertSAContent(post, container, SA_NAME,
+                    ImmutableList.of(component1, component1));
+            Iterator<ServiceUnitFull> iterator = post.serviceUnits.values().iterator();
+            ServiceUnitFull postSU1 = iterator.next();
+            ServiceUnitFull postSU2 = iterator.next();
+            assertThat(iterator.hasNext()).isFalse();
+
+            assertThat(postSU1.serviceUnit.name).isEqualTo(SU1_NAME);
+            assertThat(postSU2.serviceUnit.name).isEqualTo(SU2_NAME);
 
             expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("COMPONENT_DEPLOYED");
+                a.assertThat(e.getName()).isEqualTo("SA_DEPLOYED");
                 WorkspaceContent data = e.readData(WorkspaceContent.class);
 
-                assertComponentContent(a, data, post);
+                assertSAContent(a, data, post);
             });
 
             assertThat(resource.httpServer.wasCalled()).isTrue();
             assertThat(resource.httpServer.wasClosed()).isTrue();
 
-            assertThat(container.getComponents()).hasSize(1);
-            Component comp = container.getComponents().iterator().next();
-            assertThat(comp.getName()).isEqualTo(postC.component.name);
-            assertThat(comp.getState()).isEqualTo(ArtifactState.State.LOADED);
-            assertThat(comp.getType()).isEqualTo("BC");
+            assertThat(container.getServiceAssemblies()).hasSize(1);
 
-            resource.target("/components/" + postC.component.id).request().get(ComponentOverview.class);
+            resource.target("/serviceassemblies/" + postDataSA.serviceAssembly.id).request()
+                    .get(ServiceUnitOverview.class);
+            resource.target("/serviceunits/" + postSU1.serviceUnit.id).request().get(ServiceUnitOverview.class);
+            resource.target("/serviceunits/" + postSU2.serviceUnit.id).request().get(ServiceUnitOverview.class);
         }
     }
 
     @Test
-    public void deployComponentConflictContainerError() throws Exception {
+    public void deploySAConflictContainerError() throws Exception {
         failDeployment = true;
 
-        MultiPart mpe = getComponentMultiPart();
-        Response post = resource.target("/workspaces/1/containers/" + getId(container) + "/components").request()
+        MultiPart mpe = getSAMultiPart();
+        Response post = resource.target("/workspaces/1/containers/" + getId(container) + "/serviceassemblies").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertThat(post.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
         ErrorMessage err = post.readEntity(ErrorMessage.class);
         assertThat(err.getCode()).isEqualTo(Status.CONFLICT.getStatusCode());
         assertThat(err.getMessage()).isEqualTo("error");
-        assertThat(err.getDetails()).contains(DeployComponentTest.class.getName() + "$1.addComponent");
+        assertThat(err.getDetails()).contains(DeploySATest.class.getName() + "$1.addServiceAssembly");
 
-        assertThat(container.getComponents()).isEmpty();
+        assertThat(container.getServiceAssemblies()).isEmpty();
         assertThat(resource.httpServer.wasCalled()).isTrue();
         assertThat(resource.httpServer.wasClosed()).isTrue();
     }

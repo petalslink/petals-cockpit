@@ -21,39 +21,38 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Map.Entry;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
-import org.assertj.core.api.SoftAssertions;
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.glassfish.jersey.media.sse.EventInput;
-import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
-import org.ow2.petals.admin.api.artifact.ServiceUnit;
+import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
-import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
+import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import io.dropwizard.jersey.errors.ErrorMessage;
 import javaslang.Tuple;
-import javaslang.Tuple2;
 
 public class DeploySUTest extends AbstractCockpitResourceTest {
 
@@ -63,8 +62,19 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
 
     private final int containerPort = 7700;
 
+    private boolean failDeployment = false;
+
     private final Container container = new Container("cont1", "host1",
-            ImmutableMap.of(Container.PortType.JMX, containerPort), "user", "pass", Container.State.REACHABLE);
+            ImmutableMap.of(Container.PortType.JMX, containerPort), "user", "pass", Container.State.REACHABLE) {
+        @Override
+        public void addServiceAssembly(@Nullable ServiceAssembly serviceAssembly) {
+            if (failDeployment) {
+                throw new PetalsAdminException(new ArtifactAdministrationException("error"));
+            }
+
+            super.addServiceAssembly(serviceAssembly);
+        }
+    };
 
     private final Component component1 = new Component("comp1", ComponentType.SE, ArtifactState.State.STARTED);
 
@@ -79,6 +89,8 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
         resource.petals.registerArtifact(component1, container);
 
         setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
+
+        failDeployment = false;
     }
 
     @SuppressWarnings({ "resource" })
@@ -162,8 +174,7 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
 
     @Test
     public void deploySU() throws Exception {
-        try (EventInput eventInput = resource.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);
 
@@ -171,78 +182,44 @@ public class DeploySUTest extends AbstractCockpitResourceTest {
             WorkspaceContent post = resource.target("/workspaces/1/components/" + getId(component1) + "/serviceunits")
                     .request().post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
 
-            Tuple2<ServiceAssemblyFull, ServiceUnitFull> postData = assertSUContent(post);
+            ServiceAssemblyFull postDataSA = assertSAContent(post, container, "sa-" + SU_NAME,
+                    ImmutableList.of(component1));
+            ServiceUnitFull postDataSU = post.serviceUnits.values().iterator().next();
 
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("SA_DEPLOYED");
                 WorkspaceContent data = e.readData(WorkspaceContent.class);
 
-                assertSUContent(a, data, post);
-
+                assertSAContent(a, data, post);
             });
 
-            assertThat(resource.httpServer.wasCalled()).isEqualTo(true);
-            assertThat(resource.httpServer.wasClosed()).isEqualTo(true);
+            assertThat(resource.httpServer.wasCalled()).isTrue();
+            assertThat(resource.httpServer.wasClosed()).isTrue();
 
             assertThat(container.getServiceAssemblies()).hasSize(1);
-            ServiceAssembly sa = container.getServiceAssemblies().iterator().next();
-            assertThat(sa.getName()).isEqualTo(postData._1.serviceAssembly.name);
-            assertThat(sa.getState()).isEqualTo(ArtifactState.State.SHUTDOWN);
-            assertThat(sa.getServiceUnits()).hasSize(1);
-            ServiceUnit su = sa.getServiceUnits().iterator().next();
-            assertThat(su.getName()).isEqualTo(postData._2.serviceUnit.name);
-            assertThat(su.getTargetComponent()).isEqualTo(component1.getName());
 
-            ServiceUnitOverview suOverview = resource.target("/serviceunits/" + postData._2.serviceUnit.id).request()
+            resource.target("/serviceunits/" + postDataSU.serviceUnit.id).request().get(ServiceUnitOverview.class);
+            resource.target("/serviceassemblies/" + postDataSA.serviceAssembly.id).request()
                     .get(ServiceUnitOverview.class);
-            ServiceUnitOverview saOverview = resource.target("/serviceassemblies/" + postData._1.serviceAssembly.id)
-                    .request().get(ServiceUnitOverview.class);
         }
     }
 
-    private Tuple2<ServiceAssemblyFull, ServiceUnitFull> assertSUContent(WorkspaceContent content) {
-        SoftAssertions a = new SoftAssertions();
-        Tuple2<ServiceAssemblyFull, ServiceUnitFull> res = assertSUContent(a, content, null);
-        a.assertAll();
-        return res;
+    @Test
+    public void deploySUConflictContainerError() throws Exception {
+        failDeployment = true;
+
+        MultiPart mpe = getSUMultiPart();
+        Response post = resource.target("/workspaces/1/components/" + getId(component1) + "/serviceunits").request()
+                .post(Entity.entity(mpe, mpe.getMediaType()));
+
+        assertThat(post.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
+        ErrorMessage err = post.readEntity(ErrorMessage.class);
+        assertThat(err.getCode()).isEqualTo(Status.CONFLICT.getStatusCode());
+        assertThat(err.getMessage()).isEqualTo("error");
+        assertThat(err.getDetails()).contains(DeploySUTest.class.getName() + "$1.addServiceAssembly");
+
+        assertThat(container.getServiceAssemblies()).isEmpty();
+        assertThat(resource.httpServer.wasCalled()).isTrue();
+        assertThat(resource.httpServer.wasClosed()).isTrue();
     }
-
-    private Tuple2<ServiceAssemblyFull, ServiceUnitFull> assertSUContent(SoftAssertions a, WorkspaceContent content,
-            @Nullable WorkspaceContent control) {
-        assertThat(content.buses).isEmpty();
-        assertThat(content.busesInProgress).isEmpty();
-        assertThat(content.containers).isEmpty();
-        assertThat(content.components).isEmpty();
-        assertThat(content.serviceAssemblies).hasSize(1);
-        assertThat(content.serviceUnits).hasSize(1);
-
-        Entry<String, ServiceAssemblyFull> contentSAE = content.serviceAssemblies.entrySet().iterator().next();
-        Entry<String, ServiceUnitFull> contentSUE = content.serviceUnits.entrySet().iterator().next();
-
-        ServiceAssemblyFull contentSA = contentSAE.getValue();
-        ServiceUnitFull contentSU = contentSUE.getValue();
-
-        a.assertThat(contentSAE.getKey()).isEqualTo(Long.toString(contentSA.serviceAssembly.id));
-        a.assertThat(contentSUE.getKey()).isEqualTo(Long.toString(contentSU.serviceUnit.id));
-
-        if (control == null) {
-            a.assertThat(contentSU.componentId).isEqualTo(getId(component1));
-            a.assertThat(contentSU.serviceAssemblyId).isEqualTo(contentSA.serviceAssembly.id);
-            a.assertThat(contentSU.serviceUnit.name).isEqualTo(SU_NAME);
-
-            a.assertThat(contentSA.containerId).isEqualTo(getId(container));
-            a.assertThat(contentSA.serviceAssembly.name).isEqualTo("sa-" + SU_NAME);
-            a.assertThat(contentSA.serviceUnits).containsOnly(Long.toString(contentSU.serviceUnit.id));
-            a.assertThat(contentSA.state).isEqualTo(ServiceAssemblyMin.State.Shutdown);
-        } else {
-            ServiceAssemblyFull controlSA = control.serviceAssemblies.values().iterator().next();
-            ServiceUnitFull controlSU = control.serviceUnits.values().iterator().next();
-
-            a.assertThat(contentSU).isEqualToComparingFieldByFieldRecursively(controlSU);
-            a.assertThat(contentSA).isEqualToComparingFieldByFieldRecursively(controlSA);
-        }
-
-        return Tuple.of(contentSA, contentSU);
-    }
-
 }

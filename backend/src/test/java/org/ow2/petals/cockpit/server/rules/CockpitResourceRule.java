@@ -26,6 +26,8 @@ import javax.ws.rs.client.WebTarget;
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.media.sse.EventInput;
+import org.glassfish.jersey.media.sse.SseFeature;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
@@ -42,6 +44,7 @@ import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
+import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
 import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule;
 import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
@@ -90,6 +93,7 @@ public class CockpitResourceRule implements TestRule {
                         bind(ADMIN_TOKEN).to(String.class).named(SetupResource.ADMIN_TOKEN);
                     }
                 }).setClientConfigurator(cc -> cc.register(MultiPartFeature.class));
+        builder.addProvider(new PetalsAdminExceptionMapper(true));
         // we need to use the factory-based constructor to be sure it will always use the current value of profile!
         builder.addProvider(new Pac4JValueFactoryProvider.Binder(p -> () -> currentProfile,
                 p -> () -> Optional.ofNullable(currentProfile), null));
@@ -119,6 +123,11 @@ public class CockpitResourceRule implements TestRule {
 
     public WebTarget target(String path) {
         return this.resource.target(path);
+    }
+
+    public EventInput sse(long workspaceId) {
+        return resource.target("/workspaces/" + workspaceId + "/content").request(SseFeature.SERVER_SENT_EVENTS_TYPE)
+                .get(EventInput.class);
     }
 
     public DSLContext db() {

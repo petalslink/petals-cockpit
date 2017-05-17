@@ -77,7 +77,7 @@ export class ServiceUnitsEffects {
 
           return Observable.of({
             type: ServiceUnits.CHANGE_STATE_ERROR,
-            payload: { serviceUnitId: action.payload.serviceUnitId, errorChangeState: err._body }
+            payload: { serviceUnitId: action.payload.serviceUnitId, errorChangeState: err.json().message }
           });
         });
     }

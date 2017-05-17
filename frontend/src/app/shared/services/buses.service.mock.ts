@@ -49,7 +49,7 @@ export class BusesMockService extends BusesServiceImpl {
   postBus(idWorkspace: string, bus: IBusImport) {
     // only used by the tests to verify an error coming from the backend...
     if (bus.ip === IMPORT_HTTP_ERROR_IP) {
-      return helper.responseBody('Error backend', 500);
+      return helper.errorBackend('Error backend', 500);
     }
 
     const newBus = workspacesService.getWorkspace(idWorkspace).tryAddBus(bus);

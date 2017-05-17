@@ -48,9 +48,10 @@ export class BusesInProgressEffects {
         })
         )
         .catch((res: Response) => {
+          const err = res.json();
           return Observable.of({
             type: BusesInProgress.POST_BUS_IN_PROGRESS_ERROR,
-            payload: `Error ${res.status}${res.statusText ? ` (${res.statusText})` : ``}: ${res.text()}`
+            payload: `Error ${err.code}: ${err.message}`
           });
         })
     );

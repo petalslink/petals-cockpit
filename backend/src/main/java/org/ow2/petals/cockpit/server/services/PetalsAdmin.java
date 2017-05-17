@@ -160,7 +160,7 @@ public class PetalsAdmin {
     public ServiceAssembly deploy(String ip, int port, String username, String password, String saName, URL saUrl) {
         ServiceAssembly deployedSA = runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
             try {
-                // Note: since there is only one SU in it, a failure will result in the SA being removed
+                // TODO handle partially deployed SAs??!!
                 petals.newArtifactLifecycleFactory().createServiceAssemblyLifecycle(new ServiceAssembly(saName))
                         .deploy(saUrl);
                 return (ServiceAssembly) petals.newArtifactAdministration().getArtifactInfo(ServiceAssembly.TYPE,

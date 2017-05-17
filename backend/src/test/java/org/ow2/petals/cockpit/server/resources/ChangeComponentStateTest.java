@@ -25,8 +25,8 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.sse.EventInput;
-import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
@@ -34,6 +34,7 @@ import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
+import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
@@ -42,9 +43,11 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentStateChanged;
+import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
 
 import com.google.common.collect.ImmutableMap;
 
+import io.dropwizard.jersey.errors.ErrorMessage;
 import javaslang.Tuple;
 
 public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
@@ -60,7 +63,12 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     private final Component component2 = new Component("comp2", ComponentType.BC, ArtifactState.State.STOPPED);
 
-    private final Component component3 = new Component("comp3", ComponentType.BC, ArtifactState.State.STOPPED);
+    private final Component component3 = new Component("comp3", ComponentType.BC, ArtifactState.State.STOPPED) {
+        @Override
+        public void setState(ArtifactState.@Nullable State state) {
+            throw new PetalsAdminException(new ArtifactAdministrationException("error"));
+        }
+    };
 
     private final ServiceUnit serviceUnit1 = new ServiceUnit("su1", component3.getName());
 
@@ -85,9 +93,7 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeComp1State() {
-        try (EventInput eventInput = resource.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
-
+        try (EventInput eventInput = resource.sse(1)) {
             expectWorkspaceContent(eventInput);
 
             ComponentStateChanged put = resource.target("/workspaces/1/components/" + getId(component1)).request().put(
@@ -116,7 +122,6 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeComp1StateForbidden() {
-
         resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         Domain fDomain = new Domain("domf");
@@ -147,7 +152,6 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeNonExistingCompStateForbidden() {
-
         resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -170,7 +174,6 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeWrongCompStateForbidden() {
-
         resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -193,7 +196,6 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeComp1StateNotFound() {
-
         Response put = resource.target("/workspaces/1/components/339879").request()
                 .put(Entity.json(new ComponentChangeState(ComponentMin.State.Stopped)));
 
@@ -211,9 +213,30 @@ public class ChangeComponentStateTest extends AbstractCockpitResourceTest {
     }
 
     @Test
+    public void changeComp3StateConflictContainerError() {
+        Response put = resource.target("/workspaces/1/components/" + getId(component3)).request()
+                .put(Entity.json(new ComponentChangeState(ComponentMin.State.Started)));
+
+        assertThat(put.getStatus()).isEqualTo(409);
+        ErrorMessage err = put.readEntity(ErrorMessage.class);
+        assertThat(err.getCode()).isEqualTo(409);
+        assertThat(err.getMessage()).isEqualTo("error");
+        assertThat(err.getDetails()).contains(ChangeComponentStateTest.class.getName() + "$1.setState");
+
+        assertThatDbComp(getId(component1)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Started.name());
+        assertThat(component1.getState()).isEqualTo(ArtifactState.State.STARTED);
+        assertThatDbComp(getId(component2)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
+        assertThat(component2.getState()).isEqualTo(ArtifactState.State.STOPPED);
+        assertThatDbComp(getId(component3)).value(COMPONENTS.STATE.getName())
+                .isEqualTo(ComponentMin.State.Stopped.name());
+        assertThat(component3.getState()).isEqualTo(ArtifactState.State.STOPPED);
+    }
+
+    @Test
     public void changeComp2StateUnload() {
-        try (EventInput eventInput = resource.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);
 

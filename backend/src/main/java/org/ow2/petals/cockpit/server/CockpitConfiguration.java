@@ -58,6 +58,14 @@ public class CockpitConfiguration extends Configuration {
         return artifactTemporaryPath;
     }
 
+    @JsonProperty
+    private boolean showPetalsAdminStacktraces = false;
+
+    @JsonProperty
+    public boolean isShowPetalsAdminStacktraces() {
+        return showPetalsAdminStacktraces;
+    }
+
     @Valid
     @NotNull
     @JsonProperty

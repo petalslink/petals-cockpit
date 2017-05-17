@@ -85,7 +85,7 @@ export class ComponentsEffects {
 
           return Observable.of({
             type: Components.CHANGE_STATE_ERROR,
-            payload: { componentId: action.payload.componentId, errorChangeState: err._body }
+            payload: { componentId: action.payload.componentId, errorChangeState: err.json().message }
           });
         })
     );
@@ -119,7 +119,7 @@ export class ComponentsEffects {
 
           return Observable.of({
             type: Components.DEPLOY_SERVICE_UNIT_ERROR,
-            payload: { componentId: action.payload.componentId, errorDeployment: err._body }
+            payload: { componentId: action.payload.componentId, errorDeployment: err.json().message }
           });
         })
     );

@@ -2,6 +2,9 @@ class com/google/common/collect/ImmutableMap
 copyOf
  <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Map<+TK;+TV;>;)Lcom/google/common/collect/ImmutableMap<TK;TV;>;
  <K:Ljava/lang/Object;V:Ljava/lang/Object;>(L1java/util/Map<+TK;+TV;>;)L1com/google/common/collect/ImmutableMap<TK;TV;>;
+entrySet
+ ()Lcom/google/common/collect/ImmutableSet<Ljava/util/Map$Entry<TK;TV;>;>;
+ ()L1com/google/common/collect/ImmutableSet<L1java/util/Map$Entry<TK;TV;>;>;
 keySet
  ()Lcom/google/common/collect/ImmutableSet<TK;>;
  ()L1com/google/common/collect/ImmutableSet<TK;>;
