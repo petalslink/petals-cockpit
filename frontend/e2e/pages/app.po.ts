@@ -62,10 +62,14 @@ export class PetalsCockpitPage {
     return LoginPage.waitAndGet();
   }
 
-  clickAndExpectNotification(el: ElementFinder, title?: Matcher, content?: Matcher) {
+  waitAndClick(el: ElementFinder) {
     browser.wait(EC.elementToBeClickable(el), waitTimeout);
 
     el.click();
+  }
+
+  clickAndExpectNotification(el: ElementFinder, title?: Matcher, content?: Matcher) {
+    this.waitAndClick(el);
 
     const simpleNotification = $(`simple-notification`);
 

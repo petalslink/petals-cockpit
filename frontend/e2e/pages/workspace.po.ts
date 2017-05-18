@@ -36,7 +36,7 @@ export abstract class WorkspacePage {
   public readonly sidenav = WorkspacePage.sidenav;
   public readonly addBusButton = this.sidenav.$(`a.btn-add-bus`);
   public readonly changeWorkspaceButton = this.sidenav.$(`button.change-workspace`);
-  public readonly busesInProgress = this.sidenav.$$(`app-buses-in-progress md-nav-list a.bus-in-progress`);
+  public readonly busesInProgress = this.sidenav.$$(`app-buses-in-progress md-nav-list a`);
 
   static wait(expectedName?: Matcher) {
     browser.wait(urlToMatch(/\/workspaces\/\w+$/), waitTimeout);
@@ -73,7 +73,7 @@ export abstract class WorkspacePage {
     if (typeof identifier === 'string') {
       return this.sidenav.element(by.cssContainingText(`app-material-tree a.workspace-element-type-${type} span`, identifier));
     } else {
-      return this.sidenav.$$(`app-material-tree a.workspace-element-type-${type}`).get(identifier);
+      return this.sidenav.$$(`app-material-tree md-nav-list a.workspace-element-type-${type}`).get(identifier);
     }
   }
 
@@ -108,13 +108,13 @@ export abstract class WorkspacePage {
   }
 
   getWorkspaceTree() {
-    return $$(`app-cockpit md-sidenav app-material-tree div.mat-list-item-content > span`).getText()
+    return this.sidenav.$$('app-material-tree md-nav-list a div > span').getText()
       // getText on element.all is wrongly type, it should be a string[]
       .then((elements: any) => elements as string[]);
   }
 
   getHighlightedElement() {
-    return $$(`app-cockpit md-sidenav app-material-tree div.mat-list-item-content .highlight`).getText()
+    return this.sidenav.$$('app-material-tree md-nav-list .highlight').getText()
       // getText on element.all is wrongly type, it should be a string[]
       .then((elements: any) => elements as string[]);
   }

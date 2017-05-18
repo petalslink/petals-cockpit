@@ -26,7 +26,6 @@ export abstract class ServiceUnitPage {
 
   public readonly component = ServiceUnitPage.component;
   public readonly title = this.component.$(`md-toolbar-row .title`);
-  public readonly state = this.component.$(`md-card.state md-card-title`);
 
   protected static wait() {
     browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/service-units\/\w+/), waitTimeout);
@@ -39,6 +38,7 @@ export class ServiceUnitOverviewPage extends ServiceUnitPage {
   public static readonly overview = ServiceUnitPage.component.$(`app-petals-service-unit-overview`);
 
   public readonly overview = ServiceUnitOverviewPage.overview;
+  public readonly state = this.overview.$(`md-card.state md-card-title`);
   public readonly stopButton = this.overview.element(by.cssContainingText(`button`, `Stop`));
   public readonly startButton = this.overview.element(by.cssContainingText(`button`, `Start`));
   public readonly unloadButton = this.overview.element(by.cssContainingText(`button`, `Unload`));
