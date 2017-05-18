@@ -53,7 +53,7 @@ export interface IServiceUnitUI {
 
 export interface IServiceUnitRow extends IServiceUnitUI, IServiceUnitBackendSSE, IServiceUnitBackendDetails { }
 
-export interface IServiceUnit extends IServiceUnitUI, IServiceUnitBackendSSECommon, IServiceUnitBackendSSECommon { }
+export interface IServiceUnit extends IServiceUnitUI, IServiceUnitBackendSSECommon, IServiceUnitBackendDetailsCommon { }
 
 export function serviceUnitRowFactory(): IServiceUnitRow {
   return {

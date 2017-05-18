@@ -147,7 +147,7 @@ export class Containers {
     const container = containersTable.byId[payload.containerId];
 
     return updateById(containersTable, payload.containerId, {
-      components: [...Array.from(new Set([...container.components, payload.id]))],
+      components: [...container.components, payload.id],
       isDeployingComponent: false,
       errorDeployment: ''
     });
