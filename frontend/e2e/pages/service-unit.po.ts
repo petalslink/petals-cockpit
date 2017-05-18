@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $, by } from 'protractor';
+import { browser, ExpectedConditions as EC, $ } from 'protractor';
 
 import { urlToMatch } from '../utils';
 import { waitTimeout } from '../common';
+import { ServiceAssemblyOverviewPage } from './service-assembly.po';
 
 export abstract class ServiceUnitPage {
 
@@ -26,7 +27,6 @@ export abstract class ServiceUnitPage {
 
   public readonly component = ServiceUnitPage.component;
   public readonly title = this.component.$(`md-toolbar-row .title`);
-  public readonly state = this.component.$(`md-card.state md-card-title`);
 
   protected static wait() {
     browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/service-units\/\w+/), waitTimeout);
@@ -39,9 +39,9 @@ export class ServiceUnitOverviewPage extends ServiceUnitPage {
   public static readonly overview = ServiceUnitPage.component.$(`app-petals-service-unit-overview`);
 
   public readonly overview = ServiceUnitOverviewPage.overview;
-  public readonly stopButton = this.overview.element(by.cssContainingText(`button`, `Stop`));
-  public readonly startButton = this.overview.element(by.cssContainingText(`button`, `Start`));
-  public readonly unloadButton = this.overview.element(by.cssContainingText(`button`, `Unload`));
+  public readonly state = this.overview.$(`md-card.state md-card-title`);
+  public readonly serviceAssemblyCard = this.overview.$('md-card.service-assembly');
+  public readonly serviceAssembly = this.serviceAssemblyCard.$('md-card-title');
 
   static waitAndGet() {
     super.wait();
@@ -52,21 +52,9 @@ export class ServiceUnitOverviewPage extends ServiceUnitPage {
   private constructor() {
     super();
   }
-}
 
-export class ServiceUnitOperationPage extends ServiceUnitPage {
-
-  public static readonly operations = ServiceUnitPage.component.$(`app-petals-service-unit-operations`);
-
-  public readonly operations = ServiceUnitOperationPage.operations;
-
-  static waitAndGet() {
-    super.wait();
-    browser.wait(EC.visibilityOf(ServiceUnitOperationPage.operations), waitTimeout);
-    return new ServiceUnitOperationPage();
-  }
-
-  private constructor() {
-    super();
+  openServiceAssembly() {
+    this.serviceAssembly.$('a').click();
+    return ServiceAssemblyOverviewPage.waitAndGet();
   }
 }

@@ -15,14 +15,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <md-nav-list dense *ngFor="let item of tree; let i = index" [style.marginLeft.px]="margin">
   <a md-list-item [class]="item.cssClass" [routerLink]="[item.link]" routerLinkActive="active-link" (click)="select({deepLevel: deepLevel, index: i, item: item})">
-    <md-icon
-      md-list-icon
-      *ngIf="item.children && item.children.length > 0"
-      (click)="toggleFold({deepLevel: deepLevel, index: i, item: item})"
-      [class.disable-fold-unfold]="search !== ''"
-      [class.rotate-minus-90]="item.isFolded">arrow_drop_down</md-icon>
+    <div fxLayout="row" fxLayoutAlign="start center">
+      <md-icon
+        *ngIf="item.children && item.children.length > 0; else iconNoChildren"
+        md-list-icon
+        (click)="toggleFold({deepLevel: deepLevel, index: i, item: item})"
+        [class.disable-fold-unfold]="search !== ''"
+        [class.rotate-minus-90]="item.isFolded">arrow_drop_down</md-icon>
 
-    <span appColorSearchedLetters [search]="search" classToApply="highlight" [text]="item.name"></span>
+      <ng-template #iconNoChildren>
+        <md-icon class="no-children" fxLayout="row" fxLayoutAlign="center center">panorama_fish_eye</md-icon>
+      </ng-template>
+
+      <span appColorSearchedLetters [search]="search" classToApply="highlight" [text]="item.name"></span>
+    </div>
   </a>
 
   <app-material-tree

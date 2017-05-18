@@ -63,9 +63,7 @@ export class ServiceUnit {
         name: this.name,
         containerId: this.component.container.id,
         componentId: this.component.id,
-        serviceAssemblyId: this.serviceAssembly.id,
-        // TODO for now, the effect sets it as expected
-        state: undefined
+        serviceAssemblyId: this.serviceAssembly.id
       }
     };
   }

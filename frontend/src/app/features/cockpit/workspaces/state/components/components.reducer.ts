@@ -184,10 +184,9 @@ export class Components {
   // tslint:disable-next-line:member-ordering
   public static DEPLOY_SERVICE_UNIT_SUCCESS = `${Components.reducerName} Deploy service unit success`;
   private static deployServiceUnitSuccess(componentsTable: IComponentsTable, payload: IServiceUnitBackendSSE): IComponentsTable {
-    const component = componentsTable.byId[payload.componentId];
-
     return updateById(componentsTable, payload.componentId, {
-      serviceUnits: [...Array.from(new Set([...component.serviceUnits, payload.id]))],
+      serviceUnits: [...componentsTable.byId[payload.componentId].serviceUnits, payload.id],
+      // TODO that's not totally correct, because we don't really know if this was deployed by us and from a component
       isDeployingServiceUnit: false,
       errorDeployment: ''
     });

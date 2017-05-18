@@ -23,18 +23,11 @@ import { Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 
 import { environment } from './../../../environments/environment';
-import { SseService, SseWorkspaceEvent } from './sse.service';
-import { ServiceUnits } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
+import { SseService } from './sse.service';
 import { IStore } from '../interfaces/store.interface';
-import { EServiceUnitState, ServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 
 export abstract class ServiceUnitsService {
   abstract getDetailsServiceUnit(serviceUnitId: string): Observable<Response>;
-
-  abstract putState(workspaceId: string, serviceAssemblyId: string, newState: ServiceUnitState): Observable<Response>;
-
-  abstract watchEventSuStateChangeOk(): Observable<void>;
 }
 
 @Injectable()
@@ -51,41 +44,5 @@ export class ServiceUnitsServiceImpl extends ServiceUnitsService {
 
   getDetailsServiceUnit(serviceUnitId: string) {
     return this.http.get(`${environment.urlBackend}/serviceunits/${serviceUnitId}`);
-  }
-
-  putState(workspaceId: string, serviceAssemblyId: string, newState: ServiceUnitState) {
-    return this.http.put(`${environment.urlBackend}/workspaces/${workspaceId}/serviceassemblies/${serviceAssemblyId}`, { state: newState });
-  }
-
-  watchEventSuStateChangeOk() {
-    return this.sseService
-      .subscribeToWorkspaceEvent(SseWorkspaceEvent.SA_STATE_CHANGE)
-      .withLatestFrom(this.store$)
-      .do(([data, store]: [{ id: string, state: ServiceUnitState }, IStore]) => {
-        const sus = store.serviceUnits.allIds
-          .map(id => store.serviceUnits.byId[id])
-          .filter(su => su.serviceAssemblyId === data.id);
-        if (data.state === EServiceUnitState.Unloaded && sus.length > 0) {
-          this.router.navigate(['/workspaces', store.workspaces.selectedWorkspaceId]);
-
-          // we should notify about the SA, not the SU
-          this.notification.success('Service unit unloaded', `"${sus[0].name}" has been unloaded`);
-
-          const actions = sus.map(su => ({
-            type: ServiceUnits.REMOVE_SERVICE_UNIT,
-            payload: { componentId: su.componentId, serviceUnitId: su.id }
-          }));
-
-          this.store$.dispatch(batchActions(actions));
-        } else {
-          const actions = sus.map(su => ({
-            type: ServiceUnits.CHANGE_STATE_SUCCESS,
-            payload: { newState: data.state, serviceUnitId: su.id }
-          }));
-
-          this.store$.dispatch(batchActions(actions));
-        }
-      })
-      .mapTo(null);
   }
 }

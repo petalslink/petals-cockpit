@@ -41,6 +41,11 @@ const routes: Routes = [
     loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-view.module#PetalsContainerViewModule'
   },
   {
+    path: 'service-assemblies/:serviceAssemblyId',
+    // tslint:disable-next-line:max-line-length
+    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.module#PetalsServiceAssemblyViewModule'
+  },
+  {
     path: 'components/:componentId',
     // tslint:disable-next-line:max-line-length
     loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-view.module#PetalsComponentViewModule'

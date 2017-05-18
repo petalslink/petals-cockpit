@@ -23,56 +23,51 @@ import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Ui } from '../../../../../shared/state/ui.reducer';
-import { ServiceUnits } from '../../state/service-units/service-units.reducer';
-import { getCurrentServiceUnit } from '../../state/service-units/service-units.selectors';
-import { IServiceUnitRow } from '../../state/service-units/service-unit.interface';
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import {
+  getCurrentServiceAssembly,
+  getServiceUnitsAndComponentsOfServiceAssembly
+} from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
+import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 
 @Component({
-  selector: 'app-petals-service-unit-view',
-  templateUrl: './petals-service-unit-view.component.html',
-  styleUrls: ['./petals-service-unit-view.component.scss']
+  selector: 'app-petals-service-assembly-view',
+  templateUrl: './petals-service-assembly-view.component.html',
+  styleUrls: ['./petals-service-assembly-view.component.scss']
 })
-export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
+export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  public serviceUnit$: Observable<IServiceUnitRow>;
   public serviceAssembly$: Observable<IServiceAssemblyRow>;
-  public workspaceId$: Observable<string>;
+  public serviceUnitsAndComponentsOfServiceAssembly$: Observable<IServiceUnitAndComponent[]>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    const serviceUnitId$ = this.route.paramMap
-      .map(pm => pm.get('serviceUnitId'))
+    const serviceAssemblyId$ = this.route.paramMap
+      .map(pm => pm.get('serviceAssemblyId'))
       .distinctUntilChanged();
 
-    this.serviceUnit$ = this.store$.let(getCurrentServiceUnit);
+    this.serviceAssembly$ = this.store$.let(getCurrentServiceAssembly);
 
-    this.serviceAssembly$ = this
-      .serviceUnit$
-      .combineLatest(this
-        .store$
-        .select(state => state.serviceAssemblies))
-      .map(([serviceUnit, serviceAssembliesTable]) => serviceAssembliesTable.byId[serviceUnit.serviceAssemblyId]);
+    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Service Assemblies' } });
 
-    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Service Unit' } });
-
-    serviceUnitId$
+    serviceAssemblyId$
       .takeUntil(this.onDestroy$)
-      .do(serviceUnitId => {
-        this.store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId } });
-        this.store$.dispatch({ type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS, payload: { serviceUnitId } });
+      .do(serviceAssemblyId => {
+        this.store$.dispatch({ type: ServiceAssemblies.SET_CURRENT_SERVICE_ASSEMBLY, payload: { serviceAssemblyId } });
+        this.store$.dispatch({ type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS, payload: { serviceAssemblyId } });
       })
       .subscribe();
 
-    this.workspaceId$ = this.store$.select(state => state.workspaces.selectedWorkspaceId);
+    this.serviceUnitsAndComponentsOfServiceAssembly$ = this.store$.let(getServiceUnitsAndComponentsOfServiceAssembly);
   }
 
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    this.store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: '' } });
+    this.store$.dispatch({ type: ServiceAssemblies.SET_CURRENT_SERVICE_ASSEMBLY, payload: { serviceAssemblyId: '' } });
   }
 }

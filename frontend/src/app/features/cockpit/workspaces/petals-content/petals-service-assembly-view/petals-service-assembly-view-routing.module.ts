@@ -15,27 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.rotate-minus-90 {
-  -ms-transform: rotate(-90deg);
-  -webkit-transform: rotate(-90deg);
-  transform: rotate(-90deg);
-}
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import {
+  PetalsServiceAssemblyViewComponent
+} from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.component';
 
-.md-list[dense],
-md-nav-list[dense] {
-  padding-top: 0;
-}
+// /workspaces/:workspaceId/petals/service-assemblies/:serviceAssemblyId
+const routes: Routes = [
+  {
+    path: '',
+    component: PetalsServiceAssemblyViewComponent
+  }
+];
 
-.disable-fold-unfold {
-  color: grey;
-  opacity: 0.4;
-}
-
-.no-children {
-  font-size: 11px;
-}
-
-.mat-list[dense] .mat-list-item .mat-list-icon,
-.mat-nav-list[dense] .mat-list-item .mat-list-icon {
-  padding: 1px;
-}
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
+  providers: []
+})
+export class PetalsServiceAssemblyViewRoutingModule { }

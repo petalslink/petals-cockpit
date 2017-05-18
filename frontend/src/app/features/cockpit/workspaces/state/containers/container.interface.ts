@@ -16,6 +16,7 @@
  */
 
 import { IComponents } from '../components/components.interface';
+import { IServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 
 export interface IContainerBackendSSECommon {
   id: string;
@@ -30,6 +31,7 @@ export interface IContainerBackendDetailsCommon {
 
 export interface IContainerBackendSSE extends IContainerBackendSSECommon {
   components: string[];
+  serviceAssemblies: string[];
 }
 
 export interface IContainerBackendDetails extends IContainerBackendDetailsCommon {
@@ -48,6 +50,7 @@ export interface IContainerRow extends IContainerUI, IContainerBackendSSE, ICont
 
 export interface IContainer extends IContainerUI, IContainerBackendSSECommon, IContainerBackendDetailsCommon {
   components: IComponents;
+  serviceAssemblies: IServiceAssemblies;
 }
 
 export function containerRowFactory(): IContainerRow {
@@ -65,6 +68,7 @@ export function containerRowFactory(): IContainerRow {
     errorDeployment: '',
 
     components: [],
+    serviceAssemblies: [],
     reachabilities: []
   };
 }

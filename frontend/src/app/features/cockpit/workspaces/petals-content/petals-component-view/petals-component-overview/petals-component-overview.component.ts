@@ -68,6 +68,6 @@ export class PetalsComponentOverviewComponent implements OnInit, OnChanges {
   }
 
   componentState(index, item) {
-    return this.component ? this.component.state : null;
+    return item.actionName;
   }
 }

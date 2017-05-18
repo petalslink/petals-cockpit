@@ -15,43 +15,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ServiceUnitState, EServiceUnitState } from '../../features/cockpit/workspaces/state/service-units/service-unit.interface';
+import {
+  ServiceAssemblyState,
+  EServiceAssemblyState
+} from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
 
 /**
  * @param state : The state you want to get the possible actions from. For example : 'Started'
  * @returns The possible new actions according to the state
  */
-export function stateNameToPossibleActionsServiceUnit(
-  state: ServiceUnitState
-): { actionName: string, newStateAfterAction: ServiceUnitState }[] {
+export function stateNameToPossibleActionsServiceAssembly(
+  state: ServiceAssemblyState
+): { actionName: string, newStateAfterAction: ServiceAssemblyState }[] {
   switch (state) {
-    case EServiceUnitState.Shutdown:
+    case EServiceAssemblyState.Shutdown:
       return [
-        { actionName: 'Start', newStateAfterAction: EServiceUnitState.Started },
-        { actionName: 'Unload', newStateAfterAction: EServiceUnitState.Unloaded }
+        { actionName: 'Start', newStateAfterAction: EServiceAssemblyState.Started },
+        { actionName: 'Unload', newStateAfterAction: EServiceAssemblyState.Unloaded }
       ];
 
-    case EServiceUnitState.Started:
+    case EServiceAssemblyState.Started:
       return [
-        { actionName: 'Stop', newStateAfterAction: EServiceUnitState.Stopped }
+        { actionName: 'Stop', newStateAfterAction: EServiceAssemblyState.Stopped }
       ];
 
-    case EServiceUnitState.Stopped:
+    case EServiceAssemblyState.Stopped:
       return [
-        { actionName: 'Start', newStateAfterAction: EServiceUnitState.Started },
-        { actionName: 'Unload', newStateAfterAction: EServiceUnitState.Unloaded }
+        { actionName: 'Start', newStateAfterAction: EServiceAssemblyState.Started },
+        { actionName: 'Unload', newStateAfterAction: EServiceAssemblyState.Unloaded }
       ];
 
-    case EServiceUnitState.Unknown:
+    case EServiceAssemblyState.Unknown:
       return [
-        { actionName: 'Unload', newStateAfterAction: EServiceUnitState.Unloaded }
+        { actionName: 'Unload', newStateAfterAction: EServiceAssemblyState.Unloaded }
       ];
 
-    case EServiceUnitState.Unloaded:
+    case EServiceAssemblyState.Unloaded:
       // no possible new state here but it exists so handle it in order to not throw an error
       break;
 
     default:
-      throw new Error(`SU state cannot be '${state}'`);
+      throw new Error(`SA state cannot be '${state}'`);
   }
 }

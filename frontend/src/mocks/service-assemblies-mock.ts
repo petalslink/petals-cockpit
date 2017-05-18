@@ -18,7 +18,7 @@
 import { Container } from './containers-mock';
 import { ServiceUnit, serviceUnitsService } from './service-units-mock';
 import { Component } from './components-mock';
-import { ServiceUnitState } from './../app/features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { ServiceAssemblyState } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
 
 class ServiceAssemblies {
   private readonly serviceAssemblies = new Map<string, ServiceAssembly>();
@@ -41,8 +41,7 @@ export const serviceAssembliesService = new ServiceAssemblies();
 export class ServiceAssembly {
   private static cpt = 0;
   public readonly id: string;
-  // TODO should be EServiceAssemblyState
-  public state: ServiceUnitState = 'Started';
+  public state: ServiceAssemblyState = 'Started';
   public readonly name: string;
   public readonly container: Container;
   private readonly serviceUnits = new Map<string, ServiceUnit>();
@@ -80,5 +79,9 @@ export class ServiceAssembly {
 
   getDetails()/*: IServiceAssemblyBackendDetails*/ {
     return {};
+  }
+
+  setState(newState: ServiceAssemblyState) {
+    this.state = newState;
   }
 }

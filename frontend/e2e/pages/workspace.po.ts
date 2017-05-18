@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $, $$, by } from 'protractor';
+import { browser, ExpectedConditions as EC, $, by } from 'protractor';
 
 import { urlToMatch, Matcher, textToMatchInElement } from '../utils';
 import { waitTimeout } from '../common';
@@ -25,6 +25,7 @@ import { ComponentOverviewPage } from './component.po';
 import { ContainerOverviewPage } from './container.po';
 import { ServiceUnitOverviewPage } from './service-unit.po';
 import { WorkspacesPage } from './workspaces.po';
+import { ServiceAssemblyOverviewPage } from './service-assembly.po';
 
 export abstract class WorkspacePage {
 
@@ -36,7 +37,7 @@ export abstract class WorkspacePage {
   public readonly sidenav = WorkspacePage.sidenav;
   public readonly addBusButton = this.sidenav.$(`a.btn-add-bus`);
   public readonly changeWorkspaceButton = this.sidenav.$(`button.change-workspace`);
-  public readonly busesInProgress = this.sidenav.$$(`app-buses-in-progress md-nav-list a.bus-in-progress`);
+  public readonly busesInProgress = this.sidenav.$$(`app-buses-in-progress md-nav-list a`);
 
   static wait(expectedName?: Matcher) {
     browser.wait(urlToMatch(/\/workspaces\/\w+$/), waitTimeout);
@@ -73,7 +74,7 @@ export abstract class WorkspacePage {
     if (typeof identifier === 'string') {
       return this.sidenav.element(by.cssContainingText(`app-material-tree a.workspace-element-type-${type} span`, identifier));
     } else {
-      return this.sidenav.$$(`app-material-tree a.workspace-element-type-${type}`).get(identifier);
+      return this.sidenav.$$(`app-material-tree md-nav-list a.workspace-element-type-${type}`).get(identifier);
     }
   }
 
@@ -96,6 +97,11 @@ export abstract class WorkspacePage {
     return ContainerOverviewPage.waitAndGet();
   }
 
+  openServiceAssembly(identifier: string | number) {
+    this.treeElement(identifier, 'service-assembly').click();
+    return ServiceAssemblyOverviewPage.waitAndGet();
+  }
+
   openServiceUnit(identifier: string | number) {
     this.treeElement(identifier, 'service-unit').click();
     return ServiceUnitOverviewPage.waitAndGet();
@@ -108,13 +114,13 @@ export abstract class WorkspacePage {
   }
 
   getWorkspaceTree() {
-    return $$(`app-cockpit md-sidenav app-material-tree div.mat-list-item-content > span`).getText()
+    return this.sidenav.$$('app-material-tree md-nav-list a div > span').getText()
       // getText on element.all is wrongly type, it should be a string[]
       .then((elements: any) => elements as string[]);
   }
 
   getHighlightedElement() {
-    return $$(`app-cockpit md-sidenav app-material-tree div.mat-list-item-content .highlight`).getText()
+    return this.sidenav.$$('app-material-tree md-nav-list .highlight').getText()
       // getText on element.all is wrongly type, it should be a string[]
       .then((elements: any) => elements as string[]);
   }

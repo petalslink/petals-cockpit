@@ -54,7 +54,7 @@ export interface IComponentBackendSSE extends IComponentBackendSSECommon {
 }
 
 // tslint:disable-next-line:no-empty-interface
-export interface IComponentBackendDetails extends IComponentBackendDetailsCommon {}
+export interface IComponentBackendDetails extends IComponentBackendDetailsCommon { }
 
 export interface IComponentUI {
   // for UI
@@ -66,8 +66,9 @@ export interface IComponentUI {
   errorDeployment: string;
 }
 
-export interface IComponentRow extends IComponentUI, IComponentBackendSSE, IComponentBackendDetails {
-}
+export interface IComponentRow extends IComponentUI, IComponentBackendSSE, IComponentBackendDetails { }
+
+export interface IComponentRowWithoutDetails extends IComponentUI, IComponentBackendSSE { }
 
 export interface IComponent extends IComponentUI, IComponentBackendSSECommon, IComponentBackendDetailsCommon {
   serviceUnits: IServiceUnits;
@@ -80,7 +81,7 @@ export function componentRowFactory(): IComponentRow {
     state: null,
     type: null,
     containerId: null,
-    parameters: {},
+    parameters: { },
 
     isFolded: false,
     isFetchingDetails: false,

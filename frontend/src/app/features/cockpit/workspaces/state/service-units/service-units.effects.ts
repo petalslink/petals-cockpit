@@ -25,7 +25,6 @@ import { environment } from './../../../../../../environments/environment';
 import { ServiceUnitsService } from './../../../../../shared/services/service-units.service';
 import { ServiceUnits } from './../service-units/service-units.reducer';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { ServiceUnitState } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 
 @Injectable()
 export class ServiceUnitsEffects {
@@ -57,29 +56,5 @@ export class ServiceUnitsEffects {
             payload: { serviceUnitId: action.payload.serviceUnitId }
           });
         })
-    );
-
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) changeState$: Observable<Action> = this.actions$
-    .ofType(ServiceUnits.CHANGE_STATE)
-    .withLatestFrom(this.store$)
-    .switchMap(([action, store]: [{ type: string, payload: { serviceUnitId: string, newState: ServiceUnitState } }, IStore]) => {
-      const saId = store.serviceUnits.byId[action.payload.serviceUnitId].serviceAssemblyId;
-      return this.serviceUnitsService.putState(store.workspaces.selectedWorkspaceId, saId, action.payload.newState)
-        .mergeMap(_ => Observable.empty())
-        .catch((err) => {
-          if (environment.debug) {
-            console.group();
-            console.warn('Error caught in service-unit.effects: ofType(ServiceUnits.CHANGE_STATE)');
-            console.error(err);
-            console.groupEnd();
-          }
-
-          return Observable.of({
-            type: ServiceUnits.CHANGE_STATE_ERROR,
-            payload: { serviceUnitId: action.payload.serviceUnitId, errorChangeState: err.json().message }
-          });
-        });
-    }
     );
 }

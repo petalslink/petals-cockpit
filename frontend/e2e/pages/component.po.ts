@@ -26,8 +26,6 @@ export abstract class ComponentPage {
 
   public readonly component = ComponentPage.component;
   public readonly title = this.component.$(`md-toolbar-row .title`);
-  public readonly state = this.component.$(`md-card.state md-card-title`);
-  public readonly type = this.component.$(`md-card.type md-card-title`);
 
   protected static wait() {
     browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/components\/\w+/), waitTimeout);
@@ -45,13 +43,16 @@ export class ComponentOverviewPage extends ComponentPage {
   public static readonly overview = ComponentPage.component.$(`app-petals-component-overview`);
 
   public readonly overview = ComponentOverviewPage.overview;
-  public readonly stopButton = this.overview.element(by.cssContainingText(`button`, `Stop`));
-  public readonly startButton = this.overview.element(by.cssContainingText(`button`, `Start`));
-  public readonly installButton = this.overview.element(by.cssContainingText(`button`, `Install`));
-  public readonly uninstallButton = this.overview.element(by.cssContainingText(`button`, `Uninstall`));
-  public readonly unloadButton = this.overview.element(by.cssContainingText(`button`, `Unload`));
-  public readonly changeStateError = this.overview.$(`md-card.state .error .italic`);
-  public readonly parameters = this.overview.$(`.parameters`);
+  public readonly stateCard = this.overview.$(`md-card.state`);
+  public readonly state = this.stateCard.$(`md-card-title`);
+  public readonly type = this.overview.$(`md-card.type md-card-title`);
+  public readonly stopButton = this.stateCard.element(by.cssContainingText(`button`, `Stop`));
+  public readonly startButton = this.stateCard.element(by.cssContainingText(`button`, `Start`));
+  public readonly installButton = this.stateCard.element(by.cssContainingText(`button`, `Install`));
+  public readonly uninstallButton = this.stateCard.element(by.cssContainingText(`button`, `Uninstall`));
+  public readonly unloadButton = this.stateCard.element(by.cssContainingText(`button`, `Unload`));
+  public readonly changeStateError = this.stateCard.$(`.error .italic`);
+  public readonly parameters = this.stateCard.$(`.parameters`);
 
   static waitAndGet() {
     super.wait();

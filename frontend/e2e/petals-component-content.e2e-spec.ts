@@ -60,13 +60,17 @@ describe(`Petals component content`, () => {
     comp.stopButton.click();
 
     // unload the 2 SU
-    const su0 = workspace.openServiceUnit('SU 0');
-    su0.stopButton.click();
-    page.clickAndExpectNotification(su0.unloadButton);
+    const sa0 = workspace.openServiceAssembly('SA 0').openOperations();
+    page.waitAndClick(sa0.stopButton);
+    page.clickAndExpectNotification(sa0.unloadButton);
 
-    const su1 = workspace.openServiceUnit('SU 1');
-    su1.stopButton.click();
-    page.clickAndExpectNotification(su1.unloadButton);
+    const sa1 = workspace.openServiceAssembly('SA 1').openOperations();
+    page.waitAndClick(sa1.stopButton);
+    page.clickAndExpectNotification(sa1.unloadButton);
+
+    const sa4 = workspace.openServiceAssembly('SA 4').openOperations();
+    page.waitAndClick(sa4.stopButton);
+    page.clickAndExpectNotification(sa4.unloadButton);
 
     // we should now be able to unload the comp 0
     comp = workspace.openComponent('Comp 0');
@@ -150,19 +154,33 @@ describe(`Petals component content`, () => {
     const expectedTreeBeforeDeploy = [
       `Bus 0`,
       `Cont 0`,
+      `SA 0`,
+      `SA 1`,
+      `SA 2`,
+      `SA 3`,
+      `SA 4`,
       `Comp 0`,
       `SU 0`,
       `SU 1`,
+      `SU 4`,
       `Comp 1`,
       `SU 2`,
       `SU 3`,
-      `Cont 1`,
-      `Comp 2`,
-      `SU 4`,
       `SU 5`,
-      `Comp 3`,
+      `Cont 1`,
+      `SA 5`,
+      `SA 6`,
+      `SA 7`,
+      `SA 8`,
+      `SA 9`,
+      `Comp 2`,
       `SU 6`,
-      `SU 7`
+      `SU 7`,
+      `SU 10`,
+      `Comp 3`,
+      `SU 8`,
+      `SU 9`,
+      `SU 11`
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
@@ -174,21 +192,36 @@ describe(`Petals component content`, () => {
     const expectedTreeAfterDeploy = [
       `Bus 0`,
       `Cont 0`,
+      `SA 0`,
+      `SA 1`,
+      `SA 2`,
+      `SA 3`,
+      `SA 4`,
+      `sa-su`,
       `Comp 0`,
       `SU 0`,
       `SU 1`,
+      `SU 4`,
       // this one should have been deployed
       `su`,
       `Comp 1`,
       `SU 2`,
       `SU 3`,
-      `Cont 1`,
-      `Comp 2`,
-      `SU 4`,
       `SU 5`,
-      `Comp 3`,
+      `Cont 1`,
+      `SA 5`,
+      `SA 6`,
+      `SA 7`,
+      `SA 8`,
+      `SA 9`,
+      `Comp 2`,
       `SU 6`,
-      `SU 7`
+      `SU 7`,
+      `SU 10`,
+      `Comp 3`,
+      `SU 8`,
+      `SU 9`,
+      `SU 11`
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);

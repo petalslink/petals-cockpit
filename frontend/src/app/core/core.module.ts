@@ -52,6 +52,9 @@ import { ComponentsMockService } from './../shared/services/components.service.m
 import { ServiceUnitsService, ServiceUnitsServiceImpl } from './../shared/services/service-units.service';
 import { ServiceUnitsMockService } from './../shared/services/service-units.service.mock';
 import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
+import { ServiceAssembliesService, ServiceAssembliesServiceImpl } from 'app/shared/services/service-assemblies.service';
+import { ServiceAssembliesMockService } from 'app/shared/services/service-assemblies.service.mock';
+import { ServiceAssembliesEffects } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.effects';
 
 export const providers = [
   {
@@ -75,6 +78,10 @@ export const providers = [
   {
     provide: ComponentsService,
     useClass: (environment.mock ? ComponentsMockService : ComponentsServiceImpl)
+  },
+  {
+    provide: ServiceAssembliesService,
+    useClass: (environment.mock ? ServiceAssembliesMockService : ServiceAssembliesServiceImpl)
   },
   {
     provide: ServiceUnitsService,
@@ -110,6 +117,7 @@ export const providers = [
     EffectsModule.run(BusesEffects),
     EffectsModule.run(ContainersEffects),
     EffectsModule.run(ComponentsEffects),
+    EffectsModule.run(ServiceAssembliesEffects),
     EffectsModule.run(ServiceUnitsEffects),
     StoreDevtoolsModule.instrumentOnlyWithExtension(),
     TranslateModule.forRoot({

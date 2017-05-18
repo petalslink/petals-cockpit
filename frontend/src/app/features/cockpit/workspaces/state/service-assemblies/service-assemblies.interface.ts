@@ -15,27 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.rotate-minus-90 {
-  -ms-transform: rotate(-90deg);
-  -webkit-transform: rotate(-90deg);
-  transform: rotate(-90deg);
+import { IServiceAssemblyRow, IServiceAssembly } from './service-assembly.interface';
+
+interface IServiceAssembliesCommon {
+  selectedServiceAssemblyId: string;
+  isFetchingDetails: boolean;
 }
 
-.md-list[dense],
-md-nav-list[dense] {
-  padding-top: 0;
+export interface IServiceAssembliesTable extends IServiceAssembliesCommon {
+  byId: { [key: string]: IServiceAssemblyRow };
+  allIds: string[];
 }
 
-.disable-fold-unfold {
-  color: grey;
-  opacity: 0.4;
+export interface IServiceAssemblies extends IServiceAssembliesCommon {
+  list: IServiceAssembly[];
 }
 
-.no-children {
-  font-size: 11px;
-}
+export function serviceAssembliesTableFactory(): IServiceAssembliesTable {
+  return {
+    selectedServiceAssemblyId: '',
+    isFetchingDetails: false,
 
-.mat-list[dense] .mat-list-item .mat-list-icon,
-.mat-nav-list[dense] .mat-list-item .mat-list-icon {
-  padding: 1px;
+    byId: {},
+    allIds: []
+  };
 }

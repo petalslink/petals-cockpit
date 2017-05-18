@@ -15,56 +15,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IComponentRowWithoutDetails } from 'app/features/cockpit/workspaces/state/components/component.interface';
+// http://stackoverflow.com/a/41631732/2398593
+export const EServiceAssemblyState = {
+  Started: 'Started' as 'Started',
+  Stopped: 'Stopped' as 'Stopped',
+  Unloaded: 'Unloaded' as 'Unloaded',
+  Shutdown: 'Shutdown' as 'Shutdown',
+  Unknown: 'Unknown' as 'Unknown'
+};
 
-export interface IServiceUnitBackendSSECommon {
+export type ServiceAssemblyState = keyof typeof EServiceAssemblyState;
+
+export interface IServiceAssemblyBackendSSECommon {
   id: string;
   name: string;
   containerId: string;
-  componentId: string;
-  serviceAssemblyId: string;
+  state: ServiceAssemblyState;
 }
 
 // tslint:disable-next-line:no-empty-interface
-export interface IServiceUnitBackendDetailsCommon { }
+export interface IServiceAssemblyBackendDetailsCommon { }
 
 // tslint:disable-next-line:no-empty-interface
-export interface IServiceUnitBackendSSE extends IServiceUnitBackendSSECommon { }
+export interface IServiceAssemblyBackendSSE extends IServiceAssemblyBackendSSECommon {
+  serviceUnits: string[];
+}
 
 // tslint:disable-next-line:no-empty-interface
-export interface IServiceUnitBackendDetails extends IServiceUnitBackendDetailsCommon { }
+export interface IServiceAssemblyBackendDetails extends IServiceAssemblyBackendDetailsCommon { }
 
-export interface IServiceUnitUI {
+export interface IServiceAssemblyUI {
   // for UI
   isFolded: boolean;
   isUpdatingState: boolean;
   errorChangeState: string;
 }
 
-export interface IServiceUnitRow extends IServiceUnitUI, IServiceUnitBackendSSE, IServiceUnitBackendDetails { }
+export interface IServiceAssemblyRow extends IServiceAssemblyUI, IServiceAssemblyBackendSSE, IServiceAssemblyBackendDetails { }
 
-export interface IServiceUnitRowWithoutDetails extends IServiceUnitUI, IServiceUnitBackendSSE { }
+export interface IServiceAssembly extends IServiceAssemblyUI, IServiceAssemblyBackendSSECommon, IServiceAssemblyBackendDetailsCommon { }
 
-export interface IServiceUnit extends IServiceUnitUI, IServiceUnitBackendSSECommon, IServiceUnitBackendDetailsCommon { }
-
-export function serviceUnitRowFactory(): IServiceUnitRow {
+export function serviceAssemblyRowFactory(): IServiceAssemblyRow {
   return {
     id: null,
     name: null,
+    serviceUnits: [],
     containerId: null,
-    componentId: null,
-    serviceAssemblyId: null,
+    state: null,
 
     isFolded: false,
     isUpdatingState: false,
     errorChangeState: ''
   };
-}
-
-// -------------------------
-
-// selectors
-
-export interface IServiceUnitAndComponent extends IServiceUnitRowWithoutDetails {
-  component: IComponentRowWithoutDetails;
 }
