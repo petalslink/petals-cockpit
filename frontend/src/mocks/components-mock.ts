@@ -52,7 +52,7 @@ export class Component {
   public state: ComponentState;
   public parameters: { [key: string]: string };
 
-  constructor(container: Container, name?: string, state: ComponentState = 'Started') {
+  constructor(container: Container, name?: string, state: ComponentState = 'Loaded') {
     const i = Component.cpt++;
     this.container = container;
     this.id = `idComp${i}`;

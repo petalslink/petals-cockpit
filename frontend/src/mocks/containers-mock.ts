@@ -20,6 +20,7 @@ import { Bus } from './buses-mock';
 import { ServiceAssembly, serviceAssembliesService } from './service-assemblies-mock';
 import { IContainerBackendSSE, IContainerBackendDetails } from './../app/features/cockpit/workspaces/state/containers/container.interface';
 import { ComponentState } from './../app/features/cockpit/workspaces/state/components/component.interface';
+import { ServiceAssemblyState } from './../app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
 
 export class Containers {
   private readonly containers = new Map<string, Container>();
@@ -55,18 +56,14 @@ export class Container {
     this.ip = `192.168.0.${i}`;
     this.bus = bus;
 
-    // by default add 2 components
-    const c1 = this.addComponent();
-    const c2 = this.addComponent();
+    // by default add 2 components each with an SU
+    const c1 = this.addComponent('Started');
+    this.addServiceUnit(c1, 'Started');
+    const c2 = this.addComponent('Started');
+    this.addServiceUnit(c2, 'Started');
 
-    // by default add 2 service units to each
-    this.addServiceUnit(c1);
-    this.addServiceUnit(c1);
-
-    this.addServiceUnit(c2);
-    this.addServiceUnit(c2);
-
-    this.addServiceAssembly();
+    // and also a default service assembly
+    this.addServiceAssembly('Started');
   }
 
   getComponents() {
@@ -77,15 +74,15 @@ export class Container {
     return Array.from(this.serviceAssemblies.values());
   }
 
-  addComponent(name?: string, state?: ComponentState) {
+  addComponent(state?: ComponentState, name?: string) {
     const component = componentsService.create(this, name, state);
     this.components.set(component.id, component);
 
     return component;
   }
 
-  addServiceAssembly(name?: string) {
-    const serviceAssembly = serviceAssembliesService.create(this, name);
+  addServiceAssembly(state?: ServiceAssemblyState, name?: string) {
+    const serviceAssembly = serviceAssembliesService.create(this, name, state);
 
     const it = this.components.values();
     const c1 = it.next().value;
@@ -101,8 +98,8 @@ export class Container {
     return serviceAssembly;
   }
 
-  addServiceUnit(component: Component, name?: string) {
-    const serviceAssembly = serviceAssembliesService.create(this, name ? `sa-${name}` : undefined);
+  addServiceUnit(component: Component, state?: ServiceAssemblyState, name?: string) {
+    const serviceAssembly = serviceAssembliesService.create(this, name ? `sa-${name}` : undefined, state);
     const serviceUnit = serviceAssembly.addServiceUnit(component, name);
 
     component.addServiceUnit(serviceUnit);
