@@ -37,6 +37,7 @@ import { IContainerBackendSSE } from 'app/features/cockpit/workspaces/state/cont
 import { IServiceUnitBackendSSE } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 import { IComponentBackendSSE } from 'app/features/cockpit/workspaces/state/components/component.interface';
 import { toJavascriptMap } from 'app/shared/helpers/map.helper';
+import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
 
 
 export abstract class BusesService {
@@ -112,14 +113,7 @@ export class BusesServiceImpl extends BusesService {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_OK)
       .do((data: any) => {
-
         const buses = toJavascriptMap<IBusBackendSSE>(data.buses);
-
-        const sus = toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits);
-        sus.allIds.forEach(id => {
-          const su = sus.byId[id];
-          su.state = data.serviceAssemblies[su.serviceAssemblyId].state;
-        });
 
         // there should be only one element in there!
         const bus = buses.byId[buses.allIds[0]];
@@ -130,8 +124,12 @@ export class BusesServiceImpl extends BusesService {
           { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: bus.id },
           { type: Buses.ADD_BUSES_SUCCESS, payload: buses },
           { type: Containers.ADD_CONTAINERS_SUCCESS, payload: toJavascriptMap<IContainerBackendSSE>(data.containers) },
+          {
+            type: ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS,
+            payload: toJavascriptMap<IComponentBackendSSE>(data.serviceAssemblies)
+          },
           { type: Components.ADD_COMPONENTS_SUCCESS, payload: toJavascriptMap<IComponentBackendSSE>(data.components) },
-          { type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, payload: sus },
+          { type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits) }
         ]));
       });
   }

@@ -23,6 +23,7 @@ import { IBusesInProgressTable } from '../../features/cockpit/workspaces/state/b
 import { IContainersTable } from '../../features/cockpit/workspaces/state/containers/containers.interface';
 import { IComponentsTable } from '../../features/cockpit/workspaces/state/components/components.interface';
 import { IServiceUnitsTable } from '../../features/cockpit/workspaces/state/service-units/service-units.interface';
+import { IServiceAssembliesTable } from '../../features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 
 export interface IStore {
   ui: IUi;
@@ -33,4 +34,5 @@ export interface IStore {
   containers: IContainersTable;
   components: IComponentsTable;
   serviceUnits: IServiceUnitsTable;
+  serviceAssemblies: IServiceAssembliesTable;
 }

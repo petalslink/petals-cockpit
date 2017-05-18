@@ -27,6 +27,8 @@ import {
   IContainerBackendDetails
 } from 'app/features/cockpit/workspaces/state/containers/container.interface';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+import { IServiceAssemblyBackendSSE } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
 
 export class Containers {
   private static reducerName = '[Containers]';
@@ -158,12 +160,32 @@ export class Containers {
     containersTable: IContainersTable,
     payload: { containerId: string, componentId: string }
   ): IContainersTable {
-
     return updateById(containersTable, payload.containerId, {
       components: containersTable
         .byId[payload.containerId]
         .components
         .filter(id => id !== payload.componentId)
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DEPLOY_SERVICE_ASSEMBLY_SUCCESS = `${Containers.reducerName} Deploy service assembly success`;
+  private static deployServiceAssemblySuccess(containersTable: IContainersTable, payload: IServiceAssemblyBackendSSE): IContainersTable {
+    return updateById(containersTable, payload.containerId, {
+      serviceAssemblies: [...containersTable.byId[payload.containerId].serviceAssemblies, payload.id]
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  private static removeServiceAssembly(
+    containersTable: IContainersTable,
+    payload: { containerId: string, serviceAssemblyId: string }
+  ): IContainersTable {
+    return updateById(containersTable, payload.containerId, {
+      serviceAssemblies: containersTable
+        .byId[payload.containerId]
+        .serviceAssemblies
+        .filter(id => id !== payload.serviceAssemblyId)
     });
   }
 
@@ -187,8 +209,10 @@ export class Containers {
     [Containers.DEPLOY_COMPONENT]: Containers.deployComponent,
     [Containers.DEPLOY_COMPONENT_ERROR]: Containers.deployComponentError,
     [Containers.DEPLOY_COMPONENT_SUCCESS]: Containers.deployComponentSuccess,
+    [Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS]: Containers.deployServiceAssemblySuccess,
 
     [Components.REMOVE_COMPONENT]: Containers.removeComponent,
+    [ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY]: Containers.removeServiceAssembly,
     [Workspaces.CLEAN_WORKSPACE]: Containers.cleanWorkspace
   };
 }

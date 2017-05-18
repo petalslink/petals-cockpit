@@ -1,0 +1,50 @@
+<!-- Copyright (C) 2017 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<div fxLayout="column" fxFill class="content content-max-width">
+  <div class="central-content">
+    <md-card class="state">
+      <md-card-title-group fxLayout="column" *ngIf="serviceAssembly">
+        <div fxLayout="column" fxLayoutAlign="end end">
+          <md-card-subtitle>State</md-card-subtitle>
+          <md-card-title>{{ serviceAssembly.state }}</md-card-title>
+          <md-card-content *ngIf="serviceAssembly.state">
+            <button
+              md-raised-button
+              color="primary"
+              class="margin-right-x1-no-last"
+              *ngFor="let possibleState of getPossibleStateActions(serviceAssembly.state); trackBy:saState"
+              (click)="changeState(possibleState.newStateAfterAction)"
+              [disabled]="serviceAssembly.isUpdatingState"
+            >
+              {{ possibleState.actionName }}
+            </button>
+          </md-card-content>
+        </div>
+
+        <div *ngIf="serviceAssembly.errorChangeState" fxFlex class="error">
+          <div class="bold margin-bottom-x1">An error occurred:</div>
+          <span class="italic">{{ serviceAssembly.errorChangeState }}</span>
+        </div>
+
+        <div fxLayout="row" fxAlign="start center" class="color-primary">
+          <md-icon class="margin-right-x1">info outline</md-icon>
+
+          Changing the state of an SA will affect its SUs
+        </div>
+      </md-card-title-group>
+    </md-card>
+  </div>
+</div>

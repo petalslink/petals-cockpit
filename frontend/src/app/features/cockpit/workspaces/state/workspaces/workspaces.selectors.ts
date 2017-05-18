@@ -73,12 +73,13 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
       state.buses,
       state.containers,
       state.components,
+      state.serviceAssemblies,
       state.serviceUnits
     ]))
     // as the object has a new reference every time,
     // use distinctUntilChanged for performance
     .distinctUntilChanged(arrayEquals)
-    .map(([workspaces, users, buses, containers, components, serviceUnits]) => {
+    .map(([workspaces, users, buses, containers, components, serviceAssemblies, serviceUnits]) => {
       const workspace = workspaces.byId[workspaces.selectedWorkspaceId];
       return {
         id: workspace.id,
@@ -155,13 +156,30 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                                 componentId: serviceUnit.componentId,
                                 serviceAssemblyId: serviceUnit.serviceAssemblyId,
                                 name: serviceUnit.name,
-                                state: serviceUnit.state,
                                 isUpdatingState: serviceUnit.isUpdatingState,
                                 isFolded: serviceUnit.isFolded || false,
                                 errorChangeState: ''
                               };
                             })
                           }
+                        };
+                      })
+                    },
+                    serviceAssemblies: {
+                      selectedServiceAssemblyId: serviceAssemblies.selectedServiceAssemblyId,
+                      isFetchingDetails: serviceAssemblies.isFetchingDetails,
+                      list: container.serviceAssemblies.map(serviceAssemblyId => {
+                        const serviceAssembly = serviceAssemblies.byId[serviceAssemblyId];
+                        return {
+                          id: serviceAssembly.id,
+                          name: serviceAssembly.name,
+                          serviceUnits: serviceAssembly.serviceUnits,
+                          containerId: serviceAssembly.containerId,
+                          state: serviceAssembly.state,
+
+                          isFolded: serviceAssembly.isFolded,
+                          isUpdatingState: serviceAssembly.isUpdatingState,
+                          errorChangeState: serviceAssembly.errorChangeState
                         };
                       })
                     }
@@ -182,7 +200,7 @@ export function getCurrentWorkspace() {
 // -----------------------------------------------------------
 
 export enum WorkspaceElementType {
-  BUS, CONTAINER, COMPONENT, SERVICEUNIT
+  BUS, CONTAINER, COMPONENT, SERVICEASSEMBLY, SERVICEUNIT
 }
 
 export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
@@ -211,24 +229,35 @@ export function _getCurrentTree(store$: Store<IStore>): Observable<WorkspaceElem
           isFolded: container.isFolded,
           cssClass: `workspace-element-type-container`,
 
-          children: container.components.list.map<WorkspaceElement>(component => ({
-            id: component.id,
-            type: WorkspaceElementType.COMPONENT,
-            name: component.name,
-            link: `${baseUrl}/components/${component.id}`,
-            isFolded: component.isFolded,
-            cssClass: `workspace-element-type-component`,
-
-            children: component.serviceUnits.list.map<WorkspaceElement>(serviceUnit => ({
-              id: serviceUnit.id,
-              type: WorkspaceElementType.SERVICEUNIT,
-              name: serviceUnit.name,
-              link: `${baseUrl}/service-units/${serviceUnit.id}`,
-              isFolded: serviceUnit.isFolded,
-              cssClass: `workspace-element-type-service-unit`,
+          children: [
+            ...container.serviceAssemblies.list.map<WorkspaceElement>(serviceAssembly => ({
+              id: serviceAssembly.id,
+              type: WorkspaceElementType.SERVICEASSEMBLY,
+              name: serviceAssembly.name,
+              link: `${baseUrl}/service-assemblies/${serviceAssembly.id}`,
+              isFolded: serviceAssembly.isFolded,
+              cssClass: `workspace-element-type-service-assembly`,
               children: []
+            })),
+            ...container.components.list.map<WorkspaceElement>(component => ({
+              id: component.id,
+              type: WorkspaceElementType.COMPONENT,
+              name: component.name,
+              link: `${baseUrl}/components/${component.id}`,
+              isFolded: component.isFolded,
+              cssClass: `workspace-element-type-component`,
+
+              children: component.serviceUnits.list.map<WorkspaceElement>(serviceUnit => ({
+                id: serviceUnit.id,
+                type: WorkspaceElementType.SERVICEUNIT,
+                name: serviceUnit.name,
+                link: `${baseUrl}/service-units/${serviceUnit.id}`,
+                isFolded: serviceUnit.isFolded,
+                cssClass: `workspace-element-type-service-unit`,
+                children: []
+              }))
             }))
-          }))
+          ]
         }))
       }));
     })

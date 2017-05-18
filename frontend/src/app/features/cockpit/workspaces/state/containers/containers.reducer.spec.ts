@@ -17,8 +17,7 @@
 
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.reducer';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { containersTableFactory } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
+import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
 
 describe(`Containers reducer`, () => {
   it(`should have a default value`, () => {
@@ -124,6 +123,7 @@ describe(`Containers reducer`, () => {
             isFetchingDetails: false,
             isDeployingComponent: false,
             errorDeployment: 'some previous error',
+            serviceAssemblies: []
           },
           idCont3: {
             name: 'Cont 3',
@@ -137,7 +137,8 @@ describe(`Containers reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isDeployingComponent: false,
-            errorDeployment: ''
+            errorDeployment: '',
+            serviceAssemblies: []
           }
         },
         allIds: [
@@ -197,43 +198,44 @@ describe(`Containers reducer`, () => {
         type: Containers.ADD_CONTAINERS_SUCCESS,
         payload: map
       })).toEqual({
-          keepPreviousValues: '',
-          byId: {
-            idCont2: {
-              name: 'Cont 2',
-              keepPreviousValues: '',
-              components: [
-                'idComp4',
-                'idComp5'
-              ],
-              id: 'idCont2',
-              busId: 'idBus0',
-              reachabilities: [],
-              isFolded: false,
-              isFetchingDetails: false,
-              isDeployingComponent: false,
-              errorDeployment: 'some previous error',
-            },
-            idCont3: {
-              name: 'Cont 3',
-              components: [
-                'idComp6',
-                'idComp7'
-              ],
-              id: 'idCont3',
-              busId: 'idBus0',
-              reachabilities: [],
-              isFolded: false,
-              isFetchingDetails: false,
-              isDeployingComponent: false,
-              errorDeployment: ''
-            }
+        keepPreviousValues: '',
+        byId: {
+          idCont2: {
+            name: 'Cont 2',
+            keepPreviousValues: '',
+            components: [
+              'idComp4',
+              'idComp5'
+            ],
+            id: 'idCont2',
+            busId: 'idBus0',
+            reachabilities: [],
+            isFolded: false,
+            isFetchingDetails: false,
+            isDeployingComponent: false,
+            errorDeployment: 'some previous error',
           },
-          allIds: [
-            'idCont2',
-            'idCont3'
-          ]
-        });
+          idCont3: {
+            name: 'Cont 3',
+            components: [
+              'idComp6',
+              'idComp7'
+            ],
+            id: 'idCont3',
+            busId: 'idBus0',
+            reachabilities: [],
+            isFolded: false,
+            isFetchingDetails: false,
+            isDeployingComponent: false,
+            errorDeployment: '',
+            serviceAssemblies: []
+          }
+        },
+        allIds: [
+          'idCont2',
+          'idCont3'
+        ]
+      });
     });
   });
 
@@ -737,24 +739,104 @@ describe(`Containers reducer`, () => {
     });
   });
 
-  describe(Workspaces.CLEAN_WORKSPACE, () => {
-    it(`should return the initial value to reset the workspace`, () => {
+
+
+  describe(Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS, () => {
+    it(`should add the corresponding service-assembly into the container`, () => {
       const initialState: any = {
-        doNotKeepPreviousValues: '',
+        keepPreviousValues: '',
         byId: {
-          doNotKeepPreviousValues: '',
+          keepPreviousValues: '',
           idCont0: {
-            doNotKeepPreviousValues: ''
+            id: 'idCont0',
+            keepPreviousValues: '',
+            components: ['idComp0'],
+            serviceAssemblies: ['isSa0', 'isSa1', 'isSa2']
+          },
+          idCont1: {
+            id: 'idCont1',
+            keepPreviousValues: '',
+            components: ['idComp1'],
+            serviceAssemblies: ['isSa3', 'isSa4']
           }
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0', 'idCont1']
       };
 
-      expect(Containers.reducer(undefined, { type: Workspaces.CLEAN_WORKSPACE, payload: { noMatter: 'which payload !' } }))
-        .toEqual(containersTableFactory());
+      expect(Containers.reducer(initialState, {
+        type: Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS,
+        payload: {
+          id: 'idSa5',
+          containerId: 'idCont0',
+          name: 'New Su',
+          state: 'Started'
+        }
+      })).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idCont0: {
+            id: 'idCont0',
+            keepPreviousValues: '',
+            components: ['idComp0'],
+            serviceAssemblies: ['isSa0', 'isSa1', 'isSa2', 'idSa5']
+          },
+          idCont1: {
+            id: 'idCont1',
+            keepPreviousValues: '',
+            components: ['idComp1'],
+            serviceAssemblies: ['isSa3', 'isSa4']
+          }
+        },
+        allIds: ['idCont0', 'idCont1']
+      });
+    });
+  });
 
-      expect(Containers.reducer(initialState, { type: Workspaces.CLEAN_WORKSPACE, payload: { noMatter: 'which payload !' } }))
-        .toEqual(containersTableFactory());
+  describe(ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY, () => {
+    it(`should remove a service assembly from a container`, () => {
+      const initialState: any = {
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idCont0: {
+            id: 'idCont0',
+            keepPreviousValues: '',
+            components: ['idComp0'],
+            serviceAssemblies: ['isSa0', 'isSa1', 'isSa2']
+          },
+          idCont1: {
+            id: 'idCont1',
+            keepPreviousValues: '',
+            components: ['idComp1'],
+            serviceAssemblies: ['isSa3', 'isSa4']
+          }
+        },
+        allIds: ['idCont0', 'idCont1']
+      };
+
+      expect(Containers.reducer(initialState, {
+        type: ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY,
+        payload: { containerId: 'idCont0', serviceAssemblyId: 'isSa1' }
+      })).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idCont0: {
+            id: 'idCont0',
+            keepPreviousValues: '',
+            components: ['idComp0'],
+            serviceAssemblies: ['isSa0', 'isSa2']
+          },
+          idCont1: {
+            id: 'idCont1',
+            keepPreviousValues: '',
+            components: ['idComp1'],
+            serviceAssemblies: ['isSa3', 'isSa4']
+          }
+        },
+        allIds: ['idCont0', 'idCont1']
+      });
     });
   });
 });

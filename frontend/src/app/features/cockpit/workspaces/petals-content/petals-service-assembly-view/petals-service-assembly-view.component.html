@@ -13,21 +13,24 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="serviceUnit$ | async as serviceUnit" fxLayout="column" fxFill class="wrapper-content">
+<div *ngIf="serviceAssembly$ | async as serviceAssembly" fxLayout="column" fxFill class="wrapper-content">
   <md-toolbar>
     <div class="prefix-toolbar-title">
-      <md-icon color="primary" *ngIf="!serviceUnit.isFetchingDetails">grade</md-icon>
+      <md-icon color="primary" *ngIf="!serviceAssembly.isFetchingDetails">grade</md-icon>
 
-      <md-spinner *ngIf="serviceUnit.isFetchingDetails"></md-spinner>
+      <md-spinner *ngIf="serviceAssembly.isFetchingDetails"></md-spinner>
     </div>
 
-    <span class="title">{{ serviceUnit.name }}</span>
+    <span class="title">{{ serviceAssembly.name }}</span>
   </md-toolbar>
 
   <md-tab-group fxFlex>
     <md-tab label="Overview">
-      <!-- TODO: Create a component for every tab -->
-      <app-petals-service-unit-overview [serviceUnit]="serviceUnit" [serviceAssembly]="serviceAssembly$ | async" [workspaceId]="workspaceId$ | async" fxFill></app-petals-service-unit-overview>
+      <app-petals-service-assembly-overview [serviceAssembly]="serviceAssembly" [serviceUnitsAndComponentsOfServiceAssembly]="serviceUnitsAndComponentsOfServiceAssembly$ | async" fxFill></app-petals-service-assembly-overview>
+    </md-tab>
+
+    <md-tab label="Operations">
+      <app-petals-service-assembly-operations [serviceAssembly]="serviceAssembly" fxFill></app-petals-service-assembly-operations>
     </md-tab>
   </md-tab-group>
 </div>

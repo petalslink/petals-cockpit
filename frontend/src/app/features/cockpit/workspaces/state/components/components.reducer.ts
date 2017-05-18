@@ -186,6 +186,7 @@ export class Components {
   private static deployServiceUnitSuccess(componentsTable: IComponentsTable, payload: IServiceUnitBackendSSE): IComponentsTable {
     return updateById(componentsTable, payload.componentId, {
       serviceUnits: [...componentsTable.byId[payload.componentId].serviceUnits, payload.id],
+      // TODO that's not totally correct, because we don't really know if this was deployed by us and from a component
       isDeployingServiceUnit: false,
       errorDeployment: ''
     });

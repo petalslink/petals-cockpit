@@ -68,6 +68,8 @@ export interface IComponentUI {
 
 export interface IComponentRow extends IComponentUI, IComponentBackendSSE, IComponentBackendDetails { }
 
+export interface IComponentRowWithoutDetails extends IComponentUI, IComponentBackendSSE { }
+
 export interface IComponent extends IComponentUI, IComponentBackendSSECommon, IComponentBackendDetailsCommon {
   serviceUnits: IServiceUnits;
 }

@@ -15,31 +15,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
-    <md-card class="state">
-      <md-card-title-group fxLayout="column">
-        <div fxLayout="column" fxLayoutAlign="end end">
-          <md-card-subtitle>State</md-card-subtitle>
-          <md-card-title>{{ serviceUnit.state }}</md-card-title>
-          <md-card-content *ngIf="serviceUnit.state">
-            <button
-              md-raised-button
-              color="primary"
-              class="margin-right-x1-no-last"
-              *ngFor="let possibleState of getPossibleStateActions(serviceUnit.state); trackBy:suState"
-              (click)="changeState(possibleState.newStateAfterAction)"
-              [disabled]="serviceUnit.isUpdatingState"
-            >
-              {{ possibleState.actionName }}
-            </button>
-          </md-card-content>
-        </div>
-        <div class="green-led"></div>
+    <div fxLayout="row" fxLayoutGap="10px">
+      <md-card fxFlex class="state">
+        <md-card-title-group fxLayout="column">
+          <div fxLayout="column" fxLayoutAlign="end end">
+            <md-card-subtitle>State</md-card-subtitle>
+            <md-card-title>{{ serviceAssembly.state }}</md-card-title>
+          </div>
+        </md-card-title-group>
+      </md-card>
 
-        <div *ngIf="serviceUnit.errorChangeState" fxFlex class="error">
-          <div class="bold margin-bottom-x1">An error occurred:</div>
-          <span class="italic">{{ serviceUnit.errorChangeState }}</span>
-        </div>
-      </md-card-title-group>
-    </md-card>
+      <md-card fxFlex class="service-assembly">
+        <md-card-title-group fxLayout="column">
+          <div fxLayout="column" fxLayoutAlign="end end">
+            <md-card-subtitle>Service assembly</md-card-subtitle>
+            <md-card-title><a [routerLink]="['/workspaces', workspaceId, 'petals', 'service-assemblies', serviceAssembly.id]" class="color-primary">{{ serviceAssembly.name }}</a></md-card-title>
+          </div>
+        </md-card-title-group>
+      </md-card>
+    </div>
   </div>
 </div>

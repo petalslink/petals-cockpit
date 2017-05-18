@@ -36,7 +36,6 @@ import { BusesInProgress } from '../buses-in-progress/buses-in-progress.reducer'
 import { SseService, SseWorkspaceEvent } from './../../../../../shared/services/sse.service';
 import { BusesService } from './../../../../../shared/services/buses.service';
 import { NotificationsService } from 'angular2-notifications';
-import { ServiceUnitsService } from '../../../../../shared/services/service-units.service';
 import { ComponentsService } from '../../../../../shared/services/components.service';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { IStore } from 'app/shared/interfaces/store.interface';
@@ -49,6 +48,9 @@ import { IComponentBackendSSE } from 'app/features/cockpit/workspaces/state/comp
 import { IServiceUnitBackendSSE } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 import { ContainersService } from 'app/shared/services/containers.service';
 import { toJavascriptMap } from 'app/shared/helpers/map.helper';
+import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
+import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+import { IServiceAssemblyBackendSSE } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
 
 @Injectable()
 export class WorkspacesEffects {
@@ -61,7 +63,7 @@ export class WorkspacesEffects {
     private busesService: BusesService,
     private componentsService: ComponentsService,
     private containersService: ContainersService,
-    private serviceUnitsService: ServiceUnitsService,
+    private serviceAssembliesService: ServiceAssembliesService,
     private notification: NotificationsService
   ) { }
 
@@ -143,7 +145,7 @@ export class WorkspacesEffects {
         this.sub.add(this.busesService.watchEventBusDeleted().subscribe());
         this.sub.add(this.busesService.watchEventBusImportOk().subscribe());
         this.sub.add(this.busesService.watchEventBusImportError().subscribe());
-        this.sub.add(this.serviceUnitsService.watchEventSuStateChangeOk().subscribe());
+        this.sub.add(this.serviceAssembliesService.watchEventSaStateChangeOk().subscribe());
         this.sub.add(this.componentsService.watchEventComponentStateChangeOk().subscribe());
         this.sub.add(this.workspacesService.watchEventWorkspaceDeleted().subscribe());
         this.sub.add(this.componentsService.watchEventSuDeployedOk().subscribe());
@@ -169,13 +171,6 @@ export class WorkspacesEffects {
     .ofType(Workspaces.FETCH_WORKSPACE_SSE_SUCCESS)
     .switchMap((action: Action) => this.sseService.subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
       .switchMap((data: any) => {
-
-        const sus = toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits);
-        sus.allIds.forEach(id => {
-          const su = sus.byId[id];
-          su.state = data.serviceAssemblies[su.serviceAssemblyId].state;
-        });
-
         return Observable.of(batchActions([
           { type: Workspaces.CLEAN_WORKSPACE },
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
@@ -184,8 +179,11 @@ export class WorkspacesEffects {
           { type: Buses.FETCH_BUSES_SUCCESS, payload: toJavascriptMap<IBusBackendSSE>(data.buses) },
           { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap<IContainerBackendSSE>(data.containers) },
           { type: Components.FETCH_COMPONENTS_SUCCESS, payload: toJavascriptMap<IComponentBackendSSE>(data.components) },
-          { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: sus },
-
+          {
+            type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLIES_SUCCESS,
+            payload: toJavascriptMap<IServiceAssemblyBackendSSE>(data.serviceAssemblies)
+          },
+          { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits) },
           { type: Ui.OPEN_SIDENAV },
           { type: Ui.CLOSE_POPUP_WORKSPACES_LIST }
         ]));

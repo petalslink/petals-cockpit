@@ -17,23 +17,27 @@
 
 import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 
-import { IServiceUnitRow } from '../../../state/service-units/service-unit.interface';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 
 @Component({
-  selector: 'app-petals-service-unit-overview',
-  templateUrl: './petals-service-unit-overview.component.html',
-  styleUrls: ['./petals-service-unit-overview.component.scss'],
+  selector: 'app-petals-service-assembly-overview',
+  templateUrl: './petals-service-assembly-overview.component.html',
+  styleUrls: ['./petals-service-assembly-overview.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PetalsServiceUnitOverviewComponent implements OnInit {
-  @Input() serviceUnit: IServiceUnitRow;
+export class PetalsServiceAssemblyOverviewComponent implements OnInit {
   @Input() serviceAssembly: IServiceAssemblyRow;
-  @Input() workspaceId: string;
+  @Input() serviceUnitsAndComponentsOfServiceAssembly: IServiceUnitAndComponent;
+
+  public workspaceId$: Observable<string>;
 
   constructor(private store$: Store<IStore>) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.workspaceId$ = this.store$.select(state => state.workspaces.selectedWorkspaceId);
+  }
 }

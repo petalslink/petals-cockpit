@@ -59,13 +59,14 @@ export class Container {
     const c1 = this.addComponent();
     const c2 = this.addComponent();
 
-
     // by default add 2 service units to each
     this.addServiceUnit(c1);
     this.addServiceUnit(c1);
 
     this.addServiceUnit(c2);
     this.addServiceUnit(c2);
+
+    this.addServiceAssembly();
   }
 
   getComponents() {
@@ -86,6 +87,15 @@ export class Container {
   addServiceAssembly(name?: string) {
     const serviceAssembly = serviceAssembliesService.create(this, name);
 
+    const it = this.components.values();
+    const c1 = it.next().value;
+    const c2 = it.next().value;
+
+    const su1 = serviceAssembly.addServiceUnit(c1, name ? `su1-${name}` : undefined);
+    const su2 = serviceAssembly.addServiceUnit(c2, name ? `su2-${name}` : undefined);
+
+    c1.addServiceUnit(su1);
+    c2.addServiceUnit(su2);
     this.serviceAssemblies.set(serviceAssembly.id, serviceAssembly);
 
     return serviceAssembly;
@@ -108,7 +118,7 @@ export class Container {
         name: this.name,
         busId: this.bus.id,
         components: Array.from(this.components.keys()),
-        // serviceAssemblies: Array.from(this.serviceAssemblies.keys())
+        serviceAssemblies: Array.from(this.serviceAssemblies.keys())
       }
     };
   }

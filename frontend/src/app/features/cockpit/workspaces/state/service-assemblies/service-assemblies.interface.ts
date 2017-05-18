@@ -14,24 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { page } from './common';
-import { WorkspacePage } from './pages/workspace.po';
 
-describe(`Petals service-unit content`, () => {
-  let workspace: WorkspacePage;
+import { IServiceAssemblyRow, IServiceAssembly } from './service-assembly.interface';
 
-  beforeEach(() => {
-    workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
-  });
+interface IServiceAssembliesCommon {
+  selectedServiceAssemblyId: string;
+  isFetchingDetails: boolean;
+}
 
-  it(`should open the content page`, () => {
-    const su = workspace.openServiceUnit('SU 0');
+export interface IServiceAssembliesTable extends IServiceAssembliesCommon {
+  byId: { [key: string]: IServiceAssemblyRow };
+  allIds: string[];
+}
 
-    expect(su.title.getText()).toEqual('SU 0');
-    expect(su.state.getText()).toEqual('Started');
-    expect(su.serviceAssembly.getText()).toEqual('SA 0');
+export interface IServiceAssemblies extends IServiceAssembliesCommon {
+  list: IServiceAssembly[];
+}
 
-    const sa = su.openServiceAssembly();
-    expect(sa.title.getText()).toEqual('SA 0');
-  });
-});
+export function serviceAssembliesTableFactory(): IServiceAssembliesTable {
+  return {
+    selectedServiceAssemblyId: '',
+    isFetchingDetails: false,
+
+    byId: {},
+    allIds: []
+  };
+}

@@ -14,24 +14,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { page } from './common';
-import { WorkspacePage } from './pages/workspace.po';
 
-describe(`Petals service-unit content`, () => {
-  let workspace: WorkspacePage;
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import {
+  PetalsServiceAssemblyViewComponent
+} from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.component';
 
-  beforeEach(() => {
-    workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
-  });
+// /workspaces/:workspaceId/petals/service-assemblies/:serviceAssemblyId
+const routes: Routes = [
+  {
+    path: '',
+    component: PetalsServiceAssemblyViewComponent
+  }
+];
 
-  it(`should open the content page`, () => {
-    const su = workspace.openServiceUnit('SU 0');
-
-    expect(su.title.getText()).toEqual('SU 0');
-    expect(su.state.getText()).toEqual('Started');
-    expect(su.serviceAssembly.getText()).toEqual('SA 0');
-
-    const sa = su.openServiceAssembly();
-    expect(sa.title.getText()).toEqual('SA 0');
-  });
-});
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
+  providers: []
+})
+export class PetalsServiceAssemblyViewRoutingModule { }

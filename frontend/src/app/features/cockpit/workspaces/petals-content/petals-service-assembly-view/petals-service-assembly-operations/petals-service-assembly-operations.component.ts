@@ -17,23 +17,36 @@
 
 import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-
-import { IServiceUnitRow } from '../../../state/service-units/service-unit.interface';
+import { stateNameToPossibleActionsServiceAssembly } from '../../../../../../shared/helpers/service-assembly.helper';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import {
+  ServiceAssemblyState,
+  IServiceAssemblyRow
+} from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
 
 @Component({
-  selector: 'app-petals-service-unit-overview',
-  templateUrl: './petals-service-unit-overview.component.html',
-  styleUrls: ['./petals-service-unit-overview.component.scss'],
+  selector: 'app-petals-service-assembly-operations',
+  templateUrl: './petals-service-assembly-operations.component.html',
+  styleUrls: ['./petals-service-assembly-operations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PetalsServiceUnitOverviewComponent implements OnInit {
-  @Input() serviceUnit: IServiceUnitRow;
+export class PetalsServiceAssemblyOperationsComponent implements OnInit {
   @Input() serviceAssembly: IServiceAssemblyRow;
-  @Input() workspaceId: string;
 
   constructor(private store$: Store<IStore>) { }
 
   ngOnInit() { }
+
+  getPossibleStateActions(state: ServiceAssemblyState) {
+    return stateNameToPossibleActionsServiceAssembly(state);
+  }
+
+  saState(index, item) {
+    return item.newStateAction;
+  }
+
+  changeState(newState: ServiceAssemblyState) {
+    this.store$.dispatch({ type: ServiceAssemblies.CHANGE_STATE, payload: { serviceAssemblyId: this.serviceAssembly.id, newState } });
+  }
 }

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $, $$, by } from 'protractor';
+import { browser, ExpectedConditions as EC, $, by } from 'protractor';
 
 import { urlToMatch, Matcher, textToMatchInElement } from '../utils';
 import { waitTimeout } from '../common';
@@ -25,6 +25,7 @@ import { ComponentOverviewPage } from './component.po';
 import { ContainerOverviewPage } from './container.po';
 import { ServiceUnitOverviewPage } from './service-unit.po';
 import { WorkspacesPage } from './workspaces.po';
+import { ServiceAssemblyOverviewPage } from './service-assembly.po';
 
 export abstract class WorkspacePage {
 
@@ -94,6 +95,11 @@ export abstract class WorkspacePage {
   openContainer(identifier: string | number) {
     this.treeElement(identifier, 'container').click();
     return ContainerOverviewPage.waitAndGet();
+  }
+
+  openServiceAssembly(identifier: string | number) {
+    this.treeElement(identifier, 'service-assembly').click();
+    return ServiceAssemblyOverviewPage.waitAndGet();
   }
 
   openServiceUnit(identifier: string | number) {
