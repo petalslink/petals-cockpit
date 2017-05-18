@@ -34,30 +34,22 @@ describe(`Workspaces Tree`, () => {
       `SA 0`,
       `SA 1`,
       `SA 2`,
-      `SA 3`,
-      `SA 4`,
       `Comp 0`,
       `SU 0`,
-      `SU 1`,
-      `SU 4`,
-      `Comp 1`,
       `SU 2`,
+      `Comp 1`,
+      `SU 1`,
       `SU 3`,
-      `SU 5`,
       `Cont 1`,
+      `SA 3`,
+      `SA 4`,
       `SA 5`,
-      `SA 6`,
-      `SA 7`,
-      `SA 8`,
-      `SA 9`,
       `Comp 2`,
+      `SU 4`,
       `SU 6`,
-      `SU 7`,
-      `SU 10`,
       `Comp 3`,
-      `SU 8`,
-      `SU 9`,
-      `SU 11`
+      `SU 5`,
+      `SU 7`
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBuses);
@@ -85,8 +77,7 @@ describe(`Workspaces Tree`, () => {
       `Cont 0`,
       `Comp 0`,
       `SU 0`,
-      `SU 1`,
-      `SU 4`
+      `SU 2`
     ];
 
     // check the list content
@@ -105,36 +96,27 @@ describe(`Workspaces Tree`, () => {
       `SA 0`,
       `SA 1`,
       `SA 2`,
-      `SA 3`,
-      `SA 4`,
       `Comp 0`,
       `SU 0`,
-      `SU 1`,
-      `SU 4`,
-      `Comp 1`,
       `SU 2`,
+      `Comp 1`,
+      `SU 1`,
       `SU 3`,
-      `SU 5`,
       `Cont 1`,
+      `SA 3`,
+      `SA 4`,
       `SA 5`,
-      `SA 6`,
-      `SA 7`,
-      `SA 8`,
-      `SA 9`,
       `Comp 2`,
+      `SU 4`,
       `SU 6`,
-      `SU 7`,
-      `SU 10`,
       `Comp 3`,
-      `SU 8`,
-      `SU 9`,
-      `SU 11`
+      `SU 5`,
+      `SU 7`
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBusesFilteredU);
 
-    // there should be 13 matches : Bus, SU 0, SU 1, SU 4, SU 2, SU 3, SU 5, SU 6, SU 7, SU 10, SU 8, SU 9, SU 11
-    expect(workspace.getHighlightedElement().then(e => e.length)).toEqual(13);
+    expect(workspace.getHighlightedElement().then(e => e.length)).toEqual(9);
 
     // ---------------------------------------
     // test 3 : When no match, should display a message and search bar should still be enabled
@@ -165,30 +147,22 @@ describe(`Workspaces Tree`, () => {
       `SA 0`,
       `SA 1`,
       `SA 2`,
-      `SA 3`,
-      `SA 4`,
       `Comp 0`,
       `SU 0`,
-      `SU 1`,
-      `SU 4`,
-      `Comp 1`,
       `SU 2`,
+      `Comp 1`,
+      `SU 1`,
       `SU 3`,
-      `SU 5`,
       `Cont 1`,
+      `SA 3`,
+      `SA 4`,
       `SA 5`,
-      `SA 6`,
-      `SA 7`,
-      `SA 8`,
-      `SA 9`,
       `Comp 2`,
+      `SU 4`,
       `SU 6`,
-      `SU 7`,
-      `SU 10`,
       `Comp 3`,
-      `SU 8`,
-      `SU 9`,
-      `SU 11`
+      `SU 5`,
+      `SU 7`
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBuses);
@@ -203,19 +177,15 @@ describe(`Workspaces Tree`, () => {
       `Bus 0`,
       `Cont 0`,
       `Cont 1`,
+      `SA 3`,
+      `SA 4`,
       `SA 5`,
-      `SA 6`,
-      `SA 7`,
-      `SA 8`,
-      `SA 9`,
       `Comp 2`,
+      `SU 4`,
       `SU 6`,
-      `SU 7`,
-      `SU 10`,
       `Comp 3`,
-      `SU 8`,
-      `SU 9`,
-      `SU 11`
+      `SU 5`,
+      `SU 7`
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBusesFolded);
@@ -235,27 +205,20 @@ describe(`Workspaces Tree`, () => {
       `SA 0`,
       `SA 1`,
       `SA 2`,
-      `SA 3`,
-      `SA 4`,
       `Comp 0`,
       `Comp 1`,
-      `SU 2`,
+      `SU 1`,
       `SU 3`,
-      `SU 5`,
       `Cont 1`,
+      `SA 3`,
+      `SA 4`,
       `SA 5`,
-      `SA 6`,
-      `SA 7`,
-      `SA 8`,
-      `SA 9`,
       `Comp 2`,
+      `SU 4`,
       `SU 6`,
-      `SU 7`,
-      `SU 10`,
       `Comp 3`,
-      `SU 8`,
-      `SU 9`,
-      `SU 11`
+      `SU 5`,
+      `SU 7`
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBusesFolded);

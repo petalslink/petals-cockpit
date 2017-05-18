@@ -25,8 +25,8 @@ class ServiceAssemblies {
 
   constructor() { }
 
-  create(container: Container, name?: string) {
-    const sa = new ServiceAssembly(container, name);
+  create(container: Container, name?: string, state?: ServiceAssemblyState) {
+    const sa = new ServiceAssembly(container, name, state);
     this.serviceAssemblies.set(sa.id, sa);
     return sa;
   }
@@ -41,16 +41,17 @@ export const serviceAssembliesService = new ServiceAssemblies();
 export class ServiceAssembly {
   private static cpt = 0;
   public readonly id: string;
-  public state: ServiceAssemblyState = 'Started';
+  public state: ServiceAssemblyState;
   public readonly name: string;
   public readonly container: Container;
   private readonly serviceUnits = new Map<string, ServiceUnit>();
 
-  constructor(container: Container, name?: string) {
+  constructor(container: Container, name?: string, state: ServiceAssemblyState = 'Shutdown') {
     const i = ServiceAssembly.cpt++;
     this.id = `idSa${i}`;
     this.name = name ? name : `SA ${i}`;
     this.container = container;
+    this.state = state;
   }
 
   getServiceUnits() {

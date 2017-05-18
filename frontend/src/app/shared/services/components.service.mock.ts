@@ -80,7 +80,7 @@ export class ComponentsMockService extends ComponentsServiceImpl {
     }
 
     const component = componentsService.get(componentId);
-    const [serviceAssembly, serviceUnit] = component.container.addServiceUnit(component, serviceUnitName);
+    const [serviceAssembly, serviceUnit] = component.container.addServiceUnit(component, 'Shutdown', serviceUnitName);
 
     const response = {
       serviceAssemblies: serviceAssembly.toObj(),
