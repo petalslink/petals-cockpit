@@ -22,12 +22,16 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ebmwebsourcing.easycommons.lang.ExceptionHelper;
 
 import io.dropwizard.jersey.errors.ErrorMessage;
 
 public class PetalsAdminExceptionMapper implements ExceptionMapper<PetalsAdminException> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PetalsAdminExceptionMapper.class);
 
     private final boolean showDetails;
 
@@ -37,7 +41,7 @@ public class PetalsAdminExceptionMapper implements ExceptionMapper<PetalsAdminEx
 
     @Override
     public Response toResponse(PetalsAdminException exception) {
-        System.out.println(exception.getCause().getMessage());
+        LOG.debug("Returning CONFLICT because of ", exception);
         return Response.status(Status.CONFLICT).type(MediaType.APPLICATION_JSON_TYPE)
                 .entity(new ErrorMessage(Status.CONFLICT.getStatusCode(), exception.getCause().getMessage(),
                         showDetails ? ExceptionHelper.getStackTrace(exception.getCause()) : null))
