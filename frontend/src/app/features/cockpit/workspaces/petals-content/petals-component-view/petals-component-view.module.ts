@@ -31,6 +31,7 @@ import { PetalsComponentOperationsComponent } from './petals-component-operation
   declarations: [
     PetalsComponentViewComponent,
     PetalsComponentOverviewComponent,
-    PetalsComponentOperationsComponent]
+    PetalsComponentOperationsComponent
+  ]
 })
 export class PetalsComponentViewModule { }

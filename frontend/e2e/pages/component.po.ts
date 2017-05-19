@@ -19,6 +19,7 @@ import { browser, ExpectedConditions as EC, $, by } from 'protractor';
 
 import { urlToMatch } from '../utils';
 import { waitTimeout } from '../common';
+import { UploadComponentPage } from './upload-component.po';
 
 export abstract class ComponentPage {
 
@@ -75,15 +76,6 @@ export class ComponentOperationPage extends ComponentPage {
 
   public readonly operations = ComponentOperationPage.operations;
 
-  public readonly deployCard = this.operations.$(`.deploy`);
-  public readonly chooseFileButton = this.deployCard.$(`.choose-file`);
-  public readonly fileInput = this.deployCard.$(`input[type="file"]`);
-  public readonly selectedFile = this.deployCard.$(`.selected-file .file-name`);
-  public readonly changeSuNameInput = this.deployCard.$(`form input[name="serviceUnitName"]`);
-  public readonly deployButton = this.deployCard.$(`form button[type="submit"]`);
-  public readonly errorDetailsTitle = this.deployCard.$(`.error-deploy .title`);
-  public readonly errorDetailsMessage = this.deployCard.$(`.error-deploy .message`);
-
   static waitAndGet() {
     super.wait();
     browser.wait(EC.visibilityOf(ComponentOperationPage.operations), waitTimeout);
@@ -92,5 +84,9 @@ export class ComponentOperationPage extends ComponentPage {
 
   private constructor() {
     super();
+  }
+
+  getSUUpload() {
+    return UploadComponentPage.waitAndGet('deploy-service-unit');
   }
 }

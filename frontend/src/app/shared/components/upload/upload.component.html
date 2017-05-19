@@ -1,0 +1,54 @@
+<!-- Copyright (C) 2017 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<!-- Material doesn't support inputs of type file -->
+<!-- https://github.com/angular/material2/issues/3262 -->
+<!-- https://github.com/angular/material2/issues/3758 -->
+<!-- the trick here consists in hiding the input, and bind the click on a button to that input -->
+<md-card fxFlex>
+  <md-card-title-group fxLayout="column">
+    <div fxLayout="column" fxLayoutAlign="end end">
+      <md-card-subtitle class="title">{{ title }}</md-card-subtitle>
+
+      <md-card-content>
+        <form (ngSubmit)="onDeploy.emit({file: fileToDeploy, name: changeFileName})">
+          <div *ngIf="fileToDeploy" class="selected-file" fxFlexLayout="row" fxLayoutAlign="end center">
+            <span>Selected file:</span> <span class="file-name">{{ fileToDeploy.name }}</span>
+          </div>
+
+          <button type="button" md-raised-button (click)="deploy.click()" class="choose-file">
+            <span *ngIf="!fileToDeploy; else changeFile">Choose a file to upload</span>
+            <ng-template #changeFile>Change the file</ng-template>
+          </button>
+
+          <input #deploy class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="disabled">
+
+          <md-input-container *ngIf="fileToDeploy && placeholderChangeFileName" class="change-file-name">
+            <input mdInput type="text" [(ngModel)]="changeFileName" name="changeFileName" [placeholder]="placeholderChangeFileName" [disabled]="changeFileName?.trim().length === 0 || disabled">
+          </md-input-container>
+
+          <button md-raised-button color="primary" type="submit" *ngIf="fileToDeploy" [disabled]="disabled" class="deploy">
+            Deploy
+          </button>
+        </form>
+      </md-card-content>
+    </div>
+
+    <div *ngIf="error" fxFlex class="error error-deploy">
+      <div class="title bold margin-bottom-x1">An error occurred:</div>
+      <span class="message italic">{{ error }}</span>
+    </div>
+  </md-card-title-group>
+</md-card>

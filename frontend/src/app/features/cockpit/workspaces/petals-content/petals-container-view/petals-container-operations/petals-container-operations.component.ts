@@ -30,24 +30,19 @@ import { Containers } from 'app/features/cockpit/workspaces/state/containers/con
 })
 export class PetalsContainerOperationsComponent implements OnInit {
   @Input() container: IContainerRow;
-  public fileToDeploy: File;
+  public fileToDeployComponent: File = null;
+  public fileToDeployServiceAssembly: File = null;
 
   constructor(private store$: Store<IStore>) { }
 
   ngOnInit() { }
 
-  fileChange(event) {
-    const fileList: FileList = event.target.files;
-
-    if (fileList.length > 0) {
-      this.fileToDeploy = fileList[0];
+  deploy(whatToDeploy: 'component', file: File) {
+    if (whatToDeploy === 'component') {
+      this.store$.dispatch({
+        type: Containers.DEPLOY_COMPONENT,
+        payload: { file, containerId: this.container.id }
+      });
     }
-  }
-
-  deploy(file: File) {
-    this.store$.dispatch({
-      type: Containers.DEPLOY_COMPONENT,
-      payload: { file, containerId: this.container.id }
-    });
   }
 }

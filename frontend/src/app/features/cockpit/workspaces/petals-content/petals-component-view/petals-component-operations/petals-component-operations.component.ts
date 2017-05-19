@@ -37,15 +37,6 @@ export class PetalsComponentOperationsComponent implements OnInit {
 
   ngOnInit() { }
 
-  fileChange(event) {
-    const fileList: FileList = event.target.files;
-
-    if (fileList.length > 0) {
-      this.fileToDeploy = fileList[0];
-      this.serviceUnitName = this.fileToDeploy.name.substring(0, this.fileToDeploy.name.length - 4);
-    }
-  }
-
   deploy(file: File, serviceUnitName: string) {
     this.store$.dispatch({
       type: Components.DEPLOY_SERVICE_UNIT,

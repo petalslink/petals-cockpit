@@ -111,43 +111,46 @@ describe(`Petals component content`, () => {
   });
 
   it('should have a correct SU deployment form', () => {
-    const ops = workspace.openComponent('Comp 0').openOperations();
+    const deploy = workspace.openComponent('Comp 0').openOperations().getSUUpload();
 
-    expect(ops.chooseFileButton.getText()).toEqual(`Choose a file to upload`);
-    ops.fileInput.sendKeys('/test.zip');
+    expect(deploy.chooseFileButton.getText()).toEqual(`Choose a file to upload`);
+    deploy.fileInput.sendKeys('/test.zip');
 
-    expect(ops.selectedFile.isDisplayed()).toBe(true);
-    expect(ops.selectedFile.getText()).toEqual(`test.zip`);
-    expect(ops.chooseFileButton.getText()).toEqual(`Change the file`);
+    expect(deploy.fileName.isDisplayed()).toBe(true);
+    expect(deploy.fileName.getText()).toEqual(`test.zip`);
+    expect(deploy.chooseFileButton.getText()).toEqual(`Change the file`);
 
-    expect(ops.changeSuNameInput.getAttribute('value')).toEqual(`test`);
+    expect(deploy.fileNameInput.getAttribute('value')).toEqual(`test`);
 
-    expect(ops.deployButton.getText()).toMatch(`Deploy`);
-    expect(ops.deployButton.isEnabled()).toBe(true);
+    expect(deploy.deployButton.getText()).toMatch(`Deploy`);
+    expect(deploy.deployButton.isEnabled()).toBe(true);
   });
 
   it(`should show a detailed error if the SU deployment fails`, () => {
-    const ops = workspace.openComponent('Comp 0').openOperations();
+    const deploy = workspace.openComponent('Comp 0').openOperations().getSUUpload();
 
     const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
-    ops.fileInput.sendKeys(filePath);
+    deploy.fileInput.sendKeys(filePath);
 
     // deploy the component
     page.clickAndExpectNotification(
-      ops.deployButton,
+      deploy.deployButton,
       'Deploy Service-Unit failed',
       'An error occurred when trying to deploy the file "error-deploy.zip"'
     );
 
-    expect(ops.errorDetailsTitle.getText()).toEqual('An error occurred:');
-    expect(ops.errorDetailsMessage.getText()).toEqual('[Mock message] An error happened when trying to deploy the service-unit');
+    expect(deploy.errorTitle.getText()).toEqual('An error occurred:');
+    expect(deploy.errorMsg.getText()).toEqual('[Mock message] An error happened when trying to deploy the service-unit');
   });
 
   it(`should deploy a service-unit`, () => {
-    const ops = workspace.openComponent('Comp 0').openOperations();
+    const deploy = workspace.openComponent('Comp 0').openOperations().getSUUpload();
 
     const filePath = path.resolve(__dirname, './resources/su.zip');
-    ops.fileInput.sendKeys(filePath);
+
+    expect(deploy.fileNameInput.isPresent()).toBe(false);
+    deploy.fileInput.sendKeys(filePath);
+    expect(deploy.fileNameInput.isDisplayed()).toBe(true);
 
     const expectedTreeBeforeDeploy = [
       `Bus 0`,
@@ -176,7 +179,7 @@ describe(`Petals component content`, () => {
     expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
 
     // deploy the service-unit
-    page.clickAndExpectNotification(ops.deployButton, 'SU deployed', '"su" has been deployed');
+    page.clickAndExpectNotification(deploy.deployButton, 'SU deployed', '"su" has been deployed');
 
     // check that the service-unit is now added to the tree and that we've been redirected to it
     const expectedTreeAfterDeploy = [
@@ -214,11 +217,11 @@ describe(`Petals component content`, () => {
 
   it(`should display an error if component change state (install) fails`, () => {
     // deploy a component (already tested in containers E2E tests)
-    const cont = workspace.openContainer('Cont 0').openOperations();
+    const deploy = workspace.openContainer('Cont 0').openOperations().getCompUpload();
 
     const filePath = path.resolve(__dirname, './resources/component.zip');
-    cont.fileInput.sendKeys(filePath);
-    page.clickAndExpectNotification(cont.deployButton, 'Component deployed', '"component" has been deployed');
+    deploy.fileInput.sendKeys(filePath);
+    page.clickAndExpectNotification(deploy.deployButton, 'Component deployed', '"component" has been deployed');
 
     // we should be redirected
     const comp = ComponentOverviewPage.waitAndGet();

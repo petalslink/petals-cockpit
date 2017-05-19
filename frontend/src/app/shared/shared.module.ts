@@ -34,6 +34,7 @@ import {
 
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
+import { UploadComponent } from 'app/shared/components/upload/upload.component';
 
 export const MaterialModules = [
   MdButtonModule,
@@ -65,7 +66,11 @@ export const modules = [
   ...MaterialModules
 ];
 
-export const declarations = [GenerateIconComponent, ColorSearchedLettersDirective];
+export const declarations = [
+  GenerateIconComponent,
+  ColorSearchedLettersDirective,
+  UploadComponent
+];
 
 @NgModule({
   imports: modules,
