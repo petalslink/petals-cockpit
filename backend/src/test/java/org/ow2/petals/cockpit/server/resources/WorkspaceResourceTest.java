@@ -78,22 +78,22 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(requestWorkspace(1)).hasNumberOfRows(0);
         assertThat(requestWorkspace(2)).hasNumberOfRows(1);
 
-        assertThat(requestBus(getId(domain))).hasNumberOfRows(0);
-        assertThat(requestBus(getId(fDomain))).hasNumberOfRows(1);
+        assertThat(requestBus(domain)).hasNumberOfRows(0);
+        assertThat(requestBus(fDomain)).hasNumberOfRows(1);
 
-        assertThat(requestContainer(getId(container1))).hasNumberOfRows(0);
-        assertThat(requestContainer(getId(container2))).hasNumberOfRows(0);
-        assertThat(requestContainer(getId(container3))).hasNumberOfRows(0);
-        assertThat(requestContainer(getId(fContainer))).hasNumberOfRows(1);
+        assertThat(requestContainer(container1)).hasNumberOfRows(0);
+        assertThat(requestContainer(container2)).hasNumberOfRows(0);
+        assertThat(requestContainer(container3)).hasNumberOfRows(0);
+        assertThat(requestContainer(fContainer)).hasNumberOfRows(1);
 
-        assertThat(requestComponent(getId(component))).hasNumberOfRows(0);
-        assertThat(requestComponent(getId(fComponent))).hasNumberOfRows(1);
+        assertThat(requestComponent(component)).hasNumberOfRows(0);
+        assertThat(requestComponent(fComponent)).hasNumberOfRows(1);
 
-        assertThat(requestSA(getId(serviceAssembly))).hasNumberOfRows(0);
-        assertThat(requestSA(getId(fServiceAssembly))).hasNumberOfRows(1);
+        assertThat(requestSA(serviceAssembly)).hasNumberOfRows(0);
+        assertThat(requestSA(fServiceAssembly)).hasNumberOfRows(1);
 
-        assertThat(requestSU(getId(serviceUnit))).hasNumberOfRows(0);
-        assertThat(requestSU(getId(fServiceUnit))).hasNumberOfRows(1);
+        assertThat(requestSU(serviceUnit)).hasNumberOfRows(0);
+        assertThat(requestSU(fServiceUnit)).hasNumberOfRows(1);
     }
 
     @Test
@@ -177,7 +177,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
 
         WorkspaceOverviewContent put = resource.target("/workspaces/1").request()
                 .put(Entity.json(new WorkspaceUpdate(null, "description")), WorkspaceOverviewContent.class);
-        
+
         assertThat(put.workspace.id).isEqualTo(1);
         assertThat(put.workspace.name).isEqualTo("test");
         assertThat(put.workspace.users).containsExactlyInAnyOrder(ADMIN);

@@ -16,6 +16,7 @@
  */
 package org.ow2.petals.cockpit.server;
 
+import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
@@ -31,6 +32,11 @@ public class AbstractTest {
         ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME))
                 .setLevel(Level.INFO);
         // if needed, use this to set more specific log levels
-        // ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(LoggerListener.class)).setLevel(Level.DEBUG);
+        // setLevel(LoggerListener.class, Level.DEBUG);
+        setLevel(PetalsAdminExceptionMapper.class, Level.DEBUG);
+    }
+
+    private static void setLevel(Class<?> logger, Level level) {
+        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(logger)).setLevel(level);
     }
 }

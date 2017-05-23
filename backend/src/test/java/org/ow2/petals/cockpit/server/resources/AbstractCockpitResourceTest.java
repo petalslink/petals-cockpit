@@ -125,28 +125,46 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         return new Table(resource.db.getDataSource(), table.getName());
     }
 
-    protected RequestRowAssert assertThatDbSU(long id) {
-        return assertThat(requestSU(id)).hasNumberOfRows(1).row();
+    protected RequestRowAssert assertThatDbSU(ServiceUnit su) {
+        return assertThat(requestSU(su)).hasNumberOfRows(1).row();
     }
 
-    protected RequestRowAssert assertThatDbSA(long id) {
-        return assertThat(requestSA(id)).hasNumberOfRows(1).row();
+    protected RequestRowAssert assertThatDbSA(ServiceAssembly sa) {
+        return assertThat(requestSA(sa)).hasNumberOfRows(1).row();
     }
 
-    protected RequestRowAssert assertThatDbComp(long id) {
-        return assertThat(requestComp(id)).hasNumberOfRows(1).row();
+    protected void assertThatDbSAState(ServiceAssembly sa, ServiceAssemblyMin.State expectedState) {
+        assertThatDbSA(sa).value(SERVICEASSEMBLIES.STATE.getName()).isEqualTo(expectedState.name());
     }
 
-    protected void assertNoDbSU(long id) {
-        assertThat(requestSU(id)).hasNumberOfRows(0);
+    protected void assertThatSAState(ServiceAssembly sa, ArtifactState.State expectedState) {
+        assertThatDbSAState(sa, ServiceAssemblyMin.State.from(expectedState));
+        assertThat(sa.getState()).isEqualTo(expectedState);
     }
 
-    protected void assertNoDbSA(long id) {
-        assertThat(requestSA(id)).hasNumberOfRows(0);
+    protected RequestRowAssert assertThatDbComponent(Component c) {
+        return assertThat(requestComponent(c)).hasNumberOfRows(1).row();
     }
 
-    protected void assertNoDbComp(long id) {
-        assertThat(requestComp(id)).hasNumberOfRows(0);
+    protected void assertThatDbComponentState(Component c, ComponentMin.State expectedState) {
+        assertThatDbComponent(c).value(COMPONENTS.STATE.getName()).isEqualTo(expectedState.name());
+    }
+
+    protected void assertThatComponentState(Component c, ArtifactState.State expectedState) {
+        assertThatDbComponentState(c, ComponentMin.State.from(expectedState));
+        assertThat(c.getState()).isEqualTo(expectedState);
+    }
+
+    protected void assertNoDbSU(ServiceUnit su) {
+        assertThat(requestSU(su)).hasNumberOfRows(0);
+    }
+
+    protected void assertNoDbSA(ServiceAssembly sa) {
+        assertThat(requestSA(sa)).hasNumberOfRows(0);
+    }
+
+    protected void assertNoDbComponent(Component c) {
+        assertThat(requestComponent(c)).hasNumberOfRows(0);
     }
 
     protected <R extends Record, T> Request requestBy(TableField<R, T> field, T id) {
@@ -162,33 +180,26 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         return requestBy(USERS.USERNAME, username);
     }
 
-    protected Request requestBus(long id) {
-        return requestBy(BUSES.ID, id);
+    protected Request requestBus(Domain bus) {
+        return requestBy(BUSES.ID, getId(bus));
     }
 
-    protected Request requestContainer(long id) {
-        return requestBy(CONTAINERS.ID, id);
+    protected Request requestContainer(Container c) {
+        return requestBy(CONTAINERS.ID, getId(c));
     }
 
-    protected Request requestComponent(long id) {
-        return requestBy(COMPONENTS.ID, id);
+    protected Request requestComponent(Component c) {
+        return requestBy(COMPONENTS.ID, getId(c));
     }
 
-    protected Request requestSU(long id) {
-        return requestBy(SERVICEUNITS.ID, id);
+    protected Request requestSU(ServiceUnit su) {
+        return requestBy(SERVICEUNITS.ID, getId(su));
     }
 
-    protected Request requestSA(long id) {
-        return requestBy(SERVICEASSEMBLIES.ID, id);
+    protected Request requestSA(ServiceAssembly sa) {
+        return requestBy(SERVICEASSEMBLIES.ID, getId(sa));
     }
 
-    protected Request requestComp(long id) {
-        return requestBy(COMPONENTS.ID, id);
-    }
-
-    /**
-     * TODO generate id automatically? but then we need some kind of way to query this data after that!
-     */
     protected void setupWorkspace(long wsId, String wsName, List<Tuple2<Domain, String>> data, String... users) {
         resource.db().transaction(conf -> {
 
