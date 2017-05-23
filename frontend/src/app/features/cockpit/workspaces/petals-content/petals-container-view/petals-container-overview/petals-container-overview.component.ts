@@ -15,22 +15,79 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
+import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
+import {
+  VisNodes, VisEdges,
+  VisNetworkService, VisNetworkData, VisNetworkOptions
+} from 'ng2-vis';
 
-import { IContainerRow } from '../../../state/containers/container.interface';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
+import { containerNetworkOptions, buildVisNetworkData } from './container-graph';
+
+class NetworkData implements VisNetworkData {
+  public nodes: VisNodes;
+  public edges: VisEdges;
+}
 
 @Component({
   selector: 'app-petals-container-overview',
   templateUrl: './petals-container-overview.component.html',
-  styleUrls: ['./petals-container-overview.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./petals-container-overview.component.scss']
 })
-export class PetalsContainerOverviewComponent implements OnInit {
+export class PetalsContainerOverviewComponent implements OnInit, OnDestroy, OnChanges {
+  private onDestroy$ = new Subject<void>();
+
   @Input() container: IContainerRow;
   @Input() otherContainers: IContainerRow[];
   @Input() workspaceId: string;
 
-  constructor() { }
+  visNetwork = 'vis-network-container';
+  visNetworkData: NetworkData;
+  visNetworkOptions: VisNetworkOptions = containerNetworkOptions;
+  selectedContainer: IContainerRow;
 
-  ngOnInit() { }
+  constructor(private visNetworkService: VisNetworkService) { }
+
+  ngOnChanges(_changes: SimpleChanges) {
+    if (this.container && this.otherContainers && this.container.reachabilities.length > 0) {
+      this.visNetworkData = buildVisNetworkData(this.container, this.otherContainers);
+    }
+  }
+
+  ngOnInit() {
+    // because of https://github.com/seveves/ng2-vis/issues/36
+    Observable.fromEvent(window, 'resize')
+      .takeUntil(this.onDestroy$)
+      .debounceTime(1000)
+      .do(_ => {
+        const sizeChanged = (this.visNetworkService as any).networks[this.visNetwork].setSize();
+        if (sizeChanged) {
+          this.visNetworkService.redraw(this.visNetwork);
+        }
+      })
+      .subscribe();
+  }
+
+  networkInitialized() {
+    this.visNetworkService.on(this.visNetwork, 'click');
+
+    this.visNetworkService.click
+      .subscribe((eventData: any[]) => {
+        if (eventData[0] === this.visNetwork) {
+          const selectedContainerId = eventData[1].nodes[0];
+          if (selectedContainerId) {
+            this.selectedContainer = this.otherContainers.find(c => c.id === selectedContainerId);
+          }
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+
+    this.visNetworkService.off(this.visNetwork, 'click');
+  }
 }

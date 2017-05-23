@@ -53,6 +53,7 @@
     "markdown-to-html-pipe": "1.2.1",
     "material-design-icons-iconfont": "3.0.3",
     "ng2-translate": "5.0.0",
+    "ng2-vis": "0.0.6",
     "ngrx-store-freeze": "0.1.9",
     "ngx-pipes": "1.5.10",
     "rxjs": "5.4.0",

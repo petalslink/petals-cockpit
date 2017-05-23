@@ -129,6 +129,18 @@ div > .mat-dialog-container {
   color: #4c83ef !important;
 }
 
+.vis-network-tooltip {
+  height: 22px;
+  max-width: 250px;
+  font-size: 10px;
+  margin: 14px;
+  padding: 8px;
+  background: mat-color($mat-grey, 700, 0.9);
+  border-radius: 2px;
+  position: absolute;
+  color: #fff;
+}
+
 .warning {
   @extend .error;
   background-color: rgba(255, 234, 206, 0.4) !important;
