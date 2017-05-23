@@ -30,17 +30,12 @@ export function getCurrentContainer(store$: Store<IStore>): Observable<IContaine
     .distinctUntilChanged();
 }
 
-/**
- * Returns the other containers in the bus of the container with id containerId.
- * @param containerId the id of the concerned container (not in the resulting array)
- */
 export function getCurrentContainerSiblings(store$: Store<IStore>): Observable<IContainerRow[]> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.containers.selectedContainerId)
     .map(state => {
       const containerId = state.containers.selectedContainerId;
-      // TODO not the best in term of performances...
-      const busId = state.buses.allIds.find(bId => state.buses.byId[bId].containers.includes(containerId));
+      const busId = state.containers.byId[containerId].busId;
       return state.buses.byId[busId].containers
         .filter(cid => cid !== containerId)
         .map(cid => state.containers.byId[cid]);
