@@ -53,41 +53,41 @@ describe(`Petals container content`, () => {
   });
 
   it('should have a correct component deployment form', () => {
-    const ops = workspace.openContainer('Cont 0').openOperations();
+    const upload = workspace.openContainer('Cont 0').openOperations().getCompUpload();
 
-    expect(ops.chooseFileButton.getText()).toEqual(`Choose a file to upload`);
-    ops.fileInput.sendKeys('/test.zip');
+    expect(upload.chooseFileButton.getText()).toEqual(`Choose a file to upload`);
+    upload.fileInput.sendKeys('/test.zip');
 
-    expect(ops.selectedFile.isDisplayed()).toBe(true);
-    expect(ops.selectedFile.getText()).toEqual(`test.zip`);
-    expect(ops.chooseFileButton.getText()).toEqual(`Change the file`);
+    expect(upload.fileNameInput.isPresent()).toBe(false);
+    expect(upload.fileName.getText()).toEqual(`test.zip`);
+    expect(upload.chooseFileButton.getText()).toEqual(`Change the file`);
 
-    expect(ops.deployButton.getText()).toMatch(`Deploy`);
-    expect(ops.deployButton.isEnabled()).toBe(true);
+    expect(upload.deployButton.getText()).toMatch(`Deploy`);
+    expect(upload.deployButton.isEnabled()).toBe(true);
   });
 
   it(`should show a detailed error if the component deployment fails`, () => {
-    const ops = workspace.openContainer('Cont 0').openOperations();
+    const upload = workspace.openContainer('Cont 0').openOperations().getCompUpload();
 
     const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
-    ops.fileInput.sendKeys(filePath);
+    upload.fileInput.sendKeys(filePath);
 
     // deploy the component
     page.clickAndExpectNotification(
-      ops.deployButton,
+      upload.deployButton,
       'Deploy component failed',
       'An error occurred when trying to deploy the file "error-deploy.zip"'
     );
 
-    expect(ops.errorDetailsTitle.getText()).toEqual('An error occurred:');
-    expect(ops.errorDetailsMessage.getText()).toEqual('[Mock message] An error happened when trying to deploy the component');
+    expect(upload.errorTitle.getText()).toEqual('An error occurred:');
+    expect(upload.errorMsg.getText()).toEqual('[Mock message] An error happened when trying to deploy the component');
   });
 
   it(`should deploy a component`, () => {
-    const ops = workspace.openContainer('Cont 0').openOperations();
+    const upload = workspace.openContainer('Cont 0').openOperations().getCompUpload();
 
     const filePath = path.resolve(__dirname, './resources/component.zip');
-    ops.fileInput.sendKeys(filePath);
+    upload.fileInput.sendKeys(filePath);
 
     const expectedTreeBeforeDeploy = [
       `Bus 0`,
@@ -115,8 +115,11 @@ describe(`Petals container content`, () => {
 
     expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
 
+    // make sure we can't change the name of the component we want to deploy
+    expect(upload.fileNameInput.isPresent()).toBe(false);
+
     // deploy the component
-    page.clickAndExpectNotification(ops.deployButton, 'Component deployed', '"component" has been deployed');
+    page.clickAndExpectNotification(upload.deployButton, 'Component deployed', '"component" has been deployed');
 
     // check that the component is now added to the tree and that we've been redirected to it
     const expectedTreeAfterDeploy = [

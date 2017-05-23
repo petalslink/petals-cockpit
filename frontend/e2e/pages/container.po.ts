@@ -19,6 +19,7 @@ import { browser, ExpectedConditions as EC, $, by } from 'protractor';
 
 import { urlToMatch } from '../utils';
 import { waitTimeout } from '../common';
+import { UploadComponentPage } from './upload-component.po';
 
 export abstract class ContainerPage {
 
@@ -71,13 +72,9 @@ export class ContainerOperationPage extends ContainerPage {
 
   public readonly operations = ContainerOperationPage.operations;
 
-  public readonly deployCard = this.operations.$(`.deploy`);
-  public readonly fileInput = this.deployCard.$(`input[type="file"]`);
-  public readonly deployButton = this.deployCard.$(`form button[type="submit"]`);
-  public readonly chooseFileButton = $(`app-petals-container-operations .deploy .choose-file`);
-  public readonly selectedFile = $(`app-petals-container-operations .deploy .selected-file .file-name`);
-  public readonly errorDetailsTitle = $(`app-petals-container-operations .deploy .error-deploy .title`);
-  public readonly errorDetailsMessage = $(`app-petals-container-operations .deploy .error-deploy .message`);
+  public readonly deploys = this.operations.$(`.deploys`);
+
+  // deploy a component
 
   static waitAndGet() {
     super.wait();
@@ -87,5 +84,9 @@ export class ContainerOperationPage extends ContainerPage {
 
   private constructor() {
     super();
+  }
+
+  getCompUpload() {
+    return UploadComponentPage.waitAndGet('deploy-component');
   }
 }
