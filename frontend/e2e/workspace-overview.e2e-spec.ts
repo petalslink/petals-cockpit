@@ -30,10 +30,9 @@ describe(`Workspace Overview`, () => {
 
     expect(workspace.description.getText()).toEqual(`You can import a bus from the container 192.168.0.1:7700 to get a mock bus.`);
     expect(workspace.descriptionArea.isPresent()).toBe(false);
-    expect(workspace.description.getAttribute('class')).toContain('info');
 
     expect(workspace.users.$(`.users-in-workspace`).getText())
-      .toEqual(`You are the only one using this workspace:`);
+      .toEqual(`You are the only one using this workspace.`);
 
     expect(workspace.users.$$(`md-list-item .mat-list-text`).getText())
       .toEqual(['admin\nAdministrator']);
@@ -55,7 +54,7 @@ describe(`Workspace Overview`, () => {
     expect(workspace.descriptionArea.isPresent()).toBe(false);
 
     expect(workspace.users.$(`.users-in-workspace`).getText())
-      .toEqual(`5 people are using this workspace:`);
+      .toEqual(`5 people are using this workspace.`);
 
     expect(workspace.users.$$(`md-list-item .mat-list-text`).getText())
       .toEqual([
@@ -78,8 +77,6 @@ describe(`Workspace Overview`, () => {
 
     expect(workspace.description.getText())
       .toEqual(`Put some description in markdown for the workspace here.`);
-    expect(workspace.description.getAttribute('class'))
-      .toContain('info');
 
     // the description should be rendered via markdown
     expect(workspace.description.$(`strong`).getText())
@@ -89,7 +86,6 @@ describe(`Workspace Overview`, () => {
     workspace.editButton.click();
 
     expect(workspace.descriptionPreview.getText()).toEqual(`Put some description in markdown for the workspace here.`);
-    expect(workspace.descriptionPreview.getAttribute('class')).toContain('warning');
 
     // write a few words
     workspace.descriptionArea.sendKeys(' And some ~~more~~.');
