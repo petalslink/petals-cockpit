@@ -27,6 +27,7 @@ import * as helper from './../helpers/mock.helper';
 import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/interfaces/store.interface';
+import { EServiceAssemblyState } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
 
 @Injectable()
 export class ContainersMockService extends ContainersServiceImpl {
@@ -59,6 +60,26 @@ export class ContainersMockService extends ContainersServiceImpl {
 
     setTimeout(() =>
       (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.COMPONENT_DEPLOYED, response),
+      environment.mock.sseDelay
+    );
+
+    return helper.responseBody(response);
+  }
+
+  deployServiceAssembly(workspaceId: string, containerId: string, file: File) {
+    if (file.name.includes('error')) {
+      return helper.errorBackend('[Mock message] An error happened when trying to deploy the service-assembly', 400);
+    }
+
+    const [serviceAssembly, serviceUnits] = containersService.get(containerId).addServiceAssembly(EServiceAssemblyState.Shutdown);
+
+    const response = {
+      serviceAssemblies: serviceAssembly,
+      serviceUnits: serviceUnits
+    };
+
+    setTimeout(() =>
+      (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.SA_DEPLOYED, response),
       environment.mock.sseDelay
     );
 

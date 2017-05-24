@@ -95,7 +95,7 @@ export class Container {
     c2.addServiceUnit(su2);
     this.serviceAssemblies.set(serviceAssembly.id, serviceAssembly);
 
-    return serviceAssembly;
+    return [serviceAssembly.toObj(), { ...su1.toObj(), ...su2.toObj() }];
   }
 
   addServiceUnit(component: Component, state?: ServiceAssemblyState, name?: string) {

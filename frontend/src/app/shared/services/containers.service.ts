@@ -35,6 +35,8 @@ export abstract class ContainersService {
 
   abstract deployComponent(workspaceId: string, containerId: string, file: File): Observable<Response>;
 
+  abstract deployServiceAssembly(workspaceId: string, containerId: string, file: File): Observable<Response>;
+
   abstract watchEventComponentDeployedOk(): Observable<void>;
 }
 
@@ -58,6 +60,13 @@ export class ContainersServiceImpl extends ContainersService {
     formData.append('file', file, file.name);
 
     return this.http.post(`${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/components`, formData);
+  }
+
+  deployServiceAssembly(workspaceId: string, containerId: string, file: File) {
+    const formData: FormData = new FormData();
+    formData.append('file', file, file.name);
+
+    return this.http.post(`${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/serviceassemblies`, formData);
   }
 
   watchEventComponentDeployedOk() {

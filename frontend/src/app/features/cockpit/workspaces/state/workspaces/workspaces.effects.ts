@@ -148,7 +148,7 @@ export class WorkspacesEffects {
         this.sub.add(this.serviceAssembliesService.watchEventSaStateChangeOk().subscribe());
         this.sub.add(this.componentsService.watchEventComponentStateChangeOk().subscribe());
         this.sub.add(this.workspacesService.watchEventWorkspaceDeleted().subscribe());
-        this.sub.add(this.componentsService.watchEventSuDeployedOk().subscribe());
+        this.sub.add(this.componentsService.watchEventSaDeployedOk().subscribe());
         this.sub.add(this.containersService.watchEventComponentDeployedOk().subscribe());
 
         return { type: Workspaces.FETCH_WORKSPACE_SSE_SUCCESS, payload: action.payload };

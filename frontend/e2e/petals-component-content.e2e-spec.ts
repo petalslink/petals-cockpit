@@ -19,8 +19,8 @@ import * as path from 'path';
 
 import { page } from './common';
 import { WorkspacePage } from './pages/workspace.po';
-import { ServiceUnitOverviewPage } from './pages/service-unit.po';
 import { ComponentOverviewPage } from './pages/component.po';
+import { ServiceAssemblyOverviewPage } from './pages/service-assembly.po';
 
 describe(`Petals component content`, () => {
   let workspace: WorkspacePage;
@@ -188,6 +188,7 @@ describe(`Petals component content`, () => {
       `SA 0`,
       `SA 1`,
       `SA 2`,
+      // the corresponding SA should have been added
       `sa-su`,
       `Comp 0`,
       `SU 0`,
@@ -212,12 +213,12 @@ describe(`Petals component content`, () => {
     expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
     // we should get redirected after
-    ServiceUnitOverviewPage.waitAndGet();
+    ServiceAssemblyOverviewPage.waitAndGet();
   });
 
   it(`should display an error if component change state (install) fails`, () => {
     // deploy a component (already tested in containers E2E tests)
-    const deploy = workspace.openContainer('Cont 0').openOperations().getCompUpload();
+    const deploy = workspace.openContainer('Cont 0').openOperations().getComponentUpload();
 
     const filePath = path.resolve(__dirname, './resources/component.zip');
     deploy.fileInput.sendKeys(filePath);

@@ -37,10 +37,15 @@ export class PetalsContainerOperationsComponent implements OnInit {
 
   ngOnInit() { }
 
-  deploy(whatToDeploy: 'component', file: File) {
+  deploy(whatToDeploy: 'component' | 'service-assembly', file: File) {
     if (whatToDeploy === 'component') {
       this.store$.dispatch({
         type: Containers.DEPLOY_COMPONENT,
+        payload: { file, containerId: this.container.id }
+      });
+    } else if (whatToDeploy === 'service-assembly') {
+      this.store$.dispatch({
+        type: Containers.DEPLOY_SERVICE_ASSEMBLY,
         payload: { file, containerId: this.container.id }
       });
     }

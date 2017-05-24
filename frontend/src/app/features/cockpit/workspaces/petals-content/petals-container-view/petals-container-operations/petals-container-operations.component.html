@@ -15,14 +15,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
-    <div fxLayout="row" fxLayout.lt-lg="column" class="deploys">
+    <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px" fxLayoutWrap class="deploys">
       <app-upload
         [title]="'Component Deployment'"
         [disabled]="container.isDeployingComponent"
-        [error]="container.errorDeployment"
+        [error]="container.errorDeploymentComponent"
         (onDeploy)="deploy('component', $event.file)"
-        class="deploy-component"
-        fxFlexFill></app-upload>
-    </div>
+        class="deploy-component margin-bottom-x2"
+        fxFlex></app-upload>
+
+      <app-upload
+        [title]="'Service assembly'"
+        [disabled]="container.isDeployingServiceAssembly"
+        [error]="container.errorDeploymentServiceAssembly"
+        (onDeploy)="deploy('service-assembly', $event.file)"
+        class="deploy-service-assembly margin-bottom-x2"
+        fxFlex></app-upload>
   </div>
 </div>

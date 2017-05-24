@@ -19,6 +19,7 @@ import * as path from 'path';
 import { page } from './common';
 import { WorkspacePage } from './pages/workspace.po';
 import { ComponentOverviewPage } from './pages/component.po';
+import { ServiceAssemblyOverviewPage } from './pages/service-assembly.po';
 
 describe(`Petals container content`, () => {
   let workspace: WorkspacePage;
@@ -41,115 +42,229 @@ describe(`Petals container content`, () => {
     ].join(' '));
   });
 
-  it('should have a correct component deployment form', () => {
-    const upload = workspace.openContainer('Cont 0').openOperations().getCompUpload();
+  describe('Deploy component', () => {
+    it('should have a correct component deployment form', () => {
+      const upload = workspace.openContainer('Cont 0').openOperations().getComponentUpload();
 
-    expect(upload.chooseFileButton.getText()).toEqual(`CHOOSE A FILE TO UPLOAD insert_drive_file`);
-    upload.fileInput.sendKeys('/test.zip');
+      expect(upload.chooseFileButton.getText()).toEqual(`CHOOSE A FILE TO UPLOAD insert_drive_file`);
+      upload.fileInput.sendKeys('/test.zip');
 
-    expect(upload.fileNameInput.isPresent()).toBe(false);
-    expect(upload.fileName.getText()).toEqual(`test.zip`);
-    expect(upload.chooseFileButton.getText()).toEqual(`CHANGE THE FILE insert_drive_file`);
+      expect(upload.fileNameInput.isPresent()).toBe(false);
+      expect(upload.fileName.getText()).toEqual(`test.zip`);
+      expect(upload.chooseFileButton.getText()).toEqual(`CHANGE THE FILE insert_drive_file`);
 
-    expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
-    expect(upload.deployButton.isEnabled()).toBe(true);
+      expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
+      expect(upload.deployButton.isEnabled()).toBe(true);
+    });
+
+    it(`should show a detailed error if the component deployment fails`, () => {
+      const upload = workspace.openContainer('Cont 0').openOperations().getComponentUpload();
+
+      const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
+      upload.fileInput.sendKeys(filePath);
+
+      // deploy the component
+      page.clickAndExpectNotification(
+        upload.deployButton,
+        'Deploy component failed',
+        'An error occurred when trying to deploy the file "error-deploy.zip"'
+      );
+
+      expect(upload.errorTitle.getText()).toEqual('An error occurred:');
+      expect(upload.errorMsg.getText()).toEqual('[Mock message] An error happened when trying to deploy the component');
+    });
+
+    it(`should deploy a component`, () => {
+      const upload = workspace.openContainer('Cont 0').openOperations().getComponentUpload();
+
+      const filePath = path.resolve(__dirname, './resources/component.zip');
+      upload.fileInput.sendKeys(filePath);
+
+      const expectedTreeBeforeDeploy = [
+        `Bus 0`,
+        `Cont 0`,
+        `SA 0`,
+        `SA 1`,
+        `SA 2`,
+        `Comp 0`,
+        `SU 0`,
+        `SU 2`,
+        `Comp 1`,
+        `SU 1`,
+        `SU 3`,
+        `Cont 1`,
+        `SA 3`,
+        `SA 4`,
+        `SA 5`,
+        `Comp 2`,
+        `SU 4`,
+        `SU 6`,
+        `Comp 3`,
+        `SU 5`,
+        `SU 7`
+      ];
+
+      expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
+
+      // make sure we can't change the name of the component we want to deploy
+      expect(upload.fileNameInput.isPresent()).toBe(false);
+
+      // deploy the component
+      page.clickAndExpectNotification(upload.deployButton, 'Component deployed', '"component" has been deployed');
+
+      // check that the component is now added to the tree and that we've been redirected to it
+      const expectedTreeAfterDeploy = [
+        `Bus 0`,
+        `Cont 0`,
+        `SA 0`,
+        `SA 1`,
+        `SA 2`,
+        `Comp 0`,
+        `SU 0`,
+        `SU 2`,
+        `Comp 1`,
+        `SU 1`,
+        `SU 3`,
+        // this one should have been deployed
+        `component`,
+        `Cont 1`,
+        `SA 3`,
+        `SA 4`,
+        `SA 5`,
+        `Comp 2`,
+        `SU 4`,
+        `SU 6`,
+        `Comp 3`,
+        `SU 5`,
+        `SU 7`
+      ];
+
+      expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
+
+      // we should be redirected
+      const ops = ComponentOverviewPage.waitAndGet().openOperations();
+
+      expect(ops.state.getText()).toEqual('Loaded');
+
+      expect(ops.lifecycleCard.$('.component-parameters span').getText()).toEqual('Install parameters');
+      expect(ops.parameters.$$('input').count()).toBe(2);
+      expect(ops.parameter('http-port').getAttribute('value')).toEqual('8080');
+      expect(ops.parameter('enable-https').getAttribute('value')).toEqual('false');
+
+      expect(ops.installButton.isEnabled()).toBe(true);
+      expect(ops.unloadButton.isEnabled()).toBe(true);
+    });
   });
 
-  it(`should show a detailed error if the component deployment fails`, () => {
-    const upload = workspace.openContainer('Cont 0').openOperations().getCompUpload();
+  describe('Deploy service assembly', () => {
+    it('should have a correct service-assembly deployment form', () => {
+      const upload = workspace.openContainer('Cont 0').openOperations().getServiceAssemblyUpload();
 
-    const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
-    upload.fileInput.sendKeys(filePath);
+      expect(upload.chooseFileButton.getText()).toEqual(`CHOOSE A FILE TO UPLOAD insert_drive_file`);
+      upload.fileInput.sendKeys('/test.zip');
 
-    // deploy the component
-    page.clickAndExpectNotification(
-      upload.deployButton,
-      'Deploy component failed',
-      'An error occurred when trying to deploy the file "error-deploy.zip"'
-    );
+      expect(upload.fileNameInput.isPresent()).toBe(false);
+      expect(upload.fileName.getText()).toEqual(`test.zip`);
+      expect(upload.chooseFileButton.getText()).toEqual(`CHANGE THE FILE insert_drive_file`);
 
-    expect(upload.errorTitle.getText()).toEqual('An error occurred:');
-    expect(upload.errorMsg.getText()).toEqual('[Mock message] An error happened when trying to deploy the component');
-  });
+      expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
+      expect(upload.deployButton.isEnabled()).toBe(true);
+    });
 
-  it(`should deploy a component`, () => {
-    const upload = workspace.openContainer('Cont 0').openOperations().getCompUpload();
+    it(`should show a detailed error if the service-assembly deployment fails`, () => {
+      const upload = workspace.openContainer('Cont 0').openOperations().getServiceAssemblyUpload();
 
-    const filePath = path.resolve(__dirname, './resources/component.zip');
-    upload.fileInput.sendKeys(filePath);
+      const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
+      upload.fileInput.sendKeys(filePath);
 
-    const expectedTreeBeforeDeploy = [
-      `Bus 0`,
-      `Cont 0`,
-      `SA 0`,
-      `SA 1`,
-      `SA 2`,
-      `Comp 0`,
-      `SU 0`,
-      `SU 2`,
-      `Comp 1`,
-      `SU 1`,
-      `SU 3`,
-      `Cont 1`,
-      `SA 3`,
-      `SA 4`,
-      `SA 5`,
-      `Comp 2`,
-      `SU 4`,
-      `SU 6`,
-      `Comp 3`,
-      `SU 5`,
-      `SU 7`
-    ];
+      // deploy the service-assembly
+      page.clickAndExpectNotification(
+        upload.deployButton,
+        'Deploy service-assembly failed',
+        'An error occurred when trying to deploy the file "error-deploy.zip"'
+      );
 
-    expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
+      expect(upload.errorTitle.getText()).toEqual('An error occurred:');
+      expect(upload.errorMsg.getText()).toEqual('[Mock message] An error happened when trying to deploy the service-assembly');
+    });
 
-    // make sure we can't change the name of the component we want to deploy
-    expect(upload.fileNameInput.isPresent()).toBe(false);
+    it(`should deploy a service-assembly`, () => {
+      const upload = workspace.openContainer('Cont 0').openOperations().getServiceAssemblyUpload();
 
-    // deploy the component
-    page.clickAndExpectNotification(upload.deployButton, 'Component deployed', '"component" has been deployed');
+      const filePath = path.resolve(__dirname, './resources/sa.zip');
+      upload.fileInput.sendKeys(filePath);
 
-    // check that the component is now added to the tree and that we've been redirected to it
-    const expectedTreeAfterDeploy = [
-      `Bus 0`,
-      `Cont 0`,
-      `SA 0`,
-      `SA 1`,
-      `SA 2`,
-      `Comp 0`,
-      `SU 0`,
-      `SU 2`,
-      `Comp 1`,
-      `SU 1`,
-      `SU 3`,
-      // this one should have been deployed
-      `component`,
-      `Cont 1`,
-      `SA 3`,
-      `SA 4`,
-      `SA 5`,
-      `Comp 2`,
-      `SU 4`,
-      `SU 6`,
-      `Comp 3`,
-      `SU 5`,
-      `SU 7`
-    ];
+      const expectedTreeBeforeDeploy = [
+        `Bus 0`,
+        `Cont 0`,
+        `SA 0`,
+        `SA 1`,
+        `SA 2`,
+        `Comp 0`,
+        `SU 0`,
+        `SU 2`,
+        `Comp 1`,
+        `SU 1`,
+        `SU 3`,
+        `Cont 1`,
+        `SA 3`,
+        `SA 4`,
+        `SA 5`,
+        `Comp 2`,
+        `SU 4`,
+        `SU 6`,
+        `Comp 3`,
+        `SU 5`,
+        `SU 7`
+      ];
 
-    expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
+      expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
 
-    // we should be redirected
-    const ops = ComponentOverviewPage.waitAndGet().openOperations();
+      // make sure we can't change the name of the component we want to deploy
+      expect(upload.fileNameInput.isPresent()).toBe(false);
 
-    expect(ops.state.getText()).toEqual('Loaded');
+      // deploy the component
+      page.clickAndExpectNotification(upload.deployButton, 'SA deployed', '"SA 12" has been deployed');
 
-    expect(ops.lifecycleCard.$('.component-parameters span').getText()).toEqual('Install parameters');
-    expect(ops.parameters.$$('input').count()).toBe(2);
-    expect(ops.parameter('http-port').getAttribute('value')).toEqual('8080');
-    expect(ops.parameter('enable-https').getAttribute('value')).toEqual('false');
+      // check that the component is now added to the tree and that we've been redirected to it
+      const expectedTreeAfterDeploy = [
+        `Bus 0`,
+        `Cont 0`,
+        `SA 0`,
+        `SA 1`,
+        `SA 2`,
+        `SA 12`, // <-- added
+        `Comp 0`,
+        `SU 0`,
+        `SU 2`,
+        `SU 16`, // <-- added
+        `Comp 1`,
+        `SU 1`,
+        `SU 3`,
+        `SU 17`, // <-- added
+        `Cont 1`,
+        `SA 3`,
+        `SA 4`,
+        `SA 5`,
+        `Comp 2`,
+        `SU 4`,
+        `SU 6`,
+        `Comp 3`,
+        `SU 5`,
+        `SU 7`
+      ];
 
-    expect(ops.installButton.isEnabled()).toBe(true);
-    expect(ops.unloadButton.isEnabled()).toBe(true);
+      expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
+
+      // we should get redirected
+      const sa = ServiceAssemblyOverviewPage.waitAndGet();
+
+      expect(sa.state.getText()).toEqual('Shutdown');
+
+      expect(sa.serviceUnits.getText()).toEqual([
+        'Service unit "SU 16" deployed on component "Comp 0"',
+        'Service unit "SU 17" deployed on component "Comp 1"'
+      ]);
+    });
   });
 });

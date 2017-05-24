@@ -43,7 +43,9 @@ export interface IContainerUI {
   isFolded: boolean;
   isFetchingDetails: boolean;
   isDeployingComponent: boolean;
-  errorDeployment: string;
+  errorDeploymentComponent: string;
+  isDeployingServiceAssembly: boolean;
+  errorDeploymentServiceAssembly: string;
 }
 
 export interface IContainerRow extends IContainerUI, IContainerBackendSSE, IContainerBackendDetails { }
@@ -65,7 +67,9 @@ export function containerRowFactory(): IContainerRow {
     isFolded: false,
     isFetchingDetails: false,
     isDeployingComponent: false,
-    errorDeployment: '',
+    errorDeploymentComponent: '',
+    isDeployingServiceAssembly: false,
+    errorDeploymentServiceAssembly: '',
 
     components: [],
     serviceAssemblies: [],
