@@ -38,28 +38,26 @@ describe(`Petals component content`, () => {
   });
 
   it(`should stop/start/stop/unload a component`, () => {
-    let comp = workspace.openComponent('Comp 0');
+    let ops = workspace.openComponent('Comp 0').openOperations();
 
-    expect(comp.state.getText()).toEqual('Started');
+    ops.stopButton.click();
+    expect(ops.state.getText()).toEqual('Stopped');
+    expect(ops.stopButton.isPresent()).toBe(false);
+    expect(ops.startButton.isEnabled()).toBe(true);
+    expect(ops.installButton.isPresent()).toBe(false);
+    // as the ops 0 still have 2 SUs (SU 0, SU 1), we can't unload it yet
+    expect(ops.uninstallButton.isEnabled()).toBe(false);
+    expect(ops.unloadButton.isEnabled()).toBe(false);
 
-    comp.stopButton.click();
-    expect(comp.state.getText()).toEqual('Stopped');
-    expect(comp.stopButton.isPresent()).toBe(false);
-    expect(comp.startButton.isEnabled()).toBe(true);
-    expect(comp.installButton.isPresent()).toBe(false);
-    // as the comp 0 still have 2 SUs (SU 0, SU 1), we can't unload it yet
-    expect(comp.uninstallButton.isEnabled()).toBe(false);
-    expect(comp.unloadButton.isEnabled()).toBe(false);
+    ops.startButton.click();
+    expect(ops.state.getText()).toEqual('Started');
+    expect(ops.stopButton.isEnabled()).toBe(true);
+    expect(ops.startButton.isPresent()).toBe(false);
+    expect(ops.unloadButton.isPresent()).toBe(false);
+    expect(ops.installButton.isPresent()).toBe(false);
+    expect(ops.uninstallButton.isPresent()).toBe(false);
 
-    comp.startButton.click();
-    expect(comp.state.getText()).toEqual('Started');
-    expect(comp.stopButton.isEnabled()).toBe(true);
-    expect(comp.startButton.isPresent()).toBe(false);
-    expect(comp.unloadButton.isPresent()).toBe(false);
-    expect(comp.installButton.isPresent()).toBe(false);
-    expect(comp.uninstallButton.isPresent()).toBe(false);
-
-    comp.stopButton.click();
+    ops.stopButton.click();
 
     // unload the 2 SU
     const sa0 = workspace.openServiceAssembly('SA 0').openOperations();
@@ -71,37 +69,39 @@ describe(`Petals component content`, () => {
     page.clickAndExpectNotification(sa2.unloadButton);
 
     // we should now be able to unload the comp 0
-    comp = workspace.openComponent('Comp 0');
+    ops = workspace.openComponent('Comp 0').openOperations();
 
-    expect(comp.state.getText()).toEqual('Stopped');
-    expect(comp.stopButton.isPresent()).toBe(false);
-    expect(comp.startButton.isEnabled()).toBe(true);
-    expect(comp.installButton.isPresent()).toBe(false);
-    expect(comp.uninstallButton.isEnabled()).toBe(true);
-    expect(comp.unloadButton.isEnabled()).toBe(true);
+    expect(ops.state.getText()).toEqual('Stopped');
+    expect(ops.stopButton.isPresent()).toBe(false);
+    expect(ops.startButton.isEnabled()).toBe(true);
+    expect(ops.installButton.isPresent()).toBe(false);
+    expect(ops.uninstallButton.isEnabled()).toBe(true);
+    expect(ops.unloadButton.isEnabled()).toBe(true);
 
     // uninstall
-    comp.uninstallButton.click();
-    expect(comp.state.getText()).toEqual('Loaded');
-    expect(comp.stopButton.isPresent()).toBe(false);
-    expect(comp.startButton.isPresent()).toBe(false);
-    expect(comp.installButton.isEnabled()).toBe(true);
-    expect(comp.uninstallButton.isPresent()).toBe(false);
-    expect(comp.unloadButton.isEnabled()).toBe(true);
+    ops.uninstallButton.click();
+    expect(ops.state.getText()).toEqual('Loaded');
+    expect(ops.stopButton.isPresent()).toBe(false);
+    expect(ops.startButton.isPresent()).toBe(false);
+    expect(ops.installButton.isEnabled()).toBe(true);
+    expect(ops.uninstallButton.isPresent()).toBe(false);
+    expect(ops.unloadButton.isEnabled()).toBe(true);
+
+    expect(ops.getSUUpload().chooseFileButton.isEnabled()).toBe(false);
 
     // install
-    comp.installButton.click();
-    expect(comp.state.getText()).toEqual('Shutdown');
-    expect(comp.stopButton.isPresent()).toBe(false);
-    expect(comp.startButton.isEnabled()).toBe(true);
-    expect(comp.installButton.isPresent()).toBe(false);
-    expect(comp.uninstallButton.isEnabled()).toBe(true);
-    expect(comp.unloadButton.isEnabled()).toBe(true);
+    ops.installButton.click();
+    expect(ops.state.getText()).toEqual('Shutdown');
+    expect(ops.stopButton.isPresent()).toBe(false);
+    expect(ops.startButton.isEnabled()).toBe(true);
+    expect(ops.installButton.isPresent()).toBe(false);
+    expect(ops.uninstallButton.isEnabled()).toBe(true);
+    expect(ops.unloadButton.isEnabled()).toBe(true);
 
-    comp.uninstallButton.click();
+    ops.uninstallButton.click();
 
     // once unloaded ...
-    page.clickAndExpectNotification(comp.unloadButton);
+    page.clickAndExpectNotification(ops.unloadButton);
 
     // we should be redirected to the workspace page ...
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
@@ -113,16 +113,16 @@ describe(`Petals component content`, () => {
   it('should have a correct SU deployment form', () => {
     const deploy = workspace.openComponent('Comp 0').openOperations().getSUUpload();
 
-    expect(deploy.chooseFileButton.getText()).toEqual(`Choose a file to upload`);
+    expect(deploy.chooseFileButton.getText()).toEqual(`CHOOSE A FILE TO UPLOAD`);
     deploy.fileInput.sendKeys('/test.zip');
 
     expect(deploy.fileName.isDisplayed()).toBe(true);
     expect(deploy.fileName.getText()).toEqual(`test.zip`);
-    expect(deploy.chooseFileButton.getText()).toEqual(`Change the file`);
+    expect(deploy.chooseFileButton.getText()).toEqual(`CHANGE THE FILE`);
 
     expect(deploy.fileNameInput.getAttribute('value')).toEqual(`test`);
 
-    expect(deploy.deployButton.getText()).toMatch(`Deploy`);
+    expect(deploy.deployButton.getText()).toMatch(`DEPLOY`);
     expect(deploy.deployButton.isEnabled()).toBe(true);
   });
 
@@ -224,17 +224,17 @@ describe(`Petals component content`, () => {
     page.clickAndExpectNotification(deploy.deployButton, 'Component deployed', '"component" has been deployed');
 
     // we should be redirected
-    const comp = ComponentOverviewPage.waitAndGet();
+    const ops = ComponentOverviewPage.waitAndGet().openOperations();
 
     // change state to install with some parameters (with error in http-port to make it fail)
-    const inputHttpPort = comp.parameter('http-port');
-    const inputEnableHttps = comp.parameter('enable-https');
+    const inputHttpPort = ops.parameter('http-port');
+    const inputEnableHttps = ops.parameter('enable-https');
 
     inputHttpPort.sendKeys('error');
-    comp.installButton.click();
+    ops.installButton.click();
 
     // check if the error is displayed
-    expect(comp.changeStateError.getText())
+    expect(ops.changeStateError.getText())
       .toEqual(`[Mock message] An error happened when trying to change the state of that component`);
 
     // make sure the form isn't reset

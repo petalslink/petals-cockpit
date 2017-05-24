@@ -15,11 +15,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
-
-    <h3 class="color-primary-light-bold margin-top-x2">Deployment</h3>
-    <div fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="10px" class="deploys">
+    <div fxLayout="row" fxLayout.lt-lg="column" class="deploys">
       <app-upload
-        [title]="'Component'"
+        [title]="'Component Deployment'"
         [disabled]="container.isDeployingComponent"
         [error]="container.errorDeployment"
         (onDeploy)="deploy('component', $event.file)"

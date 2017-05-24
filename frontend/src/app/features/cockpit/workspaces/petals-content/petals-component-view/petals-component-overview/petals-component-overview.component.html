@@ -15,74 +15,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="content content-max-width" fxLayoutWrap>
   <div class="central-content">
-    <div fxLayout fxLayoutWrap fxLayoutGap="10px">
-      <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="state">
-        <md-card-title-group fxLayout="column">
-          <div fxLayout="column" fxLayoutAlign="end end">
-            <md-card-subtitle>State</md-card-subtitle>
-            <md-card-title>{{ component.state }}</md-card-title>
-            <md-card-content *ngIf="component.state">
-              <!-- TODO : Move that into a modal ? -->
-              <div *ngIf="component.state === 'Loaded'" class="parameters">
-                <h3 class="color-primary">Install parameters</h3>
-                <form *ngIf="parametersForm" [formGroup]="parametersForm">
-                  <div *ngFor="let param of parametersForm.controls | keys">
-                    <md-input-container floatPlaceholder="always">
-                      <input mdInput [placeholder]="param" type="text" [formControlName]="param">
-                    </md-input-container>
-                  </div>
-                </form>
-              </div>
 
-              <div fxFlexLayout="row" fxLayoutAlign="end center">
-                <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:componentState" fxFlexLayout="row" class="margin-right-x1-no-last"
-                  fxLayoutAlign="end center">
-                  <button
-                    md-raised-button
-                    color="primary"
-                    (click)="changeState(possibleState.newStateAfterAction)"
-                    [disabled]="component.isFetchingDetails || component.isUpdatingState || ((possibleState.actionName === 'Unload' || possibleState.actionName === 'Uninstall') && component.serviceUnits.length > 0)"
-                  >
-                    {{ possibleState.actionName }}
+    <md-card class="component-infos">
+      <md-card-title fxLayout="row">
+        <span fxFlex class="text-upper">Component Infos</span>
+        <md-icon color="primary">info_outline</md-icon>
+      </md-card-title>
 
-                    <md-icon
-                      *ngIf="possibleState.actionName === 'Unload' && component.serviceUnits.length > 0"
-                      mdTooltip="To unload a component, all service units of the component should be unloaded first"
-                      mdTooltipPosition="above"
-                      class="margin-left-x1"
-                    >
-                      info outline
-                    </md-icon>
-                    <md-icon
-                      *ngIf="possibleState.actionName === 'Uninstall' && component.serviceUnits.length > 0"
-                      mdTooltip="To uninstall a component, all service units of the component should be unloaded first"
-                      mdTooltipPosition="above"
-                      class="margin-left-x1"
-                    >
-                      info outline
-                    </md-icon>
-                  </button>
-                </span>
-              </div>
-            </md-card-content>
-          </div>
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <md-card-header fxFlex *ngIf="component.state">
+          <md-card-title>State</md-card-title>
+          <md-divider></md-divider>
+          <md-card-subtitle class="component-state" fxLayout="row" fxLayoutAlign="start center">
+            {{ component.state }}
+            <div class="margin-left-x1"
+              [class.green-led]="component.state === 'Started'"
+              [class.yellow-led]="component.state === 'Stopped'"
+              [class.red-led]="component.state === 'Shutdown'"
+              [class.grey-led]="component.state === 'Loaded'"></div>
+          </md-card-subtitle>
+        </md-card-header>
 
-          <div *ngIf="component.errorChangeState" fxFlex class="error">
-            <div class="bold margin-bottom-x1">An error occurred:</div>
-            <span class="italic">{{ component.errorChangeState }}</span>
-          </div>
-        </md-card-title-group>
-      </md-card>
+        <md-card-header fxFlex>
+          <div md-card-avatar class="img-card-type"></div>
+          <md-card-title>Type</md-card-title>
+          <md-card-subtitle class="component-type">{{component.type }}</md-card-subtitle>
+        </md-card-header>
+      </div>
+    </md-card>
 
-      <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="type">
-        <md-card-title-group>
-          <div md-card-sm-image class="img-card-type"></div>
-          <div fxFlex fxLayout="column" fxLayoutAlign="end end">
-            <md-card-subtitle>Type</md-card-subtitle>
-            <md-card-title>{{ component.type }}</md-card-title>
-          </div>
-        </md-card-title-group>
-      </md-card>
-    </div>
   </div>
 </div>
