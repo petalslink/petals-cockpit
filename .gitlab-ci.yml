@@ -90,6 +90,7 @@ test-frontend:
   <<: *node-java-yarn
   stage: build
   except:
+    - tags
     # we don't want to test the frontend in back/* and product/*
     - /^back\/.*$/
     - /^product\/.*$/
