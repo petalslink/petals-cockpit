@@ -1,3 +1,31 @@
+<a name="0.9.0"></a>
+# [0.9.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.8.0...v0.9.0) (2017-05-29)
+
+
+### Bug Fixes
+
+* **frontend:** ensure ws delete button is disabled ([9a75831](https://gitlab.com/linagora/petals-cockpit/commit/9a75831))
+* **frontend:** only ignore non parameter-related changes in component install change detection ([401cc0a](https://gitlab.com/linagora/petals-cockpit/commit/401cc0a))
+* **frontend:** tabs in sidenav are properly sized ([d888e8b](https://gitlab.com/linagora/petals-cockpit/commit/d888e8b))
+* **product:** disable admin connector from dropwizard ([1caa3ff](https://gitlab.com/linagora/petals-cockpit/commit/1caa3ff))
+
+### Features
+
+* Introduces service assemblies (deployment still missing!) ([0b2cc22](https://gitlab.com/linagora/petals-cockpit/commit/0b2cc22), [ddba446](https://gitlab.com/linagora/petals-cockpit/commit/ddba446)), closes [#319](https://gitlab.com/linagora/petals-cockpit/issues/319) [#320](https://gitlab.com/linagora/petals-cockpit/issues/320) [#321](https://gitlab.com/linagora/petals-cockpit/issues/321) [#322](https://gitlab.com/linagora/petals-cockpit/issues/322) [#324](https://gitlab.com/linagora/petals-cockpit/issues/324)
+* Show error in case of deploy and lifecycle problems (Comp, SU and SA) ([999c4fa](https://gitlab.com/linagora/petals-cockpit/commit/999c4fa), [0a428f0](https://gitlab.com/linagora/petals-cockpit/commit/0a428f0)), closes [#325](https://gitlab.com/linagora/petals-cockpit/issues/325)
+* Display containers in bus overview ([5aa6d22](https://gitlab.com/linagora/petals-cockpit/commit/5aa6d22)), closes [#309](https://gitlab.com/linagora/petals-cockpit/issues/309)
+* Add admin on first start using a token ([b8c21bf](https://gitlab.com/linagora/petals-cockpit/commit/b8c21bf)), closes [#162](https://gitlab.com/linagora/petals-cockpit/issues/162)
+* Show error in case of lifecycle problem - Su and comp ([586887f](https://gitlab.com/linagora/petals-cockpit/commit/586887f))
+* **frontend:** improve workspace view ([c24b4bef](https://gitlab.com/linagora/petals-cockpit/commit/c24b4bef)), closes [#339](https://gitlab.com/linagora/petals-cockpit/issues/339)
+* **frontend:** add o icon to SUs in tree ([d775c89](https://gitlab.com/linagora/petals-cockpit/commit/d775c89))
+* **frontend:** move lifecycle management of component into operations tab ([04b9cde](https://gitlab.com/linagora/petals-cockpit/commit/04b9cde)), closes [#315](https://gitlab.com/linagora/petals-cockpit/issues/315)(https://gitlab.com/linagora/petals-cockpit/issues/322) [#324](https://gitlab.com/linagora/petals-cockpit/issues/324)
+* **product:** add startup scripts in released zip, migrate db by default ([c329191](https://gitlab.com/linagora/petals-cockpit/commit/c329191), [a688a09](https://gitlab.com/linagora/petals-cockpit/commit/a688a09)), closes [#89](https://gitlab.com/linagora/petals-cockpit/issues/89)
+* **product:** better artifact zip name ([e8699a8](https://gitlab.com/linagora/petals-cockpit/commit/e8699a8)), closes [#271](https://gitlab.com/linagora/petals-cockpit/issues/271)
+* **product:** ensure access logs and logs go each to their own file ([10811ab](https://gitlab.com/linagora/petals-cockpit/commit/10811ab))
+* **product:** print the url of the server on start ([c82c47a](https://gitlab.com/linagora/petals-cockpit/commit/c82c47a))
+
+
+
 <a name="0.8.0"></a>
 # [0.8.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.7.0...v0.8.0) (2017-04-25)
 
