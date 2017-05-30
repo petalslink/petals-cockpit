@@ -48,6 +48,10 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
       .map(p => p.get('workspaceId'))
       .distinctUntilChanged();
 
+    this.container$ = this.store$.let(getCurrentContainer);
+
+    this.otherContainers$ = this.store$.let(getCurrentContainerSiblings);
+
     this.route.paramMap
       .map(p => p.get('containerId'))
       .takeUntil(this.onDestroy$)
@@ -55,11 +59,12 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
         this.store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: id } });
         this.store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: id } });
       })
+      .switchMap(busId => this.otherContainers$
+        .first()
+        .do(cs => cs.forEach(c => this.store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: c.id } })))
+        .map(_ => busId)
+      )
       .subscribe();
-
-    this.container$ = this.store$.let(getCurrentContainer);
-
-    this.otherContainers$ = this.store$.let(getCurrentContainerSiblings);
   }
 
   ngOnDestroy() {

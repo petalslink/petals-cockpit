@@ -16,6 +16,7 @@
  */
 
 import { NgModule } from '@angular/core';
+import { VisModule } from 'ng2-vis';
 
 import { SharedModule } from '../../../../../shared/shared.module';
 import { PetalsContainerViewRoutingModule } from './petals-container-view-routing.module';
@@ -26,7 +27,8 @@ import { PetalsContainerOperationsComponent } from './petals-container-operation
 @NgModule({
   imports: [
     SharedModule,
-    PetalsContainerViewRoutingModule
+    PetalsContainerViewRoutingModule,
+    VisModule
   ],
   declarations: [
     PetalsContainerViewComponent,

@@ -34,22 +34,11 @@ describe(`Petals container content`, () => {
 
     expect(cont.ip.getText()).toEqual('192.168.0.0');
     expect(cont.port.getText()).toEqual('7700');
-    expect(cont.reachabilities.count()).toBe(1);
-    expect(cont.reachabilities.get(0).getText()).toEqual('Cont 1');
+
     expect(cont.systemInfo.getText()).toEqual([
       'Petals ESB µKernel 4.0.2 Petals Standalone Shared Memory 4.0.2 OpenJDK',
       'Runtime Environment 1.7.0_111-b01 Oracle Corporation Linux 3.16.0-4-amd64 amd64'
     ].join(' '));
-  });
-
-  it(`should navigate to another container of the bus`, () => {
-    const cont = workspace.openContainer('Cont 0');
-
-    expect(cont.title.getText()).toEqual('Cont 0');
-
-    const cont2 = cont.openReachability(0);
-
-    expect(cont2.title.getText()).toEqual('Cont 1');
   });
 
   it('should have a correct component deployment form', () => {

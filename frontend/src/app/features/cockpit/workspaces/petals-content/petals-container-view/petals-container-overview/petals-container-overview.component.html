@@ -15,49 +15,86 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
-    <div fxLayoutWrap fxLayoutGap="10px">
-      <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="ip">
-        <md-card-title-group>
-          <div md-card-sm-image class="img-card-ip"></div>
-          <div fxFlex fxLayout="column" fxLayoutAlign="end end">
-            <md-card-subtitle>IP</md-card-subtitle>
-            <md-card-title>{{ container.ip }}</md-card-title>
-          </div>
-        </md-card-title-group>
-      </md-card>
-      <md-card fxFlex.gt-sm="48%" fxFlex="100%" class="port">
-        <md-card-title-group>
-          <div md-card-sm-image class="img-card-port"></div>
-          <div fxFlex fxLayout="column" fxLayoutAlign="end end">
-            <md-card-subtitle>Port</md-card-subtitle>
-            <md-card-title>{{ container.port }}</md-card-title>
-          </div>
-        </md-card-title-group>
-      </md-card>
-    </div>
-    <h3 class="color-primary-light-bold margin-top-x2">Reachabilities</h3>
-    <div fxLayoutWrap fxLayoutGap="10px">
-      <!-- To have more deterministic behavour, we should be able to set 50 to say 2 per line
-           See: https://github.com/angular/flex-layout/issues/235 -->
-      <md-card fxFlex="100%" *ngFor="let otherContainer of otherContainers" class="reachability background-color-hover-light-green-x2 cursor-pointer"
-        [routerLink]="['/workspaces', workspaceId, 'petals', 'containers', otherContainer.id]">
-        <md-card-title-group>
-          <div md-card-sm-image class="img-card-server"></div>
-          <div fxFlex fxLayout="column" fxLayoutAlign="end end">
-            <md-card-subtitle>Container</md-card-subtitle>
-            <md-card-title>{{ otherContainer.name }}</md-card-title>
-          </div>
-          <div class="icon-slot">
-            <div *ngIf="container.reachabilities.includes(otherContainer.id); else unreachable" class="green-led"></div>
-            <ng-template #unreachable><div class="red-led"></div></ng-template>
-          </div>
-        </md-card-title-group>
-      </md-card>
-    </div>
 
-    <h3 class="color-primary-light-bold margin-top-x2">System info</h3>
-    <div fxLayout="row">
-      <md-card fxFlex class="system-info">{{ container.systemInfo }}</md-card>
-    </div>
+    <md-card class="container-infos">
+      <md-card-title fxLayout="row">
+        <span fxFlex class="text-upper">Container Infos</span>
+        <md-icon color="primary">info_outline</md-icon>
+      </md-card-title>
+
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <md-card-header fxFlex>
+          <div md-card-avatar class="img-card-ip"></div>
+          <md-card-title>IP</md-card-title>
+          <md-divider></md-divider>
+          <md-card-subtitle class="container-ip">{{ container.ip }}</md-card-subtitle>
+        </md-card-header>
+
+        <md-card-header fxFlex>
+          <div md-card-avatar class="img-card-port"></div>
+          <md-card-title>Port</md-card-title>
+          <md-card-subtitle class="container-port">{{ container.port }}</md-card-subtitle>
+        </md-card-header>
+      </div>
+    </md-card>
+
+    <md-card fxLayout="column" class="margin-top-x1">
+      <md-card-title fxLayout="row">
+        <span fxFlex class="text-upper">Containers Reachabilities</span>
+        <md-icon color="primary">dns</md-icon>
+      </md-card-title>
+    </md-card>
+
+    <md-card class="graph-containers">
+      <md-divider></md-divider>
+      <div fxLayout="column" fxFill fxLayoutAlign="center center">
+        <md-spinner *ngIf="container.isFetchingDetails"></md-spinner>
+      </div>
+
+      <div fxFill class="network-canvas"
+        *ngIf="!container.isFetchingDetails"
+        [visNetwork]="visNetwork"
+        [visNetworkData]="visNetworkData"
+        [visNetworkOptions]="visNetworkOptions"
+        (initialized)="networkInitialized()"></div>
+    </md-card>
+
+    <md-card class="container-infos-selected" *ngIf="selectedContainer && container.id !== selectedContainer.id">
+      <md-card-title fxLayout="row">
+        <span fxFlex class="text-upper">Selected Container</span>
+        <md-icon color="primary">pageview</md-icon>
+      </md-card-title>
+
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <md-card-header fxFlex>
+          <div md-card-avatar class="img-card-ip"></div>
+          <md-card-title>IP</md-card-title>
+          <md-divider></md-divider>
+          <md-card-subtitle class="selected-container-ip">{{ selectedContainer.ip }}</md-card-subtitle>
+        </md-card-header>
+
+        <md-card-header fxFlex>
+          <div md-card-avatar class="img-card-port"></div>
+          <md-card-title>Port</md-card-title>
+          <md-card-subtitle class="selected-container-port">{{ selectedContainer.port }}</md-card-subtitle>
+        </md-card-header>
+
+        <md-card-header fxFlex class="btn-view-container">
+          <a class="text-upper view-container" md-button color="primary"
+          [routerLink]="['/workspaces', workspaceId, 'petals', 'containers', selectedContainer.id]">
+            View this container
+          </a>
+        </md-card-header>
+      </div>
+    </md-card>
+
+    <md-card class="petals-servers margin-top-x1">
+      <md-card-title fxLayout="row">
+        <span fxFlex class="text-upper">System Info</span>
+        <md-icon color="primary">description</md-icon>
+      </md-card-title>
+      <md-card-content class="system-info" >{{ container.systemInfo }}</md-card-content>
+    </md-card>
+
   </div>
 </div>

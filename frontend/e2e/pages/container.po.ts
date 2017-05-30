@@ -45,10 +45,11 @@ export class ContainerOverviewPage extends ContainerPage {
 
   public readonly overview = ContainerOverviewPage.overview;
 
-  public readonly ip = this.overview.$(`md-card.ip md-card-title`);
-  public readonly port = this.overview.$(`md-card.port md-card-title`);
-  public readonly reachabilities = this.overview.$$(`md-card.reachability md-card-title`);
-  public readonly systemInfo = this.overview.$(`md-card.system-info`);
+  public readonly ip = this.overview.$(`.container-infos md-card-subtitle.container-ip`);
+  public readonly port = this.overview.$(`.container-infos md-card-subtitle.container-port`);
+
+  public readonly systemInfo = this.overview.$(`md-card md-card-content.system-info`);
+
 
   static waitAndGet() {
     super.wait();
@@ -58,11 +59,6 @@ export class ContainerOverviewPage extends ContainerPage {
 
   private constructor() {
     super();
-  }
-
-  openReachability(index: number) {
-    this.reachabilities.get(0).click();
-    return ContainerOverviewPage.waitAndGet();
   }
 }
 

@@ -16,7 +16,7 @@
  */
 
 import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
-import { ObservableMedia, MediaChange } from '@angular/flex-layout';
+import { ObservableMedia } from '@angular/flex-layout';
 import { TranslateService } from 'ng2-translate';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs/Subject';
@@ -68,7 +68,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.media$
       .asObservable()
-      .map((change: MediaChange) => change.mqAlias)
+      .map(change => change.mqAlias)
       .distinctUntilChanged()
       .takeUntil(this.onDestroy$)
       .do(screenSize =>
