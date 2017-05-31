@@ -586,7 +586,7 @@ public class WorkspaceResource {
             // jackson will inject values itself (because of @JsonUnwrapped)
             this.users = ImmutableMap.of();
             this.content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
-                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
+                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
             this.workspace = new WorkspaceOverview(0, "", ImmutableList.of(), "");
         }
     }

@@ -34,6 +34,7 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
+import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
@@ -213,6 +214,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(content.content.components).hasSize(1);
         assertThat(content.content.serviceAssemblies).hasSize(1);
         assertThat(content.content.serviceUnits).hasSize(1);
+        assertThat(content.content.sharedLibraries).hasSize(1);
 
         assertUsers(content.users);
 
@@ -278,5 +280,13 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(su.containerId).isEqualTo(c1.container.id);
         assertThat(su.componentId).isEqualTo(comp.component.id);
         assertThat(su.serviceAssemblyId).isEqualTo(sa.serviceAssembly.id);
+
+        SharedLibraryFull sl = content.content.sharedLibraries.get(Long.toString(getId(sharedLibrary)));
+        assert sl != null;
+
+        assertThat(sl.sharedLibrary.id).isEqualTo(getId(sharedLibrary));
+        assertThat(sl.sharedLibrary.name).isEqualTo(sharedLibrary.getName());
+        assertThat(sl.sharedLibrary.version).isEqualTo(sharedLibrary.getVersion());
+        assertThat(sl.containerId).isEqualTo(c1.container.id);
     }
 }

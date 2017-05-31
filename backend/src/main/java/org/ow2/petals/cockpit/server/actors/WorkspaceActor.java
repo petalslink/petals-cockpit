@@ -589,7 +589,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                 ImmutableMap.of(),
                 ImmutableMap.of(Long.toString(saDb.getId()), new ServiceAssemblyFull(
                         new ServiceAssemblyMin(saDb.getId(), saDb.getName()), cId, state, serviceUnitsDb.keySet())),
-                serviceUnitsDb);
+                serviceUnitsDb, ImmutableMap.of());
 
         // we want the event to be sent after we answered
         doInActorLoop(() -> broadcast(WorkspaceEvent.saDeployed(res)));
@@ -623,7 +623,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                 ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(
                         new ComponentMin(compDb.getId(), compDb.getName(), type), cId, state, ImmutableSet.of())),
-                ImmutableMap.of(), ImmutableMap.of());
+                ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
 
         // we want the event to be sent after we answered
         doInActorLoop(() -> broadcast(WorkspaceEvent.componentDeployed(res)));

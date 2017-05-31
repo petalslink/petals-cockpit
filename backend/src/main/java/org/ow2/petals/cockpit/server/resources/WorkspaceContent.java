@@ -21,6 +21,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +36,7 @@ import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
+import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Domain;
@@ -44,6 +46,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecor
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusFull;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusMin;
@@ -56,6 +59,8 @@ import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.Service
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
+import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
+import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
 
@@ -100,19 +105,25 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
     @JsonProperty
     public final ImmutableMap<String, ServiceUnitFull> serviceUnits;
 
+    @Valid
+    @JsonProperty
+    public final ImmutableMap<String, SharedLibraryFull> sharedLibraries;
+
     @JsonCreator
     public WorkspaceContent(@JsonProperty("busesInProgress") Map<String, BusInProgress> busesInProgress,
             @JsonProperty("buses") Map<String, BusFull> buses,
             @JsonProperty("containers") Map<String, ContainerFull> containers,
             @JsonProperty("components") Map<String, ComponentFull> components,
             @JsonProperty("serviceAssemblies") Map<String, ServiceAssemblyFull> serviceAssemblies,
-            @JsonProperty("serviceUnits") Map<String, ServiceUnitFull> serviceUnits) {
+            @JsonProperty("serviceUnits") Map<String, ServiceUnitFull> serviceUnits,
+            @JsonProperty("sharedLibraries") Map<String, SharedLibraryFull> sharedLibraries) {
         this.busesInProgress = ImmutableMap.copyOf(busesInProgress);
         this.buses = ImmutableMap.copyOf(buses);
         this.containers = ImmutableMap.copyOf(containers);
         this.components = ImmutableMap.copyOf(components);
         this.serviceAssemblies = ImmutableMap.copyOf(serviceAssemblies);
         this.serviceUnits = ImmutableMap.copyOf(serviceUnits);
+        this.sharedLibraries = ImmutableMap.copyOf(sharedLibraries);
     }
 
     /**
@@ -131,6 +142,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
         Map<String, ComponentFull> comps = new HashMap<>();
         Map<String, ServiceAssemblyFull> sas = new HashMap<>();
         Map<String, ServiceUnitFull> sus = new HashMap<>();
+        Map<String, SharedLibraryFull> sls = new HashMap<>();
 
         Set<String> containers = new HashSet<>();
         for (Container container : topology.getContainers()) {
@@ -202,12 +214,24 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
                         new ComponentFull(t._1(), cDb.getId(), t._2(), serviceUnitsByComp.get(t._1().id)));
             }
 
+            Set<String> sharedLibraries = new HashSet<>();
+            for (SharedLibrary sl : container.getSharedLibraries()) {
+                SharedlibrariesRecord slDb = new SharedlibrariesRecord(null, sl.getName(), sl.getVersion(),
+                        cDb.getId());
+                slDb.attach(jooq);
+                int slDbi = slDb.insert();
+                assert slDbi == 1;
+
+                sls.put(Long.toString(slDb.getId()), new SharedLibraryFull(
+                        new SharedLibraryMin(slDb.getId(), slDb.getName(), slDb.getVersion()), slDb.getContainerId()));
+            }
+
             containers.add(Long.toString(cDb.getId()));
             cs.put(Long.toString(cDb.getId()),
                     new ContainerFull(
                             new ContainerMin(cDb.getId(), container.getContainerName()), bId, components.values()
                                     .stream().map(l -> Long.toString(l)).collect(ImmutableSet.toImmutableSet()),
-                            serviceAssemblies));
+                            serviceAssemblies, sharedLibraries));
         }
 
         importedBuses.put(Long.toString(bId), new BusFull(new BusMin(bId, topology.getName()), wId, containers));
@@ -215,7 +239,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
         DSL.using(jooq).update(BUSES).set(BUSES.IMPORTED, true).set(BUSES.NAME, topology.getName())
                 .where(BUSES.ID.eq(bId)).execute();
 
-        return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus);
+        return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus, sls);
     }
 
     /**
@@ -228,6 +252,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
         Map<String, ComponentFull> comps = new HashMap<>();
         Map<String, ServiceAssemblyFull> sas = new HashMap<>();
         Map<String, ServiceUnitFull> sus = new HashMap<>();
+        Map<String, SharedLibraryFull> sls = new HashMap<>();
 
         DSLContext ctx = DSL.using(conf);
         for (BusesRecord b : ctx.selectFrom(BUSES).where(BUSES.WORKSPACE_ID.eq(w.getId())).fetchInto(BUSES)) {
@@ -270,9 +295,17 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
                                         state, serviceUnitsBySA.get(sa.getId())));
                     }
 
+                    Set<String> sharedLibraries = new HashSet<>();
+                    for (SharedlibrariesRecord sl : ctx.selectFrom(SHAREDLIBRARIES)
+                            .where(SHAREDLIBRARIES.CONTAINER_ID.eq(c.getId()))) {
+                        sharedLibraries.add(Long.toString(sl.getId()));
+                        sls.put(Long.toString(sl.getId()), new SharedLibraryFull(
+                                new SharedLibraryMin(sl.getId(), sl.getName(), sl.getVersion()), sl.getContainerId()));
+                    }
+
                     containers.add(Long.toString(c.getId()));
                     cs.put(Long.toString(c.getId()), new ContainerFull(new ContainerMin(c.getId(), c.getName()),
-                            b.getId(), components, serviceAssemblies));
+                            b.getId(), components, serviceAssemblies, sharedLibraries));
                 }
                 importedBuses.put(Long.toString(b.getId()),
                         new BusFull(new BusMin(b.getId(), b.getName()), w.getId(), containers));
@@ -282,6 +315,6 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             }
         }
 
-        return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus);
+        return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus, sls);
     }
 }

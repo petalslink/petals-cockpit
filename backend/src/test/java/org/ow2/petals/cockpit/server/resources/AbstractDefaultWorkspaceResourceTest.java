@@ -24,6 +24,7 @@ import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
+import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
@@ -58,6 +59,8 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractCockp
     protected final ServiceAssembly serviceAssembly = new ServiceAssembly("sa", ArtifactState.State.STARTED,
             serviceUnit);
 
+    protected final SharedLibrary sharedLibrary = new SharedLibrary("sl", "1.0.0");
+
     protected final Domain fDomain = new Domain("dom2");
 
     protected final Container fContainer = new Container("cont2", "", ImmutableMap.of(PortType.JMX, containerPort), "",
@@ -84,6 +87,7 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractCockp
         resource.petals.registerContainer(container3);
         resource.petals.registerArtifact(component, container1);
         resource.petals.registerArtifact(serviceAssembly, container1);
+        resource.petals.registerArtifact(sharedLibrary, container1);
 
         resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
