@@ -302,29 +302,25 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
     private BusInProgress handleImportBus(ImportBus bus) throws SuspendExecution, InterruptedException {
         final BusImport nb = bus.nb;
 
-        final long bId = db.runTransaction(conf -> {
+        final BusesRecord bDb = db.runTransaction(conf -> {
             BusesRecord br = new BusesRecord(null, wId, false, nb.ip, nb.port, nb.username, nb.password, nb.passphrase,
                     null, null);
             br.attach(conf);
             br.insert();
-
-            Long id = br.getId();
-            assert id != null;
-
-            return id;
+            return br;
         });
 
-        BusInProgress bip = new BusInProgress(bId, nb.ip, nb.port, nb.username);
+        BusInProgress bip = new BusInProgress(bDb);
 
         doInActorLoop(() -> broadcast(WorkspaceEvent.busImport(bip)));
 
         // we use a fiber to let the actor handles other message during bus import
-        importBusInFiber(nb, bId);
+        importBusInFiber(nb, bDb);
 
         return bip;
     }
 
-    private void importBusInFiber(final BusImport nb, final long bId) {
+    private void importBusInFiber(final BusImport nb, final BusesRecord bDb) {
         Fiber<?> importFiber = new Fiber<>(() -> {
             // this can be interrupted by Fiber.cancel: if it happens, the fiber will simply be stopped
             // and removed from the map by the delete handling
@@ -335,19 +331,20 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
             // so that the fiber terminate and can't be cancelled
             doInActorLoop(() -> {
                 // in any case we now remove it if it's there
-                Fiber<?> f = importsInProgress.remove(bId);
+                Fiber<?> f = importsInProgress.remove(bDb.getId());
 
                 // if it's null, it has been cancelled!
                 if (f != null) {
                     broadcast(db.runTransaction(conf -> {
                         return res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
-                            return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, wId, bId, topology));
+                            return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, bDb, topology));
                         }).fold(error -> {
-                            LOG.info("Can't import bus from container {}:{}: {}", nb.ip, nb.port, error);
-                            DSL.using(conf).update(BUSES).set(BUSES.IMPORT_ERROR, error).where(BUSES.ID.eq(bId))
-                                    .execute();
-                            return WorkspaceEvent
-                                    .busImportError(new BusInProgress(bId, nb.ip, nb.port, nb.username, error));
+                            LOG.info("Can't import bus from container {}:{}: {}", bDb.getImportIp(),
+                                    bDb.getImportPort(), error);
+                            bDb.setImportError(error);
+                            bDb.attach(conf);
+                            bDb.update();
+                            return WorkspaceEvent.busImportError(new BusInProgress(bDb));
                         }, WorkspaceEvent::busImportOk);
                     }));
                 }
@@ -355,7 +352,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         });
 
         // store it before starting to prevent race condition
-        importsInProgress.put(bId, importFiber);
+        importsInProgress.put(bDb.getId(), importFiber);
 
         importFiber.start();
     }
@@ -579,16 +576,13 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                             DSL.select(COMPONENTS.ID).from(COMPONENTS).where(
                                     COMPONENTS.NAME.eq(su.getTargetComponent()).and(COMPONENTS.CONTAINER_ID.eq(cId))))
                     .returning(SERVICEUNITS.ID, SERVICEUNITS.COMPONENT_ID).fetchOne();
-            long suId = inserted.get(SERVICEUNITS.ID);
-            long compId = inserted.get(SERVICEUNITS.COMPONENT_ID);
-            serviceUnitsDb.put(Long.toString(suId),
-                    new ServiceUnitFull(new ServiceUnitMin(suId, suDb.getName()), cId, compId, saDb.getId()));
+            suDb.from(inserted, SERVICEUNITS.ID, SERVICEUNITS.COMPONENT_ID);
+            serviceUnitsDb.put(Long.toString(suDb.getId()), new ServiceUnitFull(suDb));
         }
 
         WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                 ImmutableMap.of(),
-                ImmutableMap.of(Long.toString(saDb.getId()), new ServiceAssemblyFull(
-                        new ServiceAssemblyMin(saDb.getId(), saDb.getName()), cId, state, serviceUnitsDb.keySet())),
+                ImmutableMap.of(Long.toString(saDb.getId()), new ServiceAssemblyFull(saDb, serviceUnitsDb.keySet())),
                 serviceUnitsDb, ImmutableMap.of());
 
         // we want the event to be sent after we answered
@@ -621,8 +615,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         assert suDbi == 1;
 
         WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
-                ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(
-                        new ComponentMin(compDb.getId(), compDb.getName(), type), cId, state, ImmutableSet.of())),
+                ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(compDb, ImmutableSet.of())),
                 ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
 
         // we want the event to be sent after we answered

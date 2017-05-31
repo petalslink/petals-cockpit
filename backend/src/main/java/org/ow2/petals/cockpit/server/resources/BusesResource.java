@@ -93,8 +93,12 @@ public class BusesResource {
         @JsonProperty
         public final String name;
 
+        public BusMin(BusesRecord bDb) {
+            this(bDb.getId(), bDb.getName());
+        }
+
         @JsonCreator
-        public BusMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+        private BusMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
             this.id = id;
             this.name = name;
         }
@@ -118,7 +122,11 @@ public class BusesResource {
         @JsonProperty
         public final ImmutableSet<String> containers;
 
-        public BusFull(BusMin bus, long workspaceId, Set<String> containers) {
+        public BusFull(BusesRecord bDb, Set<String> containers) {
+            this(new BusMin(bDb), bDb.getWorkspaceId(), containers);
+        }
+
+        private BusFull(BusMin bus, long workspaceId, Set<String> containers) {
             this.bus = bus;
             this.workspaceId = workspaceId;
             this.containers = ImmutableSet.copyOf(containers);

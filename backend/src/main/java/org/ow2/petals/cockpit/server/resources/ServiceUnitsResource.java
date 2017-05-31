@@ -95,7 +95,11 @@ public class ServiceUnitsResource {
         @JsonProperty
         public final String name;
 
-        public ServiceUnitMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+        public ServiceUnitMin(ServiceunitsRecord suDb) {
+            this(suDb.getId(), suDb.getName());
+        }
+
+        private ServiceUnitMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
             this.id = id;
             this.name = name;
         }
@@ -124,7 +128,12 @@ public class ServiceUnitsResource {
         @Min(1)
         public final long serviceAssemblyId;
 
-        public ServiceUnitFull(ServiceUnitMin serviceUnit, long containerId, long componentId, long serviceAssemblyId) {
+        public ServiceUnitFull(ServiceunitsRecord suDb) {
+            this(new ServiceUnitMin(suDb), suDb.getContainerId(), suDb.getComponentId(), suDb.getServiceassemblyId());
+        }
+
+        private ServiceUnitFull(ServiceUnitMin serviceUnit, long containerId, long componentId,
+                long serviceAssemblyId) {
             this.serviceUnit = serviceUnit;
             this.containerId = containerId;
             this.componentId = componentId;

@@ -21,6 +21,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -42,7 +43,11 @@ public class SharedLibrariesResource {
         @JsonProperty
         public final String version;
 
-        public SharedLibraryMin(@JsonProperty("id") long id, @JsonProperty("name") String name,
+        public SharedLibraryMin(SharedlibrariesRecord slDb) {
+            this(slDb.getId(), slDb.getName(), slDb.getVersion());
+        }
+
+        private SharedLibraryMin(@JsonProperty("id") long id, @JsonProperty("name") String name,
                 @JsonProperty("version") String version) {
             this.id = id;
             this.name = name;
@@ -65,7 +70,11 @@ public class SharedLibrariesResource {
         @Min(1)
         public final long containerId;
 
-        public SharedLibraryFull(SharedLibraryMin SharedLibrary, long containerId) {
+        public SharedLibraryFull(SharedlibrariesRecord slDb) {
+            this(new SharedLibraryMin(slDb), slDb.getContainerId());
+        }
+
+        private SharedLibraryFull(SharedLibraryMin SharedLibrary, long containerId) {
             this.sharedLibrary = SharedLibrary;
             this.containerId = containerId;
         }

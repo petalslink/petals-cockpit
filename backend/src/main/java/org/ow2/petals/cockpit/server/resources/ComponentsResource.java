@@ -196,8 +196,12 @@ public class ComponentsResource {
         @JsonProperty
         public final Type type;
 
+        public ComponentMin(ComponentsRecord compDb) {
+            this(compDb.getId(), compDb.getName(), ComponentMin.Type.valueOf(compDb.getType()));
+        }
+
         @JsonCreator
-        public ComponentMin(@JsonProperty("id") long id, @JsonProperty("name") String name,
+        private ComponentMin(@JsonProperty("id") long id, @JsonProperty("name") String name,
                 @JsonProperty("type") Type type) {
             this.id = id;
             this.name = name;
@@ -227,11 +231,16 @@ public class ComponentsResource {
         @JsonProperty
         public final ImmutableSet<String> serviceUnits;
 
-        public ComponentFull(ComponentMin component, long containerId, State state, Set<String> serviceUnits) {
+        private ComponentFull(ComponentMin component, long containerId, State state, Set<String> serviceUnits) {
             this.component = component;
             this.containerId = containerId;
             this.state = state;
             this.serviceUnits = ImmutableSet.copyOf(serviceUnits);
+        }
+
+        public ComponentFull(ComponentsRecord compDb, Set<String> serviceUnits) {
+            this(new ComponentMin(compDb), compDb.getContainerId(), ComponentMin.State.valueOf(compDb.getState()),
+                    serviceUnits);
         }
 
         @JsonCreator

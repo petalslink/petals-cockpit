@@ -129,8 +129,12 @@ public class ContainersResource {
         @JsonProperty
         public final String name;
 
+        public ContainerMin(ContainersRecord cDb) {
+            this(cDb.getId(), cDb.getName());
+        }
+
         @JsonCreator
-        public ContainerMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+        private ContainerMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
             this.id = id;
             this.name = name;
         }
@@ -160,13 +164,18 @@ public class ContainersResource {
         @JsonProperty
         public final ImmutableSet<String> sharedLibraries;
 
-        public ContainerFull(ContainerMin container, long busId, Set<String> components,
+        private ContainerFull(ContainerMin container, long busId, Set<String> components,
                 Set<String> serviceAssemblies, Set<String> sharedLibraries) {
             this.container = container;
             this.busId = busId;
             this.components = ImmutableSet.copyOf(components);
             this.serviceAssemblies = ImmutableSet.copyOf(serviceAssemblies);
             this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
+        }
+
+        public ContainerFull(ContainersRecord cDb, Set<String> components, Set<String> serviceAssemblies,
+                Set<String> sharedLibraries) {
+            this(new ContainerMin(cDb), cDb.getBusId(), components, serviceAssemblies, sharedLibraries);
         }
 
         @JsonCreator

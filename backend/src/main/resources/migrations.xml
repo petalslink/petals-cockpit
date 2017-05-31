@@ -252,9 +252,9 @@
     <dropColumn tableName="serviceunits" columnName="sa_name" />
     <dropColumn tableName="serviceunits" columnName="state" />
   </changeSet>
-  
+
   <changeSet id="v0.10.0-1" author="vnoel">
-      <createTable tableName="sharedlibraries">
+    <createTable tableName="sharedlibraries">
       <column name="id" type="bigint" autoIncrement="true">
         <constraints primaryKey="true" nullable="false" />
       </column>
@@ -265,8 +265,8 @@
         <constraints nullable="false" />
       </column>
       <column name="container_id" type="bigint">
-        <constraints nullable="false" foreignKeyName="fk_sharedlibraries_container_id"
-          referencedTableName="containers" referencedColumnNames="id" deleteCascade="true" />
+        <constraints nullable="false" foreignKeyName="fk_sharedlibraries_container_id" referencedTableName="containers"
+          referencedColumnNames="id" deleteCascade="true" />
       </column>
     </createTable>
 
