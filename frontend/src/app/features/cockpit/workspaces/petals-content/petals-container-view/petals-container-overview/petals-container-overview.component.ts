@@ -61,10 +61,12 @@ export class PetalsContainerOverviewComponent implements OnInit, OnDestroy, OnCh
     Observable.fromEvent(window, 'resize')
       .takeUntil(this.onDestroy$)
       .debounceTime(1000)
-      .do(_ => {
-        const sizeChanged = (this.visNetworkService as any).networks[this.visNetwork].setSize();
+      .map(_ => (this.visNetworkService as any).networks[this.visNetwork])
+      .filter(net => !!net)
+      .do(net => {
+        const sizeChanged = net.setSize();
         if (sizeChanged) {
-          this.visNetworkService.redraw(this.visNetwork);
+          net.redraw();
         }
       })
       .subscribe();
