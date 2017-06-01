@@ -18,9 +18,9 @@
 import { componentsService, Component } from './components-mock';
 import { Bus } from './buses-mock';
 import { ServiceAssembly, serviceAssembliesService } from './service-assemblies-mock';
-import { IContainerBackendSSE, IContainerBackendDetails } from './../app/features/cockpit/workspaces/state/containers/container.interface';
-import { ComponentState } from './../app/features/cockpit/workspaces/state/components/component.interface';
-import { ServiceAssemblyState } from './../app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { ComponentState } from 'app/shared/services/components.service';
+import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
+import { IContainerBackendSSE, IContainerBackendDetails } from 'app/shared/services/containers.service';
 
 export class Containers {
   private readonly containers = new Map<string, Container>();

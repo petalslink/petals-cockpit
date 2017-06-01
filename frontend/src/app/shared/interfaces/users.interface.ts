@@ -15,8 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IUserRow, IUser } from './user.interface';
 import { environment } from 'environments/environment';
+import { IUserBackend, IUserBackendCommon } from 'app/shared/services/users.service';
+
+export interface IUserUI { }
+
+// used within table
+export interface IUserRow extends IUserUI, IUserBackend { }
+
+// used in generated views
+export interface IUser extends IUserBackendCommon { }
+
+export interface ICurrentUser extends IUserRow, IUser { }
 
 interface IUsersCommon {
   connectedUserId: string;
@@ -36,6 +46,14 @@ export interface IUsersTable extends IUsersCommon, IUsersTableOnly { }
 
 export interface IUsers extends IUsersCommon {
   list: IUser[];
+}
+
+export function userRowFactory(): IUserRow {
+  return {
+    id: null,
+    name: null,
+    lastWorkspace: undefined
+  };
 }
 
 export function usersTableFactory(): IUsersTable {

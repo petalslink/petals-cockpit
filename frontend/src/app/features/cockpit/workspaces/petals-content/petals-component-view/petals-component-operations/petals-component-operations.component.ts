@@ -19,10 +19,11 @@ import { Component, OnInit, Input, ChangeDetectionStrategy, SimpleChanges, OnCha
 import { FormGroup, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
-import { IComponentRow, ComponentState, EComponentState } from '../../../state/components/component.interface';
+import { IComponentRow } from '../../../state/components/components.interface';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
 import { Components } from '../../../state/components/components.reducer';
 import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
+import { ComponentState, EComponentState } from 'app/shared/services/components.service';
 
 @Component({
   selector: 'app-petals-component-operations',

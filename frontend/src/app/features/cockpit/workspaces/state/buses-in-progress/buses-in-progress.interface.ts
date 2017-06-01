@@ -15,8 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IBusInProgress, IBusInProgressRow } from './bus-in-progress.interface';
 import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
+import { IBusInProgressBackendCommon, IBusInProgressBackend } from 'app/shared/services/buses.service';
+
+export interface IBusInProgressUI {
+  // for UI
+  isRemoving: boolean;
+
+  // TODO is it really meant to be here?
+  password: string;
+  passphrase: string;
+}
+
+// used within table
+export interface IBusInProgressRow extends IBusInProgressUI, IBusInProgressBackend { }
+
+// used in generated views
+export interface IBusInProgress extends IBusInProgressUI, IBusInProgressBackendCommon { }
 
 export interface IBusesInProgressCommon {
   selectedBusInProgressId: string;
@@ -31,6 +46,20 @@ export interface IBusesInProgressTable extends IBusesInProgressCommon, JsMap<IBu
 
 export interface IBusesInProgress extends IBusesInProgressCommon {
   list: Array<IBusInProgress>;
+}
+
+export function busInProgressRowFactory(): IBusInProgressRow {
+  return {
+    id: null,
+    username: null,
+    port: null,
+    ip: null,
+
+    importError: '',
+    isRemoving: false,
+    password: '',
+    passphrase: ''
+  };
 }
 
 export function busesInProgressTableFactory(): IBusesInProgressTable {

@@ -25,7 +25,7 @@ import { NotificationsService } from 'angular2-notifications';
 
 import { Users } from './../state/users.reducer';
 import { UsersService } from './../services/users.service';
-import { ICurrentUser } from './../interfaces/user.interface';
+import { ICurrentUser } from './../interfaces/users.interface';
 import { environment } from './../../../environments/environment';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';

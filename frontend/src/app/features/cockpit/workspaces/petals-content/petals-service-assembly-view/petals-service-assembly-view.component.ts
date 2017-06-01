@@ -23,13 +23,13 @@ import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Ui } from '../../../../../shared/state/ui.reducer';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 import {
   getCurrentServiceAssembly,
   getServiceUnitsAndComponentsOfServiceAssembly
 } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
-import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 
 @Component({
   selector: 'app-petals-service-assembly-view',

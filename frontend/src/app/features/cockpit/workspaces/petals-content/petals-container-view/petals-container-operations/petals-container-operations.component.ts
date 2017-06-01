@@ -18,7 +18,7 @@
 import { Component, Input, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import { IContainerRow } from '../../../state/containers/container.interface';
+import { IContainerRow } from '../../../state/containers/containers.interface';
 import { IStore } from 'app/shared/interfaces/store.interface';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
 

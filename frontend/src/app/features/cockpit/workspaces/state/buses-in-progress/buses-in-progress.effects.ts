@@ -22,7 +22,7 @@ import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from 'app/shared/interfaces/store.interface';
-import { IBusInProgressRow } from './bus-in-progress.interface';
+import { IBusInProgressRow } from './buses-in-progress.interface';
 import { BusesInProgress } from './buses-in-progress.reducer';
 import { BusesService } from 'app/shared/services/buses.service';
 import { environment } from 'environments/environment';

@@ -17,14 +17,10 @@
 
 import { Action } from '@ngrx/store';
 
-import { IServiceUnitsTable, serviceUnitsTableFactory } from './service-units.interface';
+import { IServiceUnitsTable, serviceUnitsTableFactory, serviceUnitRowFactory } from './service-units.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { putAll, updateById, removeById, mergeOnly, JsMap } from 'app/shared/helpers/map.helper';
-import {
-  serviceUnitRowFactory,
-  IServiceUnitBackendSSE,
-  IServiceUnitBackendDetails
-} from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { IServiceUnitBackendSSE, IServiceUnitBackendDetails } from 'app/shared/services/service-units.service';
 
 export class ServiceUnits {
   private static reducerName = '[Service units]';

@@ -17,9 +17,9 @@
 
 import { omit, flatMap, assign } from 'lodash';
 
-import { IBusImport } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { Bus, BusInProgress, busesService, busesInProgressService } from './buses-mock';
 import { users } from './backend-mock';
+import { IBusImport } from 'app/shared/services/buses.service';
 
 function toObj<A>(arr: { toObj: () => A }[]): A {
   return assign.apply({}, arr.map(c => c.toObj()));

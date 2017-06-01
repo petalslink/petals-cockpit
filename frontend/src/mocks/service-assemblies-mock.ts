@@ -20,7 +20,7 @@ import { ServiceUnit, serviceUnitsService } from './service-units-mock';
 import { Component } from './components-mock';
 import {
   ServiceAssemblyState, IServiceAssemblyBackendSSE, IServiceAssemblyBackendDetails
-} from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+} from 'app/shared/services/service-assemblies.service';
 
 class ServiceAssemblies {
   private readonly serviceAssemblies = new Map<string, ServiceAssembly>();

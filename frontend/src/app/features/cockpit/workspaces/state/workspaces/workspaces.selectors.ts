@@ -18,11 +18,10 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IWorkspaces } from './workspaces.interface';
+import { IWorkspaces, IWorkspace } from './workspaces.interface';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { IWorkspace } from './workspace.interface';
 import { escapeStringRegexp, arrayEquals, tuple } from '../../../../../shared/helpers/shared.helper';
-import { IUser } from '../../../../../shared/interfaces/user.interface';
+import { IUser } from '../../../../../shared/interfaces/users.interface';
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 
 export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspaces> {

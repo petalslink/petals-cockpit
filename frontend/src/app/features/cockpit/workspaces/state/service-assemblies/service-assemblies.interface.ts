@@ -15,8 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IServiceAssemblyRow, IServiceAssembly } from './service-assembly.interface';
 import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
+import {
+  IServiceAssemblyBackendSSE, IServiceAssemblyBackendDetails, IServiceAssemblyBackendSSECommon, IServiceAssemblyBackendDetailsCommon
+} from 'app/shared/services/service-assemblies.service';
+
+export interface IServiceAssemblyUI {
+  // for UI
+  isFolded: boolean;
+  isUpdatingState: boolean;
+  errorChangeState: string;
+}
+
+export interface IServiceAssemblyRow extends IServiceAssemblyUI, IServiceAssemblyBackendSSE, IServiceAssemblyBackendDetails { }
+
+export interface IServiceAssembly extends IServiceAssemblyUI, IServiceAssemblyBackendSSECommon, IServiceAssemblyBackendDetailsCommon { }
 
 interface IServiceAssembliesCommon {
   selectedServiceAssemblyId: string;
@@ -27,6 +40,20 @@ export interface IServiceAssembliesTable extends IServiceAssembliesCommon, JsMap
 
 export interface IServiceAssemblies extends IServiceAssembliesCommon {
   list: IServiceAssembly[];
+}
+
+export function serviceAssemblyRowFactory(): IServiceAssemblyRow {
+  return {
+    id: null,
+    name: null,
+    serviceUnits: [],
+    containerId: null,
+    state: null,
+
+    isFolded: false,
+    isUpdatingState: false,
+    errorChangeState: ''
+  };
 }
 
 export function serviceAssembliesTableFactory(): IServiceAssembliesTable {

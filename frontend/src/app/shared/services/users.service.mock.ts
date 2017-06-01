@@ -17,8 +17,8 @@
 
 import { Injectable } from '@angular/core';
 
-import { UsersService } from './users.service';
-import { IUserLogin, ICurrentUser, IUserSetup } from './../interfaces/user.interface';
+import { UsersService, IUserLogin, IUserSetup } from './users.service';
+import { ICurrentUser } from './../interfaces/users.interface';
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 import { users, CORRECT_SETUP_TOKEN, GONE_SETUP_TOKEN } from './../../../mocks/backend-mock';

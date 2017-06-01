@@ -17,10 +17,7 @@
 
 import { Component } from './components-mock';
 import { ServiceAssembly } from './service-assemblies-mock';
-import {
-  IServiceUnitBackendSSE,
-  IServiceUnitBackendDetails
-} from './../app/features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { IServiceUnitBackendSSE, IServiceUnitBackendDetails } from 'app/shared/services/service-units.service';
 
 class ServiceUnits {
   private readonly serviceUnits = new Map<string, ServiceUnit>();

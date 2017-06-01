@@ -18,7 +18,7 @@
 import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import { IComponentRow } from '../../../state/components/component.interface';
+import { IComponentRow } from '../../../state/components/components.interface';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
 
 @Component({

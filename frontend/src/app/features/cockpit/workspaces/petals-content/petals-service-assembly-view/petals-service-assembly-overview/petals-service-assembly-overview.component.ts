@@ -20,8 +20,8 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
-import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
+import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 
 @Component({
   selector: 'app-petals-service-assembly-overview',

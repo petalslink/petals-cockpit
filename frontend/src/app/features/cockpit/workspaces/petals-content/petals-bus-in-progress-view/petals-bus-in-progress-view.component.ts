@@ -24,8 +24,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 import { IStore } from './../../../../../shared/interfaces/store.interface';
-import { IBusesInProgressTable } from './../../state/buses-in-progress/buses-in-progress.interface';
-import { IBusInProgressRow, IBusImport } from './../../state/buses-in-progress/bus-in-progress.interface';
+import { IBusesInProgressTable, IBusInProgressRow } from './../../state/buses-in-progress/buses-in-progress.interface';
 import { Ui } from './../../../../../shared/state/ui.reducer';
 import { BusesInProgress } from './../../state/buses-in-progress/buses-in-progress.reducer';
 import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
@@ -33,6 +32,7 @@ import { CustomValidators } from './../../../../../shared/helpers/custom-validat
 import { getFormErrors, disableAllFormFields } from './../../../../../shared/helpers/form.helper';
 import { arrayEquals, tuple } from 'app/shared/helpers/shared.helper';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
+import { IBusImport } from 'app/shared/services/buses.service';
 
 @Component({
   selector: 'app-petals-bus-in-progress-view',

@@ -24,7 +24,7 @@ import { Subject } from 'rxjs/Subject';
 import { Components } from '../../state/components/components.reducer';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Ui } from '../../../../../shared/state/ui.reducer';
-import { IComponentRow } from '../../state/components/component.interface';
+import { IComponentRow } from '../../state/components/components.interface';
 import { getCurrentComponent } from '../../state/components/components.selectors';
 
 @Component({

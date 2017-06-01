@@ -17,7 +17,7 @@
 
 import { VisNetworkOptions, VisNodes, VisEdges } from 'ng2-vis';
 
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 
 export function buildVisNetworkData(container: IContainerRow, otherContainers: IContainerRow[]) {
   return {

@@ -15,10 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IBusImport, IBusInProgressBackend } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { containersService, Container } from './containers-mock';
 import { Workspace } from './workspaces-mock';
-import { IBusBackendSSE, IBusBackendDetails } from './../app/features/cockpit/workspaces/state/buses/bus.interface';
+import { IBusImport, IBusBackendSSE, IBusBackendDetails, IBusInProgressBackend } from 'app/shared/services/buses.service';
 
 export class Buses {
   private readonly buses = new Map<string, Bus>();

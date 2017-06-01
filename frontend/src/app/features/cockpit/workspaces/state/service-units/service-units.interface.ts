@@ -15,8 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IServiceUnitRow, IServiceUnit } from './service-unit.interface';
 import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
+import { IComponentRowWithoutDetails } from 'app/features/cockpit/workspaces/state/components/components.interface';
+import {
+  IServiceUnitBackendSSE, IServiceUnitBackendDetails, IServiceUnitBackendSSECommon, IServiceUnitBackendDetailsCommon
+} from 'app/shared/services/service-units.service';
+
+export interface IServiceUnitUI {
+  // for UI
+  isFolded: boolean;
+  isUpdatingState: boolean;
+  errorChangeState: string;
+}
+
+export interface IServiceUnitRow extends IServiceUnitUI, IServiceUnitBackendSSE, IServiceUnitBackendDetails { }
+
+export interface IServiceUnitRowWithoutDetails extends IServiceUnitUI, IServiceUnitBackendSSE { }
+
+export interface IServiceUnit extends IServiceUnitUI, IServiceUnitBackendSSECommon, IServiceUnitBackendDetailsCommon { }
+
+export interface IServiceUnitAndComponent extends IServiceUnitRowWithoutDetails {
+  component: IComponentRowWithoutDetails;
+}
 
 interface IServiceUnitsCommon {
   selectedServiceUnitId: string;
@@ -27,6 +47,20 @@ export interface IServiceUnitsTable extends IServiceUnitsCommon, JsMap<IServiceU
 
 export interface IServiceUnits extends IServiceUnitsCommon {
   list: IServiceUnit[];
+}
+
+export function serviceUnitRowFactory(): IServiceUnitRow {
+  return {
+    id: null,
+    name: null,
+    containerId: null,
+    componentId: null,
+    serviceAssemblyId: null,
+
+    isFolded: false,
+    isUpdatingState: false,
+    errorChangeState: ''
+  };
 }
 
 export function serviceUnitsTableFactory(): IServiceUnitsTable {

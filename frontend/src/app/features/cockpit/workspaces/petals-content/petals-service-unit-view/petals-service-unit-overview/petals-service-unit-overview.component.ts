@@ -19,9 +19,9 @@ import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
-import { IServiceUnitRow } from '../../../state/service-units/service-unit.interface';
+import { IServiceUnitRow } from '../../../state/service-units/service-units.interface';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 
 @Component({

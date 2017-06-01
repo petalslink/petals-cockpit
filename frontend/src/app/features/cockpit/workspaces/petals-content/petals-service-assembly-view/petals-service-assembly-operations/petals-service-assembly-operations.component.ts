@@ -17,13 +17,12 @@
 
 import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
+
 import { stateNameToPossibleActionsServiceAssembly } from '../../../../../../shared/helpers/service-assembly.helper';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
-import {
-  ServiceAssemblyState,
-  IServiceAssemblyRow
-} from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 
 @Component({
   selector: 'app-petals-service-assembly-operations',

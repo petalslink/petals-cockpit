@@ -24,7 +24,7 @@ import { Subject } from 'rxjs/Subject';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Containers } from '../../state/containers/containers.reducer';
 import { Ui } from '../../../../../shared/state/ui.reducer';
-import { IContainerRow } from '../../state/containers/container.interface';
+import { IContainerRow } from '../../state/containers/containers.interface';
 import { getCurrentContainer, getCurrentContainerSiblings } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 
 @Component({

@@ -24,9 +24,8 @@ import {
   VisNetworkService, VisNetworkData, VisNetworkOptions
 } from 'ng2-vis';
 
-
 import { IStore } from 'app/shared/interfaces/store.interface';
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 import { containerNetworkOptions, buildVisNetworkData } from './container-graph';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 

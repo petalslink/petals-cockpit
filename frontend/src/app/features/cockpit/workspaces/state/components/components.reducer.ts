@@ -17,16 +17,12 @@
 
 import { Action } from '@ngrx/store';
 
-import { IComponentsTable, componentsTableFactory } from './components.interface';
+import { IComponentBackendSSE, IComponentBackendDetails } from 'app/shared/services/components.service';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+import { IComponentsTable, componentsTableFactory, componentRowFactory } from './components.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { ServiceUnits } from '../service-units/service-units.reducer';
 import { putAll, updateById, removeById, mergeOnly, JsMap } from 'app/shared/helpers/map.helper';
-import {
-  componentRowFactory,
-  IComponentBackendSSE,
-  IComponentBackendDetails
-} from 'app/features/cockpit/workspaces/state/components/component.interface';
-import { IServiceUnitBackendSSE } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 
 export class Components {
   private static reducerName = '[Components]';

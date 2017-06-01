@@ -26,6 +26,20 @@ import { environment } from './../../../environments/environment';
 import { SseService } from './sse.service';
 import { IStore } from '../interfaces/store.interface';
 
+export interface IServiceUnitBackendSSECommon {
+  id: string;
+  name: string;
+  containerId: string;
+  componentId: string;
+  serviceAssemblyId: string;
+}
+
+export interface IServiceUnitBackendDetailsCommon { }
+
+export interface IServiceUnitBackendSSE extends IServiceUnitBackendSSECommon { }
+
+export interface IServiceUnitBackendDetails extends IServiceUnitBackendDetailsCommon { }
+
 export abstract class ServiceUnitsService {
   abstract getDetailsServiceUnit(serviceUnitId: string): Observable<Response>;
 }

@@ -19,7 +19,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { IComponentRow } from './component.interface';
+import { IComponentRow } from './components.interface';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
 export function getCurrentComponent(store$: Store<IStore>): Observable<IComponentRow> {

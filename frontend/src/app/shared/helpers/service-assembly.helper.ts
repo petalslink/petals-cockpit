@@ -15,15 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  ServiceAssemblyState,
-  EServiceAssemblyState
-} from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
-
 /**
  * @param state : The state you want to get the possible actions from. For example : 'Started'
  * @returns The possible new actions according to the state
  */
+import { ServiceAssemblyState, EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
+
 export function stateNameToPossibleActionsServiceAssembly(
   state: ServiceAssemblyState
 ): { actionName: string, newStateAfterAction: ServiceAssemblyState }[] {

@@ -23,9 +23,8 @@ import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../../../../environments/environment';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
+import { ServiceAssembliesService, ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
-import { ServiceAssemblyState } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
 
 @Injectable()
 export class ServiceAssembliesEffects {

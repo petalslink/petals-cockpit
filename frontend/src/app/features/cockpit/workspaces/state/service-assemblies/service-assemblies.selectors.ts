@@ -17,11 +17,11 @@
 
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { IServiceAssemblyRow } from './service-assembly.interface';
+import { IServiceAssemblyRow } from './service-assemblies.interface';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
+import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 import { arrayEquals, tuple } from 'app/shared/helpers/shared.helper';
 
 export function getCurrentServiceAssembly(store$: Store<IStore>): Observable<IServiceAssemblyRow> {

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IServiceUnitRow } from './service-unit.interface';
+import { IServiceUnitRow } from './service-units.interface';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 

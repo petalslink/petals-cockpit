@@ -15,8 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IComponentRow, IComponent } from './component.interface';
 import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
+import { IServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+import {
+  IComponentBackendSSE, IComponentBackendDetails, IComponentBackendSSECommon, IComponentBackendDetailsCommon
+} from 'app/shared/services/components.service';
+
+export interface IComponentUI {
+  // for UI
+  isFolded: boolean;
+  isFetchingDetails: boolean;
+  isUpdatingState: boolean;
+  isDeployingServiceUnit: boolean;
+  errorChangeState: string;
+  errorDeployment: string;
+}
+
+export interface IComponentRow extends IComponentUI, IComponentBackendSSE, IComponentBackendDetails { }
+
+export interface IComponentRowWithoutDetails extends IComponentUI, IComponentBackendSSE { }
+
+export interface IComponent extends IComponentUI, IComponentBackendSSECommon, IComponentBackendDetailsCommon {
+  serviceUnits: IServiceUnits;
+}
 
 export interface IComponentsCommon {
   selectedComponentId: string;
@@ -27,6 +48,26 @@ export interface IComponentsTable extends IComponentsCommon, JsMap<IComponentRow
 
 export interface IComponents extends IComponentsCommon {
   list: IComponent[];
+}
+
+export function componentRowFactory(): IComponentRow {
+  return {
+    id: null,
+    name: null,
+    state: null,
+    type: null,
+    containerId: null,
+    parameters: {},
+
+    isFolded: false,
+    isFetchingDetails: false,
+    isUpdatingState: false,
+    isDeployingServiceUnit: false,
+    errorChangeState: '',
+    errorDeployment: '',
+
+    serviceUnits: []
+  };
 }
 
 export function componentsTableFactory(): IComponentsTable {

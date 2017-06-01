@@ -23,8 +23,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
 
-import { IWorkspace } from './workspaces/state/workspaces/workspace.interface';
-import { IWorkspacesTable } from './workspaces/state/workspaces/workspaces.interface';
+import { IWorkspace, IWorkspacesTable } from './workspaces/state/workspaces/workspaces.interface';
 import { Workspaces } from './workspaces/state/workspaces/workspaces.reducer';
 import { Ui } from '../../shared/state/ui.reducer';
 import { LANGUAGES } from '../../core/opaque-tokens';
@@ -32,7 +31,7 @@ import { IStore } from '../../shared/interfaces/store.interface';
 import { IUi } from '../../shared/interfaces/ui.interface';
 import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog.component';
 import { getCurrentWorkspace } from '../cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { ICurrentUser } from 'app/shared/interfaces/user.interface';
+import { ICurrentUser } from 'app/shared/interfaces/users.interface';
 import { getCurrentUser } from 'app/shared/state/users.selectors';
 import { Users } from 'app/shared/state/users.reducer';
 import { isSmallScreen, isLargeScreen } from 'app/shared/state/ui.selectors';

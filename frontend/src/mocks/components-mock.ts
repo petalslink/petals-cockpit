@@ -17,12 +17,7 @@
 
 import { ServiceUnit } from './service-units-mock';
 import { Container } from './containers-mock';
-import {
-  IComponentBackendSSE,
-  IComponentBackendDetails,
-  ComponentState,
-  EComponentType
-} from './../app/features/cockpit/workspaces/state/components/component.interface';
+import { ComponentState, IComponentBackendSSE, EComponentType, IComponentBackendDetails } from 'app/shared/services/components.service';
 
 export class Components {
   private readonly components = new Map<string, Component>();
