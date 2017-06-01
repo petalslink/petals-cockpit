@@ -18,7 +18,9 @@
 import { Container } from './containers-mock';
 import { ServiceUnit, serviceUnitsService } from './service-units-mock';
 import { Component } from './components-mock';
-import { ServiceAssemblyState } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import {
+  ServiceAssemblyState, IServiceAssemblyBackendSSE, IServiceAssemblyBackendDetails
+} from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
 
 class ServiceAssemblies {
   private readonly serviceAssemblies = new Map<string, ServiceAssembly>();
@@ -66,7 +68,7 @@ export class ServiceAssembly {
     return serviceUnit;
   }
 
-  toObj() /*: { [id: string]: IServiceAssemblyBackendSSE } */ {
+  toObj(): { [id: string]: IServiceAssemblyBackendSSE } {
     return {
       [this.id]: {
         id: this.id,
@@ -78,7 +80,7 @@ export class ServiceAssembly {
     };
   }
 
-  getDetails()/*: IServiceAssemblyBackendDetails*/ {
+  getDetails(): IServiceAssemblyBackendDetails {
     return {};
   }
 
