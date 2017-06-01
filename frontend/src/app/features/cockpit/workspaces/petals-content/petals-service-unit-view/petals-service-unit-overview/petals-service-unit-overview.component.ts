@@ -16,11 +16,13 @@
  */
 
 import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
 import { IServiceUnitRow } from '../../../state/service-units/service-unit.interface';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { isLargeScreen } from 'app/shared/state/ui.selectors';
 
 @Component({
   selector: 'app-petals-service-unit-overview',
@@ -29,11 +31,17 @@ import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/servi
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PetalsServiceUnitOverviewComponent implements OnInit {
+  public btnByScreenSize$: Observable<string>;
+
   @Input() serviceUnit: IServiceUnitRow;
   @Input() serviceAssembly: IServiceAssemblyRow;
   @Input() workspaceId: string;
 
   constructor(private store$: Store<IStore>) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.btnByScreenSize$ = this.store$
+      .let(isLargeScreen)
+      .map(ls => ls ? `mat-raised-button` : `mat-mini-fab`);
+  }
 }

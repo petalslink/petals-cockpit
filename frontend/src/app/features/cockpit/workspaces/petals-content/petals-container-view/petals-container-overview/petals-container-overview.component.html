@@ -50,7 +50,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </md-card>
 
     <md-card class="graph-containers">
-      <md-divider></md-divider>
       <div fxLayout="column" fxFill fxLayoutAlign="center center">
         <md-spinner *ngIf="container.isFetchingDetails"></md-spinner>
       </div>
@@ -68,18 +67,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <span fxFlex class="text-upper"><b>{{ selectedContainer.name }}</b> Selected</span>
         <md-icon color="primary">check</md-icon>
       </md-card-title>
-      <div fxLayout="row">
 
+      <div fxLayout="row">
         <div fxFlex fxLayout="row">
           <md-card-header fxFlex="40%">
             <div md-card-avatar class="img-card-ip"></div>
             <md-card-title>IP</md-card-title>
-            <md-divider></md-divider>
             <md-card-subtitle class="selected-container-ip">{{ selectedContainer.ip }}</md-card-subtitle>
           </md-card-header>
         </div>
 
-        <div fxFlex="60%" fxLayout.lt-md="column" fxLayout="row" fxLayoutWrap>
+        <div fxFlex="60%" fxLayout.lt-md="column" fxLayout="row">
           <md-card-header fxFlex class="padding-right-x1">
             <div md-card-avatar class="img-card-port"></div>
             <md-card-title>Port</md-card-title>
@@ -96,11 +94,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </a>
           </md-card-actions>
         </div>
-
       </div>
     </md-card>
 
-    <md-card class="petals-servers margin-top-x1">
+    <md-card class="petals-servers margin-top-x1 margin-bottom-x1">
       <md-card-title fxLayout="row">
         <span fxFlex class="text-upper">System Info</span>
         <md-icon color="primary">description</md-icon>

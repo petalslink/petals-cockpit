@@ -39,9 +39,11 @@ export class ServiceUnitOverviewPage extends ServiceUnitPage {
   public static readonly overview = ServiceUnitPage.component.$(`app-petals-service-unit-overview`);
 
   public readonly overview = ServiceUnitOverviewPage.overview;
-  public readonly state = this.overview.$(`md-card.state md-card-title`);
-  public readonly serviceAssemblyCard = this.overview.$('md-card.service-assembly');
-  public readonly serviceAssembly = this.serviceAssemblyCard.$('md-card-title');
+  public readonly state = this.overview.$(`md-card .sa-state`);
+
+  public readonly serviceAssemblyCard = this.overview.$('md-card-header.service-assembly');
+  public readonly serviceAssembly = this.serviceAssemblyCard.$('md-card-subtitle.sa-name');
+  public readonly viewServiceAssembly = this.overview.$('md-card-actions.btn-view-container');
 
   static waitAndGet() {
     super.wait();
@@ -54,7 +56,7 @@ export class ServiceUnitOverviewPage extends ServiceUnitPage {
   }
 
   openServiceAssembly() {
-    this.serviceAssembly.$('a').click();
+    this.viewServiceAssembly.$('a').click();
     return ServiceAssemblyOverviewPage.waitAndGet();
   }
 }
