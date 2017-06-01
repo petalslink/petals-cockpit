@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <span fxFlex class="text-upper">Whiteboard</span>
           </md-card-title>
 
-          <md-card-content fxFlexLayout="row" fxLayoutAlign="center center" *ngIf="!isEditingDescription; else descriptionEdit" class="workspace-description">
+          <md-card-content fxLayout="row" fxLayoutAlign="center center" *ngIf="!isEditingDescription; else descriptionEdit" class="workspace-description">
             <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml"></span>
             <button class="btn-edit" color="primary" md-icon-button (click)="editDescription()" mdTooltip="Edit" mdTooltipPosition="below">
               <md-icon>edit</md-icon>
@@ -50,7 +50,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 <md-input-container fxFlex class="margin-right-x1">
                   <textarea mdInput class="description-wks" mdTextareaAutosize [disabled]="isSettingDescription" [(ngModel)]="description"></textarea>
                 </md-input-container>
-                <md-card-subtitle fxFlexLayout="row" fxLayoutAlign="center center">
+                <md-card-subtitle fxLayout="row" fxLayoutAlign="center center">
                   <span fxFlex class="workspace-description-preview" [innerHTML]="description | MarkdownToHtml"></span>
                 </md-card-subtitle>
               </div>
@@ -76,13 +76,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <md-card-content>
             <div fxLayout="column" *ngIf="workspace.users.list as users" class="workspace-users">
 
-              <md-card-subtitle fxFlexLayout="row" fxLayoutAlign="start center" *ngIf="users.length === 1; else workspaceShared">
+              <md-card-subtitle fxLayout="row" fxLayoutAlign="start center" *ngIf="users.length === 1; else workspaceShared">
                 <md-icon class="margin-right-x1" color="primary">info</md-icon>
                 <span class="color-primary users-in-workspace" fxFlex>You are the only one using this workspace.</span>
               </md-card-subtitle>
 
               <ng-template #workspaceShared>
-                <md-card-subtitle fxFlexLayout="row" fxLayoutAlign="start center">
+                <md-card-subtitle fxLayout="row" fxLayoutAlign="start center">
                   <md-icon class="margin-right-x1" color="primary">info</md-icon>
                   <span class="color-primary users-in-workspace" fxFlex>{{ users.length }} people are using this workspace.</span>
                 </md-card-subtitle>
