@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFill class="content content-max-width" fxLayoutWrap>
+<div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
 
     <md-card class="component-infos">
@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <md-card-header fxFlex="40%" *ngIf="component.state">
           <md-card-title>State</md-card-title>
           <md-divider></md-divider>
-          <md-card-subtitle class="component-state" fxLayout="row" fxLayoutAlign="start center">
+          <md-card-subtitle class="component-state" fxLayoutAlign="start center">
             {{ component.state }}
             <div class="margin-left-x1"
               [class.green-led]="component.state === 'Started'"
