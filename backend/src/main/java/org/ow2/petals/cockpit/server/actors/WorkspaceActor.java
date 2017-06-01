@@ -611,8 +611,8 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
 
         ComponentsRecord compDb = new ComponentsRecord(null, cId, deployedComp.getName(), state.name(), type.name());
         compDb.attach(conf);
-        int suDbi = compDb.insert();
-        assert suDbi == 1;
+        int compDbi = compDb.insert();
+        assert compDbi == 1;
 
         WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                 ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(compDb, ImmutableSet.of())),

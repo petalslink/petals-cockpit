@@ -63,7 +63,6 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.LinkedHashMultimap;
@@ -165,7 +164,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
                 componentsToBuild.add(compDb);
             }
 
-            SetMultimap<Long, String> serviceUnitsByComp = HashMultimap.create();
+            SetMultimap<Long, String> serviceUnitsByComp = LinkedHashMultimap.create();
             Set<String> serviceAssemblies = new HashSet<>();
             for (ServiceAssembly sa : container.getServiceAssemblies()) {
 
