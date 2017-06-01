@@ -16,27 +16,22 @@
  */
 
 import { IComponentRow, IComponent } from './component.interface';
+import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 
 export interface IComponentsCommon {
   selectedComponentId: string;
   isFetchingDetails: boolean;
 }
 
-export interface IComponentsTable extends IComponentsCommon {
-  byId: { [key: string]: IComponentRow };
-  allIds: string[];
-}
+export interface IComponentsTable extends IComponentsCommon, JsMap<IComponentRow> { }
 
 export interface IComponents extends IComponentsCommon {
   list: IComponent[];
 }
 
 export function componentsTableFactory(): IComponentsTable {
-  return {
+  return Object.assign({}, emptyJavascriptMap<IComponentRow>(), {
     selectedComponentId: '',
-    isFetchingDetails: false,
-
-    byId: {},
-    allIds: []
-  };
+    isFetchingDetails: false
+  });
 }

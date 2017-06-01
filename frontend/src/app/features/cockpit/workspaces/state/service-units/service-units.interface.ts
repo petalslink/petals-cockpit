@@ -16,27 +16,22 @@
  */
 
 import { IServiceUnitRow, IServiceUnit } from './service-unit.interface';
+import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 
 interface IServiceUnitsCommon {
   selectedServiceUnitId: string;
   isFetchingDetails: boolean;
 }
 
-export interface IServiceUnitsTable extends IServiceUnitsCommon {
-  byId: { [key: string]: IServiceUnitRow };
-  allIds: string[];
-}
+export interface IServiceUnitsTable extends IServiceUnitsCommon, JsMap<IServiceUnitRow> { }
 
 export interface IServiceUnits extends IServiceUnitsCommon {
   list: IServiceUnit[];
 }
 
 export function serviceUnitsTableFactory(): IServiceUnitsTable {
-  return {
+  return Object.assign({}, emptyJavascriptMap<IServiceUnitRow>(), {
     selectedServiceUnitId: '',
-    isFetchingDetails: false,
-
-    byId: {},
-    allIds: []
-  };
+    isFetchingDetails: false
+  });
 }

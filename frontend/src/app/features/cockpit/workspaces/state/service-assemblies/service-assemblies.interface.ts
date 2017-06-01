@@ -16,27 +16,22 @@
  */
 
 import { IServiceAssemblyRow, IServiceAssembly } from './service-assembly.interface';
+import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 
 interface IServiceAssembliesCommon {
   selectedServiceAssemblyId: string;
   isFetchingDetails: boolean;
 }
 
-export interface IServiceAssembliesTable extends IServiceAssembliesCommon {
-  byId: { [key: string]: IServiceAssemblyRow };
-  allIds: string[];
-}
+export interface IServiceAssembliesTable extends IServiceAssembliesCommon, JsMap<IServiceAssemblyRow> { }
 
 export interface IServiceAssemblies extends IServiceAssembliesCommon {
   list: IServiceAssembly[];
 }
 
 export function serviceAssembliesTableFactory(): IServiceAssembliesTable {
-  return {
+  return Object.assign({}, emptyJavascriptMap<IServiceAssemblyRow>(), {
     selectedServiceAssemblyId: '',
-    isFetchingDetails: false,
-
-    byId: {},
-    allIds: []
-  };
+    isFetchingDetails: false
+  });
 }

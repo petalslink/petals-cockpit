@@ -16,27 +16,22 @@
  */
 
 import { IContainerRow, IContainer } from './container.interface';
+import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 
 export interface IContainersCommon {
   selectedContainerId: string;
   isFetchingDetails: boolean;
 }
 
-export interface IContainersTable extends IContainersCommon {
-  byId: { [key: string]: IContainerRow };
-  allIds: string[];
-}
+export interface IContainersTable extends IContainersCommon, JsMap<IContainerRow> { }
 
 export interface IContainers extends IContainersCommon {
   list: IContainer[];
 }
 
 export function containersTableFactory(): IContainersTable {
-  return {
+  return Object.assign({}, emptyJavascriptMap<IContainerRow>(), {
     selectedContainerId: '',
-    isFetchingDetails: false,
-
-    byId: {},
-    allIds: []
-  };
+    isFetchingDetails: false
+  });
 }

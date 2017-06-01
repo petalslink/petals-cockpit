@@ -16,6 +16,7 @@
  */
 
 import { IBusInProgress, IBusInProgressRow } from './bus-in-progress.interface';
+import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 
 export interface IBusesInProgressCommon {
   selectedBusInProgressId: string;
@@ -26,23 +27,17 @@ export interface IBusesInProgressCommon {
   importBusId: string;
 }
 
-export interface IBusesInProgressTable extends IBusesInProgressCommon {
-  byId: { [key: string]: IBusInProgressRow };
-  allIds: Array<string>;
-}
+export interface IBusesInProgressTable extends IBusesInProgressCommon, JsMap<IBusInProgressRow> { }
 
 export interface IBusesInProgress extends IBusesInProgressCommon {
   list: Array<IBusInProgress>;
 }
 
 export function busesInProgressTableFactory(): IBusesInProgressTable {
-  return {
+  return Object.assign({}, emptyJavascriptMap<IBusInProgressRow>(), {
     selectedBusInProgressId: '',
     isImportingBus: false,
     importBusError: '',
-    importBusId: '',
-
-    byId: {},
-    allIds: []
-  };
+    importBusId: ''
+  });
 }

@@ -16,24 +16,20 @@
  */
 
 import { IBusRow, IBus } from './bus.interface';
+import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 
 export interface IBusesCommon {
   selectedBusId: string;
 }
 
-export interface IBusesTable extends IBusesCommon {
-  byId: { [key: string]: IBusRow };
-  allIds: string[];
-}
+export interface IBusesTable extends IBusesCommon, JsMap<IBusRow> { }
 
 export interface IBuses extends IBusesCommon {
   list: IBus[];
 }
 
 export function busesTableFactory(): IBusesTable {
-  return {
-    selectedBusId: '',
-    byId: {},
-    allIds: []
-  };
+  return Object.assign({}, emptyJavascriptMap<IBusRow>(), {
+    selectedBusId: ''
+  });
 }
