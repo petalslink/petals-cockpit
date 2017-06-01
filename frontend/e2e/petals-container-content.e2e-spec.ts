@@ -44,12 +44,12 @@ describe(`Petals container content`, () => {
   it('should have a correct component deployment form', () => {
     const upload = workspace.openContainer('Cont 0').openOperations().getCompUpload();
 
-    expect(upload.chooseFileButton.getText()).toEqual(`CHOOSE A FILE TO UPLOAD`);
+    expect(upload.chooseFileButton.getText()).toEqual(`CHOOSE A FILE TO UPLOAD insert_drive_file`);
     upload.fileInput.sendKeys('/test.zip');
 
     expect(upload.fileNameInput.isPresent()).toBe(false);
     expect(upload.fileName.getText()).toEqual(`test.zip`);
-    expect(upload.chooseFileButton.getText()).toEqual(`CHANGE THE FILE`);
+    expect(upload.chooseFileButton.getText()).toEqual(`CHANGE THE FILE insert_drive_file`);
 
     expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
     expect(upload.deployButton.isEnabled()).toBe(true);

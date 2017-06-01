@@ -30,6 +30,6 @@ export function isSmallScreen(store$: Store<IStore>): Observable<boolean> {
 export function isLargeScreen(store$: Store<IStore>): Observable<boolean> {
   return store$
     .select(state => state.ui.screenSize)
-    .map(ss => ss === 'md' || ss === 'lg' || ss === 'gt-lg' || ss === 'xl')
+    .map(ss => ss === 'md' || ss === 'lg' || ss === 'gt-lg' || ss === 'xl' || ss === 'gt-md')
     .distinctUntilChanged();
 }
