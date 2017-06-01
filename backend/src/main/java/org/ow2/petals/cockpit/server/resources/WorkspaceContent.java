@@ -22,6 +22,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES_COMPONENTS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecor
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusFull;
@@ -148,6 +150,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             int cDbi = cDb.insert();
             assert cDbi == 1;
 
+            SetMultimap<SharedLibrary, Long> componentsBySL = LinkedHashMultimap.create();
             Map<String, Long> components = new HashMap<>();
             List<ComponentsRecord> componentsToBuild = new ArrayList<>(container.getComponents().size());
             for (Component component : container.getComponents()) {
@@ -162,6 +165,26 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
 
                 components.put(component.getName(), compDb.getId());
                 componentsToBuild.add(compDb);
+                for (SharedLibrary sl : component.getSharedLibraries()) {
+                    componentsBySL.put(sl, compDb.getId());
+                }
+            }
+
+            SetMultimap<Long, String> slsByComponent = LinkedHashMultimap.create();
+            Set<String> sharedLibraries = new HashSet<>();
+            for (SharedLibrary sl : container.getSharedLibraries()) {
+                SharedlibrariesRecord slDb = new SharedlibrariesRecord(null, sl.getName(), sl.getVersion(),
+                        cDb.getId());
+                slDb.attach(jooq);
+                int slDbi = slDb.insert();
+                assert slDbi == 1;
+
+                Set<Long> slComponents = componentsBySL.get(sl);
+                sls.put(Long.toString(slDb.getId()), new SharedLibraryFull(slDb,
+                        slComponents.stream().map(id -> Long.toString(id)).collect(ImmutableSet.toImmutableSet())));
+                for (Long c : slComponents) {
+                    slsByComponent.put(c, Long.toString(slDb.getId()));
+                }
             }
 
             SetMultimap<Long, String> serviceUnitsByComp = LinkedHashMultimap.create();
@@ -203,18 +226,8 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
 
             for (ComponentsRecord compDb : componentsToBuild) {
                 comps.put(Long.toString(compDb.getId()),
-                        new ComponentFull(compDb, serviceUnitsByComp.get(compDb.getId())));
-            }
-
-            Set<String> sharedLibraries = new HashSet<>();
-            for (SharedLibrary sl : container.getSharedLibraries()) {
-                SharedlibrariesRecord slDb = new SharedlibrariesRecord(null, sl.getName(), sl.getVersion(),
-                        cDb.getId());
-                slDb.attach(jooq);
-                int slDbi = slDb.insert();
-                assert slDbi == 1;
-
-                sls.put(Long.toString(slDb.getId()), new SharedLibraryFull(slDb));
+                        new ComponentFull(compDb, serviceUnitsByComp.get(compDb.getId()),
+                                slsByComponent.get(compDb.getId())));
             }
 
             String cId = Long.toString(cDb.getId());
@@ -263,12 +276,21 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
                         sus.put(suId, new ServiceUnitFull(su));
                     }
 
+                    SetMultimap<Long, String> componentsBySL = LinkedHashMultimap.create();
                     Set<String> components = new HashSet<>();
                     for (ComponentsRecord comp : ctx.selectFrom(COMPONENTS)
                             .where(COMPONENTS.CONTAINER_ID.eq(c.getId()))) {
                         String compId = Long.toString(comp.getId());
+
+                        Set<String> compSLs = new HashSet<>();
+                        for (SharedlibrariesComponentsRecord slc : ctx.selectFrom(SHAREDLIBRARIES_COMPONENTS)
+                                .where(SHAREDLIBRARIES_COMPONENTS.COMPONENT_ID.eq(comp.getId()))) {
+                            compSLs.add(Long.toString(slc.getSharedlibraryId()));
+                            componentsBySL.put(slc.getSharedlibraryId(), compId);
+                        }
+
                         components.add(compId);
-                        comps.put(compId, new ComponentFull(comp, serviceUnitsByComp.get(comp.getId())));
+                        comps.put(compId, new ComponentFull(comp, serviceUnitsByComp.get(comp.getId()), compSLs));
                     }
 
                     Set<String> serviceAssemblies = new HashSet<>();
@@ -284,7 +306,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
                             .where(SHAREDLIBRARIES.CONTAINER_ID.eq(c.getId()))) {
                         String slId = Long.toString(sl.getId());
                         sharedLibraries.add(slId);
-                        sls.put(slId, new SharedLibraryFull(sl));
+                        sls.put(slId, new SharedLibraryFull(sl, componentsBySL.get(sl.getId())));
                     }
 
                     String cId = Long.toString(c.getId());

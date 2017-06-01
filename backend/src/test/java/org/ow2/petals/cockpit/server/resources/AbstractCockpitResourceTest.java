@@ -62,6 +62,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecor
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
@@ -233,6 +234,14 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                     cDb.insert();
                     setId(c, cDb.getId());
 
+                    for (SharedLibrary sl : c.getSharedLibraries()) {
+                        SharedlibrariesRecord slDb = new SharedlibrariesRecord(null, sl.getName(), sl.getVersion(),
+                                cDb.getId());
+                        slDb.attach(conf);
+                        slDb.insert();
+                        setId(sl, slDb.getId());
+                    }
+
                     for (Component comp : c.getComponents()) {
                         ComponentsRecord compDb = new ComponentsRecord(null, cDb.getId(), comp.getName(),
                                 ComponentMin.State.from(comp.getState()).name(),
@@ -240,6 +249,13 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                         compDb.attach(conf);
                         compDb.insert();
                         setId(comp, compDb.getId());
+
+                        for (SharedLibrary sl : comp.getSharedLibraries()) {
+                            SharedlibrariesComponentsRecord slcDb = new SharedlibrariesComponentsRecord(getId(sl),
+                                    compDb.getId());
+                            slcDb.attach(conf);
+                            slcDb.insert();
+                        }
                     }
 
                     for (ServiceAssembly sa : c.getServiceAssemblies()) {
@@ -259,14 +275,6 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                             suDb.insert();
                             setId(su, suDb.getId());
                         }
-                    }
-
-                    for (SharedLibrary sl : c.getSharedLibraries()) {
-                        SharedlibrariesRecord slDb = new SharedlibrariesRecord(null, sl.getName(), sl.getVersion(),
-                                cDb.getId());
-                        slDb.attach(conf);
-                        slDb.insert();
-                        setId(sl, slDb.getId());
                     }
                 }
             }

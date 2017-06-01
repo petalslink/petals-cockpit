@@ -34,9 +34,14 @@ public class AbstractTest {
         // if needed, use this to set more specific log levels
         // setLevel(LoggerListener.class, Level.DEBUG);
         setLevel(PetalsAdminExceptionMapper.class, Level.DEBUG);
+        setLevel("liquibase", Level.WARN);
     }
 
     private static void setLevel(Class<?> logger, Level level) {
+        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(logger)).setLevel(level);
+    }
+
+    private static void setLevel(String logger, Level level) {
         ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(logger)).setLevel(level);
     }
 }

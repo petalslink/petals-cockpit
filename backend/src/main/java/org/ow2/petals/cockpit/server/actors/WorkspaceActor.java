@@ -24,6 +24,8 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES_COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
@@ -31,8 +33,10 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
@@ -51,6 +55,7 @@ import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
+import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.admin.api.artifact.lifecycle.ArtifactLifecycle;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
@@ -60,6 +65,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecor
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
@@ -614,8 +620,20 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         int compDbi = compDb.insert();
         assert compDbi == 1;
 
+        Set<String> sls = new HashSet<>();
+        for(SharedLibrary sl: deployedComp.getSharedLibraries()) {
+            SharedlibrariesComponentsRecord inserted = DSL.using(conf).insertInto(SHAREDLIBRARIES_COMPONENTS)
+                    .set(SHAREDLIBRARIES_COMPONENTS.COMPONENT_ID, compDb.getId())
+                    .set(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID,
+                            DSL.select(SHAREDLIBRARIES.ID).from(SHAREDLIBRARIES).where(
+                                    SHAREDLIBRARIES.NAME.eq(sl.getName()).and(SHAREDLIBRARIES.VERSION.eq(sl.getVersion()))
+                                    .and(SHAREDLIBRARIES.CONTAINER_ID.eq(cId))))
+                    .returning(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID).fetchOne();
+            sls.add(Long.toString(inserted.getSharedlibraryId()));
+        }
+        
         WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
-                ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(compDb, ImmutableSet.of())),
+                ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(compDb, ImmutableSet.of(), sls)),
                 ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
 
         // we want the event to be sent after we answered

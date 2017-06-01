@@ -274,4 +274,17 @@
       <column name="container_id" />
     </createIndex>
   </changeSet>
+
+  <changeSet id="v0.10.0-2" author="vnoel">
+    <createTable tableName="sharedlibraries_components">
+      <column name="sharedlibrary_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_sharedlibraries_components_sharedlibrary_id"
+          referencedTableName="sharedlibraries" referencedColumnNames="id" deleteCascade="true" />
+      </column>
+      <column name="component_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_sharedlibraries_components_component_id"
+          referencedTableName="components" referencedColumnNames="id" deleteCascade="true" />
+      </column>
+    </createTable>
+  </changeSet>
 </databaseChangeLog>

@@ -70,11 +70,11 @@ public class ComponentParametersTest extends AbstractCockpitResourceTest {
         resource.petals.registerArtifact(component1, container);
         resource.petals.registerArtifact(component2, container);
 
-        resource.jmx.addComponentInstallerClient("comp1",
+        resource.jmx.addComponentInstallerClient(component1.getName(),
                 org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule.ComponentType.ENGINE,
                 new InstallationConfigurationServiceClientMock(new Config(InstallerConfig.class)), null);
 
-        resource.jmx.addComponentClient("comp2",
+        resource.jmx.addComponentClient(component2.getName(),
                 org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule.ComponentType.ENGINE, null,
                 new RuntimeConfigurationServiceClientMock(new Config(RuntimeConfig.class)), null, null);
 
