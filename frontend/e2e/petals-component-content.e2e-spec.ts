@@ -113,12 +113,12 @@ describe(`Petals component content`, () => {
   it('should have a correct SU deployment form', () => {
     const deploy = workspace.openComponent('Comp 0').openOperations().getSUUpload();
 
-    expect(deploy.chooseFileButton.getText()).toEqual(`CHOOSE A FILE TO UPLOAD`);
+    expect(deploy.chooseFileButton.getText()).toEqual(`CHOOSE A FILE TO UPLOAD insert_drive_file`);
     deploy.fileInput.sendKeys('/test.zip');
 
     expect(deploy.fileName.isDisplayed()).toBe(true);
     expect(deploy.fileName.getText()).toEqual(`test.zip`);
-    expect(deploy.chooseFileButton.getText()).toEqual(`CHANGE THE FILE`);
+    expect(deploy.chooseFileButton.getText()).toEqual(`CHANGE THE FILE insert_drive_file`);
 
     expect(deploy.fileNameInput.getAttribute('value')).toEqual(`test`);
 
