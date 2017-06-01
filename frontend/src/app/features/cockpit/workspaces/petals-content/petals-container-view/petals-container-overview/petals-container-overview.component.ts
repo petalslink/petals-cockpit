@@ -65,7 +65,7 @@ export class PetalsContainerOverviewComponent implements OnInit, OnDestroy, OnCh
     // because of https://github.com/seveves/ng2-vis/issues/36
     Observable.fromEvent(window, 'resize')
       .takeUntil(this.onDestroy$)
-      .debounceTime(1000)
+      .debounceTime(500)
       .map(_ => (this.visNetworkService as any).networks[this.visNetwork])
       .filter(net => !!net)
       .do(net => {
