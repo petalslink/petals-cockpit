@@ -18,13 +18,17 @@
 import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
+import { Store } from '@ngrx/store';
 import {
   VisNodes, VisEdges,
   VisNetworkService, VisNetworkData, VisNetworkOptions
 } from 'ng2-vis';
 
+
+import { IStore } from 'app/shared/interfaces/store.interface';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
 import { containerNetworkOptions, buildVisNetworkData } from './container-graph';
+import { isLargeScreen } from 'app/shared/state/ui.selectors';
 
 class NetworkData implements VisNetworkData {
   public nodes: VisNodes;
@@ -38,6 +42,7 @@ class NetworkData implements VisNetworkData {
 })
 export class PetalsContainerOverviewComponent implements OnInit, OnDestroy, OnChanges {
   private onDestroy$ = new Subject<void>();
+  public btnByScreenSize$: Observable<string>;
 
   @Input() container: IContainerRow;
   @Input() otherContainers: IContainerRow[];
@@ -48,7 +53,7 @@ export class PetalsContainerOverviewComponent implements OnInit, OnDestroy, OnCh
   visNetworkOptions: VisNetworkOptions = containerNetworkOptions;
   selectedContainer: IContainerRow;
 
-  constructor(private visNetworkService: VisNetworkService) { }
+  constructor(private visNetworkService: VisNetworkService, private store$: Store<IStore>) { }
 
   ngOnChanges(_changes: SimpleChanges) {
     if (this.container && this.otherContainers && this.container.reachabilities.length > 0) {
@@ -60,14 +65,20 @@ export class PetalsContainerOverviewComponent implements OnInit, OnDestroy, OnCh
     // because of https://github.com/seveves/ng2-vis/issues/36
     Observable.fromEvent(window, 'resize')
       .takeUntil(this.onDestroy$)
-      .debounceTime(1000)
-      .do(_ => {
-        const sizeChanged = (this.visNetworkService as any).networks[this.visNetwork].setSize();
+      .debounceTime(500)
+      .map(_ => (this.visNetworkService as any).networks[this.visNetwork])
+      .filter(net => !!net)
+      .do(net => {
+        const sizeChanged = net.setSize();
         if (sizeChanged) {
-          this.visNetworkService.redraw(this.visNetwork);
+          net.redraw();
         }
       })
       .subscribe();
+
+    this.btnByScreenSize$ = this.store$
+      .let(isLargeScreen)
+      .map(ls => ls ? `mat-raised-button` : `mat-mini-fab`);
   }
 
   networkInitialized() {

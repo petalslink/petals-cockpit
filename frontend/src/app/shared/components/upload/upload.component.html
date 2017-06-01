@@ -43,6 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <button md-button color="primary" type="button" (click)="deploy.click()" class="choose-file text-upper" [disabled]="disabled">
           <span *ngIf="!fileToDeploy; else changeFile">Choose a file to upload</span>
           <ng-template #changeFile>Change the file</ng-template>
+          <md-icon color="primary" class="icon-file">insert_drive_file</md-icon>
         </button>
 
         <button class="text-upper deploy" md-raised-button color="accent" type="submit" *ngIf="fileToDeploy" [disabled]="disabled">
