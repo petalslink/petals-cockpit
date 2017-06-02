@@ -23,7 +23,19 @@
     "build-electron-mock": "yarn run build -- --e=prod-e2e -bh='./'; node ./electron/generate-package-json.js; cp ./electron/electron.js dist/",
     "electron-mock": "yarn run build-electron-mock; electron dist/",
     "build-electron": "yarn run build -- -bh='./'; node ./electron/generate-package-json.js; cp ./electron/electron.js dist/",
-    "electron": "yarn run build-electron; electron dist/"
+    "electron": "yarn run build-electron; electron dist/",
+    "prettier:base": "yarn run prettier -- --parser typescript --single-quote --trailing-comma es5",
+    "prettier:check": "yarn run prettier:base -- -l \"./{e2e,src}/**/*.ts\"",
+    "prettier:write": "yarn run prettier:base -- --write \"./{e2e,src}/**/*.ts\"",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "gitDir": "../",
+    "linters": {
+      "*.ts": [
+        "yarn run prettier:check"
+      ]
+    }
   },
   "private": true,
   "dependencies": {
@@ -70,10 +82,13 @@
     "@types/lodash": "4.14.65",
     "@types/node": "7.0.27",
     "codelyzer": "3.0.1",
+    "husky": "0.13.4",
     "jasmine-core": "2.6.2",
     "jasmine-spec-reporter": "4.1.0",
     "jest": "20.0.4",
     "jest-preset-angular": "2.0.2",
+    "lint-staged": "3.6.0",
+    "prettier": "1.4.4",
     "protractor": "5.1.2",
     "ts-node": "3.0.4",
     "tslint": "5.4.2",
