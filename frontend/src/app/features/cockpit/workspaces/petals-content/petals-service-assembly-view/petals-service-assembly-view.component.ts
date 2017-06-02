@@ -40,7 +40,7 @@ export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   public serviceAssembly$: Observable<IServiceAssemblyRow>;
-  public serviceUnitsAndComponentsOfServiceAssembly$: Observable<IServiceUnitAndComponent[]>;
+  public serviceUnits$: Observable<IServiceUnitAndComponent[]>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
@@ -61,7 +61,7 @@ export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
       })
       .subscribe();
 
-    this.serviceUnitsAndComponentsOfServiceAssembly$ = this.store$.let(getServiceUnitsAndComponentsOfServiceAssembly);
+    this.serviceUnits$ = this.store$.let(getServiceUnitsAndComponentsOfServiceAssembly);
   }
 
   ngOnDestroy() {

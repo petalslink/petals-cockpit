@@ -28,8 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <md-card class="service-units">
       <md-card-content>
         <ul>
-          <li *ngFor="let serviceUnitAndComponent of serviceUnitsAndComponentsOfServiceAssembly">
-            Service unit "<a [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', serviceUnitAndComponent.id]" class="service-unit bold color-primary">{{ serviceUnitAndComponent.name }}</a>" deployed on component "<a [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', serviceUnitAndComponent.component.id]" class="component bold color-primary">{{ serviceUnitAndComponent.component.name }}</a>"
+          <li *ngFor="let serviceUnit of serviceUnits">
+            Service unit "<a [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', serviceUnit.id]" class="service-unit bold color-primary">{{ serviceUnit.name }}</a>" deployed on component "<a [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', serviceUnit.component.id]" class="component bold color-primary">{{ serviceUnit.component.name }}</a>"
           </li>
         </ul>
       </md-card-content>

@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <md-tab-group fxFlex>
     <md-tab label="Overview">
-      <app-petals-service-assembly-overview [serviceAssembly]="serviceAssembly" [serviceUnitsAndComponentsOfServiceAssembly]="serviceUnitsAndComponentsOfServiceAssembly$ | async" fxFill></app-petals-service-assembly-overview>
+      <app-petals-service-assembly-overview [serviceAssembly]="serviceAssembly" [serviceUnits]="serviceUnits$ | async" fxFill></app-petals-service-assembly-overview>
     </md-tab>
 
     <md-tab label="Operations">

@@ -31,7 +31,7 @@ import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/
 })
 export class PetalsServiceAssemblyOverviewComponent implements OnInit {
   @Input() serviceAssembly: IServiceAssemblyRow;
-  @Input() serviceUnitsAndComponentsOfServiceAssembly: IServiceUnitAndComponent;
+  @Input() serviceUnits: IServiceUnitAndComponent[];
 
   public workspaceId$: Observable<string>;
 
