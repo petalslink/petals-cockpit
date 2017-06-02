@@ -34,8 +34,9 @@ export function getCurrentServiceAssembly(store$: Store<IStore>): Observable<ISe
 export function getServiceUnitsAndComponentsOfServiceAssembly(store$: Store<IStore>): Observable<IServiceUnitAndComponent[]> {
   return getCurrentServiceAssembly(store$)
     .withLatestFrom(store$.select(state => tuple([state.serviceUnits, state.components])))
+    .map(([a, [b, c]]) => tuple([a, b, c]))
     .distinctUntilChanged(arrayEquals)
-    .map(([serviceAssemblyRow, [serviceUnitsTable, componentsTable]]) =>
+    .map(([serviceAssemblyRow, serviceUnitsTable, componentsTable]) =>
       serviceAssemblyRow.serviceUnits.map(serviceUnitId => (<IServiceUnitAndComponent>{
         ...serviceUnitsTable.byId[serviceUnitId],
         component: componentsTable
