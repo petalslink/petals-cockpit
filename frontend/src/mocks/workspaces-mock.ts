@@ -25,9 +25,6 @@ function toObj<A>(arr: { toObj: () => A }[]): A {
   return assign.apply({}, arr.map(c => c.toObj()));
 }
 
-// used in buses.service.mock
-export const IMPORT_HTTP_ERROR_IP = 'IMPORT_HTTP_ERROR_IP';
-
 // buses that can be imported
 export const validContainers = [
   '192.168.0.1:7700'

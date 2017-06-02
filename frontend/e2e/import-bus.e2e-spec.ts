@@ -17,7 +17,7 @@
 
 import { $, $$, by } from 'protractor';
 
-import { IMPORT_HTTP_ERROR_IP } from '../src/mocks/workspaces-mock';
+import { IMPORT_HTTP_ERROR_IP } from '../src/mocks/backend-mock';
 
 import { page } from './common';
 import { expectFocused } from './utils';

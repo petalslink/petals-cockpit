@@ -28,7 +28,8 @@ import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 import { busesService } from './../../../mocks/buses-mock';
-import { workspacesService, IMPORT_HTTP_ERROR_IP } from '../../../mocks/workspaces-mock';
+import { workspacesService } from '../../../mocks/workspaces-mock';
+import { IMPORT_HTTP_ERROR_IP } from '../../../mocks/backend-mock';
 import { UsersService } from 'app/shared/services/users.service';
 import { UsersMockService } from 'app/shared/services/users.service.mock';
 
