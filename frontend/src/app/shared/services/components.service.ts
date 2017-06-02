@@ -49,7 +49,7 @@ export abstract class ComponentsService {
 
   abstract watchEventComponentStateChangeOk(): Observable<void>;
 
-  abstract watchEventSuDeployedOk(): Observable<void>;
+  abstract watchEventSaDeployedOk(): Observable<void>;
 }
 
 @Injectable()
@@ -107,7 +107,7 @@ export class ComponentsServiceImpl extends ComponentsService {
       .mapTo(null);
   }
 
-  watchEventSuDeployedOk() {
+  watchEventSaDeployedOk() {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.SA_DEPLOYED)
       .do((data: any) => {

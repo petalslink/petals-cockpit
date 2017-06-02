@@ -98,7 +98,7 @@ export class Containers {
 
     if (payload.containerId) {
       return {
-        ...updateById(containersTable, payload.containerId, { errorDeployment: '' }),
+        ...updateById(containersTable, payload.containerId, { errorDeploymentComponent: '' }),
         ...res
       };
     }
@@ -139,8 +139,11 @@ export class Containers {
   public static DEPLOY_COMPONENT_ERROR = `${Containers.reducerName} Deploy component error`;
   private static deployComponentError(
     containersTable: IContainersTable,
-    payload: { containerId: string, errorDeployment: string }): IContainersTable {
-    return updateById(containersTable, payload.containerId, { isDeployingComponent: false, errorDeployment: payload.errorDeployment });
+    payload: { containerId: string, errorDeploymentComponent: string }): IContainersTable {
+    return updateById(containersTable, payload.containerId, {
+      isDeployingComponent: false,
+      errorDeploymentComponent: payload.errorDeploymentComponent
+    });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -151,7 +154,34 @@ export class Containers {
     return updateById(containersTable, payload.containerId, {
       components: [...container.components, payload.id],
       isDeployingComponent: false,
-      errorDeployment: ''
+      errorDeploymentComponent: ''
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DEPLOY_SERVICE_ASSEMBLY = `${Containers.reducerName} Deploy service assembly`;
+  private static deployServiceAssembly(containersTable: IContainersTable, payload: { containerId: string }): IContainersTable {
+    return updateById(containersTable, payload.containerId, { isDeployingServiceAssembly: true });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DEPLOY_SERVICE_ASSEMBLY_ERROR = `${Containers.reducerName} Deploy service assembly error`;
+  private static deployServiceAssemblyError(
+    containersTable: IContainersTable,
+    payload: { containerId: string, errorDeploymentServiceAssembly: string }): IContainersTable {
+    return updateById(containersTable, payload.containerId, {
+      isDeployingServiceAssembly: false,
+      errorDeploymentServiceAssembly: payload.errorDeploymentServiceAssembly
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DEPLOY_SERVICE_ASSEMBLY_SUCCESS = `${Containers.reducerName} Deploy service assembly success`;
+  private static deployServiceAssemblySuccess(containersTable: IContainersTable, payload: IServiceAssemblyBackendSSE): IContainersTable {
+    return updateById(containersTable, payload.containerId, {
+      serviceAssemblies: [...containersTable.byId[payload.containerId].serviceAssemblies, payload.id],
+      isDeployingServiceAssembly: false,
+      errorDeploymentServiceAssembly: ''
     });
   }
 
@@ -165,14 +195,6 @@ export class Containers {
         .byId[payload.containerId]
         .components
         .filter(id => id !== payload.componentId)
-    });
-  }
-
-  // tslint:disable-next-line:member-ordering
-  public static DEPLOY_SERVICE_ASSEMBLY_SUCCESS = `${Containers.reducerName} Deploy service assembly success`;
-  private static deployServiceAssemblySuccess(containersTable: IContainersTable, payload: IServiceAssemblyBackendSSE): IContainersTable {
-    return updateById(containersTable, payload.containerId, {
-      serviceAssemblies: [...containersTable.byId[payload.containerId].serviceAssemblies, payload.id]
     });
   }
 
@@ -209,7 +231,9 @@ export class Containers {
     [Containers.DEPLOY_COMPONENT]: Containers.deployComponent,
     [Containers.DEPLOY_COMPONENT_ERROR]: Containers.deployComponentError,
     [Containers.DEPLOY_COMPONENT_SUCCESS]: Containers.deployComponentSuccess,
+    [Containers.DEPLOY_SERVICE_ASSEMBLY]: Containers.deployServiceAssembly,
     [Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS]: Containers.deployServiceAssemblySuccess,
+    [Containers.DEPLOY_SERVICE_ASSEMBLY_ERROR]: Containers.deployServiceAssemblyError,
 
     [Components.REMOVE_COMPONENT]: Containers.removeComponent,
     [ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY]: Containers.removeServiceAssembly,

@@ -82,12 +82,12 @@ describe(`Containers reducer`, () => {
       expect(reducer.byId.idCont3.reachabilities).toEqual([]);
     });
 
-    it(`should replace existing components while keeping extra values`, () => {
+    it(`should replace existing containers while keeping extra values`, () => {
       const initialState: any = {
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
-          idCont1: { keepPreviousValues: '', reachabilities: [], errorDeployment: 'some previous error' },
+          idCont1: { keepPreviousValues: '', reachabilities: [], errorDeploymentComponent: 'some previous error' },
           idCont2: {
             name: 'Cont 2 old name',
             keepPreviousValues: '',
@@ -97,7 +97,7 @@ describe(`Containers reducer`, () => {
               'thisComponentIdShouldBeRemoved'
             ],
             id: 'idCont2',
-            errorDeployment: 'some previous error'
+            errorDeploymentComponent: 'some previous error'
           },
         },
         allIds: ['idCont1']
@@ -111,6 +111,8 @@ describe(`Containers reducer`, () => {
         byId: {
           idCont2: {
             name: 'Cont 2',
+            errorDeploymentServiceAssembly: '',
+            isDeployingServiceAssembly: false,
             keepPreviousValues: '',
             components: [
               'idComp4',
@@ -122,11 +124,13 @@ describe(`Containers reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isDeployingComponent: false,
-            errorDeployment: 'some previous error',
+            errorDeploymentComponent: 'some previous error',
             serviceAssemblies: []
           },
           idCont3: {
             name: 'Cont 3',
+            errorDeploymentServiceAssembly: '',
+            isDeployingServiceAssembly: false,
             components: [
               'idComp6',
               'idComp7'
@@ -137,7 +141,7 @@ describe(`Containers reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isDeployingComponent: false,
-            errorDeployment: '',
+            errorDeploymentComponent: '',
             serviceAssemblies: []
           }
         },
@@ -186,7 +190,7 @@ describe(`Containers reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isDeployingComponent: false,
-            errorDeployment: 'some previous error',
+            errorDeploymentComponent: 'some previous error',
           }
         },
         allIds: [
@@ -213,10 +217,12 @@ describe(`Containers reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isDeployingComponent: false,
-            errorDeployment: 'some previous error',
+            errorDeploymentComponent: 'some previous error',
           },
           idCont3: {
             name: 'Cont 3',
+            errorDeploymentServiceAssembly: '',
+            isDeployingServiceAssembly: false,
             components: [
               'idComp6',
               'idComp7'
@@ -227,7 +233,7 @@ describe(`Containers reducer`, () => {
             isFolded: false,
             isFetchingDetails: false,
             isDeployingComponent: false,
-            errorDeployment: '',
+            errorDeploymentComponent: '',
             serviceAssemblies: []
           }
         },
@@ -461,7 +467,7 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         selectedContainerId: '',
         byId: {
-          idCont0: { errorDeployment: 'some error' }
+          idCont0: { errorDeploymentComponent: 'some error' }
         }
       };
 
@@ -474,7 +480,7 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         selectedContainerId: 'idCont0',
         byId: {
-          idCont0: { errorDeployment: '' }
+          idCont0: { errorDeploymentComponent: '' }
         }
       });
     });
@@ -638,7 +644,7 @@ describe(`Containers reducer`, () => {
     it(`should set the isDeployingComponent variable to false for an existing container`, () => {
       expect(Containers.reducer(initialState, {
         type: Containers.DEPLOY_COMPONENT_ERROR,
-        payload: { containerId: 'idCont0', errorDeployment: 'some error' }
+        payload: { containerId: 'idCont0', errorDeploymentComponent: 'some error' }
       })).toEqual({
         keepPreviousValues: '',
         byId: {
@@ -646,7 +652,7 @@ describe(`Containers reducer`, () => {
           idCont0: {
             keepPreviousValues: '',
             isDeployingComponent: false,
-            errorDeployment: 'some error'
+            errorDeploymentComponent: 'some error'
           }
         },
         allIds: ['idCont0']
@@ -688,7 +694,7 @@ describe(`Containers reducer`, () => {
             keepPreviousValues: '',
             isDeployingComponent: false,
             components: ['idComp0', 'idCompNew'],
-            errorDeployment: ''
+            errorDeploymentComponent: ''
           }
         },
         allIds: ['idCont0']
@@ -777,6 +783,8 @@ describe(`Containers reducer`, () => {
           keepPreviousValues: '',
           idCont0: {
             id: 'idCont0',
+            errorDeploymentServiceAssembly: '',
+            isDeployingServiceAssembly: false,
             keepPreviousValues: '',
             components: ['idComp0'],
             serviceAssemblies: ['isSa0', 'isSa1', 'isSa2', 'idSa5']

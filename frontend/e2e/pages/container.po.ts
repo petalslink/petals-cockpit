@@ -70,7 +70,7 @@ export class ContainerOperationPage extends ContainerPage {
 
   public readonly deploys = this.operations.$(`.deploys`);
 
-  // deploy a component
+  // deploy components and service-assemblies
 
   static waitAndGet() {
     super.wait();
@@ -82,7 +82,11 @@ export class ContainerOperationPage extends ContainerPage {
     super();
   }
 
-  getCompUpload() {
+  getComponentUpload() {
     return UploadComponentPage.waitAndGet('deploy-component');
+  }
+
+  getServiceAssemblyUpload() {
+    return UploadComponentPage.waitAndGet('deploy-service-assembly');
   }
 }

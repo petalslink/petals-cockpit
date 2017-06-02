@@ -28,6 +28,7 @@ import { Containers } from './containers.reducer';
 import { ContainersService } from './../../../../../shared/services/containers.service';
 import { IStore } from 'app/shared/interfaces/store.interface';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
 
 @Injectable()
 export class ContainersEffects {
@@ -85,7 +86,7 @@ export class ContainersEffects {
 
           return Observable.of({
             type: Containers.DEPLOY_COMPONENT_ERROR,
-            payload: { containerId: action.payload.containerId, errorDeployment: err.json().message }
+            payload: { containerId: action.payload.containerId, errorDeploymentComponent: err.json().message }
           });
         })
     );
@@ -96,6 +97,42 @@ export class ContainersEffects {
     .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
     .do(([{ payload }, workspaceId]: [{ payload: IComponentRow }, string]) => {
       this.router.navigate(['workspaces', workspaceId, 'petals', 'components', payload.id]);
+    })
+    .mapTo(null);
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true }) deployServiceAssembly$: Observable<Action> = this.actions$
+    .ofType(Containers.DEPLOY_SERVICE_ASSEMBLY)
+    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .switchMap(([action, workspaceId]: [{ type: string, payload: { file: File, containerId: string } }, string]) =>
+      this.containersService.deployServiceAssembly(workspaceId, action.payload.containerId, action.payload.file)
+        .mergeMap(_ => Observable.empty())
+        .catch((err) => {
+          if (environment.debug) {
+            console.group();
+            console.warn(`Error caught in containers.effects: ofType(${Containers.DEPLOY_SERVICE_ASSEMBLY})`);
+            console.error(err);
+            console.groupEnd();
+          }
+
+          this.notification.error(
+            'Deploy service-assembly failed',
+            `An error occurred when trying to deploy the file "${action.payload.file.name}"`
+          );
+
+          return Observable.of({
+            type: Containers.DEPLOY_SERVICE_ASSEMBLY_ERROR,
+            payload: { containerId: action.payload.containerId, errorDeploymentServiceAssembly: err.json().message }
+          });
+        })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: false }) deployServiceAssemblySuccess$: Observable<void> = this.actions$
+    .ofType(Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS)
+    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .do(([{ payload }, workspaceId]: [{ payload: IServiceAssemblyRow }, string]) => {
+      this.router.navigate(['workspaces', workspaceId, 'petals', 'service-assemblies', payload.id]);
     })
     .mapTo(null);
 }
