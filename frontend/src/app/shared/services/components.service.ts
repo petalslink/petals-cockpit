@@ -68,6 +68,7 @@ export interface IComponentBackendDetailsCommon {
 export interface IComponentBackendSSE extends IComponentBackendSSECommon {
   // from server (sse)
   serviceUnits: string[];
+  sharedLibraries: string[];
 }
 
 export interface IComponentBackendDetails extends IComponentBackendDetailsCommon { }

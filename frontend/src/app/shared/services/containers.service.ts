@@ -45,6 +45,7 @@ export interface IContainerBackendDetailsCommon {
 export interface IContainerBackendSSE extends IContainerBackendSSECommon {
   components: string[];
   serviceAssemblies: string[];
+  sharedLibraries: string[];
 }
 
 export interface IContainerBackendDetails extends IContainerBackendDetailsCommon {

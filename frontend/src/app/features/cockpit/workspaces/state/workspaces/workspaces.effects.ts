@@ -45,6 +45,8 @@ import { ServiceAssembliesService, IServiceAssemblyBackendSSE } from 'app/shared
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { IUserBackendCommon } from 'app/shared/services/users.service';
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
+import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
 
 @Injectable()
 export class WorkspacesEffects {
@@ -178,6 +180,10 @@ export class WorkspacesEffects {
             payload: toJavascriptMap<IServiceAssemblyBackendSSE>(data.serviceAssemblies)
           },
           { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits) },
+          {
+            type: SharedLibraries.FETCHED,
+            payload: toJavascriptMap<ISharedLibraryBackendSSE>(data.sharedLibraries)
+          },
           { type: Ui.OPEN_SIDENAV },
           { type: Ui.CLOSE_POPUP_WORKSPACES_LIST }
         ]));

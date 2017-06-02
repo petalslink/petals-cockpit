@@ -21,6 +21,7 @@ import { IServiceAssemblies } from 'app/features/cockpit/workspaces/state/servic
 import {
   IContainerBackendSSE, IContainerBackendDetails, IContainerBackendSSECommon, IContainerBackendDetailsCommon
 } from 'app/shared/services/containers.service';
+import { ISharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 
 export interface IContainerUI {
   // for UI
@@ -37,6 +38,7 @@ export interface IContainerRow extends IContainerUI, IContainerBackendSSE, ICont
 export interface IContainer extends IContainerUI, IContainerBackendSSECommon, IContainerBackendDetailsCommon {
   components: IComponents;
   serviceAssemblies: IServiceAssemblies;
+  sharedLibraries: ISharedLibraries;
 }
 
 export interface IContainersCommon {
@@ -68,7 +70,8 @@ export function containerRowFactory(): IContainerRow {
 
     components: [],
     serviceAssemblies: [],
-    reachabilities: []
+    reachabilities: [],
+    sharedLibraries: []
   };
 }
 

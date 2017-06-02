@@ -30,6 +30,7 @@ import { Components } from '../../features/cockpit/workspaces/state/components/c
 import { ServiceUnits } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
 import { enableBatching } from 'app/shared/helpers/batch-actions.helper';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
 
 const reducers = {
   ui: Ui.reducer,
@@ -40,7 +41,8 @@ const reducers = {
   containers: Containers.reducer,
   components: Components.reducer,
   serviceUnits: ServiceUnits.reducer,
-  serviceAssemblies: ServiceAssemblies.reducer
+  serviceAssemblies: ServiceAssemblies.reducer,
+  sharedLibraries: SharedLibraries.reducer
 };
 
 // if environment is != from production

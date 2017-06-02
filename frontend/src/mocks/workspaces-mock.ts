@@ -109,13 +109,15 @@ export class Workspace {
       const components = flatMap(containers, c => c.getComponents());
       const serviceAssemblies = flatMap(containers, c => c.getServiceAssemblies());
       const serviceUnits = flatMap(components, c => c.getServiceUnits());
+      const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
       const eventData = {
         buses: bus.toObj(),
         containers: toObj(containers),
         components: toObj(components),
         serviceAssemblies: toObj(serviceAssemblies),
-        serviceUnits: toObj(serviceUnits)
+        serviceUnits: toObj(serviceUnits),
+        sharedLibraries: toObj(sharedLibraries)
       };
 
       return {
@@ -230,6 +232,7 @@ export class Workspaces {
     const components = flatMap(containers, c => c.getComponents());
     const serviceAssemblies = flatMap(containers, c => c.getServiceAssemblies());
     const serviceUnits = flatMap(components, c => c.getServiceUnits());
+    const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
     const composedWks = {
       workspace: newWorkspace.toObj(),
@@ -239,7 +242,8 @@ export class Workspaces {
       containers: toObj(containers),
       components: toObj(components),
       serviceAssemblies: toObj(serviceAssemblies),
-      serviceUnits: toObj(serviceUnits)
+      serviceUnits: toObj(serviceUnits),
+      sharedLibraries: toObj(sharedLibraries)
     };
 
     this.memoizedWorkspaces.set(newWorkspace.id, { wks: newWorkspace, composedWks });

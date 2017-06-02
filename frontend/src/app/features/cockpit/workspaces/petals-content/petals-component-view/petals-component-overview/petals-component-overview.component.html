@@ -44,5 +44,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </div>
     </md-card>
 
+    <md-card class="margin-top-x1 shared-libraries">
+      <md-card-title fxLayout="row">
+        <span fxFlex class="text-upper">Shared Libraries</span>
+        <md-icon color="primary">info_outline</md-icon>
+      </md-card-title>
+
+      <md-card-content>
+        <ul>
+          <li *ngFor="let sl of sharedLibraries">
+            <a [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'shared-libraries', sl.id]" class="bold color-primary">{{ sl.name }}</a>
+          </li>
+        </ul>
+        <span *ngIf="sharedLibraries.length === 0">This component doesn't use any shared library</span>
+      </md-card-content>
+    </md-card>
+
   </div>
 </div>

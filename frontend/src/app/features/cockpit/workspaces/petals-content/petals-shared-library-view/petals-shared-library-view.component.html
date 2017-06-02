@@ -13,23 +13,20 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="component$ | async as component" fxLayout="column" fxFill class="wrapper-content">
+<div *ngIf="sharedLibrary$ | async as sharedLibrary" fxLayout="column" fxFill class="wrapper-content">
   <md-toolbar>
     <div class="prefix-toolbar-title">
-      <md-icon color="primary" *ngIf="!component.isFetchingDetails">grade</md-icon>
+      <md-icon color="primary" *ngIf="!sharedLibrary.isFetchingDetails">grade</md-icon>
 
-      <md-spinner *ngIf="component.isFetchingDetails"></md-spinner>
+      <md-spinner *ngIf="sharedLibrary.isFetchingDetails"></md-spinner>
     </div>
 
-    <span class="title">{{ component.name }}</span>
+    <span class="title">{{ sharedLibrary.name }}</span>
   </md-toolbar>
 
   <md-tab-group fxFlex>
     <md-tab label="Overview">
-      <app-petals-component-overview [component]="component" [sharedLibraries]="sharedLibraries$ | async" fxFill></app-petals-component-overview>
-    </md-tab>
-    <md-tab label="Operations">
-      <app-petals-component-operations [component]="component" fxFill></app-petals-component-operations>
+      <app-petals-shared-library-overview [sharedLibrary]="sharedLibrary" [components]="components$ | async" fxFill></app-petals-shared-library-overview>
     </md-tab>
   </md-tab-group>
 </div>

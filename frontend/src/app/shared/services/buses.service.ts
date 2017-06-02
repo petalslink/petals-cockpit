@@ -36,6 +36,8 @@ import { IComponentBackendSSE } from 'app/shared/services/components.service';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { toJavascriptMap } from 'app/shared/helpers/map.helper';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
+import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
 
 export interface IBusBackendSSECommon {
   id: string;
@@ -159,7 +161,8 @@ export class BusesServiceImpl extends BusesService {
             payload: toJavascriptMap<IComponentBackendSSE>(data.serviceAssemblies)
           },
           { type: Components.ADD_COMPONENTS_SUCCESS, payload: toJavascriptMap<IComponentBackendSSE>(data.components) },
-          { type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits) }
+          { type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits) },
+          { type: SharedLibraries.ADDED, payload: toJavascriptMap<ISharedLibraryBackendSSE>(data.sharedLibraries) }
         ]));
       });
   }

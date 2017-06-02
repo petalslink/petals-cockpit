@@ -24,14 +24,14 @@ import { IStore } from '../../../../../../shared/interfaces/store.interface';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 
 @Component({
-  selector: 'app-petals-component-overview',
-  templateUrl: './petals-component-overview.component.html',
-  styleUrls: ['./petals-component-overview.component.scss'],
+  selector: 'app-petals-shared-library-overview',
+  templateUrl: './petals-shared-library-overview.component.html',
+  styleUrls: ['./petals-shared-library-overview.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PetalsComponentOverviewComponent implements OnInit {
-  @Input() component: IComponentRow;
-  @Input() sharedLibraries: ISharedLibraryRow[];
+export class PetalsSharedLibraryOverviewComponent implements OnInit {
+  @Input() sharedLibrary: ISharedLibraryRow;
+  @Input() components: IComponentRow[];
 
   workspaceId$: Observable<string>;
 

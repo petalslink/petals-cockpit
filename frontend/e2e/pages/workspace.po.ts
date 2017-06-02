@@ -26,6 +26,7 @@ import { ContainerOverviewPage } from './container.po';
 import { ServiceUnitOverviewPage } from './service-unit.po';
 import { WorkspacesPage } from './workspaces.po';
 import { ServiceAssemblyOverviewPage } from './service-assembly.po';
+import { SharedLibraryOverviewPage } from './shared-library.po';
 
 export abstract class WorkspacePage {
 
@@ -105,6 +106,11 @@ export abstract class WorkspacePage {
   openServiceUnit(identifier: string | number) {
     this.treeElement(identifier, 'service-unit').click();
     return ServiceUnitOverviewPage.waitAndGet();
+  }
+
+  openSharedLibrary(identifier: string | number) {
+    this.treeElement(identifier, 'shared-library').click();
+    return SharedLibraryOverviewPage.waitAndGet();
   }
 
   search(search: string) {

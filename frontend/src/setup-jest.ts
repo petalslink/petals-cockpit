@@ -1,5 +1,7 @@
 import 'jest-preset-angular';
 
+import 'app/core/rxjs-operators';
+
 // basic mocks for some of the browser features
 const mock = () => {
   let storage = {};

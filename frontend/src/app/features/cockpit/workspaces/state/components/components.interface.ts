@@ -66,7 +66,8 @@ export function componentRowFactory(): IComponentRow {
     errorChangeState: '',
     errorDeployment: '',
 
-    serviceUnits: []
+    serviceUnits: [],
+    sharedLibraries: []
   };
 }
 

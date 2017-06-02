@@ -17,13 +17,14 @@
 
 import { IUi } from './ui.interface';
 import { IUsersTable } from './users.interface';
-import { IWorkspacesTable } from '../../features/cockpit/workspaces/state/workspaces/workspaces.interface';
-import { IBusesTable } from '../../features/cockpit/workspaces/state/buses/buses.interface';
-import { IBusesInProgressTable } from '../../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
-import { IContainersTable } from '../../features/cockpit/workspaces/state/containers/containers.interface';
-import { IComponentsTable } from '../../features/cockpit/workspaces/state/components/components.interface';
-import { IServiceUnitsTable } from '../../features/cockpit/workspaces/state/service-units/service-units.interface';
-import { IServiceAssembliesTable } from '../../features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
+import { IWorkspacesTable } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
+import { IBusesTable } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
+import { IBusesInProgressTable } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
+import { IContainersTable } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
+import { IComponentsTable } from 'app/features/cockpit/workspaces/state/components/components.interface';
+import { IServiceUnitsTable } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+import { IServiceAssembliesTable } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
+import { ISharedLibrariesTable } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 
 export interface IStore {
   ui: IUi;
@@ -35,4 +36,5 @@ export interface IStore {
   components: IComponentsTable;
   serviceUnits: IServiceUnitsTable;
   serviceAssemblies: IServiceAssembliesTable;
+  sharedLibraries: ISharedLibrariesTable;
 }

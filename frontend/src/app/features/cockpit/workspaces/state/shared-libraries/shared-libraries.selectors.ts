@@ -19,23 +19,23 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { IComponentRow } from './components.interface';
-import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
+import { ISharedLibraryRow } from './shared-libraries.interface';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { arrayEquals } from 'app/shared/helpers/shared.helper';
+import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 
-export function getCurrentComponent(store$: Store<IStore>): Observable<IComponentRow> {
+export function getCurrentSharedLibrary(store$: Store<IStore>): Observable<ISharedLibraryRow> {
   return filterWorkspaceFetched(store$)
-    .filter(state => !!state.components.selectedComponentId)
-    .map(state => state.components.byId[state.components.selectedComponentId])
+    .filter(state => !!state.sharedLibraries.selectedSharedLibraryId)
+    .map(state => state.sharedLibraries.byId[state.sharedLibraries.selectedSharedLibraryId])
     .distinctUntilChanged();
 }
 
-export function getCurrentComponentSharedLibraries(store$: Store<IStore>): Observable<ISharedLibraryRow[]> {
-  return getCurrentComponent(store$)
-    .withLatestFrom(store$.select(state => state.sharedLibraries))
+export function getCurrentSharedLibraryComponents(store$: Store<IStore>): Observable<IComponentRow[]> {
+  return getCurrentSharedLibrary(store$)
+    .withLatestFrom(store$.select(state => state.components))
     .distinctUntilChanged(arrayEquals)
-    .map(([component, sharedLibrariesTable]) =>
-      component.sharedLibraries.map(slId => sharedLibrariesTable.byId[slId])
+    .map(([sharedLibrary, componentsTable]) =>
+      sharedLibrary.components.map(slId => componentsTable.byId[slId])
     );
 }

@@ -15,12 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { componentsService, Component } from './components-mock';
-import { Bus } from './buses-mock';
 import { ServiceAssembly, serviceAssembliesService } from './service-assemblies-mock';
 import { ComponentState } from 'app/shared/services/components.service';
 import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 import { IContainerBackendSSE, IContainerBackendDetails } from 'app/shared/services/containers.service';
+import { sharedLibrariesService, SharedLibrary } from './shared-libraries-mock';
+import { componentsService, Component } from './components-mock';
+import { Bus } from './buses-mock';
 
 export class Containers {
   private readonly containers = new Map<string, Container>();
@@ -47,6 +48,7 @@ export class Container {
   public readonly name: string;
   private readonly components = new Map<string, Component>();
   private readonly serviceAssemblies = new Map<string, ServiceAssembly>();
+  private readonly sharedLibraries = new Map<string, SharedLibrary>();
   public readonly ip: string;
 
   constructor(bus: Bus, name?: string) {
@@ -64,6 +66,11 @@ export class Container {
 
     // and also a default service assembly
     this.addServiceAssembly('Started');
+
+    const sl = this.addSharedLibrary();
+    const c3 = this.addComponent('Started');
+    c3.registerSharedLibrary(sl);
+    sl.registerComponent(c3);
   }
 
   getComponents() {
@@ -72,6 +79,10 @@ export class Container {
 
   getServiceAssemblies() {
     return Array.from(this.serviceAssemblies.values());
+  }
+
+  getSharedLibraries() {
+    return Array.from(this.sharedLibraries.values());
   }
 
   addComponent(state?: ComponentState, name?: string) {
@@ -91,8 +102,8 @@ export class Container {
     const su1 = serviceAssembly.addServiceUnit(c1, name ? `su1-${name}` : undefined);
     const su2 = serviceAssembly.addServiceUnit(c2, name ? `su2-${name}` : undefined);
 
-    c1.addServiceUnit(su1);
-    c2.addServiceUnit(su2);
+    c1.registerServiceUnit(su1);
+    c2.registerServiceUnit(su2);
     this.serviceAssemblies.set(serviceAssembly.id, serviceAssembly);
 
     return [serviceAssembly.toObj(), { ...su1.toObj(), ...su2.toObj() }];
@@ -102,10 +113,16 @@ export class Container {
     const serviceAssembly = serviceAssembliesService.create(this, name ? `sa-${name}` : undefined, state);
     const serviceUnit = serviceAssembly.addServiceUnit(component, name);
 
-    component.addServiceUnit(serviceUnit);
+    component.registerServiceUnit(serviceUnit);
     this.serviceAssemblies.set(serviceAssembly.id, serviceAssembly);
 
     return [serviceAssembly, serviceUnit];
+  }
+
+  addSharedLibrary(name?: string, version?: string) {
+    const sl = sharedLibrariesService.create(this, name, version);
+    this.sharedLibraries.set(sl.id, sl);
+    return sl;
   }
 
   toObj(): { [id: string]: IContainerBackendSSE } {
@@ -115,7 +132,8 @@ export class Container {
         name: this.name,
         busId: this.bus.id,
         components: Array.from(this.components.keys()),
-        serviceAssemblies: Array.from(this.serviceAssemblies.keys())
+        serviceAssemblies: Array.from(this.serviceAssemblies.keys()),
+        sharedLibraries: Array.from(this.sharedLibraries.keys())
       }
     };
   }
