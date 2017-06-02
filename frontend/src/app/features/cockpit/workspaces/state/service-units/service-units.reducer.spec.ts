@@ -117,10 +117,7 @@ describe(`ServiceUnits reducer`, () => {
         ]
       });
     });
-
-
   });
-
 
   describe(ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, () => {
     it(`should check action name`, () => {
@@ -222,7 +219,6 @@ describe(`ServiceUnits reducer`, () => {
       });
     });
   });
-
 
   describe(ServiceUnits.SET_CURRENT_SERVICE_UNIT, () => {
     it(`should check action name`, () => {

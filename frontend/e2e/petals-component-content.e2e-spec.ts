@@ -40,6 +40,13 @@ describe(`Petals component content`, () => {
   it(`should stop/start/stop/unload a component`, () => {
     let ops = workspace.openComponent('Comp 0').openOperations();
 
+    expect(ops.state.getText()).toEqual('Started');
+    expect(ops.stopButton.isEnabled()).toBe(true);
+    expect(ops.startButton.isPresent()).toBe(false);
+    expect(ops.unloadButton.isPresent()).toBe(false);
+    expect(ops.installButton.isPresent()).toBe(false);
+    expect(ops.uninstallButton.isPresent()).toBe(false);
+
     ops.stopButton.click();
     expect(ops.state.getText()).toEqual('Stopped');
     expect(ops.stopButton.isPresent()).toBe(false);

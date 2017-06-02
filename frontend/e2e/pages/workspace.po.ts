@@ -132,7 +132,7 @@ export class WorkspaceOverviewPage extends WorkspacePage {
   public readonly title = this.component.$(`md-toolbar-row .title`);
   public readonly deleteButton = this.component.$(`.btn-delete-wks`);
 
-  public readonly description = this.component.$(`md-card-content.workspace-description span`);
+  public readonly description = this.component.$(`md-card-content.workspace-description > span`);
   public readonly editButton = this.component.$(`.workspace-description button`);
   public readonly descriptionArea = this.component.$(`.workspace-description-edit textarea`);
   public readonly descriptionPreview = this.component.$(`.workspace-description-edit md-card-subtitle span.workspace-description-preview`);
