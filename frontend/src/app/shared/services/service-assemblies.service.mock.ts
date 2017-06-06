@@ -32,13 +32,13 @@ import { ServiceAssembliesServiceImpl, ServiceAssemblyState } from 'app/shared/s
 @Injectable()
 export class ServiceAssembliesMockService extends ServiceAssembliesServiceImpl {
   constructor(
-    private pHttp: Http,
-    private pRouter: Router,
     private pSseService: SseService,
-    private pStore$: Store<IStore>,
-    private pNotification: NotificationsService
+    http: Http,
+    router: Router,
+    store$: Store<IStore>,
+    notification: NotificationsService
   ) {
-    super(pHttp, pRouter, pSseService, pStore$, pNotification);
+    super(http, router, pSseService, store$, notification);
   }
 
   getDetailsServiceAssembly(serviceAssemblyId: string) {

@@ -16,7 +16,6 @@
  */
 
 import { Component, ViewChild, Inject, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
 import { MdDialog, MdDialogRef } from '@angular/material';
 import { MdSidenav } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
@@ -60,8 +59,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
   constructor(
     private store$: Store<IStore>,
     @Inject(LANGUAGES) public languages: any,
-    public dialog: MdDialog,
-    private router: Router
+    public dialog: MdDialog
   ) { }
 
   ngOnInit() {

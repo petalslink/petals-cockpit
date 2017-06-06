@@ -16,7 +16,6 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { Response } from '@angular/http';
 import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
@@ -31,7 +30,6 @@ import { IStore } from '../../../../../shared/interfaces/store.interface';
 @Injectable()
 export class ComponentsEffects {
   constructor(
-    private router: Router,
     private store$: Store<IStore>,
     private actions$: Actions,
     private componentsService: ComponentsService,

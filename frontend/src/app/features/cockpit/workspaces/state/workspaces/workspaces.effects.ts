@@ -18,7 +18,7 @@
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Router } from '@angular/router';
-import { Action, Store } from '@ngrx/store';
+import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -38,7 +38,6 @@ import { SseService, SseWorkspaceEvent } from './../../../../../shared/services/
 import { BusesService, IBusInProgressBackend, IBusBackendSSE } from './../../../../../shared/services/buses.service';
 import { ComponentsService, IComponentBackendSSE } from '../../../../../shared/services/components.service';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { IStore } from 'app/shared/interfaces/store.interface';
 import { ContainersService, IContainerBackendSSE } from 'app/shared/services/containers.service';
 import { toJavascriptMap } from 'app/shared/helpers/map.helper';
 import { ServiceAssembliesService, IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
@@ -52,7 +51,6 @@ import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.s
 export class WorkspacesEffects {
   constructor(
     private actions$: Actions,
-    private store$: Store<IStore>,
     private router: Router,
     private workspacesService: WorkspacesService,
     private sseService: SseService,

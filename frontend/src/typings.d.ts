@@ -1,10 +1,7 @@
-// Typings reference file, you can add your own global typings here
-// https://www.typescriptlang.org/docs/handbook/writing-declaration-files.html
-
-declare var System: any;
-
-declare interface ObjectConstructor {
-  assign(...objects: Object[]): Object;
+/* SystemJS module definition */
+declare var module: NodeModule;
+interface NodeModule {
+  id: string;
 }
 
 // Type definitions for Server-Sent Events

@@ -17,7 +17,6 @@
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Router } from '@angular/router';
 import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
@@ -32,7 +31,6 @@ export class BusesEffects {
   constructor(
     private actions$: Actions,
     private store$: Store<IStore>,
-    private router: Router,
     private busesService: BusesService
   ) { }
 
