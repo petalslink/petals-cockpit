@@ -30,6 +30,8 @@
     <loadData tableName="components" file="e2e/data/components.csv" />
     <loadData tableName="serviceassemblies" file="e2e/data/serviceassemblies.csv" />
     <loadData tableName="serviceunits" file="e2e/data/serviceunits.csv" />
+    <loadData tableName="sharedlibraries" file="e2e/data/sharedlibraries.csv" />
+    <loadData tableName="sharedlibraries_components" file="e2e/data/sharedlibraries_components.csv" />
   </changeSet>
 
 </databaseChangeLog>

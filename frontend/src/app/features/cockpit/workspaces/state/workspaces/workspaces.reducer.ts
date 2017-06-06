@@ -17,10 +17,10 @@
 
 import { Action } from '@ngrx/store';
 
-import { IWorkspacesTable, workspacesTableFactory } from './workspaces.interface';
+import { IWorkspacesTable, workspacesTableFactory, workspaceRowFactory } from './workspaces.interface';
 import { Users } from './../../../../../shared/state/users.reducer';
-import { updateById, removeById, mergeInto, putById } from 'app/shared/helpers/map.helper';
-import { workspaceRowFactory } from 'app/features/cockpit/workspaces/state/workspaces/workspace.interface';
+import { updateById, removeById, mergeInto, putById, JsMap } from 'app/shared/helpers/map.helper';
+import { IWorkspaceBackend, IWorkspaceBackendDetails } from 'app/shared/services/workspaces.service';
 
 export class Workspaces {
   private static reducerName = '[Workspaces]';
@@ -46,7 +46,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACES_SUCCESS = `${Workspaces.reducerName} Fetch workspaces success`;
-  private static fetchWorkspacesSuccess(workspacesTable: IWorkspacesTable, payload): IWorkspacesTable {
+  private static fetchWorkspacesSuccess(workspacesTable: IWorkspacesTable, payload: JsMap<IWorkspaceBackend>): IWorkspacesTable {
     return {
       ...mergeInto(workspacesTable, payload, workspaceRowFactory()),
       ...<IWorkspacesTable>{
@@ -81,7 +81,7 @@ export class Workspaces {
   public static POST_WORKSPACE_SUCCESS = `${Workspaces.reducerName} Post workspace success`;
   private static postWorkspaceSuccess(
     workspacesTable: IWorkspacesTable,
-    payload: { id: string, name: string, users: string[] }): IWorkspacesTable {
+    payload: IWorkspaceBackend): IWorkspacesTable {
     return {
       ...putById(workspacesTable, payload.id, payload, workspaceRowFactory()),
       ...<IWorkspacesTable>{
@@ -119,7 +119,7 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_SUCCESS = `${Workspaces.reducerName} Fetch workspace success`;
-  private static fetchWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload): IWorkspacesTable {
+  private static fetchWorkspaceSuccess(workspacesTable: IWorkspacesTable, payload: IWorkspaceBackend): IWorkspacesTable {
     return {
       ...(workspacesTable.byId[payload.id] ?
         updateById(workspacesTable, payload.id, payload)
@@ -139,7 +139,10 @@ export class Workspaces {
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE_DETAILS_SUCCESS = `${Workspaces.reducerName} Fetch workspace details success`;
-  private static fetchWorkspaceDetailsSuccess(workspacesTable: IWorkspacesTable, payload): IWorkspacesTable {
+  private static fetchWorkspaceDetailsSuccess(
+    workspacesTable: IWorkspacesTable,
+    payload: { id: string, data: IWorkspaceBackendDetails }
+  ): IWorkspacesTable {
     return updateById(workspacesTable, payload.id, { ...payload.data, isFetchingDetails: false });
   }
 

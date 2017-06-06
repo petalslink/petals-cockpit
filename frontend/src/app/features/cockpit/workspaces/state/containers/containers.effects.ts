@@ -27,8 +27,8 @@ import { environment } from './../../../../../../environments/environment';
 import { Containers } from './containers.reducer';
 import { ContainersService } from './../../../../../shared/services/containers.service';
 import { IStore } from 'app/shared/interfaces/store.interface';
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
+import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 
 @Injectable()
 export class ContainersEffects {

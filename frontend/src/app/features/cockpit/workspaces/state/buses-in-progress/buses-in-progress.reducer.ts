@@ -17,13 +17,10 @@
 
 import { Action } from '@ngrx/store';
 
-import { IBusesInProgressTable, busesInProgressTableFactory } from './buses-in-progress.interface';
+import { IBusInProgressBackend } from 'app/shared/services/buses.service';
+import { IBusesInProgressTable, busesInProgressTableFactory, busInProgressRowFactory } from './buses-in-progress.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { putAll, updateById, removeById, mergeOnly, JsMap } from 'app/shared/helpers/map.helper';
-import {
-  busInProgressRowFactory,
-  IBusInProgressBackend
-} from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 
 export class BusesInProgress {
   private static reducerName = '[Buses In Prog]';

@@ -18,6 +18,8 @@
 export const CORRECT_SETUP_TOKEN = 'CORRECT_SETUP_TOKEN';
 export const GONE_SETUP_TOKEN = 'GONE_SETUP_TOKEN';
 
+export const IMPORT_HTTP_ERROR_IP = 'IMPORT_HTTP_ERROR_IP';
+
 export const users = {
   admin: {
     id: 'admin',

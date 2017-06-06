@@ -26,10 +26,9 @@ import { Router } from '@angular/router';
 import { Workspaces } from '../workspaces/state/workspaces/workspaces.reducer';
 import { IStore } from '../../../shared/interfaces/store.interface';
 import { getWorkspacesList } from '../workspaces/state/workspaces/workspaces.selectors';
-import { IWorkspaces } from '../workspaces/state/workspaces/workspaces.interface';
-import { IWorkspace } from '../workspaces/state/workspaces/workspace.interface';
+import { IWorkspaces, IWorkspace } from '../workspaces/state/workspaces/workspaces.interface';
 import { Ui } from './../../../shared/state/ui.reducer';
-import { IUser, ICurrentUser } from './../../../shared/interfaces/user.interface';
+import { IUser, ICurrentUser } from './../../../shared/interfaces/users.interface';
 import { getCurrentUser } from './../../../shared/state/users.selectors';
 
 @Component({

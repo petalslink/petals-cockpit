@@ -17,18 +17,14 @@
 
 import { Action } from '@ngrx/store';
 
-import { IContainersTable, containersTableFactory } from './containers.interface';
+import { IContainerBackendSSE, IContainerBackendDetails } from 'app/shared/services/containers.service';
+import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
+import { IContainersTable, containersTableFactory, containerRowFactory } from './containers.interface';
+import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { Components } from '../components/components.reducer';
-import { putAll, updateById, mergeOnly, JsMap } from 'app/shared/helpers/map.helper';
-import {
-  containerRowFactory,
-  IContainerBackendSSE,
-  IContainerBackendDetails
-} from 'app/features/cockpit/workspaces/state/containers/container.interface';
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/component.interface';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
-import { IServiceAssemblyBackendSSE } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { putAll, updateById, mergeOnly, JsMap } from 'app/shared/helpers/map.helper';
 
 export class Containers {
   private static reducerName = '[Containers]';

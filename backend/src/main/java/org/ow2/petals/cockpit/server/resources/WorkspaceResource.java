@@ -65,6 +65,7 @@ import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployComponent;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployServiceAssembly;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
@@ -468,6 +469,10 @@ public class WorkspaceResource {
         @JsonInclude(Include.NON_EMPTY)
         public final String importError;
 
+        public BusInProgress(BusesRecord bDb) {
+            this(bDb.getId(), bDb.getImportIp(), bDb.getImportPort(), bDb.getImportUsername(), bDb.getImportError());
+        }
+
         @JsonCreator
         private BusInProgress(@JsonProperty("id") String id, @JsonProperty("ip") String ip,
                 @JsonProperty("port") int port, @JsonProperty("username") String username,
@@ -475,11 +480,7 @@ public class WorkspaceResource {
             this(Long.valueOf(id), ip, port, username, importError);
         }
 
-        public BusInProgress(long id, String ip, int port, String username) {
-            this(id, ip, port, username, null);
-        }
-
-        public BusInProgress(long id, String ip, int port, String username, @Nullable String importError) {
+        private BusInProgress(long id, String ip, int port, String username, @Nullable String importError) {
             this.id = id;
             this.ip = ip;
             this.port = port;
@@ -586,7 +587,7 @@ public class WorkspaceResource {
             // jackson will inject values itself (because of @JsonUnwrapped)
             this.users = ImmutableMap.of();
             this.content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
-                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
+                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
             this.workspace = new WorkspaceOverview(0, "", ImmutableList.of(), "");
         }
     }

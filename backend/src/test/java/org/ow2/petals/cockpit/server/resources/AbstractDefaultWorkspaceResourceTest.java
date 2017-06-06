@@ -24,6 +24,7 @@ import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
+import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
@@ -31,6 +32,7 @@ import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import javaslang.Tuple;
 
@@ -51,7 +53,12 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractCockp
     protected final Container container3 = new Container("cont3", "host3", ImmutableMap.of(PortType.JMX, containerPort),
             "user", "pass", State.UNREACHABLE);
 
+    protected final SharedLibrary sharedLibrary = new SharedLibrary("sl", "1.0.0");
+
     protected final Component component = new Component("comp", ComponentType.SE, ArtifactState.State.STARTED);
+
+    protected final Component componentWithSL = new Component("compSL", ComponentType.SE, ArtifactState.State.STARTED,
+            ImmutableSet.of(sharedLibrary.copy()));
 
     protected final ServiceUnit serviceUnit = new ServiceUnit("su", component.getName());
 
@@ -67,8 +74,10 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractCockp
 
     protected final ServiceUnit fServiceUnit = new ServiceUnit("su2", "comp2");
 
-    protected final ServiceAssembly fServiceAssembly = new ServiceAssembly("", ArtifactState.State.STARTED,
+    protected final ServiceAssembly fServiceAssembly = new ServiceAssembly("sa2", ArtifactState.State.STARTED,
             fServiceUnit);
+
+    protected final SharedLibrary fSharedLibrary = new SharedLibrary("sl2", "1.0.0");
 
     public AbstractDefaultWorkspaceResourceTest(Class<?>... ressources) {
         super(ressources);
@@ -83,7 +92,9 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractCockp
         resource.petals.registerContainer(container2);
         resource.petals.registerContainer(container3);
         resource.petals.registerArtifact(component, container1);
+        resource.petals.registerArtifact(componentWithSL, container1);
         resource.petals.registerArtifact(serviceAssembly, container1);
+        resource.petals.registerArtifact(sharedLibrary, container1);
 
         resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
 
@@ -91,6 +102,7 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractCockp
         fDomain.addContainers(fContainer);
         fContainer.addComponent(fComponent);
         fContainer.addServiceAssembly(fServiceAssembly);
+        fContainer.addSharedLibrary(fSharedLibrary);
         setupWorkspace(2, "test2", Arrays.asList(Tuple.of(fDomain, "passphrase")), "anotheruser");
 
         // test workspace

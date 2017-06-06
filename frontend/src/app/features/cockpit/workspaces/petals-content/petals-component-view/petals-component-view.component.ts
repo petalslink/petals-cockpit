@@ -24,8 +24,9 @@ import { Subject } from 'rxjs/Subject';
 import { Components } from '../../state/components/components.reducer';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Ui } from '../../../../../shared/state/ui.reducer';
-import { IComponentRow } from '../../state/components/component.interface';
-import { getCurrentComponent } from '../../state/components/components.selectors';
+import { IComponentRow } from '../../state/components/components.interface';
+import { getCurrentComponent, getCurrentComponentSharedLibraries } from '../../state/components/components.selectors';
+import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 
 @Component({
   selector: 'app-petals-component-view',
@@ -36,6 +37,7 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   public component$: Observable<IComponentRow>;
+  public sharedLibraries$: Observable<ISharedLibraryRow[]>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
 
@@ -52,6 +54,7 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
       .subscribe();
 
     this.component$ = this.store$.let(getCurrentComponent);
+    this.sharedLibraries$ = this.store$.let(getCurrentComponentSharedLibraries);
   }
 
   ngOnDestroy() {

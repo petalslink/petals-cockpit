@@ -19,17 +19,17 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
+import { NotificationsService } from 'angular2-notifications';
 
-import { BusesServiceImpl } from './buses.service';
+import { BusesServiceImpl, IBusImport } from './buses.service';
 import { IStore } from './../interfaces/store.interface';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from 'app/shared/services/sse.service.mock';
-import { NotificationsService } from 'angular2-notifications';
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 import { busesService } from './../../../mocks/buses-mock';
-import { workspacesService, IMPORT_HTTP_ERROR_IP } from '../../../mocks/workspaces-mock';
-import { IBusImport } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
+import { workspacesService } from '../../../mocks/workspaces-mock';
+import { IMPORT_HTTP_ERROR_IP } from '../../../mocks/backend-mock';
 import { UsersService } from 'app/shared/services/users.service';
 import { UsersMockService } from 'app/shared/services/users.service.mock';
 

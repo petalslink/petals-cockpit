@@ -17,9 +17,9 @@
 
 import { Action } from '@ngrx/store';
 
-import { IUsersTable, usersTableFactory } from '../interfaces/users.interface';
 import { putById, updateById, mergeInto, JsMap } from 'app/shared/helpers/map.helper';
-import { userRowFactory, IUserBackend } from 'app/shared/interfaces/user.interface';
+import { IUsersTable, usersTableFactory, userRowFactory } from 'app/shared/interfaces/users.interface';
+import { IUserBackend } from 'app/shared/services/users.service';
 
 export class Users {
   private static reducerName = '[Users]';

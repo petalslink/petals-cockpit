@@ -26,9 +26,31 @@ import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/interfaces/store.interface';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
 import { toJavascriptMap } from 'app/shared/helpers/map.helper';
-import { IComponentBackendSSE } from 'app/features/cockpit/workspaces/state/components/component.interface';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.reducer';
+import { IComponentBackendSSE } from 'app/shared/services/components.service';
+
+export interface IContainerBackendSSECommon {
+  id: string;
+  name: string;
+  busId: string;
+}
+
+export interface IContainerBackendDetailsCommon {
+  ip: string;
+  port: number;
+  systemInfo: string;
+}
+
+export interface IContainerBackendSSE extends IContainerBackendSSECommon {
+  components: string[];
+  serviceAssemblies: string[];
+  sharedLibraries: string[];
+}
+
+export interface IContainerBackendDetails extends IContainerBackendDetailsCommon {
+  reachabilities: string[];
+}
 
 export abstract class ContainersService {
   abstract getDetailsContainer(containerId: string): Observable<Response>;

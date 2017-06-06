@@ -31,14 +31,46 @@ import { Components } from './../../features/cockpit/workspaces/state/components
 import { Containers } from './../../features/cockpit/workspaces/state/containers/containers.reducer';
 import { environment } from './../../../environments/environment';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { IBusImport, IBusInProgressBackend } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
-import { IBusBackendSSE } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
-import { IContainerBackendSSE } from 'app/features/cockpit/workspaces/state/containers/container.interface';
-import { IServiceUnitBackendSSE } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
-import { IComponentBackendSSE } from 'app/features/cockpit/workspaces/state/components/component.interface';
+import { IContainerBackendSSE } from 'app/shared/services/containers.service';
+import { IComponentBackendSSE } from 'app/shared/services/components.service';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { toJavascriptMap } from 'app/shared/helpers/map.helper';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
+import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
 
+export interface IBusBackendSSECommon {
+  id: string;
+  name: string;
+  workspaceId: string;
+}
+
+export interface IBusBackendDetailsCommon { }
+
+export interface IBusBackendSSE extends IBusBackendSSECommon {
+  containers: string[];
+}
+
+export interface IBusInProgressBackendCommon {
+  id: string;
+  username: string;
+  port: number;
+  ip: string;
+  importError: string;
+}
+
+// used when we import a bus
+export interface IBusImport {
+  port: number;
+  ip: string;
+  username: string;
+  password: string;
+  passphrase: string;
+}
+
+export interface IBusInProgressBackend extends IBusInProgressBackendCommon { }
+
+export interface IBusBackendDetails extends IBusBackendDetailsCommon { }
 
 export abstract class BusesService {
   abstract postBus(idWorkspace: string, bus: IBusImport): Observable<Response>;
@@ -129,7 +161,8 @@ export class BusesServiceImpl extends BusesService {
             payload: toJavascriptMap<IComponentBackendSSE>(data.serviceAssemblies)
           },
           { type: Components.ADD_COMPONENTS_SUCCESS, payload: toJavascriptMap<IComponentBackendSSE>(data.components) },
-          { type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits) }
+          { type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits) },
+          { type: SharedLibraries.ADDED, payload: toJavascriptMap<ISharedLibraryBackendSSE>(data.sharedLibraries) }
         ]));
       });
   }

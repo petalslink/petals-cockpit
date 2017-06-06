@@ -23,7 +23,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { Ui } from '../../../../shared/state/ui.reducer';
 import { IStore } from '../../../../shared/interfaces/store.interface';
-import { IWorkspace } from './../state/workspaces/workspace.interface';
+import { IWorkspace } from './../state/workspaces/workspaces.interface';
 import { getCurrentWorkspace } from '../../../cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 

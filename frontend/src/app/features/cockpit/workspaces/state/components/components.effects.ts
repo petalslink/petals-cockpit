@@ -25,9 +25,8 @@ import { NotificationsService } from 'angular2-notifications';
 
 import { environment } from './../../../../../../environments/environment';
 import { Components } from './components.reducer';
-import { ComponentsService } from './../../../../../shared/services/components.service';
+import { ComponentsService, ComponentState } from './../../../../../shared/services/components.service';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { ComponentState } from 'app/features/cockpit/workspaces/state/components/component.interface';
 
 @Injectable()
 export class ComponentsEffects {

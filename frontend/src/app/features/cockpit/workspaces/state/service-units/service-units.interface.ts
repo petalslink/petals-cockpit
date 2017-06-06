@@ -15,28 +15,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IServiceUnitRow, IServiceUnit } from './service-unit.interface';
+import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
+import { IComponentRowWithoutDetails } from 'app/features/cockpit/workspaces/state/components/components.interface';
+import {
+  IServiceUnitBackendSSE, IServiceUnitBackendDetails, IServiceUnitBackendSSECommon, IServiceUnitBackendDetailsCommon
+} from 'app/shared/services/service-units.service';
+
+export interface IServiceUnitUI {
+  // for UI
+  isFolded: boolean;
+  isUpdatingState: boolean;
+  errorChangeState: string;
+}
+
+export interface IServiceUnitRow extends IServiceUnitUI, IServiceUnitBackendSSE, IServiceUnitBackendDetails { }
+
+export interface IServiceUnitRowWithoutDetails extends IServiceUnitUI, IServiceUnitBackendSSE { }
+
+export interface IServiceUnit extends IServiceUnitUI, IServiceUnitBackendSSECommon, IServiceUnitBackendDetailsCommon { }
+
+export interface IServiceUnitAndComponent extends IServiceUnitRowWithoutDetails {
+  component: IComponentRowWithoutDetails;
+}
 
 interface IServiceUnitsCommon {
   selectedServiceUnitId: string;
   isFetchingDetails: boolean;
 }
 
-export interface IServiceUnitsTable extends IServiceUnitsCommon {
-  byId: { [key: string]: IServiceUnitRow };
-  allIds: string[];
-}
+export interface IServiceUnitsTable extends IServiceUnitsCommon, JsMap<IServiceUnitRow> { }
 
 export interface IServiceUnits extends IServiceUnitsCommon {
   list: IServiceUnit[];
 }
 
-export function serviceUnitsTableFactory(): IServiceUnitsTable {
+export function serviceUnitRowFactory(): IServiceUnitRow {
   return {
-    selectedServiceUnitId: '',
-    isFetchingDetails: false,
+    id: null,
+    name: null,
+    containerId: null,
+    componentId: null,
+    serviceAssemblyId: null,
 
-    byId: {},
-    allIds: []
+    isFolded: false,
+    isUpdatingState: false,
+    errorChangeState: ''
   };
+}
+
+export function serviceUnitsTableFactory(): IServiceUnitsTable {
+  return Object.assign({}, emptyJavascriptMap<IServiceUnitRow>(), {
+    selectedServiceUnitId: '',
+    isFetchingDetails: false
+  });
 }

@@ -27,7 +27,7 @@ import * as helper from './../helpers/mock.helper';
 import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/interfaces/store.interface';
-import { EServiceAssemblyState } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 
 @Injectable()
 export class ContainersMockService extends ContainersServiceImpl {

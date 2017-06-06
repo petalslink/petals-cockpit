@@ -17,10 +17,10 @@
 
 import { Action } from '@ngrx/store';
 
-import { IBusesTable, busesTableFactory } from './buses.interface';
+import { IBusBackendSSE, IBusBackendDetails } from 'app/shared/services/buses.service';
+import { IBusesTable, busesTableFactory, busRowFactory } from './buses.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { updateById, removeById, mergeOnly, putAll, JsMap } from 'app/shared/helpers/map.helper';
-import { busRowFactory, IBusBackendSSE, IBusBackendDetails } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
 
 export class Buses {
   private static reducerName = '[Buses]';

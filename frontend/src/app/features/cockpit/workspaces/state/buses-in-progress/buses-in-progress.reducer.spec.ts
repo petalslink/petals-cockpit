@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
+import { BusesInProgress } from './buses-in-progress.reducer';
+import { busesInProgressTableFactory } from './buses-in-progress.interface';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { busesInProgressTableFactory } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 
 describe(`Buses in progress reducer`, () => {
   it(`should have a default value`, () => {

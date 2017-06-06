@@ -25,8 +25,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { IStore } from 'app/shared/interfaces/store.interface';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
-import { UsersService } from 'app/shared/services/users.service';
-import { IUserSetup } from 'app/shared/interfaces/user.interface';
+import { UsersService, IUserSetup } from 'app/shared/services/users.service';
 
 @Component({
   selector: 'app-setup',

@@ -26,14 +26,52 @@ import { environment } from './../../../environments/environment';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { IStore } from '../interfaces/store.interface';
 import { Components } from '../../features/cockpit/workspaces/state/components/components.reducer';
-import { EComponentState, ComponentState } from '../../features/cockpit/workspaces/state/components/component.interface';
 import { toJavascriptMap } from 'app/shared/helpers/map.helper';
-import { IServiceUnitBackendSSE } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.reducer';
-import { IServiceAssemblyBackendSSE } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
+import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+
+// http://stackoverflow.com/a/41631732/2398593
+export const EComponentState = {
+  Started: 'Started' as 'Started',
+  Stopped: 'Stopped' as 'Stopped',
+  Loaded: 'Loaded' as 'Loaded',
+  Unloaded: 'Unloaded' as 'Unloaded',
+  Shutdown: 'Shutdown' as 'Shutdown',
+  Unknown: 'Unknown' as 'Unknown'
+};
+
+export type ComponentState = keyof typeof EComponentState;
+
+export const EComponentType = {
+  BC: 'BC' as 'BC',
+  SE: 'SE' as 'SE'
+};
+
+export type ComponentType = keyof typeof EComponentType;
+
+export interface IComponentBackendSSECommon {
+  id: string;
+  name: string;
+  state: ComponentState;
+  type: ComponentType;
+  containerId: string;
+}
+
+export interface IComponentBackendDetailsCommon {
+  parameters: { [key: string]: string };
+}
+
+export interface IComponentBackendSSE extends IComponentBackendSSECommon {
+  // from server (sse)
+  serviceUnits: string[];
+  sharedLibraries: string[];
+}
+
+export interface IComponentBackendDetails extends IComponentBackendDetailsCommon { }
 
 export abstract class ComponentsService {
   abstract getDetailsComponent(componentId: string): Observable<Response>;

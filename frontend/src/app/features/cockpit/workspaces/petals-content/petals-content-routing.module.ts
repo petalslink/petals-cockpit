@@ -54,6 +54,11 @@ const routes: Routes = [
     path: 'service-units/:serviceUnitId',
     // tslint:disable-next-line:max-line-length
     loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-service-unit-view/petals-service-unit-view.module#PetalsServiceUnitViewModule'
+  },
+  {
+    path: 'shared-libraries/:sharedLibraryId',
+    // tslint:disable-next-line:max-line-length
+    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-shared-library-view/petals-shared-library-view.module#PetalsSharedLibraryViewModule'
   }
 ];
 

@@ -17,14 +17,23 @@
 
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
-import { Store } from '@ngrx/store';
-import { NotificationsService } from 'angular2-notifications';
 
 import { environment } from './../../../environments/environment';
-import { SseService } from './sse.service';
-import { IStore } from '../interfaces/store.interface';
+
+export interface IServiceUnitBackendSSECommon {
+  id: string;
+  name: string;
+  containerId: string;
+  componentId: string;
+  serviceAssemblyId: string;
+}
+
+export interface IServiceUnitBackendDetailsCommon { }
+
+export interface IServiceUnitBackendSSE extends IServiceUnitBackendSSECommon { }
+
+export interface IServiceUnitBackendDetails extends IServiceUnitBackendDetailsCommon { }
 
 export abstract class ServiceUnitsService {
   abstract getDetailsServiceUnit(serviceUnitId: string): Observable<Response>;
@@ -32,13 +41,7 @@ export abstract class ServiceUnitsService {
 
 @Injectable()
 export class ServiceUnitsServiceImpl extends ServiceUnitsService {
-  constructor(
-    private http: Http,
-    private router: Router,
-    private sseService: SseService,
-    private store$: Store<IStore>,
-    private notification: NotificationsService
-  ) {
+  constructor(private http: Http) {
     super();
   }
 

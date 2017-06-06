@@ -86,22 +86,26 @@ describe(`Petals container content`, () => {
         `SA 0`,
         `SA 1`,
         `SA 2`,
+        `SL 0`,
         `Comp 0`,
         `SU 0`,
         `SU 2`,
         `Comp 1`,
         `SU 1`,
         `SU 3`,
+        `Comp 2`,
         `Cont 1`,
         `SA 3`,
         `SA 4`,
         `SA 5`,
-        `Comp 2`,
+        `SL 1`,
+        `Comp 3`,
         `SU 4`,
         `SU 6`,
-        `Comp 3`,
+        `Comp 4`,
         `SU 5`,
-        `SU 7`
+        `SU 7`,
+        `Comp 5`,
       ];
 
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
@@ -119,24 +123,28 @@ describe(`Petals container content`, () => {
         `SA 0`,
         `SA 1`,
         `SA 2`,
+        `SL 0`,
         `Comp 0`,
         `SU 0`,
         `SU 2`,
         `Comp 1`,
         `SU 1`,
         `SU 3`,
+        `Comp 2`,
         // this one should have been deployed
         `component`,
         `Cont 1`,
         `SA 3`,
         `SA 4`,
         `SA 5`,
-        `Comp 2`,
+        `SL 1`,
+        `Comp 3`,
         `SU 4`,
         `SU 6`,
-        `Comp 3`,
+        `Comp 4`,
         `SU 5`,
-        `SU 7`
+        `SU 7`,
+        `Comp 5`,
       ];
 
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
@@ -200,22 +208,26 @@ describe(`Petals container content`, () => {
         `SA 0`,
         `SA 1`,
         `SA 2`,
+        `SL 0`,
         `Comp 0`,
         `SU 0`,
         `SU 2`,
         `Comp 1`,
         `SU 1`,
         `SU 3`,
+        `Comp 2`,
         `Cont 1`,
         `SA 3`,
         `SA 4`,
         `SA 5`,
-        `Comp 2`,
+        `SL 1`,
+        `Comp 3`,
         `SU 4`,
         `SU 6`,
-        `Comp 3`,
+        `Comp 4`,
         `SU 5`,
-        `SU 7`
+        `SU 7`,
+        `Comp 5`,
       ];
 
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
@@ -234,6 +246,7 @@ describe(`Petals container content`, () => {
         `SA 1`,
         `SA 2`,
         `SA 12`, // <-- added
+        `SL 0`,
         `Comp 0`,
         `SU 0`,
         `SU 2`,
@@ -242,16 +255,19 @@ describe(`Petals container content`, () => {
         `SU 1`,
         `SU 3`,
         `SU 17`, // <-- added
+        `Comp 2`,
         `Cont 1`,
         `SA 3`,
         `SA 4`,
         `SA 5`,
-        `Comp 2`,
+        `SL 1`,
+        `Comp 3`,
         `SU 4`,
         `SU 6`,
-        `Comp 3`,
+        `Comp 4`,
         `SU 5`,
-        `SU 7`
+        `SU 7`,
+        `Comp 5`,
       ];
 
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);

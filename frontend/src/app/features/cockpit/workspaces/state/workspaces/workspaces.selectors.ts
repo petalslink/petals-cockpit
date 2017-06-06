@@ -18,11 +18,10 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IWorkspaces } from './workspaces.interface';
+import { IWorkspaces, IWorkspace } from './workspaces.interface';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { IWorkspace } from './workspace.interface';
 import { escapeStringRegexp, arrayEquals, tuple } from '../../../../../shared/helpers/shared.helper';
-import { IUser } from '../../../../../shared/interfaces/user.interface';
+import { IUser } from '../../../../../shared/interfaces/users.interface';
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 
 export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspaces> {
@@ -74,12 +73,13 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
       state.containers,
       state.components,
       state.serviceAssemblies,
-      state.serviceUnits
+      state.serviceUnits,
+      state.sharedLibraries
     ]))
     // as the object has a new reference every time,
     // use distinctUntilChanged for performance
     .distinctUntilChanged(arrayEquals)
-    .map(([workspaces, users, buses, containers, components, serviceAssemblies, serviceUnits]) => {
+    .map(([workspaces, users, buses, containers, components, serviceAssemblies, serviceUnits, sharedLibraries]) => {
       const workspace = workspaces.byId[workspaces.selectedWorkspaceId];
       return {
         id: workspace.id,
@@ -184,6 +184,22 @@ export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspa
                           errorChangeState: serviceAssembly.errorChangeState
                         };
                       })
+                    },
+                    sharedLibraries: {
+                      selectedSharedLibraryId: sharedLibraries.selectedSharedLibraryId,
+                      isFetchingDetails: sharedLibraries.isFetchingDetails,
+
+                      list: container.sharedLibraries.map(id => {
+                        const sl = sharedLibraries.byId[id];
+                        return {
+                          id: sl.id,
+                          name: sl.name,
+                          version: sl.version,
+                          containerId: sl.containerId,
+
+                          isFolded: sl.isFolded
+                        };
+                      })
                     }
                   };
                 })
@@ -202,7 +218,7 @@ export function getCurrentWorkspace() {
 // -----------------------------------------------------------
 
 export enum WorkspaceElementType {
-  BUS, CONTAINER, COMPONENT, SERVICEASSEMBLY, SERVICEUNIT
+  BUS, CONTAINER, COMPONENT, SERVICEASSEMBLY, SERVICEUNIT, SHAREDLIBRARY
 }
 
 export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
@@ -239,6 +255,15 @@ export function _getCurrentTree(store$: Store<IStore>): Observable<WorkspaceElem
               link: `${baseUrl}/service-assemblies/${serviceAssembly.id}`,
               isFolded: serviceAssembly.isFolded,
               cssClass: `workspace-element-type-service-assembly`,
+              children: []
+            })),
+            ...container.sharedLibraries.list.map<WorkspaceElement>(sl => ({
+              id: sl.id,
+              type: WorkspaceElementType.SHAREDLIBRARY,
+              name: sl.name,
+              link: `${baseUrl}/shared-libraries/${sl.id}`,
+              isFolded: sl.isFolded,
+              cssClass: `workspace-element-type-shared-library`,
               children: []
             })),
             ...container.components.list.map<WorkspaceElement>(component => ({

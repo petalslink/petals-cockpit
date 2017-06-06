@@ -17,16 +17,13 @@
 
 import { omit, flatMap, assign } from 'lodash';
 
-import { IBusImport } from './../app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
 import { Bus, BusInProgress, busesService, busesInProgressService } from './buses-mock';
 import { users } from './backend-mock';
+import { IBusImport } from 'app/shared/services/buses.service';
 
 function toObj<A>(arr: { toObj: () => A }[]): A {
   return assign.apply({}, arr.map(c => c.toObj()));
 }
-
-// used in buses.service.mock
-export const IMPORT_HTTP_ERROR_IP = 'IMPORT_HTTP_ERROR_IP';
 
 // buses that can be imported
 export const validContainers = [
@@ -112,13 +109,15 @@ export class Workspace {
       const components = flatMap(containers, c => c.getComponents());
       const serviceAssemblies = flatMap(containers, c => c.getServiceAssemblies());
       const serviceUnits = flatMap(components, c => c.getServiceUnits());
+      const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
       const eventData = {
         buses: bus.toObj(),
         containers: toObj(containers),
         components: toObj(components),
         serviceAssemblies: toObj(serviceAssemblies),
-        serviceUnits: toObj(serviceUnits)
+        serviceUnits: toObj(serviceUnits),
+        sharedLibraries: toObj(sharedLibraries)
       };
 
       return {
@@ -233,6 +232,7 @@ export class Workspaces {
     const components = flatMap(containers, c => c.getComponents());
     const serviceAssemblies = flatMap(containers, c => c.getServiceAssemblies());
     const serviceUnits = flatMap(components, c => c.getServiceUnits());
+    const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
     const composedWks = {
       workspace: newWorkspace.toObj(),
@@ -242,7 +242,8 @@ export class Workspaces {
       containers: toObj(containers),
       components: toObj(components),
       serviceAssemblies: toObj(serviceAssemblies),
-      serviceUnits: toObj(serviceUnits)
+      serviceUnits: toObj(serviceUnits),
+      sharedLibraries: toObj(sharedLibraries)
     };
 
     this.memoizedWorkspaces.set(newWorkspace.id, { wks: newWorkspace, composedWks });

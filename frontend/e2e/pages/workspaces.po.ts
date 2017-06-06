@@ -26,7 +26,7 @@ export class WorkspacesPage {
   public static readonly component = $(`app-workspaces-dialog`);
 
   public readonly component = WorkspacesPage.component;
-  public readonly workspacesCard = this.component.$(`app-workspaces-dialog md-card.card-workspaces`);
+  public readonly workspacesCard = this.component.$(`md-card.card-workspaces`);
   public readonly workspacesCards = this.workspacesCard.$$('div.card-workspace');
 
   public readonly inputName = this.component.$(`input[formControlName="name"]`);
@@ -43,7 +43,7 @@ export class WorkspacesPage {
   private constructor() { }
 
   selectWorkspace(index: number, expectedName?: Matcher) {
-    this.workspacesCards.get(index).click();
+    this.workspacesCard.$$('div.card-workspace md-card-title').get(index).click();
 
     return WorkspaceOverviewPage.waitAndGet(expectedName);
   }

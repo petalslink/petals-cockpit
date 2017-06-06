@@ -17,8 +17,8 @@
 
 import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 
-import { IBusRow } from '../../../state/buses/bus.interface';
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
+import { IBusRow } from '../../../state/buses/buses.interface';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 
 @Component({
   selector: 'app-petals-bus-overview',

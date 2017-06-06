@@ -17,20 +17,15 @@
 
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
-import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
 
 import { ServiceUnitsServiceImpl } from './service-units.service';
 import { serviceUnitsService } from 'mocks/service-units-mock';
 import * as helper from './../helpers/mock.helper';
-import { SseService } from './sse.service';
-import { IStore } from '../interfaces/store.interface';
-import { NotificationsService } from 'angular2-notifications';
 
 @Injectable()
 export class ServiceUnitsMockService extends ServiceUnitsServiceImpl {
-  constructor(http: Http, router: Router, private pSseService: SseService, store$: Store<IStore>, notification: NotificationsService) {
-    super(http, router, pSseService, store$, notification);
+  constructor(http: Http) {
+    super(http);
   }
 
   getDetailsServiceUnit(serviceUnitId: string) {

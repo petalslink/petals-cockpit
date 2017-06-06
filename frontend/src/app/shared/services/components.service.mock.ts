@@ -23,12 +23,11 @@ import { NotificationsService } from 'angular2-notifications';
 
 import { componentsService } from '../../../mocks/components-mock';
 import * as helper from './../helpers/mock.helper';
-import { ComponentsServiceImpl } from './components.service';
+import { ComponentsServiceImpl, ComponentState } from './components.service';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { IStore } from '../interfaces/store.interface';
 import { SseServiceMock } from './sse.service.mock';
 import { environment } from '../../../environments/environment';
-import { ComponentState } from 'app/features/cockpit/workspaces/state/components/component.interface';
 
 @Injectable()
 export class ComponentsMockService extends ComponentsServiceImpl {

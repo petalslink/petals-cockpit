@@ -22,9 +22,10 @@ import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import { NotificationsService } from 'angular2-notifications';
 
 import { Workspaces } from './workspaces.reducer';
-import { WorkspacesService } from './../../../../../shared/services/workspaces.service';
+import { WorkspacesService, IWorkspaceBackend } from './../../../../../shared/services/workspaces.service';
 import { Users } from '../../../../../shared/state/users.reducer';
 import { environment } from '../../../../../../environments/environment';
 import { Buses } from '../buses/buses.reducer';
@@ -34,23 +35,18 @@ import { ServiceUnits } from '../service-units/service-units.reducer';
 import { Ui } from '../../../../../shared/state/ui.reducer';
 import { BusesInProgress } from '../buses-in-progress/buses-in-progress.reducer';
 import { SseService, SseWorkspaceEvent } from './../../../../../shared/services/sse.service';
-import { BusesService } from './../../../../../shared/services/buses.service';
-import { NotificationsService } from 'angular2-notifications';
-import { ComponentsService } from '../../../../../shared/services/components.service';
+import { BusesService, IBusInProgressBackend, IBusBackendSSE } from './../../../../../shared/services/buses.service';
+import { ComponentsService, IComponentBackendSSE } from '../../../../../shared/services/components.service';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { IStore } from 'app/shared/interfaces/store.interface';
-import { IWorkspaceRow } from 'app/features/cockpit/workspaces/state/workspaces/workspace.interface';
-import { IUserRow, IUserBackend } from 'app/shared/interfaces/user.interface';
-import { IBusInProgressBackend } from 'app/features/cockpit/workspaces/state/buses-in-progress/bus-in-progress.interface';
-import { IBusBackendSSE } from 'app/features/cockpit/workspaces/state/buses/bus.interface';
-import { IContainerBackendSSE } from 'app/features/cockpit/workspaces/state/containers/container.interface';
-import { IComponentBackendSSE } from 'app/features/cockpit/workspaces/state/components/component.interface';
-import { IServiceUnitBackendSSE } from 'app/features/cockpit/workspaces/state/service-units/service-unit.interface';
-import { ContainersService } from 'app/shared/services/containers.service';
+import { ContainersService, IContainerBackendSSE } from 'app/shared/services/containers.service';
 import { toJavascriptMap } from 'app/shared/helpers/map.helper';
-import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
+import { ServiceAssembliesService, IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
-import { IServiceAssemblyBackendSSE } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+import { IUserBackendCommon } from 'app/shared/services/users.service';
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
+import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
 
 @Injectable()
 export class WorkspacesEffects {
@@ -74,8 +70,8 @@ export class WorkspacesEffects {
       .switchMap((res: Response) => {
         const data = res.json();
         return Observable.of(batchActions([
-          { type: Workspaces.FETCH_WORKSPACES_SUCCESS, payload: toJavascriptMap<IWorkspaceRow>(data.workspaces) },
-          { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap<IUserRow>(data.users) }
+          { type: Workspaces.FETCH_WORKSPACES_SUCCESS, payload: toJavascriptMap<IWorkspaceBackend>(data.workspaces) },
+          { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap<IUserBackendCommon>(data.users) }
         ]));
       })
       .catch(err => {
@@ -174,7 +170,7 @@ export class WorkspacesEffects {
         return Observable.of(batchActions([
           { type: Workspaces.CLEAN_WORKSPACE },
           { type: Workspaces.FETCH_WORKSPACE_SUCCESS, payload: data.workspace },
-          { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap<IUserBackend>(data.users) },
+          { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap<IUserBackendCommon>(data.users) },
           { type: BusesInProgress.FETCH_BUSES_IN_PROGRESS, payload: toJavascriptMap<IBusInProgressBackend>(data.busesInProgress) },
           { type: Buses.FETCH_BUSES_SUCCESS, payload: toJavascriptMap<IBusBackendSSE>(data.buses) },
           { type: Containers.FETCH_CONTAINERS_SUCCESS, payload: toJavascriptMap<IContainerBackendSSE>(data.containers) },
@@ -184,6 +180,10 @@ export class WorkspacesEffects {
             payload: toJavascriptMap<IServiceAssemblyBackendSSE>(data.serviceAssemblies)
           },
           { type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits) },
+          {
+            type: SharedLibraries.FETCHED,
+            payload: toJavascriptMap<ISharedLibraryBackendSSE>(data.sharedLibraries)
+          },
           { type: Ui.OPEN_SIDENAV },
           { type: Ui.CLOSE_POPUP_WORKSPACES_LIST }
         ]));
@@ -199,7 +199,7 @@ export class WorkspacesEffects {
           const data = res.json();
           return batchActions([
             { type: Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS, payload: { id: action.payload, data: data.workspace } },
-            { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap<IUserRow>(data.users) },
+            { type: Users.FETCH_USERS_SUCCESS, payload: toJavascriptMap<IUserBackendCommon>(data.users) },
           ]);
         })
         .catch((err) => {

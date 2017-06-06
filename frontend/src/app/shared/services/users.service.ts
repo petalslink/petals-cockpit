@@ -20,7 +20,27 @@ import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
-import { IUserLogin, IUserSetup } from './../interfaces/user.interface';
+
+export interface IUserBackendCommon {
+  // from server
+  id: string;
+  name: string;
+}
+
+export interface IUserBackend extends IUserBackendCommon {
+  // from server (actually only present for current user)
+  lastWorkspace: string;
+}
+
+export interface IUserLogin {
+  username: string;
+  password: string;
+}
+
+export interface IUserSetup extends IUserLogin {
+  token: string;
+  name: string;
+}
 
 export abstract class UsersService {
   abstract connectUser(user: IUserLogin): Observable<Response>;

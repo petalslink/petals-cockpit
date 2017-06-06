@@ -20,6 +20,7 @@ import { browser, ExpectedConditions as EC, $, by } from 'protractor';
 import { urlToMatch } from '../utils';
 import { waitTimeout } from '../common';
 import { UploadComponentPage } from './upload-component.po';
+import { SharedLibraryOverviewPage } from './shared-library.po';
 
 export abstract class ComponentPage {
 
@@ -46,6 +47,7 @@ export class ComponentOverviewPage extends ComponentPage {
   public readonly overview = ComponentOverviewPage.overview;
   public readonly state = this.overview.$(`md-card .component-state`);
   public readonly type = this.overview.$(`md-card .component-type`);
+  public readonly sharedLibraries = this.overview.$$(`md-card.shared-libraries ul > li`);
 
   static waitAndGet() {
     super.wait();
@@ -55,6 +57,15 @@ export class ComponentOverviewPage extends ComponentPage {
 
   private constructor() {
     super();
+  }
+
+  openSharedLibrary(identifier: string | number) {
+    if (typeof identifier === 'string') {
+      this.overview.element(by.cssContainingText(`md-card.shared-libraries ul > li a`, identifier)).click();
+    } else {
+      this.overview.$$('md-card.shared-libraries ul > li a').get(identifier).click();
+    }
+    return SharedLibraryOverviewPage.waitAndGet();
   }
 }
 

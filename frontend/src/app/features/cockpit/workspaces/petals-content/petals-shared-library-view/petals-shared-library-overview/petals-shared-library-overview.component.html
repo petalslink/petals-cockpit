@@ -1,0 +1,43 @@
+<!-- Copyright (C) 2017 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<div fxLayout="column" fxFill class="content content-max-width" fxLayoutWrap>
+  <div class="central-content">
+
+    <md-card class="shared-library-infos">
+      <md-card-title fxLayout="row">
+        <span fxFlex class="text-upper">About <b>{{ sharedLibrary.name }}</b></span>
+        <md-icon color="primary">info_outline</md-icon>
+      </md-card-title>
+    </md-card>
+
+    <md-card class="margin-top-x1 components">
+      <md-card-title fxLayout="row">
+        <span fxFlex class="text-upper">Components</span>
+        <md-icon color="primary">info_outline</md-icon>
+      </md-card-title>
+
+      <md-card-content>
+        <ul>
+          <li *ngFor="let component of components">
+            <a [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', component.id]" class="bold color-primary">{{ component.name }}</a>
+          </li>
+        </ul>
+        <span *ngIf="components.length === 0">This shared library is not used by any component</span>
+      </md-card-content>
+    </md-card>
+
+  </div>
+</div>

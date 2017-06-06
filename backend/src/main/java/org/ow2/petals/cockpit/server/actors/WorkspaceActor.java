@@ -24,6 +24,8 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES_COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
@@ -31,8 +33,10 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
@@ -51,6 +55,7 @@ import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
+import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.admin.api.artifact.lifecycle.ArtifactLifecycle;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.actors.CockpitActors.CockpitRequest;
@@ -60,6 +65,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecor
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
@@ -302,29 +308,25 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
     private BusInProgress handleImportBus(ImportBus bus) throws SuspendExecution, InterruptedException {
         final BusImport nb = bus.nb;
 
-        final long bId = db.runTransaction(conf -> {
+        final BusesRecord bDb = db.runTransaction(conf -> {
             BusesRecord br = new BusesRecord(null, wId, false, nb.ip, nb.port, nb.username, nb.password, nb.passphrase,
                     null, null);
             br.attach(conf);
             br.insert();
-
-            Long id = br.getId();
-            assert id != null;
-
-            return id;
+            return br;
         });
 
-        BusInProgress bip = new BusInProgress(bId, nb.ip, nb.port, nb.username);
+        BusInProgress bip = new BusInProgress(bDb);
 
         doInActorLoop(() -> broadcast(WorkspaceEvent.busImport(bip)));
 
         // we use a fiber to let the actor handles other message during bus import
-        importBusInFiber(nb, bId);
+        importBusInFiber(nb, bDb);
 
         return bip;
     }
 
-    private void importBusInFiber(final BusImport nb, final long bId) {
+    private void importBusInFiber(final BusImport nb, final BusesRecord bDb) {
         Fiber<?> importFiber = new Fiber<>(() -> {
             // this can be interrupted by Fiber.cancel: if it happens, the fiber will simply be stopped
             // and removed from the map by the delete handling
@@ -335,19 +337,20 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
             // so that the fiber terminate and can't be cancelled
             doInActorLoop(() -> {
                 // in any case we now remove it if it's there
-                Fiber<?> f = importsInProgress.remove(bId);
+                Fiber<?> f = importsInProgress.remove(bDb.getId());
 
                 // if it's null, it has been cancelled!
                 if (f != null) {
                     broadcast(db.runTransaction(conf -> {
                         return res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
-                            return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, wId, bId, topology));
+                            return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, bDb, topology));
                         }).fold(error -> {
-                            LOG.info("Can't import bus from container {}:{}: {}", nb.ip, nb.port, error);
-                            DSL.using(conf).update(BUSES).set(BUSES.IMPORT_ERROR, error).where(BUSES.ID.eq(bId))
-                                    .execute();
-                            return WorkspaceEvent
-                                    .busImportError(new BusInProgress(bId, nb.ip, nb.port, nb.username, error));
+                            LOG.info("Can't import bus from container {}:{}: {}", bDb.getImportIp(),
+                                    bDb.getImportPort(), error);
+                            bDb.setImportError(error);
+                            bDb.attach(conf);
+                            bDb.update();
+                            return WorkspaceEvent.busImportError(new BusInProgress(bDb));
                         }, WorkspaceEvent::busImportOk);
                     }));
                 }
@@ -355,7 +358,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         });
 
         // store it before starting to prevent race condition
-        importsInProgress.put(bId, importFiber);
+        importsInProgress.put(bDb.getId(), importFiber);
 
         importFiber.start();
     }
@@ -579,17 +582,14 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                             DSL.select(COMPONENTS.ID).from(COMPONENTS).where(
                                     COMPONENTS.NAME.eq(su.getTargetComponent()).and(COMPONENTS.CONTAINER_ID.eq(cId))))
                     .returning(SERVICEUNITS.ID, SERVICEUNITS.COMPONENT_ID).fetchOne();
-            long suId = inserted.get(SERVICEUNITS.ID);
-            long compId = inserted.get(SERVICEUNITS.COMPONENT_ID);
-            serviceUnitsDb.put(Long.toString(suId),
-                    new ServiceUnitFull(new ServiceUnitMin(suId, suDb.getName()), cId, compId, saDb.getId()));
+            suDb.from(inserted, SERVICEUNITS.ID, SERVICEUNITS.COMPONENT_ID);
+            serviceUnitsDb.put(Long.toString(suDb.getId()), new ServiceUnitFull(suDb));
         }
 
         WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                 ImmutableMap.of(),
-                ImmutableMap.of(Long.toString(saDb.getId()), new ServiceAssemblyFull(
-                        new ServiceAssemblyMin(saDb.getId(), saDb.getName()), cId, state, serviceUnitsDb.keySet())),
-                serviceUnitsDb);
+                ImmutableMap.of(Long.toString(saDb.getId()), new ServiceAssemblyFull(saDb, serviceUnitsDb.keySet())),
+                serviceUnitsDb, ImmutableMap.of());
 
         // we want the event to be sent after we answered
         doInActorLoop(() -> broadcast(WorkspaceEvent.saDeployed(res)));
@@ -617,13 +617,24 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
 
         ComponentsRecord compDb = new ComponentsRecord(null, cId, deployedComp.getName(), state.name(), type.name());
         compDb.attach(conf);
-        int suDbi = compDb.insert();
-        assert suDbi == 1;
+        int compDbi = compDb.insert();
+        assert compDbi == 1;
 
+        Set<String> sls = new HashSet<>();
+        for(SharedLibrary sl: deployedComp.getSharedLibraries()) {
+            SharedlibrariesComponentsRecord inserted = DSL.using(conf).insertInto(SHAREDLIBRARIES_COMPONENTS)
+                    .set(SHAREDLIBRARIES_COMPONENTS.COMPONENT_ID, compDb.getId())
+                    .set(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID,
+                            DSL.select(SHAREDLIBRARIES.ID).from(SHAREDLIBRARIES).where(
+                                    SHAREDLIBRARIES.NAME.eq(sl.getName()).and(SHAREDLIBRARIES.VERSION.eq(sl.getVersion()))
+                                    .and(SHAREDLIBRARIES.CONTAINER_ID.eq(cId))))
+                    .returning(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID).fetchOne();
+            sls.add(Long.toString(inserted.getSharedlibraryId()));
+        }
+        
         WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
-                ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(
-                        new ComponentMin(compDb.getId(), compDb.getName(), type), cId, state, ImmutableSet.of())),
-                ImmutableMap.of(), ImmutableMap.of());
+                ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(compDb, ImmutableSet.of(), sls)),
+                ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
 
         // we want the event to be sent after we answered
         doInActorLoop(() -> broadcast(WorkspaceEvent.componentDeployed(res)));

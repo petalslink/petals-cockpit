@@ -15,25 +15,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IBusRow, IBus } from './bus.interface';
+import { IContainers } from '../containers/containers.interface';
+import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
+import { IBusBackendSSE, IBusBackendDetails, IBusBackendSSECommon, IBusBackendDetailsCommon } from 'app/shared/services/buses.service';
+
+export interface IBusUI {
+  // for UI
+  isFolded: boolean;
+  isFetchingDetails: boolean;
+}
+
+// used within table
+export interface IBusRow extends IBusUI, IBusBackendSSE, IBusBackendDetails { }
+
+// used in generated views
+export interface IBus extends IBusUI, IBusBackendSSECommon, IBusBackendDetailsCommon {
+  containers: IContainers;
+}
 
 export interface IBusesCommon {
   selectedBusId: string;
 }
 
-export interface IBusesTable extends IBusesCommon {
-  byId: { [key: string]: IBusRow };
-  allIds: string[];
-}
+export interface IBusesTable extends IBusesCommon, JsMap<IBusRow> { }
 
 export interface IBuses extends IBusesCommon {
   list: IBus[];
 }
 
-export function busesTableFactory(): IBusesTable {
+export function busRowFactory(): IBusRow {
   return {
-    selectedBusId: '',
-    byId: {},
-    allIds: []
+    id: null,
+    name: null,
+    workspaceId: null,
+
+    isFolded: false,
+    isFetchingDetails: false,
+
+    containers: []
   };
+}
+
+export function busesTableFactory(): IBusesTable {
+  return Object.assign({}, emptyJavascriptMap<IBusRow>(), {
+    selectedBusId: ''
+  });
 }

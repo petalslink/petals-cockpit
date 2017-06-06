@@ -48,6 +48,7 @@ describe(`Components reducer`, () => {
                 'idSu2A',
                 'idSu3A'
               ],
+              sharedLibraries: [],
               id: 'idComp1',
               containerId: 'idCont0',
               state: 'Started',
@@ -68,6 +69,7 @@ describe(`Components reducer`, () => {
               'idSu2A',
               'idSu3A'
             ],
+            sharedLibraries: [],
             id: 'idComp1',
             containerId: 'idCont0',
             state: 'Started',
@@ -125,6 +127,9 @@ describe(`Components reducer`, () => {
                 'idSu2A',
                 'idSu3A'
               ],
+              sharedLibraries: [
+                'idSL1'
+              ],
               id: 'idComp1',
               containerId: 'idCont0',
               state: 'Started',
@@ -142,6 +147,9 @@ describe(`Components reducer`, () => {
             serviceUnits: [
               'idSu2A',
               'idSu3A'
+            ],
+            sharedLibraries: [
+              'idSL1'
             ],
             id: 'idComp1',
             containerId: 'idCont0',
@@ -256,6 +264,7 @@ describe(`Components reducer`, () => {
               'idSu4',
               'idSu5'
             ],
+            sharedLibraries: [],
             id: 'idComp2',
             containerId: 'idCont0',
             state: 'Started',
@@ -274,6 +283,7 @@ describe(`Components reducer`, () => {
               'idSu6',
               'idSu7'
             ],
+            sharedLibraries: [],
             id: 'idComp3',
             containerId: 'idCont0',
             state: 'Started',

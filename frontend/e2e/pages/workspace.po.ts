@@ -26,6 +26,7 @@ import { ContainerOverviewPage } from './container.po';
 import { ServiceUnitOverviewPage } from './service-unit.po';
 import { WorkspacesPage } from './workspaces.po';
 import { ServiceAssemblyOverviewPage } from './service-assembly.po';
+import { SharedLibraryOverviewPage } from './shared-library.po';
 
 export abstract class WorkspacePage {
 
@@ -107,6 +108,11 @@ export abstract class WorkspacePage {
     return ServiceUnitOverviewPage.waitAndGet();
   }
 
+  openSharedLibrary(identifier: string | number) {
+    this.treeElement(identifier, 'shared-library').click();
+    return SharedLibraryOverviewPage.waitAndGet();
+  }
+
   search(search: string) {
     const input = $(`input.search`);
     input.clear();
@@ -132,7 +138,7 @@ export class WorkspaceOverviewPage extends WorkspacePage {
   public readonly title = this.component.$(`md-toolbar-row .title`);
   public readonly deleteButton = this.component.$(`.btn-delete-wks`);
 
-  public readonly description = this.component.$(`md-card-content.workspace-description span`);
+  public readonly description = this.component.$(`md-card-content.workspace-description > span`);
   public readonly editButton = this.component.$(`.workspace-description button`);
   public readonly descriptionArea = this.component.$(`.workspace-description-edit textarea`);
   public readonly descriptionPreview = this.component.$(`.workspace-description-edit md-card-subtitle span.workspace-description-preview`);

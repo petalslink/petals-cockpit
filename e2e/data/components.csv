@@ -1,9 +1,13 @@
 id,container_id,name,state,type
 1,1,Comp 0,Started,BC
 2,1,Comp 1,Started,SE
-3,2,Comp 2,Started,BC
-4,2,Comp 3,Started,SE
-5,3,Comp 4,Started,BC
-6,3,Comp 5,Started,SE
-7,4,Comp 6,Started,BC
-8,4,Comp 7,Started,SE
+3,1,Comp 2,Started,SE
+4,2,Comp 3,Started,BC
+5,2,Comp 4,Started,SE
+6,2,Comp 5,Started,SE
+7,3,Comp 6,Started,BC
+8,3,Comp 7,Started,SE
+9,3,Comp 8,Started,SE
+10,4,Comp 9,Started,BC
+11,4,Comp 10,Started,SE
+12,4,Comp 11,Started,SE

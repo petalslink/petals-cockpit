@@ -25,6 +25,22 @@ import { SseService, SseWorkspaceEvent } from './sse.service';
 import { Workspaces } from './../../features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 import { environment } from './../../../environments/environment';
 
+export interface IWorkspaceBackendCommon {
+  id: string;
+  name: string;
+}
+
+export interface IWorkspaceBackendDetailsCommon {
+  description: string;
+}
+
+export interface IWorkspaceBackend extends IWorkspaceBackendCommon {
+  // from server (sse)
+  users: Array<string>;
+}
+
+export interface IWorkspaceBackendDetails extends IWorkspaceBackendDetailsCommon { }
+
 export abstract class WorkspacesService {
   abstract fetchWorkspaces(): Observable<Response>;
 

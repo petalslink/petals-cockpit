@@ -34,6 +34,7 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
+import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
@@ -210,9 +211,10 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
 
         assertThat(content.content.buses).hasSize(1);
         assertThat(content.content.containers).hasSize(3);
-        assertThat(content.content.components).hasSize(1);
+        assertThat(content.content.components).hasSize(2);
         assertThat(content.content.serviceAssemblies).hasSize(1);
         assertThat(content.content.serviceUnits).hasSize(1);
+        assertThat(content.content.sharedLibraries).hasSize(1);
 
         assertUsers(content.users);
 
@@ -231,7 +233,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(c1.container.id).isEqualTo(getId(container1));
         assertThat(c1.container.name).isEqualTo(container1.getContainerName());
         assertThat(c1.busId).isEqualTo(b.bus.id);
-        assertThat(c1.components).containsOnly(Long.toString(getId(component)));
+        assertThat(c1.components).containsOnly(Long.toString(getId(component)), Long.toString(getId(componentWithSL)));
         assertThat(c1.serviceAssemblies).containsOnly(Long.toString(getId(serviceAssembly)));
 
         ContainerFull c2 = content.content.containers.get(Long.toString(getId(container2)));
@@ -252,14 +254,25 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(c3.components).containsOnly();
         assertThat(c3.serviceAssemblies).containsOnly();
 
-        ComponentFull comp = content.content.components.get(Long.toString(getId(component)));
-        assert comp != null;
+        ComponentFull comp1 = content.content.components.get(Long.toString(getId(component)));
+        assert comp1 != null;
 
-        assertThat(comp.component.id).isEqualTo(getId(component));
-        assertThat(comp.component.name).isEqualTo(component.getName());
-        assertThat(comp.containerId).isEqualTo(c1.container.id);
-        assertThat(comp.state.toString()).isEqualTo(component.getState().toString());
-        assertThat(comp.serviceUnits).containsOnly(Long.toString(getId(serviceUnit)));
+        assertThat(comp1.component.id).isEqualTo(getId(component));
+        assertThat(comp1.component.name).isEqualTo(component.getName());
+        assertThat(comp1.containerId).isEqualTo(c1.container.id);
+        assertThat(comp1.state.toString()).isEqualTo(component.getState().toString());
+        assertThat(comp1.serviceUnits).containsOnly(Long.toString(getId(serviceUnit)));
+        assertThat(comp1.sharedLibraries).containsOnly();
+
+        ComponentFull comp2 = content.content.components.get(Long.toString(getId(componentWithSL)));
+        assert comp2 != null;
+
+        assertThat(comp2.component.id).isEqualTo(getId(componentWithSL));
+        assertThat(comp2.component.name).isEqualTo(componentWithSL.getName());
+        assertThat(comp2.containerId).isEqualTo(c1.container.id);
+        assertThat(comp2.state.toString()).isEqualTo(componentWithSL.getState().toString());
+        assertThat(comp2.serviceUnits).containsOnly();
+        assertThat(comp2.sharedLibraries).containsOnly(Long.toString(getId(sharedLibrary)));
 
         ServiceAssemblyFull sa = content.content.serviceAssemblies.get(Long.toString(getId(serviceAssembly)));
         assert sa != null;
@@ -276,7 +289,16 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(su.serviceUnit.id).isEqualTo(getId(serviceUnit));
         assertThat(su.serviceUnit.name).isEqualTo(serviceUnit.getName());
         assertThat(su.containerId).isEqualTo(c1.container.id);
-        assertThat(su.componentId).isEqualTo(comp.component.id);
+        assertThat(su.componentId).isEqualTo(comp1.component.id);
         assertThat(su.serviceAssemblyId).isEqualTo(sa.serviceAssembly.id);
+
+        SharedLibraryFull sl = content.content.sharedLibraries.get(Long.toString(getId(sharedLibrary)));
+        assert sl != null;
+
+        assertThat(sl.sharedLibrary.id).isEqualTo(getId(sharedLibrary));
+        assertThat(sl.sharedLibrary.name).isEqualTo(sharedLibrary.getName());
+        assertThat(sl.sharedLibrary.version).isEqualTo(sharedLibrary.getVersion());
+        assertThat(sl.components).containsOnly(Long.toString(getId(componentWithSL)));
+        assertThat(sl.containerId).isEqualTo(c1.container.id);
     }
 }

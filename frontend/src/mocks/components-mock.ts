@@ -15,14 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { ComponentState, IComponentBackendSSE, EComponentType, IComponentBackendDetails } from 'app/shared/services/components.service';
 import { ServiceUnit } from './service-units-mock';
 import { Container } from './containers-mock';
-import {
-  IComponentBackendSSE,
-  IComponentBackendDetails,
-  ComponentState,
-  EComponentType
-} from './../app/features/cockpit/workspaces/state/components/component.interface';
+import { SharedLibrary } from './shared-libraries-mock';
 
 export class Components {
   private readonly components = new Map<string, Component>();
@@ -48,6 +44,7 @@ export class Component {
   public readonly id: string;
   public readonly container: Container;
   private readonly serviceUnits = new Map<string, ServiceUnit>();
+  private readonly sharedLibraries = new Map<string, SharedLibrary>();
   public readonly name: string;
   public state: ComponentState;
   public parameters: { [key: string]: string };
@@ -68,8 +65,16 @@ export class Component {
     return Array.from(this.serviceUnits.values());
   }
 
-  addServiceUnit(serviceUnit: ServiceUnit) {
+  getSharedLibraries() {
+    return Array.from(this.sharedLibraries.values());
+  }
+
+  registerServiceUnit(serviceUnit: ServiceUnit) {
     this.serviceUnits.set(serviceUnit.id, serviceUnit);
+  }
+
+  registerSharedLibrary(sharedLibrary: SharedLibrary) {
+    this.sharedLibraries.set(sharedLibrary.id, sharedLibrary);
   }
 
   toObj(): { [id: string]: IComponentBackendSSE } {
@@ -80,7 +85,8 @@ export class Component {
         type: EComponentType.BC,
         state: this.state,
         containerId: this.container.id,
-        serviceUnits: Array.from(this.serviceUnits.keys())
+        serviceUnits: Array.from(this.serviceUnits.keys()),
+        sharedLibraries: Array.from(this.sharedLibraries.keys())
       }
     };
   }

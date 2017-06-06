@@ -15,7 +15,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IWorkspaceRow, IWorkspace } from './workspace.interface';
+import { IUsers } from '../../../../../shared/interfaces/users.interface';
+import { IBuses } from '../buses/buses.interface';
+import {
+  IWorkspaceBackend, IWorkspaceBackendDetails, IWorkspaceBackendCommon, IWorkspaceBackendDetailsCommon
+} from 'app/shared/services/workspaces.service';
+
+export interface IWorkspaceUI {
+  // from UI
+  isRemoving: boolean;
+  isFetchingDetails: boolean;
+  isSettingDescription: boolean;
+}
+
+// used within table
+export interface IWorkspaceRow extends IWorkspaceUI, IWorkspaceBackend, IWorkspaceBackendDetails { }
+
+// used in generated views
+export interface IWorkspace extends IWorkspaceUI, IWorkspaceBackendCommon, IWorkspaceBackendDetailsCommon {
+  buses: IBuses;
+  users: IUsers;
+}
+
+export function workspaceRowFactory(): IWorkspaceRow {
+  return {
+    id: null,
+    name: null,
+
+    description: undefined,
+
+    isRemoving: false,
+    isFetchingDetails: false,
+    isSettingDescription: false,
+
+    users: []
+  };
+}
 
 export interface IWorkspacesCommon {
   selectedWorkspaceId: string;

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.reducer';
+import { busesTableFactory } from './buses.interface';
+import { Buses } from './buses.reducer';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { busesTableFactory } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
 
 describe(`Buses reducer`, () => {
   it(`should have a default value`, () => {

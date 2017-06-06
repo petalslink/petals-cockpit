@@ -25,8 +25,8 @@ import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Ui } from '../../../../../shared/state/ui.reducer';
 import { ServiceUnits } from '../../state/service-units/service-units.reducer';
 import { getCurrentServiceUnit } from '../../state/service-units/service-units.selectors';
-import { IServiceUnitRow } from '../../state/service-units/service-unit.interface';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { IServiceUnitRow } from '../../state/service-units/service-units.interface';
+import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 
 @Component({
   selector: 'app-petals-service-unit-view',

@@ -23,8 +23,8 @@ import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
 
 import { Buses } from '../../state/buses/buses.reducer';
-import { IBusRow } from '../../state/buses/bus.interface';
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/container.interface';
+import { IBusRow } from '../../state/buses/buses.interface';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 import { Ui } from '../../../../../shared/state/ui.reducer';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { getCurrentBus } from '../../state/buses/buses.selectors';

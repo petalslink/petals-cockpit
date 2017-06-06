@@ -120,7 +120,11 @@ public class ServiceAssembliesResource {
         @JsonProperty
         public final String name;
 
-        public ServiceAssemblyMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+        public ServiceAssemblyMin(ServiceassembliesRecord saDb) {
+            this(saDb.getId(), saDb.getName());
+        }
+
+        private ServiceAssemblyMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
             this.id = id;
             this.name = name;
         }
@@ -148,8 +152,13 @@ public class ServiceAssembliesResource {
         @JsonProperty
         public final ImmutableSet<String> serviceUnits;
 
-        public ServiceAssemblyFull(ServiceAssemblyMin serviceAssembly, long containerId, ServiceAssemblyMin.State state,
-                Set<String> serviceUnits) {
+        public ServiceAssemblyFull(ServiceassembliesRecord saDb, Set<String> serviceUnits) {
+            this(new ServiceAssemblyMin(saDb), saDb.getContainerId(), ServiceAssemblyMin.State.valueOf(saDb.getState()),
+                    serviceUnits);
+        }
+
+        private ServiceAssemblyFull(ServiceAssemblyMin serviceAssembly, long containerId,
+                ServiceAssemblyMin.State state, Set<String> serviceUnits) {
             this.serviceAssembly = serviceAssembly;
             this.containerId = containerId;
             this.state = state;

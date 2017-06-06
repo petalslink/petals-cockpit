@@ -19,6 +19,7 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { NotificationsService } from 'angular2-notifications';
 
 import { serviceAssembliesService } from 'mocks/service-assemblies-mock';
 import * as helper from './../helpers/mock.helper';
@@ -26,9 +27,7 @@ import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
 import { environment } from '../../../environments/environment';
 import { IStore } from '../interfaces/store.interface';
-import { NotificationsService } from 'angular2-notifications';
-import { ServiceAssembliesServiceImpl } from 'app/shared/services/service-assemblies.service';
-import { ServiceAssemblyState } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
+import { ServiceAssembliesServiceImpl, ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 
 @Injectable()
 export class ServiceAssembliesMockService extends ServiceAssembliesServiceImpl {

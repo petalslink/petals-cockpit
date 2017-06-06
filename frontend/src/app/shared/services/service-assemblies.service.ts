@@ -26,12 +26,34 @@ import { environment } from './../../../environments/environment';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { ServiceUnits } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
 import { IStore } from '../interfaces/store.interface';
-import {
-  EServiceAssemblyState,
-  ServiceAssemblyState
-} from '../../features/cockpit/workspaces/state/service-assemblies/service-assembly.interface';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+
+// http://stackoverflow.com/a/41631732/2398593
+export const EServiceAssemblyState = {
+  Started: 'Started' as 'Started',
+  Stopped: 'Stopped' as 'Stopped',
+  Unloaded: 'Unloaded' as 'Unloaded',
+  Shutdown: 'Shutdown' as 'Shutdown',
+  Unknown: 'Unknown' as 'Unknown'
+};
+
+export type ServiceAssemblyState = keyof typeof EServiceAssemblyState;
+
+export interface IServiceAssemblyBackendSSECommon {
+  id: string;
+  name: string;
+  containerId: string;
+  state: ServiceAssemblyState;
+}
+
+export interface IServiceAssemblyBackendDetailsCommon { }
+
+export interface IServiceAssemblyBackendSSE extends IServiceAssemblyBackendSSECommon {
+  serviceUnits: string[];
+}
+
+export interface IServiceAssemblyBackendDetails extends IServiceAssemblyBackendDetailsCommon { }
 
 export abstract class ServiceAssembliesService {
   abstract getDetailsServiceAssembly(serviceAssemblyId: string): Observable<Response>;

@@ -252,4 +252,39 @@
     <dropColumn tableName="serviceunits" columnName="sa_name" />
     <dropColumn tableName="serviceunits" columnName="state" />
   </changeSet>
+
+  <changeSet id="v0.10.0-1" author="vnoel">
+    <createTable tableName="sharedlibraries">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+      <column name="name" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="version" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="container_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_sharedlibraries_container_id" referencedTableName="containers"
+          referencedColumnNames="id" deleteCascade="true" />
+      </column>
+    </createTable>
+
+    <createIndex tableName="sharedlibraries" indexName="idx_sharedlibraries_container">
+      <column name="container_id" />
+    </createIndex>
+  </changeSet>
+
+  <changeSet id="v0.10.0-2" author="vnoel">
+    <createTable tableName="sharedlibraries_components">
+      <column name="sharedlibrary_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_sharedlibraries_components_sharedlibrary_id"
+          referencedTableName="sharedlibraries" referencedColumnNames="id" deleteCascade="true" />
+      </column>
+      <column name="component_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_sharedlibraries_components_component_id"
+          referencedTableName="components" referencedColumnNames="id" deleteCascade="true" />
+      </column>
+    </createTable>
+  </changeSet>
 </databaseChangeLog>

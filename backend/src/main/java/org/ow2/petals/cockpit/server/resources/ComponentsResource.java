@@ -196,8 +196,12 @@ public class ComponentsResource {
         @JsonProperty
         public final Type type;
 
+        public ComponentMin(ComponentsRecord compDb) {
+            this(compDb.getId(), compDb.getName(), ComponentMin.Type.valueOf(compDb.getType()));
+        }
+
         @JsonCreator
-        public ComponentMin(@JsonProperty("id") long id, @JsonProperty("name") String name,
+        private ComponentMin(@JsonProperty("id") long id, @JsonProperty("name") String name,
                 @JsonProperty("type") Type type) {
             this.id = id;
             this.name = name;
@@ -227,17 +231,27 @@ public class ComponentsResource {
         @JsonProperty
         public final ImmutableSet<String> serviceUnits;
 
-        public ComponentFull(ComponentMin component, long containerId, State state, Set<String> serviceUnits) {
+        @JsonProperty
+        public final ImmutableSet<String> sharedLibraries;
+
+        private ComponentFull(ComponentMin component, long containerId, State state, Set<String> serviceUnits,
+                Set<String> sharedLibraries) {
             this.component = component;
             this.containerId = containerId;
             this.state = state;
             this.serviceUnits = ImmutableSet.copyOf(serviceUnits);
+            this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
+        }
+
+        public ComponentFull(ComponentsRecord compDb, Set<String> serviceUnits, Set<String> sharedLibraries) {
+            this(new ComponentMin(compDb), compDb.getContainerId(), ComponentMin.State.valueOf(compDb.getState()),
+                    serviceUnits, sharedLibraries);
         }
 
         @JsonCreator
         private ComponentFull() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new ComponentMin(0, "", Type.BC), 0, ComponentMin.State.Unknown, ImmutableSet.of());
+            this(new ComponentMin(0, "", Type.BC), 0, ComponentMin.State.Unknown, ImmutableSet.of(), ImmutableSet.of());
         }
 
         @JsonProperty

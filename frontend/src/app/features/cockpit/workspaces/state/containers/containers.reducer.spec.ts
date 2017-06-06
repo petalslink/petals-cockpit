@@ -44,6 +44,7 @@ describe(`Containers reducer`, () => {
             'idComp4',
             'idComp5'
           ],
+          sharedLibraries: [],
           id: 'idCont2',
           busId: 'idBus0'
         },
@@ -52,6 +53,9 @@ describe(`Containers reducer`, () => {
           components: [
             'idComp6',
             'idComp7'
+          ],
+          sharedLibraries: [
+            'idSL1'
           ],
           id: 'idCont3',
           busId: 'idBus0'
@@ -96,6 +100,9 @@ describe(`Containers reducer`, () => {
               'idComp5 old',
               'thisComponentIdShouldBeRemoved'
             ],
+            sharedLibraries: [
+              'idSL1 old'
+            ],
             id: 'idCont2',
             errorDeploymentComponent: 'some previous error'
           },
@@ -118,6 +125,7 @@ describe(`Containers reducer`, () => {
               'idComp4',
               'idComp5'
             ],
+            sharedLibraries: [],
             id: 'idCont2',
             busId: 'idBus0',
             reachabilities: [],
@@ -134,6 +142,9 @@ describe(`Containers reducer`, () => {
             components: [
               'idComp6',
               'idComp7'
+            ],
+            sharedLibraries: [
+              'idSL1'
             ],
             id: 'idCont3',
             busId: 'idBus0',
@@ -166,6 +177,7 @@ describe(`Containers reducer`, () => {
             'idComp6',
             'idComp7'
           ],
+          sharedLibraries: [],
           id: 'idCont3',
           busId: 'idBus0'
         }
@@ -183,6 +195,9 @@ describe(`Containers reducer`, () => {
             components: [
               'idComp4',
               'idComp5'
+            ],
+            sharedLibraries: [
+              'idSL1'
             ],
             id: 'idCont2',
             busId: 'idBus0',
@@ -211,6 +226,9 @@ describe(`Containers reducer`, () => {
               'idComp4',
               'idComp5'
             ],
+            sharedLibraries: [
+              'idSL1'
+            ],
             id: 'idCont2',
             busId: 'idBus0',
             reachabilities: [],
@@ -227,6 +245,7 @@ describe(`Containers reducer`, () => {
               'idComp6',
               'idComp7'
             ],
+            sharedLibraries: [],
             id: 'idCont3',
             busId: 'idBus0',
             reachabilities: [],

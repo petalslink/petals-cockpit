@@ -25,7 +25,7 @@ import { UsersService } from './users.service';
 import { environment } from './../../../environments/environment';
 import { IStore } from './../interfaces/store.interface';
 import { Users } from './../state/users.reducer';
-import { ICurrentUser } from './../interfaces/user.interface';
+import { ICurrentUser } from './../interfaces/users.interface';
 
 @Injectable()
 export class GuardLoginService implements CanActivate {

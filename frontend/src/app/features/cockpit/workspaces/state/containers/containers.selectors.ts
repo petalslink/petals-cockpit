@@ -19,7 +19,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { IContainerRow } from './container.interface';
+import { IContainerRow } from './containers.interface';
 import { arrayEquals } from '../../../../../shared/helpers/shared.helper';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
