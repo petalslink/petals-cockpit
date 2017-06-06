@@ -142,7 +142,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
 
   createFormImportBus() {
     this.busImportForm = this.fb.group({
-      ip: ['', Validators.compose([Validators.required])],
+      ip: ['', Validators.required],
       port: ['', Validators.compose([Validators.required, CustomValidators.isPort])],
       username: ['', [Validators.required]],
       password: ['', [Validators.required]],

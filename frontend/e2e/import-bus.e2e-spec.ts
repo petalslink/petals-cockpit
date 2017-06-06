@@ -39,10 +39,10 @@ describe(`Import Bus`, () => {
     expect(importBus.password.getAttribute('value')).toEqual(``);
     expect(importBus.passphrase.getAttribute('value')).toEqual(``);
 
-    expect(importBus.importButton.getText()).toEqual(`Import`);
+    expect(importBus.importButton.getText()).toEqual(`import_export IMPORT`);
     expect(importBus.importButton.isEnabled()).toBe(false);
 
-    expect(importBus.clearButton.getText()).toEqual(`Clear`);
+    expect(importBus.clearButton.getText()).toEqual(`clear_all CLEAR`);
     expect(importBus.clearButton.isEnabled()).toBe(true);
 
     expect(importBus.discardButton.isPresent()).toBe(false);
@@ -73,7 +73,7 @@ describe(`Import Bus`, () => {
     // check if clear button is not present
     expect(otherBus.clearButton.isPresent()).toBe(false);
 
-    expect(otherBus.discardButton.getText()).toEqual(`Cancel`);
+    expect(otherBus.discardButton.getText()).toEqual(`cancel CANCEL`);
     expect(otherBus.discardButton.isEnabled()).toBe(true);
   });
 
@@ -126,7 +126,7 @@ describe(`Import Bus`, () => {
     expect(workspace.busesInProgress.get(2).$(`.ip-port`).getText()).toEqual('hostname:7700');
     expect(workspace.busesInProgress.get(2).element(by.cssContainingText(`md-icon`, `warning`)).isDisplayed()).toEqual(true);
 
-    expect(importBus.discardButton.getText()).toEqual(`Discard`);
+    expect(importBus.discardButton.getText()).toEqual(`remove_circle DISCARD`);
     expect(importBus.discardButton.isEnabled()).toBe(true);
   });
 

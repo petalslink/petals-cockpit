@@ -16,18 +16,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div fxLayout="column" fxFill class="wrapper-content">
   <md-toolbar>
     <md-icon color="primary">edit</md-icon>
-    Description
+    <span>Description</span>
   </md-toolbar>
 
-  <div fxFill fxLayout="column" class="content content-max-width" fxLayoutWrap>
+  <div fxFill fxLayout="column" class="content content-max-width">
     <div class="central-content">
-      <form novalidate [formGroup]="busImportForm" (ngSubmit)="onSubmit(busImportForm) && busImportForm.reset()">
-        <md-card>
+      <form formnovalidate [formGroup]="busImportForm" (ngSubmit)="onSubmit(busImportForm) && busImportForm.reset()">
+        <md-card fxLayout="column">
+
+          <md-card-title fxLayout="row">
+            <span fxFlex class="text-upper">Import Bus</span>
+            <md-icon color="primary">archive</md-icon>
+          </md-card-title>
+          <md-card-subtitle fxLayout="row" fxLayoutAlign="start center">
+            <md-icon color="primary">info</md-icon>
+            <span class="color-primary">After completing all the required fields, click <b>IMPORT</b>.</span>
+          </md-card-subtitle>
+
           <md-card-content>
             <div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="10px">
               <!-- To have more deterministic behavour, we should be able to set 50 to say 2 per line
                    See: https://github.com/angular/flex-layout/issues/235 -->
-              <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+              <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
                 <md-input-container #ipInput fxFill>
                   <input mdInput placeholder="IP or hostname" formControlName="ip" required>
                   <span mdPrefix><md-icon color="primary">star_half</md-icon></span>
@@ -37,7 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </md-input-container>
               </div>
 
-              <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+              <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
                 <md-input-container fxFill>
                   <input mdInput placeholder="Port" formControlName="port" required>
                   <span mdPrefix><md-icon color="primary">settings_ethernet</md-icon></span>
@@ -47,7 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </md-input-container>
               </div>
 
-              <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+              <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
                 <md-input-container fxFill>
                   <input mdInput placeholder="Username" formControlName="username" required>
                   <span mdPrefix><md-icon color="primary">person</md-icon></span>
@@ -57,7 +67,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </md-input-container>
               </div>
 
-              <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+              <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
                 <md-input-container fxFill>
                   <input mdInput type="password" placeholder="Password" formControlName="password" required>
                   <span mdPrefix><md-icon color="primary">vpn_key</md-icon></span>
@@ -67,7 +77,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </md-input-container>
               </div>
 
-              <div fxFlex="45" fxFlex.xs="100" class="margin-top-x2">
+              <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
                 <md-input-container fxFill>
                   <input mdInput type="password" placeholder="Topology passphrase" formControlName="passphrase" required>
                   <span mdPrefix><md-icon color="primary">security</md-icon></span>
@@ -78,39 +88,59 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </div>
             </div>
           </md-card-content>
-          <div fxLayout="column">
-            <md-card-actions fxLayout="row" fxLayoutWrap class="margin-x1" fxLayoutAlign="end center">
-              <div fxFlex.xs="100" fxLayout="row" class="error" fxLayoutAlign="start center" *ngIf="(busesInProgressTable$ | async).importBusError || (busInProgress && busInProgress.importError)">
-                <md-icon color="warn">warning</md-icon>
-                <span class="error-details">{{ (busInProgress && busInProgress.importError) ? busInProgress.importError : (busesInProgressTable$ | async).importBusError }}</span>
-              </div>
-              <div fxFlex></div>
-              <div fxLayout="row" class="margin-top-x1 margin-bottom-x1">
-                <button
-                  md-raised-button
-                  color="accent"
-                  type="button"
-                  *ngIf="!busInProgress && !(busesInProgressTable$ | async).isImportingBus && !(busesInProgressTable$ | async).selectedBusInProgressId"
-                  class="btn-clear-form margin-right-x1"
-                  (click)="reset()">Clear
-                </button>
-                <button md-raised-button color="warn" type="button" *ngIf="busInProgress" (click)="discard(busInProgress)" [disabled]="busInProgress && busInProgress.isRemoving" class="margin-right-x1 btn-discard-form">
-                  <span *ngIf="busInProgress.importError; else cancel">Discard</span>
-                  <ng-template #cancel><span>Cancel</span></ng-template>
-                </button>
-                <button md-raised-button color="primary" type="submit" class="btn-import-form" [disabled]="busImportForm.invalid || (busesInProgressTable$ | async).isImportingBus || busInProgress">
-                  <span
-                    *ngIf="!((busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError))">
-                    Import
-                  </span>
-                  <span  fxFill fxLayout="row" fxLayoutAlign="center center"
-                    *ngIf="(busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError)">
-                    Importing <md-spinner></md-spinner>
-                  </span>
-                </button>
-              </div>
-            </md-card-actions>
-          </div>
+
+          <md-card-content
+            fxLayout="column"
+            *ngIf="(busesInProgressTable$ | async).importBusError || (busInProgress && busInProgress.importError)"
+            class="error">
+            <div fxLayout="row" fxLayoutAlign="start center">
+              <md-icon color="warn">warning</md-icon>
+              <span class="error-details">{{ (busInProgress && busInProgress.importError) ? busInProgress.importError : (busesInProgressTable$ | async).importBusError }}</span>
+            </div>
+          </md-card-content>
+
+          <md-card-actions class="padding-right-x1 margin-bottom-x1" fxLayoutAlign="end center">
+            <button
+              md-raised-button
+              color="accent"
+              type="button"
+              *ngIf="!busInProgress && !(busesInProgressTable$ | async).isImportingBus && !(busesInProgressTable$ | async).selectedBusInProgressId"
+              class="btn-clear-form margin-right-x1 text-upper"
+              (click)="reset()">
+              <md-icon>clear_all</md-icon>
+              <span>Clear</span>
+            </button>
+            <button
+              md-raised-button
+              color="warn"
+              type="button"
+              *ngIf="busInProgress"
+              (click)="discard(busInProgress)"
+              [disabled]="busInProgress && busInProgress.isRemoving"
+              class="margin-right-x1 btn-discard-form text-upper">
+              <md-icon *ngIf="busInProgress.importError">remove_circle</md-icon>
+              <md-icon *ngIf="cancel && !busInProgress.importError">cancel</md-icon>
+              <span *ngIf="busInProgress.importError; else cancel">Discard</span>
+              <ng-template #cancel><span>Cancel</span></ng-template>
+            </button>
+            <button
+              md-raised-button
+              color="primary"
+              type="submit"
+              class="btn-import-form text-upper"
+              [disabled]="busImportForm.invalid || (busesInProgressTable$ | async).isImportingBus || busInProgress">
+              <md-icon *ngIf="!((busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError))">import_export</md-icon>
+              <span
+                *ngIf="!((busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError))">
+                Import
+              </span>
+              <span  fxFill fxLayout="row" fxLayoutAlign="center center"
+                *ngIf="(busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError)">
+                Importing <md-spinner></md-spinner>
+              </span>
+            </button>
+          </md-card-actions>
+
         </md-card>
       </form>
     </div>
