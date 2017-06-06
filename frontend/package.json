@@ -9,7 +9,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:ci": "jest --runInBand",
-    "check": "yarn run check:lint && yarn run check:copyrights",
+    "check": "yarn run check:lint && yarn run check:copyrights && yarn run prettier:check",
     "check:lint": "ng lint --type-check",
     "check:copyrights": "node generate-headers.js --dry",
     "e2e": "ng e2e -e=dev-e2e",
