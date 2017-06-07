@@ -27,11 +27,12 @@ export abstract class ComponentPage {
   public static readonly component = $(`app-petals-component-view`);
 
   public readonly component = ComponentPage.component;
-  public readonly title = this.component.$(`md-toolbar-row .title`);
+  public readonly title = this.component.$(`md-toolbar .title`);
 
   protected static wait() {
     browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/components\/\w+/), waitTimeout);
     browser.wait(EC.visibilityOf(ComponentPage.component), waitTimeout);
+    browser.wait(EC.stalenessOf(ComponentPage.component.$('md-toolbar md-spinner')), waitTimeout);
   }
 
   openOperations() {
@@ -51,6 +52,7 @@ export class ComponentOverviewPage extends ComponentPage {
 
   static waitAndGet() {
     super.wait();
+    browser.wait(EC.visibilityOf(ComponentOverviewPage.overview), waitTimeout);
     browser.wait(EC.visibilityOf(ComponentOverviewPage.overview), waitTimeout);
     return new ComponentOverviewPage();
   }

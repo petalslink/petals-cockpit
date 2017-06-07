@@ -31,10 +31,10 @@ import { busesService } from './../../../mocks/buses-mock';
 import { workspacesService } from '../../../mocks/workspaces-mock';
 import { IMPORT_HTTP_ERROR_IP } from '../../../mocks/backend-mock';
 import { UsersService } from 'app/shared/services/users.service';
-import { UsersMockService } from 'app/shared/services/users.service.mock';
+import { UsersServiceMock } from 'app/shared/services/users.service.mock';
 
 @Injectable()
-export class BusesMockService extends BusesServiceImpl {
+export class BusesServiceMock extends BusesServiceImpl {
 
   constructor(
     http: Http,
@@ -88,7 +88,7 @@ export class BusesMockService extends BusesServiceImpl {
         setTimeout(() => (this.pSseService as SseServiceMock)
           .triggerSseEvent(SseWorkspaceEvent.BUS_DELETED, {
             id,
-            reason: `bus deleted by ${(this.userService as UsersMockService).getCurrentUser().id}`
+            reason: `bus deleted by ${(this.userService as UsersServiceMock).getCurrentUser().id}`
           }), environment.mock.sseDelay);
       });
   }

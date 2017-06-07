@@ -21,7 +21,7 @@ import { Store } from '@ngrx/store';
 
 import { WorkspacesServiceImpl } from './workspaces.service';
 import { UsersService } from './users.service';
-import { UsersMockService } from './users.service.mock';
+import { UsersServiceMock } from './users.service.mock';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
 import { workspacesService } from '../../../mocks/workspaces-mock';
@@ -30,14 +30,14 @@ import { environment } from '../../../environments/environment';
 import { IStore } from '../interfaces/store.interface';
 
 @Injectable()
-export class WorkspacesMockService extends WorkspacesServiceImpl {
+export class WorkspacesServiceMock extends WorkspacesServiceImpl {
 
   constructor(http: Http, store$: Store<IStore>, private pSseService: SseService, private usersService: UsersService) {
     super(http, store$, pSseService);
   }
 
   fetchWorkspaces() {
-    const mock = (this.usersService as UsersMockService);
+    const mock = (this.usersService as UsersServiceMock);
     return helper.responseBody(workspacesService.getWorkspacesListAndUsers(mock.getCurrentUser().id));
   }
 

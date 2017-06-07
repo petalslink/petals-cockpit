@@ -23,7 +23,7 @@ import { serviceUnitsService } from 'mocks/service-units-mock';
 import * as helper from './../helpers/mock.helper';
 
 @Injectable()
-export class ServiceUnitsMockService extends ServiceUnitsServiceImpl {
+export class ServiceUnitsServiceMock extends ServiceUnitsServiceImpl {
   constructor(http: Http) {
     super(http);
   }

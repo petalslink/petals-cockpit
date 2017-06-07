@@ -26,11 +26,12 @@ export abstract class ServiceUnitPage {
   public static readonly component = $(`app-petals-service-unit-view`);
 
   public readonly component = ServiceUnitPage.component;
-  public readonly title = this.component.$(`md-toolbar-row .title`);
+  public readonly title = this.component.$(`md-toolbar .title`);
 
   protected static wait() {
     browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/service-units\/\w+/), waitTimeout);
     browser.wait(EC.visibilityOf(ServiceUnitPage.component), waitTimeout);
+    browser.wait(EC.stalenessOf(ServiceUnitPage.component.$('md-toolbar md-spinner')), waitTimeout);
   }
 }
 

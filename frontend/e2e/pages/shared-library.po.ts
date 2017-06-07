@@ -26,11 +26,12 @@ export abstract class SharedLibraryPage {
   public static readonly component = $(`app-petals-shared-library-view`);
 
   public readonly component = SharedLibraryPage.component;
-  public readonly title = this.component.$(`md-toolbar-row .title`);
+  public readonly title = this.component.$(`md-toolbar .title`);
 
   protected static wait() {
     browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/shared-libraries\/\w+/), waitTimeout);
     browser.wait(EC.visibilityOf(SharedLibraryPage.component), waitTimeout);
+    browser.wait(EC.stalenessOf(SharedLibraryPage.component.$('md-toolbar md-spinner')), waitTimeout);
   }
 }
 
