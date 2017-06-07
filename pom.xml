@@ -39,7 +39,8 @@
     <argLine></argLine>
 
     <liquibase.version>3.5.3</liquibase.version>
-    <quasar.version>0.7.8</quasar.version>
+    <!-- 0.7.8 is not usable because of https://github.com/puniverse/quasar/issues/279 -->
+    <quasar.version>0.7.7</quasar.version>
     <pac4j.version>2.0.0</pac4j.version>
     <h2.version>1.4.195</h2.version>
     <slf4j.version>1.7.25</slf4j.version>
