@@ -24,7 +24,7 @@ import * as helper from './../helpers/mock.helper';
 import { users, CORRECT_SETUP_TOKEN, GONE_SETUP_TOKEN } from './../../../mocks/backend-mock';
 
 @Injectable()
-export class UsersMockService extends UsersService {
+export class UsersServiceMock extends UsersService {
 
   private static users = {
     admin: {
@@ -50,7 +50,7 @@ export class UsersMockService extends UsersService {
   constructor() {
     super();
     if (environment.mock.alreadyConnected) {
-      this.currentUser = UsersMockService.users.admin;
+      this.currentUser = UsersServiceMock.users.admin;
     }
   }
 
@@ -59,8 +59,8 @@ export class UsersMockService extends UsersService {
   }
 
   connectUser(user: IUserLogin) {
-    if (UsersMockService.users[user.username] && user.username === user.password) {
-      this.currentUser = UsersMockService.users[user.username];
+    if (UsersServiceMock.users[user.username] && user.username === user.password) {
+      this.currentUser = UsersServiceMock.users[user.username];
       return helper.responseBody(this.currentUser);
     }
 

@@ -30,7 +30,7 @@ import { IStore } from 'app/shared/interfaces/store.interface';
 import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 
 @Injectable()
-export class ContainersMockService extends ContainersServiceImpl {
+export class ContainersServiceMock extends ContainersServiceImpl {
   constructor(
     http: Http,
     store$: Store<IStore>,

@@ -30,7 +30,7 @@ import { SseServiceMock } from './sse.service.mock';
 import { environment } from '../../../environments/environment';
 
 @Injectable()
-export class ComponentsMockService extends ComponentsServiceImpl {
+export class ComponentsServiceMock extends ComponentsServiceImpl {
   constructor(
     http: Http,
     router: Router,

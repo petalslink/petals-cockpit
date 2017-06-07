@@ -39,24 +39,24 @@ import { ServiceUnitsEffects } from './../features/cockpit/workspaces/state/serv
 import { SseService, SseServiceImpl } from '../shared/services/sse.service';
 import { SseServiceMock } from '../shared/services/sse.service.mock';
 import { WorkspacesService, WorkspacesServiceImpl } from '../shared/services/workspaces.service';
-import { WorkspacesMockService } from '../shared/services/workspaces.service.mock';
-import { UsersMockService } from '../shared/services/users.service.mock';
+import { WorkspacesServiceMock } from '../shared/services/workspaces.service.mock';
+import { UsersServiceMock } from '../shared/services/users.service.mock';
 import { UsersService, UsersServiceImpl } from '../shared/services/users.service';
 import { GuardLoginService } from '../shared/services/guard-login.service';
 import { BusesService, BusesServiceImpl } from '../shared/services/buses.service';
-import { BusesMockService } from '../shared/services/buses.service.mock';
+import { BusesServiceMock } from '../shared/services/buses.service.mock';
 import { ContainersService, ContainersServiceImpl } from './../shared/services/containers.service';
-import { ContainersMockService } from './../shared/services/containers.service.mock';
+import { ContainersServiceMock } from './../shared/services/containers.service.mock';
 import { ComponentsService, ComponentsServiceImpl } from './../shared/services/components.service';
-import { ComponentsMockService } from './../shared/services/components.service.mock';
+import { ComponentsServiceMock } from './../shared/services/components.service.mock';
 import { ServiceUnitsService, ServiceUnitsServiceImpl } from './../shared/services/service-units.service';
-import { ServiceUnitsMockService } from './../shared/services/service-units.service.mock';
+import { ServiceUnitsServiceMock } from './../shared/services/service-units.service.mock';
 import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
 import { ServiceAssembliesService, ServiceAssembliesServiceImpl } from 'app/shared/services/service-assemblies.service';
-import { ServiceAssembliesMockService } from 'app/shared/services/service-assemblies.service.mock';
+import { ServiceAssembliesServiceMock } from 'app/shared/services/service-assemblies.service.mock';
 import { ServiceAssembliesEffects } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.effects';
 import { SharedLibrariesEffects } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.effects';
-import { SharedLibrariesMockService } from 'app/shared/services/shared-libraries.service.mock';
+import { SharedLibrariesServiceMock } from 'app/shared/services/shared-libraries.service.mock';
 import { SharedLibrariesService, SharedLibrariesServiceImpl } from 'app/shared/services/shared-libraries.service';
 
 export const providers = [
@@ -72,35 +72,35 @@ export const providers = [
   },
   {
     provide: BusesService,
-    useClass: (environment.mock ? BusesMockService : BusesServiceImpl)
+    useClass: (environment.mock ? BusesServiceMock : BusesServiceImpl)
   },
   {
     provide: ContainersService,
-    useClass: (environment.mock ? ContainersMockService : ContainersServiceImpl)
+    useClass: (environment.mock ? ContainersServiceMock : ContainersServiceImpl)
   },
   {
     provide: ComponentsService,
-    useClass: (environment.mock ? ComponentsMockService : ComponentsServiceImpl)
+    useClass: (environment.mock ? ComponentsServiceMock : ComponentsServiceImpl)
   },
   {
     provide: ServiceAssembliesService,
-    useClass: (environment.mock ? ServiceAssembliesMockService : ServiceAssembliesServiceImpl)
+    useClass: (environment.mock ? ServiceAssembliesServiceMock : ServiceAssembliesServiceImpl)
   },
   {
     provide: ServiceUnitsService,
-    useClass: (environment.mock ? ServiceUnitsMockService : ServiceUnitsServiceImpl)
+    useClass: (environment.mock ? ServiceUnitsServiceMock : ServiceUnitsServiceImpl)
   },
   {
     provide: SharedLibrariesService,
-    useClass: (environment.mock ? SharedLibrariesMockService : SharedLibrariesServiceImpl)
+    useClass: (environment.mock ? SharedLibrariesServiceMock : SharedLibrariesServiceImpl)
   },
   {
     provide: WorkspacesService,
-    useClass: (environment.mock ? WorkspacesMockService : WorkspacesServiceImpl)
+    useClass: (environment.mock ? WorkspacesServiceMock : WorkspacesServiceImpl)
   },
   {
     provide: UsersService,
-    useClass: (environment.mock ? UsersMockService : UsersServiceImpl)
+    useClass: (environment.mock ? UsersServiceMock : UsersServiceImpl)
   },
   // we override the default one with ours aware of batch actions
   {

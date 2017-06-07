@@ -23,7 +23,7 @@ import { SharedLibrariesServiceImpl, ISharedLibraryBackendDetails } from 'app/sh
 import { sharedLibrariesService } from 'mocks/shared-libraries-mock';
 
 @Injectable()
-export class SharedLibrariesMockService extends SharedLibrariesServiceImpl {
+export class SharedLibrariesServiceMock extends SharedLibrariesServiceImpl {
   constructor(http: Http) {
     super(http);
   }
