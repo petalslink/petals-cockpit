@@ -1,0 +1,4 @@
+class org/glassfish/jersey/media/multipart/FormDataMultiPart
+field
+ (Ljava/lang/String;Ljava/lang/String;)Lorg/glassfish/jersey/media/multipart/FormDataMultiPart;
+ (Ljava/lang/String;Ljava/lang/String;)L1org/glassfish/jersey/media/multipart/FormDataMultiPart;

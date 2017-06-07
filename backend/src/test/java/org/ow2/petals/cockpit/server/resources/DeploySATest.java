@@ -18,8 +18,6 @@ package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -28,9 +26,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
-import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.junit.Before;
 import org.junit.Test;
@@ -98,14 +94,8 @@ public class DeploySATest extends AbstractCockpitResourceTest {
         failDeployment = false;
     }
 
-    private static MultiPart getSAMultiPart() throws URISyntaxException {
-        return getSAMultiPart("fakeSA.zip");
-    }
-
-    @SuppressWarnings({ "resource" })
-    private static MultiPart getSAMultiPart(String zip) throws URISyntaxException {
-        return new FormDataMultiPart().bodyPart(
-                new FileDataBodyPart("file", new File(DeploySATest.class.getResource("/" + zip).toURI())));
+    private MultiPart getSAMultiPart() throws Exception {
+        return getMultiPart("sa-jbi.xml", "fakeSA");
     }
 
     @Test

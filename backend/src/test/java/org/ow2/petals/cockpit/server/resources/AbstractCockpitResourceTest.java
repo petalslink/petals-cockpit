@@ -26,6 +26,9 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,12 +36,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.db.api.RequestRowAssert;
 import org.assertj.db.type.Request;
 import org.assertj.db.type.Table;
 import org.eclipse.jdt.annotation.Nullable;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.jooq.Record;
@@ -47,6 +55,7 @@ import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
@@ -94,6 +103,9 @@ import javaslang.Tuple2;
 public class AbstractCockpitResourceTest extends AbstractTest {
 
     public static final String ADMIN = "admin";
+
+    @Rule
+    public TemporaryFolder zipFolder = new TemporaryFolder();
 
     @Rule
     public final CockpitResourceRule resource;
@@ -471,5 +483,26 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         }
 
         return contentC;
+    }
+
+    @SuppressWarnings({ "resource" })
+    protected FormDataMultiPart getMultiPart(String jbiFilename, String zipFilename) throws Exception {
+        return (FormDataMultiPart) new FormDataMultiPart()
+                .bodyPart(new FileDataBodyPart("file", createZipFromJBIFile(jbiFilename, zipFilename)));
+    }
+
+    protected File createZipFromJBIFile(String jbiFilename, String zipFilename) throws Exception {
+        // To be able to create 2 URL in the same test, we must used random folder storing zip file.
+        File zip = new File(zipFolder.newFolder(), zipFilename + ".zip");
+        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zip));
+                InputStream fis = AbstractCockpitResourceTest.class.getResourceAsStream("/" + jbiFilename)) {
+            zos.putNextEntry(new ZipEntry("META-INF/jbi.xml"));
+            try {
+                IOUtils.copy(fis, zos);
+            } finally {
+                zos.closeEntry();
+            }
+        }
+        return zip;
     }
 }

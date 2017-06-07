@@ -18,8 +18,6 @@ package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import javax.ws.rs.client.Entity;
@@ -27,9 +25,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
-import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +51,7 @@ import javaslang.Tuple;
 public class DeployComponentTest extends AbstractCockpitResourceTest {
 
     // this is the name declared in the zip's jbi file
-    private static final String COMP_NAME = "petals-bc-soap-provide";
+    private static final String COMP_NAME = "petals-component";
 
     private final Domain domain = new Domain("dom");
 
@@ -92,12 +88,8 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
         failDeployment = false;
     }
 
-    @SuppressWarnings("resource")
-    private static MultiPart getComponentMultiPart() throws URISyntaxException {
-        // fake-jbi-component-soap only contains the jbi file
-        // so it's ok for tests (until we test with a real petals container)
-        return new FormDataMultiPart().bodyPart(new FileDataBodyPart("file",
-                new File(DeployComponentTest.class.getResource("/fake-jbi-component-soap.zip").toURI())));
+    private MultiPart getComponentMultiPart() throws Exception {
+        return getMultiPart("component-jbi.xml", "fakeComponent");
     }
 
     @Test
