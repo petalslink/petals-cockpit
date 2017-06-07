@@ -55,6 +55,9 @@ import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
 import { ServiceAssembliesService, ServiceAssembliesServiceImpl } from 'app/shared/services/service-assemblies.service';
 import { ServiceAssembliesMockService } from 'app/shared/services/service-assemblies.service.mock';
 import { ServiceAssembliesEffects } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.effects';
+import { SharedLibrariesEffects } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.effects';
+import { SharedLibrariesMockService } from 'app/shared/services/shared-libraries.service.mock';
+import { SharedLibrariesService, SharedLibrariesServiceImpl } from 'app/shared/services/shared-libraries.service';
 
 export const providers = [
   {
@@ -88,6 +91,10 @@ export const providers = [
     useClass: (environment.mock ? ServiceUnitsMockService : ServiceUnitsServiceImpl)
   },
   {
+    provide: SharedLibrariesService,
+    useClass: (environment.mock ? SharedLibrariesMockService : SharedLibrariesServiceImpl)
+  },
+  {
     provide: WorkspacesService,
     useClass: (environment.mock ? WorkspacesMockService : WorkspacesServiceImpl)
   },
@@ -119,6 +126,7 @@ export const providers = [
     EffectsModule.run(ComponentsEffects),
     EffectsModule.run(ServiceAssembliesEffects),
     EffectsModule.run(ServiceUnitsEffects),
+    EffectsModule.run(SharedLibrariesEffects),
     StoreDevtoolsModule.instrumentOnlyWithExtension(),
     TranslateModule.forRoot({
       provide: TranslateLoader,
