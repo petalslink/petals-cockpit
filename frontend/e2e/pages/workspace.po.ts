@@ -45,6 +45,7 @@ export abstract class WorkspacePage {
 
     browser.wait(EC.visibilityOf(this.component), waitTimeout);
     browser.wait(EC.visibilityOf(this.component.$(`md-sidenav.mat-sidenav-opened`)), waitTimeout);
+    browser.wait(EC.stalenessOf(this.component.$('md-toolbar md-spinner')), waitTimeout);
 
     let test = EC.elementToBeClickable(this.workspaceButton);
     if (expectedName) {

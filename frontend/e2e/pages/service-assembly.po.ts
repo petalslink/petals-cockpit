@@ -27,11 +27,12 @@ export abstract class ServiceAssemblyPage {
   public static readonly component = $(`app-petals-service-assembly-view`);
 
   public readonly component = ServiceAssemblyPage.component;
-  public readonly title = this.component.$(`md-toolbar-row .title`);
+  public readonly title = this.component.$(`md-toolbar .title`);
 
   protected static wait() {
     browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/service-assemblies\/\w+/), waitTimeout);
     browser.wait(EC.visibilityOf(ServiceAssemblyPage.component), waitTimeout);
+    browser.wait(EC.stalenessOf(ServiceAssemblyPage.component.$('md-toolbar md-spinner')), waitTimeout);
   }
 }
 

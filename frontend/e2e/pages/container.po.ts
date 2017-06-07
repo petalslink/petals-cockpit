@@ -26,11 +26,12 @@ export abstract class ContainerPage {
   public static readonly component = $(`app-petals-container-view`);
 
   public readonly component = ContainerPage.component;
-  public readonly title = this.component.$(`md-toolbar-row .title`);
+  public readonly title = this.component.$(`md-toolbar .title`);
 
   protected static wait() {
     browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/containers\/\w+/), waitTimeout);
     browser.wait(EC.visibilityOf(ContainerPage.component), waitTimeout);
+    browser.wait(EC.stalenessOf(ContainerPage.component.$('md-toolbar md-spinner')), waitTimeout);
   }
 
   openOperations() {
