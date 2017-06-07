@@ -120,7 +120,7 @@ public class PetalsAdmin {
     }
 
     @Suspendable
-    public ComponentMin.State changeState(String ip, int port, String username, String password, String type,
+    public ComponentMin.State changeComponentState(String ip, int port, String username, String password, String type,
             String name, ComponentMin.State current, ComponentMin.State next, Map<String, String> parameters) {
         return runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
             try {
@@ -141,7 +141,7 @@ public class PetalsAdmin {
     }
 
     @Suspendable
-    public ServiceAssemblyMin.State changeState(String ip, int port, String username, String password, String saName,
+    public ServiceAssemblyMin.State changeSAState(String ip, int port, String username, String password, String saName,
             ServiceAssemblyMin.State next) {
         return runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
             try {
@@ -157,7 +157,7 @@ public class PetalsAdmin {
     }
 
     @Suspendable
-    public ServiceAssembly deploy(String ip, int port, String username, String password, String saName, URL saUrl) {
+    public ServiceAssembly deploySA(String ip, int port, String username, String password, String saName, URL saUrl) {
         ServiceAssembly deployedSA = runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
             try {
                 // TODO handle partially deployed SAs??!!
@@ -174,7 +174,7 @@ public class PetalsAdmin {
     }
 
     @Suspendable
-    public Component deploy(String ip, int port, String username, String password, ComponentType type, String name,
+    public Component deployComponent(String ip, int port, String username, String password, ComponentType type, String name,
             URL compUrl) {
         Component deployedComp = runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
             try {

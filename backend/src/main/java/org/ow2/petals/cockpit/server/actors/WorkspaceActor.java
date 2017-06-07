@@ -421,7 +421,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                     .where(CONTAINERS.ID.eq(comp.getContainerId())).fetchOne();
             assert cont != null;
 
-            State newCurrentState = petals.changeState(cont.getIp(), cont.getPort(), cont.getUsername(),
+            State newCurrentState = petals.changeComponentState(cont.getIp(), cont.getPort(), cont.getUsername(),
                     cont.getPassword(), comp.getType(), comp.getName(), currentState, newState,
                     change.action.parameters);
 
@@ -504,7 +504,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                     .fetchOne();
             assert cont != null;
 
-            ServiceAssemblyMin.State newCurrentState = petals.changeState(cont.getIp(), cont.getPort(),
+            ServiceAssemblyMin.State newCurrentState = petals.changeSAState(cont.getIp(), cont.getPort(),
                     cont.getUsername(), cont.getPassword(), sa.getName(), newState);
 
             SAStateChanged res = new SAStateChanged(sa.getId(), newCurrentState);
@@ -558,7 +558,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
             ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(sa.cId)).fetchOne();
             assert cont != null;
 
-            ServiceAssembly deployedSA = petals.deploy(cont.getIp(), cont.getPort(), cont.getUsername(),
+            ServiceAssembly deployedSA = petals.deploySA(cont.getIp(), cont.getPort(), cont.getUsername(),
                     cont.getPassword(), sa.name, sa.saUrl);
 
             return serviceAssemblyDeployed(deployedSA, sa.cId, conf);
@@ -602,8 +602,8 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
             ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(comp.cId)).fetchOne();
             assert cont != null;
 
-            Component deployedComp = petals.deploy(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
-                    comp.type.to(), comp.name, comp.saUrl);
+            Component deployedComp = petals.deployComponent(cont.getIp(), cont.getPort(), cont.getUsername(),
+                    cont.getPassword(), comp.type.to(), comp.name, comp.saUrl);
 
             return componentDeployed(deployedComp, comp.cId, conf);
         });
