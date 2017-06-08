@@ -33,7 +33,7 @@
     "gitDir": "../",
     "linters": {
       "*.ts": [
-        "yarn run prettier:check"
+        "yarn run prettier:base -- -l"
       ]
     }
   },
