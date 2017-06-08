@@ -14,7 +14,7 @@
     "check:copyrights": "node generate-headers.js --dry",
     "e2e": "ng e2e -e=dev-e2e",
     "e2e:ci": "webdriver-manager update --versions.chrome=2.29 --gecko=false && ng e2e --webdriver-update false --prod --progress=false -e=prod-e2e",
-    "e2e:product": "ng e2e --serve=false --specs=e2e/login.e2e-spec.ts --specs=e2e/workspaces.e2e-spec.ts --specs=e2e/workspace-tree.e2e-spec.ts --specs=e2e/workspace-overview.e2e-spec.ts",
+    "e2e:product": "webdriver-manager update --versions.chrome=2.29 --gecko=false && ng e2e --webdriver-update false --serve=false --specs=e2e/login.e2e-spec.ts --specs=e2e/workspaces.e2e-spec.ts --specs=e2e/workspace-tree.e2e-spec.ts --specs=e2e/workspace-overview.e2e-spec.ts",
     "build": "ng build --prod",
     "build:product": "yarn run build -- -bh='{{baseUrl}}'",
     "build:product:ci": "yarn run build:product -- --progress=false",
