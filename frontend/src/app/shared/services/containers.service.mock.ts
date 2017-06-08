@@ -48,18 +48,27 @@ export class ContainersServiceMock extends ContainersServiceImpl {
 
   deployComponent(workspaceId: string, containerId: string, file: File) {
     if (file.name.includes('error')) {
-      return helper.errorBackend('[Mock message] An error happened when trying to deploy the component', 400);
+      return helper.errorBackend(
+        '[Mock message] An error happened when trying to deploy the component',
+        400
+      );
     }
 
     const name = file.name.replace(/\.zip$/, '');
-    const component = containersService.get(containerId).addComponent('Loaded', name);
+    const component = containersService
+      .get(containerId)
+      .addComponent('Loaded', name);
 
     const response = {
-      components: component.toObj()
+      components: component.toObj(),
     };
 
-    setTimeout(() =>
-      (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.COMPONENT_DEPLOYED, response),
+    setTimeout(
+      () =>
+        (this.pSseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.COMPONENT_DEPLOYED,
+          response
+        ),
       environment.mock.sseDelay
     );
 
@@ -68,18 +77,27 @@ export class ContainersServiceMock extends ContainersServiceImpl {
 
   deployServiceAssembly(workspaceId: string, containerId: string, file: File) {
     if (file.name.includes('error')) {
-      return helper.errorBackend('[Mock message] An error happened when trying to deploy the service-assembly', 400);
+      return helper.errorBackend(
+        '[Mock message] An error happened when trying to deploy the service-assembly',
+        400
+      );
     }
 
-    const [serviceAssembly, serviceUnits] = containersService.get(containerId).addServiceAssembly(EServiceAssemblyState.Shutdown);
+    const [serviceAssembly, serviceUnits] = containersService
+      .get(containerId)
+      .addServiceAssembly(EServiceAssemblyState.Shutdown);
 
     const response = {
       serviceAssemblies: serviceAssembly,
-      serviceUnits: serviceUnits
+      serviceUnits: serviceUnits,
     };
 
-    setTimeout(() =>
-      (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.SA_DEPLOYED, response),
+    setTimeout(
+      () =>
+        (this.pSseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.SA_DEPLOYED,
+          response
+        ),
       environment.mock.sseDelay
     );
 

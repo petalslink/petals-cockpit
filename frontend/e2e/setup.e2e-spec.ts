@@ -17,7 +17,10 @@
 
 import { browser, Key } from 'protractor';
 
-import { CORRECT_SETUP_TOKEN, GONE_SETUP_TOKEN } from '../src/mocks/backend-mock';
+import {
+  CORRECT_SETUP_TOKEN,
+  GONE_SETUP_TOKEN,
+} from '../src/mocks/backend-mock';
 import { page } from './common';
 import { expectFocused } from './utils';
 import { SetupPage } from './pages/setup.po';
@@ -84,7 +87,9 @@ describe(`Setup`, () => {
 
       setup.button.click();
       expect(setup.error.isDisplayed()).toBe(true);
-      expect(setup.error.$('p').getText()).toEqual('Petals Cockpit is already setup');
+      expect(setup.error.$('p').getText()).toEqual(
+        'Petals Cockpit is already setup'
+      );
     });
 
     it('should select token', () => {

@@ -21,7 +21,6 @@ import { page } from './common';
 import { expectNotFocused, expectNothingFocused } from './utils';
 
 describe(`Mobile`, () => {
-
   beforeEach(() => {
     browser.manage().window().setSize(412, 732);
   });
@@ -57,5 +56,4 @@ describe(`Mobile`, () => {
       expectNothingFocused();
     });
   });
-
 });

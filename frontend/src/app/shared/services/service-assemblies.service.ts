@@ -35,7 +35,7 @@ export const EServiceAssemblyState = {
   Stopped: 'Stopped' as 'Stopped',
   Unloaded: 'Unloaded' as 'Unloaded',
   Shutdown: 'Shutdown' as 'Shutdown',
-  Unknown: 'Unknown' as 'Unknown'
+  Unknown: 'Unknown' as 'Unknown',
 };
 
 export type ServiceAssemblyState = keyof typeof EServiceAssemblyState;
@@ -47,18 +47,24 @@ export interface IServiceAssemblyBackendSSECommon {
   state: ServiceAssemblyState;
 }
 
-export interface IServiceAssemblyBackendDetailsCommon { }
+export interface IServiceAssemblyBackendDetailsCommon {}
 
 export interface IServiceAssemblyBackendSSE extends IServiceAssemblyBackendSSECommon {
   serviceUnits: string[];
 }
 
-export interface IServiceAssemblyBackendDetails extends IServiceAssemblyBackendDetailsCommon { }
+export interface IServiceAssemblyBackendDetails extends IServiceAssemblyBackendDetailsCommon {}
 
 export abstract class ServiceAssembliesService {
-  abstract getDetailsServiceAssembly(serviceAssemblyId: string): Observable<Response>;
+  abstract getDetailsServiceAssembly(
+    serviceAssemblyId: string
+  ): Observable<Response>;
 
-  abstract putState(workspaceId: string, serviceAssemblyId: string, newState: ServiceAssemblyState): Observable<Response>;
+  abstract putState(
+    workspaceId: string,
+    serviceAssemblyId: string,
+    newState: ServiceAssemblyState
+  ): Observable<Response>;
 
   abstract watchEventSaStateChangeOk(): Observable<void>;
 }
@@ -76,51 +82,70 @@ export class ServiceAssembliesServiceImpl extends ServiceAssembliesService {
   }
 
   getDetailsServiceAssembly(serviceAssemblyId: string) {
-    return this.http.get(`${environment.urlBackend}/serviceassemblies/${serviceAssemblyId}`);
+    return this.http.get(
+      `${environment.urlBackend}/serviceassemblies/${serviceAssemblyId}`
+    );
   }
 
-  putState(workspaceId: string, serviceAssemblyId: string, newState: ServiceAssemblyState) {
-    return this.http.put(`${environment.urlBackend}/workspaces/${workspaceId}/serviceassemblies/${serviceAssemblyId}`, { state: newState });
+  putState(
+    workspaceId: string,
+    serviceAssemblyId: string,
+    newState: ServiceAssemblyState
+  ) {
+    return this.http.put(
+      `${environment.urlBackend}/workspaces/${workspaceId}/serviceassemblies/${serviceAssemblyId}`,
+      { state: newState }
+    );
   }
 
   watchEventSaStateChangeOk() {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.SA_STATE_CHANGE)
       .withLatestFrom(this.store$)
-      .do(([data, store]: [{ id: string, state: ServiceAssemblyState }, IStore]) => {
-        const sa = store.serviceAssemblies.byId[data.id];
+      .do(
+        (
+          [data, store]: [{ id: string; state: ServiceAssemblyState }, IStore]
+        ) => {
+          const sa = store.serviceAssemblies.byId[data.id];
 
-        if (data.state === EServiceAssemblyState.Unloaded) {
-          this.router.navigate(['/workspaces', store.workspaces.selectedWorkspaceId]);
+          if (data.state === EServiceAssemblyState.Unloaded) {
+            this.router.navigate([
+              '/workspaces',
+              store.workspaces.selectedWorkspaceId,
+            ]);
 
-          this.notification.success('Service assembly unloaded', `'${sa.name}' has been unloaded`);
+            this.notification.success(
+              'Service assembly unloaded',
+              `'${sa.name}' has been unloaded`
+            );
 
-          const actions = [
-            {
-              type: ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY,
-              payload: {
-                containerId: sa.containerId,
-                serviceAssemblyId: sa.id
-              }
-            },
+            const actions = [
+              {
+                type: ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY,
+                payload: {
+                  containerId: sa.containerId,
+                  serviceAssemblyId: sa.id,
+                },
+              },
 
-            ...sa.serviceUnits.map(suId => ({
-              type: ServiceUnits.REMOVE_SERVICE_UNIT,
-              payload: {
-                componentId: store.serviceUnits.byId[suId].componentId,
-                serviceUnitId: suId
-              }
-            }))
-          ];
+              ...sa.serviceUnits.map(suId => ({
+                type: ServiceUnits.REMOVE_SERVICE_UNIT,
+                payload: {
+                  componentId: store.serviceUnits.byId[suId].componentId,
+                  serviceUnitId: suId,
+                },
+              })),
+            ];
 
-          this.store$.dispatch(batchActions(actions));
-        } else {
-          this.store$.dispatch({
-            type: ServiceAssemblies.CHANGE_STATE_SUCCESS,
-            payload: { newState: data.state, serviceAssemblyId: sa.id }
-          });
+            this.store$.dispatch(batchActions(actions));
+          } else {
+            this.store$.dispatch({
+              type: ServiceAssemblies.CHANGE_STATE_SUCCESS,
+              payload: { newState: data.state, serviceAssemblyId: sa.id },
+            });
+          }
         }
-      })
+      )
       .mapTo(null);
   }
 }

@@ -42,12 +42,16 @@ const reducers = {
   components: Components.reducer,
   serviceUnits: ServiceUnits.reducer,
   serviceAssemblies: ServiceAssemblies.reducer,
-  sharedLibraries: SharedLibraries.reducer
+  sharedLibraries: SharedLibraries.reducer,
 };
 
 // if environment is != from production
 // use storeFreeze to avoid state mutation
-const developmentReducer = compose(storeFreeze, enableBatching, combineReducers)(reducers);
+const developmentReducer = compose(
+  storeFreeze,
+  enableBatching,
+  combineReducers
+)(reducers);
 const productionReducer = compose(enableBatching, combineReducers)(reducers);
 
 // enableBatching allows us to dispatch multiple actions

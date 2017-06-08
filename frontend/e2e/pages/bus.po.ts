@@ -22,21 +22,27 @@ import { waitTimeout } from '../common';
 import { ContainerOverviewPage } from './container.po';
 
 export class BusPage {
-
   public static readonly component = $(`app-petals-bus-view`);
 
   public readonly component = BusPage.component;
   public readonly title = this.component.$(`md-toolbar-row .title`);
-  public readonly containers = this.component.$$(`.swiper-container .swiper-slide`);
-  public readonly deleteButton = this.component.$('md-toolbar-row .btn-delete-bus');
+  public readonly containers = this.component.$$(
+    `.swiper-container .swiper-slide`
+  );
+  public readonly deleteButton = this.component.$(
+    'md-toolbar-row .btn-delete-bus'
+  );
 
   static waitAndGet() {
-    browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/buses\/\w+/), waitTimeout);
+    browser.wait(
+      urlToMatch(/\/workspaces\/\w+\/petals\/buses\/\w+/),
+      waitTimeout
+    );
     browser.wait(EC.visibilityOf(BusPage.component), waitTimeout);
     return new BusPage();
   }
 
-  private constructor() { }
+  private constructor() {}
 
   openContainer(index: number) {
     this.containers.get(index).$('.swiper-img-container').click();

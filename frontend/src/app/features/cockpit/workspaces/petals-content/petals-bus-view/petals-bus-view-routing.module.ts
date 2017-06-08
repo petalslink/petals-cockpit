@@ -24,7 +24,7 @@ import { PetalsBusViewComponent } from './petals-bus-view.component';
 const routes: Routes = [
   {
     path: '',
-    component: PetalsBusViewComponent
+    component: PetalsBusViewComponent,
     // when we'll be able to use router-outlet with material2 tabs
     // https://github.com/angular/material2/issues/524
     // load every tab content separately
@@ -38,12 +38,12 @@ const routes: Routes = [
     //     loadChildren:
     //   }
     // ]
-  }
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
-  providers: []
+  providers: [],
 })
-export class PetalsBusViewRoutingModule { }
+export class PetalsBusViewRoutingModule {}

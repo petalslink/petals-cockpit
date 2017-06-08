@@ -55,9 +55,17 @@ export interface IContainerBackendDetails extends IContainerBackendDetailsCommon
 export abstract class ContainersService {
   abstract getDetailsContainer(containerId: string): Observable<Response>;
 
-  abstract deployComponent(workspaceId: string, containerId: string, file: File): Observable<Response>;
+  abstract deployComponent(
+    workspaceId: string,
+    containerId: string,
+    file: File
+  ): Observable<Response>;
 
-  abstract deployServiceAssembly(workspaceId: string, containerId: string, file: File): Observable<Response>;
+  abstract deployServiceAssembly(
+    workspaceId: string,
+    containerId: string,
+    file: File
+  ): Observable<Response>;
 
   abstract watchEventComponentDeployedOk(): Observable<void>;
 }
@@ -81,33 +89,46 @@ export class ContainersServiceImpl extends ContainersService {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
 
-    return this.http.post(`${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/components`, formData);
+    return this.http.post(
+      `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/components`,
+      formData
+    );
   }
 
   deployServiceAssembly(workspaceId: string, containerId: string, file: File) {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
 
-    return this.http.post(`${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/serviceassemblies`, formData);
+    return this.http.post(
+      `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/serviceassemblies`,
+      formData
+    );
   }
 
   watchEventComponentDeployedOk() {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.COMPONENT_DEPLOYED)
       .do((data: any) => {
-        const components = toJavascriptMap<IComponentBackendSSE>(data.components);
+        const components = toJavascriptMap<IComponentBackendSSE>(
+          data.components
+        );
 
         // there is only one component deployed here
         const component = components.byId[components.allIds[0]];
 
-        this.notification.success('Component deployed', `"${component.name}" has been deployed`);
+        this.notification.success(
+          'Component deployed',
+          `"${component.name}" has been deployed`
+        );
 
-        this.store$.dispatch(batchActions([
-          // add the component
-          { type: Components.ADD_COMPONENTS_SUCCESS, payload: components },
-          // add it to the container
-          { type: Containers.DEPLOY_COMPONENT_SUCCESS, payload: component }
-        ]));
+        this.store$.dispatch(
+          batchActions([
+            // add the component
+            { type: Components.ADD_COMPONENTS_SUCCESS, payload: components },
+            // add it to the container
+            { type: Containers.DEPLOY_COMPONENT_SUCCESS, payload: component },
+          ])
+        );
       })
       .mapTo(null);
   }

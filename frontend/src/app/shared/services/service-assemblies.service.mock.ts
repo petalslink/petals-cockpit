@@ -27,7 +27,10 @@ import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
 import { environment } from '../../../environments/environment';
 import { IStore } from '../interfaces/store.interface';
-import { ServiceAssembliesServiceImpl, ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
+import {
+  ServiceAssembliesServiceImpl,
+  ServiceAssemblyState,
+} from 'app/shared/services/service-assemblies.service';
 
 @Injectable()
 export class ServiceAssembliesServiceMock extends ServiceAssembliesServiceImpl {
@@ -42,24 +45,34 @@ export class ServiceAssembliesServiceMock extends ServiceAssembliesServiceImpl {
   }
 
   getDetailsServiceAssembly(serviceAssemblyId: string) {
-    const detailsServiceAssembly = serviceAssembliesService.get(serviceAssemblyId).getDetails();
+    const detailsServiceAssembly = serviceAssembliesService
+      .get(serviceAssemblyId)
+      .getDetails();
 
     return helper.responseBody(detailsServiceAssembly);
   }
 
-  putState(_workspaceId: string, serviceAssemblyId: string, newState: ServiceAssemblyState) {
+  putState(
+    _workspaceId: string,
+    serviceAssemblyId: string,
+    newState: ServiceAssemblyState
+  ) {
     const serviceAssembly = serviceAssembliesService.get(serviceAssemblyId);
 
     serviceAssembly.setState(newState);
 
     const response = {
       id: serviceAssemblyId,
-      state: newState
+      state: newState,
     };
 
     // when the state changes, trigger a fake SSE event
-    setTimeout(() =>
-      (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.SA_STATE_CHANGE, response),
+    setTimeout(
+      () =>
+        (this.pSseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.SA_STATE_CHANGE,
+          response
+        ),
       environment.mock.sseDelay
     );
 

@@ -22,11 +22,16 @@ import { IStore } from './../interfaces/store.interface';
 import { ICurrentUser } from './../interfaces/users.interface';
 import { isNot } from '../helpers/shared.helper';
 
-export function _getCurrentUser(store$: Store<IStore>): Observable<ICurrentUser> {
+export function _getCurrentUser(
+  store$: Store<IStore>
+): Observable<ICurrentUser> {
   return store$
-    .select(state => state.users.connectedUserId === ''
-      ? null
-      : state.users.byId[state.users.connectedUserId])
+    .select(
+      state =>
+        state.users.connectedUserId === ''
+          ? null
+          : state.users.byId[state.users.connectedUserId]
+    )
     .filter(isNot(null));
 }
 

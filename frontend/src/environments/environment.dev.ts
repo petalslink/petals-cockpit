@@ -50,6 +50,6 @@ export const environment = {
     // ALREADYCONNECTED
     // define wether we should consider
     // that the user's already logged or not
-    alreadyConnected: true
-  }
+    alreadyConnected: true,
+  },
 };

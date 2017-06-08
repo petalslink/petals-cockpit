@@ -32,36 +32,46 @@ export class BusesEffects {
     private actions$: Actions,
     private store$: Store<IStore>,
     private busesService: BusesService
-  ) { }
+  ) {}
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchBusDetails$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  fetchBusDetails$: Observable<Action> = this.actions$
     .ofType(Buses.FETCH_BUS_DETAILS)
-    .switchMap((action: { type: string, payload: { busId: string } }) =>
-      this.busesService.getDetailsBus(action.payload.busId)
+    .switchMap((action: { type: string; payload: { busId: string } }) =>
+      this.busesService
+        .getDetailsBus(action.payload.busId)
         .map((res: Response) => {
           const rslt = res.json();
-          return { type: Buses.FETCH_BUS_DETAILS_SUCCESS, payload: { busId: action.payload.busId, rslt } };
+          return {
+            type: Buses.FETCH_BUS_DETAILS_SUCCESS,
+            payload: { busId: action.payload.busId, rslt },
+          };
         })
-        .catch((err) => {
+        .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in buses.effects.ts: ofType(Buses.FETCH_BUS_DETAILS)');
+            console.warn(
+              'Error caught in buses.effects.ts: ofType(Buses.FETCH_BUS_DETAILS)'
+            );
             console.error(err);
             console.groupEnd();
           }
 
           return Observable.of({
             type: Buses.FETCH_BUS_DETAILS_ERROR,
-            payload: { busId: action.payload.busId }
+            payload: { busId: action.payload.busId },
           });
         })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) deleteBus$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  deleteBus$: Observable<Action> = this.actions$
     .ofType(Buses.DELETE_BUS)
-    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
     .switchMap(([action, idWorkspace]) =>
       this.busesService
         .deleteBus(idWorkspace, action.payload)
@@ -69,12 +79,17 @@ export class BusesEffects {
         .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in buses.effects: ofType(Buses.DELETE_BUS)');
+            console.warn(
+              'Error catched in buses.effects: ofType(Buses.DELETE_BUS)'
+            );
             console.error(err);
             console.groupEnd();
           }
 
-          return Observable.of({ type: Buses.DELETE_BUS_FAILED, payload: action.payload });
+          return Observable.of({
+            type: Buses.DELETE_BUS_FAILED,
+            payload: action.payload,
+          });
         })
     );
 }

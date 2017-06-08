@@ -24,7 +24,10 @@ import { NotificationsService } from 'angular2-notifications';
 
 import { environment } from './../../../../../../environments/environment';
 import { Components } from './components.reducer';
-import { ComponentsService, ComponentState } from './../../../../../shared/services/components.service';
+import {
+  ComponentsService,
+  ComponentState,
+} from './../../../../../shared/services/components.service';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 
 @Injectable()
@@ -34,89 +37,154 @@ export class ComponentsEffects {
     private actions$: Actions,
     private componentsService: ComponentsService,
     private notification: NotificationsService
-  ) { }
+  ) {}
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchContainersDetails$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  fetchContainersDetails$: Observable<Action> = this.actions$
     .ofType(Components.FETCH_COMPONENT_DETAILS)
-    .switchMap((action: { type: string, payload: { componentId: string } }) =>
-      this.componentsService.getDetailsComponent(action.payload.componentId)
+    .switchMap((action: { type: string; payload: { componentId: string } }) =>
+      this.componentsService
+        .getDetailsComponent(action.payload.componentId)
         .map((res: Response) => {
           const data = res.json();
-          return { type: Components.FETCH_COMPONENT_DETAILS_SUCCESS, payload: { componentId: action.payload.componentId, data } };
+          return {
+            type: Components.FETCH_COMPONENT_DETAILS_SUCCESS,
+            payload: { componentId: action.payload.componentId, data },
+          };
         })
-        .catch((err) => {
+        .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in components.effects.ts: ofType(Components.FETCH_COMPONENT_DETAILS)');
+            console.warn(
+              'Error caught in components.effects.ts: ofType(Components.FETCH_COMPONENT_DETAILS)'
+            );
             console.error(err);
             console.groupEnd();
           }
 
           return Observable.of({
             type: Components.FETCH_COMPONENT_DETAILS_ERROR,
-            payload: { componentId: action.payload.componentId }
+            payload: { componentId: action.payload.componentId },
           });
         })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) changeState$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  changeState$: Observable<Action> = this.actions$
     .ofType(Components.CHANGE_STATE)
-    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
-    .switchMap(([action, workspaceId]:
-      [
-        { type: string, payload: { componentId: string, newState: ComponentState, parameters: { [key: string]: string } } },
-        string
-      ]) =>
-      this.componentsService.putState(workspaceId, action.payload.componentId, action.payload.newState, action.payload.parameters)
-        .mergeMap(_ => Observable.empty())
-        .catch((err) => {
-          if (environment.debug) {
-            console.group();
-            console.warn('Error catched in components.effects: ofType(Components.CHANGE_STATE)');
-            console.error(err);
-            console.groupEnd();
-          }
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
+    .switchMap(
+      (
+        [action, workspaceId]: [
+          {
+            type: string;
+            payload: {
+              componentId: string;
+              newState: ComponentState;
+              parameters: { [key: string]: string };
+            };
+          },
+          string
+        ]
+      ) =>
+        this.componentsService
+          .putState(
+            workspaceId,
+            action.payload.componentId,
+            action.payload.newState,
+            action.payload.parameters
+          )
+          .mergeMap(_ => Observable.empty())
+          .catch(err => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error catched in components.effects: ofType(Components.CHANGE_STATE)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          return Observable.of({
-            type: Components.CHANGE_STATE_ERROR,
-            payload: { componentId: action.payload.componentId, errorChangeState: err.json().message }
-          });
-        })
+            return Observable.of({
+              type: Components.CHANGE_STATE_ERROR,
+              payload: {
+                componentId: action.payload.componentId,
+                errorChangeState: err.json().message,
+              },
+            });
+          })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) changeStateSuccess$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  changeStateSuccess$: Observable<Action> = this.actions$
     .ofType(Components.CHANGE_STATE_SUCCESS)
-    .map((action: { type: string, payload: { componentId: string, newState: string } }) =>
-      ({ type: Components.FETCH_COMPONENT_DETAILS, payload: { componentId: action.payload.componentId } })
+    .map(
+      (action: {
+        type: string;
+        payload: { componentId: string; newState: string };
+      }) => ({
+        type: Components.FETCH_COMPONENT_DETAILS,
+        payload: { componentId: action.payload.componentId },
+      })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) deployServiceUnit$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  deployServiceUnit$: Observable<Action> = this.actions$
     .ofType(Components.DEPLOY_SERVICE_UNIT)
-    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
-    .switchMap(([action, workspaceId]: [{ type: string, payload: { file: File, componentId: string, serviceUnitName: string } }, string]) =>
-      this.componentsService.deploySu(workspaceId, action.payload.componentId, action.payload.file, action.payload.serviceUnitName)
-        .mergeMap(_ => Observable.empty())
-        .catch((err) => {
-          if (environment.debug) {
-            console.group();
-            console.warn('Error caught in components.effects: ofType(Components.DEPLOY_SERVICE_UNIT)');
-            console.error(err);
-            console.groupEnd();
-          }
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
+    .switchMap(
+      (
+        [action, workspaceId]: [
+          {
+            type: string;
+            payload: {
+              file: File;
+              componentId: string;
+              serviceUnitName: string;
+            };
+          },
+          string
+        ]
+      ) =>
+        this.componentsService
+          .deploySu(
+            workspaceId,
+            action.payload.componentId,
+            action.payload.file,
+            action.payload.serviceUnitName
+          )
+          .mergeMap(_ => Observable.empty())
+          .catch(err => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in components.effects: ofType(Components.DEPLOY_SERVICE_UNIT)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          this.notification.error(
-            'Deploy Service-Unit failed',
-            `An error occurred when trying to deploy the file "${action.payload.file.name}"`
-          );
+            this.notification.error(
+              'Deploy Service-Unit failed',
+              `An error occurred when trying to deploy the file "${action
+                .payload.file.name}"`
+            );
 
-          return Observable.of({
-            type: Components.DEPLOY_SERVICE_UNIT_ERROR,
-            payload: { componentId: action.payload.componentId, errorDeployment: err.json().message }
-          });
-        })
+            return Observable.of({
+              type: Components.DEPLOY_SERVICE_UNIT_ERROR,
+              payload: {
+                componentId: action.payload.componentId,
+                errorDeployment: err.json().message,
+              },
+            });
+          })
     );
 }

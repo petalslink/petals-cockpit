@@ -17,12 +17,17 @@
 
 import { containersService, Container } from './containers-mock';
 import { Workspace } from './workspaces-mock';
-import { IBusImport, IBusBackendSSE, IBusBackendDetails, IBusInProgressBackend } from 'app/shared/services/buses.service';
+import {
+  IBusImport,
+  IBusBackendSSE,
+  IBusBackendDetails,
+  IBusInProgressBackend,
+} from 'app/shared/services/buses.service';
 
 export class Buses {
   private readonly buses = new Map<string, Bus>();
 
-  constructor() { }
+  constructor() {}
 
   create(workspace: Workspace) {
     const bus = new Bus(workspace);
@@ -40,7 +45,7 @@ export const busesService = new Buses();
 export class BusesInProgress {
   private readonly busesInProgress = new Map<string, BusInProgress>();
 
-  constructor() { }
+  constructor() {}
 
   create(workspace: Workspace, bus?: IBusImport) {
     const busInProgress = new BusInProgress(workspace, bus);
@@ -91,8 +96,8 @@ export class Bus extends BusBase {
         id: this.id,
         name: this.name,
         workspaceId: this.workspace.id,
-        containers: Array.from(this.containers.keys())
-      }
+        containers: Array.from(this.containers.keys()),
+      },
     };
   }
 
@@ -102,7 +107,6 @@ export class Bus extends BusBase {
 }
 
 export class BusInProgress extends BusBase {
-
   public readonly ip: string;
   public readonly port: number;
   public readonly username: string;
@@ -127,8 +131,8 @@ export class BusInProgress extends BusBase {
         ip: this.ip,
         port: this.port,
         username: this.username,
-        importError: undefined
-      }
+        importError: undefined,
+      },
     };
   }
 }

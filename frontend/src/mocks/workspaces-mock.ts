@@ -17,7 +17,12 @@
 
 import { omit, flatMap, assign } from 'lodash';
 
-import { Bus, BusInProgress, busesService, busesInProgressService } from './buses-mock';
+import {
+  Bus,
+  BusInProgress,
+  busesService,
+  busesInProgressService,
+} from './buses-mock';
 import { users } from './backend-mock';
 import { IBusImport } from 'app/shared/services/buses.service';
 
@@ -26,9 +31,7 @@ function toObj<A>(arr: { toObj: () => A }[]): A {
 }
 
 // buses that can be imported
-export const validContainers = [
-  '192.168.0.1:7700'
-];
+export const validContainers = ['192.168.0.1:7700'];
 
 export class Workspace {
   private static cpt = 0;
@@ -41,15 +44,19 @@ export class Workspace {
 
   private static workspaceUsers(i: number) {
     switch (i) {
-      case 1: return ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'];
-      default: return ['admin'];
+      case 1:
+        return ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'];
+      default:
+        return ['admin'];
     }
   }
 
   private static workspaceDescription(i: number) {
     switch (i) {
-      case 0: return 'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.';
-      default: return 'Put some description in **markdown** for the workspace here.';
+      case 0:
+        return 'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.';
+      default:
+        return 'Put some description in **markdown** for the workspace here.';
     }
   }
 
@@ -72,7 +79,7 @@ export class Workspace {
       id: this.id,
       name: this.name,
       description: this.description,
-      users: this.users
+      users: this.users,
     };
   }
 
@@ -98,7 +105,7 @@ export class Workspace {
     return bus;
   }
 
-  tryAddBus(importData: IBusImport): { id: string, eventData: any } {
+  tryAddBus(importData: IBusImport): { id: string; eventData: any } {
     const ipPort = `${importData.ip}:${importData.port}`;
 
     // this will return the data for the BUS_IMPORT_OK event
@@ -107,7 +114,9 @@ export class Workspace {
 
       const containers = bus.getContainers();
       const components = flatMap(containers, c => c.getComponents());
-      const serviceAssemblies = flatMap(containers, c => c.getServiceAssemblies());
+      const serviceAssemblies = flatMap(containers, c =>
+        c.getServiceAssemblies()
+      );
       const serviceUnits = flatMap(components, c => c.getServiceUnits());
       const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
@@ -117,12 +126,12 @@ export class Workspace {
         components: toObj(components),
         serviceAssemblies: toObj(serviceAssemblies),
         serviceUnits: toObj(serviceUnits),
-        sharedLibraries: toObj(sharedLibraries)
+        sharedLibraries: toObj(sharedLibraries),
       };
 
       return {
         id: bus.id,
-        eventData
+        eventData,
       };
     }
 
@@ -134,15 +143,18 @@ export class Workspace {
       eventData: {
         ...bus.toObj()[bus.id],
         importError: `Can't connect to ${ipPort}`,
-        id: bus.id
-      }
+        id: bus.id,
+      },
     };
   }
 }
 
 export class Workspaces {
   // map to cache the created workspaces
-  private readonly memoizedWorkspaces = new Map<string, { wks: Workspace, composedWks: any }>();
+  private readonly memoizedWorkspaces = new Map<
+    string,
+    { wks: Workspace; composedWks: any }
+  >();
 
   constructor() {
     // generate 2 workspaces by default
@@ -179,7 +191,7 @@ export class Workspaces {
         return {
           ...acc,
           // this is potentially big, so the backend des not return it here
-          [workspaceId]: omit(ws, 'description')
+          [workspaceId]: omit(ws, 'description'),
         };
       } else {
         return acc;
@@ -230,7 +242,9 @@ export class Workspaces {
 
     const containers = flatMap(buses, b => b.getContainers());
     const components = flatMap(containers, c => c.getComponents());
-    const serviceAssemblies = flatMap(containers, c => c.getServiceAssemblies());
+    const serviceAssemblies = flatMap(containers, c =>
+      c.getServiceAssemblies()
+    );
     const serviceUnits = flatMap(components, c => c.getServiceUnits());
     const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
@@ -243,10 +257,13 @@ export class Workspaces {
       components: toObj(components),
       serviceAssemblies: toObj(serviceAssemblies),
       serviceUnits: toObj(serviceUnits),
-      sharedLibraries: toObj(sharedLibraries)
+      sharedLibraries: toObj(sharedLibraries),
     };
 
-    this.memoizedWorkspaces.set(newWorkspace.id, { wks: newWorkspace, composedWks });
+    this.memoizedWorkspaces.set(newWorkspace.id, {
+      wks: newWorkspace,
+      composedWks,
+    });
 
     return { ...composedWks };
   }

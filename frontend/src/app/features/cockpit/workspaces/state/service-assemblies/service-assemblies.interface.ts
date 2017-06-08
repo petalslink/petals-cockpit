@@ -17,7 +17,10 @@
 
 import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 import {
-  IServiceAssemblyBackendSSE, IServiceAssemblyBackendDetails, IServiceAssemblyBackendSSECommon, IServiceAssemblyBackendDetailsCommon
+  IServiceAssemblyBackendSSE,
+  IServiceAssemblyBackendDetails,
+  IServiceAssemblyBackendSSECommon,
+  IServiceAssemblyBackendDetailsCommon,
 } from 'app/shared/services/service-assemblies.service';
 
 export interface IServiceAssemblyUI {
@@ -27,16 +30,18 @@ export interface IServiceAssemblyUI {
   errorChangeState: string;
 }
 
-export interface IServiceAssemblyRow extends IServiceAssemblyUI, IServiceAssemblyBackendSSE, IServiceAssemblyBackendDetails { }
+export interface IServiceAssemblyRow extends IServiceAssemblyUI, IServiceAssemblyBackendSSE, IServiceAssemblyBackendDetails {}
 
-export interface IServiceAssembly extends IServiceAssemblyUI, IServiceAssemblyBackendSSECommon, IServiceAssemblyBackendDetailsCommon { }
+export interface IServiceAssembly extends IServiceAssemblyUI, IServiceAssemblyBackendSSECommon, IServiceAssemblyBackendDetailsCommon {}
 
 interface IServiceAssembliesCommon {
   selectedServiceAssemblyId: string;
   isFetchingDetails: boolean;
 }
 
-export interface IServiceAssembliesTable extends IServiceAssembliesCommon, JsMap<IServiceAssemblyRow> { }
+export interface IServiceAssembliesTable extends IServiceAssembliesCommon, JsMap<
+  IServiceAssemblyRow
+> {}
 
 export interface IServiceAssemblies extends IServiceAssembliesCommon {
   list: IServiceAssembly[];
@@ -52,13 +57,13 @@ export function serviceAssemblyRowFactory(): IServiceAssemblyRow {
 
     isFolded: false,
     isUpdatingState: false,
-    errorChangeState: ''
+    errorChangeState: '',
   };
 }
 
 export function serviceAssembliesTableFactory(): IServiceAssembliesTable {
   return Object.assign({}, emptyJavascriptMap<IServiceAssemblyRow>(), {
     selectedServiceAssemblyId: '',
-    isFetchingDetails: false
+    isFetchingDetails: false,
   });
 }

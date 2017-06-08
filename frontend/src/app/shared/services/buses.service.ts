@@ -45,7 +45,7 @@ export interface IBusBackendSSECommon {
   workspaceId: string;
 }
 
-export interface IBusBackendDetailsCommon { }
+export interface IBusBackendDetailsCommon {}
 
 export interface IBusBackendSSE extends IBusBackendSSECommon {
   containers: string[];
@@ -68,9 +68,9 @@ export interface IBusImport {
   passphrase: string;
 }
 
-export interface IBusInProgressBackend extends IBusInProgressBackendCommon { }
+export interface IBusInProgressBackend extends IBusInProgressBackendCommon {}
 
-export interface IBusBackendDetails extends IBusBackendDetailsCommon { }
+export interface IBusBackendDetails extends IBusBackendDetailsCommon {}
 
 export abstract class BusesService {
   abstract postBus(idWorkspace: string, bus: IBusImport): Observable<Response>;
@@ -101,11 +101,16 @@ export class BusesServiceImpl extends BusesService {
   }
 
   postBus(idWorkspace: string, bus: IBusImport) {
-    return this.http.post(`${environment.urlBackend}/workspaces/${idWorkspace}/buses`, bus);
+    return this.http.post(
+      `${environment.urlBackend}/workspaces/${idWorkspace}/buses`,
+      bus
+    );
   }
 
   deleteBus(idWorkspace: string, id: string) {
-    return this.http.delete(`${environment.urlBackend}/workspaces/${idWorkspace}/buses/${id}`);
+    return this.http.delete(
+      `${environment.urlBackend}/workspaces/${idWorkspace}/buses/${id}`
+    );
   }
 
   getDetailsBus(busId: string) {
@@ -115,10 +120,12 @@ export class BusesServiceImpl extends BusesService {
   watchEventBusImport() {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT)
-      .do(bip => this.store$.dispatch({
-        type: BusesInProgress.ADD_BUSES_IN_PROGRESS,
-        payload: toJavascriptMap<IBusInProgressBackend>({ [bip.id]: bip })
-      }));
+      .do(bip =>
+        this.store$.dispatch({
+          type: BusesInProgress.ADD_BUSES_IN_PROGRESS,
+          payload: toJavascriptMap<IBusInProgressBackend>({ [bip.id]: bip }),
+        })
+      );
   }
 
   watchEventBusDeleted() {
@@ -129,13 +136,22 @@ export class BusesServiceImpl extends BusesService {
         const bus = state.buses.byId[id];
         if (bus) {
           this.notifications.info(bus.name, reason);
-          this.store$.dispatch({ type: Buses.REMOVE_BUS, payload: { busId: id } });
+          this.store$.dispatch({
+            type: Buses.REMOVE_BUS,
+            payload: { busId: id },
+          });
           // redirect to current workspace
-          this.router.navigate(['/workspaces', state.workspaces.selectedWorkspaceId]);
+          this.router.navigate([
+            '/workspaces',
+            state.workspaces.selectedWorkspaceId,
+          ]);
         } else {
           const bip = state.busesInProgress.byId[id];
           this.notifications.info(`${bip.ip}:${bip.port}`, reason);
-          this.store$.dispatch({ type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: id });
+          this.store$.dispatch({
+            type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
+            payload: id,
+          });
         }
       })
       .mapTo(null);
@@ -150,20 +166,43 @@ export class BusesServiceImpl extends BusesService {
         // there should be only one element in there!
         const bus = buses.byId[buses.allIds[0]];
 
-        this.notifications.success(`Bus import success`, `The import of the bus ${bus.name} succeeded`);
+        this.notifications.success(
+          `Bus import success`,
+          `The import of the bus ${bus.name} succeeded`
+        );
 
-        this.store$.dispatch(batchActions([
-          { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: bus.id },
-          { type: Buses.ADD_BUSES_SUCCESS, payload: buses },
-          { type: Containers.ADD_CONTAINERS_SUCCESS, payload: toJavascriptMap<IContainerBackendSSE>(data.containers) },
-          {
-            type: ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS,
-            payload: toJavascriptMap<IComponentBackendSSE>(data.serviceAssemblies)
-          },
-          { type: Components.ADD_COMPONENTS_SUCCESS, payload: toJavascriptMap<IComponentBackendSSE>(data.components) },
-          { type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits) },
-          { type: SharedLibraries.ADDED, payload: toJavascriptMap<ISharedLibraryBackendSSE>(data.sharedLibraries) }
-        ]));
+        this.store$.dispatch(
+          batchActions([
+            { type: BusesInProgress.REMOVE_BUS_IN_PROGRESS, payload: bus.id },
+            { type: Buses.ADD_BUSES_SUCCESS, payload: buses },
+            {
+              type: Containers.ADD_CONTAINERS_SUCCESS,
+              payload: toJavascriptMap<IContainerBackendSSE>(data.containers),
+            },
+            {
+              type: ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS,
+              payload: toJavascriptMap<IComponentBackendSSE>(
+                data.serviceAssemblies
+              ),
+            },
+            {
+              type: Components.ADD_COMPONENTS_SUCCESS,
+              payload: toJavascriptMap<IComponentBackendSSE>(data.components),
+            },
+            {
+              type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS,
+              payload: toJavascriptMap<IServiceUnitBackendSSE>(
+                data.serviceUnits
+              ),
+            },
+            {
+              type: SharedLibraries.ADDED,
+              payload: toJavascriptMap<ISharedLibraryBackendSSE>(
+                data.sharedLibraries
+              ),
+            },
+          ])
+        );
       });
   }
 
@@ -171,11 +210,15 @@ export class BusesServiceImpl extends BusesService {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.BUS_IMPORT_ERROR)
       .do((busInError: any) => {
+        this.notifications.alert(
+          `Bus import error`,
+          `The import of a bus from the IP ${busInError.ip}:${busInError.port} failed`
+        );
 
-        this.notifications.alert(`Bus import error`,
-          `The import of a bus from the IP ${busInError.ip}:${busInError.port} failed`);
-
-        this.store$.dispatch({ type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS, payload: busInError });
+        this.store$.dispatch({
+          type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS,
+          payload: busInError,
+        });
       });
   }
 }

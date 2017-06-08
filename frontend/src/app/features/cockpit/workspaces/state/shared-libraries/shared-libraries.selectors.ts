@@ -24,14 +24,23 @@ import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/wo
 import { arrayEquals } from 'app/shared/helpers/shared.helper';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 
-export function getCurrentSharedLibrary(store$: Store<IStore>): Observable<ISharedLibraryRow> {
+export function getCurrentSharedLibrary(
+  store$: Store<IStore>
+): Observable<ISharedLibraryRow> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.sharedLibraries.selectedSharedLibraryId)
-    .map(state => state.sharedLibraries.byId[state.sharedLibraries.selectedSharedLibraryId])
+    .map(
+      state =>
+        state.sharedLibraries.byId[
+          state.sharedLibraries.selectedSharedLibraryId
+        ]
+    )
     .distinctUntilChanged();
 }
 
-export function getCurrentSharedLibraryComponents(store$: Store<IStore>): Observable<IComponentRow[]> {
+export function getCurrentSharedLibraryComponents(
+  store$: Store<IStore>
+): Observable<IComponentRow[]> {
   return getCurrentSharedLibrary(store$)
     .withLatestFrom(store$.select(state => state.components))
     .distinctUntilChanged(arrayEquals)

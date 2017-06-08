@@ -18,18 +18,15 @@
 import { NgModule } from '@angular/core';
 import { MarkdownToHtmlModule } from 'markdown-to-html-pipe';
 
-import { WorkspaceComponent, WorkspaceDeleteDialogComponent } from 'app/features/cockpit/workspaces/workspace/workspace.component';
+import {
+  WorkspaceComponent,
+  WorkspaceDeleteDialogComponent,
+} from 'app/features/cockpit/workspaces/workspace/workspace.component';
 import { SharedModule } from 'app/shared/shared.module';
 
 @NgModule({
-  imports: [
-    SharedModule,
-    MarkdownToHtmlModule
-  ],
-  declarations: [
-    WorkspaceComponent,
-    WorkspaceDeleteDialogComponent
-  ],
-  entryComponents: [WorkspaceDeleteDialogComponent]
+  imports: [SharedModule, MarkdownToHtmlModule],
+  declarations: [WorkspaceComponent, WorkspaceDeleteDialogComponent],
+  entryComponents: [WorkspaceDeleteDialogComponent],
 })
-export class WorkspaceModule { }
+export class WorkspaceModule {}

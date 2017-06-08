@@ -93,13 +93,17 @@ describe(`Import Bus`, () => {
     importBus.importButton.click();
 
     // the first one should fail
-    expect($(`app-petals-bus-in-progress-view .error-details`).getText()).toEqual('Error 500: Error backend');
+    expect(
+      $(`app-petals-bus-in-progress-view .error-details`).getText()
+    ).toEqual('Error 500: Error backend');
 
     // clear the form and the error
     importBus.clearButton.click();
 
     // check if the error for import bus is not displayed
-    expect($(`app-petals-bus-in-progress-view .error-details`).isPresent()).toBe(false);
+    expect(
+      $(`app-petals-bus-in-progress-view .error-details`).isPresent()
+    ).toBe(false);
 
     // still 2 buses in progress
     expect(workspace.busesInProgress.count()).toEqual(2);
@@ -123,8 +127,15 @@ describe(`Import Bus`, () => {
     // but cannot connect to the bus
     expect(importBus.error.getText()).toEqual(`Can't connect to hostname:7700`);
     expect(workspace.busesInProgress.count()).toEqual(3);
-    expect(workspace.busesInProgress.get(2).$(`.ip-port`).getText()).toEqual('hostname:7700');
-    expect(workspace.busesInProgress.get(2).element(by.cssContainingText(`md-icon`, `warning`)).isDisplayed()).toEqual(true);
+    expect(workspace.busesInProgress.get(2).$(`.ip-port`).getText()).toEqual(
+      'hostname:7700'
+    );
+    expect(
+      workspace.busesInProgress
+        .get(2)
+        .element(by.cssContainingText(`md-icon`, `warning`))
+        .isDisplayed()
+    ).toEqual(true);
 
     expect(importBus.discardButton.getText()).toEqual(`remove_circle DISCARD`);
     expect(importBus.discardButton.isEnabled()).toBe(true);
@@ -133,7 +144,9 @@ describe(`Import Bus`, () => {
   it(`should import a bus`, () => {
     const importBus = workspace.openImportBus();
 
-    expect($$(`app-petals-menu-view > app-material-tree > md-nav-list`).count()).toEqual(1);
+    expect(
+      $$(`app-petals-menu-view > app-material-tree > md-nav-list`).count()
+    ).toEqual(1);
 
     importBus.ip.sendKeys(`192.168.0.1`);
     importBus.port.sendKeys(`7700`);
@@ -141,9 +154,15 @@ describe(`Import Bus`, () => {
     importBus.password.sendKeys(`password`);
     importBus.passphrase.sendKeys(`passphrase`);
 
-    page.clickAndExpectNotification(importBus.importButton, 'Bus import success', /^The import of the bus .* succeeded$/);
+    page.clickAndExpectNotification(
+      importBus.importButton,
+      'Bus import success',
+      /^The import of the bus .* succeeded$/
+    );
 
-    expect($$(`app-petals-menu-view > app-material-tree > md-nav-list`).count()).toEqual(2);
+    expect(
+      $$(`app-petals-menu-view > app-material-tree > md-nav-list`).count()
+    ).toEqual(2);
   });
 
   it(`should select the first input of import bus form on desktop`, () => {

@@ -20,20 +20,19 @@ import { NgModule } from '@angular/core';
 import { SharedModule } from '../../shared/shared.module';
 import { CockpitRoutingModule } from './cockpit-routing.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
-import { CockpitComponent, DeletedWorkspaceDialogComponent } from './cockpit.component';
+import {
+  CockpitComponent,
+  DeletedWorkspaceDialogComponent,
+} from './cockpit.component';
 import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog.component';
 
 @NgModule({
-  imports: [
-    SharedModule,
-    CockpitRoutingModule,
-    WorkspacesModule
-  ],
+  imports: [SharedModule, CockpitRoutingModule, WorkspacesModule],
   declarations: [
     CockpitComponent,
     WorkspacesDialogComponent,
-    DeletedWorkspaceDialogComponent
+    DeletedWorkspaceDialogComponent,
   ],
-  entryComponents: [WorkspacesDialogComponent, DeletedWorkspaceDialogComponent]
+  entryComponents: [WorkspacesDialogComponent, DeletedWorkspaceDialogComponent],
 })
-export class CockpitModule { }
+export class CockpitModule {}

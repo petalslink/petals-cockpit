@@ -21,50 +21,42 @@ import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service
 
 describe(`Containers reducer`, () => {
   it(`should have a default value`, () => {
-    expect(Containers.reducer(undefined, { type: `init`, payload: `` }))
-      .toEqual({
-        selectedContainerId: '',
-        isFetchingDetails: false,
+    expect(
+      Containers.reducer(undefined, { type: `init`, payload: `` })
+    ).toEqual({
+      selectedContainerId: '',
+      isFetchingDetails: false,
 
-        byId: {},
-        allIds: []
-      });
+      byId: {},
+      allIds: [],
+    });
   });
 
   describe(Containers.FETCH_CONTAINERS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Containers.FETCH_CONTAINERS_SUCCESS).toEqual(`[Containers] Fetch containers success`);
+      expect(Containers.FETCH_CONTAINERS_SUCCESS).toEqual(
+        `[Containers] Fetch containers success`
+      );
     });
 
     const map = {
       byId: {
         idCont2: {
           name: 'Cont 2',
-          components: [
-            'idComp4',
-            'idComp5'
-          ],
+          components: ['idComp4', 'idComp5'],
           sharedLibraries: [],
           id: 'idCont2',
-          busId: 'idBus0'
+          busId: 'idBus0',
         },
         idCont3: {
           name: 'Cont 3',
-          components: [
-            'idComp6',
-            'idComp7'
-          ],
-          sharedLibraries: [
-            'idSL1'
-          ],
+          components: ['idComp6', 'idComp7'],
+          sharedLibraries: ['idSL1'],
           id: 'idCont3',
-          busId: 'idBus0'
-        }
+          busId: 'idBus0',
+        },
       },
-      allIds: [
-        'idCont2',
-        'idCont3'
-      ]
+      allIds: ['idCont2', 'idCont3'],
     };
 
     it(`should add reachabilities array on every container`, () => {
@@ -72,14 +64,14 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
-          idCont1: { keepPreviousValues: '', reachabilities: [] }
+          idCont1: { keepPreviousValues: '', reachabilities: [] },
         },
-        allIds: ['idCont1']
+        allIds: ['idCont1'],
       };
 
       const reducer = Containers.reducer(initialState, {
         type: Containers.FETCH_CONTAINERS_SUCCESS,
-        payload: map
+        payload: map,
       });
 
       expect(reducer.byId.idCont2.reachabilities).toEqual([]);
@@ -91,29 +83,33 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
-          idCont1: { keepPreviousValues: '', reachabilities: [], errorDeploymentComponent: 'some previous error' },
+          idCont1: {
+            keepPreviousValues: '',
+            reachabilities: [],
+            errorDeploymentComponent: 'some previous error',
+          },
           idCont2: {
             name: 'Cont 2 old name',
             keepPreviousValues: '',
             components: [
               'idComp4 old',
               'idComp5 old',
-              'thisComponentIdShouldBeRemoved'
+              'thisComponentIdShouldBeRemoved',
             ],
-            sharedLibraries: [
-              'idSL1 old'
-            ],
+            sharedLibraries: ['idSL1 old'],
             id: 'idCont2',
-            errorDeploymentComponent: 'some previous error'
+            errorDeploymentComponent: 'some previous error',
           },
         },
-        allIds: ['idCont1']
+        allIds: ['idCont1'],
       };
 
-      expect(Containers.reducer(initialState, {
-        type: Containers.FETCH_CONTAINERS_SUCCESS,
-        payload: map
-      })).toEqual({
+      expect(
+        Containers.reducer(initialState, {
+          type: Containers.FETCH_CONTAINERS_SUCCESS,
+          payload: map,
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           idCont2: {
@@ -121,10 +117,7 @@ describe(`Containers reducer`, () => {
             errorDeploymentServiceAssembly: '',
             isDeployingServiceAssembly: false,
             keepPreviousValues: '',
-            components: [
-              'idComp4',
-              'idComp5'
-            ],
+            components: ['idComp4', 'idComp5'],
             sharedLibraries: [],
             id: 'idCont2',
             busId: 'idBus0',
@@ -133,19 +126,14 @@ describe(`Containers reducer`, () => {
             isFetchingDetails: false,
             isDeployingComponent: false,
             errorDeploymentComponent: 'some previous error',
-            serviceAssemblies: []
+            serviceAssemblies: [],
           },
           idCont3: {
             name: 'Cont 3',
             errorDeploymentServiceAssembly: '',
             isDeployingServiceAssembly: false,
-            components: [
-              'idComp6',
-              'idComp7'
-            ],
-            sharedLibraries: [
-              'idSL1'
-            ],
+            components: ['idComp6', 'idComp7'],
+            sharedLibraries: ['idSL1'],
             id: 'idCont3',
             busId: 'idBus0',
             reachabilities: [],
@@ -153,36 +141,32 @@ describe(`Containers reducer`, () => {
             isFetchingDetails: false,
             isDeployingComponent: false,
             errorDeploymentComponent: '',
-            serviceAssemblies: []
-          }
+            serviceAssemblies: [],
+          },
         },
-        allIds: [
-          'idCont2',
-          'idCont3'
-        ]
+        allIds: ['idCont2', 'idCont3'],
       });
     });
   });
 
   describe(Containers.ADD_CONTAINERS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Containers.ADD_CONTAINERS_SUCCESS).toEqual(`[Containers] Add containers success`);
+      expect(Containers.ADD_CONTAINERS_SUCCESS).toEqual(
+        `[Containers] Add containers success`
+      );
     });
 
     const map = {
       byId: {
         idCont3: {
           name: 'Cont 3',
-          components: [
-            'idComp6',
-            'idComp7'
-          ],
+          components: ['idComp6', 'idComp7'],
           sharedLibraries: [],
           id: 'idCont3',
-          busId: 'idBus0'
-        }
+          busId: 'idBus0',
+        },
       },
-      allIds: ['idCont3']
+      allIds: ['idCont3'],
     };
 
     it(`should add component`, () => {
@@ -192,13 +176,8 @@ describe(`Containers reducer`, () => {
           idCont2: {
             name: 'Cont 2',
             keepPreviousValues: '',
-            components: [
-              'idComp4',
-              'idComp5'
-            ],
-            sharedLibraries: [
-              'idSL1'
-            ],
+            components: ['idComp4', 'idComp5'],
+            sharedLibraries: ['idSL1'],
             id: 'idCont2',
             busId: 'idBus0',
             reachabilities: [],
@@ -206,29 +185,24 @@ describe(`Containers reducer`, () => {
             isFetchingDetails: false,
             isDeployingComponent: false,
             errorDeploymentComponent: 'some previous error',
-          }
+          },
         },
-        allIds: [
-          'idCont2'
-        ]
+        allIds: ['idCont2'],
       };
 
-      expect(Containers.reducer(initialState, {
-        type: Containers.ADD_CONTAINERS_SUCCESS,
-        payload: map
-      })).toEqual({
+      expect(
+        Containers.reducer(initialState, {
+          type: Containers.ADD_CONTAINERS_SUCCESS,
+          payload: map,
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           idCont2: {
             name: 'Cont 2',
             keepPreviousValues: '',
-            components: [
-              'idComp4',
-              'idComp5'
-            ],
-            sharedLibraries: [
-              'idSL1'
-            ],
+            components: ['idComp4', 'idComp5'],
+            sharedLibraries: ['idSL1'],
             id: 'idCont2',
             busId: 'idBus0',
             reachabilities: [],
@@ -241,10 +215,7 @@ describe(`Containers reducer`, () => {
             name: 'Cont 3',
             errorDeploymentServiceAssembly: '',
             isDeployingServiceAssembly: false,
-            components: [
-              'idComp6',
-              'idComp7'
-            ],
+            components: ['idComp6', 'idComp7'],
             sharedLibraries: [],
             id: 'idCont3',
             busId: 'idBus0',
@@ -253,17 +224,13 @@ describe(`Containers reducer`, () => {
             isFetchingDetails: false,
             isDeployingComponent: false,
             errorDeploymentComponent: '',
-            serviceAssemblies: []
-          }
+            serviceAssemblies: [],
+          },
         },
-        allIds: [
-          'idCont2',
-          'idCont3'
-        ]
+        allIds: ['idCont2', 'idCont3'],
       });
     });
   });
-
 
   describe(Containers.FOLD_CONTAINER, () => {
     it(`should check action name`, () => {
@@ -277,16 +244,16 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         idCont0: {
           keepPreviousValues: '',
-          isFolded: false
-        }
+          isFolded: false,
+        },
       },
-      allIds: ['idCont0']
+      allIds: ['idCont0'],
     };
 
     it(`should return the same object if ID doesn't exists`, () => {
       const reducer = Containers.reducer(initialState, {
         type: Containers.FOLD_CONTAINER,
-        payload: { containerId: 'unknown' }
+        payload: { containerId: 'unknown' },
       });
 
       expect(reducer).toBe(initialState);
@@ -295,7 +262,7 @@ describe(`Containers reducer`, () => {
     it(`should fold an existing container`, () => {
       const reducer = Containers.reducer(initialState, {
         type: Containers.FOLD_CONTAINER,
-        payload: { containerId: 'idCont0' }
+        payload: { containerId: 'idCont0' },
       });
 
       expect(reducer).toEqual({
@@ -305,10 +272,10 @@ describe(`Containers reducer`, () => {
           keepPreviousValues: '',
           idCont0: {
             keepPreviousValues: '',
-            isFolded: true
-          }
+            isFolded: true,
+          },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       });
     });
 
@@ -316,14 +283,14 @@ describe(`Containers reducer`, () => {
       const initialState2: any = {
         selectedContainerId: '',
         byId: {
-          idCont0: { isFolded: true }
+          idCont0: { isFolded: true },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       };
 
       const reducer = Containers.reducer(initialState2, {
         type: Containers.FOLD_CONTAINER,
-        payload: { containerId: 'idCont0' }
+        payload: { containerId: 'idCont0' },
       });
 
       expect(reducer).toBe(initialState2);
@@ -332,7 +299,9 @@ describe(`Containers reducer`, () => {
 
   describe(Containers.UNFOLD_CONTAINER, () => {
     it(`should check action name`, () => {
-      expect(Containers.UNFOLD_CONTAINER).toEqual(`[Containers] Unfold container`);
+      expect(Containers.UNFOLD_CONTAINER).toEqual(
+        `[Containers] Unfold container`
+      );
     });
 
     const initialState: any = {
@@ -342,16 +311,16 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         idCont0: {
           keepPreviousValues: '',
-          isFolded: false
-        }
+          isFolded: false,
+        },
       },
-      allIds: ['idCont0']
+      allIds: ['idCont0'],
     };
 
     it(`should return the same object when trying to unfold an unknown container`, () => {
       const reducer = Containers.reducer(initialState, {
         type: Containers.UNFOLD_CONTAINER,
-        payload: { containerId: 'unknown' }
+        payload: { containerId: 'unknown' },
       });
 
       expect(reducer).toBe(initialState);
@@ -360,7 +329,7 @@ describe(`Containers reducer`, () => {
     it(`should unfold an existing container`, () => {
       const reducer = Containers.reducer(initialState, {
         type: Containers.UNFOLD_CONTAINER,
-        payload: { containerId: 'idCont0' }
+        payload: { containerId: 'idCont0' },
       });
 
       expect(reducer).toEqual({
@@ -370,10 +339,10 @@ describe(`Containers reducer`, () => {
           keepPreviousValues: '',
           idCont0: {
             keepPreviousValues: '',
-            isFolded: false
-          }
+            isFolded: false,
+          },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       });
     });
 
@@ -381,14 +350,14 @@ describe(`Containers reducer`, () => {
       const initialState2: any = {
         selectedContainerId: '',
         byId: {
-          idCont0: { isFolded: false }
+          idCont0: { isFolded: false },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       };
 
       const reducer = Containers.reducer(initialState2, {
         type: Containers.UNFOLD_CONTAINER,
-        payload: { containerId: 'idCont0' }
+        payload: { containerId: 'idCont0' },
       });
 
       expect(reducer).toBe(initialState2);
@@ -397,7 +366,9 @@ describe(`Containers reducer`, () => {
 
   describe(Containers.TOGGLE_FOLD_CONTAINER, () => {
     it(`should check action name`, () => {
-      expect(Containers.TOGGLE_FOLD_CONTAINER).toEqual(`[Containers] Toggle fold container`);
+      expect(Containers.TOGGLE_FOLD_CONTAINER).toEqual(
+        `[Containers] Toggle fold container`
+      );
     });
 
     const initialState: any = {
@@ -407,16 +378,16 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         idCont0: {
           keepPreviousValues: '',
-          isFolded: true
-        }
+          isFolded: true,
+        },
       },
-      allIds: ['idCont0']
+      allIds: ['idCont0'],
     };
 
     it(`should return the same object when trying to toggle an unknown ID`, () => {
       const reducer = Containers.reducer(initialState, {
         type: Containers.TOGGLE_FOLD_CONTAINER,
-        payload: { containerId: 'unknown' }
+        payload: { containerId: 'unknown' },
       });
 
       expect(reducer).toBe(initialState);
@@ -425,7 +396,7 @@ describe(`Containers reducer`, () => {
     it(`should toggle from true to false`, () => {
       const reducer2 = Containers.reducer(initialState, {
         type: Containers.TOGGLE_FOLD_CONTAINER,
-        payload: { containerId: 'idCont0' }
+        payload: { containerId: 'idCont0' },
       });
 
       expect(reducer2).toEqual({
@@ -435,10 +406,10 @@ describe(`Containers reducer`, () => {
           keepPreviousValues: '',
           idCont0: {
             keepPreviousValues: '',
-            isFolded: false
-          }
+            isFolded: false,
+          },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       });
     });
 
@@ -450,15 +421,15 @@ describe(`Containers reducer`, () => {
           keepPreviousValues: '',
           idCont0: {
             keepPreviousValues: '',
-            isFolded: false
-          }
+            isFolded: false,
+          },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       };
 
       const reducer = Containers.reducer(initialState2, {
         type: Containers.TOGGLE_FOLD_CONTAINER,
-        payload: { containerId: 'idCont0' }
+        payload: { containerId: 'idCont0' },
       });
 
       expect(reducer).toEqual({
@@ -468,17 +439,19 @@ describe(`Containers reducer`, () => {
           keepPreviousValues: '',
           idCont0: {
             keepPreviousValues: '',
-            isFolded: true
-          }
+            isFolded: true,
+          },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       });
     });
   });
 
   describe(Containers.SET_CURRENT_CONTAINER, () => {
     it(`should check action name`, () => {
-      expect(Containers.SET_CURRENT_CONTAINER).toEqual(`[Containers] Set current container`);
+      expect(Containers.SET_CURRENT_CONTAINER).toEqual(
+        `[Containers] Set current container`
+      );
     });
 
     it(`should set the current container and reset its errors`, () => {
@@ -486,28 +459,30 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         selectedContainerId: '',
         byId: {
-          idCont0: { errorDeploymentComponent: 'some error' }
-        }
+          idCont0: { errorDeploymentComponent: 'some error' },
+        },
       };
 
       const reducer = Containers.reducer(initialState, {
         type: Containers.SET_CURRENT_CONTAINER,
-        payload: { containerId: 'idCont0' }
+        payload: { containerId: 'idCont0' },
       });
 
       expect(reducer).toEqual({
         keepPreviousValues: '',
         selectedContainerId: 'idCont0',
         byId: {
-          idCont0: { errorDeploymentComponent: '' }
-        }
+          idCont0: { errorDeploymentComponent: '' },
+        },
       });
     });
   });
 
   describe(Containers.FETCH_CONTAINER_DETAILS, () => {
     it(`should check action name`, () => {
-      expect(Containers.FETCH_CONTAINER_DETAILS).toEqual(`[Containers] Fetch container details`);
+      expect(Containers.FETCH_CONTAINER_DETAILS).toEqual(
+        `[Containers] Fetch container details`
+      );
     });
 
     const initialState: any = {
@@ -516,32 +491,36 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         idCont0: {
           keepPreviousValues: '',
-        }
+        },
       },
-      allIds: ['idCont0']
+      allIds: ['idCont0'],
     };
 
     it(`should set isFetchingDetails to true even if isFetchingDetails doesn't exists yet`, () => {
-      expect(Containers.reducer(initialState, {
-        type: Containers.FETCH_CONTAINER_DETAILS,
-        payload: { containerId: 'idCont0' }
-      })).toEqual({
+      expect(
+        Containers.reducer(initialState, {
+          type: Containers.FETCH_CONTAINER_DETAILS,
+          payload: { containerId: 'idCont0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idCont0: {
             keepPreviousValues: '',
-            isFetchingDetails: true
+            isFetchingDetails: true,
           },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       });
     });
   });
 
   describe(Containers.FETCH_CONTAINER_DETAILS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Containers.FETCH_CONTAINER_DETAILS_SUCCESS).toEqual(`[Containers] Fetch container details success`);
+      expect(Containers.FETCH_CONTAINER_DETAILS_SUCCESS).toEqual(
+        `[Containers] Fetch container details success`
+      );
     });
 
     const initialState: any = {
@@ -550,33 +529,37 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         idCont0: {
           keepPreviousValues: '',
-        }
+        },
       },
-      allIds: ['idCont0']
+      allIds: ['idCont0'],
     };
 
     it(`should set isFetchingDetails to false even if isFetchingDetails doesn't exists yet`, () => {
-      expect(Containers.reducer(initialState, {
-        type: Containers.FETCH_CONTAINER_DETAILS_SUCCESS,
-        payload: { containerId: 'idCont0', data: { someData: 'some data' } }
-      })).toEqual({
+      expect(
+        Containers.reducer(initialState, {
+          type: Containers.FETCH_CONTAINER_DETAILS_SUCCESS,
+          payload: { containerId: 'idCont0', data: { someData: 'some data' } },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idCont0: {
             keepPreviousValues: '',
             isFetchingDetails: false,
-            someData: 'some data'
-          }
+            someData: 'some data',
+          },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       });
     });
   });
 
   describe(Containers.FETCH_CONTAINER_DETAILS_ERROR, () => {
     it(`should check action name`, () => {
-      expect(Containers.FETCH_CONTAINER_DETAILS_ERROR).toEqual(`[Containers] Fetch container details error`);
+      expect(Containers.FETCH_CONTAINER_DETAILS_ERROR).toEqual(
+        `[Containers] Fetch container details error`
+      );
     });
 
     const initialState: any = {
@@ -585,33 +568,37 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         idCont0: {
           keepPreviousValues: '',
-          isFetchingDetails: true
-        }
+          isFetchingDetails: true,
+        },
       },
-      allIds: ['idCont0']
+      allIds: ['idCont0'],
     };
 
     it(`should set isFetchingDetails to false if the container exists`, () => {
-      expect(Containers.reducer(initialState, {
-        type: Containers.FETCH_CONTAINER_DETAILS_ERROR,
-        payload: { containerId: 'idCont0' }
-      })).toEqual({
+      expect(
+        Containers.reducer(initialState, {
+          type: Containers.FETCH_CONTAINER_DETAILS_ERROR,
+          payload: { containerId: 'idCont0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idCont0: {
             keepPreviousValues: '',
-            isFetchingDetails: false
-          }
+            isFetchingDetails: false,
+          },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       });
     });
   });
 
   describe(Containers.DEPLOY_COMPONENT, () => {
     it(`should check action name`, () => {
-      expect(Containers.DEPLOY_COMPONENT).toEqual(`[Containers] Deploy component`);
+      expect(Containers.DEPLOY_COMPONENT).toEqual(
+        `[Containers] Deploy component`
+      );
     });
 
     const initialState: any = {
@@ -619,33 +606,37 @@ describe(`Containers reducer`, () => {
       byId: {
         keepPreviousValues: '',
         idCont0: {
-          keepPreviousValues: ''
-        }
+          keepPreviousValues: '',
+        },
       },
-      allIds: ['idCont0']
+      allIds: ['idCont0'],
     };
 
     it(`should set the isDeployingComponent variable to true for an existing container`, () => {
-      expect(Containers.reducer(initialState, {
-        type: Containers.DEPLOY_COMPONENT,
-        payload: { containerId: 'idCont0' }
-      })).toEqual({
+      expect(
+        Containers.reducer(initialState, {
+          type: Containers.DEPLOY_COMPONENT,
+          payload: { containerId: 'idCont0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idCont0: {
             keepPreviousValues: '',
-            isDeployingComponent: true
-          }
+            isDeployingComponent: true,
+          },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       });
     });
   });
 
   describe(Containers.DEPLOY_COMPONENT_ERROR, () => {
     it(`should check action name`, () => {
-      expect(Containers.DEPLOY_COMPONENT_ERROR).toEqual(`[Containers] Deploy component error`);
+      expect(Containers.DEPLOY_COMPONENT_ERROR).toEqual(
+        `[Containers] Deploy component error`
+      );
     });
 
     const initialState: any = {
@@ -654,34 +645,41 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         idCont0: {
           keepPreviousValues: '',
-          isDeployingComponent: true
-        }
+          isDeployingComponent: true,
+        },
       },
-      allIds: ['idCont0']
+      allIds: ['idCont0'],
     };
 
     it(`should set the isDeployingComponent variable to false for an existing container`, () => {
-      expect(Containers.reducer(initialState, {
-        type: Containers.DEPLOY_COMPONENT_ERROR,
-        payload: { containerId: 'idCont0', errorDeploymentComponent: 'some error' }
-      })).toEqual({
+      expect(
+        Containers.reducer(initialState, {
+          type: Containers.DEPLOY_COMPONENT_ERROR,
+          payload: {
+            containerId: 'idCont0',
+            errorDeploymentComponent: 'some error',
+          },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idCont0: {
             keepPreviousValues: '',
             isDeployingComponent: false,
-            errorDeploymentComponent: 'some error'
-          }
+            errorDeploymentComponent: 'some error',
+          },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       });
     });
   });
 
   describe(Containers.DEPLOY_COMPONENT_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Containers.DEPLOY_COMPONENT_SUCCESS).toEqual(`[Containers] Deploy component success`);
+      expect(Containers.DEPLOY_COMPONENT_SUCCESS).toEqual(
+        `[Containers] Deploy component success`
+      );
     });
 
     const initialState: any = {
@@ -690,22 +688,24 @@ describe(`Containers reducer`, () => {
         keepPreviousValues: '',
         idCont0: {
           keepPreviousValues: '',
-          components: ['idComp0']
-        }
+          components: ['idComp0'],
+        },
       },
-      allIds: ['idCont0']
+      allIds: ['idCont0'],
     };
 
     it(`should set the isDeployingComponent variable to false for an existing container and update the container`, () => {
-      expect(Containers.reducer(initialState, {
-        type: Containers.DEPLOY_COMPONENT_SUCCESS,
-        payload: {
-          id: 'idCompNew',
-          name: 'New Comp',
-          state: 'Started',
-          containerId: 'idCont0'
-        }
-      })).toEqual({
+      expect(
+        Containers.reducer(initialState, {
+          type: Containers.DEPLOY_COMPONENT_SUCCESS,
+          payload: {
+            id: 'idCompNew',
+            name: 'New Comp',
+            state: 'Started',
+            containerId: 'idCont0',
+          },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
@@ -713,10 +713,10 @@ describe(`Containers reducer`, () => {
             keepPreviousValues: '',
             isDeployingComponent: false,
             components: ['idComp0', 'idCompNew'],
-            errorDeploymentComponent: ''
-          }
+            errorDeploymentComponent: '',
+          },
         },
-        allIds: ['idCont0']
+        allIds: ['idCont0'],
       });
     });
   });
@@ -730,41 +730,41 @@ describe(`Containers reducer`, () => {
           idCont0: {
             id: 'idCont0',
             keepPreviousValues: '',
-            components: ['idComp0']
+            components: ['idComp0'],
           },
           idCont1: {
             id: 'idCont1',
             keepPreviousValues: '',
-            components: ['idComp1']
-          }
+            components: ['idComp1'],
+          },
         },
-        allIds: ['idCont0', 'idCont1']
+        allIds: ['idCont0', 'idCont1'],
       };
 
-      expect(Containers.reducer(initialState, {
-        type: Components.REMOVE_COMPONENT,
-        payload: { containerId: 'idCont0', componentId: 'idComp0' }
-      })).toEqual({
+      expect(
+        Containers.reducer(initialState, {
+          type: Components.REMOVE_COMPONENT,
+          payload: { containerId: 'idCont0', componentId: 'idComp0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idCont0: {
             keepPreviousValues: '',
             id: 'idCont0',
-            components: []
+            components: [],
           },
           idCont1: {
             id: 'idCont1',
             keepPreviousValues: '',
-            components: ['idComp1']
-          }
+            components: ['idComp1'],
+          },
         },
-        allIds: ['idCont0', 'idCont1']
+        allIds: ['idCont0', 'idCont1'],
       });
     });
   });
-
-
 
   describe(Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS, () => {
     it(`should add the corresponding service-assembly into the container`, () => {
@@ -776,27 +776,29 @@ describe(`Containers reducer`, () => {
             id: 'idCont0',
             keepPreviousValues: '',
             components: ['idComp0'],
-            serviceAssemblies: ['isSa0', 'isSa1', 'isSa2']
+            serviceAssemblies: ['isSa0', 'isSa1', 'isSa2'],
           },
           idCont1: {
             id: 'idCont1',
             keepPreviousValues: '',
             components: ['idComp1'],
-            serviceAssemblies: ['isSa3', 'isSa4']
-          }
+            serviceAssemblies: ['isSa3', 'isSa4'],
+          },
         },
-        allIds: ['idCont0', 'idCont1']
+        allIds: ['idCont0', 'idCont1'],
       };
 
-      expect(Containers.reducer(initialState, {
-        type: Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS,
-        payload: {
-          id: 'idSa5',
-          containerId: 'idCont0',
-          name: 'New Su',
-          state: 'Started'
-        }
-      })).toEqual({
+      expect(
+        Containers.reducer(initialState, {
+          type: Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS,
+          payload: {
+            id: 'idSa5',
+            containerId: 'idCont0',
+            name: 'New Su',
+            state: 'Started',
+          },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
@@ -806,16 +808,16 @@ describe(`Containers reducer`, () => {
             isDeployingServiceAssembly: false,
             keepPreviousValues: '',
             components: ['idComp0'],
-            serviceAssemblies: ['isSa0', 'isSa1', 'isSa2', 'idSa5']
+            serviceAssemblies: ['isSa0', 'isSa1', 'isSa2', 'idSa5'],
           },
           idCont1: {
             id: 'idCont1',
             keepPreviousValues: '',
             components: ['idComp1'],
-            serviceAssemblies: ['isSa3', 'isSa4']
-          }
+            serviceAssemblies: ['isSa3', 'isSa4'],
+          },
         },
-        allIds: ['idCont0', 'idCont1']
+        allIds: ['idCont0', 'idCont1'],
       });
     });
   });
@@ -830,22 +832,24 @@ describe(`Containers reducer`, () => {
             id: 'idCont0',
             keepPreviousValues: '',
             components: ['idComp0'],
-            serviceAssemblies: ['isSa0', 'isSa1', 'isSa2']
+            serviceAssemblies: ['isSa0', 'isSa1', 'isSa2'],
           },
           idCont1: {
             id: 'idCont1',
             keepPreviousValues: '',
             components: ['idComp1'],
-            serviceAssemblies: ['isSa3', 'isSa4']
-          }
+            serviceAssemblies: ['isSa3', 'isSa4'],
+          },
         },
-        allIds: ['idCont0', 'idCont1']
+        allIds: ['idCont0', 'idCont1'],
       };
 
-      expect(Containers.reducer(initialState, {
-        type: ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY,
-        payload: { containerId: 'idCont0', serviceAssemblyId: 'isSa1' }
-      })).toEqual({
+      expect(
+        Containers.reducer(initialState, {
+          type: ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY,
+          payload: { containerId: 'idCont0', serviceAssemblyId: 'isSa1' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
@@ -853,16 +857,16 @@ describe(`Containers reducer`, () => {
             id: 'idCont0',
             keepPreviousValues: '',
             components: ['idComp0'],
-            serviceAssemblies: ['isSa0', 'isSa2']
+            serviceAssemblies: ['isSa0', 'isSa2'],
           },
           idCont1: {
             id: 'idCont1',
             keepPreviousValues: '',
             components: ['idComp1'],
-            serviceAssemblies: ['isSa3', 'isSa4']
-          }
+            serviceAssemblies: ['isSa3', 'isSa4'],
+          },
         },
-        allIds: ['idCont0', 'idCont1']
+        allIds: ['idCont0', 'idCont1'],
       });
     });
   });

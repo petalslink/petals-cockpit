@@ -24,17 +24,17 @@ import { PetalsBusInProgressViewComponent } from './petals-bus-in-progress-view.
 const routes: Routes = [
   {
     path: '',
-    component: PetalsBusInProgressViewComponent
+    component: PetalsBusInProgressViewComponent,
   },
   {
     path: ':busInProgressId',
-    component: PetalsBusInProgressViewComponent
-  }
+    component: PetalsBusInProgressViewComponent,
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
-  providers: []
+  providers: [],
 })
-export class PetalsBusInProgressViewRoutingModule { }
+export class PetalsBusInProgressViewRoutingModule {}

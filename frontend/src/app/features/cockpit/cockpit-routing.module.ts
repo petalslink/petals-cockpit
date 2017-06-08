@@ -24,7 +24,7 @@ const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: '/workspaces'
+    redirectTo: '/workspaces',
   },
   {
     path: '',
@@ -32,13 +32,14 @@ const routes: Routes = [
     children: [
       {
         path: 'workspaces',
-        loadChildren: 'app/features/cockpit/workspaces/workspaces.module#WorkspacesModule'
-      }
-    ]
-  }
+        loadChildren:
+          'app/features/cockpit/workspaces/workspaces.module#WorkspacesModule',
+      },
+    ],
+  },
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)]
+  imports: [RouterModule.forChild(routes)],
 })
-export class CockpitRoutingModule { }
+export class CockpitRoutingModule {}

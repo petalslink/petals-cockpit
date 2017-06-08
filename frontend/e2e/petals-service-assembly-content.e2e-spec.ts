@@ -30,7 +30,9 @@ describe(`Petals service-assembly content`, () => {
     expect(sa.title.getText()).toEqual('SA 0');
     expect(sa.state.getText()).toEqual('Started');
 
-    expect(sa.serviceUnits.getText()).toEqual(['Service unit "SU 0" deployed on component "Comp 0"']);
+    expect(sa.serviceUnits.getText()).toEqual([
+      'Service unit "SU 0" deployed on component "Comp 0"',
+    ]);
 
     // clicking on SU's name should open SU's page
     sa.openServiceUnit('SU 0');
@@ -57,12 +59,15 @@ describe(`Petals service-assembly content`, () => {
     page.clickAndExpectNotification(
       ops.unloadButton,
       'Service assembly unloaded',
-      '"SA 0" has been unloaded');
+      '"SA 0" has been unloaded'
+    );
 
     // we should be redirected to the workspace page ...
     WorkspaceOverviewPage.waitAndGet();
 
     // and the SU should have been deleted from petals tree
-    expect(workspace.treeElement(`SU 0`, 'service-unit').isPresent()).toBe(false);
+    expect(workspace.treeElement(`SU 0`, 'service-unit').isPresent()).toBe(
+      false
+    );
   });
 });

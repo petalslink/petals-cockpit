@@ -18,7 +18,9 @@
 import { browser, ElementFinder, $ } from 'protractor';
 import * as util from 'protractor/built/util';
 
-export type Matcher = { [Symbol.match](string: string): RegExpMatchArray } | string;
+export type Matcher =
+  | { [Symbol.match](string: string): RegExpMatchArray }
+  | string;
 
 export function match(text: string, matcher: Matcher): boolean {
   if (typeof matcher === 'string') {
@@ -33,8 +35,14 @@ export function urlToMatch(matcher: Matcher): Function {
   return () => browser.getCurrentUrl().then(url => match(url, matcher));
 }
 
-export function textToMatchInElement(elementFinder: ElementFinder, matcher: Matcher): Function {
-  return () => elementFinder.getText().then(text => match(text, matcher), util.falseIfMissing);
+export function textToMatchInElement(
+  elementFinder: ElementFinder,
+  matcher: Matcher
+): Function {
+  return () =>
+    elementFinder
+      .getText()
+      .then(text => match(text, matcher), util.falseIfMissing);
 }
 
 export function expectNothingFocused() {
@@ -42,9 +50,13 @@ export function expectNothingFocused() {
 }
 
 export function expectNotFocused(element: ElementFinder) {
-  return expect(browser.switchTo().activeElement().getId()).not.toEqual(element.getId());
+  return expect(browser.switchTo().activeElement().getId()).not.toEqual(
+    element.getId()
+  );
 }
 
 export function expectFocused(element: ElementFinder) {
-  return expect(browser.switchTo().activeElement().getId()).toEqual(element.getId());
+  return expect(browser.switchTo().activeElement().getId()).toEqual(
+    element.getId()
+  );
 }

@@ -28,12 +28,15 @@ import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/wo
 
 @Injectable()
 export class WorkspaceResolver implements Resolve<Observable<any>> {
-  constructor(private store$: Store<IStore>) { }
+  constructor(private store$: Store<IStore>) {}
 
   resolve(route: ActivatedRouteSnapshot) {
     const workspaceId = route.paramMap.get('workspaceId');
 
-    this.store$.dispatch({ type: Workspaces.FETCH_WORKSPACE, payload: workspaceId });
+    this.store$.dispatch({
+      type: Workspaces.FETCH_WORKSPACE,
+      payload: workspaceId,
+    });
 
     return this.store$.let(filterWorkspaceFetched).first();
   }

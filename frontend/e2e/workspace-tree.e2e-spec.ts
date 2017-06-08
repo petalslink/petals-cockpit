@@ -64,12 +64,11 @@ describe(`Workspaces Tree`, () => {
     expect(workspace.busesInProgress.count()).toEqual(2);
 
     // check that buses/container/component/su are available
-    const availableBusesInProgress = [
-      `192.168.0.1:7700`,
-      `192.168.0.2:7700`
-    ];
+    const availableBusesInProgress = [`192.168.0.1:7700`, `192.168.0.2:7700`];
 
-    expect(workspace.busesInProgress.$$('span').getText()).toEqual(availableBusesInProgress);
+    expect(workspace.busesInProgress.$$('span').getText()).toEqual(
+      availableBusesInProgress
+    );
   });
 
   it(`should filter by bus, container, component and su when searching in Petals menu`, () => {
@@ -81,7 +80,7 @@ describe(`Workspaces Tree`, () => {
       `Cont 0`,
       `Comp 0`,
       `SU 0`,
-      `SU 2`
+      `SU 2`,
     ];
 
     // check the list content
@@ -130,8 +129,9 @@ describe(`Workspaces Tree`, () => {
     // test 3 : When no match, should display a message and search bar should still be enabled
     workspace.search(`Some random search`);
 
-    expect($(`app-cockpit md-sidenav .info.no-match`).getText())
-      .toEqual(`There is no match with "Some random search".`);
+    expect($(`app-cockpit md-sidenav .info.no-match`).getText()).toEqual(
+      `There is no match with "Some random search".`
+    );
 
     // there shouldn't be any match
     expect(workspace.getWorkspaceTree()).toEqual([]);
@@ -254,12 +254,7 @@ describe(`Workspaces Tree`, () => {
 
     workspace.search(`su 0`);
 
-    const availableBusesFiltered = [
-      `Bus 0`,
-      `Cont 0`,
-      `Comp 0`,
-      `SU 0`
-    ];
+    const availableBusesFiltered = [`Bus 0`, `Cont 0`, `Comp 0`, `SU 0`];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBusesFiltered);
   });

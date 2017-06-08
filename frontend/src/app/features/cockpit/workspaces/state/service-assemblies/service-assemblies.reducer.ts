@@ -17,22 +17,42 @@
 
 import { Action } from '@ngrx/store';
 
-import { IServiceAssembliesTable, serviceAssembliesTableFactory, serviceAssemblyRowFactory } from './service-assemblies.interface';
+import {
+  IServiceAssembliesTable,
+  serviceAssembliesTableFactory,
+  serviceAssemblyRowFactory,
+} from './service-assemblies.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
-import { putAll, updateById, removeById, mergeOnly, JsMap } from 'app/shared/helpers/map.helper';
-import { IServiceAssemblyBackendSSE, IServiceAssemblyBackendDetails } from 'app/shared/services/service-assemblies.service';
+import {
+  putAll,
+  updateById,
+  removeById,
+  mergeOnly,
+  JsMap,
+} from 'app/shared/helpers/map.helper';
+import {
+  IServiceAssemblyBackendSSE,
+  IServiceAssemblyBackendDetails,
+} from 'app/shared/services/service-assemblies.service';
 
 export class ServiceAssemblies {
   private static reducerName = '[Service assemblies]';
 
-  public static reducer(serviceAssembliesTable = serviceAssembliesTableFactory(), { type, payload }: Action): IServiceAssembliesTable {
+  public static reducer(
+    serviceAssembliesTable = serviceAssembliesTableFactory(),
+    { type, payload }: Action
+  ): IServiceAssembliesTable {
     if (!ServiceAssemblies.mapActionsToMethod[type]) {
       return serviceAssembliesTable;
     }
 
-    return ServiceAssemblies.mapActionsToMethod[type](serviceAssembliesTable, payload) || serviceAssembliesTable;
+    return (
+      ServiceAssemblies.mapActionsToMethod[type](
+        serviceAssembliesTable,
+        payload
+      ) || serviceAssembliesTable
+    );
   }
-
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_ASSEMBLIES_SUCCESS = `${ServiceAssemblies.reducerName} Fetch service assemblies success`;
@@ -40,7 +60,11 @@ export class ServiceAssemblies {
     serviceAssembliesTable: IServiceAssembliesTable,
     payload: JsMap<IServiceAssemblyBackendSSE>
   ): IServiceAssembliesTable {
-    return mergeOnly(serviceAssembliesTable, payload, serviceAssemblyRowFactory());
+    return mergeOnly(
+      serviceAssembliesTable,
+      payload,
+      serviceAssemblyRowFactory()
+    );
   }
 
   // tslint:disable-next-line:member-ordering
@@ -55,38 +79,49 @@ export class ServiceAssemblies {
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_SERVICE_ASSEMBLY = `${ServiceAssemblies.reducerName} Set current service assembly`;
   private static setCurrentServiceAssembly(
-    serviceAssembliesTable: IServiceAssembliesTable, payload: { serviceAssemblyId: string }): IServiceAssembliesTable {
+    serviceAssembliesTable: IServiceAssembliesTable,
+    payload: { serviceAssemblyId: string }
+  ): IServiceAssembliesTable {
     const res = <IServiceAssembliesTable>{
-      selectedServiceAssemblyId: payload.serviceAssemblyId
+      selectedServiceAssemblyId: payload.serviceAssemblyId,
     };
 
     if (payload.serviceAssemblyId) {
       return {
-        ...updateById(serviceAssembliesTable, payload.serviceAssemblyId, { errorChangeState: '' }),
-        ...res
+        ...updateById(serviceAssembliesTable, payload.serviceAssemblyId, {
+          errorChangeState: '',
+        }),
+        ...res,
       };
     }
 
     return {
       ...serviceAssembliesTable,
-      ...res
+      ...res,
     };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_ASSEMBLY_DETAILS = `${ServiceAssemblies.reducerName} Fetch service assembly details`;
   private static fetchServiceAssemblyDetails(
-    serviceAssembliesTable: IServiceAssembliesTable, payload: { serviceAssemblyId: string }): IServiceAssembliesTable {
-    return updateById(serviceAssembliesTable, payload.serviceAssemblyId, { isFetchingDetails: true });
+    serviceAssembliesTable: IServiceAssembliesTable,
+    payload: { serviceAssemblyId: string }
+  ): IServiceAssembliesTable {
+    return updateById(serviceAssembliesTable, payload.serviceAssemblyId, {
+      isFetchingDetails: true,
+    });
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_ASSEMBLY_DETAILS_SUCCESS = `${ServiceAssemblies.reducerName} Fetch service assembly details success`;
   private static fetchServiceAssemblyDetailsSuccess(
     serviceAssembliesTable: IServiceAssembliesTable,
-    payload: { serviceAssemblyId: string, data: IServiceAssemblyBackendDetails }
+    payload: { serviceAssemblyId: string; data: IServiceAssemblyBackendDetails }
   ): IServiceAssembliesTable {
-    return updateById(serviceAssembliesTable, payload.serviceAssemblyId, { ...payload.data, isFetchingDetails: false });
+    return updateById(serviceAssembliesTable, payload.serviceAssemblyId, {
+      ...payload.data,
+      isFetchingDetails: false,
+    });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -95,26 +130,32 @@ export class ServiceAssemblies {
     serviceAssembliesTable: IServiceAssembliesTable,
     payload: { serviceAssemblyId: string }
   ): IServiceAssembliesTable {
-    return updateById(serviceAssembliesTable, payload.serviceAssemblyId, { isFetchingDetails: false });
+    return updateById(serviceAssembliesTable, payload.serviceAssemblyId, {
+      isFetchingDetails: false,
+    });
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE = `${ServiceAssemblies.reducerName} Change state`;
   private static changeState(
-    serviceAssembliesTable: IServiceAssembliesTable, payload: { serviceAssemblyId: string }): IServiceAssembliesTable {
-    return updateById(serviceAssembliesTable, payload.serviceAssemblyId, { isUpdatingState: true });
+    serviceAssembliesTable: IServiceAssembliesTable,
+    payload: { serviceAssemblyId: string }
+  ): IServiceAssembliesTable {
+    return updateById(serviceAssembliesTable, payload.serviceAssemblyId, {
+      isUpdatingState: true,
+    });
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_SUCCESS = `${ServiceAssemblies.reducerName} Change state success`;
   private static changeStateSuccess(
     serviceAssembliesTable: IServiceAssembliesTable,
-    payload: { serviceAssemblyId: string, newState: string }
+    payload: { serviceAssemblyId: string; newState: string }
   ): IServiceAssembliesTable {
     return updateById(serviceAssembliesTable, payload.serviceAssemblyId, {
       isUpdatingState: false,
       state: payload.newState,
-      errorChangeState: ''
+      errorChangeState: '',
     });
   }
 
@@ -122,11 +163,11 @@ export class ServiceAssemblies {
   public static CHANGE_STATE_ERROR = `${ServiceAssemblies.reducerName} Change state error`;
   private static changeStateError(
     serviceAssembliesTable: IServiceAssembliesTable,
-    payload: { serviceAssemblyId: string, errorChangeState: string }
+    payload: { serviceAssemblyId: string; errorChangeState: string }
   ): IServiceAssembliesTable {
     return updateById(serviceAssembliesTable, payload.serviceAssemblyId, {
       isUpdatingState: false,
-      errorChangeState: payload.errorChangeState
+      errorChangeState: payload.errorChangeState,
     });
   }
 
@@ -134,38 +175,54 @@ export class ServiceAssemblies {
   public static REMOVE_SERVICE_ASSEMBLY = `${ServiceAssemblies.reducerName} Remove service assembly`;
   private static removeServiceAssembly(
     serviceAssembliesTable: IServiceAssembliesTable,
-    payload: { containerId: string, serviceAssemblyId: string }
+    payload: { containerId: string; serviceAssemblyId: string }
   ): IServiceAssembliesTable {
-    const selectedServiceAssemblyId =
-      serviceAssembliesTable.selectedServiceAssemblyId === payload.serviceAssemblyId ?
-        '' :
-        serviceAssembliesTable.selectedServiceAssemblyId;
+    const selectedServiceAssemblyId = serviceAssembliesTable.selectedServiceAssemblyId ===
+      payload.serviceAssemblyId
+      ? ''
+      : serviceAssembliesTable.selectedServiceAssemblyId;
 
     return {
       ...removeById(serviceAssembliesTable, payload.serviceAssemblyId),
-      selectedServiceAssemblyId
+      selectedServiceAssemblyId,
     };
   }
 
-  private static cleanWorkspace(_serviceAssembliesTable: IServiceAssembliesTable, _payload): IServiceAssembliesTable {
+  private static cleanWorkspace(
+    _serviceAssembliesTable: IServiceAssembliesTable,
+    _payload
+  ): IServiceAssembliesTable {
     return serviceAssembliesTableFactory();
   }
 
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod: { [type: string]: (t: IServiceAssembliesTable, p: any) => IServiceAssembliesTable } = {
-    [ServiceAssemblies.FETCH_SERVICE_ASSEMBLIES_SUCCESS]: ServiceAssemblies.fetchServiceAssembliesSuccess,
-    [ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS]: ServiceAssemblies.addServiceAssembliesSuccess,
-    [ServiceAssemblies.SET_CURRENT_SERVICE_ASSEMBLY]: ServiceAssemblies.setCurrentServiceAssembly,
-    [ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS]: ServiceAssemblies.fetchServiceAssemblyDetails,
-    [ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_SUCCESS]: ServiceAssemblies.fetchServiceAssemblyDetailsSuccess,
-    [ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_ERROR]: ServiceAssemblies.fetchServiceAssemblyDetailsError,
+  private static mapActionsToMethod: {
+    [type: string]: (
+      t: IServiceAssembliesTable,
+      p: any
+    ) => IServiceAssembliesTable;
+  } = {
+    [ServiceAssemblies.FETCH_SERVICE_ASSEMBLIES_SUCCESS]:
+      ServiceAssemblies.fetchServiceAssembliesSuccess,
+    [ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS]:
+      ServiceAssemblies.addServiceAssembliesSuccess,
+    [ServiceAssemblies.SET_CURRENT_SERVICE_ASSEMBLY]:
+      ServiceAssemblies.setCurrentServiceAssembly,
+    [ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS]:
+      ServiceAssemblies.fetchServiceAssemblyDetails,
+    [ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_SUCCESS]:
+      ServiceAssemblies.fetchServiceAssemblyDetailsSuccess,
+    [ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_ERROR]:
+      ServiceAssemblies.fetchServiceAssemblyDetailsError,
     [ServiceAssemblies.CHANGE_STATE]: ServiceAssemblies.changeState,
-    [ServiceAssemblies.CHANGE_STATE_SUCCESS]: ServiceAssemblies.changeStateSuccess,
+    [ServiceAssemblies.CHANGE_STATE_SUCCESS]:
+      ServiceAssemblies.changeStateSuccess,
     [ServiceAssemblies.CHANGE_STATE_ERROR]: ServiceAssemblies.changeStateError,
-    [ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY]: ServiceAssemblies.removeServiceAssembly,
+    [ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY]:
+      ServiceAssemblies.removeServiceAssembly,
 
-    [Workspaces.CLEAN_WORKSPACE]: ServiceAssemblies.cleanWorkspace
+    [Workspaces.CLEAN_WORKSPACE]: ServiceAssemblies.cleanWorkspace,
   };
 }

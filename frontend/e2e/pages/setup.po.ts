@@ -21,13 +21,16 @@ import { urlToMatch } from '../utils';
 import { waitTimeout } from '../common';
 
 export class SetupPage {
-
   public static readonly component = $('app-setup');
 
   public readonly component = SetupPage.component;
   public readonly token = this.component.$(`input[formControlName="token"]`);
-  public readonly username = this.component.$(`input[formControlName="username"]`);
-  public readonly password = this.component.$(`input[formControlName="password"]`);
+  public readonly username = this.component.$(
+    `input[formControlName="username"]`
+  );
+  public readonly password = this.component.$(
+    `input[formControlName="password"]`
+  );
   public readonly name = this.component.$(`input[formControlName="name"]`);
   public readonly button = this.component.$(`button`);
   public readonly error = this.component.$(`div.form-error`);
@@ -38,7 +41,7 @@ export class SetupPage {
     return new SetupPage();
   }
 
-  private constructor() { }
+  private constructor() {}
 
   expectDefaultButton(enabled = false, hasError = false) {
     expect(this.button.isEnabled()).toBe(enabled);

@@ -21,7 +21,7 @@ import {
   ChangeDetectionStrategy,
   OnChanges,
   AfterViewInit,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 
 declare const jdenticon;
@@ -31,7 +31,7 @@ declare const md5;
   selector: 'app-generate-icon',
   templateUrl: './generate-icon.component.html',
   styleUrls: ['./generate-icon.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GenerateIconComponent implements AfterViewInit, OnChanges {
   @Input() size: number;
@@ -39,14 +39,17 @@ export class GenerateIconComponent implements AfterViewInit, OnChanges {
 
   public hashMd5: string;
 
-  constructor() { }
+  constructor() {}
 
   ngAfterViewInit() {
     this.updateSvg();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['text'] && changes['text'].currentValue !== changes['text'].previousValue) {
+    if (
+      changes['text'] &&
+      changes['text'].currentValue !== changes['text'].previousValue
+    ) {
       this.updateSvg();
     }
   }

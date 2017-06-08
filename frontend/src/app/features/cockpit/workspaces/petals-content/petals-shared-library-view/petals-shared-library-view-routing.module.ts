@@ -24,13 +24,13 @@ import { PetalsSharedLibraryViewComponent } from './petals-shared-library-view.c
 const routes: Routes = [
   {
     path: '',
-    component: PetalsSharedLibraryViewComponent
-  }
+    component: PetalsSharedLibraryViewComponent,
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
-  providers: []
+  providers: [],
 })
-export class PetalsSharedLibraryViewRoutingModule { }
+export class PetalsSharedLibraryViewRoutingModule {}

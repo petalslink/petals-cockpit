@@ -17,12 +17,15 @@
 
 import { Container } from './containers-mock';
 import { Component } from './components-mock';
-import { ISharedLibraryBackendSSE, ISharedLibraryBackendDetails } from 'app/shared/services/shared-libraries.service';
+import {
+  ISharedLibraryBackendSSE,
+  ISharedLibraryBackendDetails,
+} from 'app/shared/services/shared-libraries.service';
 
 class SharedLibraries {
   private readonly sharedLibraries = new Map<string, SharedLibrary>();
 
-  constructor() { }
+  constructor() {}
 
   create(container: Container, name?: string, version?: string) {
     const sl = new SharedLibrary(container, name, version);
@@ -72,8 +75,8 @@ export class SharedLibrary {
         name: this.name,
         version: this.version,
         containerId: this.container.id,
-        components: Array.from(this.components.keys())
-      }
+        components: Array.from(this.components.keys()),
+      },
     };
   }
 

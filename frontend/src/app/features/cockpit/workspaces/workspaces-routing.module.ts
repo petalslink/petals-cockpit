@@ -26,7 +26,7 @@ import { WorkspaceResolver } from './workspace-resolver';
 const routes: Routes = [
   {
     path: '',
-    component: WorkspacesComponent
+    component: WorkspacesComponent,
   },
   {
     path: ':workspaceId',
@@ -37,18 +37,19 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        component: WorkspaceComponent
+        component: WorkspaceComponent,
       },
       {
         path: 'petals',
-        loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule'
-      }
-    ]
-  }
+        loadChildren:
+          'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule',
+      },
+    ],
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  providers: []
+  providers: [],
 })
-export class WorkspacesRoutingModule { }
+export class WorkspacesRoutingModule {}

@@ -20,11 +20,17 @@ import { Observable } from 'rxjs/Observable';
 
 import { IWorkspaces, IWorkspace } from './workspaces.interface';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { escapeStringRegexp, arrayEquals, tuple } from '../../../../../shared/helpers/shared.helper';
+import {
+  escapeStringRegexp,
+  arrayEquals,
+  tuple,
+} from '../../../../../shared/helpers/shared.helper';
 import { IUser } from '../../../../../shared/interfaces/users.interface';
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 
-export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspaces> {
+export function _getWorkspacesList(
+  store$: Store<IStore>
+): Observable<IWorkspaces> {
   const sWorkspaces = store$.select((state: IStore) => state.workspaces);
   const sUsers = store$.select((state: IStore) => state.users);
   const sBuses = store$.select((state: IStore) => state.buses);
@@ -40,12 +46,14 @@ export function _getWorkspacesList(store$: Store<IStore>): Observable<IWorkspace
               ...workspaces.byId[workspaceId],
               ...<IWorkspace>{
                 users: {
-                  list: workspaces.byId[workspaceId].users.map(userId => <IUser>users.byId[userId])
-                }
-              }
+                  list: workspaces.byId[workspaceId].users.map(
+                    userId => <IUser>users.byId[userId]
+                  ),
+                },
+              },
             };
-          })
-        }
+          }),
+        },
       };
     });
 }
@@ -59,156 +67,200 @@ export function getWorkspacesList() {
 /**
  * filter the store to only get the state if the current workspace is fetched.
  */
-export function filterWorkspaceFetched(store$: Store<IStore>): Observable<IStore> {
-  return store$
-    .filter(state => state.workspaces.selectedWorkspaceId && state.workspaces.isSelectedWorkspaceFetched);
+export function filterWorkspaceFetched(
+  store$: Store<IStore>
+): Observable<IStore> {
+  return store$.filter(
+    state =>
+      state.workspaces.selectedWorkspaceId &&
+      state.workspaces.isSelectedWorkspaceFetched
+  );
 }
 
-export function _getCurrentWorkspace(store$: Store<IStore>): Observable<IWorkspace> {
-  return filterWorkspaceFetched(store$)
-    .map(state => tuple([
-      state.workspaces,
-      state.users,
-      state.buses,
-      state.containers,
-      state.components,
-      state.serviceAssemblies,
-      state.serviceUnits,
-      state.sharedLibraries
-    ]))
-    // as the object has a new reference every time,
-    // use distinctUntilChanged for performance
-    .distinctUntilChanged(arrayEquals)
-    .map(([workspaces, users, buses, containers, components, serviceAssemblies, serviceUnits, sharedLibraries]) => {
-      const workspace = workspaces.byId[workspaces.selectedWorkspaceId];
-      return {
-        id: workspace.id,
-        name: workspace.name,
-        description: workspace.description,
-        isRemoving: workspace.isRemoving,
-        isSettingDescription: workspace.isSettingDescription,
-        isFetchingDetails: workspace.isFetchingDetails,
+export function _getCurrentWorkspace(
+  store$: Store<IStore>
+): Observable<IWorkspace> {
+  return (
+    filterWorkspaceFetched(store$)
+      .map(state =>
+        tuple([
+          state.workspaces,
+          state.users,
+          state.buses,
+          state.containers,
+          state.components,
+          state.serviceAssemblies,
+          state.serviceUnits,
+          state.sharedLibraries,
+        ])
+      )
+      // as the object has a new reference every time,
+      // use distinctUntilChanged for performance
+      .distinctUntilChanged(arrayEquals)
+      .map(
+        (
+          [
+            workspaces,
+            users,
+            buses,
+            containers,
+            components,
+            serviceAssemblies,
+            serviceUnits,
+            sharedLibraries,
+          ]
+        ) => {
+          const workspace = workspaces.byId[workspaces.selectedWorkspaceId];
+          return {
+            id: workspace.id,
+            name: workspace.name,
+            description: workspace.description,
+            isRemoving: workspace.isRemoving,
+            isSettingDescription: workspace.isSettingDescription,
+            isFetchingDetails: workspace.isFetchingDetails,
 
-        users: {
-          connectedUserId: users.connectedUserId,
-          isConnecting: users.isConnecting,
-          isConnected: users.isConnected,
-          isDisconnecting: users.isDisconnecting,
-          connectionFailed: users.connectionFailed,
-          list: workspace.users.map(userId => users.byId[userId])
-        },
+            users: {
+              connectedUserId: users.connectedUserId,
+              isConnecting: users.isConnecting,
+              isConnected: users.isConnected,
+              isDisconnecting: users.isDisconnecting,
+              connectionFailed: users.connectionFailed,
+              list: workspace.users.map(userId => users.byId[userId]),
+            },
 
-        buses: {
-          selectedBusId: buses.selectedBusId,
-          list: buses.allIds.map(busId => {
-            const bus = buses.byId[busId];
-            return {
-              id: bus.id,
-              workspaceId: bus.workspaceId,
-              name: bus.name,
-              isFetchingDetails: bus.isFetchingDetails,
-              isFolded: bus.isFolded || false,
+            buses: {
+              selectedBusId: buses.selectedBusId,
+              list: buses.allIds.map(busId => {
+                const bus = buses.byId[busId];
+                return {
+                  id: bus.id,
+                  workspaceId: bus.workspaceId,
+                  name: bus.name,
+                  isFetchingDetails: bus.isFetchingDetails,
+                  isFolded: bus.isFolded || false,
 
-              containers: {
-                selectedContainerId: containers.selectedContainerId,
-                isFetchingDetails: containers.isFetchingDetails,
-                list: bus.containers.map(containerId => {
-                  const container = containers.byId[containerId];
-                  return {
-                    id: container.id,
-                    busId: container.busId,
-                    name: container.name,
-                    ip: container.ip,
-                    port: container.port,
-                    systemInfo: container.systemInfo,
-                    isFetchingDetails: container.isFetchingDetails,
-                    isFolded: container.isFolded || false,
-                    isDeployingComponent: container.isDeployingComponent,
-                    errorDeploymentComponent: container.errorDeploymentComponent,
-                    isDeployingServiceAssembly: container.isDeployingServiceAssembly,
-                    errorDeploymentServiceAssembly: container.errorDeploymentServiceAssembly,
+                  containers: {
+                    selectedContainerId: containers.selectedContainerId,
+                    isFetchingDetails: containers.isFetchingDetails,
+                    list: bus.containers.map(containerId => {
+                      const container = containers.byId[containerId];
+                      return {
+                        id: container.id,
+                        busId: container.busId,
+                        name: container.name,
+                        ip: container.ip,
+                        port: container.port,
+                        systemInfo: container.systemInfo,
+                        isFetchingDetails: container.isFetchingDetails,
+                        isFolded: container.isFolded || false,
+                        isDeployingComponent: container.isDeployingComponent,
+                        errorDeploymentComponent:
+                          container.errorDeploymentComponent,
+                        isDeployingServiceAssembly:
+                          container.isDeployingServiceAssembly,
+                        errorDeploymentServiceAssembly:
+                          container.errorDeploymentServiceAssembly,
 
-                    components: {
-                      selectedComponentId: components.selectedComponentId,
-                      isFetchingDetails: components.isFetchingDetails,
-                      list: container.components.map(componentId => {
-                        const component = components.byId[componentId];
-                        return {
-                          id: component.id,
-                          containerId: component.containerId,
-                          name: component.name,
-                          state: component.state,
-                          type: component.type,
-                          parameters: component.parameters,
-                          isFetchingDetails: component.isFetchingDetails,
-                          isUpdatingState: component.isUpdatingState,
-                          isDeployingServiceUnit: component.isDeployingServiceUnit,
-                          isFolded: component.isFolded || false,
-                          errorChangeState: component.errorChangeState,
-                          errorDeployment: component.errorDeployment,
+                        components: {
+                          selectedComponentId: components.selectedComponentId,
+                          isFetchingDetails: components.isFetchingDetails,
+                          list: container.components.map(componentId => {
+                            const component = components.byId[componentId];
+                            return {
+                              id: component.id,
+                              containerId: component.containerId,
+                              name: component.name,
+                              state: component.state,
+                              type: component.type,
+                              parameters: component.parameters,
+                              isFetchingDetails: component.isFetchingDetails,
+                              isUpdatingState: component.isUpdatingState,
+                              isDeployingServiceUnit:
+                                component.isDeployingServiceUnit,
+                              isFolded: component.isFolded || false,
+                              errorChangeState: component.errorChangeState,
+                              errorDeployment: component.errorDeployment,
 
-                          serviceUnits: {
-                            selectedServiceUnitId: serviceUnits.selectedServiceUnitId,
-                            isFetchingDetails: serviceUnits.isFetchingDetails,
-                            list: component.serviceUnits.map(serviceUnitId => {
-                              const serviceUnit = serviceUnits.byId[serviceUnitId];
+                              serviceUnits: {
+                                selectedServiceUnitId:
+                                  serviceUnits.selectedServiceUnitId,
+                                isFetchingDetails:
+                                  serviceUnits.isFetchingDetails,
+                                list: component.serviceUnits.map(
+                                  serviceUnitId => {
+                                    const serviceUnit =
+                                      serviceUnits.byId[serviceUnitId];
+                                    return {
+                                      id: serviceUnit.id,
+                                      containerId: serviceUnit.containerId,
+                                      componentId: serviceUnit.componentId,
+                                      serviceAssemblyId:
+                                        serviceUnit.serviceAssemblyId,
+                                      name: serviceUnit.name,
+                                      isUpdatingState:
+                                        serviceUnit.isUpdatingState,
+                                      isFolded: serviceUnit.isFolded || false,
+                                      errorChangeState:
+                                        serviceUnit.errorChangeState,
+                                    };
+                                  }
+                                ),
+                              },
+                            };
+                          }),
+                        },
+                        serviceAssemblies: {
+                          selectedServiceAssemblyId:
+                            serviceAssemblies.selectedServiceAssemblyId,
+                          isFetchingDetails:
+                            serviceAssemblies.isFetchingDetails,
+                          list: container.serviceAssemblies.map(
+                            serviceAssemblyId => {
+                              const serviceAssembly =
+                                serviceAssemblies.byId[serviceAssemblyId];
                               return {
-                                id: serviceUnit.id,
-                                containerId: serviceUnit.containerId,
-                                componentId: serviceUnit.componentId,
-                                serviceAssemblyId: serviceUnit.serviceAssemblyId,
-                                name: serviceUnit.name,
-                                isUpdatingState: serviceUnit.isUpdatingState,
-                                isFolded: serviceUnit.isFolded || false,
-                                errorChangeState: serviceUnit.errorChangeState
+                                id: serviceAssembly.id,
+                                name: serviceAssembly.name,
+                                serviceUnits: serviceAssembly.serviceUnits,
+                                containerId: serviceAssembly.containerId,
+                                state: serviceAssembly.state,
+
+                                isFolded: serviceAssembly.isFolded,
+                                isUpdatingState:
+                                  serviceAssembly.isUpdatingState,
+                                errorChangeState:
+                                  serviceAssembly.errorChangeState,
                               };
-                            })
-                          }
-                        };
-                      })
-                    },
-                    serviceAssemblies: {
-                      selectedServiceAssemblyId: serviceAssemblies.selectedServiceAssemblyId,
-                      isFetchingDetails: serviceAssemblies.isFetchingDetails,
-                      list: container.serviceAssemblies.map(serviceAssemblyId => {
-                        const serviceAssembly = serviceAssemblies.byId[serviceAssemblyId];
-                        return {
-                          id: serviceAssembly.id,
-                          name: serviceAssembly.name,
-                          serviceUnits: serviceAssembly.serviceUnits,
-                          containerId: serviceAssembly.containerId,
-                          state: serviceAssembly.state,
+                            }
+                          ),
+                        },
+                        sharedLibraries: {
+                          selectedSharedLibraryId:
+                            sharedLibraries.selectedSharedLibraryId,
+                          isFetchingDetails: sharedLibraries.isFetchingDetails,
 
-                          isFolded: serviceAssembly.isFolded,
-                          isUpdatingState: serviceAssembly.isUpdatingState,
-                          errorChangeState: serviceAssembly.errorChangeState
-                        };
-                      })
-                    },
-                    sharedLibraries: {
-                      selectedSharedLibraryId: sharedLibraries.selectedSharedLibraryId,
-                      isFetchingDetails: sharedLibraries.isFetchingDetails,
+                          list: container.sharedLibraries.map(id => {
+                            const sl = sharedLibraries.byId[id];
+                            return {
+                              id: sl.id,
+                              name: sl.name,
+                              version: sl.version,
+                              containerId: sl.containerId,
 
-                      list: container.sharedLibraries.map(id => {
-                        const sl = sharedLibraries.byId[id];
-                        return {
-                          id: sl.id,
-                          name: sl.name,
-                          version: sl.version,
-                          containerId: sl.containerId,
-
-                          isFolded: sl.isFolded
-                        };
-                      })
-                    }
-                  };
-                })
-              }
-            };
-          })
+                              isFolded: sl.isFolded,
+                            };
+                          }),
+                        },
+                      };
+                    }),
+                  },
+                };
+              }),
+            },
+          };
         }
-      };
-    });
+      )
+  );
 }
 
 export function getCurrentWorkspace() {
@@ -218,7 +270,12 @@ export function getCurrentWorkspace() {
 // -----------------------------------------------------------
 
 export enum WorkspaceElementType {
-  BUS, CONTAINER, COMPONENT, SERVICEASSEMBLY, SERVICEUNIT, SHAREDLIBRARY
+  BUS,
+  CONTAINER,
+  COMPONENT,
+  SERVICEASSEMBLY,
+  SERVICEUNIT,
+  SHAREDLIBRARY,
 }
 
 export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
@@ -227,7 +284,9 @@ export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
   name: string;
 }
 
-export function _getCurrentTree(store$: Store<IStore>): Observable<WorkspaceElement[]> {
+export function _getCurrentTree(
+  store$: Store<IStore>
+): Observable<WorkspaceElement[]> {
   return _getCurrentWorkspace(store$)
     .map(workspace => {
       const baseUrl = `/workspaces/${workspace.id}/petals`;
@@ -248,14 +307,16 @@ export function _getCurrentTree(store$: Store<IStore>): Observable<WorkspaceElem
           cssClass: `workspace-element-type-container`,
 
           children: [
-            ...container.serviceAssemblies.list.map<WorkspaceElement>(serviceAssembly => ({
+            ...container.serviceAssemblies.list.map<
+              WorkspaceElement
+            >(serviceAssembly => ({
               id: serviceAssembly.id,
               type: WorkspaceElementType.SERVICEASSEMBLY,
               name: serviceAssembly.name,
               link: `${baseUrl}/service-assemblies/${serviceAssembly.id}`,
               isFolded: serviceAssembly.isFolded,
               cssClass: `workspace-element-type-service-assembly`,
-              children: []
+              children: [],
             })),
             ...container.sharedLibraries.list.map<WorkspaceElement>(sl => ({
               id: sl.id,
@@ -264,7 +325,7 @@ export function _getCurrentTree(store$: Store<IStore>): Observable<WorkspaceElem
               link: `${baseUrl}/shared-libraries/${sl.id}`,
               isFolded: sl.isFolded,
               cssClass: `workspace-element-type-shared-library`,
-              children: []
+              children: [],
             })),
             ...container.components.list.map<WorkspaceElement>(component => ({
               id: component.id,
@@ -274,18 +335,20 @@ export function _getCurrentTree(store$: Store<IStore>): Observable<WorkspaceElem
               isFolded: component.isFolded,
               cssClass: `workspace-element-type-component`,
 
-              children: component.serviceUnits.list.map<WorkspaceElement>(serviceUnit => ({
+              children: component.serviceUnits.list.map<
+                WorkspaceElement
+              >(serviceUnit => ({
                 id: serviceUnit.id,
                 type: WorkspaceElementType.SERVICEUNIT,
                 name: serviceUnit.name,
                 link: `${baseUrl}/service-units/${serviceUnit.id}`,
                 isFolded: serviceUnit.isFolded,
                 cssClass: `workspace-element-type-service-unit`,
-                children: []
-              }))
-            }))
-          ]
-        }))
+                children: [],
+              })),
+            })),
+          ],
+        })),
       }));
     })
     .withLatestFrom(store$.select(s => s.workspaces.searchPetals))
@@ -318,7 +381,7 @@ export function filterElement(filter: string, element: any): any {
       return {
         ...element,
         isFolded: false,
-        children: es
+        children: es,
       };
     }
   }

@@ -22,9 +22,13 @@ import { Observable } from 'rxjs/Observable';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
-export function getCurrentServiceUnit(store$: Store<IStore>): Observable<IServiceUnitRow> {
+export function getCurrentServiceUnit(
+  store$: Store<IStore>
+): Observable<IServiceUnitRow> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.serviceUnits.selectedServiceUnitId)
-    .map(state => state.serviceUnits.byId[state.serviceUnits.selectedServiceUnitId])
+    .map(
+      state => state.serviceUnits.byId[state.serviceUnits.selectedServiceUnitId]
+    )
     .distinctUntilChanged();
 }

@@ -18,7 +18,10 @@
 import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 import { IServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 import {
-  IComponentBackendSSE, IComponentBackendDetails, IComponentBackendSSECommon, IComponentBackendDetailsCommon
+  IComponentBackendSSE,
+  IComponentBackendDetails,
+  IComponentBackendSSECommon,
+  IComponentBackendDetailsCommon,
 } from 'app/shared/services/components.service';
 
 export interface IComponentUI {
@@ -31,9 +34,9 @@ export interface IComponentUI {
   errorDeployment: string;
 }
 
-export interface IComponentRow extends IComponentUI, IComponentBackendSSE, IComponentBackendDetails { }
+export interface IComponentRow extends IComponentUI, IComponentBackendSSE, IComponentBackendDetails {}
 
-export interface IComponentRowWithoutDetails extends IComponentUI, IComponentBackendSSE { }
+export interface IComponentRowWithoutDetails extends IComponentUI, IComponentBackendSSE {}
 
 export interface IComponent extends IComponentUI, IComponentBackendSSECommon, IComponentBackendDetailsCommon {
   serviceUnits: IServiceUnits;
@@ -44,7 +47,9 @@ export interface IComponentsCommon {
   isFetchingDetails: boolean;
 }
 
-export interface IComponentsTable extends IComponentsCommon, JsMap<IComponentRow> { }
+export interface IComponentsTable extends IComponentsCommon, JsMap<
+  IComponentRow
+> {}
 
 export interface IComponents extends IComponentsCommon {
   list: IComponent[];
@@ -67,13 +72,13 @@ export function componentRowFactory(): IComponentRow {
     errorDeployment: '',
 
     serviceUnits: [],
-    sharedLibraries: []
+    sharedLibraries: [],
   };
 }
 
 export function componentsTableFactory(): IComponentsTable {
   return Object.assign({}, emptyJavascriptMap<IComponentRow>(), {
     selectedComponentId: '',
-    isFetchingDetails: false
+    isFetchingDetails: false,
   });
 }

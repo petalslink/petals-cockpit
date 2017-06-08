@@ -22,33 +22,48 @@ import { waitTimeout } from '../common';
 import { ServiceAssemblyOverviewPage } from './service-assembly.po';
 
 export abstract class ServiceUnitPage {
-
   public static readonly component = $(`app-petals-service-unit-view`);
 
   public readonly component = ServiceUnitPage.component;
   public readonly title = this.component.$(`md-toolbar .title`);
 
   protected static wait() {
-    browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/service-units\/\w+/), waitTimeout);
+    browser.wait(
+      urlToMatch(/\/workspaces\/\w+\/petals\/service-units\/\w+/),
+      waitTimeout
+    );
     browser.wait(EC.visibilityOf(ServiceUnitPage.component), waitTimeout);
-    browser.wait(EC.stalenessOf(ServiceUnitPage.component.$('md-toolbar md-spinner')), waitTimeout);
+    browser.wait(
+      EC.stalenessOf(ServiceUnitPage.component.$('md-toolbar md-spinner')),
+      waitTimeout
+    );
   }
 }
 
 export class ServiceUnitOverviewPage extends ServiceUnitPage {
-
-  public static readonly overview = ServiceUnitPage.component.$(`app-petals-service-unit-overview`);
+  public static readonly overview = ServiceUnitPage.component.$(
+    `app-petals-service-unit-overview`
+  );
 
   public readonly overview = ServiceUnitOverviewPage.overview;
   public readonly state = this.overview.$(`md-card .sa-state`);
 
-  public readonly serviceAssemblyCard = this.overview.$('md-card-header.service-assembly');
-  public readonly serviceAssembly = this.serviceAssemblyCard.$('md-card-subtitle.sa-name');
-  public readonly viewServiceAssembly = this.overview.$('md-card-actions.btn-view-container');
+  public readonly serviceAssemblyCard = this.overview.$(
+    'md-card-header.service-assembly'
+  );
+  public readonly serviceAssembly = this.serviceAssemblyCard.$(
+    'md-card-subtitle.sa-name'
+  );
+  public readonly viewServiceAssembly = this.overview.$(
+    'md-card-actions.btn-view-container'
+  );
 
   static waitAndGet() {
     super.wait();
-    browser.wait(EC.visibilityOf(ServiceUnitOverviewPage.overview), waitTimeout);
+    browser.wait(
+      EC.visibilityOf(ServiceUnitOverviewPage.overview),
+      waitTimeout
+    );
     return new ServiceUnitOverviewPage();
   }
 

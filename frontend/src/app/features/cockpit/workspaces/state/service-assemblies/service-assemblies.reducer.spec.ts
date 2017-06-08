@@ -21,19 +21,22 @@ import { serviceAssembliesTableFactory } from 'app/features/cockpit/workspaces/s
 
 describe(`ServiceAssemblies reducer`, () => {
   it(`should have a default value`, () => {
-    expect(ServiceAssemblies.reducer(undefined, { type: `init`, payload: `` }))
-      .toEqual({
-        selectedServiceAssemblyId: '',
-        isFetchingDetails: false,
+    expect(
+      ServiceAssemblies.reducer(undefined, { type: `init`, payload: `` })
+    ).toEqual({
+      selectedServiceAssemblyId: '',
+      isFetchingDetails: false,
 
-        byId: {},
-        allIds: []
-      });
+      byId: {},
+      allIds: [],
+    });
   });
 
   describe(ServiceAssemblies.FETCH_SERVICE_ASSEMBLIES_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(ServiceAssemblies.FETCH_SERVICE_ASSEMBLIES_SUCCESS).toEqual(`[Service assemblies] Fetch service assemblies success`);
+      expect(ServiceAssemblies.FETCH_SERVICE_ASSEMBLIES_SUCCESS).toEqual(
+        `[Service assemblies] Fetch service assemblies success`
+      );
     });
 
     const initialState: any = {
@@ -43,46 +46,42 @@ describe(`ServiceAssemblies reducer`, () => {
         idSa0: {
           keepPreviousValues: '',
           name: 'SA 0',
-          id: 'idSa0'
+          id: 'idSa0',
         },
         idSa1: {
           keepPreviousValues: '',
           name: 'SA 1',
-          id: 'idSa1'
-        }
+          id: 'idSa1',
+        },
       },
-      allIds: [
-        'idSa0',
-        'idSa1'
-      ]
+      allIds: ['idSa0', 'idSa1'],
     };
 
     it(`should replace existing service assembly while keeping extra values`, () => {
-      expect(ServiceAssemblies.reducer(initialState, {
-        type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLIES_SUCCESS,
-        payload: {
-          byId: {
-            idSa0: {
-              name: 'SA 0 updated name',
-              id: 'idSa0',
-              containerId: 'idCont0',
-              serviceUnits: ['idSu0'],
-              state: 'Loaded'
+      expect(
+        ServiceAssemblies.reducer(initialState, {
+          type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLIES_SUCCESS,
+          payload: {
+            byId: {
+              idSa0: {
+                name: 'SA 0 updated name',
+                id: 'idSa0',
+                containerId: 'idCont0',
+                serviceUnits: ['idSu0'],
+                state: 'Loaded',
+              },
+              idSa2: {
+                name: 'SA 2',
+                id: 'idSa2',
+                containerId: 'idCont0',
+                serviceUnits: ['idSu1'],
+                state: 'Loaded',
+              },
             },
-            idSa2: {
-              name: 'SA 2',
-              id: 'idSa2',
-              containerId: 'idCont0',
-              serviceUnits: ['idSu1'],
-              state: 'Loaded'
-            }
+            allIds: ['idSa0', 'idSa2'],
           },
-          allIds: [
-            'idSa0',
-            'idSa2'
-          ]
-        }
-      })).toEqual({
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           idSa0: {
@@ -94,7 +93,7 @@ describe(`ServiceAssemblies reducer`, () => {
             state: 'Loaded',
             isFolded: false,
             isUpdatingState: false,
-            errorChangeState: ''
+            errorChangeState: '',
           },
           idSa2: {
             name: 'SA 2',
@@ -104,20 +103,19 @@ describe(`ServiceAssemblies reducer`, () => {
             state: 'Loaded',
             isFolded: false,
             isUpdatingState: false,
-            errorChangeState: ''
-          }
+            errorChangeState: '',
+          },
         },
-        allIds: [
-          'idSa0',
-          'idSa2'
-        ]
+        allIds: ['idSa0', 'idSa2'],
       });
     });
   });
 
   describe(ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS).toEqual(`[Service assemblies] Add service assemblies success`);
+      expect(ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS).toEqual(
+        `[Service assemblies] Add service assemblies success`
+      );
     });
 
     it(`should add a service-assembly if doesn't exists yet`, () => {
@@ -128,55 +126,51 @@ describe(`ServiceAssemblies reducer`, () => {
           idSa0: {
             keepPreviousValues: '',
             name: 'SA 0',
-            id: 'idSa0'
+            id: 'idSa0',
           },
           idSa1: {
             keepPreviousValues: '',
             name: 'SA 1',
-            id: 'idSa1'
-          }
+            id: 'idSa1',
+          },
         },
-        allIds: [
-          'idSa0',
-          'idSa1'
-        ]
+        allIds: ['idSa0', 'idSa1'],
       };
 
-      expect(ServiceAssemblies.reducer(initialState, {
-        type: ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS,
-        payload: {
-          byId: {
-            idSa2: {
-              name: 'SA 2',
-              id: 'idSa2',
-              containerId: 'idCont0',
-              state: 'Loaded'
+      expect(
+        ServiceAssemblies.reducer(initialState, {
+          type: ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS,
+          payload: {
+            byId: {
+              idSa2: {
+                name: 'SA 2',
+                id: 'idSa2',
+                containerId: 'idCont0',
+                state: 'Loaded',
+              },
+              idSa3: {
+                name: 'SA 3',
+                id: 'idSa3',
+                containerId: 'idCont0',
+                state: 'Loaded',
+              },
             },
-            idSa3: {
-              name: 'SA 3',
-              id: 'idSa3',
-              containerId: 'idCont0',
-              state: 'Loaded'
-            }
+            allIds: ['idSa2', 'idSa3'],
           },
-          allIds: [
-            'idSa2',
-            'idSa3'
-          ]
-        }
-      })).toEqual({
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSa0: {
             keepPreviousValues: '',
             name: 'SA 0',
-            id: 'idSa0'
+            id: 'idSa0',
           },
           idSa1: {
             keepPreviousValues: '',
             name: 'SA 1',
-            id: 'idSa1'
+            id: 'idSa1',
           },
           idSa2: {
             name: 'SA 2',
@@ -186,7 +180,7 @@ describe(`ServiceAssemblies reducer`, () => {
             state: 'Loaded',
             isFolded: false,
             isUpdatingState: false,
-            errorChangeState: ''
+            errorChangeState: '',
           },
           idSa3: {
             name: 'SA 3',
@@ -196,22 +190,19 @@ describe(`ServiceAssemblies reducer`, () => {
             state: 'Loaded',
             isFolded: false,
             isUpdatingState: false,
-            errorChangeState: ''
-          }
+            errorChangeState: '',
+          },
         },
-        allIds: [
-          'idSa0',
-          'idSa1',
-          'idSa2',
-          'idSa3'
-        ]
+        allIds: ['idSa0', 'idSa1', 'idSa2', 'idSa3'],
       });
     });
   });
 
   describe(ServiceAssemblies.SET_CURRENT_SERVICE_ASSEMBLY, () => {
     it(`should check action name`, () => {
-      expect(ServiceAssemblies.SET_CURRENT_SERVICE_ASSEMBLY).toEqual(`[Service assemblies] Set current service assembly`);
+      expect(ServiceAssemblies.SET_CURRENT_SERVICE_ASSEMBLY).toEqual(
+        `[Service assemblies] Set current service assembly`
+      );
     });
 
     it(`should set the current service-assembly and reset its errors`, () => {
@@ -219,30 +210,32 @@ describe(`ServiceAssemblies reducer`, () => {
         keepPreviousValues: '',
         selectedServiceAssemblyId: '',
         byId: {
-          idSa0: { errorChangeState: 'some error' }
+          idSa0: { errorChangeState: 'some error' },
         },
-        allIds: ['idSa0']
+        allIds: ['idSa0'],
       };
 
       const reducer = ServiceAssemblies.reducer(initialState, {
         type: ServiceAssemblies.SET_CURRENT_SERVICE_ASSEMBLY,
-        payload: { serviceAssemblyId: 'idSa0' }
+        payload: { serviceAssemblyId: 'idSa0' },
       });
 
       expect(reducer).toEqual({
         keepPreviousValues: '',
         selectedServiceAssemblyId: 'idSa0',
         byId: {
-          idSa0: { errorChangeState: '' }
+          idSa0: { errorChangeState: '' },
         },
-        allIds: ['idSa0']
+        allIds: ['idSa0'],
       });
     });
   });
 
   describe(ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS, () => {
     it(`should check action name`, () => {
-      expect(ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS).toEqual(`[Service assemblies] Fetch service assembly details`);
+      expect(ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS).toEqual(
+        `[Service assemblies] Fetch service assembly details`
+      );
     });
 
     const initialState: any = {
@@ -251,33 +244,36 @@ describe(`ServiceAssemblies reducer`, () => {
         keepPreviousValues: '',
         idSa0: {
           keepPreviousValues: '',
-        }
+        },
       },
-      allIds: ['idSa0']
+      allIds: ['idSa0'],
     };
 
     it(`should set isFetchingDetails to true even if isFetchingDetails doesn't exists yet`, () => {
-      expect(ServiceAssemblies.reducer(initialState, {
-        type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS,
-        payload: { serviceAssemblyId: 'idSa0' }
-      })).toEqual({
+      expect(
+        ServiceAssemblies.reducer(initialState, {
+          type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS,
+          payload: { serviceAssemblyId: 'idSa0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSa0: {
             keepPreviousValues: '',
-            isFetchingDetails: true
+            isFetchingDetails: true,
           },
         },
-        allIds: ['idSa0']
+        allIds: ['idSa0'],
       });
     });
   });
 
   describe(ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_SUCCESS)
-        .toEqual(`[Service assemblies] Fetch service assembly details success`);
+      expect(ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_SUCCESS).toEqual(
+        `[Service assemblies] Fetch service assembly details success`
+      );
     });
 
     const initialState: any = {
@@ -286,33 +282,40 @@ describe(`ServiceAssemblies reducer`, () => {
         keepPreviousValues: '',
         idSa0: {
           keepPreviousValues: '',
-        }
+        },
       },
-      allIds: ['idSa0']
+      allIds: ['idSa0'],
     };
 
     it(`should set isFetchingDetails to false even if isFetchingDetails doesn't exists yet`, () => {
-      expect(ServiceAssemblies.reducer(initialState, {
-        type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_SUCCESS,
-        payload: { serviceAssemblyId: 'idSa0', data: { someData: 'some data' } }
-      })).toEqual({
+      expect(
+        ServiceAssemblies.reducer(initialState, {
+          type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_SUCCESS,
+          payload: {
+            serviceAssemblyId: 'idSa0',
+            data: { someData: 'some data' },
+          },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSa0: {
             keepPreviousValues: '',
             isFetchingDetails: false,
-            someData: 'some data'
-          }
+            someData: 'some data',
+          },
         },
-        allIds: ['idSa0']
+        allIds: ['idSa0'],
       });
     });
   });
 
   describe(ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_ERROR, () => {
     it(`should check action name`, () => {
-      expect(ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_ERROR).toEqual(`[Service assemblies] Fetch service assembly details error`);
+      expect(ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_ERROR).toEqual(
+        `[Service assemblies] Fetch service assembly details error`
+      );
     });
 
     const initialState: any = {
@@ -321,33 +324,37 @@ describe(`ServiceAssemblies reducer`, () => {
         keepPreviousValues: '',
         idSa0: {
           keepPreviousValues: '',
-          isFetchingDetails: true
-        }
+          isFetchingDetails: true,
+        },
       },
-      allIds: ['idSa0']
+      allIds: ['idSa0'],
     };
 
     it(`should set isFetchingDetails to false if the service-assembly exists`, () => {
-      expect(ServiceAssemblies.reducer(initialState, {
-        type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_ERROR,
-        payload: { serviceAssemblyId: 'idSa0' }
-      })).toEqual({
+      expect(
+        ServiceAssemblies.reducer(initialState, {
+          type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_ERROR,
+          payload: { serviceAssemblyId: 'idSa0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSa0: {
             keepPreviousValues: '',
-            isFetchingDetails: false
-          }
+            isFetchingDetails: false,
+          },
         },
-        allIds: ['idSa0']
+        allIds: ['idSa0'],
       });
     });
   });
 
   describe(ServiceAssemblies.CHANGE_STATE, () => {
     it(`should check action name`, () => {
-      expect(ServiceAssemblies.CHANGE_STATE).toEqual(`[Service assemblies] Change state`);
+      expect(ServiceAssemblies.CHANGE_STATE).toEqual(
+        `[Service assemblies] Change state`
+      );
     });
 
     const initialState: any = {
@@ -355,33 +362,37 @@ describe(`ServiceAssemblies reducer`, () => {
       byId: {
         keepPreviousValues: '',
         idSa0: {
-          keepPreviousValues: ''
-        }
+          keepPreviousValues: '',
+        },
       },
-      allIds: ['idSa0']
+      allIds: ['idSa0'],
     };
 
     it(`should change the isUpdatingState variable of an existing service-assembly to true`, () => {
-      expect(ServiceAssemblies.reducer(initialState, {
-        type: ServiceAssemblies.CHANGE_STATE,
-        payload: { serviceAssemblyId: 'idSa0' }
-      })).toEqual({
+      expect(
+        ServiceAssemblies.reducer(initialState, {
+          type: ServiceAssemblies.CHANGE_STATE,
+          payload: { serviceAssemblyId: 'idSa0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSa0: {
             keepPreviousValues: '',
-            isUpdatingState: true
-          }
+            isUpdatingState: true,
+          },
         },
-        allIds: ['idSa0']
+        allIds: ['idSa0'],
       });
     });
   });
 
   describe(ServiceAssemblies.CHANGE_STATE_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(ServiceAssemblies.CHANGE_STATE_SUCCESS).toEqual(`[Service assemblies] Change state success`);
+      expect(ServiceAssemblies.CHANGE_STATE_SUCCESS).toEqual(
+        `[Service assemblies] Change state success`
+      );
     });
 
     const initialState: any = {
@@ -390,17 +401,19 @@ describe(`ServiceAssemblies reducer`, () => {
         keepPreviousValues: '',
         idSa0: {
           keepPreviousValues: '',
-          errorChangeState: 'some previous error'
-        }
+          errorChangeState: 'some previous error',
+        },
       },
-      allIds: ['idSa0']
+      allIds: ['idSa0'],
     };
 
     it(`should update an existing service-assembly by setting UI variables and the state`, () => {
-      expect(ServiceAssemblies.reducer(initialState, {
-        type: ServiceAssemblies.CHANGE_STATE_SUCCESS,
-        payload: { serviceAssemblyId: 'idSa0', newState: 'Started' }
-      })).toEqual({
+      expect(
+        ServiceAssemblies.reducer(initialState, {
+          type: ServiceAssemblies.CHANGE_STATE_SUCCESS,
+          payload: { serviceAssemblyId: 'idSa0', newState: 'Started' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
@@ -408,17 +421,19 @@ describe(`ServiceAssemblies reducer`, () => {
             keepPreviousValues: '',
             isUpdatingState: false,
             state: 'Started',
-            errorChangeState: ''
-          }
+            errorChangeState: '',
+          },
         },
-        allIds: ['idSa0']
+        allIds: ['idSa0'],
       });
     });
   });
 
   describe(ServiceAssemblies.CHANGE_STATE_ERROR, () => {
     it(`should check action name`, () => {
-      expect(ServiceAssemblies.CHANGE_STATE_ERROR).toEqual(`[Service assemblies] Change state error`);
+      expect(ServiceAssemblies.CHANGE_STATE_ERROR).toEqual(
+        `[Service assemblies] Change state error`
+      );
     });
 
     const initialState: any = {
@@ -427,34 +442,41 @@ describe(`ServiceAssemblies reducer`, () => {
         keepPreviousValues: '',
         idSa0: {
           keepPreviousValues: '',
-          errorChangeState: ''
-        }
+          errorChangeState: '',
+        },
       },
-      allIds: ['idSa0']
+      allIds: ['idSa0'],
     };
 
     it(`should change the isUpdatingState variable of an existing service-assembly to false`, () => {
-      expect(ServiceAssemblies.reducer(initialState, {
-        type: ServiceAssemblies.CHANGE_STATE_ERROR,
-        payload: { serviceAssemblyId: 'idSa0', errorChangeState: 'some error' }
-      })).toEqual({
+      expect(
+        ServiceAssemblies.reducer(initialState, {
+          type: ServiceAssemblies.CHANGE_STATE_ERROR,
+          payload: {
+            serviceAssemblyId: 'idSa0',
+            errorChangeState: 'some error',
+          },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSa0: {
             keepPreviousValues: '',
             isUpdatingState: false,
-            errorChangeState: 'some error'
-          }
+            errorChangeState: 'some error',
+          },
         },
-        allIds: ['idSa0']
+        allIds: ['idSa0'],
       });
     });
   });
 
   describe(ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY, () => {
     it(`should check action name`, () => {
-      expect(ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY).toEqual(`[Service assemblies] Remove service assembly`);
+      expect(ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY).toEqual(
+        `[Service assemblies] Remove service assembly`
+      );
     });
 
     const initialState: any = {
@@ -462,68 +484,74 @@ describe(`ServiceAssemblies reducer`, () => {
       byId: {
         keepPreviousValues: '',
         idSa0: {
-          keepPreviousValues: ''
+          keepPreviousValues: '',
         },
         idSa1: {
-          keepPreviousValues: ''
+          keepPreviousValues: '',
         },
         idSa2: {
-          keepPreviousValues: ''
-        }
+          keepPreviousValues: '',
+        },
       },
-      allIds: ['idSa0', 'idSa1', 'idSa2']
+      allIds: ['idSa0', 'idSa1', 'idSa2'],
     };
 
     it(`should remove an existing service-assembly`, () => {
-      expect(ServiceAssemblies.reducer(initialState, {
-        type: ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY,
-        payload: { componentId: 'idComp0', serviceAssemblyId: 'idSa0' }
-      })).toEqual({
+      expect(
+        ServiceAssemblies.reducer(initialState, {
+          type: ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY,
+          payload: { componentId: 'idComp0', serviceAssemblyId: 'idSa0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSa1: {
-            keepPreviousValues: ''
+            keepPreviousValues: '',
           },
           idSa2: {
-            keepPreviousValues: ''
-          }
+            keepPreviousValues: '',
+          },
         },
-        allIds: ['idSa1', 'idSa2']
+        allIds: ['idSa1', 'idSa2'],
       });
 
-      expect(ServiceAssemblies.reducer(initialState, {
-        type: ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY,
-        payload: { componentId: 'idComp0', serviceAssemblyId: 'idSa1' }
-      })).toEqual({
+      expect(
+        ServiceAssemblies.reducer(initialState, {
+          type: ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY,
+          payload: { componentId: 'idComp0', serviceAssemblyId: 'idSa1' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSa0: {
-            keepPreviousValues: ''
+            keepPreviousValues: '',
           },
           idSa2: {
-            keepPreviousValues: ''
-          }
+            keepPreviousValues: '',
+          },
         },
-        allIds: ['idSa0', 'idSa2']
+        allIds: ['idSa0', 'idSa2'],
       });
 
-      expect(ServiceAssemblies.reducer(initialState, {
-        type: ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY,
-        payload: { componentId: 'idComp0', serviceAssemblyId: 'idSa2' }
-      })).toEqual({
+      expect(
+        ServiceAssemblies.reducer(initialState, {
+          type: ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY,
+          payload: { componentId: 'idComp0', serviceAssemblyId: 'idSa2' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSa0: {
-            keepPreviousValues: ''
+            keepPreviousValues: '',
           },
           idSa1: {
-            keepPreviousValues: ''
-          }
+            keepPreviousValues: '',
+          },
         },
-        allIds: ['idSa0', 'idSa1']
+        allIds: ['idSa0', 'idSa1'],
       });
     });
   });
@@ -535,21 +563,25 @@ describe(`ServiceAssemblies reducer`, () => {
         byId: {
           doNotKeepPreviousValues: '',
           idSa0: {
-            doNotKeepPreviousValues: ''
-          }
+            doNotKeepPreviousValues: '',
+          },
         },
-        allIds: ['idSa0']
+        allIds: ['idSa0'],
       };
 
-      expect(ServiceAssemblies.reducer(undefined, {
-        type: Workspaces.CLEAN_WORKSPACE,
-        payload: { noMatter: 'which payload !' }
-      })).toEqual(serviceAssembliesTableFactory());
+      expect(
+        ServiceAssemblies.reducer(undefined, {
+          type: Workspaces.CLEAN_WORKSPACE,
+          payload: { noMatter: 'which payload !' },
+        })
+      ).toEqual(serviceAssembliesTableFactory());
 
-      expect(ServiceAssemblies.reducer(initialState, {
-        type: Workspaces.CLEAN_WORKSPACE,
-        payload: { noMatter: 'which payload !' }
-      })).toEqual(serviceAssembliesTableFactory());
+      expect(
+        ServiceAssemblies.reducer(initialState, {
+          type: Workspaces.CLEAN_WORKSPACE,
+          payload: { noMatter: 'which payload !' },
+        })
+      ).toEqual(serviceAssembliesTableFactory());
     });
   });
 });

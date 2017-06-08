@@ -15,7 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  AfterViewInit,
+} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MdInputContainer } from '@angular/material';
@@ -31,7 +37,7 @@ import { isLargeScreen } from 'app/shared/state/ui.selectors';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   private onDestroy$ = new Subject<void>();
@@ -45,22 +51,23 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private store$: Store<IStore>,
     private route: ActivatedRoute,
-    private fb: FormBuilder) { }
+    private fb: FormBuilder
+  ) {}
 
   ngOnInit() {
     this.users$ = this.store$.select(state => state.users);
 
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
-      password: ['', Validators.required]
+      password: ['', Validators.required],
     });
 
-    this
-      .users$
-      .distinctUntilChanged((p, n) =>
-        p.isConnected === n.isConnected &&
-        p.isConnecting === n.isConnecting &&
-        p.connectionFailed === n.connectionFailed
+    this.users$
+      .distinctUntilChanged(
+        (p, n) =>
+          p.isConnected === n.isConnected &&
+          p.isConnecting === n.isConnecting &&
+          p.connectionFailed === n.connectionFailed
       )
       .takeUntil(this.onDestroy$)
       .do(users => {
@@ -94,7 +101,10 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   onSubmit({ value }) {
     this.store$.dispatch({
       type: Users.CONNECT_USER,
-      payload: { user: value, previousUrl: this.route.snapshot.queryParamMap.get('previousUrl') }
+      payload: {
+        user: value,
+        previousUrl: this.route.snapshot.queryParamMap.get('previousUrl'),
+      },
     });
   }
 }

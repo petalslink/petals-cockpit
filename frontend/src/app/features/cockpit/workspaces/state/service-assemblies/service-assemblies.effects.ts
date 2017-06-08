@@ -23,7 +23,10 @@ import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../../../../environments/environment';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { ServiceAssembliesService, ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
+import {
+  ServiceAssembliesService,
+  ServiceAssemblyState,
+} from 'app/shared/services/service-assemblies.service';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
 
 @Injectable()
@@ -32,59 +35,89 @@ export class ServiceAssembliesEffects {
     private store$: Store<IStore>,
     private actions$: Actions,
     private serviceAssembliesService: ServiceAssembliesService
-  ) { }
+  ) {}
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchServiceAssemblyDetails$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  fetchServiceAssemblyDetails$: Observable<Action> = this.actions$
     .ofType(ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS)
-    .switchMap((action: { type: string, payload: { serviceAssemblyId: string } }) =>
-      this.serviceAssembliesService.getDetailsServiceAssembly(action.payload.serviceAssemblyId)
-        .map((res: Response) => {
-          const data = res.json();
-          return {
-            type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_SUCCESS,
-            payload: {
-              serviceAssemblyId: action.payload.serviceAssemblyId,
-              data
+    .switchMap(
+      (action: { type: string; payload: { serviceAssemblyId: string } }) =>
+        this.serviceAssembliesService
+          .getDetailsServiceAssembly(action.payload.serviceAssemblyId)
+          .map((res: Response) => {
+            const data = res.json();
+            return {
+              type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_SUCCESS,
+              payload: {
+                serviceAssemblyId: action.payload.serviceAssemblyId,
+                data,
+              },
+            };
+          })
+          .catch(err => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in service-assemblies.effects: ofType(ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS)'
+              );
+              console.error(err);
+              console.groupEnd();
             }
-          };
-        })
-        .catch((err) => {
-          if (environment.debug) {
-            console.group();
-            console.warn('Error caught in service-assemblies.effects: ofType(ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS)');
-            console.error(err);
-            console.groupEnd();
-          }
 
-          return Observable.of({
-            type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_ERROR,
-            payload: { serviceAssemblyId: action.payload.serviceAssemblyId }
-          });
-        })
+            return Observable.of({
+              type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS_ERROR,
+              payload: { serviceAssemblyId: action.payload.serviceAssemblyId },
+            });
+          })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) changeState$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  changeState$: Observable<Action> = this.actions$
     .ofType(ServiceAssemblies.CHANGE_STATE)
     .withLatestFrom(this.store$)
-    .switchMap(([action, store]: [{ type: string, payload: { serviceAssemblyId: string, newState: ServiceAssemblyState } }, IStore]) => {
-      return this.serviceAssembliesService
-        .putState(store.workspaces.selectedWorkspaceId, action.payload.serviceAssemblyId, action.payload.newState)
-        // response will be handled by sse
-        .mergeMap(_ => Observable.empty())
-        .catch((err) => {
-          if (environment.debug) {
-            console.group();
-            console.warn('Error caught in service-assemblies.effects: ofType(ServiceAssemblies.CHANGE_STATE)');
-            console.error(err);
-            console.groupEnd();
-          }
+    .switchMap(
+      (
+        [action, store]: [
+          {
+            type: string;
+            payload: {
+              serviceAssemblyId: string;
+              newState: ServiceAssemblyState;
+            };
+          },
+          IStore
+        ]
+      ) => {
+        return (
+          this.serviceAssembliesService
+            .putState(
+              store.workspaces.selectedWorkspaceId,
+              action.payload.serviceAssemblyId,
+              action.payload.newState
+            )
+            // response will be handled by sse
+            .mergeMap(_ => Observable.empty())
+            .catch(err => {
+              if (environment.debug) {
+                console.group();
+                console.warn(
+                  'Error caught in service-assemblies.effects: ofType(ServiceAssemblies.CHANGE_STATE)'
+                );
+                console.error(err);
+                console.groupEnd();
+              }
 
-          return Observable.of({
-            type: ServiceAssemblies.CHANGE_STATE_ERROR,
-            payload: { serviceAssemblyId: action.payload.serviceAssemblyId, errorChangeState: err.json().message }
-          });
-        });
-    });
+              return Observable.of({
+                type: ServiceAssemblies.CHANGE_STATE_ERROR,
+                payload: {
+                  serviceAssemblyId: action.payload.serviceAssemblyId,
+                  errorChangeState: err.json().message,
+                },
+              });
+            })
+        );
+      }
+    );
 }

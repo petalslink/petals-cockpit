@@ -45,13 +45,12 @@ export class SseWorkspaceEvent {
       SseWorkspaceEvent.BUS_DELETED,
       SseWorkspaceEvent.WORKSPACE_DELETED,
       SseWorkspaceEvent.SA_DEPLOYED,
-      SseWorkspaceEvent.COMPONENT_DEPLOYED
+      SseWorkspaceEvent.COMPONENT_DEPLOYED,
     ];
   }
 }
 
 export abstract class SseService {
-
   /**
    * watchWorkspaceRealTime
    *
@@ -77,7 +76,6 @@ export abstract class SseService {
    * @return {Observable} Observable which is triggered every time there's the event `eventName`
    */
   abstract subscribeToWorkspaceEvent(eventName: string): Observable<any>;
-
 }
 
 @Injectable()
@@ -102,7 +100,10 @@ export class SseServiceImpl extends SseService {
    * @type {Map<string, Subject<any>>}
    * @memberOf WorkspacesService
    */
-  private registeredEvents: Map<string, { eventListener: any, subject$: Subject<any> }> = new Map();
+  private registeredEvents: Map<
+    string,
+    { eventListener: any; subject$: Subject<any> }
+  > = new Map();
 
   watchWorkspaceRealTime(workspaceId: string) {
     this.stopWatchingWorkspace();
@@ -111,17 +112,23 @@ export class SseServiceImpl extends SseService {
       console.debug('subscribing to a new sse connection');
     }
 
-    this.currentSse$ = new EventSource(`${environment.urlBackend}/workspaces/${workspaceId}/content`);
+    this.currentSse$ = new EventSource(
+      `${environment.urlBackend}/workspaces/${workspaceId}/content`
+    );
 
     // foreach event
     SseWorkspaceEvent.allEvents.forEach(eventName => {
       if (this.registeredEvents.has(eventName)) {
         // if event already exists, remove the event listener from sse
-        const eventListenerToRemove = this.registeredEvents.get(eventName).eventListener;
+        const eventListenerToRemove = this.registeredEvents.get(eventName)
+          .eventListener;
         this.currentSse$.removeEventListener(eventName, eventListenerToRemove);
       } else {
         // if event doesn't exist, create a subject for it ...
-        this.registeredEvents.set(eventName, { eventListener: null, subject$: new Subject() });
+        this.registeredEvents.set(eventName, {
+          eventListener: null,
+          subject$: new Subject(),
+        });
       }
 
       // in both cases, add the new event listener (it was either removed or didn't exist)
@@ -135,7 +142,7 @@ export class SseServiceImpl extends SseService {
 
       this.registeredEvents.set(eventName, {
         eventListener,
-        subject$: this.registeredEvents.get(eventName).subject$
+        subject$: this.registeredEvents.get(eventName).subject$,
       });
 
       this.currentSse$.addEventListener(eventName, eventListener);

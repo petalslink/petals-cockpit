@@ -30,28 +30,35 @@ export class ServiceUnitsEffects {
   constructor(
     private actions$: Actions,
     private serviceUnitsService: ServiceUnitsService
-  ) { }
+  ) {}
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchServiceUnitDetails$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  fetchServiceUnitDetails$: Observable<Action> = this.actions$
     .ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)
-    .switchMap((action: { type: string, payload: { serviceUnitId: string } }) =>
-      this.serviceUnitsService.getDetailsServiceUnit(action.payload.serviceUnitId)
+    .switchMap((action: { type: string; payload: { serviceUnitId: string } }) =>
+      this.serviceUnitsService
+        .getDetailsServiceUnit(action.payload.serviceUnitId)
         .map((res: Response) => {
           const data = res.json();
-          return { type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS, payload: { serviceUnitId: action.payload.serviceUnitId, data } };
+          return {
+            type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS,
+            payload: { serviceUnitId: action.payload.serviceUnitId, data },
+          };
         })
-        .catch((err) => {
+        .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in service-unit.effects: ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)');
+            console.warn(
+              'Error caught in service-unit.effects: ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)'
+            );
             console.error(err);
             console.groupEnd();
           }
 
           return Observable.of({
             type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR,
-            payload: { serviceUnitId: action.payload.serviceUnitId }
+            payload: { serviceUnitId: action.payload.serviceUnitId },
           });
         })
     );

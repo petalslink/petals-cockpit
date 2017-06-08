@@ -27,13 +27,13 @@ export interface ISharedLibraryBackendSSECommon {
   containerId: string;
 }
 
-export interface ISharedLibraryBackendDetailsCommon { }
+export interface ISharedLibraryBackendDetailsCommon {}
 
 export interface ISharedLibraryBackendSSE extends ISharedLibraryBackendSSECommon {
   components: string[];
 }
 
-export interface ISharedLibraryBackendDetails extends ISharedLibraryBackendDetailsCommon { }
+export interface ISharedLibraryBackendDetails extends ISharedLibraryBackendDetailsCommon {}
 
 export abstract class SharedLibrariesService {
   abstract getDetails(id: string): Observable<ISharedLibraryBackendDetails>;

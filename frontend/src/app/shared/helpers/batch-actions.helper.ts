@@ -42,22 +42,29 @@ export function enableBatching<S>(reduce: ActionReducer<S>): ActionReducer<S> {
 }
 
 export function explodeBatchActionsOperator(keepBatchAction = true) {
-   return new ExplodeBatchActionsOperator(keepBatchAction);
+  return new ExplodeBatchActionsOperator(keepBatchAction);
 }
 
-export class ExplodeBatchActionsOperator extends MergeMapOperator<any, Action, Action> {
+export class ExplodeBatchActionsOperator extends MergeMapOperator<
+  any,
+  Action,
+  Action
+> {
   constructor(keepBatchAction: boolean) {
-    super((action: Action) =>
-      action.type === BATCH
-        ? Observable.from(keepBatchAction ? [action, ...action.payload] : action.payload)
-        : Observable.of(action)
+    super(
+      (action: Action) =>
+        action.type === BATCH
+          ? Observable.from(
+              keepBatchAction ? [action, ...action.payload] : action.payload
+            )
+          : Observable.of(action)
     );
   }
 }
 
 @Injectable()
 export class ActionsWithBatched extends Actions {
-  constructor( @Inject(Dispatcher) actionsSubject: Observable<Action>) {
+  constructor(@Inject(Dispatcher) actionsSubject: Observable<Action>) {
     super(actionsSubject);
     this.operator = explodeBatchActionsOperator();
   }

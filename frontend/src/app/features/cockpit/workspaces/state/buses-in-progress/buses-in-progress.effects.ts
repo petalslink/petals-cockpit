@@ -29,37 +29,42 @@ import { environment } from 'environments/environment';
 
 @Injectable()
 export class BusesInProgressEffects {
-
   constructor(
     private actions$: Actions,
     private store$: Store<IStore>,
     private busesService: BusesService
-  ) { }
+  ) {}
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) postBus$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  postBus$: Observable<Action> = this.actions$
     .ofType(BusesInProgress.POST_BUS_IN_PROGRESS)
-    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
     .switchMap(([action, idWorkspace]) =>
-      this.busesService.postBus(idWorkspace, action.payload)
+      this.busesService
+        .postBus(idWorkspace, action.payload)
         .map((res: Response) => ({
           type: BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS,
-          payload: <IBusInProgressRow>res.json()
-        })
-        )
+          payload: <IBusInProgressRow>res.json(),
+        }))
         .catch((res: Response) => {
           const err = res.json();
           return Observable.of({
             type: BusesInProgress.POST_BUS_IN_PROGRESS_ERROR,
-            payload: `Error ${err.code}: ${err.message}`
+            payload: `Error ${err.code}: ${err.message}`,
           });
         })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) deleteBusInProgress$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  deleteBusInProgress$: Observable<Action> = this.actions$
     .ofType(BusesInProgress.DELETE_BUS_IN_PROGRESS)
-    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
     .switchMap(([action, idWorkspace]) =>
       this.busesService
         .deleteBus(idWorkspace, action.payload.id)
@@ -67,12 +72,17 @@ export class BusesInProgressEffects {
         .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn('Error catched in buses-in-progress.effects: ofType(Buses.DELETE_BUS_IN_PROGRESS)');
+            console.warn(
+              'Error catched in buses-in-progress.effects: ofType(Buses.DELETE_BUS_IN_PROGRESS)'
+            );
             console.error(err);
             console.groupEnd();
           }
 
-          return Observable.of({ type: BusesInProgress.DELETE_BUS_IN_PROGRESS_FAILED, payload: action.payload });
+          return Observable.of({
+            type: BusesInProgress.DELETE_BUS_IN_PROGRESS_FAILED,
+            payload: action.payload,
+          });
         })
     );
 }

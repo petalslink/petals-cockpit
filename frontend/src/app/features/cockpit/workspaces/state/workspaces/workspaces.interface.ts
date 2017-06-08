@@ -18,7 +18,10 @@
 import { IUsers } from '../../../../../shared/interfaces/users.interface';
 import { IBuses } from '../buses/buses.interface';
 import {
-  IWorkspaceBackend, IWorkspaceBackendDetails, IWorkspaceBackendCommon, IWorkspaceBackendDetailsCommon
+  IWorkspaceBackend,
+  IWorkspaceBackendDetails,
+  IWorkspaceBackendCommon,
+  IWorkspaceBackendDetailsCommon,
 } from 'app/shared/services/workspaces.service';
 
 export interface IWorkspaceUI {
@@ -29,7 +32,7 @@ export interface IWorkspaceUI {
 }
 
 // used within table
-export interface IWorkspaceRow extends IWorkspaceUI, IWorkspaceBackend, IWorkspaceBackendDetails { }
+export interface IWorkspaceRow extends IWorkspaceUI, IWorkspaceBackend, IWorkspaceBackendDetails {}
 
 // used in generated views
 export interface IWorkspace extends IWorkspaceUI, IWorkspaceBackendCommon, IWorkspaceBackendDetailsCommon {
@@ -48,7 +51,7 @@ export function workspaceRowFactory(): IWorkspaceRow {
     isFetchingDetails: false,
     isSettingDescription: false,
 
-    users: []
+    users: [],
   };
 }
 
@@ -70,7 +73,7 @@ export interface IWorkspacesTableOnly {
   allIds: string[];
 }
 
-export interface IWorkspacesTable extends IWorkspacesCommon, IWorkspacesTableOnly { }
+export interface IWorkspacesTable extends IWorkspacesCommon, IWorkspacesTableOnly {}
 
 export interface IWorkspaces extends IWorkspacesCommon {
   list: IWorkspace[];
@@ -87,6 +90,6 @@ export function workspacesTableFactory(): IWorkspacesTable {
     searchPetals: '',
 
     byId: {},
-    allIds: []
+    allIds: [],
   };
 }

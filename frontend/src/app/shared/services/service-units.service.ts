@@ -29,11 +29,11 @@ export interface IServiceUnitBackendSSECommon {
   serviceAssemblyId: string;
 }
 
-export interface IServiceUnitBackendDetailsCommon { }
+export interface IServiceUnitBackendDetailsCommon {}
 
-export interface IServiceUnitBackendSSE extends IServiceUnitBackendSSECommon { }
+export interface IServiceUnitBackendSSE extends IServiceUnitBackendSSECommon {}
 
-export interface IServiceUnitBackendDetails extends IServiceUnitBackendDetailsCommon { }
+export interface IServiceUnitBackendDetails extends IServiceUnitBackendDetailsCommon {}
 
 export abstract class ServiceUnitsService {
   abstract getDetailsServiceUnit(serviceUnitId: string): Observable<Response>;
@@ -46,6 +46,8 @@ export class ServiceUnitsServiceImpl extends ServiceUnitsService {
   }
 
   getDetailsServiceUnit(serviceUnitId: string) {
-    return this.http.get(`${environment.urlBackend}/serviceunits/${serviceUnitId}`);
+    return this.http.get(
+      `${environment.urlBackend}/serviceunits/${serviceUnitId}`
+    );
   }
 }

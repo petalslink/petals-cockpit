@@ -22,7 +22,10 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
 
-import { IWorkspace, IWorkspacesTable } from './workspaces/state/workspaces/workspaces.interface';
+import {
+  IWorkspace,
+  IWorkspacesTable,
+} from './workspaces/state/workspaces/workspaces.interface';
 import { Workspaces } from './workspaces/state/workspaces/workspaces.reducer';
 import { Ui } from '../../shared/state/ui.reducer';
 import { LANGUAGES } from '../../core/opaque-tokens';
@@ -38,7 +41,7 @@ import { isSmallScreen, isLargeScreen } from 'app/shared/state/ui.selectors';
 @Component({
   selector: 'app-cockpit',
   templateUrl: './cockpit.component.html',
-  styleUrls: ['./cockpit.component.scss']
+  styleUrls: ['./cockpit.component.scss'],
 })
 export class CockpitComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
@@ -60,7 +63,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
     private store$: Store<IStore>,
     @Inject(LANGUAGES) public languages: any,
     public dialog: MdDialog
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.workspaces$ = this.store$.select(state => state.workspaces);
@@ -71,7 +74,9 @@ export class CockpitComponent implements OnInit, OnDestroy {
 
     this.user$ = this.store$.let(getCurrentUser());
 
-    this.isDisconnecting$ = this.store$.select(state => state.users.isDisconnecting);
+    this.isDisconnecting$ = this.store$.select(
+      state => state.users.isDisconnecting
+    );
 
     this.ui$
       .map(ui => ui.isPopupListWorkspacesVisible)
@@ -95,24 +100,25 @@ export class CockpitComponent implements OnInit, OnDestroy {
       .subscribe();
 
     // TODO ultimately, the sidebar should be moved to WorkspaceComponent
-    this.sidenavVisible$ = this.store$.select(state => state.ui.isSidenavVisible && !!state.workspaces.selectedWorkspaceId);
+    this.sidenavVisible$ = this.store$.select(
+      state =>
+        state.ui.isSidenavVisible && !!state.workspaces.selectedWorkspaceId
+    );
 
-    this.logoByScreenSize$ = this.store$
-      .let(isLargeScreen)
-      .map(ls => {
-        const imgSrcBase = `./assets/img`;
-        const imgSrcExt = `png`;
+    this.logoByScreenSize$ = this.store$.let(isLargeScreen).map(ls => {
+      const imgSrcBase = `./assets/img`;
+      const imgSrcExt = `png`;
 
-        if (ls) {
-          return `${imgSrcBase}/logo-petals-cockpit.${imgSrcExt}`;
-        } else {
-          return `${imgSrcBase}/logo-petals-cockpit-without-text.${imgSrcExt}`;
-        }
-      });
+      if (ls) {
+        return `${imgSrcBase}/logo-petals-cockpit.${imgSrcExt}`;
+      } else {
+        return `${imgSrcBase}/logo-petals-cockpit-without-text.${imgSrcExt}`;
+      }
+    });
 
     this.sidenavMode$ = this.store$
       .let(isSmallScreen)
-      .map(ss => ss ? `over` : `side`);
+      .map(ss => (ss ? `over` : `side`));
   }
 
   ngOnDestroy() {
@@ -135,7 +141,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
       .first()
       .do(ws => {
         this.workspacesDialogRef = this.dialog.open(WorkspacesDialogComponent, {
-          disableClose: !ws
+          disableClose: !ws,
         });
 
         this.workspacesDialogRef
@@ -147,14 +153,18 @@ export class CockpitComponent implements OnInit, OnDestroy {
           .subscribe();
       })
       .subscribe();
-
   }
 
   openDeletedWorkspaceDialog() {
     this.dialog
       .open(DeletedWorkspaceDialogComponent)
       .afterClosed()
-      .do(_ => this.store$.dispatch({ type: Workspaces.CLOSE_WORKSPACE, payload: { delete: true } }))
+      .do(_ =>
+        this.store$.dispatch({
+          type: Workspaces.CLOSE_WORKSPACE,
+          payload: { delete: true },
+        })
+      )
       .subscribe();
   }
 
@@ -205,6 +215,8 @@ export class CockpitComponent implements OnInit, OnDestroy {
       </div>
     </div>
   `,
-  styles: ['md-dialog-content { height: 100%; } .central-content { padding: 24px; }']
+  styles: [
+    'md-dialog-content { height: 100%; } .central-content { padding: 24px; }',
+  ],
 })
-export class DeletedWorkspaceDialogComponent { }
+export class DeletedWorkspaceDialogComponent {}

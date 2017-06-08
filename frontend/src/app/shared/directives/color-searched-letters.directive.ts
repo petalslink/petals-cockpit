@@ -20,14 +20,14 @@ import { Directive, ElementRef, Renderer, Input, OnInit } from '@angular/core';
 import { escapeStringRegexp } from '../helpers/shared.helper';
 
 @Directive({
-  selector: '[appColorSearchedLetters]'
+  selector: '[appColorSearchedLetters]',
 })
 export class ColorSearchedLettersDirective implements OnInit {
   @Input() search: string;
   @Input() text: string;
   @Input() classToApply: string;
 
-  constructor(private el: ElementRef, private renderer: Renderer) { }
+  constructor(private el: ElementRef, private renderer: Renderer) {}
 
   ngOnInit() {
     if (!this.classToApply) {
@@ -35,16 +35,27 @@ export class ColorSearchedLettersDirective implements OnInit {
     }
 
     if (!this.search || !this.search.trim()) {
-      this.renderer.setElementProperty(this.el.nativeElement, 'innerHTML', this.text);
+      this.renderer.setElementProperty(
+        this.el.nativeElement,
+        'innerHTML',
+        this.text
+      );
       return;
     }
 
     const search = escapeStringRegexp(this.search.trim());
-    this.renderer.setElementProperty(this.el.nativeElement, 'innerHTML', this.replace(this.text, search));
+    this.renderer.setElementProperty(
+      this.el.nativeElement,
+      'innerHTML',
+      this.replace(this.text, search)
+    );
   }
 
   replace(txt = '', search: string) {
     const searchRgx = new RegExp(`(${search})`, 'gi');
-    return txt.replace(searchRgx, `<span class="${this.classToApply}">$1</span>`);
+    return txt.replace(
+      searchRgx,
+      `<span class="${this.classToApply}">$1</span>`
+    );
   }
 }

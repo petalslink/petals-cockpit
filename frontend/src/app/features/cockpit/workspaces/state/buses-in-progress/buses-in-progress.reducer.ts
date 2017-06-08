@@ -18,19 +18,35 @@
 import { Action } from '@ngrx/store';
 
 import { IBusInProgressBackend } from 'app/shared/services/buses.service';
-import { IBusesInProgressTable, busesInProgressTableFactory, busInProgressRowFactory } from './buses-in-progress.interface';
+import {
+  IBusesInProgressTable,
+  busesInProgressTableFactory,
+  busInProgressRowFactory,
+} from './buses-in-progress.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
-import { putAll, updateById, removeById, mergeOnly, JsMap } from 'app/shared/helpers/map.helper';
+import {
+  putAll,
+  updateById,
+  removeById,
+  mergeOnly,
+  JsMap,
+} from 'app/shared/helpers/map.helper';
 
 export class BusesInProgress {
   private static reducerName = '[Buses In Prog]';
 
-  public static reducer(busesInProgressTable = busesInProgressTableFactory(), { type, payload }: Action): IBusesInProgressTable {
+  public static reducer(
+    busesInProgressTable = busesInProgressTableFactory(),
+    { type, payload }: Action
+  ): IBusesInProgressTable {
     if (!BusesInProgress.mapActionsToMethod[type]) {
       return busesInProgressTable;
     }
 
-    return BusesInProgress.mapActionsToMethod[type](busesInProgressTable, payload) || busesInProgressTable;
+    return (
+      BusesInProgress.mapActionsToMethod[type](busesInProgressTable, payload) ||
+      busesInProgressTable
+    );
   }
 
   // tslint:disable-next-line:member-ordering
@@ -63,21 +79,24 @@ export class BusesInProgress {
         selectedBusInProgressId: payload.busInProgressId,
         isImportingBus: false,
         importBusError: '',
-        importBusId: ''
-      }
+        importBusId: '',
+      },
     };
   }
 
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Post bus in progress`;
-  private static postBusInProgress(busesInProgressTable: IBusesInProgressTable, _payload): IBusesInProgressTable {
+  private static postBusInProgress(
+    busesInProgressTable: IBusesInProgressTable,
+    _payload
+  ): IBusesInProgressTable {
     return {
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
         isImportingBus: true,
         importBusError: '',
-        importBusId: ''
-      }
+        importBusId: '',
+      },
     };
   }
 
@@ -85,19 +104,25 @@ export class BusesInProgress {
   // the bus itself will be added from buses reducer
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS_SUCCESS = `${BusesInProgress.reducerName} Post bus in progress success`;
-  private static postBusInProgressSuccess(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
+  private static postBusInProgressSuccess(
+    busesInProgressTable: IBusesInProgressTable,
+    payload
+  ): IBusesInProgressTable {
     return {
       ...busesInProgressTable,
       ...<IBusesInProgressTable>{
-        importBusId: payload.id
-      }
+        importBusId: payload.id,
+      },
     };
   }
 
   // once the http request is done but failed
   // tslint:disable-next-line:member-ordering
   public static POST_BUS_IN_PROGRESS_ERROR = `${BusesInProgress.reducerName} Post bus in progress error`;
-  private static postBusInProgressError(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
+  private static postBusInProgressError(
+    busesInProgressTable: IBusesInProgressTable,
+    payload
+  ): IBusesInProgressTable {
     // if it's false, it means we changed bus (with SET_CURRENT_BUS_IN_PROGRESS)
     if (busesInProgressTable.isImportingBus) {
       return {
@@ -105,8 +130,8 @@ export class BusesInProgress {
         ...<IBusesInProgressTable>{
           isImportingBus: false,
           importBusError: payload,
-          importBusId: ''
-        }
+          importBusId: '',
+        },
       };
     } else {
       return busesInProgressTable;
@@ -115,19 +140,28 @@ export class BusesInProgress {
 
   // tslint:disable-next-line:member-ordering
   public static DELETE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Delete bus in progress`;
-  private static deleteBusInProgress(busesInProgressTable: IBusesInProgressTable, payload): IBusesInProgressTable {
+  private static deleteBusInProgress(
+    busesInProgressTable: IBusesInProgressTable,
+    payload
+  ): IBusesInProgressTable {
     return updateById(busesInProgressTable, payload.id, { isRemoving: true });
   }
 
   // tslint:disable-next-line:member-ordering
   public static DELETE_BUS_IN_PROGRESS_FAILED = `${BusesInProgress.reducerName} Delete bus in progress failed`;
-  private static deleteBusInProgressFailed(busesInProgressTable: IBusesInProgressTable, payload: string): IBusesInProgressTable {
+  private static deleteBusInProgressFailed(
+    busesInProgressTable: IBusesInProgressTable,
+    payload: string
+  ): IBusesInProgressTable {
     return updateById(busesInProgressTable, payload, { isRemoving: false });
   }
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Remove bus in progress`;
-  private static removeBusInProgress(busesInProgressTable: IBusesInProgressTable, payload: string): IBusesInProgressTable {
+  private static removeBusInProgress(
+    busesInProgressTable: IBusesInProgressTable,
+    payload: string
+  ): IBusesInProgressTable {
     return removeById(busesInProgressTable, payload);
   }
 
@@ -135,30 +169,45 @@ export class BusesInProgress {
   public static UPDATE_ERROR_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Update error bus in progress`;
   private static updateErrorBusInProgress(
     busesInProgressTable: IBusesInProgressTable,
-    payload: { id: string, importError: string }
+    payload: { id: string; importError: string }
   ): IBusesInProgressTable {
-    return updateById(busesInProgressTable, payload.id, { importError: payload.importError });
+    return updateById(busesInProgressTable, payload.id, {
+      importError: payload.importError,
+    });
   }
 
-  private static cleanWorkspace(_busesInProgressTable: IBusesInProgressTable, _payload): IBusesInProgressTable {
+  private static cleanWorkspace(
+    _busesInProgressTable: IBusesInProgressTable,
+    _payload
+  ): IBusesInProgressTable {
     return busesInProgressTableFactory();
   }
 
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod: { [type: string]: (t: IBusesInProgressTable, p: any) => IBusesInProgressTable } = {
-    [BusesInProgress.FETCH_BUSES_IN_PROGRESS]: BusesInProgress.fetchBusesInProgress,
+  private static mapActionsToMethod: {
+    [type: string]: (t: IBusesInProgressTable, p: any) => IBusesInProgressTable;
+  } = {
+    [BusesInProgress.FETCH_BUSES_IN_PROGRESS]:
+      BusesInProgress.fetchBusesInProgress,
     [BusesInProgress.ADD_BUSES_IN_PROGRESS]: BusesInProgress.addBusesInProgress,
-    [BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS]: BusesInProgress.setCurrentBusInProgress,
+    [BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS]:
+      BusesInProgress.setCurrentBusInProgress,
     [BusesInProgress.POST_BUS_IN_PROGRESS]: BusesInProgress.postBusInProgress,
-    [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]: BusesInProgress.postBusInProgressSuccess,
-    [BusesInProgress.POST_BUS_IN_PROGRESS_ERROR]: BusesInProgress.postBusInProgressError,
-    [BusesInProgress.DELETE_BUS_IN_PROGRESS]: BusesInProgress.deleteBusInProgress,
-    [BusesInProgress.DELETE_BUS_IN_PROGRESS_FAILED]: BusesInProgress.deleteBusInProgressFailed,
-    [BusesInProgress.REMOVE_BUS_IN_PROGRESS]: BusesInProgress.removeBusInProgress,
-    [BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS]: BusesInProgress.updateErrorBusInProgress,
+    [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]:
+      BusesInProgress.postBusInProgressSuccess,
+    [BusesInProgress.POST_BUS_IN_PROGRESS_ERROR]:
+      BusesInProgress.postBusInProgressError,
+    [BusesInProgress.DELETE_BUS_IN_PROGRESS]:
+      BusesInProgress.deleteBusInProgress,
+    [BusesInProgress.DELETE_BUS_IN_PROGRESS_FAILED]:
+      BusesInProgress.deleteBusInProgressFailed,
+    [BusesInProgress.REMOVE_BUS_IN_PROGRESS]:
+      BusesInProgress.removeBusInProgress,
+    [BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS]:
+      BusesInProgress.updateErrorBusInProgress,
 
-    [Workspaces.CLEAN_WORKSPACE]: BusesInProgress.cleanWorkspace
+    [Workspaces.CLEAN_WORKSPACE]: BusesInProgress.cleanWorkspace,
   };
 }

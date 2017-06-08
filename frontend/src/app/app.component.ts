@@ -28,7 +28,7 @@ import { Ui } from './shared/state/ui.reducer';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
@@ -39,7 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
     lastOnBottom: true,
     showProgressBar: true,
     pauseOnHover: true,
-    clickToClose: true
+    clickToClose: true,
   };
 
   constructor(
@@ -47,7 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
     @Inject(LANGUAGES) public languages: any,
     private store$: Store<IStore>,
     private media$: ObservableMedia
-  ) { }
+  ) {}
 
   ngOnInit() {
     // default and fallback language
@@ -72,7 +72,11 @@ export class AppComponent implements OnInit, OnDestroy {
       .distinctUntilChanged()
       .takeUntil(this.onDestroy$)
       .do(screenSize =>
-        this.store$.dispatch({ type: Ui.CHANGE_SCREEN_SIZE, payload: screenSize }))
+        this.store$.dispatch({
+          type: Ui.CHANGE_SCREEN_SIZE,
+          payload: screenSize,
+        })
+      )
       .subscribe();
   }
 

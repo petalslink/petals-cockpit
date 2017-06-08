@@ -18,16 +18,16 @@
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
 
 describe(`SharedLibraries reducer`, () => {
-
   it(`should have a default value`, () => {
-    expect(SharedLibraries.reducer(undefined, { type: `init`, payload: `` }))
-      .toEqual({
-        selectedSharedLibraryId: '',
-        isFetchingDetails: false,
+    expect(
+      SharedLibraries.reducer(undefined, { type: `init`, payload: `` })
+    ).toEqual({
+      selectedSharedLibraryId: '',
+      isFetchingDetails: false,
 
-        byId: {},
-        allIds: []
-      });
+      byId: {},
+      allIds: [],
+    });
   });
 
   describe(SharedLibraries.FETCHED, () => {
@@ -43,47 +43,41 @@ describe(`SharedLibraries reducer`, () => {
           keepPreviousValues: '',
           name: 'SL 0',
           version: '1',
-          id: 'idSl0'
+          id: 'idSl0',
         },
         idSl1: {
           keepPreviousValues: '',
           name: 'SL 1',
           version: '1',
-          id: 'idSl1'
-        }
+          id: 'idSl1',
+        },
       },
-      allIds: [
-        'idSl0',
-        'idSl1'
-      ]
+      allIds: ['idSl0', 'idSl1'],
     };
 
     it(`should replace existing shared library while keeping extra values`, () => {
-      expect(SharedLibraries.reducer(initialState, {
-        type: SharedLibraries.FETCHED,
-        payload: {
-          byId: {
-            idSl0: {
-              name: 'SL 0 updated name',
-              id: 'idSl0',
-              containerId: 'idCont0'
+      expect(
+        SharedLibraries.reducer(initialState, {
+          type: SharedLibraries.FETCHED,
+          payload: {
+            byId: {
+              idSl0: {
+                name: 'SL 0 updated name',
+                id: 'idSl0',
+                containerId: 'idCont0',
+              },
+              idSl2: {
+                name: 'SL 2',
+                version: '1',
+                id: 'idSl2',
+                containerId: 'idCont0',
+                components: ['idComp0'],
+              },
             },
-            idSl2: {
-              name: 'SL 2',
-              version: '1',
-              id: 'idSl2',
-              containerId: 'idCont0',
-              components: [
-                'idComp0'
-              ]
-            }
+            allIds: ['idSl0', 'idSl2'],
           },
-          allIds: [
-            'idSl0',
-            'idSl2'
-          ]
-        }
-      })).toEqual({
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           idSl0: {
@@ -93,7 +87,7 @@ describe(`SharedLibraries reducer`, () => {
             id: 'idSl0',
             containerId: 'idCont0',
             components: [],
-            isFolded: false
+            isFolded: false,
           },
           idSl2: {
             name: 'SL 2',
@@ -101,15 +95,10 @@ describe(`SharedLibraries reducer`, () => {
             id: 'idSl2',
             containerId: 'idCont0',
             isFolded: false,
-            components: [
-              'idComp0'
-            ]
-          }
+            components: ['idComp0'],
+          },
         },
-        allIds: [
-          'idSl0',
-          'idSl2'
-        ]
+        allIds: ['idSl0', 'idSl2'],
       });
     });
   });
@@ -127,41 +116,36 @@ describe(`SharedLibraries reducer`, () => {
           keepPreviousValues: '',
           name: 'SL 0',
           version: '1',
-          id: 'idSl0'
+          id: 'idSl0',
         },
         idSl1: {
           keepPreviousValues: '',
           name: 'SL 1',
           version: '1',
-          id: 'idSl1'
-        }
+          id: 'idSl1',
+        },
       },
-      allIds: [
-        'idSl0',
-        'idSl1'
-      ]
+      allIds: ['idSl0', 'idSl1'],
     };
 
     it(`should add new shared library without touching the others`, () => {
-      expect(SharedLibraries.reducer(initialState, {
-        type: SharedLibraries.ADDED,
-        payload: {
-          byId: {
-            idSl2: {
-              name: 'SL 2',
-              version: '1',
-              id: 'idSl2',
-              containerId: 'idCont0',
-              components: [
-                'idComp0'
-              ]
-            }
+      expect(
+        SharedLibraries.reducer(initialState, {
+          type: SharedLibraries.ADDED,
+          payload: {
+            byId: {
+              idSl2: {
+                name: 'SL 2',
+                version: '1',
+                id: 'idSl2',
+                containerId: 'idCont0',
+                components: ['idComp0'],
+              },
+            },
+            allIds: ['idSl2'],
           },
-          allIds: [
-            'idSl2'
-          ]
-        }
-      })).toEqual({
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
@@ -169,13 +153,13 @@ describe(`SharedLibraries reducer`, () => {
             keepPreviousValues: '',
             name: 'SL 0',
             version: '1',
-            id: 'idSl0'
+            id: 'idSl0',
           },
           idSl1: {
             keepPreviousValues: '',
             name: 'SL 1',
             version: '1',
-            id: 'idSl1'
+            id: 'idSl1',
           },
           idSl2: {
             name: 'SL 2',
@@ -183,48 +167,50 @@ describe(`SharedLibraries reducer`, () => {
             id: 'idSl2',
             containerId: 'idCont0',
             isFolded: false,
-            components: [
-              'idComp0'
-            ]
-          }
+            components: ['idComp0'],
+          },
         },
-        allIds: [
-          'idSl0',
-          'idSl1',
-          'idSl2'
-        ]
+        allIds: ['idSl0', 'idSl1', 'idSl2'],
       });
     });
   });
 
   describe(SharedLibraries.SET_CURRENT, () => {
     it(`should check action name`, () => {
-      expect(SharedLibraries.SET_CURRENT).toEqual(`[Shared libraries] Set current`);
+      expect(SharedLibraries.SET_CURRENT).toEqual(
+        `[Shared libraries] Set current`
+      );
     });
 
     it(`should set the current shared library`, () => {
       const initialState: any = {
         keepPreviousValues: '',
-        selectedSharedLibraryId: ''
+        selectedSharedLibraryId: '',
       };
 
       const reducer = SharedLibraries.reducer(initialState, {
         type: SharedLibraries.SET_CURRENT,
-        payload: { id: 'idSl0' }
+        payload: { id: 'idSl0' },
       });
 
       expect(reducer).toEqual({
         keepPreviousValues: '',
-        selectedSharedLibraryId: 'idSl0'
+        selectedSharedLibraryId: 'idSl0',
       });
     });
   });
 
   describe(SharedLibraries.FETCH_DETAILS, () => {
     it(`should check action name`, () => {
-      expect(SharedLibraries.FETCH_DETAILS).toEqual(`[Shared libraries] Fetch details`);
-      expect(SharedLibraries.FETCH_DETAILS_ERROR).toEqual(`[Shared libraries] Fetch details error`);
-      expect(SharedLibraries.FETCH_DETAILS_SUCCESS).toEqual(`[Shared libraries] Fetch details success`);
+      expect(SharedLibraries.FETCH_DETAILS).toEqual(
+        `[Shared libraries] Fetch details`
+      );
+      expect(SharedLibraries.FETCH_DETAILS_ERROR).toEqual(
+        `[Shared libraries] Fetch details error`
+      );
+      expect(SharedLibraries.FETCH_DETAILS_SUCCESS).toEqual(
+        `[Shared libraries] Fetch details success`
+      );
     });
 
     const initialState: any = {
@@ -233,15 +219,15 @@ describe(`SharedLibraries reducer`, () => {
         keepPreviousValues: '',
         idSl0: {
           keepPreviousValues: '',
-        }
+        },
       },
-      allIds: ['idSl0']
+      allIds: ['idSl0'],
     };
 
     it(`should set isFetchingDetails to true even if isFetchingDetails doesn't exists yet`, () => {
       const fetchState = SharedLibraries.reducer(initialState, {
         type: SharedLibraries.FETCH_DETAILS,
-        payload: { id: 'idSl0' }
+        payload: { id: 'idSl0' },
       });
 
       expect(fetchState).toEqual({
@@ -250,35 +236,39 @@ describe(`SharedLibraries reducer`, () => {
           keepPreviousValues: '',
           idSl0: {
             keepPreviousValues: '',
-            isFetchingDetails: true
+            isFetchingDetails: true,
           },
         },
-        allIds: ['idSl0']
+        allIds: ['idSl0'],
       });
 
       it(`should add details on success`, () => {
-        expect(SharedLibraries.reducer(fetchState, {
-          type: SharedLibraries.FETCH_DETAILS_SUCCESS,
-          payload: { id: 'idSl0', data: {} }
-        })).toEqual({
+        expect(
+          SharedLibraries.reducer(fetchState, {
+            type: SharedLibraries.FETCH_DETAILS_SUCCESS,
+            payload: { id: 'idSl0', data: {} },
+          })
+        ).toEqual({
           keepPreviousValues: '',
           byId: {
             keepPreviousValues: '',
             idSl0: {
               keepPreviousValues: '',
-              isFetchingDetails: false
+              isFetchingDetails: false,
               // there is no data in details for now...
             },
           },
-          allIds: ['idSl0']
+          allIds: ['idSl0'],
         });
       });
 
       it(`should set error on failure`, () => {
-        expect(SharedLibraries.reducer(fetchState, {
-          type: SharedLibraries.FETCH_DETAILS_ERROR,
-          payload: { id: 'idSl0' }
-        })).toEqual({
+        expect(
+          SharedLibraries.reducer(fetchState, {
+            type: SharedLibraries.FETCH_DETAILS_ERROR,
+            payload: { id: 'idSl0' },
+          })
+        ).toEqual({
           keepPreviousValues: '',
           byId: {
             keepPreviousValues: '',
@@ -288,7 +278,7 @@ describe(`SharedLibraries reducer`, () => {
               // there is no error stored for now...
             },
           },
-          allIds: ['idSl0']
+          allIds: ['idSl0'],
         });
       });
     });

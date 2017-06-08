@@ -75,7 +75,10 @@ describe(`Login`, () => {
     page.goToLogin().loginToWorkspace(`admin`, `admin`);
 
     // check the name of current user logged
-    browser.actions().mouseMove($('app-generate-icon.btn-avatar-user')).perform();
+    browser
+      .actions()
+      .mouseMove($('app-generate-icon.btn-avatar-user'))
+      .perform();
     expect($('md-tooltip-component').getText()).toEqual('Administrator');
   });
 

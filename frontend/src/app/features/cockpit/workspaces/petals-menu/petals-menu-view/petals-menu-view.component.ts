@@ -22,7 +22,11 @@ import { Store } from '@ngrx/store';
 
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 // tslint:disable-next-line:max-line-length
-import { getCurrentTree, WorkspaceElement, WorkspaceElementType } from '../../../../cockpit/workspaces/state/workspaces/workspaces.selectors';
+import {
+  getCurrentTree,
+  WorkspaceElement,
+  WorkspaceElementType,
+} from '../../../../cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { Components } from '../../state/components/components.reducer';
 import { Containers } from '../../state/containers/containers.reducer';
 import { Buses } from '../../state/buses/buses.reducer';
@@ -36,7 +40,7 @@ import { TreeEvent } from 'app/features/cockpit/workspaces/petals-menu/material-
 @Component({
   selector: 'app-petals-menu-view',
   templateUrl: './petals-menu-view.component.html',
-  styleUrls: ['./petals-menu-view.component.scss']
+  styleUrls: ['./petals-menu-view.component.scss'],
 })
 export class PetalsMenuViewComponent implements OnInit {
   public searchForm: FormGroup;
@@ -44,7 +48,7 @@ export class PetalsMenuViewComponent implements OnInit {
   public tree$: Observable<WorkspaceElement[]>;
   public busesInProgress$: Observable<IBusesInProgress>;
 
-  constructor(private fb: FormBuilder, private store$: Store<IStore>) { }
+  constructor(private fb: FormBuilder, private store$: Store<IStore>) {}
 
   ngOnInit() {
     this.workspaces$ = this.store$.select(state => state.workspaces);
@@ -52,8 +56,7 @@ export class PetalsMenuViewComponent implements OnInit {
     this.busesInProgress$ = this.store$.let(getBusesInProgress());
     this.formSearchPetals();
 
-    this.searchForm
-      .valueChanges
+    this.searchForm.valueChanges
       .do(value => {
         this.search(value.search);
       })
@@ -62,20 +65,29 @@ export class PetalsMenuViewComponent implements OnInit {
 
   formSearchPetals() {
     this.searchForm = this.fb.group({
-      search: ''
+      search: '',
     });
   }
 
   onTreeToggleFold(e: TreeEvent<WorkspaceElement>) {
     switch (e.item.type) {
       case WorkspaceElementType.BUS:
-        this.store$.dispatch({ type: Buses.TOGGLE_FOLD_BUS, payload: { busId: e.item.id } });
+        this.store$.dispatch({
+          type: Buses.TOGGLE_FOLD_BUS,
+          payload: { busId: e.item.id },
+        });
         break;
       case WorkspaceElementType.CONTAINER:
-        this.store$.dispatch({ type: Containers.TOGGLE_FOLD_CONTAINER, payload: { containerId: e.item.id } });
+        this.store$.dispatch({
+          type: Containers.TOGGLE_FOLD_CONTAINER,
+          payload: { containerId: e.item.id },
+        });
         break;
       case WorkspaceElementType.COMPONENT:
-        this.store$.dispatch({ type: Components.TOGGLE_FOLD_COMPONENT, payload: { componentId: e.item.id } });
+        this.store$.dispatch({
+          type: Components.TOGGLE_FOLD_COMPONENT,
+          payload: { componentId: e.item.id },
+        });
     }
   }
 

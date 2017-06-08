@@ -20,18 +20,17 @@ import { environment } from 'environments/environment';
 
 describe(`Users reducer`, () => {
   it(`should have a default value`, () => {
-    expect(Users.reducer(undefined, { type: `init`, payload: `` }))
-      .toEqual({
-        connectedUserId: '',
+    expect(Users.reducer(undefined, { type: `init`, payload: `` })).toEqual({
+      connectedUserId: '',
 
-        isConnecting: false,
-        isConnected: environment.mock.alreadyConnected,
-        isDisconnecting: false,
-        connectionFailed: false,
+      isConnecting: false,
+      isConnected: environment.mock.alreadyConnected,
+      isDisconnecting: false,
+      connectionFailed: false,
 
-        byId: {},
-        allIds: []
-      });
+      byId: {},
+      allIds: [],
+    });
   });
 
   describe(Users.FETCH_USERS_SUCCESS, () => {
@@ -46,26 +45,26 @@ describe(`Users reducer`, () => {
           byId: {
             user1: {
               id: 'user1',
-              name: 'User 1'
+              name: 'User 1',
             },
             user2: {
               id: 'user2',
-              name: 'User 2'
-            }
+              name: 'User 2',
+            },
           },
-          allIds: ['user1', 'user2']
-        }
+          allIds: ['user1', 'user2'],
+        },
       });
 
       expect(reducer.byId).toEqual({
         user1: {
           id: 'user1',
-          name: 'User 1'
+          name: 'User 1',
         },
         user2: {
           id: 'user2',
-          name: 'User 2'
-        }
+          name: 'User 2',
+        },
       });
 
       expect(reducer.allIds).toEqual(['user1', 'user2']);
@@ -79,15 +78,15 @@ describe(`Users reducer`, () => {
           user1: {
             keepPreviousValues: '',
             id: 'user1',
-            name: 'User 1'
+            name: 'User 1',
           },
           user2: {
             keepPreviousValues: '',
             id: 'user2',
-            name: 'User 2'
-          }
+            name: 'User 2',
+          },
         },
-        allIds: ['user1', 'user2']
+        allIds: ['user1', 'user2'],
       };
 
       const reducer = Users.reducer(initialState, {
@@ -96,15 +95,15 @@ describe(`Users reducer`, () => {
           byId: {
             user1: {
               id: 'user1',
-              name: 'User 1 updated name'
+              name: 'User 1 updated name',
             },
             user2: {
               id: 'user2',
-              name: 'User 2 updated name'
-            }
+              name: 'User 2 updated name',
+            },
           },
-          allIds: ['user1', 'user2']
-        }
+          allIds: ['user1', 'user2'],
+        },
       });
 
       expect(reducer.byId).toEqual({
@@ -112,13 +111,13 @@ describe(`Users reducer`, () => {
         user1: {
           keepPreviousValues: '',
           id: 'user1',
-          name: 'User 1 updated name'
+          name: 'User 1 updated name',
         },
         user2: {
           keepPreviousValues: '',
           id: 'user2',
-          name: 'User 2 updated name'
-        }
+          name: 'User 2 updated name',
+        },
       });
 
       expect(reducer.allIds).toEqual(['user1', 'user2']);
@@ -131,10 +130,12 @@ describe(`Users reducer`, () => {
     });
 
     it(`should set isConnecting to true from initial state no matter the payload`, () => {
-      expect(Users.reducer(undefined, {
-        type: Users.CONNECT_USER,
-        payload: { noMatter: 'the payload' }
-      })).toEqual({
+      expect(
+        Users.reducer(undefined, {
+          type: Users.CONNECT_USER,
+          payload: { noMatter: 'the payload' },
+        })
+      ).toEqual({
         connectedUserId: '',
 
         isConnecting: true,
@@ -143,23 +144,27 @@ describe(`Users reducer`, () => {
         connectionFailed: false,
 
         byId: {},
-        allIds: []
+        allIds: [],
       });
     });
 
     it(`should set isConnecting to true and only that with a given initial state and no matter the payload`, () => {
-      expect(Users.reducer(<any>{}, {
-        type: Users.CONNECT_USER,
-        payload: { noMatter: 'the payload' }
-      })).toEqual({
-        isConnecting: true
+      expect(
+        Users.reducer(<any>{}, {
+          type: Users.CONNECT_USER,
+          payload: { noMatter: 'the payload' },
+        })
+      ).toEqual({
+        isConnecting: true,
       });
     });
   });
 
   describe(Users.CONNECT_USER_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Users.CONNECT_USER_SUCCESS).toEqual(`[Users] Connect user success`);
+      expect(Users.CONNECT_USER_SUCCESS).toEqual(
+        `[Users] Connect user success`
+      );
     });
 
     const initialState: any = {
@@ -169,17 +174,17 @@ describe(`Users reducer`, () => {
       connectionFailed: false,
       connectedUserId: '',
       byId: {
-        keepPreviousValues: ''
+        keepPreviousValues: '',
       },
-      allIds: []
+      allIds: [],
     };
 
     it(`should connect the user and make sure that UI variable are the ones expected`, () => {
       const reducer = Users.reducer(initialState, {
         type: Users.CONNECT_USER_SUCCESS,
         payload: {
-          user: { id: 'user1', name: 'name' }
-        }
+          user: { id: 'user1', name: 'name' },
+        },
       });
 
       expect(reducer).toEqual({
@@ -191,9 +196,9 @@ describe(`Users reducer`, () => {
         isDisconnecting: false,
         byId: {
           keepPreviousValues: '',
-          user1: { id: 'user1', name: 'name' }
+          user1: { id: 'user1', name: 'name' },
         },
-        allIds: ['user1']
+        allIds: ['user1'],
       });
     });
 
@@ -204,9 +209,9 @@ describe(`Users reducer`, () => {
           user: {
             id: 'user1',
             name: 'User 1',
-            lastWorkspace: 'idWks0'
-          }
-        }
+            lastWorkspace: 'idWks0',
+          },
+        },
       });
 
       expect(reducer.byId).toEqual({
@@ -214,8 +219,8 @@ describe(`Users reducer`, () => {
         user1: {
           id: 'user1',
           name: 'User 1',
-          lastWorkspace: 'idWks0'
-        }
+          lastWorkspace: 'idWks0',
+        },
       });
 
       expect(reducer.allIds).toEqual(['user1']);
@@ -234,15 +239,15 @@ describe(`Users reducer`, () => {
       connectionFailed: false,
       connectedUserId: '',
       byId: {
-        keepPreviousValues: ''
+        keepPreviousValues: '',
       },
-      allIds: []
+      allIds: [],
     };
 
     it(`should make sure that when a user couldn't connect we set correct values`, () => {
       const reducer = Users.reducer(initialState, {
         type: Users.CONNECT_USER_FAILED,
-        payload: { noMatter: 'the payload' }
+        payload: { noMatter: 'the payload' },
       });
 
       expect(reducer).toEqual({
@@ -252,13 +257,13 @@ describe(`Users reducer`, () => {
         connectionFailed: true,
         connectedUserId: '',
         byId: {
-          keepPreviousValues: ''
+          keepPreviousValues: '',
         },
-        allIds: []
+        allIds: [],
       });
 
       expect(reducer.byId).toEqual({
-        keepPreviousValues: ''
+        keepPreviousValues: '',
       });
       expect(reducer.allIds).toEqual([]);
     });
@@ -281,23 +286,25 @@ describe(`Users reducer`, () => {
           keepPreviousValues: '',
           id: 'user1',
           name: 'User 1',
-          lastWorkspace: 'idWks0'
+          lastWorkspace: 'idWks0',
         },
         user2: {
           keepPreviousValues: '',
           id: 'user2',
           name: 'User 2',
-          lastWorkspace: ''
-        }
+          lastWorkspace: '',
+        },
       },
-      allIds: ['user1', 'user2']
+      allIds: ['user1', 'user2'],
     };
 
     it(`should only toggle isDisconnecting boolean to true without affecting other values`, () => {
-      expect(Users.reducer(initialState, {
-        type: Users.DISCONNECT_USER,
-        payload: { noMatter: 'the payload' }
-      })).toEqual({
+      expect(
+        Users.reducer(initialState, {
+          type: Users.DISCONNECT_USER,
+          payload: { noMatter: 'the payload' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         isConnecting: false,
         isConnected: true,
@@ -310,23 +317,25 @@ describe(`Users reducer`, () => {
             keepPreviousValues: '',
             id: 'user1',
             name: 'User 1',
-            lastWorkspace: 'idWks0'
+            lastWorkspace: 'idWks0',
           },
           user2: {
             keepPreviousValues: '',
             id: 'user2',
             name: 'User 2',
-            lastWorkspace: ''
-          }
+            lastWorkspace: '',
+          },
         },
-        allIds: ['user1', 'user2']
+        allIds: ['user1', 'user2'],
       });
     });
   });
 
   describe(Users.DISCONNECT_USER_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Users.DISCONNECT_USER_SUCCESS).toEqual(`[Users] Disconnect user success`);
+      expect(Users.DISCONNECT_USER_SUCCESS).toEqual(
+        `[Users] Disconnect user success`
+      );
     });
 
     const initialState: any = {
@@ -341,21 +350,21 @@ describe(`Users reducer`, () => {
           doNotKeepPreviousValues: '',
           id: 'user1',
           name: 'User 1',
-          lastWorkspace: 'idWks0'
+          lastWorkspace: 'idWks0',
         },
         user2: {
           doNotKeepPreviousValues: '',
           id: 'user2',
           name: 'User 2',
-          lastWorkspace: ''
-        }
+          lastWorkspace: '',
+        },
       },
-      allIds: ['user1', 'user2']
+      allIds: ['user1', 'user2'],
     };
 
     const reducer = Users.reducer(initialState, {
       type: Users.DISCONNECT_USER_SUCCESS,
-      payload: { noMatter: 'the payload' }
+      payload: { noMatter: 'the payload' },
     });
 
     it(`should have UI variables set to correct values`, () => {
@@ -372,7 +381,9 @@ describe(`Users reducer`, () => {
 
   describe(Users.DISCONNECT_USER_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Users.DISCONNECT_USER_FAILED).toEqual(`[Users] Disconnect user failed`);
+      expect(Users.DISCONNECT_USER_FAILED).toEqual(
+        `[Users] Disconnect user failed`
+      );
     });
 
     const initialState: any = {
@@ -387,23 +398,25 @@ describe(`Users reducer`, () => {
           keepPreviousValues: '',
           id: 'user1',
           name: 'User 1',
-          lastWorkspace: 'idWks0'
+          lastWorkspace: 'idWks0',
         },
         user2: {
           keepPreviousValues: '',
           id: 'user2',
           name: 'User 2',
-          lastWorkspace: ''
-        }
+          lastWorkspace: '',
+        },
       },
-      allIds: ['user1', 'user2']
+      allIds: ['user1', 'user2'],
     };
 
     it(`should only toggle isDisconnecting boolean to false without affecting other values`, () => {
-      expect(Users.reducer(initialState, {
-        type: Users.DISCONNECT_USER_FAILED,
-        payload: { noMatter: 'the payload' }
-      })).toEqual({
+      expect(
+        Users.reducer(initialState, {
+          type: Users.DISCONNECT_USER_FAILED,
+          payload: { noMatter: 'the payload' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         isConnecting: false,
         isConnected: true,
@@ -416,16 +429,16 @@ describe(`Users reducer`, () => {
             keepPreviousValues: '',
             id: 'user1',
             name: 'User 1',
-            lastWorkspace: 'idWks0'
+            lastWorkspace: 'idWks0',
           },
           user2: {
             keepPreviousValues: '',
             id: 'user2',
             name: 'User 2',
-            lastWorkspace: ''
-          }
+            lastWorkspace: '',
+          },
         },
-        allIds: ['user1', 'user2']
+        allIds: ['user1', 'user2'],
       });
     });
   });

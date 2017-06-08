@@ -31,22 +31,26 @@ import { IStore } from '../interfaces/store.interface';
 
 @Injectable()
 export class WorkspacesServiceMock extends WorkspacesServiceImpl {
-
-  constructor(http: Http, store$: Store<IStore>, private pSseService: SseService, private usersService: UsersService) {
+  constructor(
+    http: Http,
+    store$: Store<IStore>,
+    private pSseService: SseService,
+    private usersService: UsersService
+  ) {
     super(http, store$, pSseService);
   }
 
   fetchWorkspaces() {
-    const mock = (this.usersService as UsersServiceMock);
-    return helper.responseBody(workspacesService.getWorkspacesListAndUsers(mock.getCurrentUser().id));
+    const mock = this.usersService as UsersServiceMock;
+    return helper.responseBody(
+      workspacesService.getWorkspacesListAndUsers(mock.getCurrentUser().id)
+    );
   }
 
   postWorkspace(name: string) {
     const workspace = workspacesService.getNewWorkspace(name);
 
-    return helper
-      .responseBody(workspace)
-      .delay(environment.mock.httpDelay);
+    return helper.responseBody(workspace).delay(environment.mock.httpDelay);
   }
 
   fetchWorkspace(id: string) {
@@ -57,20 +61,20 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
 
   setDescription(id: string, description: string) {
     workspacesService.getWorkspace(id).description = description;
-    return helper
-      .response(204)
-      .delay(environment.mock.httpDelay);
+    return helper.response(204).delay(environment.mock.httpDelay);
   }
 
   deleteWorkspace(id: string) {
-    return helper
-      .response(204)
-      .do(_ => {
-        // simulate the backend sending the answer on the SSE
-        setTimeout(() => {
-          workspacesService.deleteWorkspace(id);
-          (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.WORKSPACE_DELETED, { id });
-        }, environment.mock.sseDelay);
-      });
+    return helper.response(204).do(_ => {
+      // simulate the backend sending the answer on the SSE
+      setTimeout(() => {
+        workspacesService.deleteWorkspace(id);
+        (this
+          .pSseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.WORKSPACE_DELETED,
+          { id }
+        );
+      }, environment.mock.sseDelay);
+    });
   }
 }

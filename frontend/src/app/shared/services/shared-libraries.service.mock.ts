@@ -19,7 +19,10 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 
 import * as helper from './../helpers/mock.helper';
-import { SharedLibrariesServiceImpl, ISharedLibraryBackendDetails } from 'app/shared/services/shared-libraries.service';
+import {
+  SharedLibrariesServiceImpl,
+  ISharedLibraryBackendDetails,
+} from 'app/shared/services/shared-libraries.service';
 import { sharedLibrariesService } from 'mocks/shared-libraries-mock';
 
 @Injectable()
@@ -31,6 +34,8 @@ export class SharedLibrariesServiceMock extends SharedLibrariesServiceImpl {
   getDetails(id: string) {
     const details = sharedLibrariesService.get(id).getDetails();
 
-    return helper.responseBody(details).map(res => res.json() as ISharedLibraryBackendDetails);
+    return helper
+      .responseBody(details)
+      .map(res => res.json() as ISharedLibraryBackendDetails);
   }
 }

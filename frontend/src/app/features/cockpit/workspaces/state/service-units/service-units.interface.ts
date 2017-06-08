@@ -18,7 +18,10 @@
 import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 import { IComponentRowWithoutDetails } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import {
-  IServiceUnitBackendSSE, IServiceUnitBackendDetails, IServiceUnitBackendSSECommon, IServiceUnitBackendDetailsCommon
+  IServiceUnitBackendSSE,
+  IServiceUnitBackendDetails,
+  IServiceUnitBackendSSECommon,
+  IServiceUnitBackendDetailsCommon,
 } from 'app/shared/services/service-units.service';
 
 export interface IServiceUnitUI {
@@ -28,11 +31,11 @@ export interface IServiceUnitUI {
   errorChangeState: string;
 }
 
-export interface IServiceUnitRow extends IServiceUnitUI, IServiceUnitBackendSSE, IServiceUnitBackendDetails { }
+export interface IServiceUnitRow extends IServiceUnitUI, IServiceUnitBackendSSE, IServiceUnitBackendDetails {}
 
-export interface IServiceUnitRowWithoutDetails extends IServiceUnitUI, IServiceUnitBackendSSE { }
+export interface IServiceUnitRowWithoutDetails extends IServiceUnitUI, IServiceUnitBackendSSE {}
 
-export interface IServiceUnit extends IServiceUnitUI, IServiceUnitBackendSSECommon, IServiceUnitBackendDetailsCommon { }
+export interface IServiceUnit extends IServiceUnitUI, IServiceUnitBackendSSECommon, IServiceUnitBackendDetailsCommon {}
 
 export interface IServiceUnitAndComponent extends IServiceUnitRowWithoutDetails {
   component: IComponentRowWithoutDetails;
@@ -43,7 +46,9 @@ interface IServiceUnitsCommon {
   isFetchingDetails: boolean;
 }
 
-export interface IServiceUnitsTable extends IServiceUnitsCommon, JsMap<IServiceUnitRow> { }
+export interface IServiceUnitsTable extends IServiceUnitsCommon, JsMap<
+  IServiceUnitRow
+> {}
 
 export interface IServiceUnits extends IServiceUnitsCommon {
   list: IServiceUnit[];
@@ -59,13 +64,13 @@ export function serviceUnitRowFactory(): IServiceUnitRow {
 
     isFolded: false,
     isUpdatingState: false,
-    errorChangeState: ''
+    errorChangeState: '',
   };
 }
 
 export function serviceUnitsTableFactory(): IServiceUnitsTable {
   return Object.assign({}, emptyJavascriptMap<IServiceUnitRow>(), {
     selectedServiceUnitId: '',
-    isFetchingDetails: false
+    isFetchingDetails: false,
   });
 }

@@ -22,22 +22,28 @@ import { waitTimeout } from '../common';
 import { ComponentOverviewPage } from './component.po';
 
 export abstract class SharedLibraryPage {
-
   public static readonly component = $(`app-petals-shared-library-view`);
 
   public readonly component = SharedLibraryPage.component;
   public readonly title = this.component.$(`md-toolbar .title`);
 
   protected static wait() {
-    browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/shared-libraries\/\w+/), waitTimeout);
+    browser.wait(
+      urlToMatch(/\/workspaces\/\w+\/petals\/shared-libraries\/\w+/),
+      waitTimeout
+    );
     browser.wait(EC.visibilityOf(SharedLibraryPage.component), waitTimeout);
-    browser.wait(EC.stalenessOf(SharedLibraryPage.component.$('md-toolbar md-spinner')), waitTimeout);
+    browser.wait(
+      EC.stalenessOf(SharedLibraryPage.component.$('md-toolbar md-spinner')),
+      waitTimeout
+    );
   }
 }
 
 export class SharedLibraryOverviewPage extends SharedLibraryPage {
-
-  public static readonly overview = SharedLibraryPage.component.$(`app-petals-shared-library-overview`);
+  public static readonly overview = SharedLibraryPage.component.$(
+    `app-petals-shared-library-overview`
+  );
 
   public readonly overview = SharedLibraryOverviewPage.overview;
   public readonly state = this.overview.$(`md-card.state md-card-title`);
@@ -45,7 +51,10 @@ export class SharedLibraryOverviewPage extends SharedLibraryPage {
 
   static waitAndGet() {
     super.wait();
-    browser.wait(EC.visibilityOf(SharedLibraryOverviewPage.overview), waitTimeout);
+    browser.wait(
+      EC.visibilityOf(SharedLibraryOverviewPage.overview),
+      waitTimeout
+    );
     return new SharedLibraryOverviewPage();
   }
 
@@ -55,7 +64,11 @@ export class SharedLibraryOverviewPage extends SharedLibraryPage {
 
   openComponent(identifier: string | number) {
     if (typeof identifier === 'string') {
-      this.overview.element(by.cssContainingText(`md-card.components ul > li a`, identifier)).click();
+      this.overview
+        .element(
+          by.cssContainingText(`md-card.components ul > li a`, identifier)
+        )
+        .click();
     } else {
       this.overview.$$('md-card.components ul > li a').get(identifier).click();
     }

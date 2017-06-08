@@ -27,13 +27,14 @@ import { IComponentRow } from '../../state/components/components.interface';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
 import {
-  getCurrentSharedLibrary, getCurrentSharedLibraryComponents
+  getCurrentSharedLibrary,
+  getCurrentSharedLibraryComponents,
 } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
 
 @Component({
   selector: 'app-petals-shared-library-view',
   templateUrl: './petals-shared-library-view.component.html',
-  styleUrls: ['./petals-shared-library-view.component.scss']
+  styleUrls: ['./petals-shared-library-view.component.scss'],
 })
 export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
@@ -41,17 +42,26 @@ export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
   public sharedLibrary$: Observable<ISharedLibraryRow>;
   public components$: Observable<IComponentRow[]>;
 
-  constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
+  constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Shared Library' } });
+    this.store$.dispatch({
+      type: Ui.SET_TITLES,
+      payload: { titleMainPart1: 'Petals', titleMainPart2: 'Shared Library' },
+    });
 
     this.route.paramMap
       .map(pm => pm.get('sharedLibraryId'))
       .takeUntil(this.onDestroy$)
       .do(id => {
-        this.store$.dispatch({ type: SharedLibraries.SET_CURRENT, payload: { id } });
-        this.store$.dispatch({ type: SharedLibraries.FETCH_DETAILS, payload: { id } });
+        this.store$.dispatch({
+          type: SharedLibraries.SET_CURRENT,
+          payload: { id },
+        });
+        this.store$.dispatch({
+          type: SharedLibraries.FETCH_DETAILS,
+          payload: { id },
+        });
       })
       .subscribe();
 
@@ -63,6 +73,9 @@ export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    this.store$.dispatch({ type: SharedLibraries.SET_CURRENT, payload: { id: '' } });
+    this.store$.dispatch({
+      type: SharedLibraries.SET_CURRENT,
+      payload: { id: '' },
+    });
   }
 }

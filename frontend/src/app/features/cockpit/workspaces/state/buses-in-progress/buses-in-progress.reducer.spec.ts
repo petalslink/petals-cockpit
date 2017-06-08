@@ -21,20 +21,23 @@ import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/wor
 
 describe(`Buses in progress reducer`, () => {
   it(`should have a default value`, () => {
-    expect(BusesInProgress.reducer(undefined, { type: `init`, payload: `` }))
-      .toEqual({
-        selectedBusInProgressId: '',
-        isImportingBus: false,
-        importBusError: '',
-        importBusId: '',
-        byId: {},
-        allIds: []
-      });
+    expect(
+      BusesInProgress.reducer(undefined, { type: `init`, payload: `` })
+    ).toEqual({
+      selectedBusInProgressId: '',
+      isImportingBus: false,
+      importBusError: '',
+      importBusId: '',
+      byId: {},
+      allIds: [],
+    });
   });
 
   describe(BusesInProgress.FETCH_BUSES_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.FETCH_BUSES_IN_PROGRESS).toEqual(`[Buses In Prog] Fetch buses in progress`);
+      expect(BusesInProgress.FETCH_BUSES_IN_PROGRESS).toEqual(
+        `[Buses In Prog] Fetch buses in progress`
+      );
     });
 
     const initialState: any = {
@@ -46,17 +49,17 @@ describe(`Buses in progress reducer`, () => {
           id: 'idBus1',
           ip: '192.168.0.1',
           port: 7701,
-          username: 'petals1'
+          username: 'petals1',
         },
         idBus2: {
           keepPreviousValues: '',
           id: 'idBus2',
           ip: '192.168.0.2',
           port: 7702,
-          username: 'petals2'
-        }
+          username: 'petals2',
+        },
       },
-      allIds: ['idBus1', 'idBus2']
+      allIds: ['idBus1', 'idBus2'],
     };
 
     it(`should replace existing buses while keeping extra values`, () => {
@@ -68,20 +71,17 @@ describe(`Buses in progress reducer`, () => {
               id: 'idBus1',
               ip: '192.168.0.10',
               port: 7711,
-              username: 'petals1 updated'
+              username: 'petals1 updated',
             },
             idBus3: {
               id: 'idBus3',
               ip: '192.168.0.3',
               port: 7712,
-              username: 'petals3'
-            }
+              username: 'petals3',
+            },
           },
-          allIds: [
-            'idBus1',
-            'idBus3'
-          ]
-        }
+          allIds: ['idBus1', 'idBus3'],
+        },
       });
 
       expect(reducer).toEqual({
@@ -96,7 +96,7 @@ describe(`Buses in progress reducer`, () => {
             importError: '',
             isRemoving: false,
             password: '',
-            passphrase: ''
+            passphrase: '',
           },
           idBus3: {
             id: 'idBus3',
@@ -106,17 +106,19 @@ describe(`Buses in progress reducer`, () => {
             importError: '',
             isRemoving: false,
             password: '',
-            passphrase: ''
-          }
+            passphrase: '',
+          },
         },
-        allIds: ['idBus1', 'idBus3']
+        allIds: ['idBus1', 'idBus3'],
       });
     });
   });
 
   describe(BusesInProgress.ADD_BUSES_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.ADD_BUSES_IN_PROGRESS).toEqual(`[Buses In Prog] Add buses in progress`);
+      expect(BusesInProgress.ADD_BUSES_IN_PROGRESS).toEqual(
+        `[Buses In Prog] Add buses in progress`
+      );
     });
 
     it(`should add a bus if doesn't exists yet`, () => {
@@ -129,17 +131,17 @@ describe(`Buses in progress reducer`, () => {
             id: 'idBus1',
             ip: '192.168.0.1',
             port: 7701,
-            username: 'petals1'
+            username: 'petals1',
           },
           idBus2: {
             keepPreviousValues: '',
             id: 'idBus2',
             ip: '192.168.0.2',
             port: 7702,
-            username: 'petals2'
-          }
+            username: 'petals2',
+          },
         },
-        allIds: ['idBus1', 'idBus2']
+        allIds: ['idBus1', 'idBus2'],
       };
 
       const reducer = BusesInProgress.reducer(initialState, {
@@ -150,20 +152,17 @@ describe(`Buses in progress reducer`, () => {
               id: 'idBus3',
               ip: '192.168.0.3',
               port: 7703,
-              username: 'petals3'
+              username: 'petals3',
             },
             idBus4: {
               id: 'idBus4',
               ip: '192.168.0.4',
               port: 7704,
-              username: 'petals4'
-            }
+              username: 'petals4',
+            },
           },
-          allIds: [
-            'idBus3',
-            'idBus4'
-          ]
-        }
+          allIds: ['idBus3', 'idBus4'],
+        },
       });
 
       expect(reducer).toEqual({
@@ -175,14 +174,14 @@ describe(`Buses in progress reducer`, () => {
             id: 'idBus1',
             ip: '192.168.0.1',
             port: 7701,
-            username: 'petals1'
+            username: 'petals1',
           },
           idBus2: {
             keepPreviousValues: '',
             id: 'idBus2',
             ip: '192.168.0.2',
             port: 7702,
-            username: 'petals2'
+            username: 'petals2',
           },
           idBus3: {
             id: 'idBus3',
@@ -192,7 +191,7 @@ describe(`Buses in progress reducer`, () => {
             importError: '',
             isRemoving: false,
             password: '',
-            passphrase: ''
+            passphrase: '',
           },
           idBus4: {
             id: 'idBus4',
@@ -202,17 +201,19 @@ describe(`Buses in progress reducer`, () => {
             importError: '',
             isRemoving: false,
             password: '',
-            passphrase: ''
-          }
+            passphrase: '',
+          },
         },
-        allIds: ['idBus1', 'idBus2', 'idBus3', 'idBus4']
+        allIds: ['idBus1', 'idBus2', 'idBus3', 'idBus4'],
       });
     });
   });
 
   describe(BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS).toEqual(`[Buses In Prog] Set current bus in progress`);
+      expect(BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS).toEqual(
+        `[Buses In Prog] Set current bus in progress`
+      );
     });
 
     const initialState: any = {
@@ -222,45 +223,51 @@ describe(`Buses in progress reducer`, () => {
       importBusError: 'maybe',
       importBusId: 'someIdBus',
       byId: {
-        keepPreviousValues: ''
+        keepPreviousValues: '',
       },
-      allIds: []
+      allIds: [],
     };
 
     it(`should reset variables related to a bus in import even if previous current bus in progress is the same as the new one`, () => {
-      expect(BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
-        payload: { busInProgressId: 'idBusInProgress1' }
-      })).toEqual({
+      expect(
+        BusesInProgress.reducer(initialState, {
+          type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
+          payload: { busInProgressId: 'idBusInProgress1' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedBusInProgressId: 'idBusInProgress1',
         isImportingBus: false,
         importBusError: '',
         importBusId: '',
         byId: { keepPreviousValues: '' },
-        allIds: []
+        allIds: [],
       });
     });
 
     it(`should reset variables related to a bus in import and set the ID of the new bus`, () => {
-      expect(BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
-        payload: { busInProgressId: 'idBusInProgress2' }
-      })).toEqual({
+      expect(
+        BusesInProgress.reducer(initialState, {
+          type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
+          payload: { busInProgressId: 'idBusInProgress2' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedBusInProgressId: 'idBusInProgress2',
         isImportingBus: false,
         importBusError: '',
         importBusId: '',
         byId: { keepPreviousValues: '' },
-        allIds: []
+        allIds: [],
       });
     });
   });
 
   describe(BusesInProgress.POST_BUS_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.POST_BUS_IN_PROGRESS).toEqual(`[Buses In Prog] Post bus in progress`);
+      expect(BusesInProgress.POST_BUS_IN_PROGRESS).toEqual(
+        `[Buses In Prog] Post bus in progress`
+      );
     });
 
     const initialState: any = {
@@ -269,27 +276,31 @@ describe(`Buses in progress reducer`, () => {
       importBusError: 'maybe',
       importBusId: 'someIdBus',
       byId: { keepPreviousValues: '' },
-      allIds: []
+      allIds: [],
     };
 
     it(`should update variable about bus import`, () => {
-      expect(BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.POST_BUS_IN_PROGRESS,
-        payload: { noMatter: 'the payload' }
-      })).toEqual({
+      expect(
+        BusesInProgress.reducer(initialState, {
+          type: BusesInProgress.POST_BUS_IN_PROGRESS,
+          payload: { noMatter: 'the payload' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         isImportingBus: true,
         importBusError: '',
         importBusId: '',
         byId: { keepPreviousValues: '' },
-        allIds: []
+        allIds: [],
       });
     });
   });
 
   describe(BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS).toEqual(`[Buses In Prog] Post bus in progress success`);
+      expect(BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS).toEqual(
+        `[Buses In Prog] Post bus in progress success`
+      );
     });
 
     const initialState: any = {
@@ -298,34 +309,38 @@ describe(`Buses in progress reducer`, () => {
       importBusError: '',
       importBusId: '',
       byId: { keepPreviousValues: '' },
-      allIds: []
+      allIds: [],
     };
 
     it(`should update variable about bus import`, () => {
-      expect(BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS,
-        payload: {
-          id: 'idBus5',
-          ip: '192.168.0.1',
-          port: '7700',
-          username: 'admin',
-          password: 'admin',
-          passphrase: 'supersecretpassphrase'
-        }
-      })).toEqual({
+      expect(
+        BusesInProgress.reducer(initialState, {
+          type: BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS,
+          payload: {
+            id: 'idBus5',
+            ip: '192.168.0.1',
+            port: '7700',
+            username: 'admin',
+            password: 'admin',
+            passphrase: 'supersecretpassphrase',
+          },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         isImportingBus: true,
         importBusError: '',
         importBusId: 'idBus5',
         byId: { keepPreviousValues: '' },
-        allIds: []
+        allIds: [],
       });
     });
   });
 
   describe(BusesInProgress.POST_BUS_IN_PROGRESS_ERROR, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.POST_BUS_IN_PROGRESS_ERROR).toEqual(`[Buses In Prog] Post bus in progress error`);
+      expect(BusesInProgress.POST_BUS_IN_PROGRESS_ERROR).toEqual(
+        `[Buses In Prog] Post bus in progress error`
+      );
     });
 
     it(`should return the same object if we're currently importing a bus`, () => {
@@ -335,12 +350,12 @@ describe(`Buses in progress reducer`, () => {
         importBusError: '',
         importBusId: 'someBusId',
         byId: { keepPreviousValues: '' },
-        allIds: []
+        allIds: [],
       };
 
       const reducer = BusesInProgress.reducer(initialState, {
         type: BusesInProgress.POST_BUS_IN_PROGRESS_ERROR,
-        payload: 'some error'
+        payload: 'some error',
       });
 
       expect(reducer).toEqual({
@@ -349,7 +364,7 @@ describe(`Buses in progress reducer`, () => {
         importBusError: 'some error',
         importBusId: '',
         byId: { keepPreviousValues: '' },
-        allIds: []
+        allIds: [],
       });
     });
 
@@ -360,11 +375,11 @@ describe(`Buses in progress reducer`, () => {
         importBusError: '',
         importBusId: 'someBusId',
         byId: { keepPreviousValues: '' },
-        allIds: []
+        allIds: [],
       };
 
       const reducer = BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.POST_BUS_IN_PROGRESS_ERROR
+        type: BusesInProgress.POST_BUS_IN_PROGRESS_ERROR,
       });
 
       expect(reducer).toEqual({
@@ -373,14 +388,16 @@ describe(`Buses in progress reducer`, () => {
         importBusError: '',
         importBusId: 'someBusId',
         byId: { keepPreviousValues: '' },
-        allIds: []
+        allIds: [],
       });
     });
   });
 
   describe(BusesInProgress.DELETE_BUS_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.DELETE_BUS_IN_PROGRESS).toEqual(`[Buses In Prog] Delete bus in progress`);
+      expect(BusesInProgress.DELETE_BUS_IN_PROGRESS).toEqual(
+        `[Buses In Prog] Delete bus in progress`
+      );
     });
 
     it(`should set the flag isRemoving on an existing bus`, () => {
@@ -388,14 +405,14 @@ describe(`Buses in progress reducer`, () => {
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
-          idBus1: { keepPreviousValues: '' }
+          idBus1: { keepPreviousValues: '' },
         },
-        allIds: ['idBus1']
+        allIds: ['idBus1'],
       };
 
       const reducer1 = BusesInProgress.reducer(initialState1, {
         type: BusesInProgress.DELETE_BUS_IN_PROGRESS,
-        payload: { id: 'idBus1' }
+        payload: { id: 'idBus1' },
       });
 
       expect(reducer1).toEqual({
@@ -404,10 +421,10 @@ describe(`Buses in progress reducer`, () => {
           keepPreviousValues: '',
           idBus1: {
             keepPreviousValues: '',
-            isRemoving: true
-          }
+            isRemoving: true,
+          },
         },
-        allIds: ['idBus1']
+        allIds: ['idBus1'],
       });
 
       // -----------------------------
@@ -418,16 +435,16 @@ describe(`Buses in progress reducer`, () => {
           keepPreviousValues: '',
           idBus1: {
             keepPreviousValues: '',
-            isRemoving: false
+            isRemoving: false,
           },
-          idBus2: { keepPreviousValues: '' }
+          idBus2: { keepPreviousValues: '' },
         },
-        allIds: ['idBus1', 'idBus2']
+        allIds: ['idBus1', 'idBus2'],
       };
 
       const reducer2 = BusesInProgress.reducer(initialState2, {
         type: BusesInProgress.DELETE_BUS_IN_PROGRESS,
-        payload: { id: 'idBus1' }
+        payload: { id: 'idBus1' },
       });
 
       expect(reducer2).toEqual({
@@ -436,18 +453,20 @@ describe(`Buses in progress reducer`, () => {
           keepPreviousValues: '',
           idBus1: {
             keepPreviousValues: '',
-            isRemoving: true
+            isRemoving: true,
           },
-          idBus2: { keepPreviousValues: '' }
+          idBus2: { keepPreviousValues: '' },
         },
-        allIds: ['idBus1', 'idBus2']
+        allIds: ['idBus1', 'idBus2'],
       });
     });
   });
 
   describe(BusesInProgress.REMOVE_BUS_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.REMOVE_BUS_IN_PROGRESS).toEqual(`[Buses In Prog] Remove bus in progress`);
+      expect(BusesInProgress.REMOVE_BUS_IN_PROGRESS).toEqual(
+        `[Buses In Prog] Remove bus in progress`
+      );
     });
 
     const initialState: any = {
@@ -456,56 +475,64 @@ describe(`Buses in progress reducer`, () => {
         keepPreviousValues: '',
         idBus1: { keepPreviousValues: '' },
         idBus2: { keepPreviousValues: '' },
-        idBus3: { keepPreviousValues: '' }
+        idBus3: { keepPreviousValues: '' },
       },
-      allIds: ['idBus1', 'idBus2', 'idBus3']
+      allIds: ['idBus1', 'idBus2', 'idBus3'],
     };
 
     it(`should remove an existing bus`, () => {
-      expect(BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
-        payload: 'idBus1'
-      })).toEqual({
+      expect(
+        BusesInProgress.reducer(initialState, {
+          type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
+          payload: 'idBus1',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idBus2: { keepPreviousValues: '' },
-          idBus3: { keepPreviousValues: '' }
+          idBus3: { keepPreviousValues: '' },
         },
-        allIds: ['idBus2', 'idBus3']
+        allIds: ['idBus2', 'idBus3'],
       });
 
-      expect(BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
-        payload: 'idBus2'
-      })).toEqual({
+      expect(
+        BusesInProgress.reducer(initialState, {
+          type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
+          payload: 'idBus2',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idBus1: { keepPreviousValues: '' },
-          idBus3: { keepPreviousValues: '' }
+          idBus3: { keepPreviousValues: '' },
         },
-        allIds: ['idBus1', 'idBus3']
+        allIds: ['idBus1', 'idBus3'],
       });
 
-      expect(BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
-        payload: 'idBus3'
-      })).toEqual({
+      expect(
+        BusesInProgress.reducer(initialState, {
+          type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
+          payload: 'idBus3',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idBus1: { keepPreviousValues: '' },
-          idBus2: { keepPreviousValues: '' }
+          idBus2: { keepPreviousValues: '' },
         },
-        allIds: ['idBus1', 'idBus2']
+        allIds: ['idBus1', 'idBus2'],
       });
     });
   });
 
   describe(BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS, () => {
     it(`should check action name`, () => {
-      expect(BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS).toEqual(`[Buses In Prog] Update error bus in progress`);
+      expect(BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS).toEqual(
+        `[Buses In Prog] Update error bus in progress`
+      );
     });
 
     it(`should update a bus import error if bus exists`, () => {
@@ -515,46 +542,50 @@ describe(`Buses in progress reducer`, () => {
           keepPreviousValues: '',
           idBus1: {
             keepPreviousValues: '',
-            importError: 'random error'
+            importError: 'random error',
           },
-          idBus2: { keepPreviousValues: '' }
+          idBus2: { keepPreviousValues: '' },
         },
-        allIds: ['idBus1', 'idBus2']
+        allIds: ['idBus1', 'idBus2'],
       };
 
-      expect(BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS,
-        payload: { id: 'idBus1', importError: 'new error' }
-      })).toEqual({
+      expect(
+        BusesInProgress.reducer(initialState, {
+          type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS,
+          payload: { id: 'idBus1', importError: 'new error' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idBus1: {
             keepPreviousValues: '',
-            importError: 'new error'
+            importError: 'new error',
           },
-          idBus2: { keepPreviousValues: '' }
+          idBus2: { keepPreviousValues: '' },
         },
-        allIds: ['idBus1', 'idBus2']
+        allIds: ['idBus1', 'idBus2'],
       });
 
-      expect(BusesInProgress.reducer(initialState, {
-        type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS,
-        payload: { id: 'idBus2', importError: 'new error' }
-      })).toEqual({
+      expect(
+        BusesInProgress.reducer(initialState, {
+          type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS,
+          payload: { id: 'idBus2', importError: 'new error' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idBus1: {
             keepPreviousValues: '',
-            importError: 'random error'
+            importError: 'random error',
           },
           idBus2: {
             keepPreviousValues: '',
-            importError: 'new error'
-          }
+            importError: 'new error',
+          },
         },
-        allIds: ['idBus1', 'idBus2']
+        allIds: ['idBus1', 'idBus2'],
       });
     });
   });
@@ -562,12 +593,14 @@ describe(`Buses in progress reducer`, () => {
   describe(Workspaces.CLEAN_WORKSPACE, () => {
     it(`should return the initial state`, () => {
       const initialState: any = {
-        noMatter: 'the state'
+        noMatter: 'the state',
       };
 
-      expect(BusesInProgress.reducer(initialState, {
-        type: Workspaces.CLEAN_WORKSPACE
-      })).toEqual(busesInProgressTableFactory());
+      expect(
+        BusesInProgress.reducer(initialState, {
+          type: Workspaces.CLEAN_WORKSPACE,
+        })
+      ).toEqual(busesInProgressTableFactory());
     });
   });
 });

@@ -15,13 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UploadComponent implements OnInit {
   @Input() title: string;
@@ -29,14 +36,15 @@ export class UploadComponent implements OnInit {
   @Input() error: boolean;
   @Input() placeholderChangeFileName?: string;
 
-  @Output() onDeploy: EventEmitter<{ file: File, name: string }> = new EventEmitter();
+  @Output()
+  onDeploy: EventEmitter<{ file: File; name: string }> = new EventEmitter();
 
   public fileToDeploy: File;
   public changeFileName: string;
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   fileChange(event) {
     const fileList: FileList = event.target.files;
@@ -44,7 +52,10 @@ export class UploadComponent implements OnInit {
     if (fileList.length > 0) {
       const selectedFile = fileList[0];
       this.fileToDeploy = selectedFile;
-      this.changeFileName = this.fileToDeploy.name.substring(0, this.fileToDeploy.name.length - 4);
+      this.changeFileName = this.fileToDeploy.name.substring(
+        0,
+        this.fileToDeploy.name.length - 4
+      );
     }
   }
 }

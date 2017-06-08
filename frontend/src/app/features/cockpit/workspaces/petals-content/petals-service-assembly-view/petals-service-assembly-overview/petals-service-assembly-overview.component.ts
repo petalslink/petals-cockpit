@@ -15,7 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  Input,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
@@ -27,7 +32,7 @@ import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/
   selector: 'app-petals-service-assembly-overview',
   templateUrl: './petals-service-assembly-overview.component.html',
   styleUrls: ['./petals-service-assembly-overview.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsServiceAssemblyOverviewComponent implements OnInit {
   @Input() serviceAssembly: IServiceAssemblyRow;
@@ -35,9 +40,11 @@ export class PetalsServiceAssemblyOverviewComponent implements OnInit {
 
   public workspaceId$: Observable<string>;
 
-  constructor(private store$: Store<IStore>) { }
+  constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.workspaceId$ = this.store$.select(state => state.workspaces.selectedWorkspaceId);
+    this.workspaceId$ = this.store$.select(
+      state => state.workspaces.selectedWorkspaceId
+    );
   }
 }

@@ -26,15 +26,21 @@ import { Router } from '@angular/router';
 import { Workspaces } from '../workspaces/state/workspaces/workspaces.reducer';
 import { IStore } from '../../../shared/interfaces/store.interface';
 import { getWorkspacesList } from '../workspaces/state/workspaces/workspaces.selectors';
-import { IWorkspaces, IWorkspace } from '../workspaces/state/workspaces/workspaces.interface';
+import {
+  IWorkspaces,
+  IWorkspace,
+} from '../workspaces/state/workspaces/workspaces.interface';
 import { Ui } from './../../../shared/state/ui.reducer';
-import { IUser, ICurrentUser } from './../../../shared/interfaces/users.interface';
+import {
+  IUser,
+  ICurrentUser,
+} from './../../../shared/interfaces/users.interface';
 import { getCurrentUser } from './../../../shared/state/users.selectors';
 
 @Component({
   selector: 'app-workspaces-dialog',
   templateUrl: './workspaces-dialog.component.html',
-  styleUrls: ['./workspaces-dialog.component.scss']
+  styleUrls: ['./workspaces-dialog.component.scss'],
 })
 export class WorkspacesDialogComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
@@ -52,30 +58,25 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
     private store$: Store<IStore>,
     private router: Router,
     private fb: FormBuilder
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.workspaces$ = this.store$.let(getWorkspacesList());
-    this.user$ = this.store$
-      .let(getCurrentUser())
-      .do(u => {
-        this.user = u;
-      });
-
-    this.newWksForm = this.fb.group({
-      name: ['', Validators.required]
+    this.user$ = this.store$.let(getCurrentUser()).do(u => {
+      this.user = u;
     });
 
-    this
-      .store$
+    this.newWksForm = this.fb.group({
+      name: ['', Validators.required],
+    });
+
+    this.store$
       .select(state => state.workspaces.isAddingWorkspace)
-      .combineLatest(Observable
-        .empty()
-        .concat(this
-          .newWksForm
-          .valueChanges
-          .map(values => values.name)
-          .distinctUntilChanged()
+      .combineLatest(
+        Observable.empty().concat(
+          this.newWksForm.valueChanges
+            .map(values => values.name)
+            .distinctUntilChanged()
         )
       )
       .takeUntil(this.onDestroy$)
@@ -116,7 +117,10 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
   }
 
   onSubmit({ value }) {
-    this.store$.dispatch({ type: Workspaces.POST_WORKSPACE, payload: value.name });
+    this.store$.dispatch({
+      type: Workspaces.POST_WORKSPACE,
+      payload: value.name,
+    });
     this.reset();
   }
 

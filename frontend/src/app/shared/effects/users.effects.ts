@@ -37,24 +37,32 @@ export class UsersEffects {
     private router: Router,
     private usersService: UsersService,
     private notification: NotificationsService
-  ) { }
+  ) {}
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) connectUser$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  connectUser$: Observable<Action> = this.actions$
     .ofType(Users.CONNECT_USER)
     .switchMap((action: Action) =>
-      this.usersService.connectUser(action.payload.user)
+      this.usersService
+        .connectUser(action.payload.user)
         .map((res: Response) => {
           const user = <ICurrentUser>res.json();
           return {
             type: Users.CONNECT_USER_SUCCESS,
-            payload: { user, navigate: true, previousUrl: action.payload.previousUrl }
+            payload: {
+              user,
+              navigate: true,
+              previousUrl: action.payload.previousUrl,
+            },
           };
         })
-        .catch((err) => {
+        .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in users.effects.ts: ofType(Users.CONNECT_USER)');
+            console.warn(
+              'Error caught in users.effects.ts: ofType(Users.CONNECT_USER)'
+            );
             console.error(err);
             console.groupEnd();
           }
@@ -64,32 +72,42 @@ export class UsersEffects {
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: false }) connectUserSuccess$: Observable<void> = this.actions$
+  @Effect({ dispatch: false })
+  connectUserSuccess$: Observable<void> = this.actions$
     .ofType(Users.CONNECT_USER_SUCCESS)
     .filter((action: Action) => action.payload.navigate)
     .map((action: Action) => {
       if (action.payload.previousUrl) {
         this.router.navigate([action.payload.previousUrl]);
       } else if (action.payload.user.lastWorkspace) {
-        this.router.navigate(['/workspaces', action.payload.user.lastWorkspace]);
+        this.router.navigate([
+          '/workspaces',
+          action.payload.user.lastWorkspace,
+        ]);
       } else {
         this.router.navigate(['/workspaces']);
       }
     });
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) disconnectUser$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  disconnectUser$: Observable<Action> = this.actions$
     .ofType(Users.DISCONNECT_USER)
     .switchMap(() =>
-      this.usersService.disconnectUser()
-        .map(() => batchActions([
-          { type: Users.DISCONNECT_USER_SUCCESS },
-          { type: Workspaces.CLOSE_WORKSPACE }
-        ]))
-        .catch((err) => {
+      this.usersService
+        .disconnectUser()
+        .map(() =>
+          batchActions([
+            { type: Users.DISCONNECT_USER_SUCCESS },
+            { type: Workspaces.CLOSE_WORKSPACE },
+          ])
+        )
+        .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in users.effects.ts: ofType(Users.DISCONNECT_USER)');
+            console.warn(
+              'Error caught in users.effects.ts: ofType(Users.DISCONNECT_USER)'
+            );
             console.error(err);
             console.groupEnd();
           }
@@ -99,8 +117,11 @@ export class UsersEffects {
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: false }) disconnectUserSuccess$: any = this.actions$
+  @Effect({ dispatch: false })
+  disconnectUserSuccess$: any = this.actions$
     .ofType(Users.DISCONNECT_USER_SUCCESS)
     .do(_ => this.router.navigate(['/login']))
-    .do(_ => this.notification.success('Log out !', `You're now disconnected.`));
+    .do(_ =>
+      this.notification.success('Log out !', `You're now disconnected.`)
+    );
 }

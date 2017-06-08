@@ -21,19 +21,22 @@ import { serviceUnitsTableFactory } from 'app/features/cockpit/workspaces/state/
 
 describe(`ServiceUnits reducer`, () => {
   it(`should have a default value`, () => {
-    expect(ServiceUnits.reducer(undefined, { type: `init`, payload: `` }))
-      .toEqual({
-        selectedServiceUnitId: '',
-        isFetchingDetails: false,
+    expect(
+      ServiceUnits.reducer(undefined, { type: `init`, payload: `` })
+    ).toEqual({
+      selectedServiceUnitId: '',
+      isFetchingDetails: false,
 
-        byId: {},
-        allIds: []
-      });
+      byId: {},
+      allIds: [],
+    });
   });
 
   describe(ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS).toEqual(`[Service units] Fetch service units success`);
+      expect(ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS).toEqual(
+        `[Service units] Fetch service units success`
+      );
     });
 
     const initialState: any = {
@@ -43,48 +46,44 @@ describe(`ServiceUnits reducer`, () => {
         idSu0: {
           keepPreviousValues: '',
           name: 'SU 0',
-          id: 'idSu0'
+          id: 'idSu0',
         },
         idSu1: {
           keepPreviousValues: '',
           name: 'SU 1',
-          id: 'idSu1'
-        }
+          id: 'idSu1',
+        },
       },
-      allIds: [
-        'idSu0',
-        'idSu1'
-      ]
+      allIds: ['idSu0', 'idSu1'],
     };
 
     it(`should replace existing service unit while keeping extra values`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS,
-        payload: {
-          byId: {
-            idSu0: {
-              name: 'SU 0 updated name',
-              id: 'idSu0',
-              componentId: 'idComp0',
-              containerId: 'idCont0',
-              serviceAssemblyId: 'idSa0',
-              state: 'Loaded'
+      expect(
+        ServiceUnits.reducer(initialState, {
+          type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS,
+          payload: {
+            byId: {
+              idSu0: {
+                name: 'SU 0 updated name',
+                id: 'idSu0',
+                componentId: 'idComp0',
+                containerId: 'idCont0',
+                serviceAssemblyId: 'idSa0',
+                state: 'Loaded',
+              },
+              idSu2: {
+                name: 'SU 2',
+                id: 'idSu2',
+                componentId: 'idComp0',
+                containerId: 'idCont0',
+                serviceAssemblyId: 'idSa0',
+                state: 'Loaded',
+              },
             },
-            idSu2: {
-              name: 'SU 2',
-              id: 'idSu2',
-              componentId: 'idComp0',
-              containerId: 'idCont0',
-              serviceAssemblyId: 'idSa0',
-              state: 'Loaded'
-            }
+            allIds: ['idSu0', 'idSu2'],
           },
-          allIds: [
-            'idSu0',
-            'idSu2'
-          ]
-        }
-      })).toEqual({
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           idSu0: {
@@ -97,7 +96,7 @@ describe(`ServiceUnits reducer`, () => {
             state: 'Loaded',
             isFolded: false,
             isUpdatingState: false,
-            errorChangeState: ''
+            errorChangeState: '',
           },
           idSu2: {
             name: 'SU 2',
@@ -108,24 +107,22 @@ describe(`ServiceUnits reducer`, () => {
             state: 'Loaded',
             isFolded: false,
             isUpdatingState: false,
-            errorChangeState: ''
-          }
+            errorChangeState: '',
+          },
         },
-        allIds: [
-          'idSu0',
-          'idSu2'
-        ]
+        allIds: ['idSu0', 'idSu2'],
       });
     });
   });
 
   describe(ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.ADD_SERVICE_UNITS_SUCCESS).toEqual(`[Service units] Add service units success`);
+      expect(ServiceUnits.ADD_SERVICE_UNITS_SUCCESS).toEqual(
+        `[Service units] Add service units success`
+      );
     });
 
     it(`should add a service-unit if doesn't exists yet`, () => {
-
       const initialState: any = {
         keepPreviousValues: '',
         byId: {
@@ -133,59 +130,55 @@ describe(`ServiceUnits reducer`, () => {
           idSu0: {
             keepPreviousValues: '',
             name: 'SU 0',
-            id: 'idSu0'
+            id: 'idSu0',
           },
           idSu1: {
             keepPreviousValues: '',
             name: 'SU 1',
-            id: 'idSu1'
-          }
+            id: 'idSu1',
+          },
         },
-        allIds: [
-          'idSu0',
-          'idSu1'
-        ]
+        allIds: ['idSu0', 'idSu1'],
       };
 
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS,
-        payload: {
-          byId: {
-            idSu2: {
-              name: 'SU 2',
-              id: 'idSu2',
-              componentId: 'idComp0',
-              containerId: 'idCont0',
-              serviceAssemblyId: 'idSa0',
-              state: 'Loaded'
+      expect(
+        ServiceUnits.reducer(initialState, {
+          type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS,
+          payload: {
+            byId: {
+              idSu2: {
+                name: 'SU 2',
+                id: 'idSu2',
+                componentId: 'idComp0',
+                containerId: 'idCont0',
+                serviceAssemblyId: 'idSa0',
+                state: 'Loaded',
+              },
+              idSu3: {
+                name: 'SU 3',
+                id: 'idSu3',
+                componentId: 'idComp0',
+                containerId: 'idCont0',
+                serviceAssemblyId: 'idSa0',
+                state: 'Loaded',
+              },
             },
-            idSu3: {
-              name: 'SU 3',
-              id: 'idSu3',
-              componentId: 'idComp0',
-              containerId: 'idCont0',
-              serviceAssemblyId: 'idSa0',
-              state: 'Loaded'
-            }
+            allIds: ['idSu2', 'idSu3'],
           },
-          allIds: [
-            'idSu2',
-            'idSu3'
-          ]
-        }
-      })).toEqual({
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSu0: {
             keepPreviousValues: '',
             name: 'SU 0',
-            id: 'idSu0'
+            id: 'idSu0',
           },
           idSu1: {
             keepPreviousValues: '',
             name: 'SU 1',
-            id: 'idSu1'
+            id: 'idSu1',
           },
           idSu2: {
             name: 'SU 2',
@@ -196,7 +189,7 @@ describe(`ServiceUnits reducer`, () => {
             state: 'Loaded',
             isFolded: false,
             isUpdatingState: false,
-            errorChangeState: ''
+            errorChangeState: '',
           },
           idSu3: {
             name: 'SU 3',
@@ -207,22 +200,19 @@ describe(`ServiceUnits reducer`, () => {
             state: 'Loaded',
             isFolded: false,
             isUpdatingState: false,
-            errorChangeState: ''
-          }
+            errorChangeState: '',
+          },
         },
-        allIds: [
-          'idSu0',
-          'idSu1',
-          'idSu2',
-          'idSu3'
-        ]
+        allIds: ['idSu0', 'idSu1', 'idSu2', 'idSu3'],
       });
     });
   });
 
   describe(ServiceUnits.SET_CURRENT_SERVICE_UNIT, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.SET_CURRENT_SERVICE_UNIT).toEqual(`[Service units] Set current service unit`);
+      expect(ServiceUnits.SET_CURRENT_SERVICE_UNIT).toEqual(
+        `[Service units] Set current service unit`
+      );
     });
 
     it(`should set the current service-unit and reset its errors`, () => {
@@ -230,28 +220,30 @@ describe(`ServiceUnits reducer`, () => {
         keepPreviousValues: '',
         selectedServiceUnitId: '',
         byId: {
-          idSu0: { errorChangeState: 'some error' }
-        }
+          idSu0: { errorChangeState: 'some error' },
+        },
       };
 
       const reducer = ServiceUnits.reducer(initialState, {
         type: ServiceUnits.SET_CURRENT_SERVICE_UNIT,
-        payload: { serviceUnitId: 'idSu0' }
+        payload: { serviceUnitId: 'idSu0' },
       });
 
       expect(reducer).toEqual({
         keepPreviousValues: '',
         selectedServiceUnitId: 'idSu0',
         byId: {
-          idSu0: { errorChangeState: '' }
-        }
+          idSu0: { errorChangeState: '' },
+        },
       });
     });
   });
 
   describe(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS).toEqual(`[Service units] Fetch service unit details`);
+      expect(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS).toEqual(
+        `[Service units] Fetch service unit details`
+      );
     });
 
     const initialState: any = {
@@ -260,32 +252,36 @@ describe(`ServiceUnits reducer`, () => {
         keepPreviousValues: '',
         idSu0: {
           keepPreviousValues: '',
-        }
+        },
       },
-      allIds: ['idSu0']
+      allIds: ['idSu0'],
     };
 
     it(`should set isFetchingDetails to true even if isFetchingDetails doesn't exists yet`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS,
-        payload: { serviceUnitId: 'idSu0' }
-      })).toEqual({
+      expect(
+        ServiceUnits.reducer(initialState, {
+          type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS,
+          payload: { serviceUnitId: 'idSu0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSu0: {
             keepPreviousValues: '',
-            isFetchingDetails: true
+            isFetchingDetails: true,
           },
         },
-        allIds: ['idSu0']
+        allIds: ['idSu0'],
       });
     });
   });
 
   describe(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS).toEqual(`[Service units] Fetch service unit details success`);
+      expect(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS).toEqual(
+        `[Service units] Fetch service unit details success`
+      );
     });
 
     const initialState: any = {
@@ -294,33 +290,37 @@ describe(`ServiceUnits reducer`, () => {
         keepPreviousValues: '',
         idSu0: {
           keepPreviousValues: '',
-        }
+        },
       },
-      allIds: ['idSu0']
+      allIds: ['idSu0'],
     };
 
     it(`should set isFetchingDetails to false even if isFetchingDetails doesn't exists yet`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS,
-        payload: { serviceUnitId: 'idSu0', data: { someData: 'some data' } }
-      })).toEqual({
+      expect(
+        ServiceUnits.reducer(initialState, {
+          type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS,
+          payload: { serviceUnitId: 'idSu0', data: { someData: 'some data' } },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSu0: {
             keepPreviousValues: '',
             isFetchingDetails: false,
-            someData: 'some data'
-          }
+            someData: 'some data',
+          },
         },
-        allIds: ['idSu0']
+        allIds: ['idSu0'],
       });
     });
   });
 
   describe(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR).toEqual(`[Service units] Fetch service unit details error`);
+      expect(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR).toEqual(
+        `[Service units] Fetch service unit details error`
+      );
     });
 
     const initialState: any = {
@@ -329,26 +329,28 @@ describe(`ServiceUnits reducer`, () => {
         keepPreviousValues: '',
         idSu0: {
           keepPreviousValues: '',
-          isFetchingDetails: true
-        }
+          isFetchingDetails: true,
+        },
       },
-      allIds: ['idSu0']
+      allIds: ['idSu0'],
     };
 
     it(`should set isFetchingDetails to false if the service-unit exists`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR,
-        payload: { serviceUnitId: 'idSu0' }
-      })).toEqual({
+      expect(
+        ServiceUnits.reducer(initialState, {
+          type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR,
+          payload: { serviceUnitId: 'idSu0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSu0: {
             keepPreviousValues: '',
-            isFetchingDetails: false
-          }
+            isFetchingDetails: false,
+          },
         },
-        allIds: ['idSu0']
+        allIds: ['idSu0'],
       });
     });
   });
@@ -363,33 +365,37 @@ describe(`ServiceUnits reducer`, () => {
       byId: {
         keepPreviousValues: '',
         idSu0: {
-          keepPreviousValues: ''
-        }
+          keepPreviousValues: '',
+        },
       },
-      allIds: ['idSu0']
+      allIds: ['idSu0'],
     };
 
     it(`should change the isUpdatingState variable of an existing service-unit to true`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.CHANGE_STATE,
-        payload: { serviceUnitId: 'idSu0' }
-      })).toEqual({
+      expect(
+        ServiceUnits.reducer(initialState, {
+          type: ServiceUnits.CHANGE_STATE,
+          payload: { serviceUnitId: 'idSu0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSu0: {
             keepPreviousValues: '',
-            isUpdatingState: true
-          }
+            isUpdatingState: true,
+          },
         },
-        allIds: ['idSu0']
+        allIds: ['idSu0'],
       });
     });
   });
 
   describe(ServiceUnits.CHANGE_STATE_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.CHANGE_STATE_SUCCESS).toEqual(`[Service units] Change state success`);
+      expect(ServiceUnits.CHANGE_STATE_SUCCESS).toEqual(
+        `[Service units] Change state success`
+      );
     });
 
     const initialState: any = {
@@ -398,17 +404,19 @@ describe(`ServiceUnits reducer`, () => {
         keepPreviousValues: '',
         idSu0: {
           keepPreviousValues: '',
-          errorChangeState: 'some previous error'
-        }
+          errorChangeState: 'some previous error',
+        },
       },
-      allIds: ['idSu0']
+      allIds: ['idSu0'],
     };
 
     it(`should update an existing service-unit by setting UI variables and the state`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.CHANGE_STATE_SUCCESS,
-        payload: { serviceUnitId: 'idSu0', newState: 'Started' }
-      })).toEqual({
+      expect(
+        ServiceUnits.reducer(initialState, {
+          type: ServiceUnits.CHANGE_STATE_SUCCESS,
+          payload: { serviceUnitId: 'idSu0', newState: 'Started' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
@@ -416,17 +424,19 @@ describe(`ServiceUnits reducer`, () => {
             keepPreviousValues: '',
             isUpdatingState: false,
             state: 'Started',
-            errorChangeState: ''
-          }
+            errorChangeState: '',
+          },
         },
-        allIds: ['idSu0']
+        allIds: ['idSu0'],
       });
     });
   });
 
   describe(ServiceUnits.CHANGE_STATE_ERROR, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.CHANGE_STATE_ERROR).toEqual(`[Service units] Change state error`);
+      expect(ServiceUnits.CHANGE_STATE_ERROR).toEqual(
+        `[Service units] Change state error`
+      );
     });
 
     const initialState: any = {
@@ -435,34 +445,38 @@ describe(`ServiceUnits reducer`, () => {
         keepPreviousValues: '',
         idSu0: {
           keepPreviousValues: '',
-          errorChangeState: ''
-        }
+          errorChangeState: '',
+        },
       },
-      allIds: ['idSu0']
+      allIds: ['idSu0'],
     };
 
     it(`should change the isUpdatingState variable of an existing service-unit to false`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.CHANGE_STATE_ERROR,
-        payload: { serviceUnitId: 'idSu0', errorChangeState: 'some error' }
-      })).toEqual({
+      expect(
+        ServiceUnits.reducer(initialState, {
+          type: ServiceUnits.CHANGE_STATE_ERROR,
+          payload: { serviceUnitId: 'idSu0', errorChangeState: 'some error' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSu0: {
             keepPreviousValues: '',
             isUpdatingState: false,
-            errorChangeState: 'some error'
-          }
+            errorChangeState: 'some error',
+          },
         },
-        allIds: ['idSu0']
+        allIds: ['idSu0'],
       });
     });
   });
 
   describe(ServiceUnits.REMOVE_SERVICE_UNIT, () => {
     it(`should check action name`, () => {
-      expect(ServiceUnits.REMOVE_SERVICE_UNIT).toEqual(`[Service units] Remove service unit`);
+      expect(ServiceUnits.REMOVE_SERVICE_UNIT).toEqual(
+        `[Service units] Remove service unit`
+      );
     });
 
     const initialState: any = {
@@ -470,68 +484,74 @@ describe(`ServiceUnits reducer`, () => {
       byId: {
         keepPreviousValues: '',
         idSu0: {
-          keepPreviousValues: ''
+          keepPreviousValues: '',
         },
         idSu1: {
-          keepPreviousValues: ''
+          keepPreviousValues: '',
         },
         idSu2: {
-          keepPreviousValues: ''
-        }
+          keepPreviousValues: '',
+        },
       },
-      allIds: ['idSu0', 'idSu1', 'idSu2']
+      allIds: ['idSu0', 'idSu1', 'idSu2'],
     };
 
     it(`should remove an existing service-unit`, () => {
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.REMOVE_SERVICE_UNIT,
-        payload: { componentId: 'idComp0', serviceUnitId: 'idSu0' }
-      })).toEqual({
+      expect(
+        ServiceUnits.reducer(initialState, {
+          type: ServiceUnits.REMOVE_SERVICE_UNIT,
+          payload: { componentId: 'idComp0', serviceUnitId: 'idSu0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSu1: {
-            keepPreviousValues: ''
+            keepPreviousValues: '',
           },
           idSu2: {
-            keepPreviousValues: ''
-          }
+            keepPreviousValues: '',
+          },
         },
-        allIds: ['idSu1', 'idSu2']
+        allIds: ['idSu1', 'idSu2'],
       });
 
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.REMOVE_SERVICE_UNIT,
-        payload: { componentId: 'idComp0', serviceUnitId: 'idSu1' }
-      })).toEqual({
+      expect(
+        ServiceUnits.reducer(initialState, {
+          type: ServiceUnits.REMOVE_SERVICE_UNIT,
+          payload: { componentId: 'idComp0', serviceUnitId: 'idSu1' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSu0: {
-            keepPreviousValues: ''
+            keepPreviousValues: '',
           },
           idSu2: {
-            keepPreviousValues: ''
-          }
+            keepPreviousValues: '',
+          },
         },
-        allIds: ['idSu0', 'idSu2']
+        allIds: ['idSu0', 'idSu2'],
       });
 
-      expect(ServiceUnits.reducer(initialState, {
-        type: ServiceUnits.REMOVE_SERVICE_UNIT,
-        payload: { componentId: 'idComp0', serviceUnitId: 'idSu2' }
-      })).toEqual({
+      expect(
+        ServiceUnits.reducer(initialState, {
+          type: ServiceUnits.REMOVE_SERVICE_UNIT,
+          payload: { componentId: 'idComp0', serviceUnitId: 'idSu2' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idSu0: {
-            keepPreviousValues: ''
+            keepPreviousValues: '',
           },
           idSu1: {
-            keepPreviousValues: ''
-          }
+            keepPreviousValues: '',
+          },
         },
-        allIds: ['idSu0', 'idSu1']
+        allIds: ['idSu0', 'idSu1'],
       });
     });
   });
@@ -543,21 +563,25 @@ describe(`ServiceUnits reducer`, () => {
         byId: {
           doNotKeepPreviousValues: '',
           idSu0: {
-            doNotKeepPreviousValues: ''
-          }
+            doNotKeepPreviousValues: '',
+          },
         },
-        allIds: ['idSu0']
+        allIds: ['idSu0'],
       };
 
-      expect(ServiceUnits.reducer(undefined, {
-        type: Workspaces.CLEAN_WORKSPACE,
-        payload: { noMatter: 'which payload !' }
-      })).toEqual(serviceUnitsTableFactory());
+      expect(
+        ServiceUnits.reducer(undefined, {
+          type: Workspaces.CLEAN_WORKSPACE,
+          payload: { noMatter: 'which payload !' },
+        })
+      ).toEqual(serviceUnitsTableFactory());
 
-      expect(ServiceUnits.reducer(initialState, {
-        type: Workspaces.CLEAN_WORKSPACE,
-        payload: { noMatter: 'which payload !' }
-      })).toEqual(serviceUnitsTableFactory());
+      expect(
+        ServiceUnits.reducer(initialState, {
+          type: Workspaces.CLEAN_WORKSPACE,
+          payload: { noMatter: 'which payload !' },
+        })
+      ).toEqual(serviceUnitsTableFactory());
     });
   });
 });

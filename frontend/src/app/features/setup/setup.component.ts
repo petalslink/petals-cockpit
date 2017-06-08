@@ -15,7 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  AfterViewInit,
+} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MdInputContainer } from '@angular/material';
@@ -30,7 +36,7 @@ import { UsersService, IUserSetup } from 'app/shared/services/users.service';
 @Component({
   selector: 'app-setup',
   templateUrl: './setup.component.html',
-  styleUrls: ['./setup.component.scss']
+  styleUrls: ['./setup.component.scss'],
 })
 export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   private onDestroy$ = new Subject<void>();
@@ -48,7 +54,8 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     private users: UsersService,
     private route: ActivatedRoute,
-    private fb: FormBuilder) { }
+    private fb: FormBuilder
+  ) {}
 
   ngOnInit() {
     const token = this.route.snapshot.queryParamMap.get('token');
@@ -57,7 +64,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       username: ['', Validators.required],
       password: ['', Validators.required],
       token: [token || '', Validators.required],
-      name: ['', Validators.required]
+      name: ['', Validators.required],
     });
   }
 
@@ -87,14 +94,16 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     } else {
       this.setupFailed = null;
       this.settingUp = true;
-      this.users.setupUser(value)
+      this.users
+        .setupUser(value)
         .takeUntil(this.onDestroy$)
         .map(res => {
           this.setupSucceeded = true;
           this.settingUp = false;
         })
         .catch(err => {
-          this.setupFailed = err.json().message || `${err.status} ${err.statusText}` ;
+          this.setupFailed =
+            err.json().message || `${err.status} ${err.statusText}`;
           this.settingUp = false;
           return Observable.of();
         })

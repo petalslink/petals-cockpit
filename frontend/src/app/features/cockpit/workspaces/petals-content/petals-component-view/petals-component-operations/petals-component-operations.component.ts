@@ -15,7 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Input, ChangeDetectionStrategy, SimpleChanges, OnChanges } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  ChangeDetectionStrategy,
+  SimpleChanges,
+  OnChanges,
+} from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
@@ -23,13 +30,16 @@ import { IComponentRow } from '../../../state/components/components.interface';
 import { IStore } from '../../../../../../shared/interfaces/store.interface';
 import { Components } from '../../../state/components/components.reducer';
 import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
-import { ComponentState, EComponentState } from 'app/shared/services/components.service';
+import {
+  ComponentState,
+  EComponentState,
+} from 'app/shared/services/components.service';
 
 @Component({
   selector: 'app-petals-component-operations',
   templateUrl: './petals-component-operations.component.html',
   styleUrls: ['./petals-component-operations.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
   @Input() component: IComponentRow;
@@ -37,13 +47,17 @@ export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
   public serviceUnitName: string;
   public parametersForm: FormGroup;
 
-  constructor(private store$: Store<IStore>) { }
+  constructor(private store$: Store<IStore>) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   ngOnChanges(changes: SimpleChanges) {
     // if an error happen, without that control the form will be reset to the values in store
-    if (changes.component.previousValue && changes.component.previousValue.parameters === changes.component.currentValue.parameters) {
+    if (
+      changes.component.previousValue &&
+      changes.component.previousValue.parameters ===
+        changes.component.currentValue.parameters
+    ) {
       return;
     }
 
@@ -51,8 +65,10 @@ export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
     const keysParameters = Object.keys(parameters);
 
     this.parametersForm = new FormGroup(
-      keysParameters
-        .reduce((acc, key) => ({ ...acc, [key]: new FormControl(parameters[key]) }), {})
+      keysParameters.reduce(
+        (acc, key) => ({ ...acc, [key]: new FormControl(parameters[key]) }),
+        {}
+      )
     );
   }
 
@@ -63,11 +79,17 @@ export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
   changeState(newState: ComponentState) {
     let parameters = null;
 
-    if (this.component.state === EComponentState.Loaded && newState !== EComponentState.Unloaded) {
+    if (
+      this.component.state === EComponentState.Loaded &&
+      newState !== EComponentState.Unloaded
+    ) {
       parameters = this.parametersForm.value;
     }
 
-    this.store$.dispatch({ type: Components.CHANGE_STATE, payload: { componentId: this.component.id, newState, parameters } });
+    this.store$.dispatch({
+      type: Components.CHANGE_STATE,
+      payload: { componentId: this.component.id, newState, parameters },
+    });
   }
 
   componentState(index, item) {
@@ -77,7 +99,11 @@ export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
   deploy(file: File, serviceUnitName: string) {
     this.store$.dispatch({
       type: Components.DEPLOY_SERVICE_UNIT,
-      payload: { file, componentId: this.component.id, serviceUnitName: serviceUnitName.trim() }
+      payload: {
+        file,
+        componentId: this.component.id,
+        serviceUnitName: serviceUnitName.trim(),
+      },
     });
   }
 }

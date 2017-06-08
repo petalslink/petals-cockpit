@@ -41,14 +41,14 @@ export const EComponentState = {
   Loaded: 'Loaded' as 'Loaded',
   Unloaded: 'Unloaded' as 'Unloaded',
   Shutdown: 'Shutdown' as 'Shutdown',
-  Unknown: 'Unknown' as 'Unknown'
+  Unknown: 'Unknown' as 'Unknown',
 };
 
 export type ComponentState = keyof typeof EComponentState;
 
 export const EComponentType = {
   BC: 'BC' as 'BC',
-  SE: 'SE' as 'SE'
+  SE: 'SE' as 'SE',
 };
 
 export type ComponentType = keyof typeof EComponentType;
@@ -71,7 +71,7 @@ export interface IComponentBackendSSE extends IComponentBackendSSECommon {
   sharedLibraries: string[];
 }
 
-export interface IComponentBackendDetails extends IComponentBackendDetailsCommon { }
+export interface IComponentBackendDetails extends IComponentBackendDetailsCommon {}
 
 export abstract class ComponentsService {
   abstract getDetailsComponent(componentId: string): Observable<Response>;
@@ -83,7 +83,12 @@ export abstract class ComponentsService {
     parameters: { [key: string]: string }
   ): Observable<Response>;
 
-  abstract deploySu(workspaceId: string, componentId: string, file: File, serviceUnitName: string): Observable<Response>;
+  abstract deploySu(
+    workspaceId: string,
+    componentId: string,
+    file: File,
+    serviceUnitName: string
+  ): Observable<Response>;
 
   abstract watchEventComponentStateChangeOk(): Observable<void>;
 
@@ -106,39 +111,61 @@ export class ComponentsServiceImpl extends ComponentsService {
     return this.http.get(`${environment.urlBackend}/components/${componentId}`);
   }
 
-  putState(workspaceId: string, componentId: string, newState: ComponentState, parameters: { [key: string]: string }) {
-    return this.http.put(`${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}`, { state: newState, parameters });
+  putState(
+    workspaceId: string,
+    componentId: string,
+    newState: ComponentState,
+    parameters: { [key: string]: string }
+  ) {
+    return this.http.put(
+      `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}`,
+      { state: newState, parameters }
+    );
   }
 
-  deploySu(workspaceId: string, componentId: string, file: File, serviceUnitName: string) {
+  deploySu(
+    workspaceId: string,
+    componentId: string,
+    file: File,
+    serviceUnitName: string
+  ) {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
     formData.append('name', serviceUnitName);
 
-    return this.http.post(`${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}/serviceunits`, formData);
+    return this.http.post(
+      `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}/serviceunits`,
+      formData
+    );
   }
 
   watchEventComponentStateChangeOk() {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.COMPONENT_STATE_CHANGE)
       .withLatestFrom(this.store$)
-      .do(([data, store]: [{ id: string, state: ComponentState }, IStore]) => {
+      .do(([data, store]: [{ id: string; state: ComponentState }, IStore]) => {
         if (data.state === EComponentState.Unloaded) {
           const component = store.components.byId[data.id];
           const container = store.containers.byId[component.containerId];
 
-          this.router.navigate(['/workspaces', store.workspaces.selectedWorkspaceId]);
+          this.router.navigate([
+            '/workspaces',
+            store.workspaces.selectedWorkspaceId,
+          ]);
 
-          this.notification.success('Component unloaded', `"${component.name}" has been unloaded`);
+          this.notification.success(
+            'Component unloaded',
+            `"${component.name}" has been unloaded`
+          );
 
           this.store$.dispatch({
             type: Components.REMOVE_COMPONENT,
-            payload: { containerId: container.id, componentId: data.id }
+            payload: { containerId: container.id, componentId: data.id },
           });
         } else {
           this.store$.dispatch({
             type: Components.CHANGE_STATE_SUCCESS,
-            payload: { componentId: data.id, newState: data.state }
+            payload: { componentId: data.id, newState: data.state },
           });
         }
       })
@@ -149,22 +176,43 @@ export class ComponentsServiceImpl extends ComponentsService {
     return this.sseService
       .subscribeToWorkspaceEvent(SseWorkspaceEvent.SA_DEPLOYED)
       .do((data: any) => {
-        const serviceAssemblies = toJavascriptMap<IServiceAssemblyBackendSSE>(data.serviceAssemblies);
-        const serviceUnits = toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits);
+        const serviceAssemblies = toJavascriptMap<IServiceAssemblyBackendSSE>(
+          data.serviceAssemblies
+        );
+        const serviceUnits = toJavascriptMap<IServiceUnitBackendSSE>(
+          data.serviceUnits
+        );
 
-        const serviceAssemby = serviceAssemblies.byId[serviceAssemblies.allIds[0]];
+        const serviceAssemby =
+          serviceAssemblies.byId[serviceAssemblies.allIds[0]];
 
-        this.notification.success('SA deployed', `"${serviceAssemby.name}" has been deployed`);
+        this.notification.success(
+          'SA deployed',
+          `"${serviceAssemby.name}" has been deployed`
+        );
 
-        const actions = serviceUnits.allIds
-          .map(id => ({ type: Components.DEPLOY_SERVICE_UNIT_SUCCESS, payload: serviceUnits.byId[id] }));
+        const actions = serviceUnits.allIds.map(id => ({
+          type: Components.DEPLOY_SERVICE_UNIT_SUCCESS,
+          payload: serviceUnits.byId[id],
+        }));
 
-        this.store$.dispatch(batchActions([
-          { type: ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS, payload: serviceAssemblies },
-          { type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS, payload: serviceUnits },
-          { type: Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS, payload: serviceAssemby },
-          ...actions
-        ]));
+        this.store$.dispatch(
+          batchActions([
+            {
+              type: ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS,
+              payload: serviceAssemblies,
+            },
+            {
+              type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS,
+              payload: serviceUnits,
+            },
+            {
+              type: Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS,
+              payload: serviceAssemby,
+            },
+            ...actions,
+          ])
+        );
       })
       .mapTo(null);
   }

@@ -15,7 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 export interface TreeElement<T extends TreeElement<T>> {
   link: string;
@@ -34,9 +41,10 @@ export interface TreeEvent<T extends TreeElement<T>> {
   selector: 'app-material-tree',
   templateUrl: './material-tree.component.html',
   styleUrls: ['./material-tree.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MaterialTreeComponent<TE extends TreeElement<TE>> implements OnInit {
+export class MaterialTreeComponent<TE extends TreeElement<TE>>
+  implements OnInit {
   // pass the tree to display
   @Input() tree;
   // pass the search to display
@@ -50,9 +58,9 @@ export class MaterialTreeComponent<TE extends TreeElement<TE>> implements OnInit
   // event when the user toggle a line
   @Output() onToggleFold = new EventEmitter<TreeEvent<TE>>();
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   get margin() {
     return this.deepLevel === 0 ? 0 : this.marginLeft;

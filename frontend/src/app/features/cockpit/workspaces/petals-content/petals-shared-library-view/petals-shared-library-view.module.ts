@@ -23,13 +23,10 @@ import { PetalsSharedLibraryViewRoutingModule } from './petals-shared-library-vi
 import { PetalsSharedLibraryOverviewComponent } from './petals-shared-library-overview/petals-shared-library-overview.component';
 
 @NgModule({
-  imports: [
-    SharedModule,
-    PetalsSharedLibraryViewRoutingModule
-  ],
+  imports: [SharedModule, PetalsSharedLibraryViewRoutingModule],
   declarations: [
     PetalsSharedLibraryViewComponent,
-    PetalsSharedLibraryOverviewComponent
-  ]
+    PetalsSharedLibraryOverviewComponent,
+  ],
 })
-export class PetalsSharedLibraryViewModule { }
+export class PetalsSharedLibraryViewModule {}

@@ -38,101 +38,170 @@ export class ContainersEffects {
     private actions$: Actions,
     private containersService: ContainersService,
     private notification: NotificationsService
-  ) { }
+  ) {}
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchContainersDetails$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  fetchContainersDetails$: Observable<Action> = this.actions$
     .ofType(Containers.FETCH_CONTAINER_DETAILS)
-    .flatMap((action: { type: string, payload: { containerId: string } }) =>
-      this.containersService.getDetailsContainer(action.payload.containerId)
+    .flatMap((action: { type: string; payload: { containerId: string } }) =>
+      this.containersService
+        .getDetailsContainer(action.payload.containerId)
         .map((res: Response) => {
           const data = res.json();
-          return { type: Containers.FETCH_CONTAINER_DETAILS_SUCCESS, payload: { containerId: action.payload.containerId, data } };
+          return {
+            type: Containers.FETCH_CONTAINER_DETAILS_SUCCESS,
+            payload: { containerId: action.payload.containerId, data },
+          };
         })
-        .catch((err) => {
+        .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in containers.effects.ts: ofType(Containers.FETCH_CONTAINER_DETAILS)');
+            console.warn(
+              'Error caught in containers.effects.ts: ofType(Containers.FETCH_CONTAINER_DETAILS)'
+            );
             console.error(err);
             console.groupEnd();
           }
 
           return Observable.of({
             type: Containers.FETCH_CONTAINER_DETAILS_ERROR,
-            payload: { containerId: action.payload.containerId }
+            payload: { containerId: action.payload.containerId },
           });
         })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) deployComponent$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  deployComponent$: Observable<Action> = this.actions$
     .ofType(Containers.DEPLOY_COMPONENT)
-    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
-    .switchMap(([action, workspaceId]: [{ type: string, payload: { file: File, containerId: string } }, string]) =>
-      this.containersService.deployComponent(workspaceId, action.payload.containerId, action.payload.file)
-        .mergeMap(_ => Observable.empty())
-        .catch((err) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(`Error caught in containers.effects: ofType(${Containers.DEPLOY_COMPONENT})`);
-            console.error(err);
-            console.groupEnd();
-          }
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
+    .switchMap(
+      (
+        [action, workspaceId]: [
+          { type: string; payload: { file: File; containerId: string } },
+          string
+        ]
+      ) =>
+        this.containersService
+          .deployComponent(
+            workspaceId,
+            action.payload.containerId,
+            action.payload.file
+          )
+          .mergeMap(_ => Observable.empty())
+          .catch(err => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                `Error caught in containers.effects: ofType(${Containers.DEPLOY_COMPONENT})`
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          this.notification.error(
-            'Deploy component failed',
-            `An error occurred when trying to deploy the file "${action.payload.file.name}"`
-          );
+            this.notification.error(
+              'Deploy component failed',
+              `An error occurred when trying to deploy the file "${action
+                .payload.file.name}"`
+            );
 
-          return Observable.of({
-            type: Containers.DEPLOY_COMPONENT_ERROR,
-            payload: { containerId: action.payload.containerId, errorDeploymentComponent: err.json().message }
-          });
-        })
+            return Observable.of({
+              type: Containers.DEPLOY_COMPONENT_ERROR,
+              payload: {
+                containerId: action.payload.containerId,
+                errorDeploymentComponent: err.json().message,
+              },
+            });
+          })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: false }) deployComponentSuccess$: Observable<void> = this.actions$
+  @Effect({ dispatch: false })
+  deployComponentSuccess$: Observable<void> = this.actions$
     .ofType(Containers.DEPLOY_COMPONENT_SUCCESS)
-    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
     .do(([{ payload }, workspaceId]: [{ payload: IComponentRow }, string]) => {
-      this.router.navigate(['workspaces', workspaceId, 'petals', 'components', payload.id]);
+      this.router.navigate([
+        'workspaces',
+        workspaceId,
+        'petals',
+        'components',
+        payload.id,
+      ]);
     })
     .mapTo(null);
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) deployServiceAssembly$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  deployServiceAssembly$: Observable<Action> = this.actions$
     .ofType(Containers.DEPLOY_SERVICE_ASSEMBLY)
-    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
-    .switchMap(([action, workspaceId]: [{ type: string, payload: { file: File, containerId: string } }, string]) =>
-      this.containersService.deployServiceAssembly(workspaceId, action.payload.containerId, action.payload.file)
-        .mergeMap(_ => Observable.empty())
-        .catch((err) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(`Error caught in containers.effects: ofType(${Containers.DEPLOY_SERVICE_ASSEMBLY})`);
-            console.error(err);
-            console.groupEnd();
-          }
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
+    .switchMap(
+      (
+        [action, workspaceId]: [
+          { type: string; payload: { file: File; containerId: string } },
+          string
+        ]
+      ) =>
+        this.containersService
+          .deployServiceAssembly(
+            workspaceId,
+            action.payload.containerId,
+            action.payload.file
+          )
+          .mergeMap(_ => Observable.empty())
+          .catch(err => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                `Error caught in containers.effects: ofType(${Containers.DEPLOY_SERVICE_ASSEMBLY})`
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          this.notification.error(
-            'Deploy service-assembly failed',
-            `An error occurred when trying to deploy the file "${action.payload.file.name}"`
-          );
+            this.notification.error(
+              'Deploy service-assembly failed',
+              `An error occurred when trying to deploy the file "${action
+                .payload.file.name}"`
+            );
 
-          return Observable.of({
-            type: Containers.DEPLOY_SERVICE_ASSEMBLY_ERROR,
-            payload: { containerId: action.payload.containerId, errorDeploymentServiceAssembly: err.json().message }
-          });
-        })
+            return Observable.of({
+              type: Containers.DEPLOY_SERVICE_ASSEMBLY_ERROR,
+              payload: {
+                containerId: action.payload.containerId,
+                errorDeploymentServiceAssembly: err.json().message,
+              },
+            });
+          })
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: false }) deployServiceAssemblySuccess$: Observable<void> = this.actions$
+  @Effect({ dispatch: false })
+  deployServiceAssemblySuccess$: Observable<void> = this.actions$
     .ofType(Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS)
-    .withLatestFrom(this.store$.select(state => state.workspaces.selectedWorkspaceId))
-    .do(([{ payload }, workspaceId]: [{ payload: IServiceAssemblyRow }, string]) => {
-      this.router.navigate(['workspaces', workspaceId, 'petals', 'service-assemblies', payload.id]);
-    })
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
+    .do(
+      (
+        [{ payload }, workspaceId]: [{ payload: IServiceAssemblyRow }, string]
+      ) => {
+        this.router.navigate([
+          'workspaces',
+          workspaceId,
+          'petals',
+          'service-assemblies',
+          payload.id,
+        ]);
+      }
+    )
     .mapTo(null);
 }

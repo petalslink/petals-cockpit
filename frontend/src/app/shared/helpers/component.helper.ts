@@ -19,38 +19,52 @@
  * @param state : the state you want to get the possible actions from. For example : 'Started'
  * @returns the possible new actions according to the state
  */
-import { ComponentState, EComponentState } from 'app/shared/services/components.service';
+import {
+  ComponentState,
+  EComponentState,
+} from 'app/shared/services/components.service';
 
-export function stateNameToPossibleActionsComponent(state: ComponentState): { actionName: string, newStateAfterAction: ComponentState }[] {
+export function stateNameToPossibleActionsComponent(
+  state: ComponentState
+): { actionName: string; newStateAfterAction: ComponentState }[] {
   switch (state) {
     case EComponentState.Shutdown:
       return [
         { actionName: 'Start', newStateAfterAction: EComponentState.Started },
-        { actionName: 'Uninstall', newStateAfterAction: EComponentState.Loaded },
-        { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded }
+        {
+          actionName: 'Uninstall',
+          newStateAfterAction: EComponentState.Loaded,
+        },
+        { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded },
       ];
 
     case EComponentState.Started:
       return [
-        { actionName: 'Stop', newStateAfterAction: EComponentState.Stopped }
+        { actionName: 'Stop', newStateAfterAction: EComponentState.Stopped },
       ];
 
     case EComponentState.Stopped:
       return [
         { actionName: 'Start', newStateAfterAction: EComponentState.Started },
-        { actionName: 'Uninstall', newStateAfterAction: EComponentState.Loaded },
-        { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded }
+        {
+          actionName: 'Uninstall',
+          newStateAfterAction: EComponentState.Loaded,
+        },
+        { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded },
       ];
 
     case EComponentState.Loaded:
       return [
-        { actionName: 'Install', newStateAfterAction: EComponentState.Shutdown },
-        { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded }
+        {
+          actionName: 'Install',
+          newStateAfterAction: EComponentState.Shutdown,
+        },
+        { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded },
       ];
 
     case EComponentState.Unknown:
       return [
-        { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded }
+        { actionName: 'Unload', newStateAfterAction: EComponentState.Unloaded },
       ];
 
     case EComponentState.Unloaded:

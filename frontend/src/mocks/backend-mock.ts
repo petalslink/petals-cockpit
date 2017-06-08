@@ -23,22 +23,22 @@ export const IMPORT_HTTP_ERROR_IP = 'IMPORT_HTTP_ERROR_IP';
 export const users = {
   admin: {
     id: 'admin',
-    name: 'Administrator'
+    name: 'Administrator',
   },
   bescudie: {
     id: 'bescudie',
-    name: 'Bertrand ESCUDIE'
+    name: 'Bertrand ESCUDIE',
   },
   mrobert: {
     id: 'mrobert',
-    name: 'Maxime ROBERT'
+    name: 'Maxime ROBERT',
   },
   cchevalier: {
     id: 'cchevalier',
-    name: 'Christophe CHEVALIER'
+    name: 'Christophe CHEVALIER',
   },
   vnoel: {
     id: 'vnoel',
-    name: 'Victor NOEL'
-  }
+    name: 'Victor NOEL',
+  },
 };
