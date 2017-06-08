@@ -23,48 +23,56 @@ const routes: Routes = [
   {
     path: '',
     // tslint:disable-next-line:max-line-length
-    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule'
+    loadChildren:
+      'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule',
   },
   {
     path: 'buses/:busId',
     // tslint:disable-next-line:max-line-length
-    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-bus-view/petals-bus-view.module#PetalsBusViewModule'
+    loadChildren:
+      'app/features/cockpit/workspaces/petals-content/petals-bus-view/petals-bus-view.module#PetalsBusViewModule',
   },
   {
     path: 'buses-in-progress',
     // tslint:disable-next-line:max-line-length
-    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule'
+    loadChildren:
+      'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule',
   },
   {
     path: 'containers/:containerId',
     // tslint:disable-next-line:max-line-length
-    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-view.module#PetalsContainerViewModule'
+    loadChildren:
+      'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-view.module#PetalsContainerViewModule',
   },
   {
     path: 'service-assemblies/:serviceAssemblyId',
     // tslint:disable-next-line:max-line-length
-    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.module#PetalsServiceAssemblyViewModule'
+    loadChildren:
+      'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.module#PetalsServiceAssemblyViewModule',
   },
   {
     path: 'components/:componentId',
     // tslint:disable-next-line:max-line-length
-    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-view.module#PetalsComponentViewModule'
+    loadChildren:
+      'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-view.module#PetalsComponentViewModule',
   },
   {
     path: 'service-units/:serviceUnitId',
     // tslint:disable-next-line:max-line-length
-    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-service-unit-view/petals-service-unit-view.module#PetalsServiceUnitViewModule'
+    loadChildren:
+      'app/features/cockpit/workspaces/petals-content/petals-service-unit-view/petals-service-unit-view.module#PetalsServiceUnitViewModule',
   },
   {
     path: 'shared-libraries/:sharedLibraryId',
     // tslint:disable-next-line:max-line-length
-    loadChildren: 'app/features/cockpit/workspaces/petals-content/petals-shared-library-view/petals-shared-library-view.module#PetalsSharedLibraryViewModule'
-  }
+    loadChildren:
+      'app/features/cockpit/workspaces/petals-content/petals-shared-library-view/petals-shared-library-view.module#PetalsSharedLibraryViewModule',
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
-  providers: []
+  providers: [],
 })
-export class PetalsContentRoutingModule { }
+export class PetalsContentRoutingModule {}

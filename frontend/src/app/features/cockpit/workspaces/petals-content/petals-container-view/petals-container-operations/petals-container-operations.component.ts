@@ -15,7 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  ChangeDetectionStrategy,
+  OnInit,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { IContainerRow } from '../../../state/containers/containers.interface';
@@ -26,27 +31,27 @@ import { Containers } from 'app/features/cockpit/workspaces/state/containers/con
   selector: 'app-petals-container-operations',
   templateUrl: './petals-container-operations.component.html',
   styleUrls: ['./petals-container-operations.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsContainerOperationsComponent implements OnInit {
   @Input() container: IContainerRow;
   public fileToDeployComponent: File = null;
   public fileToDeployServiceAssembly: File = null;
 
-  constructor(private store$: Store<IStore>) { }
+  constructor(private store$: Store<IStore>) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   deploy(whatToDeploy: 'component' | 'service-assembly', file: File) {
     if (whatToDeploy === 'component') {
       this.store$.dispatch({
         type: Containers.DEPLOY_COMPONENT,
-        payload: { file, containerId: this.container.id }
+        payload: { file, containerId: this.container.id },
       });
     } else if (whatToDeploy === 'service-assembly') {
       this.store$.dispatch({
         type: Containers.DEPLOY_SERVICE_ASSEMBLY,
-        payload: { file, containerId: this.container.id }
+        payload: { file, containerId: this.container.id },
       });
     }
   }

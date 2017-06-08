@@ -24,14 +24,11 @@ import { PetalsComponentOverviewComponent } from './petals-component-overview/pe
 import { PetalsComponentOperationsComponent } from './petals-component-operations/petals-component-operations.component';
 
 @NgModule({
-  imports: [
-    SharedModule,
-    PetalsComponentViewRoutingModule
-  ],
+  imports: [SharedModule, PetalsComponentViewRoutingModule],
   declarations: [
     PetalsComponentViewComponent,
     PetalsComponentOverviewComponent,
-    PetalsComponentOperationsComponent
-  ]
+    PetalsComponentOperationsComponent,
+  ],
 })
-export class PetalsComponentViewModule { }
+export class PetalsComponentViewModule {}

@@ -15,10 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ServiceAssembly, serviceAssembliesService } from './service-assemblies-mock';
+import {
+  ServiceAssembly,
+  serviceAssembliesService,
+} from './service-assemblies-mock';
 import { ComponentState } from 'app/shared/services/components.service';
 import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
-import { IContainerBackendSSE, IContainerBackendDetails } from 'app/shared/services/containers.service';
+import {
+  IContainerBackendSSE,
+  IContainerBackendDetails,
+} from 'app/shared/services/containers.service';
 import { sharedLibrariesService, SharedLibrary } from './shared-libraries-mock';
 import { componentsService, Component } from './components-mock';
 import { Bus } from './buses-mock';
@@ -26,7 +32,7 @@ import { Bus } from './buses-mock';
 export class Containers {
   private readonly containers = new Map<string, Container>();
 
-  constructor() { }
+  constructor() {}
 
   create(bus: Bus, name?: string) {
     const container = new Container(bus, name);
@@ -99,8 +105,14 @@ export class Container {
     const c1 = it.next().value;
     const c2 = it.next().value;
 
-    const su1 = serviceAssembly.addServiceUnit(c1, name ? `su1-${name}` : undefined);
-    const su2 = serviceAssembly.addServiceUnit(c2, name ? `su2-${name}` : undefined);
+    const su1 = serviceAssembly.addServiceUnit(
+      c1,
+      name ? `su1-${name}` : undefined
+    );
+    const su2 = serviceAssembly.addServiceUnit(
+      c2,
+      name ? `su2-${name}` : undefined
+    );
 
     c1.registerServiceUnit(su1);
     c2.registerServiceUnit(su2);
@@ -109,8 +121,16 @@ export class Container {
     return [serviceAssembly.toObj(), { ...su1.toObj(), ...su2.toObj() }];
   }
 
-  addServiceUnit(component: Component, state?: ServiceAssemblyState, name?: string) {
-    const serviceAssembly = serviceAssembliesService.create(this, name ? `sa-${name}` : undefined, state);
+  addServiceUnit(
+    component: Component,
+    state?: ServiceAssemblyState,
+    name?: string
+  ) {
+    const serviceAssembly = serviceAssembliesService.create(
+      this,
+      name ? `sa-${name}` : undefined,
+      state
+    );
     const serviceUnit = serviceAssembly.addServiceUnit(component, name);
 
     component.registerServiceUnit(serviceUnit);
@@ -133,8 +153,8 @@ export class Container {
         busId: this.bus.id,
         components: Array.from(this.components.keys()),
         serviceAssemblies: Array.from(this.serviceAssemblies.keys()),
-        sharedLibraries: Array.from(this.sharedLibraries.keys())
-      }
+        sharedLibraries: Array.from(this.sharedLibraries.keys()),
+      },
     };
   }
 
@@ -150,8 +170,8 @@ export class Container {
         'Petals ESB µKernel 4.0.2',
         'Petals Standalone Shared Memory 4.0.2',
         'OpenJDK Runtime Environment 1.7.0_111-b01 Oracle Corporation',
-        'Linux 3.16.0-4-amd64 amd64'
-      ].join('\n')
+        'Linux 3.16.0-4-amd64 amd64',
+      ].join('\n'),
     };
   }
 }

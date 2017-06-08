@@ -30,8 +30,8 @@ import { BusesInProgressComponent } from './buses-in-progress/buses-in-progress.
   declarations: [
     PetalsMenuViewComponent,
     MaterialTreeComponent,
-    BusesInProgressComponent
+    BusesInProgressComponent,
   ],
-  exports: [PetalsMenuViewComponent]
+  exports: [PetalsMenuViewComponent],
 })
-export class PetalsMenuModule { }
+export class PetalsMenuModule {}

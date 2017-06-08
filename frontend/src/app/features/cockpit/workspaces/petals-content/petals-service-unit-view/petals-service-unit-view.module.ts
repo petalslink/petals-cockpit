@@ -23,10 +23,10 @@ import { PetalsServiceUnitViewRoutingModule } from './petals-service-unit-view-r
 import { PetalsServiceUnitOverviewComponent } from './petals-service-unit-overview/petals-service-unit-overview.component';
 
 @NgModule({
-  imports: [
-    SharedModule,
-    PetalsServiceUnitViewRoutingModule
+  imports: [SharedModule, PetalsServiceUnitViewRoutingModule],
+  declarations: [
+    PetalsServiceUnitViewComponent,
+    PetalsServiceUnitOverviewComponent,
   ],
-  declarations: [PetalsServiceUnitViewComponent, PetalsServiceUnitOverviewComponent]
 })
-export class PetalsServiceUnitViewModule { }
+export class PetalsServiceUnitViewModule {}

@@ -17,7 +17,10 @@
 
 import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 import {
-  ISharedLibraryBackendSSE, ISharedLibraryBackendDetails, ISharedLibraryBackendSSECommon, ISharedLibraryBackendDetailsCommon
+  ISharedLibraryBackendSSE,
+  ISharedLibraryBackendDetails,
+  ISharedLibraryBackendSSECommon,
+  ISharedLibraryBackendDetailsCommon,
 } from 'app/shared/services/shared-libraries.service';
 
 export interface ISharedLibraryUI {
@@ -25,16 +28,18 @@ export interface ISharedLibraryUI {
   isFolded: boolean;
 }
 
-export interface ISharedLibraryRow extends ISharedLibraryUI, ISharedLibraryBackendSSE, ISharedLibraryBackendDetails { }
+export interface ISharedLibraryRow extends ISharedLibraryUI, ISharedLibraryBackendSSE, ISharedLibraryBackendDetails {}
 
-export interface ISharedLibrary extends ISharedLibraryUI, ISharedLibraryBackendSSECommon, ISharedLibraryBackendDetailsCommon { }
+export interface ISharedLibrary extends ISharedLibraryUI, ISharedLibraryBackendSSECommon, ISharedLibraryBackendDetailsCommon {}
 
 interface ISharedLibrariesCommon {
   selectedSharedLibraryId: string;
   isFetchingDetails: boolean;
 }
 
-export interface ISharedLibrariesTable extends ISharedLibrariesCommon, JsMap<ISharedLibraryRow> { }
+export interface ISharedLibrariesTable extends ISharedLibrariesCommon, JsMap<
+  ISharedLibraryRow
+> {}
 
 export interface ISharedLibraries extends ISharedLibrariesCommon {
   list: ISharedLibrary[];
@@ -48,13 +53,13 @@ export function sharedLibraryRowFactory(): ISharedLibraryRow {
     components: [],
     containerId: null,
 
-    isFolded: false
+    isFolded: false,
   };
 }
 
 export function sharedLibrariesTableFactory(): ISharedLibrariesTable {
   return Object.assign({}, emptyJavascriptMap<ISharedLibraryRow>(), {
     selectedSharedLibraryId: '',
-    isFetchingDetails: false
+    isFetchingDetails: false,
   });
 }

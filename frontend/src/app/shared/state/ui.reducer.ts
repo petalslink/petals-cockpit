@@ -24,7 +24,7 @@ import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/wor
 export class Ui {
   private static reducerName = '[Ui]';
 
-  public static reducer(ui = uiState(), {type, payload}: Action): IUi {
+  public static reducer(ui = uiState(), { type, payload }: Action): IUi {
     if (!Ui.mapActionsToMethod[type]) {
       return ui;
     }
@@ -37,7 +37,7 @@ export class Ui {
   private static setLanguage(ui: IUi, payload): IUi {
     return {
       ...ui,
-      ...<IUi>{ language: payload }
+      ...<IUi>{ language: payload },
     };
   }
 
@@ -46,7 +46,7 @@ export class Ui {
   private static toggleSidenav(ui: IUi, _payload): IUi {
     return {
       ...ui,
-      ...<IUi>{ isSidenavVisible: !ui.isSidenavVisible }
+      ...<IUi>{ isSidenavVisible: !ui.isSidenavVisible },
     };
   }
 
@@ -55,7 +55,7 @@ export class Ui {
   private static openSidenav(ui: IUi, _payload): IUi {
     return {
       ...ui,
-      ...<IUi>{ isSidenavVisible: true }
+      ...<IUi>{ isSidenavVisible: true },
     };
   }
 
@@ -67,7 +67,7 @@ export class Ui {
   private static closeSidenav(ui: IUi, _payload): IUi {
     return {
       ...ui,
-      ...<IUi>{ isSidenavVisible: false }
+      ...<IUi>{ isSidenavVisible: false },
     };
   }
 
@@ -76,7 +76,7 @@ export class Ui {
   private static openPopupWorkspacesList(ui: IUi, _payload): IUi {
     return {
       ...ui,
-      ...<IUi>{ isPopupListWorkspacesVisible: true }
+      ...<IUi>{ isPopupListWorkspacesVisible: true },
     };
   }
 
@@ -85,20 +85,33 @@ export class Ui {
   private static closePopupWorkspacesList(ui: IUi, _payload): IUi {
     return {
       ...ui,
-      ...<IUi>{ isPopupListWorkspacesVisible: false }
+      ...<IUi>{ isPopupListWorkspacesVisible: false },
     };
   }
 
   // tslint:disable-next-line:member-ordering
   public static SET_TITLES = `${Ui.reducerName} Set titles`;
-  private static setTitles(ui: IUi, payload: { titleMainPart1: number, titleMainPart2: number, titleSubPart: number }): IUi {
+  private static setTitles(
+    ui: IUi,
+    payload: {
+      titleMainPart1: number;
+      titleMainPart2: number;
+      titleSubPart: number;
+    }
+  ): IUi {
     return {
       ...ui,
       ...<IUi>{
-        titleMainPart1: (payload.titleMainPart1 ? payload.titleMainPart1 : ui.titleMainPart1),
-        titleMainPart2: (payload.titleMainPart2 ? payload.titleMainPart2 : ui.titleMainPart2),
-        titleSubPart: (payload.titleSubPart ? payload.titleSubPart : ui.titleSubPart)
-      }
+        titleMainPart1: payload.titleMainPart1
+          ? payload.titleMainPart1
+          : ui.titleMainPart1,
+        titleMainPart2: payload.titleMainPart2
+          ? payload.titleMainPart2
+          : ui.titleMainPart2,
+        titleSubPart: payload.titleSubPart
+          ? payload.titleSubPart
+          : ui.titleSubPart,
+      },
     };
   }
 
@@ -107,7 +120,7 @@ export class Ui {
       return {
         ...ui,
         isSidenavVisible: false,
-        isPopupListWorkspacesVisible: true
+        isPopupListWorkspacesVisible: true,
       };
     } else {
       return ui;
@@ -119,14 +132,16 @@ export class Ui {
   private static changeScreenSize(ui: IUi, payload): IUi {
     return {
       ...ui,
-      ...<IUi>{ screenSize: payload }
+      ...<IUi>{ screenSize: payload },
     };
   }
 
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod: { [type: string]: (t: IUi, p: any) => IUi } = {
+  private static mapActionsToMethod: {
+    [type: string]: (t: IUi, p: any) => IUi;
+  } = {
     [Ui.SET_LANGUAGE]: Ui.setLanguage,
     [Ui.TOGGLE_SIDENAV]: Ui.toggleSidenav,
     [Ui.OPEN_SIDENAV]: Ui.openSidenav,
@@ -136,6 +151,6 @@ export class Ui {
     [Ui.SET_TITLES]: Ui.setTitles,
     [Ui.CHANGE_SCREEN_SIZE]: Ui.changeScreenSize,
 
-    [Workspaces.CLOSE_WORKSPACE]: Ui.closeWorkspace
+    [Workspaces.CLOSE_WORKSPACE]: Ui.closeWorkspace,
   };
 }

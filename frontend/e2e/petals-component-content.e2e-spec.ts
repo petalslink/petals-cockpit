@@ -116,18 +116,27 @@ describe(`Petals component content`, () => {
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
 
     // and the component should have been deleted from petals tree
-    expect(workspace.treeElement(`Comp 0`, 'component').isPresent()).toBe(false);
+    expect(workspace.treeElement(`Comp 0`, 'component').isPresent()).toBe(
+      false
+    );
   });
 
   it('should have a correct SU deployment form', () => {
-    const deploy = workspace.openComponent('Comp 0').openOperations().getSUUpload();
+    const deploy = workspace
+      .openComponent('Comp 0')
+      .openOperations()
+      .getSUUpload();
 
-    expect(deploy.chooseFileButton.getText()).toEqual(`CHOOSE A FILE TO UPLOAD insert_drive_file`);
+    expect(deploy.chooseFileButton.getText()).toEqual(
+      `CHOOSE A FILE TO UPLOAD insert_drive_file`
+    );
     deploy.fileInput.sendKeys('/test.zip');
 
     expect(deploy.fileName.isDisplayed()).toBe(true);
     expect(deploy.fileName.getText()).toEqual(`test.zip`);
-    expect(deploy.chooseFileButton.getText()).toEqual(`CHANGE THE FILE insert_drive_file`);
+    expect(deploy.chooseFileButton.getText()).toEqual(
+      `CHANGE THE FILE insert_drive_file`
+    );
 
     expect(deploy.fileNameInput.getAttribute('value')).toEqual(`test`);
 
@@ -136,7 +145,10 @@ describe(`Petals component content`, () => {
   });
 
   it(`should show a detailed error if the SU deployment fails`, () => {
-    const deploy = workspace.openComponent('Comp 0').openOperations().getSUUpload();
+    const deploy = workspace
+      .openComponent('Comp 0')
+      .openOperations()
+      .getSUUpload();
 
     const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
     deploy.fileInput.sendKeys(filePath);
@@ -149,11 +161,16 @@ describe(`Petals component content`, () => {
     );
 
     expect(deploy.errorTitle.getText()).toEqual('An error occurred:');
-    expect(deploy.errorMsg.getText()).toEqual('[Mock message] An error happened when trying to deploy the service-unit');
+    expect(deploy.errorMsg.getText()).toEqual(
+      '[Mock message] An error happened when trying to deploy the service-unit'
+    );
   });
 
   it(`should deploy a service-unit`, () => {
-    const deploy = workspace.openComponent('Comp 0').openOperations().getSUUpload();
+    const deploy = workspace
+      .openComponent('Comp 0')
+      .openOperations()
+      .getSUUpload();
 
     const filePath = path.resolve(__dirname, './resources/su.zip');
 
@@ -192,7 +209,11 @@ describe(`Petals component content`, () => {
     expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
 
     // deploy the service-unit
-    page.clickAndExpectNotification(deploy.deployButton, 'SU deployed', '"su" has been deployed');
+    page.clickAndExpectNotification(
+      deploy.deployButton,
+      'SU deployed',
+      '"su" has been deployed'
+    );
 
     // check that the service-unit is now added to the tree and that we've been redirected to it
     const expectedTreeAfterDeploy = [
@@ -235,11 +256,18 @@ describe(`Petals component content`, () => {
 
   it(`should display an error if component change state (install) fails`, () => {
     // deploy a component (already tested in containers E2E tests)
-    const deploy = workspace.openContainer('Cont 0').openOperations().getComponentUpload();
+    const deploy = workspace
+      .openContainer('Cont 0')
+      .openOperations()
+      .getComponentUpload();
 
     const filePath = path.resolve(__dirname, './resources/component.zip');
     deploy.fileInput.sendKeys(filePath);
-    page.clickAndExpectNotification(deploy.deployButton, 'Component deployed', '"component" has been deployed');
+    page.clickAndExpectNotification(
+      deploy.deployButton,
+      'Component deployed',
+      '"component" has been deployed'
+    );
 
     // we should be redirected
     const ops = ComponentOverviewPage.waitAndGet().openOperations();
@@ -252,8 +280,9 @@ describe(`Petals component content`, () => {
     ops.installButton.click();
 
     // check if the error is displayed
-    expect(ops.changeStateError.getText())
-      .toEqual(`[Mock message] An error happened when trying to change the state of that component`);
+    expect(ops.changeStateError.getText()).toEqual(
+      `[Mock message] An error happened when trying to change the state of that component`
+    );
 
     // make sure the form isn't reset
     expect(inputHttpPort.getAttribute('value')).toEqual(`8080error`);

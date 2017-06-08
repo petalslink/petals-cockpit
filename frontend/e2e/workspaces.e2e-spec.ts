@@ -22,7 +22,9 @@ import { WorkspacesPage } from './pages/workspaces.po';
 
 describe(`Workspaces`, () => {
   it('should clear the dialog upon logout', () => {
-    const workspaces = page.goToWorkspacesViaLogin().loginToWorkspaces('admin', 'admin');
+    const workspaces = page
+      .goToWorkspacesViaLogin()
+      .loginToWorkspaces('admin', 'admin');
 
     page.logout();
 
@@ -32,7 +34,9 @@ describe(`Workspaces`, () => {
 
   it(`should not have any workspace selected`, () => {
     // vnoel has no lastWorkspace, so it will be redirected to /workspaces with no workspace selected
-    const workspaces = page.goToWorkspacesViaLogin().loginToWorkspaces(`vnoel`, `vnoel`);
+    const workspaces = page
+      .goToWorkspacesViaLogin()
+      .loginToWorkspaces(`vnoel`, `vnoel`);
 
     // the sidebar button should not be visible
     expect($(`app-cockpit .menu-icon`).isPresent()).toBe(false);
@@ -40,19 +44,29 @@ describe(`Workspaces`, () => {
     // check that 1 workspace is displayed
     expect(workspaces.workspacesCards.count()).toEqual(1);
 
-    const availableUsersList = 'Administrator, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER';
+    const availableUsersList =
+      'Administrator, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER';
 
     // check the current list content
-    browser.actions().mouseMove(workspaces.component.$('md-card-subtitle span.dotted')).perform();
+    browser
+      .actions()
+      .mouseMove(workspaces.component.$('md-card-subtitle span.dotted'))
+      .perform();
     expect($('md-tooltip-component').getText()).toEqual(availableUsersList);
 
     // check that no cards have a green background color
-    expect(workspaces.workspacesCard.$$(`div.background-color-light-green-x2`).count()).toEqual(0);
-    expect(workspaces.workspacesCard.$$(`div.background-color-light-green-x2 md-icon`).count()).toEqual(0);
+    expect(
+      workspaces.workspacesCard
+        .$$(`div.background-color-light-green-x2`)
+        .count()
+    ).toEqual(0);
+    expect(
+      workspaces.workspacesCard
+        .$$(`div.background-color-light-green-x2 md-icon`)
+        .count()
+    ).toEqual(0);
 
-    const workspacesAndOwners = [
-      `Workspace 1\nShared with you and 4 others.`
-    ];
+    const workspacesAndOwners = [`Workspace 1\nShared with you and 4 others.`];
 
     expect(workspaces.workspacesCards.getText()).toEqual(workspacesAndOwners);
   });
@@ -70,16 +84,29 @@ describe(`Workspaces`, () => {
 
   it(`should have a workspace selected`, () => {
     // open the workspace dialog from a workspace
-    const workspaces = page.goToLogin().loginToWorkspace(`admin`, `admin`).openWorkspacesDialog();
+    const workspaces = page
+      .goToLogin()
+      .loginToWorkspace(`admin`, `admin`)
+      .openWorkspacesDialog();
 
     // check if the card selected has a green background color
-    expect(workspaces.workspacesCard.$$(`div.background-color-light-green-x2`).count()).toEqual(1);
+    expect(
+      workspaces.workspacesCard
+        .$$(`div.background-color-light-green-x2`)
+        .count()
+    ).toEqual(1);
     // check that workspace selected has icon
-    expect(workspaces.workspacesCard.$$(`div.background-color-light-green-x2 md-icon`).count()).toEqual(1);
+    expect(
+      workspaces.workspacesCard
+        .$$(`div.background-color-light-green-x2 md-icon`)
+        .count()
+    ).toEqual(1);
   });
 
   it(`should create a new workspace and then delete it`, () => {
-    let workspaces = page.goToWorkspacesViaLogin().loginToWorkspaces(`mrobert`, `mrobert`);
+    let workspaces = page
+      .goToWorkspacesViaLogin()
+      .loginToWorkspaces(`mrobert`, `mrobert`);
 
     // check if the input form is empty
     expect(workspaces.inputName.getText()).toEqual(``);
@@ -101,7 +128,7 @@ describe(`Workspaces`, () => {
 
     const workspacesAndOwners = [
       `Workspace 1\nShared with you and 4 others.`,
-      `New workspace\nYou are the only one using this workspace.`
+      `New workspace\nYou are the only one using this workspace.`,
     ];
 
     expect(workspaces.workspacesCards.getText()).toEqual(workspacesAndOwners);
@@ -113,8 +140,11 @@ describe(`Workspaces`, () => {
     workspace.deleteButton.click();
 
     // a dialog is shown
-    expect($(`app-workspace-deletion-dialog .mat-dialog-content`).getText())
-      .toEqual(`Everything in the workspace will be deleted! Please, be certain.\nAre you sure you want to delete New workspace?`);
+    expect(
+      $(`app-workspace-deletion-dialog .mat-dialog-content`).getText()
+    ).toEqual(
+      `Everything in the workspace will be deleted! Please, be certain.\nAre you sure you want to delete New workspace?`
+    );
 
     // let's confirm the deletion
     $(`app-workspace-deletion-dialog .btn-confirm-delete-wks`).click();
@@ -126,8 +156,9 @@ describe(`Workspaces`, () => {
     // now we get a notification saying the workspace is deleted
     const confirm = $(`app-workspace-deleted-dialog .mat-dialog-content`);
     browser.wait(EC.visibilityOf(confirm), waitTimeout);
-    expect(confirm.getText())
-      .toEqual(`This workspace was deleted, click on OK to go back to the workspaces list.`);
+    expect(confirm.getText()).toEqual(
+      `This workspace was deleted, click on OK to go back to the workspaces list.`
+    );
 
     // ensure we are stil on the same workspace until we click
     expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);

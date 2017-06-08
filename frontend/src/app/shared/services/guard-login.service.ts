@@ -16,7 +16,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Router, CanActivate, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
+import {
+  Router,
+  CanActivate,
+  RouterStateSnapshot,
+  ActivatedRouteSnapshot,
+} from '@angular/router';
 import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
@@ -29,11 +34,11 @@ import { ICurrentUser } from './../interfaces/users.interface';
 
 @Injectable()
 export class GuardLoginService implements CanActivate {
-
   constructor(
     private userService: UsersService,
     private router: Router,
-    private store$: Store<IStore>) { }
+    private store$: Store<IStore>
+  ) {}
 
   canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     return this.store$
@@ -41,64 +46,79 @@ export class GuardLoginService implements CanActivate {
       .first()
       .switchMap(userId => {
         const url = state.url;
-        const isLoginPage = url.match('^\/login');
+        const isLoginPage = url.match('^/login');
 
         if (userId) {
           if (isLoginPage) {
             if (environment.debug) {
-              console.debug(`Guard Login: User already retrieved. Redirecting to /workspaces.`);
+              console.debug(
+                `Guard Login: User already retrieved. Redirecting to /workspaces.`
+              );
             }
 
             this.router.navigate(['/workspaces']);
 
             return Observable.of(false);
           } else {
-
             if (environment.debug) {
-              console.debug(`Guard App: User already retrieved. Continuing to ${url}.`);
+              console.debug(
+                `Guard App: User already retrieved. Continuing to ${url}.`
+              );
             }
 
             return Observable.of(true);
           }
         } else {
-          return this.userService.getUserInformations()
+          return this.userService
+            .getUserInformations()
             .map((res: Response) => {
               if (isLoginPage) {
                 if (environment.debug) {
-                  console.debug(`Guard Login: User already logged. Redirecting to /workspaces.`);
+                  console.debug(
+                    `Guard Login: User already logged. Redirecting to /workspaces.`
+                  );
                 }
 
                 this.store$.dispatch({
                   type: Users.CONNECT_USER_SUCCESS,
-                  payload: { user: <ICurrentUser>res.json(), navigate: true }
+                  payload: { user: <ICurrentUser>res.json(), navigate: true },
                 });
 
                 return false;
               } else {
                 if (environment.debug) {
-                  console.debug(`Guard App: User already logged. Continuing to ${url}.`);
+                  console.debug(
+                    `Guard App: User already logged. Continuing to ${url}.`
+                  );
                 }
 
                 this.store$.dispatch({
                   type: Users.CONNECT_USER_SUCCESS,
-                  payload: { user: <ICurrentUser>res.json(), navigate: false }
+                  payload: { user: <ICurrentUser>res.json(), navigate: false },
                 });
 
                 return true;
               }
-            }).catch(_ => {
+            })
+            .catch(_ => {
               if (isLoginPage) {
                 if (environment.debug) {
-                  console.debug(`Guard Login: User not logged. Continuing to /login.`);
+                  console.debug(
+                    `Guard Login: User not logged. Continuing to /login.`
+                  );
                 }
 
                 return Observable.of(true);
               } else {
                 if (environment.debug) {
-                  console.debug(`Guard App: User not logged. Redirecting to /login (and then to ${url}).`);
+                  console.debug(
+                    `Guard App: User not logged. Redirecting to /login (and then to ${url}).`
+                  );
                 }
 
-                this.router.navigate(['/login'], { queryParams: { previousUrl: url } });
+                this.router.navigate(['/login'], {
+                  queryParams: { previousUrl: url },
+                });
 
                 return Observable.of(false);
               }

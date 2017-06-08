@@ -17,14 +17,21 @@
 
 import { Component } from './components-mock';
 import { ServiceAssembly } from './service-assemblies-mock';
-import { IServiceUnitBackendSSE, IServiceUnitBackendDetails } from 'app/shared/services/service-units.service';
+import {
+  IServiceUnitBackendSSE,
+  IServiceUnitBackendDetails,
+} from 'app/shared/services/service-units.service';
 
 class ServiceUnits {
   private readonly serviceUnits = new Map<string, ServiceUnit>();
 
-  constructor() { }
+  constructor() {}
 
-  create(component: Component, serviceAssembly: ServiceAssembly, name?: string) {
+  create(
+    component: Component,
+    serviceAssembly: ServiceAssembly,
+    name?: string
+  ) {
     const serviceUnit = new ServiceUnit(component, serviceAssembly, name);
     this.serviceUnits.set(serviceUnit.id, serviceUnit);
     return serviceUnit;
@@ -45,7 +52,11 @@ export class ServiceUnit {
   public readonly component: Component;
   public readonly serviceAssembly: ServiceAssembly;
 
-  constructor(component: Component, serviceAssembly: ServiceAssembly, name?: string) {
+  constructor(
+    component: Component,
+    serviceAssembly: ServiceAssembly,
+    name?: string
+  ) {
     const i = ServiceUnit.cpt++;
     this.id = `idSu${i}`;
     this.name = name ? name : `SU ${i}`;
@@ -60,8 +71,8 @@ export class ServiceUnit {
         name: this.name,
         containerId: this.component.container.id,
         componentId: this.component.id,
-        serviceAssemblyId: this.serviceAssembly.id
-      }
+        serviceAssemblyId: this.serviceAssembly.id,
+      },
     };
   }
 

@@ -21,27 +21,40 @@ import { urlToMatch } from '../utils';
 import { waitTimeout } from '../common';
 
 export abstract class BusInProgressFields {
-
   public static readonly component = $(`app-petals-bus-in-progress-view`);
 
   public readonly component = ImportBusPage.component;
   public readonly ip = this.component.$(`input[formControlName="ip"]`);
   public readonly port = this.component.$(`input[formControlName="port"]`);
-  public readonly username = this.component.$(`input[formControlName="username"]`);
-  public readonly password = this.component.$(`input[formControlName="password"]`);
-  public readonly passphrase = this.component.$(`input[formControlName="passphrase"]`);
+  public readonly username = this.component.$(
+    `input[formControlName="username"]`
+  );
+  public readonly password = this.component.$(
+    `input[formControlName="password"]`
+  );
+  public readonly passphrase = this.component.$(
+    `input[formControlName="passphrase"]`
+  );
 
-  public readonly discardButton = this.component.$(`app-petals-bus-in-progress-view button.btn-discard-form`);
-  public readonly importButton = this.component.$(`app-petals-bus-in-progress-view button.btn-import-form`);
-  public readonly clearButton = this.component.$(`app-petals-bus-in-progress-view button.btn-clear-form`);
+  public readonly discardButton = this.component.$(
+    `app-petals-bus-in-progress-view button.btn-discard-form`
+  );
+  public readonly importButton = this.component.$(
+    `app-petals-bus-in-progress-view button.btn-import-form`
+  );
+  public readonly clearButton = this.component.$(
+    `app-petals-bus-in-progress-view button.btn-clear-form`
+  );
 
   public readonly error = this.component.$(`.error-details`);
 }
 
 export class ImportBusPage extends BusInProgressFields {
-
   static waitAndGet() {
-    browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/), waitTimeout);
+    browser.wait(
+      urlToMatch(/\/workspaces\/\w+\/petals\/buses-in-progress$/),
+      waitTimeout
+    );
     browser.wait(EC.visibilityOf(ImportBusPage.component), waitTimeout);
     return new ImportBusPage();
   }
@@ -52,9 +65,11 @@ export class ImportBusPage extends BusInProgressFields {
 }
 
 export class BusInProgressPage extends BusInProgressFields {
-
   static waitAndGet() {
-    browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/buses-in-progress\/\w+/), waitTimeout);
+    browser.wait(
+      urlToMatch(/\/workspaces\/\w+\/petals\/buses-in-progress\/\w+/),
+      waitTimeout
+    );
     browser.wait(EC.visibilityOf(BusInProgressPage.component), waitTimeout);
     return new BusInProgressPage();
   }

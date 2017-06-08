@@ -18,26 +18,30 @@
 import { FormGroup } from '@angular/forms';
 
 export const validationMessages = {
-  'ip': {
-    'required': 'Required !',
-    'isIp': 'Invalid IP format'
+  ip: {
+    required: 'Required !',
+    isIp: 'Invalid IP format',
   },
-  'port': {
-    'required': 'Required !',
-    'isPort': 'Invalid port format. Should be 0 <= port <= 65535'
+  port: {
+    required: 'Required !',
+    isPort: 'Invalid port format. Should be 0 <= port <= 65535',
   },
-  'username': {
-    'required': 'Required !'
+  username: {
+    required: 'Required !',
   },
-  'password': {
-    'required': 'Required !'
+  password: {
+    required: 'Required !',
   },
-  'passphrase': {
-    'required': 'Required !'
-  }
+  passphrase: {
+    required: 'Required !',
+  },
 };
 
-export function getFormErrors(form: FormGroup, formFields: { [key: string]: string }, _data?: any): any {
+export function getFormErrors(
+  form: FormGroup,
+  formFields: { [key: string]: string },
+  _data?: any
+): any {
   const formFieldsTmp = { ...formFields };
 
   for (const field in formFieldsTmp) {
@@ -67,7 +71,10 @@ export function disableAllFormFields(form: FormGroup) {
   _enableOrDisableAllFormFields(form, false);
 }
 
-export function _enableOrDisableAllFormFields(form: FormGroup, enable: boolean) {
+export function _enableOrDisableAllFormFields(
+  form: FormGroup,
+  enable: boolean
+) {
   for (const key in form.controls) {
     if (form.controls.hasOwnProperty(key)) {
       if (enable) {

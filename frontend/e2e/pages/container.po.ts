@@ -22,35 +22,50 @@ import { waitTimeout } from '../common';
 import { UploadComponentPage } from './upload-component.po';
 
 export abstract class ContainerPage {
-
   public static readonly component = $(`app-petals-container-view`);
 
   public readonly component = ContainerPage.component;
   public readonly title = this.component.$(`md-toolbar .title`);
 
   protected static wait() {
-    browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/containers\/\w+/), waitTimeout);
+    browser.wait(
+      urlToMatch(/\/workspaces\/\w+\/petals\/containers\/\w+/),
+      waitTimeout
+    );
     browser.wait(EC.visibilityOf(ContainerPage.component), waitTimeout);
-    browser.wait(EC.stalenessOf(ContainerPage.component.$('md-toolbar md-spinner')), waitTimeout);
+    browser.wait(
+      EC.stalenessOf(ContainerPage.component.$('md-toolbar md-spinner')),
+      waitTimeout
+    );
   }
 
   openOperations() {
-    this.component.element(by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')).click();
+    this.component
+      .element(
+        by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')
+      )
+      .click();
     return ContainerOperationPage.waitAndGet();
   }
 }
 
 export class ContainerOverviewPage extends ContainerPage {
-
-  public static readonly overview = ContainerPage.component.$(`app-petals-container-overview`);
+  public static readonly overview = ContainerPage.component.$(
+    `app-petals-container-overview`
+  );
 
   public readonly overview = ContainerOverviewPage.overview;
 
-  public readonly ip = this.overview.$(`.container-infos md-card-subtitle.container-ip`);
-  public readonly port = this.overview.$(`.container-infos md-card-subtitle.container-port`);
+  public readonly ip = this.overview.$(
+    `.container-infos md-card-subtitle.container-ip`
+  );
+  public readonly port = this.overview.$(
+    `.container-infos md-card-subtitle.container-port`
+  );
 
-  public readonly systemInfo = this.overview.$(`md-card md-card-content.system-info`);
-
+  public readonly systemInfo = this.overview.$(
+    `md-card md-card-content.system-info`
+  );
 
   static waitAndGet() {
     super.wait();
@@ -64,8 +79,9 @@ export class ContainerOverviewPage extends ContainerPage {
 }
 
 export class ContainerOperationPage extends ContainerPage {
-
-  public static readonly operations = ContainerPage.component.$(`app-petals-container-operations`);
+  public static readonly operations = ContainerPage.component.$(
+    `app-petals-container-operations`
+  );
 
   public readonly operations = ContainerOperationPage.operations;
 
@@ -75,7 +91,10 @@ export class ContainerOperationPage extends ContainerPage {
 
   static waitAndGet() {
     super.wait();
-    browser.wait(EC.visibilityOf(ContainerOperationPage.operations), waitTimeout);
+    browser.wait(
+      EC.visibilityOf(ContainerOperationPage.operations),
+      waitTimeout
+    );
     return new ContainerOperationPage();
   }
 

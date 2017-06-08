@@ -29,7 +29,9 @@ export class ServiceUnitsServiceMock extends ServiceUnitsServiceImpl {
   }
 
   getDetailsServiceUnit(serviceUnitId: string) {
-    const detailsServiceUnit = serviceUnitsService.get(serviceUnitId).getDetails();
+    const detailsServiceUnit = serviceUnitsService
+      .get(serviceUnitId)
+      .getDetails();
 
     return helper.responseBody(detailsServiceUnit);
   }

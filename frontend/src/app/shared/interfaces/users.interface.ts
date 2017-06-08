@@ -16,17 +16,20 @@
  */
 
 import { environment } from 'environments/environment';
-import { IUserBackend, IUserBackendCommon } from 'app/shared/services/users.service';
+import {
+  IUserBackend,
+  IUserBackendCommon,
+} from 'app/shared/services/users.service';
 
-export interface IUserUI { }
+export interface IUserUI {}
 
 // used within table
-export interface IUserRow extends IUserUI, IUserBackend { }
+export interface IUserRow extends IUserUI, IUserBackend {}
 
 // used in generated views
-export interface IUser extends IUserBackendCommon { }
+export interface IUser extends IUserBackendCommon {}
 
-export interface ICurrentUser extends IUserRow, IUser { }
+export interface ICurrentUser extends IUserRow, IUser {}
 
 interface IUsersCommon {
   connectedUserId: string;
@@ -42,7 +45,7 @@ export interface IUsersTableOnly {
   allIds: string[];
 }
 
-export interface IUsersTable extends IUsersCommon, IUsersTableOnly { }
+export interface IUsersTable extends IUsersCommon, IUsersTableOnly {}
 
 export interface IUsers extends IUsersCommon {
   list: IUser[];
@@ -52,7 +55,7 @@ export function userRowFactory(): IUserRow {
   return {
     id: null,
     name: null,
-    lastWorkspace: undefined
+    lastWorkspace: undefined,
   };
 }
 
@@ -66,6 +69,6 @@ export function usersTableFactory(): IUsersTable {
     connectionFailed: false,
 
     byId: {},
-    allIds: []
+    allIds: [],
   };
 }

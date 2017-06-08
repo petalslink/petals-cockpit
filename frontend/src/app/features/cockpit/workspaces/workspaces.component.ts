@@ -24,18 +24,18 @@ import { Ui } from 'app/shared/state/ui.reducer';
 @Component({
   selector: 'app-workspaces',
   templateUrl: './workspaces.component.html',
-  styleUrls: ['./workspaces.component.scss']
+  styleUrls: ['./workspaces.component.scss'],
 })
 export class WorkspacesComponent implements OnInit, OnDestroy {
-
-  constructor(
-    private store$: Store<IStore>
-  ) { }
+  constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals Cockpit', titleMainPart2: '' } });
+    this.store$.dispatch({
+      type: Ui.SET_TITLES,
+      payload: { titleMainPart1: 'Petals Cockpit', titleMainPart2: '' },
+    });
     this.store$.dispatch({ type: Ui.OPEN_POPUP_WORKSPACES_LIST });
   }
 
-  ngOnDestroy() { }
+  ngOnDestroy() {}
 }

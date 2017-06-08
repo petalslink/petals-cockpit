@@ -18,8 +18,12 @@
 // generate a UUID
 export function generateUuidV4(a = null) {
   /* tslint:disable */
-  return a ? (a ^ Math.random() * 16 >> a / 4)
-    .toString(16) : (<any>[1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, generateUuidV4);
+  return a
+    ? (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
+    : ((<any>[1e7]) + -1e3 + -4e3 + -8e3 + -1e11).replace(
+        /[018]/g,
+        generateUuidV4
+      );
   /* tslint:enable */
 }
 
@@ -45,5 +49,5 @@ export function arrayEquals<T extends [void]>(ps: T, ns: T): boolean {
 }
 
 export function isNot(e: object): (object) => boolean {
-  return (e2) => e !== e2;
+  return e2 => e !== e2;
 }

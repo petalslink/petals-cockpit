@@ -29,34 +29,51 @@ import { ServiceAssemblyOverviewPage } from './service-assembly.po';
 import { SharedLibraryOverviewPage } from './shared-library.po';
 
 export abstract class WorkspacePage {
-
   public static readonly component = $(`app-cockpit`);
   public static readonly sidenav = WorkspacePage.component.$('md-sidenav');
-  public static readonly workspaceButton = WorkspacePage.sidenav.$('button.workspace-name');
+  public static readonly workspaceButton = WorkspacePage.sidenav.$(
+    'button.workspace-name'
+  );
 
   public readonly component = WorkspacePage.component;
   public readonly sidenav = WorkspacePage.sidenav;
   public readonly addBusButton = this.sidenav.$(`a.btn-add-bus`);
-  public readonly changeWorkspaceButton = this.sidenav.$(`button.change-workspace`);
-  public readonly busesInProgress = this.sidenav.$$(`app-buses-in-progress md-nav-list a`);
+  public readonly changeWorkspaceButton = this.sidenav.$(
+    `button.change-workspace`
+  );
+  public readonly busesInProgress = this.sidenav.$$(
+    `app-buses-in-progress md-nav-list a`
+  );
 
   static wait(expectedName?: Matcher) {
     browser.wait(urlToMatch(/\/workspaces\/\w+$/), waitTimeout);
 
     browser.wait(EC.visibilityOf(this.component), waitTimeout);
-    browser.wait(EC.visibilityOf(this.component.$(`md-sidenav.mat-sidenav-opened`)), waitTimeout);
-    browser.wait(EC.stalenessOf(this.component.$('md-toolbar md-spinner')), waitTimeout);
+    browser.wait(
+      EC.visibilityOf(this.component.$(`md-sidenav.mat-sidenav-opened`)),
+      waitTimeout
+    );
+    browser.wait(
+      EC.stalenessOf(this.component.$('md-toolbar md-spinner')),
+      waitTimeout
+    );
 
     let test = EC.elementToBeClickable(this.workspaceButton);
     if (expectedName) {
-      test = EC.and(test, textToMatchInElement(this.workspaceButton, expectedName));
+      test = EC.and(
+        test,
+        textToMatchInElement(this.workspaceButton, expectedName)
+      );
     }
 
     browser.wait(test, waitTimeout);
   }
 
   openWorkspacesDialog() {
-    browser.wait(EC.elementToBeClickable(this.changeWorkspaceButton), waitTimeout);
+    browser.wait(
+      EC.elementToBeClickable(this.changeWorkspaceButton),
+      waitTimeout
+    );
     this.changeWorkspaceButton.click();
     return WorkspacesPage.waitAndGet(true);
   }
@@ -74,14 +91,23 @@ export abstract class WorkspacePage {
 
   treeElement(identifier: string | number, type: string) {
     if (typeof identifier === 'string') {
-      return this.sidenav.element(by.cssContainingText(`app-material-tree a.workspace-element-type-${type} span`, identifier));
+      return this.sidenav.element(
+        by.cssContainingText(
+          `app-material-tree a.workspace-element-type-${type} span`,
+          identifier
+        )
+      );
     } else {
-      return this.sidenav.$$(`app-material-tree md-nav-list a.workspace-element-type-${type}`).get(identifier);
+      return this.sidenav
+        .$$(`app-material-tree md-nav-list a.workspace-element-type-${type}`)
+        .get(identifier);
     }
   }
 
   treeElementFolder(identifier: string | number, type: string) {
-    return this.treeElement(identifier, type).$('md-icon[aria-label="arrow_drop_down"]');
+    return this.treeElement(identifier, type).$(
+      'md-icon[aria-label="arrow_drop_down"]'
+    );
   }
 
   openBus(identifier: string | number) {
@@ -121,30 +147,49 @@ export abstract class WorkspacePage {
   }
 
   getWorkspaceTree() {
-    return this.sidenav.$$('app-material-tree md-nav-list a div > span').getText()
-      // getText on element.all is wrongly type, it should be a string[]
-      .then((elements: any) => elements as string[]);
+    return (
+      this.sidenav
+        .$$('app-material-tree md-nav-list a div > span')
+        .getText()
+        // getText on element.all is wrongly type, it should be a string[]
+        .then((elements: any) => elements as string[])
+    );
   }
 
   getHighlightedElement() {
-    return this.sidenav.$$('app-material-tree md-nav-list .highlight').getText()
-      // getText on element.all is wrongly type, it should be a string[]
-      .then((elements: any) => elements as string[]);
+    return (
+      this.sidenav
+        .$$('app-material-tree md-nav-list .highlight')
+        .getText()
+        // getText on element.all is wrongly type, it should be a string[]
+        .then((elements: any) => elements as string[])
+    );
   }
 }
 
 export class WorkspaceOverviewPage extends WorkspacePage {
-
   public readonly component = $(`app-workspace`);
   public readonly title = this.component.$(`md-toolbar-row .title`);
   public readonly deleteButton = this.component.$(`.btn-delete-wks`);
 
-  public readonly description = this.component.$(`md-card-content.workspace-description > span`);
-  public readonly editButton = this.component.$(`.workspace-description button`);
-  public readonly descriptionArea = this.component.$(`.workspace-description-edit textarea`);
-  public readonly descriptionPreview = this.component.$(`.workspace-description-edit md-card-subtitle span.workspace-description-preview`);
-  public readonly descriptionCancel = this.component.$(`button.workspace-description-edit-cancel`);
-  public readonly descriptionSubmit = this.component.$(`button.workspace-description-edit-submit`);
+  public readonly description = this.component.$(
+    `md-card-content.workspace-description > span`
+  );
+  public readonly editButton = this.component.$(
+    `.workspace-description button`
+  );
+  public readonly descriptionArea = this.component.$(
+    `.workspace-description-edit textarea`
+  );
+  public readonly descriptionPreview = this.component.$(
+    `.workspace-description-edit md-card-subtitle span.workspace-description-preview`
+  );
+  public readonly descriptionCancel = this.component.$(
+    `button.workspace-description-edit-cancel`
+  );
+  public readonly descriptionSubmit = this.component.$(
+    `button.workspace-description-edit-submit`
+  );
 
   public readonly users = $(`app-workspace .workspace-users`);
 

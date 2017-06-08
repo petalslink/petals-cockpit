@@ -34,7 +34,7 @@ import { Containers } from 'app/features/cockpit/workspaces/state/containers/con
 @Component({
   selector: 'app-petals-bus-view',
   templateUrl: './petals-bus-view.component.html',
-  styleUrls: ['./petals-bus-view.component.scss']
+  styleUrls: ['./petals-bus-view.component.scss'],
 })
 export class PetalsBusViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
@@ -47,10 +47,13 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
     private store$: Store<IStore>,
     private route: ActivatedRoute,
     public dialog: MdDialog
-  ) { }
+  ) {}
 
   ngOnInit() {
-    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Bus' } });
+    this.store$.dispatch({
+      type: Ui.SET_TITLES,
+      payload: { titleMainPart1: 'Petals', titleMainPart2: 'Bus' },
+    });
 
     this.workspaceId$ = this.route.paramMap
       .map(p => p.get('workspaceId'))
@@ -63,13 +66,27 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
       .map(pm => pm.get('busId'))
       .takeUntil(this.onDestroy$)
       .do(busId => {
-        this.store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId } });
-        this.store$.dispatch({ type: Buses.FETCH_BUS_DETAILS, payload: { busId } });
+        this.store$.dispatch({
+          type: Buses.SET_CURRENT_BUS,
+          payload: { busId },
+        });
+        this.store$.dispatch({
+          type: Buses.FETCH_BUS_DETAILS,
+          payload: { busId },
+        });
       })
-      .switchMap(busId => this.containers$
-        .first()
-        .do(cs => cs.forEach(c => this.store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: c.id } })))
-        .map(_ => busId)
+      .switchMap(busId =>
+        this.containers$
+          .first()
+          .do(cs =>
+            cs.forEach(c =>
+              this.store$.dispatch({
+                type: Containers.FETCH_CONTAINER_DETAILS,
+                payload: { containerId: c.id },
+              })
+            )
+          )
+          .map(_ => busId)
       )
       .subscribe();
   }
@@ -78,7 +95,10 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    this.store$.dispatch({ type: Buses.SET_CURRENT_BUS, payload: { busId: '' } });
+    this.store$.dispatch({
+      type: Buses.SET_CURRENT_BUS,
+      payload: { busId: '' },
+    });
   }
 
   openDeletionDialog() {
@@ -87,11 +107,13 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
       .switchMap(b =>
         this.dialog
           .open(BusDeleteDialogComponent, {
-            data: { bus: b }
+            data: { bus: b },
           })
           .afterClosed()
           .filter((result: boolean) => result)
-          .do(_ => this.store$.dispatch({ type: Buses.DELETE_BUS, payload: b.id }))
+          .do(_ =>
+            this.store$.dispatch({ type: Buses.DELETE_BUS, payload: b.id })
+          )
       )
       .subscribe();
   }
@@ -119,12 +141,14 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
       </div>
     </div>
   `,
-  styles: ['md-dialog-content { height: 100%; } .central-content { padding: 24px; }']
+  styles: [
+    'md-dialog-content { height: 100%; } .central-content { padding: 24px; }',
+  ],
 })
 export class BusDeleteDialogComponent {
   constructor(
     public dialogRef: MdDialogRef<BusDeleteDialogComponent>,
     // TODO add some type for data when https://github.com/angular/angular/issues/15424 is fixed
     @Inject(MD_DIALOG_DATA) public data: any
-  ) { }
+  ) {}
 }

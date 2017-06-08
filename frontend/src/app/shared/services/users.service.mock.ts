@@ -21,28 +21,31 @@ import { UsersService, IUserLogin, IUserSetup } from './users.service';
 import { ICurrentUser } from './../interfaces/users.interface';
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
-import { users, CORRECT_SETUP_TOKEN, GONE_SETUP_TOKEN } from './../../../mocks/backend-mock';
+import {
+  users,
+  CORRECT_SETUP_TOKEN,
+  GONE_SETUP_TOKEN,
+} from './../../../mocks/backend-mock';
 
 @Injectable()
 export class UsersServiceMock extends UsersService {
-
   private static users = {
     admin: {
       ...users.admin,
-      lastWorkspace: 'idWks0'
+      lastWorkspace: 'idWks0',
     },
     vnoel: {
       ...users.vnoel,
-      lastWorkspace: ''
+      lastWorkspace: '',
     },
     mrobert: {
       ...users.mrobert,
-      lastWorkspace: ''
+      lastWorkspace: '',
     },
     bescudie: {
       ...users.bescudie,
-      lastWorkspace: ''
-    }
+      lastWorkspace: '',
+    },
   };
 
   private currentUser: ICurrentUser = null;
@@ -59,7 +62,10 @@ export class UsersServiceMock extends UsersService {
   }
 
   connectUser(user: IUserLogin) {
-    if (UsersServiceMock.users[user.username] && user.username === user.password) {
+    if (
+      UsersServiceMock.users[user.username] &&
+      user.username === user.password
+    ) {
       this.currentUser = UsersServiceMock.users[user.username];
       return helper.responseBody(this.currentUser);
     }

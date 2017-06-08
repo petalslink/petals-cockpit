@@ -15,7 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import { IBusRow } from '../../../state/buses/buses.interface';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
@@ -24,7 +29,7 @@ import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/
   selector: 'app-petals-bus-overview',
   templateUrl: './petals-bus-overview.component.html',
   styleUrls: ['./petals-bus-overview.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsBusOverviewComponent implements OnInit {
   @Input() bus: IBusRow;
@@ -48,8 +53,7 @@ export class PetalsBusOverviewComponent implements OnInit {
     paginationType: 'fraction',
   };
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 }

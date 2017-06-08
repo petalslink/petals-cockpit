@@ -22,61 +22,70 @@ import { emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 
 describe(`Workspaces reducer`, () => {
   it(`should have a default value`, () => {
-    expect(Workspaces.reducer(undefined, { type: `init`, payload: `` }))
-      .toEqual({
-        selectedWorkspaceId: '',
+    expect(
+      Workspaces.reducer(undefined, { type: `init`, payload: `` })
+    ).toEqual({
+      selectedWorkspaceId: '',
 
-        isAddingWorkspace: false,
-        isFetchingWorkspaces: false,
-        searchPetals: '',
+      isAddingWorkspace: false,
+      isFetchingWorkspaces: false,
+      searchPetals: '',
 
-        isSelectedWorkspaceDeleted: false,
-        isSelectedWorkspaceFetched: false,
+      isSelectedWorkspaceDeleted: false,
+      isSelectedWorkspaceFetched: false,
 
-        byId: {},
-        allIds: []
-      });
+      byId: {},
+      allIds: [],
+    });
   });
 
   describe(Workspaces.FETCH_WORKSPACES, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACES).toEqual(`[Workspaces] Fetch workspaces`);
+      expect(Workspaces.FETCH_WORKSPACES).toEqual(
+        `[Workspaces] Fetch workspaces`
+      );
     });
 
     it(`should set the isFetchingWorkspaces variable to true`, () => {
       const initialState: any = {
         keepPreviousValues: '',
-        isFetchingWorkspaces: false
+        isFetchingWorkspaces: false,
       };
 
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.FETCH_WORKSPACES,
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.FETCH_WORKSPACES,
+        })
+      ).toEqual({
         keepPreviousValues: '',
-        isFetchingWorkspaces: true
+        isFetchingWorkspaces: true,
       });
     });
   });
 
   describe(Workspaces.FETCH_WORKSPACES_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACES_SUCCESS).toEqual(`[Workspaces] Fetch workspaces success`);
+      expect(Workspaces.FETCH_WORKSPACES_SUCCESS).toEqual(
+        `[Workspaces] Fetch workspaces success`
+      );
     });
 
     it(`should set the isFetchingWorkspaces variable to false`, () => {
       const initialState: any = {
         ...emptyJavascriptMap(),
         keepPreviousValues: '',
-        isFetchingWorkspaces: true
+        isFetchingWorkspaces: true,
       };
 
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.FETCH_WORKSPACES_SUCCESS,
-        payload: emptyJavascriptMap()
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.FETCH_WORKSPACES_SUCCESS,
+          payload: emptyJavascriptMap(),
+        })
+      ).toEqual({
         ...emptyJavascriptMap(),
         keepPreviousValues: '',
-        isFetchingWorkspaces: false
+        isFetchingWorkspaces: false,
       });
     });
 
@@ -84,90 +93,74 @@ describe(`Workspaces reducer`, () => {
       const initialState: any = {
         ...emptyJavascriptMap(),
         keepPreviousValues: '',
-        isFetchingWorkspaces: true
+        isFetchingWorkspaces: true,
       };
 
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.FETCH_WORKSPACES_SUCCESS,
-        payload: {
-          byId: {
-            idWks0: {
-              id: 'idWks0',
-              name: 'Workspace 0',
-              users: [
-                'admin'
-              ]
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.FETCH_WORKSPACES_SUCCESS,
+          payload: {
+            byId: {
+              idWks0: {
+                id: 'idWks0',
+                name: 'Workspace 0',
+                users: ['admin'],
+              },
+              idWks1: {
+                id: 'idWks1',
+                name: 'Workspace 1',
+                users: ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'],
+              },
             },
-            idWks1: {
-              id: 'idWks1',
-              name: 'Workspace 1',
-              users: [
-                'admin',
-                'bescudie',
-                'mrobert',
-                'cchevalier',
-                'vnoel'
-              ]
-            }
+            allIds: ['idWks0', 'idWks1'],
           },
-          allIds: [
-            'idWks0',
-            'idWks1'
-          ]
-        }
-      })).toEqual({
+        })
+      ).toEqual({
         keepPreviousValues: '',
         isFetchingWorkspaces: false,
         byId: {
           idWks0: {
             id: 'idWks0',
             name: 'Workspace 0',
-            users: [
-              'admin'
-            ],
+            users: ['admin'],
             isRemoving: false,
             isFetchingDetails: false,
-            isSettingDescription: false
+            isSettingDescription: false,
           },
           idWks1: {
             id: 'idWks1',
             name: 'Workspace 1',
-            users: [
-              'admin',
-              'bescudie',
-              'mrobert',
-              'cchevalier',
-              'vnoel'
-            ],
+            users: ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'],
             isRemoving: false,
             isFetchingDetails: false,
-            isSettingDescription: false
-          }
+            isSettingDescription: false,
+          },
         },
-        allIds: [
-          'idWks0',
-          'idWks1'
-        ]
+        allIds: ['idWks0', 'idWks1'],
       });
     });
   });
 
   describe(Workspaces.FETCH_WORKSPACES_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACES_FAILED).toEqual(`[Workspaces] Fetch workspaces failed`);
+      expect(Workspaces.FETCH_WORKSPACES_FAILED).toEqual(
+        `[Workspaces] Fetch workspaces failed`
+      );
     });
 
     it(`should set the isFetchingWorkspaces variable to false`, () => {
       const initialState: any = {
         keepPreviousValues: '',
-        isFetchingWorkspaces: true
+        isFetchingWorkspaces: true,
       };
 
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.FETCH_WORKSPACES_FAILED,
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.FETCH_WORKSPACES_FAILED,
+        })
+      ).toEqual({
         keepPreviousValues: '',
-        isFetchingWorkspaces: false
+        isFetchingWorkspaces: false,
       });
     });
   });
@@ -179,22 +172,26 @@ describe(`Workspaces reducer`, () => {
 
     const initialState: any = {
       keepPreviousValues: '',
-      isAddingWorkspace: false
+      isAddingWorkspace: false,
     };
 
     it(`should set the isAddingWorkspace variable to true`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.POST_WORKSPACE,
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.POST_WORKSPACE,
+        })
+      ).toEqual({
         keepPreviousValues: '',
-        isAddingWorkspace: true
+        isAddingWorkspace: true,
       });
     });
   });
 
   describe(Workspaces.POST_WORKSPACE_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.POST_WORKSPACE_SUCCESS).toEqual(`[Workspaces] Post workspace success`);
+      expect(Workspaces.POST_WORKSPACE_SUCCESS).toEqual(
+        `[Workspaces] Post workspace success`
+      );
     });
 
     it(`should add a workspace if it's a new one`, () => {
@@ -202,7 +199,7 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         isAddingWorkspace: true,
         byId: { keepPreviousValues: '' },
-        allIds: []
+        allIds: [],
       };
 
       const reducer = Workspaces.reducer(initialState, {
@@ -210,106 +207,92 @@ describe(`Workspaces reducer`, () => {
         payload: {
           id: 'idWorkspace1',
           name: 'Workspace 1',
-          users: [
-            'idUser1',
-            'idUser2',
-            'idUser3'
-          ]
-        }
+          users: ['idUser1', 'idUser2', 'idUser3'],
+        },
       });
 
-      expect(reducer)
-        .toEqual({
+      expect(reducer).toEqual({
+        keepPreviousValues: '',
+        isAddingWorkspace: false,
+        byId: {
           keepPreviousValues: '',
-          isAddingWorkspace: false,
-          byId: {
-            keepPreviousValues: '',
-            idWorkspace1: {
-              id: 'idWorkspace1',
-              name: 'Workspace 1',
-              users: [
-                'idUser1',
-                'idUser2',
-                'idUser3'
-              ],
-              isRemoving: false,
-              isFetchingDetails: false,
-              isSettingDescription: false
-            }
+          idWorkspace1: {
+            id: 'idWorkspace1',
+            name: 'Workspace 1',
+            users: ['idUser1', 'idUser2', 'idUser3'],
+            isRemoving: false,
+            isFetchingDetails: false,
+            isSettingDescription: false,
           },
-          allIds: ['idWorkspace1']
-        });
+        },
+        allIds: ['idWorkspace1'],
+      });
 
-      expect(Workspaces.reducer(reducer, {
-        type: Workspaces.POST_WORKSPACE_SUCCESS,
-        payload: {
-          id: 'idWorkspace2',
-          name: 'Workspace 2',
-          users: [
-            'idUser4',
-            'idUser5',
-            'idUser6'
-          ]
-        }
-      }))
-        .toEqual({
-          keepPreviousValues: '',
-          isAddingWorkspace: false,
-          byId: {
-            keepPreviousValues: '',
-            idWorkspace1: {
-              id: 'idWorkspace1',
-              name: 'Workspace 1',
-              users: [
-                'idUser1',
-                'idUser2',
-                'idUser3'
-              ],
-              isRemoving: false,
-              isFetchingDetails: false,
-              isSettingDescription: false
-            },
-            idWorkspace2: {
-              id: 'idWorkspace2',
-              name: 'Workspace 2',
-              users: [
-                'idUser4',
-                'idUser5',
-                'idUser6'
-              ],
-              isRemoving: false,
-              isFetchingDetails: false,
-              isSettingDescription: false
-            }
+      expect(
+        Workspaces.reducer(reducer, {
+          type: Workspaces.POST_WORKSPACE_SUCCESS,
+          payload: {
+            id: 'idWorkspace2',
+            name: 'Workspace 2',
+            users: ['idUser4', 'idUser5', 'idUser6'],
           },
-          allIds: ['idWorkspace1', 'idWorkspace2']
-        });
+        })
+      ).toEqual({
+        keepPreviousValues: '',
+        isAddingWorkspace: false,
+        byId: {
+          keepPreviousValues: '',
+          idWorkspace1: {
+            id: 'idWorkspace1',
+            name: 'Workspace 1',
+            users: ['idUser1', 'idUser2', 'idUser3'],
+            isRemoving: false,
+            isFetchingDetails: false,
+            isSettingDescription: false,
+          },
+          idWorkspace2: {
+            id: 'idWorkspace2',
+            name: 'Workspace 2',
+            users: ['idUser4', 'idUser5', 'idUser6'],
+            isRemoving: false,
+            isFetchingDetails: false,
+            isSettingDescription: false,
+          },
+        },
+        allIds: ['idWorkspace1', 'idWorkspace2'],
+      });
     });
   });
 
   describe(Workspaces.POST_WORKSPACE_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.POST_WORKSPACE_FAILED).toEqual(`[Workspaces] Post workspace failed`);
+      expect(Workspaces.POST_WORKSPACE_FAILED).toEqual(
+        `[Workspaces] Post workspace failed`
+      );
     });
 
     const initialState: any = {
       keepPreviousValues: '',
-      isAddingWorkspace: true
+      isAddingWorkspace: true,
     };
 
     it(`should set the isAddingWorkspace variable to false`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.POST_WORKSPACE_FAILED,
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.POST_WORKSPACE_FAILED,
+        })
+      ).toEqual({
         keepPreviousValues: '',
-        isAddingWorkspace: false
+        isAddingWorkspace: false,
       });
     });
   });
 
   describe(Workspaces.FETCH_WORKSPACE, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACE).toEqual(`[Workspaces] Fetch workspace`);
+      expect(Workspaces.FETCH_WORKSPACE).toEqual(
+        `[Workspaces] Fetch workspace`
+      );
     });
 
     it(`should select the workspace if it's a new one and mark it as not fetched`, () => {
@@ -318,44 +301,46 @@ describe(`Workspaces reducer`, () => {
         byId: {
           keepPreviousValues: '',
         },
-        allIds: []
+        allIds: [],
       };
 
       const reducer = Workspaces.reducer(initialState, {
         type: Workspaces.FETCH_WORKSPACE,
-        payload: 'idWorkspace1'
+        payload: 'idWorkspace1',
       });
 
-      expect(reducer)
-        .toEqual({
+      expect(reducer).toEqual({
+        keepPreviousValues: '',
+        selectedWorkspaceId: 'idWorkspace1',
+        isSelectedWorkspaceFetched: false,
+        byId: {
           keepPreviousValues: '',
-          selectedWorkspaceId: 'idWorkspace1',
-          isSelectedWorkspaceFetched: false,
-          byId: {
-            keepPreviousValues: ''
-          },
-          allIds: []
-        });
+        },
+        allIds: [],
+      });
 
-      expect(Workspaces.reducer(reducer, {
-        type: Workspaces.FETCH_WORKSPACE,
-        payload: 'idWorkspace2'
-      }))
-        .toEqual({
+      expect(
+        Workspaces.reducer(reducer, {
+          type: Workspaces.FETCH_WORKSPACE,
+          payload: 'idWorkspace2',
+        })
+      ).toEqual({
+        keepPreviousValues: '',
+        selectedWorkspaceId: 'idWorkspace2',
+        isSelectedWorkspaceFetched: false,
+        byId: {
           keepPreviousValues: '',
-          selectedWorkspaceId: 'idWorkspace2',
-          isSelectedWorkspaceFetched: false,
-          byId: {
-            keepPreviousValues: ''
-          },
-          allIds: []
-        });
+        },
+        allIds: [],
+      });
     });
   });
 
   describe(Workspaces.FETCH_WORKSPACE_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACE_SUCCESS).toEqual(`[Workspaces] Fetch workspace success`);
+      expect(Workspaces.FETCH_WORKSPACE_SUCCESS).toEqual(
+        `[Workspaces] Fetch workspace success`
+      );
     });
 
     it(`should add a workspace if it's a new one (also in allIds variable) and set correct variables`, () => {
@@ -363,9 +348,9 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         selectedWorkspaceId: 'idWks1',
         byId: {
-          keepPreviousValues: ''
+          keepPreviousValues: '',
         },
-        allIds: []
+        allIds: [],
       };
 
       const reducer1 = Workspaces.reducer(initialState, {
@@ -373,15 +358,9 @@ describe(`Workspaces reducer`, () => {
         payload: {
           id: 'idWks1',
           name: 'Workspace 1',
-          users: [
-            'admin',
-            'bescudie',
-            'mrobert',
-            'cchevalier',
-            'vnoel'
-          ],
-          description: 'desc'
-        }
+          users: ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'],
+          description: 'desc',
+        },
       });
 
       expect(reducer1).toEqual({
@@ -393,23 +372,20 @@ describe(`Workspaces reducer`, () => {
           idWks1: {
             id: 'idWks1',
             name: 'Workspace 1',
-            users: [
-              'admin',
-              'bescudie',
-              'mrobert',
-              'cchevalier',
-              'vnoel'
-            ],
+            users: ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'],
             description: 'desc',
             isRemoving: false,
             isFetchingDetails: false,
-            isSettingDescription: false
-          }
+            isSettingDescription: false,
+          },
         },
-        allIds: ['idWks1']
+        allIds: ['idWks1'],
       });
 
-      const reducer2 = Workspaces.reducer(reducer1, { type: Workspaces.FETCH_WORKSPACE, payload: 'idWks2' });
+      const reducer2 = Workspaces.reducer(reducer1, {
+        type: Workspaces.FETCH_WORKSPACE,
+        payload: 'idWks2',
+      });
 
       const reducer3 = Workspaces.reducer(reducer2, {
         type: Workspaces.FETCH_WORKSPACE_SUCCESS,
@@ -418,7 +394,7 @@ describe(`Workspaces reducer`, () => {
           name: 'Workspace 2',
           users: ['admin2'],
           description: 'desc',
-        }
+        },
       });
 
       expect(reducer3).toEqual({
@@ -430,17 +406,11 @@ describe(`Workspaces reducer`, () => {
           idWks1: {
             id: 'idWks1',
             name: 'Workspace 1',
-            users: [
-              'admin',
-              'bescudie',
-              'mrobert',
-              'cchevalier',
-              'vnoel'
-            ],
+            users: ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'],
             description: 'desc',
             isRemoving: false,
             isFetchingDetails: false,
-            isSettingDescription: false
+            isSettingDescription: false,
           },
           idWks2: {
             id: 'idWks2',
@@ -449,10 +419,10 @@ describe(`Workspaces reducer`, () => {
             description: 'desc',
             isRemoving: false,
             isFetchingDetails: false,
-            isSettingDescription: false
-          }
+            isSettingDescription: false,
+          },
         },
-        allIds: ['idWks1', 'idWks2']
+        allIds: ['idWks1', 'idWks2'],
       });
     });
 
@@ -466,16 +436,10 @@ describe(`Workspaces reducer`, () => {
             keepPreviousValues: '',
             id: 'idWks1',
             name: 'Workspace 1',
-            users: [
-              'admin',
-              'bescudie',
-              'mrobert',
-              'cchevalier',
-              'vnoel'
-            ],
+            users: ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'],
             isRemoving: false,
             isFetchingDetails: false,
-            isSettingDescription: false
+            isSettingDescription: false,
           },
           idWks2: {
             keepPreviousValues: '',
@@ -484,10 +448,10 @@ describe(`Workspaces reducer`, () => {
             users: ['admin2'],
             isRemoving: false,
             isFetchingDetails: false,
-            isSettingDescription: false
-          }
+            isSettingDescription: false,
+          },
         },
-        allIds: ['idWks1', 'idWks2']
+        allIds: ['idWks1', 'idWks2'],
       };
 
       const reducer = Workspaces.reducer(initialState, {
@@ -496,8 +460,8 @@ describe(`Workspaces reducer`, () => {
           id: 'idWks1',
           name: 'Workspace 1 updated name',
           users: ['admin2', 'admin3'],
-          description: 'desc'
-        }
+          description: 'desc',
+        },
       });
 
       expect(reducer).toEqual({
@@ -514,7 +478,7 @@ describe(`Workspaces reducer`, () => {
             description: 'desc',
             isRemoving: false,
             isFetchingDetails: false,
-            isSettingDescription: false
+            isSettingDescription: false,
           },
           idWks2: {
             keepPreviousValues: '',
@@ -523,17 +487,19 @@ describe(`Workspaces reducer`, () => {
             users: ['admin2'],
             isRemoving: false,
             isFetchingDetails: false,
-            isSettingDescription: false
-          }
+            isSettingDescription: false,
+          },
         },
-        allIds: ['idWks1', 'idWks2']
+        allIds: ['idWks1', 'idWks2'],
       });
     });
   });
 
   describe(Workspaces.FETCH_WORKSPACE_DETAILS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACE_DETAILS).toEqual(`[Workspaces] Fetch workspace details`);
+      expect(Workspaces.FETCH_WORKSPACE_DETAILS).toEqual(
+        `[Workspaces] Fetch workspace details`
+      );
     });
 
     const initialState: any = {
@@ -542,32 +508,36 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         idWks1: {
           keepPreviousValues: '',
-        }
+        },
       },
-      allIds: ['idWks1']
+      allIds: ['idWks1'],
     };
 
     it(`should set isFetchingDetails to true even if isFetchingDetails doesn't exists yet`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.FETCH_WORKSPACE_DETAILS,
-        payload: 'idWks1'
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.FETCH_WORKSPACE_DETAILS,
+          payload: 'idWks1',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idWks1: {
             keepPreviousValues: '',
-            isFetchingDetails: true
+            isFetchingDetails: true,
           },
         },
-        allIds: ['idWks1']
+        allIds: ['idWks1'],
       });
     });
   });
 
   describe(Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS).toEqual(`[Workspaces] Fetch workspace details success`);
+      expect(Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS).toEqual(
+        `[Workspaces] Fetch workspace details success`
+      );
     });
 
     const initialState: any = {
@@ -576,33 +546,37 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         idWks1: {
           keepPreviousValues: '',
-        }
+        },
       },
-      allIds: ['idWks1']
+      allIds: ['idWks1'],
     };
 
     it(`should set isFetchingDetails to false even if isFetchingDetails doesn't exists yet`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS,
-        payload: { id: 'idWks1', data: { someData: 'some data' } }
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS,
+          payload: { id: 'idWks1', data: { someData: 'some data' } },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idWks1: {
             keepPreviousValues: '',
             isFetchingDetails: false,
-            someData: 'some data'
-          }
+            someData: 'some data',
+          },
         },
-        allIds: ['idWks1']
+        allIds: ['idWks1'],
       });
     });
   });
 
   describe(Workspaces.FETCH_WORKSPACE_DETAILS_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.FETCH_WORKSPACE_DETAILS_FAILED).toEqual(`[Workspaces] Fetch workspace details failed`);
+      expect(Workspaces.FETCH_WORKSPACE_DETAILS_FAILED).toEqual(
+        `[Workspaces] Fetch workspace details failed`
+      );
     });
 
     const initialState: any = {
@@ -611,33 +585,37 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         idWks1: {
           keepPreviousValues: '',
-          isFetchingDetails: true
-        }
+          isFetchingDetails: true,
+        },
       },
-      allIds: ['idWks1']
+      allIds: ['idWks1'],
     };
 
     it(`should set isFetchingDetails to false if the workspace exists`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.FETCH_WORKSPACE_DETAILS_FAILED,
-        payload: 'idWks1'
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.FETCH_WORKSPACE_DETAILS_FAILED,
+          payload: 'idWks1',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idWks1: {
             keepPreviousValues: '',
-            isFetchingDetails: false
-          }
+            isFetchingDetails: false,
+          },
         },
-        allIds: ['idWks1']
+        allIds: ['idWks1'],
       });
     });
   });
 
   describe(Workspaces.SET_DESCRIPTION, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.SET_DESCRIPTION).toEqual(`[Workspaces] Set description`);
+      expect(Workspaces.SET_DESCRIPTION).toEqual(
+        `[Workspaces] Set description`
+      );
     });
 
     const initialState: any = {
@@ -646,32 +624,36 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         idWks1: {
           keepPreviousValues: '',
-        }
+        },
       },
-      allIds: ['idWks1']
+      allIds: ['idWks1'],
     };
 
     it(`should set isSettingDescription to true even if isSettingDescription doesn't exists yet`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.SET_DESCRIPTION,
-        payload: { id: 'idWks1', description: 'desc' }
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.SET_DESCRIPTION,
+          payload: { id: 'idWks1', description: 'desc' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idWks1: {
             keepPreviousValues: '',
-            isSettingDescription: true
+            isSettingDescription: true,
           },
         },
-        allIds: ['idWks1']
+        allIds: ['idWks1'],
       });
     });
   });
 
   describe(Workspaces.SET_DESCRIPTION_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.SET_DESCRIPTION_SUCCESS).toEqual(`[Workspaces] Set description success`);
+      expect(Workspaces.SET_DESCRIPTION_SUCCESS).toEqual(
+        `[Workspaces] Set description success`
+      );
     });
 
     const initialState: any = {
@@ -680,33 +662,37 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         idWks1: {
           keepPreviousValues: '',
-        }
+        },
       },
-      allIds: ['idWks1']
+      allIds: ['idWks1'],
     };
 
     it(`should set isSettingDescription to false even if isSettingDescription doesn't exists yet`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.SET_DESCRIPTION_SUCCESS,
-        payload: { id: 'idWks1', description: 'desc' }
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.SET_DESCRIPTION_SUCCESS,
+          payload: { id: 'idWks1', description: 'desc' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idWks1: {
             keepPreviousValues: '',
             isSettingDescription: false,
-            description: 'desc'
-          }
+            description: 'desc',
+          },
         },
-        allIds: ['idWks1']
+        allIds: ['idWks1'],
       });
     });
   });
 
   describe(Workspaces.SET_DESCRIPTION_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.SET_DESCRIPTION_FAILED).toEqual(`[Workspaces] Set description failed`);
+      expect(Workspaces.SET_DESCRIPTION_FAILED).toEqual(
+        `[Workspaces] Set description failed`
+      );
     });
 
     const initialState: any = {
@@ -715,26 +701,28 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         idWks1: {
           keepPreviousValues: '',
-          isSettingDescription: true
-        }
+          isSettingDescription: true,
+        },
       },
-      allIds: ['idWks1']
+      allIds: ['idWks1'],
     };
 
     it(`should set isSettingDescription to false if the workspace exists`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.SET_DESCRIPTION_FAILED,
-        payload: 'idWks1'
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.SET_DESCRIPTION_FAILED,
+          payload: 'idWks1',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idWks1: {
             keepPreviousValues: '',
-            isSettingDescription: false
-          }
+            isSettingDescription: false,
+          },
         },
-        allIds: ['idWks1']
+        allIds: ['idWks1'],
       });
     });
   });
@@ -745,27 +733,33 @@ describe(`Workspaces reducer`, () => {
     });
 
     it(`should set the searchPetals variable`, () => {
-      expect(Workspaces.reducer(<any>{ searchPetals: '' }, {
-        type: Workspaces.SET_SEARCH,
-        payload: 'New search'
-      })).toEqual({
-        searchPetals: 'New search'
+      expect(
+        Workspaces.reducer(<any>{ searchPetals: '' }, {
+          type: Workspaces.SET_SEARCH,
+          payload: 'New search',
+        })
+      ).toEqual({
+        searchPetals: 'New search',
       });
     });
 
     it(`should trim the search before saving it`, () => {
-      expect(Workspaces.reducer(<any>{ searchPetals: '' }, {
-        type: Workspaces.SET_SEARCH,
-        payload: '  New search  '
-      })).toEqual({
-        searchPetals: 'New search'
+      expect(
+        Workspaces.reducer(<any>{ searchPetals: '' }, {
+          type: Workspaces.SET_SEARCH,
+          payload: '  New search  ',
+        })
+      ).toEqual({
+        searchPetals: 'New search',
       });
     });
   });
 
   describe(Workspaces.DELETE_WORKSPACE, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.DELETE_WORKSPACE).toEqual(`[Workspaces] Delete workspace`);
+      expect(Workspaces.DELETE_WORKSPACE).toEqual(
+        `[Workspaces] Delete workspace`
+      );
     });
 
     const initialState: any = {
@@ -775,68 +769,78 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         idWks1: {
           keepPreviousValues: '',
-          isRemoving: false
-        }
+          isRemoving: false,
+        },
       },
-      allIds: ['idWks1']
+      allIds: ['idWks1'],
     };
 
     it(`should set the isSelectedWorkspaceRemoving variable to true`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.DELETE_WORKSPACE,
-        payload: 'idWks1'
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.DELETE_WORKSPACE,
+          payload: 'idWks1',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedWorkspaceId: 'idWks1',
         byId: {
           keepPreviousValues: '',
           idWks1: {
             keepPreviousValues: '',
-            isRemoving: true
-          }
+            isRemoving: true,
+          },
         },
-        allIds: ['idWks1']
+        allIds: ['idWks1'],
       });
     });
   });
 
   describe(Workspaces.DELETE_WORKSPACE_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.DELETE_WORKSPACE_SUCCESS).toEqual(`[Workspaces] Delete workspace success`);
+      expect(Workspaces.DELETE_WORKSPACE_SUCCESS).toEqual(
+        `[Workspaces] Delete workspace success`
+      );
     });
 
     const initialState: any = {
       keepPreviousValues: '',
       selectedWorkspaceId: 'idWks1',
-      isSelectedWorkspaceDeleted: false
+      isSelectedWorkspaceDeleted: false,
     };
 
     it(`should set the isSelectedWorkspaceDeleted variable to true`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.DELETE_WORKSPACE_SUCCESS,
-        payload: 'idWks1'
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.DELETE_WORKSPACE_SUCCESS,
+          payload: 'idWks1',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedWorkspaceId: 'idWks1',
-        isSelectedWorkspaceDeleted: true
+        isSelectedWorkspaceDeleted: true,
       });
     });
 
     it(`should not set the isSelectedWorkspaceDeleted variable if we are on another workspace`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.DELETE_WORKSPACE_SUCCESS,
-        payload: 'idWks2'
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.DELETE_WORKSPACE_SUCCESS,
+          payload: 'idWks2',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedWorkspaceId: 'idWks1',
-        isSelectedWorkspaceDeleted: false
+        isSelectedWorkspaceDeleted: false,
       });
     });
   });
 
   describe(Workspaces.DELETE_WORKSPACE_FAILED, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.DELETE_WORKSPACE_FAILED).toEqual(`[Workspaces] Delete workspace failed`);
+      expect(Workspaces.DELETE_WORKSPACE_FAILED).toEqual(
+        `[Workspaces] Delete workspace failed`
+      );
     });
 
     const initialState: any = {
@@ -846,74 +850,86 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         idWks1: {
           keepPreviousValues: '',
-          isRemoving: true
-        }
+          isRemoving: true,
+        },
       },
-      allIds: ['idWks1']
+      allIds: ['idWks1'],
     };
 
     it(`should set the isSelectedWorkspaceRemoving variable to false`, () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.DELETE_WORKSPACE_FAILED,
-        payload: 'idWks1'
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.DELETE_WORKSPACE_FAILED,
+          payload: 'idWks1',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedWorkspaceId: 'idWks1',
         byId: {
           keepPreviousValues: '',
           idWks1: {
             keepPreviousValues: '',
-            isRemoving: false
-          }
+            isRemoving: false,
+          },
         },
-        allIds: ['idWks1']
+        allIds: ['idWks1'],
       });
     });
   });
 
   describe(Workspaces.REMOVE_WORKSPACE, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.REMOVE_WORKSPACE).toEqual(`[Workspaces] Remove workspace`);
+      expect(Workspaces.REMOVE_WORKSPACE).toEqual(
+        `[Workspaces] Remove workspace`
+      );
     });
 
     const initialState: any = {
       keepPreviousValues: '',
       selectedWorkspaceId: 'idWks1',
-      isSelectedWorkspaceDeleted: false
+      isSelectedWorkspaceDeleted: false,
     };
 
     it('should set the deletedWorkspace to true', () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.REMOVE_WORKSPACE,
-        payload: 'idWks1'
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.REMOVE_WORKSPACE,
+          payload: 'idWks1',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedWorkspaceId: 'idWks1',
-        isSelectedWorkspaceDeleted: true
+        isSelectedWorkspaceDeleted: true,
       });
     });
 
     it('should not set the deletedWorkspace to true if we are on another workspace', () => {
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.REMOVE_WORKSPACE,
-        payload: 'idWks2'
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.REMOVE_WORKSPACE,
+          payload: 'idWks2',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedWorkspaceId: 'idWks1',
-        isSelectedWorkspaceDeleted: false
+        isSelectedWorkspaceDeleted: false,
       });
     });
   });
 
   describe(Workspaces.CLEAN_WORKSPACE, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.CLEAN_WORKSPACE).toEqual(`[Workspaces] Clean workspace`);
+      expect(Workspaces.CLEAN_WORKSPACE).toEqual(
+        `[Workspaces] Clean workspace`
+      );
     });
   });
 
   describe(Workspaces.CLOSE_WORKSPACE, () => {
     it(`should check action name`, () => {
-      expect(Workspaces.CLOSE_WORKSPACE).toEqual(`[Workspaces] Close workspace`);
+      expect(Workspaces.CLOSE_WORKSPACE).toEqual(
+        `[Workspaces] Close workspace`
+      );
     });
 
     it(`should close the workspace only if there's a workspace selected and a truthy payload.delete`, () => {
@@ -922,69 +938,85 @@ describe(`Workspaces reducer`, () => {
         byId: {
           keepPreviousValues: '',
           idWks1: { keepPreviousValues: '' },
-          idWks2: { keepPreviousValues: '' }
+          idWks2: { keepPreviousValues: '' },
         },
         allIds: ['idWks1', 'idWks2'],
-        selectedWorkspaceId: 'idWks1'
+        selectedWorkspaceId: 'idWks1',
       };
 
-      expect(Workspaces.reducer(initialState, {
-        type: Workspaces.CLOSE_WORKSPACE,
-        payload: { delete: true }
-      })).toEqual({
+      expect(
+        Workspaces.reducer(initialState, {
+          type: Workspaces.CLOSE_WORKSPACE,
+          payload: { delete: true },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
-          idWks2: { keepPreviousValues: '' }
+          idWks2: { keepPreviousValues: '' },
         },
         allIds: ['idWks2'],
         selectedWorkspaceId: '',
-        isSelectedWorkspaceDeleted: false
+        isSelectedWorkspaceDeleted: false,
       });
     });
 
     it(`should just set the current workspace to empty if there's a workspace already selected or if payload.delete is falsy`, () => {
-      expect(Workspaces.reducer(<any>{
+      expect(
+        Workspaces.reducer(
+          <any>{
+            keepPreviousValues: '',
+            selectedWorkspaceId: 'idWks1',
+          },
+          {
+            type: Workspaces.CLOSE_WORKSPACE,
+          }
+        )
+      ).toEqual({
         keepPreviousValues: '',
-        selectedWorkspaceId: 'idWks1'
-      }, {
-          type: Workspaces.CLOSE_WORKSPACE
-        }))
-        .toEqual({
-          keepPreviousValues: '',
-          selectedWorkspaceId: ''
-        });
+        selectedWorkspaceId: '',
+      });
 
-      expect(Workspaces.reducer(<any>{
+      expect(
+        Workspaces.reducer(
+          <any>{
+            keepPreviousValues: '',
+            selectedWorkspaceId: '',
+          },
+          {
+            type: Workspaces.CLOSE_WORKSPACE,
+          }
+        )
+      ).toEqual({
         keepPreviousValues: '',
-        selectedWorkspaceId: ''
-      }, {
-          type: Workspaces.CLOSE_WORKSPACE
-        }))
-        .toEqual({
-          keepPreviousValues: '',
-          selectedWorkspaceId: ''
-        });
+        selectedWorkspaceId: '',
+      });
 
-      expect(Workspaces.reducer(<any>{
+      expect(
+        Workspaces.reducer(
+          <any>{
+            keepPreviousValues: '',
+            selectedWorkspaceId: 'idWks1',
+          },
+          {
+            type: Workspaces.CLOSE_WORKSPACE,
+            payload: { delete: false },
+          }
+        )
+      ).toEqual({
         keepPreviousValues: '',
-        selectedWorkspaceId: 'idWks1'
-      }, {
-          type: Workspaces.CLOSE_WORKSPACE,
-          payload: { delete: false }
-        }))
-        .toEqual({
-          keepPreviousValues: '',
-          selectedWorkspaceId: ''
-        });
+        selectedWorkspaceId: '',
+      });
     });
   });
 
   describe(Users.DISCONNECT_USER_SUCCESS, () => {
     it(`should return the initial value of the reducer`, () => {
-      expect(Workspaces.reducer(<any>{}, {
-        type: Users.DISCONNECT_USER_SUCCESS
-      })).toEqual(workspacesTableFactory());
+      expect(
+        Workspaces.reducer(<any>{}, {
+          type: Users.DISCONNECT_USER_SUCCESS,
+        })
+      ).toEqual(workspacesTableFactory());
     });
   });
 });

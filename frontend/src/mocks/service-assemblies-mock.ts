@@ -19,13 +19,15 @@ import { Container } from './containers-mock';
 import { ServiceUnit, serviceUnitsService } from './service-units-mock';
 import { Component } from './components-mock';
 import {
-  ServiceAssemblyState, IServiceAssemblyBackendSSE, IServiceAssemblyBackendDetails
+  ServiceAssemblyState,
+  IServiceAssemblyBackendSSE,
+  IServiceAssemblyBackendDetails,
 } from 'app/shared/services/service-assemblies.service';
 
 class ServiceAssemblies {
   private readonly serviceAssemblies = new Map<string, ServiceAssembly>();
 
-  constructor() { }
+  constructor() {}
 
   create(container: Container, name?: string, state?: ServiceAssemblyState) {
     const sa = new ServiceAssembly(container, name, state);
@@ -48,7 +50,11 @@ export class ServiceAssembly {
   public readonly container: Container;
   private readonly serviceUnits = new Map<string, ServiceUnit>();
 
-  constructor(container: Container, name?: string, state: ServiceAssemblyState = 'Shutdown') {
+  constructor(
+    container: Container,
+    name?: string,
+    state: ServiceAssemblyState = 'Shutdown'
+  ) {
     const i = ServiceAssembly.cpt++;
     this.id = `idSa${i}`;
     this.name = name ? name : `SA ${i}`;
@@ -75,8 +81,8 @@ export class ServiceAssembly {
         name: this.name,
         state: this.state,
         containerId: this.container.id,
-        serviceUnits: Array.from(this.serviceUnits.keys())
-      }
+        serviceUnits: Array.from(this.serviceUnits.keys()),
+      },
     };
   }
 

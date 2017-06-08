@@ -19,32 +19,53 @@
  * @param state : The state you want to get the possible actions from. For example : 'Started'
  * @returns The possible new actions according to the state
  */
-import { ServiceAssemblyState, EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
+import {
+  ServiceAssemblyState,
+  EServiceAssemblyState,
+} from 'app/shared/services/service-assemblies.service';
 
 export function stateNameToPossibleActionsServiceAssembly(
   state: ServiceAssemblyState
-): { actionName: string, newStateAfterAction: ServiceAssemblyState }[] {
+): { actionName: string; newStateAfterAction: ServiceAssemblyState }[] {
   switch (state) {
     case EServiceAssemblyState.Shutdown:
       return [
-        { actionName: 'Start', newStateAfterAction: EServiceAssemblyState.Started },
-        { actionName: 'Unload', newStateAfterAction: EServiceAssemblyState.Unloaded }
+        {
+          actionName: 'Start',
+          newStateAfterAction: EServiceAssemblyState.Started,
+        },
+        {
+          actionName: 'Unload',
+          newStateAfterAction: EServiceAssemblyState.Unloaded,
+        },
       ];
 
     case EServiceAssemblyState.Started:
       return [
-        { actionName: 'Stop', newStateAfterAction: EServiceAssemblyState.Stopped }
+        {
+          actionName: 'Stop',
+          newStateAfterAction: EServiceAssemblyState.Stopped,
+        },
       ];
 
     case EServiceAssemblyState.Stopped:
       return [
-        { actionName: 'Start', newStateAfterAction: EServiceAssemblyState.Started },
-        { actionName: 'Unload', newStateAfterAction: EServiceAssemblyState.Unloaded }
+        {
+          actionName: 'Start',
+          newStateAfterAction: EServiceAssemblyState.Started,
+        },
+        {
+          actionName: 'Unload',
+          newStateAfterAction: EServiceAssemblyState.Unloaded,
+        },
       ];
 
     case EServiceAssemblyState.Unknown:
       return [
-        { actionName: 'Unload', newStateAfterAction: EServiceAssemblyState.Unloaded }
+        {
+          actionName: 'Unload',
+          newStateAfterAction: EServiceAssemblyState.Unloaded,
+        },
       ];
 
     case EServiceAssemblyState.Unloaded:

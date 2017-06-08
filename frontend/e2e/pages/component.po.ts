@@ -23,32 +23,44 @@ import { UploadComponentPage } from './upload-component.po';
 import { SharedLibraryOverviewPage } from './shared-library.po';
 
 export abstract class ComponentPage {
-
   public static readonly component = $(`app-petals-component-view`);
 
   public readonly component = ComponentPage.component;
   public readonly title = this.component.$(`md-toolbar .title`);
 
   protected static wait() {
-    browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/components\/\w+/), waitTimeout);
+    browser.wait(
+      urlToMatch(/\/workspaces\/\w+\/petals\/components\/\w+/),
+      waitTimeout
+    );
     browser.wait(EC.visibilityOf(ComponentPage.component), waitTimeout);
-    browser.wait(EC.stalenessOf(ComponentPage.component.$('md-toolbar md-spinner')), waitTimeout);
+    browser.wait(
+      EC.stalenessOf(ComponentPage.component.$('md-toolbar md-spinner')),
+      waitTimeout
+    );
   }
 
   openOperations() {
-    this.component.element(by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')).click();
+    this.component
+      .element(
+        by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')
+      )
+      .click();
     return ComponentOperationPage.waitAndGet();
   }
 }
 
 export class ComponentOverviewPage extends ComponentPage {
-
-  public static readonly overview = ComponentPage.component.$(`app-petals-component-overview`);
+  public static readonly overview = ComponentPage.component.$(
+    `app-petals-component-overview`
+  );
 
   public readonly overview = ComponentOverviewPage.overview;
   public readonly state = this.overview.$(`md-card .component-state`);
   public readonly type = this.overview.$(`md-card .component-type`);
-  public readonly sharedLibraries = this.overview.$$(`md-card.shared-libraries ul > li`);
+  public readonly sharedLibraries = this.overview.$$(
+    `md-card.shared-libraries ul > li`
+  );
 
   static waitAndGet() {
     super.wait();
@@ -63,28 +75,50 @@ export class ComponentOverviewPage extends ComponentPage {
 
   openSharedLibrary(identifier: string | number) {
     if (typeof identifier === 'string') {
-      this.overview.element(by.cssContainingText(`md-card.shared-libraries ul > li a`, identifier)).click();
+      this.overview
+        .element(
+          by.cssContainingText(`md-card.shared-libraries ul > li a`, identifier)
+        )
+        .click();
     } else {
-      this.overview.$$('md-card.shared-libraries ul > li a').get(identifier).click();
+      this.overview
+        .$$('md-card.shared-libraries ul > li a')
+        .get(identifier)
+        .click();
     }
     return SharedLibraryOverviewPage.waitAndGet();
   }
 }
 
 export class ComponentOperationPage extends ComponentPage {
-
-  public static readonly operations = ComponentPage.component.$(`app-petals-component-operations`);
+  public static readonly operations = ComponentPage.component.$(
+    `app-petals-component-operations`
+  );
 
   public readonly operations = ComponentOperationPage.operations;
 
-  public readonly lifecycleCard = this.operations.$(`md-card.component-lifecycle`);
+  public readonly lifecycleCard = this.operations.$(
+    `md-card.component-lifecycle`
+  );
 
-  public readonly state = this.lifecycleCard.$(`md-card-subtitle span.component-state`);
-  public readonly stopButton = this.lifecycleCard.element(by.cssContainingText(`button`, `Stop`));
-  public readonly startButton = this.lifecycleCard.element(by.cssContainingText(`button`, `Start`));
-  public readonly installButton = this.lifecycleCard.element(by.cssContainingText(`button`, `Install`));
-  public readonly uninstallButton = this.lifecycleCard.element(by.cssContainingText(`button`, `Uninstall`));
-  public readonly unloadButton = this.lifecycleCard.element(by.cssContainingText(`button`, `Unload`));
+  public readonly state = this.lifecycleCard.$(
+    `md-card-subtitle span.component-state`
+  );
+  public readonly stopButton = this.lifecycleCard.element(
+    by.cssContainingText(`button`, `Stop`)
+  );
+  public readonly startButton = this.lifecycleCard.element(
+    by.cssContainingText(`button`, `Start`)
+  );
+  public readonly installButton = this.lifecycleCard.element(
+    by.cssContainingText(`button`, `Install`)
+  );
+  public readonly uninstallButton = this.lifecycleCard.element(
+    by.cssContainingText(`button`, `Uninstall`)
+  );
+  public readonly unloadButton = this.lifecycleCard.element(
+    by.cssContainingText(`button`, `Unload`)
+  );
   public readonly changeStateError = this.lifecycleCard.$(`.error .italic`);
   public readonly parameters = this.lifecycleCard.$(`.parameters`);
 
@@ -94,7 +128,10 @@ export class ComponentOperationPage extends ComponentPage {
 
   static waitAndGet() {
     super.wait();
-    browser.wait(EC.visibilityOf(ComponentOperationPage.operations), waitTimeout);
+    browser.wait(
+      EC.visibilityOf(ComponentOperationPage.operations),
+      waitTimeout
+    );
     return new ComponentOperationPage();
   }
 

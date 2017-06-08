@@ -15,41 +15,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { TestBed } from '@angular/core/testing';
-import { EffectsTestingModule, EffectsRunner } from '@ngrx/effects/bundles/effects-testing.umd';
+import {
+  EffectsTestingModule,
+  EffectsRunner,
+} from '@ngrx/effects/bundles/effects-testing.umd';
 import { Observable } from 'rxjs/Observable';
 
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
 import { SharedLibrariesEffects } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.effects';
-import { SharedLibrariesService, ISharedLibraryBackendDetails } from 'app/shared/services/shared-libraries.service';
+import {
+  SharedLibrariesService,
+  ISharedLibraryBackendDetails,
+} from 'app/shared/services/shared-libraries.service';
 
 describe('SharedLibraries Effects', () => {
+  beforeEach(() =>
+    TestBed.configureTestingModule({
+      imports: [EffectsTestingModule],
+      providers: [
+        SharedLibrariesEffects,
+        {
+          provide: SharedLibrariesService,
+          useValue: {
+            getDetails: jest.fn(),
+          },
+        },
+      ],
+    })
+  );
 
-  beforeEach(() => TestBed.configureTestingModule({
-    imports: [
-      EffectsTestingModule
-    ],
-    providers: [
-      SharedLibrariesEffects,
-      {
-        provide: SharedLibrariesService,
-        useValue: {
-          getDetails: jest.fn()
-        }
-      }
-    ]
-  }));
-
-  function setup(params?: { details: (id: string) => ISharedLibraryBackendDetails }) {
+  function setup(params?: {
+    details: (id: string) => ISharedLibraryBackendDetails;
+  }) {
     const services = TestBed.get(SharedLibrariesService);
 
     if (params && params.details) {
-      services.getDetails.mockImplementation(id => Observable.of(params.details(id)));
+      services.getDetails.mockImplementation(id =>
+        Observable.of(params.details(id))
+      );
     }
 
     return {
       runner: TestBed.get(EffectsRunner) as EffectsRunner,
       effects: TestBed.get(SharedLibrariesEffects) as SharedLibrariesEffects,
-      services
+      services,
     };
   }
 
@@ -64,9 +73,9 @@ describe('SharedLibraries Effects', () => {
         payload: {
           id: 1,
           data: {
-            marker: 1
-          }
-        }
+            marker: 1,
+          },
+        },
       });
     });
   });

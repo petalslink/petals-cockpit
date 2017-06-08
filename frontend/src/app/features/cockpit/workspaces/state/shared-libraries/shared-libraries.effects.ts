@@ -29,33 +29,37 @@ export class SharedLibrariesEffects {
   constructor(
     private actions$: Actions,
     private sharedLibrariesService: SharedLibrariesService
-  ) { }
+  ) {}
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) fetchDetails$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  fetchDetails$: Observable<Action> = this.actions$
     .ofType(SharedLibraries.FETCH_DETAILS)
-    .switchMap((action: { type: string, payload: { id: string } }) =>
-      this.sharedLibrariesService.getDetails(action.payload.id)
+    .switchMap((action: { type: string; payload: { id: string } }) =>
+      this.sharedLibrariesService
+        .getDetails(action.payload.id)
         .map(data => {
           return {
             type: SharedLibraries.FETCH_DETAILS_SUCCESS,
             payload: {
               id: action.payload.id,
-              data
-            }
+              data,
+            },
           };
         })
         .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn('Error caught in shared-libraries.effects: ofType(SharedLibraries.FETCH_DETAILS)');
+            console.warn(
+              'Error caught in shared-libraries.effects: ofType(SharedLibraries.FETCH_DETAILS)'
+            );
             console.error(err);
             console.groupEnd();
           }
 
           return Observable.of({
             type: SharedLibraries.FETCH_DETAILS_ERROR,
-            payload: { id: action.payload.id }
+            payload: { id: action.payload.id },
           });
         })
     );

@@ -19,7 +19,10 @@ import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
 import { IComponents } from '../components/components.interface';
 import { IServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 import {
-  IContainerBackendSSE, IContainerBackendDetails, IContainerBackendSSECommon, IContainerBackendDetailsCommon
+  IContainerBackendSSE,
+  IContainerBackendDetails,
+  IContainerBackendSSECommon,
+  IContainerBackendDetailsCommon,
 } from 'app/shared/services/containers.service';
 import { ISharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 
@@ -33,7 +36,7 @@ export interface IContainerUI {
   errorDeploymentServiceAssembly: string;
 }
 
-export interface IContainerRow extends IContainerUI, IContainerBackendSSE, IContainerBackendDetails { }
+export interface IContainerRow extends IContainerUI, IContainerBackendSSE, IContainerBackendDetails {}
 
 export interface IContainer extends IContainerUI, IContainerBackendSSECommon, IContainerBackendDetailsCommon {
   components: IComponents;
@@ -46,7 +49,9 @@ export interface IContainersCommon {
   isFetchingDetails: boolean;
 }
 
-export interface IContainersTable extends IContainersCommon, JsMap<IContainerRow> { }
+export interface IContainersTable extends IContainersCommon, JsMap<
+  IContainerRow
+> {}
 
 export interface IContainers extends IContainersCommon {
   list: IContainer[];
@@ -71,13 +76,13 @@ export function containerRowFactory(): IContainerRow {
     components: [],
     serviceAssemblies: [],
     reachabilities: [],
-    sharedLibraries: []
+    sharedLibraries: [],
   };
 }
 
 export function containersTableFactory(): IContainersTable {
   return Object.assign({}, emptyJavascriptMap<IContainerRow>(), {
     selectedContainerId: '',
-    isFetchingDetails: false
+    isFetchingDetails: false,
   });
 }

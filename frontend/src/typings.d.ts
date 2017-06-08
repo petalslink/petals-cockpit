@@ -10,7 +10,7 @@ interface NodeModule {
 
 declare var EventSource: sse.IEventSourceStatic;
 
-declare module sse {
+declare namespace sse {
   // the readyState attribute represents the state of the connection
   enum ReadyState {
     // the connection has not yet been established, or it was closed and the user agent is reconnecting
@@ -21,7 +21,7 @@ declare module sse {
 
     // the connection is not open, and the user agent is not trying to reconnect
     // either there was a fatal error or the close() method was invoked
-    CLOSED = 2
+    CLOSED = 2,
   }
 
   interface IEventSourceStatic extends EventTarget {

@@ -39,7 +39,7 @@ export interface IWorkspaceBackend extends IWorkspaceBackendCommon {
   users: Array<string>;
 }
 
-export interface IWorkspaceBackendDetails extends IWorkspaceBackendDetailsCommon { }
+export interface IWorkspaceBackendDetails extends IWorkspaceBackendDetailsCommon {}
 
 export abstract class WorkspacesService {
   abstract fetchWorkspaces(): Observable<Response>;
@@ -50,7 +50,10 @@ export abstract class WorkspacesService {
 
   abstract deleteWorkspace(id: string): Observable<Response>;
 
-  abstract setDescription(id: string, description: string): Observable<Response>;
+  abstract setDescription(
+    id: string,
+    description: string
+  ): Observable<Response>;
 
   abstract watchEventWorkspaceDeleted(): Observable<void>;
 }
@@ -70,7 +73,9 @@ export class WorkspacesServiceImpl extends WorkspacesService {
   }
 
   postWorkspace(name: string) {
-    return this.http.post(`${environment.urlBackend}/workspaces`, { name: name });
+    return this.http.post(`${environment.urlBackend}/workspaces`, {
+      name: name,
+    });
   }
 
   fetchWorkspace(id: string) {
@@ -82,7 +87,9 @@ export class WorkspacesServiceImpl extends WorkspacesService {
   }
 
   setDescription(id: string, description: string) {
-    return this.http.put(`${environment.urlBackend}/workspaces/${id}`, { description });
+    return this.http.put(`${environment.urlBackend}/workspaces/${id}`, {
+      description,
+    });
   }
 
   watchEventWorkspaceDeleted() {
@@ -91,7 +98,8 @@ export class WorkspacesServiceImpl extends WorkspacesService {
       .do((data: { id: string }) => {
         this.sseService.stopWatchingWorkspace();
         this.store$.dispatch({
-          type: Workspaces.REMOVE_WORKSPACE, payload: data.id
+          type: Workspaces.REMOVE_WORKSPACE,
+          payload: data.id,
         });
       });
   }

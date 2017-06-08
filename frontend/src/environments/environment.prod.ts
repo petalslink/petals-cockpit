@@ -1,4 +1,3 @@
-
 import { environment as dev } from './environment.dev';
 
 export const environment = {
@@ -6,5 +5,5 @@ export const environment = {
   production: true,
   strictCoherence: false,
   debug: false,
-  mock: undefined
+  mock: undefined,
 };

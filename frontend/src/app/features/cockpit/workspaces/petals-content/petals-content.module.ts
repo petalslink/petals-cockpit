@@ -22,10 +22,7 @@ import { PetalsContentRoutingModule } from './petals-content-routing.module';
 import { PetalsContentViewComponent } from './petals-content.component';
 
 @NgModule({
-  imports: [
-    SharedModule,
-    PetalsContentRoutingModule
-  ],
-  declarations: [PetalsContentViewComponent]
+  imports: [SharedModule, PetalsContentRoutingModule],
+  declarations: [PetalsContentViewComponent],
 })
-export class PetalsContentModule { }
+export class PetalsContentModule {}

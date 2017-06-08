@@ -35,14 +35,14 @@ import { UsersServiceMock } from 'app/shared/services/users.service.mock';
 
 @Injectable()
 export class BusesServiceMock extends BusesServiceImpl {
-
   constructor(
     http: Http,
     store$: Store<IStore>,
     router: Router,
     private pSseService: SseService,
     private userService: UsersService,
-    notifications: NotificationsService) {
+    notifications: NotificationsService
+  ) {
     super(http, store$, router, pSseService, notifications);
   }
 
@@ -63,34 +63,46 @@ export class BusesServiceMock extends BusesServiceImpl {
 
     const detailsBus = {
       ...bus,
-      id: newBus.id
+      id: newBus.id,
     };
 
-    return helper
-      .responseBody(detailsBus)
-      .do(_ => {
-        // simulate the backend sending the bus in progress on the SSE
-        setTimeout(() => {
-          (this.pSseService as SseServiceMock).triggerSseEvent(SseWorkspaceEvent.BUS_IMPORT, detailsBus);
-          // simulate the backend sending the imported bus on the SSE
-          setTimeout(() => (this.pSseService as SseServiceMock)
-            .triggerSseEvent(event, newBus.eventData), environment.mock.sseDelay);
-        }, environment.mock.sseDelay);
-
-      });
+    return helper.responseBody(detailsBus).do(_ => {
+      // simulate the backend sending the bus in progress on the SSE
+      setTimeout(() => {
+        (this.pSseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.BUS_IMPORT,
+          detailsBus
+        );
+        // simulate the backend sending the imported bus on the SSE
+        setTimeout(
+          () =>
+            (this.pSseService as SseServiceMock).triggerSseEvent(
+              event,
+              newBus.eventData
+            ),
+          environment.mock.sseDelay
+        );
+      }, environment.mock.sseDelay);
+    });
   }
 
   deleteBus(_idWorkspace: string, id: string) {
-    return helper
-      .response(204)
-      .do(_ => {
-        // simulate the backend sending the answer on the SSE
-        setTimeout(() => (this.pSseService as SseServiceMock)
-          .triggerSseEvent(SseWorkspaceEvent.BUS_DELETED, {
-            id,
-            reason: `bus deleted by ${(this.userService as UsersServiceMock).getCurrentUser().id}`
-          }), environment.mock.sseDelay);
-      });
+    return helper.response(204).do(_ => {
+      // simulate the backend sending the answer on the SSE
+      setTimeout(
+        () =>
+          (this
+            .pSseService as SseServiceMock).triggerSseEvent(
+            SseWorkspaceEvent.BUS_DELETED,
+            {
+              id,
+              reason: `bus deleted by ${(this
+                .userService as UsersServiceMock).getCurrentUser().id}`,
+            }
+          ),
+        environment.mock.sseDelay
+      );
+    });
   }
 
   getDetailsBus(busId: string) {

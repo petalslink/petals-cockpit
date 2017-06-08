@@ -38,75 +38,105 @@ import { ComponentsEffects } from './../features/cockpit/workspaces/state/compon
 import { ServiceUnitsEffects } from './../features/cockpit/workspaces/state/service-units/service-units.effects';
 import { SseService, SseServiceImpl } from '../shared/services/sse.service';
 import { SseServiceMock } from '../shared/services/sse.service.mock';
-import { WorkspacesService, WorkspacesServiceImpl } from '../shared/services/workspaces.service';
+import {
+  WorkspacesService,
+  WorkspacesServiceImpl,
+} from '../shared/services/workspaces.service';
 import { WorkspacesServiceMock } from '../shared/services/workspaces.service.mock';
 import { UsersServiceMock } from '../shared/services/users.service.mock';
-import { UsersService, UsersServiceImpl } from '../shared/services/users.service';
+import {
+  UsersService,
+  UsersServiceImpl,
+} from '../shared/services/users.service';
 import { GuardLoginService } from '../shared/services/guard-login.service';
-import { BusesService, BusesServiceImpl } from '../shared/services/buses.service';
+import {
+  BusesService,
+  BusesServiceImpl,
+} from '../shared/services/buses.service';
 import { BusesServiceMock } from '../shared/services/buses.service.mock';
-import { ContainersService, ContainersServiceImpl } from './../shared/services/containers.service';
+import {
+  ContainersService,
+  ContainersServiceImpl,
+} from './../shared/services/containers.service';
 import { ContainersServiceMock } from './../shared/services/containers.service.mock';
-import { ComponentsService, ComponentsServiceImpl } from './../shared/services/components.service';
+import {
+  ComponentsService,
+  ComponentsServiceImpl,
+} from './../shared/services/components.service';
 import { ComponentsServiceMock } from './../shared/services/components.service.mock';
-import { ServiceUnitsService, ServiceUnitsServiceImpl } from './../shared/services/service-units.service';
+import {
+  ServiceUnitsService,
+  ServiceUnitsServiceImpl,
+} from './../shared/services/service-units.service';
 import { ServiceUnitsServiceMock } from './../shared/services/service-units.service.mock';
 import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
-import { ServiceAssembliesService, ServiceAssembliesServiceImpl } from 'app/shared/services/service-assemblies.service';
+import {
+  ServiceAssembliesService,
+  ServiceAssembliesServiceImpl,
+} from 'app/shared/services/service-assemblies.service';
 import { ServiceAssembliesServiceMock } from 'app/shared/services/service-assemblies.service.mock';
 import { ServiceAssembliesEffects } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.effects';
 import { SharedLibrariesEffects } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.effects';
 import { SharedLibrariesServiceMock } from 'app/shared/services/shared-libraries.service.mock';
-import { SharedLibrariesService, SharedLibrariesServiceImpl } from 'app/shared/services/shared-libraries.service';
+import {
+  SharedLibrariesService,
+  SharedLibrariesServiceImpl,
+} from 'app/shared/services/shared-libraries.service';
 
 export const providers = [
   {
     provide: LANGUAGES,
     // order matters : The first one will be used by default
-    useValue: ['en', 'fr']
+    useValue: ['en', 'fr'],
   },
   GuardLoginService,
   {
     provide: SseService,
-    useClass: (environment.mock ? SseServiceMock : SseServiceImpl)
+    useClass: environment.mock ? SseServiceMock : SseServiceImpl,
   },
   {
     provide: BusesService,
-    useClass: (environment.mock ? BusesServiceMock : BusesServiceImpl)
+    useClass: environment.mock ? BusesServiceMock : BusesServiceImpl,
   },
   {
     provide: ContainersService,
-    useClass: (environment.mock ? ContainersServiceMock : ContainersServiceImpl)
+    useClass: environment.mock ? ContainersServiceMock : ContainersServiceImpl,
   },
   {
     provide: ComponentsService,
-    useClass: (environment.mock ? ComponentsServiceMock : ComponentsServiceImpl)
+    useClass: environment.mock ? ComponentsServiceMock : ComponentsServiceImpl,
   },
   {
     provide: ServiceAssembliesService,
-    useClass: (environment.mock ? ServiceAssembliesServiceMock : ServiceAssembliesServiceImpl)
+    useClass: environment.mock
+      ? ServiceAssembliesServiceMock
+      : ServiceAssembliesServiceImpl,
   },
   {
     provide: ServiceUnitsService,
-    useClass: (environment.mock ? ServiceUnitsServiceMock : ServiceUnitsServiceImpl)
+    useClass: environment.mock
+      ? ServiceUnitsServiceMock
+      : ServiceUnitsServiceImpl,
   },
   {
     provide: SharedLibrariesService,
-    useClass: (environment.mock ? SharedLibrariesServiceMock : SharedLibrariesServiceImpl)
+    useClass: environment.mock
+      ? SharedLibrariesServiceMock
+      : SharedLibrariesServiceImpl,
   },
   {
     provide: WorkspacesService,
-    useClass: (environment.mock ? WorkspacesServiceMock : WorkspacesServiceImpl)
+    useClass: environment.mock ? WorkspacesServiceMock : WorkspacesServiceImpl,
   },
   {
     provide: UsersService,
-    useClass: (environment.mock ? UsersServiceMock : UsersServiceImpl)
+    useClass: environment.mock ? UsersServiceMock : UsersServiceImpl,
   },
   // we override the default one with ours aware of batch actions
   {
     provide: Actions,
-    useClass: ActionsWithBatched
-  }
+    useClass: ActionsWithBatched,
+  },
 ];
 
 @NgModule({
@@ -130,11 +160,11 @@ export const providers = [
     StoreDevtoolsModule.instrumentOnlyWithExtension(),
     TranslateModule.forRoot({
       provide: TranslateLoader,
-      useFactory: (createTranslateLoader),
-      deps: [Http]
+      useFactory: createTranslateLoader,
+      deps: [Http],
     }),
-    SimpleNotificationsModule.forRoot()
+    SimpleNotificationsModule.forRoot(),
   ],
-  providers
+  providers,
 })
-export class CoreModule { }
+export class CoreModule {}

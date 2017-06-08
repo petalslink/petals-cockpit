@@ -28,7 +28,7 @@ export interface JsMap<I> {
 export function emptyJavascriptMap<I>(): JsMap<I> {
   return {
     byId: {},
-    allIds: []
+    allIds: [],
   };
 }
 
@@ -49,21 +49,25 @@ export function toJavascriptMap<I>(obj: object): JsMap<I> {
  * into map.byId elements and toMerge.allIds into map.allIds.
  * And also ensure elements are fully initialised.
  */
-export function mergeInto<I, M extends JsMap<I>>(map: M, toMerge: JsMap<I>, initializer: I): M {
-  return Object.assign({},
-    map,
-    toMerge,
-    {
-      allIds: [...Array.from(new Set([...map.allIds, ...toMerge.allIds]))],
-      byId: toMerge.allIds.reduce((acc, id) => ({
+export function mergeInto<I, M extends JsMap<I>>(
+  map: M,
+  toMerge: JsMap<I>,
+  initializer: I
+): M {
+  return Object.assign({}, map, toMerge, {
+    allIds: [...Array.from(new Set([...map.allIds, ...toMerge.allIds]))],
+    byId: toMerge.allIds.reduce(
+      (acc, id) => ({
         ...acc,
         [id]: Object.assign<object, I, I>(
           {},
           acc[id] ? acc[id] : initializer,
           toMerge.byId[id]
-        )
-      }), map.byId)
-    });
+        ),
+      }),
+      map.byId
+    ),
+  });
 }
 
 /**
@@ -71,29 +75,36 @@ export function mergeInto<I, M extends JsMap<I>>(map: M, toMerge: JsMap<I>, init
  * into map.byId elements, and only toMerge.allIds into map.allIds.
  * But this keep the previous data of map.byId associated to the elements in toMerge.byId
  */
-export function mergeOnly<I, M extends JsMap<I>>(map: M, toMerge: JsMap<I>, initializer: I): M {
-  return Object.assign(
-    {},
-    map,
-    toMerge,
-    {
-      allIds: [...toMerge.allIds],
-      byId: toMerge.allIds.reduce((acc, id) => ({
+export function mergeOnly<I, M extends JsMap<I>>(
+  map: M,
+  toMerge: JsMap<I>,
+  initializer: I
+): M {
+  return Object.assign({}, map, toMerge, {
+    allIds: [...toMerge.allIds],
+    byId: toMerge.allIds.reduce(
+      (acc, id) => ({
         ...acc,
         [id]: Object.assign<object, I, I, I>(
           {},
           initializer,
           map.byId[id],
           toMerge.byId[id]
-        )
-      }), {})
-    });
+        ),
+      }),
+      {}
+    ),
+  });
 }
 
 /**
  * This put all the elements of toMerge.byId in map.byId.
  */
-export function putAll<I, M extends JsMap<I>>(map: M, toMerge: JsMap<I>, initializer: I): M {
+export function putAll<I, M extends JsMap<I>>(
+  map: M,
+  toMerge: JsMap<I>,
+  initializer: I
+): M {
   // normally there shouldn't be any duplicate, so it's cheaper to check that now
   // than to use a Set below.
   let duplicate = false;
@@ -102,7 +113,9 @@ export function putAll<I, M extends JsMap<I>>(map: M, toMerge: JsMap<I>, initial
       duplicate = true;
       if (!environment.strictCoherence) {
         if (environment.debug) {
-          console.debug(`putAll called on an already existing element ${id} on: ${map}`);
+          console.debug(
+            `putAll called on an already existing element ${id} on: ${map}`
+          );
         } else {
           console.warn(`putAll called on an already existing element ${id}`);
         }
@@ -113,25 +126,34 @@ export function putAll<I, M extends JsMap<I>>(map: M, toMerge: JsMap<I>, initial
     }
   });
 
-  return Object.assign({},
-    map,
-    {
-      allIds: duplicate ? [...Array.from(new Set([...map.allIds, ...toMerge.allIds]))] : [...map.allIds, ...toMerge.allIds],
-      byId: toMerge.allIds.reduce((acc, id) => ({
+  return Object.assign({}, map, {
+    allIds: duplicate
+      ? [...Array.from(new Set([...map.allIds, ...toMerge.allIds]))]
+      : [...map.allIds, ...toMerge.allIds],
+    byId: toMerge.allIds.reduce(
+      (acc, id) => ({
         ...acc,
-        [id]: Object.assign<object, I, I>({}, initializer, toMerge.byId[id])
-      }), map.byId)
-    });
+        [id]: Object.assign<object, I, I>({}, initializer, toMerge.byId[id]),
+      }),
+      map.byId
+    ),
+  });
 }
 
 /**
  * This merge value into map.byId[id]
  */
-export function updateById<I, M extends JsMap<I>>(map: M, id: string, value: object): M {
+export function updateById<I, M extends JsMap<I>>(
+  map: M,
+  id: string,
+  value: object
+): M {
   if (!map.byId[id]) {
     if (!environment.strictCoherence) {
       if (environment.debug) {
-        console.debug(`updateById called on an unexisting element ${id} on: ${map}`);
+        console.debug(
+          `updateById called on an unexisting element ${id} on: ${map}`
+        );
       } else {
         console.warn(`updateById called on an unexisting element ${id}`);
       }
@@ -141,24 +163,29 @@ export function updateById<I, M extends JsMap<I>>(map: M, id: string, value: obj
     }
   }
 
-  return Object.assign({},
-    map,
-    {
-      byId: {
-        ...map.byId,
-        [id]: Object.assign({}, map.byId[id], value)
-      }
-    });
+  return Object.assign({}, map, {
+    byId: {
+      ...map.byId,
+      [id]: Object.assign({}, map.byId[id], value),
+    },
+  });
 }
 
 /**
  * This put value in map.byId[id] and adds id to allIds.
  */
-export function putById<I, M extends JsMap<I>>(map: M, id: string, value: I, initializer: I): M {
+export function putById<I, M extends JsMap<I>>(
+  map: M,
+  id: string,
+  value: I,
+  initializer: I
+): M {
   if (map.byId[id]) {
     if (!environment.strictCoherence) {
       if (environment.debug) {
-        console.debug(`putById called on an already existing element ${id} on: ${map}`);
+        console.debug(
+          `putById called on an already existing element ${id} on: ${map}`
+        );
       } else {
         console.warn(`putById called on an already existing element ${id}`);
       }
@@ -168,15 +195,15 @@ export function putById<I, M extends JsMap<I>>(map: M, id: string, value: I, ini
     }
   }
 
-  return Object.assign({},
-    map,
-    {
-      allIds: map.byId[id] ? [...Array.from(new Set([...map.allIds, id]))] : [...map.allIds, id],
-      byId: {
-        ...map.byId,
-        [id]: Object.assign({}, initializer, value)
-      }
-    });
+  return Object.assign({}, map, {
+    allIds: map.byId[id]
+      ? [...Array.from(new Set([...map.allIds, id]))]
+      : [...map.allIds, id],
+    byId: {
+      ...map.byId,
+      [id]: Object.assign({}, initializer, value),
+    },
+  });
 }
 
 /**
@@ -186,7 +213,9 @@ export function removeById<I, M extends JsMap<I>>(map: M, id: string): M {
   if (!map.byId[id]) {
     if (!environment.strictCoherence) {
       if (environment.debug) {
-        console.debug(`removeById called on an unexisting element ${id} on: ${map}`);
+        console.debug(
+          `removeById called on an unexisting element ${id} on: ${map}`
+        );
       } else {
         console.warn(`removeById called on an unexisting element ${id}`);
       }
@@ -196,10 +225,8 @@ export function removeById<I, M extends JsMap<I>>(map: M, id: string): M {
     }
   }
 
-  return Object.assign({},
-    map,
-    {
-      byId: omit(map.byId, id),
-      allIds: map.allIds.filter(i => i !== id)
-    });
+  return Object.assign({}, map, {
+    byId: omit(map.byId, id),
+    allIds: map.allIds.filter(i => i !== id),
+  });
 }

@@ -15,7 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ComponentState, IComponentBackendSSE, EComponentType, IComponentBackendDetails } from 'app/shared/services/components.service';
+import {
+  ComponentState,
+  IComponentBackendSSE,
+  EComponentType,
+  IComponentBackendDetails,
+} from 'app/shared/services/components.service';
 import { ServiceUnit } from './service-units-mock';
 import { Container } from './containers-mock';
 import { SharedLibrary } from './shared-libraries-mock';
@@ -23,7 +28,7 @@ import { SharedLibrary } from './shared-libraries-mock';
 export class Components {
   private readonly components = new Map<string, Component>();
 
-  constructor() { }
+  constructor() {}
 
   create(container: Container, name?: string, state?: ComponentState) {
     const component = new Component(container, name, state);
@@ -49,7 +54,11 @@ export class Component {
   public state: ComponentState;
   public parameters: { [key: string]: string };
 
-  constructor(container: Container, name?: string, state: ComponentState = 'Loaded') {
+  constructor(
+    container: Container,
+    name?: string,
+    state: ComponentState = 'Loaded'
+  ) {
     const i = Component.cpt++;
     this.container = container;
     this.id = `idComp${i}`;
@@ -57,7 +66,7 @@ export class Component {
     this.state = state;
     this.parameters = {
       'http-port': '8080',
-      'enable-https': 'false'
+      'enable-https': 'false',
     };
   }
 
@@ -86,20 +95,20 @@ export class Component {
         state: this.state,
         containerId: this.container.id,
         serviceUnits: Array.from(this.serviceUnits.keys()),
-        sharedLibraries: Array.from(this.sharedLibraries.keys())
-      }
+        sharedLibraries: Array.from(this.sharedLibraries.keys()),
+      },
     };
   }
 
   getDetails(): IComponentBackendDetails {
     if (this.state === 'Loaded') {
       return {
-        parameters: this.parameters
+        parameters: this.parameters,
       };
     }
 
     return {
-      parameters: {}
+      parameters: {},
     };
   }
 }

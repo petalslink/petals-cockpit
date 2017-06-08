@@ -18,21 +18,37 @@
 import { Action } from '@ngrx/store';
 
 import { Workspaces } from '../workspaces/workspaces.reducer';
-import { updateById, mergeOnly, JsMap, putAll } from 'app/shared/helpers/map.helper';
 import {
-  ISharedLibrariesTable, sharedLibrariesTableFactory, sharedLibraryRowFactory
+  updateById,
+  mergeOnly,
+  JsMap,
+  putAll,
+} from 'app/shared/helpers/map.helper';
+import {
+  ISharedLibrariesTable,
+  sharedLibrariesTableFactory,
+  sharedLibraryRowFactory,
 } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { ISharedLibraryBackendSSE, ISharedLibraryBackendDetails } from 'app/shared/services/shared-libraries.service';
+import {
+  ISharedLibraryBackendSSE,
+  ISharedLibraryBackendDetails,
+} from 'app/shared/services/shared-libraries.service';
 
 export class SharedLibraries {
   private static reducerName = '[Shared libraries]';
 
-  public static reducer(sharedLibrariesTable = sharedLibrariesTableFactory(), { type, payload }: Action): ISharedLibrariesTable {
+  public static reducer(
+    sharedLibrariesTable = sharedLibrariesTableFactory(),
+    { type, payload }: Action
+  ): ISharedLibrariesTable {
     if (!SharedLibraries.mapActionsToMethod[type]) {
       return sharedLibrariesTable;
     }
 
-    return SharedLibraries.mapActionsToMethod[type](sharedLibrariesTable, payload) || sharedLibrariesTable;
+    return (
+      SharedLibraries.mapActionsToMethod[type](sharedLibrariesTable, payload) ||
+      sharedLibrariesTable
+    );
   }
 
   // tslint:disable-next-line:member-ordering
@@ -61,7 +77,7 @@ export class SharedLibraries {
   ): ISharedLibrariesTable {
     return {
       ...sharedLibrariesTable,
-      selectedSharedLibraryId: payload.id
+      selectedSharedLibraryId: payload.id,
     };
   }
 
@@ -71,16 +87,21 @@ export class SharedLibraries {
     sharedLibrariesTable: ISharedLibrariesTable,
     payload: { id: string }
   ): ISharedLibrariesTable {
-    return updateById(sharedLibrariesTable, payload.id, { isFetchingDetails: true });
+    return updateById(sharedLibrariesTable, payload.id, {
+      isFetchingDetails: true,
+    });
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_DETAILS_SUCCESS = `${SharedLibraries.reducerName} Fetch details success`;
   private static fetchDetailsSuccess(
     sharedLibrariesTable: ISharedLibrariesTable,
-    payload: { id: string, data: ISharedLibraryBackendDetails }
+    payload: { id: string; data: ISharedLibraryBackendDetails }
   ): ISharedLibrariesTable {
-    return updateById(sharedLibrariesTable, payload.id, { ...payload.data, isFetchingDetails: false });
+    return updateById(sharedLibrariesTable, payload.id, {
+      ...payload.data,
+      isFetchingDetails: false,
+    });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -89,24 +110,32 @@ export class SharedLibraries {
     sharedLibrariesTable: ISharedLibrariesTable,
     payload: { id: string }
   ): ISharedLibrariesTable {
-    return updateById(sharedLibrariesTable, payload.id, { isFetchingDetails: false });
+    return updateById(sharedLibrariesTable, payload.id, {
+      isFetchingDetails: false,
+    });
   }
 
-  private static cleanWorkspace(_sharedLibrariesTable: ISharedLibrariesTable, _payload): ISharedLibrariesTable {
+  private static cleanWorkspace(
+    _sharedLibrariesTable: ISharedLibrariesTable,
+    _payload
+  ): ISharedLibrariesTable {
     return sharedLibrariesTableFactory();
   }
 
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod: { [type: string]: (t: ISharedLibrariesTable, p: any) => ISharedLibrariesTable } = {
+  private static mapActionsToMethod: {
+    [type: string]: (t: ISharedLibrariesTable, p: any) => ISharedLibrariesTable;
+  } = {
     [SharedLibraries.FETCHED]: SharedLibraries.fetched,
     [SharedLibraries.ADDED]: SharedLibraries.added,
     [SharedLibraries.SET_CURRENT]: SharedLibraries.setCurrent,
     [SharedLibraries.FETCH_DETAILS]: SharedLibraries.fetchDetails,
-    [SharedLibraries.FETCH_DETAILS_SUCCESS]: SharedLibraries.fetchDetailsSuccess,
+    [SharedLibraries.FETCH_DETAILS_SUCCESS]:
+      SharedLibraries.fetchDetailsSuccess,
     [SharedLibraries.FETCH_DETAILS_ERROR]: SharedLibraries.fetchDetailsError,
 
-    [Workspaces.CLEAN_WORKSPACE]: SharedLibraries.cleanWorkspace
+    [Workspaces.CLEAN_WORKSPACE]: SharedLibraries.cleanWorkspace,
   };
 }

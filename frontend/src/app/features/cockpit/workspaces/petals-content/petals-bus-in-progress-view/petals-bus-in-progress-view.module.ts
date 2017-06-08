@@ -22,10 +22,7 @@ import { PetalsBusInProgressViewRoutingModule } from './petals-bus-in-progress-v
 import { PetalsBusInProgressViewComponent } from './petals-bus-in-progress-view.component';
 
 @NgModule({
-  imports: [
-    SharedModule,
-    PetalsBusInProgressViewRoutingModule
-  ],
-  declarations: [PetalsBusInProgressViewComponent]
+  imports: [SharedModule, PetalsBusInProgressViewRoutingModule],
+  declarations: [PetalsBusInProgressViewComponent],
 })
-export class PetalsBusInProgressViewModule { }
+export class PetalsBusInProgressViewModule {}

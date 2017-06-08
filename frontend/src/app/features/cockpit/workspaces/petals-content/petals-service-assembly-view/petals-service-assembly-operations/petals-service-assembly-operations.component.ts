@@ -15,7 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  Input,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { stateNameToPossibleActionsServiceAssembly } from '../../../../../../shared/helpers/service-assembly.helper';
@@ -28,14 +33,14 @@ import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.ser
   selector: 'app-petals-service-assembly-operations',
   templateUrl: './petals-service-assembly-operations.component.html',
   styleUrls: ['./petals-service-assembly-operations.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsServiceAssemblyOperationsComponent implements OnInit {
   @Input() serviceAssembly: IServiceAssemblyRow;
 
-  constructor(private store$: Store<IStore>) { }
+  constructor(private store$: Store<IStore>) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   getPossibleStateActions(state: ServiceAssemblyState) {
     return stateNameToPossibleActionsServiceAssembly(state);
@@ -46,6 +51,9 @@ export class PetalsServiceAssemblyOperationsComponent implements OnInit {
   }
 
   changeState(newState: ServiceAssemblyState) {
-    this.store$.dispatch({ type: ServiceAssemblies.CHANGE_STATE, payload: { serviceAssemblyId: this.serviceAssembly.id, newState } });
+    this.store$.dispatch({
+      type: ServiceAssemblies.CHANGE_STATE,
+      payload: { serviceAssemblyId: this.serviceAssembly.id, newState },
+    });
   }
 }

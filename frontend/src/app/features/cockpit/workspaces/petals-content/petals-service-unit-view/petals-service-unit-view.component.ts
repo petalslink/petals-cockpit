@@ -31,7 +31,7 @@ import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/servi
 @Component({
   selector: 'app-petals-service-unit-view',
   templateUrl: './petals-service-unit-view.component.html',
-  styleUrls: ['./petals-service-unit-view.component.scss']
+  styleUrls: ['./petals-service-unit-view.component.scss'],
 })
 export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
@@ -40,7 +40,7 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
   public serviceAssembly$: Observable<IServiceAssemblyRow>;
   public workspaceId$: Observable<string>;
 
-  constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
+  constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
 
   ngOnInit() {
     const serviceUnitId$ = this.route.paramMap
@@ -49,30 +49,44 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
 
     this.serviceUnit$ = this.store$.let(getCurrentServiceUnit);
 
-    this.serviceAssembly$ = this
-      .serviceUnit$
-      .combineLatest(this
-        .store$
-        .select(state => state.serviceAssemblies))
-      .map(([serviceUnit, serviceAssembliesTable]) => serviceAssembliesTable.byId[serviceUnit.serviceAssemblyId]);
+    this.serviceAssembly$ = this.serviceUnit$
+      .combineLatest(this.store$.select(state => state.serviceAssemblies))
+      .map(
+        ([serviceUnit, serviceAssembliesTable]) =>
+          serviceAssembliesTable.byId[serviceUnit.serviceAssemblyId]
+      );
 
-    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Service Unit' } });
+    this.store$.dispatch({
+      type: Ui.SET_TITLES,
+      payload: { titleMainPart1: 'Petals', titleMainPart2: 'Service Unit' },
+    });
 
     serviceUnitId$
       .takeUntil(this.onDestroy$)
       .do(serviceUnitId => {
-        this.store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId } });
-        this.store$.dispatch({ type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS, payload: { serviceUnitId } });
+        this.store$.dispatch({
+          type: ServiceUnits.SET_CURRENT_SERVICE_UNIT,
+          payload: { serviceUnitId },
+        });
+        this.store$.dispatch({
+          type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS,
+          payload: { serviceUnitId },
+        });
       })
       .subscribe();
 
-    this.workspaceId$ = this.store$.select(state => state.workspaces.selectedWorkspaceId);
+    this.workspaceId$ = this.store$.select(
+      state => state.workspaces.selectedWorkspaceId
+    );
   }
 
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    this.store$.dispatch({ type: ServiceUnits.SET_CURRENT_SERVICE_UNIT, payload: { serviceUnitId: '' } });
+    this.store$.dispatch({
+      type: ServiceUnits.SET_CURRENT_SERVICE_UNIT,
+      payload: { serviceUnitId: '' },
+    });
   }
 }

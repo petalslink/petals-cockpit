@@ -25,12 +25,15 @@ import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Containers } from '../../state/containers/containers.reducer';
 import { Ui } from '../../../../../shared/state/ui.reducer';
 import { IContainerRow } from '../../state/containers/containers.interface';
-import { getCurrentContainer, getCurrentContainerSiblings } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
+import {
+  getCurrentContainer,
+  getCurrentContainerSiblings,
+} from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 
 @Component({
   selector: 'app-petals-container-view',
   templateUrl: './petals-container-view.component.html',
-  styleUrls: ['./petals-container-view.component.scss']
+  styleUrls: ['./petals-container-view.component.scss'],
 })
 export class PetalsContainerViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
@@ -39,10 +42,13 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
   public container$: Observable<IContainerRow>;
   public otherContainers$: Observable<IContainerRow[]>;
 
-  constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
+  constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Container' } });
+    this.store$.dispatch({
+      type: Ui.SET_TITLES,
+      payload: { titleMainPart1: 'Petals', titleMainPart2: 'Container' },
+    });
 
     this.workspaceId$ = this.route.paramMap
       .map(p => p.get('workspaceId'))
@@ -56,13 +62,27 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
       .map(p => p.get('containerId'))
       .takeUntil(this.onDestroy$)
       .do(id => {
-        this.store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: id } });
-        this.store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: id } });
+        this.store$.dispatch({
+          type: Containers.SET_CURRENT_CONTAINER,
+          payload: { containerId: id },
+        });
+        this.store$.dispatch({
+          type: Containers.FETCH_CONTAINER_DETAILS,
+          payload: { containerId: id },
+        });
       })
-      .switchMap(busId => this.otherContainers$
-        .first()
-        .do(cs => cs.forEach(c => this.store$.dispatch({ type: Containers.FETCH_CONTAINER_DETAILS, payload: { containerId: c.id } })))
-        .map(_ => busId)
+      .switchMap(busId =>
+        this.otherContainers$
+          .first()
+          .do(cs =>
+            cs.forEach(c =>
+              this.store$.dispatch({
+                type: Containers.FETCH_CONTAINER_DETAILS,
+                payload: { containerId: c.id },
+              })
+            )
+          )
+          .map(_ => busId)
       )
       .subscribe();
   }
@@ -71,6 +91,9 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    this.store$.dispatch({ type: Containers.SET_CURRENT_CONTAINER, payload: { containerId: '' } });
+    this.store$.dispatch({
+      type: Containers.SET_CURRENT_CONTAINER,
+      payload: { containerId: '' },
+    });
   }
 }

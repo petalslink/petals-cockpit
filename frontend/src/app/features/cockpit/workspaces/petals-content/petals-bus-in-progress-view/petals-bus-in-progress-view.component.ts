@@ -15,7 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  AfterViewInit,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MdInputContainer } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -24,12 +30,18 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 import { IStore } from './../../../../../shared/interfaces/store.interface';
-import { IBusesInProgressTable, IBusInProgressRow } from './../../state/buses-in-progress/buses-in-progress.interface';
+import {
+  IBusesInProgressTable,
+  IBusInProgressRow,
+} from './../../state/buses-in-progress/buses-in-progress.interface';
 import { Ui } from './../../../../../shared/state/ui.reducer';
 import { BusesInProgress } from './../../state/buses-in-progress/buses-in-progress.reducer';
 import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
 import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
-import { getFormErrors, disableAllFormFields } from './../../../../../shared/helpers/form.helper';
+import {
+  getFormErrors,
+  disableAllFormFields,
+} from './../../../../../shared/helpers/form.helper';
 import { arrayEquals, tuple } from 'app/shared/helpers/shared.helper';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { IBusImport } from 'app/shared/services/buses.service';
@@ -37,9 +49,10 @@ import { IBusImport } from 'app/shared/services/buses.service';
 @Component({
   selector: 'app-petals-bus-in-progress-view',
   templateUrl: './petals-bus-in-progress-view.component.html',
-  styleUrls: ['./petals-bus-in-progress-view.component.scss']
+  styleUrls: ['./petals-bus-in-progress-view.component.scss'],
 })
-export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, AfterViewInit {
+export class PetalsBusInProgressViewComponent
+  implements OnInit, OnDestroy, AfterViewInit {
   private onDestroy$ = new Subject<void>();
 
   @ViewChild('ipInput') ipInput: MdInputContainer;
@@ -52,11 +65,11 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
   public busImportForm: FormGroup;
 
   public formErrors = {
-    'ip': '',
-    'port': '',
-    'username': '',
-    'password': '',
-    'passphrase': ''
+    ip: '',
+    port: '',
+    username: '',
+    password: '',
+    passphrase: '',
   };
 
   constructor(
@@ -64,12 +77,17 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit() {
-    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Import bus' } });
+    this.store$.dispatch({
+      type: Ui.SET_TITLES,
+      payload: { titleMainPart1: 'Petals', titleMainPart2: 'Import bus' },
+    });
 
-    this.busesInProgressTable$ = this.store$.select(state => state.busesInProgress);
+    this.busesInProgressTable$ = this.store$.select(
+      state => state.busesInProgress
+    );
     this.busInProgress$ = this.store$.let(getCurrentBusInProgressOrNull);
 
     this.createFormImportBus();
@@ -78,13 +96,17 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
       .map(paramMap => paramMap.get('busInProgressId'))
       // displays the last thing in url if no params (bug ?)
       // TODO clean that, it's not the correct way to handle empty form versus completed form
-      .map(bId => bId === 'buses-in-progress' ? '' : bId)
+      .map(bId => (bId === 'buses-in-progress' ? '' : bId))
       .distinctUntilChanged();
 
     id$
       .takeUntil(this.onDestroy$)
       .do(busInProgressId =>
-        this.store$.dispatch({ type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS, payload: { busInProgressId } }))
+        this.store$.dispatch({
+          type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
+          payload: { busInProgressId },
+        })
+      )
       .subscribe();
 
     // takes care of redirecting to the right URL after the shown bus in progress is deleted
@@ -92,29 +114,53 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
     id$
       .switchMap(bId => {
         if (bId) {
-          return this.store$
-            // when either the bus in progress is deleted or it became a real bus
-            // (note: this can happen in two passes)
-            .select(state => tuple([state.busesInProgress.byId[bId], state.buses.byId[bId]]))
-            .distinctUntilChanged(arrayEquals)
-            // only interested in deleted bus in progress
-            .filter(([bip, _]) => !bip)
-            .do(([_, bus]) => {
-              if (bus) {
-                this.router.navigate(['/workspaces', this.route.snapshot.paramMap.get('workspaceId'), 'petals', 'buses', bus.id]);
-              } else {
-                this.router.navigate(['/workspaces', this.route.snapshot.paramMap.get('workspaceId')]);
-              }
-            })
-            .mapTo(null);
+          return (
+            this.store$
+              // when either the bus in progress is deleted or it became a real bus
+              // (note: this can happen in two passes)
+              .select(state =>
+                tuple([state.busesInProgress.byId[bId], state.buses.byId[bId]])
+              )
+              .distinctUntilChanged(arrayEquals)
+              // only interested in deleted bus in progress
+              .filter(([bip, _]) => !bip)
+              .do(([_, bus]) => {
+                if (bus) {
+                  this.router.navigate([
+                    '/workspaces',
+                    this.route.snapshot.paramMap.get('workspaceId'),
+                    'petals',
+                    'buses',
+                    bus.id,
+                  ]);
+                } else {
+                  this.router.navigate([
+                    '/workspaces',
+                    this.route.snapshot.paramMap.get('workspaceId'),
+                  ]);
+                }
+              })
+              .mapTo(null)
+          );
         } else {
-          return this.store$
-            // when the currently imported bus becomes present
-            .select(state => state.busesInProgress.byId[state.busesInProgress.importBusId])
-            .filter(bip => !!bip)
-            .do(bip => {
-              this.router.navigate(['/workspaces', this.route.snapshot.paramMap.get('workspaceId'), 'petals', 'buses-in-progress', bip.id]);
-            });
+          return (
+            this.store$
+              // when the currently imported bus becomes present
+              .select(
+                state =>
+                  state.busesInProgress.byId[state.busesInProgress.importBusId]
+              )
+              .filter(bip => !!bip)
+              .do(bip => {
+                this.router.navigate([
+                  '/workspaces',
+                  this.route.snapshot.paramMap.get('workspaceId'),
+                  'petals',
+                  'buses-in-progress',
+                  bip.id,
+                ]);
+              })
+          );
         }
       })
       .takeUntil(this.onDestroy$)
@@ -131,7 +177,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
             port: busInProgress.port,
             username: busInProgress.username,
             password: busInProgress.password,
-            passphrase: busInProgress.passphrase
+            passphrase: busInProgress.passphrase,
           });
 
           disableAllFormFields(this.busImportForm);
@@ -143,24 +189,30 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
   createFormImportBus() {
     this.busImportForm = this.fb.group({
       ip: ['', Validators.required],
-      port: ['', Validators.compose([Validators.required, CustomValidators.isPort])],
+      port: [
+        '',
+        Validators.compose([Validators.required, CustomValidators.isPort]),
+      ],
       username: ['', [Validators.required]],
       password: ['', [Validators.required]],
       passphrase: ['', [Validators.required]],
     });
 
-    this
-      .busImportForm
-      .valueChanges
+    this.busImportForm.valueChanges
       .takeUntil(this.onDestroy$)
       .do(data => {
-        this.formErrors = getFormErrors(this.busImportForm, this.formErrors, data);
+        this.formErrors = getFormErrors(
+          this.busImportForm,
+          this.formErrors,
+          data
+        );
       })
       .subscribe();
   }
 
   ngAfterViewInit() {
-    this.store$.let(isLargeScreen)
+    this.store$
+      .let(isLargeScreen)
       .first()
       .filter(ss => ss)
       .do(_ => this.ipInput._focusInput())
@@ -172,16 +224,25 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy, Afte
     this.onDestroy$.complete();
   }
 
-  onSubmit({ value }: { value: IBusImport, valid: boolean }) {
-    this.store$.dispatch({ type: BusesInProgress.POST_BUS_IN_PROGRESS, payload: value });
+  onSubmit({ value }: { value: IBusImport; valid: boolean }) {
+    this.store$.dispatch({
+      type: BusesInProgress.POST_BUS_IN_PROGRESS,
+      payload: value,
+    });
   }
 
   discard(busInProgress: IBusInProgressRow) {
-    this.store$.dispatch({ type: BusesInProgress.DELETE_BUS_IN_PROGRESS, payload: busInProgress });
+    this.store$.dispatch({
+      type: BusesInProgress.DELETE_BUS_IN_PROGRESS,
+      payload: busInProgress,
+    });
   }
 
   reset() {
     this.busImportForm.reset();
-    this.store$.dispatch({ type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS, payload: '' });
+    this.store$.dispatch({
+      type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
+      payload: '',
+    });
   }
 }

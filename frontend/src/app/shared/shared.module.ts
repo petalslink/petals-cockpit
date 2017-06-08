@@ -27,9 +27,18 @@ import { PrettyJsonModule } from 'angular2-prettyjson';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { NgObjectPipesModule } from 'ngx-pipes';
 import {
-  MdButtonModule, MdCardModule, MdDialogModule, MdIconModule,
-  MdInputModule, MdListModule, MdProgressSpinnerModule, MdRippleModule,
-  MdSidenavModule, MdTabsModule, MdToolbarModule, MdTooltipModule
+  MdButtonModule,
+  MdCardModule,
+  MdDialogModule,
+  MdIconModule,
+  MdInputModule,
+  MdListModule,
+  MdProgressSpinnerModule,
+  MdRippleModule,
+  MdSidenavModule,
+  MdTabsModule,
+  MdToolbarModule,
+  MdTooltipModule,
 } from '@angular/material';
 
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
@@ -48,7 +57,7 @@ export const MaterialModules = [
   MdSidenavModule,
   MdTabsModule,
   MdToolbarModule,
-  MdTooltipModule
+  MdTooltipModule,
 ];
 
 export const modules = [
@@ -63,18 +72,18 @@ export const modules = [
   PrettyJsonModule,
   SimpleNotificationsModule,
   NgObjectPipesModule,
-  ...MaterialModules
+  ...MaterialModules,
 ];
 
 export const declarations = [
   GenerateIconComponent,
   ColorSearchedLettersDirective,
-  UploadComponent
+  UploadComponent,
 ];
 
 @NgModule({
   imports: modules,
   exports: [...modules, ...declarations],
-  declarations
+  declarations,
 })
-export class SharedModule { }
+export class SharedModule {}

@@ -30,7 +30,7 @@ import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/wor
 @Component({
   selector: 'app-workspace',
   templateUrl: './workspace.component.html',
-  styleUrls: ['./workspace.component.scss']
+  styleUrls: ['./workspace.component.scss'],
 })
 export class WorkspaceComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
@@ -42,23 +42,30 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   public isSettingDescription = false;
   public description: string = null;
 
-  constructor(private store$: Store<IStore>, public dialog: MdDialog) { }
+  constructor(private store$: Store<IStore>, public dialog: MdDialog) {}
 
   ngOnInit() {
-    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: '' } });
+    this.store$.dispatch({
+      type: Ui.SET_TITLES,
+      payload: { titleMainPart1: 'Petals', titleMainPart2: '' },
+    });
 
     this.workspace$ = this.store$.let(getCurrentWorkspace());
 
     this.workspace$
       .takeUntil(this.onDestroy$)
       // only when we change workspace!
-      .map(ws => ws.id).distinctUntilChanged()
+      .map(ws => ws.id)
+      .distinctUntilChanged()
       .do(id => {
         // we reinit these in case one change workspace while editing
         this.description = null;
         this.isEditingDescription = false;
         this.isSettingDescription = false;
-        this.store$.dispatch({ type: Workspaces.FETCH_WORKSPACE_DETAILS, payload: id });
+        this.store$.dispatch({
+          type: Workspaces.FETCH_WORKSPACE_DETAILS,
+          payload: id,
+        });
       })
       .subscribe();
 
@@ -98,7 +105,10 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.workspace$
       .first()
       .do(ws => {
-        this.store$.dispatch({ type: Workspaces.SET_DESCRIPTION, payload: { id: ws.id, description: desc } });
+        this.store$.dispatch({
+          type: Workspaces.SET_DESCRIPTION,
+          payload: { id: ws.id, description: desc },
+        });
       })
       .subscribe();
   }
@@ -106,16 +116,21 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   openDeletionDialog() {
     this.workspace$
       .first()
-      .do(_ => this.isRemoving = true)
+      .do(_ => (this.isRemoving = true))
       .switchMap(ws =>
         this.dialog
           .open(WorkspaceDeleteDialogComponent, {
-            data: { workspace: ws }
+            data: { workspace: ws },
           })
           .afterClosed()
-          .do((result: boolean) => this.isRemoving = result)
+          .do((result: boolean) => (this.isRemoving = result))
           .filter((result: boolean) => result)
-          .do(_ => this.store$.dispatch({ type: Workspaces.DELETE_WORKSPACE, payload: ws.id }))
+          .do(_ =>
+            this.store$.dispatch({
+              type: Workspaces.DELETE_WORKSPACE,
+              payload: ws.id,
+            })
+          )
       )
       .subscribe();
   }
@@ -151,12 +166,14 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
       </div>
     </div>
   `,
-  styles: ['md-dialog-content { height: 100%; } .central-content { padding: 24px; }']
+  styles: [
+    'md-dialog-content { height: 100%; } .central-content { padding: 24px; }',
+  ],
 })
 export class WorkspaceDeleteDialogComponent {
   constructor(
     public dialogRef: MdDialogRef<WorkspaceDeleteDialogComponent>,
     // TODO add some type for data when https://github.com/angular/angular/issues/15424 is fixed
     @Inject(MD_DIALOG_DATA) public data: any
-  ) { }
+  ) {}
 }

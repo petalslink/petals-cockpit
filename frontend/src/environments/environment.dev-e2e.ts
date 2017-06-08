@@ -1,4 +1,3 @@
-
 import { environment as dev } from './environment.dev';
 
 export const environment = {
@@ -6,6 +5,6 @@ export const environment = {
   mock: {
     httpDelay: 0,
     sseDelay: 0,
-    alreadyConnected: false
-  }
+    alreadyConnected: false,
+  },
 };

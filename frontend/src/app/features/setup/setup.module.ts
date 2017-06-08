@@ -21,12 +21,8 @@ import { SharedModule } from 'app/shared/shared.module';
 import { SetupRoutingModule } from 'app/features/setup/setup-routing.module';
 import { SetupComponent } from 'app/features/setup/setup.component';
 
-
 @NgModule({
-  imports: [
-    SharedModule,
-    SetupRoutingModule
-  ],
-  declarations: [SetupComponent]
+  imports: [SharedModule, SetupRoutingModule],
+  declarations: [SetupComponent],
 })
-export class SetupModule { }
+export class SetupModule {}

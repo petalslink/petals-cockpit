@@ -23,30 +23,41 @@ import { ServiceUnitOverviewPage } from './service-unit.po';
 import { ComponentOverviewPage } from './component.po';
 
 export abstract class ServiceAssemblyPage {
-
   public static readonly component = $(`app-petals-service-assembly-view`);
 
   public readonly component = ServiceAssemblyPage.component;
   public readonly title = this.component.$(`md-toolbar .title`);
 
   protected static wait() {
-    browser.wait(urlToMatch(/\/workspaces\/\w+\/petals\/service-assemblies\/\w+/), waitTimeout);
+    browser.wait(
+      urlToMatch(/\/workspaces\/\w+\/petals\/service-assemblies\/\w+/),
+      waitTimeout
+    );
     browser.wait(EC.visibilityOf(ServiceAssemblyPage.component), waitTimeout);
-    browser.wait(EC.stalenessOf(ServiceAssemblyPage.component.$('md-toolbar md-spinner')), waitTimeout);
+    browser.wait(
+      EC.stalenessOf(ServiceAssemblyPage.component.$('md-toolbar md-spinner')),
+      waitTimeout
+    );
   }
 }
 
 export class ServiceAssemblyOverviewPage extends ServiceAssemblyPage {
-
-  public static readonly overview = ServiceAssemblyPage.component.$(`app-petals-service-assembly-overview`);
+  public static readonly overview = ServiceAssemblyPage.component.$(
+    `app-petals-service-assembly-overview`
+  );
 
   public readonly overview = ServiceAssemblyOverviewPage.overview;
   public readonly state = this.overview.$(`md-card.state md-card-title`);
-  public readonly serviceUnits = this.overview.$$(`md-card.service-units ul > li`);
+  public readonly serviceUnits = this.overview.$$(
+    `md-card.service-units ul > li`
+  );
 
   static waitAndGet() {
     super.wait();
-    browser.wait(EC.visibilityOf(ServiceAssemblyOverviewPage.overview), waitTimeout);
+    browser.wait(
+      EC.visibilityOf(ServiceAssemblyOverviewPage.overview),
+      waitTimeout
+    );
     return new ServiceAssemblyOverviewPage();
   }
 
@@ -55,43 +66,77 @@ export class ServiceAssemblyOverviewPage extends ServiceAssemblyPage {
   }
 
   openOperations() {
-    this.component.element(by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')).click();
+    this.component
+      .element(
+        by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')
+      )
+      .click();
     return ServiceAssemblyOperationPage.waitAndGet();
   }
 
   openServiceUnit(identifier: string | number) {
     if (typeof identifier === 'string') {
-      this.overview.element(by.cssContainingText(`md-card.service-units ul > li a.service-unit`, identifier)).click();
+      this.overview
+        .element(
+          by.cssContainingText(
+            `md-card.service-units ul > li a.service-unit`,
+            identifier
+          )
+        )
+        .click();
     } else {
-      this.overview.$$('md-card.service-units ul > li a.service-unit').get(identifier).click();
+      this.overview
+        .$$('md-card.service-units ul > li a.service-unit')
+        .get(identifier)
+        .click();
     }
     return ServiceUnitOverviewPage.waitAndGet();
   }
 
   openComponent(identifier: string | number) {
     if (typeof identifier === 'string') {
-      this.overview.element(by.cssContainingText(`md-card.service-units ul > li a.component`, identifier)).click();
+      this.overview
+        .element(
+          by.cssContainingText(
+            `md-card.service-units ul > li a.component`,
+            identifier
+          )
+        )
+        .click();
     } else {
-      this.overview.$$('md-card.service-units ul > li a.component').get(identifier).click();
+      this.overview
+        .$$('md-card.service-units ul > li a.component')
+        .get(identifier)
+        .click();
     }
     return ComponentOverviewPage.waitAndGet();
   }
 }
 
 export class ServiceAssemblyOperationPage extends ServiceAssemblyPage {
-
-  public static readonly operations = ServiceAssemblyPage.component.$(`app-petals-service-assembly-operations`);
+  public static readonly operations = ServiceAssemblyPage.component.$(
+    `app-petals-service-assembly-operations`
+  );
 
   public readonly operations = ServiceAssemblyOperationPage.operations;
   public readonly stateCard = this.operations.$(`md-card.state`);
   public readonly state = this.stateCard.$(`md-card-title`);
-  public readonly stopButton = this.stateCard.element(by.cssContainingText(`button`, `Stop`));
-  public readonly startButton = this.stateCard.element(by.cssContainingText(`button`, `Start`));
-  public readonly unloadButton = this.stateCard.element(by.cssContainingText(`button`, `Unload`));
+  public readonly stopButton = this.stateCard.element(
+    by.cssContainingText(`button`, `Stop`)
+  );
+  public readonly startButton = this.stateCard.element(
+    by.cssContainingText(`button`, `Start`)
+  );
+  public readonly unloadButton = this.stateCard.element(
+    by.cssContainingText(`button`, `Unload`)
+  );
 
   static waitAndGet() {
     super.wait();
-    browser.wait(EC.visibilityOf(ServiceAssemblyOperationPage.operations), waitTimeout);
+    browser.wait(
+      EC.visibilityOf(ServiceAssemblyOperationPage.operations),
+      waitTimeout
+    );
     return new ServiceAssemblyOperationPage();
   }
 

@@ -24,13 +24,13 @@ import { PetalsComponentViewComponent } from './petals-component-view.component'
 const routes: Routes = [
   {
     path: '',
-    component: PetalsComponentViewComponent
-  }
+    component: PetalsComponentViewComponent,
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
-  providers: []
+  providers: [],
 })
-export class PetalsComponentViewRoutingModule { }
+export class PetalsComponentViewRoutingModule {}

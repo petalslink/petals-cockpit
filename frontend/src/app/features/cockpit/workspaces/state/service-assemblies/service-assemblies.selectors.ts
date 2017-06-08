@@ -24,23 +24,39 @@ import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/wo
 import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 import { arrayEquals, tuple } from 'app/shared/helpers/shared.helper';
 
-export function getCurrentServiceAssembly(store$: Store<IStore>): Observable<IServiceAssemblyRow> {
+export function getCurrentServiceAssembly(
+  store$: Store<IStore>
+): Observable<IServiceAssemblyRow> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.serviceAssemblies.selectedServiceAssemblyId)
-    .map(state => state.serviceAssemblies.byId[state.serviceAssemblies.selectedServiceAssemblyId])
+    .map(
+      state =>
+        state.serviceAssemblies.byId[
+          state.serviceAssemblies.selectedServiceAssemblyId
+        ]
+    )
     .distinctUntilChanged();
 }
 
-export function getServiceUnitsAndComponentsOfServiceAssembly(store$: Store<IStore>): Observable<IServiceUnitAndComponent[]> {
+export function getServiceUnitsAndComponentsOfServiceAssembly(
+  store$: Store<IStore>
+): Observable<IServiceUnitAndComponent[]> {
   return getCurrentServiceAssembly(store$)
-    .withLatestFrom(store$.select(state => tuple([state.serviceUnits, state.components])))
+    .withLatestFrom(
+      store$.select(state => tuple([state.serviceUnits, state.components]))
+    )
     .map(([a, [b, c]]) => tuple([a, b, c]))
     .distinctUntilChanged(arrayEquals)
     .map(([serviceAssemblyRow, serviceUnitsTable, componentsTable]) =>
-      serviceAssemblyRow.serviceUnits.map(serviceUnitId => (<IServiceUnitAndComponent>{
-        ...serviceUnitsTable.byId[serviceUnitId],
-        component: componentsTable
-          .byId[serviceUnitsTable
-            .byId[serviceUnitId].componentId]
-      })));
+      serviceAssemblyRow.serviceUnits.map(
+        serviceUnitId =>
+          <IServiceUnitAndComponent>{
+            ...serviceUnitsTable.byId[serviceUnitId],
+            component:
+              componentsTable.byId[
+                serviceUnitsTable.byId[serviceUnitId].componentId
+              ],
+          }
+      )
+    );
 }

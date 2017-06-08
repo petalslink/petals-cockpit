@@ -20,22 +20,24 @@ import { browser, ExpectedConditions as EC } from 'protractor';
 import { page, waitTimeout } from './common';
 
 describe(`Workspace Overview`, () => {
-
   it(`should have the workspace information in overview`, () => {
     const workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
 
     // check the page content
-    expect(workspace.title.getText())
-      .toEqual(`Workspace 0`);
+    expect(workspace.title.getText()).toEqual(`Workspace 0`);
 
-    expect(workspace.description.getText()).toEqual(`You can import a bus from the container 192.168.0.1:7700 to get a mock bus.`);
+    expect(workspace.description.getText()).toEqual(
+      `You can import a bus from the container 192.168.0.1:7700 to get a mock bus.`
+    );
     expect(workspace.descriptionArea.isPresent()).toBe(false);
 
-    expect(workspace.users.$(`.users-in-workspace`).getText())
-      .toEqual(`You are the only one using this workspace.`);
+    expect(workspace.users.$(`.users-in-workspace`).getText()).toEqual(
+      `You are the only one using this workspace.`
+    );
 
-    expect(workspace.users.$$(`md-list-item .mat-list-text`).getText())
-      .toEqual(['admin\nAdministrator']);
+    expect(
+      workspace.users.$$(`md-list-item .mat-list-text`).getText()
+    ).toEqual(['admin\nAdministrator']);
   });
 
   it(`should reset workspace overview when changing workspaces`, () => {
@@ -45,25 +47,30 @@ describe(`Workspace Overview`, () => {
     workspace.editButton.click();
 
     // let's check another workspace
-    const ws2 = workspace.openWorkspacesDialog().selectWorkspace(1, `Workspace 1`);
+    const ws2 = workspace
+      .openWorkspacesDialog()
+      .selectWorkspace(1, `Workspace 1`);
 
     expect(ws2.title.getText()).toEqual(`Workspace 1`);
 
-    expect(workspace.description.getText())
-      .toEqual(`Put some description in markdown for the workspace here.`);
+    expect(workspace.description.getText()).toEqual(
+      `Put some description in markdown for the workspace here.`
+    );
     expect(workspace.descriptionArea.isPresent()).toBe(false);
 
-    expect(workspace.users.$(`.users-in-workspace`).getText())
-      .toEqual(`5 people are using this workspace.`);
+    expect(workspace.users.$(`.users-in-workspace`).getText()).toEqual(
+      `5 people are using this workspace.`
+    );
 
-    expect(workspace.users.$$(`md-list-item .mat-list-text`).getText())
-      .toEqual([
-        'admin\nAdministrator',
-        'bescudie\nBertrand ESCUDIE',
-        'mrobert\nMaxime ROBERT',
-        'cchevalier\nChristophe CHEVALIER',
-        'vnoel\nVictor NOEL'
-      ]);
+    expect(
+      workspace.users.$$(`md-list-item .mat-list-text`).getText()
+    ).toEqual([
+      'admin\nAdministrator',
+      'bescudie\nBertrand ESCUDIE',
+      'mrobert\nMaxime ROBERT',
+      'cchevalier\nChristophe CHEVALIER',
+      'vnoel\nVictor NOEL',
+    ]);
 
     // and go back to the first one (for last workspace to be valid in other tests...)
     workspace.openWorkspacesDialog().selectWorkspace(0, `Workspace 0`);
@@ -75,25 +82,30 @@ describe(`Workspace Overview`, () => {
     // let's check another workspace
     workspace.openWorkspacesDialog().selectWorkspace(1, `Workspace 1`);
 
-    expect(workspace.description.getText())
-      .toEqual(`Put some description in markdown for the workspace here.`);
+    expect(workspace.description.getText()).toEqual(
+      `Put some description in markdown for the workspace here.`
+    );
 
     // the description should be rendered via markdown
-    expect(workspace.description.$(`strong`).getText())
-      .toEqual(`markdown`);
+    expect(workspace.description.$(`strong`).getText()).toEqual(`markdown`);
 
     // edition
     workspace.editButton.click();
 
-    expect(workspace.descriptionPreview.getText()).toEqual(`Put some description in markdown for the workspace here.`);
+    expect(workspace.descriptionPreview.getText()).toEqual(
+      `Put some description in markdown for the workspace here.`
+    );
 
     // write a few words
     workspace.descriptionArea.sendKeys(' And some ~~more~~.');
 
-    expect(workspace.descriptionPreview.getText())
-      .toEqual(`Put some description in markdown for the workspace here. And some more.`);
+    expect(workspace.descriptionPreview.getText()).toEqual(
+      `Put some description in markdown for the workspace here. And some more.`
+    );
 
-    expect(workspace.descriptionPreview.$(`strong`).getText()).toEqual(`markdown`);
+    expect(workspace.descriptionPreview.$(`strong`).getText()).toEqual(
+      `markdown`
+    );
     expect(workspace.descriptionPreview.$(`del`).getText()).toEqual(`more`);
 
     // and go back to the first one (for last workspace to be valid in other tests...)
@@ -101,7 +113,9 @@ describe(`Workspace Overview`, () => {
   });
 
   it(`should edit the workspace description in overview`, () => {
-    const workspaces = page.goToWorkspacesViaLogin().loginToWorkspaces('bescudie', 'bescudie');
+    const workspaces = page
+      .goToWorkspacesViaLogin()
+      .loginToWorkspaces('bescudie', 'bescudie');
 
     workspaces.inputName.sendKeys(`New workspace`);
     workspaces.addButton.click();
@@ -109,19 +123,23 @@ describe(`Workspace Overview`, () => {
 
     expect(workspace.title.getText()).toEqual(`New workspace`);
 
-    expect(workspace.description.getText())
-      .toEqual(`Put some description in markdown for the workspace here.`);
+    expect(workspace.description.getText()).toEqual(
+      `Put some description in markdown for the workspace here.`
+    );
 
     workspace.editButton.click();
 
     // cancel
     workspace.descriptionArea.sendKeys(' Will disappear.');
-    expect(workspace.descriptionPreview.getText()).toEqual(`Put some description in markdown for the workspace here. Will disappear.`);
+    expect(workspace.descriptionPreview.getText()).toEqual(
+      `Put some description in markdown for the workspace here. Will disappear.`
+    );
 
     workspace.descriptionCancel.click();
 
-    expect(workspace.description.getText())
-      .toEqual(`Put some description in markdown for the workspace here.`);
+    expect(workspace.description.getText()).toEqual(
+      `Put some description in markdown for the workspace here.`
+    );
 
     // edit again
 
@@ -133,19 +151,22 @@ describe(`Workspace Overview`, () => {
 
     browser.wait(EC.visibilityOf(workspace.description), waitTimeout);
 
-    expect(workspace.description.getText())
-      .toEqual(`Put some description in markdown for the workspace here. And some more.`);
+    expect(workspace.description.getText()).toEqual(
+      `Put some description in markdown for the workspace here. And some more.`
+    );
 
     // let's check it is not modified in other...
     workspace.openWorkspacesDialog().selectWorkspace(0, `Workspace 1`);
 
-    expect(workspace.description.getText())
-      .toEqual(`Put some description in markdown for the workspace here.`);
+    expect(workspace.description.getText()).toEqual(
+      `Put some description in markdown for the workspace here.`
+    );
 
     // but correct in modified
     workspace.openWorkspacesDialog().selectWorkspace(1, `New workspace`);
 
-    expect(workspace.description.getText())
-      .toEqual(`Put some description in markdown for the workspace here. And some more.`);
+    expect(workspace.description.getText()).toEqual(
+      `Put some description in markdown for the workspace here. And some more.`
+    );
   });
 });

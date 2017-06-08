@@ -24,17 +24,13 @@ import { Ui } from '../state/ui.reducer';
 import { IStore } from 'app/shared/interfaces/store.interface';
 import { isSmallScreen } from 'app/shared/state/ui.selectors';
 
-
 @Injectable()
 export class UiEffects {
-
-  constructor(
-    private actions$: Actions,
-    private store$: Store<IStore>
-  ) { }
+  constructor(private actions$: Actions, private store$: Store<IStore>) {}
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true }) closeSidenavOnSmallScreen$: Observable<Action> = this.actions$
+  @Effect({ dispatch: true })
+  closeSidenavOnSmallScreen$: Observable<Action> = this.actions$
     .ofType(Ui.CLOSE_SIDENAV_ON_SMALL_SCREEN)
     .withLatestFrom(this.store$.let(isSmallScreen))
     .filter(([_, ss]) => ss)

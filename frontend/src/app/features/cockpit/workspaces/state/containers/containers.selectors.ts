@@ -23,14 +23,18 @@ import { IContainerRow } from './containers.interface';
 import { arrayEquals } from '../../../../../shared/helpers/shared.helper';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
-export function getCurrentContainer(store$: Store<IStore>): Observable<IContainerRow> {
+export function getCurrentContainer(
+  store$: Store<IStore>
+): Observable<IContainerRow> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.containers.selectedContainerId)
     .map(state => state.containers.byId[state.containers.selectedContainerId])
     .distinctUntilChanged();
 }
 
-export function getCurrentContainerSiblings(store$: Store<IStore>): Observable<IContainerRow[]> {
+export function getCurrentContainerSiblings(
+  store$: Store<IStore>
+): Observable<IContainerRow[]> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.containers.selectedContainerId)
     .map(state => {
@@ -43,13 +47,18 @@ export function getCurrentContainerSiblings(store$: Store<IStore>): Observable<I
     .distinctUntilChanged(arrayEquals);
 }
 
-export function getContainers(store$: Store<IStore>): Observable<IContainerRow[]> {
+export function getContainers(
+  store$: Store<IStore>
+): Observable<IContainerRow[]> {
   return filterWorkspaceFetched(store$)
-    .filter(s => !!s.buses.selectedBusId && !!s.buses.byId[s.buses.selectedBusId])
+    .filter(
+      s => !!s.buses.selectedBusId && !!s.buses.byId[s.buses.selectedBusId]
+    )
     .map(state => {
       const busId = state.buses.selectedBusId;
-      return state.buses.byId[busId].containers
-        .map(cid => state.containers.byId[cid]);
+      return state.buses.byId[busId].containers.map(
+        cid => state.containers.byId[cid]
+      );
     })
     .distinctUntilChanged(arrayEquals);
 }

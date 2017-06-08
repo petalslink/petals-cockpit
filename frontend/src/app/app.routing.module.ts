@@ -25,31 +25,31 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'login'
+    redirectTo: 'login',
   },
   {
     path: 'setup',
-    loadChildren: 'app/features/setup/setup.module#SetupModule'
+    loadChildren: 'app/features/setup/setup.module#SetupModule',
   },
   {
     path: 'login',
     canActivate: [GuardLoginService],
-    loadChildren: 'app/features/login/login.module#LoginModule'
+    loadChildren: 'app/features/login/login.module#LoginModule',
   },
   {
     path: '',
     canActivate: [GuardLoginService],
-    loadChildren: 'app/features/cockpit/cockpit.module#CockpitModule'
-  }
+    loadChildren: 'app/features/cockpit/cockpit.module#CockpitModule',
+  },
 ];
 
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, {
       preloadingStrategy: PreloadAllModules,
-      useHash: (environment.hashLocationStrategy ? true : false),
-      enableTracing: false
-    })
-  ]
+      useHash: environment.hashLocationStrategy ? true : false,
+      enableTracing: false,
+    }),
+  ],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

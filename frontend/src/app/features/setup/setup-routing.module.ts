@@ -23,11 +23,11 @@ import { SetupComponent } from 'app/features/setup/setup.component';
 const routes: Routes = [
   {
     path: '',
-    component: SetupComponent
-  }
+    component: SetupComponent,
+  },
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)]
+  imports: [RouterModule.forChild(routes)],
 })
-export class SetupRoutingModule { }
+export class SetupRoutingModule {}

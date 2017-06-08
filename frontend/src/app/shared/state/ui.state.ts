@@ -25,6 +25,6 @@ export function uiState(): IUi {
     isPopupListWorkspacesVisible: false,
     titleMainPart1: 'Petals Cockpit',
     titleMainPart2: '',
-    titleSubPart: ''
+    titleSubPart: '',
   };
 }

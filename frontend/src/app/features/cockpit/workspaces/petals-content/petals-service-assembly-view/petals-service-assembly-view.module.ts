@@ -27,10 +27,11 @@ import { PetalsServiceAssemblyOperationsComponent } from 'app/features/cockpit/w
 // tslint:enable:max-line-length
 
 @NgModule({
-  imports: [
-    SharedModule,
-    PetalsServiceAssemblyViewRoutingModule
+  imports: [SharedModule, PetalsServiceAssemblyViewRoutingModule],
+  declarations: [
+    PetalsServiceAssemblyViewComponent,
+    PetalsServiceAssemblyOverviewComponent,
+    PetalsServiceAssemblyOperationsComponent,
   ],
-  declarations: [PetalsServiceAssemblyViewComponent, PetalsServiceAssemblyOverviewComponent, PetalsServiceAssemblyOperationsComponent]
 })
-export class PetalsServiceAssemblyViewModule { }
+export class PetalsServiceAssemblyViewModule {}

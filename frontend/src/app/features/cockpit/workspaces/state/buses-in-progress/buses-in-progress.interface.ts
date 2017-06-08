@@ -16,7 +16,10 @@
  */
 
 import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
-import { IBusInProgressBackendCommon, IBusInProgressBackend } from 'app/shared/services/buses.service';
+import {
+  IBusInProgressBackendCommon,
+  IBusInProgressBackend,
+} from 'app/shared/services/buses.service';
 
 export interface IBusInProgressUI {
   // for UI
@@ -28,10 +31,10 @@ export interface IBusInProgressUI {
 }
 
 // used within table
-export interface IBusInProgressRow extends IBusInProgressUI, IBusInProgressBackend { }
+export interface IBusInProgressRow extends IBusInProgressUI, IBusInProgressBackend {}
 
 // used in generated views
-export interface IBusInProgress extends IBusInProgressUI, IBusInProgressBackendCommon { }
+export interface IBusInProgress extends IBusInProgressUI, IBusInProgressBackendCommon {}
 
 export interface IBusesInProgressCommon {
   selectedBusInProgressId: string;
@@ -42,7 +45,9 @@ export interface IBusesInProgressCommon {
   importBusId: string;
 }
 
-export interface IBusesInProgressTable extends IBusesInProgressCommon, JsMap<IBusInProgressRow> { }
+export interface IBusesInProgressTable extends IBusesInProgressCommon, JsMap<
+  IBusInProgressRow
+> {}
 
 export interface IBusesInProgress extends IBusesInProgressCommon {
   list: Array<IBusInProgress>;
@@ -58,7 +63,7 @@ export function busInProgressRowFactory(): IBusInProgressRow {
     importError: '',
     isRemoving: false,
     password: '',
-    passphrase: ''
+    passphrase: '',
   };
 }
 
@@ -67,6 +72,6 @@ export function busesInProgressTableFactory(): IBusesInProgressTable {
     selectedBusInProgressId: '',
     isImportingBus: false,
     importBusError: '',
-    importBusId: ''
+    importBusId: '',
   });
 }

@@ -61,12 +61,23 @@ export class SseServiceMock extends SseService {
     // foreach event
     SseWorkspaceEvent.allEvents
       .filter(eventName => !this.registeredEvents.has(eventName))
-      .forEach(eventName => this.registeredEvents.set(eventName, new Subject()));
+      .forEach(eventName =>
+        this.registeredEvents.set(eventName, new Subject())
+      );
 
-    const workspaceContent = workspacesService.getWorkspaceComposed(workspaceId);
+    const workspaceContent = workspacesService.getWorkspaceComposed(
+      workspaceId
+    );
 
     // simulate the backend sending the first event of the SSE
-    setTimeout(() => this.triggerSseEvent(SseWorkspaceEvent.WORKSPACE_CONTENT, workspaceContent), 500);
+    setTimeout(
+      () =>
+        this.triggerSseEvent(
+          SseWorkspaceEvent.WORKSPACE_CONTENT,
+          workspaceContent
+        ),
+      500
+    );
 
     return Observable.of(null);
   }
@@ -83,7 +94,10 @@ export class SseServiceMock extends SseService {
 
   public subscribeToWorkspaceEvent(eventName: string) {
     if (this.registeredEvents.has(eventName)) {
-      return this.registeredEvents.get(eventName).asObservable().delay(environment.mock.sseDelay);
+      return this.registeredEvents
+        .get(eventName)
+        .asObservable()
+        .delay(environment.mock.sseDelay);
     }
 
     if (environment.debug) {

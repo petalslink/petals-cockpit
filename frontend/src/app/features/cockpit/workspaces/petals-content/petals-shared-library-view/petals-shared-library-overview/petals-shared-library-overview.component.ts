@@ -15,7 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
@@ -27,7 +32,7 @@ import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-
   selector: 'app-petals-shared-library-overview',
   templateUrl: './petals-shared-library-overview.component.html',
   styleUrls: ['./petals-shared-library-overview.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsSharedLibraryOverviewComponent implements OnInit {
   @Input() sharedLibrary: ISharedLibraryRow;
@@ -35,9 +40,11 @@ export class PetalsSharedLibraryOverviewComponent implements OnInit {
 
   workspaceId$: Observable<string>;
 
-  constructor(private store$: Store<IStore>) { }
+  constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.workspaceId$ = this.store$.select(state => state.workspaces.selectedWorkspaceId);
+    this.workspaceId$ = this.store$.select(
+      state => state.workspaces.selectedWorkspaceId
+    );
   }
 }

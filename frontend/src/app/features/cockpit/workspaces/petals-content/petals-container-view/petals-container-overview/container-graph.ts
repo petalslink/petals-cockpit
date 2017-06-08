@@ -19,34 +19,51 @@ import { VisNetworkOptions, VisNodes, VisEdges } from 'ng2-vis';
 
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 
-export function buildVisNetworkData(container: IContainerRow, otherContainers: IContainerRow[]) {
+export function buildVisNetworkData(
+  container: IContainerRow,
+  otherContainers: IContainerRow[]
+) {
   return {
-    nodes: new VisNodes([node(container)(container), ...otherContainers.map(node(container))]),
-    edges: new VisEdges(otherContainers.map(edge(container)))
+    nodes: new VisNodes([
+      node(container)(container),
+      ...otherContainers.map(node(container)),
+    ]),
+    edges: new VisEdges(otherContainers.map(edge(container))),
   };
 }
 
 function node(container: IContainerRow) {
-  return (otherContainer) => ({
+  return otherContainer => ({
     id: otherContainer.id,
     label: otherContainer.name,
     fixed: true,
-    title: '<b>IP :</b> <span class="ip">' + otherContainer.ip + '</span><br>' + '<b>Port :</b> <span class="port">' +
-    otherContainer.port + '</span>', image: container.id === otherContainer.id || container.reachabilities.includes(otherContainer.id)
+    title:
+      '<b>IP :</b> <span class="ip">' +
+        otherContainer.ip +
+        '</span><br>' +
+        '<b>Port :</b> <span class="port">' +
+        otherContainer.port +
+        '</span>',
+    image: container.id === otherContainer.id ||
+      container.reachabilities.includes(otherContainer.id)
       ? 'assets/img/network-container.png'
-      : 'assets/img/network-container-no-reachable.png'
+      : 'assets/img/network-container-no-reachable.png',
   });
 }
 
 function edge(container: IContainerRow) {
-  return (otherContainer) => ({
+  return otherContainer => ({
     from: container.id,
     to: otherContainer.id,
-    color: container.reachabilities.includes(otherContainer.id) ? 'green' : 'red',
-    label: container.reachabilities.includes(otherContainer.id) ? 'reachable' : 'no reachable',
+    color: container.reachabilities.includes(otherContainer.id)
+      ? 'green'
+      : 'red',
+    label: container.reachabilities.includes(otherContainer.id)
+      ? 'reachable'
+      : 'no reachable',
     arrows: {
-      to: container.reachabilities.includes(otherContainer.id) ? true : false
-    }
+      to: container.reachabilities.includes(otherContainer.id) ? true : false,
+    },
   });
 }
 
@@ -59,7 +76,7 @@ export const containerNetworkOptions: VisNetworkOptions = {
   layout: {
     randomSeed: 4,
     improvedLayout: true,
-    hierarchical: false
+    hierarchical: false,
   },
   nodes: {
     shape: 'image',
@@ -71,29 +88,29 @@ export const containerNetworkOptions: VisNetworkOptions = {
         min: 8,
         max: 30,
         drawThreshold: 2,
-        maxVisible: 50
-      }
+        maxVisible: 50,
+      },
     },
   },
   edges: {
     font: {
       size: 10,
       strokeWidth: 1,
-      align: 'top'
+      align: 'top',
     },
     color: 'gray', // default
     shadow: true,
     smooth: {
       enabled: true,
       type: 'continuous', // cubicBezier, dynamic, discrete
-      roundness: 0.2
+      roundness: 0.2,
     },
     arrows: {
       to: { enabled: true, scaleFactor: 0.5, type: 'arrow' },
-      from: { enabled: false, scaleFactor: 0.5, type: 'arrow' }
+      from: { enabled: false, scaleFactor: 0.5, type: 'arrow' },
     },
     arrowStrikethrough: true,
-    dashes: true
+    dashes: true,
   },
   physics: {
     stabilization: true,
@@ -102,7 +119,7 @@ export const containerNetworkOptions: VisNetworkOptions = {
       centralGravity: 0,
       springLength: 100,
       springConstant: 0.1,
-      damping: 0.09
+      damping: 0.09,
     },
     maxVelocity: 25,
     minVelocity: 1,
@@ -110,6 +127,6 @@ export const containerNetworkOptions: VisNetworkOptions = {
   },
   interaction: {
     hideEdgesOnDrag: false, // better performance if true
-    hideNodesOnDrag: false // better performance if true
-  }
+    hideNodesOnDrag: false, // better performance if true
+  },
 };

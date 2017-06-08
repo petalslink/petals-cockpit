@@ -15,7 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  Input,
+} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
@@ -28,7 +33,7 @@ import { isLargeScreen } from 'app/shared/state/ui.selectors';
   selector: 'app-petals-service-unit-overview',
   templateUrl: './petals-service-unit-overview.component.html',
   styleUrls: ['./petals-service-unit-overview.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsServiceUnitOverviewComponent implements OnInit {
   public btnByScreenSize$: Observable<string>;
@@ -37,11 +42,11 @@ export class PetalsServiceUnitOverviewComponent implements OnInit {
   @Input() serviceAssembly: IServiceAssemblyRow;
   @Input() workspaceId: string;
 
-  constructor(private store$: Store<IStore>) { }
+  constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
     this.btnByScreenSize$ = this.store$
       .let(isLargeScreen)
-      .map(ls => ls ? `mat-raised-button` : `mat-mini-fab`);
+      .map(ls => (ls ? `mat-raised-button` : `mat-mini-fab`));
   }
 }

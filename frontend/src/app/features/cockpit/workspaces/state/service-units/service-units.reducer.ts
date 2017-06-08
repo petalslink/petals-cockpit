@@ -17,20 +17,39 @@
 
 import { Action } from '@ngrx/store';
 
-import { IServiceUnitsTable, serviceUnitsTableFactory, serviceUnitRowFactory } from './service-units.interface';
+import {
+  IServiceUnitsTable,
+  serviceUnitsTableFactory,
+  serviceUnitRowFactory,
+} from './service-units.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
-import { putAll, updateById, removeById, mergeOnly, JsMap } from 'app/shared/helpers/map.helper';
-import { IServiceUnitBackendSSE, IServiceUnitBackendDetails } from 'app/shared/services/service-units.service';
+import {
+  putAll,
+  updateById,
+  removeById,
+  mergeOnly,
+  JsMap,
+} from 'app/shared/helpers/map.helper';
+import {
+  IServiceUnitBackendSSE,
+  IServiceUnitBackendDetails,
+} from 'app/shared/services/service-units.service';
 
 export class ServiceUnits {
   private static reducerName = '[Service units]';
 
-  public static reducer(serviceUnitsTable = serviceUnitsTableFactory(), { type, payload }: Action): IServiceUnitsTable {
+  public static reducer(
+    serviceUnitsTable = serviceUnitsTableFactory(),
+    { type, payload }: Action
+  ): IServiceUnitsTable {
     if (!ServiceUnits.mapActionsToMethod[type]) {
       return serviceUnitsTable;
     }
 
-    return ServiceUnits.mapActionsToMethod[type](serviceUnitsTable, payload) || serviceUnitsTable;
+    return (
+      ServiceUnits.mapActionsToMethod[type](serviceUnitsTable, payload) ||
+      serviceUnitsTable
+    );
   }
 
   // tslint:disable-next-line:member-ordering
@@ -53,37 +72,50 @@ export class ServiceUnits {
 
   // tslint:disable-next-line:member-ordering
   public static SET_CURRENT_SERVICE_UNIT = `${ServiceUnits.reducerName} Set current service unit`;
-  private static setCurrentServiceUnit(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
+  private static setCurrentServiceUnit(
+    serviceUnitsTable: IServiceUnitsTable,
+    payload: { serviceUnitId: string }
+  ): IServiceUnitsTable {
     const res = <IServiceUnitsTable>{
-      selectedServiceUnitId: payload.serviceUnitId
+      selectedServiceUnitId: payload.serviceUnitId,
     };
 
     if (payload.serviceUnitId) {
       return {
-        ...updateById(serviceUnitsTable, payload.serviceUnitId, { errorChangeState: '' }),
-        ...res
+        ...updateById(serviceUnitsTable, payload.serviceUnitId, {
+          errorChangeState: '',
+        }),
+        ...res,
       };
     }
 
     return {
       ...serviceUnitsTable,
-      ...res
+      ...res,
     };
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS = `${ServiceUnits.reducerName} Fetch service unit details`;
-  private static fetchServiceUnitDetails(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
-    return updateById(serviceUnitsTable, payload.serviceUnitId, { isFetchingDetails: true });
+  private static fetchServiceUnitDetails(
+    serviceUnitsTable: IServiceUnitsTable,
+    payload: { serviceUnitId: string }
+  ): IServiceUnitsTable {
+    return updateById(serviceUnitsTable, payload.serviceUnitId, {
+      isFetchingDetails: true,
+    });
   }
 
   // tslint:disable-next-line:member-ordering
   public static FETCH_SERVICE_UNIT_DETAILS_SUCCESS = `${ServiceUnits.reducerName} Fetch service unit details success`;
   private static fetchServiceUnitDetailsSuccess(
     serviceUnitsTable: IServiceUnitsTable,
-    payload: { serviceUnitId: string, data: IServiceUnitBackendDetails }
+    payload: { serviceUnitId: string; data: IServiceUnitBackendDetails }
   ): IServiceUnitsTable {
-    return updateById(serviceUnitsTable, payload.serviceUnitId, { ...payload.data, isFetchingDetails: false });
+    return updateById(serviceUnitsTable, payload.serviceUnitId, {
+      ...payload.data,
+      isFetchingDetails: false,
+    });
   }
 
   // tslint:disable-next-line:member-ordering
@@ -92,61 +124,85 @@ export class ServiceUnits {
     serviceUnitsTable: IServiceUnitsTable,
     payload: { serviceUnitId: string }
   ): IServiceUnitsTable {
-    return updateById(serviceUnitsTable, payload.serviceUnitId, { isFetchingDetails: false });
+    return updateById(serviceUnitsTable, payload.serviceUnitId, {
+      isFetchingDetails: false,
+    });
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE = `${ServiceUnits.reducerName} Change state`;
-  private static changeState(serviceUnitsTable: IServiceUnitsTable, payload: { serviceUnitId: string }): IServiceUnitsTable {
-    return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: true });
+  private static changeState(
+    serviceUnitsTable: IServiceUnitsTable,
+    payload: { serviceUnitId: string }
+  ): IServiceUnitsTable {
+    return updateById(serviceUnitsTable, payload.serviceUnitId, {
+      isUpdatingState: true,
+    });
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_SUCCESS = `${ServiceUnits.reducerName} Change state success`;
   private static changeStateSuccess(
     serviceUnitsTable: IServiceUnitsTable,
-    payload: { serviceUnitId: string, newState: string }
+    payload: { serviceUnitId: string; newState: string }
   ): IServiceUnitsTable {
-    return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: false, state: payload.newState, errorChangeState: '' });
+    return updateById(serviceUnitsTable, payload.serviceUnitId, {
+      isUpdatingState: false,
+      state: payload.newState,
+      errorChangeState: '',
+    });
   }
 
   // tslint:disable-next-line:member-ordering
   public static CHANGE_STATE_ERROR = `${ServiceUnits.reducerName} Change state error`;
   private static changeStateError(
     serviceUnitsTable: IServiceUnitsTable,
-    payload: { serviceUnitId: string, errorChangeState: string }
+    payload: { serviceUnitId: string; errorChangeState: string }
   ): IServiceUnitsTable {
-    return updateById(serviceUnitsTable, payload.serviceUnitId, { isUpdatingState: false, errorChangeState: payload.errorChangeState });
+    return updateById(serviceUnitsTable, payload.serviceUnitId, {
+      isUpdatingState: false,
+      errorChangeState: payload.errorChangeState,
+    });
   }
 
   // tslint:disable-next-line:member-ordering
   public static REMOVE_SERVICE_UNIT = `${ServiceUnits.reducerName} Remove service unit`;
   private static removeServiceUnit(
     serviceUnitsTable: IServiceUnitsTable,
-    payload: { componentId: string, serviceUnitId: string }
+    payload: { componentId: string; serviceUnitId: string }
   ): IServiceUnitsTable {
     return removeById(serviceUnitsTable, payload.serviceUnitId);
   }
 
-  private static cleanWorkspace(_serviceUnitsTable: IServiceUnitsTable, _payload): IServiceUnitsTable {
+  private static cleanWorkspace(
+    _serviceUnitsTable: IServiceUnitsTable,
+    _payload
+  ): IServiceUnitsTable {
     return serviceUnitsTableFactory();
   }
 
   // -------------------------------------------------------------------------------------------
 
   // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod: { [type: string]: (t: IServiceUnitsTable, p: any) => IServiceUnitsTable } = {
-    [ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS]: ServiceUnits.fetchServiceUnitsSuccess,
-    [ServiceUnits.ADD_SERVICE_UNITS_SUCCESS]: ServiceUnits.addServiceUnitsSuccess,
+  private static mapActionsToMethod: {
+    [type: string]: (t: IServiceUnitsTable, p: any) => IServiceUnitsTable;
+  } = {
+    [ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS]:
+      ServiceUnits.fetchServiceUnitsSuccess,
+    [ServiceUnits.ADD_SERVICE_UNITS_SUCCESS]:
+      ServiceUnits.addServiceUnitsSuccess,
     [ServiceUnits.SET_CURRENT_SERVICE_UNIT]: ServiceUnits.setCurrentServiceUnit,
-    [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS]: ServiceUnits.fetchServiceUnitDetails,
-    [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS]: ServiceUnits.fetchServiceUnitDetailsSuccess,
-    [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR]: ServiceUnits.fetchServiceUnitDetailsError,
+    [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS]:
+      ServiceUnits.fetchServiceUnitDetails,
+    [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS]:
+      ServiceUnits.fetchServiceUnitDetailsSuccess,
+    [ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR]:
+      ServiceUnits.fetchServiceUnitDetailsError,
     [ServiceUnits.CHANGE_STATE]: ServiceUnits.changeState,
     [ServiceUnits.CHANGE_STATE_SUCCESS]: ServiceUnits.changeStateSuccess,
     [ServiceUnits.CHANGE_STATE_ERROR]: ServiceUnits.changeStateError,
     [ServiceUnits.REMOVE_SERVICE_UNIT]: ServiceUnits.removeServiceUnit,
 
-    [Workspaces.CLEAN_WORKSPACE]: ServiceUnits.cleanWorkspace
+    [Workspaces.CLEAN_WORKSPACE]: ServiceUnits.cleanWorkspace,
   };
 }

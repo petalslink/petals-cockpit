@@ -29,18 +29,16 @@ import { WorkspaceModule } from 'app/features/cockpit/workspaces/workspace/works
     SharedModule,
     WorkspacesRoutingModule,
     PetalsMenuModule,
-    WorkspaceModule
+    WorkspaceModule,
   ],
-  declarations: [
-    WorkspacesComponent
-  ],
+  declarations: [WorkspacesComponent],
   exports: [
     // TODO : Remove this line when aux route becomes available in lazy loaded module
     // we export here to use this component from cockpit.component
     // were we should instead use a router-outlet
     // (in order to lazy load only what's needed)
-    PetalsMenuModule
+    PetalsMenuModule,
   ],
-  providers: [WorkspaceResolver]
+  providers: [WorkspaceResolver],
 })
-export class WorkspacesModule { }
+export class WorkspacesModule {}

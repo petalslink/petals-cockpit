@@ -21,12 +21,11 @@ import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/wor
 
 describe(`Buses reducer`, () => {
   it(`should have a default value`, () => {
-    expect(Buses.reducer(undefined, { type: `init`, payload: `` }))
-      .toEqual({
-        selectedBusId: '',
-        byId: {},
-        allIds: []
-      });
+    expect(Buses.reducer(undefined, { type: `init`, payload: `` })).toEqual({
+      selectedBusId: '',
+      byId: {},
+      allIds: [],
+    });
   });
 
   describe(Buses.FETCH_BUSES_SUCCESS, () => {
@@ -43,11 +42,11 @@ describe(`Buses reducer`, () => {
               name: 'Bus 0',
               containers: ['idCont0', 'idCont1'],
               id: 'idBus0',
-              workspaceId: 'wsId0'
-            }
+              workspaceId: 'wsId0',
+            },
           },
-          allIds: ['idBus0']
-        }
+          allIds: ['idBus0'],
+        },
       });
 
       expect(reducer).toEqual({
@@ -60,9 +59,9 @@ describe(`Buses reducer`, () => {
             workspaceId: 'wsId0',
             isFolded: false,
             isFetchingDetails: false,
-          }
+          },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       });
     });
 
@@ -87,9 +86,9 @@ describe(`Buses reducer`, () => {
             id: 'idBus1',
             isFolded: false,
             isFetchingDetails: false,
-          }
+          },
         },
-        allIds: ['idBus0', 'idBus1']
+        allIds: ['idBus0', 'idBus1'],
       };
 
       const reducer = Buses.reducer(initialState, {
@@ -101,10 +100,10 @@ describe(`Buses reducer`, () => {
               containers: ['idCont2-updated', 'idCont3-updated'],
               id: 'idBus1',
               workspaceId: 'wsId0',
-            }
+            },
           },
-          allIds: ['idBus1']
-        }
+          allIds: ['idBus1'],
+        },
       });
 
       expect(reducer).toEqual({
@@ -119,9 +118,9 @@ describe(`Buses reducer`, () => {
             workspaceId: 'wsId0',
             isFolded: false,
             isFetchingDetails: false,
-          }
+          },
         },
-        allIds: ['idBus1']
+        allIds: ['idBus1'],
       });
     });
   });
@@ -145,9 +144,9 @@ describe(`Buses reducer`, () => {
             workspaceId: 'wsId0',
             isFolded: false,
             isFetchingDetails: false,
-          }
+          },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       };
 
       const reducer = Buses.reducer(initialState, {
@@ -158,11 +157,11 @@ describe(`Buses reducer`, () => {
               name: 'Bus 1',
               containers: ['idCont2', 'idCont3'],
               id: 'idBus1',
-              workspaceId: 'wsId0'
-            }
+              workspaceId: 'wsId0',
+            },
           },
-          allIds: ['idBus1']
-        }
+          allIds: ['idBus1'],
+        },
       });
 
       expect(reducer).toEqual({
@@ -186,9 +185,9 @@ describe(`Buses reducer`, () => {
             workspaceId: 'wsId0',
             isFolded: false,
             isFetchingDetails: false,
-          }
+          },
         },
-        allIds: ['idBus0', 'idBus1']
+        allIds: ['idBus0', 'idBus1'],
       });
     });
   });
@@ -205,16 +204,16 @@ describe(`Buses reducer`, () => {
         keepPreviousValues: '',
         idBus0: {
           keepPreviousValues: '',
-          isFolded: false
-        }
+          isFolded: false,
+        },
       },
-      allIds: ['idBus0']
+      allIds: ['idBus0'],
     };
 
     it(`should return the same object if ID doesn't exists`, () => {
       const reducer = Buses.reducer(initialState, {
         type: Buses.FOLD_BUS,
-        payload: { busId: 'unknown' }
+        payload: { busId: 'unknown' },
       });
 
       expect(reducer).toBe(initialState);
@@ -223,7 +222,7 @@ describe(`Buses reducer`, () => {
     it(`should fold an existing bus`, () => {
       const reducer = Buses.reducer(initialState, {
         type: Buses.FOLD_BUS,
-        payload: { busId: 'idBus0' }
+        payload: { busId: 'idBus0' },
       });
 
       expect(reducer).toEqual({
@@ -233,10 +232,10 @@ describe(`Buses reducer`, () => {
           keepPreviousValues: '',
           idBus0: {
             keepPreviousValues: '',
-            isFolded: true
-          }
+            isFolded: true,
+          },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       });
     });
 
@@ -248,15 +247,15 @@ describe(`Buses reducer`, () => {
           keepPreviousValues: '',
           idBus0: {
             keepPreviousValues: '',
-            isFolded: true
-          }
+            isFolded: true,
+          },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       };
 
       const reducer = Buses.reducer(initialState2, {
         type: Buses.FOLD_BUS,
-        payload: { busId: 'idBus0' }
+        payload: { busId: 'idBus0' },
       });
 
       expect(reducer).toBe(initialState2);
@@ -275,16 +274,16 @@ describe(`Buses reducer`, () => {
         keepPreviousValues: '',
         idBus0: {
           keepPreviousValues: '',
-          isFolded: true
-        }
+          isFolded: true,
+        },
       },
-      allIds: ['idBus0']
+      allIds: ['idBus0'],
     };
 
     it(`should return the same object when trying to unfold an unknown bus`, () => {
       const reducer = Buses.reducer(initialState, {
         type: Buses.UNFOLD_BUS,
-        payload: { busId: 'unknown' }
+        payload: { busId: 'unknown' },
       });
 
       expect(reducer).toBe(initialState);
@@ -293,7 +292,7 @@ describe(`Buses reducer`, () => {
     it(`should unfold an existing bus`, () => {
       const reducer = Buses.reducer(initialState, {
         type: Buses.UNFOLD_BUS,
-        payload: { busId: 'idBus0' }
+        payload: { busId: 'idBus0' },
       });
 
       expect(reducer).toEqual({
@@ -303,10 +302,10 @@ describe(`Buses reducer`, () => {
           keepPreviousValues: '',
           idBus0: {
             keepPreviousValues: '',
-            isFolded: false
-          }
+            isFolded: false,
+          },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       });
     });
 
@@ -314,14 +313,14 @@ describe(`Buses reducer`, () => {
       const initialState2: any = {
         selectedBusId: '',
         byId: {
-          idBus0: { isFolded: false }
+          idBus0: { isFolded: false },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       };
 
       const reducer = Buses.reducer(initialState2, {
         type: Buses.UNFOLD_BUS,
-        payload: { busId: 'idBus0' }
+        payload: { busId: 'idBus0' },
       });
 
       expect(reducer).toBe(initialState2);
@@ -340,16 +339,16 @@ describe(`Buses reducer`, () => {
         keepPreviousValues: '',
         idBus0: {
           keepPreviousValues: '',
-          isFolded: true
-        }
+          isFolded: true,
+        },
       },
-      allIds: ['idBus0']
+      allIds: ['idBus0'],
     };
 
     it(`should return the same object when trying to toggle an unknown ID`, () => {
       const reducer = Buses.reducer(initialState, {
         type: Buses.TOGGLE_FOLD_BUS,
-        payload: { busId: 'unknown' }
+        payload: { busId: 'unknown' },
       });
 
       expect(reducer).toBe(initialState);
@@ -358,7 +357,7 @@ describe(`Buses reducer`, () => {
     it(`should toggle from true to false`, () => {
       const reducer2 = Buses.reducer(initialState, {
         type: Buses.TOGGLE_FOLD_BUS,
-        payload: { busId: 'idBus0' }
+        payload: { busId: 'idBus0' },
       });
 
       expect(reducer2).toEqual({
@@ -368,10 +367,10 @@ describe(`Buses reducer`, () => {
           keepPreviousValues: '',
           idBus0: {
             keepPreviousValues: '',
-            isFolded: false
-          }
+            isFolded: false,
+          },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       });
     });
 
@@ -383,15 +382,15 @@ describe(`Buses reducer`, () => {
           keepPreviousValues: '',
           idBus0: {
             keepPreviousValues: '',
-            isFolded: false
-          }
+            isFolded: false,
+          },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       };
 
       const reducer = Buses.reducer(initialState2, {
         type: Buses.TOGGLE_FOLD_BUS,
-        payload: { busId: 'idBus0' }
+        payload: { busId: 'idBus0' },
       });
 
       expect(reducer).toEqual({
@@ -401,10 +400,10 @@ describe(`Buses reducer`, () => {
           keepPreviousValues: '',
           idBus0: {
             keepPreviousValues: '',
-            isFolded: true
-          }
+            isFolded: true,
+          },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       });
     });
   });
@@ -424,12 +423,12 @@ describe(`Buses reducer`, () => {
       // because we'll be trying to fetch that bus right after
       const reducer = Buses.reducer(initialState, {
         type: Buses.SET_CURRENT_BUS,
-        payload: { busId: 'unknown' }
+        payload: { busId: 'unknown' },
       });
 
       expect(reducer).toEqual({
         keepPreviousValues: '',
-        selectedBusId: 'unknown'
+        selectedBusId: 'unknown',
       });
     });
   });
@@ -451,9 +450,9 @@ describe(`Buses reducer`, () => {
         idBus2: {
           isFolded: true,
           keepPreviousValues: '',
-        }
+        },
       },
-      allIds: ['idBus0', 'idBus1', 'idBus2']
+      allIds: ['idBus0', 'idBus1', 'idBus2'],
     };
 
     it(`should check action name`, () => {
@@ -461,68 +460,74 @@ describe(`Buses reducer`, () => {
     });
 
     it(`should remove the first bus`, () => {
-      expect(Buses.reducer(initialState, {
-        type: Buses.REMOVE_BUS,
-        payload: { busId: 'idBus0' }
-      })).toEqual({
+      expect(
+        Buses.reducer(initialState, {
+          type: Buses.REMOVE_BUS,
+          payload: { busId: 'idBus0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedBusId: '',
         byId: {
           keepPreviousValues: '',
           idBus1: {
             keepPreviousValues: '',
-            isFolded: true
+            isFolded: true,
           },
           idBus2: {
             keepPreviousValues: '',
-            isFolded: true
-          }
+            isFolded: true,
+          },
         },
-        allIds: ['idBus1', 'idBus2']
+        allIds: ['idBus1', 'idBus2'],
       });
     });
 
     it(`should remove the second bus`, () => {
-      expect(Buses.reducer(initialState, {
-        type: Buses.REMOVE_BUS,
-        payload: { busId: 'idBus1' }
-      })).toEqual({
+      expect(
+        Buses.reducer(initialState, {
+          type: Buses.REMOVE_BUS,
+          payload: { busId: 'idBus1' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedBusId: '',
         byId: {
           keepPreviousValues: '',
           idBus0: {
             keepPreviousValues: '',
-            isFolded: true
+            isFolded: true,
           },
           idBus2: {
             keepPreviousValues: '',
-            isFolded: true
-          }
+            isFolded: true,
+          },
         },
-        allIds: ['idBus0', 'idBus2']
+        allIds: ['idBus0', 'idBus2'],
       });
     });
 
     it(`should remove the third bus`, () => {
-      expect(Buses.reducer(initialState, {
-        type: Buses.REMOVE_BUS,
-        payload: { busId: 'idBus2' }
-      })).toEqual({
+      expect(
+        Buses.reducer(initialState, {
+          type: Buses.REMOVE_BUS,
+          payload: { busId: 'idBus2' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedBusId: '',
         byId: {
           keepPreviousValues: '',
           idBus0: {
             keepPreviousValues: '',
-            isFolded: true
+            isFolded: true,
           },
           idBus1: {
             keepPreviousValues: '',
-            isFolded: true
-          }
+            isFolded: true,
+          },
         },
-        allIds: ['idBus0', 'idBus1']
+        allIds: ['idBus0', 'idBus1'],
       });
     });
   });
@@ -537,33 +542,37 @@ describe(`Buses reducer`, () => {
       byId: {
         keepPreviousValues: '',
         idBus0: {
-          keepPreviousValues: ''
-        }
+          keepPreviousValues: '',
+        },
       },
-      allIds: ['idBus0']
+      allIds: ['idBus0'],
     };
 
     it(`should set isFetchingDetails to true even if isFetchingDetails doesn't exists yet`, () => {
-      expect(Buses.reducer(initialState, {
-        type: Buses.FETCH_BUS_DETAILS,
-        payload: { busId: 'idBus0' }
-      })).toEqual({
+      expect(
+        Buses.reducer(initialState, {
+          type: Buses.FETCH_BUS_DETAILS,
+          payload: { busId: 'idBus0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idBus0: {
             keepPreviousValues: '',
-            isFetchingDetails: true
-          }
+            isFetchingDetails: true,
+          },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       });
     });
   });
 
   describe(Buses.FETCH_BUS_DETAILS_SUCCESS, () => {
     it(`should check action name`, () => {
-      expect(Buses.FETCH_BUS_DETAILS_SUCCESS).toEqual(`[Buses] Fetch bus details success`);
+      expect(Buses.FETCH_BUS_DETAILS_SUCCESS).toEqual(
+        `[Buses] Fetch bus details success`
+      );
     });
 
     const initialState: any = {
@@ -571,34 +580,38 @@ describe(`Buses reducer`, () => {
       byId: {
         keepPreviousValues: '',
         idBus0: {
-          keepPreviousValues: ''
-        }
+          keepPreviousValues: '',
+        },
       },
-      allIds: ['idBus0']
+      allIds: ['idBus0'],
     };
 
     it(`should set isFetchingDetails to false even if isFetchingDetails doesn't exists yet`, () => {
-      expect(Buses.reducer(initialState, {
-        type: Buses.FETCH_BUS_DETAILS_SUCCESS,
-        payload: { busId: 'idBus0', data: { someData: 'some data' } }
-      })).toEqual({
+      expect(
+        Buses.reducer(initialState, {
+          type: Buses.FETCH_BUS_DETAILS_SUCCESS,
+          payload: { busId: 'idBus0', data: { someData: 'some data' } },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idBus0: {
             keepPreviousValues: '',
             isFetchingDetails: false,
-            someData: 'some data'
-          }
+            someData: 'some data',
+          },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       });
     });
   });
 
   describe(Buses.FETCH_BUS_DETAILS_ERROR, () => {
     it(`should check action name`, () => {
-      expect(Buses.FETCH_BUS_DETAILS_ERROR).toEqual(`[Buses] Fetch bus details error`);
+      expect(Buses.FETCH_BUS_DETAILS_ERROR).toEqual(
+        `[Buses] Fetch bus details error`
+      );
     });
 
     const initialState: any = {
@@ -607,26 +620,28 @@ describe(`Buses reducer`, () => {
         keepPreviousValues: '',
         idBus0: {
           keepPreviousValues: '',
-          isFetchingDetails: true
-        }
+          isFetchingDetails: true,
+        },
       },
-      allIds: ['idBus0']
+      allIds: ['idBus0'],
     };
 
     it(`should set isFetchingDetails to false if the bus exists`, () => {
-      expect(Buses.reducer(initialState, {
-        type: Buses.FETCH_BUS_DETAILS_ERROR,
-        payload: { busId: 'idBus0' }
-      })).toEqual({
+      expect(
+        Buses.reducer(initialState, {
+          type: Buses.FETCH_BUS_DETAILS_ERROR,
+          payload: { busId: 'idBus0' },
+        })
+      ).toEqual({
         keepPreviousValues: '',
         byId: {
           keepPreviousValues: '',
           idBus0: {
             keepPreviousValues: '',
-            isFetchingDetails: false
-          }
+            isFetchingDetails: false,
+          },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       });
     });
   });
@@ -637,16 +652,24 @@ describe(`Buses reducer`, () => {
         doNotKeepPreviousValues: '',
         byId: {
           doNotKeepPreviousValues: '',
-          idBus0: { isFetchingDetails: true }
+          idBus0: { isFetchingDetails: true },
         },
-        allIds: ['idBus0']
+        allIds: ['idBus0'],
       };
 
-      expect(Buses.reducer(undefined, { type: Workspaces.CLEAN_WORKSPACE, payload: { noMatter: 'which payload !' } }))
-        .toEqual(busesTableFactory());
+      expect(
+        Buses.reducer(undefined, {
+          type: Workspaces.CLEAN_WORKSPACE,
+          payload: { noMatter: 'which payload !' },
+        })
+      ).toEqual(busesTableFactory());
 
-      expect(Buses.reducer(initialState, { type: Workspaces.CLEAN_WORKSPACE, payload: { noMatter: 'which payload !' } }))
-        .toEqual(busesTableFactory());
+      expect(
+        Buses.reducer(initialState, {
+          type: Workspaces.CLEAN_WORKSPACE,
+          payload: { noMatter: 'which payload !' },
+        })
+      ).toEqual(busesTableFactory());
     });
   });
 
@@ -663,22 +686,24 @@ describe(`Buses reducer`, () => {
         idBus0: {
           keepPreviousValues: '',
           isRemoving: false,
-          isFolded: true
+          isFolded: true,
         },
         idBus1: {
           keepPreviousValues: '',
           isRemoving: false,
-          isFolded: true
-        }
+          isFolded: true,
+        },
       },
-      allIds: ['idBus0', 'idBus1']
+      allIds: ['idBus0', 'idBus1'],
     };
 
     it(`should set the isSelectedBusRemoving variable to true on the first bus`, () => {
-      expect(Buses.reducer(initialState, {
-        type: Buses.DELETE_BUS,
-        payload: 'idBus0'
-      })).toEqual({
+      expect(
+        Buses.reducer(initialState, {
+          type: Buses.DELETE_BUS,
+          payload: 'idBus0',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedBusId: 'idBus0',
         byId: {
@@ -686,15 +711,15 @@ describe(`Buses reducer`, () => {
           idBus0: {
             keepPreviousValues: '',
             isRemoving: true,
-            isFolded: true
+            isFolded: true,
           },
           idBus1: {
             keepPreviousValues: '',
             isRemoving: false,
-            isFolded: true
-          }
+            isFolded: true,
+          },
         },
-        allIds: ['idBus0', 'idBus1']
+        allIds: ['idBus0', 'idBus1'],
       });
     });
   });
@@ -712,22 +737,24 @@ describe(`Buses reducer`, () => {
         idBus0: {
           keepPreviousValues: '',
           isRemoving: true,
-          isFolded: true
+          isFolded: true,
         },
         idBus1: {
           keepPreviousValues: '',
           isRemoving: false,
-          isFolded: true
-        }
+          isFolded: true,
+        },
       },
-      allIds: ['idBus0', 'idBus1']
+      allIds: ['idBus0', 'idBus1'],
     };
 
     it(`should set the isSelectedBusRemoving variable to false`, () => {
-      expect(Buses.reducer(initialState, {
-        type: Buses.DELETE_BUS_FAILED,
-        payload: 'idBus0'
-      })).toEqual({
+      expect(
+        Buses.reducer(initialState, {
+          type: Buses.DELETE_BUS_FAILED,
+          payload: 'idBus0',
+        })
+      ).toEqual({
         keepPreviousValues: '',
         selectedBusId: 'idBus0',
         byId: {
@@ -735,15 +762,15 @@ describe(`Buses reducer`, () => {
           idBus0: {
             keepPreviousValues: '',
             isRemoving: false,
-            isFolded: true
+            isFolded: true,
           },
           idBus1: {
             keepPreviousValues: '',
             isRemoving: false,
-            isFolded: true
-          }
+            isFolded: true,
+          },
         },
-        allIds: ['idBus0', 'idBus1']
+        allIds: ['idBus0', 'idBus1'],
       });
     });
   });

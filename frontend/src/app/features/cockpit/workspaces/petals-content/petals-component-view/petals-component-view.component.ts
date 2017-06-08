@@ -25,13 +25,16 @@ import { Components } from '../../state/components/components.reducer';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
 import { Ui } from '../../../../../shared/state/ui.reducer';
 import { IComponentRow } from '../../state/components/components.interface';
-import { getCurrentComponent, getCurrentComponentSharedLibraries } from '../../state/components/components.selectors';
+import {
+  getCurrentComponent,
+  getCurrentComponentSharedLibraries,
+} from '../../state/components/components.selectors';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 
 @Component({
   selector: 'app-petals-component-view',
   templateUrl: './petals-component-view.component.html',
-  styleUrls: ['./petals-component-view.component.scss']
+  styleUrls: ['./petals-component-view.component.scss'],
 })
 export class PetalsComponentViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
@@ -39,17 +42,26 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
   public component$: Observable<IComponentRow>;
   public sharedLibraries$: Observable<ISharedLibraryRow[]>;
 
-  constructor(private store$: Store<IStore>, private route: ActivatedRoute) { }
+  constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.store$.dispatch({ type: Ui.SET_TITLES, payload: { titleMainPart1: 'Petals', titleMainPart2: 'Component' } });
+    this.store$.dispatch({
+      type: Ui.SET_TITLES,
+      payload: { titleMainPart1: 'Petals', titleMainPart2: 'Component' },
+    });
 
     this.route.paramMap
       .map(pm => pm.get('componentId'))
       .takeUntil(this.onDestroy$)
       .do(componentId => {
-        this.store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId } });
-        this.store$.dispatch({ type: Components.FETCH_COMPONENT_DETAILS, payload: { componentId } });
+        this.store$.dispatch({
+          type: Components.SET_CURRENT_COMPONENT,
+          payload: { componentId },
+        });
+        this.store$.dispatch({
+          type: Components.FETCH_COMPONENT_DETAILS,
+          payload: { componentId },
+        });
       })
       .subscribe();
 
@@ -61,6 +73,9 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    this.store$.dispatch({ type: Components.SET_CURRENT_COMPONENT, payload: { componentId: '' } });
+    this.store$.dispatch({
+      type: Components.SET_CURRENT_COMPONENT,
+      payload: { componentId: '' },
+    });
   }
 }

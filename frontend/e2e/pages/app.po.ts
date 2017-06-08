@@ -15,7 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, ElementFinder, $ } from 'protractor';
+import {
+  browser,
+  ExpectedConditions as EC,
+  ElementFinder,
+  $,
+} from 'protractor';
 
 import { Matcher, textToMatchInElement } from '../utils';
 import { waitTimeout } from '../common';
@@ -23,7 +28,6 @@ import { SetupPage } from './setup.po';
 import { LoginPage } from './login.po';
 
 export class PetalsCockpitPage {
-
   goTo(to = '/') {
     return browser.get(to);
   }
@@ -68,7 +72,11 @@ export class PetalsCockpitPage {
     el.click();
   }
 
-  clickAndExpectNotification(el: ElementFinder, title?: Matcher, content?: Matcher) {
+  clickAndExpectNotification(
+    el: ElementFinder,
+    title?: Matcher,
+    content?: Matcher
+  ) {
     this.waitAndClick(el);
 
     const simpleNotification = $(`simple-notification`);
@@ -86,28 +94,34 @@ export class PetalsCockpitPage {
     }
 
     browser.ignoreSynchronization = true;
-    return browser.wait(test, 10000)
+    return browser
+      .wait(test, 10000)
       .then(() => {
         browser.ignoreSynchronization = false;
         return browser.wait(EC.invisibilityOf(simpleNotification), 10000);
-      }).catch(_ => {
+      })
+      .catch(_ => {
         browser.ignoreSynchronization = false;
       });
   }
 
   openSidenav() {
-    return $(`app-cockpit md-sidenav.mat-sidenav-closed`).isPresent().then(present => {
-      if (present) {
-        return $(`app-cockpit md-toolbar-row button.menu-icon`).click();
-      }
-    });
+    return $(`app-cockpit md-sidenav.mat-sidenav-closed`)
+      .isPresent()
+      .then(present => {
+        if (present) {
+          return $(`app-cockpit md-toolbar-row button.menu-icon`).click();
+        }
+      });
   }
 
   closeSidenav() {
-    return $(`app-cockpit md-sidenav.mat-sidenav-opened`).isPresent().then(present => {
-      if (present) {
-        return $(`app-cockpit md-toolbar-row button.menu-icon`).click();
-      }
-    });
+    return $(`app-cockpit md-sidenav.mat-sidenav-opened`)
+      .isPresent()
+      .then(present => {
+        if (present) {
+          return $(`app-cockpit md-toolbar-row button.menu-icon`).click();
+        }
+      });
   }
 }

@@ -23,12 +23,15 @@ import { WorkspaceOverviewPage } from './workspace.po';
 import { WorkspacesPage } from './workspaces.po';
 
 export class LoginPage {
-
   public static readonly component = $(`app-login`);
 
   public readonly component = LoginPage.component;
-  public readonly username = this.component.$(`input[formcontrolname="username"]`);
-  public readonly password = this.component.$(`input[formcontrolname="password"]`);
+  public readonly username = this.component.$(
+    `input[formcontrolname="username"]`
+  );
+  public readonly password = this.component.$(
+    `input[formcontrolname="password"]`
+  );
   public readonly button = this.component.$(`button`);
 
   static waitAndGet() {
@@ -37,7 +40,7 @@ export class LoginPage {
     return new LoginPage();
   }
 
-  private constructor() { }
+  private constructor() {}
 
   loginToWorkspace(user: string, pass: string): WorkspaceOverviewPage {
     this.loginNoCheck(user, pass);

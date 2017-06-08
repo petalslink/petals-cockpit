@@ -15,7 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $, ElementFinder } from 'protractor';
+import {
+  browser,
+  ExpectedConditions as EC,
+  $,
+  ElementFinder,
+} from 'protractor';
 import { waitTimeout } from '../common';
 
 export class UploadComponentPage {
@@ -45,7 +50,9 @@ export class UploadComponentPage {
     this.chooseFileButton = this.component.$('.choose-file');
     this.deployButton = this.component.$('.deploy');
     this.fileNameInput = this.component.$('input[name="changeFileName"]');
-    this.fileNamePlaceholder = this.component.$('.change-file-name .mat-input-placeholder');
+    this.fileNamePlaceholder = this.component.$(
+      '.change-file-name .mat-input-placeholder'
+    );
     this.errorTitle = this.component.$('.error-deploy .title');
     this.errorMsg = this.component.$('.error-deploy .message');
   }
