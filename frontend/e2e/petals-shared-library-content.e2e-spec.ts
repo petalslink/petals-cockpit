@@ -14,8 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import { page } from './common';
 import { WorkspacePage } from './pages/workspace.po';
+import { NotFoundPage } from './pages/not-found';
+
+describe(`Petals shared library content`, () => {
+  it(`should open the 404 page if the shared-library doesn't exists`, () => {
+    page
+      .goToViaLogin('/workspaces/idWks0/petals/shared-libraries/unknownIdSl')
+      .loginNoCheck('admin', 'admin');
+
+    NotFoundPage.waitAndGet();
+  });
+});
 
 describe(`Petals shared library content`, () => {
   let workspace: WorkspacePage;

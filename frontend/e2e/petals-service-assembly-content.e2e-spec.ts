@@ -14,8 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import { page } from './common';
 import { WorkspacePage, WorkspaceOverviewPage } from './pages/workspace.po';
+import { NotFoundPage } from './pages/not-found';
+
+describe(`Petals service-assembly content`, () => {
+  it(`should open the 404 page if the service-assembly doesn't exists`, () => {
+    page
+      .goToViaLogin('/workspaces/idWks0/petals/service-assemblies/unknownIdSa')
+      .loginNoCheck('admin', 'admin');
+
+    NotFoundPage.waitAndGet();
+  });
+});
 
 describe(`Petals service-assembly content`, () => {
   let workspace: WorkspacePage;

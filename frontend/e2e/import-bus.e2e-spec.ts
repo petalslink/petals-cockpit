@@ -22,6 +22,17 @@ import { IMPORT_HTTP_ERROR_IP } from '../src/mocks/backend-mock';
 import { page } from './common';
 import { expectFocused } from './utils';
 import { WorkspacePage } from './pages/workspace.po';
+import { NotFoundPage } from './pages/not-found';
+
+describe(`Import Bus`, () => {
+  it(`should open the 404 page if the bus in progress doesn't exists`, () => {
+    page
+      .goToViaLogin('/workspaces/idWks0/petals/buses-in-progress/unknownIdBip')
+      .loginNoCheck('admin', 'admin');
+
+    NotFoundPage.waitAndGet();
+  });
+});
 
 describe(`Import Bus`, () => {
   let workspace: WorkspacePage;

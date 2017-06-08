@@ -21,6 +21,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { WorkspacesComponent } from './workspaces.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { WorkspaceResolver } from './workspace-resolver';
+import { NotFound404Component } from 'app/shared/components/not-found-404/not-found-404.component';
 
 // /workspaces
 const routes: Routes = [
@@ -38,6 +39,10 @@ const routes: Routes = [
       {
         path: '',
         component: WorkspaceComponent,
+      },
+      {
+        path: 'not-found',
+        component: NotFound404Component,
       },
       {
         path: 'petals',

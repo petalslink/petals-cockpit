@@ -21,7 +21,6 @@ import { SharedModule } from '../../../shared/shared.module';
 import { WorkspacesRoutingModule } from './workspaces-routing.module';
 import { WorkspacesComponent } from './workspaces.component';
 import { PetalsMenuModule } from './petals-menu/petals-menu.module';
-import { WorkspaceResolver } from './workspace-resolver';
 import { WorkspaceModule } from 'app/features/cockpit/workspaces/workspace/workspace.module';
 
 @NgModule({
@@ -39,6 +38,5 @@ import { WorkspaceModule } from 'app/features/cockpit/workspaces/workspace/works
     // (in order to lazy load only what's needed)
     PetalsMenuModule,
   ],
-  providers: [WorkspaceResolver],
 })
 export class WorkspacesModule {}
