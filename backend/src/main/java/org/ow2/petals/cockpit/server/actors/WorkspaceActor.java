@@ -68,6 +68,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecor
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
@@ -77,6 +78,7 @@ import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.Service
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
+import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusImport;
@@ -179,6 +181,8 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                 answer((DeployServiceAssembly) msg, this::handleDeployServiceAssembly);
             } else if (msg instanceof DeployComponent) {
                 answer((DeployComponent) msg, this::handleDeployComponent);
+            } else if (msg instanceof DeploySharedLibrary) {
+                answer((DeploySharedLibrary) msg, this::handleDeploySharedLibrary);
             } else {
                 if (msg instanceof RequestMessage<?>) {
                     RequestReplyHelper.replyError((RequestMessage<?>) msg,
@@ -652,6 +656,36 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         return res;
     }
 
+    private WorkspaceContent handleDeploySharedLibrary(DeploySharedLibrary sl)
+            throws SuspendExecution, InterruptedException {
+        return db.runTransaction(conf -> {
+            ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(sl.cId)).fetchOne();
+            assert cont != null;
+
+            SharedLibrary deployedSL = petals.deploySL(cont.getIp(), cont.getPort(), cont.getUsername(),
+                    cont.getPassword(), sl.name, sl.version, sl.saUrl);
+
+            return sharedLibraryDeployed(deployedSL, sl.cId, conf);
+        });
+    }
+
+    private WorkspaceContent sharedLibraryDeployed(SharedLibrary deployedSL, long cId, Configuration conf) {
+        SharedlibrariesRecord slDb = new SharedlibrariesRecord(null, deployedSL.getName(), deployedSL.getVersion(),
+                cId);
+        slDb.attach(conf);
+        int slDbi = slDb.insert();
+        assert slDbi == 1;
+
+        WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                ImmutableMap.of(Long.toString(slDb.getId()), new SharedLibraryFull(slDb, ImmutableSet.of())));
+
+        // we want the event to be sent after we answered
+        doInActorLoop(() -> broadcast(WorkspaceEvent.sharedLibraryDeployed(res)));
+
+        return res;
+    }
+
     public interface Msg {
         // marker interface for messages to this actor
     }
@@ -763,6 +797,26 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
 
         public DeployServiceAssembly(String name, URL saUrl, long cId) {
             this.name = name;
+            this.saUrl = saUrl;
+            this.cId = cId;
+        }
+    }
+
+    public static class DeploySharedLibrary extends WorkspaceRequest<WorkspaceContent> {
+
+        private static final long serialVersionUID = 3305750050657001574L;
+
+        final String name;
+
+        final URL saUrl;
+
+        final long cId;
+
+        final String version;
+
+        public DeploySharedLibrary(String name, String version, URL saUrl, long cId) {
+            this.name = name;
+            this.version = version;
             this.saUrl = saUrl;
             this.cId = cId;
         }

@@ -63,6 +63,7 @@ import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteWorkspace;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployComponent;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployServiceAssembly;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeploySharedLibrary;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
@@ -255,6 +256,31 @@ public class WorkspaceResource {
         checkAccess(jooq);
 
         return as.call(wsId, new ChangeComponentState(compId, action));
+    }
+
+    @POST
+    @Path("/containers/{containerId}/sharedlibraries")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public WorkspaceContent deploySharedLibrary(@NotNull @PathParam("containerId") @Min(1) long containerId,
+            @NotNull @FormDataParam("file") InputStream file,
+            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition)
+            throws IOException, JBIDescriptorException, InterruptedException {
+
+        checkAccess(jooq);
+
+        if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
+        String filename = StringUtils.isEmpty(fileDisposition.getFileName()) ? "sl.zip" : fileDisposition.getFileName();
+
+        try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
+            Jbi descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptorFromArchive(sa.getFile());
+
+            return as.call(wsId, new DeploySharedLibrary(descriptor.getSharedLibrary().getIdentification().getName(),
+                    descriptor.getSharedLibrary().getVersion(), sa.getArtifactExternalUrl(), containerId));
+        }
     }
 
     @POST
@@ -600,7 +626,7 @@ public class WorkspaceResource {
 
         public enum Event {
             WORKSPACE_CONTENT, BUS_IMPORT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SA_STATE_CHANGE, COMPONENT_STATE_CHANGE,
-            BUS_DELETED, SA_DEPLOYED, WORKSPACE_DELETED, COMPONENT_DEPLOYED
+            BUS_DELETED, SA_DEPLOYED, WORKSPACE_DELETED, COMPONENT_DEPLOYED, SL_DEPLOYED
         }
 
         @JsonProperty
@@ -649,6 +675,10 @@ public class WorkspaceResource {
 
         public static WorkspaceEvent componentDeployed(WorkspaceContent cd) {
             return new WorkspaceEvent(Event.COMPONENT_DEPLOYED, cd);
+        }
+
+        public static WorkspaceEvent sharedLibraryDeployed(WorkspaceContent cd) {
+            return new WorkspaceEvent(Event.SL_DEPLOYED, cd);
         }
 
         public static WorkspaceEvent busImport(BusInProgress bip) {

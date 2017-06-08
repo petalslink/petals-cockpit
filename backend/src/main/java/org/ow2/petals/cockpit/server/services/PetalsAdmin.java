@@ -34,6 +34,7 @@ import org.ow2.petals.admin.api.artifact.Artifact;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
+import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.admin.api.artifact.lifecycle.ComponentLifecycle;
 import org.ow2.petals.admin.api.artifact.lifecycle.ServiceAssemblyLifecycle;
 import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
@@ -174,8 +175,8 @@ public class PetalsAdmin {
     }
 
     @Suspendable
-    public Component deployComponent(String ip, int port, String username, String password, ComponentType type, String name,
-            URL compUrl) {
+    public Component deployComponent(String ip, int port, String username, String password, ComponentType type,
+            String name, URL compUrl) {
         Component deployedComp = runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
             try {
                 petals.newArtifactLifecycleFactory().createComponentLifecycle(new Component(name, type)).deploy(compUrl,
@@ -187,6 +188,23 @@ public class PetalsAdmin {
         });
         assert deployedComp != null;
         return deployedComp;
+    }
+
+    @Suspendable
+    public SharedLibrary deploySL(String ip, int port, String username, String password, String name, String version,
+            URL slUrl) {
+        SharedLibrary deployedSL = runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
+            try {
+                petals.newArtifactLifecycleFactory().createSharedLibraryLifecycle(new SharedLibrary(name, version))
+                        .deploy(slUrl);
+                return (SharedLibrary) petals.newArtifactAdministration().getArtifactInfo(SharedLibrary.TYPE, name,
+                        version);
+            } catch (ArtifactAdministrationException e) {
+                throw new PetalsAdminException(e);
+            }
+        });
+        assert deployedSL != null;
+        return deployedSL;
     }
 
     public Map<String, String> getInstallParameters(String ip, int port, String username, String password,

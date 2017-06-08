@@ -81,6 +81,7 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
+import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.rules.CockpitResourceRule;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
@@ -349,10 +350,54 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         });
     }
 
-    protected ServiceAssemblyFull assertSAContent(WorkspaceContent content, Container cont, String saName,
+    protected SharedLibraryFull assertSLContent(WorkspaceContent content, Container cont, String slName,
+            String slVersion) {
+        SoftAssertions a = new SoftAssertions();
+        SharedLibraryFull res = assertSLContent(a, content, null, cont, slName, slVersion);
+        a.assertAll();
+        return res;
+    }
+
+    protected SharedLibraryFull assertSLContent(SoftAssertions a, WorkspaceContent content, WorkspaceContent control) {
+        return assertSLContent(a, content, control, null, null, null);
+    }
+
+    private SharedLibraryFull assertSLContent(SoftAssertions a, WorkspaceContent content,
+            @Nullable WorkspaceContent control, @Nullable Container container, @Nullable String slName,
+            @Nullable String slVersion) {
+        assertThat(content.buses).isEmpty();
+        assertThat(content.busesInProgress).isEmpty();
+        assertThat(content.containers).isEmpty();
+        assertThat(content.components).isEmpty();
+        assertThat(content.serviceAssemblies).isEmpty();
+        assertThat(content.sharedLibraries).hasSize(1);
+
+        Entry<String, SharedLibraryFull> contentSLE = content.sharedLibraries.entrySet().iterator().next();
+        SharedLibraryFull contentSL = contentSLE.getValue();
+
+        a.assertThat(contentSLE.getKey()).isEqualTo(Long.toString(contentSL.sharedLibrary.id));
+
+        if (control == null) {
+            assert container != null;
+            assert slName != null;
+            assert slVersion != null;
+
+            a.assertThat(contentSL.containerId).isEqualTo(getId(container));
+            a.assertThat(contentSL.sharedLibrary.name).isEqualTo(slName);
+            a.assertThat(contentSL.sharedLibrary.version).isEqualTo(slVersion);
+            a.assertThat(contentSL.components).isEmpty();
+        } else {
+            SharedLibraryFull controlSL = content.sharedLibraries.values().iterator().next();
+            a.assertThat(contentSL).isEqualToComparingFieldByFieldRecursively(controlSL);
+        }
+
+        return contentSL;
+    }
+
+    protected ServiceAssemblyFull assertSAContent(WorkspaceContent content, Container container, String saName,
             List<Component> comps) {
         SoftAssertions a = new SoftAssertions();
-        ServiceAssemblyFull res = assertSAContent(a, content, null, cont, saName, comps);
+        ServiceAssemblyFull res = assertSAContent(a, content, null, container, saName, comps);
         a.assertAll();
         return res;
     }
@@ -363,19 +408,19 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     private ServiceAssemblyFull assertSAContent(SoftAssertions a, WorkspaceContent content,
-            @Nullable WorkspaceContent control, @Nullable Container cont, @Nullable String saName,
+            @Nullable WorkspaceContent control, @Nullable Container container, @Nullable String saName,
             List<Component> comps) {
-
         assertThat(content.buses).isEmpty();
         assertThat(content.busesInProgress).isEmpty();
         assertThat(content.containers).isEmpty();
         assertThat(content.components).isEmpty();
         assertThat(content.serviceAssemblies).hasSize(1);
+        assertThat(content.sharedLibraries).isEmpty();
 
         if (control == null) {
-            assert cont != null;
+            assert container != null;
             assert saName != null;
-            Iterator<ServiceAssembly> iterator = cont.getServiceAssemblies().stream()
+            Iterator<ServiceAssembly> iterator = container.getServiceAssemblies().stream()
                     .filter(sa -> saName.equals(sa.getName())).iterator();
             assertThat(iterator.hasNext()).isTrue();
             assertThat(content.serviceUnits).hasSameSizeAs(iterator.next().getServiceUnits());
@@ -392,11 +437,11 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
         if (control == null) {
             assert saName != null;
-            assert cont != null;
+            assert container != null;
 
             // we already know it's present, see above
-            ServiceAssembly sa = cont.getServiceAssemblies().stream().filter(s -> saName.equals(s.getName())).iterator()
-                    .next();
+            ServiceAssembly sa = container.getServiceAssemblies().stream().filter(s -> saName.equals(s.getName()))
+                    .iterator().next();
 
             assertThat(sa.getName()).isEqualTo(contentSA.serviceAssembly.name);
             assertThat(sa.getState()).isEqualTo(ArtifactState.State.SHUTDOWN);
@@ -426,7 +471,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             // we consumed all the components
             a.assertThat(components).isEmpty();
 
-            a.assertThat(contentSA.containerId).isEqualTo(getId(cont));
+            a.assertThat(contentSA.containerId).isEqualTo(getId(container));
             a.assertThat(contentSA.serviceAssembly.name).isEqualTo(sa.getName());
             a.assertThat(contentSA.state).isEqualTo(ServiceAssemblyMin.State.from(sa.getState()));
         } else {
@@ -464,6 +509,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         assertThat(content.serviceAssemblies).isEmpty();
         assertThat(content.serviceUnits).isEmpty();
         assertThat(content.components).hasSize(1);
+        assertThat(content.sharedLibraries).isEmpty();
 
         Entry<String, ComponentFull> contentCE = content.components.entrySet().iterator().next();
         ComponentFull contentC = contentCE.getValue();
