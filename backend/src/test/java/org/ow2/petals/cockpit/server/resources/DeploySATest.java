@@ -144,7 +144,7 @@ public class DeploySATest extends AbstractCockpitResourceTest {
 
         MultiPart mpe = getSAMultiPart();
 
-        // the component exists but it's in another workspace
+        // the container exists but it's in another workspace
         Response post = resource.target("/workspaces/2/containers/" + getId(container) + "/serviceassemblies").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
@@ -170,7 +170,6 @@ public class DeploySATest extends AbstractCockpitResourceTest {
     @Test
     public void deploySA() throws Exception {
         try (EventInput eventInput = resource.sse(1)) {
-
             expectWorkspaceContent(eventInput);
 
             MultiPart mpe = getSAMultiPart();
