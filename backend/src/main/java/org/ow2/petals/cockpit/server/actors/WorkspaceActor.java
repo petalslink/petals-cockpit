@@ -43,6 +43,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.io.EofException;
 import org.glassfish.jersey.media.sse.EventOutput;
@@ -51,6 +52,8 @@ import org.glassfish.jersey.media.sse.SseBroadcaster;
 import org.glassfish.jersey.server.BroadcasterListener;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.jooq.Configuration;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
@@ -65,7 +68,6 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecor
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
@@ -621,17 +623,20 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         assert compDbi == 1;
 
         Set<String> sls = new HashSet<>();
-        for(SharedLibrary sl: deployedComp.getSharedLibraries()) {
-            SharedlibrariesComponentsRecord inserted = DSL.using(conf).insertInto(SHAREDLIBRARIES_COMPONENTS)
+        for (SharedLibrary sl : deployedComp.getSharedLibraries()) {
+            @NonNull
+            SelectConditionStep<Record1<Long>> where = DSL.using(conf).select(SHAREDLIBRARIES.ID).from(SHAREDLIBRARIES)
+                    .where(SHAREDLIBRARIES.NAME.eq(sl.getName()).and(SHAREDLIBRARIES.VERSION.eq(sl.getVersion()))
+                            .and(SHAREDLIBRARIES.CONTAINER_ID.eq(cId)));
+            int inserted = DSL.using(conf).insertInto(SHAREDLIBRARIES_COMPONENTS)
                     .set(SHAREDLIBRARIES_COMPONENTS.COMPONENT_ID, compDb.getId())
-                    .set(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID,
-                            DSL.select(SHAREDLIBRARIES.ID).from(SHAREDLIBRARIES).where(
-                                    SHAREDLIBRARIES.NAME.eq(sl.getName()).and(SHAREDLIBRARIES.VERSION.eq(sl.getVersion()))
-                                    .and(SHAREDLIBRARIES.CONTAINER_ID.eq(cId))))
-                    .returning(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID).fetchOne();
-            sls.add(Long.toString(inserted.getSharedlibraryId()));
+                    .set(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID, where).execute();
+            assert inserted == 1;
+            Record1<Long> slId = where.fetchOne();
+            assert slId != null;
+            sls.add(Long.toString(slId.value1()));
         }
-        
+
         WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                 ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(compDb, ImmutableSet.of(), sls)),
                 ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());

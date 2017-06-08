@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
 import org.ow2.petals.admin.api.artifact.Component;
+import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
@@ -71,6 +72,8 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
         }
     };
 
+    private final SharedLibrary sl = new SharedLibrary("sl", "1.0.0");
+
     public DeployComponentTest() {
         super(ComponentsResource.class, WorkspaceResource.class);
     }
@@ -79,6 +82,7 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
     public void setUp() throws Exception {
         resource.petals.registerDomain(domain);
         resource.petals.registerContainer(container);
+        resource.petals.registerArtifact(sl, container);
 
         resource.jmx.addComponentInstallerClient(COMP_NAME, ComponentType.BINDING,
                 new InstallationConfigurationServiceClientMock(), null);
@@ -168,7 +172,6 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
     @Test
     public void deployComponent() throws Exception {
         try (EventInput eventInput = resource.sse(1)) {
-
             expectWorkspaceContent(eventInput);
 
             MultiPart mpe = getComponentMultiPart();
@@ -214,5 +217,52 @@ public class DeployComponentTest extends AbstractCockpitResourceTest {
         assertThat(container.getComponents()).isEmpty();
         assertThat(resource.httpServer.wasCalled()).isTrue();
         assertThat(resource.httpServer.wasClosed()).isTrue();
+    }
+
+    @Test
+    public void deployComponentMissingSL() throws Exception {
+        MultiPart mpe = getMultiPart("component-with-sl1-jbi.xml", "fakeComponentWithSL");
+        Response post = resource.target("/workspaces/1/containers/" + getId(container) + "/components").request()
+                .post(Entity.entity(mpe, mpe.getMediaType()));
+
+        assertThat(post.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
+        ErrorMessage err = post.readEntity(ErrorMessage.class);
+        assertThat(err.getCode()).isEqualTo(Status.CONFLICT.getStatusCode());
+        assertThat(err.getMessage()).contains("Missing SL");
+
+        assertThat(container.getComponents()).isEmpty();
+        assertThat(resource.httpServer.wasCalled()).isTrue();
+        assertThat(resource.httpServer.wasClosed()).isTrue();
+    }
+
+    @Test
+    public void deployComponentWithSL() throws Exception {
+        try (EventInput eventInput = resource.sse(1)) {
+            expectWorkspaceContent(eventInput);
+
+            MultiPart mpe = getMultiPart("component-with-sl-jbi.xml", "fakeComponentWithSL");
+            WorkspaceContent post = resource.target("/workspaces/1/containers/" + getId(container) + "/components")
+                    .request().post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
+
+            ComponentFull postC = assertComponentContent(post, container, COMP_NAME);
+
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("COMPONENT_DEPLOYED");
+                WorkspaceContent data = e.readData(WorkspaceContent.class);
+
+                assertComponentContent(a, data, post);
+            });
+
+            assertThat(resource.httpServer.wasCalled()).isTrue();
+            assertThat(resource.httpServer.wasClosed()).isTrue();
+
+            assertThat(container.getComponents()).hasSize(1);
+            Component comp = container.getComponents().iterator().next();
+            assertThat(comp.getName()).isEqualTo(postC.component.name);
+            assertThat(comp.getState()).isEqualTo(ArtifactState.State.LOADED);
+            assertThat(comp.getType()).isEqualTo("BC");
+
+            resource.target("/components/" + postC.component.id).request().get(ComponentOverview.class);
+        }
     }
 }
