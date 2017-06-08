@@ -88,8 +88,8 @@ describe(`Petals container content`, () => {
       // deploy the component
       page.clickAndExpectNotification(
         upload.deployButton,
-        'Deploy component failed',
-        'An error occurred when trying to deploy the file "error-deploy.zip"'
+        'Component Deployment Failed',
+        'An error occurred while deploying error-deploy.zip'
       );
 
       expect(upload.errorTitle.getText()).toEqual('An error occurred:');
@@ -143,8 +143,8 @@ describe(`Petals container content`, () => {
       // deploy the component
       page.clickAndExpectNotification(
         upload.deployButton,
-        'Component deployed',
-        '"component" has been deployed'
+        'Component Deployed',
+        'component has been successfully deployed'
       );
 
       // check that the component is now added to the tree and that we've been redirected to it
@@ -231,8 +231,8 @@ describe(`Petals container content`, () => {
       // deploy the service-assembly
       page.clickAndExpectNotification(
         upload.deployButton,
-        'Deploy service-assembly failed',
-        'An error occurred when trying to deploy the file "error-deploy.zip"'
+        'Service Assembly Deployment Failed',
+        'An error occurred while deploying error-deploy.zip'
       );
 
       expect(upload.errorTitle.getText()).toEqual('An error occurred:');
@@ -286,8 +286,8 @@ describe(`Petals container content`, () => {
       // deploy the component
       page.clickAndExpectNotification(
         upload.deployButton,
-        'SA deployed',
-        '"SA 12" has been deployed'
+        'Service Assembly Deployed',
+        'SA 12 has been successfully deployed'
       );
 
       // check that the component is now added to the tree and that we've been redirected to it

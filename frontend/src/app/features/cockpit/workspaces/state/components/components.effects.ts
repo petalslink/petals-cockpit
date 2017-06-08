@@ -173,9 +173,8 @@ export class ComponentsEffects {
             }
 
             this.notification.error(
-              'Deploy Service-Unit failed',
-              `An error occurred when trying to deploy the file "${action
-                .payload.file.name}"`
+              'Service Unit Deployment Failed',
+              `An error occurred while deploying ${action.payload.file.name}`
             );
 
             return Observable.of({

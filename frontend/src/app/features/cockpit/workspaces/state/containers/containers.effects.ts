@@ -103,9 +103,8 @@ export class ContainersEffects {
             }
 
             this.notification.error(
-              'Deploy component failed',
-              `An error occurred when trying to deploy the file "${action
-                .payload.file.name}"`
+              'Component Deployment Failed',
+              `An error occurred while deploying ${action.payload.file.name}`
             );
 
             return Observable.of({
@@ -168,9 +167,8 @@ export class ContainersEffects {
             }
 
             this.notification.error(
-              'Deploy service-assembly failed',
-              `An error occurred when trying to deploy the file "${action
-                .payload.file.name}"`
+              'Service Assembly Deployment Failed',
+              `An error occurred while deploying ${action.payload.file.name}`
             );
 
             return Observable.of({

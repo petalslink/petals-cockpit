@@ -164,8 +164,8 @@ describe(`Petals component content`, () => {
     // deploy the component
     page.clickAndExpectNotification(
       deploy.deployButton,
-      'Deploy Service-Unit failed',
-      'An error occurred when trying to deploy the file "error-deploy.zip"'
+      'Service Unit Deployment Failed',
+      'An error occurred while deploying error-deploy.zip'
     );
 
     expect(deploy.errorTitle.getText()).toEqual('An error occurred:');
@@ -219,8 +219,8 @@ describe(`Petals component content`, () => {
     // deploy the service-unit
     page.clickAndExpectNotification(
       deploy.deployButton,
-      'SU deployed',
-      '"su" has been deployed'
+      'Service Unit Deployed',
+      '"su" has been successfully deployed'
     );
 
     // check that the service-unit is now added to the tree and that we've been redirected to it
@@ -271,11 +271,7 @@ describe(`Petals component content`, () => {
 
     const filePath = path.resolve(__dirname, './resources/component.zip');
     deploy.fileInput.sendKeys(filePath);
-    page.clickAndExpectNotification(
-      deploy.deployButton,
-      'Component deployed',
-      '"component" has been deployed'
-    );
+    page.clickAndExpectNotification(deploy.deployButton);
 
     // we should be redirected
     const ops = ComponentOverviewPage.waitAndGet().openOperations();

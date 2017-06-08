@@ -117,8 +117,8 @@ export class ContainersServiceImpl extends ContainersService {
         const component = components.byId[components.allIds[0]];
 
         this.notification.success(
-          'Component deployed',
-          `"${component.name}" has been deployed`
+          'Component Deployed',
+          `${component.name} has been successfully deployed`
         );
 
         this.store$.dispatch(
