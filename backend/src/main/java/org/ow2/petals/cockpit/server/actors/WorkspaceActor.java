@@ -98,6 +98,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import co.paralleluniverse.actors.BasicActor;
+import co.paralleluniverse.actors.behaviors.RequestMessage;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.SuspendExecution;
@@ -179,6 +180,10 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
             } else if (msg instanceof DeployComponent) {
                 answer((DeployComponent) msg, this::handleDeployComponent);
             } else {
+                if (msg instanceof RequestMessage<?>) {
+                    RequestReplyHelper.replyError((RequestMessage<?>) msg,
+                            new UnsupportedOperationException("Unexpected event for workspace " + wId + ": " + msg));
+                }
                 LOG.warn("Unexpected event for workspace {}: {}", wId, msg);
             }
         }
