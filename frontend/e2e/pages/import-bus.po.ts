@@ -45,6 +45,10 @@ export abstract class BusInProgressFields {
   public readonly clearButton = this.component.$(
     `app-petals-bus-in-progress-view button.btn-clear-form`
   );
+  public readonly discardName = this.discardButton.$(`span.discard-name`);
+  public readonly cancelName = this.discardButton.$(`span.cancel-name`);
+  public readonly importName = this.importButton.$(`span.import-name`);
+  public readonly clearName = this.clearButton.$(`span.clear-name`);
 
   public readonly error = this.component.$(`.error-details`);
 }

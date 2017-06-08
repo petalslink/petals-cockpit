@@ -108,7 +108,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               class="btn-clear-form margin-right-x1 text-upper"
               (click)="reset()">
               <md-icon>clear_all</md-icon>
-              <span>Clear</span>
+              <span class="clear-name">Clear</span>
             </button>
             <button
               md-raised-button
@@ -120,8 +120,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               class="margin-right-x1 btn-discard-form text-upper">
               <md-icon *ngIf="busInProgress.importError">remove_circle</md-icon>
               <md-icon *ngIf="cancel && !busInProgress.importError">cancel</md-icon>
-              <span *ngIf="busInProgress.importError; else cancel">Discard</span>
-              <ng-template #cancel><span>Cancel</span></ng-template>
+              <span class="discard-name" *ngIf="busInProgress.importError; else cancel">Discard</span>
+              <ng-template #cancel><span class="cancel-name">Cancel</span></ng-template>
             </button>
             <button
               md-raised-button
@@ -131,6 +131,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               [disabled]="busImportForm.invalid || (busesInProgressTable$ | async).isImportingBus || busInProgress">
               <md-icon *ngIf="!((busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError))">import_export</md-icon>
               <span
+                class="import-name"
                 *ngIf="!((busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError))">
                 Import
               </span>

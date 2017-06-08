@@ -39,10 +39,10 @@ describe(`Import Bus`, () => {
     expect(importBus.password.getAttribute('value')).toEqual(``);
     expect(importBus.passphrase.getAttribute('value')).toEqual(``);
 
-    expect(importBus.importButton.getText()).toEqual(`import_export IMPORT`);
+    expect(importBus.importName.getText()).toEqual(`IMPORT`);
     expect(importBus.importButton.isEnabled()).toBe(false);
 
-    expect(importBus.clearButton.getText()).toEqual(`clear_all CLEAR`);
+    expect(importBus.clearName.getText()).toEqual(`CLEAR`);
     expect(importBus.clearButton.isEnabled()).toBe(true);
 
     expect(importBus.discardButton.isPresent()).toBe(false);
@@ -73,7 +73,7 @@ describe(`Import Bus`, () => {
     // check if clear button is not present
     expect(otherBus.clearButton.isPresent()).toBe(false);
 
-    expect(otherBus.discardButton.getText()).toEqual(`cancel CANCEL`);
+    expect(otherBus.cancelName.getText()).toEqual(`CANCEL`);
     expect(otherBus.discardButton.isEnabled()).toBe(true);
   });
 
@@ -137,7 +137,7 @@ describe(`Import Bus`, () => {
         .isDisplayed()
     ).toEqual(true);
 
-    expect(importBus.discardButton.getText()).toEqual(`remove_circle DISCARD`);
+    expect(importBus.discardName.getText()).toEqual(`DISCARD`);
     expect(importBus.discardButton.isEnabled()).toBe(true);
   });
 

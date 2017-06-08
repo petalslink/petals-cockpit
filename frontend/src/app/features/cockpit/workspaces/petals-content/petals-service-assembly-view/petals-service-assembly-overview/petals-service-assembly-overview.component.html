@@ -13,26 +13,63 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFill class="content content-max-width">
+<div fxFill fxLayout="column" class="content content-max-width">
   <div class="central-content">
-    <md-card class="state">
-      <md-card-title-group fxLayout="column">
-        <div fxLayout="column" fxLayoutAlign="end end">
-          <md-card-subtitle>State</md-card-subtitle>
-          <md-card-title>{{ serviceAssembly.state }}</md-card-title>
-        </div>
-      </md-card-title-group>
-    </md-card>
+    <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
 
-    <h3 class="color-primary-light-bold margin-top-x2">Service units</h3>
-    <md-card class="service-units">
-      <md-card-content>
-        <ul>
-          <li *ngFor="let serviceUnit of serviceUnits">
-            Service unit "<a [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', serviceUnit.id]" class="service-unit bold color-primary">{{ serviceUnit.name }}</a>" deployed on component "<a [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', serviceUnit.component.id]" class="component bold color-primary">{{ serviceUnit.component.name }}</a>"
-          </li>
-        </ul>
-      </md-card-content>
-    </md-card>
+      <md-card fxFlex class="sa-infos" [ngClass.gt-md]="'card-auto-size'">
+        <md-card-title fxLayout="row">
+          <span fxFlex class="text-upper">About <b>{{ serviceAssembly.name }}</b></span>
+          <md-icon color="primary">info_outline</md-icon>
+        </md-card-title>
+
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <md-card-header fxFlex *ngIf="serviceAssembly.state">
+            <md-card-title>State</md-card-title>
+            <md-card-subtitle class="sa-state" fxLayoutAlign="start center">
+              {{ serviceAssembly.state }}
+              <div class="margin-left-x1"
+                [class.green-led]="serviceAssembly.state === 'Started'"
+                [class.yellow-led]="serviceAssembly.state === 'Stopped'"
+                [class.red-led]="serviceAssembly.state === 'Shutdown'"></div>
+            </md-card-subtitle>
+          </md-card-header>
+        </div>
+
+      </md-card>
+
+      <md-card fxFlex class="service-units">
+        <md-card-title fxLayout="row">
+          <span fxFlex class="text-upper">Service Units</span>
+          <md-icon color="primary">view_list</md-icon>
+        </md-card-title>
+
+        <md-divider></md-divider>
+
+        <md-nav-list dense fxLayout="column">
+          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let serviceUnit of serviceUnits">
+            <a md-list-item [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', serviceUnit.id]"
+              class="service-unit">
+              <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
+                <span class="su-name">{{ serviceUnit.name }}</span>
+                <md-icon md-list-icon>play_circle_outline</md-icon>
+              </div>
+            </a>
+
+            <span fxFlex md-subheader fxLayoutAlign="center center">deployed on component</span>
+
+            <a md-list-item
+              [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', serviceUnit.component.id]"
+              class="su-component">
+              <div fxFlex fxLayout="row" fxLayoutAlign="end center" class="color-primary">
+                <span class="su-component-name">{{ serviceUnit.component.name }}</span>
+                <md-icon md-list-icon>play_circle_outline</md-icon>
+              </div>
+            </a>
+          </div>
+        </md-nav-list>
+      </md-card>
+
+    </div>
   </div>
 </div>

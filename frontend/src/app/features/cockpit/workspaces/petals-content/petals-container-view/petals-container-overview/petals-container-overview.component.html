@@ -15,33 +15,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
+    <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
 
-    <md-card class="container-infos">
-      <md-card-title fxLayout="row">
-        <span fxFlex class="text-upper">About <b>{{ container.name }}</b></span>
-        <md-icon color="primary">info_outline</md-icon>
-      </md-card-title>
+      <md-card fxFlex class="container-infos">
+        <md-card-title fxLayout="row">
+          <span fxFlex class="text-upper">About <b>{{ container.name }}</b></span>
+          <md-icon color="primary">info_outline</md-icon>
+        </md-card-title>
 
-      <div fxLayout="row" fxLayoutAlign="start center">
-        <md-card-header fxFlex="40%">
-          <div md-card-avatar class="img-card-ip"></div>
-          <md-card-title>IP</md-card-title>
-          <md-divider></md-divider>
-          <md-card-subtitle class="container-ip">{{ container.ip }}</md-card-subtitle>
-        </md-card-header>
+        <div fxLayout="row" fxLayoutAlign="start center" class="margin-top-x1">
+          <md-card-header fxFlex>
+            <div md-card-avatar class="img-card-ip"></div>
+            <md-card-title>IP</md-card-title>
+            <md-card-subtitle class="container-ip">{{ container.ip }}</md-card-subtitle>
+          </md-card-header>
 
-        <md-card-header fxFlex="40%">
-          <div md-card-avatar class="img-card-port"></div>
-          <md-card-title>Port</md-card-title>
-          <md-card-subtitle class="container-port">{{ container.port }}</md-card-subtitle>
-        </md-card-header>
-      </div>
-    </md-card>
+          <md-card-header fxFlex>
+            <div md-card-avatar class="img-card-port"></div>
+            <md-card-title>Port</md-card-title>
+            <md-card-subtitle class="container-port">{{ container.port }}</md-card-subtitle>
+          </md-card-header>
+        </div>
+      </md-card>
+
+      <md-card fxFlex class="petals-servers">
+        <md-card-title fxLayout="row">
+          <span fxFlex class="text-upper">System Info</span>
+          <md-icon color="primary">description</md-icon>
+        </md-card-title>
+        <md-card-content class="system-info">{{ container.systemInfo }}</md-card-content>
+      </md-card>
+
+    </div>
 
     <md-card fxLayout="column" class="margin-top-x1">
       <md-card-title fxLayout="row">
-        <span fxFlex class="text-upper">Containers Reachabilities</span>
-        <md-icon color="primary">dns</md-icon>
+        <div fxFlex class="text-upper" fxLayout="row">
+          <span class="margin-right-x1">Containers Reachabilities</span>
+          <md-spinner fxLayoutAlign="start center" *ngIf="container.isFetchingDetails"></md-spinner>
+        </div>
+        <md-icon fxLayoutAlign="end center" color="primary">dns</md-icon>
       </md-card-title>
       <md-card-subtitle fxLayout="row" fxLayoutAlign="start center">
         <md-icon class="margin-right-x1" color="primary">info</md-icon>
@@ -50,10 +63,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </md-card>
 
     <md-card class="graph-containers">
-      <div fxLayout="column" fxFill fxLayoutAlign="center center">
-        <md-spinner *ngIf="container.isFetchingDetails"></md-spinner>
-      </div>
-
       <div fxFill class="network-canvas"
         *ngIf="!container.isFetchingDetails"
         [visNetwork]="visNetwork"
@@ -62,47 +71,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         (initialized)="networkInitialized()"></div>
     </md-card>
 
-    <md-card fxLayout="column" class="container-infos-selected" *ngIf="selectedContainer && container.id !== selectedContainer.id">
+    <md-card fxLayout="column" class="container-infos-selected margin-bottom-x1" *ngIf="selectedContainer && container.id !== selectedContainer.id">
       <md-card-title fxLayout="row">
-        <span fxFlex class="text-upper"><b>{{ selectedContainer.name }}</b> Selected</span>
-        <md-icon color="primary">check</md-icon>
+        <div fxFlex fxLayout="row" fxLayoutAlign="start center">
+          <span fxFlex class="text-upper"><b>{{ selectedContainer.name }}</b> Selected</span>
+
+          <md-nav-list dense fxLayout="row">
+            <div fxFlex fxLayout="row" fxLayoutAlign="end center">
+              <a md-list-item class="container" color="primary" [routerLink]="['/workspaces', workspaceId, 'petals', 'containers', selectedContainer.id]">
+                <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
+                  <span class="text-upper view-container">View this container</span>
+                  <md-icon md-list-icon>play_circle_outline</md-icon>
+                </div>
+              </a>
+            </div>
+          </md-nav-list>
+        </div>
       </md-card-title>
 
       <div fxLayout="row">
         <div fxFlex fxLayout="row">
-          <md-card-header fxFlex="40%">
+          <md-card-header>
             <div md-card-avatar class="img-card-ip"></div>
             <md-card-title>IP</md-card-title>
             <md-card-subtitle class="selected-container-ip">{{ selectedContainer.ip }}</md-card-subtitle>
           </md-card-header>
         </div>
 
-        <div fxFlex="60%" fxLayout.lt-md="column" fxLayout="row">
-          <md-card-header fxFlex class="padding-right-x1">
+        <div fxFlex fxLayout="row">
+          <md-card-header fxFlex>
             <div md-card-avatar class="img-card-port"></div>
             <md-card-title>Port</md-card-title>
             <md-card-subtitle class="selected-container-port">{{ selectedContainer.port }}</md-card-subtitle>
           </md-card-header>
-
-          <md-card-actions fxFlex fxLayoutAlign="end end" class="btn-view-container padding-right-x1">
-            <a class="view-container"
-              [ngClass]="btnByScreenSize$ | async"
-              md-raised-button color="primary"
-              [routerLink]="['/workspaces', workspaceId, 'petals', 'containers', selectedContainer.id]">
-              <span class="text-upper" fxHide.lt-md fxShow>View this container</span>
-              <md-icon>chevron_right</md-icon>
-            </a>
-          </md-card-actions>
         </div>
       </div>
-    </md-card>
-
-    <md-card class="petals-servers margin-top-x1 margin-bottom-x1">
-      <md-card-title fxLayout="row">
-        <span fxFlex class="text-upper">System Info</span>
-        <md-icon color="primary">description</md-icon>
-      </md-card-title>
-      <md-card-content class="system-info" >{{ container.systemInfo }}</md-card-content>
     </md-card>
 
   </div>

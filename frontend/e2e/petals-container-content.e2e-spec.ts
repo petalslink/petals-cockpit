@@ -51,16 +51,14 @@ describe(`Petals container content`, () => {
         .openOperations()
         .getComponentUpload();
 
-      expect(upload.chooseFileButton.getText()).toEqual(
-        `CHOOSE A FILE TO UPLOAD insert_drive_file`
+      expect(upload.chooseFileName.getText()).toEqual(
+        `CHOOSE A FILE TO UPLOAD`
       );
       upload.fileInput.sendKeys('/test.zip');
 
       expect(upload.fileNameInput.isPresent()).toBe(false);
       expect(upload.fileName.getText()).toEqual(`test.zip`);
-      expect(upload.chooseFileButton.getText()).toEqual(
-        `CHANGE THE FILE insert_drive_file`
-      );
+      expect(upload.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
 
       expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
       expect(upload.deployButton.isEnabled()).toBe(true);
@@ -196,16 +194,14 @@ describe(`Petals container content`, () => {
         .openOperations()
         .getServiceAssemblyUpload();
 
-      expect(upload.chooseFileButton.getText()).toEqual(
-        `CHOOSE A FILE TO UPLOAD insert_drive_file`
+      expect(upload.chooseFileName.getText()).toEqual(
+        `CHOOSE A FILE TO UPLOAD`
       );
       upload.fileInput.sendKeys('/test.zip');
 
       expect(upload.fileNameInput.isPresent()).toBe(false);
       expect(upload.fileName.getText()).toEqual(`test.zip`);
-      expect(upload.chooseFileButton.getText()).toEqual(
-        `CHANGE THE FILE insert_drive_file`
-      );
+      expect(upload.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
 
       expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
       expect(upload.deployButton.isEnabled()).toBe(true);
@@ -321,10 +317,8 @@ describe(`Petals container content`, () => {
 
       expect(sa.state.getText()).toEqual('Shutdown');
 
-      expect(sa.serviceUnits.getText()).toEqual([
-        'Service unit "SU 16" deployed on component "Comp 0"',
-        'Service unit "SU 17" deployed on component "Comp 1"',
-      ]);
+      expect(sa.serviceUnits.getText()).toEqual(['SU 16', 'SU 17']);
+      expect(sa.suComponents.getText()).toEqual(['Comp 0', 'Comp 1']);
     });
   });
 });

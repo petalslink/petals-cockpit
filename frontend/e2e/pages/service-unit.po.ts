@@ -46,16 +46,15 @@ export class ServiceUnitOverviewPage extends ServiceUnitPage {
   );
 
   public readonly overview = ServiceUnitOverviewPage.overview;
-  public readonly state = this.overview.$(`md-card .sa-state`);
+  public readonly state = this.overview.$(`.sa-state`);
 
   public readonly serviceAssemblyCard = this.overview.$(
-    'md-card-header.service-assembly'
+    '.su-infos .service-assembly'
   );
-  public readonly serviceAssembly = this.serviceAssemblyCard.$(
-    'md-card-subtitle.sa-name'
-  );
-  public readonly viewServiceAssembly = this.overview.$(
-    'md-card-actions.btn-view-container'
+  public readonly serviceAssembly = this.serviceAssemblyCard.$('.sa-name');
+  public readonly viewServiceAssembly = this.overview.$('.su-infos .view-sa');
+  public readonly viewServiceAssemblyName = this.viewServiceAssembly.$(
+    '.view-sa-name'
   );
 
   static waitAndGet() {
@@ -72,7 +71,7 @@ export class ServiceUnitOverviewPage extends ServiceUnitPage {
   }
 
   openServiceAssembly() {
-    this.viewServiceAssembly.$('a').click();
+    this.viewServiceAssembly.$('a.sa').click();
     return ServiceAssemblyOverviewPage.waitAndGet();
   }
 }

@@ -70,7 +70,7 @@ function edge(container: IContainerRow) {
 export const containerNetworkOptions: VisNetworkOptions = {
   // see ngOnInit of the component for autoResize
   autoResize: false,
-  height: '400px',
+  height: '320px',
   width: '100%',
   clickToUse: true,
   layout: {

@@ -15,50 +15,61 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
+    <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
 
-    <md-card class="component-infos">
-      <md-card-title fxLayout="row">
-        <span fxFlex class="text-upper">About <b>{{ component.name }}</b></span>
-        <md-icon color="primary">info_outline</md-icon>
-      </md-card-title>
+      <md-card fxFlex class="component-infos" [ngClass.gt-md]="'card-auto-size'">
+        <md-card-title fxLayout="row">
+          <span fxFlex class="text-upper">About <b>{{ component.name }}</b></span>
+          <md-icon color="primary">info_outline</md-icon>
+        </md-card-title>
 
-      <div fxLayout="row" fxLayoutAlign="start center">
-        <md-card-header fxFlex="40%" *ngIf="component.state">
-          <md-card-title>State</md-card-title>
-          <md-divider></md-divider>
-          <md-card-subtitle class="component-state" fxLayoutAlign="start center">
-            {{ component.state }}
-            <div class="margin-left-x1"
-              [class.green-led]="component.state === 'Started'"
-              [class.yellow-led]="component.state === 'Stopped'"
-              [class.red-led]="component.state === 'Shutdown'"
-              [class.grey-led]="component.state === 'Loaded'"></div>
-          </md-card-subtitle>
-        </md-card-header>
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <md-card-header fxFlex *ngIf="component.state">
+            <md-card-title>State</md-card-title>
+            <md-card-subtitle class="component-state" fxLayoutAlign="start center">
+              {{ component.state }}
+              <div class="margin-left-x1"
+                [class.green-led]="component.state === 'Started'"
+                [class.yellow-led]="component.state === 'Stopped'"
+                [class.red-led]="component.state === 'Shutdown'"
+                [class.grey-led]="component.state === 'Loaded'"></div>
+            </md-card-subtitle>
+          </md-card-header>
 
-        <md-card-header fxFlex="40%">
-          <div md-card-avatar class="img-card-type"></div>
-          <md-card-title>Type</md-card-title>
-          <md-card-subtitle class="component-type">{{ component.type }}</md-card-subtitle>
-        </md-card-header>
-      </div>
-    </md-card>
+          <md-card-header fxFlex *ngIf="component.type">
+            <div md-card-avatar class="img-card-type"></div>
+            <md-card-title>Type</md-card-title>
+            <md-card-subtitle class="component-type">{{ component.type }}</md-card-subtitle>
+          </md-card-header>
+        </div>
+      </md-card>
 
-    <md-card class="margin-top-x1 shared-libraries">
-      <md-card-title fxLayout="row">
-        <span fxFlex class="text-upper">Shared Libraries</span>
-        <md-icon color="primary">info_outline</md-icon>
-      </md-card-title>
+      <md-card fxFlex class="components-infos">
+        <md-card-title fxLayout="row">
+          <span fxFlex class="text-upper">Shared Libraries</span>
+          <md-icon color="primary">view_list</md-icon>
+        </md-card-title>
 
-      <md-card-content>
-        <ul>
-          <li *ngFor="let sl of sharedLibraries">
-            <a [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'shared-libraries', sl.id]" class="bold color-primary">{{ sl.name }}</a>
-          </li>
-        </ul>
-        <span *ngIf="sharedLibraries.length === 0">This component doesn't use any shared library</span>
-      </md-card-content>
-    </md-card>
+        <md-divider></md-divider>
 
+        <md-card-content *ngIf="sharedLibraries.length === 0" class="margin-top-x1">
+          This component doesn't use any shared library.
+        </md-card-content>
+
+        <md-nav-list dense fxLayout="column">
+          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let sl of sharedLibraries">
+            <a md-list-item [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'shared-libraries', sl.id]"
+              class="shared-library">
+              <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
+                <span class="sl-name">{{ sl.name }}</span>
+                <md-icon md-list-icon>play_circle_outline</md-icon>
+              </div>
+            </a>
+          </div>
+
+        </md-nav-list>
+      </md-card>
+
+    </div>
   </div>
 </div>

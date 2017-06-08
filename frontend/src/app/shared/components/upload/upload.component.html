@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <!-- https://github.com/angular/material2/issues/3262 -->
 <!-- https://github.com/angular/material2/issues/3758 -->
 <!-- the trick here consists in hiding the input, and bind the click on a button to that input -->
-<md-card fxLayout="column" class="margin-top-x1">
+<md-card [ngClass.gt-md]="'card-auto-size'">
   <form (ngSubmit)="onDeploy.emit({file: fileToDeploy, name: changeFileName})">
     <md-card-title fxLayout="row">
       <span fxFlex class="text-upper title">{{ title }}</span>
@@ -32,18 +32,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <!-- https://github.com/angular/material2/issues/3262 -->
     <!-- https://github.com/angular/material2/issues/3758 -->
     <!--the trick here consists in hiding the input, and bind the click on a button to that input-->
-    <md-card-content class="margin-top-x2" fxLayout="column" fxLayout.gt-sm="row">
+    <md-card-content fxLayout="column" fxLayout.gt-sm="row">
       <input #deploy class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="disabled">
 
-      <md-input-container fxFlex *ngIf="fileToDeploy && placeholderChangeFileName" class="change-file-name">
+      <md-input-container fxFlex *ngIf="fileToDeploy && placeholderChangeFileName" class="change-file-input">
         <input mdInput type="text" [(ngModel)]="changeFileName" name="changeFileName" [placeholder]="placeholderChangeFileName" [disabled]="changeFileName?.trim().length === 0 || disabled">
       </md-input-container>
 
       <div>
         <button md-button color="primary" type="button" (click)="deploy.click()" class="choose-file text-upper" [disabled]="disabled">
-          <span *ngIf="!fileToDeploy; else changeFile">Choose a file to upload</span>
-          <ng-template #changeFile>Change the file</ng-template>
-          <md-icon color="primary" class="icon-file">insert_drive_file</md-icon>
+          <span *ngIf="!fileToDeploy; else changeFile" class="choose-file-name">Choose a file to upload</span>
+          <ng-template #changeFile><span class="change-file-name">Change the file</span></ng-template>
+          <md-icon color="primary">insert_drive_file</md-icon>
         </button>
 
         <button class="text-upper deploy" md-raised-button color="accent" type="submit" *ngIf="fileToDeploy" [disabled]="disabled">

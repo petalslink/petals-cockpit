@@ -30,6 +30,7 @@ describe(`Petals service-unit content`, () => {
     expect(su.title.getText()).toEqual('SU 0');
     expect(su.state.getText()).toEqual('Started');
     expect(su.serviceAssembly.getText()).toEqual('SA 0');
+    expect(su.viewServiceAssemblyName.getText()).toEqual('VIEW THIS SA');
 
     const sa = su.openServiceAssembly();
     expect(sa.title.getText()).toEqual('SA 0');
