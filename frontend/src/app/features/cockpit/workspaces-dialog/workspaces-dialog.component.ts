@@ -16,7 +16,7 @@
  */
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { TooltipPosition } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
@@ -67,7 +67,7 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
     });
 
     this.newWksForm = this.fb.group({
-      name: ['', Validators.required],
+      name: [''],
     });
 
     this.store$
@@ -80,8 +80,8 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
         )
       )
       .takeUntil(this.onDestroy$)
-      .do(([isAddingWorkspace, _]) => {
-        if (this.newWksForm.invalid || isAddingWorkspace) {
+      .do(([isAddingWorkspace, name]) => {
+        if (!name || isAddingWorkspace) {
           this.btnSubmitDisabled = true;
         } else {
           this.btnSubmitDisabled = false;
@@ -121,10 +121,6 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
       type: Workspaces.POST_WORKSPACE,
       payload: value.name,
     });
-    this.reset();
-  }
-
-  reset() {
     this.newWksForm.reset();
   }
 
