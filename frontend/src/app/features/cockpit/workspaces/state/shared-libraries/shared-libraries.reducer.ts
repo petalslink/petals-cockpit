@@ -33,6 +33,8 @@ import {
   ISharedLibraryBackendSSE,
   ISharedLibraryBackendDetails,
 } from 'app/shared/services/shared-libraries.service';
+import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
 
 export class SharedLibraries {
   private static reducerName = '[Shared libraries]';
@@ -115,6 +117,17 @@ export class SharedLibraries {
     });
   }
 
+  private static deployComponentSuccess(
+    sharedLibrariesTable: ISharedLibrariesTable,
+    payload: IComponentRow
+  ): ISharedLibrariesTable {
+    return payload.sharedLibraries.reduce((acc, sl) => {
+      return updateById(sharedLibrariesTable, sl, {
+        components: [...sharedLibrariesTable.byId[sl].components, payload.id],
+      });
+    }, sharedLibrariesTable);
+  }
+
   private static cleanWorkspace(
     _sharedLibrariesTable: ISharedLibrariesTable,
     _payload
@@ -135,6 +148,8 @@ export class SharedLibraries {
     [SharedLibraries.FETCH_DETAILS_SUCCESS]:
       SharedLibraries.fetchDetailsSuccess,
     [SharedLibraries.FETCH_DETAILS_ERROR]: SharedLibraries.fetchDetailsError,
+    [Containers.DEPLOY_COMPONENT_SUCCESS]:
+      SharedLibraries.deployComponentSuccess,
 
     [Workspaces.CLEAN_WORKSPACE]: SharedLibraries.cleanWorkspace,
   };
