@@ -24,16 +24,17 @@
     "electron-mock": "yarn run build-electron-mock; electron dist/",
     "build-electron": "yarn run build -- -bh='./'; node ./electron/generate-package-json.js; cp ./electron/electron.js dist/",
     "electron": "yarn run build-electron; electron dist/",
-    "prettier:base": "yarn run prettier -- --parser typescript --single-quote --trailing-comma es5",
-    "prettier:check": "yarn run prettier:base -- -l \"./{e2e,src}/**/*.ts\"",
-    "prettier:write": "yarn run prettier:base -- --write \"./{e2e,src}/**/*.ts\"",
+    "prettier": "prettier",
+    "prettier:base": "npm run prettier -- --parser typescript --single-quote --trailing-comma es5",
+    "prettier:write": "npm run prettier:base -- --write './{e2e,src}/**/*.ts'",
+    "prettier:check": "npm run prettier:write -- -l",
     "precommit": "lint-staged"
   },
   "lint-staged": {
     "gitDir": "../",
     "linters": {
       "*.ts": [
-        "yarn run prettier:base -- -l"
+        "npm run prettier:base -- -l"
       ]
     }
   },
