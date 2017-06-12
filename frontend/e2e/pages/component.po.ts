@@ -59,7 +59,7 @@ export class ComponentOverviewPage extends ComponentPage {
   public readonly state = this.overview.$(`.component-infos .component-state`);
   public readonly type = this.overview.$(`.component-infos .component-type`);
   public readonly sharedLibraries = this.overview.$$(
-    `.components-infos a.shared-library .sl-name`
+    `.shared-libraries a.shared-library .sl-name`
   );
 
   static waitAndGet() {
@@ -77,7 +77,7 @@ export class ComponentOverviewPage extends ComponentPage {
     if (typeof identifier === 'string') {
       this.overview
         .element(
-          by.cssContainingText(`.components-infos a.shared-library`, identifier)
+          by.cssContainingText(`.shared-libraries a.shared-library`, identifier)
         )
         .click();
     } else {
