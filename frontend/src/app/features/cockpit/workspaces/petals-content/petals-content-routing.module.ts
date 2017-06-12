@@ -22,6 +22,11 @@ import { Routes, RouterModule } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
+    pathMatch: 'full',
+    redirectTo: 'buses-in-progress',
+  },
+  {
+    path: 'buses-in-progress',
     // tslint:disable-next-line:max-line-length
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule',
@@ -31,12 +36,6 @@ const routes: Routes = [
     // tslint:disable-next-line:max-line-length
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-bus-view/petals-bus-view.module#PetalsBusViewModule',
-  },
-  {
-    path: 'buses-in-progress',
-    // tslint:disable-next-line:max-line-length
-    loadChildren:
-      'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule',
   },
   {
     path: 'containers/:containerId',
