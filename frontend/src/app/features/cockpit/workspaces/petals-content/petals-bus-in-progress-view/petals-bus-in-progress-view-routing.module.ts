@@ -19,6 +19,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { PetalsBusInProgressViewComponent } from './petals-bus-in-progress-view.component';
+import { ResourceByIdResolver } from 'app/shared/services/guard-resource-by-id.resolver';
 
 // /workspaces/:workspaceId/petals/buses-in-progress
 const routes: Routes = [
@@ -28,6 +29,7 @@ const routes: Routes = [
   },
   {
     path: ':busInProgressId',
+    resolve: { _: ResourceByIdResolver },
     component: PetalsBusInProgressViewComponent,
   },
 ];

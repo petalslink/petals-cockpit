@@ -94,9 +94,6 @@ export class PetalsBusInProgressViewComponent
 
     const id$ = this.route.paramMap
       .map(paramMap => paramMap.get('busInProgressId'))
-      // displays the last thing in url if no params (bug ?)
-      // TODO clean that, it's not the correct way to handle empty form versus completed form
-      .map(bId => (bId === 'buses-in-progress' ? '' : bId))
       .distinctUntilChanged();
 
     id$

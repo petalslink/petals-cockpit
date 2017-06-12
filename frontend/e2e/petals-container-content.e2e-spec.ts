@@ -14,12 +14,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import * as path from 'path';
 
 import { page } from './common';
 import { WorkspacePage } from './pages/workspace.po';
 import { ComponentOverviewPage } from './pages/component.po';
 import { ServiceAssemblyOverviewPage } from './pages/service-assembly.po';
+import { NotFoundPage } from './pages/not-found';
+
+describe(`Petals container content`, () => {
+  it(`should open the 404 page if the container doesn't exists`, () => {
+    page
+      .goToViaLogin('/workspaces/idWks0/petals/containers/unknownIdCont')
+      .loginNoCheck('admin', 'admin');
+
+    NotFoundPage.waitAndGet();
+  });
+});
 
 describe(`Petals container content`, () => {
   let workspace: WorkspacePage;

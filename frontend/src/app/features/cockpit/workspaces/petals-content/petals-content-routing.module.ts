@@ -17,20 +17,14 @@
 
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { ResourceByIdResolver } from 'app/shared/services/guard-resource-by-id.resolver';
 
 // /workspaces/:workspaceId/petals
 const routes: Routes = [
   {
     path: '',
-    // tslint:disable-next-line:max-line-length
-    loadChildren:
-      'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule',
-  },
-  {
-    path: 'buses/:busId',
-    // tslint:disable-next-line:max-line-length
-    loadChildren:
-      'app/features/cockpit/workspaces/petals-content/petals-bus-view/petals-bus-view.module#PetalsBusViewModule',
+    pathMatch: 'full',
+    redirectTo: 'buses-in-progress',
   },
   {
     path: 'buses-in-progress',
@@ -39,31 +33,43 @@ const routes: Routes = [
       'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule',
   },
   {
+    path: 'buses/:busId',
+    resolve: { _: ResourceByIdResolver },
+    // tslint:disable-next-line:max-line-length
+    loadChildren:
+      'app/features/cockpit/workspaces/petals-content/petals-bus-view/petals-bus-view.module#PetalsBusViewModule',
+  },
+  {
     path: 'containers/:containerId',
+    resolve: { _: ResourceByIdResolver },
     // tslint:disable-next-line:max-line-length
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-view.module#PetalsContainerViewModule',
   },
   {
     path: 'service-assemblies/:serviceAssemblyId',
+    resolve: { _: ResourceByIdResolver },
     // tslint:disable-next-line:max-line-length
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.module#PetalsServiceAssemblyViewModule',
   },
   {
     path: 'components/:componentId',
+    resolve: { _: ResourceByIdResolver },
     // tslint:disable-next-line:max-line-length
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-view.module#PetalsComponentViewModule',
   },
   {
     path: 'service-units/:serviceUnitId',
+    resolve: { _: ResourceByIdResolver },
     // tslint:disable-next-line:max-line-length
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-service-unit-view/petals-service-unit-view.module#PetalsServiceUnitViewModule',
   },
   {
     path: 'shared-libraries/:sharedLibraryId',
+    resolve: { _: ResourceByIdResolver },
     // tslint:disable-next-line:max-line-length
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-shared-library-view/petals-shared-library-view.module#PetalsSharedLibraryViewModule',

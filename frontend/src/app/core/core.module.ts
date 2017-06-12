@@ -82,6 +82,8 @@ import {
   SharedLibrariesService,
   SharedLibrariesServiceImpl,
 } from 'app/shared/services/shared-libraries.service';
+import { ResourceByIdResolver } from 'app/shared/services/guard-resource-by-id.resolver';
+import { WorkspaceResolver } from 'app/features/cockpit/workspaces/workspace-resolver';
 
 export const providers = [
   {
@@ -90,6 +92,8 @@ export const providers = [
     useValue: ['en', 'fr'],
   },
   GuardLoginService,
+  WorkspaceResolver,
+  ResourceByIdResolver,
   {
     provide: SseService,
     useClass: environment.mock ? SseServiceMock : SseServiceImpl,
