@@ -2646,9 +2646,9 @@ istanbul-reports@^1.1.1:
   dependencies:
     handlebars "^4.0.3"
 
-jasmine-core@2.6.2, jasmine-core@~2.6.0:
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.6.2.tgz#74ea1f7cf428691af201107d631234027a09daab"
+jasmine-core@2.6.3, jasmine-core@~2.6.0:
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.6.3.tgz#45072950e4a42b1e322fe55c001100a465d77815"
 
 jasmine-spec-reporter@4.1.0:
   version "4.1.0"
@@ -2807,11 +2807,11 @@ jest-mock@^20.0.3:
   version "20.0.3"
   resolved "https://registry.yarnpkg.com/jest-mock/-/jest-mock-20.0.3.tgz#8bc070e90414aa155c11a8d64c869a0d5c71da59"
 
-jest-preset-angular@2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/jest-preset-angular/-/jest-preset-angular-2.0.2.tgz#1d6f2592a1ac230b964cdb31fc23a3fbf1ccd6fd"
+jest-preset-angular@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/jest-preset-angular/-/jest-preset-angular-2.0.3.tgz#6993ef3c44b1890c3f798ba5db3d8f2f8f2a1fa8"
   dependencies:
-    jest-zone-patch "^0.0.6"
+    jest-zone-patch "^0.0.7"
     ts-jest "^20.0.0"
 
 jest-regex-util@^20.0.3:
@@ -2884,9 +2884,9 @@ jest-validate@^20.0.3:
     leven "^2.1.0"
     pretty-format "^20.0.3"
 
-jest-zone-patch@^0.0.6:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/jest-zone-patch/-/jest-zone-patch-0.0.6.tgz#5d7ce083fd2efdba62b3f10c7648301e46ceaf38"
+jest-zone-patch@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/jest-zone-patch/-/jest-zone-patch-0.0.7.tgz#d963cd3eb005d500db1b41242a7a63a371a500f3"
 
 jest@20.0.4:
   version "20.0.4"
