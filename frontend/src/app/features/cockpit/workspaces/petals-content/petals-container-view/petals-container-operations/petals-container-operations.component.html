@@ -31,5 +31,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         (onDeploy)="deploy('service-assembly', $event.file)"
         class="deploy-service-assembly"
         fxFlex></app-upload>
+
+      <app-upload
+        [title]="'Shared library'"
+        [disabled]="container.isDeployingSharedLibrary"
+        [error]="container.errorDeploymentSharedLibrary"
+        (onDeploy)="deploy('shared-library', $event.file)"
+        class="deploy-shared-library margin-bottom-x2"
+        fxFlex></app-upload>
   </div>
 </div>

@@ -109,4 +109,8 @@ export class ContainerOperationPage extends ContainerPage {
   getServiceAssemblyUpload() {
     return UploadComponentPage.waitAndGet('deploy-service-assembly');
   }
+
+  getSharedLibraryUpload() {
+    return UploadComponentPage.waitAndGet('deploy-shared-library');
+  }
 }

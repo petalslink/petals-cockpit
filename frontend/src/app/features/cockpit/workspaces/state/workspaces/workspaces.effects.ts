@@ -214,6 +214,11 @@ export class WorkspacesEffects {
           this.sub.add(
             this.containersService.watchEventComponentDeployedOk().subscribe()
           );
+          this.sub.add(
+            this.containersService
+              .watchEventSharedLibraryDeployedOk()
+              .subscribe()
+          );
 
           return {
             type: Workspaces.FETCH_WORKSPACE_SSE_SUCCESS,

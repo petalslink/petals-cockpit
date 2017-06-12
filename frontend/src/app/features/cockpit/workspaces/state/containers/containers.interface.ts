@@ -34,6 +34,8 @@ export interface IContainerUI {
   errorDeploymentComponent: string;
   isDeployingServiceAssembly: boolean;
   errorDeploymentServiceAssembly: string;
+  isDeployingSharedLibrary: boolean;
+  errorDeploymentSharedLibrary: string;
 }
 
 export interface IContainerRow extends IContainerUI, IContainerBackendSSE, IContainerBackendDetails {}
@@ -72,6 +74,8 @@ export function containerRowFactory(): IContainerRow {
     errorDeploymentComponent: '',
     isDeployingServiceAssembly: false,
     errorDeploymentServiceAssembly: '',
+    isDeployingSharedLibrary: false,
+    errorDeploymentSharedLibrary: '',
 
     components: [],
     serviceAssemblies: [],

@@ -103,4 +103,30 @@ export class ContainersServiceMock extends ContainersServiceImpl {
 
     return helper.responseBody(response);
   }
+
+  deploySharedLibrary(workspaceId: string, containerId: string, file: File) {
+    if (file.name.includes('error')) {
+      return helper.errorBackend(
+        '[Mock message] An error happened when trying to deploy the shared library',
+        400
+      );
+    }
+
+    const sl = containersService.get(containerId).addSharedLibrary();
+
+    const response = {
+      sharedLibraries: sl.toObj(),
+    };
+
+    setTimeout(
+      () =>
+        (this.pSseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.SL_DEPLOYED,
+          response
+        ),
+      environment.mock.sseDelay
+    );
+
+    return helper.responseBody(response);
+  }
 }

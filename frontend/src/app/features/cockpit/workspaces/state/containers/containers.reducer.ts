@@ -37,6 +37,7 @@ import {
   mergeOnly,
   JsMap,
 } from 'app/shared/helpers/map.helper';
+import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
 
 export class Containers {
   private static reducerName = '[Containers]';
@@ -262,6 +263,45 @@ export class Containers {
   }
 
   // tslint:disable-next-line:member-ordering
+  public static DEPLOY_SHARED_LIBRARY = `${Containers.reducerName} Deploy shared library`;
+  private static deploySharedLibrary(
+    containersTable: IContainersTable,
+    payload: { containerId: string }
+  ): IContainersTable {
+    return updateById(containersTable, payload.containerId, {
+      isDeployingSharedLibrary: true,
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DEPLOY_SHARED_LIBRARY_ERROR = `${Containers.reducerName} Deploy shared library error`;
+  private static deploySharedLibraryError(
+    containersTable: IContainersTable,
+    payload: { containerId: string; errorDeploymentSharedLibrary: string }
+  ): IContainersTable {
+    return updateById(containersTable, payload.containerId, {
+      isDeployingSharedLibrary: false,
+      errorDeploymentSharedLibrary: payload.errorDeploymentSharedLibrary,
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static DEPLOY_SHARED_LIBRARY_SUCCESS = `${Containers.reducerName} Deploy shared library success`;
+  private static deploySharedLibrarySuccess(
+    containersTable: IContainersTable,
+    payload: ISharedLibraryBackendSSE
+  ): IContainersTable {
+    return updateById(containersTable, payload.containerId, {
+      sharedLibraries: [
+        ...containersTable.byId[payload.containerId].sharedLibraries,
+        payload.id,
+      ],
+      isDeployingSharedLibrary: false,
+      errorDeploymentSharedLibrary: '',
+    });
+  }
+
+  // tslint:disable-next-line:member-ordering
   private static removeComponent(
     containersTable: IContainersTable,
     payload: { containerId: string; componentId: string }
@@ -317,6 +357,11 @@ export class Containers {
       Containers.deployServiceAssemblySuccess,
     [Containers.DEPLOY_SERVICE_ASSEMBLY_ERROR]:
       Containers.deployServiceAssemblyError,
+    [Containers.DEPLOY_SHARED_LIBRARY]: Containers.deploySharedLibrary,
+    [Containers.DEPLOY_SHARED_LIBRARY_SUCCESS]:
+      Containers.deploySharedLibrarySuccess,
+    [Containers.DEPLOY_SHARED_LIBRARY_ERROR]:
+      Containers.deploySharedLibraryError,
 
     [Components.REMOVE_COMPONENT]: Containers.removeComponent,
     [ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY]:

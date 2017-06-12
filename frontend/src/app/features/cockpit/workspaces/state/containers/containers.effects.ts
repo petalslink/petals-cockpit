@@ -29,6 +29,7 @@ import { ContainersService } from './../../../../../shared/services/containers.s
 import { IStore } from 'app/shared/interfaces/store.interface';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
+import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 
 @Injectable()
 export class ContainersEffects {
@@ -197,6 +198,74 @@ export class ContainersEffects {
           workspaceId,
           'petals',
           'service-assemblies',
+          payload.id,
+        ]);
+      }
+    )
+    .mapTo(null);
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true })
+  deploySharedLibrary$: Observable<Action> = this.actions$
+    .ofType(Containers.DEPLOY_SHARED_LIBRARY)
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
+    .switchMap(
+      (
+        [action, workspaceId]: [
+          { type: string; payload: { file: File; containerId: string } },
+          string
+        ]
+      ) =>
+        this.containersService
+          .deploySharedLibrary(
+            workspaceId,
+            action.payload.containerId,
+            action.payload.file
+          )
+          .mergeMap(_ => Observable.empty())
+          .catch(err => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                `Error caught in containers.effects: ofType(${Containers.DEPLOY_SHARED_LIBRARY})`
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            this.notification.error(
+              'Shared Library Deployment Failed',
+              `An error occurred while deploying ${action.payload.file.name}`
+            );
+
+            return Observable.of({
+              type: Containers.DEPLOY_SHARED_LIBRARY_ERROR,
+              payload: {
+                containerId: action.payload.containerId,
+                errorDeploymentSharedLibrary: err.json().message,
+              },
+            });
+          })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: false })
+  deploySharedLibrarySuccess$: Observable<void> = this.actions$
+    .ofType(Containers.DEPLOY_SHARED_LIBRARY_SUCCESS)
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
+    .do(
+      (
+        [{ payload }, workspaceId]: [{ payload: ISharedLibraryRow }, string]
+      ) => {
+        this.router.navigate([
+          'workspaces',
+          workspaceId,
+          'petals',
+          'shared-libraries',
           payload.id,
         ]);
       }
