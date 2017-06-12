@@ -29,10 +29,8 @@ describe(`Petals service-assembly content`, () => {
 
     expect(sa.title.getText()).toEqual('SA 0');
     expect(sa.state.getText()).toEqual('Started');
-
-    expect(sa.serviceUnits.getText()).toEqual([
-      'Service unit "SU 0" deployed on component "Comp 0"',
-    ]);
+    expect(sa.serviceUnits.getText()).toEqual(['SU 0']);
+    expect(sa.suComponents.getText()).toEqual(['Comp 0']);
 
     // clicking on SU's name should open SU's page
     sa.openServiceUnit('SU 0');

@@ -46,8 +46,9 @@ export class SharedLibraryOverviewPage extends SharedLibraryPage {
   );
 
   public readonly overview = SharedLibraryOverviewPage.overview;
-  public readonly state = this.overview.$(`md-card.state md-card-title`);
-  public readonly components = this.overview.$$(`md-card.components ul > li`);
+  public readonly components = this.overview.$$(
+    `.shared-library-infos a.component .component-name`
+  );
 
   static waitAndGet() {
     super.wait();
@@ -66,11 +67,11 @@ export class SharedLibraryOverviewPage extends SharedLibraryPage {
     if (typeof identifier === 'string') {
       this.overview
         .element(
-          by.cssContainingText(`md-card.components ul > li a`, identifier)
+          by.cssContainingText(`.shared-library-infos a.component`, identifier)
         )
         .click();
     } else {
-      this.overview.$$('md-card.components ul > li a').get(identifier).click();
+      this.components.get(identifier).click();
     }
     return ComponentOverviewPage.waitAndGet();
   }

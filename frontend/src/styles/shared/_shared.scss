@@ -37,8 +37,8 @@ body .text-upper {
   text-transform: uppercase;
 }
 
-mat-card-subtitle {
-  float: right;
+.card-auto-size {
+  margin: 0 0 auto 0;
 }
 
 div > .mat-dialog-container {

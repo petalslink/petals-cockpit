@@ -29,6 +29,8 @@ export class UploadComponentPage {
   public readonly fileInput;
   public readonly fileName;
   public readonly chooseFileButton;
+  public readonly chooseFileName;
+  public readonly changeFileName;
   public readonly deployButton;
   public readonly fileNameInput;
   public readonly fileNamePlaceholder;
@@ -48,10 +50,12 @@ export class UploadComponentPage {
     this.fileInput = this.component.$('input[type="file"]');
     this.fileName = this.component.$('.file-name');
     this.chooseFileButton = this.component.$('.choose-file');
+    this.chooseFileName = this.chooseFileButton.$('.choose-file-name');
+    this.changeFileName = this.chooseFileButton.$('.change-file-name');
     this.deployButton = this.component.$('.deploy');
     this.fileNameInput = this.component.$('input[name="changeFileName"]');
     this.fileNamePlaceholder = this.component.$(
-      '.change-file-name .mat-input-placeholder'
+      '.change-file-input .mat-input-placeholder'
     );
     this.errorTitle = this.component.$('.error-deploy .title');
     this.errorMsg = this.component.$('.error-deploy .message');

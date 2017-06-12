@@ -36,7 +36,7 @@ describe(`Petals component content`, () => {
     expect(comp.state.getText()).toEqual('Started');
     expect(comp.type.getText()).toEqual('BC');
 
-    expect(comp.sharedLibraries.getText()).toEqual(['SL 0']);
+    expect(comp.sharedLibraries.getText()).toEqual([`SL 0`]);
   });
 
   it(`should stop/start/stop/unload a component`, () => {
@@ -127,16 +127,12 @@ describe(`Petals component content`, () => {
       .openOperations()
       .getSUUpload();
 
-    expect(deploy.chooseFileButton.getText()).toEqual(
-      `CHOOSE A FILE TO UPLOAD insert_drive_file`
-    );
+    expect(deploy.chooseFileName.getText()).toEqual(`CHOOSE A FILE TO UPLOAD`);
     deploy.fileInput.sendKeys('/test.zip');
 
     expect(deploy.fileName.isDisplayed()).toBe(true);
     expect(deploy.fileName.getText()).toEqual(`test.zip`);
-    expect(deploy.chooseFileButton.getText()).toEqual(
-      `CHANGE THE FILE insert_drive_file`
-    );
+    expect(deploy.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
 
     expect(deploy.fileNameInput.getAttribute('value')).toEqual(`test`);
 

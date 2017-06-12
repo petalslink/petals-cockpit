@@ -30,11 +30,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <div fxFill fxLayout="column" class="content content-max-width">
     <div class="central-content">
-      <div fxLayout="column" fxLayout.gt-md="row">
-        <md-card fxFlex [ngClass.gt-md]="'whiteboard'">
+      <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
+        <md-card fxFlex [ngClass.gt-md]="'card-auto-size'">
           <md-card-title fxLayout="row" *ngIf="!isEditingDescription">
             <span fxFlex class="text-upper">Whiteboard</span>
           </md-card-title>
+
 
           <md-card-content fxLayout="row" fxLayoutAlign="center center" *ngIf="!isEditingDescription; else descriptionEdit" class="workspace-description">
             <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml"></span>
@@ -47,17 +48,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
             <ng-template #descriptionEdit>
               <div fxLayout="column" *ngIf="description !== null" class="workspace-description-edit">
-                <md-input-container fxFlex class="margin-right-x1">
-                  <textarea mdInput class="description-wks" mdTextareaAutosize [disabled]="isSettingDescription" [(ngModel)]="description"></textarea>
-                </md-input-container>
-                <md-card-subtitle fxLayout="row" fxLayoutAlign="center center">
+                <p>
+                  <md-input-container fxFlex>
+                    <textarea mdInput class="description-wks" mdTextareaAutosize [disabled]="isSettingDescription" [(ngModel)]="description"></textarea>
+                  </md-input-container>
+                </p>
+                <md-card-subtitle>
                   <span fxFlex class="workspace-description-preview" [innerHTML]="description | MarkdownToHtml"></span>
                 </md-card-subtitle>
               </div>
 
               <div align="end">
-                <button type="button" class="workspace-description-edit-cancel" md-button [disabled]="isSettingDescription" (click)="cancelDescription()">Cancel</button>
-                <button type="submit" class="workspace-description-edit-submit" md-button [disabled]="isSettingDescription" (click)="validateDescription()"
+                <button
+                  type="button"
+                  class="workspace-description-edit-cancel text-upper"
+                  color="primary"
+                  md-button
+                  [disabled]="isSettingDescription"
+                (click)="cancelDescription()">Cancel</button>
+                <button
+                  type="submit"
+                  class="workspace-description-edit-submit text-upper"
+                  md-button
+                  [disabled]="isSettingDescription"
+                  (click)="validateDescription()"
                   color="accent" md-raised-button>Submit</button>
               </div>
             </ng-template>
@@ -65,9 +79,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </md-card-content>
         </md-card>
 
-        <div [ngClass.gt-md]="'margin-left-x1'"></div>
-
-        <md-card fxFlex [ngClass.lt-lg]="'margin-top-x1'">
+        <md-card fxFlex [ngClass.gt-md]="'card-auto-size'">
           <md-card-title fxLayout="row">
             <span fxFlex class="text-upper">User{{ (workspace.users.list.length - 1) >= 2 ? 's' : '' }}</span>
             <md-icon color="primary">supervisor_account</md-icon>

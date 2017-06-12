@@ -15,36 +15,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
-    <md-card class="state">
-      <md-card-title-group fxLayout="column" *ngIf="serviceAssembly">
-        <div fxLayout="column" fxLayoutAlign="end end">
-          <md-card-subtitle>State</md-card-subtitle>
-          <md-card-title>{{ serviceAssembly.state }}</md-card-title>
-          <md-card-content *ngIf="serviceAssembly.state">
+    <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
+
+      <md-card fxFlex fxFlex.gt-md="50%" class="sa-lifecycle">
+        <md-card-title fxLayout="row">
+          <span fxFlex class="text-upper">Lifecycle</span>
+          <md-icon color="primary">play_for_work</md-icon>
+        </md-card-title>
+
+        <div fxLayout="column">
+          <md-card-subtitle>State: <b><span class="service-assembly-state">{{ serviceAssembly.state }}</span></b></md-card-subtitle>
+
+          <md-divider></md-divider>
+
+          <md-card-subtitle fxLayout="row" fxLayoutAlign="start center" class="margin-top-x1">
+            <md-icon class="margin-right-x1" color="primary">info</md-icon>
+            <span class="color-primary" fxFlex>Changing the state of an SA will affect its SUs.</span>
+          </md-card-subtitle>
+        </div>
+
+        <md-card-content fxLayout="row" *ngIf="serviceAssembly.state">
+          <span *ngFor="let possibleState of getPossibleStateActions(serviceAssembly.state); trackBy:saState">
             <button
-              md-raised-button
+              class="text-upper"
+              md-button
               color="primary"
-              class="margin-right-x1-no-last"
-              *ngFor="let possibleState of getPossibleStateActions(serviceAssembly.state); trackBy:saState"
               (click)="changeState(possibleState.newStateAfterAction)"
               [disabled]="serviceAssembly.isUpdatingState"
             >
-              {{ possibleState.actionName }}
+              <md-icon *ngIf="possibleState.actionName === 'Stop'">stop</md-icon>
+              <md-icon *ngIf="possibleState.actionName === 'Start'">play_arrow</md-icon>
+              <md-icon *ngIf="possibleState.actionName === 'Unload'">remove_circle_outline</md-icon>
+              <span class="sa-state">{{ possibleState.actionName }}</span>
             </button>
-          </md-card-content>
-        </div>
+          </span>
+        </md-card-content>
 
-        <div *ngIf="serviceAssembly.errorChangeState" fxFlex class="error">
+        <md-card-content fxLayout="column" *ngIf="serviceAssembly.errorChangeState" class="error">
           <div class="bold margin-bottom-x1">An error occurred:</div>
           <span class="italic">{{ serviceAssembly.errorChangeState }}</span>
-        </div>
+        </md-card-content>
+      </md-card>
 
-        <div fxLayout="row" fxAlign="start center" class="color-primary">
-          <md-icon class="margin-right-x1">info outline</md-icon>
-
-          Changing the state of an SA will affect its SUs
-        </div>
-      </md-card-title-group>
-    </md-card>
+    </div>
   </div>
 </div>

@@ -47,9 +47,12 @@ export class ServiceAssemblyOverviewPage extends ServiceAssemblyPage {
   );
 
   public readonly overview = ServiceAssemblyOverviewPage.overview;
-  public readonly state = this.overview.$(`md-card.state md-card-title`);
+  public readonly state = this.overview.$(`.sa-infos .sa-state`);
   public readonly serviceUnits = this.overview.$$(
-    `md-card.service-units ul > li`
+    `.service-units a.service-unit .su-name`
+  );
+  public readonly suComponents = this.overview.$$(
+    `.service-units a.su-component .su-component-name`
   );
 
   static waitAndGet() {
@@ -78,17 +81,11 @@ export class ServiceAssemblyOverviewPage extends ServiceAssemblyPage {
     if (typeof identifier === 'string') {
       this.overview
         .element(
-          by.cssContainingText(
-            `md-card.service-units ul > li a.service-unit`,
-            identifier
-          )
+          by.cssContainingText(`.service-units a.service-unit`, identifier)
         )
         .click();
     } else {
-      this.overview
-        .$$('md-card.service-units ul > li a.service-unit')
-        .get(identifier)
-        .click();
+      this.serviceUnits.get(identifier).click();
     }
     return ServiceUnitOverviewPage.waitAndGet();
   }
@@ -97,17 +94,11 @@ export class ServiceAssemblyOverviewPage extends ServiceAssemblyPage {
     if (typeof identifier === 'string') {
       this.overview
         .element(
-          by.cssContainingText(
-            `md-card.service-units ul > li a.component`,
-            identifier
-          )
+          by.cssContainingText(`.service-units a.su-component`, identifier)
         )
         .click();
     } else {
-      this.overview
-        .$$('md-card.service-units ul > li a.component')
-        .get(identifier)
-        .click();
+      this.suComponents.get(identifier).click();
     }
     return ComponentOverviewPage.waitAndGet();
   }
@@ -119,15 +110,17 @@ export class ServiceAssemblyOperationPage extends ServiceAssemblyPage {
   );
 
   public readonly operations = ServiceAssemblyOperationPage.operations;
-  public readonly stateCard = this.operations.$(`md-card.state`);
-  public readonly state = this.stateCard.$(`md-card-title`);
-  public readonly stopButton = this.stateCard.element(
+
+  public readonly lifecycleCard = this.operations.$(`.sa-lifecycle`);
+
+  public readonly state = this.lifecycleCard.$(`span.service-assembly-state`);
+  public readonly stopButton = this.lifecycleCard.element(
     by.cssContainingText(`button`, `Stop`)
   );
-  public readonly startButton = this.stateCard.element(
+  public readonly startButton = this.lifecycleCard.element(
     by.cssContainingText(`button`, `Start`)
   );
-  public readonly unloadButton = this.stateCard.element(
+  public readonly unloadButton = this.lifecycleCard.element(
     by.cssContainingText(`button`, `Unload`)
   );
 
