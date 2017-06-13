@@ -219,6 +219,11 @@ export class PetalsBusInProgressViewComponent
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+
+    this.store$.dispatch({
+      type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
+      payload: { busInProgressId: '' },
+    });
   }
 
   onSubmit({ value }: { value: IBusImport; valid: boolean }) {
@@ -239,7 +244,7 @@ export class PetalsBusInProgressViewComponent
     this.busImportForm.reset();
     this.store$.dispatch({
       type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
-      payload: '',
+      payload: { busInProgressId: '' },
     });
   }
 }
