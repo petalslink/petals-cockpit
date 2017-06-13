@@ -38,6 +38,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
+        pathMatch: 'full',
         component: WorkspaceComponent,
       },
       {
