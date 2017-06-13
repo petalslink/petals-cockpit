@@ -43,6 +43,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.io.EofException;
 import org.glassfish.jersey.media.sse.EventOutput;
@@ -51,6 +52,8 @@ import org.glassfish.jersey.media.sse.SseBroadcaster;
 import org.glassfish.jersey.server.BroadcasterListener;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.jooq.Configuration;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
@@ -65,7 +68,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecor
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesComponentsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
@@ -75,6 +78,7 @@ import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.Service
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
+import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusImport;
@@ -96,6 +100,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import co.paralleluniverse.actors.BasicActor;
+import co.paralleluniverse.actors.behaviors.RequestMessage;
 import co.paralleluniverse.actors.behaviors.RequestReplyHelper;
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.SuspendExecution;
@@ -176,7 +181,13 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                 answer((DeployServiceAssembly) msg, this::handleDeployServiceAssembly);
             } else if (msg instanceof DeployComponent) {
                 answer((DeployComponent) msg, this::handleDeployComponent);
+            } else if (msg instanceof DeploySharedLibrary) {
+                answer((DeploySharedLibrary) msg, this::handleDeploySharedLibrary);
             } else {
+                if (msg instanceof RequestMessage<?>) {
+                    RequestReplyHelper.replyError((RequestMessage<?>) msg,
+                            new UnsupportedOperationException("Unexpected event for workspace " + wId + ": " + msg));
+                }
                 LOG.warn("Unexpected event for workspace {}: {}", wId, msg);
             }
         }
@@ -421,7 +432,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                     .where(CONTAINERS.ID.eq(comp.getContainerId())).fetchOne();
             assert cont != null;
 
-            State newCurrentState = petals.changeState(cont.getIp(), cont.getPort(), cont.getUsername(),
+            State newCurrentState = petals.changeComponentState(cont.getIp(), cont.getPort(), cont.getUsername(),
                     cont.getPassword(), comp.getType(), comp.getName(), currentState, newState,
                     change.action.parameters);
 
@@ -504,7 +515,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                     .fetchOne();
             assert cont != null;
 
-            ServiceAssemblyMin.State newCurrentState = petals.changeState(cont.getIp(), cont.getPort(),
+            ServiceAssemblyMin.State newCurrentState = petals.changeSAState(cont.getIp(), cont.getPort(),
                     cont.getUsername(), cont.getPassword(), sa.getName(), newState);
 
             SAStateChanged res = new SAStateChanged(sa.getId(), newCurrentState);
@@ -558,7 +569,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
             ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(sa.cId)).fetchOne();
             assert cont != null;
 
-            ServiceAssembly deployedSA = petals.deploy(cont.getIp(), cont.getPort(), cont.getUsername(),
+            ServiceAssembly deployedSA = petals.deploySA(cont.getIp(), cont.getPort(), cont.getUsername(),
                     cont.getPassword(), sa.name, sa.saUrl);
 
             return serviceAssemblyDeployed(deployedSA, sa.cId, conf);
@@ -602,8 +613,8 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
             ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(comp.cId)).fetchOne();
             assert cont != null;
 
-            Component deployedComp = petals.deploy(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
-                    comp.type.to(), comp.name, comp.saUrl);
+            Component deployedComp = petals.deployComponent(cont.getIp(), cont.getPort(), cont.getUsername(),
+                    cont.getPassword(), comp.type.to(), comp.name, comp.saUrl);
 
             return componentDeployed(deployedComp, comp.cId, conf);
         });
@@ -621,23 +632,56 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         assert compDbi == 1;
 
         Set<String> sls = new HashSet<>();
-        for(SharedLibrary sl: deployedComp.getSharedLibraries()) {
-            SharedlibrariesComponentsRecord inserted = DSL.using(conf).insertInto(SHAREDLIBRARIES_COMPONENTS)
+        for (SharedLibrary sl : deployedComp.getSharedLibraries()) {
+            @NonNull
+            SelectConditionStep<Record1<Long>> where = DSL.using(conf).select(SHAREDLIBRARIES.ID).from(SHAREDLIBRARIES)
+                    .where(SHAREDLIBRARIES.NAME.eq(sl.getName()).and(SHAREDLIBRARIES.VERSION.eq(sl.getVersion()))
+                            .and(SHAREDLIBRARIES.CONTAINER_ID.eq(cId)));
+            int inserted = DSL.using(conf).insertInto(SHAREDLIBRARIES_COMPONENTS)
                     .set(SHAREDLIBRARIES_COMPONENTS.COMPONENT_ID, compDb.getId())
-                    .set(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID,
-                            DSL.select(SHAREDLIBRARIES.ID).from(SHAREDLIBRARIES).where(
-                                    SHAREDLIBRARIES.NAME.eq(sl.getName()).and(SHAREDLIBRARIES.VERSION.eq(sl.getVersion()))
-                                    .and(SHAREDLIBRARIES.CONTAINER_ID.eq(cId))))
-                    .returning(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID).fetchOne();
-            sls.add(Long.toString(inserted.getSharedlibraryId()));
+                    .set(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID, where).execute();
+            assert inserted == 1;
+            Record1<Long> slId = where.fetchOne();
+            assert slId != null;
+            sls.add(Long.toString(slId.value1()));
         }
-        
+
         WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                 ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(compDb, ImmutableSet.of(), sls)),
                 ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
 
         // we want the event to be sent after we answered
         doInActorLoop(() -> broadcast(WorkspaceEvent.componentDeployed(res)));
+
+        return res;
+    }
+
+    private WorkspaceContent handleDeploySharedLibrary(DeploySharedLibrary sl)
+            throws SuspendExecution, InterruptedException {
+        return db.runTransaction(conf -> {
+            ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(sl.cId)).fetchOne();
+            assert cont != null;
+
+            SharedLibrary deployedSL = petals.deploySL(cont.getIp(), cont.getPort(), cont.getUsername(),
+                    cont.getPassword(), sl.name, sl.version, sl.saUrl);
+
+            return sharedLibraryDeployed(deployedSL, sl.cId, conf);
+        });
+    }
+
+    private WorkspaceContent sharedLibraryDeployed(SharedLibrary deployedSL, long cId, Configuration conf) {
+        SharedlibrariesRecord slDb = new SharedlibrariesRecord(null, deployedSL.getName(), deployedSL.getVersion(),
+                cId);
+        slDb.attach(conf);
+        int slDbi = slDb.insert();
+        assert slDbi == 1;
+
+        WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                ImmutableMap.of(Long.toString(slDb.getId()), new SharedLibraryFull(slDb, ImmutableSet.of())));
+
+        // we want the event to be sent after we answered
+        doInActorLoop(() -> broadcast(WorkspaceEvent.sharedLibraryDeployed(res)));
 
         return res;
     }
@@ -753,6 +797,26 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
 
         public DeployServiceAssembly(String name, URL saUrl, long cId) {
             this.name = name;
+            this.saUrl = saUrl;
+            this.cId = cId;
+        }
+    }
+
+    public static class DeploySharedLibrary extends WorkspaceRequest<WorkspaceContent> {
+
+        private static final long serialVersionUID = 3305750050657001574L;
+
+        final String name;
+
+        final URL saUrl;
+
+        final long cId;
+
+        final String version;
+
+        public DeploySharedLibrary(String name, String version, URL saUrl, long cId) {
+            this.name = name;
+            this.version = version;
             this.saUrl = saUrl;
             this.cId = cId;
         }

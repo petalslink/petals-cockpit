@@ -42,7 +42,10 @@ export class PetalsContainerOperationsComponent implements OnInit {
 
   ngOnInit() {}
 
-  deploy(whatToDeploy: 'component' | 'service-assembly', file: File) {
+  deploy(
+    whatToDeploy: 'component' | 'service-assembly' | 'shared-library',
+    file: File
+  ) {
     if (whatToDeploy === 'component') {
       this.store$.dispatch({
         type: Containers.DEPLOY_COMPONENT,
@@ -51,6 +54,11 @@ export class PetalsContainerOperationsComponent implements OnInit {
     } else if (whatToDeploy === 'service-assembly') {
       this.store$.dispatch({
         type: Containers.DEPLOY_SERVICE_ASSEMBLY,
+        payload: { file, containerId: this.container.id },
+      });
+    } else if (whatToDeploy === 'shared-library') {
+      this.store$.dispatch({
+        type: Containers.DEPLOY_SHARED_LIBRARY,
         payload: { file, containerId: this.container.id },
       });
     }

@@ -160,6 +160,10 @@ export function _getCurrentWorkspace(
                           container.isDeployingServiceAssembly,
                         errorDeploymentServiceAssembly:
                           container.errorDeploymentServiceAssembly,
+                        isDeployingSharedLibrary:
+                          container.isDeployingSharedLibrary,
+                        errorDeploymentSharedLibrary:
+                          container.errorDeploymentSharedLibrary,
 
                         components: {
                           selectedComponentId: components.selectedComponentId,

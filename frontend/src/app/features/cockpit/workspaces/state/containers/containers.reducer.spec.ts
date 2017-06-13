@@ -116,6 +116,8 @@ describe(`Containers reducer`, () => {
             name: 'Cont 2',
             errorDeploymentServiceAssembly: '',
             isDeployingServiceAssembly: false,
+            errorDeploymentSharedLibrary: '',
+            isDeployingSharedLibrary: false,
             keepPreviousValues: '',
             components: ['idComp4', 'idComp5'],
             sharedLibraries: [],
@@ -132,6 +134,8 @@ describe(`Containers reducer`, () => {
             name: 'Cont 3',
             errorDeploymentServiceAssembly: '',
             isDeployingServiceAssembly: false,
+            errorDeploymentSharedLibrary: '',
+            isDeployingSharedLibrary: false,
             components: ['idComp6', 'idComp7'],
             sharedLibraries: ['idSL1'],
             id: 'idCont3',
@@ -215,6 +219,8 @@ describe(`Containers reducer`, () => {
             name: 'Cont 3',
             errorDeploymentServiceAssembly: '',
             isDeployingServiceAssembly: false,
+            errorDeploymentSharedLibrary: '',
+            isDeployingSharedLibrary: false,
             components: ['idComp6', 'idComp7'],
             sharedLibraries: [],
             id: 'idCont3',
@@ -590,6 +596,98 @@ describe(`Containers reducer`, () => {
           },
         },
         allIds: ['idCont0'],
+      });
+    });
+  });
+
+  describe(Containers.DEPLOY_SHARED_LIBRARY, () => {
+    it(`should check action name`, () => {
+      expect(Containers.DEPLOY_SHARED_LIBRARY).toEqual(
+        `[Containers] Deploy shared library`
+      );
+      expect(Containers.DEPLOY_SHARED_LIBRARY_ERROR).toEqual(
+        `[Containers] Deploy shared library error`
+      );
+      expect(Containers.DEPLOY_SHARED_LIBRARY_SUCCESS).toEqual(
+        `[Containers] Deploy shared library success`
+      );
+    });
+
+    const initialState: any = {
+      keepPreviousValues: '',
+      byId: {
+        keepPreviousValues: '',
+        idCont0: {
+          keepPreviousValues: '',
+          isDeployingSharedLibrary: true,
+          errorDeploymentSharedLibrary: '',
+        },
+      },
+      allIds: ['idCont0'],
+    };
+
+    it(`should set the isDeployingSharedLibrary variable to true for an existing container`, () => {
+      const deployState = Containers.reducer(initialState, {
+        type: Containers.DEPLOY_SHARED_LIBRARY,
+        payload: { containerId: 'idCont0' },
+      });
+
+      expect(deployState).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idCont0: {
+            keepPreviousValues: '',
+            isDeployingSharedLibrary: true,
+            errorDeploymentSharedLibrary: '',
+          },
+        },
+        allIds: ['idCont0'],
+      });
+
+      it('should set isDeployingSharedLibrary variable to false and the error on error', () => {
+        expect(
+          Containers.reducer(initialState, {
+            type: Containers.DEPLOY_SHARED_LIBRARY_ERROR,
+            payload: {
+              containerId: 'idCont0',
+              errorDeploymentSharedLibrary: 'some error',
+            },
+          })
+        ).toEqual({
+          keepPreviousValues: '',
+          byId: {
+            keepPreviousValues: '',
+            idCont0: {
+              keepPreviousValues: '',
+              isDeployingSharedLibrary: false,
+              errorDeploymentSharedLibrary: 'some error',
+            },
+          },
+          allIds: ['idCont0'],
+        });
+      });
+
+      it('should set isDeployingSharedLibrary variable to false and no error', () => {
+        expect(
+          Containers.reducer(initialState, {
+            type: Containers.DEPLOY_SHARED_LIBRARY_SUCCESS,
+            payload: {
+              containerId: 'idCont0',
+            },
+          })
+        ).toEqual({
+          keepPreviousValues: '',
+          byId: {
+            keepPreviousValues: '',
+            idCont0: {
+              keepPreviousValues: '',
+              isDeployingSharedLibrary: false,
+              errorDeploymentSharedLibrary: '',
+            },
+          },
+          allIds: ['idCont0'],
+        });
       });
     });
   });

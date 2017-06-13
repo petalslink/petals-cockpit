@@ -22,6 +22,7 @@ import { WorkspacePage } from './pages/workspace.po';
 import { ComponentOverviewPage } from './pages/component.po';
 import { ServiceAssemblyOverviewPage } from './pages/service-assembly.po';
 import { NotFoundPage } from './pages/not-found';
+import { SharedLibraryOverviewPage } from './pages/shared-library.po';
 
 describe(`Petals container content`, () => {
   it(`should open the 404 page if the container doesn't exists`, () => {
@@ -88,8 +89,8 @@ describe(`Petals container content`, () => {
       // deploy the component
       page.clickAndExpectNotification(
         upload.deployButton,
-        'Deploy component failed',
-        'An error occurred when trying to deploy the file "error-deploy.zip"'
+        'Component Deployment Failed',
+        'An error occurred while deploying error-deploy.zip'
       );
 
       expect(upload.errorTitle.getText()).toEqual('An error occurred:');
@@ -143,8 +144,8 @@ describe(`Petals container content`, () => {
       // deploy the component
       page.clickAndExpectNotification(
         upload.deployButton,
-        'Component deployed',
-        '"component" has been deployed'
+        'Component Deployed',
+        'component has been successfully deployed'
       );
 
       // check that the component is now added to the tree and that we've been redirected to it
@@ -231,8 +232,8 @@ describe(`Petals container content`, () => {
       // deploy the service-assembly
       page.clickAndExpectNotification(
         upload.deployButton,
-        'Deploy service-assembly failed',
-        'An error occurred when trying to deploy the file "error-deploy.zip"'
+        'Service Assembly Deployment Failed',
+        'An error occurred while deploying error-deploy.zip'
       );
 
       expect(upload.errorTitle.getText()).toEqual('An error occurred:');
@@ -286,8 +287,8 @@ describe(`Petals container content`, () => {
       // deploy the component
       page.clickAndExpectNotification(
         upload.deployButton,
-        'SA deployed',
-        '"SA 12" has been deployed'
+        'Service Assembly Deployed',
+        'SA 12 has been successfully deployed'
       );
 
       // check that the component is now added to the tree and that we've been redirected to it
@@ -331,6 +332,139 @@ describe(`Petals container content`, () => {
 
       expect(sa.serviceUnits.getText()).toEqual(['SU 16', 'SU 17']);
       expect(sa.suComponents.getText()).toEqual(['Comp 0', 'Comp 1']);
+    });
+  });
+
+  describe('Deploy shared library', () => {
+    it('should have a correct shared library deployment form', () => {
+      const upload = workspace
+        .openContainer('Cont 0')
+        .openOperations()
+        .getSharedLibraryUpload();
+
+      expect(upload.chooseFileButton.getText()).toEqual(
+        `CHOOSE A FILE TO UPLOAD insert_drive_file`
+      );
+      upload.fileInput.sendKeys('/test.zip');
+
+      expect(upload.fileNameInput.isPresent()).toBe(false);
+      expect(upload.fileName.getText()).toEqual(`test.zip`);
+      expect(upload.chooseFileButton.getText()).toEqual(
+        `CHANGE THE FILE insert_drive_file`
+      );
+
+      expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
+      expect(upload.deployButton.isEnabled()).toBe(true);
+    });
+
+    it(`should show a detailed error if the shared library deployment fails`, () => {
+      const upload = workspace
+        .openContainer('Cont 0')
+        .openOperations()
+        .getSharedLibraryUpload();
+
+      const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
+      upload.fileInput.sendKeys(filePath);
+
+      // deploy the service-assembly
+      page.clickAndExpectNotification(
+        upload.deployButton,
+        'Shared Library Deployment Failed',
+        'An error occurred while deploying error-deploy.zip'
+      );
+
+      expect(upload.errorTitle.getText()).toEqual('An error occurred:');
+      expect(upload.errorMsg.getText()).toEqual(
+        '[Mock message] An error happened when trying to deploy the shared library'
+      );
+    });
+
+    it(`should deploy a shared library`, () => {
+      const upload = workspace
+        .openContainer('Cont 0')
+        .openOperations()
+        .getSharedLibraryUpload();
+
+      const filePath = path.resolve(__dirname, './resources/sl.zip');
+      upload.fileInput.sendKeys(filePath);
+
+      const expectedTreeBeforeDeploy = [
+        `Bus 0`,
+        `Cont 0`,
+        `SA 0`,
+        `SA 1`,
+        `SA 2`,
+        `SL 0`,
+        `Comp 0`,
+        `SU 0`,
+        `SU 2`,
+        `Comp 1`,
+        `SU 1`,
+        `SU 3`,
+        `Comp 2`,
+        `Cont 1`,
+        `SA 3`,
+        `SA 4`,
+        `SA 5`,
+        `SL 1`,
+        `Comp 3`,
+        `SU 4`,
+        `SU 6`,
+        `Comp 4`,
+        `SU 5`,
+        `SU 7`,
+        `Comp 5`,
+      ];
+
+      expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
+
+      // make sure we can't change the name of the component we want to deploy
+      expect(upload.fileNameInput.isPresent()).toBe(false);
+
+      // deploy the component
+      page.clickAndExpectNotification(
+        upload.deployButton,
+        'Shared Library Deployed',
+        'SL 4 has been successfully deployed'
+      );
+
+      // check that the component is now added to the tree and that we've been redirected to it
+      const expectedTreeAfterDeploy = [
+        `Bus 0`,
+        `Cont 0`,
+        `SA 0`,
+        `SA 1`,
+        `SA 2`,
+        `SL 0`,
+        `SL 4`, // <-- added
+        `Comp 0`,
+        `SU 0`,
+        `SU 2`,
+        `Comp 1`,
+        `SU 1`,
+        `SU 3`,
+        `Comp 2`,
+        `Cont 1`,
+        `SA 3`,
+        `SA 4`,
+        `SA 5`,
+        `SL 1`,
+        `Comp 3`,
+        `SU 4`,
+        `SU 6`,
+        `Comp 4`,
+        `SU 5`,
+        `SU 7`,
+        `Comp 5`,
+      ];
+
+      expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
+
+      // we should get redirected
+      const sl = SharedLibraryOverviewPage.waitAndGet();
+
+      expect(sl.title.getText()).toEqual('SL 4');
+      expect(sl.components.getText()).toEqual([]);
     });
   });
 });

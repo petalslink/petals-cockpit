@@ -187,8 +187,8 @@ export class ComponentsServiceImpl extends ComponentsService {
           serviceAssemblies.byId[serviceAssemblies.allIds[0]];
 
         this.notification.success(
-          'SA deployed',
-          `"${serviceAssemby.name}" has been deployed`
+          'Service Assembly Deployed',
+          `${serviceAssemby.name} has been successfully deployed`
         );
 
         const actions = serviceUnits.allIds.map(id => ({

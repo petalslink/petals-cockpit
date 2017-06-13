@@ -33,6 +33,7 @@ export class SseWorkspaceEvent {
   public static WORKSPACE_DELETED = 'WORKSPACE_DELETED';
   public static SA_DEPLOYED = 'SA_DEPLOYED';
   public static COMPONENT_DEPLOYED = 'COMPONENT_DEPLOYED';
+  public static SL_DEPLOYED = 'SL_DEPLOYED';
 
   public static get allEvents() {
     return [
@@ -46,6 +47,7 @@ export class SseWorkspaceEvent {
       SseWorkspaceEvent.WORKSPACE_DELETED,
       SseWorkspaceEvent.SA_DEPLOYED,
       SseWorkspaceEvent.COMPONENT_DEPLOYED,
+      SseWorkspaceEvent.SL_DEPLOYED,
     ];
   }
 }

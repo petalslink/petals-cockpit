@@ -47,7 +47,7 @@ export class SharedLibraryOverviewPage extends SharedLibraryPage {
 
   public readonly overview = SharedLibraryOverviewPage.overview;
   public readonly components = this.overview.$$(
-    `.shared-library-infos a.component .component-name`
+    `.components a.component .component-name`
   );
 
   static waitAndGet() {
@@ -66,9 +66,7 @@ export class SharedLibraryOverviewPage extends SharedLibraryPage {
   openComponent(identifier: string | number) {
     if (typeof identifier === 'string') {
       this.overview
-        .element(
-          by.cssContainingText(`.shared-library-infos a.component`, identifier)
-        )
+        .element(by.cssContainingText(`.components a.component`, identifier))
         .click();
     } else {
       this.components.get(identifier).click();

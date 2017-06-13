@@ -13,17 +13,21 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFill class="content content-max-width">
+<div fxFill fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
     <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
 
-      <md-card fxFlex fxFlex.gt-md="50%" class="shared-library-infos">
+      <md-card fxFlex class="components">
         <md-card-title fxLayout="row">
           <span fxFlex class="text-upper">Components</span>
           <md-icon color="primary">view_list</md-icon>
         </md-card-title>
 
         <md-divider></md-divider>
+
+        <md-card-content *ngIf="components.length === 0" class="margin-top-x1">
+          This shared library isn't used by any component.
+        </md-card-content>
 
         <md-nav-list dense fxLayout="column">
           <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let component of components">

@@ -45,14 +45,21 @@ public class PetalsDb {
         this.executor = executor;
     }
 
+    @SuppressWarnings("unused")
     private <R> R runMaybeBlocking(Function0<R> s) throws SuspendExecution, InterruptedException {
         if (Strand.isCurrentFiber()) {
-            return FiberAsync.runBlocking(executor, new CheckedCallable<R, RuntimeException>() {
-                @Override
-                public R call() {
-                    return s.apply();
-                }
-            });
+            try {
+                return FiberAsync.runBlocking(executor, new CheckedCallable<R, RuntimeException>() {
+                    @Override
+                    public R call() {
+                        return s.apply();
+                    }
+                });
+            } catch (InterruptedException e) {
+                // TODO until https://github.com/puniverse/quasar/issues/245 is fixed, we shouldn't interrupt
+                // runBlocking because the actual behaviour is not the expected one!
+                throw new AssertionError("This should not be interrupted!", e);
+            }
         } else {
             return s.apply();
         }
