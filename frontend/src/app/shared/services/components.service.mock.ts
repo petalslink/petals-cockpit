@@ -31,14 +31,8 @@ import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class ComponentsServiceMock extends ComponentsServiceImpl {
-  constructor(
-    http: Http,
-    router: Router,
-    private pSseService: SseService,
-    store$: Store<IStore>,
-    notification: NotificationsService
-  ) {
-    super(http, router, pSseService, store$, notification);
+  constructor(http: Http, private sseService: SseService) {
+    super(http);
   }
 
   getDetailsComponent(componentId: string) {
@@ -79,8 +73,8 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
     // when the state changes, trigger a fake SSE event
     setTimeout(
       () =>
-        (this.pSseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.COMPONENT_STATE_CHANGE,
+        (this.sseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.COMPONENT_STATE_CHANGE.event,
           response
         ),
       environment.mock.sseDelay
@@ -116,8 +110,8 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
 
     setTimeout(
       () =>
-        (this.pSseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.SA_DEPLOYED,
+        (this.sseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.SA_DEPLOYED.event,
           response
         ),
       environment.mock.sseDelay

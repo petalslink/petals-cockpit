@@ -16,19 +16,18 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+
 import { Observable } from 'rxjs/Observable';
+import { Subscriber } from 'rxjs/Subscriber';
+import { Action } from '@ngrx/store';
 
 import { environment } from '../../../environments/environment';
-import { SseWorkspaceEvent } from './sse.service';
+import { SseWorkspaceEvent, SseService } from './sse.service';
 import { workspacesService } from '../../../mocks/workspaces-mock';
-import { SseService } from './sse.service';
 
 @Injectable()
 export class SseServiceMock extends SseService {
-  private isSseOpened = false;
-
-  private registeredEvents: Map<string, Subject<any>> = new Map();
+  private current: Subscriber<Action> = null;
 
   constructor() {
     super();
@@ -36,77 +35,54 @@ export class SseServiceMock extends SseService {
 
   // call that method from another mock to simulate an SSE event
   public triggerSseEvent(eventName: string, data: any) {
-    if (this.registeredEvents.has(eventName)) {
-      if (environment.debug) {
-        console.debug('SSE: ', eventName, data);
-      }
-      this.registeredEvents.get(eventName).next(data);
-    } else if (environment.debug) {
-      console.error(`
-        Tried to triggerSseEvent for ${eventName}, but no event of this name was watching the SSE.
-        Did you call watchWorkspaceRealTime first? Is the event listed in SseWorkspaceEvent class?
-      `);
+    if (environment.debug) {
+      console.debug('SSE: ', eventName, data);
     }
+
+    this.current.next({
+      type: SseWorkspaceEvent.toAction(eventName),
+      payload: data,
+    });
   }
 
-  public watchWorkspaceRealTime(workspaceId: string) {
+  public watchWorkspaceRealTime(workspaceId: string): Observable<Action> {
     this.stopWatchingWorkspace();
 
-    this.isSseOpened = true;
+    return new Observable<Action>(observer => {
+      if (environment.debug) {
+        console.debug('subscribing to a new sse connection');
+      }
 
-    if (environment.debug) {
-      console.debug('subscribing to a new sse connection');
-    }
+      this.current = observer;
 
-    // foreach event
-    SseWorkspaceEvent.allEvents
-      .filter(eventName => !this.registeredEvents.has(eventName))
-      .forEach(eventName =>
-        this.registeredEvents.set(eventName, new Subject())
+      const workspaceContent = workspacesService.getWorkspaceComposed(
+        workspaceId
       );
 
-    const workspaceContent = workspacesService.getWorkspaceComposed(
-      workspaceId
-    );
-
-    // simulate the backend sending the first event of the SSE
-    setTimeout(
-      () =>
-        this.triggerSseEvent(
-          SseWorkspaceEvent.WORKSPACE_CONTENT,
-          workspaceContent
-        ),
-      500
-    );
-
-    return Observable.of(null);
+      if (workspaceContent) {
+        // simulate the backend sending the first event of the SSE
+        setTimeout(
+          () =>
+            this.triggerSseEvent(
+              SseWorkspaceEvent.WORKSPACE_CONTENT.event,
+              workspaceContent
+            ),
+          500
+        );
+      } else {
+        setTimeout(() => this.current.error('unknown workspace id'), 500);
+      }
+    });
   }
 
   public stopWatchingWorkspace() {
-    if (this.isSseOpened) {
+    if (this.current) {
       if (environment.debug) {
         console.debug('closing previous sse connection');
       }
+
+      this.current.complete();
+      this.current = null;
     }
-
-    this.isSseOpened = false;
-  }
-
-  public subscribeToWorkspaceEvent(eventName: string) {
-    if (this.registeredEvents.has(eventName)) {
-      return this.registeredEvents
-        .get(eventName)
-        .asObservable()
-        .delay(environment.mock.sseDelay);
-    }
-
-    if (environment.debug) {
-      console.error(`
-        Tried to subscribeToWorkspaceEvent for ${eventName}, but no event of this name was watching the SSE.
-        Did you call watchWorkspaceRealTime first? Is the event listed in SseWorkspaceEvent class?
-      `);
-    }
-
-    return Observable.empty();
   }
 }

@@ -21,8 +21,8 @@ import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
-import { environment } from './../../../../../../environments/environment';
-import { ServiceUnitsService } from './../../../../../shared/services/service-units.service';
+import { environment } from 'environments/environment';
+import { ServiceUnitsService } from 'app/shared/services/service-units.service';
 import { ServiceUnits } from './../service-units/service-units.reducer';
 
 @Injectable()

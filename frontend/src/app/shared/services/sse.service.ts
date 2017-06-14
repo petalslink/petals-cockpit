@@ -16,168 +16,144 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+
 import { Observable } from 'rxjs/Observable';
+import { Subscriber } from 'rxjs/Subscriber';
+import { Action } from '@ngrx/store';
 
 import { environment } from '../../../environments/environment';
 
-// define all the workspace events
 export class SseWorkspaceEvent {
-  public static BUS_IMPORT = 'BUS_IMPORT';
-  public static BUS_IMPORT_OK = 'BUS_IMPORT_OK';
-  public static WORKSPACE_CONTENT = 'WORKSPACE_CONTENT';
-  public static BUS_IMPORT_ERROR = 'BUS_IMPORT_ERROR';
-  public static SA_STATE_CHANGE = 'SA_STATE_CHANGE';
-  public static COMPONENT_STATE_CHANGE = 'COMPONENT_STATE_CHANGE';
-  public static BUS_DELETED = 'BUS_DELETED';
-  public static WORKSPACE_DELETED = 'WORKSPACE_DELETED';
-  public static SA_DEPLOYED = 'SA_DEPLOYED';
-  public static COMPONENT_DEPLOYED = 'COMPONENT_DEPLOYED';
-  public static SL_DEPLOYED = 'SL_DEPLOYED';
+  public static readonly events: SseWorkspaceEvent[] = [];
 
-  public static get allEvents() {
-    return [
-      SseWorkspaceEvent.BUS_IMPORT,
-      SseWorkspaceEvent.BUS_IMPORT_OK,
-      SseWorkspaceEvent.WORKSPACE_CONTENT,
-      SseWorkspaceEvent.BUS_IMPORT_ERROR,
-      SseWorkspaceEvent.SA_STATE_CHANGE,
-      SseWorkspaceEvent.COMPONENT_STATE_CHANGE,
-      SseWorkspaceEvent.BUS_DELETED,
-      SseWorkspaceEvent.WORKSPACE_DELETED,
-      SseWorkspaceEvent.SA_DEPLOYED,
-      SseWorkspaceEvent.COMPONENT_DEPLOYED,
-      SseWorkspaceEvent.SL_DEPLOYED,
-    ];
+  public static readonly BUS_IMPORT = new SseWorkspaceEvent('BUS_IMPORT');
+  public static readonly BUS_IMPORT_OK = new SseWorkspaceEvent('BUS_IMPORT_OK');
+  public static readonly WORKSPACE_CONTENT = new SseWorkspaceEvent(
+    'WORKSPACE_CONTENT'
+  );
+  public static readonly BUS_IMPORT_ERROR = new SseWorkspaceEvent(
+    'BUS_IMPORT_ERROR'
+  );
+  public static readonly SA_STATE_CHANGE = new SseWorkspaceEvent(
+    'SA_STATE_CHANGE'
+  );
+  public static readonly COMPONENT_STATE_CHANGE = new SseWorkspaceEvent(
+    'COMPONENT_STATE_CHANGE'
+  );
+  public static readonly BUS_DELETED = new SseWorkspaceEvent('BUS_DELETED');
+  public static readonly WORKSPACE_DELETED = new SseWorkspaceEvent(
+    'WORKSPACE_DELETED'
+  );
+  public static readonly SA_DEPLOYED = new SseWorkspaceEvent('SA_DEPLOYED');
+  public static readonly COMPONENT_DEPLOYED = new SseWorkspaceEvent(
+    'COMPONENT_DEPLOYED'
+  );
+  public static readonly SL_DEPLOYED = new SseWorkspaceEvent('SL_DEPLOYED');
+
+  public static readonly ON_MESSAGE = SseWorkspaceEvent.toAction('On Message');
+
+  public readonly action: string;
+
+  public static toAction(event: string) {
+    return `[SSE Event] ${event}`;
+  }
+
+  private constructor(public readonly event: string) {
+    this.action = SseWorkspaceEvent.toAction(event);
+    SseWorkspaceEvent.events.push(this);
   }
 }
 
 export abstract class SseService {
-  /**
-   * watchWorkspaceRealTime
-   *
-   * when the user selects a workspace, this method will be call to subscribe
-   * to the sse stream of that workspace. It will automatically close the previous
-   * connection if another workspace was selected
-   *
-   * @param {string} workspaceId
-   *
-   * @return {function} Call the function to close the SSE stream if needed
-   */
-  abstract watchWorkspaceRealTime(workspaceId: string): Observable<any>;
-
+  abstract watchWorkspaceRealTime(workspaceId: string): Observable<Action>;
   abstract stopWatchingWorkspace();
-
-  /**
-   * subscribeToWorkspaceEvent
-   *
-   * return an observable to observe a certain type of SSE event
-   *
-   * @param {string} eventName : The name event to observe
-   *
-   * @return {Observable} Observable which is triggered every time there's the event `eventName`
-   */
-  abstract subscribeToWorkspaceEvent(eventName: string): Observable<any>;
 }
 
 @Injectable()
 export class SseServiceImpl extends SseService {
-  /**
-   * currentSse
-   *
-   * holds the current sse connection
-   *
-   * @private
-   * @type {*}
-   */
-  private currentSse$: any;
+  private current: {
+    sse: sse.IEventSourceStatic;
+    observer: Subscriber<Action>;
+  } = null;
 
-  /**
-   * registeredEvents
-   *
-   * holds a map containing all the events that we need to watch
-   * in order to notify subscribers
-   *
-   * @private
-   * @type {Map<string, Subject<any>>}
-   * @memberOf WorkspacesService
-   */
-  private registeredEvents: Map<
-    string,
-    { eventListener: any; subject$: Subject<any> }
-  > = new Map();
-
-  watchWorkspaceRealTime(workspaceId: string) {
+  watchWorkspaceRealTime(workspaceId: string): Observable<Action> {
     this.stopWatchingWorkspace();
 
-    if (environment.debug) {
-      console.debug('subscribing to a new sse connection');
-    }
-
-    this.currentSse$ = new EventSource(
-      `${environment.urlBackend}/workspaces/${workspaceId}/content`
-    );
-
-    // foreach event
-    SseWorkspaceEvent.allEvents.forEach(eventName => {
-      if (this.registeredEvents.has(eventName)) {
-        // if event already exists, remove the event listener from sse
-        const eventListenerToRemove = this.registeredEvents.get(eventName)
-          .eventListener;
-        this.currentSse$.removeEventListener(eventName, eventListenerToRemove);
-      } else {
-        // if event doesn't exist, create a subject for it ...
-        this.registeredEvents.set(eventName, {
-          eventListener: null,
-          subject$: new Subject(),
-        });
+    return new Observable<Action>(observer => {
+      if (environment.debug) {
+        console.debug('subscribing to a new sse connection');
       }
 
-      // in both cases, add the new event listener (it was either removed or didn't exist)
-      const eventListener = ({ data }: { data: string }) => {
-        const json = JSON.parse(data);
-        if (environment.debug) {
-          console.debug('SSE: ', eventName, json);
+      const es = new EventSource(
+        `${environment.urlBackend}/workspaces/${workspaceId}/content`
+      );
+
+      const cleanup = () => {
+        // in case it has been closed or it's an old connection...
+        if (!this.current || es !== this.current.sse) {
+          if (environment.debug) {
+            console.debug('closing old stale sse connection');
+          }
+
+          observer.complete();
+          es.close();
+          return true;
+        } else {
+          return false;
         }
-        this.registeredEvents.get(eventName).subject$.next(json);
       };
 
-      this.registeredEvents.set(eventName, {
-        eventListener,
-        subject$: this.registeredEvents.get(eventName).subject$,
+      SseWorkspaceEvent.events.forEach(event => {
+        es.addEventListener(event.event, ev => {
+          if (!cleanup()) {
+            const json = JSON.parse((ev as any).data);
+            observer.next({
+              type: event.action,
+              payload: json,
+            });
+          }
+        });
       });
 
-      this.currentSse$.addEventListener(eventName, eventListener);
-    });
+      es.onmessage = ev => {
+        if (!cleanup()) {
+          observer.next({
+            type: SseWorkspaceEvent.ON_MESSAGE,
+            payload: ev.data,
+          });
+        }
+      };
 
-    return new Observable(s => {
-      s.next(null);
-      return this.stopWatchingWorkspace;
+      es.onerror = ev => {
+        if (!cleanup()) {
+          // if it's closed, it is a fatal error and it couldn't reconnect
+          // else it will just reconnect and all is well from the observable point of view
+          if (
+            (ev.target as sse.IEventSourceStatic).readyState ===
+            EventSource.CLOSED
+          ) {
+            observer.error('connection was closed');
+          }
+        }
+      };
+
+      this.current = { sse: es, observer };
+
+      return () => this.stopWatchingWorkspace();
     });
   }
 
   stopWatchingWorkspace() {
-    if (this.currentSse$) {
+    if (this.current) {
+      const c = this.current;
+      this.current = null;
+
       if (environment.debug) {
         console.debug('closing sse connection');
       }
 
-      this.currentSse$.close();
+      c.observer.complete();
+      c.sse.close();
     }
-  }
-
-  subscribeToWorkspaceEvent(eventName: string) {
-    if (this.registeredEvents.has(eventName)) {
-      return this.registeredEvents.get(eventName).subject$.asObservable();
-    }
-
-    if (environment.debug) {
-      console.error(`
-        try to subscribeToWorkspaceEvent with an event name ${eventName} but no event of this name was watching the SSE.
-        Have you call watchWorkspaceRealTime first ? Is the event listed in SseWorkspaceEvent class ?
-      `);
-    }
-
-    return Observable.empty();
   }
 }

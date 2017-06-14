@@ -232,6 +232,8 @@ export class Workspaces {
     if (id) {
       if (this.memoizedWorkspaces.has(id)) {
         return { ...this.memoizedWorkspaces.get(id).composedWks };
+      } else {
+        return null;
       }
     }
 

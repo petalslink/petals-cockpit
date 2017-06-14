@@ -18,11 +18,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import { Store } from '@ngrx/store';
 
-import { IStore } from './../interfaces/store.interface';
-import { SseService, SseWorkspaceEvent } from './sse.service';
-import { Workspaces } from './../../features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 import { environment } from './../../../environments/environment';
 
 export interface IWorkspaceBackendCommon {
@@ -54,17 +50,11 @@ export abstract class WorkspacesService {
     id: string,
     description: string
   ): Observable<Response>;
-
-  abstract watchEventWorkspaceDeleted(): Observable<void>;
 }
 
 @Injectable()
 export class WorkspacesServiceImpl extends WorkspacesService {
-  constructor(
-    private http: Http,
-    private store$: Store<IStore>,
-    private sseService: SseService
-  ) {
+  constructor(private http: Http) {
     super();
   }
 
@@ -90,17 +80,5 @@ export class WorkspacesServiceImpl extends WorkspacesService {
     return this.http.put(`${environment.urlBackend}/workspaces/${id}`, {
       description,
     });
-  }
-
-  watchEventWorkspaceDeleted() {
-    return this.sseService
-      .subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_DELETED)
-      .do((data: { id: string }) => {
-        this.sseService.stopWatchingWorkspace();
-        this.store$.dispatch({
-          type: Workspaces.REMOVE_WORKSPACE,
-          payload: data.id,
-        });
-      });
   }
 }

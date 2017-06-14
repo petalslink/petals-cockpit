@@ -18,19 +18,8 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import { NotificationsService } from 'angular2-notifications';
-import { Store } from '@ngrx/store';
 
 import { environment } from './../../../environments/environment';
-import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
-import { IStore } from 'app/shared/interfaces/store.interface';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
-import { toJavascriptMap } from 'app/shared/helpers/map.helper';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.reducer';
-import { IComponentBackendSSE } from 'app/shared/services/components.service';
-import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
 
 export interface IContainerBackendSSECommon {
   id: string;
@@ -74,20 +63,11 @@ export abstract class ContainersService {
     containerId: string,
     file: File
   ): Observable<Response>;
-
-  abstract watchEventComponentDeployedOk(): Observable<void>;
-
-  abstract watchEventSharedLibraryDeployedOk(): Observable<void>;
 }
 
 @Injectable()
 export class ContainersServiceImpl extends ContainersService {
-  constructor(
-    private http: Http,
-    private store$: Store<IStore>,
-    private sseService: SseService,
-    private notification: NotificationsService
-  ) {
+  constructor(private http: Http) {
     super();
   }
 
@@ -123,61 +103,5 @@ export class ContainersServiceImpl extends ContainersService {
       `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/sharedlibraries`,
       formData
     );
-  }
-
-  watchEventComponentDeployedOk() {
-    return this.sseService
-      .subscribeToWorkspaceEvent(SseWorkspaceEvent.COMPONENT_DEPLOYED)
-      .do((data: any) => {
-        const components = toJavascriptMap<IComponentBackendSSE>(
-          data.components
-        );
-
-        // there is only one component deployed here
-        const component = components.byId[components.allIds[0]];
-
-        this.notification.success(
-          'Component Deployed',
-          `${component.name} has been successfully deployed`
-        );
-
-        this.store$.dispatch(
-          batchActions([
-            // add the component
-            { type: Components.ADD_COMPONENTS_SUCCESS, payload: components },
-            // add it to the container
-            { type: Containers.DEPLOY_COMPONENT_SUCCESS, payload: component },
-          ])
-        );
-      })
-      .mapTo(null);
-  }
-
-  watchEventSharedLibraryDeployedOk() {
-    return this.sseService
-      .subscribeToWorkspaceEvent(SseWorkspaceEvent.SL_DEPLOYED)
-      .do((data: any) => {
-        const sls = toJavascriptMap<ISharedLibraryBackendSSE>(
-          data.sharedLibraries
-        );
-
-        // there is only one sl deployed here
-        const sl = sls.byId[sls.allIds[0]];
-
-        this.notification.success(
-          'Shared Library Deployed',
-          `${sl.name} has been successfully deployed`
-        );
-
-        this.store$.dispatch(
-          batchActions([
-            // add the component
-            { type: SharedLibraries.ADDED, payload: sls },
-            // add it to the container
-            { type: Containers.DEPLOY_SHARED_LIBRARY_SUCCESS, payload: sl },
-          ])
-        );
-      })
-      .mapTo(null);
   }
 }

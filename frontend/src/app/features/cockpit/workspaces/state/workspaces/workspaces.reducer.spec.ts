@@ -33,6 +33,7 @@ describe(`Workspaces reducer`, () => {
 
       isSelectedWorkspaceDeleted: false,
       isSelectedWorkspaceFetched: false,
+      isSelectedWorkspaceFetchError: false,
 
       byId: {},
       allIds: [],
@@ -313,6 +314,7 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         selectedWorkspaceId: 'idWorkspace1',
         isSelectedWorkspaceFetched: false,
+        isSelectedWorkspaceFetchError: false,
         byId: {
           keepPreviousValues: '',
         },
@@ -328,6 +330,7 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         selectedWorkspaceId: 'idWorkspace2',
         isSelectedWorkspaceFetched: false,
+        isSelectedWorkspaceFetchError: false,
         byId: {
           keepPreviousValues: '',
         },
@@ -401,6 +404,7 @@ describe(`Workspaces reducer`, () => {
         keepPreviousValues: '',
         selectedWorkspaceId: 'idWks2',
         isSelectedWorkspaceFetched: true,
+        isSelectedWorkspaceFetchError: false,
         byId: {
           keepPreviousValues: '',
           idWks1: {

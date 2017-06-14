@@ -22,7 +22,7 @@ import {
   ViewChild,
   AfterViewInit,
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { MdInputContainer } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -42,7 +42,7 @@ import {
   getFormErrors,
   disableAllFormFields,
 } from './../../../../../shared/helpers/form.helper';
-import { arrayEquals, tuple } from 'app/shared/helpers/shared.helper';
+
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { IBusImport } from 'app/shared/services/buses.service';
 
@@ -75,8 +75,7 @@ export class PetalsBusInProgressViewComponent
   constructor(
     private store$: Store<IStore>,
     private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
@@ -92,75 +91,16 @@ export class PetalsBusInProgressViewComponent
 
     this.createFormImportBus();
 
-    const id$ = this.route.paramMap
-      .map(paramMap => paramMap.get('busInProgressId'))
-      .distinctUntilChanged();
-
-    id$
+    this.route.paramMap
       .takeUntil(this.onDestroy$)
+      .map(paramMap => paramMap.get('busInProgressId'))
+      .distinctUntilChanged()
       .do(busInProgressId =>
         this.store$.dispatch({
           type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
           payload: { busInProgressId },
         })
       )
-      .subscribe();
-
-    // takes care of redirecting to the right URL after the shown bus in progress is deleted
-    // this is here because it only makes sense if we are on this page for the given bus
-    id$
-      .switchMap(bId => {
-        if (bId) {
-          return (
-            this.store$
-              // when either the bus in progress is deleted or it became a real bus
-              // (note: this can happen in two passes)
-              .select(state =>
-                tuple([state.busesInProgress.byId[bId], state.buses.byId[bId]])
-              )
-              .distinctUntilChanged(arrayEquals)
-              // only interested in deleted bus in progress
-              .filter(([bip, _]) => !bip)
-              .do(([_, bus]) => {
-                if (bus) {
-                  this.router.navigate([
-                    '/workspaces',
-                    this.route.snapshot.paramMap.get('workspaceId'),
-                    'petals',
-                    'buses',
-                    bus.id,
-                  ]);
-                } else {
-                  this.router.navigate([
-                    '/workspaces',
-                    this.route.snapshot.paramMap.get('workspaceId'),
-                  ]);
-                }
-              })
-              .mapTo(null)
-          );
-        } else {
-          return (
-            this.store$
-              // when the currently imported bus becomes present
-              .select(
-                state =>
-                  state.busesInProgress.byId[state.busesInProgress.importBusId]
-              )
-              .filter(bip => !!bip)
-              .do(bip => {
-                this.router.navigate([
-                  '/workspaces',
-                  this.route.snapshot.paramMap.get('workspaceId'),
-                  'petals',
-                  'buses-in-progress',
-                  bip.id,
-                ]);
-              })
-          );
-        }
-      })
-      .takeUntil(this.onDestroy$)
       .subscribe();
 
     this.busInProgress$

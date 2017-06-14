@@ -21,45 +21,32 @@ import { Router } from '@angular/router';
 import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+
 import { NotificationsService } from 'angular2-notifications';
 
 import { Workspaces } from './workspaces.reducer';
 import {
   WorkspacesService,
   IWorkspaceBackend,
-} from './../../../../../shared/services/workspaces.service';
-import { Users } from '../../../../../shared/state/users.reducer';
-import { environment } from '../../../../../../environments/environment';
+} from 'app/shared/services/workspaces.service';
+import { Users } from 'app/shared/state/users.reducer';
+import { environment } from 'environments/environment';
 import { Buses } from '../buses/buses.reducer';
 import { Containers } from '../containers/containers.reducer';
 import { Components } from '../components/components.reducer';
 import { ServiceUnits } from '../service-units/service-units.reducer';
-import { Ui } from '../../../../../shared/state/ui.reducer';
+import { Ui } from 'app/shared/state/ui.reducer';
 import { BusesInProgress } from '../buses-in-progress/buses-in-progress.reducer';
+import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
 import {
-  SseService,
-  SseWorkspaceEvent,
-} from './../../../../../shared/services/sse.service';
-import {
-  BusesService,
   IBusInProgressBackend,
   IBusBackendSSE,
-} from './../../../../../shared/services/buses.service';
-import {
-  ComponentsService,
-  IComponentBackendSSE,
-} from '../../../../../shared/services/components.service';
+} from 'app/shared/services/buses.service';
+import { IComponentBackendSSE } from 'app/shared/services/components.service';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import {
-  ContainersService,
-  IContainerBackendSSE,
-} from 'app/shared/services/containers.service';
+import { IContainerBackendSSE } from 'app/shared/services/containers.service';
 import { toJavascriptMap } from 'app/shared/helpers/map.helper';
-import {
-  ServiceAssembliesService,
-  IServiceAssemblyBackendSSE,
-} from 'app/shared/services/service-assemblies.service';
+import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { IUserBackendCommon } from 'app/shared/services/users.service';
@@ -73,34 +60,28 @@ export class WorkspacesEffects {
     private router: Router,
     private workspacesService: WorkspacesService,
     private sseService: SseService,
-    private busesService: BusesService,
-    private componentsService: ComponentsService,
-    private containersService: ContainersService,
-    private serviceAssembliesService: ServiceAssembliesService,
-    private notification: NotificationsService
+    private notifications: NotificationsService
   ) {}
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchWorkspaces$: Observable<Action> = this.actions$
     .ofType(Workspaces.FETCH_WORKSPACES)
-    .switchMap((action: Action) =>
+    .switchMap(action =>
       this.workspacesService
         .fetchWorkspaces()
-        .switchMap((res: Response) => {
+        .map((res: Response) => {
           const data = res.json();
-          return Observable.of(
-            batchActions([
-              {
-                type: Workspaces.FETCH_WORKSPACES_SUCCESS,
-                payload: toJavascriptMap<IWorkspaceBackend>(data.workspaces),
-              },
-              {
-                type: Users.FETCH_USERS_SUCCESS,
-                payload: toJavascriptMap<IUserBackendCommon>(data.users),
-              },
-            ])
-          );
+          return batchActions([
+            {
+              type: Workspaces.FETCH_WORKSPACES_SUCCESS,
+              payload: toJavascriptMap<IWorkspaceBackend>(data.workspaces),
+            },
+            {
+              type: Users.FETCH_USERS_SUCCESS,
+              payload: toJavascriptMap<IUserBackendCommon>(data.users),
+            },
+          ]);
         })
         .catch(err => {
           if (environment.debug) {
@@ -112,10 +93,11 @@ export class WorkspacesEffects {
             console.groupEnd();
           }
 
-          this.notification.error(
+          this.notifications.error(
             `Workspaces`,
             `An error occurred while loading the workspaces.`
           );
+
           return Observable.of({
             type: Workspaces.FETCH_WORKSPACES_FAILED,
             payload: action.payload,
@@ -132,7 +114,6 @@ export class WorkspacesEffects {
         .postWorkspace(action.payload)
         .map((res: Response) => {
           const workspace = res.json();
-
           return {
             type: Workspaces.POST_WORKSPACE_SUCCESS,
             payload: workspace,
@@ -148,7 +129,7 @@ export class WorkspacesEffects {
             console.groupEnd();
           }
 
-          this.notification.error(
+          this.notifications.error(
             `Workspaces`,
             `An error occurred while adding a new workspace.`
           );
@@ -156,75 +137,43 @@ export class WorkspacesEffects {
         })
     );
 
-  // TODO this is ugly!
-  // tslint:disable-next-line:member-ordering
-  private sub: Subscription;
-
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   closeWorkspace$: Observable<Action> = this.actions$
     .ofType(Workspaces.CLOSE_WORKSPACE)
-    .do(_ => this.sub && this.sub.unsubscribe())
     .do(_ => this.sseService.stopWatchingWorkspace())
     .do((action: Action) => {
       if (action.payload && action.payload.delete) {
         this.router.navigate(['/workspaces']);
       }
     })
+    .do(_ => this.notifications.remove())
     .map(_ => ({ type: Workspaces.CLEAN_WORKSPACE }));
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
-  cleanWorkspace$: Observable<Action> = this.actions$
-    .ofType(Workspaces.CLEAN_WORKSPACE)
-    .do(_ => this.notification.remove());
+  removeWorkspace$: Observable<Action> = this.actions$
+    .ofType(SseWorkspaceEvent.WORKSPACE_DELETED.action)
+    .do(_ => this.sseService.stopWatchingWorkspace())
+    .map(action => ({
+      type: Workspaces.REMOVE_WORKSPACE,
+      payload: action.payload.id,
+    }));
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchWorkspace$: Observable<Action> = this.actions$
     .ofType(Workspaces.FETCH_WORKSPACE)
-    .do(_ => this.sub && this.sub.unsubscribe())
     .switchMap((action: Action) =>
       this.sseService
         .watchWorkspaceRealTime(action.payload)
-        .map(_ => {
-          this.sub = new Subscription();
-          this.sub.add(this.busesService.watchEventBusImport().subscribe());
-          this.sub.add(this.busesService.watchEventBusDeleted().subscribe());
-          this.sub.add(this.busesService.watchEventBusImportOk().subscribe());
-          this.sub.add(
-            this.busesService.watchEventBusImportError().subscribe()
-          );
-          this.sub.add(
-            this.serviceAssembliesService
-              .watchEventSaStateChangeOk()
-              .subscribe()
-          );
-          this.sub.add(
-            this.componentsService
-              .watchEventComponentStateChangeOk()
-              .subscribe()
-          );
-          this.sub.add(
-            this.workspacesService.watchEventWorkspaceDeleted().subscribe()
-          );
-          this.sub.add(
-            this.componentsService.watchEventSaDeployedOk().subscribe()
-          );
-          this.sub.add(
-            this.containersService.watchEventComponentDeployedOk().subscribe()
-          );
-          this.sub.add(
-            this.containersService
-              .watchEventSharedLibraryDeployedOk()
-              .subscribe()
-          );
-
-          return {
-            type: Workspaces.FETCH_WORKSPACE_SSE_SUCCESS,
-            payload: action.payload,
-          };
-        })
+        .startWith(
+          batchActions([
+            { type: Workspaces.CLEAN_WORKSPACE },
+            { type: Ui.OPEN_SIDENAV },
+            { type: Ui.CLOSE_POPUP_WORKSPACES_LIST },
+          ])
+        )
         .catch(err => {
           if (environment.debug) {
             console.group();
@@ -235,75 +184,64 @@ export class WorkspacesEffects {
             console.groupEnd();
           }
 
-          this.notification.error(
-            `Workspace`,
-            `An error occurred while loading the workspace.`
+          this.notifications.error(
+            `Workspace Error`,
+            `An error occurred with the workspace connection.`
           );
-          return Observable.empty();
+
+          return Observable.of({ type: Workspaces.FETCH_WORKSPACE_FAILED });
         })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchWorkspaceSseSuccess$: Observable<Action> = this.actions$
-    .ofType(Workspaces.FETCH_WORKSPACE_SSE_SUCCESS)
-    .switchMap((action: Action) =>
-      this.sseService
-        .subscribeToWorkspaceEvent(SseWorkspaceEvent.WORKSPACE_CONTENT)
-        .switchMap((data: any) => {
-          return Observable.of(
-            batchActions([
-              { type: Workspaces.CLEAN_WORKSPACE },
-              {
-                type: Workspaces.FETCH_WORKSPACE_SUCCESS,
-                payload: data.workspace,
-              },
-              {
-                type: Users.FETCH_USERS_SUCCESS,
-                payload: toJavascriptMap<IUserBackendCommon>(data.users),
-              },
-              {
-                type: BusesInProgress.FETCH_BUSES_IN_PROGRESS,
-                payload: toJavascriptMap<IBusInProgressBackend>(
-                  data.busesInProgress
-                ),
-              },
-              {
-                type: Buses.FETCH_BUSES_SUCCESS,
-                payload: toJavascriptMap<IBusBackendSSE>(data.buses),
-              },
-              {
-                type: Containers.FETCH_CONTAINERS_SUCCESS,
-                payload: toJavascriptMap<IContainerBackendSSE>(data.containers),
-              },
-              {
-                type: Components.FETCH_COMPONENTS_SUCCESS,
-                payload: toJavascriptMap<IComponentBackendSSE>(data.components),
-              },
-              {
-                type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLIES_SUCCESS,
-                payload: toJavascriptMap<IServiceAssemblyBackendSSE>(
-                  data.serviceAssemblies
-                ),
-              },
-              {
-                type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS,
-                payload: toJavascriptMap<IServiceUnitBackendSSE>(
-                  data.serviceUnits
-                ),
-              },
-              {
-                type: SharedLibraries.FETCHED,
-                payload: toJavascriptMap<ISharedLibraryBackendSSE>(
-                  data.sharedLibraries
-                ),
-              },
-              { type: Ui.OPEN_SIDENAV },
-              { type: Ui.CLOSE_POPUP_WORKSPACES_LIST },
-            ])
-          );
-        })
-    );
+    .ofType(SseWorkspaceEvent.WORKSPACE_CONTENT.action)
+    .map((action: Action) => {
+      const data = action.payload;
+      return batchActions([
+        {
+          type: Workspaces.FETCH_WORKSPACE_SUCCESS,
+          payload: data.workspace,
+        },
+        {
+          type: Users.FETCH_USERS_SUCCESS,
+          payload: toJavascriptMap<IUserBackendCommon>(data.users),
+        },
+        {
+          type: BusesInProgress.FETCH_BUSES_IN_PROGRESS,
+          payload: toJavascriptMap<IBusInProgressBackend>(data.busesInProgress),
+        },
+        {
+          type: Buses.FETCH_BUSES_SUCCESS,
+          payload: toJavascriptMap<IBusBackendSSE>(data.buses),
+        },
+        {
+          type: Containers.FETCH_CONTAINERS_SUCCESS,
+          payload: toJavascriptMap<IContainerBackendSSE>(data.containers),
+        },
+        {
+          type: Components.FETCH_COMPONENTS_SUCCESS,
+          payload: toJavascriptMap<IComponentBackendSSE>(data.components),
+        },
+        {
+          type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLIES_SUCCESS,
+          payload: toJavascriptMap<IServiceAssemblyBackendSSE>(
+            data.serviceAssemblies
+          ),
+        },
+        {
+          type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS,
+          payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits),
+        },
+        {
+          type: SharedLibraries.FETCHED,
+          payload: toJavascriptMap<ISharedLibraryBackendSSE>(
+            data.sharedLibraries
+          ),
+        },
+      ]);
+    });
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })

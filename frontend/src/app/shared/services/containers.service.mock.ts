@@ -31,13 +31,8 @@ import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.se
 
 @Injectable()
 export class ContainersServiceMock extends ContainersServiceImpl {
-  constructor(
-    http: Http,
-    store$: Store<IStore>,
-    private pSseService: SseService,
-    notification: NotificationsService
-  ) {
-    super(http, store$, pSseService, notification);
+  constructor(http: Http, private sseService: SseService) {
+    super(http);
   }
 
   getDetailsContainer(containerId: string) {
@@ -65,8 +60,8 @@ export class ContainersServiceMock extends ContainersServiceImpl {
 
     setTimeout(
       () =>
-        (this.pSseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.COMPONENT_DEPLOYED,
+        (this.sseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.COMPONENT_DEPLOYED.event,
           response
         ),
       environment.mock.sseDelay
@@ -94,8 +89,8 @@ export class ContainersServiceMock extends ContainersServiceImpl {
 
     setTimeout(
       () =>
-        (this.pSseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.SA_DEPLOYED,
+        (this.sseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.SA_DEPLOYED.event,
           response
         ),
       environment.mock.sseDelay
@@ -120,8 +115,8 @@ export class ContainersServiceMock extends ContainersServiceImpl {
 
     setTimeout(
       () =>
-        (this.pSseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.SL_DEPLOYED,
+        (this.sseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.SL_DEPLOYED.event,
           response
         ),
       environment.mock.sseDelay

@@ -8,7 +8,9 @@
     "types": [
       "jest",
       "node"
-    ]
+    ],
+    // this is needed by jest to transpile angular2-notifications!
+    "allowJs": true
   },
   "include": [
     "**/*.spec.ts",

@@ -17,7 +17,6 @@
 
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
-import { Store } from '@ngrx/store';
 
 import { WorkspacesServiceImpl } from './workspaces.service';
 import { UsersService } from './users.service';
@@ -27,17 +26,15 @@ import { SseServiceMock } from './sse.service.mock';
 import { workspacesService } from '../../../mocks/workspaces-mock';
 import * as helper from './../helpers/mock.helper';
 import { environment } from '../../../environments/environment';
-import { IStore } from '../interfaces/store.interface';
 
 @Injectable()
 export class WorkspacesServiceMock extends WorkspacesServiceImpl {
   constructor(
     http: Http,
-    store$: Store<IStore>,
-    private pSseService: SseService,
+    private sseService: SseService,
     private usersService: UsersService
   ) {
-    super(http, store$, pSseService);
+    super(http);
   }
 
   fetchWorkspaces() {
@@ -69,9 +66,8 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
       // simulate the backend sending the answer on the SSE
       setTimeout(() => {
         workspacesService.deleteWorkspace(id);
-        (this
-          .pSseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.WORKSPACE_DELETED,
+        (this.sseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.WORKSPACE_DELETED.event,
           { id }
         );
       }, environment.mock.sseDelay);

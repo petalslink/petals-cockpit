@@ -16,23 +16,11 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import { Store } from '@ngrx/store';
-import { NotificationsService } from 'angular2-notifications';
 
 import { environment } from './../../../environments/environment';
-import { SseService, SseWorkspaceEvent } from './sse.service';
-import { IStore } from '../interfaces/store.interface';
-import { Components } from '../../features/cockpit/workspaces/state/components/components.reducer';
-import { toJavascriptMap } from 'app/shared/helpers/map.helper';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.reducer';
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
-import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 
 // http://stackoverflow.com/a/41631732/2398593
 export const EComponentState = {
@@ -89,21 +77,11 @@ export abstract class ComponentsService {
     file: File,
     serviceUnitName: string
   ): Observable<Response>;
-
-  abstract watchEventComponentStateChangeOk(): Observable<void>;
-
-  abstract watchEventSaDeployedOk(): Observable<void>;
 }
 
 @Injectable()
 export class ComponentsServiceImpl extends ComponentsService {
-  constructor(
-    private http: Http,
-    private router: Router,
-    private sseService: SseService,
-    private store$: Store<IStore>,
-    private notification: NotificationsService
-  ) {
+  constructor(private http: Http) {
     super();
   }
 
@@ -137,83 +115,5 @@ export class ComponentsServiceImpl extends ComponentsService {
       `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}/serviceunits`,
       formData
     );
-  }
-
-  watchEventComponentStateChangeOk() {
-    return this.sseService
-      .subscribeToWorkspaceEvent(SseWorkspaceEvent.COMPONENT_STATE_CHANGE)
-      .withLatestFrom(this.store$)
-      .do(([data, store]: [{ id: string; state: ComponentState }, IStore]) => {
-        if (data.state === EComponentState.Unloaded) {
-          const component = store.components.byId[data.id];
-          const container = store.containers.byId[component.containerId];
-
-          this.router.navigate([
-            '/workspaces',
-            store.workspaces.selectedWorkspaceId,
-          ]);
-
-          this.notification.success(
-            'Component unloaded',
-            `"${component.name}" has been unloaded`
-          );
-
-          this.store$.dispatch({
-            type: Components.REMOVE_COMPONENT,
-            payload: { containerId: container.id, componentId: data.id },
-          });
-        } else {
-          this.store$.dispatch({
-            type: Components.CHANGE_STATE_SUCCESS,
-            payload: { componentId: data.id, newState: data.state },
-          });
-        }
-      })
-      .mapTo(null);
-  }
-
-  watchEventSaDeployedOk() {
-    return this.sseService
-      .subscribeToWorkspaceEvent(SseWorkspaceEvent.SA_DEPLOYED)
-      .do((data: any) => {
-        const serviceAssemblies = toJavascriptMap<IServiceAssemblyBackendSSE>(
-          data.serviceAssemblies
-        );
-        const serviceUnits = toJavascriptMap<IServiceUnitBackendSSE>(
-          data.serviceUnits
-        );
-
-        const serviceAssemby =
-          serviceAssemblies.byId[serviceAssemblies.allIds[0]];
-
-        this.notification.success(
-          'Service Assembly Deployed',
-          `${serviceAssemby.name} has been successfully deployed`
-        );
-
-        const actions = serviceUnits.allIds.map(id => ({
-          type: Components.DEPLOY_SERVICE_UNIT_SUCCESS,
-          payload: serviceUnits.byId[id],
-        }));
-
-        this.store$.dispatch(
-          batchActions([
-            {
-              type: ServiceAssemblies.ADD_SERVICE_ASSEMBLIES_SUCCESS,
-              payload: serviceAssemblies,
-            },
-            {
-              type: ServiceUnits.ADD_SERVICE_UNITS_SUCCESS,
-              payload: serviceUnits,
-            },
-            {
-              type: Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS,
-              payload: serviceAssemby,
-            },
-            ...actions,
-          ])
-        );
-      })
-      .mapTo(null);
   }
 }
