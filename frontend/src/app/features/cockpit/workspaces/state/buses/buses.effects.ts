@@ -144,10 +144,10 @@ export class BusesEffects {
       this.busesService
         .getDetailsBus(action.payload.busId)
         .map((res: Response) => {
-          const rslt = res.json();
+          const data = res.json();
           return {
             type: Buses.FETCH_BUS_DETAILS_SUCCESS,
-            payload: { busId: action.payload.busId, rslt },
+            payload: { busId: action.payload.busId, data },
           };
         })
         .catch(err => {
