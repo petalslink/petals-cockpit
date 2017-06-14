@@ -17,17 +17,10 @@
 
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { Router } from '@angular/router';
+
 import { Observable } from 'rxjs/Observable';
-import { Store } from '@ngrx/store';
-import { NotificationsService } from 'angular2-notifications';
 
 import { environment } from './../../../environments/environment';
-import { SseService, SseWorkspaceEvent } from './sse.service';
-import { ServiceUnits } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
-import { IStore } from '../interfaces/store.interface';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
 
 // http://stackoverflow.com/a/41631732/2398593
 export const EServiceAssemblyState = {
@@ -65,19 +58,11 @@ export abstract class ServiceAssembliesService {
     serviceAssemblyId: string,
     newState: ServiceAssemblyState
   ): Observable<Response>;
-
-  abstract watchEventSaStateChangeOk(): Observable<void>;
 }
 
 @Injectable()
 export class ServiceAssembliesServiceImpl extends ServiceAssembliesService {
-  constructor(
-    private http: Http,
-    private router: Router,
-    private sseService: SseService,
-    private store$: Store<IStore>,
-    private notification: NotificationsService
-  ) {
+  constructor(private http: Http) {
     super();
   }
 
@@ -96,56 +81,5 @@ export class ServiceAssembliesServiceImpl extends ServiceAssembliesService {
       `${environment.urlBackend}/workspaces/${workspaceId}/serviceassemblies/${serviceAssemblyId}`,
       { state: newState }
     );
-  }
-
-  watchEventSaStateChangeOk() {
-    return this.sseService
-      .subscribeToWorkspaceEvent(SseWorkspaceEvent.SA_STATE_CHANGE)
-      .withLatestFrom(this.store$)
-      .do(
-        (
-          [data, store]: [{ id: string; state: ServiceAssemblyState }, IStore]
-        ) => {
-          const sa = store.serviceAssemblies.byId[data.id];
-
-          if (data.state === EServiceAssemblyState.Unloaded) {
-            this.router.navigate([
-              '/workspaces',
-              store.workspaces.selectedWorkspaceId,
-            ]);
-
-            this.notification.success(
-              'Service assembly unloaded',
-              `'${sa.name}' has been unloaded`
-            );
-
-            const actions = [
-              {
-                type: ServiceAssemblies.REMOVE_SERVICE_ASSEMBLY,
-                payload: {
-                  containerId: sa.containerId,
-                  serviceAssemblyId: sa.id,
-                },
-              },
-
-              ...sa.serviceUnits.map(suId => ({
-                type: ServiceUnits.REMOVE_SERVICE_UNIT,
-                payload: {
-                  componentId: store.serviceUnits.byId[suId].componentId,
-                  serviceUnitId: suId,
-                },
-              })),
-            ];
-
-            this.store$.dispatch(batchActions(actions));
-          } else {
-            this.store$.dispatch({
-              type: ServiceAssemblies.CHANGE_STATE_SUCCESS,
-              payload: { newState: data.state, serviceAssemblyId: sa.id },
-            });
-          }
-        }
-      )
-      .mapTo(null);
   }
 }

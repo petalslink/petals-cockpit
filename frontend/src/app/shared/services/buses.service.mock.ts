@@ -17,12 +17,9 @@
 
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
-import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
-import { NotificationsService } from 'angular2-notifications';
 
 import { BusesServiceImpl, IBusImport } from './buses.service';
-import { IStore } from './../interfaces/store.interface';
+
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import { environment } from './../../../environments/environment';
@@ -37,13 +34,10 @@ import { UsersServiceMock } from 'app/shared/services/users.service.mock';
 export class BusesServiceMock extends BusesServiceImpl {
   constructor(
     http: Http,
-    store$: Store<IStore>,
-    router: Router,
-    private pSseService: SseService,
-    private userService: UsersService,
-    notifications: NotificationsService
+    private sseService: SseService,
+    private userService: UsersService
   ) {
-    super(http, store$, router, pSseService, notifications);
+    super(http);
   }
 
   postBus(idWorkspace: string, bus: IBusImport) {
@@ -54,11 +48,11 @@ export class BusesServiceMock extends BusesServiceImpl {
 
     const newBus = workspacesService.getWorkspace(idWorkspace).tryAddBus(bus);
 
-    let event;
+    let event: string;
     if (newBus.eventData.importError) {
-      event = SseWorkspaceEvent.BUS_IMPORT_ERROR;
+      event = SseWorkspaceEvent.BUS_IMPORT_ERROR.event;
     } else {
-      event = SseWorkspaceEvent.BUS_IMPORT_OK;
+      event = SseWorkspaceEvent.BUS_IMPORT_OK.event;
     }
 
     const detailsBus = {
@@ -69,14 +63,14 @@ export class BusesServiceMock extends BusesServiceImpl {
     return helper.responseBody(detailsBus).do(_ => {
       // simulate the backend sending the bus in progress on the SSE
       setTimeout(() => {
-        (this.pSseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.BUS_IMPORT,
+        (this.sseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.BUS_IMPORT.event,
           detailsBus
         );
         // simulate the backend sending the imported bus on the SSE
         setTimeout(
           () =>
-            (this.pSseService as SseServiceMock).triggerSseEvent(
+            (this.sseService as SseServiceMock).triggerSseEvent(
               event,
               newBus.eventData
             ),
@@ -91,9 +85,8 @@ export class BusesServiceMock extends BusesServiceImpl {
       // simulate the backend sending the answer on the SSE
       setTimeout(
         () =>
-          (this
-            .pSseService as SseServiceMock).triggerSseEvent(
-            SseWorkspaceEvent.BUS_DELETED,
+          (this.sseService as SseServiceMock).triggerSseEvent(
+            SseWorkspaceEvent.BUS_DELETED.event,
             {
               id,
               reason: `bus deleted by ${(this

@@ -38,7 +38,7 @@ export class ContainersEffects {
     private store$: Store<IStore>,
     private actions$: Actions,
     private containersService: ContainersService,
-    private notification: NotificationsService
+    private notifications: NotificationsService
   ) {}
 
   // tslint:disable-next-line:member-ordering
@@ -103,7 +103,7 @@ export class ContainersEffects {
               console.groupEnd();
             }
 
-            this.notification.error(
+            this.notifications.error(
               'Component Deployment Failed',
               `An error occurred while deploying ${action.payload.file.name}`
             );
@@ -167,7 +167,7 @@ export class ContainersEffects {
               console.groupEnd();
             }
 
-            this.notification.error(
+            this.notifications.error(
               'Service Assembly Deployment Failed',
               `An error occurred while deploying ${action.payload.file.name}`
             );
@@ -235,7 +235,7 @@ export class ContainersEffects {
               console.groupEnd();
             }
 
-            this.notification.error(
+            this.notifications.error(
               'Shared Library Deployment Failed',
               `An error occurred while deploying ${action.payload.file.name}`
             );

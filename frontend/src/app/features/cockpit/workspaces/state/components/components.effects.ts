@@ -17,6 +17,7 @@
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
+import { Router } from '@angular/router';
 import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
@@ -27,17 +28,85 @@ import { Components } from './components.reducer';
 import {
   ComponentsService,
   ComponentState,
+  EComponentState,
+  IComponentBackendSSE,
 } from './../../../../../shared/services/components.service';
 import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { batchActions } from 'app/shared/helpers/batch-actions.helper';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
+import { toJavascriptMap } from 'app/shared/helpers/map.helper';
 
 @Injectable()
 export class ComponentsEffects {
   constructor(
     private store$: Store<IStore>,
     private actions$: Actions,
+    private router: Router,
     private componentsService: ComponentsService,
-    private notification: NotificationsService
+    private notifications: NotificationsService
   ) {}
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true })
+  watchDeployed$: Observable<Action> = this.actions$
+    .ofType(SseWorkspaceEvent.COMPONENT_DEPLOYED.action)
+    .map(action => {
+      const data = action.payload;
+
+      const components = toJavascriptMap<IComponentBackendSSE>(data.components);
+
+      // there is only one component deployed here
+      const component = components.byId[components.allIds[0]];
+
+      this.notifications.success(
+        'Component Deployed',
+        `${component.name} has been successfully deployed`
+      );
+
+      return batchActions([
+        // add the component
+        { type: Components.ADD_COMPONENTS_SUCCESS, payload: components },
+        // add it to the container
+        { type: Containers.DEPLOY_COMPONENT_SUCCESS, payload: component },
+      ]);
+    });
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true })
+  watchStateChange$: Observable<Action> = this.actions$
+    .ofType(SseWorkspaceEvent.COMPONENT_STATE_CHANGE.action)
+    .withLatestFrom(this.store$)
+    .map(([action, store]) => {
+      const data: { id: string; state: ComponentState } = action.payload;
+
+      if (data.state === EComponentState.Unloaded) {
+        const component = store.components.byId[data.id];
+        const container = store.containers.byId[component.containerId];
+
+        if (store.components.selectedComponentId === component.id) {
+          this.router.navigate([
+            '/workspaces',
+            store.workspaces.selectedWorkspaceId,
+          ]);
+        }
+
+        this.notifications.success(
+          'Component unloaded',
+          `"${component.name}" has been unloaded`
+        );
+
+        return {
+          type: Components.REMOVE_COMPONENT,
+          payload: { containerId: container.id, componentId: data.id },
+        };
+      } else {
+        return {
+          type: Components.CHANGE_STATE_SUCCESS,
+          payload: { componentId: data.id, newState: data.state },
+        };
+      }
+    });
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
@@ -172,7 +241,7 @@ export class ComponentsEffects {
               console.groupEnd();
             }
 
-            this.notification.error(
+            this.notifications.error(
               'Service Unit Deployment Failed',
               `An error occurred while deploying ${action.payload.file.name}`
             );

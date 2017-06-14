@@ -136,10 +136,6 @@ export class Workspaces {
     };
   }
 
-  // only used in effect, no point to handle that action
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_WORKSPACE_SSE_SUCCESS = `${Workspaces.reducerName} Fetch workspace sse success`;
-
   // tslint:disable-next-line:member-ordering
   public static FETCH_WORKSPACE = `${Workspaces.reducerName} Fetch workspace`;
   private static fetchWorkspace(
@@ -150,6 +146,7 @@ export class Workspaces {
       ...workspacesTable,
       ...<IWorkspacesTable>{
         selectedWorkspaceId: payload,
+        isSelectedWorkspaceFetchError: false,
         isSelectedWorkspaceFetched: false,
       },
     };
@@ -167,6 +164,20 @@ export class Workspaces {
         : putById(workspacesTable, payload.id, payload, workspaceRowFactory()),
       ...<IWorkspacesTable>{
         isSelectedWorkspaceFetched: true,
+      },
+    };
+  }
+
+  // tslint:disable-next-line:member-ordering
+  public static FETCH_WORKSPACE_FAILED = `${Workspaces.reducerName} Fetch workspace failed`;
+  private static fetchWorkspaceFailed(
+    workspacesTable: IWorkspacesTable,
+    _payload
+  ): IWorkspacesTable {
+    return {
+      ...workspacesTable,
+      ...<IWorkspacesTable>{
+        isSelectedWorkspaceFetchError: true,
       },
     };
   }
@@ -351,6 +362,7 @@ export class Workspaces {
     // Workspace
     [Workspaces.FETCH_WORKSPACE]: Workspaces.fetchWorkspace,
     [Workspaces.FETCH_WORKSPACE_SUCCESS]: Workspaces.fetchWorkspaceSuccess,
+    [Workspaces.FETCH_WORKSPACE_FAILED]: Workspaces.fetchWorkspaceFailed,
     [Workspaces.FETCH_WORKSPACE_DETAILS]: Workspaces.fetchWorkspaceDetails,
     [Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS]:
       Workspaces.fetchWorkspaceDetailsSuccess,

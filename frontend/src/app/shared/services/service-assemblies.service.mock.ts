@@ -17,16 +17,13 @@
 
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
-import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { NotificationsService } from 'angular2-notifications';
 
 import { serviceAssembliesService } from 'mocks/service-assemblies-mock';
 import * as helper from './../helpers/mock.helper';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
 import { environment } from '../../../environments/environment';
-import { IStore } from '../interfaces/store.interface';
+
 import {
   ServiceAssembliesServiceImpl,
   ServiceAssemblyState,
@@ -34,14 +31,8 @@ import {
 
 @Injectable()
 export class ServiceAssembliesServiceMock extends ServiceAssembliesServiceImpl {
-  constructor(
-    private pSseService: SseService,
-    http: Http,
-    router: Router,
-    store$: Store<IStore>,
-    notification: NotificationsService
-  ) {
-    super(http, router, pSseService, store$, notification);
+  constructor(private sseService: SseService, http: Http) {
+    super(http);
   }
 
   getDetailsServiceAssembly(serviceAssemblyId: string) {
@@ -69,8 +60,8 @@ export class ServiceAssembliesServiceMock extends ServiceAssembliesServiceImpl {
     // when the state changes, trigger a fake SSE event
     setTimeout(
       () =>
-        (this.pSseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.SA_STATE_CHANGE,
+        (this.sseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.SA_STATE_CHANGE.event,
           response
         ),
       environment.mock.sseDelay

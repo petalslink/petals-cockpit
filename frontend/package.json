@@ -100,6 +100,9 @@
   "jest": {
     "preset": "jest-preset-angular",
     "setupTestFrameworkScriptFile": "<rootDir>/src/setup-jest.ts",
+    "transformIgnorePatterns": [
+      "node_modules/(?!@ngrx|angular2-notifications)"
+    ],
     "collectCoverageFrom": [
       "src/**/*.ts",
       "!src/**/*.spec.ts",

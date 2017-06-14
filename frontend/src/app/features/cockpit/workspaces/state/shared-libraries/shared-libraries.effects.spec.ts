@@ -20,6 +20,7 @@ import {
   EffectsRunner,
 } from '@ngrx/effects/bundles/effects-testing.umd';
 import { Observable } from 'rxjs/Observable';
+import { NotificationsService } from 'angular2-notifications';
 
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
 import { SharedLibrariesEffects } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.effects';
@@ -38,6 +39,12 @@ describe('SharedLibraries Effects', () => {
           provide: SharedLibrariesService,
           useValue: {
             getDetails: jest.fn(),
+          },
+        },
+        {
+          provide: NotificationsService,
+          useValue: {
+            success: jest.fn(),
           },
         },
       ],

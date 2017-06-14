@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 // until ts 2.4 is released, see https://github.com/palantir/tslint/issues/2470 https://github.com/Microsoft/TypeScript/issues/14953
 // tslint:disable-next-line:no-unused-variable
@@ -24,11 +24,10 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from './../../../shared/interfaces/store.interface';
 import { Workspaces } from './state/workspaces/workspaces.reducer';
-import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
 @Injectable()
 export class WorkspaceResolver implements Resolve<Observable<any>> {
-  constructor(private store$: Store<IStore>) {}
+  constructor(private store$: Store<IStore>, private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot) {
     const workspaceId = route.paramMap.get('workspaceId');
@@ -38,6 +37,21 @@ export class WorkspaceResolver implements Resolve<Observable<any>> {
       payload: workspaceId,
     });
 
-    return this.store$.let(filterWorkspaceFetched).first();
+    return this.store$
+      .select(state => state.workspaces)
+      .filter(
+        workspaces =>
+          workspaces.isSelectedWorkspaceFetched ||
+          workspaces.isSelectedWorkspaceFetchError
+      )
+      .first()
+      .do(workspaces => {
+        if (
+          workspaces.isSelectedWorkspaceFetchError &&
+          !workspaces.isSelectedWorkspaceFetched
+        ) {
+          this.router.navigate(['/workspaces']);
+        }
+      });
   }
 }

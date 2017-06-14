@@ -19,17 +19,52 @@ import { Injectable } from '@angular/core';
 import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
+import { NotificationsService } from 'angular2-notifications';
 
-import { environment } from './../../../../../../environments/environment';
-import { SharedLibrariesService } from 'app/shared/services/shared-libraries.service';
+import { environment } from 'environments/environment';
+import {
+  SharedLibrariesService,
+  ISharedLibraryBackendSSE,
+} from 'app/shared/services/shared-libraries.service';
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
+import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { toJavascriptMap } from 'app/shared/helpers/map.helper';
+import { batchActions } from 'app/shared/helpers/batch-actions.helper';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
 
 @Injectable()
 export class SharedLibrariesEffects {
   constructor(
     private actions$: Actions,
-    private sharedLibrariesService: SharedLibrariesService
+    private sharedLibrariesService: SharedLibrariesService,
+    private notifications: NotificationsService
   ) {}
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true })
+  watchDelpoyed$: Observable<Action> = this.actions$
+    .ofType(SseWorkspaceEvent.SL_DEPLOYED.action)
+    .map(action => {
+      const data = action.payload;
+      const sls = toJavascriptMap<ISharedLibraryBackendSSE>(
+        data.sharedLibraries
+      );
+
+      // there is only one sl deployed here
+      const sl = sls.byId[sls.allIds[0]];
+
+      this.notifications.success(
+        'Shared Library Deployed',
+        `${sl.name} has been successfully deployed`
+      );
+
+      return batchActions([
+        // add the component
+        { type: SharedLibraries.ADDED, payload: sls },
+        // add it to the container
+        { type: Containers.DEPLOY_SHARED_LIBRARY_SUCCESS, payload: sl },
+      ]);
+    });
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
