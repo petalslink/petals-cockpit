@@ -14,3 +14,6 @@ copyOf
 of
  <E:Ljava/lang/Object;>()Lcom/google/common/collect/ImmutableSet<TE;>;
  <E:Ljava/lang/Object;>()L1com/google/common/collect/ImmutableSet<TE;>;
+toImmutableSet
+ <E:Ljava/lang/Object;>()Ljava/util/stream/Collector<TE;*Lcom/google/common/collect/ImmutableSet<TE;>;>;
+ <E:Ljava/lang/Object;>()L1java/util/stream/Collector<TE;*1L1com/google/common/collect/ImmutableSet<TE;>;>;

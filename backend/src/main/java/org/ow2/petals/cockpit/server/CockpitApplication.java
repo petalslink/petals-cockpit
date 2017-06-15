@@ -52,6 +52,7 @@ import org.ow2.petals.cockpit.server.services.HttpArtifactServer;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
 import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
+import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.SaveWorkspaceDbWitness;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.context.DefaultAuthorizers;
 import org.pac4j.core.matching.PathMatcher;
@@ -232,6 +233,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 bind(PetalsAdmin.class).to(PetalsAdmin.class).in(Singleton.class);
                 bind(PetalsDb.class).to(PetalsDb.class).in(Singleton.class);
                 bind(adminConsoleToken).to(String.class).named(SetupResource.ADMIN_TOKEN);
+                bind(SaveWorkspaceDbWitness.NOP).to(SaveWorkspaceDbWitness.class);
             }
         });
 

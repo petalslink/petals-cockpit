@@ -65,24 +65,25 @@ public class PetalsDb {
         }
     }
 
-    public <R> R runTransaction(Configuration conf, Function1<Configuration, R> transaction)
-            throws SuspendExecution, InterruptedException {
-        return runMaybeBlocking(() -> DSL.using(conf).transactionResult(transaction::apply));
+    public <R> R runTransaction(Function1<Configuration, R> t) throws SuspendExecution, InterruptedException {
+        return runMaybeBlocking(() -> DSL.using(jooq).transactionResult(t::apply));
     }
 
-    public void runTransaction(Configuration conf, Consumer<Configuration> t)
-            throws SuspendExecution, InterruptedException {
-        runTransaction(conf, c -> {
+    public <R> R run(Function1<Configuration, R> t) throws SuspendExecution, InterruptedException {
+        return runMaybeBlocking(() -> t.apply(jooq));
+    }
+
+    public void run(Consumer<Configuration> t) throws SuspendExecution, InterruptedException {
+        run(c -> {
             t.accept(c);
             return null;
         });
     }
 
-    public <R> R runTransaction(Function1<Configuration, R> t) throws SuspendExecution, InterruptedException {
-        return runTransaction(jooq, t);
-    }
-
     public void runTransaction(Consumer<Configuration> t) throws SuspendExecution, InterruptedException {
-        runTransaction(jooq, t);
+        runTransaction(c -> {
+            t.accept(c);
+            return null;
+        });
     }
 }

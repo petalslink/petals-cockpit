@@ -14,6 +14,9 @@ filter
 findFirst
  ()Ljava/util/Optional<TT;>;
  ()L1java/util/Optional<TT;>;
+flatMap
+ <R:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+Ljava/util/stream/Stream<+TR;>;>;)Ljava/util/stream/Stream<TR;>;
+ <R:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+Ljava/util/stream/Stream<+TR;>;>;)L1java/util/stream/Stream<TR;>;
 generate
  <T:Ljava/lang/Object;>(Ljava/util/function/Supplier<TT;>;)Ljava/util/stream/Stream<TT;>;
  <T:Ljava/lang/Object;>(L1java/util/function/Supplier<TT;>;)L1java/util/stream/Stream<TT;>;
@@ -29,3 +32,6 @@ of
 of
  <T:Ljava/lang/Object;>([TT;)Ljava/util/stream/Stream<TT;>;
  <T:Ljava/lang/Object;>([TT;)L1java/util/stream/Stream<TT;>;
+toArray
+ <A:Ljava/lang/Object;>(Ljava/util/function/IntFunction<[TA;>;)[TA;
+ <A:Ljava/lang/Object;>(Ljava/util/function/IntFunction<[TA;>;)[1TA;

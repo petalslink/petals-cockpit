@@ -73,11 +73,13 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecor
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
+import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContentBuilder;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.ArtifactServer.ServicedArtifact;
 import org.ow2.petals.cockpit.server.utils.PetalsUtils;
+import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations;
 import org.ow2.petals.jbi.descriptor.JBIDescriptorException;
 import org.ow2.petals.jbi.descriptor.original.JBIDescriptorBuilder;
 import org.ow2.petals.jbi.descriptor.original.generated.Jbi;
@@ -180,12 +182,14 @@ public class WorkspaceResource {
         return DSL.using(jooq).transactionResult(conf -> {
             WorkspacesRecord ws = get(conf);
 
-            WorkspaceContent content = WorkspaceContent.buildFromDatabase(conf, ws);
+            WorkspaceContentBuilder c = WorkspaceContent.builder();
+
+            WorkspaceDbOperations.fetchWorkspaceFromDatabase(conf, ws, c);
 
             List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
                     .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)).fetchInto(USERS);
 
-            return new WorkspaceFullContent(ws, wsUsers, content);
+            return new WorkspaceFullContent(ws, wsUsers, c.build());
         });
     }
 

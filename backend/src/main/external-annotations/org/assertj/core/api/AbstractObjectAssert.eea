@@ -1,0 +1,4 @@
+class org/assertj/core/api/AbstractObjectAssert
+as
+ (Ljava/lang/String;[Ljava/lang/Object;)TSELF;
+ (Ljava/lang/String;[Ljava/lang/Object;)T1SELF;

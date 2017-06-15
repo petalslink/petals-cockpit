@@ -80,6 +80,7 @@ import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitF
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent;
+import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContentBuilder;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusImport;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
@@ -93,6 +94,8 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullCo
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
+import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations;
+import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.SaveWorkspaceDbWitness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,6 +138,9 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
 
     @Inject
     protected PetalsDb db;
+
+    @Inject
+    protected SaveWorkspaceDbWitness wDbWitness;
 
     public WorkspaceActor(long wId) {
         this.wId = wId;
@@ -235,14 +241,15 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
             // this should never happen!
             assert ws != null;
 
-            WorkspaceContent c = WorkspaceContent.buildFromDatabase(conf, ws);
+            WorkspaceContentBuilder c = WorkspaceContent.builder();
+            WorkspaceDbOperations.fetchWorkspaceFromDatabase(conf, ws, c);
 
             List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
                     .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wId)).fetchInto(USERS);
 
             DSL.using(conf).update(USERS).set(USERS.LAST_WORKSPACE, wId).where(USERS.USERNAME.eq(nc.user)).execute();
 
-            return new WorkspaceFullContent(ws, wsUsers, c);
+            return new WorkspaceFullContent(ws, wsUsers, c.build());
         });
         assert content != null;
 
@@ -352,9 +359,12 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
 
                 // if it's null, it has been cancelled!
                 if (f != null) {
-                    broadcast(db.runTransaction(conf -> {
+                    broadcast(db.run(conf -> {
                         return res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
-                            return Either.right(WorkspaceContent.buildAndSaveToDatabase(conf, bDb, topology));
+                            WorkspaceContentBuilder b = WorkspaceContent.builder();
+                            DSL.using(conf).transaction(
+                                    c -> WorkspaceDbOperations.saveDomainToDatabase(c, bDb, topology, b, wDbWitness));
+                            return Either.right(b.build());
                         }).fold(error -> {
                             LOG.info("Can't import bus from container {}:{}: {}", bDb.getImportIp(),
                                     bDb.getImportPort(), error);
@@ -378,9 +388,10 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
     @Suspendable
     private Either<String, Domain> doImportExistingBus(BusImport bus) throws InterruptedException {
         try {
-            // TODO even though runBlocking can be interrupted, the petals admin code is based on RMI which cannot be
+            // TODO even though getTopology can be interrupted, the petals admin code is based on RMI which cannot be
             // interrupted, so it will continue to be executed even after InterruptedException is thrown. There is
-            // nothing we can do for this until petals admin is changed.
+            // nothing we can do for this until petals admin is changed, but it's ok since there is no side effect
+            // in this operation: it will run in the background while we consider the operation interrupted on our side.
             Domain topology = petals.getTopology(bus.ip, bus.port, bus.username, bus.password, bus.passphrase);
             return Either.right(topology);
         } catch (InterruptedException e) {
@@ -584,6 +595,8 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         int saDbi = saDb.insert();
         assert saDbi == 1;
 
+        wDbWitness.serviceAssemblyAdded(deployedSA, saDb);
+
         Map<String, ServiceUnitFull> serviceUnitsDb = new HashMap<>();
         for (ServiceUnit su : deployedSA.getServiceUnits()) {
             // use ServiceunitsRecord for the typing of its constructor
@@ -631,6 +644,8 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         int compDbi = compDb.insert();
         assert compDbi == 1;
 
+        wDbWitness.componentAdded(deployedComp, compDb);
+
         Set<String> sls = new HashSet<>();
         for (SharedLibrary sl : deployedComp.getSharedLibraries()) {
             @NonNull
@@ -675,6 +690,8 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         slDb.attach(conf);
         int slDbi = slDb.insert();
         assert slDbi == 1;
+
+        wDbWitness.sharedLibraryAdded(deployedSL, slDb);
 
         WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                 ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),

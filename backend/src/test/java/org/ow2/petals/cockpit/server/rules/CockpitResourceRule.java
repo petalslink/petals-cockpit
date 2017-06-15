@@ -16,6 +16,10 @@
  */
 package org.ow2.petals.cockpit.server.rules;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,9 +39,21 @@ import org.jooq.impl.DSL;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.ow2.petals.admin.api.artifact.Component;
+import org.ow2.petals.admin.api.artifact.ServiceAssembly;
+import org.ow2.petals.admin.api.artifact.ServiceUnit;
+import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.admin.junit.PetalsAdministrationApi;
+import org.ow2.petals.admin.topology.Container;
+import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
 import org.ow2.petals.cockpit.server.mocks.MockArtifactServer;
 import org.ow2.petals.cockpit.server.resources.SetupResource;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
@@ -45,6 +61,7 @@ import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
 import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
+import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.SaveWorkspaceDbWitness;
 import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule;
 import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
@@ -69,6 +86,8 @@ public class CockpitResourceRule implements TestRule {
 
     public final ResourceTestRule resource;
 
+    private final Map<Object, Long> workspaceIds = new HashMap<>();
+
     public CockpitResourceRule(Class<?>... resources) {
         this.resource = buildResourceTestRule(resources);
 
@@ -91,6 +110,7 @@ public class CockpitResourceRule implements TestRule {
                         bind(PetalsAdmin.class).to(PetalsAdmin.class).in(Singleton.class);
                         bind(PetalsDb.class).to(PetalsDb.class).in(Singleton.class);
                         bind(ADMIN_TOKEN).to(String.class).named(SetupResource.ADMIN_TOKEN);
+                        bind(new WDbWitness()).to(SaveWorkspaceDbWitness.class);
                     }
                 }).setClientConfigurator(cc -> cc.register(MultiPartFeature.class));
         builder.addProvider(new PetalsAdminExceptionMapper(true));
@@ -103,6 +123,22 @@ public class CockpitResourceRule implements TestRule {
             builder.addProvider(resource);
         }
         return builder.build();
+    }
+
+    public long getWorkspaceId(Object o) {
+        assertThat(o).isNotNull();
+        Long id = workspaceIds.get(o);
+        // System.out.println(">" + o + ": " + id);
+        assertThat(id).isNotNull();
+        assert id != null;
+        return id;
+    }
+
+    private void setWorkspaceId(Object o, long id) {
+        // System.out.println("<" + o + ": " + id);
+        assertThat(o).isNotNull();
+        Long old = workspaceIds.putIfAbsent(o, id);
+        assertThat(old).isNull();
     }
 
     /**
@@ -132,5 +168,39 @@ public class CockpitResourceRule implements TestRule {
 
     public DSLContext db() {
         return DSL.using(db.getConnectionJdbcUrl());
+    }
+
+    public class WDbWitness implements SaveWorkspaceDbWitness {
+
+        @Override
+        public void busAdded(Domain bus, BusesRecord bDb) {
+            setWorkspaceId(bus, bDb.getId());
+        }
+
+        @Override
+        public void containerAdded(Container container, ContainersRecord cDb) {
+            setWorkspaceId(container, cDb.getId());
+        }
+
+        @Override
+        public void componentAdded(Component component, ComponentsRecord compDb) {
+            setWorkspaceId(component, compDb.getId());
+        }
+
+        @Override
+        public void sharedLibraryAdded(SharedLibrary sl, SharedlibrariesRecord slDb) {
+            setWorkspaceId(sl, slDb.getId());
+        }
+
+        @Override
+        public void serviceAssemblyAdded(ServiceAssembly sa, ServiceassembliesRecord saDb) {
+            setWorkspaceId(sa, saDb.getId());
+        }
+
+        @Override
+        public void serviceUnitAdded(ServiceUnit su, ServiceunitsRecord suDb) {
+            setWorkspaceId(su, suDb.getId());
+        }
+
     }
 }
