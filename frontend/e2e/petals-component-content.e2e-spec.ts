@@ -15,11 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser } from 'protractor';
 import * as path from 'path';
 
 import { page } from './common';
-import { WorkspacePage } from './pages/workspace.po';
+import { WorkspacePage, WorkspaceOverviewPage } from './pages/workspace.po';
 import { ComponentOverviewPage } from './pages/component.po';
 import { ServiceAssemblyOverviewPage } from './pages/service-assembly.po';
 import { NotFoundPage } from './pages/not-found';
@@ -125,7 +124,7 @@ describe(`Petals component content`, () => {
     page.clickAndExpectNotification(ops.unloadButton);
 
     // we should be redirected to the workspace page ...
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+/);
+    WorkspaceOverviewPage.waitAndGet();
 
     // and the component should have been deleted from petals tree
     expect(workspace.treeElement(`Comp 0`, 'component').isPresent()).toBe(
