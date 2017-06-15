@@ -18,12 +18,7 @@ package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 
-import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 
 import javax.ws.rs.client.Entity;
@@ -40,15 +35,12 @@ import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
+import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusFull;
@@ -56,6 +48,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableSet;
 
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
@@ -69,7 +62,12 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
     private final Container container2 = new Container("cont2", "host2", ImmutableMap.of(PortType.JMX, 7700), "user",
             "pass", State.REACHABLE);
 
+    private final SharedLibrary sharedLibrary = new SharedLibrary("sl", "1.0.0");
+
     private final Component component = new Component("comp", ComponentType.SE, ArtifactState.State.STARTED);
+
+    private final Component componentWithSL = new Component("comp2", ComponentType.SE, ArtifactState.State.STARTED,
+            ImmutableSet.of(sharedLibrary.copy()));
 
     private final ServiceUnit serviceUnit = new ServiceUnit("su", component.getName());
 
@@ -88,6 +86,8 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         resource.petals.registerContainer(container2);
         resource.petals.registerArtifact(component, container);
         resource.petals.registerArtifact(serviceAssembly, container);
+        resource.petals.registerArtifact(sharedLibrary, container);
+        resource.petals.registerArtifact(componentWithSL, container);
 
         resource.db().transaction(conf -> {
             DSL.using(conf).executeInsert(new WorkspacesRecord(1L, "test", ""));
@@ -145,13 +145,12 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
             assertThat(post.id).isEqualTo(bus.getId());
             busId = bus.getId();
 
-            // TODO verify all the content!
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("BUS_IMPORT_OK");
                 WorkspaceContent data = e.readData(WorkspaceContent.class);
                 BusFull busData = data.buses.get(post.getId());
                 a.assertThat(busData.bus.id).isEqualTo(busId);
-                a.assertThat(busData.bus.name).isEqualTo(domain.getName());
+                assertWorkspaceContent(a, data, 1, domain);
             });
         }
 
@@ -166,37 +165,11 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
         assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
         assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
         assertThat(bus.getWorkspaceId()).isEqualTo(1);
+
         // these should have been set now
         assertThat(bus.getImported()).isEqualTo(true);
         assertThat(bus.getImportError()).isNull();
         assertThat(bus.getName()).isEqualTo(domain.getName());
-
-        Result<ContainersRecord> containers = resource.db().selectFrom(CONTAINERS).where(CONTAINERS.BUS_ID.eq(busId))
-                .fetch();
-        assertThat(containers).hasSize(2);
-        Iterator<ContainersRecord> iterator = containers.iterator();
-        ContainersRecord cDb = iterator.next();
-        ContainersRecord cDb2 = iterator.next();
-        assertEquivalent(cDb, container);
-        assertEquivalent(cDb2, container2);
-
-        Result<ComponentsRecord> components = resource.db().selectFrom(COMPONENTS)
-                .where(COMPONENTS.CONTAINER_ID.eq(cDb.getId())).fetch();
-        assertThat(components).hasSize(1);
-        ComponentsRecord compDb = components.iterator().next();
-        assertEquivalent(compDb, component);
-
-        Result<ServiceassembliesRecord> sas = resource.db().selectFrom(SERVICEASSEMBLIES)
-                .where(SERVICEASSEMBLIES.CONTAINER_ID.eq(cDb.getId())).fetch();
-        assertThat(sas).hasSize(1);
-        ServiceassembliesRecord saDb = sas.iterator().next();
-        assertEquivalent(saDb, serviceAssembly);
-
-        Result<ServiceunitsRecord> sus = resource.db().selectFrom(SERVICEUNITS)
-                .where(SERVICEUNITS.COMPONENT_ID.eq(compDb.getId())).fetch();
-        assertThat(sus).hasSize(1);
-        ServiceunitsRecord suDb = sus.iterator().next();
-        assertEquivalent(suDb, serviceUnit);
     }
 
     @Test
@@ -277,7 +250,6 @@ public class ImportBusTest extends AbstractCockpitResourceTest {
 
             doneSignal.countDown();
 
-            // TODO verify all the content!
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("BUS_DELETED");
                 BusDeleted data = e.readData(BusDeleted.class);

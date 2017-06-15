@@ -23,6 +23,8 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES_COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
@@ -30,12 +32,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -44,6 +47,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.assertj.db.api.RequestRowAssert;
 import org.assertj.db.type.Request;
 import org.assertj.db.type.Table;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
@@ -71,13 +75,14 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecor
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
+import org.ow2.petals.cockpit.server.resources.BusesResource.BusFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
+import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
@@ -85,6 +90,8 @@ import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLib
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.rules.CockpitResourceRule;
 import org.ow2.petals.cockpit.server.security.CockpitProfile;
+import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations;
+import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.WorkspaceDbWitness;
 
 import com.google.common.collect.ImmutableList;
 
@@ -111,8 +118,6 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     @Rule
     public final CockpitResourceRule resource;
 
-    private final Map<Object, Long> ids = new HashMap<>();
-
     public AbstractCockpitResourceTest(Class<?>... resources) {
         this.resource = new CockpitResourceRule(resources);
     }
@@ -123,18 +128,8 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         resource.db().executeInsert(new UsersRecord(ADMIN, "...", "Administrator", null));
     }
 
-    protected long getId(Object o) {
-        assertThat(o).isNotNull();
-        Long id = ids.get(o);
-        assertThat(id).isNotNull();
-        assert id != null;
-        return id;
-    }
-
-    private void setId(Object o, long id) {
-        assertThat(o).isNotNull();
-        Long old = ids.putIfAbsent(o, id);
-        assertThat(old).isNull();
+    public long getId(Object o) {
+        return resource.getWorkspaceId(o);
     }
 
     protected Table table(org.jooq.Table<?> table) {
@@ -235,60 +230,11 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                         entry.getJmxUsername(), entry.getJmxPassword(), passphrase, null, bus.getName());
                 busDb.attach(conf);
                 busDb.insert();
-                setId(bus, busDb.getId());
+
+                WorkspaceDbOperations.saveDomainToDatabase(conf, busDb, bus, WorkspaceDbWitness.NOP, resource.new WDbWitness());
 
                 for (Container c : containers) {
                     c.addProperty("petals.topology.passphrase", passphrase);
-
-                    // TODO handle also artifacts
-                    ContainersRecord cDb = new ContainersRecord(null, busDb.getId(), c.getContainerName(), c.getHost(),
-                            getPort(c), c.getJmxUsername(), c.getJmxPassword());
-                    cDb.attach(conf);
-                    cDb.insert();
-                    setId(c, cDb.getId());
-
-                    for (SharedLibrary sl : c.getSharedLibraries()) {
-                        SharedlibrariesRecord slDb = new SharedlibrariesRecord(null, sl.getName(), sl.getVersion(),
-                                cDb.getId());
-                        slDb.attach(conf);
-                        slDb.insert();
-                        setId(sl, slDb.getId());
-                    }
-
-                    for (Component comp : c.getComponents()) {
-                        ComponentsRecord compDb = new ComponentsRecord(null, cDb.getId(), comp.getName(),
-                                ComponentMin.State.from(comp.getState()).name(),
-                                ComponentMin.Type.from(comp.getComponentType()).name());
-                        compDb.attach(conf);
-                        compDb.insert();
-                        setId(comp, compDb.getId());
-
-                        for (SharedLibrary sl : comp.getSharedLibraries()) {
-                            SharedlibrariesComponentsRecord slcDb = new SharedlibrariesComponentsRecord(getId(sl),
-                                    compDb.getId());
-                            slcDb.attach(conf);
-                            slcDb.insert();
-                        }
-                    }
-
-                    for (ServiceAssembly sa : c.getServiceAssemblies()) {
-                        ServiceassembliesRecord saDb = new ServiceassembliesRecord(null, cDb.getId(), sa.getName(),
-                                ServiceAssemblyMin.State.from(sa.getState()).name());
-                        saDb.attach(conf);
-                        saDb.insert();
-                        setId(sa, saDb.getId());
-
-                        for (ServiceUnit su : sa.getServiceUnits()) {
-                            Long compId = ids.get(c.getComponents().stream()
-                                    .filter(comp -> comp.getName().equals(su.getTargetComponent())).findFirst().get());
-
-                            ServiceunitsRecord suDb = new ServiceunitsRecord(null, compId, su.getName(), saDb.getId(),
-                                    cDb.getId());
-                            suDb.attach(conf);
-                            suDb.insert();
-                            setId(su, suDb.getId());
-                        }
-                    }
                 }
             }
         });
@@ -300,30 +246,39 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         return port;
     }
 
-    protected static void assertEquivalent(ContainersRecord record, Container container) {
-        assertThat(record.getIp()).isEqualTo(container.getHost());
-        assertThat(record.getPort()).isEqualTo(getPort(container));
-        assertThat(record.getUsername()).isEqualTo(container.getJmxUsername());
-        assertThat(record.getPassword()).isEqualTo(container.getJmxPassword());
-        assertThat(record.getName()).isEqualTo(container.getContainerName());
+    protected void assertEquivalent(SoftAssertions a, BusesRecord record, Domain bus) {
+        a.assertThat(record.getName()).isEqualTo(bus.getName());
     }
 
-    protected static void assertEquivalent(ComponentsRecord record, Component component) {
-        assertThat(record.getName()).isEqualTo(component.getName());
-        assertThat(record.getState()).isEqualTo(ComponentMin.State.from(component.getState()).name());
-        assertThat(record.getType()).isEqualTo(ComponentMin.Type.from(component.getComponentType()).name());
+    protected void assertEquivalent(SoftAssertions a, ContainersRecord record, Container container) {
+        a.assertThat(record.getIp()).isEqualTo(container.getHost());
+        a.assertThat(record.getPort()).isEqualTo(getPort(container));
+        a.assertThat(record.getUsername()).isEqualTo(container.getJmxUsername());
+        a.assertThat(record.getPassword()).isEqualTo(container.getJmxPassword());
+        a.assertThat(record.getName()).isEqualTo(container.getContainerName());
     }
 
-    protected static void assertEquivalent(ServiceassembliesRecord record, ServiceAssembly sa) {
-        assertThat(record.getName()).isEqualTo(sa.getName());
-        assertThat(record.getState()).isEqualTo(ServiceAssemblyMin.State.from(sa.getState()).name());
+    protected void assertEquivalent(SoftAssertions a, ComponentsRecord record, Component component) {
+        a.assertThat(record.getName()).isEqualTo(component.getName());
+        a.assertThat(record.getState()).isEqualTo(ComponentMin.State.from(component.getState()).name());
+        a.assertThat(record.getType()).isEqualTo(ComponentMin.Type.from(component.getComponentType()).name());
     }
 
-    protected static void assertEquivalent(ServiceunitsRecord record, ServiceUnit su) {
-        assertThat(record.getName()).isEqualTo(su.getName());
+    protected void assertEquivalent(SoftAssertions a, ServiceassembliesRecord record, ServiceAssembly sa) {
+        a.assertThat(record.getName()).isEqualTo(sa.getName());
+        a.assertThat(record.getState()).isEqualTo(ServiceAssemblyMin.State.from(sa.getState()).name());
     }
 
-    protected static void expectEvent(EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {
+    protected void assertEquivalent(SoftAssertions a, ServiceunitsRecord record, ServiceUnit su) {
+        a.assertThat(record.getName()).isEqualTo(su.getName());
+    }
+
+    protected void assertEquivalent(SoftAssertions a, SharedlibrariesRecord record, SharedLibrary sl) {
+        a.assertThat(record.getName()).isEqualTo(sl.getName());
+        a.assertThat(record.getVersion()).isEqualTo(sl.getVersion());
+    }
+
+    protected void expectEvent(EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {
         assertThat(eventInput.isClosed()).isEqualTo(false);
 
         // TODO add timeout
@@ -336,13 +291,12 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         });
     }
 
-    protected static void expectWorkspaceContent(EventInput eventInput) {
+    protected void expectWorkspaceContent(EventInput eventInput) {
         expectWorkspaceContent(eventInput, (t, a) -> {
         });
     }
 
-    protected static void expectWorkspaceContent(EventInput eventInput,
-            BiConsumer<WorkspaceFullContent, SoftAssertions> c) {
+    protected void expectWorkspaceContent(EventInput eventInput, BiConsumer<WorkspaceFullContent, SoftAssertions> c) {
         expectEvent(eventInput, (e, a) -> {
             a.assertThat(e.getName()).isEqualTo("WORKSPACE_CONTENT");
             WorkspaceFullContent ev = e.readData(WorkspaceFullContent.class);
@@ -382,6 +336,13 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             assert slName != null;
             assert slVersion != null;
 
+            Iterator<SharedLibrary> iterator = container.getSharedLibraries().stream()
+                    .filter(c -> slName.equals(c.getName()) && slVersion.equals(c.getVersion())).iterator();
+            assertThat(iterator.hasNext()).isTrue();
+            SharedLibrary sl = iterator.next();
+            assertThat(iterator.hasNext()).isFalse();
+
+            a.assertThat(contentSL.sharedLibrary.id).isEqualTo(getId(sl));
             a.assertThat(contentSL.containerId).isEqualTo(getId(container));
             a.assertThat(contentSL.sharedLibrary.name).isEqualTo(slName);
             a.assertThat(contentSL.sharedLibrary.version).isEqualTo(slVersion);
@@ -460,7 +421,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                     ServiceUnitFull contentSU = contentSUE.getValue();
                     a.assertThat(contentSUE.getKey()).isEqualTo(Long.toString(contentSU.serviceUnit.id));
                     a.assertThat(contentSU.componentId).isEqualTo(getId(component));
-                    // TODO if we could find the id of the created SA via getId(), then we could check that
+                    a.assertThat(contentSU.serviceAssemblyId).isEqualTo(getId(sa));
                     a.assertThat(contentSU.serviceAssemblyId).isEqualTo(contentSA.serviceAssembly.id);
 
                     // there is only one with this name
@@ -519,6 +480,14 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         if (control == null) {
             assert container != null;
             assert componentName != null;
+
+            Iterator<Component> iterator = container.getComponents().stream()
+                    .filter(c -> componentName.equals(c.getName())).iterator();
+            assertThat(iterator.hasNext()).isTrue();
+            Component component = iterator.next();
+            assertThat(iterator.hasNext()).isFalse();
+
+            a.assertThat(contentC.component.id).isEqualTo(getId(component));
             a.assertThat(contentC.containerId).isEqualTo(getId(container));
             a.assertThat(contentC.component.name).isEqualTo(componentName);
             a.assertThat(contentC.component.type).isEqualTo(ComponentMin.Type.BC);
@@ -550,5 +519,205 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             }
         }
         return zip;
+    }
+
+    protected void assertWorkspaceContentForBuses(SoftAssertions a, WorkspaceContent content, long wsId,
+            Domain... buses) {
+        for (Domain bus : buses) {
+            long id = getId(bus);
+            BusFull b = content.buses.get(Long.toString(id));
+            assert b != null;
+
+            a.assertThat(b.bus.id).isEqualTo(id);
+            a.assertThat(b.bus.name).isEqualTo(bus.getName());
+            a.assertThat(b.workspaceId).isEqualTo(wsId);
+            a.assertThat(b.containers).containsExactlyInAnyOrder(getIds(bus.getContainers()));
+
+            BusesRecord bDb = resource.db().selectFrom(BUSES).where(BUSES.ID.eq(id).and(BUSES.WORKSPACE_ID.eq(wsId)))
+                    .fetchOne();
+            assert bDb != null;
+            assertEquivalent(a, bDb, bus);
+        }
+
+        assertThat(content.buses).hasSameSizeAs(buses);
+    }
+
+    protected @NonNull String[] getIds(Collection<?> coll) {
+        return getIds(coll.stream());
+    }
+
+    protected @NonNull String[] getIds(Stream<?> stream) {
+        return stream.map(e -> Long.toString(getId(e))).toArray(String[]::new);
+    }
+
+    protected void assertWorkspaceContentForContainers(SoftAssertions a, WorkspaceContent content, Domain... buses) {
+        for (Domain bus : buses) {
+            long busId = getId(bus);
+            for (Container cont : bus.getContainers()) {
+                long id = getId(cont);
+                ContainerFull c = content.containers.get(Long.toString(id));
+                assert c != null;
+
+                a.assertThat(c.container.id).isEqualTo(id);
+                a.assertThat(c.container.name).isEqualTo(cont.getContainerName());
+                a.assertThat(c.busId).isEqualTo(busId);
+                a.assertThat(c.components).containsExactlyInAnyOrder(getIds(cont.getComponents()));
+                a.assertThat(c.serviceAssemblies).containsExactlyInAnyOrder(getIds(cont.getServiceAssemblies()));
+                a.assertThat(c.sharedLibraries).containsExactlyInAnyOrder(getIds(cont.getSharedLibraries()));
+
+                ContainersRecord cDb = resource.db().selectFrom(CONTAINERS)
+                        .where(CONTAINERS.ID.eq(id).and(CONTAINERS.BUS_ID.eq(busId))).fetchOne();
+                assert cDb != null;
+                assertEquivalent(a, cDb, cont);
+            }
+        }
+
+        assertThat(content.containers)
+                .hasSameSizeAs(Arrays.stream(buses).flatMap(b -> b.getContainers().stream()).toArray(Container[]::new));
+    }
+
+    protected void assertWorkspaceContentForComponents(SoftAssertions a, WorkspaceContent content, Domain... buses) {
+        for (Domain bus : buses) {
+            for (Container cont : bus.getContainers()) {
+                long contId = getId(cont);
+                for (Component comp : cont.getComponents()) {
+                    long id = getId(comp);
+                    ComponentFull c = content.components.get(Long.toString(id));
+                    assert c != null;
+
+                    String[] slsIds = getIds(comp.getSharedLibraries());
+
+                    a.assertThat(c.component.id).isEqualTo(id);
+                    a.assertThat(c.component.name).isEqualTo(comp.getName());
+                    a.assertThat(c.containerId).isEqualTo(contId);
+                    a.assertThat(c.state.toString()).isEqualTo(comp.getState().toString());
+                    a.assertThat(c.sharedLibraries).containsExactlyInAnyOrder(slsIds);
+                    a.assertThat(c.serviceUnits).containsExactlyInAnyOrder(
+                            getIds(cont.getServiceAssemblies().stream().flatMap(sa -> sa.getServiceUnits().stream()
+                                    .filter(su -> su.getTargetComponent().equals(comp.getName())))));
+
+                    ComponentsRecord compDb = resource.db().selectFrom(COMPONENTS)
+                            .where(COMPONENTS.ID.eq(id).and(COMPONENTS.CONTAINER_ID.eq(contId))).fetchOne();
+                    assert compDb != null;
+                    assertEquivalent(a, compDb, comp);
+
+                    a.assertThat(resource.db().selectFrom(SHAREDLIBRARIES_COMPONENTS)
+                            .where(SHAREDLIBRARIES_COMPONENTS.COMPONENT_ID.eq(id)).fetch().stream()
+                            .map(sl -> Long.toString(sl.getSharedlibraryId()))).containsExactlyInAnyOrder(slsIds);
+
+                }
+            }
+        }
+
+        assertThat(content.components).hasSameSizeAs(
+                Arrays.stream(buses).flatMap(b -> b.getContainers().stream().flatMap(c -> c.getComponents().stream()))
+                        .toArray(Component[]::new));
+    }
+
+    protected void assertWorkspaceContentForServiceAssemblies(SoftAssertions a, WorkspaceContent content,
+            Domain... buses) {
+        for (Domain bus : buses) {
+            for (Container cont : bus.getContainers()) {
+                long contId = getId(cont);
+                for (ServiceAssembly sa : cont.getServiceAssemblies()) {
+                    long id = getId(sa);
+                    ServiceAssemblyFull s = content.serviceAssemblies.get(Long.toString(id));
+                    assert s != null;
+
+                    a.assertThat(s.serviceAssembly.id).isEqualTo(id);
+                    a.assertThat(s.serviceAssembly.name).isEqualTo(sa.getName());
+                    a.assertThat(s.containerId).isEqualTo(contId);
+                    a.assertThat(s.state.toString()).isEqualTo(sa.getState().toString());
+                    a.assertThat(s.serviceUnits).containsExactlyInAnyOrder(getIds(sa.getServiceUnits()));
+
+                    ServiceassembliesRecord saDb = resource.db().selectFrom(SERVICEASSEMBLIES)
+                            .where(SERVICEASSEMBLIES.ID.eq(id).and(SERVICEASSEMBLIES.CONTAINER_ID.eq(contId)))
+                            .fetchOne();
+                    assert saDb != null;
+                    assertEquivalent(a, saDb, sa);
+                }
+            }
+        }
+
+        assertThat(content.serviceAssemblies).hasSameSizeAs(Arrays.stream(buses)
+                .flatMap(b -> b.getContainers().stream().flatMap(c -> c.getServiceAssemblies().stream()))
+                .toArray(ServiceAssembly[]::new));
+    }
+
+    protected void assertWorkspaceContentForServiceUnits(SoftAssertions a, WorkspaceContent content, Domain... buses) {
+        for (Domain bus : buses) {
+            for (Container cont : bus.getContainers()) {
+                long contId = getId(cont);
+                for (ServiceAssembly sa : cont.getServiceAssemblies()) {
+                    long saId = getId(sa);
+                    for (ServiceUnit su : sa.getServiceUnits()) {
+                        long id = getId(su);
+                        ServiceUnitFull s = content.serviceUnits.get(Long.toString(id));
+                        assert s != null;
+
+                        long compId = getId(cont.getComponents().stream()
+                                .filter(c -> c.getName().equals(su.getTargetComponent())).findFirst().get());
+
+                        a.assertThat(s.serviceUnit.id).isEqualTo(id);
+                        a.assertThat(s.serviceUnit.name).isEqualTo(su.getName());
+                        a.assertThat(s.containerId).isEqualTo(contId);
+                        a.assertThat(s.componentId).isEqualTo(compId);
+                        a.assertThat(s.serviceAssemblyId).isEqualTo(saId);
+
+                        ServiceunitsRecord suDb = resource.db().selectFrom(SERVICEUNITS)
+                                .where(SERVICEUNITS.ID.eq(id).and(SERVICEUNITS.COMPONENT_ID.eq(compId))
+                                        .and(SERVICEUNITS.CONTAINER_ID.eq(contId))
+                                        .and(SERVICEUNITS.SERVICEASSEMBLY_ID.eq(saId)))
+                                .fetchOne();
+                        assert suDb != null;
+                        assertEquivalent(a, suDb, su);
+                    }
+                }
+            }
+        }
+
+        assertThat(content.serviceUnits).hasSameSizeAs(Arrays.stream(buses)
+                .flatMap(b -> b.getContainers().stream()
+                        .flatMap(c -> c.getServiceAssemblies().stream().flatMap(sa -> sa.getServiceUnits().stream())))
+                .toArray(ServiceUnit[]::new));
+    }
+
+    protected void assertWorkspaceContentForSharedLibraries(SoftAssertions a, WorkspaceContent content,
+            Domain... buses) {
+        for (Domain bus : buses) {
+            for (Container cont : bus.getContainers()) {
+                long contId = getId(cont);
+                for (SharedLibrary sl : cont.getSharedLibraries()) {
+                    long id = getId(sl);
+                    SharedLibraryFull s = content.sharedLibraries.get(Long.toString(id));
+                    assert s != null;
+
+                    a.assertThat(s.sharedLibrary.id).isEqualTo(id);
+                    a.assertThat(s.sharedLibrary.name).isEqualTo(sl.getName());
+                    a.assertThat(s.sharedLibrary.version).isEqualTo(sl.getVersion());
+                    a.assertThat(s.containerId).isEqualTo(contId);
+                    a.assertThat(s.components).containsExactlyInAnyOrder(
+                            getIds(cont.getComponents().stream().filter(c -> c.getSharedLibraries().contains(sl))));
+
+                    SharedlibrariesRecord slDb = resource.db().selectFrom(SHAREDLIBRARIES)
+                            .where(SHAREDLIBRARIES.ID.eq(id).and(SHAREDLIBRARIES.CONTAINER_ID.eq(contId))).fetchOne();
+                    assert slDb != null;
+                    assertEquivalent(a, slDb, sl);
+                }
+            }
+        }
+
+        assertThat(content.sharedLibraries).hasSameSizeAs(Arrays.stream(buses)
+                .flatMap(b -> b.getContainers().stream().flatMap(c -> c.getSharedLibraries().stream()))
+                .toArray(SharedLibrary[]::new));
+    }
+
+    protected void assertWorkspaceContent(SoftAssertions a, WorkspaceContent content, long wsId, Domain... buses) {
+        assertWorkspaceContentForBuses(a, content, wsId, buses);
+        assertWorkspaceContentForContainers(a, content, buses);
+        assertWorkspaceContentForComponents(a, content, buses);
+        assertWorkspaceContentForServiceAssemblies(a, content, buses);
+        assertWorkspaceContentForServiceUnits(a, content, buses);
+        assertWorkspaceContentForSharedLibraries(a, content, buses);
     }
 }

@@ -1,0 +1,4 @@
+class org/assertj/core/api/AbstractIterableAssert
+as
+ (Ljava/lang/String;[Ljava/lang/Object;)TSELF;
+ (Ljava/lang/String;[Ljava/lang/Object;)T1SELF;

@@ -26,15 +26,11 @@ import java.util.Map;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
+import org.assertj.core.api.SoftAssertions;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Test;
-import org.ow2.petals.cockpit.server.resources.BusesResource.BusFull;
-import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
-import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerFull;
-import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
-import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
+import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
@@ -118,7 +114,9 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         WorkspaceFullContent content = resource.target("/workspaces/1/content").request()
                 .get(WorkspaceFullContent.class);
 
-        assertContent(content);
+        SoftAssertions a = new SoftAssertions();
+        assertContent(a, content, domain);
+        a.assertAll();
 
         // with a normal GET, we don't record it as the last workspace of the user
         assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
@@ -129,7 +127,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isNull();
 
         try (EventInput eventInput = resource.sse(1)) {
-            expectWorkspaceContent(eventInput, (t, a) -> assertContent(t));
+            expectWorkspaceContent(eventInput, (t, a) -> assertContent(a, t, domain));
         }
 
         // ensure that calling get workspace tree set the last workspace in the db
@@ -151,7 +149,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void getOverviewWorkspace() {
         WorkspaceOverviewContent get = resource.target("/workspaces/1").request().get(WorkspaceOverviewContent.class);
 
-        assertOverview(get.workspace);
+        assertContentOverview(get.workspace);
 
         assertUsers(get.users);
     }
@@ -189,6 +187,13 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.DESCRIPTION.getName()).isEqualTo("description");
     }
 
+    private void assertContent(SoftAssertions a, WorkspaceFullContent content, Domain... buses) {
+        assertContentOverview(content.workspace);
+        assertUsers(content.users);
+
+        assertWorkspaceContent(a, content.content, content.workspace.id, buses);
+    }
+
     private void assertUsers(Map<String, UserMin> users) {
         assertThat(users).hasSize(1);
 
@@ -199,106 +204,10 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(u.name).isEqualTo("Administrator");
     }
 
-    private void assertOverview(WorkspaceOverview overview) {
+    private void assertContentOverview(WorkspaceOverview overview) {
         assertThat(overview.id).isEqualTo(1);
         assertThat(overview.name).isEqualTo("test");
         assertThat(overview.users).containsExactlyInAnyOrder(ADMIN);
         assertThat(overview.description).isEqualTo("");
-    }
-
-    private void assertContent(WorkspaceFullContent content) {
-        assertOverview(content.workspace);
-
-        assertThat(content.content.buses).hasSize(1);
-        assertThat(content.content.containers).hasSize(3);
-        assertThat(content.content.components).hasSize(2);
-        assertThat(content.content.serviceAssemblies).hasSize(1);
-        assertThat(content.content.serviceUnits).hasSize(1);
-        assertThat(content.content.sharedLibraries).hasSize(1);
-
-        assertUsers(content.users);
-
-        BusFull b = content.content.buses.get(Long.toString(getId(domain)));
-        assert b != null;
-
-        assertThat(b.bus.id).isEqualTo(getId(domain));
-        assertThat(b.bus.name).isEqualTo(domain.getName());
-        assertThat(b.workspaceId).isEqualTo(content.workspace.id);
-        assertThat(b.containers).containsOnly(Long.toString(getId(container1)), Long.toString(getId(container2)),
-                Long.toString(getId(container3)));
-
-        ContainerFull c1 = content.content.containers.get(Long.toString(getId(container1)));
-        assert c1 != null;
-
-        assertThat(c1.container.id).isEqualTo(getId(container1));
-        assertThat(c1.container.name).isEqualTo(container1.getContainerName());
-        assertThat(c1.busId).isEqualTo(b.bus.id);
-        assertThat(c1.components).containsOnly(Long.toString(getId(component)), Long.toString(getId(componentWithSL)));
-        assertThat(c1.serviceAssemblies).containsOnly(Long.toString(getId(serviceAssembly)));
-
-        ContainerFull c2 = content.content.containers.get(Long.toString(getId(container2)));
-        assert c2 != null;
-
-        assertThat(c2.container.id).isEqualTo(getId(container2));
-        assertThat(c2.container.name).isEqualTo(container2.getContainerName());
-        assertThat(c2.busId).isEqualTo(b.bus.id);
-        assertThat(c2.components).containsOnly();
-        assertThat(c2.serviceAssemblies).containsOnly();
-
-        ContainerFull c3 = content.content.containers.get(Long.toString(getId(container3)));
-        assert c3 != null;
-
-        assertThat(c3.container.id).isEqualTo(getId(container3));
-        assertThat(c3.container.name).isEqualTo(container3.getContainerName());
-        assertThat(c3.busId).isEqualTo(b.bus.id);
-        assertThat(c3.components).containsOnly();
-        assertThat(c3.serviceAssemblies).containsOnly();
-
-        ComponentFull comp1 = content.content.components.get(Long.toString(getId(component)));
-        assert comp1 != null;
-
-        assertThat(comp1.component.id).isEqualTo(getId(component));
-        assertThat(comp1.component.name).isEqualTo(component.getName());
-        assertThat(comp1.containerId).isEqualTo(c1.container.id);
-        assertThat(comp1.state.toString()).isEqualTo(component.getState().toString());
-        assertThat(comp1.serviceUnits).containsOnly(Long.toString(getId(serviceUnit)));
-        assertThat(comp1.sharedLibraries).containsOnly();
-
-        ComponentFull comp2 = content.content.components.get(Long.toString(getId(componentWithSL)));
-        assert comp2 != null;
-
-        assertThat(comp2.component.id).isEqualTo(getId(componentWithSL));
-        assertThat(comp2.component.name).isEqualTo(componentWithSL.getName());
-        assertThat(comp2.containerId).isEqualTo(c1.container.id);
-        assertThat(comp2.state.toString()).isEqualTo(componentWithSL.getState().toString());
-        assertThat(comp2.serviceUnits).containsOnly();
-        assertThat(comp2.sharedLibraries).containsOnly(Long.toString(getId(sharedLibrary)));
-
-        ServiceAssemblyFull sa = content.content.serviceAssemblies.get(Long.toString(getId(serviceAssembly)));
-        assert sa != null;
-
-        assertThat(sa.serviceAssembly.id).isEqualTo(getId(serviceAssembly));
-        assertThat(sa.serviceAssembly.name).isEqualTo(serviceAssembly.getName());
-        assertThat(sa.containerId).isEqualTo(c1.container.id);
-        assertThat(sa.state.toString()).isEqualTo(serviceAssembly.getState().toString());
-        assertThat(sa.serviceUnits).containsOnly(Long.toString(getId(serviceUnit)));
-
-        ServiceUnitFull su = content.content.serviceUnits.get(Long.toString(getId(serviceUnit)));
-        assert su != null;
-
-        assertThat(su.serviceUnit.id).isEqualTo(getId(serviceUnit));
-        assertThat(su.serviceUnit.name).isEqualTo(serviceUnit.getName());
-        assertThat(su.containerId).isEqualTo(c1.container.id);
-        assertThat(su.componentId).isEqualTo(comp1.component.id);
-        assertThat(su.serviceAssemblyId).isEqualTo(sa.serviceAssembly.id);
-
-        SharedLibraryFull sl = content.content.sharedLibraries.get(Long.toString(getId(sharedLibrary)));
-        assert sl != null;
-
-        assertThat(sl.sharedLibrary.id).isEqualTo(getId(sharedLibrary));
-        assertThat(sl.sharedLibrary.name).isEqualTo(sharedLibrary.getName());
-        assertThat(sl.sharedLibrary.version).isEqualTo(sharedLibrary.getVersion());
-        assertThat(sl.components).containsOnly(Long.toString(getId(componentWithSL)));
-        assertThat(sl.containerId).isEqualTo(c1.container.id);
     }
 }

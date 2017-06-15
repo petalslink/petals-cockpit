@@ -16,14 +16,6 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
-import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES_COMPONENTS;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,17 +25,6 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
-import org.jooq.Configuration;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
-import org.ow2.petals.admin.api.artifact.Component;
-import org.ow2.petals.admin.api.artifact.ServiceAssembly;
-import org.ow2.petals.admin.api.artifact.ServiceUnit;
-import org.ow2.petals.admin.api.artifact.SharedLibrary;
-import org.ow2.petals.admin.topology.Container;
-import org.ow2.petals.admin.topology.Container.PortType;
-import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
@@ -51,22 +32,21 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.Serviceassembli
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
-import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
-import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
+import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.WorkspaceDbBusBuilder;
+import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.WorkspaceDbContainerBuilder;
+import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.WorkspaceDbWitness;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
 
@@ -121,204 +101,160 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
         this.sharedLibraries = ImmutableMap.copyOf(sharedLibraries);
     }
 
-    /**
-     * Meant to be called from inside a DB transaction!
-     * 
-     * TODO this should be done by {@link WorkspaceActor}
-     */
-    public static WorkspaceContent buildAndSaveToDatabase(Configuration jooq, BusesRecord bDb, Domain topology) {
-        return DSL.using(jooq).transactionResult(c -> doBuildAndSaveToDatabase(c, bDb, topology));
+    public static WorkspaceContentBuilder builder() {
+        return new WorkspaceContentBuilder();
     }
 
-    private static WorkspaceContent doBuildAndSaveToDatabase(Configuration jooq, BusesRecord bDb, Domain topology) {
-        Map<String, BusFull> importedBuses = new HashMap<>();
-        Map<String, BusInProgress> busesInProgress = new HashMap<>();
-        Map<String, ContainerFull> cs = new HashMap<>();
-        Map<String, ComponentFull> comps = new HashMap<>();
-        Map<String, ServiceAssemblyFull> sas = new HashMap<>();
-        Map<String, ServiceUnitFull> sus = new HashMap<>();
-        Map<String, SharedLibraryFull> sls = new HashMap<>();
+    public static class WorkspaceContentBuilder implements WorkspaceDbWitness {
 
-        Set<String> containers = new HashSet<>();
-        for (Container container : topology.getContainers()) {
-            Integer port = container.getPorts().get(PortType.JMX);
-            assert port != null;
+        private final Map<String, BusInProgress> busesInProgress = new HashMap<>();
 
-            ContainersRecord cDb = new ContainersRecord(null, bDb.getId(), container.getContainerName(),
-                    container.getHost(), port, container.getJmxUsername(), container.getJmxPassword());
-            cDb.attach(jooq);
-            int cDbi = cDb.insert();
-            assert cDbi == 1;
+        private final List<WorkspaceContentBusBuilderImpl> buses = new ArrayList<>();
 
-            SetMultimap<SharedLibrary, Long> componentsBySL = LinkedHashMultimap.create();
-            Map<String, Long> components = new HashMap<>();
-            List<ComponentsRecord> componentsToBuild = new ArrayList<>(container.getComponents().size());
-            for (Component component : container.getComponents()) {
-                ComponentMin.State compState = ComponentMin.State.from(component.getState());
-                ComponentMin.Type compType = ComponentMin.Type.from(component.getComponentType());
+        @Override
+        public void addBusInProgress(BusesRecord bDb) {
+            BusInProgress bip = new BusInProgress(bDb);
+            busesInProgress.put(bip.getId(), bip);
+        }
 
-                ComponentsRecord compDb = new ComponentsRecord(null, cDb.getId(), component.getName(), compState.name(),
-                        compType.name());
-                compDb.attach(jooq);
-                int compDbi = compDb.insert();
-                assert compDbi == 1;
+        @Override
+        public WorkspaceDbBusBuilder addImportedBus(BusesRecord bDb) {
+            WorkspaceContentBusBuilderImpl builder = new WorkspaceContentBusBuilderImpl(bDb);
+            buses.add(builder);
+            return builder;
+        }
 
-                components.put(component.getName(), compDb.getId());
-                componentsToBuild.add(compDb);
-                for (SharedLibrary sl : component.getSharedLibraries()) {
-                    componentsBySL.put(sl, compDb.getId());
-                }
-            }
+        public WorkspaceContent build() {
+            Map<String, BusFull> importedBuses = new HashMap<>();
+            Map<String, ContainerFull> cs = new HashMap<>();
+            Map<String, ComponentFull> comps = new HashMap<>();
+            Map<String, ServiceAssemblyFull> sas = new HashMap<>();
+            Map<String, ServiceUnitFull> sus = new HashMap<>();
+            Map<String, SharedLibraryFull> sls = new HashMap<>();
 
-            SetMultimap<Long, String> slsByComponent = LinkedHashMultimap.create();
-            Set<String> sharedLibraries = new HashSet<>();
-            for (SharedLibrary sl : container.getSharedLibraries()) {
-                SharedlibrariesRecord slDb = new SharedlibrariesRecord(null, sl.getName(), sl.getVersion(),
-                        cDb.getId());
-                slDb.attach(jooq);
-                int slDbi = slDb.insert();
-                assert slDbi == 1;
+            buses.stream().forEach(b -> {
+                BusFull bus = b.build(cs, comps, sas, sus, sls);
+                importedBuses.put(bus.bus.getId(), bus);
+            });
 
-                Set<Long> slComponents = componentsBySL.get(sl);
-                sls.put(Long.toString(slDb.getId()), new SharedLibraryFull(slDb,
-                        slComponents.stream().map(id -> Long.toString(id)).collect(ImmutableSet.toImmutableSet())));
-                for (Long c : slComponents) {
-                    slsByComponent.put(c, Long.toString(slDb.getId()));
-                }
-            }
+            return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus, sls);
+        }
+    }
 
-            SetMultimap<Long, String> serviceUnitsByComp = LinkedHashMultimap.create();
+    private static class WorkspaceContentBusBuilderImpl implements WorkspaceDbBusBuilder {
+
+        private final List<WorkspaceContentContainerBuilderImpl> containers = new ArrayList<>();
+
+        private final BusesRecord bDb;
+
+        private WorkspaceContentBusBuilderImpl(BusesRecord bDb) {
+            this.bDb = bDb;
+        }
+
+        @Override
+        public WorkspaceDbContainerBuilder addContainer(ContainersRecord cDb) {
+            WorkspaceContentContainerBuilderImpl builder = new WorkspaceContentContainerBuilderImpl(cDb);
+            containers.add(builder);
+            return builder;
+        }
+
+        private BusFull build(Map<String, ContainerFull> cs, Map<String, ComponentFull> comps,
+                Map<String, ServiceAssemblyFull> sas, Map<String, ServiceUnitFull> sus,
+                Map<String, SharedLibraryFull> sls) {
+
+            Set<String> containersIds = new HashSet<>();
+            containers.stream().forEach(b -> {
+                ContainerFull container = b.build(comps, sas, sus, sls);
+                String containerId = container.container.getId();
+                cs.put(containerId, container);
+                containersIds.add(containerId);
+            });
+            return new BusFull(bDb, containersIds);
+        }
+    }
+
+    private static class WorkspaceContentContainerBuilderImpl implements WorkspaceDbContainerBuilder {
+
+        private final ContainersRecord cDb;
+
+        private final List<ComponentsRecord> componentsToBuild = new ArrayList<>();
+
+        private final List<SharedlibrariesRecord> slsToBuild = new ArrayList<>();
+
+        private final List<ServiceassembliesRecord> sasToBuild = new ArrayList<>();
+
+        private final List<ServiceunitsRecord> susToBuild = new ArrayList<>();
+
+        private final SetMultimap<Long, String> componentsBySL = LinkedHashMultimap.create();
+
+        private final SetMultimap<Long, String> slsByComponent = LinkedHashMultimap.create();
+
+        private final SetMultimap<Long, String> serviceUnitsByComp = LinkedHashMultimap.create();
+
+        private final SetMultimap<Long, String> serviceUnitsBySA = LinkedHashMultimap.create();
+
+        private WorkspaceContentContainerBuilderImpl(ContainersRecord cDb) {
+            this.cDb = cDb;
+        }
+
+        @Override
+        public void addComponent(ComponentsRecord compDb) {
+            componentsToBuild.add(compDb);
+        }
+
+        @Override
+        public void addSharedLibrary(SharedlibrariesRecord slDb) {
+            slsToBuild.add(slDb);
+        }
+
+        @Override
+        public void addSharedLibraryComponent(SharedlibrariesComponentsRecord slCompDb) {
+            slsByComponent.put(slCompDb.getComponentId(), Long.toString(slCompDb.getSharedlibraryId()));
+            componentsBySL.put(slCompDb.getSharedlibraryId(), Long.toString(slCompDb.getComponentId()));
+        }
+
+        @Override
+        public void addServiceAssembly(ServiceassembliesRecord saDb) {
+            sasToBuild.add(saDb);
+        }
+
+        @Override
+        public void addServiceUnit(ServiceunitsRecord suDb) {
+            String suId = Long.toString(suDb.getId());
+            serviceUnitsBySA.put(suDb.getServiceassemblyId(), suId);
+            serviceUnitsByComp.put(suDb.getComponentId(), suId);
+            susToBuild.add(suDb);
+        }
+
+        private ContainerFull build(Map<String, ComponentFull> comps, Map<String, ServiceAssemblyFull> sas,
+                Map<String, ServiceUnitFull> sus, Map<String, SharedLibraryFull> sls) {
+            Set<String> components = new HashSet<>();
             Set<String> serviceAssemblies = new HashSet<>();
-            for (ServiceAssembly sa : container.getServiceAssemblies()) {
+            Set<String> sharedLibraries = new HashSet<>();
 
-                // TODO is this information returned by admin correct? Some SUs could be in a different
-                // state in case of problems...!
-                ServiceAssemblyMin.State state = ServiceAssemblyMin.State.from(sa.getState());
+            componentsToBuild.stream()
+                    .map(c -> new ComponentFull(c, serviceUnitsByComp.get(c.getId()), slsByComponent.get(c.getId())))
+                    .forEach(c -> {
+                        String id = c.component.getId();
+                        comps.put(id, c);
+                        components.add(id);
+                    });
 
-                ServiceassembliesRecord saDb = new ServiceassembliesRecord(null, cDb.getId(), sa.getName(),
-                        state.name());
-                saDb.attach(jooq);
-                int saDbi = saDb.insert();
-                assert saDbi == 1;
+            slsToBuild.stream().map(sl -> new SharedLibraryFull(sl, componentsBySL.get(sl.getId()))).forEach(sl -> {
+                String id = sl.sharedLibrary.getId();
+                sls.put(id, sl);
+                sharedLibraries.add(id);
+            });
 
-                Set<String> serviceUnits = new HashSet<>();
-                for (ServiceUnit su : sa.getServiceUnits()) {
-                    Long componentId = components.get(su.getTargetComponent());
-                    // TODO what should we do if it's not?
-                    assert componentId != null;
+            sasToBuild.stream().map(sa -> new ServiceAssemblyFull(sa, serviceUnitsBySA.get(sa.getId()))).forEach(sa -> {
+                String id = sa.serviceAssembly.getId();
+                sas.put(id, sa);
+                serviceAssemblies.add(id);
+            });
 
-                    ServiceunitsRecord suDb = new ServiceunitsRecord(null, componentId, su.getName(), saDb.getId(),
-                            cDb.getId());
-                    suDb.attach(jooq);
-                    int suDbi = suDb.insert();
-                    assert suDbi == 1;
+            susToBuild.stream().map(ServiceUnitFull::new).forEach(su -> sus.put(su.serviceUnit.getId(), su));
 
-                    String suId = Long.toString(suDb.getId());
-                    serviceUnits.add(suId);
-                    serviceUnitsByComp.put(componentId, suId);
-                    sus.put(suId, new ServiceUnitFull(suDb));
-                }
-
-                String saId = Long.toString(saDb.getId());
-                serviceAssemblies.add(saId);
-                sas.put(saId, new ServiceAssemblyFull(saDb, serviceUnits));
-            }
-
-            for (ComponentsRecord compDb : componentsToBuild) {
-                comps.put(Long.toString(compDb.getId()),
-                        new ComponentFull(compDb, serviceUnitsByComp.get(compDb.getId()),
-                                slsByComponent.get(compDb.getId())));
-            }
-
-            String cId = Long.toString(cDb.getId());
-            containers.add(cId);
-            cs.put(cId, new ContainerFull(cDb,
-                    components.values().stream().map(l -> Long.toString(l)).collect(ImmutableSet.toImmutableSet()),
-                    serviceAssemblies, sharedLibraries));
+            return new ContainerFull(cDb, components, serviceAssemblies, sharedLibraries);
         }
-
-        bDb.setImported(true);
-        bDb.setName(topology.getName());
-        bDb.attach(jooq);
-        bDb.update();
-
-        importedBuses.put(Long.toString(bDb.getId()), new BusFull(bDb, containers));
-
-        return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus, sls);
-    }
-
-    /**
-     * TODO this should be done by {@link WorkspaceActor}
-     */
-    public static WorkspaceContent buildFromDatabase(Configuration conf, WorkspacesRecord w) {
-        Map<String, BusFull> importedBuses = new HashMap<>();
-        Map<String, BusInProgress> busesInProgress = new HashMap<>();
-        Map<String, ContainerFull> cs = new HashMap<>();
-        Map<String, ComponentFull> comps = new HashMap<>();
-        Map<String, ServiceAssemblyFull> sas = new HashMap<>();
-        Map<String, ServiceUnitFull> sus = new HashMap<>();
-        Map<String, SharedLibraryFull> sls = new HashMap<>();
-
-        DSLContext ctx = DSL.using(conf);
-        for (BusesRecord b : ctx.selectFrom(BUSES).where(BUSES.WORKSPACE_ID.eq(w.getId())).fetchInto(BUSES)) {
-            String bId = Long.toString(b.getId());
-            if (b.getImported()) {
-                Set<String> containers = new HashSet<>();
-                for (ContainersRecord c : ctx.selectFrom(CONTAINERS).where(CONTAINERS.BUS_ID.eq(b.getId()))) {
-
-                    SetMultimap<Long, String> serviceUnitsBySA = LinkedHashMultimap.create();
-                    SetMultimap<Long, String> serviceUnitsByComp = LinkedHashMultimap.create();
-                    for (ServiceunitsRecord su : ctx.selectFrom(SERVICEUNITS)
-                            .where(SERVICEUNITS.CONTAINER_ID.eq(c.getId()))) {
-                        String suId = Long.toString(su.getId());
-                        serviceUnitsBySA.put(su.getServiceassemblyId(), suId);
-                        serviceUnitsByComp.put(su.getComponentId(), suId);
-                        sus.put(suId, new ServiceUnitFull(su));
-                    }
-
-                    SetMultimap<Long, String> componentsBySL = LinkedHashMultimap.create();
-                    Set<String> components = new HashSet<>();
-                    for (ComponentsRecord comp : ctx.selectFrom(COMPONENTS)
-                            .where(COMPONENTS.CONTAINER_ID.eq(c.getId()))) {
-                        String compId = Long.toString(comp.getId());
-
-                        Set<String> compSLs = new HashSet<>();
-                        for (SharedlibrariesComponentsRecord slc : ctx.selectFrom(SHAREDLIBRARIES_COMPONENTS)
-                                .where(SHAREDLIBRARIES_COMPONENTS.COMPONENT_ID.eq(comp.getId()))) {
-                            compSLs.add(Long.toString(slc.getSharedlibraryId()));
-                            componentsBySL.put(slc.getSharedlibraryId(), compId);
-                        }
-
-                        components.add(compId);
-                        comps.put(compId, new ComponentFull(comp, serviceUnitsByComp.get(comp.getId()), compSLs));
-                    }
-
-                    Set<String> serviceAssemblies = new HashSet<>();
-                    for (ServiceassembliesRecord sa : ctx.selectFrom(SERVICEASSEMBLIES)
-                            .where(SERVICEASSEMBLIES.CONTAINER_ID.eq(c.getId()))) {
-                        String saId = Long.toString(sa.getId());
-                        serviceAssemblies.add(saId);
-                        sas.put(saId, new ServiceAssemblyFull(sa, serviceUnitsBySA.get(sa.getId())));
-                    }
-
-                    Set<String> sharedLibraries = new HashSet<>();
-                    for (SharedlibrariesRecord sl : ctx.selectFrom(SHAREDLIBRARIES)
-                            .where(SHAREDLIBRARIES.CONTAINER_ID.eq(c.getId()))) {
-                        String slId = Long.toString(sl.getId());
-                        sharedLibraries.add(slId);
-                        sls.put(slId, new SharedLibraryFull(sl, componentsBySL.get(sl.getId())));
-                    }
-
-                    String cId = Long.toString(c.getId());
-                    containers.add(cId);
-                    cs.put(cId, new ContainerFull(c, components, serviceAssemblies, sharedLibraries));
-                }
-                importedBuses.put(bId, new BusFull(b, containers));
-            } else {
-                busesInProgress.put(bId, new BusInProgress(b));
-            }
-        }
-
-        return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus, sls);
     }
 }
