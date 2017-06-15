@@ -26,6 +26,7 @@ import {
   IComponentsTable,
   componentsTableFactory,
   componentRowFactory,
+  IComponentRow,
 } from './components.interface';
 import { Workspaces } from '../workspaces/workspaces.reducer';
 import { ServiceUnits } from '../service-units/service-units.reducer';
@@ -234,9 +235,9 @@ export class Components {
   public static REMOVE_COMPONENT = `${Components.reducerName} Remove component`;
   private static removeComponent(
     componentsTable: IComponentsTable,
-    payload: { containerId: string; componentId: string }
+    payload: IComponentRow
   ): IComponentsTable {
-    return removeById(componentsTable, payload.componentId);
+    return removeById(componentsTable, payload.id);
   }
 
   // tslint:disable-next-line:member-ordering

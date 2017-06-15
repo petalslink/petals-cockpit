@@ -82,7 +82,6 @@ export class ComponentsEffects {
 
       if (data.state === EComponentState.Unloaded) {
         const component = store.components.byId[data.id];
-        const container = store.containers.byId[component.containerId];
 
         if (store.components.selectedComponentId === component.id) {
           this.router.navigate([
@@ -98,7 +97,7 @@ export class ComponentsEffects {
 
         return {
           type: Components.REMOVE_COMPONENT,
-          payload: { containerId: container.id, componentId: data.id },
+          payload: component,
         };
       } else {
         return {

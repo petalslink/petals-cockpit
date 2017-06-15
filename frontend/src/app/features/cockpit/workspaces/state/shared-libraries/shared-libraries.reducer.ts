@@ -35,6 +35,7 @@ import {
 } from 'app/shared/services/shared-libraries.service';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.reducer';
 
 export class SharedLibraries {
   private static reducerName = '[Shared libraries]';
@@ -122,8 +123,22 @@ export class SharedLibraries {
     payload: IComponentRow
   ): ISharedLibrariesTable {
     return payload.sharedLibraries.reduce((acc, sl) => {
-      return updateById(sharedLibrariesTable, sl, {
+      return updateById(acc, sl, {
         components: [...sharedLibrariesTable.byId[sl].components, payload.id],
+      });
+    }, sharedLibrariesTable);
+  }
+
+  // tslint:disable-next-line:member-ordering
+  private static removeComponent(
+    sharedLibrariesTable: ISharedLibrariesTable,
+    payload: IComponentRow
+  ): ISharedLibrariesTable {
+    return payload.sharedLibraries.reduce((acc, sl) => {
+      return updateById(acc, sl, {
+        components: sharedLibrariesTable.byId[sl].components.filter(
+          id => id !== payload.id
+        ),
       });
     }, sharedLibrariesTable);
   }
@@ -150,6 +165,7 @@ export class SharedLibraries {
     [SharedLibraries.FETCH_DETAILS_ERROR]: SharedLibraries.fetchDetailsError,
     [Containers.DEPLOY_COMPONENT_SUCCESS]:
       SharedLibraries.deployComponentSuccess,
+    [Components.REMOVE_COMPONENT]: SharedLibraries.removeComponent,
 
     [Workspaces.CLEAN_WORKSPACE]: SharedLibraries.cleanWorkspace,
   };

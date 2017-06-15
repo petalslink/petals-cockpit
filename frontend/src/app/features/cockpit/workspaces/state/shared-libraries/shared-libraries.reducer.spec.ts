@@ -16,6 +16,8 @@
  */
 
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.reducer';
 
 describe(`SharedLibraries reducer`, () => {
   it(`should have a default value`, () => {
@@ -280,6 +282,123 @@ describe(`SharedLibraries reducer`, () => {
           },
           allIds: ['idSl0'],
         });
+      });
+    });
+  });
+
+  describe(Containers.DEPLOY_COMPONENT_SUCCESS, () => {
+    const initialState: any = {
+      keepPreviousValues: '',
+      byId: {
+        keepPreviousValues: '',
+        idSl0: {
+          keepPreviousValues: '',
+          components: ['idComp0'],
+        },
+        idSl1: {
+          keepPreviousValues: '',
+          components: [],
+        },
+        idSl2: {
+          keepPreviousValues: '',
+          components: ['idComp1'],
+        },
+        idSl3: {
+          keepPreviousValues: '',
+          components: [],
+        },
+      },
+      allIds: ['idSl0', 'idSl1', 'idSl2', 'idSl3'],
+    };
+
+    it(`should add the component to the shared libraries`, () => {
+      const fetchState = SharedLibraries.reducer(initialState, {
+        type: Containers.DEPLOY_COMPONENT_SUCCESS,
+        payload: { id: 'idComp2', sharedLibraries: ['idSl0', 'idSl1'] },
+      });
+
+      expect(fetchState).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idSl0: {
+            keepPreviousValues: '',
+            components: ['idComp0', 'idComp2'],
+          },
+          idSl1: {
+            keepPreviousValues: '',
+            components: ['idComp2'],
+          },
+          idSl2: {
+            keepPreviousValues: '',
+            components: ['idComp1'],
+          },
+          idSl3: {
+            keepPreviousValues: '',
+            components: [],
+          },
+        },
+        allIds: ['idSl0', 'idSl1', 'idSl2', 'idSl3'],
+      });
+    });
+  });
+
+  describe(Components.REMOVE_COMPONENT, () => {
+    const initialState: any = {
+      keepPreviousValues: '',
+      byId: {
+        keepPreviousValues: '',
+        idSl0: {
+          keepPreviousValues: '',
+          components: ['idComp0', 'idComp2'],
+        },
+        idSl1: {
+          keepPreviousValues: '',
+          components: ['idComp2'],
+        },
+        idSl2: {
+          keepPreviousValues: '',
+          components: ['idComp0'],
+        },
+        idSl3: {
+          keepPreviousValues: '',
+          components: [],
+        },
+      },
+      allIds: ['idSl0', 'idSl1', 'idSl2', 'idSl3'],
+    };
+
+    it(`should remove the component from the shared libraries`, () => {
+      const fetchState = SharedLibraries.reducer(initialState, {
+        type: Components.REMOVE_COMPONENT,
+        payload: {
+          id: 'idComp0',
+          sharedLibraries: ['idSl0', 'idSl2'],
+        },
+      });
+
+      expect(fetchState).toEqual({
+        keepPreviousValues: '',
+        byId: {
+          keepPreviousValues: '',
+          idSl0: {
+            keepPreviousValues: '',
+            components: ['idComp2'],
+          },
+          idSl1: {
+            keepPreviousValues: '',
+            components: ['idComp2'],
+          },
+          idSl2: {
+            keepPreviousValues: '',
+            components: [],
+          },
+          idSl3: {
+            keepPreviousValues: '',
+            components: [],
+          },
+        },
+        allIds: ['idSl0', 'idSl1', 'idSl2', 'idSl3'],
       });
     });
   });

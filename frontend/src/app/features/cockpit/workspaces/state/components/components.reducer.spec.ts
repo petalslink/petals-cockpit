@@ -824,7 +824,7 @@ describe(`Components reducer`, () => {
       expect(
         Components.reducer(initialState, {
           type: Components.REMOVE_COMPONENT,
-          payload: { containerId: 'idCont0', componentId: 'idComp0' },
+          payload: { containerId: 'idCont0', id: 'idComp0' },
         })
       ).toEqual({
         keepPreviousValues: '',
@@ -843,7 +843,7 @@ describe(`Components reducer`, () => {
       expect(
         Components.reducer(initialState, {
           type: Components.REMOVE_COMPONENT,
-          payload: { containerId: 'idCont0', componentId: 'idComp1' },
+          payload: { containerId: 'idCont0', id: 'idComp1' },
         })
       ).toEqual({
         keepPreviousValues: '',
@@ -862,7 +862,7 @@ describe(`Components reducer`, () => {
       expect(
         Components.reducer(initialState, {
           type: Components.REMOVE_COMPONENT,
-          payload: { containerId: 'idCont0', componentId: 'idComp2' },
+          payload: { containerId: 'idCont0', id: 'idComp2' },
         })
       ).toEqual({
         keepPreviousValues: '',

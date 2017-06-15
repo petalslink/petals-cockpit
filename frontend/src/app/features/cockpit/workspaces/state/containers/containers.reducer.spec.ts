@@ -842,7 +842,7 @@ describe(`Containers reducer`, () => {
       expect(
         Containers.reducer(initialState, {
           type: Components.REMOVE_COMPONENT,
-          payload: { containerId: 'idCont0', componentId: 'idComp0' },
+          payload: { containerId: 'idCont0', id: 'idComp0' },
         })
       ).toEqual({
         keepPreviousValues: '',

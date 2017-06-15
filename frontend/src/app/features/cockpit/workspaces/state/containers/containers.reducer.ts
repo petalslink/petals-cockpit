@@ -304,11 +304,11 @@ export class Containers {
   // tslint:disable-next-line:member-ordering
   private static removeComponent(
     containersTable: IContainersTable,
-    payload: { containerId: string; componentId: string }
+    payload: IComponentRow
   ): IContainersTable {
     return updateById(containersTable, payload.containerId, {
       components: containersTable.byId[payload.containerId].components.filter(
-        id => id !== payload.componentId
+        id => id !== payload.id
       ),
     });
   }
