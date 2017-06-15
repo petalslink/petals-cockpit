@@ -35,6 +35,7 @@ export function getCurrentServiceAssembly(
           state.serviceAssemblies.selectedServiceAssemblyId
         ]
     )
+    .filter(s => !!s)
     .distinctUntilChanged();
 }
 

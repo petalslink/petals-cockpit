@@ -35,6 +35,7 @@ export function getCurrentSharedLibrary(
           state.sharedLibraries.selectedSharedLibraryId
         ]
     )
+    .filter(s => !!s)
     .distinctUntilChanged();
 }
 

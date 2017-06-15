@@ -29,6 +29,7 @@ export function getCurrentContainer(
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.containers.selectedContainerId)
     .map(state => state.containers.byId[state.containers.selectedContainerId])
+    .filter(c => !!c)
     .distinctUntilChanged();
 }
 

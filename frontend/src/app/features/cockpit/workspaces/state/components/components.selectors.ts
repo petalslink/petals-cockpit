@@ -30,6 +30,7 @@ export function getCurrentComponent(
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.components.selectedComponentId)
     .map(state => state.components.byId[state.components.selectedComponentId])
+    .filter(c => !!c)
     .distinctUntilChanged();
 }
 

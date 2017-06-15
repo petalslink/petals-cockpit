@@ -30,5 +30,6 @@ export function getCurrentServiceUnit(
     .map(
       state => state.serviceUnits.byId[state.serviceUnits.selectedServiceUnitId]
     )
+    .filter(s => !!s)
     .distinctUntilChanged();
 }

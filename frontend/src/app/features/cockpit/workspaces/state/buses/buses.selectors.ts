@@ -26,5 +26,6 @@ export function getCurrentBus(store$: Store<IStore>): Observable<IBusRow> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.buses.selectedBusId)
     .map(state => state.buses.byId[state.buses.selectedBusId])
+    .filter(b => !!b)
     .distinctUntilChanged();
 }
