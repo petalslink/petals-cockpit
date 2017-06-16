@@ -23,7 +23,11 @@ import { NotificationsService } from 'angular2-notifications';
 
 import { componentsService } from '../../../mocks/components-mock';
 import * as helper from './../helpers/mock.helper';
-import { ComponentsServiceImpl, ComponentState } from './components.service';
+import {
+  ComponentsServiceImpl,
+  ComponentState,
+  EComponentState,
+} from './components.service';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { IStore } from '../interfaces/store.interface';
 import { SseServiceMock } from './sse.service.mock';
@@ -59,10 +63,15 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
       );
     }
 
-    componentsService.get(componentId).state = newState;
+    const component = componentsService.get(componentId);
+    if (newState === EComponentState.Unloaded) {
+      componentsService.remove(componentId);
+    } else {
+      component.state = newState;
+    }
 
     if (parameters) {
-      componentsService.get(componentId).parameters = parameters;
+      component.parameters = parameters;
     }
 
     const response = {

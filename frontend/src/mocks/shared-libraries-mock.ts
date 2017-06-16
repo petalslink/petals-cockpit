@@ -64,8 +64,8 @@ export class SharedLibrary {
     this.components.set(component.id, component);
   }
 
-  unregisterComponent(component: Component) {
-    this.components.delete(component.id);
+  unregisterComponent(id: string) {
+    this.components.delete(id);
   }
 
   toObj(): { [id: string]: ISharedLibraryBackendSSE } {

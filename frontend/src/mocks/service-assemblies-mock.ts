@@ -38,6 +38,12 @@ class ServiceAssemblies {
   get(id: string) {
     return this.serviceAssemblies.get(id);
   }
+
+  remove(id: string) {
+    const sa = this.get(id);
+    this.serviceAssemblies.delete(id);
+    sa.container.removeServiceAssembly(id);
+  }
 }
 
 export const serviceAssembliesService = new ServiceAssemblies();
@@ -88,9 +94,5 @@ export class ServiceAssembly {
 
   getDetails(): IServiceAssemblyBackendDetails {
     return {};
-  }
-
-  setState(newState: ServiceAssemblyState) {
-    this.state = newState;
   }
 }
