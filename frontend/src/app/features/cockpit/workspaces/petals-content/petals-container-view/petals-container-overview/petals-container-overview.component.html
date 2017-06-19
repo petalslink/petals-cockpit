@@ -58,7 +58,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </md-card-title>
       <md-card-subtitle fxLayout="row" fxLayoutAlign="start center">
         <md-icon class="margin-right-x1" color="primary">info</md-icon>
-        <span class="color-primary" fxFlex>Click on a container to see its parameters.</span>
+        <span *ngIf="container.reachabilities.length > 0" class="color-primary" fxFlex>Click on a container to see its parameters.</span>
+        <span *ngIf="container.reachabilities.length === 0" class="color-primary" fxFlex>There is no other containers in this bus.</span>
       </md-card-subtitle>
     </md-card>
 
