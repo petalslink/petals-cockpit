@@ -28,11 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <md-card-title>State</md-card-title>
             <md-card-subtitle class="component-state" fxLayoutAlign="start center">
               {{ component.state }}
-              <div class="margin-left-x1"
-                [class.green-led]="component.state === 'Started'"
-                [class.yellow-led]="component.state === 'Stopped'"
-                [class.red-led]="component.state === 'Shutdown'"
-                [class.grey-led]="component.state === 'Loaded'"></div>
+              <app-state-led [state]="component.state"></app-state-led>
             </md-card-subtitle>
           </md-card-header>
 
