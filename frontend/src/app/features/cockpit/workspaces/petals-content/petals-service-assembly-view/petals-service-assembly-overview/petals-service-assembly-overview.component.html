@@ -28,10 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <md-card-title>State</md-card-title>
             <md-card-subtitle class="sa-state" fxLayoutAlign="start center">
               {{ serviceAssembly.state }}
-              <div class="margin-left-x1"
-                [class.green-led]="serviceAssembly.state === 'Started'"
-                [class.yellow-led]="serviceAssembly.state === 'Stopped'"
-                [class.red-led]="serviceAssembly.state === 'Shutdown'"></div>
+              <app-state-led [state]="serviceAssembly.state"></app-state-led>
             </md-card-subtitle>
           </md-card-header>
         </div>
