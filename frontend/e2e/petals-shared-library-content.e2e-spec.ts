@@ -16,7 +16,7 @@
  */
 
 import { page } from './common';
-import { WorkspacePage } from './pages/workspace.po';
+import { WorkspacePage, WorkspaceOverviewPage } from './pages/workspace.po';
 import { NotFoundPage } from './pages/not-found';
 
 describe(`Petals shared library content`, () => {
@@ -47,5 +47,31 @@ describe(`Petals shared library content`, () => {
 
     expect(comp.sharedLibraries.getText()).toEqual(['SL 0']);
     comp.openSharedLibrary('SL 0');
+  });
+
+  it(`should unload a shared library`, () => {
+    let ops = workspace.openSharedLibrary('SL 0').openOperations();
+
+    expect(ops.unloadButton.isEnabled()).toBe(false);
+
+    // unload the component
+    const comp = ops.openOverview().openComponent(0).openOperations();
+    page.waitAndClick(comp.stopButton);
+    page.clickAndExpectNotification(comp.unloadButton);
+
+    // we should now be able to unload the comp 0
+    ops = workspace.openSharedLibrary('SL 0').openOperations();
+
+    expect(ops.unloadButton.isEnabled()).toBe(true);
+
+    page.clickAndExpectNotification(ops.unloadButton);
+
+    // we should be redirected to the workspace page ...
+    WorkspaceOverviewPage.waitAndGet();
+
+    // and the sl should have been deleted from petals tree
+    expect(workspace.treeElement(`SL 0`, 'shared-library').isPresent()).toBe(
+      false
+    );
   });
 });

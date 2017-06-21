@@ -36,6 +36,12 @@ class SharedLibraries {
   get(id: string) {
     return this.sharedLibraries.get(id);
   }
+
+  remove(id: string) {
+    const sl = this.get(id);
+    this.sharedLibraries.delete(id);
+    sl.container.removeSharedLibrary(id);
+  }
 }
 
 export const sharedLibrariesService = new SharedLibraries();

@@ -16,9 +16,18 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+
 import { environment } from './../../../environments/environment';
+
+// http://stackoverflow.com/a/41631732/2398593
+export const ESharedLibraryState = {
+  Loaded: 'Loaded' as 'Loaded',
+  Unloaded: 'Unloaded' as 'Unloaded',
+};
+
+export type SharedLibraryState = keyof typeof ESharedLibraryState;
 
 export interface ISharedLibraryBackendSSECommon {
   id: string;
@@ -37,6 +46,12 @@ export interface ISharedLibraryBackendDetails extends ISharedLibraryBackendDetai
 
 export abstract class SharedLibrariesService {
   abstract getDetails(id: string): Observable<ISharedLibraryBackendDetails>;
+
+  abstract putState(
+    workspaceId: string,
+    id: string,
+    state: SharedLibraryState
+  ): Observable<Response>;
 }
 
 @Injectable()
@@ -49,5 +64,12 @@ export class SharedLibrariesServiceImpl extends SharedLibrariesService {
     return this.http
       .get(`${environment.urlBackend}/sharedlibraries/${id}`)
       .map(res => res.json() as ISharedLibraryBackendDetails);
+  }
+
+  putState(workspaceId: string, id: string, state: SharedLibraryState) {
+    return this.http.put(
+      `${environment.urlBackend}/workspaces/${workspaceId}/sharedlibraries/${id}`,
+      { state }
+    );
   }
 }

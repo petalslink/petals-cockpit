@@ -158,6 +158,10 @@ export class Container {
     return sl;
   }
 
+  removeSharedLibrary(id: string) {
+    this.sharedLibraries.delete(id);
+  }
+
   toObj(): { [id: string]: IContainerBackendSSE } {
     return {
       [this.id]: {

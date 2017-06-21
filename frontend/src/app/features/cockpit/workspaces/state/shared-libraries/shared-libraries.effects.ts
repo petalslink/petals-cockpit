@@ -16,7 +16,8 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Action } from '@ngrx/store';
+import { Router } from '@angular/router';
+import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
@@ -25,6 +26,8 @@ import { environment } from 'environments/environment';
 import {
   SharedLibrariesService,
   ISharedLibraryBackendSSE,
+  SharedLibraryState,
+  ESharedLibraryState,
 } from 'app/shared/services/shared-libraries.service';
 
 import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
@@ -33,11 +36,14 @@ import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { IStore } from 'app/shared/state/store.interface';
 
 @Injectable()
 export class SharedLibrariesEffects {
   constructor(
+    private store$: Store<IStore>,
     private actions$: Actions,
+    private router: Router,
     private sharedLibrariesService: SharedLibrariesService,
     private notifications: NotificationsService
   ) {}
@@ -95,4 +101,68 @@ export class SharedLibrariesEffects {
           );
         })
     );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true })
+  changeState$: Observable<Action> = this.actions$
+    .ofType(SharedLibraries.ChangeStateType)
+    .withLatestFrom(this.store$)
+    .switchMap(([action, store]: [SharedLibraries.ChangeState, IStore]) => {
+      return (
+        this.sharedLibrariesService
+          .putState(
+            store.workspaces.selectedWorkspaceId,
+            action.payload.id,
+            action.payload.state
+          )
+          // response will be handled by sse
+          .mergeMap(_ => Observable.empty())
+          .catch(err => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in share-libraries.effects: ofType(SharedLibraries.ChangeStateType)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            return Observable.of(
+              new SharedLibraries.ChangeStateError({
+                id: action.payload.id,
+                errorChangeState: err.json().message,
+              })
+            );
+          })
+      );
+    });
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true })
+  watchStateChanged$: Observable<Action> = this.actions$
+    .ofType(SseWorkspaceEvent.SL_STATE_CHANGE.action)
+    .withLatestFrom(this.store$)
+    .flatMap(([action, store]) => {
+      const data: { id: string; state: SharedLibraryState } = action.payload;
+
+      const sl = store.sharedLibraries.byId[data.id];
+
+      if (data.state === ESharedLibraryState.Unloaded) {
+        if (store.sharedLibraries.selectedSharedLibraryId === sl.id) {
+          this.router.navigate([
+            '/workspaces',
+            store.workspaces.selectedWorkspaceId,
+          ]);
+        }
+
+        this.notifications.success(
+          'Shared Library Unloaded',
+          `'${sl.name}' has been unloaded`
+        );
+
+        return Observable.of(new SharedLibraries.Removed(sl));
+      } else {
+        return Observable.empty();
+      }
+    });
 }

@@ -20,11 +20,13 @@ import {
   mergeOnly,
   JsTable,
   putAll,
+  removeById,
 } from 'app/shared/helpers/jstable.helper';
 import {
   ISharedLibrariesTable,
   sharedLibrariesTableFactory,
   sharedLibraryRowFactory,
+  ISharedLibraryRow,
 } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import {
   ISharedLibraryBackendSSE,
@@ -46,6 +48,9 @@ export namespace SharedLibrariesReducer {
     | SharedLibraries.FetchDetails
     | SharedLibraries.FetchDetailsError
     | SharedLibraries.FetchDetailsSuccess
+    | SharedLibraries.ChangeState
+    | SharedLibraries.ChangeStateError
+    | SharedLibraries.Removed
     | Containers.DeployComponentSuccess
     | Components.Removed
     | Workspaces.Clean;
@@ -72,6 +77,15 @@ export namespace SharedLibrariesReducer {
       }
       case SharedLibraries.FetchDetailsSuccessType: {
         return fetchDetailsSuccess(table, action.payload);
+      }
+      case SharedLibraries.ChangeStateType: {
+        return changeState(table, action.payload);
+      }
+      case SharedLibraries.ChangeStateErrorType: {
+        return changeStateError(table, action.payload);
+      }
+      case SharedLibraries.RemovedType: {
+        return remove(table, action.payload);
       }
       case Containers.DeployComponentSuccessType: {
         return deployComponentSuccess(table, action.payload);
@@ -131,6 +145,36 @@ export namespace SharedLibrariesReducer {
     return updateById(table, payload.id, {
       isFetchingDetails: false,
     });
+  }
+
+  function changeState(table: ISharedLibrariesTable, payload: { id: string }) {
+    return updateById(table, payload.id, {
+      isUpdatingState: true,
+    });
+  }
+
+  function changeStateError(
+    table: ISharedLibrariesTable,
+    payload: { id: string; errorChangeState: string }
+  ): ISharedLibrariesTable {
+    return updateById(table, payload.id, {
+      isUpdatingState: false,
+      errorChangeState: payload.errorChangeState,
+    });
+  }
+
+  function remove(
+    table: ISharedLibrariesTable,
+    payload: ISharedLibraryRow
+  ): ISharedLibrariesTable {
+    const selectedSharedLibraryid = table.selectedSharedLibraryId === payload.id
+      ? ''
+      : table.selectedSharedLibraryId;
+
+    return {
+      ...removeById(table, payload.id),
+      selectedSharedLibraryid,
+    };
   }
 
   function deployComponentSuccess(

@@ -21,6 +21,7 @@ import { JsTable } from 'app/shared/helpers/jstable.helper';
 import {
   ISharedLibraryBackendSSE,
   ISharedLibraryBackendDetails,
+  SharedLibraryState,
 } from 'app/shared/services/shared-libraries.service';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 
@@ -70,7 +71,9 @@ export namespace SharedLibraries {
   export const ChangeStateType = '[Shared libraries] Change state';
   export class ChangeState implements Action {
     readonly type = ChangeStateType;
-    constructor(public readonly payload: { id: string }) {}
+    constructor(
+      public readonly payload: { id: string; state: SharedLibraryState }
+    ) {}
   }
 
   export const ChangeStateErrorType = '[Shared libraries] Change state error';

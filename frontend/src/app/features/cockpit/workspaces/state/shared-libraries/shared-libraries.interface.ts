@@ -27,6 +27,8 @@ export interface ISharedLibraryUI {
   // for UI
   isFolded: boolean;
   isFetchingDetails: boolean;
+  isUpdatingState: boolean;
+  errorChangeState: string;
 }
 
 export interface ISharedLibraryRow extends ISharedLibraryUI, ISharedLibraryBackendSSE, ISharedLibraryBackendDetails {}
@@ -55,6 +57,8 @@ export function sharedLibraryRowFactory(): ISharedLibraryRow {
     isFetchingDetails: false,
 
     isFolded: false,
+    isUpdatingState: false,
+    errorChangeState: '',
   };
 }
 

@@ -49,6 +49,9 @@ export class SseWorkspaceEvent {
     'COMPONENT_DEPLOYED'
   );
   public static readonly SL_DEPLOYED = new SseWorkspaceEvent('SL_DEPLOYED');
+  public static readonly SL_STATE_CHANGE = new SseWorkspaceEvent(
+    'SL_STATE_CHANGE'
+  );
 
   public static readonly ON_MESSAGE = SseWorkspaceEvent.toAction('On Message');
 

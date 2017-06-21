@@ -41,6 +41,8 @@ import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/wor
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 import { IComponentBackendSSE } from 'app/shared/services/components.service';
+import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 
 export namespace ContainersReducer {
   type All =
@@ -64,6 +66,7 @@ export namespace ContainersReducer {
     | Containers.DeployComponentSuccess
     | Components.Removed
     | ServiceAssemblies.Removed
+    | SharedLibraries.Removed
     | Workspaces.Clean;
 
   export function reducer(
@@ -130,6 +133,9 @@ export namespace ContainersReducer {
       }
       case Components.RemovedType: {
         return removeComponent(table, action.payload);
+      }
+      case SharedLibraries.RemovedType: {
+        return removeSharedLibrary(table, action.payload);
       }
       case Workspaces.CleanType: {
         return containersTableFactory();
@@ -305,6 +311,17 @@ export namespace ContainersReducer {
       serviceAssemblies: table.byId[
         payload.containerId
       ].serviceAssemblies.filter(id => id !== payload.id),
+    });
+  }
+
+  function removeSharedLibrary(
+    table: IContainersTable,
+    payload: ISharedLibraryRow
+  ): IContainersTable {
+    return updateById(table, payload.containerId, {
+      sharedLibraries: table.byId[payload.containerId].sharedLibraries.filter(
+        id => id !== payload.id
+      ),
     });
   }
 }
