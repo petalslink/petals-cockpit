@@ -75,8 +75,12 @@ describe(`Petals service-assembly content`, () => {
     // we should be redirected to the workspace page ...
     WorkspaceOverviewPage.waitAndGet();
 
-    // and the SU should have been deleted from petals tree
+    // the SU should have been deleted from petals tree
     expect(workspace.treeElement(`SU 0`, 'service-unit').isPresent()).toBe(
+      false
+    );
+    // the SA should have been deleted from petals tree
+    expect(workspace.treeElement(`SA 0`, 'service-assembly').isPresent()).toBe(
       false
     );
   });
