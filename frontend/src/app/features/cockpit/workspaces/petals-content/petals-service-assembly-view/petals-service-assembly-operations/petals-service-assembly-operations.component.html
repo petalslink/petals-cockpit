@@ -34,12 +34,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </md-card-subtitle>
         </div>
 
-        <md-card-content fxLayout="row" *ngIf="serviceAssembly.state">
-          <span *ngFor="let possibleState of getPossibleStateActions(serviceAssembly.state); trackBy:saState">
+        <md-card-content fxLayoutWrap fxLayout="row" *ngIf="serviceAssembly.state">
+          <span *ngFor="let possibleState of getPossibleStateActions(serviceAssembly.state); trackBy:saState" class="color-primary padding-bottom-x1">
             <button
-              class="text-upper"
-              md-button
-              color="primary"
+              class="text-upper margin-right-x1"
+              md-raised-button
               (click)="changeState(possibleState.newStateAfterAction)"
               [disabled]="serviceAssembly.isUpdatingState"
             >

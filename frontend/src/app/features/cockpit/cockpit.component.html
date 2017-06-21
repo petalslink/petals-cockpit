@@ -14,24 +14,22 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div class="page-cockpit" fxLayout="column" fxFill>
-  <md-toolbar color="primary" class="header-toolbar">
+  <md-toolbar color="primary" class="header-toolbar" [class.mat-elevation-z6]="showShadow">
     <div class="toolbar-logo">
       <img class="logo-toolbar" [src]="logoByScreenSize$ | async">
     </div>
 
-    <button *ngIf="workspace$ | async" md-icon-button (click)="toggleSidenav()" class="menu-icon">
+    <button *ngIf="workspace$ | async" md-button (click)="toggleSidenav()" class="sidenav-toggle">
       <md-icon>menu</md-icon>
     </button>
 
-    <span fxLayout="row">
+    <span fxLayout="row" fxFlex class="text-upper">
       {{ (ui$ | async).titleMainPart1 }}
 
       <span *ngIf="(ui$ | async).titleMainPart2" fxLayoutAlign="center center">
-        <md-icon>chevron_right</md-icon> <span class="color-accent-bold">{{ (ui$ | async).titleMainPart2 }}</span>
+        <md-icon>chevron_right</md-icon> <span class="color-accent-light-bold text-upper" md-line>{{ (ui$ | async).titleMainPart2 }}</span>
       </span>
     </span>
-
-    <div fxFlex></div>
 
     <button md-icon-button class="margin-right-x2 btn-logout-user" [disabled]="(isDisconnecting$ | async)" (click)="disconnect()">
       <md-icon>power_settings_new</md-icon>
@@ -49,8 +47,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <md-sidenav-container fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">
     <md-sidenav fxLayout="column" *ngIf="workspace$ | async as workspace" [opened]="sidenavVisible$ | async" [mode]="sidenavMode$ | async">
-      <div fxLayout>
-        <button fxFlex="100" md-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', workspace.id]" class="workspace-name width-full no-border-radius" color="accent">
+      <div fxLayout="row">
+        <button fxFlex="100" md-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', workspace.id]" class="workspace-name width-full no-border-radius text-upper" color="accent">
           {{ workspace.name }}
         </button>
 
@@ -68,7 +66,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           Some more tab content
         </md-tab>
 
-        <md-tab label="API">
+        <md-tab label="Api">
           Some more tab content
         </md-tab>
       </md-tab-group>

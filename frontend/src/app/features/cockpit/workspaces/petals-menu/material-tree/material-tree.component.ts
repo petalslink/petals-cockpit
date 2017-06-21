@@ -25,7 +25,7 @@ import {
 } from '@angular/core';
 
 export interface TreeElement<T extends TreeElement<T>> {
-  link: string;
+  link?: string;
   isFolded: boolean;
   children: T[];
   cssClass: string;

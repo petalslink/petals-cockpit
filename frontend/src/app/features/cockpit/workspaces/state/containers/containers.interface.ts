@@ -29,6 +29,9 @@ import { ISharedLibraries } from 'app/features/cockpit/workspaces/state/shared-l
 export interface IContainerUI {
   // for UI
   isFolded: boolean;
+  isComponentsCategoryFolded: boolean;
+  isSharedLibrariesCategoryFolded: boolean;
+  isServiceAssembliesCategoryFolded: boolean;
   isFetchingDetails: boolean;
   isDeployingComponent: boolean;
   errorDeploymentComponent: string;
@@ -68,6 +71,9 @@ export function containerRowFactory(): IContainerRow {
     systemInfo: undefined,
 
     isFolded: false,
+    isComponentsCategoryFolded: false,
+    isSharedLibrariesCategoryFolded: false,
+    isServiceAssembliesCategoryFolded: false,
     isFetchingDetails: false,
     isDeployingComponent: false,
     errorDeploymentComponent: '',

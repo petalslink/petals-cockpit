@@ -40,33 +40,76 @@ md-sidenav-container {
   color: mat-color($theme-primary, default-contrast);
 }
 
-md-toolbar {
-  background-color: mat-color($theme-primary-x1);
-  color: mat-color($theme-primary-x2, default-contrast);
-  h3 {
-    margin: 0;
+// all categories without tree elements
+md-sidenav-container a.workspace-element-type-category-components,
+md-sidenav-container a.workspace-element-type-category-service-assemblies,
+md-sidenav-container a.workspace-element-type-category-shared-libraries {
+  .mat-list-item-content {
+    @extend .text-upper;
+    background: rgba(0, 0, 0, 0.02);
+    color: rgba(0, 0, 0, 0.54);
+    font-weight: 500;
   }
 }
 
-.mat-menu-item .mat-icon {
-  color: mat-color($theme-primary-x7);
+// all tree elements without categories
+md-sidenav-container a.workspace-element-type-bus,
+md-sidenav-container a.workspace-element-type-container,
+md-sidenav-container a.workspace-element-type-component,
+md-sidenav-container a.workspace-element-type-service-assembly,
+md-sidenav-container a.workspace-element-type-shared-library,
+md-sidenav-container a.workspace-element-type-service-unit {
+  .mat-list-item-content:hover, .mat-list-item-content:focus {
+    background-color: mat-color($theme-primary-x);
+    @extend .color-primary-light-bold;
+  }
+}
+
+// all tree elements with categories
+md-sidenav-container a /deep/ .mat-list-item-content {
+  height: 24px !important;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-color: rgba(0,0,0,.02);
+}
+
+.icon-primary {
+  color: mat-color($theme-primary-x6);
 }
 
 .active-link, .active-link:hover {
-  .mat-list-item-content {
+  .mat-list-item-content, .mat-list-item-content:hover {
     background-color: mat-color($theme-primary-x);
-    @extend .color-primary;
-    @extend .bold;
+    @extend .color-primary-bold;
     margin: 0;
-    border: 1px solid #dedede;
   }
-}
-
-md-sidenav-container .mat-list-item-content:hover, md-sidenav-container .mat-list-item-content:focus {
-  background-color: mat-color($theme-primary-x);
-  @extend .light-bold;
 }
 
 .highlight {
   background-color: mat-color($theme-accent-x5);
+}
+
+.page-cockpit /deep/ .header-toolbar, .page-cockpit /deep/ .header-toolbar .mat-toolbar-row {
+  height: 56px;
+  min-height: 56px !important;
+}
+
+.page-cockpit /deep/ .toolbar-page-header, .page-cockpit /deep/ .toolbar-page-header .mat-toolbar-row {
+  height: 120px;
+  min-height: 140px !important;
+}
+
+@media screen and (max-width: 840px) {
+  .page-cockpit /deep/ .toolbar-page-header, .page-cockpit /deep/ .toolbar-page-header .mat-toolbar-row {
+    height: 80px;
+    min-height: 80px !important;
+  }
+  .md-icon {
+    padding-right: 30px;
+  }
+}
+
+.mat-icon.goto-icon {
+  height: 18px;
+  width: 18px;
 }

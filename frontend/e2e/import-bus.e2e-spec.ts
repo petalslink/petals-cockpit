@@ -156,7 +156,9 @@ describe(`Import Bus`, () => {
     const importBus = workspace.openImportBus();
 
     expect(
-      $$(`app-petals-menu-view > app-material-tree > md-nav-list`).count()
+      $$(
+        `app-petals-menu-view app-material-tree md-nav-list a.workspace-element-type-bus`
+      ).count()
     ).toEqual(1);
 
     importBus.ip.sendKeys(`192.168.0.1`);
@@ -172,7 +174,9 @@ describe(`Import Bus`, () => {
     );
 
     expect(
-      $$(`app-petals-menu-view > app-material-tree > md-nav-list`).count()
+      $$(
+        `app-petals-menu-view app-material-tree .mat-nav-list a.workspace-element-type-bus`
+      ).count()
     ).toEqual(2);
   });
 

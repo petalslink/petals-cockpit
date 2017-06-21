@@ -79,10 +79,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
           <md-nav-list dense fxLayout="row">
             <div fxFlex fxLayout="row" fxLayoutAlign="end center">
-              <a md-list-item class="container" color="primary" [routerLink]="['/workspaces', workspaceId, 'petals', 'containers', selectedContainer.id]">
+              <a md-raised-button class="container" [routerLink]="['/workspaces', workspaceId, 'petals', 'containers', selectedContainer.id]">
                 <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
-                  <span class="text-upper view-container">View this container</span>
-                  <md-icon md-list-icon>play_circle_outline</md-icon>
+                  <span class="text-upper view-container margin-right-x1">View this container</span>
+                  <md-icon md-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
                 </div>
               </a>
             </div>

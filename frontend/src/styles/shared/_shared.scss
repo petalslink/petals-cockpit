@@ -46,11 +46,13 @@ div > .mat-dialog-container {
   margin: 0;
 }
 
+.mat-tab-body-wrapper,
+.mat-tab-body-content {
+  height: 100%;
+}
+
 .wrapper-content {
-  .md-tab-body-wrapper,
-  .md-tab-body-content {
-    height: 100%;
-  }
+  height: 100%;
   .central-content {
     width: 90%;
     max-width: 1000px;
@@ -68,6 +70,7 @@ div > .mat-dialog-container {
     background-size: auto;
     background-repeat: repeat;
     height: 100%;
+    width: 100%;
 
     &.content-max-width {
       max-width: 1000px;
@@ -211,7 +214,7 @@ pre {
 }
 
 .prefix-toolbar-title {
-  width: 40px;
+  width: 20px;
   text-align: center;
 
   md-spinner {
@@ -221,12 +224,33 @@ pre {
   }
 }
 
+.toolbar-page-header h1 {
+    font-size: 30px;
+    font-weight: 300;
+    margin: 0;
+    padding: 50px;
+}
+
+@media (max-width: 840px) {
+  .toolbar-page-header h1  {
+    padding: 24px 8px;
+    font-size: 20px;
+  }
+}
+
 // see https://github.com/angular/material2/issues/2829
 md-sidenav {
   .mat-tab-label {
     min-width: 0px !important;
     // 33 because we have 3 tabs
     width: 33%;
+    text-transform: uppercase;
+  }
+}
+
+.wrapper-content {
+  .mat-tab-label {
+    text-transform: uppercase;
   }
 }
 

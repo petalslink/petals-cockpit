@@ -17,43 +17,43 @@
 
 import { JsTable, updateById } from 'app/shared/helpers/jstable.helper';
 
-interface Foldable { isFolded: boolean }
-
-export function fold<M extends JsTable<Foldable>>(
+export function fold<E extends { isFolded: boolean }, M extends JsTable<E>>(
   table: M,
-  payload: { id: string }
-) {
-  if (!table.byId[payload.id] || table.byId[payload.id].isFolded) {
+  payload: { id: string },
+  property: keyof E = 'isFolded'
+): M {
+  if (!table.byId[payload.id] || table.byId[payload.id][property]) {
     return table;
   }
 
-  return updateById(table, payload.id, { isFolded: true });
+  return updateById(table, payload.id, { [property]: true });
 }
 
-export function unfold<M extends JsTable<Foldable>>(
+export function unfold<E extends { isFolded: boolean }, M extends JsTable<E>>(
   table: M,
-  payload: { id: string }
-) {
-  if (!table.byId[payload.id] || !table.byId[payload.id].isFolded) {
+  payload: { id: string },
+  property: keyof E = 'isFolded'
+): M {
+  if (!table.byId[payload.id] || !table.byId[payload.id][property]) {
     return table;
   }
 
-  return updateById(table, payload.id, { isFolded: false });
+  return updateById(table, payload.id, { [property]: false });
 }
 
-export function toggleFold<M extends JsTable<Foldable>>(
-  table: M,
-  payload: { id: string }
-) {
+export function toggleFold<
+  E extends { isFolded: boolean },
+  M extends JsTable<E>
+>(table: M, payload: { id: string }, property: keyof E = 'isFolded'): M {
   const e = table.byId[payload.id];
 
   if (!e) {
     return table;
   }
 
-  if (e.isFolded) {
-    return unfold(table, payload);
+  if (e[property]) {
+    return unfold<E, M>(table, payload, property);
   }
 
-  return fold(table, payload);
+  return fold<E, M>(table, payload, property);
 }

@@ -13,18 +13,18 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="bus$ | async as bus" fxLayout="column" fxFill class="wrapper-content">
-  <md-toolbar>
+<div *ngIf="bus$ | async as bus" fxLayout="column" class="wrapper-content">
+  <md-toolbar color="primary" class="toolbar-page-header">
     <div class="prefix-toolbar-title">
-      <md-icon color="primary" *ngIf="!bus.isFetchingDetails">grade</md-icon>
+      <md-icon color="accent" *ngIf="!bus.isFetchingDetails">grade</md-icon>
 
-      <md-spinner *ngIf="bus.isFetchingDetails"></md-spinner>
+      <md-spinner color="accent" *ngIf="bus.isFetchingDetails"></md-spinner>
     </div>
 
-    <span class="title" fxFlex>{{ bus.name }}</span>
+    <h1 class="title" fxFlex [ngClass.lt-md]="'margin-left-x1'">{{ bus.name }}</h1>
 
     <button color="warn" type="button" class="btn-delete-bus" (click)="openDeletionDialog()" md-mini-fab mdTooltip="Delete the bus"
-      mdTooltipPosition="below" [disabled]="bus.isRemoving">
+      mdTooltipPosition="before" [disabled]="bus.isRemoving">
       <md-icon>delete</md-icon>
     </button>
   </md-toolbar>

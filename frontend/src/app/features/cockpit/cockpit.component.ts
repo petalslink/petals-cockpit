@@ -58,6 +58,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
   public logoByScreenSize$: Observable<string>;
   public user$: Observable<ICurrentUser>;
   public isDisconnecting$: Observable<boolean>;
+  public showShadow = true;
 
   @ViewChild(MdSidenav) sidenav: MdSidenav;
 

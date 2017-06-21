@@ -49,10 +49,12 @@ export class ServiceUnitOverviewPage extends ServiceUnitPage {
   public readonly state = this.overview.$(`.sa-state`);
 
   public readonly serviceAssemblyCard = this.overview.$(
-    '.su-infos .service-assembly'
+    '.su-infos-sa .service-assembly'
   );
   public readonly serviceAssembly = this.serviceAssemblyCard.$('.sa-name');
-  public readonly viewServiceAssembly = this.overview.$('.su-infos .view-sa');
+  public readonly viewServiceAssembly = this.overview.$(
+    '.su-infos-sa .view-sa'
+  );
   public readonly viewServiceAssemblyName = this.viewServiceAssembly.$(
     '.view-sa-name'
   );

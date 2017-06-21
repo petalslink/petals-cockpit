@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <md-card fxFlex class="shared-libraries">
         <md-card-title fxLayout="row">
           <span fxFlex class="text-upper">Shared Libraries</span>
-          <md-icon color="primary">view_list</md-icon>
+          <md-icon svgIcon="sl-overview"></md-icon>
         </md-card-title>
 
         <md-divider></md-divider>
@@ -52,13 +52,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           This component doesn't use any shared library.
         </md-card-content>
 
-        <md-nav-list dense fxLayout="column">
+        <md-nav-list dense fxLayout="column" class="padding-top-x1">
           <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let sl of sharedLibraries">
-            <a md-list-item [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'shared-libraries', sl.id]"
+            <a md-raised-button [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'shared-libraries', sl.id]"
               class="shared-library">
               <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
-                <span class="sl-name">{{ sl.name }}</span>
-                <md-icon md-list-icon>play_circle_outline</md-icon>
+                <span class="sl-name margin-right-x1">{{ sl.name }}</span>
+                <md-icon md-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
               </div>
             </a>
           </div>

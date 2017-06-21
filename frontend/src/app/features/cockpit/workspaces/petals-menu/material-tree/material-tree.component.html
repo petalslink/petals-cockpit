@@ -13,23 +13,29 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-nav-list dense *ngFor="let item of tree; let i = index" [style.marginLeft.px]="margin">
-  <a md-list-item [class]="item.cssClass" [routerLink]="[item.link]" routerLinkActive="active-link" (click)="select({deepLevel: deepLevel, index: i, item: item})">
-    <div fxLayout="row" fxLayoutAlign="start center">
-      <md-icon
-        *ngIf="item.children && item.children.length > 0; else iconNoChildren"
-        md-list-icon
-        (click)="toggleFold({deepLevel: deepLevel, index: i, item: item})"
-        [class.disable-fold-unfold]="search !== ''"
-        [class.rotate-minus-90]="item.isFolded">arrow_drop_down</md-icon>
+<md-nav-list dense *ngFor="let item of tree; let i = index" [style.marginLeft.px]="margin" class="nav-list-petals-tree">
+  <div class="test">
+    <a md-list-item [class]="item.cssClass" [routerLink]="item.link ? [item.link] : []" [routerLinkActive]="item.link ? 'active-link' : ''" (click)="select({deepLevel: deepLevel, index: i, item: item})"
+     ng-style="deepLevel === 0 && {'background-color':'green'} || deepLevel === 1 && {'background-color':'yellow'}">
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <md-icon
+          *ngIf="item.children && item.children.length > 0; else noIconChildren"
+          md-list-icon
+          (click)="toggleFold({deepLevel: deepLevel, index: i, item: item})"
+          [class.disable-fold-unfold]="search !== ''"
+          [class.rotate-minus-90]="item.isFolded">arrow_drop_down</md-icon>
 
-      <ng-template #iconNoChildren>
-        <md-icon class="no-children" fxLayout="row" fxLayoutAlign="center center">panorama_fish_eye</md-icon>
-      </ng-template>
+        <ng-template #noIconChildren>
+          <span class="no-icon-children"></span>
+        </ng-template>
 
-      <span appColorSearchedLetters [search]="search" classToApply="highlight" [text]="item.name"></span>
-    </div>
-  </a>
+        <md-icon *ngIf="item.svgIcon" md-list-icon [svgIcon]="item.svgIcon"></md-icon>
+        <md-icon *ngIf="item.icon" md-list-icon color="primary">{{ item.icon }}</md-icon>
+
+        <span class="item-name" appColorSearchedLetters [search]="search" classToApply="highlight" [text]="item.name"></span>
+      </div>
+    </a>
+  </div>
 
   <app-material-tree
     *ngIf="!item.isFolded && item.children"

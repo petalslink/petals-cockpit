@@ -24,6 +24,7 @@ import {
   IContainersTable,
   containersTableFactory,
   containerRowFactory,
+  IContainerRow,
 } from './containers.interface';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 
@@ -93,13 +94,25 @@ export namespace ContainersReducer {
         return fetchDetailsSuccess(table, action.payload);
       }
       case Containers.FoldType: {
-        return fold(table, action.payload);
+        return fold<IContainerRow, IContainersTable>(
+          table,
+          action.payload,
+          getFoldProperty(action.payload)
+        );
       }
       case Containers.UnfoldType: {
-        return unfold(table, action.payload);
+        return unfold<IContainerRow, IContainersTable>(
+          table,
+          action.payload,
+          getFoldProperty(action.payload)
+        );
       }
       case Containers.ToggleFoldType: {
-        return toggleFold(table, action.payload);
+        return toggleFold<IContainerRow, IContainersTable>(
+          table,
+          action.payload,
+          getFoldProperty(action.payload)
+        );
       }
       case Containers.DeployServiceAssemblyType: {
         return deployServiceAssembly(table, action.payload);
@@ -142,6 +155,21 @@ export namespace ContainersReducer {
       }
       default:
         return table;
+    }
+  }
+
+  function getFoldProperty(
+    payload: Containers.FoldPayload
+  ): keyof IContainerRow {
+    switch (payload.type) {
+      case 'components':
+        return 'isComponentsCategoryFolded';
+      case 'shared-libraries':
+        return 'isSharedLibrariesCategoryFolded';
+      case 'service-assemblies':
+        return 'isServiceAssembliesCategoryFolded';
+      default:
+        return undefined;
     }
   }
 

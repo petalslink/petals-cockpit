@@ -149,7 +149,7 @@ export abstract class WorkspacePage {
   getWorkspaceTree() {
     return (
       this.sidenav
-        .$$('app-material-tree md-nav-list a div > span')
+        .$$('app-material-tree .mat-nav-list a .item-name')
         .getText()
         // getText on element.all is wrongly type, it should be a string[]
         .then((elements: any) => elements as string[])
@@ -159,7 +159,7 @@ export abstract class WorkspacePage {
   getHighlightedElement() {
     return (
       this.sidenav
-        .$$('app-material-tree md-nav-list .highlight')
+        .$$('app-material-tree .mat-nav-list .highlight')
         .getText()
         // getText on element.all is wrongly type, it should be a string[]
         .then((elements: any) => elements as string[])

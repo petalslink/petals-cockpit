@@ -13,15 +13,15 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="container$ | async as container" fxLayout="column" fxFill class="wrapper-content">
-  <md-toolbar>
+<div *ngIf="container$ | async as container" fxLayout="column" class="wrapper-content">
+  <md-toolbar color="primary" class="toolbar-page-header">
     <div class="prefix-toolbar-title">
-      <md-icon color="primary" *ngIf="!container.isFetchingDetails">grade</md-icon>
+      <md-icon color="accent" *ngIf="!container.isFetchingDetails">grade</md-icon>
 
-      <md-spinner *ngIf="container.isFetchingDetails"></md-spinner>
+      <md-spinner color="accent" *ngIf="container.isFetchingDetails"></md-spinner>
     </div>
 
-    <span class="title">{{ container.name }}</span>
+    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ container.name }}</h1>
   </md-toolbar>
 
   <md-tab-group fxFlex>
