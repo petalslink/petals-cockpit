@@ -26,7 +26,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.sse.EventInput;
-import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
@@ -93,8 +92,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeSA1State() {
-        try (EventInput eventInput = resource.target("/workspaces/1/content")
-                .request(SseFeature.SERVER_SENT_EVENTS_TYPE).get(EventInput.class)) {
+        try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);
 
@@ -130,7 +128,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
         fContainer.addServiceAssembly(fServiceAssembly);
         setupWorkspace(2, "test2", Arrays.asList(Tuple.of(fDomain, "phrase")), "anotheruser");
 
-        Response put = resource.target("/workspaces/2/serviceassemblies/42").request()
+        Response put = resource.target("/workspaces/2/serviceassemblies/" + getId(fServiceAssembly)).request()
                 .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Stopped)));
 
         assertThat(put.getStatus()).isEqualTo(403);

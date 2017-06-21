@@ -241,7 +241,7 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
-    public SAStateChanged changeSUState(@NotNull @PathParam("saId") @Min(1) long saId,
+    public SAStateChanged changeSAState(@NotNull @PathParam("saId") @Min(1) long saId,
             @NotNull @Valid SAChangeState action) throws InterruptedException {
 
         checkAccess(jooq);

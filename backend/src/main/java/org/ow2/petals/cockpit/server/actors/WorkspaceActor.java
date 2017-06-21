@@ -73,7 +73,6 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
-import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin.State;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
@@ -443,8 +442,8 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                     .where(CONTAINERS.ID.eq(comp.getContainerId())).fetchOne();
             assert cont != null;
 
-            State newCurrentState = petals.changeComponentState(cont.getIp(), cont.getPort(), cont.getUsername(),
-                    cont.getPassword(), comp.getType(), comp.getName(), currentState, newState,
+            ComponentMin.State newCurrentState = petals.changeComponentState(cont.getIp(), cont.getPort(),
+                    cont.getUsername(), cont.getPassword(), comp.getType(), comp.getName(), currentState, newState,
                     change.action.parameters);
 
             ComponentStateChanged res = new ComponentStateChanged(comp.getId(), newCurrentState);
