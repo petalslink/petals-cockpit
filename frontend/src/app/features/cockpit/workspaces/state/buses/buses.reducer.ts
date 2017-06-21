@@ -15,8 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Action } from '@ngrx/store';
-
 import {
   IBusBackendSSE,
   IBusBackendDetails,
@@ -26,199 +24,127 @@ import {
   busesTableFactory,
   busRowFactory,
 } from './buses.interface';
-import { Workspaces } from '../workspaces/workspaces.reducer';
+
 import {
   updateById,
   removeById,
   mergeOnly,
   putAll,
-  JsMap,
-} from 'app/shared/helpers/map.helper';
+  JsTable,
+} from 'app/shared/helpers/jstable.helper';
+import { fold, unfold, toggleFold } from 'app/shared/helpers/reducers.helper';
+import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 
-export class Buses {
-  private static reducerName = '[Buses]';
+export namespace BusesReducer {
+  type All =
+    | Buses.Fetched
+    | Buses.Added
+    | Buses.SetCurrent
+    | Buses.FetchDetails
+    | Buses.FetchDetailsError
+    | Buses.FetchDetailsSuccess
+    | Buses.Removed
+    | Buses.Delete
+    | Buses.DeleteError
+    | Buses.Fold
+    | Buses.Unfold
+    | Buses.ToggleFold
+    | Workspaces.Clean;
 
-  public static reducer(
-    busesTable = busesTableFactory(),
-    { type, payload }: Action
+  export function reducer(
+    table = busesTableFactory(),
+    action: All
   ): IBusesTable {
-    if (!Buses.mapActionsToMethod[type]) {
-      return busesTable;
+    switch (action.type) {
+      case Buses.FetchedType: {
+        return fetched(table, action.payload);
+      }
+      case Buses.AddedType: {
+        return added(table, action.payload);
+      }
+      case Buses.SetCurrentType: {
+        return setCurrent(table, action.payload);
+      }
+      case Buses.FetchDetailsType: {
+        return fetchDetails(table, action.payload);
+      }
+      case Buses.FetchDetailsErrorType: {
+        return fetchDetailsError(table, action.payload);
+      }
+      case Buses.FetchDetailsSuccessType: {
+        return fetchDetailsSuccess(table, action.payload);
+      }
+      case Buses.RemovedType: {
+        return removed(table, action.payload);
+      }
+      case Buses.DeleteType: {
+        return deletee(table, action.payload);
+      }
+      case Buses.DeleteErrorType: {
+        return deleteError(table, action.payload);
+      }
+      case Buses.FoldType: {
+        return fold(table, action.payload);
+      }
+      case Buses.UnfoldType: {
+        return unfold(table, action.payload);
+      }
+      case Buses.ToggleFoldType: {
+        return toggleFold(table, action.payload);
+      }
+      case Workspaces.CleanType: {
+        return busesTableFactory();
+      }
+      default:
+        return table;
     }
-
-    return Buses.mapActionsToMethod[type](busesTable, payload) || busesTable;
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_BUSES_SUCCESS = `${Buses.reducerName} Fetch buses success`;
-  private static fetchBusesSuccess(
-    busesTable: IBusesTable,
-    payload: JsMap<IBusBackendSSE>
-  ): IBusesTable {
-    return mergeOnly(busesTable, payload, busRowFactory());
+  function fetched(table: IBusesTable, payload: JsTable<IBusBackendSSE>) {
+    return mergeOnly(table, payload, busRowFactory);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static ADD_BUSES_SUCCESS = `${Buses.reducerName} Add buses success`;
-  private static addBusesSuccess(
-    busesTable: IBusesTable,
-    payload: JsMap<IBusBackendSSE>
-  ): IBusesTable {
-    return putAll(busesTable, payload, busRowFactory());
+  function added(table: IBusesTable, payload: JsTable<IBusBackendSSE>) {
+    return putAll(table, payload, busRowFactory);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FOLD_BUS = `${Buses.reducerName} Fold bus`;
-  private static foldBus(
-    busesTable: IBusesTable,
-    payload: { busId: string }
-  ): IBusesTable {
-    if (
-      !busesTable.byId[payload.busId] ||
-      busesTable.byId[payload.busId].isFolded
-    ) {
-      return busesTable;
-    }
-
-    return updateById(busesTable, payload.busId, { isFolded: true });
-  }
-
-  // tslint:disable-next-line:member-ordering
-  public static UNFOLD_BUS = `${Buses.reducerName} Unfold bus`;
-  private static unfoldBus(
-    busesTable: IBusesTable,
-    payload: { busId: string }
-  ): IBusesTable {
-    if (
-      !busesTable.byId[payload.busId] ||
-      !busesTable.byId[payload.busId].isFolded
-    ) {
-      return busesTable;
-    }
-
-    return updateById(busesTable, payload.busId, { isFolded: false });
-  }
-
-  // tslint:disable-next-line:member-ordering
-  public static TOGGLE_FOLD_BUS = `${Buses.reducerName} Toggle fold bus`;
-  private static toggleFoldBus(
-    busesTable: IBusesTable,
-    payload: { busId: string }
-  ): IBusesTable {
-    const bus = busesTable.byId[payload.busId];
-
-    if (!bus) {
-      return busesTable;
-    }
-
-    if (bus.isFolded) {
-      return Buses.unfoldBus(busesTable, payload);
-    }
-
-    return Buses.foldBus(busesTable, payload);
-  }
-
-  // tslint:disable-next-line:member-ordering
-  public static SET_CURRENT_BUS = `${Buses.reducerName} Set current bus`;
-  private static setCurrentBus(
-    busesTable: IBusesTable,
-    payload: { busId: string }
-  ): IBusesTable {
+  function setCurrent(table: IBusesTable, payload: { id: string }) {
     return {
-      ...busesTable,
+      ...table,
       ...<IBusesTable>{
-        selectedBusId: payload.busId,
+        selectedBusId: payload.id,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_BUS_DETAILS = `${Buses.reducerName} Fetch bus details`;
-  private static fetchBusDetails(
-    busesTable: IBusesTable,
-    payload: { busId: string }
-  ): IBusesTable {
-    return updateById(busesTable, payload.busId, { isFetchingDetails: true });
+  function fetchDetails(table: IBusesTable, payload: { id: string }) {
+    return updateById(table, payload.id, { isFetchingDetails: true });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_BUS_DETAILS_SUCCESS = `${Buses.reducerName} Fetch bus details success`;
-  private static fetchBusDetailsSuccess(
-    busesTable: IBusesTable,
-    payload: { busId: string; data: IBusBackendDetails }
-  ): IBusesTable {
-    return updateById(busesTable, payload.busId, {
+  function fetchDetailsSuccess(
+    table: IBusesTable,
+    payload: { id: string; data: IBusBackendDetails }
+  ) {
+    return updateById(table, payload.id, {
       ...payload.data,
       isFetchingDetails: false,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_BUS_DETAILS_ERROR = `${Buses.reducerName} Fetch bus details error`;
-  private static fetchBusDetailsError(
-    busesTable: IBusesTable,
-    payload: { busId: string }
-  ): IBusesTable {
-    return updateById(busesTable, payload.busId, { isFetchingDetails: false });
+  function fetchDetailsError(table: IBusesTable, payload: { id: string }) {
+    return updateById(table, payload.id, { isFetchingDetails: false });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static DELETE_BUS = `${Buses.reducerName} Delete bus`;
-  private static deleteBus(
-    busesTable: IBusesTable,
-    payload: string
-  ): IBusesTable {
-    return updateById(busesTable, payload, { isRemoving: true });
+  function deletee(table: IBusesTable, payload: { id: string }) {
+    return updateById(table, payload.id, { isRemoving: true });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static DELETE_BUS_FAILED = `${Buses.reducerName} Delete bus failed`;
-  private static deleteBusFailed(
-    busesTable: IBusesTable,
-    payload: string
-  ): IBusesTable {
-    return updateById(busesTable, payload, { isRemoving: false });
+  function deleteError(table: IBusesTable, payload: { id: string }) {
+    return updateById(table, payload.id, { isRemoving: false });
   }
 
-  /**
-   * Note: while DELETE_BUS concerns the HTTP action of deleting a bus,
-   * REMOVE_BUS concerns the event coming from the SSE that a bus has been deleted.
-   */
-  // tslint:disable-next-line:member-ordering
-  public static REMOVE_BUS = `${Buses.reducerName} Remove bus`;
-  private static removeBus(
-    busesTable: IBusesTable,
-    payload: { busId: string }
-  ): IBusesTable {
-    return removeById(busesTable, payload.busId);
+  function removed(table: IBusesTable, payload: { id: string }) {
+    return removeById(table, payload.id);
   }
-
-  private static cleanWorkspace(
-    _busesTable: IBusesTable,
-    _payload
-  ): IBusesTable {
-    return busesTableFactory();
-  }
-
-  // -------------------------------------------------------------------------------------------
-
-  // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod: {
-    [type: string]: (t: IBusesTable, p: any) => IBusesTable;
-  } = {
-    [Buses.FETCH_BUSES_SUCCESS]: Buses.fetchBusesSuccess,
-    [Buses.ADD_BUSES_SUCCESS]: Buses.addBusesSuccess,
-    [Buses.FOLD_BUS]: Buses.foldBus,
-    [Buses.UNFOLD_BUS]: Buses.unfoldBus,
-    [Buses.TOGGLE_FOLD_BUS]: Buses.toggleFoldBus,
-    [Buses.SET_CURRENT_BUS]: Buses.setCurrentBus,
-    [Buses.FETCH_BUS_DETAILS]: Buses.fetchBusDetails,
-    [Buses.FETCH_BUS_DETAILS_SUCCESS]: Buses.fetchBusDetailsSuccess,
-    [Buses.FETCH_BUS_DETAILS_ERROR]: Buses.fetchBusDetailsError,
-    [Buses.DELETE_BUS]: Buses.deleteBus,
-    [Buses.DELETE_BUS_FAILED]: Buses.deleteBusFailed,
-    [Buses.REMOVE_BUS]: Buses.removeBus,
-
-    [Workspaces.CLEAN_WORKSPACE]: Buses.cleanWorkspace,
-  };
 }

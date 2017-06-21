@@ -27,6 +27,7 @@ import { environment } from '../../../environments/environment';
 import {
   ServiceAssembliesServiceImpl,
   ServiceAssemblyState,
+  EServiceAssemblyState,
 } from 'app/shared/services/service-assemblies.service';
 
 @Injectable()
@@ -49,8 +50,11 @@ export class ServiceAssembliesServiceMock extends ServiceAssembliesServiceImpl {
     newState: ServiceAssemblyState
   ) {
     const serviceAssembly = serviceAssembliesService.get(serviceAssemblyId);
-
-    serviceAssembly.setState(newState);
+    if (newState === EServiceAssemblyState.Unloaded) {
+      serviceAssembliesService.remove(serviceAssemblyId);
+    } else {
+      serviceAssembly.state = newState;
+    }
 
     const response = {
       id: serviceAssemblyId,

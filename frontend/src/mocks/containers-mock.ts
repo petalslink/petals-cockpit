@@ -74,8 +74,7 @@ export class Container {
     this.addServiceAssembly('Started');
 
     const sl = this.addSharedLibrary();
-    const c3 = this.addComponent('Started');
-    c3.registerSharedLibrary(sl);
+    const c3 = this.addComponent('Started', undefined, sl);
     sl.registerComponent(c3);
   }
 
@@ -91,11 +90,17 @@ export class Container {
     return Array.from(this.sharedLibraries.values());
   }
 
-  addComponent(state?: ComponentState, name?: string) {
-    const component = componentsService.create(this, name, state);
+  addComponent(state?: ComponentState, name?: string, ...sls: SharedLibrary[]) {
+    const component = componentsService.create(this, name, state, ...sls);
     this.components.set(component.id, component);
 
     return component;
+  }
+
+  removeComponent(id: string) {
+    const component = this.components.get(id);
+    this.components.delete(id);
+    component.getSharedLibraries().forEach(sl => sl.unregisterComponent(id));
   }
 
   addServiceAssembly(state?: ServiceAssemblyState, name?: string) {
@@ -121,6 +126,14 @@ export class Container {
     return [serviceAssembly.toObj(), { ...su1.toObj(), ...su2.toObj() }];
   }
 
+  removeServiceAssembly(id: string) {
+    const sa = this.serviceAssemblies.get(id);
+    this.serviceAssemblies.delete(id);
+    sa
+      .getServiceUnits()
+      .forEach(su => su.component.unregisterServiceUnit(su.id));
+  }
+
   addServiceUnit(
     component: Component,
     state?: ServiceAssemblyState,
@@ -143,6 +156,10 @@ export class Container {
     const sl = sharedLibrariesService.create(this, name, version);
     this.sharedLibraries.set(sl.id, sl);
     return sl;
+  }
+
+  removeSharedLibrary(id: string) {
+    this.sharedLibraries.delete(id);
   }
 
   toObj(): { [id: string]: IContainerBackendSSE } {

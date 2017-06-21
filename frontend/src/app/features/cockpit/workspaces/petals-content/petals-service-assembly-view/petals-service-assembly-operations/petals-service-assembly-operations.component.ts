@@ -24,10 +24,11 @@ import {
 import { Store } from '@ngrx/store';
 
 import { stateNameToPossibleActionsServiceAssembly } from '../../../../../../shared/helpers/service-assembly.helper';
-import { IStore } from '../../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../../shared/state/store.interface';
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+
 import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
+import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 
 @Component({
   selector: 'app-petals-service-assembly-operations',
@@ -46,14 +47,16 @@ export class PetalsServiceAssemblyOperationsComponent implements OnInit {
     return stateNameToPossibleActionsServiceAssembly(state);
   }
 
-  saState(index, item) {
+  saState(index: number, item: any) {
     return item.newStateAction;
   }
 
-  changeState(newState: ServiceAssemblyState) {
-    this.store$.dispatch({
-      type: ServiceAssemblies.CHANGE_STATE,
-      payload: { serviceAssemblyId: this.serviceAssembly.id, newState },
-    });
+  changeState(state: ServiceAssemblyState) {
+    this.store$.dispatch(
+      new ServiceAssemblies.ChangeState({
+        id: this.serviceAssembly.id,
+        state,
+      })
+    );
   }
 }

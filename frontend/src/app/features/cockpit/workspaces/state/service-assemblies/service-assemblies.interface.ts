@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
+import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
 import {
   IServiceAssemblyBackendSSE,
   IServiceAssemblyBackendDetails,
@@ -28,6 +28,7 @@ export interface IServiceAssemblyUI {
   isFolded: boolean;
   isUpdatingState: boolean;
   errorChangeState: string;
+  isFetchingDetails: boolean;
 }
 
 export interface IServiceAssemblyRow extends IServiceAssemblyUI, IServiceAssemblyBackendSSE, IServiceAssemblyBackendDetails {}
@@ -36,10 +37,9 @@ export interface IServiceAssembly extends IServiceAssemblyUI, IServiceAssemblyBa
 
 interface IServiceAssembliesCommon {
   selectedServiceAssemblyId: string;
-  isFetchingDetails: boolean;
 }
 
-export interface IServiceAssembliesTable extends IServiceAssembliesCommon, JsMap<
+export interface IServiceAssembliesTable extends IServiceAssembliesCommon, JsTable<
   IServiceAssemblyRow
 > {}
 
@@ -58,12 +58,12 @@ export function serviceAssemblyRowFactory(): IServiceAssemblyRow {
     isFolded: false,
     isUpdatingState: false,
     errorChangeState: '',
+    isFetchingDetails: false,
   };
 }
 
 export function serviceAssembliesTableFactory(): IServiceAssembliesTable {
-  return Object.assign({}, emptyJavascriptMap<IServiceAssemblyRow>(), {
+  return Object.assign({}, emptyJsTable<IServiceAssemblyRow>(), {
     selectedServiceAssemblyId: '',
-    isFetchingDetails: false,
   });
 }

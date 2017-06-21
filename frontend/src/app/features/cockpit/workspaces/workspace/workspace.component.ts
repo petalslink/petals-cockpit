@@ -21,11 +21,12 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { Ui } from '../../../../shared/state/ui.reducer';
-import { IStore } from '../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../shared/state/store.interface';
 import { IWorkspace } from './../state/workspaces/workspaces.interface';
 import { getCurrentWorkspace } from '../../../cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
+
+import { Ui } from 'app/shared/state/ui.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 
 @Component({
   selector: 'app-workspace',
@@ -45,10 +46,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   constructor(private store$: Store<IStore>, public dialog: MdDialog) {}
 
   ngOnInit() {
-    this.store$.dispatch({
-      type: Ui.SET_TITLES,
-      payload: { titleMainPart1: 'Petals', titleMainPart2: '' },
-    });
+    this.store$.dispatch(new Ui.SetTitles({ titleMainPart1: 'Petals' }));
 
     this.workspace$ = this.store$.let(getCurrentWorkspace());
 
@@ -62,10 +60,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
         this.description = null;
         this.isEditingDescription = false;
         this.isSettingDescription = false;
-        this.store$.dispatch({
-          type: Workspaces.FETCH_WORKSPACE_DETAILS,
-          payload: id,
-        });
+        this.store$.dispatch(new Workspaces.FetchDetails({ id }));
       })
       .subscribe();
 
@@ -101,14 +96,13 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
   validateDescription() {
     this.isSettingDescription = true;
-    const desc = this.description;
+    const description = this.description;
     this.workspace$
       .first()
       .do(ws => {
-        this.store$.dispatch({
-          type: Workspaces.SET_DESCRIPTION,
-          payload: { id: ws.id, description: desc },
-        });
+        this.store$.dispatch(
+          new Workspaces.SetDescription({ id: ws.id, description })
+        );
       })
       .subscribe();
   }
@@ -125,12 +119,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
           .afterClosed()
           .do((result: boolean) => (this.isRemoving = result))
           .filter((result: boolean) => result)
-          .do(_ =>
-            this.store$.dispatch({
-              type: Workspaces.DELETE_WORKSPACE,
-              payload: ws.id,
-            })
-          )
+          .do(_ => this.store$.dispatch(new Workspaces.Delete({ id: ws.id })))
       )
       .subscribe();
   }

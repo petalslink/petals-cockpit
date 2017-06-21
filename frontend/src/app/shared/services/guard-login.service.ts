@@ -22,15 +22,15 @@ import {
   RouterStateSnapshot,
   ActivatedRouteSnapshot,
 } from '@angular/router';
-import { Response } from '@angular/http';
+
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
 import { UsersService } from './users.service';
 import { environment } from './../../../environments/environment';
-import { IStore } from './../interfaces/store.interface';
-import { Users } from './../state/users.reducer';
-import { ICurrentUser } from './../interfaces/users.interface';
+import { IStore } from '../state/store.interface';
+
+import { Users } from 'app/shared/state/users.actions';
 
 @Injectable()
 export class GuardLoginService implements CanActivate {
@@ -71,7 +71,7 @@ export class GuardLoginService implements CanActivate {
         } else {
           return this.userService
             .getUserInformations()
-            .map((res: Response) => {
+            .map(user => {
               if (isLoginPage) {
                 if (environment.debug) {
                   console.debug(
@@ -79,10 +79,9 @@ export class GuardLoginService implements CanActivate {
                   );
                 }
 
-                this.store$.dispatch({
-                  type: Users.CONNECT_USER_SUCCESS,
-                  payload: { user: <ICurrentUser>res.json(), navigate: true },
-                });
+                this.store$.dispatch(
+                  new Users.ConnectSuccess({ user, navigate: true })
+                );
 
                 return false;
               } else {
@@ -92,10 +91,9 @@ export class GuardLoginService implements CanActivate {
                   );
                 }
 
-                this.store$.dispatch({
-                  type: Users.CONNECT_USER_SUCCESS,
-                  payload: { user: <ICurrentUser>res.json(), navigate: false },
-                });
+                this.store$.dispatch(
+                  new Users.ConnectSuccess({ user, navigate: false })
+                );
 
                 return true;
               }

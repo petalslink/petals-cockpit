@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
+import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
 import {
   ISharedLibraryBackendSSE,
   ISharedLibraryBackendDetails,
@@ -26,6 +26,9 @@ import {
 export interface ISharedLibraryUI {
   // for UI
   isFolded: boolean;
+  isFetchingDetails: boolean;
+  isUpdatingState: boolean;
+  errorChangeState: string;
 }
 
 export interface ISharedLibraryRow extends ISharedLibraryUI, ISharedLibraryBackendSSE, ISharedLibraryBackendDetails {}
@@ -34,10 +37,9 @@ export interface ISharedLibrary extends ISharedLibraryUI, ISharedLibraryBackendS
 
 interface ISharedLibrariesCommon {
   selectedSharedLibraryId: string;
-  isFetchingDetails: boolean;
 }
 
-export interface ISharedLibrariesTable extends ISharedLibrariesCommon, JsMap<
+export interface ISharedLibrariesTable extends ISharedLibrariesCommon, JsTable<
   ISharedLibraryRow
 > {}
 
@@ -52,14 +54,16 @@ export function sharedLibraryRowFactory(): ISharedLibraryRow {
     version: null,
     components: [],
     containerId: null,
+    isFetchingDetails: false,
 
     isFolded: false,
+    isUpdatingState: false,
+    errorChangeState: '',
   };
 }
 
 export function sharedLibrariesTableFactory(): ISharedLibrariesTable {
-  return Object.assign({}, emptyJavascriptMap<ISharedLibraryRow>(), {
+  return Object.assign({}, emptyJsTable<ISharedLibraryRow>(), {
     selectedSharedLibraryId: '',
-    isFetchingDetails: false,
   });
 }

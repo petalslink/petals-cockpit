@@ -20,9 +20,10 @@ import { Router, ActivatedRouteSnapshot, Resolve } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
-import { IStore } from 'app/shared/interfaces/store.interface';
+import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
+import { JsTable } from 'app/shared/helpers/jstable.helper';
 
 @Injectable()
 export class ResourceByIdResolver implements Resolve<any> {
@@ -31,7 +32,8 @@ export class ResourceByIdResolver implements Resolve<any> {
   resolve(route: ActivatedRouteSnapshot): Observable<boolean> | boolean {
     const workspaceId = route.params['workspaceId'];
 
-    let id, resourceState;
+    let id: string;
+    let resourceState: (state: IStore) => JsTable<object>;
 
     if ((id = route.params['busId'])) {
       resourceState = state => state.buses;

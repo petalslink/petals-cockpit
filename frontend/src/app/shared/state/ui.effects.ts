@@ -20,9 +20,9 @@ import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
-import { Ui } from '../state/ui.reducer';
-import { IStore } from 'app/shared/interfaces/store.interface';
+import { IStore } from 'app/shared/state/store.interface';
 import { isSmallScreen } from 'app/shared/state/ui.selectors';
+import { Ui } from 'app/shared/state/ui.actions';
 
 @Injectable()
 export class UiEffects {
@@ -31,8 +31,8 @@ export class UiEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   closeSidenavOnSmallScreen$: Observable<Action> = this.actions$
-    .ofType(Ui.CLOSE_SIDENAV_ON_SMALL_SCREEN)
+    .ofType(Ui.CloseSidenavOnSmallScreenType)
     .withLatestFrom(this.store$.let(isSmallScreen))
     .filter(([_, ss]) => ss)
-    .map(_ => ({ type: Ui.CLOSE_SIDENAV }));
+    .map(_ => new Ui.CloseSidenav());
 }

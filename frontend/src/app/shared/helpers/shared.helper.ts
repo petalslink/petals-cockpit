@@ -15,25 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// generate a UUID
-export function generateUuidV4(a = null) {
-  /* tslint:disable */
-  return a
-    ? (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
-    : ((<any>[1e7]) + -1e3 + -4e3 + -8e3 + -1e11).replace(
-        /[018]/g,
-        generateUuidV4
-      );
-  /* tslint:enable */
-}
-
 const matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
 
-export function escapeStringRegexp(str) {
-  if (typeof str !== 'string') {
-    throw new TypeError('Expected a string');
-  }
-
+export function escapeStringRegexp(str: string) {
   return str.replace(matchOperatorsRe, '\\$&');
 }
 
@@ -48,6 +32,6 @@ export function arrayEquals<T extends [void]>(ps: T, ns: T): boolean {
   return ps.every((p, i) => p === ns[i]);
 }
 
-export function isNot(e: object): (object) => boolean {
+export function isNot(e: object): (object: any) => boolean {
   return e2 => e !== e2;
 }

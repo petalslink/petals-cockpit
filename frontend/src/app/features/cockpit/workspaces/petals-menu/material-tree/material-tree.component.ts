@@ -46,9 +46,9 @@ export interface TreeEvent<T extends TreeElement<T>> {
 export class MaterialTreeComponent<TE extends TreeElement<TE>>
   implements OnInit {
   // pass the tree to display
-  @Input() tree;
+  @Input() tree: TreeElement<TE>[];
   // pass the search to display
-  @Input() search;
+  @Input() search: string;
   // pass a margin to apply on each level (in px)
   @Input() marginLeft = 0;
   // only used internally

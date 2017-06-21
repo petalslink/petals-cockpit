@@ -16,7 +16,7 @@
  */
 
 import { IContainers } from '../containers/containers.interface';
-import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
+import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
 import {
   IBusBackendSSE,
   IBusBackendDetails,
@@ -28,6 +28,7 @@ export interface IBusUI {
   // for UI
   isFolded: boolean;
   isFetchingDetails: boolean;
+  isRemoving: boolean;
 }
 
 // used within table
@@ -42,7 +43,7 @@ export interface IBusesCommon {
   selectedBusId: string;
 }
 
-export interface IBusesTable extends IBusesCommon, JsMap<IBusRow> {}
+export interface IBusesTable extends IBusesCommon, JsTable<IBusRow> {}
 
 export interface IBuses extends IBusesCommon {
   list: IBus[];
@@ -56,13 +57,14 @@ export function busRowFactory(): IBusRow {
 
     isFolded: false,
     isFetchingDetails: false,
+    isRemoving: false,
 
     containers: [],
   };
 }
 
 export function busesTableFactory(): IBusesTable {
-  return Object.assign({}, emptyJavascriptMap<IBusRow>(), {
+  return Object.assign({}, emptyJsTable<IBusRow>(), {
     selectedBusId: '',
   });
 }

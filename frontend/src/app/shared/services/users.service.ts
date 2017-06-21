@@ -47,7 +47,7 @@ export abstract class UsersService {
 
   abstract disconnectUser(): Observable<Response>;
 
-  abstract getUserInformations(): Observable<Response>;
+  abstract getUserInformations(): Observable<IUserBackend>;
 
   abstract setupUser(value: IUserSetup): Observable<Response>;
 }
@@ -67,7 +67,9 @@ export class UsersServiceImpl extends UsersService {
   }
 
   getUserInformations() {
-    return this.http.get(`${environment.urlBackend}/user/session`);
+    return this.http
+      .get(`${environment.urlBackend}/user/session`)
+      .map(res => res.json() as IUserBackend);
   }
 
   setupUser(value: IUserSetup) {

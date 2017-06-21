@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
+
 import { Router } from '@angular/router';
 import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
@@ -24,19 +24,13 @@ import { Observable } from 'rxjs/Observable';
 
 import { NotificationsService } from 'angular2-notifications';
 
-import { Workspaces } from './workspaces.reducer';
 import {
   WorkspacesService,
   IWorkspaceBackend,
 } from 'app/shared/services/workspaces.service';
-import { Users } from 'app/shared/state/users.reducer';
+
 import { environment } from 'environments/environment';
-import { Buses } from '../buses/buses.reducer';
-import { Containers } from '../containers/containers.reducer';
-import { Components } from '../components/components.reducer';
-import { ServiceUnits } from '../service-units/service-units.reducer';
-import { Ui } from 'app/shared/state/ui.reducer';
-import { BusesInProgress } from '../buses-in-progress/buses-in-progress.reducer';
+
 import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
 import {
   IBusInProgressBackend,
@@ -45,13 +39,23 @@ import {
 import { IComponentBackendSSE } from 'app/shared/services/components.service';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { IContainerBackendSSE } from 'app/shared/services/containers.service';
-import { toJavascriptMap } from 'app/shared/helpers/map.helper';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { IUserBackendCommon } from 'app/shared/services/users.service';
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
+
 import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
+import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
+import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
+import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
+import { Users } from 'app/shared/state/users.actions';
+import { Ui } from 'app/shared/state/ui.actions';
 
 @Injectable()
 export class WorkspacesEffects {
@@ -66,28 +70,24 @@ export class WorkspacesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchWorkspaces$: Observable<Action> = this.actions$
-    .ofType(Workspaces.FETCH_WORKSPACES)
-    .switchMap(action =>
+    .ofType(Workspaces.FetchAllType)
+    .switchMap((action: Workspaces.FetchAll) =>
       this.workspacesService
         .fetchWorkspaces()
-        .map((res: Response) => {
+        .map(res => {
           const data = res.json();
           return batchActions([
-            {
-              type: Workspaces.FETCH_WORKSPACES_SUCCESS,
-              payload: toJavascriptMap<IWorkspaceBackend>(data.workspaces),
-            },
-            {
-              type: Users.FETCH_USERS_SUCCESS,
-              payload: toJavascriptMap<IUserBackendCommon>(data.users),
-            },
+            new Workspaces.FetchAllSuccess(
+              toJsTable<IWorkspaceBackend>(data.workspaces)
+            ),
+            new Users.Fetched(toJsTable<IUserBackendCommon>(data.users)),
           ]);
         })
         .catch(err => {
           if (environment.debug) {
             console.group();
             console.debug(
-              `Error in workspaces.effects: ${Workspaces.FETCH_WORKSPACES}`
+              `Error in workspaces.effects: ofType(Workspaces.FetchAllType)`
             );
             console.error(err);
             console.groupEnd();
@@ -98,32 +98,23 @@ export class WorkspacesEffects {
             `An error occurred while loading the workspaces.`
           );
 
-          return Observable.of({
-            type: Workspaces.FETCH_WORKSPACES_FAILED,
-            payload: action.payload,
-          });
+          return Observable.of(new Workspaces.FetchAllError());
         })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   postWorkspace$: Observable<Action> = this.actions$
-    .ofType(Workspaces.POST_WORKSPACE)
-    .switchMap((action: Action) =>
+    .ofType(Workspaces.PostType)
+    .switchMap((action: Workspaces.Post) =>
       this.workspacesService
-        .postWorkspace(action.payload)
-        .map((res: Response) => {
-          const workspace = res.json();
-          return {
-            type: Workspaces.POST_WORKSPACE_SUCCESS,
-            payload: workspace,
-          };
-        })
+        .postWorkspace(action.payload.name)
+        .map(res => new Workspaces.PostSuccess(res.json()))
         .catch(err => {
           if (environment.debug) {
             console.group();
             console.debug(
-              `Error in workspaces.effects: ${Workspaces.POST_WORKSPACE}`
+              `Error in workspaces.effects: ofType(Workspaces.PostType)`
             );
             console.error(err);
             console.groupEnd();
@@ -133,52 +124,49 @@ export class WorkspacesEffects {
             `Workspaces`,
             `An error occurred while adding a new workspace.`
           );
-          return Observable.of({ type: Workspaces.POST_WORKSPACE_FAILED });
+          return Observable.of(new Workspaces.PostError());
         })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   closeWorkspace$: Observable<Action> = this.actions$
-    .ofType(Workspaces.CLOSE_WORKSPACE)
+    .ofType(Workspaces.CloseType)
     .do(_ => this.sseService.stopWatchingWorkspace())
-    .do((action: Action) => {
+    .do((action: Workspaces.Close) => {
       if (action.payload && action.payload.delete) {
         this.router.navigate(['/workspaces']);
       }
     })
     .do(_ => this.notifications.remove())
-    .map(_ => ({ type: Workspaces.CLEAN_WORKSPACE }));
+    .map(_ => new Workspaces.Clean());
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   removeWorkspace$: Observable<Action> = this.actions$
     .ofType(SseWorkspaceEvent.WORKSPACE_DELETED.action)
     .do(_ => this.sseService.stopWatchingWorkspace())
-    .map(action => ({
-      type: Workspaces.REMOVE_WORKSPACE,
-      payload: action.payload.id,
-    }));
+    .map(action => new Workspaces.Removed(action.payload.id));
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchWorkspace$: Observable<Action> = this.actions$
-    .ofType(Workspaces.FETCH_WORKSPACE)
-    .switchMap((action: Action) =>
+    .ofType(Workspaces.FetchType)
+    .switchMap((action: Workspaces.Fetch) =>
       this.sseService
-        .watchWorkspaceRealTime(action.payload)
+        .watchWorkspaceRealTime(action.payload.id)
         .startWith(
           batchActions([
-            { type: Workspaces.CLEAN_WORKSPACE },
-            { type: Ui.OPEN_SIDENAV },
-            { type: Ui.CLOSE_POPUP_WORKSPACES_LIST },
+            new Workspaces.Clean(),
+            new Ui.OpenSidenav(),
+            new Ui.CloseWorkspaces(),
           ])
         )
         .catch(err => {
           if (environment.debug) {
             console.group();
             console.debug(
-              `Error in workspaces.effects: ${Workspaces.FETCH_WORKSPACE}`
+              `Error in workspaces.effects: ofType(Workspaces.FetchType)`
             );
             console.error(err);
             console.groupEnd();
@@ -189,7 +177,7 @@ export class WorkspacesEffects {
             `An error occurred with the workspace connection.`
           );
 
-          return Observable.of({ type: Workspaces.FETCH_WORKSPACE_FAILED });
+          return Observable.of(new Workspaces.FetchError(action.payload));
         })
     );
 
@@ -200,139 +188,106 @@ export class WorkspacesEffects {
     .map((action: Action) => {
       const data = action.payload;
       return batchActions([
-        {
-          type: Workspaces.FETCH_WORKSPACE_SUCCESS,
-          payload: data.workspace,
-        },
-        {
-          type: Users.FETCH_USERS_SUCCESS,
-          payload: toJavascriptMap<IUserBackendCommon>(data.users),
-        },
-        {
-          type: BusesInProgress.FETCH_BUSES_IN_PROGRESS,
-          payload: toJavascriptMap<IBusInProgressBackend>(data.busesInProgress),
-        },
-        {
-          type: Buses.FETCH_BUSES_SUCCESS,
-          payload: toJavascriptMap<IBusBackendSSE>(data.buses),
-        },
-        {
-          type: Containers.FETCH_CONTAINERS_SUCCESS,
-          payload: toJavascriptMap<IContainerBackendSSE>(data.containers),
-        },
-        {
-          type: Components.FETCH_COMPONENTS_SUCCESS,
-          payload: toJavascriptMap<IComponentBackendSSE>(data.components),
-        },
-        {
-          type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLIES_SUCCESS,
-          payload: toJavascriptMap<IServiceAssemblyBackendSSE>(
-            data.serviceAssemblies
-          ),
-        },
-        {
-          type: ServiceUnits.FETCH_SERVICE_UNITS_SUCCESS,
-          payload: toJavascriptMap<IServiceUnitBackendSSE>(data.serviceUnits),
-        },
-        {
-          type: SharedLibraries.FETCHED,
-          payload: toJavascriptMap<ISharedLibraryBackendSSE>(
-            data.sharedLibraries
-          ),
-        },
+        new Workspaces.FetchSuccess(data.workspace),
+        new Users.Fetched(toJsTable<IUserBackendCommon>(data.users)),
+        new BusesInProgress.Fetched(
+          toJsTable<IBusInProgressBackend>(data.busesInProgress)
+        ),
+        new Buses.Fetched(toJsTable<IBusBackendSSE>(data.buses)),
+        new Containers.Fetched(
+          toJsTable<IContainerBackendSSE>(data.containers)
+        ),
+        new Components.Fetched(
+          toJsTable<IComponentBackendSSE>(data.components)
+        ),
+        new ServiceAssemblies.Fetched(
+          toJsTable<IServiceAssemblyBackendSSE>(data.serviceAssemblies)
+        ),
+        new ServiceUnits.Fetched(
+          toJsTable<IServiceUnitBackendSSE>(data.serviceUnits)
+        ),
+        new SharedLibraries.Fetched(
+          toJsTable<ISharedLibraryBackendSSE>(data.sharedLibraries)
+        ),
       ]);
     });
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchWorkspaceDetails$: Observable<Action> = this.actions$
-    .ofType(Workspaces.FETCH_WORKSPACE_DETAILS)
-    .switchMap((action: Action) =>
+    .ofType(Workspaces.FetchDetailsType)
+    .switchMap((action: Workspaces.FetchDetails) =>
       this.workspacesService
-        .fetchWorkspace(action.payload)
-        .map((res: Response) => {
+        .fetchWorkspace(action.payload.id)
+        .map(res => {
           const data = res.json();
           return batchActions([
-            {
-              type: Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS,
-              payload: { id: action.payload, data: data.workspace },
-            },
-            {
-              type: Users.FETCH_USERS_SUCCESS,
-              payload: toJavascriptMap<IUserBackendCommon>(data.users),
-            },
+            new Workspaces.FetchDetailsSuccess({
+              id: action.payload.id,
+              data: data.workspace,
+            }),
+            new Users.Fetched(toJsTable<IUserBackendCommon>(data.users)),
           ]);
         })
         .catch(err => {
           if (environment.debug) {
             console.group();
             console.warn(
-              `Error caught in workspaces.effects: ${Workspaces.FETCH_WORKSPACE_DETAILS}`
+              `Error caught in workspaces.effects: ofType(Workspaces.FetchDetailsType)`
             );
             console.error(err);
             console.groupEnd();
           }
 
-          return Observable.of({
-            type: Workspaces.FETCH_WORKSPACE_DETAILS_FAILED,
-            payload: action.payload,
-          });
+          return Observable.of(
+            new Workspaces.FetchDetailsError(action.payload)
+          );
         })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   setDescription$: Observable<Action> = this.actions$
-    .ofType(Workspaces.SET_DESCRIPTION)
-    .switchMap((action: Action) =>
+    .ofType(Workspaces.SetDescriptionType)
+    .switchMap((action: Workspaces.SetDescription) =>
       this.workspacesService
         .setDescription(action.payload.id, action.payload.description)
-        .map(__ => ({
-          type: Workspaces.SET_DESCRIPTION_SUCCESS,
-          payload: action.payload,
-        }))
+        .map(_ => new Workspaces.SetDescriptionSuccess(action.payload))
         .catch(err => {
           if (environment.debug) {
             console.group();
             console.warn(
-              `Error catched in workspaces.effects: ${Workspaces.SET_DESCRIPTION}`
+              `Error catched in workspaces.effects: ofType(Workspaces.SetDescriptionType)`
             );
             console.error(err);
             console.groupEnd();
           }
 
-          return Observable.of({
-            type: Workspaces.SET_DESCRIPTION_FAILED,
-            payload: action.payload.id,
-          });
+          return Observable.of(
+            new Workspaces.SetDescriptionError(action.payload)
+          );
         })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deleteWorkspace$: Observable<Action> = this.actions$
-    .ofType(Workspaces.DELETE_WORKSPACE)
-    .switchMap((action: Action) =>
+    .ofType(Workspaces.DeleteType)
+    .switchMap((action: Workspaces.Delete) =>
       this.workspacesService
-        .deleteWorkspace(action.payload)
-        .map(__ => ({
-          type: Workspaces.DELETE_WORKSPACE_SUCCESS,
-          payload: action.payload,
-        }))
+        .deleteWorkspace(action.payload.id)
+        .map(_ => new Workspaces.DeleteSuccess(action.payload))
         .catch(err => {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error catched in workspace.effects: ofType(Workspaces.DELETE_WORKSPACE)'
+              'Error catched in workspace.effects: ofType(Workspaces.DeleteType)'
             );
             console.error(err);
             console.groupEnd();
           }
 
-          return Observable.of({
-            type: Workspaces.DELETE_WORKSPACE_FAILED,
-            payload: action.payload,
-          });
+          return Observable.of(new Workspaces.DeleteError(action.payload));
         })
     );
 }

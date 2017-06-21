@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IUsers } from '../../../../../shared/interfaces/users.interface';
+import { IUsers } from '../../../../../shared/state/users.interface';
 import { IBuses } from '../buses/buses.interface';
 import {
   IWorkspaceBackend,

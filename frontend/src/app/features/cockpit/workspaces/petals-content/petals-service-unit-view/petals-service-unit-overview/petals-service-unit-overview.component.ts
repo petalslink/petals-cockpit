@@ -25,7 +25,7 @@ import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
 import { IServiceUnitRow } from '../../../state/service-units/service-units.interface';
-import { IStore } from '../../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../../shared/state/store.interface';
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 

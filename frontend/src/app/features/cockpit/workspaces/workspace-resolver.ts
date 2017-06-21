@@ -22,20 +22,18 @@ import { Store } from '@ngrx/store';
 // tslint:disable-next-line:no-unused-variable
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from './../../../shared/interfaces/store.interface';
-import { Workspaces } from './state/workspaces/workspaces.reducer';
+import { IStore } from '../../../shared/state/store.interface';
+
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 
 @Injectable()
 export class WorkspaceResolver implements Resolve<Observable<any>> {
   constructor(private store$: Store<IStore>, private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot) {
-    const workspaceId = route.paramMap.get('workspaceId');
+    const id = route.paramMap.get('workspaceId');
 
-    this.store$.dispatch({
-      type: Workspaces.FETCH_WORKSPACE,
-      payload: workspaceId,
-    });
+    this.store$.dispatch(new Workspaces.Fetch({ id }));
 
     return this.store$
       .select(state => state.workspaces)

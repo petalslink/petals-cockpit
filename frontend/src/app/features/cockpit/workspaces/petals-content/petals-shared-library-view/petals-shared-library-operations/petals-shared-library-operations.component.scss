@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface IUi {
-  language: string;
-  isSidenavVisible: boolean;
-  screenSize: string;
-  isPopupListWorkspacesVisible: boolean;
-  titleMainPart1: string;
-  titleMainPart2: string;
-  titleSubPart: string;
+.mat-card-title {
+  font-size: 16px;
 }

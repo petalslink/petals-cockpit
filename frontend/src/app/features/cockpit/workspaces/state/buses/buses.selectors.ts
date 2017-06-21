@@ -18,7 +18,7 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../shared/state/store.interface';
 import { IBusRow } from './buses.interface';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
@@ -26,5 +26,6 @@ export function getCurrentBus(store$: Store<IStore>): Observable<IBusRow> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.buses.selectedBusId)
     .map(state => state.buses.byId[state.buses.selectedBusId])
+    .filter(b => !!b)
     .distinctUntilChanged();
 }

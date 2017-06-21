@@ -30,8 +30,13 @@ export class Components {
 
   constructor() {}
 
-  create(container: Container, name?: string, state?: ComponentState) {
-    const component = new Component(container, name, state);
+  create(
+    container: Container,
+    name?: string,
+    state?: ComponentState,
+    ...sls: SharedLibrary[]
+  ) {
+    const component = new Component(container, name, state, ...sls);
 
     this.components.set(component.id, component);
     return component;
@@ -39,6 +44,12 @@ export class Components {
 
   get(id: string) {
     return this.components.get(id);
+  }
+
+  remove(id: string) {
+    const c = this.get(id);
+    this.components.delete(id);
+    c.container.removeComponent(id);
   }
 }
 
@@ -57,7 +68,8 @@ export class Component {
   constructor(
     container: Container,
     name?: string,
-    state: ComponentState = 'Loaded'
+    state: ComponentState = 'Loaded',
+    ...sls: SharedLibrary[]
   ) {
     const i = Component.cpt++;
     this.container = container;
@@ -68,6 +80,7 @@ export class Component {
       'http-port': '8080',
       'enable-https': 'false',
     };
+    sls.forEach(sl => this.sharedLibraries.set(sl.id, sl));
   }
 
   getServiceUnits() {
@@ -82,8 +95,8 @@ export class Component {
     this.serviceUnits.set(serviceUnit.id, serviceUnit);
   }
 
-  registerSharedLibrary(sharedLibrary: SharedLibrary) {
-    this.sharedLibraries.set(sharedLibrary.id, sharedLibrary);
+  unregisterServiceUnit(id: string) {
+    this.serviceUnits.delete(id);
   }
 
   toObj(): { [id: string]: IComponentBackendSSE } {

@@ -36,6 +36,12 @@ class SharedLibraries {
   get(id: string) {
     return this.sharedLibraries.get(id);
   }
+
+  remove(id: string) {
+    const sl = this.get(id);
+    this.sharedLibraries.delete(id);
+    sl.container.removeSharedLibrary(id);
+  }
 }
 
 export const sharedLibrariesService = new SharedLibraries();
@@ -64,8 +70,8 @@ export class SharedLibrary {
     this.components.set(component.id, component);
   }
 
-  unregisterComponent(component: Component) {
-    this.components.delete(component.id);
+  unregisterComponent(id: string) {
+    this.components.delete(id);
   }
 
   toObj(): { [id: string]: ISharedLibraryBackendSSE } {

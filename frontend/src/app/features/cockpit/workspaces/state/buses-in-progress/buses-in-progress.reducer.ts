@@ -15,68 +15,100 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Action } from '@ngrx/store';
-
 import { IBusInProgressBackend } from 'app/shared/services/buses.service';
 import {
   IBusesInProgressTable,
   busesInProgressTableFactory,
   busInProgressRowFactory,
+  IBusInProgressRow,
 } from './buses-in-progress.interface';
-import { Workspaces } from '../workspaces/workspaces.reducer';
+
 import {
   putAll,
   updateById,
   removeById,
   mergeOnly,
-  JsMap,
-} from 'app/shared/helpers/map.helper';
+  JsTable,
+} from 'app/shared/helpers/jstable.helper';
+import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 
-export class BusesInProgress {
-  private static reducerName = '[Buses In Prog]';
+export namespace BusesInProgressReducer {
+  type All =
+    | BusesInProgress.Fetched
+    | BusesInProgress.Added
+    | BusesInProgress.SetCurrent
+    | BusesInProgress.Post
+    | BusesInProgress.PostError
+    | BusesInProgress.PostSuccess
+    | BusesInProgress.Delete
+    | BusesInProgress.DeleteError
+    | BusesInProgress.Removed
+    | BusesInProgress.UpdateError
+    | Workspaces.Clean;
 
-  public static reducer(
-    busesInProgressTable = busesInProgressTableFactory(),
-    { type, payload }: Action
+  export function reducer(
+    table = busesInProgressTableFactory(),
+    action: All
   ): IBusesInProgressTable {
-    if (!BusesInProgress.mapActionsToMethod[type]) {
-      return busesInProgressTable;
+    switch (action.type) {
+      case BusesInProgress.FetchedType: {
+        return fetched(table, action.payload);
+      }
+      case BusesInProgress.AddedType: {
+        return added(table, action.payload);
+      }
+      case BusesInProgress.SetCurrentType: {
+        return setCurrent(table, action.payload);
+      }
+      case BusesInProgress.PostType: {
+        return post(table);
+      }
+      case BusesInProgress.PostErrorType: {
+        return postError(table, action.payload);
+      }
+      case BusesInProgress.PostSuccessType: {
+        return postSuccess(table, action.payload);
+      }
+      case BusesInProgress.RemovedType: {
+        return removed(table, action.payload);
+      }
+      case BusesInProgress.DeleteType: {
+        return deletee(table, action.payload);
+      }
+      case BusesInProgress.DeleteErrorType: {
+        return deleteError(table, action.payload);
+      }
+      case BusesInProgress.UpdateErrorType: {
+        return updateError(table, action.payload);
+      }
+      case Workspaces.CleanType: {
+        return busesInProgressTableFactory();
+      }
+      default:
+        return table;
     }
-
-    return (
-      BusesInProgress.mapActionsToMethod[type](busesInProgressTable, payload) ||
-      busesInProgressTable
-    );
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_BUSES_IN_PROGRESS = `${BusesInProgress.reducerName} Fetch buses in progress`;
-  private static fetchBusesInProgress(
-    busesInProgressTable: IBusesInProgressTable,
-    payload: JsMap<IBusInProgressBackend>
-  ): IBusesInProgressTable {
-    return mergeOnly(busesInProgressTable, payload, busInProgressRowFactory());
+  function fetched(
+    table: IBusesInProgressTable,
+    payload: JsTable<IBusInProgressBackend>
+  ) {
+    return mergeOnly(table, payload, busInProgressRowFactory);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static ADD_BUSES_IN_PROGRESS = `${BusesInProgress.reducerName} Add buses in progress`;
-  private static addBusesInProgress(
-    busesInProgressTable: IBusesInProgressTable,
-    payload: JsMap<IBusInProgressBackend>
-  ): IBusesInProgressTable {
-    return putAll(busesInProgressTable, payload, busInProgressRowFactory());
+  function added(
+    table: IBusesInProgressTable,
+    payload: JsTable<IBusInProgressBackend>
+  ) {
+    return putAll(table, payload, busInProgressRowFactory);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static SET_CURRENT_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Set current bus in progress`;
-  private static setCurrentBusInProgress(
-    busesInProgressTable: IBusesInProgressTable,
-    payload: { busInProgressId: string }
-  ): IBusesInProgressTable {
+  function setCurrent(table: IBusesInProgressTable, payload: { id: string }) {
     return {
-      ...busesInProgressTable,
+      ...table,
       ...<IBusesInProgressTable>{
-        selectedBusInProgressId: payload.busInProgressId,
+        selectedBusInProgressId: payload.id,
         isImportingBus: false,
         importBusError: '',
         importBusId: '',
@@ -84,14 +116,9 @@ export class BusesInProgress {
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static POST_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Post bus in progress`;
-  private static postBusInProgress(
-    busesInProgressTable: IBusesInProgressTable,
-    _payload
-  ): IBusesInProgressTable {
+  function post(table: IBusesInProgressTable) {
     return {
-      ...busesInProgressTable,
+      ...table,
       ...<IBusesInProgressTable>{
         isImportingBus: true,
         importBusError: '',
@@ -102,14 +129,9 @@ export class BusesInProgress {
 
   // once the http request is done
   // the bus itself will be added from buses reducer
-  // tslint:disable-next-line:member-ordering
-  public static POST_BUS_IN_PROGRESS_SUCCESS = `${BusesInProgress.reducerName} Post bus in progress success`;
-  private static postBusInProgressSuccess(
-    busesInProgressTable: IBusesInProgressTable,
-    payload
-  ): IBusesInProgressTable {
+  function postSuccess(table: IBusesInProgressTable, payload: { id: string }) {
     return {
-      ...busesInProgressTable,
+      ...table,
       ...<IBusesInProgressTable>{
         importBusId: payload.id,
       },
@@ -117,97 +139,43 @@ export class BusesInProgress {
   }
 
   // once the http request is done but failed
-  // tslint:disable-next-line:member-ordering
-  public static POST_BUS_IN_PROGRESS_ERROR = `${BusesInProgress.reducerName} Post bus in progress error`;
-  private static postBusInProgressError(
-    busesInProgressTable: IBusesInProgressTable,
-    payload
-  ): IBusesInProgressTable {
+  function postError(
+    table: IBusesInProgressTable,
+    payload: { importBusError: string }
+  ) {
     // if it's false, it means we changed bus (with SET_CURRENT_BUS_IN_PROGRESS)
-    if (busesInProgressTable.isImportingBus) {
+    if (table.isImportingBus) {
       return {
-        ...busesInProgressTable,
+        ...table,
         ...<IBusesInProgressTable>{
           isImportingBus: false,
-          importBusError: payload,
+          importBusError: payload.importBusError,
           importBusId: '',
         },
       };
     } else {
-      return busesInProgressTable;
+      return table;
     }
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static DELETE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Delete bus in progress`;
-  private static deleteBusInProgress(
-    busesInProgressTable: IBusesInProgressTable,
-    payload
-  ): IBusesInProgressTable {
-    return updateById(busesInProgressTable, payload.id, { isRemoving: true });
+  function deletee(table: IBusesInProgressTable, payload: IBusInProgressRow) {
+    return updateById(table, payload.id, { isRemoving: true });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static DELETE_BUS_IN_PROGRESS_FAILED = `${BusesInProgress.reducerName} Delete bus in progress failed`;
-  private static deleteBusInProgressFailed(
-    busesInProgressTable: IBusesInProgressTable,
-    payload: string
-  ): IBusesInProgressTable {
-    return updateById(busesInProgressTable, payload, { isRemoving: false });
+  function deleteError(table: IBusesInProgressTable, payload: { id: string }) {
+    return updateById(table, payload.id, { isRemoving: false });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static REMOVE_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Remove bus in progress`;
-  private static removeBusInProgress(
-    busesInProgressTable: IBusesInProgressTable,
-    payload: string
-  ): IBusesInProgressTable {
-    return removeById(busesInProgressTable, payload);
+  function removed(table: IBusesInProgressTable, payload: { id: string }) {
+    return removeById(table, payload.id);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static UPDATE_ERROR_BUS_IN_PROGRESS = `${BusesInProgress.reducerName} Update error bus in progress`;
-  private static updateErrorBusInProgress(
-    busesInProgressTable: IBusesInProgressTable,
+  function updateError(
+    table: IBusesInProgressTable,
     payload: { id: string; importError: string }
-  ): IBusesInProgressTable {
-    return updateById(busesInProgressTable, payload.id, {
+  ) {
+    return updateById(table, payload.id, {
       importError: payload.importError,
     });
   }
-
-  private static cleanWorkspace(
-    _busesInProgressTable: IBusesInProgressTable,
-    _payload
-  ): IBusesInProgressTable {
-    return busesInProgressTableFactory();
-  }
-
-  // -------------------------------------------------------------------------------------------
-
-  // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod: {
-    [type: string]: (t: IBusesInProgressTable, p: any) => IBusesInProgressTable;
-  } = {
-    [BusesInProgress.FETCH_BUSES_IN_PROGRESS]:
-      BusesInProgress.fetchBusesInProgress,
-    [BusesInProgress.ADD_BUSES_IN_PROGRESS]: BusesInProgress.addBusesInProgress,
-    [BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS]:
-      BusesInProgress.setCurrentBusInProgress,
-    [BusesInProgress.POST_BUS_IN_PROGRESS]: BusesInProgress.postBusInProgress,
-    [BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS]:
-      BusesInProgress.postBusInProgressSuccess,
-    [BusesInProgress.POST_BUS_IN_PROGRESS_ERROR]:
-      BusesInProgress.postBusInProgressError,
-    [BusesInProgress.DELETE_BUS_IN_PROGRESS]:
-      BusesInProgress.deleteBusInProgress,
-    [BusesInProgress.DELETE_BUS_IN_PROGRESS_FAILED]:
-      BusesInProgress.deleteBusInProgressFailed,
-    [BusesInProgress.REMOVE_BUS_IN_PROGRESS]:
-      BusesInProgress.removeBusInProgress,
-    [BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS]:
-      BusesInProgress.updateErrorBusInProgress,
-
-    [Workspaces.CLEAN_WORKSPACE]: BusesInProgress.cleanWorkspace,
-  };
 }

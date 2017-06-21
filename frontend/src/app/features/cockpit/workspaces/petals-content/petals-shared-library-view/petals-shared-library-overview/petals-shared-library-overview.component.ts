@@ -25,7 +25,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IComponentRow } from '../../../state/components/components.interface';
-import { IStore } from '../../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../../shared/state/store.interface';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 
 @Component({

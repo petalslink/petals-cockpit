@@ -24,8 +24,9 @@ import {
 import { Store } from '@ngrx/store';
 
 import { IContainerRow } from '../../../state/containers/containers.interface';
-import { IStore } from 'app/shared/interfaces/store.interface';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
+import { IStore } from 'app/shared/state/store.interface';
+
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 
 @Component({
   selector: 'app-petals-container-operations',
@@ -47,20 +48,17 @@ export class PetalsContainerOperationsComponent implements OnInit {
     file: File
   ) {
     if (whatToDeploy === 'component') {
-      this.store$.dispatch({
-        type: Containers.DEPLOY_COMPONENT,
-        payload: { file, containerId: this.container.id },
-      });
+      this.store$.dispatch(
+        new Containers.DeployComponent({ id: this.container.id, file })
+      );
     } else if (whatToDeploy === 'service-assembly') {
-      this.store$.dispatch({
-        type: Containers.DEPLOY_SERVICE_ASSEMBLY,
-        payload: { file, containerId: this.container.id },
-      });
+      this.store$.dispatch(
+        new Containers.DeployServiceAssembly({ id: this.container.id, file })
+      );
     } else if (whatToDeploy === 'shared-library') {
-      this.store$.dispatch({
-        type: Containers.DEPLOY_SHARED_LIBRARY,
-        payload: { file, containerId: this.container.id },
-      });
+      this.store$.dispatch(
+        new Containers.DeploySharedLibrary({ id: this.container.id, file })
+      );
     }
   }
 }

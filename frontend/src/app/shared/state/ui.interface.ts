@@ -15,9 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IUi } from '../interfaces/ui.interface';
+export interface IUi {
+  language: string;
+  isSidenavVisible: boolean;
+  screenSize: string;
+  isPopupListWorkspacesVisible: boolean;
+  titleMainPart1: string;
+  titleMainPart2: string;
+  titleSubPart: string;
+}
 
-export function uiState(): IUi {
+export function uiFactory(): IUi {
   return {
     language: '',
     isSidenavVisible: false,

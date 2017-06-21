@@ -15,62 +15,86 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Action } from '@ngrx/store';
-
 import {
   putById,
   updateById,
   mergeInto,
-  JsMap,
-} from 'app/shared/helpers/map.helper';
+  JsTable,
+} from 'app/shared/helpers/jstable.helper';
 import {
   IUsersTable,
   usersTableFactory,
   userRowFactory,
-} from 'app/shared/interfaces/users.interface';
-import { IUserBackend } from 'app/shared/services/users.service';
+  ICurrentUser,
+} from 'app/shared/state/users.interface';
+import { IUserBackendCommon } from 'app/shared/services/users.service';
+import { Users } from 'app/shared/state/users.actions';
 
-export class Users {
-  private static reducerName = '[Users]';
+export namespace UsersReducer {
+  type All =
+    | Users.Fetched
+    | Users.Connect
+    | Users.ConnectError
+    | Users.ConnectSuccess
+    | Users.Disconnect
+    | Users.DisconnectError
+    | Users.DisconnectSuccess;
 
-  public static reducer(
-    users = usersTableFactory(),
-    { type, payload }: Action
+  export function reducer(
+    table = usersTableFactory(),
+    action: All
   ): IUsersTable {
-    if (!Users.mapActionsToMethod[type]) {
-      return users;
+    switch (action.type) {
+      case Users.FetchedType: {
+        return fetched(table, action.payload);
+      }
+      case Users.ConnectType: {
+        return connect(table);
+      }
+      case Users.ConnectErrorType: {
+        return connectError(table);
+      }
+      case Users.ConnectSuccessType: {
+        return connectSuccess(table, action.payload);
+      }
+      case Users.DisconnectType: {
+        return disconnect(table);
+      }
+      case Users.DisconnectErrorType: {
+        return disconnectError(table);
+      }
+      case Users.DisconnectSuccessType: {
+        return usersTableFactory();
+      }
+      default:
+        return table;
     }
-
-    return Users.mapActionsToMethod[type](users, payload);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_USERS_SUCCESS = `${Users.reducerName} Fetch users success`;
-  private static fetchUsersSuccess(
-    users: IUsersTable,
-    payload: JsMap<IUserBackend>
+  function fetched(
+    table: IUsersTable,
+    payload: JsTable<IUserBackendCommon>
   ): IUsersTable {
-    return mergeInto(users, payload, userRowFactory());
+    return mergeInto(table, payload, userRowFactory);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static CONNECT_USER = `${Users.reducerName} Connect user`;
-  private static connectUser(users: IUsersTable, _payload): IUsersTable {
+  function connect(table: IUsersTable): IUsersTable {
     return {
-      ...users,
+      ...table,
       ...<IUsersTable>{ isConnecting: true },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static CONNECT_USER_SUCCESS = `${Users.reducerName} Connect user success`;
-  private static connectUserSuccess(users: IUsersTable, payload): IUsersTable {
+  function connectSuccess(
+    table: IUsersTable,
+    payload: { user: ICurrentUser }
+  ): IUsersTable {
     const id = payload.user.id;
 
     return {
-      ...users.byId[id]
-        ? updateById(users, id, payload.user)
-        : putById(users, id, payload.user, userRowFactory()),
+      ...table.byId[id]
+        ? updateById(table, id, payload.user)
+        : putById(table, id, payload.user, userRowFactory),
       isConnecting: false,
       isConnected: true,
       connectionFailed: false,
@@ -79,11 +103,9 @@ export class Users {
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static CONNECT_USER_FAILED = `${Users.reducerName} Connect user failed`;
-  private static connectUserFailed(users: IUsersTable, _payload): IUsersTable {
+  function connectError(table: IUsersTable): IUsersTable {
     return {
-      ...users,
+      ...table,
       ...<IUsersTable>{
         isConnecting: false,
         connectionFailed: true,
@@ -93,58 +115,19 @@ export class Users {
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static DISCONNECT_USER = `${Users.reducerName} Disconnect user`;
-  private static disconnectUser(users: IUsersTable, _payload): IUsersTable {
+  function disconnect(table: IUsersTable): IUsersTable {
     return {
-      ...users,
+      ...table,
       ...<IUsersTable>{ isDisconnecting: true },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static DISCONNECT_USER_SUCCESS = `${Users.reducerName} Disconnect user success`;
-  private static disconnectUserSuccess(
-    users: IUsersTable,
-    _payload
-  ): IUsersTable {
+  function disconnectError(table: IUsersTable): IUsersTable {
     return {
-      ...users,
-      ...usersTableFactory(),
-      ...<IUsersTable>{
-        isDisconnecting: false,
-        isConnected: false,
-        connectedUserId: '',
-      },
-    };
-  }
-
-  // tslint:disable-next-line:member-ordering
-  public static DISCONNECT_USER_FAILED = `${Users.reducerName} Disconnect user failed`;
-  private static disconnectUserFailed(
-    users: IUsersTable,
-    _payload
-  ): IUsersTable {
-    return {
-      ...users,
+      ...table,
       ...<IUsersTable>{
         isDisconnecting: false,
       },
     };
   }
-
-  // -------------------------------------------------------------------------------------------
-
-  // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod: {
-    [type: string]: (t: IUsersTable, p: any) => IUsersTable;
-  } = {
-    [Users.FETCH_USERS_SUCCESS]: Users.fetchUsersSuccess,
-    [Users.CONNECT_USER]: Users.connectUser,
-    [Users.CONNECT_USER_SUCCESS]: Users.connectUserSuccess,
-    [Users.CONNECT_USER_FAILED]: Users.connectUserFailed,
-    [Users.DISCONNECT_USER]: Users.disconnectUser,
-    [Users.DISCONNECT_USER_SUCCESS]: Users.disconnectUserSuccess,
-    [Users.DISCONNECT_USER_FAILED]: Users.disconnectUserFailed,
-  };
 }

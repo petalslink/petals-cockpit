@@ -29,10 +29,12 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { IStore } from './../../shared/interfaces/store.interface';
-import { Users } from './../../shared/state/users.reducer';
-import { IUsersTable } from './../../shared/interfaces/users.interface';
+import { IStore } from '../../shared/state/store.interface';
+
+import { IUsersTable } from '../../shared/state/users.interface';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
+import { Users } from 'app/shared/state/users.actions';
+import { IUserLogin } from 'app/shared/services/users.service';
 
 @Component({
   selector: 'app-login',
@@ -98,13 +100,12 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe();
   }
 
-  onSubmit({ value }) {
-    this.store$.dispatch({
-      type: Users.CONNECT_USER,
-      payload: {
+  onSubmit({ value }: { value: IUserLogin }) {
+    this.store$.dispatch(
+      new Users.Connect({
         user: value,
         previousUrl: this.route.snapshot.queryParamMap.get('previousUrl'),
-      },
-    });
+      })
+    );
   }
 }

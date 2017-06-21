@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
+import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
 import { IServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 import {
   IComponentBackendSSE,
@@ -44,10 +44,9 @@ export interface IComponent extends IComponentUI, IComponentBackendSSECommon, IC
 
 export interface IComponentsCommon {
   selectedComponentId: string;
-  isFetchingDetails: boolean;
 }
 
-export interface IComponentsTable extends IComponentsCommon, JsMap<
+export interface IComponentsTable extends IComponentsCommon, JsTable<
   IComponentRow
 > {}
 
@@ -77,7 +76,7 @@ export function componentRowFactory(): IComponentRow {
 }
 
 export function componentsTableFactory(): IComponentsTable {
-  return Object.assign({}, emptyJavascriptMap<IComponentRow>(), {
+  return Object.assign({}, emptyJsTable<IComponentRow>(), {
     selectedComponentId: '',
     isFetchingDetails: false,
   });

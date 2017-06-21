@@ -21,12 +21,13 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { Ui } from '../../../../../shared/state/ui.reducer';
-import { ServiceUnits } from '../../state/service-units/service-units.reducer';
+import { IStore } from '../../../../../shared/state/store.interface';
+
 import { getCurrentServiceUnit } from '../../state/service-units/service-units.selectors';
 import { IServiceUnitRow } from '../../state/service-units/service-units.interface';
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
+import { Ui } from 'app/shared/state/ui.actions';
+import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 
 @Component({
   selector: 'app-petals-service-unit-view',
@@ -56,22 +57,18 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
           serviceAssembliesTable.byId[serviceUnit.serviceAssemblyId]
       );
 
-    this.store$.dispatch({
-      type: Ui.SET_TITLES,
-      payload: { titleMainPart1: 'Petals', titleMainPart2: 'Service Unit' },
-    });
+    this.store$.dispatch(
+      new Ui.SetTitles({
+        titleMainPart1: 'Petals',
+        titleMainPart2: 'Service Unit',
+      })
+    );
 
     serviceUnitId$
       .takeUntil(this.onDestroy$)
-      .do(serviceUnitId => {
-        this.store$.dispatch({
-          type: ServiceUnits.SET_CURRENT_SERVICE_UNIT,
-          payload: { serviceUnitId },
-        });
-        this.store$.dispatch({
-          type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS,
-          payload: { serviceUnitId },
-        });
+      .do(id => {
+        this.store$.dispatch(new ServiceUnits.SetCurrent({ id }));
+        this.store$.dispatch(new ServiceUnits.FetchDetails({ id }));
       })
       .subscribe();
 
@@ -84,9 +81,6 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    this.store$.dispatch({
-      type: ServiceUnits.SET_CURRENT_SERVICE_UNIT,
-      payload: { serviceUnitId: '' },
-    });
+    this.store$.dispatch(new ServiceUnits.SetCurrent({ id: '' }));
   }
 }

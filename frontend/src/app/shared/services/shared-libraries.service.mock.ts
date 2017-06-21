@@ -22,12 +22,17 @@ import * as helper from './../helpers/mock.helper';
 import {
   SharedLibrariesServiceImpl,
   ISharedLibraryBackendDetails,
+  SharedLibraryState,
+  ESharedLibraryState,
 } from 'app/shared/services/shared-libraries.service';
 import { sharedLibrariesService } from 'mocks/shared-libraries-mock';
+import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { SseServiceMock } from 'app/shared/services/sse.service.mock';
+import { environment } from 'environments/environment';
 
 @Injectable()
 export class SharedLibrariesServiceMock extends SharedLibrariesServiceImpl {
-  constructor(http: Http) {
+  constructor(private sseService: SseService, http: Http) {
     super(http);
   }
 
@@ -37,5 +42,25 @@ export class SharedLibrariesServiceMock extends SharedLibrariesServiceImpl {
     return helper
       .responseBody(details)
       .map(res => res.json() as ISharedLibraryBackendDetails);
+  }
+
+  putState(_workspaceId: string, id: string, state: SharedLibraryState) {
+    if (state === ESharedLibraryState.Unloaded) {
+      sharedLibrariesService.remove(id);
+    }
+
+    const response = { id, state };
+
+    // when the state changes, trigger a fake SSE event
+    setTimeout(
+      () =>
+        (this.sseService as SseServiceMock).triggerSseEvent(
+          SseWorkspaceEvent.SL_STATE_CHANGE.event,
+          response
+        ),
+      environment.mock.sseDelay
+    );
+
+    return helper.responseBody(response);
   }
 }

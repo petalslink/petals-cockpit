@@ -23,19 +23,17 @@ import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 
-import { Workspaces } from '../workspaces/state/workspaces/workspaces.reducer';
-import { IStore } from '../../../shared/interfaces/store.interface';
+import { IStore } from '../../../shared/state/store.interface';
 import { getWorkspacesList } from '../workspaces/state/workspaces/workspaces.selectors';
 import {
   IWorkspaces,
   IWorkspace,
 } from '../workspaces/state/workspaces/workspaces.interface';
-import { Ui } from './../../../shared/state/ui.reducer';
-import {
-  IUser,
-  ICurrentUser,
-} from './../../../shared/interfaces/users.interface';
+
+import { IUser, ICurrentUser } from '../../../shared/state/users.interface';
 import { getCurrentUser } from './../../../shared/state/users.selectors';
+import { Ui } from 'app/shared/state/ui.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 
 @Component({
   selector: 'app-workspaces-dialog',
@@ -108,7 +106,7 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
       .do(wsId => {
         // if no workspace is open, it will simply navigate to the required one
         if (wsId === workspace.id) {
-          this.store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
+          this.store$.dispatch(new Ui.CloseWorkspaces());
         } else {
           this.router.navigate(['/workspaces', workspace.id]);
         }
@@ -117,10 +115,7 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
   }
 
   onSubmit({ value }) {
-    this.store$.dispatch({
-      type: Workspaces.POST_WORKSPACE,
-      payload: value.name,
-    });
+    this.store$.dispatch(new Workspaces.Post({ name: value.name }));
     this.newWksForm.reset();
   }
 

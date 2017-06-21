@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.admin.api.ArtifactAdministration;
 import org.ow2.petals.admin.api.ContainerAdministration;
 import org.ow2.petals.admin.api.PetalsAdministration;
@@ -151,6 +152,22 @@ public class PetalsAdmin {
                 assert a instanceof ServiceAssembly;
                 ServiceAssembly sa = (ServiceAssembly) a;
                 return changeSAState(petals, sa, next);
+            } catch (ArtifactAdministrationException e) {
+                throw new PetalsAdminException(e);
+            }
+        });
+    }
+
+    @Suspendable
+    public void undeploySL(String ip, int port, String username, String password, String slName) {
+        this.<@Nullable Void> runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
+            try {
+                ArtifactAdministration aa = petals.newArtifactAdministration();
+                Artifact a = aa.getArtifact(SharedLibrary.TYPE, slName, null);
+                assert a instanceof SharedLibrary;
+                SharedLibrary sl = (SharedLibrary) a;
+                petals.newArtifactLifecycleFactory().createSharedLibraryLifecycle(sl).undeploy();
+                return null;
             } catch (ArtifactAdministrationException e) {
                 throw new PetalsAdminException(e);
             }

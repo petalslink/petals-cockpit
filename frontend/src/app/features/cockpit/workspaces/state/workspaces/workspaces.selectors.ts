@@ -19,13 +19,13 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IWorkspaces, IWorkspace } from './workspaces.interface';
-import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../shared/state/store.interface';
 import {
   escapeStringRegexp,
   arrayEquals,
   tuple,
 } from '../../../../../shared/helpers/shared.helper';
-import { IUser } from '../../../../../shared/interfaces/users.interface';
+import { IUser } from '../../../../../shared/state/users.interface';
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 
 export function _getWorkspacesList(
@@ -112,146 +112,59 @@ export function _getCurrentWorkspace(
         ) => {
           const workspace = workspaces.byId[workspaces.selectedWorkspaceId];
           return {
-            id: workspace.id,
-            name: workspace.name,
-            description: workspace.description,
-            isRemoving: workspace.isRemoving,
-            isSettingDescription: workspace.isSettingDescription,
-            isFetchingDetails: workspace.isFetchingDetails,
+            ...workspace,
 
             users: {
-              connectedUserId: users.connectedUserId,
-              isConnecting: users.isConnecting,
-              isConnected: users.isConnected,
-              isDisconnecting: users.isDisconnecting,
-              connectionFailed: users.connectionFailed,
+              ...users,
               list: workspace.users.map(userId => users.byId[userId]),
             },
 
             buses: {
-              selectedBusId: buses.selectedBusId,
+              ...buses,
               list: buses.allIds.map(busId => {
                 const bus = buses.byId[busId];
                 return {
-                  id: bus.id,
-                  workspaceId: bus.workspaceId,
-                  name: bus.name,
-                  isFetchingDetails: bus.isFetchingDetails,
-                  isFolded: bus.isFolded || false,
-
+                  ...bus,
                   containers: {
-                    selectedContainerId: containers.selectedContainerId,
-                    isFetchingDetails: containers.isFetchingDetails,
+                    ...containers,
                     list: bus.containers.map(containerId => {
                       const container = containers.byId[containerId];
                       return {
-                        id: container.id,
-                        busId: container.busId,
-                        name: container.name,
-                        ip: container.ip,
-                        port: container.port,
-                        systemInfo: container.systemInfo,
-                        isFetchingDetails: container.isFetchingDetails,
-                        isFolded: container.isFolded || false,
-                        isDeployingComponent: container.isDeployingComponent,
-                        errorDeploymentComponent:
-                          container.errorDeploymentComponent,
-                        isDeployingServiceAssembly:
-                          container.isDeployingServiceAssembly,
-                        errorDeploymentServiceAssembly:
-                          container.errorDeploymentServiceAssembly,
-                        isDeployingSharedLibrary:
-                          container.isDeployingSharedLibrary,
-                        errorDeploymentSharedLibrary:
-                          container.errorDeploymentSharedLibrary,
-
+                        ...container,
                         components: {
-                          selectedComponentId: components.selectedComponentId,
-                          isFetchingDetails: components.isFetchingDetails,
+                          ...components,
                           list: container.components.map(componentId => {
                             const component = components.byId[componentId];
                             return {
-                              id: component.id,
-                              containerId: component.containerId,
-                              name: component.name,
-                              state: component.state,
-                              type: component.type,
-                              parameters: component.parameters,
-                              isFetchingDetails: component.isFetchingDetails,
-                              isUpdatingState: component.isUpdatingState,
-                              isDeployingServiceUnit:
-                                component.isDeployingServiceUnit,
-                              isFolded: component.isFolded || false,
-                              errorChangeState: component.errorChangeState,
-                              errorDeployment: component.errorDeployment,
-
+                              ...component,
                               serviceUnits: {
-                                selectedServiceUnitId:
-                                  serviceUnits.selectedServiceUnitId,
-                                isFetchingDetails:
-                                  serviceUnits.isFetchingDetails,
-                                list: component.serviceUnits.map(
-                                  serviceUnitId => {
-                                    const serviceUnit =
-                                      serviceUnits.byId[serviceUnitId];
-                                    return {
-                                      id: serviceUnit.id,
-                                      containerId: serviceUnit.containerId,
-                                      componentId: serviceUnit.componentId,
-                                      serviceAssemblyId:
-                                        serviceUnit.serviceAssemblyId,
-                                      name: serviceUnit.name,
-                                      isUpdatingState:
-                                        serviceUnit.isUpdatingState,
-                                      isFolded: serviceUnit.isFolded || false,
-                                      errorChangeState:
-                                        serviceUnit.errorChangeState,
-                                    };
-                                  }
-                                ),
+                                ...serviceUnits,
+                                list: component.serviceUnits.map(suId => {
+                                  const serviceUnit = serviceUnits.byId[suId];
+                                  return {
+                                    ...serviceUnit,
+                                  };
+                                }),
                               },
                             };
                           }),
                         },
                         serviceAssemblies: {
-                          selectedServiceAssemblyId:
-                            serviceAssemblies.selectedServiceAssemblyId,
-                          isFetchingDetails:
-                            serviceAssemblies.isFetchingDetails,
-                          list: container.serviceAssemblies.map(
-                            serviceAssemblyId => {
-                              const serviceAssembly =
-                                serviceAssemblies.byId[serviceAssemblyId];
-                              return {
-                                id: serviceAssembly.id,
-                                name: serviceAssembly.name,
-                                serviceUnits: serviceAssembly.serviceUnits,
-                                containerId: serviceAssembly.containerId,
-                                state: serviceAssembly.state,
-
-                                isFolded: serviceAssembly.isFolded,
-                                isUpdatingState:
-                                  serviceAssembly.isUpdatingState,
-                                errorChangeState:
-                                  serviceAssembly.errorChangeState,
-                              };
-                            }
-                          ),
+                          ...serviceAssemblies,
+                          list: container.serviceAssemblies.map(saId => {
+                            const serviceAssembly =
+                              serviceAssemblies.byId[saId];
+                            return {
+                              ...serviceAssembly,
+                            };
+                          }),
                         },
                         sharedLibraries: {
-                          selectedSharedLibraryId:
-                            sharedLibraries.selectedSharedLibraryId,
-                          isFetchingDetails: sharedLibraries.isFetchingDetails,
-
+                          ...sharedLibraries,
                           list: container.sharedLibraries.map(id => {
                             const sl = sharedLibraries.byId[id];
                             return {
-                              id: sl.id,
-                              name: sl.name,
-                              version: sl.version,
-                              containerId: sl.containerId,
-
-                              isFolded: sl.isFolded,
+                              ...sl,
                             };
                           }),
                         },

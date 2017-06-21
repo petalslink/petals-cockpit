@@ -27,13 +27,14 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
 import { IComponentRow } from '../../../state/components/components.interface';
-import { IStore } from '../../../../../../shared/interfaces/store.interface';
-import { Components } from '../../../state/components/components.reducer';
+import { IStore } from '../../../../../../shared/state/store.interface';
+
 import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
 import {
   ComponentState,
   EComponentState,
 } from 'app/shared/services/components.service';
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 
 @Component({
   selector: 'app-petals-component-operations',
@@ -76,34 +77,32 @@ export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
     return stateNameToPossibleActionsComponent(state);
   }
 
-  changeState(newState: ComponentState) {
+  changeState(state: ComponentState) {
     let parameters = null;
 
     if (
       this.component.state === EComponentState.Loaded &&
-      newState !== EComponentState.Unloaded
+      state !== EComponentState.Unloaded
     ) {
       parameters = this.parametersForm.value;
     }
 
-    this.store$.dispatch({
-      type: Components.CHANGE_STATE,
-      payload: { componentId: this.component.id, newState, parameters },
-    });
+    this.store$.dispatch(
+      new Components.ChangeState({ id: this.component.id, state, parameters })
+    );
   }
 
-  componentState(index, item) {
+  componentState(index: number, item: any) {
     return item.actionName;
   }
 
   deploy(file: File, serviceUnitName: string) {
-    this.store$.dispatch({
-      type: Components.DEPLOY_SERVICE_UNIT,
-      payload: {
+    this.store$.dispatch(
+      new Components.DeployServiceUnit({
+        id: this.component.id,
         file,
-        componentId: this.component.id,
         serviceUnitName: serviceUnitName.trim(),
-      },
-    });
+      })
+    );
   }
 }

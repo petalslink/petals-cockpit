@@ -18,7 +18,7 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../shared/state/store.interface';
 import { IContainerRow } from './containers.interface';
 import { arrayEquals } from '../../../../../shared/helpers/shared.helper';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
@@ -29,6 +29,7 @@ export function getCurrentContainer(
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.containers.selectedContainerId)
     .map(state => state.containers.byId[state.containers.selectedContainerId])
+    .filter(c => !!c)
     .distinctUntilChanged();
 }
 

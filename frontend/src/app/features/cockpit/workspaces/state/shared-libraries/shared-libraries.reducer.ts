@@ -15,142 +15,187 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Action } from '@ngrx/store';
-
-import { Workspaces } from '../workspaces/workspaces.reducer';
 import {
   updateById,
   mergeOnly,
-  JsMap,
+  JsTable,
   putAll,
-} from 'app/shared/helpers/map.helper';
+  removeById,
+} from 'app/shared/helpers/jstable.helper';
 import {
   ISharedLibrariesTable,
   sharedLibrariesTableFactory,
   sharedLibraryRowFactory,
+  ISharedLibraryRow,
 } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import {
   ISharedLibraryBackendSSE,
   ISharedLibraryBackendDetails,
 } from 'app/shared/services/shared-libraries.service';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
 
-export class SharedLibraries {
-  private static reducerName = '[Shared libraries]';
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
+import { IComponentBackendSSE } from 'app/shared/services/components.service';
 
-  public static reducer(
-    sharedLibrariesTable = sharedLibrariesTableFactory(),
-    { type, payload }: Action
+export namespace SharedLibrariesReducer {
+  type All =
+    | SharedLibraries.Fetched
+    | SharedLibraries.Added
+    | SharedLibraries.SetCurrent
+    | SharedLibraries.FetchDetails
+    | SharedLibraries.FetchDetailsError
+    | SharedLibraries.FetchDetailsSuccess
+    | SharedLibraries.ChangeState
+    | SharedLibraries.ChangeStateError
+    | SharedLibraries.Removed
+    | Containers.DeployComponentSuccess
+    | Components.Removed
+    | Workspaces.Clean;
+
+  export function reducer(
+    table = sharedLibrariesTableFactory(),
+    action: All
   ): ISharedLibrariesTable {
-    if (!SharedLibraries.mapActionsToMethod[type]) {
-      return sharedLibrariesTable;
+    switch (action.type) {
+      case SharedLibraries.FetchedType: {
+        return fetched(table, action.payload);
+      }
+      case SharedLibraries.AddedType: {
+        return added(table, action.payload);
+      }
+      case SharedLibraries.SetCurrentType: {
+        return setCurrent(table, action.payload);
+      }
+      case SharedLibraries.FetchDetailsType: {
+        return fetchDetails(table, action.payload);
+      }
+      case SharedLibraries.FetchDetailsErrorType: {
+        return fetchDetailsError(table, action.payload);
+      }
+      case SharedLibraries.FetchDetailsSuccessType: {
+        return fetchDetailsSuccess(table, action.payload);
+      }
+      case SharedLibraries.ChangeStateType: {
+        return changeState(table, action.payload);
+      }
+      case SharedLibraries.ChangeStateErrorType: {
+        return changeStateError(table, action.payload);
+      }
+      case SharedLibraries.RemovedType: {
+        return remove(table, action.payload);
+      }
+      case Containers.DeployComponentSuccessType: {
+        return deployComponentSuccess(table, action.payload);
+      }
+      case Components.RemovedType: {
+        return removeComponent(table, action.payload);
+      }
+      case Workspaces.CleanType: {
+        return sharedLibrariesTableFactory();
+      }
+      default:
+        return table;
     }
-
-    return (
-      SharedLibraries.mapActionsToMethod[type](sharedLibrariesTable, payload) ||
-      sharedLibrariesTable
-    );
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCHED = `${SharedLibraries.reducerName} Fetched`;
-  private static fetched(
-    sharedLibrariesTable: ISharedLibrariesTable,
-    payload: JsMap<ISharedLibraryBackendSSE>
-  ): ISharedLibrariesTable {
-    return mergeOnly(sharedLibrariesTable, payload, sharedLibraryRowFactory());
+  function fetched(
+    table: ISharedLibrariesTable,
+    payload: JsTable<ISharedLibraryBackendSSE>
+  ) {
+    return mergeOnly(table, payload, sharedLibraryRowFactory);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static ADDED = `${SharedLibraries.reducerName} Added`;
-  private static added(
-    sharedLibrariesTable: ISharedLibrariesTable,
-    payload: JsMap<ISharedLibraryBackendSSE>
-  ): ISharedLibrariesTable {
-    return putAll(sharedLibrariesTable, payload, sharedLibraryRowFactory());
+  function added(
+    table: ISharedLibrariesTable,
+    payload: JsTable<ISharedLibraryBackendSSE>
+  ) {
+    return putAll(table, payload, sharedLibraryRowFactory);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static SET_CURRENT = `${SharedLibraries.reducerName} Set current`;
-  private static setCurrent(
-    sharedLibrariesTable: ISharedLibrariesTable,
-    payload: { id: string }
-  ): ISharedLibrariesTable {
+  function setCurrent(table: ISharedLibrariesTable, payload: { id: string }) {
     return {
-      ...sharedLibrariesTable,
+      ...table,
       selectedSharedLibraryId: payload.id,
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_DETAILS = `${SharedLibraries.reducerName} Fetch details`;
-  private static fetchDetails(
-    sharedLibrariesTable: ISharedLibrariesTable,
-    payload: { id: string }
-  ): ISharedLibrariesTable {
-    return updateById(sharedLibrariesTable, payload.id, {
+  function fetchDetails(table: ISharedLibrariesTable, payload: { id: string }) {
+    return updateById(table, payload.id, {
       isFetchingDetails: true,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_DETAILS_SUCCESS = `${SharedLibraries.reducerName} Fetch details success`;
-  private static fetchDetailsSuccess(
-    sharedLibrariesTable: ISharedLibrariesTable,
+  function fetchDetailsSuccess(
+    table: ISharedLibrariesTable,
     payload: { id: string; data: ISharedLibraryBackendDetails }
-  ): ISharedLibrariesTable {
-    return updateById(sharedLibrariesTable, payload.id, {
+  ) {
+    return updateById(table, payload.id, {
       ...payload.data,
       isFetchingDetails: false,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_DETAILS_ERROR = `${SharedLibraries.reducerName} Fetch details error`;
-  private static fetchDetailsError(
-    sharedLibrariesTable: ISharedLibrariesTable,
+  function fetchDetailsError(
+    table: ISharedLibrariesTable,
     payload: { id: string }
-  ): ISharedLibrariesTable {
-    return updateById(sharedLibrariesTable, payload.id, {
+  ) {
+    return updateById(table, payload.id, {
       isFetchingDetails: false,
     });
   }
 
-  private static deployComponentSuccess(
-    sharedLibrariesTable: ISharedLibrariesTable,
-    payload: IComponentRow
+  function changeState(table: ISharedLibrariesTable, payload: { id: string }) {
+    return updateById(table, payload.id, {
+      isUpdatingState: true,
+    });
+  }
+
+  function changeStateError(
+    table: ISharedLibrariesTable,
+    payload: { id: string; errorChangeState: string }
   ): ISharedLibrariesTable {
+    return updateById(table, payload.id, {
+      isUpdatingState: false,
+      errorChangeState: payload.errorChangeState,
+    });
+  }
+
+  function remove(
+    table: ISharedLibrariesTable,
+    payload: ISharedLibraryRow
+  ): ISharedLibrariesTable {
+    const selectedSharedLibraryid = table.selectedSharedLibraryId === payload.id
+      ? ''
+      : table.selectedSharedLibraryId;
+
+    return {
+      ...removeById(table, payload.id),
+      selectedSharedLibraryid,
+    };
+  }
+
+  function deployComponentSuccess(
+    table: ISharedLibrariesTable,
+    payload: IComponentBackendSSE
+  ) {
     return payload.sharedLibraries.reduce((acc, sl) => {
-      return updateById(sharedLibrariesTable, sl, {
-        components: [...sharedLibrariesTable.byId[sl].components, payload.id],
+      return updateById(acc, sl, {
+        components: [...table.byId[sl].components, payload.id],
       });
-    }, sharedLibrariesTable);
+    }, table);
   }
 
-  private static cleanWorkspace(
-    _sharedLibrariesTable: ISharedLibrariesTable,
-    _payload
-  ): ISharedLibrariesTable {
-    return sharedLibrariesTableFactory();
+  function removeComponent(
+    table: ISharedLibrariesTable,
+    payload: IComponentRow
+  ) {
+    return payload.sharedLibraries.reduce((acc, sl) => {
+      return updateById(acc, sl, {
+        components: table.byId[sl].components.filter(id => id !== payload.id),
+      });
+    }, table);
   }
-
-  // -------------------------------------------------------------------------------------------
-
-  // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod: {
-    [type: string]: (t: ISharedLibrariesTable, p: any) => ISharedLibrariesTable;
-  } = {
-    [SharedLibraries.FETCHED]: SharedLibraries.fetched,
-    [SharedLibraries.ADDED]: SharedLibraries.added,
-    [SharedLibraries.SET_CURRENT]: SharedLibraries.setCurrent,
-    [SharedLibraries.FETCH_DETAILS]: SharedLibraries.fetchDetails,
-    [SharedLibraries.FETCH_DETAILS_SUCCESS]:
-      SharedLibraries.fetchDetailsSuccess,
-    [SharedLibraries.FETCH_DETAILS_ERROR]: SharedLibraries.fetchDetailsError,
-    [Containers.DEPLOY_COMPONENT_SUCCESS]:
-      SharedLibraries.deployComponentSuccess,
-
-    [Workspaces.CLEAN_WORKSPACE]: SharedLibraries.cleanWorkspace,
-  };
 }

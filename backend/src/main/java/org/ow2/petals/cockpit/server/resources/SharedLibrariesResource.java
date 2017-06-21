@@ -91,6 +91,10 @@ public class SharedLibrariesResource {
 
     public static class SharedLibraryMin {
 
+        public enum State {
+            Unloaded, Loaded;
+        }
+
         @NotNull
         @Min(1)
         public final long id;

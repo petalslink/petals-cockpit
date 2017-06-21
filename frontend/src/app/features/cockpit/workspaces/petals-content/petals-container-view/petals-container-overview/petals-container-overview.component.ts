@@ -34,7 +34,7 @@ import {
   VisNetworkOptions,
 } from 'ng2-vis';
 
-import { IStore } from 'app/shared/interfaces/store.interface';
+import { IStore } from 'app/shared/state/store.interface';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 import {
   containerNetworkOptions,

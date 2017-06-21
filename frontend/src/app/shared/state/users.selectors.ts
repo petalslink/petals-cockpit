@@ -18,8 +18,8 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from './../interfaces/store.interface';
-import { ICurrentUser } from './../interfaces/users.interface';
+import { IStore } from './store.interface';
+import { ICurrentUser } from './users.interface';
 import { isNot } from '../helpers/shared.helper';
 
 export function _getCurrentUser(

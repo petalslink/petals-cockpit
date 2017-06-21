@@ -22,14 +22,16 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
 
-import { Buses } from '../../state/buses/buses.reducer';
 import { IBusRow } from '../../state/buses/buses.interface';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
-import { Ui } from '../../../../../shared/state/ui.reducer';
-import { IStore } from '../../../../../shared/interfaces/store.interface';
+
+import { IStore } from '../../../../../shared/state/store.interface';
 import { getCurrentBus } from '../../state/buses/buses.selectors';
 import { getContainers } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
+
+import { Ui } from 'app/shared/state/ui.actions';
+import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 
 @Component({
   selector: 'app-petals-bus-view',
@@ -50,10 +52,9 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.store$.dispatch({
-      type: Ui.SET_TITLES,
-      payload: { titleMainPart1: 'Petals', titleMainPart2: 'Bus' },
-    });
+    this.store$.dispatch(
+      new Ui.SetTitles({ titleMainPart1: 'Petals', titleMainPart2: 'Bus' })
+    );
 
     this.workspaceId$ = this.route.paramMap
       .map(p => p.get('workspaceId'))
@@ -65,25 +66,16 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
     this.route.paramMap
       .map(pm => pm.get('busId'))
       .takeUntil(this.onDestroy$)
-      .do(busId => {
-        this.store$.dispatch({
-          type: Buses.SET_CURRENT_BUS,
-          payload: { busId },
-        });
-        this.store$.dispatch({
-          type: Buses.FETCH_BUS_DETAILS,
-          payload: { busId },
-        });
+      .do(id => {
+        this.store$.dispatch(new Buses.SetCurrent({ id }));
+        this.store$.dispatch(new Buses.FetchDetails({ id }));
       })
       .switchMap(busId =>
         this.containers$
           .first()
           .do(cs =>
             cs.forEach(c =>
-              this.store$.dispatch({
-                type: Containers.FETCH_CONTAINER_DETAILS,
-                payload: { containerId: c.id },
-              })
+              this.store$.dispatch(new Containers.FetchDetails(c))
             )
           )
           .map(_ => busId)
@@ -95,10 +87,7 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    this.store$.dispatch({
-      type: Buses.SET_CURRENT_BUS,
-      payload: { busId: '' },
-    });
+    this.store$.dispatch(new Buses.SetCurrent({ id: '' }));
   }
 
   openDeletionDialog() {
@@ -111,9 +100,7 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
           })
           .afterClosed()
           .filter((result: boolean) => result)
-          .do(_ =>
-            this.store$.dispatch({ type: Buses.DELETE_BUS, payload: b.id })
-          )
+          .do(_ => this.store$.dispatch(new Buses.Delete(b)))
       )
       .subscribe();
   }

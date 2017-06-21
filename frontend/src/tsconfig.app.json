@@ -7,6 +7,7 @@
     "types": []
   },
   "exclude": [
+    "setup-jest.ts",
     "**/*.spec.ts"
   ]
 }

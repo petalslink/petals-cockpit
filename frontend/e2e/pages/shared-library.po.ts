@@ -38,6 +38,22 @@ export abstract class SharedLibraryPage {
       waitTimeout
     );
   }
+
+  openOperations() {
+    this.component
+      .element(
+        by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')
+      )
+      .click();
+    return SharedLibraryOperationPage.waitAndGet();
+  }
+
+  openOverview() {
+    this.component
+      .element(by.cssContainingText(`md-tab-header .mat-tab-label`, 'Overview'))
+      .click();
+    return SharedLibraryOverviewPage.waitAndGet();
+  }
 }
 
 export class SharedLibraryOverviewPage extends SharedLibraryPage {
@@ -72,5 +88,37 @@ export class SharedLibraryOverviewPage extends SharedLibraryPage {
       this.components.get(identifier).click();
     }
     return ComponentOverviewPage.waitAndGet();
+  }
+}
+
+export class SharedLibraryOperationPage extends SharedLibraryPage {
+  public static readonly operations = SharedLibraryPage.component.$(
+    `app-petals-shared-library-operations`
+  );
+
+  public readonly operations = SharedLibraryOperationPage.operations;
+
+  public readonly lifecycleCard = this.operations.$(
+    `md-card.shared-library-lifecycle`
+  );
+
+  public readonly unloadButton = this.lifecycleCard.element(
+    by.cssContainingText(`button`, `Unload`)
+  );
+  public readonly changeStateError = this.lifecycleCard.$(`.error .italic`);
+
+  // deploy a su
+
+  static waitAndGet() {
+    super.wait();
+    browser.wait(
+      EC.visibilityOf(SharedLibraryOperationPage.operations),
+      waitTimeout
+    );
+    return new SharedLibraryOperationPage();
+  }
+
+  private constructor() {
+    super();
   }
 }
