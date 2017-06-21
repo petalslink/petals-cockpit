@@ -78,6 +78,7 @@ import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.Service
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
+import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContentBuilder;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
@@ -87,6 +88,8 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChange
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentStateChanged;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAStateChanged;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SLChangeState;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SLStateChanged;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
@@ -182,6 +185,8 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                 answer((ChangeServiceAssemblyState) msg, this::handleSAStateChange);
             } else if (msg instanceof ChangeComponentState) {
                 answer((ChangeComponentState) msg, this::handleComponentStateChange);
+            } else if (msg instanceof ChangeSharedLibraryState) {
+                answer((ChangeSharedLibraryState) msg, this::handleSLStateChange);
             } else if (msg instanceof DeployServiceAssembly) {
                 answer((DeployServiceAssembly) msg, this::handleDeployServiceAssembly);
             } else if (msg instanceof DeployComponent) {
@@ -573,6 +578,46 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         }
     }
 
+    private SLStateChanged handleSLStateChange(ChangeSharedLibraryState change)
+            throws SuspendExecution, InterruptedException {
+        return db.runTransaction(conf -> {
+            SharedlibrariesRecord sl = DSL.using(conf).select(SHAREDLIBRARIES.fields()).from(SHAREDLIBRARIES)
+                    .join(CONTAINERS).onKey().join(BUSES).onKey()
+                    .where(SHAREDLIBRARIES.ID.eq(change.slId).and(BUSES.WORKSPACE_ID.eq(wId)))
+                    .fetchOneInto(SharedlibrariesRecord.class);
+
+            if (sl == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
+
+            if (change.action.state == SharedLibraryMin.State.Loaded) {
+                return new SLStateChanged(change.slId, SharedLibraryMin.State.Loaded);
+            }
+
+            // TODO merge with previous request...
+            ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(sl.getContainerId()))
+                    .fetchOne();
+            assert cont != null;
+
+            petals.undeploySL(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(), sl.getName());
+
+            SLStateChanged res = new SLStateChanged(sl.getId(), SharedLibraryMin.State.Unloaded);
+
+            sharedLibraryStateUpdated(res, conf);
+
+            return res;
+        });
+    }
+
+    private void sharedLibraryStateUpdated(SLStateChanged sl, Configuration conf) {
+        if (sl.state == SharedLibraryMin.State.Unloaded) {
+            DSL.using(conf).deleteFrom(SHAREDLIBRARIES).where(SHAREDLIBRARIES.ID.eq(sl.id)).execute();
+        }
+
+        // we want the event to be sent after we answered
+        doInActorLoop(() -> broadcast(WorkspaceEvent.slStateChange(sl)));
+    }
+
     private WorkspaceContent handleDeployServiceAssembly(DeployServiceAssembly sa)
             throws SuspendExecution, InterruptedException {
         return db.runTransaction(conf -> {
@@ -777,6 +822,20 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
 
         public ChangeComponentState(long compId, ComponentChangeState action) {
             this.compId = compId;
+            this.action = action;
+        }
+    }
+
+    public static class ChangeSharedLibraryState extends WorkspaceRequest<SLStateChanged> {
+
+        private static final long serialVersionUID = 8119375036012239516L;
+
+        final SLChangeState action;
+
+        final long slId;
+
+        public ChangeSharedLibraryState(long slId, SLChangeState action) {
+            this.slId = slId;
             this.action = action;
         }
     }

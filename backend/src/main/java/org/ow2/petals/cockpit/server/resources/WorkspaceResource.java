@@ -59,6 +59,7 @@ import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeComponentState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeServiceAssemblyState;
+import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeSharedLibraryState;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteWorkspace;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployComponent;
@@ -72,6 +73,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
+import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryMin;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContentBuilder;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
@@ -234,6 +236,18 @@ public class WorkspaceResource {
         checkAccess(jooq);
 
         return as.call(wsId, new DeleteBus(profile.getId(), bId));
+    }
+
+    @PUT
+    @Path("/sharedlibraries/{slId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public SLStateChanged changeSLState(@NotNull @PathParam("slId") @Min(1) long slId,
+            @NotNull @Valid SLChangeState action) throws InterruptedException {
+
+        checkAccess(jooq);
+
+        return as.call(wsId, new ChangeSharedLibraryState(slId, action));
     }
 
     @PUT
@@ -568,6 +582,28 @@ public class WorkspaceResource {
         }
     }
 
+    public static class SLStateChanged implements WorkspaceEvent.Data {
+
+        @NotNull
+        @Min(1)
+        public final long id;
+
+        @NotNull
+        @JsonProperty
+        public final SharedLibraryMin.State state;
+
+        @JsonCreator
+        public SLStateChanged(@JsonProperty("id") long id, @JsonProperty("state") SharedLibraryMin.State state) {
+            this.id = id;
+            this.state = state;
+        }
+
+        @JsonProperty
+        public String getId() {
+            return Long.toString(id);
+        }
+    }
+
     public static class BusDeleted implements WorkspaceEvent.Data {
 
         @NotNull
@@ -630,7 +666,7 @@ public class WorkspaceResource {
 
         public enum Event {
             WORKSPACE_CONTENT, BUS_IMPORT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SA_STATE_CHANGE, COMPONENT_STATE_CHANGE,
-            BUS_DELETED, SA_DEPLOYED, WORKSPACE_DELETED, COMPONENT_DEPLOYED, SL_DEPLOYED
+            BUS_DELETED, SA_DEPLOYED, WORKSPACE_DELETED, COMPONENT_DEPLOYED, SL_DEPLOYED, SL_STATE_CHANGE
         }
 
         @JsonProperty
@@ -663,6 +699,10 @@ public class WorkspaceResource {
 
         public static WorkspaceEvent saStateChange(SAStateChanged ns) {
             return new WorkspaceEvent(Event.SA_STATE_CHANGE, ns);
+        }
+
+        public static WorkspaceEvent slStateChange(SLStateChanged ns) {
+            return new WorkspaceEvent(Event.SL_STATE_CHANGE, ns);
         }
 
         public static WorkspaceEvent componentStateChange(ComponentStateChanged ns) {
@@ -724,6 +764,17 @@ public class WorkspaceResource {
 
         public ComponentChangeState(ComponentMin.State state) {
             this(state, null);
+        }
+    }
+
+    public static class SLChangeState {
+
+        @NotNull
+        @JsonProperty
+        public final SharedLibraryMin.State state;
+
+        public SLChangeState(@JsonProperty("state") SharedLibraryMin.State state) {
+            this.state = state;
         }
     }
 }

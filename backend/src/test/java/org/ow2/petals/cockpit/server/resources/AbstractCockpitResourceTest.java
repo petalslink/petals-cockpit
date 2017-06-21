@@ -144,6 +144,10 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         return assertThat(requestSA(sa)).hasNumberOfRows(1).row();
     }
 
+    protected RequestRowAssert assertThatDbSL(SharedLibrary sl) {
+        return assertThat(requestSL(sl)).hasNumberOfRows(1).row();
+    }
+
     protected void assertThatDbSAState(ServiceAssembly sa, ServiceAssemblyMin.State expectedState) {
         assertThatDbSA(sa).value(SERVICEASSEMBLIES.STATE.getName()).isEqualTo(expectedState.name());
     }
@@ -172,6 +176,10 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
     protected void assertNoDbSA(ServiceAssembly sa) {
         assertThat(requestSA(sa)).hasNumberOfRows(0);
+    }
+
+    protected void assertNoDbSL(SharedLibrary sl) {
+        assertThat(requestSL(sl)).hasNumberOfRows(0);
     }
 
     protected void assertNoDbComponent(Component c) {
@@ -209,6 +217,10 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
     protected Request requestSA(ServiceAssembly sa) {
         return requestBy(SERVICEASSEMBLIES.ID, getId(sa));
+    }
+
+    protected Request requestSL(SharedLibrary sl) {
+        return requestBy(SHAREDLIBRARIES.ID, getId(sl));
     }
 
     protected void setupWorkspace(long wsId, String wsName, List<Tuple2<Domain, String>> data, String... users) {
