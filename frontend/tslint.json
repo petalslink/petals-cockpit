@@ -16,6 +16,8 @@
     "no-use-before-declare": false,
     "no-access-missing-member": false,
     "no-unused-variable": [true, {"ignore-pattern": "^_"}],
-    "ban": [true, ["fit"], ["fdescribe"], ["xit"], ["xdescribe"]]
+    "ban": [true, ["fit"], ["fdescribe"], ["xit"], ["xdescribe"]],
+    "banana-in-box": true,
+    "templates-no-negated-async": true
   }
 }
