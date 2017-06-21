@@ -1,3 +1,22 @@
+<a name="0.10.0"></a>
+# [0.10.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.9.0...v0.10.0) (2017-06-21)
+
+
+### Bug Fixes
+
+* **frontend:** do not show error in new workspace form ([bc51835](https://gitlab.com/linagora/petals-cockpit/commit/bc51835)), closes [#331](https://gitlab.com/linagora/petals-cockpit/issues/331)
+
+
+### Features
+
+* introduces shared libraries, closes [#332](https://gitlab.com/linagora/petals-cockpit/issues/332), [#347](https://gitlab.com/linagora/petals-cockpit/issues/347), [#352](https://gitlab.com/linagora/petals-cockpit/issues/352)
+* deploy service-assembly ([921d992](https://gitlab.com/linagora/petals-cockpit/commit/921d992)), closes [#323](https://gitlab.com/linagora/petals-cockpit/issues/323), [#316](https://gitlab.com/linagora/petals-cockpit/issues/316)
+* **frontend:** graph of reachabilities in container overview ([7b8e577](https://gitlab.com/linagora/petals-cockpit/commit/7b8e577)), closes [#310](https://gitlab.com/linagora/petals-cockpit/issues/310)
+* **frontend:** handle 404 by redirecting to a simple 404 not found page ([3d69ab4](https://gitlab.com/linagora/petals-cockpit/commit/3d69ab4)), closes [#340](https://gitlab.com/linagora/petals-cockpit/issues/340)
+* **frontend:** various UI improvements for coherence sake
+
+
+
 <a name="0.9.0"></a>
 # [0.9.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.8.0...v0.9.0) (2017-05-29)
 

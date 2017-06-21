@@ -8,7 +8,7 @@ Running demo (mock) [https://linagora.gitlab.io/petals-cockpit](https://linagora
 ### Running the pre-compiled JAR
 
 1. Download the latest compiled petals-cockpit:
- - [Version 0.9.0](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/v0.9.0/download?job=release-product)
+ - [Version 0.10.0](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/v0.10.0/download?job=release-product)
  - [Version Latest](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/master/download?job=package-product-master)
 2. Unpack it and go into the directory
 3. Initialize the database (or update it if you already had one from a previous version):
