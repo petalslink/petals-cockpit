@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
+import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
 import { IComponentRowWithoutDetails } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import {
   IServiceUnitBackendSSE,
@@ -29,6 +29,7 @@ export interface IServiceUnitUI {
   isFolded: boolean;
   isUpdatingState: boolean;
   errorChangeState: string;
+  isFetchingDetails: boolean;
 }
 
 export interface IServiceUnitRow extends IServiceUnitUI, IServiceUnitBackendSSE, IServiceUnitBackendDetails {}
@@ -43,10 +44,9 @@ export interface IServiceUnitAndComponent extends IServiceUnitRowWithoutDetails 
 
 interface IServiceUnitsCommon {
   selectedServiceUnitId: string;
-  isFetchingDetails: boolean;
 }
 
-export interface IServiceUnitsTable extends IServiceUnitsCommon, JsMap<
+export interface IServiceUnitsTable extends IServiceUnitsCommon, JsTable<
   IServiceUnitRow
 > {}
 
@@ -65,12 +65,12 @@ export function serviceUnitRowFactory(): IServiceUnitRow {
     isFolded: false,
     isUpdatingState: false,
     errorChangeState: '',
+    isFetchingDetails: false,
   };
 }
 
 export function serviceUnitsTableFactory(): IServiceUnitsTable {
-  return Object.assign({}, emptyJavascriptMap<IServiceUnitRow>(), {
+  return Object.assign({}, emptyJsTable<IServiceUnitRow>(), {
     selectedServiceUnitId: '',
-    isFetchingDetails: false,
   });
 }

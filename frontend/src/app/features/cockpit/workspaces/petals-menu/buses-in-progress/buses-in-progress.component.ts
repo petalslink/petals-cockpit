@@ -24,8 +24,9 @@ import {
 import { Store } from '@ngrx/store';
 
 import { IBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
-import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { Ui } from '../../../../../shared/state/ui.reducer';
+import { IStore } from '../../../../../shared/state/store.interface';
+
+import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
   selector: 'app-buses-in-progress',
@@ -42,6 +43,6 @@ export class BusesInProgressComponent implements OnInit {
   ngOnInit() {}
 
   closeSidenavOnSmallScreen() {
-    this.store$.dispatch({ type: Ui.CLOSE_SIDENAV_ON_SMALL_SCREEN });
+    this.store$.dispatch(new Ui.CloseSidenavOnSmallScreen());
   }
 }

@@ -33,7 +33,7 @@ export function buildVisNetworkData(
 }
 
 function node(container: IContainerRow) {
-  return otherContainer => ({
+  return (otherContainer: IContainerRow) => ({
     id: otherContainer.id,
     label: otherContainer.name,
     fixed: true,
@@ -52,7 +52,7 @@ function node(container: IContainerRow) {
 }
 
 function edge(container: IContainerRow) {
-  return otherContainer => ({
+  return (otherContainer: IContainerRow) => ({
     from: container.id,
     to: otherContainer.id,
     color: container.reachabilities.includes(otherContainer.id)

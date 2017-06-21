@@ -22,8 +22,9 @@ import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs/Subject';
 
 import { LANGUAGES } from './core/opaque-tokens';
-import { IStore } from './shared/interfaces/store.interface';
-import { Ui } from './shared/state/ui.reducer';
+import { IStore } from './shared/state/store.interface';
+
+import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
   selector: 'app-root',
@@ -55,7 +56,7 @@ export class AppComponent implements OnInit, OnDestroy {
     // it'll try to get it on the default language
     // by default here, we take the first of the array
     this.translate.setDefaultLang(this.languages[0]);
-    this.store$.dispatch({ type: Ui.SET_LANGUAGE, payload: this.languages[0] });
+    this.store$.dispatch(new Ui.SetLanguage({ language: this.languages[0] }));
 
     // when the language changes in store,
     // change it in translate provider
@@ -72,10 +73,7 @@ export class AppComponent implements OnInit, OnDestroy {
       .distinctUntilChanged()
       .takeUntil(this.onDestroy$)
       .do(screenSize =>
-        this.store$.dispatch({
-          type: Ui.CHANGE_SCREEN_SIZE,
-          payload: screenSize,
-        })
+        this.store$.dispatch(new Ui.ChangeScreenSize({ screenSize }))
       )
       .subscribe();
   }

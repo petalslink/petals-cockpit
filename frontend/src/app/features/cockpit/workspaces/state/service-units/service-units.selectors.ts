@@ -19,7 +19,7 @@ import { IServiceUnitRow } from './service-units.interface';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../shared/state/store.interface';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
 export function getCurrentServiceUnit(

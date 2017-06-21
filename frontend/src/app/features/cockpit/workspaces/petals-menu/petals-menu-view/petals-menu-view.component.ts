@@ -20,22 +20,24 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
-import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../shared/state/store.interface';
 // tslint:disable-next-line:max-line-length
 import {
   getCurrentTree,
   WorkspaceElement,
   WorkspaceElementType,
 } from '../../../../cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { Components } from '../../state/components/components.reducer';
-import { Containers } from '../../state/containers/containers.reducer';
-import { Buses } from '../../state/buses/buses.reducer';
+
 import { IBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
 import { getBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.selectors';
 import { IWorkspacesTable } from './../../state/workspaces/workspaces.interface';
-import { Workspaces } from './../../state/workspaces/workspaces.reducer';
-import { Ui } from '../../../../../shared/state/ui.reducer';
+
 import { TreeEvent } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
+import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
   selector: 'app-petals-menu-view',
@@ -72,22 +74,13 @@ export class PetalsMenuViewComponent implements OnInit {
   onTreeToggleFold(e: TreeEvent<WorkspaceElement>) {
     switch (e.item.type) {
       case WorkspaceElementType.BUS:
-        this.store$.dispatch({
-          type: Buses.TOGGLE_FOLD_BUS,
-          payload: { busId: e.item.id },
-        });
+        this.store$.dispatch(new Buses.ToggleFold({ id: e.item.id }));
         break;
       case WorkspaceElementType.CONTAINER:
-        this.store$.dispatch({
-          type: Containers.TOGGLE_FOLD_CONTAINER,
-          payload: { containerId: e.item.id },
-        });
+        this.store$.dispatch(new Containers.ToggleFold({ id: e.item.id }));
         break;
       case WorkspaceElementType.COMPONENT:
-        this.store$.dispatch({
-          type: Components.TOGGLE_FOLD_COMPONENT,
-          payload: { componentId: e.item.id },
-        });
+        this.store$.dispatch(new Components.ToggleFold({ id: e.item.id }));
     }
   }
 
@@ -99,10 +92,10 @@ export class PetalsMenuViewComponent implements OnInit {
   }
 
   search(search: string) {
-    this.store$.dispatch({ type: Workspaces.SET_SEARCH, payload: search });
+    this.store$.dispatch(new Workspaces.SetSearch({ search }));
   }
 
   closeSidenavOnSmallScreen() {
-    this.store$.dispatch({ type: Ui.CLOSE_SIDENAV_ON_SMALL_SCREEN });
+    this.store$.dispatch(new Ui.CloseSidenavOnSmallScreen());
   }
 }

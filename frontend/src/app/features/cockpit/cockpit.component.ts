@@ -26,17 +26,19 @@ import {
   IWorkspace,
   IWorkspacesTable,
 } from './workspaces/state/workspaces/workspaces.interface';
-import { Workspaces } from './workspaces/state/workspaces/workspaces.reducer';
-import { Ui } from '../../shared/state/ui.reducer';
+
 import { LANGUAGES } from '../../core/opaque-tokens';
-import { IStore } from '../../shared/interfaces/store.interface';
-import { IUi } from '../../shared/interfaces/ui.interface';
+import { IStore } from '../../shared/state/store.interface';
+import { IUi } from '../../shared/state/ui.interface';
 import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog.component';
 import { getCurrentWorkspace } from '../cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { ICurrentUser } from 'app/shared/interfaces/users.interface';
+import { ICurrentUser } from 'app/shared/state/users.interface';
 import { getCurrentUser } from 'app/shared/state/users.selectors';
-import { Users } from 'app/shared/state/users.reducer';
+
 import { isSmallScreen, isLargeScreen } from 'app/shared/state/ui.selectors';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { Ui } from 'app/shared/state/ui.actions';
+import { Users } from 'app/shared/state/users.actions';
 
 @Component({
   selector: 'app-cockpit',
@@ -134,7 +136,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
   }
 
   private doOpenWorkspacesDialog() {
-    this.store$.dispatch({ type: Workspaces.FETCH_WORKSPACES });
+    this.store$.dispatch(new Workspaces.FetchAll());
 
     this.store$
       .select(state => !!state.workspaces.selectedWorkspaceId)
@@ -147,7 +149,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
         this.workspacesDialogRef
           .afterClosed()
           .do(_ => {
-            this.store$.dispatch({ type: Ui.CLOSE_POPUP_WORKSPACES_LIST });
+            this.store$.dispatch(new Ui.CloseWorkspaces());
             this.workspacesDialogRef = null;
           })
           .subscribe();
@@ -159,37 +161,32 @@ export class CockpitComponent implements OnInit, OnDestroy {
     this.dialog
       .open(DeletedWorkspaceDialogComponent)
       .afterClosed()
-      .do(_ =>
-        this.store$.dispatch({
-          type: Workspaces.CLOSE_WORKSPACE,
-          payload: { delete: true },
-        })
-      )
+      .do(_ => this.store$.dispatch(new Workspaces.Close({ delete: true })))
       .subscribe();
   }
 
   openWorkspacesDialog() {
-    this.store$.dispatch({ type: Ui.OPEN_POPUP_WORKSPACES_LIST });
+    this.store$.dispatch(new Ui.OpenWorkspaces());
   }
 
   openSidenav() {
-    this.store$.dispatch({ type: Ui.OPEN_SIDENAV });
+    this.store$.dispatch(new Ui.OpenSidenav());
   }
 
   closeSidenav() {
-    this.store$.dispatch({ type: Ui.CLOSE_SIDENAV });
+    this.store$.dispatch(new Ui.CloseSidenav());
   }
 
   closeSidenavOnSmallScreen() {
-    this.store$.dispatch({ type: Ui.CLOSE_SIDENAV_ON_SMALL_SCREEN });
+    this.store$.dispatch(new Ui.CloseSidenavOnSmallScreen());
   }
 
   toggleSidenav() {
-    this.store$.dispatch({ type: Ui.TOGGLE_SIDENAV });
+    this.store$.dispatch(new Ui.ToggleSidenav());
   }
 
   disconnect() {
-    this.store$.dispatch({ type: Users.DISCONNECT_USER });
+    this.store$.dispatch(new Users.Disconnect());
   }
 }
 

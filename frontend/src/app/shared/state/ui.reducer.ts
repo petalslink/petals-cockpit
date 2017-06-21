@@ -15,88 +15,105 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Action } from '@ngrx/store';
+import { IUi, uiFactory } from './ui.interface';
 
-import { IUi } from '../interfaces/ui.interface';
-import { uiState } from './ui.state';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
+import { Ui } from 'app/shared/state/ui.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 
-export class Ui {
-  private static reducerName = '[Ui]';
+export namespace UiReducer {
+  type All =
+    | Ui.SetLanguage
+    | Ui.OpenSidenav
+    | Ui.CloseSidenav
+    | Ui.ToggleSidenav
+    | Ui.OpenWorkspaces
+    | Ui.CloseWorkspaces
+    | Ui.ChangeScreenSize
+    | Ui.SetTitles
+    | Workspaces.Close;
 
-  public static reducer(ui = uiState(), { type, payload }: Action): IUi {
-    if (!Ui.mapActionsToMethod[type]) {
-      return ui;
+  export function reducer(table = uiFactory(), action: All): IUi {
+    switch (action.type) {
+      case Ui.SetLanguageType: {
+        return setLanguage(table, action.payload);
+      }
+      case Ui.OpenSidenavType: {
+        return openSidenav(table);
+      }
+      case Ui.CloseSidenavType: {
+        return closeSidenav(table);
+      }
+      case Ui.ToggleSidenavType: {
+        return toggleSidenav(table);
+      }
+      case Ui.OpenWorkspacesType: {
+        return openWorkspaces(table);
+      }
+      case Ui.CloseWorkspacesType: {
+        return closeWorkspaces(table);
+      }
+      case Ui.ChangeScreenSizeType: {
+        return changeScreenSize(table, action.payload);
+      }
+      case Ui.SetTitlesType: {
+        return setTitles(table, action.payload);
+      }
+      case Workspaces.CloseType: {
+        return closeWorkspace(table, action.payload);
+      }
+      default:
+        return table;
     }
-
-    return Ui.mapActionsToMethod[type](ui, payload);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static SET_LANGUAGE = `${Ui.reducerName} Set language`;
-  private static setLanguage(ui: IUi, payload): IUi {
+  function setLanguage(ui: IUi, payload: { language: string }): IUi {
     return {
       ...ui,
-      ...<IUi>{ language: payload },
+      ...<IUi>{ language: payload.language },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static TOGGLE_SIDENAV = `${Ui.reducerName} Toggle sidenav`;
-  private static toggleSidenav(ui: IUi, _payload): IUi {
+  function toggleSidenav(ui: IUi): IUi {
     return {
       ...ui,
       ...<IUi>{ isSidenavVisible: !ui.isSidenavVisible },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static OPEN_SIDENAV = `${Ui.reducerName} Open sidenav`;
-  private static openSidenav(ui: IUi, _payload): IUi {
+  function openSidenav(ui: IUi): IUi {
     return {
       ...ui,
       ...<IUi>{ isSidenavVisible: true },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static CLOSE_SIDENAV_ON_SMALL_SCREEN = `${Ui.reducerName} Close sidenav on small screen`;
-
-  // tslint:disable-next-line:member-ordering
-  public static CLOSE_SIDENAV = `${Ui.reducerName} Close sidenav`;
-  private static closeSidenav(ui: IUi, _payload): IUi {
+  function closeSidenav(ui: IUi): IUi {
     return {
       ...ui,
       ...<IUi>{ isSidenavVisible: false },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static OPEN_POPUP_WORKSPACES_LIST = `${Ui.reducerName} Open popup workspaces list`;
-  private static openPopupWorkspacesList(ui: IUi, _payload): IUi {
+  function openWorkspaces(ui: IUi): IUi {
     return {
       ...ui,
       ...<IUi>{ isPopupListWorkspacesVisible: true },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static CLOSE_POPUP_WORKSPACES_LIST = `${Ui.reducerName} Close popup workspaces list`;
-  private static closePopupWorkspacesList(ui: IUi, _payload): IUi {
+  function closeWorkspaces(ui: IUi): IUi {
     return {
       ...ui,
       ...<IUi>{ isPopupListWorkspacesVisible: false },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static SET_TITLES = `${Ui.reducerName} Set titles`;
-  private static setTitles(
+  function setTitles(
     ui: IUi,
     payload: {
-      titleMainPart1: number;
-      titleMainPart2: number;
-      titleSubPart: number;
+      titleMainPart1?: string;
+      titleMainPart2?: string;
+      titleSubPart?: string;
     }
   ): IUi {
     return {
@@ -115,7 +132,14 @@ export class Ui {
     };
   }
 
-  private static closeWorkspace(ui: IUi, payload): IUi {
+  function changeScreenSize(ui: IUi, payload: { screenSize: string }): IUi {
+    return {
+      ...ui,
+      ...<IUi>{ screenSize: payload.screenSize },
+    };
+  }
+
+  function closeWorkspace(ui: IUi, payload: { delete: boolean }): IUi {
     if (payload && payload.delete) {
       return {
         ...ui,
@@ -126,31 +150,4 @@ export class Ui {
       return ui;
     }
   }
-
-  // tslint:disable-next-line:member-ordering
-  public static CHANGE_SCREEN_SIZE = `${Ui.reducerName} Change screen size`;
-  private static changeScreenSize(ui: IUi, payload): IUi {
-    return {
-      ...ui,
-      ...<IUi>{ screenSize: payload },
-    };
-  }
-
-  // -------------------------------------------------------------------------------------------
-
-  // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod: {
-    [type: string]: (t: IUi, p: any) => IUi;
-  } = {
-    [Ui.SET_LANGUAGE]: Ui.setLanguage,
-    [Ui.TOGGLE_SIDENAV]: Ui.toggleSidenav,
-    [Ui.OPEN_SIDENAV]: Ui.openSidenav,
-    [Ui.CLOSE_SIDENAV]: Ui.closeSidenav,
-    [Ui.OPEN_POPUP_WORKSPACES_LIST]: Ui.openPopupWorkspacesList,
-    [Ui.CLOSE_POPUP_WORKSPACES_LIST]: Ui.closePopupWorkspacesList,
-    [Ui.SET_TITLES]: Ui.setTitles,
-    [Ui.CHANGE_SCREEN_SIZE]: Ui.changeScreenSize,
-
-    [Workspaces.CLOSE_WORKSPACE]: Ui.closeWorkspace,
-  };
 }

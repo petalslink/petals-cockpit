@@ -15,11 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Action } from '@ngrx/store';
-
 import {
   IComponentBackendSSE,
   IComponentBackendDetails,
+  ComponentState,
 } from 'app/shared/services/components.service';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import {
@@ -28,117 +27,127 @@ import {
   componentRowFactory,
   IComponentRow,
 } from './components.interface';
-import { Workspaces } from '../workspaces/workspaces.reducer';
-import { ServiceUnits } from '../service-units/service-units.reducer';
+
 import {
   putAll,
   updateById,
   removeById,
   mergeOnly,
-  JsMap,
-} from 'app/shared/helpers/map.helper';
+  JsTable,
+} from 'app/shared/helpers/jstable.helper';
+import { fold, unfold, toggleFold } from 'app/shared/helpers/reducers.helper';
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
+import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 
-export class Components {
-  private static reducerName = '[Components]';
+export namespace ComponentsReducer {
+  type All =
+    | Components.Fetched
+    | Components.Added
+    | Components.SetCurrent
+    | Components.FetchDetails
+    | Components.FetchDetailsError
+    | Components.FetchDetailsSuccess
+    | Components.ChangeState
+    | Components.ChangeStateError
+    | Components.ChangeStateSuccess
+    | Components.Removed
+    | Components.Fold
+    | Components.Unfold
+    | Components.ToggleFold
+    | Components.DeployServiceUnit
+    | Components.DeployServiceUnitError
+    | Components.DeployServiceUnitSuccess
+    | ServiceUnits.Removed
+    | Workspaces.Clean;
 
-  public static reducer(
-    componentsTable = componentsTableFactory(),
-    { type, payload }: Action
+  export function reducer(
+    table = componentsTableFactory(),
+    action: All
   ): IComponentsTable {
-    if (!Components.mapActionsToMethod[type]) {
-      return componentsTable;
+    switch (action.type) {
+      case Components.FetchedType: {
+        return fetched(table, action.payload);
+      }
+      case Components.AddedType: {
+        return added(table, action.payload);
+      }
+      case Components.SetCurrentType: {
+        return setCurrent(table, action.payload);
+      }
+      case Components.FetchDetailsType: {
+        return fetchDetails(table, action.payload);
+      }
+      case Components.FetchDetailsErrorType: {
+        return fetchDetailsError(table, action.payload);
+      }
+      case Components.FetchDetailsSuccessType: {
+        return fetchDetailsSuccess(table, action.payload);
+      }
+      case Components.RemovedType: {
+        return remove(table, action.payload);
+      }
+      case Components.ChangeStateType: {
+        return changeState(table, action.payload);
+      }
+      case Components.ChangeStateErrorType: {
+        return changeStateError(table, action.payload);
+      }
+      case Components.ChangeStateSuccessType: {
+        return changeStateSuccess(table, action.payload);
+      }
+      case Components.FoldType: {
+        return fold(table, action.payload);
+      }
+      case Components.UnfoldType: {
+        return unfold(table, action.payload);
+      }
+      case Components.ToggleFoldType: {
+        return toggleFold(table, action.payload);
+      }
+      case Components.DeployServiceUnitType: {
+        return deployServiceUnit(table, action.payload);
+      }
+      case Components.DeployServiceUnitErrorType: {
+        return deployServiceUnitError(table, action.payload);
+      }
+      case Components.DeployServiceUnitSuccessType: {
+        return deployServiceUnitSuccess(table, action.payload);
+      }
+      case ServiceUnits.RemovedType: {
+        return removeServiceUnit(table, action.payload);
+      }
+      case Workspaces.CleanType: {
+        return componentsTableFactory();
+      }
+      default:
+        return table;
     }
-
-    return (
-      Components.mapActionsToMethod[type](componentsTable, payload) ||
-      componentsTable
-    );
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_COMPONENTS_SUCCESS = `${Components.reducerName} Fetch components success`;
-  private static fetchComponentsSuccess(
-    componentsTable: IComponentsTable,
-    payload: JsMap<IComponentBackendSSE>
-  ): IComponentsTable {
-    return mergeOnly(componentsTable, payload, componentRowFactory());
+  function fetched(
+    table: IComponentsTable,
+    payload: JsTable<IComponentBackendSSE>
+  ) {
+    return mergeOnly(table, payload, componentRowFactory);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static ADD_COMPONENTS_SUCCESS = `${Components.reducerName} Add components success`;
-  private static addComponentsSuccess(
-    componentsTable: IComponentsTable,
-    payload: JsMap<IComponentBackendSSE>
-  ): IComponentsTable {
-    return putAll(componentsTable, payload, componentRowFactory());
+  function added(
+    table: IComponentsTable,
+    payload: JsTable<IComponentBackendSSE>
+  ) {
+    return putAll(table, payload, componentRowFactory);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FOLD_COMPONENT = `${Components.reducerName} Fold component`;
-  private static foldComponent(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string }
-  ): IComponentsTable {
-    if (
-      !componentsTable.byId[payload.componentId] ||
-      componentsTable.byId[payload.componentId].isFolded
-    ) {
-      return componentsTable;
-    }
-
-    return updateById(componentsTable, payload.componentId, { isFolded: true });
-  }
-
-  // tslint:disable-next-line:member-ordering
-  public static UNFOLD_COMPONENT = `${Components.reducerName} Unfold component`;
-  private static unfoldComponent(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string }
-  ): IComponentsTable {
-    if (
-      !componentsTable.byId[payload.componentId] ||
-      !componentsTable.byId[payload.componentId].isFolded
-    ) {
-      return componentsTable;
-    }
-
-    return updateById(componentsTable, payload.componentId, {
-      isFolded: false,
-    });
-  }
-
-  // tslint:disable-next-line:member-ordering
-  public static TOGGLE_FOLD_COMPONENT = `${Components.reducerName} Toggle fold component`;
-  private static toggleFoldComponent(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string }
-  ): IComponentsTable {
-    const component = componentsTable.byId[payload.componentId];
-
-    if (!component) {
-      return componentsTable;
-    }
-
-    if (component.isFolded) {
-      return Components.unfoldComponent(componentsTable, payload);
-    }
-
-    return Components.foldComponent(componentsTable, payload);
-  }
-
-  // tslint:disable-next-line:member-ordering
-  public static SET_CURRENT_COMPONENT = `${Components.reducerName} Set current component`;
-  private static setCurrentComponent(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string }
-  ): IComponentsTable {
+  function setCurrent(table: IComponentsTable, payload: { id: string }) {
     const res = <IComponentsTable>{
-      selectedComponentId: payload.componentId,
+      selectedComponentId: payload.id,
     };
 
-    if (payload.componentId) {
+    if (payload.id) {
       return {
-        ...updateById(componentsTable, payload.componentId, {
+        ...updateById(table, payload.id, {
           errorChangeState: '',
           errorDeployment: '',
         }),
@@ -147,131 +156,97 @@ export class Components {
     }
 
     return {
-      ...componentsTable,
+      ...table,
       ...res,
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_COMPONENT_DETAILS = `${Components.reducerName} Fetch component details`;
-  private static fetchComponentDetails(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string }
-  ): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, {
+  function fetchDetails(table: IComponentsTable, payload: { id: string }) {
+    return updateById(table, payload.id, {
       isFetchingDetails: true,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_COMPONENT_DETAILS_SUCCESS = `${Components.reducerName} Fetch component details success`;
-  private static fetchComponentDetailsSuccess(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string; data: IComponentBackendDetails }
-  ): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, {
+  function fetchDetailsSuccess(
+    table: IComponentsTable,
+    payload: { id: string; data: IComponentBackendDetails }
+  ) {
+    return updateById(table, payload.id, {
       ...payload.data,
       isFetchingDetails: false,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_COMPONENT_DETAILS_ERROR = `${Components.reducerName} Fetch component details error`;
-  private static fetchComponentDetailsError(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string }
-  ): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, {
+  function fetchDetailsError(table: IComponentsTable, payload: { id: string }) {
+    return updateById(table, payload.id, {
       isFetchingDetails: false,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static CHANGE_STATE = `${Components.reducerName} Change state`;
-  private static changeState(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string }
-  ): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, {
+  function changeState(
+    table: IComponentsTable,
+    payload: {
+      id: string;
+      state: ComponentState;
+      parameters: { [key: string]: string };
+    }
+  ) {
+    return updateById(table, payload.id, {
       isUpdatingState: true,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static CHANGE_STATE_SUCCESS = `${Components.reducerName} Change state success`;
-  private static changeStateSuccess(
-    componentsTable: IComponentsTable,
+  function changeStateSuccess(
+    table: IComponentsTable,
     payload: {
-      componentId: string;
-      newState: string;
-      parameters: { [key: string]: string };
+      id: string;
+      state: ComponentState;
     }
-  ): IComponentsTable {
-    // if the parameters are not given here, simply set them to an empty object as
-    // it wouldn't be accurate until next get details
-    const parameters = payload.parameters || {};
-
-    return updateById(componentsTable, payload.componentId, {
-      state: payload.newState,
+  ) {
+    return updateById(table, payload.id, {
+      state: payload.state,
       isUpdatingState: false,
-      parameters,
       errorChangeState: '',
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static CHANGE_STATE_ERROR = `${Components.reducerName} Change state error`;
-  private static changeStateError(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string; errorChangeState: string }
-  ): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, {
+  function changeStateError(
+    table: IComponentsTable,
+    payload: { id: string; errorChangeState: string }
+  ) {
+    return updateById(table, payload.id, {
       isUpdatingState: false,
       errorChangeState: payload.errorChangeState,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static REMOVE_COMPONENT = `${Components.reducerName} Remove component`;
-  private static removeComponent(
-    componentsTable: IComponentsTable,
-    payload: IComponentRow
-  ): IComponentsTable {
-    return removeById(componentsTable, payload.id);
+  function remove(table: IComponentsTable, payload: IComponentRow) {
+    return removeById(table, payload.id);
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static DEPLOY_SERVICE_UNIT = `${Components.reducerName} Deploy service unit`;
-  private static deployServiceUnit(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string }
-  ): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, {
+  function deployServiceUnit(table: IComponentsTable, payload: { id: string }) {
+    return updateById(table, payload.id, {
       isDeployingServiceUnit: true,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static DEPLOY_SERVICE_UNIT_ERROR = `${Components.reducerName} Deploy service unit error`;
-  private static deployServiceUnitError(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string; errorDeployment: string }
-  ): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, {
+  function deployServiceUnitError(
+    table: IComponentsTable,
+    payload: { id: string; errorDeployment: string }
+  ) {
+    return updateById(table, payload.id, {
       isDeployingServiceUnit: false,
       errorDeployment: payload.errorDeployment,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static DEPLOY_SERVICE_UNIT_SUCCESS = `${Components.reducerName} Deploy service unit success`;
-  private static deployServiceUnitSuccess(
-    componentsTable: IComponentsTable,
+  function deployServiceUnitSuccess(
+    table: IComponentsTable,
     payload: IServiceUnitBackendSSE
-  ): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, {
+  ) {
+    return updateById(table, payload.componentId, {
       serviceUnits: [
-        ...componentsTable.byId[payload.componentId].serviceUnits,
+        ...table.byId[payload.componentId].serviceUnits,
         payload.id,
       ],
       // TODO that's not totally correct, because we don't really know if this was deployed by us and from a component
@@ -280,53 +255,14 @@ export class Components {
     });
   }
 
-  private static removeServiceUnit(
-    componentsTable: IComponentsTable,
-    payload: { componentId: string; serviceUnitId: string }
-  ): IComponentsTable {
-    return updateById(componentsTable, payload.componentId, {
-      serviceUnits: componentsTable.byId[
-        payload.componentId
-      ].serviceUnits.filter(
-        serviceUnitId => serviceUnitId !== payload.serviceUnitId
+  function removeServiceUnit(
+    table: IComponentsTable,
+    payload: IServiceUnitRow
+  ) {
+    return updateById(table, payload.componentId, {
+      serviceUnits: table.byId[payload.componentId].serviceUnits.filter(
+        serviceUnitId => serviceUnitId !== payload.id
       ),
     });
   }
-
-  private static cleanWorkspace(
-    _componentsTable: IComponentsTable,
-    _payload
-  ): IComponentsTable {
-    return componentsTableFactory();
-  }
-
-  // -------------------------------------------------------------------------------------------
-
-  // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod: {
-    [type: string]: (t: IComponentsTable, p: any) => IComponentsTable;
-  } = {
-    [Components.FETCH_COMPONENTS_SUCCESS]: Components.fetchComponentsSuccess,
-    [Components.ADD_COMPONENTS_SUCCESS]: Components.addComponentsSuccess,
-    [Components.FOLD_COMPONENT]: Components.foldComponent,
-    [Components.UNFOLD_COMPONENT]: Components.unfoldComponent,
-    [Components.TOGGLE_FOLD_COMPONENT]: Components.toggleFoldComponent,
-    [Components.SET_CURRENT_COMPONENT]: Components.setCurrentComponent,
-    [Components.FETCH_COMPONENT_DETAILS]: Components.fetchComponentDetails,
-    [Components.FETCH_COMPONENT_DETAILS_SUCCESS]:
-      Components.fetchComponentDetailsSuccess,
-    [Components.FETCH_COMPONENT_DETAILS_ERROR]:
-      Components.fetchComponentDetailsError,
-    [Components.CHANGE_STATE]: Components.changeState,
-    [Components.CHANGE_STATE_SUCCESS]: Components.changeStateSuccess,
-    [Components.CHANGE_STATE_ERROR]: Components.changeStateError,
-    [Components.REMOVE_COMPONENT]: Components.removeComponent,
-    [Components.DEPLOY_SERVICE_UNIT]: Components.deployServiceUnit,
-    [Components.DEPLOY_SERVICE_UNIT_SUCCESS]:
-      Components.deployServiceUnitSuccess,
-    [Components.DEPLOY_SERVICE_UNIT_ERROR]: Components.deployServiceUnitError,
-
-    [ServiceUnits.REMOVE_SERVICE_UNIT]: Components.removeServiceUnit,
-    [Workspaces.CLEAN_WORKSPACE]: Components.cleanWorkspace,
-  };
 }

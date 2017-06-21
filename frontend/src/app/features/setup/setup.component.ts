@@ -29,7 +29,7 @@ import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs/Subject';
 
-import { IStore } from 'app/shared/interfaces/store.interface';
+import { IStore } from 'app/shared/state/store.interface';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { UsersService, IUserSetup } from 'app/shared/services/users.service';
 

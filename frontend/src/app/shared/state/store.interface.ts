@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IUi } from './ui.interface';
+import { IUi } from 'app/shared/state/ui.interface';
 import { IUsersTable } from './users.interface';
 import { IWorkspacesTable } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { IBusesTable } from 'app/features/cockpit/workspaces/state/buses/buses.interface';

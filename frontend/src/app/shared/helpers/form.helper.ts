@@ -19,21 +19,21 @@ import { FormGroup } from '@angular/forms';
 
 export const validationMessages = {
   ip: {
-    required: 'Required !',
+    required: 'Required!',
     isIp: 'Invalid IP format',
   },
   port: {
-    required: 'Required !',
-    isPort: 'Invalid port format. Should be 0 <= port <= 65535',
+    required: 'Required!',
+    isPort: 'Invalid port format: expected 0 <= port <= 65535',
   },
   username: {
-    required: 'Required !',
+    required: 'Required!',
   },
   password: {
-    required: 'Required !',
+    required: 'Required!',
   },
   passphrase: {
-    required: 'Required !',
+    required: 'Required!',
   },
 };
 

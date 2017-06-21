@@ -15,374 +15,317 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Action } from '@ngrx/store';
-
 import {
   IWorkspacesTable,
   workspacesTableFactory,
   workspaceRowFactory,
 } from './workspaces.interface';
-import { Users } from './../../../../../shared/state/users.reducer';
+
 import {
   updateById,
   removeById,
   mergeInto,
   putById,
-  JsMap,
-} from 'app/shared/helpers/map.helper';
+  JsTable,
+} from 'app/shared/helpers/jstable.helper';
 import {
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
 } from 'app/shared/services/workspaces.service';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { Users } from 'app/shared/state/users.actions';
 
-export class Workspaces {
-  private static reducerName = '[Workspaces]';
+export namespace WorkspacesReducer {
+  type All =
+    | Workspaces.FetchAll
+    | Workspaces.FetchAllError
+    | Workspaces.FetchAllSuccess
+    | Workspaces.Post
+    | Workspaces.PostError
+    | Workspaces.PostSuccess
+    | Workspaces.Fetch
+    | Workspaces.FetchError
+    | Workspaces.FetchSuccess
+    | Workspaces.FetchDetails
+    | Workspaces.FetchDetailsError
+    | Workspaces.FetchDetailsSuccess
+    | Workspaces.SetDescription
+    | Workspaces.SetDescriptionError
+    | Workspaces.SetDescriptionSuccess
+    | Workspaces.Delete
+    | Workspaces.DeleteError
+    | Workspaces.DeleteSuccess
+    | Workspaces.SetSearch
+    | Workspaces.Removed
+    | Workspaces.Close
+    | Users.DisconnectSuccess;
 
-  public static reducer(
-    workspacesTable = workspacesTableFactory(),
-    { type, payload }: Action
+  export function reducer(
+    table = workspacesTableFactory(),
+    action: All
   ): IWorkspacesTable {
-    if (!Workspaces.mapActionsToMethod[type]) {
-      return workspacesTable;
+    switch (action.type) {
+      case Workspaces.FetchAllType: {
+        return fetchAll(table);
+      }
+      case Workspaces.FetchAllErrorType: {
+        return fetchAllError(table);
+      }
+      case Workspaces.FetchAllSuccessType: {
+        return fetchAllSuccess(table, action.payload);
+      }
+      case Workspaces.PostType: {
+        return post(table);
+      }
+      case Workspaces.PostErrorType: {
+        return postError(table);
+      }
+      case Workspaces.PostSuccessType: {
+        return postSuccess(table, action.payload);
+      }
+      case Workspaces.FetchType: {
+        return fetch(table, action.payload);
+      }
+      case Workspaces.FetchErrorType: {
+        return fetchError(table);
+      }
+      case Workspaces.FetchSuccessType: {
+        return fetchSuccess(table, action.payload);
+      }
+      case Workspaces.FetchDetailsType: {
+        return fetchDetails(table, action.payload);
+      }
+      case Workspaces.FetchDetailsErrorType: {
+        return fetchDetailsError(table, action.payload);
+      }
+      case Workspaces.FetchDetailsSuccessType: {
+        return fetchDetailsSuccess(table, action.payload);
+      }
+      case Workspaces.SetDescriptionType: {
+        return setDescription(table, action.payload);
+      }
+      case Workspaces.SetDescriptionErrorType: {
+        return setDescriptionError(table, action.payload);
+      }
+      case Workspaces.SetDescriptionSuccessType: {
+        return setDescriptionSuccess(table, action.payload);
+      }
+      case Workspaces.DeleteType: {
+        return deletee(table, action.payload);
+      }
+      case Workspaces.DeleteErrorType: {
+        return deleteError(table, action.payload);
+      }
+      case Workspaces.DeleteSuccessType: {
+        return deleteSuccess(table, action.payload);
+      }
+      case Workspaces.SetSearchType: {
+        return setSearch(table, action.payload);
+      }
+      case Workspaces.RemovedType: {
+        return removed(table, action.payload);
+      }
+      case Workspaces.CloseType: {
+        return close(table, action.payload);
+      }
+      case Users.DisconnectSuccessType: {
+        return workspacesTableFactory();
+      }
+      default:
+        return table;
     }
-
-    return (
-      Workspaces.mapActionsToMethod[type](workspacesTable, payload) ||
-      workspacesTable
-    );
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_WORKSPACES = `${Workspaces.reducerName} Fetch workspaces`;
-  private static fetchWorkspaces(
-    workspacesTable: IWorkspacesTable,
-    _payload
-  ): IWorkspacesTable {
+  function fetchAll(table: IWorkspacesTable) {
     return {
-      ...workspacesTable,
+      ...table,
       ...<IWorkspacesTable>{
         isFetchingWorkspaces: true,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_WORKSPACES_SUCCESS = `${Workspaces.reducerName} Fetch workspaces success`;
-  private static fetchWorkspacesSuccess(
-    workspacesTable: IWorkspacesTable,
-    payload: JsMap<IWorkspaceBackend>
-  ): IWorkspacesTable {
+  function fetchAllSuccess(
+    table: IWorkspacesTable,
+    payload: JsTable<IWorkspaceBackend>
+  ) {
     return {
-      ...mergeInto(workspacesTable, payload, workspaceRowFactory()),
+      ...mergeInto(table, payload, workspaceRowFactory),
       ...<IWorkspacesTable>{
         isFetchingWorkspaces: false,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_WORKSPACES_FAILED = `${Workspaces.reducerName} Fetch workspaces failed`;
-  private static fetchWorkspacesFailed(
-    workspacesTable: IWorkspacesTable,
-    _payload
-  ): IWorkspacesTable {
+  function fetchAllError(table: IWorkspacesTable) {
     return {
-      ...workspacesTable,
+      ...table,
       ...<IWorkspacesTable>{
         isFetchingWorkspaces: false,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static POST_WORKSPACE = `${Workspaces.reducerName} Post workspace`;
-  private static postWorkspace(
-    workspacesTable: IWorkspacesTable,
-    _payload
-  ): IWorkspacesTable {
+  function post(table: IWorkspacesTable) {
     return {
-      ...workspacesTable,
+      ...table,
       ...<IWorkspacesTable>{
         isAddingWorkspace: true,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static POST_WORKSPACE_SUCCESS = `${Workspaces.reducerName} Post workspace success`;
-  private static postWorkspaceSuccess(
-    workspacesTable: IWorkspacesTable,
-    payload: IWorkspaceBackend
-  ): IWorkspacesTable {
+  function postSuccess(table: IWorkspacesTable, payload: IWorkspaceBackend) {
     return {
-      ...putById(workspacesTable, payload.id, payload, workspaceRowFactory()),
+      ...putById(table, payload.id, payload, workspaceRowFactory),
       ...<IWorkspacesTable>{
         isAddingWorkspace: false,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static POST_WORKSPACE_FAILED = `${Workspaces.reducerName} Post workspace failed`;
-  private static postWorkspaceFailed(
-    workspacesTable: IWorkspacesTable,
-    _payload
-  ): IWorkspacesTable {
+  function postError(table: IWorkspacesTable) {
     return {
-      ...workspacesTable,
+      ...table,
       ...<IWorkspacesTable>{
         isAddingWorkspace: false,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_WORKSPACE = `${Workspaces.reducerName} Fetch workspace`;
-  private static fetchWorkspace(
-    workspacesTable: IWorkspacesTable,
-    payload
-  ): IWorkspacesTable {
+  function fetch(table: IWorkspacesTable, payload: { id: string }) {
     return {
-      ...workspacesTable,
+      ...table,
       ...<IWorkspacesTable>{
-        selectedWorkspaceId: payload,
+        selectedWorkspaceId: payload.id,
         isSelectedWorkspaceFetchError: false,
         isSelectedWorkspaceFetched: false,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_WORKSPACE_SUCCESS = `${Workspaces.reducerName} Fetch workspace success`;
-  private static fetchWorkspaceSuccess(
-    workspacesTable: IWorkspacesTable,
-    payload: IWorkspaceBackend
-  ): IWorkspacesTable {
+  function fetchSuccess(table: IWorkspacesTable, payload: IWorkspaceBackend) {
     return {
-      ...workspacesTable.byId[payload.id]
-        ? updateById(workspacesTable, payload.id, payload)
-        : putById(workspacesTable, payload.id, payload, workspaceRowFactory()),
+      ...table.byId[payload.id]
+        ? updateById(table, payload.id, payload)
+        : putById(table, payload.id, payload, workspaceRowFactory),
       ...<IWorkspacesTable>{
         isSelectedWorkspaceFetched: true,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_WORKSPACE_FAILED = `${Workspaces.reducerName} Fetch workspace failed`;
-  private static fetchWorkspaceFailed(
-    workspacesTable: IWorkspacesTable,
-    _payload
-  ): IWorkspacesTable {
+  function fetchError(table: IWorkspacesTable) {
     return {
-      ...workspacesTable,
+      ...table,
       ...<IWorkspacesTable>{
         isSelectedWorkspaceFetchError: true,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_WORKSPACE_DETAILS = `${Workspaces.reducerName} Fetch workspace details`;
-  private static fetchWorkspaceDetails(
-    workspacesTable: IWorkspacesTable,
-    payload: string
-  ): IWorkspacesTable {
-    return updateById(workspacesTable, payload, { isFetchingDetails: true });
+  function fetchDetails(table: IWorkspacesTable, payload: { id: string }) {
+    return updateById(table, payload.id, { isFetchingDetails: true });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_WORKSPACE_DETAILS_SUCCESS = `${Workspaces.reducerName} Fetch workspace details success`;
-  private static fetchWorkspaceDetailsSuccess(
-    workspacesTable: IWorkspacesTable,
+  function fetchDetailsSuccess(
+    table: IWorkspacesTable,
     payload: { id: string; data: IWorkspaceBackendDetails }
-  ): IWorkspacesTable {
-    return updateById(workspacesTable, payload.id, {
+  ) {
+    return updateById(table, payload.id, {
       ...payload.data,
       isFetchingDetails: false,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static FETCH_WORKSPACE_DETAILS_FAILED = `${Workspaces.reducerName} Fetch workspace details failed`;
-  private static fetchWorkspaceDetailsFailed(
-    workspacesTable: IWorkspacesTable,
-    payload: string
-  ): IWorkspacesTable {
-    return updateById(workspacesTable, payload, { isFetchingDetails: false });
+  function fetchDetailsError(table: IWorkspacesTable, payload: { id: string }) {
+    return updateById(table, payload.id, { isFetchingDetails: false });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static SET_DESCRIPTION = `${Workspaces.reducerName} Set description`;
-  private static setDescription(
-    workspacesTable: IWorkspacesTable,
-    payload: { id: string }
-  ): IWorkspacesTable {
-    return updateById(workspacesTable, payload.id, {
+  function setDescription(table: IWorkspacesTable, payload: { id: string }) {
+    return updateById(table, payload.id, {
       isSettingDescription: true,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static SET_DESCRIPTION_SUCCESS = `${Workspaces.reducerName} Set description success`;
-  private static setDescriptionSuccess(
-    workspacesTable: IWorkspacesTable,
+  function setDescriptionSuccess(
+    table: IWorkspacesTable,
     payload: { id: string; description: string }
-  ): IWorkspacesTable {
-    return updateById(workspacesTable, payload.id, {
+  ) {
+    return updateById(table, payload.id, {
       description: payload.description,
       isSettingDescription: false,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static SET_DESCRIPTION_FAILED = `${Workspaces.reducerName} Set description failed`;
-  private static setDescriptionFailed(
-    workspacesTable: IWorkspacesTable,
-    payload: string
-  ): IWorkspacesTable {
-    return updateById(workspacesTable, payload, {
+  function setDescriptionError(
+    table: IWorkspacesTable,
+    payload: { id: string }
+  ) {
+    return updateById(table, payload.id, {
       isSettingDescription: false,
     });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static SET_SEARCH = `${Workspaces.reducerName} Set search`;
-  private static setSearch(
-    workspacesTable: IWorkspacesTable,
-    payload
-  ): IWorkspacesTable {
+  function setSearch(table: IWorkspacesTable, payload: { search: string }) {
     return {
-      ...workspacesTable,
+      ...table,
       ...<IWorkspacesTable>{
-        searchPetals: payload.trim(),
+        searchPetals: payload.search,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static DELETE_WORKSPACE = `${Workspaces.reducerName} Delete workspace`;
-  private static deleteWorkspace(
-    workspacesTable: IWorkspacesTable,
-    payload: string
-  ): IWorkspacesTable {
-    return updateById(workspacesTable, payload, { isRemoving: true });
+  function deletee(table: IWorkspacesTable, payload: { id: string }) {
+    return updateById(table, payload.id, { isRemoving: true });
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static DELETE_WORKSPACE_SUCCESS = `${Workspaces.reducerName} Delete workspace success`;
-  private static deleteWorkspaceSuccess(
-    workspacesTable: IWorkspacesTable,
-    payload: string
-  ): IWorkspacesTable {
-    if (workspacesTable.selectedWorkspaceId !== payload) {
-      return workspacesTable;
+  function deleteSuccess(table: IWorkspacesTable, payload: { id: string }) {
+    if (table.selectedWorkspaceId !== payload.id) {
+      return table;
     }
 
     return {
-      ...workspacesTable,
+      ...table,
       ...<IWorkspacesTable>{
         isSelectedWorkspaceDeleted: true,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static DELETE_WORKSPACE_FAILED = `${Workspaces.reducerName} Delete workspace failed`;
-  private static deleteWorkspaceFailed(
-    workspacesTable: IWorkspacesTable,
-    payload: string
-  ): IWorkspacesTable {
-    return updateById(workspacesTable, payload, { isRemoving: false });
+  function deleteError(table: IWorkspacesTable, payload: { id: string }) {
+    return updateById(table, payload.id, { isRemoving: false });
   }
 
   /**
    * Note: while DELETE_WORKSPACE concerns the HTTP action of deleting a workspace,
    * REMOVE_WORKSPACE concerns the event coming from the SSE that a workspace has been deleted.
    */
-  // tslint:disable-next-line:member-ordering
-  public static REMOVE_WORKSPACE = `${Workspaces.reducerName} Remove workspace`;
-  private static removeWorkspace(
-    workspacesTable: IWorkspacesTable,
-    payload: string
-  ): IWorkspacesTable {
-    if (workspacesTable.selectedWorkspaceId !== payload) {
-      return workspacesTable;
+  function removed(table: IWorkspacesTable, payload: { id: string }) {
+    if (table.selectedWorkspaceId !== payload.id) {
+      return table;
     }
 
     return {
-      ...workspacesTable,
+      ...table,
       ...<IWorkspacesTable>{
         isSelectedWorkspaceDeleted: true,
       },
     };
   }
 
-  // tslint:disable-next-line:member-ordering
-  public static CLEAN_WORKSPACE = `${Workspaces.reducerName} Clean workspace`;
-
-  // tslint:disable-next-line:member-ordering
-  public static CLOSE_WORKSPACE = `${Workspaces.reducerName} Close workspace`;
-  private static closeWorkspace(
-    workspacesTable: IWorkspacesTable,
-    payload
-  ): IWorkspacesTable {
-    if (workspacesTable.selectedWorkspaceId && payload && payload.delete) {
+  function close(table: IWorkspacesTable, payload: { delete: boolean }) {
+    if (table.selectedWorkspaceId && payload && payload.delete) {
       return {
-        ...removeById(workspacesTable, workspacesTable.selectedWorkspaceId),
+        ...removeById(table, table.selectedWorkspaceId),
         selectedWorkspaceId: '',
         isSelectedWorkspaceDeleted: false,
       };
     } else {
       return {
-        ...workspacesTable,
+        ...table,
         selectedWorkspaceId: '',
       };
     }
   }
-
-  // tslint:disable-next-line:member-ordering
-  private static disconnectUserSuccess(
-    _workspacesTable: IWorkspacesTable,
-    _payload
-  ): IWorkspacesTable {
-    return workspacesTableFactory();
-  }
-
-  // -------------------------------------------------------------------------------------------
-
-  // tslint:disable-next-line:member-ordering
-  private static mapActionsToMethod: {
-    [type: string]: (t: IWorkspacesTable, p: any) => IWorkspacesTable;
-  } = {
-    // Workspaces
-    [Workspaces.FETCH_WORKSPACES]: Workspaces.fetchWorkspaces,
-    [Workspaces.FETCH_WORKSPACES_SUCCESS]: Workspaces.fetchWorkspacesSuccess,
-    [Workspaces.FETCH_WORKSPACES_FAILED]: Workspaces.fetchWorkspacesFailed,
-    // Workspace
-    [Workspaces.FETCH_WORKSPACE]: Workspaces.fetchWorkspace,
-    [Workspaces.FETCH_WORKSPACE_SUCCESS]: Workspaces.fetchWorkspaceSuccess,
-    [Workspaces.FETCH_WORKSPACE_FAILED]: Workspaces.fetchWorkspaceFailed,
-    [Workspaces.FETCH_WORKSPACE_DETAILS]: Workspaces.fetchWorkspaceDetails,
-    [Workspaces.FETCH_WORKSPACE_DETAILS_SUCCESS]:
-      Workspaces.fetchWorkspaceDetailsSuccess,
-    [Workspaces.FETCH_WORKSPACE_DETAILS_FAILED]:
-      Workspaces.fetchWorkspaceDetailsFailed,
-    [Workspaces.POST_WORKSPACE]: Workspaces.postWorkspace,
-    [Workspaces.POST_WORKSPACE_SUCCESS]: Workspaces.postWorkspaceSuccess,
-    [Workspaces.POST_WORKSPACE_FAILED]: Workspaces.postWorkspaceFailed,
-    [Workspaces.DELETE_WORKSPACE]: Workspaces.deleteWorkspace,
-    [Workspaces.DELETE_WORKSPACE_SUCCESS]: Workspaces.deleteWorkspaceSuccess,
-    [Workspaces.DELETE_WORKSPACE_FAILED]: Workspaces.deleteWorkspaceFailed,
-    [Workspaces.REMOVE_WORKSPACE]: Workspaces.removeWorkspace,
-    [Workspaces.CLOSE_WORKSPACE]: Workspaces.closeWorkspace,
-    // Search
-    [Workspaces.SET_SEARCH]: Workspaces.setSearch,
-    // Workspace description
-    [Workspaces.SET_DESCRIPTION]: Workspaces.setDescription,
-    [Workspaces.SET_DESCRIPTION_FAILED]: Workspaces.setDescriptionFailed,
-    [Workspaces.SET_DESCRIPTION_SUCCESS]: Workspaces.setDescriptionSuccess,
-    // Disconnect
-    [Users.DISCONNECT_USER_SUCCESS]: Workspaces.disconnectUserSuccess,
-  };
 }

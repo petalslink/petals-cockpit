@@ -15,27 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import { IStore } from 'app/shared/interfaces/store.interface';
-import { Ui } from 'app/shared/state/ui.reducer';
+import { IStore } from 'app/shared/state/store.interface';
+
+import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
   selector: 'app-workspaces',
   templateUrl: './workspaces.component.html',
   styleUrls: ['./workspaces.component.scss'],
 })
-export class WorkspacesComponent implements OnInit, OnDestroy {
+export class WorkspacesComponent implements OnInit {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.store$.dispatch({
-      type: Ui.SET_TITLES,
-      payload: { titleMainPart1: 'Petals Cockpit', titleMainPart2: '' },
-    });
-    this.store$.dispatch({ type: Ui.OPEN_POPUP_WORKSPACES_LIST });
+    this.store$.dispatch(
+      new Ui.SetTitles({ titleMainPart1: 'Petals Cockpit' })
+    );
+    this.store$.dispatch(new Ui.OpenWorkspaces());
   }
-
-  ngOnDestroy() {}
 }

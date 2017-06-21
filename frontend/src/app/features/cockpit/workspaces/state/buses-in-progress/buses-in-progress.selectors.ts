@@ -22,7 +22,7 @@ import {
   IBusesInProgress,
   IBusInProgressRow,
 } from './buses-in-progress.interface';
-import { IStore } from '../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../shared/state/store.interface';
 import { isNot } from '../../../../../shared/helpers/shared.helper';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 

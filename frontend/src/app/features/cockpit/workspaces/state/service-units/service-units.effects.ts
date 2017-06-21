@@ -16,14 +16,15 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
+
 import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from 'environments/environment';
 import { ServiceUnitsService } from 'app/shared/services/service-units.service';
-import { ServiceUnits } from './../service-units/service-units.reducer';
+
+import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 
 @Injectable()
 export class ServiceUnitsEffects {
@@ -35,31 +36,30 @@ export class ServiceUnitsEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchServiceUnitDetails$: Observable<Action> = this.actions$
-    .ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)
-    .switchMap((action: { type: string; payload: { serviceUnitId: string } }) =>
+    .ofType(ServiceUnits.FetchDetailsType)
+    .switchMap((action: ServiceUnits.FetchDetails) =>
       this.serviceUnitsService
-        .getDetailsServiceUnit(action.payload.serviceUnitId)
-        .map((res: Response) => {
-          const data = res.json();
-          return {
-            type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_SUCCESS,
-            payload: { serviceUnitId: action.payload.serviceUnitId, data },
-          };
-        })
+        .getDetailsServiceUnit(action.payload.id)
+        .map(
+          res =>
+            new ServiceUnits.FetchDetailsSuccess({
+              id: action.payload.id,
+              data: res.json(),
+            })
+        )
         .catch(err => {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in service-unit.effects: ofType(ServiceUnits.FETCH_SERVICE_UNIT_DETAILS)'
+              'Error caught in service-unit.effects: ofType(ServiceUnits.FetchDetailsType)'
             );
             console.error(err);
             console.groupEnd();
           }
 
-          return Observable.of({
-            type: ServiceUnits.FETCH_SERVICE_UNIT_DETAILS_ERROR,
-            payload: { serviceUnitId: action.payload.serviceUnitId },
-          });
+          return Observable.of(
+            new ServiceUnits.FetchDetailsError(action.payload)
+          );
         })
     );
 }

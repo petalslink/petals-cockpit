@@ -29,7 +29,7 @@ import {
   EComponentState,
 } from './components.service';
 import { SseService, SseWorkspaceEvent } from './sse.service';
-import { IStore } from '../interfaces/store.interface';
+import { IStore } from '../state/store.interface';
 import { SseServiceMock } from './sse.service.mock';
 import { environment } from '../../../environments/environment';
 

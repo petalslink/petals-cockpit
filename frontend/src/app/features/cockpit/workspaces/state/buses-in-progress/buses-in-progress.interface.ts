@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { JsMap, emptyJavascriptMap } from 'app/shared/helpers/map.helper';
+import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
 import {
   IBusInProgressBackendCommon,
   IBusInProgressBackend,
@@ -45,7 +45,7 @@ export interface IBusesInProgressCommon {
   importBusId: string;
 }
 
-export interface IBusesInProgressTable extends IBusesInProgressCommon, JsMap<
+export interface IBusesInProgressTable extends IBusesInProgressCommon, JsTable<
   IBusInProgressRow
 > {}
 
@@ -68,7 +68,7 @@ export function busInProgressRowFactory(): IBusInProgressRow {
 }
 
 export function busesInProgressTableFactory(): IBusesInProgressTable {
-  return Object.assign({}, emptyJavascriptMap<IBusInProgressRow>(), {
+  return Object.assign({}, emptyJsTable<IBusInProgressRow>(), {
     selectedBusInProgressId: '',
     isImportingBus: false,
     importBusError: '',

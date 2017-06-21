@@ -16,19 +16,20 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
+
 import { Router } from '@angular/router';
 import { Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
 
-import { Users } from './../state/users.reducer';
-import { UsersService } from './../services/users.service';
-import { ICurrentUser } from './../interfaces/users.interface';
-import { environment } from './../../../environments/environment';
+import { UsersService } from '../services/users.service';
+
+import { environment } from '../../../environments/environment';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
+
+import { Users } from 'app/shared/state/users.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 
 @Injectable()
 export class UsersEffects {
@@ -42,41 +43,38 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   connectUser$: Observable<Action> = this.actions$
-    .ofType(Users.CONNECT_USER)
-    .switchMap((action: Action) =>
+    .ofType(Users.ConnectType)
+    .switchMap((action: Users.Connect) =>
       this.usersService
         .connectUser(action.payload.user)
-        .map((res: Response) => {
-          const user = <ICurrentUser>res.json();
-          return {
-            type: Users.CONNECT_USER_SUCCESS,
-            payload: {
-              user,
+        .map(
+          res =>
+            new Users.ConnectSuccess({
+              user: res.json(),
               navigate: true,
               previousUrl: action.payload.previousUrl,
-            },
-          };
-        })
+            })
+        )
         .catch(err => {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in users.effects.ts: ofType(Users.CONNECT_USER)'
+              'Error caught in users.effects.ts: ofType(Users.ConnectType)'
             );
             console.error(err);
             console.groupEnd();
           }
 
-          return Observable.of({ type: Users.CONNECT_USER_FAILED });
+          return Observable.of(new Users.ConnectError());
         })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   connectUserSuccess$: Observable<void> = this.actions$
-    .ofType(Users.CONNECT_USER_SUCCESS)
-    .filter((action: Action) => action.payload.navigate)
-    .map((action: Action) => {
+    .ofType(Users.ConnectSuccessType)
+    .filter((action: Users.ConnectSuccess) => action.payload.navigate)
+    .map((action: Users.ConnectSuccess) => {
       if (action.payload.previousUrl) {
         this.router.navigate([action.payload.previousUrl]);
       } else if (action.payload.user.lastWorkspace) {
@@ -92,34 +90,34 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   disconnectUser$: Observable<Action> = this.actions$
-    .ofType(Users.DISCONNECT_USER)
+    .ofType(Users.DisconnectType)
     .switchMap(() =>
       this.usersService
         .disconnectUser()
         .map(() =>
           batchActions([
-            { type: Users.DISCONNECT_USER_SUCCESS },
-            { type: Workspaces.CLOSE_WORKSPACE },
+            new Users.DisconnectSuccess(),
+            new Workspaces.Close({ delete: false }),
           ])
         )
         .catch(err => {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in users.effects.ts: ofType(Users.DISCONNECT_USER)'
+              'Error caught in users.effects.ts: ofType(Users.DisconnectType)'
             );
             console.error(err);
             console.groupEnd();
           }
 
-          return Observable.of({ type: Users.DISCONNECT_USER_FAILED });
+          return Observable.of(new Users.DisconnectError());
         })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   disconnectUserSuccess$: any = this.actions$
-    .ofType(Users.DISCONNECT_USER_SUCCESS)
+    .ofType(Users.DisconnectSuccessType)
     .do(_ => this.router.navigate(['/login']))
     .do(_ =>
       this.notification.success('Log out !', `You're now disconnected.`)

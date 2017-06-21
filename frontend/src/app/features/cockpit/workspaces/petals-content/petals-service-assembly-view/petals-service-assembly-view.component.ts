@@ -21,15 +21,17 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { Ui } from '../../../../../shared/state/ui.reducer';
+import { IStore } from '../../../../../shared/state/store.interface';
+
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 import {
   getCurrentServiceAssembly,
   getServiceUnitsAndComponentsOfServiceAssembly,
 } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+
 import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+import { Ui } from 'app/shared/state/ui.actions';
+import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 
 @Component({
   selector: 'app-petals-service-assembly-view',
@@ -51,25 +53,18 @@ export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
 
     this.serviceAssembly$ = this.store$.let(getCurrentServiceAssembly);
 
-    this.store$.dispatch({
-      type: Ui.SET_TITLES,
-      payload: {
+    this.store$.dispatch(
+      new Ui.SetTitles({
         titleMainPart1: 'Petals',
         titleMainPart2: 'Service Assemblies',
-      },
-    });
+      })
+    );
 
     serviceAssemblyId$
       .takeUntil(this.onDestroy$)
-      .do(serviceAssemblyId => {
-        this.store$.dispatch({
-          type: ServiceAssemblies.SET_CURRENT_SERVICE_ASSEMBLY,
-          payload: { serviceAssemblyId },
-        });
-        this.store$.dispatch({
-          type: ServiceAssemblies.FETCH_SERVICE_ASSEMBLY_DETAILS,
-          payload: { serviceAssemblyId },
-        });
+      .do(id => {
+        this.store$.dispatch(new ServiceAssemblies.SetCurrent({ id }));
+        this.store$.dispatch(new ServiceAssemblies.FetchDetails({ id }));
       })
       .subscribe();
 
@@ -82,9 +77,6 @@ export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    this.store$.dispatch({
-      type: ServiceAssemblies.SET_CURRENT_SERVICE_ASSEMBLY,
-      payload: { serviceAssemblyId: '' },
-    });
+    this.store$.dispatch(new ServiceAssemblies.SetCurrent({ id: '' }));
   }
 }

@@ -21,15 +21,16 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { Components } from '../../state/components/components.reducer';
-import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { Ui } from '../../../../../shared/state/ui.reducer';
+import { IStore } from '../../../../../shared/state/store.interface';
+
 import { IComponentRow } from '../../state/components/components.interface';
 import {
   getCurrentComponent,
   getCurrentComponentSharedLibraries,
 } from '../../state/components/components.selectors';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
+import { Ui } from 'app/shared/state/ui.actions';
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 
 @Component({
   selector: 'app-petals-component-view',
@@ -45,23 +46,19 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.store$.dispatch({
-      type: Ui.SET_TITLES,
-      payload: { titleMainPart1: 'Petals', titleMainPart2: 'Component' },
-    });
+    this.store$.dispatch(
+      new Ui.SetTitles({
+        titleMainPart1: 'Petals',
+        titleMainPart2: 'Component',
+      })
+    );
 
     this.route.paramMap
       .map(pm => pm.get('componentId'))
       .takeUntil(this.onDestroy$)
-      .do(componentId => {
-        this.store$.dispatch({
-          type: Components.SET_CURRENT_COMPONENT,
-          payload: { componentId },
-        });
-        this.store$.dispatch({
-          type: Components.FETCH_COMPONENT_DETAILS,
-          payload: { componentId },
-        });
+      .do(id => {
+        this.store$.dispatch(new Components.SetCurrent({ id }));
+        this.store$.dispatch(new Components.FetchDetails({ id }));
       })
       .subscribe();
 
@@ -73,9 +70,6 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    this.store$.dispatch({
-      type: Components.SET_CURRENT_COMPONENT,
-      payload: { componentId: '' },
-    });
+    this.store$.dispatch(new Components.SetCurrent({ id: '' }));
   }
 }

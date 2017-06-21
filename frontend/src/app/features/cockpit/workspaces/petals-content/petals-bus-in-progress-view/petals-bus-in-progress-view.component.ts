@@ -29,13 +29,12 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { IStore } from './../../../../../shared/interfaces/store.interface';
+import { IStore } from '../../../../../shared/state/store.interface';
 import {
   IBusesInProgressTable,
   IBusInProgressRow,
 } from './../../state/buses-in-progress/buses-in-progress.interface';
-import { Ui } from './../../../../../shared/state/ui.reducer';
-import { BusesInProgress } from './../../state/buses-in-progress/buses-in-progress.reducer';
+
 import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
 import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
 import {
@@ -45,6 +44,8 @@ import {
 
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { IBusImport } from 'app/shared/services/buses.service';
+import { Ui } from 'app/shared/state/ui.actions';
+import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 
 @Component({
   selector: 'app-petals-bus-in-progress-view',
@@ -79,10 +80,12 @@ export class PetalsBusInProgressViewComponent
   ) {}
 
   ngOnInit() {
-    this.store$.dispatch({
-      type: Ui.SET_TITLES,
-      payload: { titleMainPart1: 'Petals', titleMainPart2: 'Import bus' },
-    });
+    this.store$.dispatch(
+      new Ui.SetTitles({
+        titleMainPart1: 'Petals',
+        titleMainPart2: 'Import bus',
+      })
+    );
 
     this.busesInProgressTable$ = this.store$.select(
       state => state.busesInProgress
@@ -95,12 +98,7 @@ export class PetalsBusInProgressViewComponent
       .takeUntil(this.onDestroy$)
       .map(paramMap => paramMap.get('busInProgressId'))
       .distinctUntilChanged()
-      .do(busInProgressId =>
-        this.store$.dispatch({
-          type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
-          payload: { busInProgressId },
-        })
-      )
+      .do(id => this.store$.dispatch(new BusesInProgress.SetCurrent({ id })))
       .subscribe();
 
     this.busInProgress$
@@ -160,31 +158,19 @@ export class PetalsBusInProgressViewComponent
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    this.store$.dispatch({
-      type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
-      payload: { busInProgressId: '' },
-    });
+    this.store$.dispatch(new BusesInProgress.SetCurrent({ id: '' }));
   }
 
   onSubmit({ value }: { value: IBusImport; valid: boolean }) {
-    this.store$.dispatch({
-      type: BusesInProgress.POST_BUS_IN_PROGRESS,
-      payload: value,
-    });
+    this.store$.dispatch(new BusesInProgress.Post(value));
   }
 
   discard(busInProgress: IBusInProgressRow) {
-    this.store$.dispatch({
-      type: BusesInProgress.DELETE_BUS_IN_PROGRESS,
-      payload: busInProgress,
-    });
+    this.store$.dispatch(new BusesInProgress.Delete(busInProgress));
   }
 
   reset() {
     this.busImportForm.reset();
-    this.store$.dispatch({
-      type: BusesInProgress.SET_CURRENT_BUS_IN_PROGRESS,
-      payload: { busInProgressId: '' },
-    });
+    this.store$.dispatch(new BusesInProgress.SetCurrent({ id: '' }));
   }
 }

@@ -18,7 +18,7 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from './../interfaces/store.interface';
+import { IStore } from './store.interface';
 
 export function isSmallScreen(store$: Store<IStore>): Observable<boolean> {
   return store$

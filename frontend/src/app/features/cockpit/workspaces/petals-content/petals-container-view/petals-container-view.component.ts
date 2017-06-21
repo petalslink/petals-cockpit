@@ -21,14 +21,15 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { IStore } from '../../../../../shared/interfaces/store.interface';
-import { Containers } from '../../state/containers/containers.reducer';
-import { Ui } from '../../../../../shared/state/ui.reducer';
+import { IStore } from '../../../../../shared/state/store.interface';
+
 import { IContainerRow } from '../../state/containers/containers.interface';
 import {
   getCurrentContainer,
   getCurrentContainerSiblings,
 } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
+import { Ui } from 'app/shared/state/ui.actions';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 
 @Component({
   selector: 'app-petals-container-view',
@@ -45,10 +46,12 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.store$.dispatch({
-      type: Ui.SET_TITLES,
-      payload: { titleMainPart1: 'Petals', titleMainPart2: 'Container' },
-    });
+    this.store$.dispatch(
+      new Ui.SetTitles({
+        titleMainPart1: 'Petals',
+        titleMainPart2: 'Container',
+      })
+    );
 
     this.workspaceId$ = this.route.paramMap
       .map(p => p.get('workspaceId'))
@@ -62,24 +65,15 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
       .map(p => p.get('containerId'))
       .takeUntil(this.onDestroy$)
       .do(id => {
-        this.store$.dispatch({
-          type: Containers.SET_CURRENT_CONTAINER,
-          payload: { containerId: id },
-        });
-        this.store$.dispatch({
-          type: Containers.FETCH_CONTAINER_DETAILS,
-          payload: { containerId: id },
-        });
+        this.store$.dispatch(new Containers.SetCurrent({ id }));
+        this.store$.dispatch(new Containers.FetchDetails({ id }));
       })
       .switchMap(busId =>
         this.otherContainers$
           .first()
           .do(cs =>
             cs.forEach(c =>
-              this.store$.dispatch({
-                type: Containers.FETCH_CONTAINER_DETAILS,
-                payload: { containerId: c.id },
-              })
+              this.store$.dispatch(new Containers.FetchDetails(c))
             )
           )
           .map(_ => busId)
@@ -91,9 +85,6 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    this.store$.dispatch({
-      type: Containers.SET_CURRENT_CONTAINER,
-      payload: { containerId: '' },
-    });
+    this.store$.dispatch(new Containers.SetCurrent({ id: '' }));
   }
 }

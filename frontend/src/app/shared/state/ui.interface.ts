@@ -24,3 +24,15 @@ export interface IUi {
   titleMainPart2: string;
   titleSubPart: string;
 }
+
+export function uiFactory(): IUi {
+  return {
+    language: '',
+    isSidenavVisible: false,
+    screenSize: '',
+    isPopupListWorkspacesVisible: false,
+    titleMainPart1: 'Petals Cockpit',
+    titleMainPart2: '',
+    titleSubPart: '',
+  };
+}

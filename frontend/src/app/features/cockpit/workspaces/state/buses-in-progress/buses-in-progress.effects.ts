@@ -23,16 +23,17 @@ import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
 
-import { IStore } from 'app/shared/interfaces/store.interface';
+import { IStore } from 'app/shared/state/store.interface';
 import { IBusInProgressRow } from './buses-in-progress.interface';
-import { BusesInProgress } from './buses-in-progress.reducer';
+import { BusesInProgressReducer } from './buses-in-progress.reducer';
 import {
   BusesService,
   IBusInProgressBackend,
 } from 'app/shared/services/buses.service';
 import { environment } from 'environments/environment';
 import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
-import { toJavascriptMap } from 'app/shared/helpers/map.helper';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
+import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 
 @Injectable()
 export class BusesInProgressEffects {
@@ -62,10 +63,9 @@ export class BusesInProgressEffects {
         ]);
       }
 
-      return {
-        type: BusesInProgress.ADD_BUSES_IN_PROGRESS,
-        payload: toJavascriptMap<IBusInProgressBackend>({ [bip.id]: bip }),
-      };
+      return new BusesInProgress.Added(
+        toJsTable<IBusInProgressBackend>({ [bip.id]: bip })
+      );
     });
 
   // tslint:disable-next-line:member-ordering
@@ -78,11 +78,7 @@ export class BusesInProgressEffects {
         `Bus import error`,
         `The import of a bus from the IP ${busInError.ip}:${busInError.port} failed`
       );
-
-      return {
-        type: BusesInProgress.UPDATE_ERROR_BUS_IN_PROGRESS,
-        payload: busInError,
-      };
+      return new BusesInProgress.UpdateError(busInError);
     });
 
   // tslint:disable-next-line:member-ordering
@@ -105,43 +101,38 @@ export class BusesInProgressEffects {
         ]);
       }
 
-      return {
-        type: BusesInProgress.REMOVE_BUS_IN_PROGRESS,
-        payload: id,
-      };
+      return new BusesInProgress.Removed(bip);
     });
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   postBus$: Observable<Action> = this.actions$
-    .ofType(BusesInProgress.POST_BUS_IN_PROGRESS)
+    .ofType(BusesInProgress.PostType)
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
-    .switchMap(([action, idWorkspace]) =>
+    .switchMap(([action, idWorkspace]: [BusesInProgress.Post, string]) =>
       this.busesService
         .postBus(idWorkspace, action.payload)
-        .map((res: Response) => ({
-          type: BusesInProgress.POST_BUS_IN_PROGRESS_SUCCESS,
-          payload: <IBusInProgressRow>res.json(),
-        }))
+        .map(res => new BusesInProgress.PostSuccess(res.json()))
         .catch((res: Response) => {
           const err = res.json();
-          return Observable.of({
-            type: BusesInProgress.POST_BUS_IN_PROGRESS_ERROR,
-            payload: `Error ${err.code}: ${err.message}`,
-          });
+          return Observable.of(
+            new BusesInProgress.PostError({
+              importBusError: `Error ${err.code}: ${err.message}`,
+            })
+          );
         })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deleteBusInProgress$: Observable<Action> = this.actions$
-    .ofType(BusesInProgress.DELETE_BUS_IN_PROGRESS)
+    .ofType(BusesInProgress.DeleteType)
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
-    .switchMap(([action, idWorkspace]) =>
+    .switchMap(([action, idWorkspace]: [BusesInProgress.Delete, string]) =>
       this.busesService
         .deleteBus(idWorkspace, action.payload.id)
         .mergeMap(_ => Observable.empty())
@@ -149,16 +140,13 @@ export class BusesInProgressEffects {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error catched in buses-in-progress.effects: ofType(Buses.DELETE_BUS_IN_PROGRESS)'
+              'Error catched in buses-in-progress.effects: ofType(BusesInProgress.DeleteType)'
             );
             console.error(err);
             console.groupEnd();
           }
 
-          return Observable.of({
-            type: BusesInProgress.DELETE_BUS_IN_PROGRESS_FAILED,
-            payload: action.payload,
-          });
+          return Observable.of(new BusesInProgress.DeleteError(action.payload));
         })
     );
 }

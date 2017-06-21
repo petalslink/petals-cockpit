@@ -26,11 +26,13 @@ import {
   SharedLibrariesService,
   ISharedLibraryBackendSSE,
 } from 'app/shared/services/shared-libraries.service';
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
+
 import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
-import { toJavascriptMap } from 'app/shared/helpers/map.helper';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
+
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 
 @Injectable()
 export class SharedLibrariesEffects {
@@ -46,9 +48,7 @@ export class SharedLibrariesEffects {
     .ofType(SseWorkspaceEvent.SL_DEPLOYED.action)
     .map(action => {
       const data = action.payload;
-      const sls = toJavascriptMap<ISharedLibraryBackendSSE>(
-        data.sharedLibraries
-      );
+      const sls = toJsTable<ISharedLibraryBackendSSE>(data.sharedLibraries);
 
       // there is only one sl deployed here
       const sl = sls.byId[sls.allIds[0]];
@@ -60,42 +60,39 @@ export class SharedLibrariesEffects {
 
       return batchActions([
         // add the component
-        { type: SharedLibraries.ADDED, payload: sls },
+        new SharedLibraries.Added(sls),
         // add it to the container
-        { type: Containers.DEPLOY_SHARED_LIBRARY_SUCCESS, payload: sl },
+        new Containers.DeploySharedLibrarySuccess(sl),
       ]);
     });
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchDetails$: Observable<Action> = this.actions$
-    .ofType(SharedLibraries.FETCH_DETAILS)
-    .switchMap((action: { type: string; payload: { id: string } }) =>
+    .ofType(SharedLibraries.FetchDetailsType)
+    .switchMap((action: SharedLibraries.FetchDetails) =>
       this.sharedLibrariesService
         .getDetails(action.payload.id)
-        .map(data => {
-          return {
-            type: SharedLibraries.FETCH_DETAILS_SUCCESS,
-            payload: {
+        .map(
+          data =>
+            new SharedLibraries.FetchDetailsSuccess({
               id: action.payload.id,
               data,
-            },
-          };
-        })
+            })
+        )
         .catch(err => {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in shared-libraries.effects: ofType(SharedLibraries.FETCH_DETAILS)'
+              'Error caught in shared-libraries.effects: ofType(SharedLibraries.FetchDetailsType)'
             );
             console.error(err);
             console.groupEnd();
           }
 
-          return Observable.of({
-            type: SharedLibraries.FETCH_DETAILS_ERROR,
-            payload: { id: action.payload.id },
-          });
+          return Observable.of(
+            new SharedLibraries.FetchDetailsError(action.payload)
+          );
         })
     );
 }

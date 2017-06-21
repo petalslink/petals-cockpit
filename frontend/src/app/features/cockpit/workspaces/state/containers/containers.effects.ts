@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
+
 import { Router } from '@angular/router';
 import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
@@ -24,12 +24,11 @@ import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
 
 import { environment } from './../../../../../../environments/environment';
-import { Containers } from './containers.reducer';
+
 import { ContainersService } from './../../../../../shared/services/containers.service';
-import { IStore } from 'app/shared/interfaces/store.interface';
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
-import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
+import { IStore } from 'app/shared/state/store.interface';
+
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 
 @Injectable()
 export class ContainersEffects {
@@ -44,17 +43,17 @@ export class ContainersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchContainersDetails$: Observable<Action> = this.actions$
-    .ofType(Containers.FETCH_CONTAINER_DETAILS)
-    .flatMap((action: { type: string; payload: { containerId: string } }) =>
+    .ofType(Containers.FetchDetailsType)
+    .flatMap((action: Containers.FetchDetails) =>
       this.containersService
-        .getDetailsContainer(action.payload.containerId)
-        .map((res: Response) => {
-          const data = res.json();
-          return {
-            type: Containers.FETCH_CONTAINER_DETAILS_SUCCESS,
-            payload: { containerId: action.payload.containerId, data },
-          };
-        })
+        .getDetailsContainer(action.payload.id)
+        .map(
+          res =>
+            new Containers.FetchDetailsSuccess({
+              id: action.payload.id,
+              data: res.json(),
+            })
+        )
         .catch(err => {
           if (environment.debug) {
             console.group();
@@ -65,95 +64,80 @@ export class ContainersEffects {
             console.groupEnd();
           }
 
-          return Observable.of({
-            type: Containers.FETCH_CONTAINER_DETAILS_ERROR,
-            payload: { containerId: action.payload.containerId },
-          });
+          return Observable.of(
+            new Containers.FetchDetailsError(action.payload)
+          );
         })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deployComponent$: Observable<Action> = this.actions$
-    .ofType(Containers.DEPLOY_COMPONENT)
+    .ofType(Containers.DeployComponentType)
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
-    .switchMap(
-      (
-        [action, workspaceId]: [
-          { type: string; payload: { file: File; containerId: string } },
-          string
-        ]
-      ) =>
-        this.containersService
-          .deployComponent(
-            workspaceId,
-            action.payload.containerId,
-            action.payload.file
-          )
-          .mergeMap(_ => Observable.empty())
-          .catch(err => {
-            if (environment.debug) {
-              console.group();
-              console.warn(
-                `Error caught in containers.effects: ofType(${Containers.DEPLOY_COMPONENT})`
-              );
-              console.error(err);
-              console.groupEnd();
-            }
-
-            this.notifications.error(
-              'Component Deployment Failed',
-              `An error occurred while deploying ${action.payload.file.name}`
+    .switchMap(([action, workspaceId]: [Containers.DeployComponent, string]) =>
+      this.containersService
+        .deployComponent(workspaceId, action.payload.id, action.payload.file)
+        .mergeMap(_ => Observable.empty())
+        .catch(err => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error caught in containers.effects: ofType(Containers.DeployComponentType)'
             );
+            console.error(err);
+            console.groupEnd();
+          }
 
-            return Observable.of({
-              type: Containers.DEPLOY_COMPONENT_ERROR,
-              payload: {
-                containerId: action.payload.containerId,
-                errorDeploymentComponent: err.json().message,
-              },
-            });
-          })
+          this.notifications.error(
+            'Component Deployment Failed',
+            `An error occurred while deploying ${action.payload.file.name}`
+          );
+
+          return Observable.of(
+            new Containers.DeployComponentError({
+              id: action.payload.id,
+              errorDeployment: err.json().message,
+            })
+          );
+        })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   deployComponentSuccess$: Observable<void> = this.actions$
-    .ofType(Containers.DEPLOY_COMPONENT_SUCCESS)
+    .ofType(Containers.DeployComponentSuccessType)
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
-    .do(([{ payload }, workspaceId]: [{ payload: IComponentRow }, string]) => {
-      this.router.navigate([
-        'workspaces',
-        workspaceId,
-        'petals',
-        'components',
-        payload.id,
-      ]);
-    })
+    .do(
+      ([action, workspaceId]: [Containers.DeployComponentSuccess, string]) => {
+        this.router.navigate([
+          'workspaces',
+          workspaceId,
+          'petals',
+          'components',
+          action.payload.id,
+        ]);
+      }
+    )
     .mapTo(null);
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deployServiceAssembly$: Observable<Action> = this.actions$
-    .ofType(Containers.DEPLOY_SERVICE_ASSEMBLY)
+    .ofType(Containers.DeployServiceAssemblyType)
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
     .switchMap(
-      (
-        [action, workspaceId]: [
-          { type: string; payload: { file: File; containerId: string } },
-          string
-        ]
-      ) =>
+      ([action, workspaceId]: [Containers.DeployServiceAssembly, string]) =>
         this.containersService
           .deployServiceAssembly(
             workspaceId,
-            action.payload.containerId,
+            action.payload.id,
             action.payload.file
           )
           .mergeMap(_ => Observable.empty())
@@ -161,7 +145,7 @@ export class ContainersEffects {
             if (environment.debug) {
               console.group();
               console.warn(
-                `Error caught in containers.effects: ofType(${Containers.DEPLOY_SERVICE_ASSEMBLY})`
+                'Error caught in containers.effects: ofType(Containers.DeployServiceAssemblyType)'
               );
               console.error(err);
               console.groupEnd();
@@ -172,33 +156,32 @@ export class ContainersEffects {
               `An error occurred while deploying ${action.payload.file.name}`
             );
 
-            return Observable.of({
-              type: Containers.DEPLOY_SERVICE_ASSEMBLY_ERROR,
-              payload: {
-                containerId: action.payload.containerId,
-                errorDeploymentServiceAssembly: err.json().message,
-              },
-            });
+            return Observable.of(
+              new Containers.DeployServiceAssemblyError({
+                id: action.payload.id,
+                errorDeployment: err.json().message,
+              })
+            );
           })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   deployServiceAssemblySuccess$: Observable<void> = this.actions$
-    .ofType(Containers.DEPLOY_SERVICE_ASSEMBLY_SUCCESS)
+    .ofType(Containers.DeployServiceAssemblySuccessType)
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
     .do(
       (
-        [{ payload }, workspaceId]: [{ payload: IServiceAssemblyRow }, string]
+        [action, workspaceId]: [Containers.DeployServiceAssemblySuccess, string]
       ) => {
         this.router.navigate([
           'workspaces',
           workspaceId,
           'petals',
           'service-assemblies',
-          payload.id,
+          action.payload.id,
         ]);
       }
     )
@@ -207,21 +190,16 @@ export class ContainersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deploySharedLibrary$: Observable<Action> = this.actions$
-    .ofType(Containers.DEPLOY_SHARED_LIBRARY)
+    .ofType(Containers.DeploySharedLibraryType)
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
     .switchMap(
-      (
-        [action, workspaceId]: [
-          { type: string; payload: { file: File; containerId: string } },
-          string
-        ]
-      ) =>
+      ([action, workspaceId]: [Containers.DeploySharedLibrary, string]) =>
         this.containersService
           .deploySharedLibrary(
             workspaceId,
-            action.payload.containerId,
+            action.payload.id,
             action.payload.file
           )
           .mergeMap(_ => Observable.empty())
@@ -229,7 +207,7 @@ export class ContainersEffects {
             if (environment.debug) {
               console.group();
               console.warn(
-                `Error caught in containers.effects: ofType(${Containers.DEPLOY_SHARED_LIBRARY})`
+                'Error caught in containers.effects: ofType(Containers.DeploySharedLibraryType)'
               );
               console.error(err);
               console.groupEnd();
@@ -240,33 +218,32 @@ export class ContainersEffects {
               `An error occurred while deploying ${action.payload.file.name}`
             );
 
-            return Observable.of({
-              type: Containers.DEPLOY_SHARED_LIBRARY_ERROR,
-              payload: {
-                containerId: action.payload.containerId,
-                errorDeploymentSharedLibrary: err.json().message,
-              },
-            });
+            return Observable.of(
+              new Containers.DeploySharedLibraryError({
+                id: action.payload.id,
+                errorDeployment: err.json().message,
+              })
+            );
           })
     );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   deploySharedLibrarySuccess$: Observable<void> = this.actions$
-    .ofType(Containers.DEPLOY_SHARED_LIBRARY_SUCCESS)
+    .ofType(Containers.DeploySharedLibrarySuccessType)
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
     .do(
       (
-        [{ payload }, workspaceId]: [{ payload: ISharedLibraryRow }, string]
+        [action, workspaceId]: [Containers.DeploySharedLibrarySuccess, string]
       ) => {
         this.router.navigate([
           'workspaces',
           workspaceId,
           'petals',
           'shared-libraries',
-          payload.id,
+          action.payload.id,
         ]);
       }
     )

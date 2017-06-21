@@ -17,8 +17,13 @@
 
 import { Injectable } from '@angular/core';
 
-import { UsersService, IUserLogin, IUserSetup } from './users.service';
-import { ICurrentUser } from './../interfaces/users.interface';
+import {
+  UsersService,
+  IUserLogin,
+  IUserSetup,
+  IUserBackend,
+} from './users.service';
+import { ICurrentUser } from '../state/users.interface';
 import { environment } from './../../../environments/environment';
 import * as helper from './../helpers/mock.helper';
 import {
@@ -29,7 +34,7 @@ import {
 
 @Injectable()
 export class UsersServiceMock extends UsersService {
-  private static users = {
+  private static users: { [username: string]: ICurrentUser } = {
     admin: {
       ...users.admin,
       lastWorkspace: 'idWks0',
@@ -80,11 +85,9 @@ export class UsersServiceMock extends UsersService {
   }
 
   getUserInformations() {
-    if (this.currentUser) {
-      return helper.responseBody(this.currentUser);
-    }
-
-    return helper.response(401);
+    return (this.currentUser
+      ? helper.responseBody(this.currentUser)
+      : helper.response(401)).map(res => res.json() as IUserBackend);
   }
 
   setupUser(value: IUserSetup) {

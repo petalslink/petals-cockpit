@@ -20,29 +20,29 @@ import { compose } from '@ngrx/core/compose';
 import { storeFreeze } from 'ngrx-store-freeze';
 
 import { environment } from '../../../environments/environment';
-import { Ui } from '../state/ui.reducer';
-import { Users } from './users.reducer';
-import { Workspaces } from '../../features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { Buses } from '../../features/cockpit/workspaces/state/buses/buses.reducer';
-import { BusesInProgress } from '../../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
-import { Containers } from '../../features/cockpit/workspaces/state/containers/containers.reducer';
-import { Components } from '../../features/cockpit/workspaces/state/components/components.reducer';
-import { ServiceUnits } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
+import { UiReducer } from '../state/ui.reducer';
+import { UsersReducer } from './users.reducer';
+import { WorkspacesReducer } from '../../features/cockpit/workspaces/state/workspaces/workspaces.reducer';
+import { BusesReducer } from '../../features/cockpit/workspaces/state/buses/buses.reducer';
+import { BusesInProgressReducer } from '../../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
+import { ContainersReducer } from '../../features/cockpit/workspaces/state/containers/containers.reducer';
+import { ComponentsReducer } from '../../features/cockpit/workspaces/state/components/components.reducer';
+import { ServiceUnitsReducer } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
 import { enableBatching } from 'app/shared/helpers/batch-actions.helper';
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
+import { ServiceAssembliesReducer } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+import { SharedLibrariesReducer } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
 
 const reducers = {
-  ui: Ui.reducer,
-  users: Users.reducer,
-  workspaces: Workspaces.reducer,
-  buses: Buses.reducer,
-  busesInProgress: BusesInProgress.reducer,
-  containers: Containers.reducer,
-  components: Components.reducer,
-  serviceUnits: ServiceUnits.reducer,
-  serviceAssemblies: ServiceAssemblies.reducer,
-  sharedLibraries: SharedLibraries.reducer,
+  ui: UiReducer.reducer,
+  users: UsersReducer.reducer,
+  workspaces: WorkspacesReducer.reducer,
+  buses: BusesReducer.reducer,
+  busesInProgress: BusesInProgressReducer.reducer,
+  containers: ContainersReducer.reducer,
+  components: ComponentsReducer.reducer,
+  serviceUnits: ServiceUnitsReducer.reducer,
+  serviceAssemblies: ServiceAssembliesReducer.reducer,
+  sharedLibraries: SharedLibrariesReducer.reducer,
 };
 
 // if environment is != from production
