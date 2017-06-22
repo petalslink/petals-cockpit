@@ -22,14 +22,13 @@ import { Observable } from 'rxjs/Observable';
 import { environment } from './../../../environments/environment';
 
 export interface IUserBackend {
-  // from server
   id: string;
   name: string;
 }
 
 export interface ICurrentUserBackend extends IUserBackend {
-  // from server
   lastWorkspace: string;
+  isAdmin: boolean;
 }
 
 export interface IUserLogin {

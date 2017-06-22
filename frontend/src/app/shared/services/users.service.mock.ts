@@ -38,18 +38,22 @@ export class UsersServiceMock extends UsersService {
     admin: {
       ...users.admin,
       lastWorkspace: 'idWks0',
+      isAdmin: true,
     },
     vnoel: {
       ...users.vnoel,
       lastWorkspace: '',
+      isAdmin: false,
     },
     mrobert: {
       ...users.mrobert,
       lastWorkspace: '',
+      isAdmin: false,
     },
     bescudie: {
       ...users.bescudie,
       lastWorkspace: '',
+      isAdmin: false,
     },
   };
 
