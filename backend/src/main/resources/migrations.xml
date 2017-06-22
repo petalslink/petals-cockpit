@@ -234,7 +234,7 @@
         <constraints nullable="false" />
       </column>
     </addColumn>
-    
+
     <!-- we need to do that outside of the addColumn because of https://liquibase.jira.com/browse/CORE-3058 -->
     <addForeignKeyConstraint constraintName="fk_serviceunits_serviceassembly_id" baseTableName="serviceunits"
       baseColumnNames="serviceassembly_id" referencedTableName="serviceassemblies" referencedColumnNames="id" onDelete="CASCADE" />
@@ -286,5 +286,13 @@
           referencedTableName="components" referencedColumnNames="id" deleteCascade="true" />
       </column>
     </createTable>
+  </changeSet>
+
+  <changeSet id="v0.11.0-1" author="vnoel">
+    <addColumn tableName="users">
+      <column name="admin" type="boolean" defaultValueBoolean="false">
+        <constraints nullable="false" />
+      </column>
+    </addColumn>
   </changeSet>
 </databaseChangeLog>

@@ -69,7 +69,7 @@ public class SetupResourceTest extends AbstractCockpitResourceTest {
 
         assertThat(post.getStatus()).isEqualTo(204);
 
-        assertThat(requestUser("user")).hasNumberOfRows(1);
+        assertThat(requestUser("user")).hasNumberOfRows(1).row().value(USERS.ADMIN.getName()).isEqualTo(true);
 
         Response post2 = resource.target("/setup").request()
                 .post(Entity.json(new UserSetup(CockpitResourceRule.ADMIN_TOKEN, "user", "pass", "name")));

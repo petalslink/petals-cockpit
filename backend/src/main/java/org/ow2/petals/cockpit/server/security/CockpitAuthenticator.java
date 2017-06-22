@@ -21,8 +21,8 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import javax.ws.rs.core.MediaType;
 
 import org.jooq.Configuration;
-import org.jooq.Record1;
 import org.jooq.impl.DSL;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
@@ -51,14 +51,13 @@ public class CockpitAuthenticator implements Authenticator<UsernamePasswordCrede
         Configuration conf = ((JaxRsContext) context).getProviders()
                 .getContextResolver(Configuration.class, MediaType.WILDCARD_TYPE).getContext(null);
 
-        Record1<String> pw = DSL.using(conf).select(USERS.PASSWORD).from(USERS).where(USERS.USERNAME.eq(username))
-                .fetchOne();
+        UsersRecord user = DSL.using(conf).selectFrom(USERS).where(USERS.USERNAME.eq(username)).fetchOne();
 
-        if (pw != null) {
-            if (!passwordEncoder.matches(credentials.getPassword(), pw.value1())) {
+        if (user != null) {
+            if (!passwordEncoder.matches(credentials.getPassword(), user.getPassword())) {
                 throw new BadCredentialsException("Bad credentials for: " + username);
             } else {
-                credentials.setUserProfile(new CockpitProfile(username));
+                credentials.setUserProfile(new CockpitProfile(user.getUsername(), user.getAdmin()));
             }
         } else {
             throw new AccountNotFoundException("No account found for: " + username);

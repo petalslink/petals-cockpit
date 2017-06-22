@@ -33,6 +33,7 @@ import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.lifecycle.JettyManaged;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
@@ -55,6 +56,7 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         subparser.addArgument("-u", "--username").dest("username").required(true);
         subparser.addArgument("-n", "--name").dest("name").required(true);
         subparser.addArgument("-p", "--password").dest("password").required(true);
+        subparser.addArgument("-a", "--admin").dest("admin").action(Arguments.storeTrue());
     }
 
     @Override
@@ -78,6 +80,9 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         // required
         assert name != null;
 
+        Boolean admin = namespace.getBoolean("admin");
+        assert admin != null;
+
         Configuration jooqConf = new JooqFactory().build(environment, configuration.getDataSourceFactory());
 
         for (LifeCycle lifeCycle : environment.lifecycle().getManagedObjects()) {
@@ -94,7 +99,7 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
                     System.err.println("User " + username + " already exists");
                 } else {
                     DSL.using(c).executeInsert(new UsersRecord(username,
-                            CockpitAuthenticator.passwordEncoder.encode(password), name, null));
+                            CockpitAuthenticator.passwordEncoder.encode(password), name, null, admin));
                     System.out.println("Added user " + username);
                 }
             });

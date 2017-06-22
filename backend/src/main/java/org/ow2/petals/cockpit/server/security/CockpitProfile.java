@@ -21,12 +21,25 @@ import org.pac4j.core.profile.CommonProfile;
 
 public class CockpitProfile extends CommonProfile {
 
+    public final static String IS_ADMIN = "isAdmin";
+
     CockpitProfile() {
         // needed because UserProfile is Externalizable
     }
 
-    public CockpitProfile(String username) {
+    public CockpitProfile(String username, boolean isAdmin) {
         setId(username);
         addAttribute(Pac4jConstants.USERNAME, username);
+        addAttribute(IS_ADMIN, isAdmin);
     }
+
+    public boolean isAdmin() {
+        Object ia = getAttribute(IS_ADMIN);
+        if (!(ia instanceof Boolean)) {
+            return false;
+        } else {
+            return (Boolean) ia;
+        }
+    }
+
 }

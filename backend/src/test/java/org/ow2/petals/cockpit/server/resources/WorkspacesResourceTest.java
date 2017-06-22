@@ -24,7 +24,6 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 import javax.ws.rs.client.Entity;
 
 import org.junit.Test;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.NewWorkspace;
@@ -61,8 +60,8 @@ public class WorkspacesResourceTest extends AbstractCockpitResourceTest {
         resource.db().executeInsert(new WorkspacesRecord(3L, "test3", ""));
         resource.db().executeInsert(new WorkspacesRecord(4L, "test4", ""));
 
-        resource.db().executeInsert(new UsersRecord("userX", "..", "..", null));
-        resource.db().executeInsert(new UsersRecord("userY", "..", "..", null));
+        addUser("userX");
+        addUser("userY");
 
         resource.db().executeInsert(new UsersWorkspacesRecord(1L, "admin"));
         resource.db().executeInsert(new UsersWorkspacesRecord(1L, "userX"));
@@ -89,7 +88,7 @@ public class WorkspacesResourceTest extends AbstractCockpitResourceTest {
         assertThat(ws.users.get("admin").id).isEqualTo("admin");
         assertThat(ws.users.get("admin").name).isEqualTo("Administrator");
         assertThat(ws.users.get("userX").id).isEqualTo("userX");
-        assertThat(ws.users.get("userX").name).isEqualTo("..");
+        assertThat(ws.users.get("userX").name).isEqualTo("...");
         assertThat(ws.users.get("userY")).isNull();
     }
 }

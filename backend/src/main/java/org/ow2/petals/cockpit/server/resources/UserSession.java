@@ -71,7 +71,7 @@ public class UserSession {
 
         UsersRecord user = DSL.using(jooq).fetchOne(Tables.USERS, Tables.USERS.USERNAME.eq(profile.getId()));
 
-        return new User(user.getUsername(), user.getName(), user.getLastWorkspace());
+        return new User(user.getUsername(), user.getName(), user.getLastWorkspace(), user.getAdmin());
     }
 
     @GET
@@ -121,10 +121,13 @@ public class UserSession {
         @Min(1)
         public final Long lastWorkspace;
 
+        public final boolean isAdmin;
+
         public User(@JsonProperty("username") String username, @JsonProperty("name") String name,
-                @Nullable @JsonProperty("lastWorkspace") Long lastWorkspace) {
+                @Nullable @JsonProperty("lastWorkspace") Long lastWorkspace, @JsonProperty("isAdmin") boolean isAdmin) {
             super(username, name);
             this.lastWorkspace = lastWorkspace;
+            this.isAdmin = isAdmin;
         }
 
         @Nullable
