@@ -48,9 +48,9 @@ export class UsersEffects {
       this.usersService
         .connectUser(action.payload.user)
         .map(
-          res =>
+          user =>
             new Users.ConnectSuccess({
-              user: res.json(),
+              user,
               navigate: true,
               previousUrl: action.payload.previousUrl,
             })

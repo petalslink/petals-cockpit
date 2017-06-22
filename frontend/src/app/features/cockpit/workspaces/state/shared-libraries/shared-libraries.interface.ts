@@ -63,7 +63,8 @@ export function sharedLibraryRowFactory(): ISharedLibraryRow {
 }
 
 export function sharedLibrariesTableFactory(): ISharedLibrariesTable {
-  return Object.assign({}, emptyJsTable<ISharedLibraryRow>(), {
+  return {
+    ...emptyJsTable<ISharedLibraryRow>(),
     selectedSharedLibraryId: '',
-  });
+  };
 }

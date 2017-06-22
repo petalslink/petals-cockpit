@@ -84,8 +84,9 @@ export function containerRowFactory(): IContainerRow {
 }
 
 export function containersTableFactory(): IContainersTable {
-  return Object.assign({}, emptyJsTable<IContainerRow>(), {
+  return {
+    ...emptyJsTable<IContainerRow>(),
     selectedContainerId: '',
     isFetchingDetails: false,
-  });
+  };
 }

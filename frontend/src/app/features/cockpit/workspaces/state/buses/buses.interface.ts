@@ -64,7 +64,8 @@ export function busRowFactory(): IBusRow {
 }
 
 export function busesTableFactory(): IBusesTable {
-  return Object.assign({}, emptyJsTable<IBusRow>(), {
+  return {
+    ...emptyJsTable<IBusRow>(),
     selectedBusId: '',
-  });
+  };
 }

@@ -42,13 +42,13 @@ export class GuardLoginService implements CanActivate {
 
   canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     return this.store$
-      .select(s => s.users.connectedUserId)
+      .select(s => s.users.connectedUser)
       .first()
-      .switchMap(userId => {
+      .switchMap(connectedUser => {
         const url = state.url;
         const isLoginPage = url.match('^/login');
 
-        if (userId) {
+        if (connectedUser) {
           if (isLoginPage) {
             if (environment.debug) {
               console.debug(
@@ -70,7 +70,7 @@ export class GuardLoginService implements CanActivate {
           }
         } else {
           return this.userService
-            .getUserInformations()
+            .getCurrentUserInformations()
             .map(user => {
               if (isLoginPage) {
                 if (environment.debug) {

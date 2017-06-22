@@ -23,6 +23,7 @@ import {
   IWorkspaceBackendCommon,
   IWorkspaceBackendDetailsCommon,
 } from 'app/shared/services/workspaces.service';
+import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
 
 export interface IWorkspaceUI {
   // from UI
@@ -70,12 +71,9 @@ export interface IWorkspacesCommon {
   searchPetals: string;
 }
 
-export interface IWorkspacesTableOnly {
-  byId: { [key: string]: IWorkspaceRow };
-  allIds: string[];
-}
-
-export interface IWorkspacesTable extends IWorkspacesCommon, IWorkspacesTableOnly {}
+export interface IWorkspacesTable extends IWorkspacesCommon, JsTable<
+  IWorkspaceRow
+> {}
 
 export interface IWorkspaces extends IWorkspacesCommon {
   list: IWorkspace[];
@@ -83,6 +81,7 @@ export interface IWorkspaces extends IWorkspacesCommon {
 
 export function workspacesTableFactory(): IWorkspacesTable {
   return {
+    ...emptyJsTable<IWorkspaceRow>(),
     selectedWorkspaceId: '',
     isSelectedWorkspaceFetched: false,
     isSelectedWorkspaceFetchError: false,
@@ -91,8 +90,5 @@ export function workspacesTableFactory(): IWorkspacesTable {
     isAddingWorkspace: false,
     isFetchingWorkspaces: false,
     searchPetals: '',
-
-    byId: {},
-    allIds: [],
   };
 }

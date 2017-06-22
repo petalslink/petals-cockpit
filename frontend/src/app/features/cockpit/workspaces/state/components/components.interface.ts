@@ -76,8 +76,9 @@ export function componentRowFactory(): IComponentRow {
 }
 
 export function componentsTableFactory(): IComponentsTable {
-  return Object.assign({}, emptyJsTable<IComponentRow>(), {
+  return {
+    ...emptyJsTable<IComponentRow>(),
     selectedComponentId: '',
     isFetchingDetails: false,
-  });
+  };
 }

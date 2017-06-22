@@ -26,9 +26,11 @@ import {
   IUsersTable,
   usersTableFactory,
   userRowFactory,
-  ICurrentUser,
 } from 'app/shared/state/users.interface';
-import { IUserBackendCommon } from 'app/shared/services/users.service';
+import {
+  IUserBackend,
+  ICurrentUserBackend,
+} from 'app/shared/services/users.service';
 import { Users } from 'app/shared/state/users.actions';
 
 export namespace UsersReducer {
@@ -77,7 +79,7 @@ export namespace UsersReducer {
 
   function fetched(
     table: IUsersTable,
-    payload: JsTable<IUserBackendCommon>
+    payload: JsTable<IUserBackend>
   ): IUsersTable {
     return mergeInto(table, payload, userRowFactory);
   }
@@ -91,18 +93,19 @@ export namespace UsersReducer {
 
   function connectSuccess(
     table: IUsersTable,
-    payload: { user: ICurrentUser }
+    payload: { user: ICurrentUserBackend }
   ): IUsersTable {
     const id = payload.user.id;
+    const user = { id, name: payload.user.name };
 
     return {
       ...table.byId[id]
-        ? updateById(table, id, payload.user)
-        : putById(table, id, payload.user, userRowFactory),
+        ? updateById(table, id, user)
+        : putById(table, id, user, userRowFactory),
       isConnecting: false,
       isConnected: true,
       connectionFailed: false,
-      connectedUserId: id,
+      connectedUser: payload.user,
       isDisconnecting: false,
     };
   }
@@ -114,7 +117,7 @@ export namespace UsersReducer {
         isConnecting: false,
         connectionFailed: true,
         isConnected: false,
-        connectedUserId: '',
+        connectedUser: null,
       },
     };
   }

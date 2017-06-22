@@ -70,7 +70,8 @@ export function serviceUnitRowFactory(): IServiceUnitRow {
 }
 
 export function serviceUnitsTableFactory(): IServiceUnitsTable {
-  return Object.assign({}, emptyJsTable<IServiceUnitRow>(), {
+  return {
+    ...emptyJsTable<IServiceUnitRow>(),
     selectedServiceUnitId: '',
-  });
+  };
 }
