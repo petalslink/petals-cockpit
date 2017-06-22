@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { environment } from 'environments/environment';
 import {
   IUserBackend,
   IUserBackendCommon,
@@ -64,7 +63,7 @@ export function usersTableFactory(): IUsersTable {
     connectedUserId: '',
 
     isConnecting: false,
-    isConnected: environment.mock ? environment.mock.alreadyConnected : false,
+    isConnected: false,
     isDisconnecting: false,
     connectionFailed: false,
 

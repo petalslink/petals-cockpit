@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { environment } from 'environments/environment';
 import {
   putById,
   updateById,
@@ -41,7 +42,10 @@ export namespace UsersReducer {
     | Users.DisconnectSuccess;
 
   export function reducer(
-    table = usersTableFactory(),
+    table = {
+      ...usersTableFactory(),
+      isConnected: environment.mock ? environment.mock.alreadyConnected : false,
+    },
     action: All
   ): IUsersTable {
     switch (action.type) {
