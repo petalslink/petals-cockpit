@@ -20,15 +20,15 @@ import { JsTable } from 'app/shared/helpers/jstable.helper';
 
 import {
   IUserLogin,
-  IUserBackendCommon,
+  IUserBackend,
+  ICurrentUserBackend,
 } from 'app/shared/services/users.service';
-import { ICurrentUser } from 'app/shared/state/users.interface';
 
 export namespace Users {
   export const FetchedType = '[Users] Fetched';
   export class Fetched implements Action {
     readonly type = FetchedType;
-    constructor(public readonly payload: JsTable<IUserBackendCommon>) {}
+    constructor(public readonly payload: JsTable<IUserBackend>) {}
   }
 
   export const ConnectType = '[Users] Connect';
@@ -50,7 +50,7 @@ export namespace Users {
     readonly type = ConnectSuccessType;
     constructor(
       public readonly payload: {
-        user: ICurrentUser;
+        user: ICurrentUserBackend;
         navigate: boolean;
         previousUrl?: string;
       }

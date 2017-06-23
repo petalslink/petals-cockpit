@@ -21,15 +21,14 @@ import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
 
-export interface IUserBackendCommon {
-  // from server
+export interface IUserBackend {
   id: string;
   name: string;
 }
 
-export interface IUserBackend extends IUserBackendCommon {
-  // from server (actually only present for current user)
+export interface ICurrentUserBackend extends IUserBackend {
   lastWorkspace: string;
+  isAdmin: boolean;
 }
 
 export interface IUserLogin {
@@ -43,11 +42,11 @@ export interface IUserSetup extends IUserLogin {
 }
 
 export abstract class UsersService {
-  abstract connectUser(user: IUserLogin): Observable<Response>;
+  abstract connectUser(user: IUserLogin): Observable<ICurrentUserBackend>;
 
   abstract disconnectUser(): Observable<Response>;
 
-  abstract getUserInformations(): Observable<IUserBackend>;
+  abstract getCurrentUserInformations(): Observable<ICurrentUserBackend>;
 
   abstract setupUser(value: IUserSetup): Observable<Response>;
 }
@@ -59,17 +58,19 @@ export class UsersServiceImpl extends UsersService {
   }
 
   connectUser(user: IUserLogin) {
-    return this.http.post(`${environment.urlBackend}/user/session`, <any>user);
+    return this.http
+      .post(`${environment.urlBackend}/user/session`, user)
+      .map(res => res.json() as ICurrentUserBackend);
   }
 
   disconnectUser() {
     return this.http.delete(`${environment.urlBackend}/user/session`);
   }
 
-  getUserInformations() {
+  getCurrentUserInformations() {
     return this.http
       .get(`${environment.urlBackend}/user/session`)
-      .map(res => res.json() as IUserBackend);
+      .map(res => res.json() as ICurrentUserBackend);
   }
 
   setupUser(value: IUserSetup) {

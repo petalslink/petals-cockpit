@@ -124,11 +124,15 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
     @Before
     public void setUpUser() {
-        resource.setCurrentProfile(new CockpitProfile(ADMIN));
-        resource.db().executeInsert(new UsersRecord(ADMIN, "...", "Administrator", null));
+        resource.setCurrentProfile(new CockpitProfile(ADMIN, true));
+        resource.db().executeInsert(new UsersRecord(ADMIN, "...", "Administrator", null, true));
     }
 
-    public long getId(Object o) {
+    protected void addUser(String username) {
+        resource.db().executeInsert(new UsersRecord(username, "...", "...", null, false));
+    }
+
+    protected long getId(Object o) {
         return resource.getWorkspaceId(o);
     }
 

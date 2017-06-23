@@ -21,7 +21,7 @@ import {
   UsersService,
   IUserLogin,
   IUserSetup,
-  IUserBackend,
+  ICurrentUserBackend,
 } from './users.service';
 import { ICurrentUser } from '../state/users.interface';
 import { environment } from './../../../environments/environment';
@@ -38,18 +38,22 @@ export class UsersServiceMock extends UsersService {
     admin: {
       ...users.admin,
       lastWorkspace: 'idWks0',
+      isAdmin: true,
     },
     vnoel: {
       ...users.vnoel,
       lastWorkspace: '',
+      isAdmin: false,
     },
     mrobert: {
       ...users.mrobert,
       lastWorkspace: '',
+      isAdmin: false,
     },
     bescudie: {
       ...users.bescudie,
       lastWorkspace: '',
+      isAdmin: false,
     },
   };
 
@@ -67,15 +71,18 @@ export class UsersServiceMock extends UsersService {
   }
 
   connectUser(user: IUserLogin) {
+    let ok = false;
     if (
       UsersServiceMock.users[user.username] &&
       user.username === user.password
     ) {
       this.currentUser = UsersServiceMock.users[user.username];
-      return helper.responseBody(this.currentUser);
+      ok = true;
     }
 
-    return helper.response(401);
+    return (ok
+      ? helper.responseBody(this.currentUser)
+      : helper.response(401)).map(res => res.json() as ICurrentUserBackend);
   }
 
   disconnectUser() {
@@ -84,10 +91,10 @@ export class UsersServiceMock extends UsersService {
     return helper.response(204);
   }
 
-  getUserInformations() {
+  getCurrentUserInformations() {
     return (this.currentUser
       ? helper.responseBody(this.currentUser)
-      : helper.response(401)).map(res => res.json() as IUserBackend);
+      : helper.response(401)).map(res => res.json() as ICurrentUserBackend);
   }
 
   setupUser(value: IUserSetup) {

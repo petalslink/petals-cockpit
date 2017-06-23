@@ -39,7 +39,6 @@ import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
@@ -100,7 +99,7 @@ public class DeploySATest extends AbstractCockpitResourceTest {
 
     @Test
     public void deploySAExistingContainerForbidden() throws Exception {
-        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        addUser("anotheruser");
 
         Domain fDomain = new Domain("domf");
         Container fContainer = new Container("contf", "host1", ImmutableMap.of(PortType.JMX, containerPort), "user",
@@ -121,7 +120,7 @@ public class DeploySATest extends AbstractCockpitResourceTest {
 
     @Test
     public void deploySANonExistingContainerForbidden() throws Exception {
-        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        addUser("anotheruser");
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
@@ -138,7 +137,7 @@ public class DeploySATest extends AbstractCockpitResourceTest {
 
     @Test
     public void deploySAWrongContainerForbidden() throws Exception {
-        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        addUser("anotheruser");
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 

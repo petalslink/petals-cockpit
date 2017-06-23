@@ -63,7 +63,8 @@ export function serviceAssemblyRowFactory(): IServiceAssemblyRow {
 }
 
 export function serviceAssembliesTableFactory(): IServiceAssembliesTable {
-  return Object.assign({}, emptyJsTable<IServiceAssemblyRow>(), {
+  return {
+    ...emptyJsTable<IServiceAssemblyRow>(),
     selectedServiceAssemblyId: '',
-  });
+  };
 }

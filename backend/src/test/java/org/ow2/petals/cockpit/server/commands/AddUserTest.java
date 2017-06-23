@@ -107,8 +107,9 @@ public class AddUserTest extends AbstractTest {
     }
 
     @Test
-    public void addUserToDb() throws Exception {
-        boolean success = cli().run("add-user", "-n", "Admin", "-u", "admin", "-p", "password", "add-user-test.yml");
+    public void addUserAdminToDb() throws Exception {
+        boolean success = cli().run("add-user", "-n", "Admin", "-u", "admin", "-p", "password", "-a",
+                "add-user-test.yml");
 
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(success).as("Exit success").isTrue();
@@ -118,14 +119,29 @@ public class AddUserTest extends AbstractTest {
         softly.assertAll();
 
         assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
-                .column(USERS.USERNAME.getName()).value().isEqualTo("admin")
-                .column(USERS.NAME.getName()).value().isEqualTo("Admin");
+                .column(USERS.USERNAME.getName()).value().isEqualTo("admin").column(USERS.NAME.getName()).value()
+                .isEqualTo("Admin").column(USERS.ADMIN.getName()).value().isEqualTo(true);
+    }
+
+    @Test
+    public void addUserToDb() throws Exception {
+        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-p", "password", "add-user-test.yml");
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isTrue();
+
+        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").contains("Added user user");
+        softly.assertThat(systemErrRule.getLog()).as("stderr").isEmpty();
+        softly.assertAll();
+
+        assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
+                .column(USERS.USERNAME.getName()).value().isEqualTo("user").column(USERS.NAME.getName()).value()
+                .isEqualTo("User").column(USERS.ADMIN.getName()).value().isEqualTo(false);
     }
 
     @Test
     public void addUserToDbTwice() throws Exception {
-
-        addUserToDb();
+        addUserAdminToDb();
         systemErrRule.clearLog();
         systemOutRule.clearLog();
         // needed because running cli will register them again...
@@ -141,7 +157,7 @@ public class AddUserTest extends AbstractTest {
         softly.assertAll();
 
         assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
-                .column(USERS.USERNAME.getName()).value().isEqualTo("admin")
-                .column(USERS.NAME.getName()).value().isEqualTo("Admin");
+                .column(USERS.USERNAME.getName()).value().isEqualTo("admin").column(USERS.NAME.getName()).value()
+                .isEqualTo("Admin");
     }
 }

@@ -38,7 +38,6 @@ import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAStateChanged;
@@ -115,7 +114,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeSA1StateForbidden() {
-        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        addUser("anotheruser");
 
         Domain fDomain = new Domain("domf");
         Container fContainer = new Container("contf", "host1", ImmutableMap.of(PortType.JMX, containerPort), "user",
@@ -140,7 +139,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeNonExistingSAStateForbidden() {
-        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        addUser("anotheruser");
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 
@@ -155,7 +154,7 @@ public class ChangeSAStateTest extends AbstractCockpitResourceTest {
 
     @Test
     public void changeWrongSAStateForbidden() {
-        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        addUser("anotheruser");
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
 

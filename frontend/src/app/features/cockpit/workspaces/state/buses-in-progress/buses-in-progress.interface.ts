@@ -68,10 +68,11 @@ export function busInProgressRowFactory(): IBusInProgressRow {
 }
 
 export function busesInProgressTableFactory(): IBusesInProgressTable {
-  return Object.assign({}, emptyJsTable<IBusInProgressRow>(), {
+  return {
+    ...emptyJsTable<IBusInProgressRow>(),
     selectedBusInProgressId: '',
     isImportingBus: false,
     importBusError: '',
     importBusId: '',
-  });
+  };
 }

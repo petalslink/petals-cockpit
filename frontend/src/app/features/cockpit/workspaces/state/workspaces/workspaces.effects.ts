@@ -43,7 +43,7 @@ import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
 
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
-import { IUserBackendCommon } from 'app/shared/services/users.service';
+import { IUserBackend } from 'app/shared/services/users.service';
 
 import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
@@ -80,7 +80,7 @@ export class WorkspacesEffects {
             new Workspaces.FetchAllSuccess(
               toJsTable<IWorkspaceBackend>(data.workspaces)
             ),
-            new Users.Fetched(toJsTable<IUserBackendCommon>(data.users)),
+            new Users.Fetched(toJsTable<IUserBackend>(data.users)),
           ]);
         })
         .catch(err => {
@@ -189,7 +189,7 @@ export class WorkspacesEffects {
       const data = action.payload;
       return batchActions([
         new Workspaces.FetchSuccess(data.workspace),
-        new Users.Fetched(toJsTable<IUserBackendCommon>(data.users)),
+        new Users.Fetched(toJsTable<IUserBackend>(data.users)),
         new BusesInProgress.Fetched(
           toJsTable<IBusInProgressBackend>(data.busesInProgress)
         ),
@@ -226,7 +226,7 @@ export class WorkspacesEffects {
               id: action.payload.id,
               data: data.workspace,
             }),
-            new Users.Fetched(toJsTable<IUserBackendCommon>(data.users)),
+            new Users.Fetched(toJsTable<IUserBackend>(data.users)),
           ]);
         })
         .catch(err => {

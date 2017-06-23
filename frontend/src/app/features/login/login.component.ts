@@ -46,9 +46,8 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('usernameInput') usernameInput: MdInputContainer;
 
-  public loginForm: FormGroup;
-  private users$: Observable<IUsersTable>;
-  public users: IUsersTable;
+  loginForm: FormGroup;
+  users$: Observable<IUsersTable>;
 
   constructor(
     private store$: Store<IStore>,
@@ -65,16 +64,8 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
     this.users$
-      .distinctUntilChanged(
-        (p, n) =>
-          p.isConnected === n.isConnected &&
-          p.isConnecting === n.isConnecting &&
-          p.connectionFailed === n.connectionFailed
-      )
       .takeUntil(this.onDestroy$)
       .do(users => {
-        this.users = users;
-
         if (users.isConnecting || users.isConnected) {
           this.loginForm.disable();
           this.loginForm.disable();

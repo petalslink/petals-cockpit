@@ -25,14 +25,7 @@ import { isNot } from '../helpers/shared.helper';
 export function _getCurrentUser(
   store$: Store<IStore>
 ): Observable<ICurrentUser> {
-  return store$
-    .select(
-      state =>
-        state.users.connectedUserId === ''
-          ? null
-          : state.users.byId[state.users.connectedUserId]
-    )
-    .filter(isNot(null));
+  return store$.select(state => state.users.connectedUser).filter(isNot(null));
 }
 
 export function getCurrentUser() {

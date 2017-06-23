@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { environment } from 'environments/environment';
 import {
   IUserBackend,
-  IUserBackendCommon,
+  ICurrentUserBackend,
 } from 'app/shared/services/users.service';
+import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
 
 export interface IUserUI {}
 
@@ -27,12 +27,12 @@ export interface IUserUI {}
 export interface IUserRow extends IUserUI, IUserBackend {}
 
 // used in generated views
-export interface IUser extends IUserBackendCommon {}
+export interface IUser extends IUserBackend {}
 
-export interface ICurrentUser extends IUserRow, IUser {}
+export interface ICurrentUser extends ICurrentUserBackend {}
 
 interface IUsersCommon {
-  connectedUserId: string;
+  connectedUser: ICurrentUser;
 
   isConnecting: boolean;
   isConnected: boolean;
@@ -40,12 +40,7 @@ interface IUsersCommon {
   connectionFailed: boolean;
 }
 
-export interface IUsersTableOnly {
-  byId: { [key: string]: IUserRow };
-  allIds: string[];
-}
-
-export interface IUsersTable extends IUsersCommon, IUsersTableOnly {}
+export interface IUsersTable extends IUsersCommon, JsTable<IUserRow> {}
 
 export interface IUsers extends IUsersCommon {
   list: IUser[];
@@ -55,20 +50,17 @@ export function userRowFactory(): IUserRow {
   return {
     id: null,
     name: null,
-    lastWorkspace: undefined,
   };
 }
 
 export function usersTableFactory(): IUsersTable {
   return {
-    connectedUserId: '',
+    ...emptyJsTable<IUserRow>(),
+    connectedUser: null,
 
     isConnecting: false,
-    isConnected: environment.mock ? environment.mock.alreadyConnected : false,
+    isConnected: false,
     isDisconnecting: false,
     connectionFailed: false,
-
-    byId: {},
-    allIds: [],
   };
 }

@@ -29,7 +29,6 @@ import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -96,7 +95,7 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractCockp
         resource.petals.registerArtifact(serviceAssembly, container1);
         resource.petals.registerArtifact(sharedLibrary, container1);
 
-        resource.db().executeInsert(new UsersRecord("anotheruser", "...", "...", null));
+        addUser("anotheruser");
 
         // forbidden workspace (it is NOT registered in petals admin)
         fDomain.addContainers(fContainer);

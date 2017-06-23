@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-card>
+<md-card *ngIf="users$ | async as users">
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm)" fxLayout="column">
     <md-input-container #usernameInput class="margin-top-x1">
       <span mdPrefix>
