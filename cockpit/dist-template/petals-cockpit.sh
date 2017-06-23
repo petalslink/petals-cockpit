@@ -44,11 +44,14 @@ esac
 ARGS=()
 DBMIGRATE=true
 DBCHECK=true
+DEBUG=false
 for var in "$@"; do
   if [[ $var == "--no-db-migrate" ]]; then
     DBMIGRATE=false
   elif [[ $var == "--no-db-check" ]]; then
     DBCHECK=false
+  elif [[ $var == "--debug" ]]; then
+    DEBUG=true
   else
     ARGS[${#ARGS[@]}]="$var"
   fi
@@ -59,6 +62,12 @@ if [[ ${NBARGS} -eq 0 ]]; then
   FARGS="server"
 else
   FARGS="${ARGS[@]}"
+fi
+
+if [[ $DEBUG == true ]]; then
+  JARGS="-Dcapsule.jvm.args=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5000"
+else
+  JARGS=""
 fi
 
 if [[ $DBMIGRATE == true ]]; then
@@ -83,4 +92,4 @@ if [[ $DBMIGRATE == false && $DBCHECK == true ]]; then
 fi
 
 echo "Starting Petals Cockpit"
-exec "$JAVA" -jar "$JAR" $FARGS ./conf/config.yml
+exec "$JAVA" $JARGS -jar "$JAR" $FARGS ./conf/config.yml
