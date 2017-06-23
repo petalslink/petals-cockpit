@@ -70,6 +70,7 @@ import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.AbstractTest;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
@@ -89,7 +90,6 @@ import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitF
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.rules.CockpitResourceRule;
-import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations;
 import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.WorkspaceDbWitness;
 

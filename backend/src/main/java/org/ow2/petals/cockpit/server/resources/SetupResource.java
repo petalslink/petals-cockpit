@@ -34,9 +34,9 @@ import javax.ws.rs.core.MediaType;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.impl.DSL;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
-import org.ow2.petals.cockpit.server.security.CockpitAuthenticator;
-import org.ow2.petals.cockpit.server.security.CockpitExtractor.Authentication;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

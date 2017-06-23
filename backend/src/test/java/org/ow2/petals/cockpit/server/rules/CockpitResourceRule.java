@@ -48,6 +48,7 @@ import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
@@ -56,7 +57,6 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRec
 import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
 import org.ow2.petals.cockpit.server.mocks.MockArtifactServer;
 import org.ow2.petals.cockpit.server.resources.SetupResource;
-import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsDb;

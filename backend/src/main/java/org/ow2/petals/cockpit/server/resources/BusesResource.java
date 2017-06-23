@@ -38,8 +38,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
-import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;

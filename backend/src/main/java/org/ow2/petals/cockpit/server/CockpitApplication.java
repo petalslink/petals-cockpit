@@ -18,10 +18,7 @@ package org.ow2.petals.cockpit.server;
 
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 
-import java.io.File;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.stream.Collectors;
 
 import javax.inject.Singleton;
 import javax.ws.rs.ext.ContextResolver;
@@ -33,6 +30,8 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.jooq.Configuration;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
+import org.ow2.petals.cockpit.server.bundles.artifactserver.HttpArtifactServerBundle;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.resources.BusesResource;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource;
@@ -44,34 +43,19 @@ import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource;
 import org.ow2.petals.cockpit.server.resources.UserSession;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
-import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
-import org.ow2.petals.cockpit.server.services.ArtifactServer;
-import org.ow2.petals.cockpit.server.services.HttpArtifactServer;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
 import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
 import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.SaveWorkspaceDbWitness;
-import org.pac4j.core.client.Client;
-import org.pac4j.core.context.DefaultAuthorizers;
-import org.pac4j.core.matching.PathMatcher;
 import org.pac4j.dropwizard.Pac4jBundle;
-import org.pac4j.dropwizard.Pac4jFactory;
-import org.pac4j.dropwizard.Pac4jFactory.JaxRsSecurityFilterConfiguration;
-import org.pac4j.jax.rs.filters.JaxRsHttpActionAdapter;
-import org.pac4j.jax.rs.pac4j.JaxRsContext;
-import org.pac4j.jax.rs.servlet.pac4j.ServletJaxRsContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bendb.dropwizard.jooq.JooqBundle;
 import com.bendb.dropwizard.jooq.JooqFactory;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
-import com.google.common.cache.CacheBuilderSpec;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import io.dropwizard.Application;
-import io.dropwizard.bundles.assets.ConfiguredAssetsBundle;
 import io.dropwizard.db.PooledDataSourceFactory;
 import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
@@ -88,89 +72,26 @@ import io.dropwizard.setup.Environment;
  */
 public class CockpitApplication<C extends CockpitConfiguration> extends Application<C> {
 
-    public static final String ARTIFACTS_HTTP_SUBPATH = "jbi-artifacts";
-
     public static final String BLOCKING_TASK_ES = "quasar-blocking-exec-service";
-
-    public static final String PAC4J_EXCLUDE_MATCHER = "globalMatcherExcludes";
 
     // this logger is meant to be shown in the console at the INFO level
     protected static final Logger LOG = LoggerFactory.getLogger(CockpitApplication.class);
 
-    public final Pac4jBundle<C> pac4j = new Pac4jBundle<C>() {
+    public final Pac4jBundle<C> pac4j = new CockpitSecurityBundle<C>() {
         @Override
-        public Pac4jFactory getPac4jFactory(C configuration) {
-            List<Client> clients = configuration.getSecurity().getPac4jClients();
-
-            // TODO would it make sense to do injection on the clients? e.g. for UsersDAO
-            List<String> clientsNames = clients.stream().map(Client::getName).collect(Collectors.toList());
-
-            String defaultClients = String.join(",", clientsNames);
-
-            Pac4jFactory pac4jConf = new Pac4jFactory();
-
-            // this let the /user/session url be handled by the callbacks, logout, etc filters
-            pac4jConf.setMatchers(ImmutableMap.of(PAC4J_EXCLUDE_MATCHER,
-                    new PathMatcher().excludePath("/user/session").excludePath("/setup")));
-
-            // this protects the whole application with all the declared clients
-            JaxRsSecurityFilterConfiguration f = new JaxRsSecurityFilterConfiguration();
-            f.setMatchers(PAC4J_EXCLUDE_MATCHER);
-            f.setAuthorizers(DefaultAuthorizers.IS_AUTHENTICATED);
-            f.setClients(defaultClients);
-            pac4jConf.setGlobalFilters(ImmutableList.of(f));
-
-            // this will be used by SSO-type authenticators (appended with client name as parameter)
-            // for now, we still need to give a value in order for pac4j to be happy
-            pac4jConf.setCallbackUrl("/user/session");
-            pac4jConf.setClients(clients);
-
-            // this ensure Pac4JSecurity annotations use all the clients
-            // (for example on /user)
-            pac4jConf.setDefaultClients(defaultClients);
-
-            // if the local db client is enabled, use it by default for callbacks
-            // because the frontend does not pass a client name as a parameter by default
-            String defaultClient = CockpitAuthClient.class.getSimpleName();
-            if (clientsNames.contains(defaultClient)) {
-                pac4jConf.setDefaultClient(defaultClient);
-            }
-
-            pac4jConf.setHttpActionAdapter(new HttpActionAdapter303());
-
-            return pac4jConf;
+        protected CockpitSecurityConfiguration getConfiguration(C configuration) {
+            return configuration.getSecurity();
         }
     };
 
-    /**
-     * According to the HTTP/1.1 specification, we should use 303 and not 302 when redirecting from a POST to a GET
-     */
-    public static class HttpActionAdapter303 extends JaxRsHttpActionAdapter {
-        @Override
-        @Nullable
-        public Object adapt(int code, @Nullable JaxRsContext context) {
-            assert context != null;
-            if (code == 302 && "POST".equalsIgnoreCase(context.getRequestMethod())
-                    && "HTTP/1.1".equalsIgnoreCase(((ServletJaxRsContext) context).getRequest().getProtocol())) {
-                context.setResponseStatus(303);
-                return super.adapt(303, context);
-            } else {
-                return super.adapt(code, context);
-            }
-        }
-    }
-
     public final MigrationsBundle<C> migrations = new MigrationsBundle<C>() {
-
         @Override
         public PooledDataSourceFactory getDataSourceFactory(C configuration) {
             return configuration.getDataSourceFactory();
         }
-
     };
 
     public final JooqBundle<C> jooq = new JooqBundle<C>() {
-
         @Override
         public PooledDataSourceFactory getDataSourceFactory(C configuration) {
             return configuration.getDataSourceFactory();
@@ -180,7 +101,13 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         public JooqFactory getJooqFactory(C configuration) {
             return configuration.getJooqFactory();
         }
+    };
 
+    public final HttpArtifactServerBundle<C> artifactsServer = new HttpArtifactServerBundle<C>() {
+        @Override
+        protected HttpArtifactServerConfiguration getConfiguration(C configuration) {
+            return configuration.getArtifactServer();
+        }
     };
 
     public static void main(String[] args) throws Exception {
@@ -199,8 +126,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         bootstrap.addBundle(jooq);
         bootstrap.addBundle(pac4j);
         bootstrap.addCommand(new AddUserCommand<>());
-        bootstrap.addBundle(new ConfiguredAssetsBundle(ImmutableMap.of(), "index.html", "petals-cockpit-artifacts",
-                CacheBuilderSpec.disableCaching()));
+        bootstrap.addBundle(artifactsServer);
     }
 
     @Override
@@ -231,7 +157,6 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 bind(jdbcExec).named(BLOCKING_TASK_ES).to(ExecutorService.class);
                 bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
                 bind(jooqConf).to(Configuration.class);
-                bind(HttpArtifactServer.class).to(ArtifactServer.class).in(Singleton.class);
                 bind(PetalsAdmin.class).to(PetalsAdmin.class).in(Singleton.class);
                 bind(PetalsDb.class).to(PetalsDb.class).in(Singleton.class);
                 bind(adminConsoleToken).to(String.class).named(SetupResource.ADMIN_TOKEN);
@@ -274,17 +199,5 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         // This is needed for SSE to work correctly!
         // See https://github.com/dropwizard/dropwizard/issues/1673
         ((AbstractServerFactory) configuration.getServerFactory()).getGzipFilterFactory().setSyncFlush(true);
-
-        File artifactsTemporaryDir = new File(configuration.getArtifactTemporaryPath());
-
-        if (!artifactsTemporaryDir.exists()) {
-            artifactsTemporaryDir.mkdirs();
-            artifactsTemporaryDir.deleteOnExit();
-        }
-
-        if (!(artifactsTemporaryDir.canWrite() && artifactsTemporaryDir.canRead())) {
-            throw new SecurityException(
-                    "Can't read or write in the artifact temporary folder " + artifactsTemporaryDir);
-        }
     }
 }

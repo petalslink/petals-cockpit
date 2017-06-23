@@ -14,70 +14,41 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.services;
+package org.ow2.petals.cockpit.server.bundles.artifactserver;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.NetworkConnector;
-import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.dropwizard.jetty.MutableServletContextHandler;
-import io.dropwizard.setup.Environment;
-
 public class HttpArtifactServer implements ArtifactServer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ArtifactServer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpArtifactServer.class);
 
     private final URL artifactsBaseUrl;
 
-    private final CockpitConfiguration configuration;
+    private final File temporaryDirectory;
 
     @Inject
-    public HttpArtifactServer(Environment environment, CockpitConfiguration configuration) {
-        this.configuration = configuration;
-        this.artifactsBaseUrl = getArtifactsBaseUrl(environment);
-    }
-
-    @SuppressWarnings("resource")
-    private static URL getArtifactsBaseUrl(Environment environment) {
-        MutableServletContextHandler adminContext = environment.getAdminContext();
-        String context = adminContext.getContextPath();
-        Connector[] connectors = adminContext.getServer().getConnectors();
-
-        // TODO it would be better to have a specific connector just for serving the artifacts
-        NetworkConnector adminConnector = (NetworkConnector) Stream.of(connectors)
-                .filter(c -> "admin".equals(c.getName())).findFirst().orElse(connectors[0]);
-
-        try {
-            String host = adminConnector.getHost();
-            return new URL("http", host != null ? host : InetAddress.getLocalHost().getHostAddress(),
-                    adminConnector.getLocalPort(), (context.endsWith("/") ? context : (context + "/"))
-                            + CockpitApplication.ARTIFACTS_HTTP_SUBPATH + "/");
-        } catch (MalformedURLException | UnknownHostException e) {
-            throw new AssertionError("impossible", e);
-        }
+    public HttpArtifactServer(URL baseUrl, File temporaryDirectory) {
+        this.temporaryDirectory = temporaryDirectory;
+        this.artifactsBaseUrl = baseUrl;
     }
 
     @Override
     public <E extends Throwable> ServicedArtifact serve(String fileName, ArtifactProducer<E> producer)
             throws IOException, E {
         String randomDirectoryName = UUID.randomUUID().toString();
-        File tmpDir = new File(configuration.getArtifactTemporaryPath() + "/" + randomDirectoryName);
+        File tmpDir = new File(temporaryDirectory, randomDirectoryName);
         tmpDir.mkdirs();
         tmpDir.deleteOnExit();
 

@@ -25,10 +25,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.AbstractTest;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.UserSession.User;
 import org.ow2.petals.cockpit.server.rules.CockpitApplicationRule;
-import org.ow2.petals.cockpit.server.security.CockpitExtractor.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class UserSessionTest extends AbstractTest {

@@ -23,8 +23,8 @@ import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
-import org.ow2.petals.cockpit.server.security.CockpitAuthenticator;
 
 import com.bendb.dropwizard.jooq.JooqFactory;
 

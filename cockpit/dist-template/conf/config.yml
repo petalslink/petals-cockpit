@@ -19,10 +19,6 @@ server:
         currentLogFilename: ./logs/cockpit-access.log
         archivedLogFilenamePattern: ./logs/cockpit-access-%d.log.gz
 
-security:
-  pac4jClients:
-    - org.ow2.petals.cockpit.server.security.CockpitAuthClient: {}
-
 database:
   driverClass: org.h2.Driver
   user: petals

@@ -41,11 +41,11 @@ import javax.ws.rs.core.MediaType;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.impl.DSL;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
-import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

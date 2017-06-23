@@ -67,6 +67,7 @@ import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployServiceAssembly
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeploySharedLibrary;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
@@ -77,7 +78,6 @@ import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLib
 import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContentBuilder;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
-import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.ArtifactServer.ServicedArtifact;
 import org.ow2.petals.cockpit.server.utils.PetalsUtils;
