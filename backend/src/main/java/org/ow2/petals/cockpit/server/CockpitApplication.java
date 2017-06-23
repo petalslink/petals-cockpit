@@ -24,13 +24,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import javax.inject.Singleton;
-import javax.servlet.ServletRegistration.Dynamic;
 import javax.ws.rs.ext.ContextResolver;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.DefaultServlet;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.jooq.Configuration;
 import org.jooq.impl.DSL;
@@ -68,10 +66,12 @@ import org.slf4j.LoggerFactory;
 import com.bendb.dropwizard.jooq.JooqBundle;
 import com.bendb.dropwizard.jooq.JooqFactory;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
+import com.google.common.cache.CacheBuilderSpec;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import io.dropwizard.Application;
+import io.dropwizard.bundles.assets.ConfiguredAssetsBundle;
 import io.dropwizard.db.PooledDataSourceFactory;
 import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
@@ -199,6 +199,8 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         bootstrap.addBundle(jooq);
         bootstrap.addBundle(pac4j);
         bootstrap.addCommand(new AddUserCommand<>());
+        bootstrap.addBundle(new ConfiguredAssetsBundle(ImmutableMap.of(), "index.html", "petals-cockpit-artifacts",
+                CacheBuilderSpec.disableCaching()));
     }
 
     @Override
@@ -277,21 +279,12 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
 
         if (!artifactsTemporaryDir.exists()) {
             artifactsTemporaryDir.mkdirs();
+            artifactsTemporaryDir.deleteOnExit();
         }
 
         if (!(artifactsTemporaryDir.canWrite() && artifactsTemporaryDir.canRead())) {
             throw new SecurityException(
                     "Can't read or write in the artifact temporary folder " + artifactsTemporaryDir);
         }
-
-        Dynamic petalsServlet = environment.admin().addServlet("petals-jbi-artifacts", new DefaultServlet());
-
-        petalsServlet.addMapping("/" + ARTIFACTS_HTTP_SUBPATH + "/*");
-        // apparently needed for DefaultServlet to work in a subdirectory
-        petalsServlet.setInitParameter("pathInfoOnly", "true");
-        petalsServlet.setInitParameter("resourceBase", configuration.getArtifactTemporaryPath());
-        petalsServlet.setInitParameter("dirAllowed", "false");
-        petalsServlet.setInitParameter("useFileMappedBuffer", "true");
-        petalsServlet.setInitParameter("cacheControl", "no-cache");
     }
 }

@@ -1,0 +1,7 @@
+class io/dropwizard/bundles/assets/AssetsConfiguration$Builder
+build
+ ()Lio/dropwizard/bundles/assets/AssetsConfiguration;
+ ()L1io/dropwizard/bundles/assets/AssetsConfiguration;
+mappings
+ (Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)Lio/dropwizard/bundles/assets/AssetsConfiguration$Builder;
+ (Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)L1io/dropwizard/bundles/assets/AssetsConfiguration$Builder;
