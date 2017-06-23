@@ -1,3 +1,13 @@
+<a name="0.10.1"></a>
+## [0.10.1](https://gitlab.com/linagora/petals-cockpit/compare/v0.10.0...v0.10.1) (2017-06-23)
+
+
+### Bug Fixes
+
+* **product:** fix 404 when deploying artefacts ([e659980](https://gitlab.com/linagora/petals-cockpit/commit/e659980))
+
+
+
 <a name="0.10.0"></a>
 # [0.10.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.9.0...v0.10.0) (2017-06-21)
 

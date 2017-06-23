@@ -1,6 +1,6 @@
 {
   "name": "petals-cockpit",
-  "version": "0.10.1-alpha",
+  "version": "0.10.1",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
