@@ -1,0 +1,4 @@
+class io/dropwizard/bundles/assets/AssetsConfiguration
+builder
+ ()Lio/dropwizard/bundles/assets/AssetsConfiguration$Builder;
+ ()L1io/dropwizard/bundles/assets/AssetsConfiguration$Builder;

@@ -79,8 +79,10 @@ public class HttpArtifactServer implements ArtifactServer {
         String randomDirectoryName = UUID.randomUUID().toString();
         File tmpDir = new File(configuration.getArtifactTemporaryPath() + "/" + randomDirectoryName);
         tmpDir.mkdirs();
+        tmpDir.deleteOnExit();
 
         File file = new File(tmpDir, fileName);
+        file.deleteOnExit();
 
         try (OutputStream fos = new FileOutputStream(file)) {
             producer.produce(fos);

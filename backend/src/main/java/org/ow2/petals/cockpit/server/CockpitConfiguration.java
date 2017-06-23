@@ -28,8 +28,11 @@ import org.pac4j.core.client.Client;
 
 import com.bendb.dropwizard.jooq.JooqFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableMap;
 
 import io.dropwizard.Configuration;
+import io.dropwizard.bundles.assets.AssetsBundleConfiguration;
+import io.dropwizard.bundles.assets.AssetsConfiguration;
 import io.dropwizard.db.DataSourceFactory;
 
 /**
@@ -38,7 +41,7 @@ import io.dropwizard.db.DataSourceFactory;
  * @author vnoel
  *
  */
-public class CockpitConfiguration extends Configuration {
+public class CockpitConfiguration extends Configuration implements AssetsBundleConfiguration {
 
     @Valid
     @JsonProperty
@@ -105,5 +108,14 @@ public class CockpitConfiguration extends Configuration {
         public void setPac4jClients(List<Client> pac4jClients) {
             this.pac4jClients = pac4jClients;
         }
+    }
+
+    @Override
+    public AssetsConfiguration getAssetsConfiguration() {
+        String uriPath = "/" + CockpitApplication.ARTIFACTS_HTTP_SUBPATH;
+        return AssetsConfiguration.builder()
+                // we need a fake resource mapping so that the filesystem override below works
+                .mappings(ImmutableMap.of("not-used-because-overriden-below", uriPath))
+                .overrides(ImmutableMap.of(uriPath, getArtifactTemporaryPath())).build();
     }
 }
