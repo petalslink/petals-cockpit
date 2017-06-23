@@ -35,7 +35,7 @@ import com.google.common.collect.ImmutableSet;
 
 import javaslang.Tuple;
 
-public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractCockpitResourceTest {
+public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractBasicResourceTest {
 
     protected static final String SYSINFO = "WORKSPACE TEST SYSINFO";
 

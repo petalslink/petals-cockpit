@@ -48,7 +48,7 @@ import com.google.common.collect.ImmutableMap;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import javaslang.Tuple;
 
-public class ChangeSAStateTest extends AbstractCockpitResourceTest {
+public class ChangeSAStateTest extends AbstractBasicResourceTest {
 
     private final Domain domain = new Domain("dom");
 

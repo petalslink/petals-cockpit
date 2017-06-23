@@ -24,6 +24,7 @@ import javax.validation.constraints.NotNull;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.pac4j.core.authorization.authorizer.RequireAllRolesAuthorizer;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.context.DefaultAuthorizers;
 import org.pac4j.core.matching.PathMatcher;
@@ -44,6 +45,8 @@ public abstract class CockpitSecurityBundle<C extends Configuration> extends Pac
 
     public static final String PAC4J_EXCLUDE_MATCHER = "globalMatcherExcludes";
 
+    public static final String IS_ADMIN_AUTHORIZER = "isAdminAuthorizer";
+
     protected abstract CockpitSecurityConfiguration getConfiguration(C configuration);
 
     @Override
@@ -58,7 +61,8 @@ public abstract class CockpitSecurityBundle<C extends Configuration> extends Pac
 
         Pac4jFactory pac4jConf = new Pac4jFactory();
 
-        // this let the /user/session url be handled by the callbacks, logout, etc filters
+        // /user/session url is handled by callbacks, logout, etc filters
+        // /setup is not concerned by this
         pac4jConf.setMatchers(ImmutableMap.of(PAC4J_EXCLUDE_MATCHER,
                 new PathMatcher().excludePath("/user/session").excludePath("/setup")));
 
@@ -86,6 +90,8 @@ public abstract class CockpitSecurityBundle<C extends Configuration> extends Pac
         }
 
         pac4jConf.setHttpActionAdapter(new HttpActionAdapter303());
+
+        pac4jConf.getAuthorizers().put(IS_ADMIN_AUTHORIZER, new RequireAllRolesAuthorizer<>(CockpitProfile.ROLE_ADMIN));
 
         return pac4jConf;
     }

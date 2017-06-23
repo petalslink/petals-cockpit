@@ -44,7 +44,7 @@ import com.google.common.collect.ImmutableMap;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import javaslang.Tuple;
 
-public class DeploySLTest extends AbstractCockpitResourceTest {
+public class DeploySLTest extends AbstractBasicResourceTest {
 
     private static final String SL_NAME = "sl";
 

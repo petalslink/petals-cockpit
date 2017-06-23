@@ -52,7 +52,7 @@ import com.google.common.collect.ImmutableSet;
 
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
-public class ImportBusTest extends AbstractCockpitResourceTest {
+public class ImportBusTest extends AbstractBasicResourceTest {
 
     private final Domain domain = new Domain("dom");
 

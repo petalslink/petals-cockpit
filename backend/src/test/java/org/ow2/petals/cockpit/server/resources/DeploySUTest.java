@@ -49,7 +49,7 @@ import com.google.common.collect.ImmutableMap;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import javaslang.Tuple;
 
-public class DeploySUTest extends AbstractCockpitResourceTest {
+public class DeploySUTest extends AbstractBasicResourceTest {
 
     private static final String SU_NAME = "the-su-name";
 

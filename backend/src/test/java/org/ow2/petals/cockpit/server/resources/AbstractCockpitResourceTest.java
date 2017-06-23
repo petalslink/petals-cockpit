@@ -57,7 +57,6 @@ import org.jooq.Record;
 import org.jooq.TableField;
 import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
@@ -70,7 +69,7 @@ import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.AbstractTest;
-import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
@@ -110,8 +109,6 @@ import javaslang.Tuple2;
  */
 public class AbstractCockpitResourceTest extends AbstractTest {
 
-    public static final String ADMIN = "admin";
-
     @Rule
     public TemporaryFolder zipFolder = new TemporaryFolder();
 
@@ -122,14 +119,13 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         this.resource = new CockpitResourceRule(resources);
     }
 
-    @Before
-    public void setUpUser() {
-        resource.setCurrentProfile(new CockpitProfile(ADMIN, true));
-        resource.db().executeInsert(new UsersRecord(ADMIN, "...", "Administrator", null, true));
+    protected void addUser(String username) {
+        addUser(username, false);
     }
 
-    protected void addUser(String username) {
-        resource.db().executeInsert(new UsersRecord(username, "...", "...", null, false));
+    protected void addUser(String username, boolean admin) {
+        resource.db().executeInsert(new UsersRecord(username, CockpitAuthenticator.passwordEncoder.encode(username),
+                username, null, admin));
     }
 
     protected long getId(Object o) {
@@ -172,6 +168,20 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     protected void assertThatComponentState(Component c, ArtifactState.State expectedState) {
         assertThatDbComponentState(c, ComponentMin.State.from(expectedState));
         assertThat(c.getState()).isEqualTo(expectedState);
+    }
+
+    protected RequestRowAssert assertThatDbUser(String username) {
+        return assertThat(requestUser(username)).hasNumberOfRows(1).row();
+    }
+
+    protected void assertThatDbUserPassword(String username, String plainPw) {
+        // TODO see https://github.com/joel-costigliola/assertj-db/issues/24
+        String dbPw = resource.db().selectFrom(USERS).where(USERS.USERNAME.eq(username)).fetchOne(USERS.PASSWORD);
+        assertThat(CockpitAuthenticator.passwordEncoder.matches(plainPw, dbPw)).isTrue();
+    }
+
+    protected void assertNoDbUser(String username) {
+        assertThat(requestUser(username)).hasNumberOfRows(0);
     }
 
     protected void assertNoDbSU(ServiceUnit su) {
@@ -247,7 +257,8 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                 busDb.attach(conf);
                 busDb.insert();
 
-                WorkspaceDbOperations.saveDomainToDatabase(conf, busDb, bus, WorkspaceDbWitness.NOP, resource.new WDbWitness());
+                WorkspaceDbOperations.saveDomainToDatabase(conf, busDb, bus, WorkspaceDbWitness.NOP,
+                        resource.new WDbWitness());
 
                 for (Container c : containers) {
                     c.addProperty("petals.topology.passphrase", passphrase);

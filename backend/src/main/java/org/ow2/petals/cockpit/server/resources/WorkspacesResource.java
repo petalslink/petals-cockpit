@@ -45,7 +45,7 @@ import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
-import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
+import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -98,7 +98,7 @@ public class WorkspacesResource {
                         .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(w.getId()))
                         .fetchInto(USERS)) {
                     wsUsers.add(u.getUsername());
-                    users.put(u.getUsername(), new UserMin(u.getUsername(), u.getName()));
+                    users.put(u.getUsername(), new UserMin(u));
                 }
 
                 wss.put(String.valueOf(w.getId()), new Workspace(w.getId(), w.getName(), wsUsers.build()));

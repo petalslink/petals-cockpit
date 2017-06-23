@@ -50,7 +50,7 @@ import com.google.common.collect.ImmutableMap;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import javaslang.Tuple;
 
-public class DeploySATest extends AbstractCockpitResourceTest {
+public class DeploySATest extends AbstractBasicResourceTest {
 
     private static final String SA_NAME = "fake-sa";
 

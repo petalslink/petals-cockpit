@@ -35,8 +35,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
-import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
+import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -66,7 +66,7 @@ public class SetupResource {
         }
 
         // we check the db in case it changed externally since we started the application
-        if (userCreated.get() || DSL.using(jooq).fetchExists(USERS)) {
+        if (userCreated.get() || DSL.using(jooq).fetchExists(USERS, USERS.ADMIN.eq(true))) {
             userCreated.set(true);
             throw new NotFoundException("Petals Cockpit is already setup");
         }
@@ -82,21 +82,16 @@ public class SetupResource {
         });
     }
 
-    public static class UserSetup extends Authentication {
+    public static class UserSetup extends NewUser {
 
         @NotEmpty
         @JsonProperty
         public final String token;
 
-        @NotEmpty
-        @JsonProperty
-        public final String name;
-
         public UserSetup(@JsonProperty("token") String token, @JsonProperty("username") String username,
                 @JsonProperty("password") String password, @JsonProperty("name") String name) {
-            super(username, password);
+            super(username, password, name);
             this.token = token;
-            this.name = name;
         }
     }
 }

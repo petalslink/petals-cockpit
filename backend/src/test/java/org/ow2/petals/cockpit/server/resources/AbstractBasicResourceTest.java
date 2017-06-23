@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016-2017 Linagora
+ * Copyright (C) 2017 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -14,28 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.bundles.security;
+package org.ow2.petals.cockpit.server.resources;
 
-import org.pac4j.core.context.Pac4jConstants;
-import org.pac4j.core.profile.CommonProfile;
+import org.junit.Before;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 
-public class CockpitProfile extends CommonProfile {
+public class AbstractBasicResourceTest extends AbstractCockpitResourceTest {
 
-    public final static String ROLE_ADMIN = "admin";
+    public static final String ADMIN = "admin";
 
-    CockpitProfile() {
-        // needed because UserProfile is Externalizable
+    public AbstractBasicResourceTest(Class<?>... ressources) {
+        super(ressources);
     }
 
-    public CockpitProfile(String username, boolean isAdmin) {
-        setId(username);
-        addAttribute(Pac4jConstants.USERNAME, username);
-        if (isAdmin) {
-            addRole(ROLE_ADMIN);
-        }
-    }
-
-    public boolean isAdmin() {
-        return getRoles().contains(ROLE_ADMIN);
+    @Before
+    public void setUpUser() {
+        resource.setCurrentProfile(new CockpitProfile(ADMIN, true));
+        addUser(ADMIN, true);
     }
 }

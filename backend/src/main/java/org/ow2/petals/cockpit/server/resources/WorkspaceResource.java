@@ -75,7 +75,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecor
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryMin;
-import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
+import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContentBuilder;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
@@ -394,8 +394,7 @@ public class WorkspaceResource {
         public final ImmutableMap<String, UserMin> users;
 
         public WorkspaceOverviewContent(WorkspacesRecord ws, List<UsersRecord> users) {
-            this.users = users.stream().collect(ImmutableMap.toImmutableMap(UsersRecord::getUsername,
-                    u -> new UserMin(u.getUsername(), u.getName())));
+            this.users = users.stream().collect(ImmutableMap.toImmutableMap(UsersRecord::getUsername, UserMin::new));
             List<String> wsUsernames = users.stream().map(UsersRecord::getUsername)
                     .collect(ImmutableList.toImmutableList());
             this.workspace = new WorkspaceOverview(ws.getId(), ws.getName(), wsUsernames, ws.getDescription());
@@ -640,8 +639,7 @@ public class WorkspaceResource {
         public final WorkspaceContent content;
 
         public WorkspaceFullContent(WorkspacesRecord ws, List<UsersRecord> users, WorkspaceContent content) {
-            this.users = users.stream().collect(ImmutableMap.toImmutableMap(UsersRecord::getUsername,
-                    u -> new UserMin(u.getUsername(), u.getName())));
+            this.users = users.stream().collect(ImmutableMap.toImmutableMap(UsersRecord::getUsername, UserMin::new));
             List<String> wsUsernames = users.stream().map(UsersRecord::getUsername)
                     .collect(ImmutableList.toImmutableList());
             this.workspace = new WorkspaceOverview(ws.getId(), ws.getName(), wsUsernames, ws.getDescription());

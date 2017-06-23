@@ -41,6 +41,7 @@ import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource;
 import org.ow2.petals.cockpit.server.resources.SetupResource;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource;
 import org.ow2.petals.cockpit.server.resources.UserSession;
+import org.ow2.petals.cockpit.server.resources.UsersResource;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
@@ -184,8 +185,9 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         environment.jersey().register(ServiceUnitsResource.class);
         environment.jersey().register(SharedLibrariesResource.class);
         environment.jersey().register(SetupResource.class);
+        environment.jersey().register(UsersResource.class);
 
-        if (!DSL.using(jooq.getConfiguration()).fetchExists(USERS)) {
+        if (!DSL.using(jooq.getConfiguration()).fetchExists(USERS, USERS.ADMIN.eq(true))) {
             environment.lifecycle().addServerLifecycleListener(new ServerLifecycleListener() {
                 @Override
                 public void serverStarted(@Nullable Server server) {
