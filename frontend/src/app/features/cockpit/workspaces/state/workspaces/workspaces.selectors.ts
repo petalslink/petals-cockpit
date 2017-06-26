@@ -193,12 +193,17 @@ export enum WorkspaceElementType {
   SERVICEASSEMBLY,
   SERVICEUNIT,
   SHAREDLIBRARY,
+  COMPCATEGORY,
+  SACATEGORY,
+  SLCATEGORY,
 }
 
 export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
   id: string;
   type: WorkspaceElementType;
   name: string;
+  svgIcon?: string;
+  icon?: string;
 }
 
 export function _getCurrentTree(
@@ -214,6 +219,7 @@ export function _getCurrentTree(
         link: `${baseUrl}/buses/${bus.id}`,
         isFolded: bus.isFolded,
         cssClass: `workspace-element-type-bus`,
+        svgIcon: `bus`,
 
         children: bus.containers.list.map<WorkspaceElement>(container => ({
           id: container.id,
@@ -222,48 +228,78 @@ export function _getCurrentTree(
           link: `${baseUrl}/containers/${container.id}`,
           isFolded: container.isFolded,
           cssClass: `workspace-element-type-container`,
+          icon: `dns`,
 
           children: [
-            ...container.serviceAssemblies.list.map<
-              WorkspaceElement
-            >(serviceAssembly => ({
-              id: serviceAssembly.id,
-              type: WorkspaceElementType.SERVICEASSEMBLY,
-              name: serviceAssembly.name,
-              link: `${baseUrl}/service-assemblies/${serviceAssembly.id}`,
-              isFolded: serviceAssembly.isFolded,
-              cssClass: `workspace-element-type-service-assembly`,
-              children: [],
-            })),
-            ...container.sharedLibraries.list.map<WorkspaceElement>(sl => ({
-              id: sl.id,
-              type: WorkspaceElementType.SHAREDLIBRARY,
-              name: sl.name,
-              link: `${baseUrl}/shared-libraries/${sl.id}`,
-              isFolded: sl.isFolded,
-              cssClass: `workspace-element-type-shared-library`,
-              children: [],
-            })),
-            ...container.components.list.map<WorkspaceElement>(component => ({
-              id: component.id,
-              type: WorkspaceElementType.COMPONENT,
-              name: component.name,
-              link: `${baseUrl}/components/${component.id}`,
-              isFolded: component.isFolded,
-              cssClass: `workspace-element-type-component`,
-
-              children: component.serviceUnits.list.map<
+            {
+              id: container.id,
+              type: WorkspaceElementType.COMPCATEGORY,
+              name: 'Components',
+              isFolded: container.isComponentsCategoryFolded,
+              cssClass: `workspace-element-type-category-components`,
+              children: container.components.list.map<
                 WorkspaceElement
-              >(serviceUnit => ({
-                id: serviceUnit.id,
-                type: WorkspaceElementType.SERVICEUNIT,
-                name: serviceUnit.name,
-                link: `${baseUrl}/service-units/${serviceUnit.id}`,
-                isFolded: serviceUnit.isFolded,
-                cssClass: `workspace-element-type-service-unit`,
+              >(component => ({
+                id: component.id,
+                type: WorkspaceElementType.COMPONENT,
+                name: component.name,
+                link: `${baseUrl}/components/${component.id}`,
+                isFolded: component.isFolded,
+                cssClass: `workspace-element-type-component`,
+                svgIcon: `component`,
+
+                children: component.serviceUnits.list.map<
+                  WorkspaceElement
+                >(serviceUnit => ({
+                  id: serviceUnit.id,
+                  type: WorkspaceElementType.SERVICEUNIT,
+                  name: serviceUnit.name,
+                  link: `${baseUrl}/service-units/${serviceUnit.id}`,
+                  isFolded: serviceUnit.isFolded,
+                  cssClass: `workspace-element-type-service-unit`,
+                  svgIcon: `su`,
+                  children: [],
+                })),
+              })),
+            },
+            {
+              id: container.id,
+              type: WorkspaceElementType.SACATEGORY,
+              name: 'Service Assemblies',
+              isFolded: container.isServiceAssembliesCategoryFolded,
+              cssClass: `workspace-element-type-category-service-assemblies`,
+              children: container.serviceAssemblies.list.map<
+                WorkspaceElement
+              >(serviceAssembly => ({
+                id: serviceAssembly.id,
+                type: WorkspaceElementType.SERVICEASSEMBLY,
+                name: serviceAssembly.name,
+                link: `${baseUrl}/service-assemblies/${serviceAssembly.id}`,
+                isFolded: serviceAssembly.isFolded,
+                cssClass: `workspace-element-type-service-assembly`,
+                svgIcon: `sa`,
                 children: [],
               })),
-            })),
+            },
+            {
+              id: container.id,
+              type: WorkspaceElementType.SLCATEGORY,
+              name: 'Shared Libraries',
+              isFolded: container.isSharedLibrariesCategoryFolded,
+              cssClass: `workspace-element-type-category-shared-libraries`,
+              children: container.sharedLibraries.list.map<
+                WorkspaceElement
+              >(sl => ({
+                id: sl.id,
+                type: WorkspaceElementType.SHAREDLIBRARY,
+                name: sl.name,
+                link: `${baseUrl}/shared-libraries/${sl.id}`,
+                isFolded: sl.isFolded,
+                cssClass: `workspace-element-type-shared-library`,
+                svgIcon: `sl`,
+                children: [],
+              })),
+            },
           ],
         })),
       }));

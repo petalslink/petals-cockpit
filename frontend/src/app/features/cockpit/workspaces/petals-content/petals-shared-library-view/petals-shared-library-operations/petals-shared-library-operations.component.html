@@ -23,12 +23,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <md-icon color="primary">play_for_work</md-icon>
         </md-card-title>
 
-        <md-card-content fxLayout="row" class="margin-top-x1">
-          <span>
+        <md-card-content fxLayout="row" fxLayoutWrap class="margin-top-x1">
+          <span class="color-primary padding-bottom-x1">
             <button
-              class="text-upper"
-              md-button
-              color="primary"
+              class="text-upper margin-right-x1"
+              md-raised-button
               (click)="unload()"
               [disabled]="sharedLibrary.isFetchingDetails || sharedLibrary.isUpdatingState || sharedLibrary.components.length > 0"
             >

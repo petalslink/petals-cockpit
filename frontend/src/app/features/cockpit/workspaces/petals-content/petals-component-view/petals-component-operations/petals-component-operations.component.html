@@ -44,12 +44,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </md-card-content>
         </div>
 
-        <md-card-content fxLayout="row" class="margin-top-x1" *ngIf="component.state">
-          <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:componentState">
+        <md-card-content fxLayoutWrap fxLayout="row" class="margin-top-x1" *ngIf="component.state">
+          <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:componentState" class="color-primary padding-bottom-x1">
             <button
-              class="text-upper"
-              md-button
-              color="primary"
+              class="text-upper margin-right-x1"
+              md-raised-button
               (click)="changeState(possibleState.newStateAfterAction)"
               [disabled]="component.isFetchingDetails || component.isUpdatingState || ((possibleState.actionName === 'Unload' || possibleState.actionName === 'Uninstall') && component.serviceUnits.length > 0)"
             >

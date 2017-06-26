@@ -31,11 +31,6 @@ md-nav-list[dense] {
   opacity: 0.4;
 }
 
-.no-children {
-  font-size: 11px;
-}
-
-.mat-list[dense] .mat-list-item .mat-list-icon,
-.mat-nav-list[dense] .mat-list-item .mat-list-icon {
-  padding: 1px;
+.no-icon-children {
+  margin-left: 27px;
 }

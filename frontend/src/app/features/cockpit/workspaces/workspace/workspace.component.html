@@ -13,22 +13,22 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="workspace$ | async as workspace" fxLayout="column" fxFill class="wrapper-content">
-  <md-toolbar>
+<div *ngIf="workspace$ | async as workspace" fxLayout="column" fxFlex class="wrapper-content">
+  <md-toolbar color="primary" class="toolbar-page-header">
     <div class="prefix-toolbar-title">
-      <md-icon color="primary" *ngIf="!workspace.isFetchingDetails">grade</md-icon>
-      <md-spinner *ngIf="workspace.isFetchingDetails"></md-spinner>
+      <md-icon color="accent" *ngIf="!workspace.isFetchingDetails">grade</md-icon>
+      <md-spinner color="accent" *ngIf="workspace.isFetchingDetails"></md-spinner>
     </div>
 
-    <span class="title" fxFlex>{{ workspace.name }}</span>
+    <h1 class="title" fxFlex [ngClass.lt-md]="'margin-left-x1'">{{ workspace.name }}</h1>
 
     <button color="warn" type="button" class="btn-delete-wks" (click)="openDeletionDialog()" md-mini-fab mdTooltip="Delete the workspace"
-      mdTooltipPosition="below" [disabled]="workspace.isRemoving || isRemoving">
+      mdTooltipPosition="before" [disabled]="workspace.isRemoving || isRemoving">
       <md-icon>delete</md-icon>
     </button>
   </md-toolbar>
 
-  <div fxFill fxLayout="column" class="content content-max-width">
+  <div fxFlexFill fxLayout="column" class="content content-max-width">
     <div class="central-content">
       <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
         <md-card fxFlex [ngClass.gt-md]="'card-auto-size'">

@@ -13,15 +13,15 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="serviceAssembly$ | async as serviceAssembly" fxLayout="column" fxFill class="wrapper-content">
-  <md-toolbar>
+<div *ngIf="serviceAssembly$ | async as serviceAssembly" fxLayout="column" class="wrapper-content">
+  <md-toolbar color="primary" class="toolbar-page-header">
     <div class="prefix-toolbar-title">
-      <md-icon color="primary" *ngIf="!serviceAssembly.isFetchingDetails">grade</md-icon>
+      <md-icon color="accent" *ngIf="!serviceAssembly.isFetchingDetails">grade</md-icon>
 
-      <md-spinner *ngIf="serviceAssembly.isFetchingDetails"></md-spinner>
+      <md-spinner color="accent" *ngIf="serviceAssembly.isFetchingDetails"></md-spinner>
     </div>
 
-    <span class="title">{{ serviceAssembly.name }}</span>
+    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ serviceAssembly.name }}</h1>
   </md-toolbar>
 
   <md-tab-group fxFlex>

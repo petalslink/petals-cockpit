@@ -32,10 +32,7 @@ describe(`Workspaces Tree`, () => {
     const availableBuses = [
       `Bus 0`,
       `Cont 0`,
-      `SA 0`,
-      `SA 1`,
-      `SA 2`,
-      `SL 0`,
+      `COMPONENTS`,
       `Comp 0`,
       `SU 0`,
       `SU 2`,
@@ -43,11 +40,14 @@ describe(`Workspaces Tree`, () => {
       `SU 1`,
       `SU 3`,
       `Comp 2`,
+      `SERVICE ASSEMBLIES`,
+      `SA 0`,
+      `SA 1`,
+      `SA 2`,
+      `SHARED LIBRARIES`,
+      `SL 0`,
       `Cont 1`,
-      `SA 3`,
-      `SA 4`,
-      `SA 5`,
-      `SL 1`,
+      `COMPONENTS`,
       `Comp 3`,
       `SU 4`,
       `SU 6`,
@@ -55,6 +55,12 @@ describe(`Workspaces Tree`, () => {
       `SU 5`,
       `SU 7`,
       `Comp 5`,
+      `SERVICE ASSEMBLIES`,
+      `SA 3`,
+      `SA 4`,
+      `SA 5`,
+      `SHARED LIBRARIES`,
+      `SL 1`,
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBuses);
@@ -72,13 +78,14 @@ describe(`Workspaces Tree`, () => {
     );
   });
 
-  it(`should filter by bus, container, component and su when searching in Petals menu`, () => {
+  it(`should filter by bus, container, component, su and categories when searching in Petals menu`, () => {
     // test 1 : Display only parents and children, regardless of the case
     workspace.search(`CoMp 0`);
 
     const availableBusesFilteredComp0 = [
       `Bus 0`,
       `Cont 0`,
+      `COMPONENTS`,
       `Comp 0`,
       `SU 0`,
       `SU 2`,
@@ -97,10 +104,7 @@ describe(`Workspaces Tree`, () => {
     const availableBusesFilteredU = [
       `Bus 0`,
       `Cont 0`,
-      `SA 0`,
-      `SA 1`,
-      `SA 2`,
-      `SL 0`,
+      `COMPONENTS`,
       `Comp 0`,
       `SU 0`,
       `SU 2`,
@@ -108,11 +112,14 @@ describe(`Workspaces Tree`, () => {
       `SU 1`,
       `SU 3`,
       `Comp 2`,
+      `SERVICE ASSEMBLIES`,
+      `SA 0`,
+      `SA 1`,
+      `SA 2`,
+      `SHARED LIBRARIES`,
+      `SL 0`,
       `Cont 1`,
-      `SA 3`,
-      `SA 4`,
-      `SA 5`,
-      `SL 1`,
+      `COMPONENTS`,
       `Comp 3`,
       `SU 4`,
       `SU 6`,
@@ -120,6 +127,12 @@ describe(`Workspaces Tree`, () => {
       `SU 5`,
       `SU 7`,
       `Comp 5`,
+      `SERVICE ASSEMBLIES`,
+      `SA 3`,
+      `SA 4`,
+      `SA 5`,
+      `SHARED LIBRARIES`,
+      `SL 1`,
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBusesFilteredU);
@@ -136,6 +149,49 @@ describe(`Workspaces Tree`, () => {
 
     // there shouldn't be any match
     expect(workspace.getWorkspaceTree()).toEqual([]);
+
+    // ---------------------------------------
+    // test 4 : Display every element containing 'SERVICE ASSEMBLIES' in their name
+    workspace.search(`SERVICE ASSEMBLIES`);
+
+    const availableSasCategoriesFilteredU = [
+      `Bus 0`,
+      `Cont 0`,
+      `SERVICE ASSEMBLIES`,
+      `SA 0`,
+      `SA 1`,
+      `SA 2`,
+      `Cont 1`,
+      `SERVICE ASSEMBLIES`,
+      `SA 3`,
+      `SA 4`,
+      `SA 5`,
+    ];
+
+    expect(workspace.getWorkspaceTree()).toEqual(
+      availableSasCategoriesFilteredU
+    );
+
+    expect(workspace.getHighlightedElement().then(e => e.length)).toEqual(2);
+  });
+
+  it(`should fold and unfold sa categorie visible and doesn't change the url`, () => {
+    const container = workspace.openContainer('Cont 0');
+    const firstContFolder = workspace.treeElementFolder(0, 'container');
+    firstContFolder.click();
+
+    // check the title of page
+    expect(container.title.getText()).toEqual('Cont 0');
+
+    const firstSaCat = workspace.treeElement(0, 'category-service-assemblies');
+
+    // 1) fold the category SERVICE ASSEMBLIES
+    firstSaCat.click();
+
+    expect(workspace.treeElement(0, 'container'));
+
+    // 2) unfold the category SERVICE ASSEMBLIES
+    firstSaCat.click();
   });
 
   it(`should fold and unfold Petals Buses/Containers/Components/SUs`, () => {
@@ -153,10 +209,7 @@ describe(`Workspaces Tree`, () => {
     const availableBuses = [
       `Bus 0`,
       `Cont 0`,
-      `SA 0`,
-      `SA 1`,
-      `SA 2`,
-      `SL 0`,
+      `COMPONENTS`,
       `Comp 0`,
       `SU 0`,
       `SU 2`,
@@ -164,11 +217,14 @@ describe(`Workspaces Tree`, () => {
       `SU 1`,
       `SU 3`,
       `Comp 2`,
+      `SERVICE ASSEMBLIES`,
+      `SA 0`,
+      `SA 1`,
+      `SA 2`,
+      `SHARED LIBRARIES`,
+      `SL 0`,
       `Cont 1`,
-      `SA 3`,
-      `SA 4`,
-      `SA 5`,
-      `SL 1`,
+      `COMPONENTS`,
       `Comp 3`,
       `SU 4`,
       `SU 6`,
@@ -176,6 +232,12 @@ describe(`Workspaces Tree`, () => {
       `SU 5`,
       `SU 7`,
       `Comp 5`,
+      `SERVICE ASSEMBLIES`,
+      `SA 3`,
+      `SA 4`,
+      `SA 5`,
+      `SHARED LIBRARIES`,
+      `SL 1`,
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBuses);
@@ -190,10 +252,7 @@ describe(`Workspaces Tree`, () => {
       `Bus 0`,
       `Cont 0`,
       `Cont 1`,
-      `SA 3`,
-      `SA 4`,
-      `SA 5`,
-      `SL 1`,
+      `COMPONENTS`,
       `Comp 3`,
       `SU 4`,
       `SU 6`,
@@ -201,6 +260,12 @@ describe(`Workspaces Tree`, () => {
       `SU 5`,
       `SU 7`,
       `Comp 5`,
+      `SERVICE ASSEMBLIES`,
+      `SA 3`,
+      `SA 4`,
+      `SA 5`,
+      `SHARED LIBRARIES`,
+      `SL 1`,
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBusesFolded);
@@ -217,20 +282,20 @@ describe(`Workspaces Tree`, () => {
     availableBusesFolded = [
       `Bus 0`,
       `Cont 0`,
-      `SA 0`,
-      `SA 1`,
-      `SA 2`,
-      `SL 0`,
+      `COMPONENTS`,
       `Comp 0`,
       `Comp 1`,
       `SU 1`,
       `SU 3`,
       `Comp 2`,
+      `SERVICE ASSEMBLIES`,
+      `SA 0`,
+      `SA 1`,
+      `SA 2`,
+      `SHARED LIBRARIES`,
+      `SL 0`,
       `Cont 1`,
-      `SA 3`,
-      `SA 4`,
-      `SA 5`,
-      `SL 1`,
+      `COMPONENTS`,
       `Comp 3`,
       `SU 4`,
       `SU 6`,
@@ -238,6 +303,12 @@ describe(`Workspaces Tree`, () => {
       `SU 5`,
       `SU 7`,
       `Comp 5`,
+      `SERVICE ASSEMBLIES`,
+      `SA 3`,
+      `SA 4`,
+      `SA 5`,
+      `SHARED LIBRARIES`,
+      `SL 1`,
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBusesFolded);
@@ -255,7 +326,13 @@ describe(`Workspaces Tree`, () => {
 
     workspace.search(`su 0`);
 
-    const availableBusesFiltered = [`Bus 0`, `Cont 0`, `Comp 0`, `SU 0`];
+    const availableBusesFiltered = [
+      `Bus 0`,
+      `Cont 0`,
+      `COMPONENTS`,
+      `Comp 0`,
+      `SU 0`,
+    ];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBusesFiltered);
   });

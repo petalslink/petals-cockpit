@@ -110,7 +110,7 @@ export class PetalsCockpitPage {
       .isPresent()
       .then(present => {
         if (present) {
-          return $(`app-cockpit md-toolbar-row button.menu-icon`).click();
+          return $(`app-cockpit md-toolbar-row button.sidenav-toggle`).click();
         }
       });
   }
@@ -120,7 +120,7 @@ export class PetalsCockpitPage {
       .isPresent()
       .then(present => {
         if (present) {
-          return $(`app-cockpit md-toolbar-row button.menu-icon`).click();
+          return $(`app-cockpit md-toolbar-row button.sidenav-toggle`).click();
         }
       });
   }

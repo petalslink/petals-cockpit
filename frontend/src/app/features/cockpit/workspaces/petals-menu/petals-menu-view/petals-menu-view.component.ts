@@ -77,18 +77,40 @@ export class PetalsMenuViewComponent implements OnInit {
         this.store$.dispatch(new Buses.ToggleFold({ id: e.item.id }));
         break;
       case WorkspaceElementType.CONTAINER:
-        this.store$.dispatch(new Containers.ToggleFold({ id: e.item.id }));
+        this.store$.dispatch(
+          new Containers.ToggleFold({ id: e.item.id, type: 'container' })
+        );
+        break;
+      case WorkspaceElementType.COMPCATEGORY:
+        this.store$.dispatch(
+          new Containers.ToggleFold({ id: e.item.id, type: 'components' })
+        );
+        break;
+      case WorkspaceElementType.SLCATEGORY:
+        this.store$.dispatch(
+          new Containers.ToggleFold({ id: e.item.id, type: 'shared-libraries' })
+        );
+        break;
+      case WorkspaceElementType.SACATEGORY:
+        this.store$.dispatch(
+          new Containers.ToggleFold({
+            id: e.item.id,
+            type: 'service-assemblies',
+          })
+        );
         break;
       case WorkspaceElementType.COMPONENT:
         this.store$.dispatch(new Components.ToggleFold({ id: e.item.id }));
+        break;
     }
   }
 
-  onTreeSelect(_: TreeEvent<WorkspaceElement>) {
-    // TODO: Dispatch an action to save the current bus/container/component/su
-    // Instead of dispatching it from here maybe it's a better idea to dispatch it once the
-    // component is loaded
-    this.closeSidenavOnSmallScreen();
+  onTreeSelect(e: TreeEvent<WorkspaceElement>) {
+    if (e.item.link) {
+      this.closeSidenavOnSmallScreen();
+    } else {
+      this.onTreeToggleFold(e);
+    }
   }
 
   search(search: string) {
