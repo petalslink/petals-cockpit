@@ -1,6 +1,6 @@
-username,password,name,last_workspace
-admin,$2a$10$YusDTWPr/Juq7U9CXynM0.qPrvRy./11nvSYyo0y/oLvSQO5DDNzW,Administrator,1
-bescudie,$2a$10$tajuST8xY9hjy2.3FUz4y.ta6Z4Gd8FnrFjdFVPyGJ2XE/WworrlO,Bertrand ESCUDIE,NULL
-mrobert,$2a$10$ZjZjFXus1VkHyHLrsislKeYauHhZ3K/urRxIbSrOYPg4Gq60EEhbC,Maxime ROBERT,NULL
-cchevalier,$2a$10$pQnBQAMprlk4xrSBCtCmsudcnrMEHHtr7a1LNHNQ5u8916VFpydUy,Christophe CHEVALIER,NULL
-vnoel,$2a$10$fMHaBta5mT/Fd1yisOuoEOnVSTDnGGZXgRxQq5wL847UU8uvO6JFq,Victor NOEL,NULL
+username,password,name,last_workspace,admin
+admin,$2a$10$YusDTWPr/Juq7U9CXynM0.qPrvRy./11nvSYyo0y/oLvSQO5DDNzW,Administrator,1,true
+bescudie,$2a$10$tajuST8xY9hjy2.3FUz4y.ta6Z4Gd8FnrFjdFVPyGJ2XE/WworrlO,Bertrand ESCUDIE,NULL,false
+mrobert,$2a$10$ZjZjFXus1VkHyHLrsislKeYauHhZ3K/urRxIbSrOYPg4Gq60EEhbC,Maxime ROBERT,NULL,false
+cchevalier,$2a$10$pQnBQAMprlk4xrSBCtCmsudcnrMEHHtr7a1LNHNQ5u8916VFpydUy,Christophe CHEVALIER,NULL,false
+vnoel,$2a$10$fMHaBta5mT/Fd1yisOuoEOnVSTDnGGZXgRxQq5wL847UU8uvO6JFq,Victor NOEL,NULL,false

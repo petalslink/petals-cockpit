@@ -48,7 +48,7 @@ import com.google.common.collect.ImmutableMap;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import javaslang.Tuple;
 
-public class DeployComponentTest extends AbstractCockpitResourceTest {
+public class DeployComponentTest extends AbstractBasicResourceTest {
 
     // this is the name declared in the zip's jbi file
     private static final String COMP_NAME = "petals-component";

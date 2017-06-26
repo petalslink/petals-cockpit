@@ -16,6 +16,8 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
+
 import javax.inject.Inject;
 import javax.validation.constraints.Min;
 import javax.ws.rs.DELETE;
@@ -26,13 +28,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.impl.DSL;
-import org.ow2.petals.cockpit.server.db.generated.Tables;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
-import org.ow2.petals.cockpit.server.security.CockpitExtractor.Authentication;
-import org.ow2.petals.cockpit.server.security.CockpitProfile;
+import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
 import org.pac4j.core.context.DefaultAuthorizers;
 import org.pac4j.jax.rs.annotations.Pac4JCallback;
 import org.pac4j.jax.rs.annotations.Pac4JLogout;
@@ -41,6 +42,7 @@ import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -66,26 +68,26 @@ public class UserSession {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public User getUserData(@Pac4JProfile CockpitProfile profile) {
+    public CurrentUser getUserData(@Pac4JProfile CockpitProfile profile) {
         LOG.debug("Returning infos for {}", profile.getId());
 
-        UsersRecord user = DSL.using(jooq).fetchOne(Tables.USERS, Tables.USERS.USERNAME.eq(profile.getId()));
+        UsersRecord user = DSL.using(jooq).fetchOne(USERS, USERS.USERNAME.eq(profile.getId()));
 
-        return new User(user.getUsername(), user.getName(), user.getLastWorkspace(), user.getAdmin());
+        return new CurrentUser(user);
     }
 
     @GET
     @Path("/session")
     @Produces(MediaType.APPLICATION_JSON)
     @Pac4JSecurity(authorizers = DefaultAuthorizers.IS_AUTHENTICATED)
-    public User status(@Pac4JProfile CockpitProfile profile) {
+    public CurrentUser status(@Pac4JProfile CockpitProfile profile) {
         return getUserData(profile);
     }
 
     @POST
     @Path("/session")
     @Pac4JCallback(defaultUrl = "/user/session", renewSession = false)
-    public User login(Authentication auth) {
+    public CurrentUser login(Authentication auth) {
         // the method is never called, everything is handled by pac4j
         // the parameter is here for documentation purpose
         throw new AssertionError("impossible");
@@ -99,23 +101,7 @@ public class UserSession {
         throw new AssertionError("impossible");
     }
 
-    public static class UserMin {
-
-        @NotEmpty
-        @JsonProperty
-        public final String id;
-
-        @NotEmpty
-        @JsonProperty
-        public final String name;
-
-        public UserMin(@JsonProperty("id") String id, @JsonProperty("name") String name) {
-            this.id = id;
-            this.name = name;
-        }
-    }
-
-    public static class User extends UserMin {
+    public static class CurrentUser extends UserMin {
 
         @Nullable
         @Min(1)
@@ -123,11 +109,16 @@ public class UserSession {
 
         public final boolean isAdmin;
 
-        public User(@JsonProperty("username") String username, @JsonProperty("name") String name,
+        public CurrentUser(UsersRecord record) {
+            super(record);
+            this.lastWorkspace = record.getLastWorkspace();
+            this.isAdmin = record.getAdmin();
+        }
+
+        @JsonCreator
+        private CurrentUser(@JsonProperty("username") String username, @JsonProperty("name") String name,
                 @Nullable @JsonProperty("lastWorkspace") Long lastWorkspace, @JsonProperty("isAdmin") boolean isAdmin) {
-            super(username, name);
-            this.lastWorkspace = lastWorkspace;
-            this.isAdmin = isAdmin;
+            this(new UsersRecord(username, null, name, lastWorkspace, isAdmin));
         }
 
         @Nullable

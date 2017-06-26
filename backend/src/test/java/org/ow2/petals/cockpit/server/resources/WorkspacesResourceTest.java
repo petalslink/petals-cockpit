@@ -30,7 +30,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspacesResource.NewWorkspace;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspacesContent;
 
-public class WorkspacesResourceTest extends AbstractCockpitResourceTest {
+public class WorkspacesResourceTest extends AbstractBasicResourceTest {
 
     public WorkspacesResourceTest() {
         super(WorkspacesResource.class);
@@ -86,9 +86,9 @@ public class WorkspacesResourceTest extends AbstractCockpitResourceTest {
         assertThat(ws.users).hasSize(2);
 
         assertThat(ws.users.get("admin").id).isEqualTo("admin");
-        assertThat(ws.users.get("admin").name).isEqualTo("Administrator");
+        assertThat(ws.users.get("admin").name).isEqualTo("admin");
         assertThat(ws.users.get("userX").id).isEqualTo("userX");
-        assertThat(ws.users.get("userX").name).isEqualTo("...");
+        assertThat(ws.users.get("userX").name).isEqualTo("userX");
         assertThat(ws.users.get("userY")).isNull();
     }
 }

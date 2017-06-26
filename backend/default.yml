@@ -12,10 +12,6 @@ server:
     type: http
     port: 8080
 
-security:
-  pac4jClients:
-    - org.ow2.petals.cockpit.server.security.CockpitAuthClient: {}
-
 database:
   driverClass: org.h2.Driver
   user: petals

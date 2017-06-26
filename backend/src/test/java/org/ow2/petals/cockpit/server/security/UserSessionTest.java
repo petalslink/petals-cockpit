@@ -18,61 +18,33 @@ package org.ow2.petals.cockpit.server.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.ow2.petals.cockpit.server.AbstractTest;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
-import org.ow2.petals.cockpit.server.resources.UserSession.User;
-import org.ow2.petals.cockpit.server.rules.CockpitApplicationRule;
-import org.ow2.petals.cockpit.server.security.CockpitExtractor.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
+import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
 
-public class UserSessionTest extends AbstractTest {
-
-    public static final User ADMIN = new User("admin", "Administrator", null, true);
-
-    public static final User USER = new User("user", "Normal user", null, true);
-
-    @Rule
-    public final CockpitApplicationRule app = new CockpitApplicationRule();
-
-    private void addUser(User user) {
-        app.db().executeInsert(new UsersRecord(user.id, new BCryptPasswordEncoder().encode(user.id), user.name,
-                user.lastWorkspace, user.isAdmin));
-    }
-
-    @Before
-    public void setUpDb() {
-        addUser(ADMIN);
-    }
+public class UserSessionTest extends AbstractSecurityTest {
 
     @Test
     public void testProtectedUserSucceedAfterLogin() {
         final Response get = this.app.target("/user").request().get();
         assertThat(get.getStatus()).isEqualTo(401);
 
-        final User login = this.app.target("/user/session").request()
-                .post(Entity.json(new Authentication(ADMIN.id, ADMIN.id)), User.class);
-        assertThat(login).isEqualToComparingFieldByField(ADMIN);
+        final CurrentUser login = login(ADMIN).readEntity(CurrentUser.class);
+        assertMatches(login, ADMIN, true);
 
-        final User get2 = this.app.target("/user").request().get(User.class);
-        assertThat(get2).isEqualToComparingFieldByField(ADMIN);
+        final CurrentUser get2 = this.app.target("/user").request().get(CurrentUser.class);
+        assertMatches(get2, ADMIN, true);
 
-        final User get3 = this.app.target("/user/session").request().get(User.class);
-        assertThat(get3).isEqualToComparingFieldByField(ADMIN);
+        final CurrentUser get3 = this.app.target("/user/session").request().get(CurrentUser.class);
+        assertMatches(get3, ADMIN, true);
     }
 
     @Test
     public void testLoginUser() {
-        addUser(USER);
-
-        final User login = this.app.target("/user/session").request()
-                .post(Entity.json(new Authentication(USER.id, USER.id)), User.class);
-        assertThat(login).isEqualToComparingFieldByField(USER);
+        final CurrentUser login = login(USER).readEntity(CurrentUser.class);
+        assertMatches(login, USER, false);
     }
 
     @Test
@@ -80,9 +52,8 @@ public class UserSessionTest extends AbstractTest {
         final Response get = this.app.target("/workspaces").request().get();
         assertThat(get.getStatus()).isEqualTo(401);
 
-        final User login = this.app.target("/user/session").request()
-                .post(Entity.json(new Authentication(ADMIN.id, ADMIN.id)), User.class);
-        assertThat(login).isEqualToComparingFieldByField(ADMIN);
+        final CurrentUser login = login(ADMIN).readEntity(CurrentUser.class);
+        assertMatches(login, ADMIN, true);
 
         final Response get2 = this.app.target("/workspaces").request().get();
         assertThat(get2.getStatus()).isEqualTo(200);
@@ -90,19 +61,17 @@ public class UserSessionTest extends AbstractTest {
 
     @Test
     public void testWrongLogin() {
-        final Response login = this.app.target("/user/session").request()
-                .post(Entity.json(new Authentication("wrong", "admin")));
+        final Response login = login(new Authentication("wrong", "admin"));
         assertThat(login.getStatus()).isEqualTo(401);
     }
 
     @Test
     public void testLogout() {
-        final User login = this.app.target("/user/session").request()
-                .post(Entity.json(new Authentication(ADMIN.id, ADMIN.id)), User.class);
-        assertThat(login).isEqualToComparingFieldByField(ADMIN);
+        final CurrentUser login = login(ADMIN).readEntity(CurrentUser.class);
+        assertMatches(login, ADMIN, true);
 
-        final User get = this.app.target("/user/session").request().get(User.class);
-        assertThat(get).isEqualToComparingFieldByField(ADMIN);
+        final CurrentUser get = this.app.target("/user/session").request().get(CurrentUser.class);
+        assertMatches(get, ADMIN, true);
 
         final Response logout = this.app.target("/user/session").request().delete();
         // TODO should be 204: https://github.com/pac4j/pac4j/issues/701

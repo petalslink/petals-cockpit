@@ -31,7 +31,7 @@ import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Test;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.resources.UserSession.UserMin;
+import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceOverview;
@@ -201,7 +201,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assert u != null;
 
         assertThat(u.id).isEqualTo(ADMIN);
-        assertThat(u.name).isEqualTo("Administrator");
+        assertThat(u.name).isEqualTo("admin");
     }
 
     private void assertContentOverview(WorkspaceOverview overview) {

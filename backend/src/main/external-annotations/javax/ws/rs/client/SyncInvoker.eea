@@ -2,3 +2,6 @@ class javax/ws/rs/client/SyncInvoker
 get
  <T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)TT;
  <T:Ljava/lang/Object;>(L1java/lang/Class<TT;>;)T1T;
+post
+ (Ljavax/ws/rs/client/Entity<*>;)Ljavax/ws/rs/core/Response;
+ (Ljavax/ws/rs/client/Entity<*>;)L1javax/ws/rs/core/Response;

@@ -42,8 +42,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
-import org.ow2.petals.cockpit.server.security.CockpitProfile;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -66,10 +66,10 @@ public class SharedLibrariesResource {
     @GET
     @Path("/{slId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public SharedLibraryOverview overview(@NotNull @PathParam("slId") @Min(1) long suId,
+    public SharedLibraryOverview overview(@NotNull @PathParam("slId") @Min(1) long slId,
             @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
-            SharedlibrariesRecord sl = DSL.using(conf).selectFrom(SHAREDLIBRARIES).where(SHAREDLIBRARIES.ID.eq(suId))
+            SharedlibrariesRecord sl = DSL.using(conf).selectFrom(SHAREDLIBRARIES).where(SHAREDLIBRARIES.ID.eq(slId))
                     .fetchOne();
 
             if (sl == null) {
@@ -79,7 +79,7 @@ public class SharedLibrariesResource {
             Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
                     .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
                     .onKey(FK_CONTAINERS_BUSES_ID).join(SHAREDLIBRARIES).onKey(FK_SHAREDLIBRARIES_CONTAINER_ID)
-                    .where(SHAREDLIBRARIES.ID.eq(suId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
+                    .where(SHAREDLIBRARIES.ID.eq(slId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
 
             if (user == null) {
                 throw new WebApplicationException(Status.FORBIDDEN);

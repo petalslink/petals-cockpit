@@ -17,7 +17,6 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.db.api.Assertions.assertThat;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 
 import javax.ws.rs.client.Entity;
@@ -35,6 +34,7 @@ public class SetupResourceTest extends AbstractCockpitResourceTest {
 
     @Test
     public void testDisabled() {
+        addUser("a-user", true);
         Response post = resource.target("/setup").request()
                 .post(Entity.json(new UserSetup(CockpitResourceRule.ADMIN_TOKEN, "user", "pass", "name")));
 
@@ -43,6 +43,7 @@ public class SetupResourceTest extends AbstractCockpitResourceTest {
 
     @Test
     public void testForbiddenEvenIfDisabled() {
+        addUser("a-user", true);
         Response post = resource.target("/setup").request()
                 .post(Entity.json(new UserSetup("wrong", "user", "pass", "name")));
 
@@ -51,29 +52,35 @@ public class SetupResourceTest extends AbstractCockpitResourceTest {
 
     @Test
     public void testForbidden() {
-        resource.db().deleteFrom(USERS).execute();
-        assertThat(table(USERS)).hasNumberOfRows(0);
-
         Response post = resource.target("/setup").request().post(Entity.json(new UserSetup("wrong", "b", "c", "d")));
 
         assertThat(post.getStatus()).isEqualTo(403);
     }
 
     @Test
-    public void testSuccessAndGone() {
-        resource.db().deleteFrom(USERS).where(USERS.USERNAME.eq(ADMIN)).execute();
-        assertThat(table(USERS)).hasNumberOfRows(0);
+    public void testForbiddenWithUser() {
+        addUser("a-user", false);
+        testForbidden();
+    }
 
+    @Test
+    public void testSuccessAndGone() {
         Response post = resource.target("/setup").request()
                 .post(Entity.json(new UserSetup(CockpitResourceRule.ADMIN_TOKEN, "user", "pass", "name")));
 
         assertThat(post.getStatus()).isEqualTo(204);
 
-        assertThat(requestUser("user")).hasNumberOfRows(1).row().value(USERS.ADMIN.getName()).isEqualTo(true);
+        assertThatDbUser("user").value(USERS.ADMIN.getName()).isEqualTo(true);
 
         Response post2 = resource.target("/setup").request()
                 .post(Entity.json(new UserSetup(CockpitResourceRule.ADMIN_TOKEN, "user", "pass", "name")));
 
         assertThat(post2.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void testEnabledWithUser() {
+        addUser("a-user", false);
+        testSuccessAndGone();
     }
 }

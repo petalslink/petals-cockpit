@@ -16,23 +16,16 @@
  */
 package org.ow2.petals.cockpit.server;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
-import org.ow2.petals.cockpit.server.security.CockpitAuthClient;
-import org.pac4j.core.client.Client;
+import org.ow2.petals.cockpit.server.bundles.artifactserver.HttpArtifactServerBundle.HttpArtifactServerConfiguration;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle.CockpitSecurityConfiguration;
 
 import com.bendb.dropwizard.jooq.JooqFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableMap;
 
 import io.dropwizard.Configuration;
-import io.dropwizard.bundles.assets.AssetsBundleConfiguration;
-import io.dropwizard.bundles.assets.AssetsConfiguration;
 import io.dropwizard.db.DataSourceFactory;
 
 /**
@@ -41,7 +34,7 @@ import io.dropwizard.db.DataSourceFactory;
  * @author vnoel
  *
  */
-public class CockpitConfiguration extends Configuration implements AssetsBundleConfiguration {
+public class CockpitConfiguration extends Configuration {
 
     @Valid
     @JsonProperty
@@ -52,13 +45,13 @@ public class CockpitConfiguration extends Configuration implements AssetsBundleC
         return security;
     }
 
-    @NotEmpty
+    @Valid
     @JsonProperty
-    private String artifactTemporaryPath = System.getProperty("java.io.tmpdir") + "/petals-cockpit-artifacts";
+    private HttpArtifactServerConfiguration artifactServer = new HttpArtifactServerConfiguration();
 
     @JsonProperty
-    public String getArtifactTemporaryPath() {
-        return artifactTemporaryPath;
+    public HttpArtifactServerConfiguration getArtifactServer() {
+        return artifactServer;
     }
 
     @JsonProperty
@@ -87,35 +80,5 @@ public class CockpitConfiguration extends Configuration implements AssetsBundleC
     @JsonProperty("jooq")
     public JooqFactory getJooqFactory() {
         return jooq;
-    }
-
-    public static class CockpitSecurityConfiguration {
-
-        @NotNull
-        @NotEmpty
-        private List<Client> pac4jClients = new ArrayList<>();
-
-        public CockpitSecurityConfiguration() {
-            pac4jClients.add(new CockpitAuthClient());
-        }
-
-        @JsonProperty
-        public List<Client> getPac4jClients() {
-            return pac4jClients;
-        }
-
-        @JsonProperty
-        public void setPac4jClients(List<Client> pac4jClients) {
-            this.pac4jClients = pac4jClients;
-        }
-    }
-
-    @Override
-    public AssetsConfiguration getAssetsConfiguration() {
-        String uriPath = "/" + CockpitApplication.ARTIFACTS_HTTP_SUBPATH;
-        return AssetsConfiguration.builder()
-                // we need a fake resource mapping so that the filesystem override below works
-                .mappings(ImmutableMap.of("not-used-because-overriden-below", uriPath))
-                .overrides(ImmutableMap.of(uriPath, getArtifactTemporaryPath())).build();
     }
 }

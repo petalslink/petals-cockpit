@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.security;
+package org.ow2.petals.cockpit.server.bundles.security;
 
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.profile.CommonProfile;
 
 public class CockpitProfile extends CommonProfile {
 
-    public final static String IS_ADMIN = "isAdmin";
+    public final static String ROLE_ADMIN = "admin";
 
     CockpitProfile() {
         // needed because UserProfile is Externalizable
@@ -30,16 +30,12 @@ public class CockpitProfile extends CommonProfile {
     public CockpitProfile(String username, boolean isAdmin) {
         setId(username);
         addAttribute(Pac4jConstants.USERNAME, username);
-        addAttribute(IS_ADMIN, isAdmin);
-    }
-
-    public boolean isAdmin() {
-        Object ia = getAttribute(IS_ADMIN);
-        if (!(ia instanceof Boolean)) {
-            return false;
-        } else {
-            return (Boolean) ia;
+        if (isAdmin) {
+            addRole(ROLE_ADMIN);
         }
     }
 
+    public boolean isAdmin() {
+        return getRoles().contains(ROLE_ADMIN);
+    }
 }
