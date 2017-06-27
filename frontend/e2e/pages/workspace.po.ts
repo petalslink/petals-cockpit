@@ -105,8 +105,8 @@ export abstract class WorkspacePage {
   }
 
   treeElementFolder(identifier: string | number, type: string) {
-    return this.treeElement(identifier, type).$(
-      'md-icon[aria-label="arrow_drop_down"]'
+    return this.treeElement(identifier, type).element(
+      by.cssContainingText('md-icon', 'arrow_drop_down')
     );
   }
 
