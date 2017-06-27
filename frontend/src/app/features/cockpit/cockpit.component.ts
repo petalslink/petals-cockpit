@@ -15,30 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, ViewChild, Inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { MdDialog, MdDialogRef } from '@angular/material';
 import { MdSidenav } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
 
-import {
-  IWorkspace,
-  IWorkspacesTable,
-} from './workspaces/state/workspaces/workspaces.interface';
+import { IWorkspace } from './workspaces/state/workspaces/workspaces.interface';
 
-import { LANGUAGES } from '../../core/opaque-tokens';
-import { IStore } from '../../shared/state/store.interface';
-import { IUi } from '../../shared/state/ui.interface';
+import { IStore } from 'app/shared/state/store.interface';
+import { IUi } from 'app/shared/state/ui.interface';
 import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog.component';
 import { getCurrentWorkspace } from '../cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { ICurrentUser } from 'app/shared/state/users.interface';
-import { getCurrentUser } from 'app/shared/state/users.selectors';
 
 import { isSmallScreen, isLargeScreen } from 'app/shared/state/ui.selectors';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { Ui } from 'app/shared/state/ui.actions';
-import { Users } from 'app/shared/state/users.actions';
+import { ICurrentUser } from 'app/shared/state/users.interface';
+import { getCurrentUser } from 'app/shared/state/users.selectors';
 
 @Component({
   selector: 'app-cockpit',
@@ -47,39 +42,29 @@ import { Users } from 'app/shared/state/users.actions';
 })
 export class CockpitComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
-
   private workspacesDialogRef: MdDialogRef<WorkspacesDialogComponent>;
-
-  public ui$: Observable<IUi>;
-  public sidenavVisible$: Observable<boolean>;
-  public sidenavMode$: Observable<string>;
-  public workspace$: Observable<IWorkspace>;
-  public workspaces$: Observable<IWorkspacesTable>;
-  public logoByScreenSize$: Observable<string>;
-  public user$: Observable<ICurrentUser>;
-  public isDisconnecting$: Observable<boolean>;
-  public showShadow = true;
 
   @ViewChild(MdSidenav) sidenav: MdSidenav;
 
-  constructor(
-    private store$: Store<IStore>,
-    @Inject(LANGUAGES) public languages: any,
-    public dialog: MdDialog
-  ) {}
+  isLargeScreen$: Observable<boolean>;
+  ui$: Observable<IUi>;
+  user$: Observable<ICurrentUser>;
+  isDisconnecting$: Observable<boolean>;
+  sidenavVisible$: Observable<boolean>;
+  sidenavMode$: Observable<string>;
+  workspace$: Observable<IWorkspace>;
+
+  constructor(private store$: Store<IStore>, private dialog: MdDialog) {}
 
   ngOnInit() {
-    this.workspaces$ = this.store$.select(state => state.workspaces);
-
-    this.workspace$ = this.store$.let(getCurrentWorkspace());
-
-    this.ui$ = this.store$.select(state => state.ui);
-
+    this.isLargeScreen$ = this.store$.let(isLargeScreen);
     this.user$ = this.store$.let(getCurrentUser());
-
     this.isDisconnecting$ = this.store$.select(
       state => state.users.isDisconnecting
     );
+
+    this.workspace$ = this.store$.let(getCurrentWorkspace());
+    this.ui$ = this.store$.select(state => state.ui);
 
     this.ui$
       .map(ui => ui.isPopupListWorkspacesVisible)
@@ -102,22 +87,11 @@ export class CockpitComponent implements OnInit, OnDestroy {
       .do(_ => this.openDeletedWorkspaceDialog())
       .subscribe();
 
-    // TODO ultimately, the sidebar should be moved to WorkspaceComponent
+    // TODO ultimately, the sidebar should be moved to WorkspacesComponent
     this.sidenavVisible$ = this.store$.select(
       state =>
         state.ui.isSidenavVisible && !!state.workspaces.selectedWorkspaceId
     );
-
-    this.logoByScreenSize$ = this.store$.let(isLargeScreen).map(ls => {
-      const imgSrcBase = `./assets/img`;
-      const imgSrcExt = `png`;
-
-      if (ls) {
-        return `${imgSrcBase}/logo-petals-cockpit.${imgSrcExt}`;
-      } else {
-        return `${imgSrcBase}/logo-petals-cockpit-without-text.${imgSrcExt}`;
-      }
-    });
 
     this.sidenavMode$ = this.store$
       .let(isSmallScreen)
@@ -170,24 +144,12 @@ export class CockpitComponent implements OnInit, OnDestroy {
     this.store$.dispatch(new Ui.OpenWorkspaces());
   }
 
-  openSidenav() {
-    this.store$.dispatch(new Ui.OpenSidenav());
-  }
-
   closeSidenav() {
     this.store$.dispatch(new Ui.CloseSidenav());
   }
 
   closeSidenavOnSmallScreen() {
     this.store$.dispatch(new Ui.CloseSidenavOnSmallScreen());
-  }
-
-  toggleSidenav() {
-    this.store$.dispatch(new Ui.ToggleSidenav());
-  }
-
-  disconnect() {
-    this.store$.dispatch(new Users.Disconnect());
   }
 }
 

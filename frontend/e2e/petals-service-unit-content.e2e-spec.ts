@@ -36,8 +36,7 @@ describe(`Petals service-unit content`, () => {
     workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
   });
 
-  // tslint:disable-next-line:ban
-  fit(`should open the content page`, () => {
+  it(`should open the content page`, () => {
     const su = workspace.openServiceUnit('SU 0');
 
     expect(su.title.getText()).toEqual('SU 0');

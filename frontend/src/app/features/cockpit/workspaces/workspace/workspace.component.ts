@@ -43,7 +43,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   public isSettingDescription = false;
   public description: string = null;
 
-  constructor(private store$: Store<IStore>, public dialog: MdDialog) {}
+  constructor(private store$: Store<IStore>, private dialog: MdDialog) {}
 
   ngOnInit() {
     this.store$.dispatch(new Ui.SetTitles({ titleMainPart1: 'Petals' }));

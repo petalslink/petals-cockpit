@@ -1,0 +1,39 @@
+<!-- Copyright (C) 2017 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<md-toolbar color="primary" class="header-toolbar" [class.mat-elevation-z6]="showShadow">
+  <div class="toolbar-logo">
+    <img class="logo-toolbar" [src]="logo()">
+  </div>
+
+  <button *ngIf="isOnWorkspace" md-button (click)="toggleSidenav()" class="sidenav-toggle">
+    <md-icon>menu</md-icon>
+  </button>
+
+  <span fxLayout="row" fxFlex class="text-upper">
+    {{ ui.titleMainPart1 }}
+
+    <span *ngIf="ui.titleMainPart2" fxLayoutAlign="center center">
+      <md-icon>chevron_right</md-icon> <span class="color-accent-light-bold text-upper" md-line>{{ ui.titleMainPart2 }}</span>
+  </span>
+  </span>
+
+  <button md-icon-button class="margin-right-x2 btn-logout-user" [disabled]="isDisconnecting" (click)="disconnect()">
+    <md-icon>power_settings_new</md-icon>
+  </button>
+
+  <app-generate-icon class="margin-right-x0 btn-avatar-user" [mdTooltip]="user.name" mdTooltipPosition="below" [size]="24"
+    [text]="user.id"></app-generate-icon>
+</md-toolbar>
