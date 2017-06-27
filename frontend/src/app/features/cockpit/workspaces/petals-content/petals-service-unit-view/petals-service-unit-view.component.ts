@@ -23,9 +23,11 @@ import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/state/store.interface';
 
-import { getCurrentServiceUnit } from '../../state/service-units/service-units.selectors';
-import { IServiceUnitRow } from '../../state/service-units/service-units.interface';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
+import {
+  getCurrentServiceUnit,
+  IServiceUnitWithSA,
+} from '../../state/service-units/service-units.selectors';
+
 import { Ui } from 'app/shared/state/ui.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 
@@ -37,9 +39,8 @@ import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-unit
 export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  public serviceUnit$: Observable<IServiceUnitRow>;
-  public serviceAssembly$: Observable<IServiceAssemblyRow>;
-  public workspaceId$: Observable<string>;
+  serviceUnit$: Observable<IServiceUnitWithSA>;
+  workspaceId$: Observable<string>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
 
@@ -49,13 +50,6 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
       .distinctUntilChanged();
 
     this.serviceUnit$ = this.store$.let(getCurrentServiceUnit);
-
-    this.serviceAssembly$ = this.serviceUnit$
-      .combineLatest(this.store$.select(state => state.serviceAssemblies))
-      .map(
-        ([serviceUnit, serviceAssembliesTable]) =>
-          serviceAssembliesTable.byId[serviceUnit.serviceAssemblyId]
-      );
 
     this.store$.dispatch(
       new Ui.SetTitles({

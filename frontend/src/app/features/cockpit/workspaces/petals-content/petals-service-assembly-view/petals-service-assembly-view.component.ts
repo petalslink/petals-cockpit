@@ -23,13 +23,11 @@ import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/state/store.interface';
 
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 import {
   getCurrentServiceAssembly,
-  getServiceUnitsAndComponentsOfServiceAssembly,
+  IServiceAssemblyWithSUsAndComponents,
 } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
 
-import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 
@@ -41,8 +39,8 @@ import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service
 export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  public serviceAssembly$: Observable<IServiceAssemblyRow>;
-  public serviceUnits$: Observable<IServiceUnitAndComponent[]>;
+  serviceAssembly$: Observable<IServiceAssemblyWithSUsAndComponents>;
+  workspaceId$: Observable<string>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
 
@@ -68,8 +66,8 @@ export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
       })
       .subscribe();
 
-    this.serviceUnits$ = this.store$.let(
-      getServiceUnitsAndComponentsOfServiceAssembly
+    this.workspaceId$ = this.store$.select(
+      state => state.workspaces.selectedWorkspaceId
     );
   }
 

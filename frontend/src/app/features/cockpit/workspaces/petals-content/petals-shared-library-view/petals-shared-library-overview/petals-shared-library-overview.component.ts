@@ -21,12 +21,8 @@ import {
   Input,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
 
-import { IComponentRow } from '../../../state/components/components.interface';
-import { IStore } from '../../../../../../shared/state/store.interface';
-import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
+import { ISharedLibraryWithComponents } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
 
 @Component({
   selector: 'app-petals-shared-library-overview',
@@ -35,16 +31,10 @@ import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsSharedLibraryOverviewComponent implements OnInit {
-  @Input() sharedLibrary: ISharedLibraryRow;
-  @Input() components: IComponentRow[];
+  @Input() sharedLibrary: ISharedLibraryWithComponents;
+  @Input() workspaceId: string;
 
-  workspaceId$: Observable<string>;
+  constructor() {}
 
-  constructor(private store$: Store<IStore>) {}
-
-  ngOnInit() {
-    this.workspaceId$ = this.store$.select(
-      state => state.workspaces.selectedWorkspaceId
-    );
-  }
+  ngOnInit() {}
 }

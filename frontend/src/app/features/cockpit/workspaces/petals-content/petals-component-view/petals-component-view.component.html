@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <md-tab-group fxFlex>
     <md-tab label="Overview">
-      <app-petals-component-overview [component]="component" [sharedLibraries]="sharedLibraries$ | async" fxFill></app-petals-component-overview>
+      <app-petals-component-overview [component]="component" [workspaceId]="workspaceId$ | async" fxFill></app-petals-component-overview>
     </md-tab>
     <md-tab label="Operations">
       <app-petals-component-operations [component]="component" fxFill></app-petals-component-operations>

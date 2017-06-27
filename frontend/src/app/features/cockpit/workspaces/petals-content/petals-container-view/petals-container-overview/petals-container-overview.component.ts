@@ -41,6 +41,7 @@ import {
   buildVisNetworkData,
 } from './container-graph';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
+import { IContainerWithSiblings } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 
 class NetworkData implements VisNetworkData {
   public nodes: VisNodes;
@@ -57,8 +58,7 @@ export class PetalsContainerOverviewComponent
   private onDestroy$ = new Subject<void>();
   public btnByScreenSize$: Observable<string>;
 
-  @Input() container: IContainerRow;
-  @Input() otherContainers: IContainerRow[];
+  @Input() container: IContainerWithSiblings;
   @Input() workspaceId: string;
 
   visNetwork = 'vis-network-container';
@@ -72,15 +72,8 @@ export class PetalsContainerOverviewComponent
   ) {}
 
   ngOnChanges(_changes: SimpleChanges) {
-    if (
-      this.container &&
-      this.otherContainers &&
-      this.container.reachabilities.length > 0
-    ) {
-      this.visNetworkData = buildVisNetworkData(
-        this.container,
-        this.otherContainers
-      );
+    if (this.container && this.container.reachabilities.length > 0) {
+      this.visNetworkData = buildVisNetworkData(this.container);
     }
   }
 
@@ -111,7 +104,7 @@ export class PetalsContainerOverviewComponent
       if (eventData[0] === this.visNetwork) {
         const selectedContainerId = eventData[1].nodes[0];
         if (selectedContainerId) {
-          this.selectedContainer = this.otherContainers.find(
+          this.selectedContainer = this.container.siblings.find(
             c => c.id === selectedContainerId
           );
         }

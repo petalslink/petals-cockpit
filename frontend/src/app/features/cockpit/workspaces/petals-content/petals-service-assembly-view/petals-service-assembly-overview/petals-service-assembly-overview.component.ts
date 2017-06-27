@@ -25,8 +25,8 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../../shared/state/store.interface';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
-import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+
+import { IServiceAssemblyWithSUsAndComponents } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
 
 @Component({
   selector: 'app-petals-service-assembly-overview',
@@ -35,8 +35,8 @@ import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsServiceAssemblyOverviewComponent implements OnInit {
-  @Input() serviceAssembly: IServiceAssemblyRow;
-  @Input() serviceUnits: IServiceUnitAndComponent[];
+  @Input() serviceAssembly: IServiceAssemblyWithSUsAndComponents;
+  @Input() workspaceId: string;
 
   public workspaceId$: Observable<string>;
 

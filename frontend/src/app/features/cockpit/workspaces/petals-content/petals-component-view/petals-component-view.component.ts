@@ -23,12 +23,11 @@ import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/state/store.interface';
 
-import { IComponentRow } from '../../state/components/components.interface';
 import {
   getCurrentComponent,
-  getCurrentComponentSharedLibraries,
+  IComponentWithSLsAndSUs,
 } from '../../state/components/components.selectors';
-import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
+
 import { Ui } from 'app/shared/state/ui.actions';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 
@@ -40,8 +39,8 @@ import { Components } from 'app/features/cockpit/workspaces/state/components/com
 export class PetalsComponentViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  public component$: Observable<IComponentRow>;
-  public sharedLibraries$: Observable<ISharedLibraryRow[]>;
+  public component$: Observable<IComponentWithSLsAndSUs>;
+  public workspaceId$: Observable<string>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
 
@@ -63,7 +62,10 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
       .subscribe();
 
     this.component$ = this.store$.let(getCurrentComponent);
-    this.sharedLibraries$ = this.store$.let(getCurrentComponentSharedLibraries);
+
+    this.workspaceId$ = this.store$.select(
+      state => state.workspaces.selectedWorkspaceId
+    );
   }
 
   ngOnDestroy() {

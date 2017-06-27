@@ -19,33 +19,34 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/state/store.interface';
-import { ISharedLibraryRow } from './shared-libraries.interface';
+import { ISharedLibrary } from './shared-libraries.interface';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { arrayEquals } from 'app/shared/helpers/shared.helper';
+
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
+
+export interface ISharedLibraryWithComponents extends ISharedLibrary {
+  components: IComponentRow[];
+}
 
 export function getCurrentSharedLibrary(
   store$: Store<IStore>
-): Observable<ISharedLibraryRow> {
+): Observable<ISharedLibraryWithComponents> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.sharedLibraries.selectedSharedLibraryId)
-    .map(
-      state =>
+    .map(state => {
+      const sl =
         state.sharedLibraries.byId[
           state.sharedLibraries.selectedSharedLibraryId
-        ]
-    )
+        ];
+      if (sl) {
+        return {
+          ...sl,
+          components: sl.components.map(c => state.components.byId[c]),
+        };
+      } else {
+        return undefined;
+      }
+    })
     .filter(s => !!s)
     .distinctUntilChanged();
-}
-
-export function getCurrentSharedLibraryComponents(
-  store$: Store<IStore>
-): Observable<IComponentRow[]> {
-  return getCurrentSharedLibrary(store$)
-    .withLatestFrom(store$.select(state => state.components))
-    .distinctUntilChanged(arrayEquals)
-    .map(([sharedLibrary, componentsTable]) =>
-      sharedLibrary.components.map(slId => componentsTable.byId[slId])
-    );
 }

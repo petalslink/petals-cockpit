@@ -24,10 +24,10 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
-import { IServiceUnitRow } from '../../../state/service-units/service-units.interface';
 import { IStore } from '../../../../../../shared/state/store.interface';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
+
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
+import { IServiceUnitWithSA } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
 
 @Component({
   selector: 'app-petals-service-unit-overview',
@@ -38,8 +38,7 @@ import { isLargeScreen } from 'app/shared/state/ui.selectors';
 export class PetalsServiceUnitOverviewComponent implements OnInit {
   public btnByScreenSize$: Observable<string>;
 
-  @Input() serviceUnit: IServiceUnitRow;
-  @Input() serviceAssembly: IServiceAssemblyRow;
+  @Input() serviceUnit: IServiceUnitWithSA;
   @Input() workspaceId: string;
 
   constructor(private store$: Store<IStore>) {}

@@ -18,17 +18,15 @@
 import { VisNetworkOptions, VisNodes, VisEdges } from 'ng2-vis';
 
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
+import { IContainerWithSiblings } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 
-export function buildVisNetworkData(
-  container: IContainerRow,
-  otherContainers: IContainerRow[]
-) {
+export function buildVisNetworkData(container: IContainerWithSiblings) {
   return {
     nodes: new VisNodes([
       node(container)(container),
-      ...otherContainers.map(node(container)),
+      ...container.siblings.map(node(container)),
     ]),
-    edges: new VisEdges(otherContainers.map(edge(container))),
+    edges: new VisEdges(container.siblings.map(edge(container))),
   };
 }
 

@@ -22,8 +22,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 
-import { IBusRow } from '../../../state/buses/buses.interface';
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
+import { IBusWithContainers } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
 
 @Component({
   selector: 'app-petals-bus-overview',
@@ -32,8 +31,7 @@ import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsBusOverviewComponent implements OnInit {
-  @Input() bus: IBusRow;
-  @Input() containers: IContainerRow[];
+  @Input() bus: IBusWithContainers;
   @Input() workspaceId: string;
 
   public config: any = {
