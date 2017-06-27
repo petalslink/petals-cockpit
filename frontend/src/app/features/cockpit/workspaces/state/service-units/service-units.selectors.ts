@@ -15,21 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IServiceUnitRow } from './service-units.interface';
+import { IServiceUnit } from './service-units.interface';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/state/store.interface';
+import { IStore } from 'app/shared/state/store.interface';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
+
+import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
+
+export interface IServiceUnitWithSA extends IServiceUnit {
+  serviceAssembly: IServiceAssemblyRow;
+}
 
 export function getCurrentServiceUnit(
   store$: Store<IStore>
-): Observable<IServiceUnitRow> {
+): Observable<IServiceUnitWithSA> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.serviceUnits.selectedServiceUnitId)
-    .map(
-      state => state.serviceUnits.byId[state.serviceUnits.selectedServiceUnitId]
-    )
+    .map(state => {
+      const su =
+        state.serviceUnits.byId[state.serviceUnits.selectedServiceUnitId];
+      if (su) {
+        return {
+          ...su,
+          serviceAssembly: state.serviceAssemblies.byId[su.serviceAssemblyId],
+        };
+      } else {
+        return undefined;
+      }
+    })
     .filter(s => !!s)
     .distinctUntilChanged();
 }

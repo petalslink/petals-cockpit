@@ -19,28 +19,43 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../shared/state/store.interface';
-import { IComponentRow } from './components.interface';
+import { IComponentUI } from './components.interface';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { arrayEquals } from 'app/shared/helpers/shared.helper';
+
+import {
+  IComponentBackendSSECommon,
+  IComponentBackendDetailsCommon,
+} from 'app/shared/services/components.service';
+import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+
+export interface IComponentWithSLsAndSUs extends IComponentUI, IComponentBackendSSECommon, IComponentBackendDetailsCommon {
+  serviceUnits: IServiceUnitRow[];
+  sharedLibraries: ISharedLibraryRow[];
+}
 
 export function getCurrentComponent(
   store$: Store<IStore>
-): Observable<IComponentRow> {
+): Observable<IComponentWithSLsAndSUs> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.components.selectedComponentId)
-    .map(state => state.components.byId[state.components.selectedComponentId])
+    .map(state => {
+      const component =
+        state.components.byId[state.components.selectedComponentId];
+      if (component) {
+        return {
+          ...component,
+          serviceUnits: component.serviceUnits.map(
+            suId => state.serviceUnits.byId[suId]
+          ),
+          sharedLibraries: component.sharedLibraries.map(
+            slId => state.sharedLibraries.byId[slId]
+          ),
+        };
+      } else {
+        return undefined;
+      }
+    })
     .filter(c => !!c)
     .distinctUntilChanged();
-}
-
-export function getCurrentComponentSharedLibraries(
-  store$: Store<IStore>
-): Observable<ISharedLibraryRow[]> {
-  return getCurrentComponent(store$)
-    .withLatestFrom(store$.select(state => state.sharedLibraries))
-    .distinctUntilChanged(arrayEquals)
-    .map(([component, sharedLibrariesTable]) =>
-      component.sharedLibraries.map(slId => sharedLibrariesTable.byId[slId])
-    );
 }

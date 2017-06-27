@@ -17,47 +17,40 @@
 
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { IServiceAssemblyRow } from './service-assemblies.interface';
+import { IServiceAssembly } from './service-assemblies.interface';
 
 import { IStore } from '../../../../../shared/state/store.interface';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { IServiceUnitAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
-import { arrayEquals, tuple } from 'app/shared/helpers/shared.helper';
+import { tuple } from 'app/shared/helpers/shared.helper';
+import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
+
+export interface IServiceAssemblyWithSUsAndComponents extends IServiceAssembly {
+  serviceUnitsAndComponent: [IServiceUnitRow, IComponentRow][];
+}
 
 export function getCurrentServiceAssembly(
   store$: Store<IStore>
-): Observable<IServiceAssemblyRow> {
+): Observable<IServiceAssemblyWithSUsAndComponents> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.serviceAssemblies.selectedServiceAssemblyId)
-    .map(
-      state =>
+    .map(state => {
+      const sa =
         state.serviceAssemblies.byId[
           state.serviceAssemblies.selectedServiceAssemblyId
-        ]
-    )
+        ];
+      if (sa) {
+        return {
+          ...sa,
+          serviceUnitsAndComponent: sa.serviceUnits.map(suId => {
+            const su = state.serviceUnits.byId[suId];
+            return tuple([su, state.components.byId[su.componentId]]);
+          }),
+        };
+      } else {
+        return undefined;
+      }
+    })
     .filter(s => !!s)
     .distinctUntilChanged();
-}
-
-export function getServiceUnitsAndComponentsOfServiceAssembly(
-  store$: Store<IStore>
-): Observable<IServiceUnitAndComponent[]> {
-  return getCurrentServiceAssembly(store$)
-    .withLatestFrom(
-      store$.select(state => tuple([state.serviceUnits, state.components]))
-    )
-    .map(([a, [b, c]]) => tuple([a, b, c]))
-    .distinctUntilChanged(arrayEquals)
-    .map(([serviceAssemblyRow, serviceUnitsTable, componentsTable]) =>
-      serviceAssemblyRow.serviceUnits.map(
-        serviceUnitId =>
-          <IServiceUnitAndComponent>{
-            ...serviceUnitsTable.byId[serviceUnitId],
-            component:
-              componentsTable.byId[
-                serviceUnitsTable.byId[serviceUnitId].componentId
-              ],
-          }
-      )
-    );
 }

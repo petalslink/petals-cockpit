@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <md-tab label="Overview">
       <!-- TODO: Create a component for every tab -->
       <app-petals-container-overview [workspaceId]="(workspaceId$ | async)" [container]="container"
-        [otherContainers]="otherContainers$ | async" fxFill></app-petals-container-overview>
+        fxFill></app-petals-container-overview>
     </md-tab>
     <md-tab label="Operations">
       <app-petals-container-operations [container]="container" fxFill></app-petals-container-operations>

@@ -23,10 +23,9 @@ import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/state/store.interface';
 
-import { IContainerRow } from '../../state/containers/containers.interface';
 import {
   getCurrentContainer,
-  getCurrentContainerSiblings,
+  IContainerWithSiblings,
 } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 import { Ui } from 'app/shared/state/ui.actions';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
@@ -39,9 +38,8 @@ import { Containers } from 'app/features/cockpit/workspaces/state/containers/con
 export class PetalsContainerViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  public workspaceId$: Observable<string>;
-  public container$: Observable<IContainerRow>;
-  public otherContainers$: Observable<IContainerRow[]>;
+  workspaceId$: Observable<string>;
+  container$: Observable<IContainerWithSiblings>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
 
@@ -53,13 +51,11 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.workspaceId$ = this.route.paramMap
-      .map(p => p.get('workspaceId'))
-      .distinctUntilChanged();
+    this.workspaceId$ = this.store$.select(
+      state => state.workspaces.selectedWorkspaceId
+    );
 
     this.container$ = this.store$.let(getCurrentContainer);
-
-    this.otherContainers$ = this.store$.let(getCurrentContainerSiblings);
 
     this.route.paramMap
       .map(p => p.get('containerId'))
@@ -69,10 +65,10 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
         this.store$.dispatch(new Containers.FetchDetails({ id }));
       })
       .switchMap(busId =>
-        this.otherContainers$
+        this.container$
           .first()
-          .do(cs =>
-            cs.forEach(c =>
+          .do(cont =>
+            cont.siblings.forEach(c =>
               this.store$.dispatch(new Containers.FetchDetails(c))
             )
           )

@@ -18,14 +18,35 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/state/store.interface';
-import { IBusRow } from './buses.interface';
+import { IBusUI } from './buses.interface';
+import { IStore } from 'app/shared/state/store.interface';
 import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
+import {
+  IBusBackendSSECommon,
+  IBusBackendDetailsCommon,
+} from 'app/shared/services/buses.service';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 
-export function getCurrentBus(store$: Store<IStore>): Observable<IBusRow> {
+export interface IBusWithContainers extends IBusUI, IBusBackendSSECommon, IBusBackendDetailsCommon {
+  containers: IContainerRow[];
+}
+
+export function getCurrentBus(
+  store$: Store<IStore>
+): Observable<IBusWithContainers> {
   return filterWorkspaceFetched(store$)
     .filter(state => !!state.buses.selectedBusId)
-    .map(state => state.buses.byId[state.buses.selectedBusId])
+    .map(state => {
+      const bus = state.buses.byId[state.buses.selectedBusId];
+      if (bus) {
+        return {
+          ...bus,
+          containers: bus.containers.map(c => state.containers.byId[c]),
+        };
+      } else {
+        return undefined;
+      }
+    })
     .filter(b => !!b)
     .distinctUntilChanged();
 }

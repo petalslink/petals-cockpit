@@ -22,12 +22,11 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
 
-import { IBusRow } from '../../state/buses/buses.interface';
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
-
 import { IStore } from '../../../../../shared/state/store.interface';
-import { getCurrentBus } from '../../state/buses/buses.selectors';
-import { getContainers } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
+import {
+  getCurrentBus,
+  IBusWithContainers,
+} from '../../state/buses/buses.selectors';
 
 import { Ui } from 'app/shared/state/ui.actions';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
@@ -42,8 +41,7 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   public workspaceId$: Observable<string>;
-  public bus$: Observable<IBusRow>;
-  public containers$: Observable<IContainerRow[]>;
+  public bus$: Observable<IBusWithContainers>;
 
   constructor(
     private store$: Store<IStore>,
@@ -56,12 +54,11 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
       new Ui.SetTitles({ titleMainPart1: 'Petals', titleMainPart2: 'Bus' })
     );
 
-    this.workspaceId$ = this.route.paramMap
-      .map(p => p.get('workspaceId'))
-      .distinctUntilChanged();
+    this.workspaceId$ = this.store$.select(
+      state => state.workspaces.selectedWorkspaceId
+    );
 
     this.bus$ = this.store$.let(getCurrentBus);
-    this.containers$ = this.store$.let(getContainers);
 
     this.route.paramMap
       .map(pm => pm.get('busId'))
@@ -71,10 +68,10 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
         this.store$.dispatch(new Buses.FetchDetails({ id }));
       })
       .switchMap(busId =>
-        this.containers$
+        this.bus$
           .first()
-          .do(cs =>
-            cs.forEach(c =>
+          .do(bus =>
+            bus.containers.forEach(c =>
               this.store$.dispatch(new Containers.FetchDetails(c))
             )
           )

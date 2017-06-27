@@ -26,7 +26,6 @@ import {
 import { FormGroup, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
-import { IComponentRow } from '../../../state/components/components.interface';
 import { IStore } from '../../../../../../shared/state/store.interface';
 
 import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
@@ -35,6 +34,7 @@ import {
   EComponentState,
 } from 'app/shared/services/components.service';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
+import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
 
 @Component({
   selector: 'app-petals-component-operations',
@@ -43,7 +43,7 @@ import { Components } from 'app/features/cockpit/workspaces/state/components/com
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
-  @Input() component: IComponentRow;
+  @Input() component: IComponentWithSLsAndSUs;
   public fileToDeploy: File;
   public serviceUnitName: string;
   public parametersForm: FormGroup;

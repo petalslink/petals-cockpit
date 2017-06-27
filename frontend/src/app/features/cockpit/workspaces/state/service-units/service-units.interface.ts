@@ -16,7 +16,6 @@
  */
 
 import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
-import { IComponentRowWithoutDetails } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import {
   IServiceUnitBackendSSE,
   IServiceUnitBackendDetails,
@@ -37,10 +36,6 @@ export interface IServiceUnitRow extends IServiceUnitUI, IServiceUnitBackendSSE,
 export interface IServiceUnitRowWithoutDetails extends IServiceUnitUI, IServiceUnitBackendSSE {}
 
 export interface IServiceUnit extends IServiceUnitUI, IServiceUnitBackendSSECommon, IServiceUnitBackendDetailsCommon {}
-
-export interface IServiceUnitAndComponent extends IServiceUnitRowWithoutDetails {
-  component: IComponentRowWithoutDetails;
-}
 
 interface IServiceUnitsCommon {
   selectedServiceUnitId: string;

@@ -48,13 +48,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <md-divider></md-divider>
 
-        <md-card-content *ngIf="sharedLibraries.length === 0" class="margin-top-x1">
+        <md-card-content *ngIf="component.sharedLibraries.length === 0" class="margin-top-x1">
           This component doesn't use any shared library.
         </md-card-content>
 
         <md-nav-list dense fxLayout="column" class="padding-top-x1">
-          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let sl of sharedLibraries">
-            <a md-raised-button [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'shared-libraries', sl.id]"
+          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let sl of component.sharedLibraries">
+            <a md-raised-button [routerLink]="['/workspaces', workspaceId, 'petals', 'shared-libraries', sl.id]"
               class="shared-library">
               <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
                 <span class="sl-name margin-right-x1">{{ sl.name }}</span>
