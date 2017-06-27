@@ -224,20 +224,6 @@ pre {
   }
 }
 
-.toolbar-page-header h1 {
-    font-size: 30px;
-    font-weight: 300;
-    margin: 0;
-    padding: 50px;
-}
-
-@media (max-width: 840px) {
-  .toolbar-page-header h1  {
-    padding: 24px 8px;
-    font-size: 20px;
-  }
-}
-
 // see https://github.com/angular/material2/issues/2829
 md-sidenav {
   .mat-tab-label {

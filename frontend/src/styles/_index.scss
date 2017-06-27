@@ -97,12 +97,22 @@ md-sidenav-container a /deep/ .mat-list-item-content {
 .page-cockpit /deep/ .toolbar-page-header, .page-cockpit /deep/ .toolbar-page-header .mat-toolbar-row {
   height: 120px;
   min-height: 140px !important;
+  h1 {
+    font-size: 30px;
+    font-weight: 300;
+    margin: 0;
+    padding: 50px;
+  }
 }
 
 @media screen and (max-width: 840px) {
   .page-cockpit /deep/ .toolbar-page-header, .page-cockpit /deep/ .toolbar-page-header .mat-toolbar-row {
     height: 80px;
     min-height: 80px !important;
+    h1 {
+      padding: 24px 8px;
+      font-size: 20px;
+    }
   }
   .md-icon {
     padding-right: 30px;
