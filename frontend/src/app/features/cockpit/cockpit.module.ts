@@ -25,6 +25,7 @@ import {
   DeletedWorkspaceDialogComponent,
 } from './cockpit.component';
 import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog.component';
+import { HeaderComponent } from './header/header.component';
 
 @NgModule({
   imports: [SharedModule, CockpitRoutingModule, WorkspacesModule],
@@ -32,6 +33,7 @@ import { WorkspacesDialogComponent } from './workspaces-dialog/workspaces-dialog
     CockpitComponent,
     WorkspacesDialogComponent,
     DeletedWorkspaceDialogComponent,
+    HeaderComponent,
   ],
   entryComponents: [WorkspacesDialogComponent, DeletedWorkspaceDialogComponent],
 })

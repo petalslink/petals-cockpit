@@ -1,0 +1,72 @@
+/**
+ * Copyright (C) 2017 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.logo-toolbar {
+  max-height: 34px;
+}
+
+/*
+TODO
+While the issue on material **https://github.com/angular/material2/issues/3221** is still open,
+let's make something hacky by putting the header on top of the rest
+
+This should be cleaned as soon as the new feature is ready
+*/
+
+.header-toolbar {
+  position: fixed;
+  z-index: 2000;
+  font-size: 14px;
+  line-height: 36px;
+}
+
+@media (max-width: 1279px) {
+  md-toolbar {
+    .toolbar-logo {
+      margin-right: 10px;
+    }
+
+    .sidenav-toggle {
+      padding: 0;
+      margin-right: 10px;
+      min-height: 56px;
+      min-width: 56px;
+    }
+  }
+}
+
+@media (min-width: 1280px) {
+  md-toolbar {
+    padding-left: 0;
+
+    .toolbar-logo {
+      min-width: 320px;
+      text-align: center;
+    }
+
+    .sidenav-toggle {
+      padding: 0;
+      margin-right: 10px;
+      min-height: 56px;
+      min-width: 56px;
+    }
+  }
+}
+
+.btn-menu-username {
+  background-color: #F5F5F5;
+}

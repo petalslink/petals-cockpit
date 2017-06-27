@@ -23,30 +23,11 @@
   background-color: white;
 }
 
-.logo-toolbar {
-  max-height: 34px;
-}
-
 $sidenavSize: 320px;
 
 md-sidenav {
   height: 100%;
   width: $sidenavSize;
-}
-
-/*
-TODO
-While the issue on material **https://github.com/angular/material2/issues/3221** is still open,
-let's make something hacky by putting the header on top of the rest
-
-This should be cleaned as soon as the new feature is ready
-*/
-
-.header-toolbar {
-  position: fixed;
-  z-index: 2000;
-  font-size: 14px;
-  line-height: 36px;
 }
 
 // values are coming from material toolbar.scss
@@ -70,40 +51,3 @@ md-sidenav-container {
 /*
 END TODO
 */
-
-@media (max-width: 1279px) {
-  md-toolbar {
-    .toolbar-logo {
-      margin-right: 10px;
-    }
-
-    .sidenav-toggle {
-      padding: 0;
-      margin-right: 10px;
-      min-height: 56px;
-      min-width: 56px;
-    }
-  }
-}
-
-@media (min-width: 1280px) {
-  md-toolbar {
-    padding-left: 0;
-
-    .toolbar-logo {
-      min-width: $sidenavSize;
-      text-align: center;
-    }
-
-    .sidenav-toggle {
-      padding: 0;
-      margin-right: 10px;
-      min-height: 56px;
-      min-width: 56px;
-    }
-  }
-}
-
-.btn-menu-username {
-  background-color: #F5F5F5;
-}
