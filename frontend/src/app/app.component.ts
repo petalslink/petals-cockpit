@@ -83,28 +83,28 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // svg icons for petals tree & overviews
     const busLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
-      '/assets/icons/svg/bus-logo.svg'
+      './assets/icons/svg/bus-logo.svg'
     );
     const compLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
-      '/assets/icons/svg/component-logo.svg'
+      './assets/icons/svg/component-logo.svg'
     );
     const saLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
-      '/assets/icons/svg/sa-logo.svg'
+      './assets/icons/svg/sa-logo.svg'
     );
     const slLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
-      '/assets/icons/svg/sl-logo.svg'
+      './assets/icons/svg/sl-logo.svg'
     );
     const slOverviewLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
-      '/assets/icons/svg/sl-overview-logo.svg'
+      './assets/icons/svg/sl-overview-logo.svg'
     );
     const saOverviewLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
-      '/assets/icons/svg/sa-overview-logo.svg'
+      './assets/icons/svg/sa-overview-logo.svg'
     );
     const suLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
-      '/assets/icons/svg/su-logo.svg'
+      './assets/icons/svg/su-logo.svg'
     );
     const gotoLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
-      '/assets/icons/svg/goto-logo.svg'
+      './assets/icons/svg/goto-logo.svg'
     );
 
     this.mdIconRegistry.addSvgIcon('bus', busLogo);
