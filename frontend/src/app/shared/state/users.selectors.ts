@@ -19,7 +19,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from './store.interface';
-import { ICurrentUser } from './users.interface';
+import { ICurrentUser, IUser } from './users.interface';
 import { isNot } from '../helpers/shared.helper';
 
 export function _getCurrentUser(
@@ -30,4 +30,10 @@ export function _getCurrentUser(
 
 export function getCurrentUser() {
   return _getCurrentUser;
+}
+
+export function getAllUsers(store$: Store<IStore>): Observable<IUser[]> {
+  return store$.select(state =>
+    state.users.allIds.map(id => state.users.byId[id])
+  );
 }

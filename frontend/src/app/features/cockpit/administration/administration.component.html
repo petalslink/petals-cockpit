@@ -1,0 +1,82 @@
+<!-- Copyright (C) 2017 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<div fxLayout="column" fxFlex class="wrapper-content">
+  <md-toolbar color="primary" class="toolbar-page-header">
+    <div class="prefix-toolbar-title">
+      <md-icon>settings</md-icon>
+    </div>
+
+    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">Administration</h1>
+  </md-toolbar>
+
+  <div fxFlexFill fxLayout="column" class="content content-max-width" *ngIf="(user$ | async).isAdmin; else notAdmin">
+    <div class="central-content">
+      <div fxLayout="column">
+
+        <md-card fxFlex *ngIf="users$ | async as users" [ngClass.gt-md]="'card-auto-size'">
+          <md-card-content>
+            <div fxLayout="row" fxFlex="100%">
+              <label class="text-upper">Users</label>
+              <!--<md-spinner class="margin-left-x1" *ngIf="isFetchingUsers"></md-spinner>-->
+
+              <div fxFlex fxLayoutAlign="end center" class="margin-right-x1">
+                <span class="subtitle" *ngIf="users.length > 0" md-line>
+                  {{ users.length }} user{{ (users.length) >= 2 ? 's' : '' }}
+                </span>
+              </div>
+              <md-icon color="primary">supervisor_account</md-icon>
+            </div>
+          </md-card-content>
+
+          <md-card-content>
+            <div fxLayout="column" class="administration-users">
+
+              <md-list>
+                <md-list-item *ngFor="let user of users">
+                  <app-generate-icon md-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
+
+                  <h2 md-line>{{ user.id }}</h2>
+
+                  <p md-line>
+                    <span>{{ user.name }}</span>
+                  </p>
+                </md-list-item>
+              </md-list>
+            </div>
+          </md-card-content>
+        </md-card>
+
+      </div>
+    </div>
+  </div>
+
+  <ng-template #notAdmin>
+    <div class="central-content">
+      <div fxLayout="column">
+        <md-card fxFlex [ngClass.gt-md]="'card-auto-size'" class="warning-not-admin margin-top-x1">
+          <md-card-title fxLayout="row">
+            <span fxFlex class="text-upper">Warning</span>
+            <md-icon color="warn">warning</md-icon>
+          </md-card-title>
+          <md-card-subtitle fxLayout="row" fxLayoutAlign="start center">
+            <md-icon class="margin-right-x1" color="primary">info</md-icon>
+            <span class="color-primary" fxFlex>You are not an administrator.</span>
+          </md-card-subtitle>
+        </md-card>
+      </div>
+    </div>
+  </ng-template>
+</div>

@@ -174,4 +174,32 @@ describe(`Workspaces`, () => {
     // now that the previous workspace is deleted, check that only 1 workspace is displayed
     expect(workspaces.workspacesCards.count()).toEqual(1);
   });
+
+  it(`should open the administration page and ensure that the workspaces list is closed`, () => {
+    let workspaces = page
+      .goToWorkspacesViaLogin()
+      .loginToWorkspaces(`admin`, `admin`);
+
+    let admin = page.openAdmin();
+    browser.wait(EC.stalenessOf(workspaces.component), waitTimeout);
+
+    const workspace = page.openWorkspaces().selectWorkspace(0);
+    workspaces = workspace.openWorkspacesDialog();
+
+    admin = page.openAdmin();
+    browser.wait(EC.stalenessOf(workspaces.component), waitTimeout);
+  });
+
+  it(`should not reopen the workspace list after logout and re-login`, () => {
+    const workspaces = page
+      .goToLogin()
+      .loginToWorkspace('admin', 'admin')
+      .openWorkspacesDialog();
+
+    const login = page.logout();
+    browser.wait(EC.stalenessOf(workspaces.component), waitTimeout);
+
+    login.loginToWorkspace('admin', 'admin');
+    browser.wait(EC.stalenessOf(workspaces.component), waitTimeout);
+  });
 });

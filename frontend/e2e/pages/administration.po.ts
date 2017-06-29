@@ -15,22 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
+import { browser, ExpectedConditions as EC, $ } from 'protractor';
 
-import { SharedModule } from 'app/shared/shared.module';
-import { CockpitRoutingModule } from './cockpit-routing.module';
-import { WorkspacesModule } from './workspaces/workspaces.module';
-import { CockpitComponent } from './cockpit.component';
-import { HeaderComponent } from './header/header.component';
-import { AdministrationModule } from 'app/features/cockpit/administration/administration.module';
+import { urlToMatch } from '../utils';
+import { waitTimeout } from '../common';
 
-@NgModule({
-  imports: [
-    SharedModule,
-    CockpitRoutingModule,
-    WorkspacesModule,
-    AdministrationModule,
-  ],
-  declarations: [CockpitComponent, HeaderComponent],
-})
-export class CockpitModule {}
+export class AdminPage {
+  public static readonly component = $(`app-administration`);
+
+  public readonly component = AdminPage.component;
+  public readonly title = this.component.$(`md-toolbar-row .title`);
+
+  public readonly users = this.component.$(`.administration-users`);
+
+  static waitAndGet() {
+    browser.wait(urlToMatch(/\/admin/), waitTimeout);
+    browser.wait(EC.visibilityOf(AdminPage.component), waitTimeout);
+    return new AdminPage();
+  }
+
+  private constructor() {}
+}
