@@ -31,10 +31,14 @@ export interface IBusInProgressUI {
 }
 
 // used within table
-export interface IBusInProgressRow extends IBusInProgressUI, IBusInProgressBackend {}
+export interface IBusInProgressRow
+  extends IBusInProgressUI,
+    IBusInProgressBackend {}
 
 // used in generated views
-export interface IBusInProgress extends IBusInProgressUI, IBusInProgressBackendCommon {}
+export interface IBusInProgress
+  extends IBusInProgressUI,
+    IBusInProgressBackendCommon {}
 
 export interface IBusesInProgressCommon {
   selectedBusInProgressId: string;
@@ -45,9 +49,9 @@ export interface IBusesInProgressCommon {
   importBusId: string;
 }
 
-export interface IBusesInProgressTable extends IBusesInProgressCommon, JsTable<
-  IBusInProgressRow
-> {}
+export interface IBusesInProgressTable
+  extends IBusesInProgressCommon,
+    JsTable<IBusInProgressRow> {}
 
 export interface IBusesInProgress extends IBusesInProgressCommon {
   list: Array<IBusInProgress>;

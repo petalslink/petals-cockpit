@@ -35,7 +35,10 @@ export interface IBusUI {
 export interface IBusRow extends IBusUI, IBusBackendSSE, IBusBackendDetails {}
 
 // used in generated views
-export interface IBus extends IBusUI, IBusBackendSSECommon, IBusBackendDetailsCommon {
+export interface IBus
+  extends IBusUI,
+    IBusBackendSSECommon,
+    IBusBackendDetailsCommon {
   containers: IContainers;
 }
 

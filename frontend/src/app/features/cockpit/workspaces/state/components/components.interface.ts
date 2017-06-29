@@ -34,9 +34,15 @@ export interface IComponentUI {
   errorDeployment: string;
 }
 
-export interface IComponentRow extends IComponentUI, IComponentBackendSSE, IComponentBackendDetails {}
+export interface IComponentRow
+  extends IComponentUI,
+    IComponentBackendSSE,
+    IComponentBackendDetails {}
 
-export interface IComponent extends IComponentUI, IComponentBackendSSECommon, IComponentBackendDetailsCommon {
+export interface IComponent
+  extends IComponentUI,
+    IComponentBackendSSECommon,
+    IComponentBackendDetailsCommon {
   serviceUnits: IServiceUnits;
 }
 
@@ -44,9 +50,9 @@ export interface IComponentsCommon {
   selectedComponentId: string;
 }
 
-export interface IComponentsTable extends IComponentsCommon, JsTable<
-  IComponentRow
-> {}
+export interface IComponentsTable
+  extends IComponentsCommon,
+    JsTable<IComponentRow> {}
 
 export interface IComponents extends IComponentsCommon {
   list: IComponent[];

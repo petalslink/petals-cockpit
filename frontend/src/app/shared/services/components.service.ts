@@ -59,7 +59,8 @@ export interface IComponentBackendSSE extends IComponentBackendSSECommon {
   sharedLibraries: string[];
 }
 
-export interface IComponentBackendDetails extends IComponentBackendDetailsCommon {}
+export interface IComponentBackendDetails
+  extends IComponentBackendDetailsCommon {}
 
 export abstract class ComponentsService {
   abstract getDetailsComponent(componentId: string): Observable<Response>;

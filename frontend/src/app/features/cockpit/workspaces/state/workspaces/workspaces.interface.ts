@@ -33,10 +33,16 @@ export interface IWorkspaceUI {
 }
 
 // used within table
-export interface IWorkspaceRow extends IWorkspaceUI, IWorkspaceBackend, IWorkspaceBackendDetails {}
+export interface IWorkspaceRow
+  extends IWorkspaceUI,
+    IWorkspaceBackend,
+    IWorkspaceBackendDetails {}
 
 // used in generated views
-export interface IWorkspace extends IWorkspaceUI, IWorkspaceBackendCommon, IWorkspaceBackendDetailsCommon {
+export interface IWorkspace
+  extends IWorkspaceUI,
+    IWorkspaceBackendCommon,
+    IWorkspaceBackendDetailsCommon {
   buses: IBuses;
   users: IUsers;
 }
@@ -71,9 +77,9 @@ export interface IWorkspacesCommon {
   searchPetals: string;
 }
 
-export interface IWorkspacesTable extends IWorkspacesCommon, JsTable<
-  IWorkspaceRow
-> {}
+export interface IWorkspacesTable
+  extends IWorkspacesCommon,
+    JsTable<IWorkspaceRow> {}
 
 export interface IWorkspaces extends IWorkspacesCommon {
   list: IWorkspace[];

@@ -24,7 +24,8 @@
 // themes
 @import './themes/_light.theme';
 
-div > h3, md-dialog-container > h3 {
+div > h3,
+md-dialog-container > h3 {
   margin: 0;
   padding: 10px;
   border-radius: 2dpi;
@@ -59,7 +60,8 @@ md-sidenav-container a.workspace-element-type-component,
 md-sidenav-container a.workspace-element-type-service-assembly,
 md-sidenav-container a.workspace-element-type-shared-library,
 md-sidenav-container a.workspace-element-type-service-unit {
-  .mat-list-item-content:hover, .mat-list-item-content:focus {
+  .mat-list-item-content:hover,
+  .mat-list-item-content:focus {
     background-color: mat-color($theme-primary-x);
     @extend .color-primary-light-bold;
   }
@@ -70,15 +72,17 @@ md-sidenav-container a /deep/ .mat-list-item-content {
   height: 24px !important;
   border-bottom-width: 1px;
   border-bottom-style: solid;
-  border-color: rgba(0,0,0,.02);
+  border-color: rgba(0, 0, 0, .02);
 }
 
 .icon-primary {
   color: mat-color($theme-primary-x6);
 }
 
-.active-link, .active-link:hover {
-  .mat-list-item-content, .mat-list-item-content:hover {
+.active-link,
+.active-link:hover {
+  .mat-list-item-content,
+  .mat-list-item-content:hover {
     background-color: mat-color($theme-primary-x);
     @extend .color-primary-bold;
     margin: 0;
@@ -89,12 +93,14 @@ md-sidenav-container a /deep/ .mat-list-item-content {
   background-color: mat-color($theme-accent-x5);
 }
 
-.page-cockpit /deep/ .header-toolbar, .page-cockpit /deep/ .header-toolbar .mat-toolbar-row {
+.page-cockpit /deep/ .header-toolbar,
+.page-cockpit /deep/ .header-toolbar .mat-toolbar-row {
   height: 56px;
   min-height: 56px !important;
 }
 
-.page-cockpit /deep/ .toolbar-page-header, .page-cockpit /deep/ .toolbar-page-header .mat-toolbar-row {
+.page-cockpit /deep/ .toolbar-page-header,
+.page-cockpit /deep/ .toolbar-page-header .mat-toolbar-row {
   height: 120px;
   min-height: 140px !important;
   h1 {
@@ -106,7 +112,8 @@ md-sidenav-container a /deep/ .mat-list-item-content {
 }
 
 @media screen and (max-width: 840px) {
-  .page-cockpit /deep/ .toolbar-page-header, .page-cockpit /deep/ .toolbar-page-header .mat-toolbar-row {
+  .page-cockpit /deep/ .toolbar-page-header,
+  .page-cockpit /deep/ .toolbar-page-header .mat-toolbar-row {
     height: 80px;
     min-height: 80px !important;
     h1 {

@@ -36,7 +36,9 @@ This should be cleaned as soon as the new feature is ready (see also cockpit com
 
 md-toolbar {
   padding-left: 0;
-  .sidenav-toggle, .toolbar-logo, .btn-usr-admin {
+  .sidenav-toggle,
+  .toolbar-logo,
+  .btn-usr-admin {
     margin-right: 4px;
     min-height: 56px;
     min-width: 56px;

@@ -37,15 +37,16 @@ function node(container: IContainerRow) {
     fixed: true,
     title:
       '<b>IP :</b> <span class="ip">' +
-        otherContainer.ip +
-        '</span><br>' +
-        '<b>Port :</b> <span class="port">' +
-        otherContainer.port +
-        '</span>',
-    image: container.id === otherContainer.id ||
+      otherContainer.ip +
+      '</span><br>' +
+      '<b>Port :</b> <span class="port">' +
+      otherContainer.port +
+      '</span>',
+    image:
+      container.id === otherContainer.id ||
       container.reachabilities.includes(otherContainer.id)
-      ? 'assets/img/network-container.png'
-      : 'assets/img/network-container-no-reachable.png',
+        ? 'assets/img/network-container.png'
+        : 'assets/img/network-container-no-reachable.png',
   });
 }
 

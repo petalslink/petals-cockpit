@@ -33,7 +33,8 @@ export interface IServiceUnitBackendDetailsCommon {}
 
 export interface IServiceUnitBackendSSE extends IServiceUnitBackendSSECommon {}
 
-export interface IServiceUnitBackendDetails extends IServiceUnitBackendDetailsCommon {}
+export interface IServiceUnitBackendDetails
+  extends IServiceUnitBackendDetailsCommon {}
 
 export abstract class ServiceUnitsService {
   abstract getDetailsServiceUnit(serviceUnitId: string): Observable<Response>;

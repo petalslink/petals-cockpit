@@ -190,10 +190,10 @@ export namespace ServiceAssembliesReducer {
     table: IServiceAssembliesTable,
     payload: IServiceAssemblyRow
   ) {
-    const selectedServiceAssemblyId = table.selectedServiceAssemblyId ===
-      payload.id
-      ? ''
-      : table.selectedServiceAssemblyId;
+    const selectedServiceAssemblyId =
+      table.selectedServiceAssemblyId === payload.id
+        ? ''
+        : table.selectedServiceAssemblyId;
 
     return {
       ...removeById(table, payload.id),

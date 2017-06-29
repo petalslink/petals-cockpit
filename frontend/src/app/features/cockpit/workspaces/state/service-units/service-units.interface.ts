@@ -31,19 +31,27 @@ export interface IServiceUnitUI {
   isFetchingDetails: boolean;
 }
 
-export interface IServiceUnitRow extends IServiceUnitUI, IServiceUnitBackendSSE, IServiceUnitBackendDetails {}
+export interface IServiceUnitRow
+  extends IServiceUnitUI,
+    IServiceUnitBackendSSE,
+    IServiceUnitBackendDetails {}
 
-export interface IServiceUnitRowWithoutDetails extends IServiceUnitUI, IServiceUnitBackendSSE {}
+export interface IServiceUnitRowWithoutDetails
+  extends IServiceUnitUI,
+    IServiceUnitBackendSSE {}
 
-export interface IServiceUnit extends IServiceUnitUI, IServiceUnitBackendSSECommon, IServiceUnitBackendDetailsCommon {}
+export interface IServiceUnit
+  extends IServiceUnitUI,
+    IServiceUnitBackendSSECommon,
+    IServiceUnitBackendDetailsCommon {}
 
 interface IServiceUnitsCommon {
   selectedServiceUnitId: string;
 }
 
-export interface IServiceUnitsTable extends IServiceUnitsCommon, JsTable<
-  IServiceUnitRow
-> {}
+export interface IServiceUnitsTable
+  extends IServiceUnitsCommon,
+    JsTable<IServiceUnitRow> {}
 
 export interface IServiceUnits extends IServiceUnitsCommon {
   list: IServiceUnit[];

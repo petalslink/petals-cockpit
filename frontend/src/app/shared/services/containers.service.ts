@@ -39,7 +39,8 @@ export interface IContainerBackendSSE extends IContainerBackendSSECommon {
   sharedLibraries: string[];
 }
 
-export interface IContainerBackendDetails extends IContainerBackendDetailsCommon {
+export interface IContainerBackendDetails
+  extends IContainerBackendDetailsCommon {
   reachabilities: string[];
 }
 
