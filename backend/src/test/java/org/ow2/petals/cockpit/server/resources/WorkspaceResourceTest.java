@@ -134,18 +134,21 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(table(USERS)).row(0).value(USERS.LAST_WORKSPACE.getName()).isEqualTo(1);
     }
 
+    @Test
     public void getOverviewNonExistingWorkspaceForbidden() {
         Response get = resource.target("/workspaces/3").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
 
+    @Test
     public void getOverviewWorkspaceForbidden() {
         Response get = resource.target("/workspaces/2").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
 
+    @Test
     public void getOverviewWorkspace() {
         WorkspaceOverviewContent get = resource.target("/workspaces/1").request().get(WorkspaceOverviewContent.class);
 
@@ -154,6 +157,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertUsers(get.users);
     }
 
+    @Test
     public void setDescriptionNonExistingWorkspaceForbidden() {
         Response put = resource.target("/workspaces/3").request()
                 .put(Entity.json(new WorkspaceUpdate(null, "description")));
@@ -161,6 +165,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(put.getStatus()).isEqualTo(403);
     }
 
+    @Test
     public void setDescriptionWorkspaceForbidden() {
         Response put = resource.target("/workspaces/2").request()
                 .put(Entity.json(new WorkspaceUpdate(null, "description")));
@@ -171,6 +176,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(requestWorkspace(2)).row(0).value(WORKSPACES.DESCRIPTION.getName()).isEqualTo("");
     }
 
+    @Test
     public void setDescription() {
         assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.DESCRIPTION.getName()).isEqualTo("");
 

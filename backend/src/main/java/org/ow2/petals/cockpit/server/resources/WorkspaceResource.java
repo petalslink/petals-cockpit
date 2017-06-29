@@ -156,6 +156,7 @@ public class WorkspaceResource {
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public WorkspaceOverviewContent put(WorkspaceUpdate update) {
         return DSL.using(jooq).transactionResult(conf -> {
             WorkspacesRecord ws = get(conf);
