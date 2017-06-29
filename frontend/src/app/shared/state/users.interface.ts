@@ -21,7 +21,11 @@ import {
 } from 'app/shared/services/users.service';
 import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
 
-export interface IUserUI {}
+export interface IUserUI {
+  isAdding: boolean;
+  isDeleting: boolean;
+  isModifying: boolean;
+}
 
 // used within table
 export interface IUserRow extends IUserUI, IUserBackend {}
@@ -35,9 +39,10 @@ interface IUsersCommon {
   connectedUser: ICurrentUser;
 
   isConnecting: boolean;
-  isConnected: boolean;
   isDisconnecting: boolean;
   connectionFailed: boolean;
+
+  isFetchingUsers: boolean;
 }
 
 export interface IUsersTable extends IUsersCommon, JsTable<IUserRow> {}
@@ -50,6 +55,9 @@ export function userRowFactory(): IUserRow {
   return {
     id: null,
     name: null,
+    isAdding: false,
+    isDeleting: false,
+    isModifying: false,
   };
 }
 
@@ -59,8 +67,9 @@ export function usersTableFactory(): IUsersTable {
     connectedUser: null,
 
     isConnecting: false,
-    isConnected: false,
     isDisconnecting: false,
     connectionFailed: false,
+
+    isFetchingUsers: false,
   };
 }

@@ -23,11 +23,11 @@ import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
 
-import { UsersService } from '../services/users.service';
-
+import { UsersService, IUserBackend } from '../services/users.service';
 import { environment } from '../../../environments/environment';
-
 import { Users } from 'app/shared/state/users.actions';
+
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
 
 @Injectable()
 export class UsersEffects {
@@ -37,6 +37,109 @@ export class UsersEffects {
     private usersService: UsersService,
     private notification: NotificationsService
   ) {}
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true })
+  fetchAll$: Observable<Action> = this.actions$
+    .ofType(Users.FetchAllType)
+    .switchMap((action: Users.FetchAll) =>
+      this.usersService
+        .getAll()
+        .map(
+          user =>
+            new Users.Fetched(
+              toJsTable<IUserBackend>(
+                user.reduce((p, c) => ({ ...p, [c.id]: c }), {})
+              )
+            )
+        )
+        .catch(err => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error caught in users.effects.ts: ofType(Users.FetchAllType)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of(new Users.FetchAllError());
+        })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true })
+  add$: Observable<Action> = this.actions$
+    .ofType(Users.AddType)
+    .flatMap((action: Users.Add) =>
+      this.usersService
+        .add(action.payload)
+        .map(
+          () =>
+            new Users.AddSuccess({
+              id: action.payload.username,
+              name: action.payload.name,
+            })
+        )
+        .catch(err => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error caught in users.effects.ts: ofType(Users.AddType)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of(
+            new Users.AddError({ id: action.payload.username })
+          );
+        })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true })
+  delete$: Observable<Action> = this.actions$
+    .ofType(Users.DeleteType)
+    .flatMap((action: Users.Delete) =>
+      this.usersService
+        .delete(action.payload.id)
+        .map(() => new Users.DeleteSuccess({ id: action.payload.id }))
+        .catch(err => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error caught in users.effects.ts: ofType(Users.DeleteType)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of(new Users.DeleteError(action.payload));
+        })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true })
+  modify$: Observable<Action> = this.actions$
+    .ofType(Users.ModifyType)
+    .flatMap((action: Users.Modify) =>
+      this.usersService
+        .modify(action.payload.id, action.payload.changes)
+        .map(() => new Users.ModifySuccess(action.payload))
+        .catch(err => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error caught in users.effects.ts: ofType(Users.ModifyType)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of(new Users.ModifyError(action.payload));
+        })
+    );
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })

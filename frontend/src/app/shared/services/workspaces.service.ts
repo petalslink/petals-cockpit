@@ -36,7 +36,8 @@ export interface IWorkspaceBackend extends IWorkspaceBackendCommon {
 }
 
 export interface IWorkspaceBackendDetails
-  extends IWorkspaceBackendDetailsCommon {}
+  extends IWorkspaceBackend,
+    IWorkspaceBackendDetailsCommon {}
 
 export abstract class WorkspacesService {
   abstract fetchWorkspaces(): Observable<Response>;

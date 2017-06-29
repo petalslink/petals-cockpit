@@ -45,19 +45,24 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
   }
 
   postWorkspace(name: string) {
-    const workspace = workspacesService.getNewWorkspace(name);
+    const mock = this.usersService as UsersServiceMock;
+    const workspace = workspacesService
+      .create([mock.getCurrentUser().id], name)
+      .getDetails().workspace;
 
     return helper.responseBody(workspace).delay(environment.mock.httpDelay);
   }
 
   fetchWorkspace(id: string) {
-    return helper
-      .responseBody(workspacesService.getWorkspaceOverview(id))
-      .delay(environment.mock.httpDelay);
+    const ws = workspacesService.get(id);
+
+    return (ws
+      ? helper.responseBody(ws.getDetails())
+      : helper.response(404)).delay(environment.mock.httpDelay);
   }
 
   setDescription(id: string, description: string) {
-    workspacesService.getWorkspace(id).description = description;
+    workspacesService.get(id).description = description;
     return helper.response(204).delay(environment.mock.httpDelay);
   }
 
@@ -65,7 +70,7 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
     return helper.response(204).do(_ => {
       // simulate the backend sending the answer on the SSE
       setTimeout(() => {
-        workspacesService.deleteWorkspace(id);
+        workspacesService.delete(id);
         (this.sseService as SseServiceMock).triggerSseEvent(
           SseWorkspaceEvent.WORKSPACE_DELETED.event,
           { id }

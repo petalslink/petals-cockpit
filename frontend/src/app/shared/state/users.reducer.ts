@@ -15,27 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { environment } from 'environments/environment';
 import {
   putById,
   updateById,
   mergeInto,
   JsTable,
+  removeById,
 } from 'app/shared/helpers/jstable.helper';
 import {
   IUsersTable,
   usersTableFactory,
   userRowFactory,
+  IUserRow,
 } from 'app/shared/state/users.interface';
 import {
   IUserBackend,
   ICurrentUserBackend,
+  IUserNew,
 } from 'app/shared/services/users.service';
 import { Users } from 'app/shared/state/users.actions';
 
 export namespace UsersReducer {
   type All =
+    | Users.FetchAll
+    | Users.FetchAllError
     | Users.Fetched
+    | Users.Add
+    | Users.AddSuccess
+    | Users.AddError
+    | Users.Delete
+    | Users.DeleteSuccess
+    | Users.DeleteError
+    | Users.Modify
+    | Users.ModifySuccess
+    | Users.ModifyError
     | Users.Connect
     | Users.ConnectError
     | Users.ConnectSuccess
@@ -44,15 +57,45 @@ export namespace UsersReducer {
     | Users.DisconnectSuccess;
 
   export function reducer(
-    table = {
-      ...usersTableFactory(),
-      isConnected: environment.mock ? environment.mock.alreadyConnected : false,
-    },
+    table = usersTableFactory(),
     action: All
   ): IUsersTable {
     switch (action.type) {
+      case Users.FetchAllType: {
+        return fetchAll(table);
+      }
+      case Users.FetchAllErrorType: {
+        return fetchAllError(table);
+      }
       case Users.FetchedType: {
         return fetched(table, action.payload);
+      }
+      case Users.AddType: {
+        return add(table, action.payload);
+      }
+      case Users.AddSuccessType: {
+        return addSuccess(table, action.payload);
+      }
+      case Users.AddErrorType: {
+        return addError(table, action.payload);
+      }
+      case Users.DeleteType: {
+        return deletee(table, action.payload);
+      }
+      case Users.DeleteSuccessType: {
+        return deleteSuccess(table, action.payload);
+      }
+      case Users.DeleteErrorType: {
+        return deleteError(table, action.payload);
+      }
+      case Users.ModifyType: {
+        return modify(table, action.payload);
+      }
+      case Users.ModifySuccessType: {
+        return modifySuccess(table, action.payload);
+      }
+      case Users.ModifyErrorType: {
+        return modifyError(table, action.payload);
       }
       case Users.ConnectType: {
         return connect(table);
@@ -77,14 +120,81 @@ export namespace UsersReducer {
     }
   }
 
-  function fetched(
-    table: IUsersTable,
-    payload: JsTable<IUserBackend>
-  ): IUsersTable {
-    return mergeInto(table, payload, userRowFactory);
+  function fetchAll(table: IUsersTable) {
+    return {
+      ...table,
+      ...<IUsersTable>{
+        isFetchingUsers: true,
+      },
+    };
   }
 
-  function connect(table: IUsersTable): IUsersTable {
+  function fetchAllError(table: IUsersTable) {
+    return {
+      ...table,
+      ...<IUsersTable>{
+        isFetchingUsers: false,
+      },
+    };
+  }
+
+  function fetched(table: IUsersTable, payload: JsTable<IUserBackend>) {
+    return {
+      ...mergeInto(table, payload, userRowFactory),
+      ...<IUsersTable>{
+        isFetchingUsers: false,
+      },
+    };
+  }
+
+  function add(table: IUsersTable, payload: IUserNew) {
+    return putById(
+      table,
+      payload.username,
+      <IUserRow>{ id: payload.username, name: payload.name, isAdding: true },
+      userRowFactory
+    );
+  }
+
+  function addSuccess(table: IUsersTable, payload: IUserBackend) {
+    return updateById(table, payload.id, payload);
+  }
+
+  function addError(table: IUsersTable, payload: { id: string }) {
+    return removeById(table, payload.id);
+  }
+
+  function deletee(table: IUsersTable, payload: { id: string }) {
+    return updateById(table, payload.id, <IUserRow>{ isDeleting: true });
+  }
+
+  function deleteSuccess(table: IUsersTable, payload: { id: string }) {
+    return removeById(table, payload.id);
+  }
+
+  function deleteError(table: IUsersTable, payload: { id: string }) {
+    return updateById(table, payload.id, <IUserRow>{ isDeleting: false });
+  }
+
+  function modify(table: IUsersTable, payload: { id: string }) {
+    return updateById(table, payload.id, <IUserRow>{ isModifying: true });
+  }
+
+  function modifySuccess(
+    table: IUsersTable,
+    payload: { id: string; changes: Partial<IUserBackend> }
+  ) {
+    return updateById(table, payload.id, {
+      ...payload.changes,
+      isModifying: false,
+    });
+  }
+
+  function modifyError(table: IUsersTable, payload: { id: string }) {
+    return updateById(table, payload.id, <IUserRow>{ isModifying: false });
+  }
+
+  function connect(table: IUsersTable) {
     return {
       ...table,
       ...<IUsersTable>{ isConnecting: true },
@@ -94,7 +204,7 @@ export namespace UsersReducer {
   function connectSuccess(
     table: IUsersTable,
     payload: { user: ICurrentUserBackend }
-  ): IUsersTable {
+  ) {
     const id = payload.user.id;
     const user = { id, name: payload.user.name };
 
@@ -110,26 +220,25 @@ export namespace UsersReducer {
     };
   }
 
-  function connectError(table: IUsersTable): IUsersTable {
+  function connectError(table: IUsersTable) {
     return {
       ...table,
       ...<IUsersTable>{
         isConnecting: false,
         connectionFailed: true,
-        isConnected: false,
         connectedUser: null,
       },
     };
   }
 
-  function disconnect(table: IUsersTable): IUsersTable {
+  function disconnect(table: IUsersTable) {
     return {
       ...table,
       ...<IUsersTable>{ isDisconnecting: true },
     };
   }
 
-  function disconnectError(table: IUsersTable): IUsersTable {
+  function disconnectError(table: IUsersTable) {
     return {
       ...table,
       ...<IUsersTable>{

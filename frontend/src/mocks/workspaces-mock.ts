@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { omit, flatMap, assign } from 'lodash';
+import { flatMap, assign } from 'lodash';
 
 import {
   Bus,
@@ -23,49 +23,36 @@ import {
   busesService,
   busesInProgressService,
 } from './buses-mock';
-import { users } from './backend-mock';
 import { IBusImport } from 'app/shared/services/buses.service';
+import { BackendUser } from 'mocks/users-mock';
+import {
+  IWorkspaceBackend,
+  IWorkspaceBackendDetails,
+} from 'app/shared/services/workspaces.service';
+import { IUserBackend } from 'app/shared/services/users.service';
+import { validContainers } from 'mocks/backend-mock';
 
 function toObj<A>(arr: { toObj: () => A }[]): A {
   return assign.apply({}, arr.map(c => c.toObj()));
 }
-
-// buses that can be imported
-export const validContainers = ['192.168.0.1:7700'];
 
 export class Workspace {
   private static cpt = 0;
   public readonly id: string;
   public readonly name: string;
   public description: string;
-  private readonly users: string[];
+  private readonly users = new Map<string, BackendUser>();
   private readonly buses = new Map<string, Bus>();
   private readonly busesInProgress = new Map<string, BusInProgress>();
 
-  private static workspaceUsers(i: number) {
-    switch (i) {
-      case 1:
-        return ['admin', 'bescudie', 'mrobert', 'cchevalier', 'vnoel'];
-      default:
-        return ['admin'];
-    }
-  }
-
-  private static workspaceDescription(i: number) {
-    switch (i) {
-      case 0:
-        return 'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.';
-      default:
-        return 'Put some description in **markdown** for the workspace here.';
-    }
-  }
-
-  constructor(name?: string) {
+  constructor(users: string[] = ['admin'], name?: string) {
     const i = Workspace.cpt++;
     this.id = `idWks${i}`;
     this.name = name ? name : `Workspace ${i}`;
-    this.description = Workspace.workspaceDescription(i);
-    this.users = Workspace.workspaceUsers(i);
+    this.description =
+      'Put some description in **markdown** for the workspace here.';
+    users.forEach(u => this.users.set(u, BackendUser.get(u)));
+
     // by default add 1 bus
     this.addBus();
 
@@ -74,13 +61,37 @@ export class Workspace {
     this.addBusInProgress();
   }
 
-  toObj() {
+  getDetails(): {
+    workspace: IWorkspaceBackendDetails;
+    users: { [id: string]: IUserBackend };
+  } {
     return {
-      id: this.id,
-      name: this.name,
-      description: this.description,
-      users: this.users,
+      workspace: {
+        id: this.id,
+        name: this.name,
+        description: this.description,
+        users: this.getUsersIds(),
+      },
+      users: toObj(this.getUsers()),
     };
+  }
+
+  toObj(): { [id: string]: IWorkspaceBackend } {
+    return {
+      [this.id]: {
+        id: this.id,
+        name: this.name,
+        users: this.getUsersIds(),
+      },
+    };
+  }
+
+  getUsersIds() {
+    return Array.from(this.users.keys());
+  }
+
+  getUsers() {
+    return Array.from(this.users.values());
   }
 
   getBuses() {
@@ -91,14 +102,14 @@ export class Workspace {
     return Array.from(this.busesInProgress.values());
   }
 
-  addBusInProgress(importData?: IBusImport) {
+  private addBusInProgress(importData?: IBusImport) {
     const bus = busesInProgressService.create(this, importData);
     this.busesInProgress.set(bus.id, bus);
 
     return bus;
   }
 
-  addBus() {
+  private addBus() {
     const bus = busesService.create(this);
     this.buses.set(bus.id, bus);
 
@@ -147,100 +158,9 @@ export class Workspace {
       },
     };
   }
-}
 
-export class Workspaces {
-  // map to cache the created workspaces
-  private readonly memoizedWorkspaces = new Map<
-    string,
-    { wks: Workspace; composedWks: any }
-  >();
-
-  constructor() {
-    // generate 2 workspaces by default
-    // pass undefined as name to auto generate it
-    this.getNewWorkspace(undefined);
-    this.getNewWorkspace(undefined);
-  }
-
-  /**
-   * getWorkspace
-   *
-   * return the workspace which has an id `idWks`
-   *
-   * @export
-   * @param {string} idWks The workspace id you're looking for
-   * @returns {any} the workspace
-   */
-  getWorkspace(id: string) {
-    return this.memoizedWorkspaces.get(id).wks;
-  }
-
-  /**
-   * getWorkspaces
-   *
-   * @export
-   * @returns {any} the workspaces list
-   */
-  private getWorkspaces(user: string) {
-    const workspacesIds = Array.from(this.memoizedWorkspaces.keys());
-
-    return workspacesIds.reduce((acc, workspaceId) => {
-      const ws = this.getWorkspace(workspaceId).toObj();
-      if (ws.users.includes(user)) {
-        return {
-          ...acc,
-          // this is potentially big, so the backend des not return it here
-          [workspaceId]: omit(ws, 'description'),
-        };
-      } else {
-        return acc;
-      }
-    }, {});
-  }
-
-  /**
-   * getWorkspacesListAndUsers
-   *
-   * @export
-   * @returns {any} the workspaces list and users
-   */
-  getWorkspacesListAndUsers(user: string) {
-    const workspaces = this.getWorkspaces(user);
-
-    return { workspaces, users };
-  }
-
-  getWorkspaceOverview(id: string) {
-    const workspace = this.getWorkspace(id).toObj();
-
-    return { workspace, users };
-  }
-
-  /**
-   * getWorkspaceComposed
-   *
-   * return the composed workspace which has an id `idWks`
-   * if it already exists, will return the existing one
-   * otherwise will create it with some default values
-   *
-   * @export
-   * @param {string} id The workspace id you're looking for
-   * @returns {any} the workspace composed
-   */
-  getWorkspaceComposed(id?: string, name?: string) {
-    if (id) {
-      if (this.memoizedWorkspaces.has(id)) {
-        return { ...this.memoizedWorkspaces.get(id).composedWks };
-      } else {
-        return null;
-      }
-    }
-
-    const newWorkspace = new Workspace(name);
-
-    const busesInProgress = newWorkspace.getBusesInProgress();
-    const buses = newWorkspace.getBuses();
+  toFullObj() {
+    const buses = this.getBuses();
 
     const containers = flatMap(buses, b => b.getContainers());
     const components = flatMap(containers, c => c.getComponents());
@@ -250,10 +170,9 @@ export class Workspaces {
     const serviceUnits = flatMap(components, c => c.getServiceUnits());
     const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
-    const composedWks = {
-      workspace: newWorkspace.toObj(),
-      users,
-      busesInProgress: toObj(busesInProgress),
+    return {
+      ...this.getDetails(),
+      busesInProgress: toObj(this.getBusesInProgress()),
       buses: toObj(buses),
       containers: toObj(containers),
       components: toObj(components),
@@ -261,23 +180,54 @@ export class Workspaces {
       serviceUnits: toObj(serviceUnits),
       sharedLibraries: toObj(sharedLibraries),
     };
+  }
+}
 
-    this.memoizedWorkspaces.set(newWorkspace.id, {
-      wks: newWorkspace,
-      composedWks,
+export class Workspaces {
+  private readonly workspaces = new Map<string, Workspace>();
+
+  get(id: string) {
+    return this.workspaces.get(id);
+  }
+
+  getWorkspacesListAndUsers(user: string) {
+    const workspaces = Array.from(this.workspaces.values()).filter(ws =>
+      ws.getUsersIds().includes(user)
+    );
+
+    return {
+      workspaces: toObj(workspaces),
+      users: toObj(flatMap(workspaces, w => w.getUsers())),
+    };
+  }
+
+  create(users?: string[], name?: string) {
+    const ws = new Workspace(users, name);
+    this.workspaces.set(ws.id, ws);
+    return ws;
+  }
+
+  delete(id: string) {
+    const ws = this.get(id);
+    ws.getUsers().forEach(u => {
+      if (u.lastWorkspace === id) {
+        u.lastWorkspace = null;
+      }
     });
-
-    return { ...composedWks };
-  }
-
-  getNewWorkspace(name: string) {
-    const wksComposed = this.getWorkspaceComposed(undefined, name);
-    return wksComposed.workspace;
-  }
-
-  deleteWorkspace(id: string) {
-    this.memoizedWorkspaces.delete(id);
+    this.workspaces.delete(id);
   }
 }
 
 export const workspacesService = new Workspaces();
+
+const ws = workspacesService.create();
+ws.description =
+  'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.';
+
+workspacesService.create([
+  'admin',
+  'bescudie',
+  'mrobert',
+  'cchevalier',
+  'vnoel',
+]);

@@ -45,7 +45,7 @@ export class SseServiceMock extends SseService {
     });
   }
 
-  public watchWorkspaceRealTime(workspaceId: string): Observable<Action> {
+  public watchWorkspaceRealTime(id: string): Observable<Action> {
     this.stopWatchingWorkspace();
 
     return new Observable<Action>(observer => {
@@ -55,17 +55,15 @@ export class SseServiceMock extends SseService {
 
       this.current = observer;
 
-      const workspaceContent = workspacesService.getWorkspaceComposed(
-        workspaceId
-      );
+      const workspace = workspacesService.get(id);
 
-      if (workspaceContent) {
+      if (workspace) {
         // simulate the backend sending the first event of the SSE
         setTimeout(
           () =>
             this.triggerSseEvent(
               SseWorkspaceEvent.WORKSPACE_CONTENT.event,
-              workspaceContent
+              workspace.toFullObj()
             ),
           500
         );

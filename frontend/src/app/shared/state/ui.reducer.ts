@@ -71,42 +71,42 @@ export namespace UiReducer {
     }
   }
 
-  function setLanguage(ui: IUi, payload: { language: string }): IUi {
+  function setLanguage(ui: IUi, payload: { language: string }) {
     return {
       ...ui,
       ...<IUi>{ language: payload.language },
     };
   }
 
-  function toggleSidenav(ui: IUi): IUi {
+  function toggleSidenav(ui: IUi) {
     return {
       ...ui,
       ...<IUi>{ isSidenavVisible: !ui.isSidenavVisible },
     };
   }
 
-  function openSidenav(ui: IUi): IUi {
+  function openSidenav(ui: IUi) {
     return {
       ...ui,
       ...<IUi>{ isSidenavVisible: true },
     };
   }
 
-  function closeSidenav(ui: IUi): IUi {
+  function closeSidenav(ui: IUi) {
     return {
       ...ui,
       ...<IUi>{ isSidenavVisible: false },
     };
   }
 
-  function openWorkspaces(ui: IUi): IUi {
+  function openWorkspaces(ui: IUi) {
     return {
       ...ui,
       ...<IUi>{ isPopupListWorkspacesVisible: true },
     };
   }
 
-  function closeWorkspaces(ui: IUi): IUi {
+  function closeWorkspaces(ui: IUi) {
     return {
       ...ui,
       ...<IUi>{ isPopupListWorkspacesVisible: false },
@@ -120,7 +120,7 @@ export namespace UiReducer {
       titleMainPart2?: string;
       titleSubPart?: string;
     }
-  ): IUi {
+  ) {
     return {
       ...ui,
       ...<IUi>{
@@ -137,14 +137,14 @@ export namespace UiReducer {
     };
   }
 
-  function changeScreenSize(ui: IUi, payload: { screenSize: string }): IUi {
+  function changeScreenSize(ui: IUi, payload: { screenSize: string }) {
     return {
       ...ui,
       ...<IUi>{ screenSize: payload.screenSize },
     };
   }
 
-  function closeWorkspace(ui: IUi, payload: { goToWorkspaces?: boolean }): IUi {
+  function closeWorkspace(ui: IUi, payload: { goToWorkspaces?: boolean }) {
     if (payload && payload.goToWorkspaces) {
       return {
         ...ui,

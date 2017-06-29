@@ -120,7 +120,7 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
     this.store$
       .select(
         state =>
-          !state.workspaces.selectedWorkspaceId && state.users.isConnected
+          !state.workspaces.selectedWorkspaceId && state.users.connectedUser
       )
       .takeUntil(this.onDestroy$)
       .do(notOnWsButConnected => {
