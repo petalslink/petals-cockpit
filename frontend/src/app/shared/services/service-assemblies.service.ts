@@ -42,11 +42,13 @@ export interface IServiceAssemblyBackendSSECommon {
 
 export interface IServiceAssemblyBackendDetailsCommon {}
 
-export interface IServiceAssemblyBackendSSE extends IServiceAssemblyBackendSSECommon {
+export interface IServiceAssemblyBackendSSE
+  extends IServiceAssemblyBackendSSECommon {
   serviceUnits: string[];
 }
 
-export interface IServiceAssemblyBackendDetails extends IServiceAssemblyBackendDetailsCommon {}
+export interface IServiceAssemblyBackendDetails
+  extends IServiceAssemblyBackendDetailsCommon {}
 
 export abstract class ServiceAssembliesService {
   abstract getDetailsServiceAssembly(

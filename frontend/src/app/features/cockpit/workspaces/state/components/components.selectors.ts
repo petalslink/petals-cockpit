@@ -29,7 +29,10 @@ import {
 } from 'app/shared/services/components.service';
 import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 
-export interface IComponentWithSLsAndSUs extends IComponentUI, IComponentBackendSSECommon, IComponentBackendDetailsCommon {
+export interface IComponentWithSLsAndSUs
+  extends IComponentUI,
+    IComponentBackendSSECommon,
+    IComponentBackendDetailsCommon {
   serviceUnits: IServiceUnitRow[];
   sharedLibraries: ISharedLibraryRow[];
 }

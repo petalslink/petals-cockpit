@@ -167,9 +167,10 @@ export namespace SharedLibrariesReducer {
     table: ISharedLibrariesTable,
     payload: ISharedLibraryRow
   ): ISharedLibrariesTable {
-    const selectedSharedLibraryid = table.selectedSharedLibraryId === payload.id
-      ? ''
-      : table.selectedSharedLibraryId;
+    const selectedSharedLibraryid =
+      table.selectedSharedLibraryId === payload.id
+        ? ''
+        : table.selectedSharedLibraryId;
 
     return {
       ...removeById(table, payload.id),

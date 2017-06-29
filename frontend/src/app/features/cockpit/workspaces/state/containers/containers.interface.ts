@@ -41,9 +41,15 @@ export interface IContainerUI {
   errorDeploymentSharedLibrary: string;
 }
 
-export interface IContainerRow extends IContainerUI, IContainerBackendSSE, IContainerBackendDetails {}
+export interface IContainerRow
+  extends IContainerUI,
+    IContainerBackendSSE,
+    IContainerBackendDetails {}
 
-export interface IContainer extends IContainerUI, IContainerBackendSSECommon, IContainerBackendDetailsCommon {
+export interface IContainer
+  extends IContainerUI,
+    IContainerBackendSSECommon,
+    IContainerBackendDetailsCommon {
   components: IComponents;
   serviceAssemblies: IServiceAssemblies;
   sharedLibraries: ISharedLibraries;
@@ -53,9 +59,9 @@ export interface IContainersCommon {
   selectedContainerId: string;
 }
 
-export interface IContainersTable extends IContainersCommon, JsTable<
-  IContainerRow
-> {}
+export interface IContainersTable
+  extends IContainersCommon,
+    JsTable<IContainerRow> {}
 
 export interface IContainers extends IContainersCommon {
   list: IContainer[];

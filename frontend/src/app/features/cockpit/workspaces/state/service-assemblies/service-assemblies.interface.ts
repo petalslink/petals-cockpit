@@ -31,17 +31,23 @@ export interface IServiceAssemblyUI {
   isFetchingDetails: boolean;
 }
 
-export interface IServiceAssemblyRow extends IServiceAssemblyUI, IServiceAssemblyBackendSSE, IServiceAssemblyBackendDetails {}
+export interface IServiceAssemblyRow
+  extends IServiceAssemblyUI,
+    IServiceAssemblyBackendSSE,
+    IServiceAssemblyBackendDetails {}
 
-export interface IServiceAssembly extends IServiceAssemblyUI, IServiceAssemblyBackendSSECommon, IServiceAssemblyBackendDetailsCommon {}
+export interface IServiceAssembly
+  extends IServiceAssemblyUI,
+    IServiceAssemblyBackendSSECommon,
+    IServiceAssemblyBackendDetailsCommon {}
 
 interface IServiceAssembliesCommon {
   selectedServiceAssemblyId: string;
 }
 
-export interface IServiceAssembliesTable extends IServiceAssembliesCommon, JsTable<
-  IServiceAssemblyRow
-> {}
+export interface IServiceAssembliesTable
+  extends IServiceAssembliesCommon,
+    JsTable<IServiceAssemblyRow> {}
 
 export interface IServiceAssemblies extends IServiceAssembliesCommon {
   list: IServiceAssembly[];

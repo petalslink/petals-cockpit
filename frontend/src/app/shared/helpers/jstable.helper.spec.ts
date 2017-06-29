@@ -28,7 +28,10 @@ import {
 } from 'app/shared/helpers/jstable.helper';
 
 describe('helpers to manipulate tables', () => {
-  interface T { v: string; i: number }
+  interface T {
+    v: string;
+    i: number;
+  }
   function init(): T {
     return { v: '', i: 0 };
   }

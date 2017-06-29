@@ -117,7 +117,7 @@ div > .mat-dialog-container {
   font-size: 12px;
 }
 
-.error{
+.error {
   padding: 12px;
   background-color: rgba(255, 0, 0, 0.2);
   color: mat-color($mat-red, 500, 1);
@@ -162,11 +162,21 @@ div > .mat-dialog-container {
 // use <prettyjson [obj]="someObj"></prettyjson>
 // instead of json pipe to have a pretty debug
 pre {
-  .string { color: green; }
-  .number { color: darkorange; }
-  .boolean { color: blue; }
-  .null { color: magenta; }
-  .key { color: red; }
+  .string {
+    color: green;
+  }
+  .number {
+    color: darkorange;
+  }
+  .boolean {
+    color: blue;
+  }
+  .null {
+    color: magenta;
+  }
+  .key {
+    color: red;
+  }
 }
 
 // custom scrollbar only for chrome
@@ -180,12 +190,12 @@ pre {
 }
 ::-webkit-scrollbar-corner {
   background-color: rgba(0, 0, 0, 0.17);
-  border-left: 1px solid rgba(0,0,0,0.17);
-  border-top: 1px solid rgba(0,0,0,0.17);
+  border-left: 1px solid rgba(0, 0, 0, 0.17);
+  border-top: 1px solid rgba(0, 0, 0, 0.17);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.5);
-  box-shadow: 1px 1px  2px rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 ::-webkit-scrollbar:disabled {
   background-color: rgba(0, 0, 0, 0.03);
@@ -193,24 +203,24 @@ pre {
   height: 0px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0,0,0,0.55);
+  background: rgba(0, 0, 0, 0.55);
 }
 ::-webkit-scrollbar-thumb:active {
-  background: rgba(0,0,0,0.61);
+  background: rgba(0, 0, 0, 0.61);
 }
 ::-webkit-scrollbar-track:vertical,
 ::-webkit-scrollbar-track:vertical:hover {
-  border-left: 1px solid rgba(0,0,0,0.17);
+  border-left: 1px solid rgba(0, 0, 0, 0.17);
 }
 ::-webkit-scrollbar-track:vertical:active {
-  border-left: 1px solid rgba(0,0,0,0.20);
+  border-left: 1px solid rgba(0, 0, 0, 0.20);
 }
 ::-webkit-scrollbar-track:horizontal,
 ::-webkit-scrollbar-track:horizontal:hover {
-  border-top: 1px solid rgba(0,0,0,0.17);
+  border-top: 1px solid rgba(0, 0, 0, 0.17);
 }
 ::-webkit-scrollbar-track:horizontal:active {
-  border-top: 1px solid rgba(0,0,0,0.20);
+  border-top: 1px solid rgba(0, 0, 0, 0.20);
 }
 
 .prefix-toolbar-title {
@@ -245,7 +255,8 @@ md-sidenav {
   height: 10px;
   border-radius: 50%;
   background-color: $bg;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 3px 1px, inset $shadow1 0 -1px 3px, $shadow2 0 1px 3px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 3px 1px, inset $shadow1 0 -1px 3px,
+    $shadow2 0 1px 3px;
 }
 
 .green-led {

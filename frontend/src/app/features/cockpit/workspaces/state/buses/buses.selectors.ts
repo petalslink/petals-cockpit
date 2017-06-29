@@ -27,7 +27,10 @@ import {
 } from 'app/shared/services/buses.service';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 
-export interface IBusWithContainers extends IBusUI, IBusBackendSSECommon, IBusBackendDetailsCommon {
+export interface IBusWithContainers
+  extends IBusUI,
+    IBusBackendSSECommon,
+    IBusBackendDetailsCommon {
   containers: IContainerRow[];
 }
 

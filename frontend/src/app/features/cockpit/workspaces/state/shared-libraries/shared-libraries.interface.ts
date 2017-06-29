@@ -31,17 +31,23 @@ export interface ISharedLibraryUI {
   errorChangeState: string;
 }
 
-export interface ISharedLibraryRow extends ISharedLibraryUI, ISharedLibraryBackendSSE, ISharedLibraryBackendDetails {}
+export interface ISharedLibraryRow
+  extends ISharedLibraryUI,
+    ISharedLibraryBackendSSE,
+    ISharedLibraryBackendDetails {}
 
-export interface ISharedLibrary extends ISharedLibraryUI, ISharedLibraryBackendSSECommon, ISharedLibraryBackendDetailsCommon {}
+export interface ISharedLibrary
+  extends ISharedLibraryUI,
+    ISharedLibraryBackendSSECommon,
+    ISharedLibraryBackendDetailsCommon {}
 
 interface ISharedLibrariesCommon {
   selectedSharedLibraryId: string;
 }
 
-export interface ISharedLibrariesTable extends ISharedLibrariesCommon, JsTable<
-  ISharedLibraryRow
-> {}
+export interface ISharedLibrariesTable
+  extends ISharedLibrariesCommon,
+    JsTable<ISharedLibraryRow> {}
 
 export interface ISharedLibraries extends ISharedLibrariesCommon {
   list: ISharedLibrary[];

@@ -27,7 +27,9 @@
 }
 
 @-webkit-keyframes sk-scaleout {
-  0% { -webkit-transform: scale(0) }
+  0% {
+    -webkit-transform: scale(0);
+  }
   100% {
     -webkit-transform: scale(1.0);
     opacity: 0;
@@ -38,7 +40,8 @@
   0% {
     -webkit-transform: scale(0);
     transform: scale(0);
-  } 100% {
+  }
+  100% {
     -webkit-transform: scale(1.0);
     transform: scale(1.0);
     opacity: 0;

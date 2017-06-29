@@ -25,7 +25,10 @@ declare namespace sse {
   }
 
   interface IEventSourceStatic extends EventTarget {
-    new (url: string, eventSourceInitDict?: IEventSourceInit): IEventSourceStatic;
+    new (
+      url: string,
+      eventSourceInitDict?: IEventSourceInit
+    ): IEventSourceStatic;
     // The serialisation of this EventSource object's url
     url: string;
     withCredentials: boolean;
