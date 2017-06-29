@@ -26,6 +26,7 @@ import { Matcher, textToMatchInElement } from '../utils';
 import { waitTimeout } from '../common';
 import { SetupPage } from './setup.po';
 import { LoginPage } from './login.po';
+import { WorkspacesPage } from './workspaces.po';
 
 export class PetalsCockpitPage {
   goTo(to = '/') {
@@ -56,7 +57,7 @@ export class PetalsCockpitPage {
 
   logout() {
     // open the user menu
-    $(`app-cockpit md-toolbar .btn-avatar-user`).click();
+    $(`app-header .header-toolbar .btn-avatar-user`).click();
 
     // and logout
     const logout = $(`.btn-logout-user`);
@@ -110,7 +111,7 @@ export class PetalsCockpitPage {
       .isPresent()
       .then(present => {
         if (present) {
-          return $(`app-cockpit md-toolbar-row button.sidenav-toggle`).click();
+          return $(`app-cockpit .header-toolbar button.sidenav-toggle`).click();
         }
       });
   }
@@ -120,8 +121,14 @@ export class PetalsCockpitPage {
       .isPresent()
       .then(present => {
         if (present) {
-          return $(`app-cockpit md-toolbar-row button.sidenav-toggle`).click();
+          return $(`app-cockpit .header-toolbar button.sidenav-toggle`).click();
         }
       });
+  }
+
+  openWorkspaces() {
+    $(`app-header .toolbar-logo`).click();
+
+    return WorkspacesPage.waitAndGet();
   }
 }

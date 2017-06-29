@@ -39,7 +39,7 @@ describe(`Workspaces`, () => {
       .loginToWorkspaces(`vnoel`, `vnoel`);
 
     // the sidebar button should not be visible
-    expect($(`app-cockpit .sidenav-toggle`).isPresent()).toBe(false);
+    expect($(`app-header .sidenav-toggle`).isPresent()).toBe(false);
 
     // check that 1 workspace is displayed
     expect(workspaces.workspacesCards.count()).toEqual(1);
@@ -77,7 +77,7 @@ describe(`Workspaces`, () => {
     // the workspace dialog hides stuffs so we must check if
 
     // 1) the logout button should be visible
-    expect($(`app-cockpit .sidenav-toggle`).isEnabled()).toBe(true);
+    expect($(`app-header .sidenav-toggle`).isEnabled()).toBe(true);
     // 2) we can still click on the sidenav button
     page.closeSidenav();
   });

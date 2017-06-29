@@ -13,6 +13,38 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxFill fxLayoutAlign="center center">
-  Welcome to Petals Cockpit
-</div>
+<md-sidenav-container *ngIf="isOnWorkspace$ | async" fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">
+  <md-sidenav fxLayout="column" *ngIf="workspace$ | async as workspace" [opened]="sidenavVisible$ | async" [mode]="sidenavMode$ | async">
+    <div fxLayout="row">
+      <button fxFlex="100" md-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', workspace.id]"
+        class="workspace-name width-full no-border-radius text-upper" color="accent">
+        {{ workspace.name }}
+      </button>
+
+      <button fxFlex md-raised-button (click)="openWorkspacesDialog()" class="change-workspace width-full no-border-radius" color="accent">
+        <md-icon>view_list</md-icon>
+      </button>
+    </div>
+
+    <md-tab-group fxFlex>
+      <md-tab label="Petals">
+        <app-petals-menu-view></app-petals-menu-view>
+      </md-tab>
+
+      <md-tab label="Service">
+        Some more tab content
+      </md-tab>
+
+      <md-tab label="Api">
+        Some more tab content
+      </md-tab>
+    </md-tab-group>
+    <!--<router-outlet name="aux"></router-outlet>-->
+  </md-sidenav>
+
+  <router-outlet></router-outlet>
+</md-sidenav-container>
+
+<ng-template #workspaceList>
+  <app-workspaces-list (fetch)="fetch($event)" [workspaces]="workspaces$ | async" [user]="user$ | async"></app-workspaces-list>
+</ng-template>

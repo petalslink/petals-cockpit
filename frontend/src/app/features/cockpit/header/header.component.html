@@ -14,26 +14,26 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <md-toolbar color="primary" class="header-toolbar" [class.mat-elevation-z6]="showShadow">
-  <div class="toolbar-logo">
+  <button md-button class="toolbar-logo" (click)="closeWorkspace()">
     <img class="logo-toolbar" [src]="logo()">
-  </div>
+  </button>
 
   <button *ngIf="isOnWorkspace" md-button (click)="toggleSidenav()" class="sidenav-toggle">
     <md-icon>menu</md-icon>
   </button>
 
-  <span fxLayout="row" fxFlex class="text-upper">
-    {{ ui.titleMainPart1 }}
-
+  <span fxLayout="row" fxFlex class="text-upper" [ngClass.gt-sm]="'margin-right-x1'">
+    <span [hidden]="isSmallScreen$ | async" *ngIf="ui.titleMainPart1">{{ ui.titleMainPart1 }}</span>
     <span *ngIf="ui.titleMainPart2" fxLayoutAlign="center center">
-      <md-icon>chevron_right</md-icon> <span class="color-accent-light-bold text-upper" md-line>{{ ui.titleMainPart2 }}</span>
+      <md-icon *ngIf="!(isSmallScreen$ | async)">chevron_right</md-icon>
+      <span class="color-accent-light-bold text-upper" [ngClass.lt-sm]="'pnl-title-main'">{{ ui.titleMainPart2 }}</span>
   </span>
   </span>
 
-  <button md-icon-button class="margin-right-x2 btn-logout-user" [disabled]="isDisconnecting" (click)="disconnect()">
+  <button md-icon-button class="btn-logout-user margin-right-x1" [disabled]="isDisconnecting" (click)="disconnect()">
     <md-icon>power_settings_new</md-icon>
   </button>
 
-  <app-generate-icon class="margin-right-x0 btn-avatar-user" [mdTooltip]="user.name" mdTooltipPosition="below" [size]="24"
+  <app-generate-icon class="btn-avatar-user margin-right-x0" [mdTooltip]="user.name" mdTooltipPosition="below" [size]="24"
     [text]="user.id"></app-generate-icon>
 </md-toolbar>

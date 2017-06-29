@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" class="content content-max-width">
+<div class="dialog-workspaces-list" fxLayout="column" class="content content-max-width">
   <md-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
     <h3 class="md-dialog-title margin-left-x1">SELECT THE WORKSPACE</h3>
   </md-toolbar>
@@ -34,22 +34,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </form>
 
         <div class="margin-bottom-x1">
-          <div class="info-add-workspace margin-top-x1" fxLayout="row" fxLayoutAlign="center center" *ngIf="(workspaces$ | async).list.length === 0 && !(workspaces$ | async).isFetchingWorkspaces">
+          <div class="info-add-workspace margin-top-x1" fxLayout="row" fxLayoutAlign="center center" *ngIf="workspaces.list.length === 0 && !workspaces.isFetchingWorkspaces">
             <md-icon color="primary">info</md-icon>
             <span md-line>You don't have any workspace yet</span>
           </div>
 
-          <div *ngIf="user$ | async">
+          <div>
             <md-card>
               <md-card-content>
                 <div fxLayout="row" fxFlex="100%">
                   <label>Workspaces</label>
-                  <md-spinner class="margin-left-x1" *ngIf="(workspaces$ | async).isFetchingWorkspaces"></md-spinner>
+                  <md-spinner class="margin-left-x1" *ngIf="workspaces.isFetchingWorkspaces"></md-spinner>
                   <div fxFlex></div>
                   <div fxLayoutAlign="end center">
-                    <span *ngIf="(workspaces$ | async).list.length === 0" md-line>No workspace yet</span>
-                    <span class="subtitle" *ngIf="(workspaces$ | async).list.length >= 1" md-line>
-                      {{ (workspaces$ | async).list.length }} item{{ ((workspaces$ | async).list.length) >= 2 ? 's' : '' }}
+                    <span *ngIf="workspaces.list.length === 0" md-line>No workspace yet</span>
+                    <span class="subtitle" *ngIf="workspaces.list.length > 0" md-line>
+                      {{ workspaces.list.length }} item{{ (workspaces.list.length) >= 2 ? 's' : '' }}
                     </span>
                   </div>
                 </div>
@@ -58,12 +58,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <md-divider></md-divider>
             <md-card class="card-workspaces">
               <div fxLayout="row" class="cursor-pointer background-color-hover-light-green-x2 card-workspace"
-                *ngFor="let workspace of (workspaces$ | async).list" (click)="fetchWorkspace(workspace)"
-                [class.background-color-light-green-x2]="(workspaces$ | async).selectedWorkspaceId === workspace.id"
+                *ngFor="let workspace of workspaces.list" (click)="select(workspace)"
+                [class.background-color-light-green-x2]="workspaces.selectedWorkspaceId === workspace.id"
               >
                 <div fxLayoutAlign="center start">
-                  <md-icon color="primary" *ngIf="(workspaces$ | async).selectedWorkspaceId === workspace.id && workspace.users.list.length === 1">folder_open</md-icon>
-                  <md-icon color="primary" *ngIf="(workspaces$ | async).selectedWorkspaceId === workspace.id && workspace.users.list.length > 1">folder_shared</md-icon>
+                  <md-icon color="primary" *ngIf="workspaces.selectedWorkspaceId === workspace.id && workspace.users.list.length === 1">folder_open</md-icon>
+                  <md-icon color="primary" *ngIf="workspaces.selectedWorkspaceId === workspace.id && workspace.users.list.length > 1">folder_shared</md-icon>
                 </div>
                 <md-card-title-group>
                   <div fxLayout="column" fxLayoutAlign="center start">
@@ -74,9 +74,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                         <span
                           class="color-primary-bold dotted"
                           [mdTooltip]="getUsersNames(workspace.users.list)"
-                          [mdTooltipShowDelay]="showDelay"
-                          [mdTooltipHideDelay]="hideDelay"
-                          [mdTooltipPosition]="position"
                         >{{ workspace.users.list.length - 1 }} other{{ (workspace.users.list.length - 1) >= 2 ? 's' : '' }}</span>.
                       </span>
                     </md-card-subtitle>

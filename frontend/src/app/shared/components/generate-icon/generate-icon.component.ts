@@ -61,7 +61,7 @@ export class GenerateIconComponent implements AfterViewInit, OnChanges {
     // the view's updated and the svg is draw with an old MD5 hash
     // AfterViewChecked is not a good solution because it's checked
     // too many times
-    setTimeout(() => jdenticon(), 500);
+    setTimeout(() => jdenticon(), 1);
   }
 
   get wrapperSize() {

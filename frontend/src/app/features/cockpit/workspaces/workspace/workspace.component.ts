@@ -46,7 +46,12 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   constructor(private store$: Store<IStore>, private dialog: MdDialog) {}
 
   ngOnInit() {
-    this.store$.dispatch(new Ui.SetTitles({ titleMainPart1: 'Petals' }));
+    this.store$.dispatch(
+      new Ui.SetTitles({
+        titleMainPart1: 'Workspace',
+        titleMainPart2: 'Petals',
+      })
+    );
 
     this.workspace$ = this.store$.let(getCurrentWorkspace());
 
