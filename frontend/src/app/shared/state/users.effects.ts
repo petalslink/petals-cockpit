@@ -26,10 +26,8 @@ import { NotificationsService } from 'angular2-notifications';
 import { UsersService } from '../services/users.service';
 
 import { environment } from '../../../environments/environment';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 
 import { Users } from 'app/shared/state/users.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 
 @Injectable()
 export class UsersEffects {
@@ -94,12 +92,11 @@ export class UsersEffects {
     .switchMap(() =>
       this.usersService
         .disconnectUser()
-        .map(() =>
-          batchActions([
-            new Users.DisconnectSuccess(),
-            new Workspaces.Close({ delete: false }),
-          ])
-        )
+        .map(() => {
+          this.router.navigate(['/login']);
+          this.notification.remove();
+          return new Users.DisconnectSuccess();
+        })
         .catch(err => {
           if (environment.debug) {
             console.group();
@@ -116,10 +113,9 @@ export class UsersEffects {
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
-  disconnectUserSuccess$: any = this.actions$
+  disconnectUserSuccess$: Observable<Action> = this.actions$
     .ofType(Users.DisconnectSuccessType)
-    .do(_ => this.router.navigate(['/login']))
-    .do(_ =>
+    .do(() =>
       this.notification.success('Log out !', `You're now disconnected.`)
     );
 }

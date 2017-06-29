@@ -22,7 +22,7 @@ import { waitTimeout } from '../common';
 import { WorkspaceOverviewPage } from './workspace.po';
 
 export class WorkspacesPage {
-  public static readonly component = $(`app-workspaces-dialog`);
+  public static readonly component = $(`app-workspaces-list`);
 
   public readonly component = WorkspacesPage.component;
   public readonly workspacesCard = this.component.$(`md-card.card-workspaces`);

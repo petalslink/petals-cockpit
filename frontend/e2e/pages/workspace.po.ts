@@ -191,7 +191,7 @@ export class WorkspaceOverviewPage extends WorkspacePage {
     `button.workspace-description-edit-submit`
   );
 
-  public readonly users = $(`app-workspace .workspace-users`);
+  public readonly users = this.component.$(`.workspace-users`);
 
   static waitAndGet(expectedName?: Matcher) {
     super.wait();

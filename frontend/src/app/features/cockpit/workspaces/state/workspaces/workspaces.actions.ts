@@ -32,7 +32,12 @@ export namespace Workspaces {
   export const CloseType = '[Workspaces] Close';
   export class Close implements Action {
     readonly type = CloseType;
-    constructor(public readonly payload: { delete: boolean }) {}
+    constructor(
+      public readonly payload: {
+        goToWorkspaces?: boolean;
+        deleted?: boolean;
+      } = { goToWorkspaces: false, deleted: false }
+    ) {}
   }
 
   export const FetchAllType = '[Workspaces] Fetch all';

@@ -16,35 +16,21 @@
  */
 
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
 
-import { CockpitComponent } from './cockpit.component';
-
-const routes: Routes = [
-  {
-    path: '',
-    pathMatch: 'full',
-    redirectTo: '/workspaces',
-  },
-  {
-    path: '',
-    component: CockpitComponent,
-    children: [
-      {
-        path: 'workspaces',
-        loadChildren:
-          'app/features/cockpit/workspaces/workspaces.module#WorkspacesModule',
-      },
-      {
-        path: 'admin',
-        loadChildren:
-          'app/features/cockpit/administration/administration.module#AdministrationModule',
-      },
-    ],
-  },
-];
+import { SharedModule } from 'app/shared/shared.module';
+import { AdministrationComponent } from 'app/features/cockpit/administration/administration.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [
+    SharedModule,
+    RouterModule.forChild([
+      {
+        path: '',
+        component: AdministrationComponent,
+      },
+    ]),
+  ],
+  declarations: [AdministrationComponent],
 })
-export class CockpitRoutingModule {}
+export class AdministrationModule {}

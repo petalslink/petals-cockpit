@@ -19,36 +19,28 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
+import { Ui } from 'app/shared/state/ui.actions';
 import { IStore } from 'app/shared/state/store.interface';
-import { IUi } from 'app/shared/state/ui.interface';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
-import { ICurrentUser } from 'app/shared/state/users.interface';
-import { getCurrentUser } from 'app/shared/state/users.selectors';
+import { IUser, ICurrentUser } from 'app/shared/state/users.interface';
+import { getAllUsers, getCurrentUser } from 'app/shared/state/users.selectors';
 
 @Component({
-  selector: 'app-cockpit',
-  templateUrl: './cockpit.component.html',
-  styleUrls: ['./cockpit.component.scss'],
+  selector: 'app-administration',
+  templateUrl: './administration.component.html',
+  styleUrls: ['./administration.component.scss'],
 })
-export class CockpitComponent implements OnInit {
-  isLargeScreen$: Observable<boolean>;
-  ui$: Observable<IUi>;
+export class AdministrationComponent implements OnInit {
+  users$: Observable<IUser[]>;
   user$: Observable<ICurrentUser>;
-  isDisconnecting$: Observable<boolean>;
-  isOnWorkspace$: Observable<boolean>;
 
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.isLargeScreen$ = this.store$.let(isLargeScreen);
-    this.user$ = this.store$.let(getCurrentUser());
-    this.isDisconnecting$ = this.store$.select(
-      state => state.users.isDisconnecting
+    this.store$.dispatch(
+      new Ui.SetTitles({ titleMainPart2: 'Administration' })
     );
 
-    this.isOnWorkspace$ = this.store$.select(
-      state => !!state.workspaces.selectedWorkspaceId
-    );
-    this.ui$ = this.store$.select(state => state.ui);
+    this.users$ = this.store$.let(getAllUsers);
+    this.user$ = this.store$.let(getCurrentUser());
   }
 }

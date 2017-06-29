@@ -28,27 +28,29 @@ const routes: Routes = [
   {
     path: '',
     component: WorkspacesComponent,
-  },
-  {
-    path: ':workspaceId',
-    // as we use the store to retrieve our data, no need to pass them
-    // using resolve, but we still need to call the resolver to make sure
-    // they're available before displaying the view
-    resolve: { _: WorkspaceResolver },
     children: [
       {
-        path: '',
-        pathMatch: 'full',
-        component: WorkspaceComponent,
-      },
-      {
-        path: 'not-found',
-        component: NotFound404Component,
-      },
-      {
-        path: 'petals',
-        loadChildren:
-          'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule',
+        path: ':workspaceId',
+        // as we use the store to retrieve our data, no need to pass them
+        // using resolve, but we still need to call the resolver to make sure
+        // they're available before displaying the view
+        resolve: { _: WorkspaceResolver },
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            component: WorkspaceComponent,
+          },
+          {
+            path: 'not-found',
+            component: NotFound404Component,
+          },
+          {
+            path: 'petals',
+            loadChildren:
+              'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule',
+          },
+        ],
       },
     ],
   },

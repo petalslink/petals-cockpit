@@ -26,8 +26,17 @@ import { Matcher, textToMatchInElement } from '../utils';
 import { waitTimeout } from '../common';
 import { SetupPage } from './setup.po';
 import { LoginPage } from './login.po';
+import { AdminPage } from './administration.po';
+import { WorkspacesPage } from './workspaces.po';
 
 export class PetalsCockpitPage {
+  public readonly header = $('app-header');
+  public readonly adminButton = this.header.$('.btn-usr-admin');
+  public readonly avatarButton = this.header.$('.btn-avatar-user');
+  public readonly logoutButton = this.header.$('.btn-logout-user');
+  public readonly logoButton = this.header.$('.toolbar-logo');
+  public readonly toggleSidenavButton = this.header.$('.sidenav-toggle');
+
   goTo(to = '/') {
     return browser.get(to);
   }
@@ -56,19 +65,16 @@ export class PetalsCockpitPage {
 
   logout() {
     // open the user menu
-    $(`app-cockpit md-toolbar .btn-avatar-user`).click();
+    this.waitAndClick(this.avatarButton);
 
     // and logout
-    const logout = $(`.btn-logout-user`);
-    browser.wait(EC.elementToBeClickable(logout), waitTimeout);
-    logout.click();
+    this.waitAndClick(this.logoutButton);
 
     return LoginPage.waitAndGet();
   }
 
   waitAndClick(el: ElementFinder) {
     browser.wait(EC.elementToBeClickable(el), waitTimeout);
-
     el.click();
   }
 
@@ -110,7 +116,7 @@ export class PetalsCockpitPage {
       .isPresent()
       .then(present => {
         if (present) {
-          return $(`app-cockpit md-toolbar-row button.sidenav-toggle`).click();
+          return this.toggleSidenavButton.click();
         }
       });
   }
@@ -120,8 +126,20 @@ export class PetalsCockpitPage {
       .isPresent()
       .then(present => {
         if (present) {
-          return $(`app-cockpit md-toolbar-row button.sidenav-toggle`).click();
+          return this.toggleSidenavButton.click();
         }
       });
+  }
+
+  openAdmin() {
+    this.waitAndClick(this.adminButton);
+
+    return AdminPage.waitAndGet();
+  }
+
+  openWorkspaces() {
+    this.waitAndClick(this.logoButton);
+
+    return WorkspacesPage.waitAndGet();
   }
 }

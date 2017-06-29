@@ -18,10 +18,14 @@
 import { NgModule } from '@angular/core';
 
 import { SharedModule } from '../../../shared/shared.module';
-import { WorkspacesRoutingModule } from './workspaces-routing.module';
-import { WorkspacesComponent } from './workspaces.component';
 import { PetalsMenuModule } from './petals-menu/petals-menu.module';
+import { WorkspacesRoutingModule } from './workspaces-routing.module';
 import { WorkspaceModule } from 'app/features/cockpit/workspaces/workspace/workspace.module';
+import {
+  WorkspacesComponent,
+  DeletedWorkspaceDialogComponent,
+} from './workspaces.component';
+import { WorkspacesListComponent } from 'app/features/cockpit/workspaces-list/workspaces-list.component';
 
 @NgModule({
   imports: [
@@ -30,7 +34,12 @@ import { WorkspaceModule } from 'app/features/cockpit/workspaces/workspace/works
     PetalsMenuModule,
     WorkspaceModule,
   ],
-  declarations: [WorkspacesComponent],
+  declarations: [
+    WorkspacesComponent,
+    DeletedWorkspaceDialogComponent,
+    WorkspacesListComponent,
+  ],
+  entryComponents: [DeletedWorkspaceDialogComponent],
   exports: [
     // TODO : Remove this line when aux route becomes available in lazy loaded module
     // we export here to use this component from cockpit.component

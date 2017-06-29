@@ -134,11 +134,10 @@ export class WorkspacesEffects {
     .ofType(Workspaces.CloseType)
     .do(_ => this.sseService.stopWatchingWorkspace())
     .do((action: Workspaces.Close) => {
-      if (action.payload && action.payload.delete) {
+      if (action.payload && action.payload.goToWorkspaces) {
         this.router.navigate(['/workspaces']);
       }
     })
-    .do(_ => this.notifications.remove())
     .map(_ => new Workspaces.Clean());
 
   // tslint:disable-next-line:member-ordering
@@ -155,13 +154,7 @@ export class WorkspacesEffects {
     .switchMap((action: Workspaces.Fetch) =>
       this.sseService
         .watchWorkspaceRealTime(action.payload.id)
-        .startWith(
-          batchActions([
-            new Workspaces.Clean(),
-            new Ui.OpenSidenav(),
-            new Ui.CloseWorkspaces(),
-          ])
-        )
+        .startWith(batchActions([new Workspaces.Clean(), new Ui.OpenSidenav()]))
         .catch(err => {
           if (environment.debug) {
             console.group();

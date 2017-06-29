@@ -19,6 +19,7 @@ import { IUi, uiFactory } from './ui.interface';
 
 import { Ui } from 'app/shared/state/ui.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { Users } from 'app/shared/state/users.actions';
 
 export namespace UiReducer {
   type All =
@@ -30,7 +31,8 @@ export namespace UiReducer {
     | Ui.CloseWorkspaces
     | Ui.ChangeScreenSize
     | Ui.SetTitles
-    | Workspaces.Close;
+    | Workspaces.Close
+    | Users.DisconnectSuccess;
 
   export function reducer(table = uiFactory(), action: All): IUi {
     switch (action.type) {
@@ -60,6 +62,9 @@ export namespace UiReducer {
       }
       case Workspaces.CloseType: {
         return closeWorkspace(table, action.payload);
+      }
+      case Users.DisconnectSuccessType: {
+        return uiFactory();
       }
       default:
         return table;
@@ -139,12 +144,11 @@ export namespace UiReducer {
     };
   }
 
-  function closeWorkspace(ui: IUi, payload: { delete: boolean }): IUi {
-    if (payload && payload.delete) {
+  function closeWorkspace(ui: IUi, payload: { goToWorkspaces?: boolean }): IUi {
+    if (payload && payload.goToWorkspaces) {
       return {
         ...ui,
         isSidenavVisible: false,
-        isPopupListWorkspacesVisible: true,
       };
     } else {
       return ui;

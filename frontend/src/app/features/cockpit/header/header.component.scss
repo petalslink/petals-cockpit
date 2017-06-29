@@ -24,7 +24,7 @@ TODO
 While the issue on material **https://github.com/angular/material2/issues/3221** is still open,
 let's make something hacky by putting the header on top of the rest
 
-This should be cleaned as soon as the new feature is ready
+This should be cleaned as soon as the new feature is ready (see also cockpit component for scss hack)
 */
 
 .header-toolbar {
@@ -34,39 +34,15 @@ This should be cleaned as soon as the new feature is ready
   line-height: 36px;
 }
 
-@media (max-width: 1279px) {
-  md-toolbar {
-    .toolbar-logo {
-      margin-right: 10px;
-    }
-
-    .sidenav-toggle {
-      padding: 0;
-      margin-right: 10px;
-      min-height: 56px;
-      min-width: 56px;
-    }
+md-toolbar {
+  padding-left: 0;
+  .sidenav-toggle, .toolbar-logo, .btn-usr-admin {
+    margin-right: 4px;
+    min-height: 56px;
+    min-width: 56px;
   }
 }
 
-@media (min-width: 1280px) {
-  md-toolbar {
-    padding-left: 0;
-
-    .toolbar-logo {
-      min-width: 320px;
-      text-align: center;
-    }
-
-    .sidenav-toggle {
-      padding: 0;
-      margin-right: 10px;
-      min-height: 56px;
-      min-width: 56px;
-    }
-  }
-}
-
-.btn-menu-username {
-  background-color: #F5F5F5;
+.pnl-title-main {
+  font-size: 12px;
 }

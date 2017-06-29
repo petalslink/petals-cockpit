@@ -39,7 +39,7 @@ describe(`Workspaces`, () => {
       .loginToWorkspaces(`vnoel`, `vnoel`);
 
     // the sidebar button should not be visible
-    expect($(`app-cockpit .sidenav-toggle`).isPresent()).toBe(false);
+    expect($(`app-header .sidenav-toggle`).isPresent()).toBe(false);
 
     // check that 1 workspace is displayed
     expect(workspaces.workspacesCards.count()).toEqual(1);
@@ -77,7 +77,7 @@ describe(`Workspaces`, () => {
     // the workspace dialog hides stuffs so we must check if
 
     // 1) the logout button should be visible
-    expect($(`app-cockpit .sidenav-toggle`).isEnabled()).toBe(true);
+    expect($(`app-header .sidenav-toggle`).isEnabled()).toBe(true);
     // 2) we can still click on the sidenav button
     page.closeSidenav();
   });
@@ -173,5 +173,33 @@ describe(`Workspaces`, () => {
 
     // now that the previous workspace is deleted, check that only 1 workspace is displayed
     expect(workspaces.workspacesCards.count()).toEqual(1);
+  });
+
+  it(`should open the administration page and ensure that the workspaces list is closed`, () => {
+    let workspaces = page
+      .goToWorkspacesViaLogin()
+      .loginToWorkspaces(`admin`, `admin`);
+
+    let admin = page.openAdmin();
+    browser.wait(EC.stalenessOf(workspaces.component), waitTimeout);
+
+    const workspace = page.openWorkspaces().selectWorkspace(0);
+    workspaces = workspace.openWorkspacesDialog();
+
+    admin = page.openAdmin();
+    browser.wait(EC.stalenessOf(workspaces.component), waitTimeout);
+  });
+
+  it(`should not reopen the workspace list after logout and re-login`, () => {
+    const workspaces = page
+      .goToLogin()
+      .loginToWorkspace('admin', 'admin')
+      .openWorkspacesDialog();
+
+    const login = page.logout();
+    browser.wait(EC.stalenessOf(workspaces.component), waitTimeout);
+
+    login.loginToWorkspace('admin', 'admin');
+    browser.wait(EC.stalenessOf(workspaces.component), waitTimeout);
   });
 });

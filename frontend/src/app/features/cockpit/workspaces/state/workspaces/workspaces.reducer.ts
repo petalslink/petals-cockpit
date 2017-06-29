@@ -314,8 +314,8 @@ export namespace WorkspacesReducer {
     };
   }
 
-  function close(table: IWorkspacesTable, payload: { delete: boolean }) {
-    if (table.selectedWorkspaceId && payload && payload.delete) {
+  function close(table: IWorkspacesTable, payload: { deleted?: boolean }) {
+    if (table.selectedWorkspaceId && payload && payload.deleted) {
       return {
         ...removeById(table, table.selectedWorkspaceId),
         selectedWorkspaceId: '',

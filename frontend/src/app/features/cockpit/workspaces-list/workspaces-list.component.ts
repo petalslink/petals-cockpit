@@ -15,61 +15,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  EventEmitter,
+  Output,
+  Input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { TooltipPosition } from '@angular/material';
+
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
 
-import { IStore } from '../../../shared/state/store.interface';
-import { getWorkspacesList } from '../workspaces/state/workspaces/workspaces.selectors';
+import { IStore } from 'app/shared/state/store.interface';
+
 import {
   IWorkspaces,
   IWorkspace,
-} from '../workspaces/state/workspaces/workspaces.interface';
+} from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
+import { IUser, ICurrentUser } from 'app/shared/state/users.interface';
 
-import { IUser, ICurrentUser } from '../../../shared/state/users.interface';
-import { getCurrentUser } from './../../../shared/state/users.selectors';
-import { Ui } from 'app/shared/state/ui.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 
 @Component({
-  selector: 'app-workspaces-dialog',
-  templateUrl: './workspaces-dialog.component.html',
-  styleUrls: ['./workspaces-dialog.component.scss'],
+  selector: 'app-workspaces-list',
+  templateUrl: 'workspaces-list.component.html',
+  styleUrls: ['workspaces-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WorkspacesDialogComponent implements OnInit, OnDestroy {
+export class WorkspacesListComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  public workspaces$: Observable<IWorkspaces>;
-  public newWksForm: FormGroup;
-  public btnSubmitDisabled = true;
-  public position: TooltipPosition = 'below';
-  public showDelay = 0;
-  public hideDelay = 600;
-  public user: ICurrentUser;
-  public user$: Observable<ICurrentUser>;
+  @Input() workspaces: IWorkspaces;
+  @Input() user: ICurrentUser;
+  @Output() fetch = new EventEmitter<IWorkspace>();
 
-  constructor(
-    private store$: Store<IStore>,
-    private router: Router,
-    private fb: FormBuilder
-  ) {}
+  newWksForm: FormGroup;
+  btnSubmitDisabled = true;
+
+  constructor(private store$: Store<IStore>, private fb: FormBuilder) {}
 
   ngOnInit() {
-    this.workspaces$ = this.store$.let(getWorkspacesList());
-    this.user$ = this.store$.let(getCurrentUser()).do(u => {
-      this.user = u;
-    });
-
     this.newWksForm = this.fb.group({
       name: [''],
     });
 
     this.store$
       .select(state => state.workspaces.isAddingWorkspace)
+      .do(isAddingWorkspace => {
+        if (isAddingWorkspace) {
+          this.newWksForm.disable();
+        } else {
+          this.newWksForm.enable();
+        }
+      })
       .combineLatest(
         Observable.empty().concat(
           this.newWksForm.valueChanges
@@ -77,20 +79,14 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
             .distinctUntilChanged()
         )
       )
-      .takeUntil(this.onDestroy$)
       .do(([isAddingWorkspace, name]) => {
         if (!name || isAddingWorkspace) {
           this.btnSubmitDisabled = true;
         } else {
           this.btnSubmitDisabled = false;
         }
-
-        if (isAddingWorkspace) {
-          this.newWksForm.disable();
-        } else {
-          this.newWksForm.enable();
-        }
       })
+      .takeUntil(this.onDestroy$)
       .subscribe();
   }
 
@@ -99,19 +95,8 @@ export class WorkspacesDialogComponent implements OnInit, OnDestroy {
     this.onDestroy$.complete();
   }
 
-  fetchWorkspace(workspace: IWorkspace) {
-    this.store$
-      .select(state => state.workspaces.selectedWorkspaceId)
-      .first()
-      .do(wsId => {
-        // if no workspace is open, it will simply navigate to the required one
-        if (wsId === workspace.id) {
-          this.store$.dispatch(new Ui.CloseWorkspaces());
-        } else {
-          this.router.navigate(['/workspaces', workspace.id]);
-        }
-      })
-      .subscribe();
+  select(workspace: IWorkspace) {
+    this.fetch.emit(workspace);
   }
 
   onSubmit({ value }) {
