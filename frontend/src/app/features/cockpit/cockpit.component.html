@@ -14,7 +14,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div class="page-cockpit" fxLayout="column" fxFill>
-  <app-header [largeScreen]="isLargeScreen$ | async" [ui]="ui$ | async"
+  <app-header [isLargeScreen]="isLargeScreen$ | async" [ui]="ui$ | async"
               [user]="user$ | async" [isDisconnecting]="isDisconnecting$ | async"
               [isOnWorkspace]="isOnWorkspace$ | async"></app-header>
 

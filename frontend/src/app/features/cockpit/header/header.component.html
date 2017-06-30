@@ -23,9 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   </button>
 
   <span fxLayout="row" fxFlex class="text-upper" [ngClass.gt-sm]="'margin-right-x1'">
-    <span [hidden]="isSmallScreen$ | async" *ngIf="ui.titleMainPart1">{{ ui.titleMainPart1 }}</span>
+    <span [hidden]="!isLargeScreen" *ngIf="ui.titleMainPart1">{{ ui.titleMainPart1 }}</span>
     <span *ngIf="ui.titleMainPart2" fxLayoutAlign="center center">
-      <md-icon *ngIf="!(isSmallScreen$ | async)">chevron_right</md-icon>
+      <md-icon *ngIf="isLargeScreen">chevron_right</md-icon>
       <span class="color-accent-light-bold text-upper" [ngClass.lt-sm]="'pnl-title-main'">{{ ui.titleMainPart2 }}</span>
   </span>
   </span>
