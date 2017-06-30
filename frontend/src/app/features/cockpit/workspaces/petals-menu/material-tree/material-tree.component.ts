@@ -29,6 +29,8 @@ export interface TreeElement<T extends TreeElement<T>> {
   isFolded: boolean;
   children: T[];
   cssClass: string;
+  svgIcon?: string;
+  icon?: string;
 }
 
 export interface TreeEvent<T extends TreeElement<T>> {

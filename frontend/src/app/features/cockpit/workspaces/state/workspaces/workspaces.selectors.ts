@@ -202,8 +202,6 @@ export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
   id: string;
   type: WorkspaceElementType;
   name: string;
-  svgIcon?: string;
-  icon?: string;
 }
 
 export function _getCurrentTree(
