@@ -16,53 +16,31 @@
  */
 
 import { Injectable } from '@angular/core';
+import { Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 
 import {
   UsersService,
   IUserLogin,
   IUserSetup,
   ICurrentUserBackend,
+  IUserBackend,
+  IUserNew,
 } from './users.service';
 import { ICurrentUser } from '../state/users.interface';
-import { environment } from './../../../environments/environment';
+import { environment } from 'environments/environment';
 import * as helper from './../helpers/mock.helper';
-import {
-  users,
-  CORRECT_SETUP_TOKEN,
-  GONE_SETUP_TOKEN,
-} from './../../../mocks/backend-mock';
+import { CORRECT_SETUP_TOKEN, GONE_SETUP_TOKEN } from 'mocks/backend-mock';
+import { BackendUser } from 'mocks/users-mock';
 
 @Injectable()
 export class UsersServiceMock extends UsersService {
-  private static users: { [username: string]: ICurrentUser } = {
-    admin: {
-      ...users.admin,
-      lastWorkspace: 'idWks0',
-      isAdmin: true,
-    },
-    vnoel: {
-      ...users.vnoel,
-      lastWorkspace: '',
-      isAdmin: false,
-    },
-    mrobert: {
-      ...users.mrobert,
-      lastWorkspace: '',
-      isAdmin: false,
-    },
-    bescudie: {
-      ...users.bescudie,
-      lastWorkspace: '',
-      isAdmin: false,
-    },
-  };
-
   private currentUser: ICurrentUser = null;
 
   constructor() {
     super();
     if (environment.mock.alreadyConnected) {
-      this.currentUser = UsersServiceMock.users.admin;
+      this.connectUser({ username: 'admin', password: 'admin' });
     }
   }
 
@@ -71,24 +49,23 @@ export class UsersServiceMock extends UsersService {
   }
 
   connectUser(user: IUserLogin) {
-    let ok = false;
-    if (
-      UsersServiceMock.users[user.username] &&
-      user.username === user.password
-    ) {
-      this.currentUser = UsersServiceMock.users[user.username];
-      ok = true;
+    const u = BackendUser.get(user.username);
+
+    const valid = u && u.password === user.password;
+    if (valid) {
+      this.currentUser = u.getDetails();
     }
 
-    return (ok
+    return (valid
       ? helper.responseBody(this.currentUser)
       : helper.response(401)).map(res => res.json() as ICurrentUserBackend);
   }
 
   disconnectUser() {
+    const connected = this.currentUser !== null;
     this.currentUser = null;
 
-    return helper.response(204);
+    return connected ? helper.response(204) : helper.response(401);
   }
 
   getCurrentUserInformations() {
@@ -107,5 +84,51 @@ export class UsersServiceMock extends UsersService {
     }
 
     return helper.errorBackend('Invalid token', 403);
+  }
+
+  private responseAdmin(res: Observable<Response>) {
+    return this.currentUser
+      ? this.currentUser.isAdmin ? res : helper.response(403)
+      : helper.response(401);
+  }
+
+  getAll() {
+    return this.responseAdmin(
+      helper.responseBody(
+        BackendUser.getAll().map(u => ({ id: u.id, name: u.name }))
+      )
+    ).map(res => res.json() as IUserBackend[]);
+  }
+
+  getOne(id: string) {
+    const u = BackendUser.get(id);
+    return this.responseAdmin(
+      u ? helper.responseBody({ id: u.id, name: u.name }) : helper.response(404)
+    ).map(res => res.json() as IUserBackend);
+  }
+
+  add(user: IUserNew) {
+    const added = BackendUser.create(user);
+    return this.responseAdmin(
+      added ? helper.response(204) : helper.response(409)
+    );
+  }
+
+  delete(id: string) {
+    const deleted = BackendUser.delete(id);
+    return this.responseAdmin(
+      deleted ? helper.response(204) : helper.response(409)
+    );
+  }
+
+  modify(id: string, props: { name?: string; password?: string }) {
+    const user = BackendUser.get(id);
+    if (user) {
+      user.name = props.name || user.name;
+      user.password = props.password || user.password;
+    }
+    return this.responseAdmin(
+      user ? helper.response(204) : helper.response(409)
+    );
   }
 }

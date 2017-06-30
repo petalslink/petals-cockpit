@@ -66,7 +66,7 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
     this.users$
       .takeUntil(this.onDestroy$)
       .do(users => {
-        if (users.isConnecting || users.isConnected) {
+        if (users.isConnecting || users.connectedUser) {
           this.loginForm.disable();
           this.loginForm.disable();
         } else {

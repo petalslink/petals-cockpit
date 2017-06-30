@@ -46,7 +46,7 @@ export class BusesServiceMock extends BusesServiceImpl {
       return helper.errorBackend('Error backend', 500);
     }
 
-    const newBus = workspacesService.getWorkspace(idWorkspace).tryAddBus(bus);
+    const newBus = workspacesService.get(idWorkspace).tryAddBus(bus);
 
     let event: string;
     if (newBus.eventData.importError) {

@@ -36,9 +36,12 @@ export interface IUserLogin {
   password: string;
 }
 
-export interface IUserSetup extends IUserLogin {
-  token: string;
+export interface IUserNew extends IUserLogin {
   name: string;
+}
+
+export interface IUserSetup extends IUserNew {
+  token: string;
 }
 
 export abstract class UsersService {
@@ -49,6 +52,19 @@ export abstract class UsersService {
   abstract getCurrentUserInformations(): Observable<ICurrentUserBackend>;
 
   abstract setupUser(value: IUserSetup): Observable<Response>;
+
+  abstract getAll(): Observable<IUserBackend[]>;
+
+  abstract getOne(id: string): Observable<IUserBackend>;
+
+  abstract add(user: IUserNew): Observable<Response>;
+
+  abstract delete(id: string): Observable<Response>;
+
+  abstract modify(
+    id: string,
+    props: { name?: string; password?: string }
+  ): Observable<Response>;
 }
 
 @Injectable()
@@ -75,5 +91,29 @@ export class UsersServiceImpl extends UsersService {
 
   setupUser(value: IUserSetup) {
     return this.http.post(`${environment.urlBackend}/setup`, value);
+  }
+
+  getAll() {
+    return this.http
+      .get(`${environment.urlBackend}/users`)
+      .map(res => res.json() as IUserBackend[]);
+  }
+
+  getOne(id: string) {
+    return this.http
+      .get(`${environment.urlBackend}/users/${id}`)
+      .map(res => res.json() as IUserBackend);
+  }
+
+  add(user: IUserNew) {
+    return this.http.post(`${environment.urlBackend}/users/`, user);
+  }
+
+  delete(id: string) {
+    return this.http.delete(`${environment.urlBackend}/users/${id}`);
+  }
+
+  modify(id: string, props: { name?: string; password?: string }) {
+    return this.http.put(`${environment.urlBackend}/users/${id}`, props);
   }
 }

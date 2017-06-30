@@ -20,25 +20,5 @@ export const GONE_SETUP_TOKEN = 'GONE_SETUP_TOKEN';
 
 export const IMPORT_HTTP_ERROR_IP = 'IMPORT_HTTP_ERROR_IP';
 
-export const users = {
-  admin: {
-    id: 'admin',
-    name: 'Administrator',
-  },
-  bescudie: {
-    id: 'bescudie',
-    name: 'Bertrand ESCUDIE',
-  },
-  mrobert: {
-    id: 'mrobert',
-    name: 'Maxime ROBERT',
-  },
-  cchevalier: {
-    id: 'cchevalier',
-    name: 'Christophe CHEVALIER',
-  },
-  vnoel: {
-    id: 'vnoel',
-    name: 'Victor NOEL',
-  },
-};
+// buses that can be imported
+export const validContainers = ['192.168.0.1:7700'];

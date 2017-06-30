@@ -23,6 +23,7 @@ import { Ui } from 'app/shared/state/ui.actions';
 import { IStore } from 'app/shared/state/store.interface';
 import { IUser, ICurrentUser } from 'app/shared/state/users.interface';
 import { getAllUsers, getCurrentUser } from 'app/shared/state/users.selectors';
+import { Users } from 'app/shared/state/users.actions';
 
 @Component({
   selector: 'app-administration',
@@ -42,5 +43,7 @@ export class AdministrationComponent implements OnInit {
 
     this.users$ = this.store$.let(getAllUsers);
     this.user$ = this.store$.let(getCurrentUser());
+
+    this.store$.dispatch(new Users.FetchAll());
   }
 }

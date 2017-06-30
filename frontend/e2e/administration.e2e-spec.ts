@@ -34,6 +34,7 @@ describe(`Administration`, () => {
       'mrobert\nMaxime ROBERT',
       'cchevalier\nChristophe CHEVALIER',
       'vnoel\nVictor NOEL',
+      'cdeneux\nChristophe DENEUX',
     ]);
   });
 
