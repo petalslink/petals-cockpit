@@ -23,7 +23,7 @@ import {
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import { IBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
+import { IBusInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
 import { IStore } from '../../../../../shared/state/store.interface';
 
 import { Ui } from 'app/shared/state/ui.actions';
@@ -35,7 +35,7 @@ import { Ui } from 'app/shared/state/ui.actions';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BusesInProgressComponent implements OnInit {
-  @Input() busesInProgress: IBusesInProgress;
+  @Input() busesInProgress: IBusInProgress[];
   @Input() workspaceId: string;
 
   constructor(private store$: Store<IStore>) {}

@@ -21,7 +21,6 @@ import {
   Input,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
 import { IStore } from 'app/shared/state/store.interface';
@@ -29,7 +28,6 @@ import { IUi } from 'app/shared/state/ui.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 import { ICurrentUser } from 'app/shared/state/users.interface';
 import { Users } from 'app/shared/state/users.actions';
-import { isSmallScreen } from 'app/shared/state/ui.selectors';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 
 @Component({
@@ -39,25 +37,20 @@ import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/wor
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements OnInit {
-  @Input() largeScreen: boolean;
-  @Input() smallScreen: boolean;
+  @Input() isLargeScreen: boolean;
   @Input() ui: IUi;
   @Input() user: ICurrentUser;
   @Input() isDisconnecting: boolean;
   @Input() isOnWorkspace: boolean;
 
-  isSmallScreen$: Observable<boolean>;
-
   showShadow = true;
 
   constructor(private store$: Store<IStore>) {}
 
-  ngOnInit() {
-    this.isSmallScreen$ = this.store$.let(isSmallScreen);
-  }
+  ngOnInit() {}
 
   logo() {
-    return `./assets/img/${this.largeScreen
+    return `./assets/img/${this.isLargeScreen
       ? 'logo-petals-cockpit'
       : 'logo-petals-cockpit-without-text'}.png`;
   }

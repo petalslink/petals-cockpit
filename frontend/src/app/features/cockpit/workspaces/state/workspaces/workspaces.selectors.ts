@@ -18,19 +18,13 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IWorkspaces, IWorkspace } from './workspaces.interface';
-import { IStore } from '../../../../../shared/state/store.interface';
-import {
-  escapeStringRegexp,
-  arrayEquals,
-  tuple,
-} from '../../../../../shared/helpers/shared.helper';
-import { IUser } from '../../../../../shared/state/users.interface';
+import { IWorkspaces, IWorkspace, IWorkspaceRow } from './workspaces.interface';
+import { IStore } from 'app/shared/state/store.interface';
+import { escapeStringRegexp } from 'app/shared/helpers/shared.helper';
+import { IUser, IUserRow } from 'app/shared/state/users.interface';
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 
-export function _getWorkspacesList(
-  store$: Store<IStore>
-): Observable<IWorkspaces> {
+export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
   const sWorkspaces = store$.select((state: IStore) => state.workspaces);
   const sUsers = store$.select((state: IStore) => state.users);
   const sBuses = store$.select((state: IStore) => state.buses);
@@ -58,10 +52,6 @@ export function _getWorkspacesList(
     });
 }
 
-export function getWorkspacesList() {
-  return _getWorkspacesList;
-}
-
 // -----------------------------------------------------------
 
 /**
@@ -77,111 +67,22 @@ export function filterWorkspaceFetched(
   );
 }
 
-export function _getCurrentWorkspace(
+export function getCurrentWorkspace(
   store$: Store<IStore>
-): Observable<IWorkspace> {
-  return (
-    filterWorkspaceFetched(store$)
-      .map(state =>
-        tuple([
-          state.workspaces,
-          state.users,
-          state.buses,
-          state.containers,
-          state.components,
-          state.serviceAssemblies,
-          state.serviceUnits,
-          state.sharedLibraries,
-        ])
-      )
-      // as the object has a new reference every time,
-      // use distinctUntilChanged for performance
-      .distinctUntilChanged(arrayEquals)
-      .map(
-        (
-          [
-            workspaces,
-            users,
-            buses,
-            containers,
-            components,
-            serviceAssemblies,
-            serviceUnits,
-            sharedLibraries,
-          ]
-        ) => {
-          const workspace = workspaces.byId[workspaces.selectedWorkspaceId];
-          return {
-            ...workspace,
-
-            users: {
-              ...users,
-              list: workspace.users.map(userId => users.byId[userId]),
-            },
-
-            buses: {
-              ...buses,
-              list: buses.allIds.map(busId => {
-                const bus = buses.byId[busId];
-                return {
-                  ...bus,
-                  containers: {
-                    ...containers,
-                    list: bus.containers.map(containerId => {
-                      const container = containers.byId[containerId];
-                      return {
-                        ...container,
-                        components: {
-                          ...components,
-                          list: container.components.map(componentId => {
-                            const component = components.byId[componentId];
-                            return {
-                              ...component,
-                              serviceUnits: {
-                                ...serviceUnits,
-                                list: component.serviceUnits.map(suId => {
-                                  const serviceUnit = serviceUnits.byId[suId];
-                                  return {
-                                    ...serviceUnit,
-                                  };
-                                }),
-                              },
-                            };
-                          }),
-                        },
-                        serviceAssemblies: {
-                          ...serviceAssemblies,
-                          list: container.serviceAssemblies.map(saId => {
-                            const serviceAssembly =
-                              serviceAssemblies.byId[saId];
-                            return {
-                              ...serviceAssembly,
-                            };
-                          }),
-                        },
-                        sharedLibraries: {
-                          ...sharedLibraries,
-                          list: container.sharedLibraries.map(id => {
-                            const sl = sharedLibraries.byId[id];
-                            return {
-                              ...sl,
-                            };
-                          }),
-                        },
-                      };
-                    }),
-                  },
-                };
-              }),
-            },
-          };
-        }
-      )
-  );
+): Observable<IWorkspaceRow> {
+  return filterWorkspaceFetched(store$)
+    .map(state => state.workspaces.byId[state.workspaces.selectedWorkspaceId])
+    .distinctUntilChanged();
 }
 
-export function getCurrentWorkspace() {
-  return _getCurrentWorkspace;
+export function getCurrentWorkspaceUsers(
+  store$: Store<IStore>
+): Observable<IUserRow[]> {
+  return filterWorkspaceFetched(store$).map(state =>
+    state.workspaces.byId[state.workspaces.selectedWorkspaceId].users.map(
+      id => state.users.byId[id]
+    )
+  );
 }
 
 // -----------------------------------------------------------
@@ -202,26 +103,44 @@ export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
   id: string;
   type: WorkspaceElementType;
   name: string;
-  svgIcon?: string;
-  icon?: string;
 }
 
-export function _getCurrentTree(
+export function getCurrentWorkspaceTree(
   store$: Store<IStore>
 ): Observable<WorkspaceElement[]> {
-  return _getCurrentWorkspace(store$)
-    .map(workspace => {
-      const baseUrl = `/workspaces/${workspace.id}/petals`;
-      return workspace.buses.list.map<WorkspaceElement>(bus => ({
-        id: bus.id,
-        type: WorkspaceElementType.BUS,
-        name: bus.name,
-        link: `${baseUrl}/buses/${bus.id}`,
-        isFolded: bus.isFolded,
-        cssClass: `workspace-element-type-bus`,
-        svgIcon: `bus`,
+  return filterWorkspaceFetched(store$).map(state => {
+    const tree = buildTree(state);
+    const search = state.workspaces.searchPetals;
 
-        children: bus.containers.list.map<WorkspaceElement>(container => ({
+    if (typeof search !== 'string' || search === '') {
+      return tree;
+    }
+
+    const escaped = escapeStringRegexp(search);
+
+    return tree
+      .map(e => filterElement(escaped.toLowerCase(), e))
+      .filter(e => e !== null);
+  });
+}
+
+function buildTree(state: IStore) {
+  const workspace = state.workspaces.byId[state.workspaces.selectedWorkspaceId];
+  const baseUrl = `/workspaces/${workspace.id}/petals`;
+  return state.buses.allIds
+    .map(id => state.buses.byId[id])
+    .map<WorkspaceElement>(bus => ({
+      id: bus.id,
+      type: WorkspaceElementType.BUS,
+      name: bus.name,
+      link: `${baseUrl}/buses/${bus.id}`,
+      isFolded: bus.isFolded,
+      cssClass: `workspace-element-type-bus`,
+      svgIcon: `bus`,
+
+      children: bus.containers
+        .map(id => state.containers.byId[id])
+        .map<WorkspaceElement>(container => ({
           id: container.id,
           type: WorkspaceElementType.CONTAINER,
           name: container.name,
@@ -237,30 +156,30 @@ export function _getCurrentTree(
               name: 'Components',
               isFolded: container.isComponentsCategoryFolded,
               cssClass: `workspace-element-type-category-components`,
-              children: container.components.list.map<
-                WorkspaceElement
-              >(component => ({
-                id: component.id,
-                type: WorkspaceElementType.COMPONENT,
-                name: component.name,
-                link: `${baseUrl}/components/${component.id}`,
-                isFolded: component.isFolded,
-                cssClass: `workspace-element-type-component`,
-                svgIcon: `component`,
+              children: container.components
+                .map(id => state.components.byId[id])
+                .map<WorkspaceElement>(component => ({
+                  id: component.id,
+                  type: WorkspaceElementType.COMPONENT,
+                  name: component.name,
+                  link: `${baseUrl}/components/${component.id}`,
+                  isFolded: component.isFolded,
+                  cssClass: `workspace-element-type-component`,
+                  svgIcon: `component`,
 
-                children: component.serviceUnits.list.map<
-                  WorkspaceElement
-                >(serviceUnit => ({
-                  id: serviceUnit.id,
-                  type: WorkspaceElementType.SERVICEUNIT,
-                  name: serviceUnit.name,
-                  link: `${baseUrl}/service-units/${serviceUnit.id}`,
-                  isFolded: serviceUnit.isFolded,
-                  cssClass: `workspace-element-type-service-unit`,
-                  svgIcon: `su`,
-                  children: [],
+                  children: component.serviceUnits
+                    .map(id => state.serviceUnits.byId[id])
+                    .map<WorkspaceElement>(serviceUnit => ({
+                      id: serviceUnit.id,
+                      type: WorkspaceElementType.SERVICEUNIT,
+                      name: serviceUnit.name,
+                      link: `${baseUrl}/service-units/${serviceUnit.id}`,
+                      isFolded: serviceUnit.isFolded,
+                      cssClass: `workspace-element-type-service-unit`,
+                      svgIcon: `su`,
+                      children: [],
+                    })),
                 })),
-              })),
             },
             {
               id: container.id,
@@ -268,18 +187,18 @@ export function _getCurrentTree(
               name: 'Service Assemblies',
               isFolded: container.isServiceAssembliesCategoryFolded,
               cssClass: `workspace-element-type-category-service-assemblies`,
-              children: container.serviceAssemblies.list.map<
-                WorkspaceElement
-              >(serviceAssembly => ({
-                id: serviceAssembly.id,
-                type: WorkspaceElementType.SERVICEASSEMBLY,
-                name: serviceAssembly.name,
-                link: `${baseUrl}/service-assemblies/${serviceAssembly.id}`,
-                isFolded: serviceAssembly.isFolded,
-                cssClass: `workspace-element-type-service-assembly`,
-                svgIcon: `sa`,
-                children: [],
-              })),
+              children: container.serviceAssemblies
+                .map(id => state.serviceAssemblies.byId[id])
+                .map<WorkspaceElement>(serviceAssembly => ({
+                  id: serviceAssembly.id,
+                  type: WorkspaceElementType.SERVICEASSEMBLY,
+                  name: serviceAssembly.name,
+                  link: `${baseUrl}/service-assemblies/${serviceAssembly.id}`,
+                  isFolded: serviceAssembly.isFolded,
+                  cssClass: `workspace-element-type-service-assembly`,
+                  svgIcon: `sa`,
+                  children: [],
+                })),
             },
             {
               id: container.id,
@@ -287,38 +206,25 @@ export function _getCurrentTree(
               name: 'Shared Libraries',
               isFolded: container.isSharedLibrariesCategoryFolded,
               cssClass: `workspace-element-type-category-shared-libraries`,
-              children: container.sharedLibraries.list.map<
-                WorkspaceElement
-              >(sl => ({
-                id: sl.id,
-                type: WorkspaceElementType.SHAREDLIBRARY,
-                name: sl.name,
-                link: `${baseUrl}/shared-libraries/${sl.id}`,
-                isFolded: sl.isFolded,
-                cssClass: `workspace-element-type-shared-library`,
-                svgIcon: `sl`,
-                children: [],
-              })),
+              children: container.sharedLibraries
+                .map(id => state.sharedLibraries.byId[id])
+                .map<WorkspaceElement>(sl => ({
+                  id: sl.id,
+                  type: WorkspaceElementType.SHAREDLIBRARY,
+                  name: sl.name,
+                  link: `${baseUrl}/shared-libraries/${sl.id}`,
+                  isFolded: sl.isFolded,
+                  cssClass: `workspace-element-type-shared-library`,
+                  svgIcon: `sl`,
+                  children: [],
+                })),
             },
           ],
         })),
-      }));
-    })
-    .withLatestFrom(store$.select(s => s.workspaces.searchPetals))
-    .map(([tree, search]) => {
-      if (typeof search !== 'string' || search === '') {
-        return tree;
-      }
-
-      const escaped = escapeStringRegexp(search);
-
-      return tree
-        .map(e => filterElement(escaped.toLowerCase(), e))
-        .filter(e => e !== null);
-    });
+    }));
 }
 
-export function filterElement(filter: string, element: any): any {
+function filterElement(filter: string, element: any): any {
   if (element.name.toLowerCase().trim().match(filter)) {
     return element;
   } else if (!element.children) {
@@ -338,8 +244,4 @@ export function filterElement(filter: string, element: any): any {
       };
     }
   }
-}
-
-export function getCurrentTree() {
-  return _getCurrentTree;
 }

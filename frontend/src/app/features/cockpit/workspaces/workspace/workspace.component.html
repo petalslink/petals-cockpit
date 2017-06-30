@@ -86,7 +86,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </md-card-title>
 
           <md-card-content>
-            <div fxLayout="column" *ngIf="workspace.users.list as users" class="workspace-users">
+            <div fxLayout="column" *ngIf="(users$ | async) as users" class="workspace-users">
 
               <md-card-subtitle fxLayout="row" fxLayoutAlign="start center" *ngIf="users.length === 1; else workspaceShared">
                 <md-icon class="margin-right-x1" color="primary">info</md-icon>

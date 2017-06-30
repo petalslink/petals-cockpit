@@ -24,30 +24,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </form>
 
     <a md-mini-fab class="btn-add-bus" color="primary" fxFlex="40px" mdTooltip="Import a bus" mdTooltipPosition="below"
-      [routerLink]="['/workspaces', (workspaces$ | async).selectedWorkspaceId, 'petals', 'buses-in-progress']" (click)="closeSidenavOnSmallScreen()">
+      [routerLink]="['/workspaces', workspaceId, 'petals', 'buses-in-progress']" (click)="closeSidenavOnSmallScreen()">
       <md-icon class="md-24">add</md-icon>
     </a>
   </div>
 
-  <div class="pnl-title" *ngIf="(busesInProgress$ | async).list.length > 0">
+  <div class="pnl-title" *ngIf="busesInProgress.length > 0">
     <div class="margin-left-x1" fxLayout="row" fxLayoutAlign="start center">
       <md-icon class="margin-right-x1" color="primary">import_export</md-icon>
       <span class="text-upper title" fxFlex>Imports in progress</span>
     </div>
   </div>
-  <app-buses-in-progress [busesInProgress]="busesInProgress$ | async" [workspaceId]="(workspaces$ | async).selectedWorkspaceId"></app-buses-in-progress>
+  <app-buses-in-progress [busesInProgress]="busesInProgress" [workspaceId]="workspaceId"></app-buses-in-progress>
 
-  <div class="pnl-title" *ngIf="(busesInProgress$ | async).list.length > 0">
+  <div class="pnl-title" *ngIf="busesInProgress.length > 0">
     <div class="margin-left-x1" fxLayout="row" fxLayoutAlign="start center">
       <md-icon class="margin-right-x1" color="primary">star</md-icon>
       <span class="text-upper title" fxFlex>Buses</span>
     </div>
   </div>
-  <app-material-tree [tree]="tree$ | async" [search]="(workspaces$ | async).searchPetals" [marginLeft]="18" (onToggleFold)="onTreeToggleFold($event)"
+  <app-material-tree [tree]="tree" [search]="search" [marginLeft]="18" (onToggleFold)="onTreeToggleFold($event)"
     (onSelect)="onTreeSelect($event)"></app-material-tree>
 
-  <div fxLayout="column" *ngIf="(tree$ | async).length === 0 && (workspaces$ | async).searchPetals" class="info no-match">
-    There is <b><i>no match</i></b> with <b><i>"{{ (workspaces$ | async).searchPetals }}</i></b>".
+  <div fxLayout="column" *ngIf="tree.length === 0 && search" class="info no-match">
+    There is <b><i>no match</i></b> with <b><i>"{{ search }}</i></b>".
   </div>
 
 </div>

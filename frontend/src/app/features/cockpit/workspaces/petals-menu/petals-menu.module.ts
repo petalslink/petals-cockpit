@@ -17,9 +17,9 @@
 
 import { NgModule } from '@angular/core';
 
-import { SharedModule } from '../../../../shared/shared.module';
-import { PetalsMenuViewComponent } from './petals-menu-view/petals-menu-view.component';
+import { SharedModule } from 'app/shared/shared.module';
 import { MaterialTreeComponent } from './material-tree/material-tree.component';
+import { PetalsMenuViewComponent } from './petals-menu-view/petals-menu-view.component';
 import { BusesInProgressComponent } from './buses-in-progress/buses-in-progress.component';
 
 @NgModule({

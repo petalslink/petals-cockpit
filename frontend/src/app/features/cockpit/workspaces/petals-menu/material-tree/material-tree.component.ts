@@ -29,6 +29,8 @@ export interface TreeElement<T extends TreeElement<T>> {
   isFolded: boolean;
   children: T[];
   cssClass: string;
+  svgIcon?: string;
+  icon?: string;
 }
 
 export interface TreeEvent<T extends TreeElement<T>> {
@@ -71,7 +73,7 @@ export class MaterialTreeComponent<TE extends TreeElement<TE>>
   }
 
   toggleFold(treeEvent: TreeEvent<TE>) {
-    if (this.search === '') {
+    if (!this.search || !this.search.trim()) {
       this.onToggleFold.emit(treeEvent);
     }
 

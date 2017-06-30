@@ -21,6 +21,7 @@ import {
   OnDestroy,
   ViewChild,
   AfterViewInit,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -54,7 +55,8 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     private users: UsersService,
     private route: ActivatedRoute,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -84,6 +86,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
         } else {
           this.tokenInput._focusInput();
         }
+        this.cdr.detectChanges();
       })
       .subscribe();
   }

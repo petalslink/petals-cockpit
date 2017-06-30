@@ -33,15 +33,20 @@ import { Ui } from 'app/shared/state/ui.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { isSmallScreen } from 'app/shared/state/ui.selectors';
 import {
+  getWorkspaces,
+  WorkspaceElement,
+  getCurrentWorkspaceTree,
   getCurrentWorkspace,
-  getWorkspacesList,
 } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import {
   IWorkspace,
   IWorkspaces,
+  IWorkspaceRow,
 } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { ICurrentUser } from 'app/shared/state/users.interface';
 import { getCurrentUser } from 'app/shared/state/users.selectors';
+import { getBusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.selectors';
+import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 
 @Component({
   selector: 'app-workspaces',
@@ -57,8 +62,10 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
   sidenavVisible$: Observable<boolean>;
   sidenavMode$: Observable<string>;
   isOnWorkspace$: Observable<boolean>;
-  workspace$: Observable<IWorkspace>;
+  workspace$: Observable<IWorkspaceRow>;
   workspaces$: Observable<IWorkspaces>;
+  busesInProgress$: Observable<IBusInProgress[]>;
+  tree$: Observable<WorkspaceElement[]>;
   user$: Observable<ICurrentUser>;
 
   constructor(
@@ -75,9 +82,13 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.workspace$ = this.store$.let(getCurrentWorkspace());
-    this.workspaces$ = this.store$.let(getWorkspacesList());
+    this.workspace$ = this.store$.let(getCurrentWorkspace);
+    this.workspaces$ = this.store$.let(getWorkspaces);
     this.user$ = this.store$.let(getCurrentUser());
+    this.busesInProgress$ = this.store$
+      .let(getBusesInProgress())
+      .map(bips => bips.list);
+    this.tree$ = this.store$.let(getCurrentWorkspaceTree);
 
     this.isOnWorkspace$ = this.store$.select(
       state => !!state.workspaces.selectedWorkspaceId

@@ -21,6 +21,7 @@ import {
   OnDestroy,
   ViewChild,
   AfterViewInit,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -52,7 +53,8 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private store$: Store<IStore>,
     private route: ActivatedRoute,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -87,7 +89,10 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
       .let(isLargeScreen)
       .first()
       .filter(ss => ss)
-      .do(_ => this.usernameInput._focusInput())
+      .do(_ => {
+        this.usernameInput._focusInput();
+        this.cdr.detectChanges();
+      })
       .subscribe();
   }
 
