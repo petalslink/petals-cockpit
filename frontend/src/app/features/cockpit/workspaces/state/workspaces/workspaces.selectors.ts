@@ -20,11 +20,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { IWorkspaces, IWorkspace } from './workspaces.interface';
 import { IStore } from '../../../../../shared/state/store.interface';
-import {
-  escapeStringRegexp,
-  arrayEquals,
-  tuple,
-} from '../../../../../shared/helpers/shared.helper';
+import { escapeStringRegexp } from '../../../../../shared/helpers/shared.helper';
 import { IUser } from '../../../../../shared/state/users.interface';
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 
@@ -80,94 +76,63 @@ export function filterWorkspaceFetched(
 export function _getCurrentWorkspace(
   store$: Store<IStore>
 ): Observable<IWorkspace> {
-  return (
-    filterWorkspaceFetched(store$)
-      .map(state =>
-        tuple([
-          state.workspaces,
-          state.users,
-          state.buses,
-          state.containers,
-          state.components,
-          state.serviceAssemblies,
-          state.serviceUnits,
-          state.sharedLibraries,
-        ])
-      )
-      // as the object has a new reference every time,
-      // use distinctUntilChanged for performance
-      .distinctUntilChanged(arrayEquals)
-      .map(
-        (
-          [
-            workspaces,
-            users,
-            buses,
-            containers,
-            components,
-            serviceAssemblies,
-            serviceUnits,
-            sharedLibraries,
-          ]
-        ) => {
-          const workspace = workspaces.byId[workspaces.selectedWorkspaceId];
+  return filterWorkspaceFetched(store$).map(state => {
+    const workspace =
+      state.workspaces.byId[state.workspaces.selectedWorkspaceId];
+    return {
+      ...workspace,
+
+      users: {
+        ...state.users,
+        list: workspace.users.map(userId => state.users.byId[userId]),
+      },
+
+      buses: {
+        ...state.buses,
+        list: state.buses.allIds.map(busId => {
+          const bus = state.buses.byId[busId];
           return {
-            ...workspace,
-
-            users: {
-              ...users,
-              list: workspace.users.map(userId => users.byId[userId]),
-            },
-
-            buses: {
-              ...buses,
-              list: buses.allIds.map(busId => {
-                const bus = buses.byId[busId];
+            ...bus,
+            containers: {
+              ...state.containers,
+              list: bus.containers.map(containerId => {
+                const container = state.containers.byId[containerId];
                 return {
-                  ...bus,
-                  containers: {
-                    ...containers,
-                    list: bus.containers.map(containerId => {
-                      const container = containers.byId[containerId];
+                  ...container,
+                  components: {
+                    ...state.components,
+                    list: container.components.map(componentId => {
+                      const component = state.components.byId[componentId];
                       return {
-                        ...container,
-                        components: {
-                          ...components,
-                          list: container.components.map(componentId => {
-                            const component = components.byId[componentId];
+                        ...component,
+                        serviceUnits: {
+                          ...state.serviceUnits,
+                          list: component.serviceUnits.map(suId => {
+                            const serviceUnit = state.serviceUnits.byId[suId];
                             return {
-                              ...component,
-                              serviceUnits: {
-                                ...serviceUnits,
-                                list: component.serviceUnits.map(suId => {
-                                  const serviceUnit = serviceUnits.byId[suId];
-                                  return {
-                                    ...serviceUnit,
-                                  };
-                                }),
-                              },
+                              ...serviceUnit,
                             };
                           }),
                         },
-                        serviceAssemblies: {
-                          ...serviceAssemblies,
-                          list: container.serviceAssemblies.map(saId => {
-                            const serviceAssembly =
-                              serviceAssemblies.byId[saId];
-                            return {
-                              ...serviceAssembly,
-                            };
-                          }),
-                        },
-                        sharedLibraries: {
-                          ...sharedLibraries,
-                          list: container.sharedLibraries.map(id => {
-                            const sl = sharedLibraries.byId[id];
-                            return {
-                              ...sl,
-                            };
-                          }),
-                        },
+                      };
+                    }),
+                  },
+                  serviceAssemblies: {
+                    ...state.serviceAssemblies,
+                    list: container.serviceAssemblies.map(saId => {
+                      const serviceAssembly =
+                        state.serviceAssemblies.byId[saId];
+                      return {
+                        ...serviceAssembly,
+                      };
+                    }),
+                  },
+                  sharedLibraries: {
+                    ...state.sharedLibraries,
+                    list: container.sharedLibraries.map(id => {
+                      const sl = state.sharedLibraries.byId[id];
+                      return {
+                        ...sl,
                       };
                     }),
                   },
@@ -175,9 +140,10 @@ export function _getCurrentWorkspace(
               }),
             },
           };
-        }
-      )
-  );
+        }),
+      },
+    };
+  });
 }
 
 export function getCurrentWorkspace() {
