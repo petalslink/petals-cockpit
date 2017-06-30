@@ -22,11 +22,16 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../shared/state/store.interface';
-import { IWorkspace } from './../state/workspaces/workspaces.interface';
-import { getCurrentWorkspace } from '../../../cockpit/workspaces/state/workspaces/workspaces.selectors';
+import { IWorkspaceRow } from './../state/workspaces/workspaces.interface';
+import {
+  getCurrentWorkspace,
+  filterWorkspaceFetched,
+  getCurrentWorkspaceUsers,
+} from '../../../cockpit/workspaces/state/workspaces/workspaces.selectors';
 
 import { Ui } from 'app/shared/state/ui.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { IUserRow } from 'app/shared/state/users.interface';
 
 @Component({
   selector: 'app-workspace',
@@ -35,13 +40,15 @@ import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/wor
 })
 export class WorkspaceComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
-  public workspace$: Observable<IWorkspace>;
 
-  public isRemoving = false;
+  workspace$: Observable<IWorkspaceRow>;
+  users$: Observable<IUserRow[]>;
 
-  public isEditingDescription = false;
-  public isSettingDescription = false;
-  public description: string = null;
+  isRemoving = false;
+
+  isEditingDescription = false;
+  isSettingDescription = false;
+  description: string = null;
 
   constructor(private store$: Store<IStore>, private dialog: MdDialog) {}
 
@@ -53,12 +60,14 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.workspace$ = this.store$.let(getCurrentWorkspace());
+    this.workspace$ = this.store$.let(getCurrentWorkspace);
+    this.users$ = this.store$.let(getCurrentWorkspaceUsers);
 
-    this.workspace$
+    this.store$
+      .let(filterWorkspaceFetched)
       .takeUntil(this.onDestroy$)
       // only when we change workspace!
-      .map(ws => ws.id)
+      .map(state => state.workspaces.selectedWorkspaceId)
       .distinctUntilChanged()
       .do(id => {
         // we reinit these in case one change workspace while editing
@@ -113,13 +122,13 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   }
 
   openDeletionDialog() {
+    this.isRemoving = true;
     this.workspace$
       .first()
-      .do(_ => (this.isRemoving = true))
       .switchMap(ws =>
         this.dialog
           .open(WorkspaceDeleteDialogComponent, {
-            data: { workspace: ws },
+            data: { name: ws.name },
           })
           .afterClosed()
           .do((result: boolean) => (this.isRemoving = result))
@@ -149,7 +158,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
         <md-dialog-content>
           <p fxLayout="column">
             <span>Everything in the workspace will be deleted! <b>Please, be certain</b>.</span>
-            <span class="margin-top-x1">Are you sure you want to delete <b>{{ data.workspace.name }}</b>?</span>
+            <span class="margin-top-x1">Are you sure you want to delete <b>{{ data.name }}</b>?</span>
           </p>
         </md-dialog-content>
 

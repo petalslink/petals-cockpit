@@ -73,7 +73,7 @@ export class MaterialTreeComponent<TE extends TreeElement<TE>>
   }
 
   toggleFold(treeEvent: TreeEvent<TE>) {
-    if (this.search === '') {
+    if (!this.search || !this.search.trim()) {
       this.onToggleFold.emit(treeEvent);
     }
 

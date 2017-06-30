@@ -28,7 +28,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
     <md-tab-group fxFlex>
       <md-tab label="Petals">
-        <app-petals-menu-view></app-petals-menu-view>
+        <app-petals-menu-view
+          [busesInProgress]="busesInProgress$ | async" [tree]="tree$ | async"
+          [workspaceId]="workspace.id" ></app-petals-menu-view>
       </md-tab>
 
       <md-tab label="Service">

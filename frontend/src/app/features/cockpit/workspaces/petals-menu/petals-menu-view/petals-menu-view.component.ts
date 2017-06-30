@@ -15,24 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
-import { IStore } from '../../../../../shared/state/store.interface';
-// tslint:disable-next-line:max-line-length
+import { IStore } from 'app/shared/state/store.interface';
 import {
-  getCurrentTree,
   WorkspaceElement,
   WorkspaceElementType,
-} from '../../../../cockpit/workspaces/state/workspaces/workspaces.selectors';
-
-import { IBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
-import { getBusesInProgress } from '../../state/buses-in-progress/buses-in-progress.selectors';
-import { IWorkspacesTable } from './../../state/workspaces/workspaces.interface';
-
+} from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { TreeEvent } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
+import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
@@ -43,32 +41,36 @@ import { Ui } from 'app/shared/state/ui.actions';
   selector: 'app-petals-menu-view',
   templateUrl: './petals-menu-view.component.html',
   styleUrls: ['./petals-menu-view.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsMenuViewComponent implements OnInit {
-  public searchForm: FormGroup;
-  public workspaces$: Observable<IWorkspacesTable>;
-  public tree$: Observable<WorkspaceElement[]>;
-  public busesInProgress$: Observable<IBusesInProgress>;
+  @Input() workspaceId: string;
+  @Input() tree: WorkspaceElement[];
+  @Input() busesInProgress: IBusInProgress[];
+
+  searchForm: FormGroup;
+  search = '';
 
   constructor(private fb: FormBuilder, private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.workspaces$ = this.store$.select(state => state.workspaces);
-    this.tree$ = this.store$.let(getCurrentTree());
-    this.busesInProgress$ = this.store$.let(getBusesInProgress());
-    this.formSearchPetals();
-
-    this.searchForm.valueChanges
-      .do(value => {
-        this.search(value.search);
-      })
-      .subscribe();
-  }
-
-  formSearchPetals() {
     this.searchForm = this.fb.group({
       search: '',
     });
+
+    this.searchForm.valueChanges
+      .map(value => value.search)
+      .do(search => (this.search = search))
+      .do(search => this.store$.dispatch(new Workspaces.SetSearch({ search })))
+      .subscribe();
+  }
+
+  onTreeSelect(e: TreeEvent<WorkspaceElement>) {
+    if (e.item.link) {
+      this.closeSidenavOnSmallScreen();
+    } else {
+      this.onTreeToggleFold(e);
+    }
   }
 
   onTreeToggleFold(e: TreeEvent<WorkspaceElement>) {
@@ -103,18 +105,6 @@ export class PetalsMenuViewComponent implements OnInit {
         this.store$.dispatch(new Components.ToggleFold({ id: e.item.id }));
         break;
     }
-  }
-
-  onTreeSelect(e: TreeEvent<WorkspaceElement>) {
-    if (e.item.link) {
-      this.closeSidenavOnSmallScreen();
-    } else {
-      this.onTreeToggleFold(e);
-    }
-  }
-
-  search(search: string) {
-    this.store$.dispatch(new Workspaces.SetSearch({ search }));
   }
 
   closeSidenavOnSmallScreen() {
