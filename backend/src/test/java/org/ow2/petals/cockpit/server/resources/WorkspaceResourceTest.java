@@ -19,6 +19,7 @@ package org.ow2.petals.cockpit.server.resources;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.db.api.Assertions.assertThat;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Test;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
@@ -191,6 +193,88 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertUsers(put.users);
 
         assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.DESCRIPTION.getName()).isEqualTo("description");
+    }
+
+    @Test
+    public void addUserToExistingWorkspace() {
+        addUser("user1");
+
+        Response add = resource.target("/workspaces/1/users").request().post(Entity.json("user1"));
+        assertThat(add.getStatus()).isEqualTo(204);
+
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(2)
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin").value().isEqualTo("user1");
+
+        // adding an already added user should work
+        Response add2 = resource.target("/workspaces/1/users").request().post(Entity.json("user1"));
+        assertThat(add2.getStatus()).isEqualTo(204);
+
+        // non-existing user
+        Response add3 = resource.target("/workspaces/1/users").request().post(Entity.json("user2"));
+        assertThat(add3.getStatus()).isEqualTo(409);
+
+        // the other workspace wasn't touched
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(1)
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("anotheruser");
+    }
+
+    @Test
+    public void addUserToExistingWorkspaceForbidden() {
+        addUser("user1");
+
+        Response add = resource.target("/workspaces/2/users").request().post(Entity.json("user1"));
+        assertThat(add.getStatus()).isEqualTo(403);
+
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(1)
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("anotheruser");
+    }
+
+    @Test
+    public void addUserToNonExistingWorkspaceForbidden() {
+        addUser("user1");
+
+        Response add = resource.target("/workspaces/3/users").request().post(Entity.json("user1"));
+        assertThat(add.getStatus()).isEqualTo(403);
+    }
+
+    @Test
+    public void deleteUserFromExistingWorkspace() {
+        addUser("user1");
+
+        resource.db().executeInsert(new UsersWorkspacesRecord(1L, "user1"));
+
+        Response add = resource.target("/workspaces/1/users/user1").request().delete();
+        assertThat(add.getStatus()).isEqualTo(204);
+
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(1)
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin");
+
+        // deleting an non-workspace user should work
+        Response add2 = resource.target("/workspaces/1/users/user1").request().delete();
+        assertThat(add2.getStatus()).isEqualTo(204);
+
+        // non-existing user should work also
+        Response add3 = resource.target("/workspaces/1/users/user2").request().delete();
+        assertThat(add3.getStatus()).isEqualTo(204);
+
+        // the other workspace wasn't touched
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(1)
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("anotheruser");
+    }
+
+    @Test
+    public void deleteUserFromNonExistingWorkspaceForbidden() {
+        Response add = resource.target("/workspaces/3/users/user1").request().delete();
+        assertThat(add.getStatus()).isEqualTo(403);
+    }
+
+    @Test
+    public void deleteUserFromExistingWorkspaceForbidden() {
+        Response add = resource.target("/workspaces/2/users/anotheruser").request().delete();
+        assertThat(add.getStatus()).isEqualTo(403);
+
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(1)
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("anotheruser");
     }
 
     private void assertContent(SoftAssertions a, WorkspaceFullContent content, Domain... buses) {
