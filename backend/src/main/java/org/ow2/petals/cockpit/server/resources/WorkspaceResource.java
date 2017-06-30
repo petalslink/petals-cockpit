@@ -55,6 +55,8 @@ import org.glassfish.jersey.media.sse.SseFeature;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
+import org.jooq.exception.DataAccessException;
+import org.jooq.exception.SQLStateClass;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeComponentState;
@@ -156,6 +158,7 @@ public class WorkspaceResource {
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public WorkspaceOverviewContent put(WorkspaceUpdate update) {
         return DSL.using(jooq).transactionResult(conf -> {
             WorkspacesRecord ws = get(conf);
@@ -381,6 +384,33 @@ public class WorkspaceResource {
                     new DeployServiceAssembly(descriptor.getServiceAssembly().getIdentification().getName(),
                             sa.getArtifactExternalUrl(), containerId));
         }
+    }
+
+    @POST
+    @Path("/users/")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void addUsers(@NotEmpty String username) {
+        checkAccess(jooq);
+
+        try {
+            DSL.using(jooq).insertInto(USERS_WORKSPACES).set(USERS_WORKSPACES.WORKSPACE_ID, wsId)
+                    .set(USERS_WORKSPACES.USERNAME, username).onDuplicateKeyIgnore().execute();
+        } catch (DataAccessException e) {
+            if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
+                throw new WebApplicationException(Status.CONFLICT);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    @DELETE
+    @Path("/users/{id}")
+    public void deleteUser(@NotEmpty @PathParam("id") String username) {
+        checkAccess(jooq);
+
+        DSL.using(jooq).delete(USERS_WORKSPACES)
+                .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(username))).execute();
     }
 
     public static class WorkspaceOverviewContent {

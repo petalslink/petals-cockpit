@@ -295,4 +295,8 @@
       </column>
     </addColumn>
   </changeSet>
+
+  <changeSet id="v0.11.0-2" author="vnoel">
+    <addPrimaryKey columnNames="username, workspace_id" constraintName="pk_users_workspaces" tableName="users_workspaces" />
+  </changeSet>
 </databaseChangeLog>
