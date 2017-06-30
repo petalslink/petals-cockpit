@@ -54,7 +54,7 @@ export interface IBusesInProgressTable
     JsTable<IBusInProgressRow> {}
 
 export interface IBusesInProgress extends IBusesInProgressCommon {
-  list: Array<IBusInProgress>;
+  list: IBusInProgress[];
 }
 
 export function busInProgressRowFactory(): IBusInProgressRow {

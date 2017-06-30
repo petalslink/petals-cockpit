@@ -21,6 +21,7 @@ import {
   OnDestroy,
   ViewChild,
   AfterViewInit,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MdInputContainer } from '@angular/material';
@@ -76,7 +77,8 @@ export class PetalsBusInProgressViewComponent
   constructor(
     private store$: Store<IStore>,
     private fb: FormBuilder,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -150,7 +152,10 @@ export class PetalsBusInProgressViewComponent
       .let(isLargeScreen)
       .first()
       .filter(ss => ss)
-      .do(_ => this.ipInput._focusInput())
+      .do(_ => {
+        this.ipInput._focusInput();
+        this.cdr.detectChanges();
+      })
       .subscribe();
   }
 
