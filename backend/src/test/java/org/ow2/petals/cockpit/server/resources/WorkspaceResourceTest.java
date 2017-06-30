@@ -45,14 +45,14 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     @Test
-    public void deleteWorkspaceNonExistingWorkspaceForbidden() {
+    public void deleteNonExistingWorkspaceForbidden() {
         Response delete = resource.target("/workspaces/3").request().delete();
 
         assertThat(delete.getStatus()).isEqualTo(403);
     }
 
     @Test
-    public void deleteWorkspaceWorkspaceForbidden() {
+    public void deleteExistingWorkspaceForbidden() {
         Response delete = resource.target("/workspaces/2").request().delete();
 
         assertThat(delete.getStatus()).isEqualTo(403);
@@ -62,7 +62,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     @Test
-    public void deleteWorkspace() {
+    public void deleteExistingWorkspace() {
         assertThat(table(WORKSPACES)).hasNumberOfRows(2);
 
         WorkspaceDeleted delete = resource.target("/workspaces/1").request().delete(WorkspaceDeleted.class);
@@ -101,7 +101,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     @Test
-    public void getEventWorkspaceForbidden() {
+    public void getEventExistingWorkspaceForbidden() {
         Response get = resource.target("/workspaces/2/content").request(SseFeature.SERVER_SENT_EVENTS_TYPE).get();
 
         assertThat(get.getStatus()).isEqualTo(403);
@@ -142,14 +142,14 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     @Test
-    public void getOverviewWorkspaceForbidden() {
+    public void getOverviewExistingWorkspaceForbidden() {
         Response get = resource.target("/workspaces/2").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
     }
 
     @Test
-    public void getOverviewWorkspace() {
+    public void getOverviewExistingWorkspace() {
         WorkspaceOverviewContent get = resource.target("/workspaces/1").request().get(WorkspaceOverviewContent.class);
 
         assertContentOverview(get.workspace);
@@ -166,7 +166,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     @Test
-    public void setDescriptionWorkspaceForbidden() {
+    public void setDescriptionExistingWorkspaceForbidden() {
         Response put = resource.target("/workspaces/2").request()
                 .put(Entity.json(new WorkspaceUpdate(null, "description")));
 
