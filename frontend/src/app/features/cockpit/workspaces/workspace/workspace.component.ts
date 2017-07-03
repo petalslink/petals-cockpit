@@ -131,8 +131,9 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
             data: { name: ws.name },
           })
           .afterClosed()
-          .do((result: boolean) => (this.isRemoving = result))
-          .filter((result: boolean) => result)
+          .map(res => !!res)
+          .do(result => (this.isRemoving = result))
+          .filter(result => result)
           .do(_ => this.store$.dispatch(new Workspaces.Delete({ id: ws.id })))
       )
       .subscribe();
@@ -163,7 +164,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
         </md-dialog-content>
 
         <md-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
-          <button md-button md-dialog-close class="margin-right-x1">Cancel</button>
+          <button md-button md-dialog-close class="btn-cancel-delete-wks margin-right-x1">Cancel</button>
           <button md-raised-button color="warn" class="btn-confirm-delete-wks" (click)="dialogRef.close(true)">Delete</button>
         </md-dialog-actions>
       </div>
