@@ -14,8 +14,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <md-sidenav-container *ngIf="isOnWorkspace$ | async" fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">
-  <md-sidenav fxLayout="column" *ngIf="workspace$ | async as workspace" [opened]="sidenavVisible$ | async" [mode]="sidenavMode$ | async">
-    <div fxLayout="row">
+  <md-sidenav fxLayout="column" *ngIf="workspace$ | async as workspace" [opened]="sidenavVisible$ | async" [mode]="sidenavMode$ | async" [class.mat-elevation-z6]="showShadow">
+    <div fxLayout="row" class="pnl-buttons-workspaces">
       <button fxFlex="100" md-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', workspace.id]"
         class="workspace-name width-full no-border-radius text-upper" color="accent">
         {{ workspace.name }}
@@ -26,11 +26,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </button>
     </div>
 
-    <md-tab-group fxFlex>
+    <md-tab-group fxFlex md-stretch-tabs>
       <md-tab label="Petals">
         <app-petals-menu-view
           [busesInProgress]="busesInProgress$ | async" [tree]="tree$ | async"
-          [workspaceId]="workspace.id" ></app-petals-menu-view>
+          [workspaceId]="workspace.id"></app-petals-menu-view>
       </md-tab>
 
       <md-tab label="Service">

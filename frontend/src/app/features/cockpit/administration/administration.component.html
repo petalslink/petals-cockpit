@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <div fxFlexFill fxLayout="column" class="content content-max-width" *ngIf="(user$ | async).isAdmin; else notAdmin">
     <div class="central-content">
-      <div fxLayout="column">
+      <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
 
         <md-card fxFlex *ngIf="users$ | async as users" [ngClass.gt-md]="'card-auto-size'">
           <md-card-content>

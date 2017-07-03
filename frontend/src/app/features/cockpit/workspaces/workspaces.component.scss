@@ -16,13 +16,18 @@
  */
 
 :host {
-  display: flex;
-  flex-direction: column;
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
+// all menu views have the same size (petals, service, api)
 md-sidenav {
   height: 100%;
   width: 320px;
+  // customize the buttons of petals menu view
+  .pnl-buttons-workspaces > .no-border-radius {
+    border-radius: 0;
+  }
 }

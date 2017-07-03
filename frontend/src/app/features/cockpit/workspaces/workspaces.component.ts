@@ -68,6 +68,8 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
   tree$: Observable<WorkspaceElement[]>;
   user$: Observable<ICurrentUser>;
 
+  showShadow = true;
+
   constructor(
     private store$: Store<IStore>,
     private router: Router,
