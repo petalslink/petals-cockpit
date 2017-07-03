@@ -24,85 +24,22 @@
 // themes
 @import './themes/_light.theme';
 
-div > h3,
-md-dialog-container > h3 {
-  margin: 0;
-  padding: 10px;
-  border-radius: 2dpi;
-}
-
-div > h4 {
-  @extend .color-accent;
-  @extend .bold;
-}
-
 md-sidenav-container {
   background-image: url(./assets/img/gray_jean.png);
   color: mat-color($theme-primary, default-contrast);
 }
 
-// all categories without tree elements
-md-sidenav-container a.workspace-element-type-category-components,
-md-sidenav-container a.workspace-element-type-category-service-assemblies,
-md-sidenav-container a.workspace-element-type-category-shared-libraries {
-  .mat-list-item-content {
-    @extend .text-upper;
-    background: rgba(0, 0, 0, 0.02);
-    color: rgba(0, 0, 0, 0.54);
-    font-weight: 500;
-  }
-}
-
-// all tree elements without categories
-md-sidenav-container a.workspace-element-type-bus,
-md-sidenav-container a.workspace-element-type-container,
-md-sidenav-container a.workspace-element-type-component,
-md-sidenav-container a.workspace-element-type-service-assembly,
-md-sidenav-container a.workspace-element-type-shared-library,
-md-sidenav-container a.workspace-element-type-service-unit {
-  .mat-list-item-content:hover,
-  .mat-list-item-content:focus {
-    background-color: mat-color($theme-primary-x);
-    @extend .color-primary-light-bold;
-  }
-}
-
-// all tree elements with categories
-md-sidenav-container a /deep/ .mat-list-item-content {
-  height: 24px !important;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-  border-color: rgba(0, 0, 0, .02);
-}
-
-.icon-primary {
-  color: mat-color($theme-primary-x6);
-}
-
-.active-link,
-.active-link:hover {
-  .mat-list-item-content,
-  .mat-list-item-content:hover {
-    background-color: mat-color($theme-primary-x);
-    @extend .color-primary-bold;
-    margin: 0;
-  }
-}
-
-.highlight {
-  background-color: mat-color($theme-accent-x5);
-}
-
-.page-cockpit /deep/ .header-toolbar,
-.page-cockpit /deep/ .header-toolbar .mat-toolbar-row {
+// customize toolbars
+app-header .header-toolbar,
+.header-toolbar > .mat-toolbar-layout > .mat-toolbar-row {
   height: 56px;
-  min-height: 56px !important;
+  min-height: 56px;
 }
 
-.page-cockpit /deep/ .toolbar-page-header,
-.page-cockpit /deep/ .toolbar-page-header .mat-toolbar-row {
-  height: 120px;
-  min-height: 140px !important;
+app-header .toolbar-page-header,
+.toolbar-page-header > .mat-toolbar-layout > .mat-toolbar-row {
+  height: 140px;
+  min-height: 140px;
   h1 {
     font-size: 30px;
     font-weight: 300;
@@ -112,10 +49,10 @@ md-sidenav-container a /deep/ .mat-list-item-content {
 }
 
 @media screen and (max-width: 840px) {
-  .page-cockpit /deep/ .toolbar-page-header,
-  .page-cockpit /deep/ .toolbar-page-header .mat-toolbar-row {
+  app-header .toolbar-page-header,
+  .toolbar-page-header > .mat-toolbar-layout > .mat-toolbar-row {
     height: 80px;
-    min-height: 80px !important;
+    min-height: 80px;
     h1 {
       padding: 24px 8px;
       font-size: 20px;
@@ -129,4 +66,104 @@ md-sidenav-container a /deep/ .mat-list-item-content {
 .mat-icon.goto-icon {
   height: 18px;
   width: 18px;
+}
+
+.icon-primary {
+  color: mat-color($theme-primary-x6);
+}
+
+.highlight {
+  background-color: mat-color($theme-accent-x5);
+}
+
+// all items elements in petals menu view
+app-buses-in-progress
+  > .nav-list-imports-in-progress
+  > .item-list
+  > .mat-list-item
+  > .mat-list-item-content,
+app-material-tree
+  > .nav-list-petals-tree
+  > .item-list
+  > .mat-list-item
+  > .mat-list-item-content {
+  height: 24px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-color: rgba(0, 0, 0, .02);
+}
+
+.active-link,
+.active-link:hover {
+  .mat-list-item-content,
+  .mat-list-item-content:hover {
+    background-color: mat-color($theme-primary-x);
+    @extend .color-primary-bold;
+    margin: 0;
+  }
+}
+
+// all items elements in petals tree
+app-material-tree > .nav-list-petals-tree > .item-list {
+  // customize tree elements
+  .mat-list-item > .mat-list-item-content:hover,
+  .mat-list-item > .mat-list-item-content:focus {
+    background-color: mat-color($theme-primary-x);
+    @extend .color-primary-light-bold;
+  }
+  // customize categories of elements
+  .workspace-element-type-category-components > .mat-list-item-content,
+  .workspace-element-type-category-service-assemblies > .mat-list-item-content,
+  .workspace-element-type-category-shared-libraries > .mat-list-item-content {
+    @extend .text-upper;
+    background: rgba(0, 0, 0, 0.02);
+    color: rgba(0, 0, 0, 0.54);
+    font-weight: 500;
+  }
+  // customize hover categories of elements
+  .workspace-element-type-category-components > .mat-list-item-content:hover,
+  .workspace-element-type-category-service-assemblies
+    > .mat-list-item-content:hover,
+  .workspace-element-type-category-shared-libraries
+    > .mat-list-item-content:hover {
+    background: rgba(0, 0, 0, .08);
+    color: rgba(0, 0, 0, .54);
+    font-weight: 500;
+  }
+  // customize focus categories of elements
+  .workspace-element-type-category-components > .mat-list-item-content:focus,
+  .workspace-element-type-category-service-assemblies
+    > .mat-list-item-content:focus,
+  .workspace-element-type-category-shared-libraries
+    > .mat-list-item-content:focus {
+    background: rgba(0, 0, 0, .02);
+    color: rgba(0, 0, 0, .54);
+    font-weight: 500;
+  }
+}
+
+// all items ip/port in imports in progress
+app-buses-in-progress > .nav-list-imports-in-progress > .item-list {
+  // customize tree elements
+  .mat-list-item > .mat-list-item-content:hover,
+  .mat-list-item > .mat-list-item-content:focus {
+    background-color: mat-color($theme-primary-x);
+    @extend .color-primary-light-bold;
+  }
+}
+
+.network-canvas {
+  width: 100%;
+  height: 100%;
+  .vis-network > .vis-network-tooltip {
+    height: 22px;
+    max-width: 250px;
+    font-size: 10px;
+    margin: 14px;
+    padding: 8px;
+    background: mat-color($mat-grey, 700, 0.9);
+    border-radius: 2px;
+    position: absolute;
+    color: #fff;
+  }
 }

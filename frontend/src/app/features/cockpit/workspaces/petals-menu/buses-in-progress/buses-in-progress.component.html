@@ -13,15 +13,17 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-nav-list dense *ngFor="let busInProgress of busesInProgress">
-  <a (click)="closeSidenavOnSmallScreen()" md-list-item routerLinkActive="active-link" [routerLink]="['/workspaces', workspaceId, 'petals', 'buses-in-progress', busInProgress.id]">
-    <span class="ip-port">{{ busInProgress.ip }}:{{ busInProgress.port }}</span>
+<md-nav-list dense *ngFor="let busInProgress of busesInProgress" class="nav-list-imports-in-progress">
+  <div class="item-list">
+    <a (click)="closeSidenavOnSmallScreen()" md-list-item routerLinkActive="active-link" [routerLink]="['/workspaces', workspaceId, 'petals', 'buses-in-progress', busInProgress.id]">
+      <span class="ip-port">{{ busInProgress.ip }}:{{ busInProgress.port }}</span>
 
-    <div fxFlex></div>
+      <div fxFlex></div>
 
-    <div class="wrap-icon">
-      <md-spinner *ngIf="!busInProgress.importError"></md-spinner>
-      <md-icon color="warn" *ngIf="busInProgress.importError">warning</md-icon>
-    </div>
-  </a>
+      <div class="wrap-icon">
+        <md-spinner *ngIf="!busInProgress.importError"></md-spinner>
+        <md-icon color="warn" *ngIf="busInProgress.importError">warning</md-icon>
+      </div>
+    </a>
+  </div>
 </md-nav-list>

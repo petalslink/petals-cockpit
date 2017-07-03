@@ -73,13 +73,12 @@ div > .mat-dialog-container {
     width: 100%;
 
     &.content-max-width {
-      max-width: 1000px;
       margin: auto;
     }
   }
   @media screen and (max-width: 640px) {
     .content {
-      padding: 10px !important;
+      padding: 10px;
     }
   }
 }
@@ -115,39 +114,6 @@ div > .mat-dialog-container {
 .form-error {
   color: red;
   font-size: 12px;
-}
-
-.error {
-  padding: 12px;
-  background-color: rgba(255, 0, 0, 0.2);
-  color: mat-color($mat-red, 500, 1);
-  overflow-wrap: break-word;
-  display: inline-block !important;
-  width: 100%;
-}
-
-.info {
-  @extend .error;
-  background-color: rgba(206, 227, 255, 0.4) !important;
-  color: #4c83ef !important;
-}
-
-.vis-network-tooltip {
-  height: 22px;
-  max-width: 250px;
-  font-size: 10px;
-  margin: 14px;
-  padding: 8px;
-  background: mat-color($mat-grey, 700, 0.9);
-  border-radius: 2px;
-  position: absolute;
-  color: #fff;
-}
-
-.warning {
-  @extend .error;
-  background-color: rgba(255, 234, 206, 0.4) !important;
-  color: orange !important;
 }
 
 .italic {
@@ -234,22 +200,55 @@ pre {
   }
 }
 
-// see https://github.com/angular/material2/issues/2829
-md-sidenav {
+// temporary fix https://github.com/angular/material2/issues/2829
+app-workspaces
+  > .mat-sidenav-container
+  > .mat-sidenav
+  > .mat-tab-group
+  > .mat-tab-header
+  > .mat-tab-label-container
+  > .mat-tab-list
+  > .mat-tab-labels {
   .mat-tab-label {
-    min-width: 0px !important;
-    // 33 because we have 3 tabs
-    width: 33%;
+    min-width: 72px;
     text-transform: uppercase;
   }
 }
 
-.wrapper-content {
+.wrapper-content
+  > .mat-tab-group
+  > .mat-tab-header
+  > .mat-tab-label-container
+  > .mat-tab-list
+  > .mat-tab-labels {
   .mat-tab-label {
     text-transform: uppercase;
   }
 }
 
+// all types of messages
+@mixin message($bg, $color) {
+  padding: 12px;
+  overflow-wrap: break-word;
+  display: inline-block;
+  width: 100%;
+  background-color: $bg;
+  color: $color;
+}
+
+.error {
+  @include message (rgba(255, 0, 0, 0.2), mat-color($mat-red, 500, 1));
+}
+
+.info {
+  @include message (rgba(206, 227, 255, 0.4), #4c83ef);
+}
+
+.warning {
+  @include message (rgba(255, 234, 206, 0.4), orange);
+}
+
+// all types of leds
 @mixin led($bg, $shadow1, $shadow2) {
   width: 10px;
   height: 10px;

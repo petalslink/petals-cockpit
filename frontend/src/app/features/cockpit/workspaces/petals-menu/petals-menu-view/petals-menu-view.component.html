@@ -46,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <app-material-tree [tree]="tree" [search]="search" [marginLeft]="18" (onToggleFold)="onTreeToggleFold($event)"
     (onSelect)="onTreeSelect($event)"></app-material-tree>
 
-  <div fxLayout="column" *ngIf="tree.length === 0 && search" class="info no-match">
+  <div *ngIf="tree.length === 0 && search" class="info no-match">
     There is <b><i>no match</i></b> with <b><i>"{{ search }}</i></b>".
   </div>
 
