@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { $ } from 'protractor';
+import { $, browser } from 'protractor';
 
 import { page } from './common';
 import { WorkspacePage } from './pages/workspace.po';
@@ -175,23 +175,20 @@ describe(`Workspaces Tree`, () => {
     expect(workspace.getHighlightedElement().then(e => e.length)).toEqual(2);
   });
 
-  it(`should fold and unfold sa categorie visible and doesn't change the url`, () => {
-    const container = workspace.openContainer('Cont 0');
-    const firstContFolder = workspace.treeElementFolder(0, 'container');
-    firstContFolder.click();
+  it(`should fold and unfold a category and doesn't change the url`, () => {
+    workspace.openServiceUnit('SU 0');
 
-    // check the title of page
-    expect(container.title.getText()).toEqual('Cont 0');
+    workspace.treeElementFolder(0, 'container').click();
 
-    const firstSaCat = workspace.treeElement(0, 'category-service-assemblies');
+    expect(browser.getCurrentUrl()).toMatch(
+      /\/workspaces\/\w+\/petals\/service-units\/\w+/
+    );
 
-    // 1) fold the category SERVICE ASSEMBLIES
-    firstSaCat.click();
+    workspace.treeElement(0, 'category-service-assemblies').click();
 
-    expect(workspace.treeElement(0, 'container'));
-
-    // 2) unfold the category SERVICE ASSEMBLIES
-    firstSaCat.click();
+    expect(browser.getCurrentUrl()).toMatch(
+      /\/workspaces\/\w+\/petals\/service-units\/\w+/
+    );
   });
 
   it(`should fold and unfold Petals Buses/Containers/Components/SUs`, () => {
