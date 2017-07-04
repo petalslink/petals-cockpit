@@ -29,10 +29,14 @@ import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
+import org.jooq.exception.DataAccessException;
+import org.jooq.exception.SQLStateClass;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
@@ -71,15 +75,23 @@ public class SetupResource {
             throw new NotFoundException("Petals Cockpit is already setup");
         }
 
-        DSL.using(jooq).transaction(c -> {
-            DSL.using(c).executeInsert(new UsersRecord(setup.username,
-                    CockpitAuthenticator.passwordEncoder.encode(setup.password), setup.name, null, true));
+        try {
+            DSL.using(jooq).transaction(c -> {
+                DSL.using(c).executeInsert(new UsersRecord(setup.username,
+                        CockpitAuthenticator.passwordEncoder.encode(setup.password), setup.name, null, true));
 
-            if (!userCreated.compareAndSet(false, true)) {
-                // this will rollback the transaction and cancel the insert
-                throw new NotFoundException("Petals Cockpit is already setup");
+                if (!userCreated.compareAndSet(false, true)) {
+                    // this will rollback the transaction and cancel the insert
+                    throw new NotFoundException("Petals Cockpit is already setup");
+                }
+            });
+        } catch (DataAccessException e) {
+            if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
+                throw new WebApplicationException("User already exists", Status.CONFLICT);
+            } else {
+                throw e;
             }
-        });
+        }
     }
 
     public static class UserSetup extends NewUser {
