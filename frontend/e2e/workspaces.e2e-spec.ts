@@ -146,6 +146,11 @@ describe(`Workspaces`, () => {
       `Everything in the workspace will be deleted! Please, be certain.\nAre you sure you want to delete New workspace?`
     );
 
+    // check that cancel button is working and that the delete button is unlocked
+    $(`app-workspace-deletion-dialog .btn-cancel-delete-wks`).click();
+    expect(workspace.deleteButton.isEnabled()).toBe(false);
+    workspace.deleteButton.click();
+
     // let's confirm the deletion
     $(`app-workspace-deletion-dialog .btn-confirm-delete-wks`).click();
 
