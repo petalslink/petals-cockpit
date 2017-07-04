@@ -103,7 +103,7 @@ describe(`Workspaces`, () => {
     ).toEqual(1);
   });
 
-  it(`should create a new workspace and then delete it`, () => {
+  fit(`should create a new workspace and then delete it`, () => {
     let workspaces = page
       .goToWorkspacesViaLogin()
       .loginToWorkspaces(`mrobert`, `mrobert`);
@@ -148,8 +148,8 @@ describe(`Workspaces`, () => {
 
     // check that cancel button is working and that the delete button is unlocked
     $(`app-workspace-deletion-dialog .btn-cancel-delete-wks`).click();
-    expect(workspace.deleteButton.isEnabled()).toBe(false);
-    workspace.deleteButton.click();
+
+    page.waitAndClick(workspace.deleteButton);
 
     // let's confirm the deletion
     $(`app-workspace-deletion-dialog .btn-confirm-delete-wks`).click();
