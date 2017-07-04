@@ -103,7 +103,7 @@ describe(`Workspaces`, () => {
     ).toEqual(1);
   });
 
-  fit(`should create a new workspace and then delete it`, () => {
+  it(`should create a new workspace and then delete it`, () => {
     let workspaces = page
       .goToWorkspacesViaLogin()
       .loginToWorkspaces(`mrobert`, `mrobert`);
