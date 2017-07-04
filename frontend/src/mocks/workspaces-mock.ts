@@ -61,6 +61,10 @@ export class Workspace {
     this.addBusInProgress();
   }
 
+  deleteUser(id: string) {
+    this.users.delete(id);
+  }
+
   getDetails(): {
     workspace: IWorkspaceBackendDetails;
     users: { [id: string]: IUserBackend };
@@ -190,11 +194,14 @@ export class Workspaces {
     return this.workspaces.get(id);
   }
 
-  getWorkspacesListAndUsers(user: string) {
-    const workspaces = Array.from(this.workspaces.values()).filter(ws =>
+  getWorkspaces(user: string) {
+    return Array.from(this.workspaces.values()).filter(ws =>
       ws.getUsersIds().includes(user)
     );
+  }
 
+  getWorkspacesListAndUsers(user: string) {
+    const workspaces = this.getWorkspaces(user);
     return {
       workspaces: toObj(workspaces),
       users: toObj(flatMap(workspaces, w => w.getUsers())),

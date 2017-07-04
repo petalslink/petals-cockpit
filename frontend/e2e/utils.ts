@@ -15,8 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ElementFinder, $ } from 'protractor';
+import {
+  browser,
+  ElementFinder,
+  $,
+  ExpectedConditions as EC,
+  Key,
+} from 'protractor';
 import * as util from 'protractor/built/util';
+import { range } from 'lodash';
+
+import { waitTimeout } from './common';
 
 export type Matcher =
   | { [Symbol.match](string: string): RegExpMatchArray }
@@ -59,4 +68,28 @@ export function expectFocused(element: ElementFinder) {
   return expect(browser.switchTo().activeElement().getId()).toEqual(
     element.getId()
   );
+}
+
+export function waitAndClick(el: ElementFinder) {
+  browser.wait(EC.elementToBeClickable(el), waitTimeout);
+  el.click();
+}
+
+export function clearInput(input: ElementFinder) {
+  return input.getAttribute('value').then(v => {
+    if (v === '') {
+      return;
+    } else {
+      return input.sendKeys(Key.BACK_SPACE).then(() => clearInput(input));
+    }
+  });
+}
+
+export function getMultipleElementsTexts(
+  parent: ElementFinder,
+  ...selectors: string[]
+) {
+  return Promise.all(
+    selectors.map(s => (parent.$$(s).getText() as any) as Promise<string[]>)
+  ).then(tss => range(tss[0].length).map((_, i) => tss.map(ts => ts[i])));
 }

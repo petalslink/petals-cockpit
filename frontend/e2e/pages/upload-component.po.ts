@@ -24,7 +24,6 @@ import {
 import { waitTimeout } from '../common';
 
 export class UploadComponentPage {
-  public readonly component: ElementFinder;
   public readonly title;
   public readonly fileInput;
   public readonly fileName;
@@ -43,9 +42,7 @@ export class UploadComponentPage {
     return new UploadComponentPage(component);
   }
 
-  private constructor(component: ElementFinder) {
-    this.component = component;
-
+  private constructor(public readonly component: ElementFinder) {
     this.title = this.component.$('md-card-subtitle.title');
     this.fileInput = this.component.$('input[type="file"]');
     this.fileName = this.component.$('.file-name');

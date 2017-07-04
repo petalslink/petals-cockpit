@@ -16,10 +16,11 @@
  */
 
 import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 import { SharedModule } from 'app/shared/shared.module';
 import { AdministrationComponent } from 'app/features/cockpit/administration/administration.component';
-import { RouterModule } from '@angular/router';
+import { AddEditUserComponent } from 'app/features/cockpit/administration/add-edit-user/add-edit-user.component';
 
 @NgModule({
   imports: [
@@ -31,6 +32,6 @@ import { RouterModule } from '@angular/router';
       },
     ]),
   ],
-  declarations: [AdministrationComponent],
+  declarations: [AdministrationComponent, AddEditUserComponent],
 })
 export class AdministrationModule {}

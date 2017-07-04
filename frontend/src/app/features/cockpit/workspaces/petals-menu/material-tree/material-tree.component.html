@@ -17,10 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="item-list">
     <a md-list-item [class]="item.cssClass" [routerLink]="item.link ? [item.link] : []" [routerLinkActive]="item.link ? 'active-link' : ''" (click)="select({deepLevel: deepLevel, index: i, item: item})"
      ng-style="deepLevel === 0 && {'background-color':'green'} || deepLevel === 1 && {'background-color':'yellow'}">
-      <div fxLayout="row" fxLayoutAlign="start center">
+      <div fxLayout="row" fxLayoutAlign="start center" class="item-content">
         <md-icon
           *ngIf="item.children && item.children.length > 0; else noIconChildren"
           md-list-icon
+          fxLayoutAlign="center center"
+          class="arrow-size"
           (click)="toggleFold({deepLevel: deepLevel, index: i, item: item})"
           [class.disable-fold-unfold]="search !== ''"
           [class.rotate-minus-90]="item.isFolded">arrow_drop_down</md-icon>
@@ -32,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <md-icon *ngIf="item.svgIcon" md-list-icon [svgIcon]="item.svgIcon"></md-icon>
         <md-icon *ngIf="item.icon" md-list-icon color="primary">{{ item.icon }}</md-icon>
 
-        <span class="item-name" appColorSearchedLetters [search]="search" classToApply="highlight" [text]="item.name"></span>
+        <span [title]="item.name" class="item-name" appColorSearchedLetters [search]="search" classToApply="highlight" [text]="item.name"></span>
       </div>
     </a>
   </div>

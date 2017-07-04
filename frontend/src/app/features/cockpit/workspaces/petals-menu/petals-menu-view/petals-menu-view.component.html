@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <span class="text-upper title" fxFlex>Buses</span>
     </div>
   </div>
-  <app-material-tree [tree]="tree" [search]="search" [marginLeft]="18" (onToggleFold)="onTreeToggleFold($event)"
+  <app-material-tree [tree]="tree" [search]="search" [marginLeft]="14" (onToggleFold)="onTreeToggleFold($event)"
     (onSelect)="onTreeSelect($event)"></app-material-tree>
 
   <div *ngIf="tree.length === 0 && search" class="info no-match">

@@ -19,6 +19,7 @@ import { browser, ExpectedConditions as EC, $ } from 'protractor';
 
 import { page, waitTimeout } from './common';
 import { WorkspacesPage } from './pages/workspaces.po';
+import { waitAndClick } from './utils';
 
 describe(`Workspaces`, () => {
   it('should clear the dialog upon logout', () => {
@@ -149,7 +150,7 @@ describe(`Workspaces`, () => {
     // check that cancel button is working and that the delete button is unlocked
     $(`app-workspace-deletion-dialog .btn-cancel-delete-wks`).click();
 
-    page.waitAndClick(workspace.deleteButton);
+    waitAndClick(workspace.deleteButton);
 
     // let's confirm the deletion
     $(`app-workspace-deletion-dialog .btn-confirm-delete-wks`).click();

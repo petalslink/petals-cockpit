@@ -15,10 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $ } from 'protractor';
+import {
+  browser,
+  ExpectedConditions as EC,
+  $,
+  ElementFinder,
+} from 'protractor';
 
 import { urlToMatch } from '../utils';
 import { waitTimeout } from '../common';
+import { AdminAddEditUserPage } from './admin-add-edit-user.po';
 
 export class AdminPage {
   public static readonly component = $(`app-administration`);
@@ -26,7 +32,11 @@ export class AdminPage {
   public readonly component = AdminPage.component;
   public readonly title = this.component.$(`md-toolbar-row .title`);
 
-  public readonly users = this.component.$(`.administration-users`);
+  public readonly panels = this.component.$(
+    `.user-management-page .user-management-panels`
+  );
+  public readonly panelAddUser = this.panels.$(`.pnl-add-user`);
+  public readonly panelListUsers = this.panels.$(`.pnl-list-users`);
 
   static waitAndGet() {
     browser.wait(urlToMatch(/\/admin/), waitTimeout);
@@ -35,4 +45,17 @@ export class AdminPage {
   }
 
   private constructor() {}
+
+  openAddUser() {
+    return this.openAddEdit(this.panelAddUser.$('.exp-pnl-add-user'));
+  }
+
+  openEditUser(username: string) {
+    return this.openAddEdit(this.panelListUsers.$('.exp-pnl-user-' + username));
+  }
+
+  private openAddEdit(panel: ElementFinder) {
+    panel.click();
+    return AdminAddEditUserPage.waitAndGet(panel);
+  }
 }

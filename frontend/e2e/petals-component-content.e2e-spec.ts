@@ -22,6 +22,7 @@ import { WorkspacePage, WorkspaceOverviewPage } from './pages/workspace.po';
 import { ComponentOverviewPage } from './pages/component.po';
 import { ServiceAssemblyOverviewPage } from './pages/service-assembly.po';
 import { NotFoundPage } from './pages/not-found';
+import { waitAndClick } from './utils';
 
 describe(`Petals component content`, () => {
   it(`should open the 404 page if the component doesn't exists`, () => {
@@ -81,11 +82,11 @@ describe(`Petals component content`, () => {
 
     // unload the 2 SU
     const sa0 = workspace.openServiceAssembly('SA 0').openOperations();
-    page.waitAndClick(sa0.stopButton);
+    waitAndClick(sa0.stopButton);
     page.clickAndExpectNotification(sa0.unloadButton);
 
     const sa2 = workspace.openServiceAssembly('SA 2').openOperations();
-    page.waitAndClick(sa2.stopButton);
+    waitAndClick(sa2.stopButton);
     page.clickAndExpectNotification(sa2.unloadButton);
 
     // we should now be able to unload the comp 0

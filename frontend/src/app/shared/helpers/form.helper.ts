@@ -29,6 +29,9 @@ export const validationMessages = {
   username: {
     required: 'Required!',
   },
+  name: {
+    required: 'Required!',
+  },
   password: {
     required: 'Required!',
   },
@@ -39,8 +42,7 @@ export const validationMessages = {
 
 export function getFormErrors(
   form: FormGroup,
-  formFields: { [key: string]: string },
-  _data?: any
+  formFields: { [key: string]: string }
 ): any {
   const formFieldsTmp = { ...formFields };
 
