@@ -79,6 +79,16 @@ public class SetupResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
+    public void testUserAlreadyExists() {
+        addUser("a-user", false);
+
+        Response post = resource.target("/setup").request()
+                .post(Entity.json(new UserSetup(CockpitResourceRule.ADMIN_TOKEN, "a-user", "pass", "name")));
+
+        assertThat(post.getStatus()).isEqualTo(409);
+    }
+
+    @Test
     public void testEnabledWithUser() {
         addUser("a-user", false);
         testSuccessAndGone();
