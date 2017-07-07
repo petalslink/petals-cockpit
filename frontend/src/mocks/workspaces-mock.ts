@@ -98,6 +98,14 @@ export class Workspace {
     return Array.from(this.users.values());
   }
 
+  addUser(user: BackendUser) {
+    this.users.set(user.id, user);
+  }
+
+  removeUser(userId: string) {
+    this.users.delete(userId);
+  }
+
   getBuses() {
     return Array.from(this.buses.values());
   }

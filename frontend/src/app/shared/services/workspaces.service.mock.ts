@@ -24,6 +24,7 @@ import { UsersServiceMock } from './users.service.mock';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
 import { workspacesService } from '../../../mocks/workspaces-mock';
+import { BackendUser } from '../../../mocks/users-mock';
 import * as helper from './../helpers/mock.helper';
 import { environment } from '../../../environments/environment';
 
@@ -67,7 +68,7 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
   }
 
   deleteWorkspace(id: string) {
-    return helper.response(204).do(_ => {
+    return helper.response(204).delay(environment.mock.httpDelay).do(_ => {
       // simulate the backend sending the answer on the SSE
       setTimeout(() => {
         workspacesService.delete(id);
@@ -76,6 +77,19 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
           { id }
         );
       }, environment.mock.sseDelay);
+    });
+  }
+
+  addUser(workspaceId: string, userId: string) {
+    return helper.response(204).delay(environment.mock.httpDelay).do(_ => {
+      const user: BackendUser = BackendUser.get(userId);
+      workspacesService.get(workspaceId).addUser(user);
+    });
+  }
+
+  removeUser(workspaceId: string, userId: string) {
+    return helper.response(204).delay(environment.mock.httpDelay).do(_ => {
+      workspacesService.get(workspaceId).removeUser(userId);
     });
   }
 }

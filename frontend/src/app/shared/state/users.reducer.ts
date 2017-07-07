@@ -34,6 +34,7 @@ import {
   IUserNew,
 } from 'app/shared/services/users.service';
 import { Users } from 'app/shared/state/users.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 
 export namespace UsersReducer {
   type All =
@@ -54,7 +55,10 @@ export namespace UsersReducer {
     | Users.ConnectSuccess
     | Users.Disconnect
     | Users.DisconnectError
-    | Users.DisconnectSuccess;
+    | Users.DisconnectSuccess
+    | Workspaces.DeleteUser
+    | Workspaces.DeleteUserSuccess
+    | Workspaces.DeleteUserError;
 
   export function reducer(
     table = usersTableFactory(),
@@ -114,6 +118,13 @@ export namespace UsersReducer {
       }
       case Users.DisconnectSuccessType: {
         return usersTableFactory();
+      }
+      case Workspaces.DeleteUserType: {
+        return deleteFromWorkspace(table, action.payload);
+      }
+      case Workspaces.DeleteUserSuccessType:
+      case Workspaces.DeleteUserErrorType: {
+        return deleteFromWorkspaceFinished(table, action.payload);
       }
       default:
         return table;
@@ -245,5 +256,20 @@ export namespace UsersReducer {
         isDisconnecting: false,
       },
     };
+  }
+
+  function deleteFromWorkspace(table: IUsersTable, payload: { id: string }) {
+    return updateById(table, payload.id, {
+      isDeletingFromWorkspace: true,
+    });
+  }
+
+  function deleteFromWorkspaceFinished(
+    table: IUsersTable,
+    payload: { id: string }
+  ) {
+    return updateById(table, payload.id, {
+      isDeletingFromWorkspace: false,
+    });
   }
 }

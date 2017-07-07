@@ -102,15 +102,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
               <md-divider></md-divider>
 
-              <md-list>
+              <form [formGroup]="addUserFormGroup" (ngSubmit)="addUser()">
+                <md-input-container>
+                  <input
+                    mdInput
+                    placeholder="User to add"
+                    [mdAutocomplete]="autocompleteUsers"
+                    formControlName="userSearchCtrl">
+                </md-input-container>
+
+                <md-autocomplete #autocompleteUsers>
+                  <md-option *ngFor="let filteredUser of filteredUsers$ | async" [value]="filteredUser">
+                    {{ filteredUser }}
+                  </md-option>
+                </md-autocomplete>
+
+                <button md-button type="submit" [disabled]="!addUserFormGroup.valid || workspace.isAddingUserToWorkspace">Add</button>
+              </form>
+
+              <md-list *ngIf="currentUserId$ | async as currentUserId">
                 <md-list-item *ngFor="let user of users">
                   <app-generate-icon md-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
 
-                  <h2 md-line>{{ user.id }}</h2>
+                  <h2 md-line class="user-id">{{ user.id }}</h2>
 
                   <p md-line>
-                    <span>{{ user.name }}</span>
+                    <span class="user-name">{{ user.name }}</span>
                   </p>
+
+                  <button md-icon-button
+                    (click)="removeUser(user.id)"
+                    *ngIf="currentUserId !== user.id"
+                    [disabled]="user.isDeletingFromWorkspace"
+                    class="delete">
+                    <md-icon>delete</md-icon>
+                  </button>
                 </md-list-item>
               </md-list>
             </div>

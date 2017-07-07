@@ -58,6 +58,10 @@ export namespace WorkspacesReducer {
     | Workspaces.SetSearch
     | Workspaces.Removed
     | Workspaces.Close
+    | Workspaces.AddUser
+    | Workspaces.AddUserError
+    | Workspaces.AddUserSuccess
+    | Workspaces.DeleteUserSuccess
     | Users.DisconnectSuccess;
 
   export function reducer(
@@ -127,6 +131,18 @@ export namespace WorkspacesReducer {
       }
       case Workspaces.CloseType: {
         return close(table, action.payload);
+      }
+      case Workspaces.AddUserType: {
+        return addUser(table, action.payload);
+      }
+      case Workspaces.AddUserErrorType: {
+        return addUserError(table, action.payload);
+      }
+      case Workspaces.AddUserSuccessType: {
+        return addUserSuccess(table, action.payload);
+      }
+      case Workspaces.DeleteUserSuccessType: {
+        return deleteUserSuccess(table, action.payload);
       }
       case Users.DisconnectSuccessType: {
         return workspacesTableFactory();
@@ -327,5 +343,36 @@ export namespace WorkspacesReducer {
         selectedWorkspaceId: '',
       };
     }
+  }
+
+  function addUser(table: IWorkspacesTable, payload: { id: string }) {
+    return updateById(table, table.selectedWorkspaceId, {
+      isAddingUserToWorkspace: true,
+    });
+  }
+
+  function addUserError(table: IWorkspacesTable, payload: { id: string }) {
+    return updateById(table, table.selectedWorkspaceId, {
+      isAddingUserToWorkspace: false,
+    });
+  }
+
+  function addUserSuccess(table: IWorkspacesTable, payload: { id: string }) {
+    return updateById(table, table.selectedWorkspaceId, {
+      isAddingUserToWorkspace: false,
+      users: [
+        ...Array.from(
+          new Set([...table.byId[table.selectedWorkspaceId].users, payload.id])
+        ),
+      ],
+    });
+  }
+
+  function deleteUserSuccess(table: IWorkspacesTable, payload: { id: string }) {
+    return updateById(table, table.selectedWorkspaceId, {
+      users: table.byId[table.selectedWorkspaceId].users.filter(
+        userId => userId !== payload.id
+      ),
+    });
   }
 }

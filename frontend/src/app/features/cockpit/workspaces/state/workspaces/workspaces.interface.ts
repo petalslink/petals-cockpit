@@ -30,6 +30,7 @@ export interface IWorkspaceUI {
   isRemoving: boolean;
   isFetchingDetails: boolean;
   isSettingDescription: boolean;
+  isAddingUserToWorkspace: boolean;
 }
 
 // used within table
@@ -57,6 +58,7 @@ export function workspaceRowFactory(): IWorkspaceRow {
     isRemoving: false,
     isFetchingDetails: false,
     isSettingDescription: false,
+    isAddingUserToWorkspace: false,
 
     users: [],
   };

@@ -18,6 +18,8 @@
 import { browser, ExpectedConditions as EC } from 'protractor';
 
 import { page, waitTimeout } from './common';
+import { WorkspaceOverviewPage } from './pages/workspace.po';
+import { getMultipleElementsTexts } from './utils';
 
 describe(`Workspace Overview`, () => {
   it(`should have the workspace information in overview`, () => {
@@ -168,5 +170,104 @@ describe(`Workspace Overview`, () => {
     expect(workspace.description.getText()).toEqual(
       `Put some description in markdown for the workspace here. And some more.`
     );
+  });
+
+  describe(`Users`, () => {
+    let workspace: WorkspaceOverviewPage;
+
+    beforeEach(() => {
+      workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
+    });
+
+    it(`should check users of the workspace`, () => {
+      const wksUsers = getMultipleElementsTexts(
+        workspace.users,
+        '.user-id',
+        '.user-name'
+      );
+
+      expect(wksUsers).toEqual([['admin', 'Administrator']]);
+    });
+
+    it(`should add a user into the workspace only if his name is correct`, () => {
+      workspace.addUser('bescudie');
+
+      const wksUsers = getMultipleElementsTexts(
+        workspace.users,
+        '.user-id',
+        '.user-name'
+      );
+
+      expect(wksUsers).toEqual([
+        ['admin', 'Administrator'],
+        ['bescudie', 'Bertrand ESCUDIE'],
+      ]);
+
+      // if we try with an wrong name, the button should be disabled
+      workspace.usersAutocompleteInput.sendKeys('vnoe');
+      expect(workspace.btnAddUserToWks.isEnabled()).toBe(false);
+      workspace.usersAutocompleteInput.sendKeys('l');
+      expect(workspace.btnAddUserToWks.isEnabled()).toBe(true);
+    });
+
+    it(`should display in autocomplete only users not into the workspace`, () => {
+      workspace.addUser('bescudie');
+      workspace.addUser('vnoel');
+
+      expect(workspace.getUsersAutocomplete()).toEqual([
+        'mrobert',
+        'cchevalier',
+        'cdeneux',
+      ]);
+
+      const wksUsers = getMultipleElementsTexts(
+        workspace.users,
+        '.user-id',
+        '.user-name'
+      );
+
+      expect(wksUsers).toEqual([
+        ['admin', 'Administrator'],
+        ['bescudie', 'Bertrand ESCUDIE'],
+        ['vnoel', 'Victor NOEL'],
+      ]);
+    });
+
+    it(`should remove a user from the workspace (if != than current user)`, () => {
+      workspace.addUser('bescudie');
+      workspace.addUser('vnoel');
+
+      const usersList = workspace.usersList.$$('md-list-item');
+
+      expect(usersList.getText()).toEqual([
+        // admin shouldn't be able to delete himself
+        'admin\nAdministrator',
+        'bescudie\nBertrand ESCUDIE\ndelete',
+        'vnoel\nVictor NOEL\ndelete',
+      ]);
+
+      const bescudie = usersList.get(1);
+      expect(bescudie.$('.user-id').getText()).toEqual('bescudie');
+      // remove bescudie from current workspace
+      bescudie.$('button.delete').click();
+
+      expect(workspace.getUsersAutocomplete()).toEqual([
+        'bescudie',
+        'mrobert',
+        'cchevalier',
+        'cdeneux',
+      ]);
+
+      const wksUsers = getMultipleElementsTexts(
+        workspace.users,
+        '.user-id',
+        '.user-name'
+      );
+
+      expect(wksUsers).toEqual([
+        ['admin', 'Administrator'],
+        ['vnoel', 'Victor NOEL'],
+      ]);
+    });
   });
 });
