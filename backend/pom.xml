@@ -78,7 +78,7 @@
       <!-- Needed for pac4j's password encoder -->
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-crypto</artifactId>
-      <version>4.2.2.RELEASE</version>
+      <version>4.2.3.RELEASE</version>
     </dependency>
     <!-- Quasar instrumentation dependencies -->
     <dependency>
