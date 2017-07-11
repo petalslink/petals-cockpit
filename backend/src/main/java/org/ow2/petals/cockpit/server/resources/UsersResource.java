@@ -54,6 +54,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Singleton
 @Path("/users")
 @Pac4JSecurity(authorizers = CockpitSecurityBundle.IS_ADMIN_AUTHORIZER)
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class UsersResource {
 
     private final Configuration jooq;
@@ -64,13 +66,11 @@ public class UsersResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public Collection<UserMin> getAllUsers() {
         return DSL.using(jooq).selectFrom(USERS).stream().map(UserMin::new).collect(Collectors.toList());
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
     public void add(@Valid NewUser user) {
         try {
             DSL.using(jooq).executeInsert(new UsersRecord(user.username,
@@ -86,7 +86,6 @@ public class UsersResource {
 
     @GET
     @Path("/{username}")
-    @Produces(MediaType.APPLICATION_JSON)
     public UserMin user(@NotEmpty @PathParam("username") String username) {
         UsersRecord user = DSL.using(jooq).fetchOne(USERS, USERS.USERNAME.eq(username));
 
@@ -108,7 +107,6 @@ public class UsersResource {
 
     @PUT
     @Path("/{username}")
-    @Consumes(MediaType.APPLICATION_JSON)
     public void update(@NotEmpty @PathParam("username") String username, @Valid UpdateUser user) {
         UsersRecord r = new UsersRecord();
         String name = user.name;
