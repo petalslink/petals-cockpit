@@ -91,6 +91,17 @@ app-material-tree
   border-bottom-width: 1px;
   border-bottom-style: solid;
   border-color: rgba(0, 0, 0, .02);
+
+  .item-content > .item-name {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-content > .arrow-size {
+    width: 14px;
+  }
 }
 
 .active-link,
@@ -103,9 +114,22 @@ app-material-tree
   }
 }
 
+$sidebar-width: 320px;
+
+md-sidenav {
+  width: $sidebar-width;
+}
+
+app-material-tree {
+  max-width: $sidebar-width;
+}
+
 // all items elements in petals tree
 app-material-tree > .nav-list-petals-tree > .item-list {
   // customize tree elements
+  .mat-list-item > .mat-list-item-content {
+    padding-left: 10px;
+  }
   .mat-list-item > .mat-list-item-content:hover,
   .mat-list-item > .mat-list-item-content:focus {
     background-color: mat-color($theme-primary-x);
@@ -119,6 +143,10 @@ app-material-tree > .nav-list-petals-tree > .item-list {
     background: rgba(0, 0, 0, 0.02);
     color: rgba(0, 0, 0, 0.54);
     font-weight: 500;
+
+    .item-content > .arrow-size {
+      width: 16px;
+    }
   }
   // customize hover categories of elements
   .workspace-element-type-category-components > .mat-list-item-content:hover,
@@ -139,6 +167,40 @@ app-material-tree > .nav-list-petals-tree > .item-list {
     background: rgba(0, 0, 0, .02);
     color: rgba(0, 0, 0, .54);
     font-weight: 500;
+  }
+
+  // declare width for ellipsis
+  .workspace-element-type-bus
+    > .mat-list-item-content
+    > .item-content
+    > .item-name {
+    max-width: $sidebar-width - 54px;
+  }
+  .workspace-element-type-container
+    > .mat-list-item-content
+    > .item-content
+    > .item-name {
+    max-width: $sidebar-width - 68px;
+  }
+  .workspace-element-type-component
+    > .mat-list-item-content
+    > .item-content
+    > .item-name,
+  .workspace-element-type-service-assembly
+    > .mat-list-item-content
+    > .item-content
+    > .item-name,
+  .workspace-element-type-shared-library
+    > .mat-list-item-content
+    > .item-content
+    > .item-name {
+    max-width: $sidebar-width - 94px;
+  }
+  .workspace-element-type-service-unit
+    > .mat-list-item-content
+    > .item-content
+    > .item-name {
+    max-width: $sidebar-width - 122px;
   }
 }
 
@@ -166,4 +228,18 @@ app-buses-in-progress > .nav-list-imports-in-progress > .item-list {
     position: absolute;
     color: #fff;
   }
+}
+
+.user-management-page > .user-management-panels {
+  .pnl-add-user > md-expansion-panel > md-expansion-panel-header.mat-expanded,
+  .pnl-list-users
+    > .mat-accordion
+    > md-expansion-panel
+    > md-expansion-panel-header.mat-expanded {
+    background-color: mat-color($theme-accent-x5);
+  }
+}
+
+.form-edit-user > .mat-action-row {
+  border-top: 0;
 }

@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, Key } from 'protractor';
+import { browser } from 'protractor';
 
 import {
   CORRECT_SETUP_TOKEN,
   GONE_SETUP_TOKEN,
 } from '../src/mocks/backend-mock';
 import { page } from './common';
-import { expectFocused } from './utils';
+import { expectFocused, clearInput } from './utils';
 import { SetupPage } from './pages/setup.po';
 
 describe(`Setup`, () => {
@@ -51,7 +51,7 @@ describe(`Setup`, () => {
       setup.expectDefaultButton();
 
       setup.name.sendKeys('n');
-      setup.username.sendKeys(Key.BACK_SPACE);
+      clearInput(setup.username);
 
       setup.expectDefaultButton();
 

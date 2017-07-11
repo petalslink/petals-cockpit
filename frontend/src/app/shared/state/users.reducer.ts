@@ -157,7 +157,7 @@ export namespace UsersReducer {
   }
 
   function addSuccess(table: IUsersTable, payload: IUserBackend) {
-    return updateById(table, payload.id, payload);
+    return updateById(table, payload.id, { ...payload, isAdding: false });
   }
 
   function addError(table: IUsersTable, payload: { id: string }) {

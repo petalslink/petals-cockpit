@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <div fxLayout="column" fxFill>
         <form [formGroup]="newWksForm" (ngSubmit)="onSubmit(newWksForm)" fxLayout="row" fxLayoutGap="10px">
           <md-input-container fxFlex>
-            <input mdInput placeholder="New workspace name" formControlName="name">
+            <input type="text" mdInput placeholder="New workspace name" formControlName="name">
             <span mdPrefix><md-icon color="primary">edit</md-icon></span>
           </md-input-container>
 

@@ -86,7 +86,10 @@ export namespace Users {
   export class Modify implements Action {
     readonly type = ModifyType;
     constructor(
-      public readonly payload: { id: string; changes: Partial<IUserLogin> }
+      public readonly payload: {
+        id: string;
+        changes: { name?: string; password?: string };
+      }
     ) {}
   }
 
@@ -100,7 +103,10 @@ export namespace Users {
   export class ModifySuccess implements Action {
     readonly type = ModifySuccessType;
     constructor(
-      public readonly payload: { id: string; changes: Partial<IUserLogin> }
+      public readonly payload: {
+        id: string;
+        changes: { name?: string; password?: string };
+      }
     ) {}
   }
 

@@ -137,12 +137,8 @@ export class PetalsBusInProgressViewComponent
 
     this.busImportForm.valueChanges
       .takeUntil(this.onDestroy$)
-      .do(data => {
-        this.formErrors = getFormErrors(
-          this.busImportForm,
-          this.formErrors,
-          data
-        );
+      .do(() => {
+        this.formErrors = getFormErrors(this.busImportForm, this.formErrors);
       })
       .subscribe();
   }

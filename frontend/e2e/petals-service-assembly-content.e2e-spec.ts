@@ -18,6 +18,7 @@
 import { page } from './common';
 import { WorkspacePage, WorkspaceOverviewPage } from './pages/workspace.po';
 import { NotFoundPage } from './pages/not-found';
+import { waitAndClick } from './utils';
 
 describe(`Petals service-assembly content`, () => {
   it(`should open the 404 page if the service-assembly doesn't exists`, () => {
@@ -55,13 +56,13 @@ describe(`Petals service-assembly content`, () => {
   it(`should stop/start/stop/unload a service-assembly`, () => {
     const ops = workspace.openServiceAssembly('SA 0').openOperations();
 
-    page.waitAndClick(ops.stopButton);
+    waitAndClick(ops.stopButton);
     expect(ops.state.getText()).toEqual('Stopped');
 
-    page.waitAndClick(ops.startButton);
+    waitAndClick(ops.startButton);
     expect(ops.state.getText()).toEqual('Started');
 
-    page.waitAndClick(ops.stopButton);
+    waitAndClick(ops.stopButton);
     expect(ops.state.getText()).toEqual('Stopped');
 
     // once unloaded ...

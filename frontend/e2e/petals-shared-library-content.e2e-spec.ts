@@ -18,6 +18,7 @@
 import { page } from './common';
 import { WorkspacePage, WorkspaceOverviewPage } from './pages/workspace.po';
 import { NotFoundPage } from './pages/not-found';
+import { waitAndClick } from './utils';
 
 describe(`Petals shared library content`, () => {
   it(`should open the 404 page if the shared-library doesn't exists`, () => {
@@ -56,7 +57,7 @@ describe(`Petals shared library content`, () => {
 
     // unload the component
     const comp = ops.openOverview().openComponent(0).openOperations();
-    page.waitAndClick(comp.stopButton);
+    waitAndClick(comp.stopButton);
     page.clickAndExpectNotification(comp.unloadButton);
 
     // we should now be able to unload the comp 0

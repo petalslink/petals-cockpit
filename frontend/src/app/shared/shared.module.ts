@@ -30,6 +30,7 @@ import {
   MdButtonModule,
   MdCardModule,
   MdDialogModule,
+  MdExpansionModule,
   MdIconModule,
   MdInputModule,
   MdListModule,
@@ -39,6 +40,7 @@ import {
   MdTabsModule,
   MdToolbarModule,
   MdTooltipModule,
+  MdProgressBarModule,
 } from '@angular/material';
 
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
@@ -51,9 +53,11 @@ export const MaterialModules = [
   MdButtonModule,
   MdCardModule,
   MdDialogModule,
+  MdExpansionModule,
   MdIconModule,
   MdInputModule,
   MdListModule,
+  MdProgressBarModule,
   MdProgressSpinnerModule,
   MdRippleModule,
   MdSidenavModule,

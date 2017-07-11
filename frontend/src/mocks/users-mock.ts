@@ -20,6 +20,7 @@ import {
   IUserNew,
   IUserBackend,
 } from 'app/shared/services/users.service';
+import { workspacesService } from 'mocks/workspaces-mock';
 
 export class BackendUser {
   private static cpt = 0;
@@ -40,6 +41,7 @@ export class BackendUser {
   }
 
   static delete(id: string) {
+    workspacesService.getWorkspaces(id).forEach(w => w.deleteUser(id));
     return this.users.delete(id);
   }
 

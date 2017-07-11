@@ -22,8 +22,8 @@ import {
   $,
 } from 'protractor';
 
-import { Matcher, textToMatchInElement } from '../utils';
-import { waitTimeout } from '../common';
+import { Matcher, textToMatchInElement, waitAndClick } from '../utils';
+
 import { SetupPage } from './setup.po';
 import { LoginPage } from './login.po';
 import { AdminPage } from './administration.po';
@@ -65,17 +65,12 @@ export class PetalsCockpitPage {
 
   logout() {
     // open the user menu
-    this.waitAndClick(this.avatarButton);
+    waitAndClick(this.avatarButton);
 
     // and logout
-    this.waitAndClick(this.logoutButton);
+    waitAndClick(this.logoutButton);
 
     return LoginPage.waitAndGet();
-  }
-
-  waitAndClick(el: ElementFinder) {
-    browser.wait(EC.elementToBeClickable(el), waitTimeout);
-    el.click();
   }
 
   clickAndExpectNotification(
@@ -83,7 +78,7 @@ export class PetalsCockpitPage {
     title?: Matcher,
     content?: Matcher
   ) {
-    this.waitAndClick(el);
+    waitAndClick(el);
 
     const simpleNotification = $(`simple-notification`);
 
@@ -132,13 +127,13 @@ export class PetalsCockpitPage {
   }
 
   openAdmin() {
-    this.waitAndClick(this.adminButton);
+    waitAndClick(this.adminButton);
 
     return AdminPage.waitAndGet();
   }
 
   openWorkspaces() {
-    this.waitAndClick(this.logoButton);
+    waitAndClick(this.logoButton);
 
     return WorkspacesPage.waitAndGet();
   }
