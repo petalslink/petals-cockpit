@@ -28,7 +28,8 @@
     "prettier:base": "npm run prettier -- --single-quote --trailing-comma es5",
     "prettier:write": "npm run prettier:base -- --write './{e2e,src}/**/*.{scss,ts}'",
     "prettier:check": "npm run prettier:write -- -l",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "prepush": "yarn run check:lint && yarn run check:copyrights"
   },
   "lint-staged": {
     "gitDir": "../",

@@ -19,12 +19,10 @@ import { NgModule } from '@angular/core';
 
 import { SharedModule } from '../../../../../shared/shared.module';
 
-// tslint:disable:max-line-length
 import { PetalsServiceAssemblyViewRoutingModule } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view-routing.module';
 import { PetalsServiceAssemblyViewComponent } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.component';
 import { PetalsServiceAssemblyOverviewComponent } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-overview/petals-service-assembly-overview.component';
 import { PetalsServiceAssemblyOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-operations/petals-service-assembly-operations.component';
-// tslint:enable:max-line-length
 
 @NgModule({
   imports: [SharedModule, PetalsServiceAssemblyViewRoutingModule],
