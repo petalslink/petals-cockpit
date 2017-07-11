@@ -20,6 +20,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 
 import javax.inject.Inject;
 import javax.validation.constraints.Min;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -52,6 +53,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author vnoel
  */
 @Path("/user")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class UserSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserSession.class);
@@ -67,7 +70,6 @@ public class UserSession {
      * Note: Security is covered by the global filter
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public CurrentUser getUserData(@Pac4JProfile CockpitProfile profile) {
         LOG.debug("Returning infos for {}", profile.getId());
 
@@ -78,7 +80,6 @@ public class UserSession {
 
     @GET
     @Path("/session")
-    @Produces(MediaType.APPLICATION_JSON)
     @Pac4JSecurity(authorizers = DefaultAuthorizers.IS_AUTHENTICATED)
     public CurrentUser status(@Pac4JProfile CockpitProfile profile) {
         return getUserData(profile);
