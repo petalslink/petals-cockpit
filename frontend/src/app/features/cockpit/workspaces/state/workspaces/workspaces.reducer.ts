@@ -136,91 +136,82 @@ export namespace WorkspacesReducer {
     }
   }
 
-  function fetchAll(table: IWorkspacesTable) {
+  function fetchAll(table: IWorkspacesTable): IWorkspacesTable {
     return {
       ...table,
-      ...<IWorkspacesTable>{
-        isFetchingWorkspaces: true,
-      },
+      isFetchingWorkspaces: true,
     };
   }
 
   function fetchAllSuccess(
     table: IWorkspacesTable,
     payload: JsTable<IWorkspaceBackend>
-  ) {
+  ): IWorkspacesTable {
     return {
       ...mergeInto(table, payload, workspaceRowFactory),
-      ...<IWorkspacesTable>{
-        isFetchingWorkspaces: false,
-      },
+      isFetchingWorkspaces: false,
     };
   }
 
-  function fetchAllError(table: IWorkspacesTable) {
+  function fetchAllError(table: IWorkspacesTable): IWorkspacesTable {
     return {
       ...table,
-      ...<IWorkspacesTable>{
-        isFetchingWorkspaces: false,
-      },
+      isFetchingWorkspaces: false,
     };
   }
 
-  function post(table: IWorkspacesTable) {
+  function post(table: IWorkspacesTable): IWorkspacesTable {
     return {
       ...table,
-      ...<IWorkspacesTable>{
-        isAddingWorkspace: true,
-      },
+      isAddingWorkspace: true,
     };
   }
 
-  function postSuccess(table: IWorkspacesTable, payload: IWorkspaceBackend) {
+  function postSuccess(
+    table: IWorkspacesTable,
+    payload: IWorkspaceBackend
+  ): IWorkspacesTable {
     return {
       ...putById(table, payload.id, payload, workspaceRowFactory),
-      ...<IWorkspacesTable>{
-        isAddingWorkspace: false,
-      },
+      isAddingWorkspace: false,
     };
   }
 
-  function postError(table: IWorkspacesTable) {
+  function postError(table: IWorkspacesTable): IWorkspacesTable {
     return {
       ...table,
-      ...<IWorkspacesTable>{
-        isAddingWorkspace: false,
-      },
+      isAddingWorkspace: false,
     };
   }
 
-  function fetch(table: IWorkspacesTable, payload: { id: string }) {
+  function fetch(
+    table: IWorkspacesTable,
+    payload: { id: string }
+  ): IWorkspacesTable {
     return {
       ...table,
-      ...<IWorkspacesTable>{
-        selectedWorkspaceId: payload.id,
-        isSelectedWorkspaceFetchError: false,
-        isSelectedWorkspaceFetched: false,
-      },
+      selectedWorkspaceId: payload.id,
+      isSelectedWorkspaceFetchError: false,
+      isSelectedWorkspaceFetched: false,
     };
   }
 
-  function fetchSuccess(table: IWorkspacesTable, payload: IWorkspaceBackend) {
+  function fetchSuccess(
+    table: IWorkspacesTable,
+    payload: IWorkspaceBackend
+  ): IWorkspacesTable {
     return {
       ...table.byId[payload.id]
         ? updateById(table, payload.id, payload)
         : putById(table, payload.id, payload, workspaceRowFactory),
-      ...<IWorkspacesTable>{
-        isSelectedWorkspaceFetched: true,
-      },
+      isSelectedWorkspaceFetched: true,
     };
   }
 
-  function fetchError(table: IWorkspacesTable) {
+  function fetchError(table: IWorkspacesTable): IWorkspacesTable {
     return {
       ...table,
-      ...<IWorkspacesTable>{
-        isSelectedWorkspaceFetchError: true,
-      },
+      isSelectedWorkspaceFetchError: true,
     };
   }
 
@@ -267,12 +258,13 @@ export namespace WorkspacesReducer {
     });
   }
 
-  function setSearch(table: IWorkspacesTable, payload: { search: string }) {
+  function setSearch(
+    table: IWorkspacesTable,
+    payload: { search: string }
+  ): IWorkspacesTable {
     return {
       ...table,
-      ...<IWorkspacesTable>{
-        searchPetals: payload.search,
-      },
+      searchPetals: payload.search,
     };
   }
 
@@ -280,16 +272,17 @@ export namespace WorkspacesReducer {
     return updateById(table, payload.id, { isRemoving: true });
   }
 
-  function deleteSuccess(table: IWorkspacesTable, payload: { id: string }) {
+  function deleteSuccess(
+    table: IWorkspacesTable,
+    payload: { id: string }
+  ): IWorkspacesTable {
     if (table.selectedWorkspaceId !== payload.id) {
       return table;
     }
 
     return {
       ...table,
-      ...<IWorkspacesTable>{
-        isSelectedWorkspaceDeleted: true,
-      },
+      isSelectedWorkspaceDeleted: true,
     };
   }
 
@@ -301,20 +294,24 @@ export namespace WorkspacesReducer {
    * Note: while DELETE_WORKSPACE concerns the HTTP action of deleting a workspace,
    * REMOVE_WORKSPACE concerns the event coming from the SSE that a workspace has been deleted.
    */
-  function removed(table: IWorkspacesTable, payload: { id: string }) {
+  function removed(
+    table: IWorkspacesTable,
+    payload: { id: string }
+  ): IWorkspacesTable {
     if (table.selectedWorkspaceId !== payload.id) {
       return table;
     }
 
     return {
       ...table,
-      ...<IWorkspacesTable>{
-        isSelectedWorkspaceDeleted: true,
-      },
+      isSelectedWorkspaceDeleted: true,
     };
   }
 
-  function close(table: IWorkspacesTable, payload: { deleted?: boolean }) {
+  function close(
+    table: IWorkspacesTable,
+    payload: { deleted?: boolean }
+  ): IWorkspacesTable {
     if (table.selectedWorkspaceId && payload && payload.deleted) {
       return {
         ...removeById(table, table.selectedWorkspaceId),

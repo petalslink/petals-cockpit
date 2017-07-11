@@ -187,8 +187,11 @@ export namespace ContainersReducer {
     return putAll(table, payload, containerRowFactory);
   }
 
-  function setCurrent(table: IContainersTable, payload: { id: string }) {
-    const res = <IContainersTable>{
+  function setCurrent(
+    table: IContainersTable,
+    payload: { id: string }
+  ): IContainersTable {
+    const res = {
       selectedContainerId: payload.id,
     };
 

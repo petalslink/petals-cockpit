@@ -109,12 +109,13 @@ export namespace BusesReducer {
     return putAll(table, payload, busRowFactory);
   }
 
-  function setCurrent(table: IBusesTable, payload: { id: string }) {
+  function setCurrent(
+    table: IBusesTable,
+    payload: { id: string }
+  ): IBusesTable {
     return {
       ...table,
-      ...<IBusesTable>{
-        selectedBusId: payload.id,
-      },
+      selectedBusId: payload.id,
     };
   }
 

@@ -80,7 +80,7 @@ export class ContainersEffects {
     .switchMap(([action, workspaceId]: [Containers.DeployComponent, string]) =>
       this.containersService
         .deployComponent(workspaceId, action.payload.id, action.payload.file)
-        .mergeMap(_ => Observable.empty())
+        .mergeMap(_ => Observable.empty<Action>())
         .catch(err => {
           if (environment.debug) {
             console.group();
@@ -140,7 +140,7 @@ export class ContainersEffects {
             action.payload.id,
             action.payload.file
           )
-          .mergeMap(_ => Observable.empty())
+          .mergeMap(_ => Observable.empty<Action>())
           .catch(err => {
             if (environment.debug) {
               console.group();
@@ -202,7 +202,7 @@ export class ContainersEffects {
             action.payload.id,
             action.payload.file
           )
-          .mergeMap(_ => Observable.empty())
+          .mergeMap(_ => Observable.empty<Action>())
           .catch(err => {
             if (environment.debug) {
               console.group();

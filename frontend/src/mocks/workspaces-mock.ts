@@ -117,7 +117,27 @@ export class Workspace {
     const bus = busesService.create(this);
     this.buses.set(bus.id, bus);
 
-    return bus;
+    const containers = bus.getContainers();
+    const components = flatMap(containers, c => c.getComponents());
+    const serviceAssemblies = flatMap(containers, c =>
+      c.getServiceAssemblies()
+    );
+    const serviceUnits = flatMap(components, c => c.getServiceUnits());
+    const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
+
+    const eventData = {
+      buses: bus.toObj(),
+      containers: toObj(containers),
+      components: toObj(components),
+      serviceAssemblies: toObj(serviceAssemblies),
+      serviceUnits: toObj(serviceUnits),
+      sharedLibraries: toObj(sharedLibraries),
+    };
+
+    return {
+      id: bus.id,
+      eventData,
+    };
   }
 
   tryAddBus(importData: IBusImport): { id: string; eventData: any } {
@@ -125,29 +145,7 @@ export class Workspace {
 
     // this will return the data for the BUS_IMPORT_OK event
     if (validContainers.includes(ipPort)) {
-      const bus = this.addBus();
-
-      const containers = bus.getContainers();
-      const components = flatMap(containers, c => c.getComponents());
-      const serviceAssemblies = flatMap(containers, c =>
-        c.getServiceAssemblies()
-      );
-      const serviceUnits = flatMap(components, c => c.getServiceUnits());
-      const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
-
-      const eventData = {
-        buses: bus.toObj(),
-        containers: toObj(containers),
-        components: toObj(components),
-        serviceAssemblies: toObj(serviceAssemblies),
-        serviceUnits: toObj(serviceUnits),
-        sharedLibraries: toObj(sharedLibraries),
-      };
-
-      return {
-        id: bus.id,
-        eventData,
-      };
+      return this.addBus();
     }
 
     // this will return the data for the BUS_IMPORT_ERROR event
@@ -227,8 +225,8 @@ export class Workspaces {
 
 export const workspacesService = new Workspaces();
 
-const ws = workspacesService.create();
-ws.description =
+const ws0 = workspacesService.create();
+ws0.description =
   'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.';
 
 workspacesService.create([

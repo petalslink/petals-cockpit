@@ -98,8 +98,11 @@ export namespace ServiceUnitsReducer {
     return putAll(table, payload, serviceUnitRowFactory);
   }
 
-  function setCurrent(table: IServiceUnitsTable, payload: { id: string }) {
-    const res = <IServiceUnitsTable>{
+  function setCurrent(
+    table: IServiceUnitsTable,
+    payload: { id: string }
+  ): IServiceUnitsTable {
+    const res = {
       selectedServiceUnitId: payload.id,
     };
 

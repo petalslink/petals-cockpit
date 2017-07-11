@@ -120,30 +120,27 @@ export namespace UsersReducer {
     }
   }
 
-  function fetchAll(table: IUsersTable) {
+  function fetchAll(table: IUsersTable): IUsersTable {
     return {
       ...table,
-      ...<IUsersTable>{
-        isFetchingUsers: true,
-      },
+      isFetchingUsers: true,
     };
   }
 
-  function fetchAllError(table: IUsersTable) {
+  function fetchAllError(table: IUsersTable): IUsersTable {
     return {
       ...table,
-      ...<IUsersTable>{
-        isFetchingUsers: false,
-      },
+      isFetchingUsers: false,
     };
   }
 
-  function fetched(table: IUsersTable, payload: JsTable<IUserBackend>) {
+  function fetched(
+    table: IUsersTable,
+    payload: JsTable<IUserBackend>
+  ): IUsersTable {
     return {
       ...mergeInto(table, payload, userRowFactory),
-      ...<IUsersTable>{
-        isFetchingUsers: false,
-      },
+      isFetchingUsers: false,
     };
   }
 
@@ -151,7 +148,7 @@ export namespace UsersReducer {
     return putById(
       table,
       payload.username,
-      <IUserRow>{ id: payload.username, name: payload.name, isAdding: true },
+      { id: payload.username, name: payload.name, isAdding: true },
       userRowFactory
     );
   }
@@ -191,20 +188,20 @@ export namespace UsersReducer {
   }
 
   function modifyError(table: IUsersTable, payload: { id: string }) {
-    return updateById(table, payload.id, <IUserRow>{ isModifying: false });
+    return updateById(table, payload.id, { isModifying: false });
   }
 
-  function connect(table: IUsersTable) {
+  function connect(table: IUsersTable): IUsersTable {
     return {
       ...table,
-      ...<IUsersTable>{ isConnecting: true },
+      isConnecting: true,
     };
   }
 
   function connectSuccess(
     table: IUsersTable,
     payload: { user: ICurrentUserBackend }
-  ) {
+  ): IUsersTable {
     const id = payload.user.id;
     const user = { id, name: payload.user.name };
 
@@ -213,37 +210,32 @@ export namespace UsersReducer {
         ? updateById(table, id, user)
         : putById(table, id, user, userRowFactory),
       isConnecting: false,
-      isConnected: true,
       connectionFailed: false,
       connectedUser: payload.user,
       isDisconnecting: false,
     };
   }
 
-  function connectError(table: IUsersTable) {
+  function connectError(table: IUsersTable): IUsersTable {
     return {
       ...table,
-      ...<IUsersTable>{
-        isConnecting: false,
-        connectionFailed: true,
-        connectedUser: null,
-      },
+      isConnecting: false,
+      connectionFailed: true,
+      connectedUser: null,
     };
   }
 
-  function disconnect(table: IUsersTable) {
+  function disconnect(table: IUsersTable): IUsersTable {
     return {
       ...table,
-      ...<IUsersTable>{ isDisconnecting: true },
+      isDisconnecting: true,
     };
   }
 
-  function disconnectError(table: IUsersTable) {
+  function disconnectError(table: IUsersTable): IUsersTable {
     return {
       ...table,
-      ...<IUsersTable>{
-        isDisconnecting: false,
-      },
+      isDisconnecting: false,
     };
   }
 }

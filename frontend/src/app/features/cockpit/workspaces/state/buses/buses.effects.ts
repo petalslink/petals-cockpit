@@ -162,7 +162,7 @@ export class BusesEffects {
     .switchMap(([action, idWorkspace]: [Buses.Delete, string]) =>
       this.busesService
         .deleteBus(idWorkspace, action.payload.id)
-        .mergeMap(_ => Observable.empty())
+        .mergeMap(_ => Observable.empty<Action>())
         .catch(err => {
           if (environment.debug) {
             console.group();

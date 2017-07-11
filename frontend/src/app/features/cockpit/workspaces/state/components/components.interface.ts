@@ -83,6 +83,5 @@ export function componentsTableFactory(): IComponentsTable {
   return {
     ...emptyJsTable<IComponentRow>(),
     selectedComponentId: '',
-    isFetchingDetails: false,
   };
 }

@@ -104,37 +104,37 @@ export namespace BusesInProgressReducer {
     return putAll(table, payload, busInProgressRowFactory);
   }
 
-  function setCurrent(table: IBusesInProgressTable, payload: { id: string }) {
+  function setCurrent(
+    table: IBusesInProgressTable,
+    payload: { id: string }
+  ): IBusesInProgressTable {
     return {
       ...table,
-      ...<IBusesInProgressTable>{
-        selectedBusInProgressId: payload.id,
-        isImportingBus: false,
-        importBusError: '',
-        importBusId: '',
-      },
+      selectedBusInProgressId: payload.id,
+      isImportingBus: false,
+      importBusError: '',
+      importBusId: '',
     };
   }
 
-  function post(table: IBusesInProgressTable) {
+  function post(table: IBusesInProgressTable): IBusesInProgressTable {
     return {
       ...table,
-      ...<IBusesInProgressTable>{
-        isImportingBus: true,
-        importBusError: '',
-        importBusId: '',
-      },
+      isImportingBus: true,
+      importBusError: '',
+      importBusId: '',
     };
   }
 
   // once the http request is done
   // the bus itself will be added from buses reducer
-  function postSuccess(table: IBusesInProgressTable, payload: { id: string }) {
+  function postSuccess(
+    table: IBusesInProgressTable,
+    payload: { id: string }
+  ): IBusesInProgressTable {
     return {
       ...table,
-      ...<IBusesInProgressTable>{
-        importBusId: payload.id,
-      },
+      importBusId: payload.id,
     };
   }
 
@@ -142,16 +142,14 @@ export namespace BusesInProgressReducer {
   function postError(
     table: IBusesInProgressTable,
     payload: { importBusError: string }
-  ) {
+  ): IBusesInProgressTable {
     // if it's false, it means we changed bus (with SET_CURRENT_BUS_IN_PROGRESS)
     if (table.isImportingBus) {
       return {
         ...table,
-        ...<IBusesInProgressTable>{
-          isImportingBus: false,
-          importBusError: payload.importBusError,
-          importBusId: '',
-        },
+        isImportingBus: false,
+        importBusError: payload.importBusError,
+        importBusId: '',
       };
     } else {
       return table;

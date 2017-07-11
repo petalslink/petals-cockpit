@@ -85,7 +85,7 @@ export namespace SharedLibrariesReducer {
         return changeStateError(table, action.payload);
       }
       case SharedLibraries.RemovedType: {
-        return remove(table, action.payload);
+        return removed(table, action.payload);
       }
       case Containers.DeployComponentSuccessType: {
         return deployComponentSuccess(table, action.payload);
@@ -115,10 +115,26 @@ export namespace SharedLibrariesReducer {
     return putAll(table, payload, sharedLibraryRowFactory);
   }
 
-  function setCurrent(table: ISharedLibrariesTable, payload: { id: string }) {
+  function setCurrent(
+    table: ISharedLibrariesTable,
+    payload: { id: string }
+  ): ISharedLibrariesTable {
+    const res = {
+      selectedSharedLibraryId: payload.id,
+    };
+
+    if (payload.id) {
+      return {
+        ...updateById(table, payload.id, {
+          errorChangeState: '',
+        }),
+        ...res,
+      };
+    }
+
     return {
       ...table,
-      selectedSharedLibraryId: payload.id,
+      ...res,
     };
   }
 
@@ -163,19 +179,11 @@ export namespace SharedLibrariesReducer {
     });
   }
 
-  function remove(
+  function removed(
     table: ISharedLibrariesTable,
     payload: ISharedLibraryRow
   ): ISharedLibrariesTable {
-    const selectedSharedLibraryid =
-      table.selectedSharedLibraryId === payload.id
-        ? ''
-        : table.selectedSharedLibraryId;
-
-    return {
-      ...removeById(table, payload.id),
-      selectedSharedLibraryid,
-    };
+    return removeById(table, payload.id);
   }
 
   function deployComponentSuccess(
