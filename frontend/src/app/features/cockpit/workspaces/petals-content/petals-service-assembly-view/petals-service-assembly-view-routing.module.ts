@@ -17,7 +17,6 @@
 
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-// tslint:disable-next-line:max-line-length
 import { PetalsServiceAssemblyViewComponent } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.component';
 
 // /workspaces/:workspaceId/petals/service-assemblies/:serviceAssemblyId
