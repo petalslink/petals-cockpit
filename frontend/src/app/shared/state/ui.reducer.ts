@@ -71,45 +71,45 @@ export namespace UiReducer {
     }
   }
 
-  function setLanguage(ui: IUi, payload: { language: string }) {
+  function setLanguage(ui: IUi, payload: { language: string }): IUi {
     return {
       ...ui,
-      ...<IUi>{ language: payload.language },
+      language: payload.language,
     };
   }
 
-  function toggleSidenav(ui: IUi) {
+  function toggleSidenav(ui: IUi): IUi {
     return {
       ...ui,
-      ...<IUi>{ isSidenavVisible: !ui.isSidenavVisible },
+      isSidenavVisible: !ui.isSidenavVisible,
     };
   }
 
-  function openSidenav(ui: IUi) {
+  function openSidenav(ui: IUi): IUi {
     return {
       ...ui,
-      ...<IUi>{ isSidenavVisible: true },
+      isSidenavVisible: true,
     };
   }
 
-  function closeSidenav(ui: IUi) {
+  function closeSidenav(ui: IUi): IUi {
     return {
       ...ui,
-      ...<IUi>{ isSidenavVisible: false },
+      isSidenavVisible: false,
     };
   }
 
-  function openWorkspaces(ui: IUi) {
+  function openWorkspaces(ui: IUi): IUi {
     return {
       ...ui,
-      ...<IUi>{ isPopupListWorkspacesVisible: true },
+      isPopupListWorkspacesVisible: true,
     };
   }
 
-  function closeWorkspaces(ui: IUi) {
+  function closeWorkspaces(ui: IUi): IUi {
     return {
       ...ui,
-      ...<IUi>{ isPopupListWorkspacesVisible: false },
+      isPopupListWorkspacesVisible: false,
     };
   }
 
@@ -120,31 +120,29 @@ export namespace UiReducer {
       titleMainPart2?: string;
       titleSubPart?: string;
     }
-  ) {
+  ): IUi {
     return {
       ...ui,
-      ...<IUi>{
-        titleMainPart1: payload.titleMainPart1
-          ? payload.titleMainPart1
-          : ui.titleMainPart1,
-        titleMainPart2: payload.titleMainPart2
-          ? payload.titleMainPart2
-          : ui.titleMainPart2,
-        titleSubPart: payload.titleSubPart
-          ? payload.titleSubPart
-          : ui.titleSubPart,
-      },
+      titleMainPart1: payload.titleMainPart1
+        ? payload.titleMainPart1
+        : ui.titleMainPart1,
+      titleMainPart2: payload.titleMainPart2
+        ? payload.titleMainPart2
+        : ui.titleMainPart2,
+      titleSubPart: payload.titleSubPart
+        ? payload.titleSubPart
+        : ui.titleSubPart,
     };
   }
 
-  function changeScreenSize(ui: IUi, payload: { screenSize: string }) {
+  function changeScreenSize(ui: IUi, payload: { screenSize: string }): IUi {
     return {
       ...ui,
-      ...<IUi>{ screenSize: payload.screenSize },
+      screenSize: payload.screenSize,
     };
   }
 
-  function closeWorkspace(ui: IUi, payload: { goToWorkspaces?: boolean }) {
+  function closeWorkspace(ui: IUi, payload: { goToWorkspaces?: boolean }): IUi {
     if (payload && payload.goToWorkspaces) {
       return {
         ...ui,

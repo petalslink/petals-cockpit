@@ -18,36 +18,26 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IWorkspaces, IWorkspace, IWorkspaceRow } from './workspaces.interface';
+import { IWorkspaces, IWorkspaceRow } from './workspaces.interface';
 import { IStore } from 'app/shared/state/store.interface';
 import { escapeStringRegexp } from 'app/shared/helpers/shared.helper';
-import { IUser, IUserRow } from 'app/shared/state/users.interface';
+import { IUserRow } from 'app/shared/state/users.interface';
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 
 export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
-  const sWorkspaces = store$.select((state: IStore) => state.workspaces);
-  const sUsers = store$.select((state: IStore) => state.users);
-  const sBuses = store$.select((state: IStore) => state.buses);
-
-  return sWorkspaces
-    .withLatestFrom(sUsers, sBuses)
+  return store$
+    .select(state => state.workspaces)
+    .withLatestFrom(store$.select(state => state.users))
     .map(([workspaces, users]) => {
       return {
         ...workspaces,
-        ...<IWorkspaces>{
-          list: workspaces.allIds.map(workspaceId => {
-            return {
-              ...workspaces.byId[workspaceId],
-              ...<IWorkspace>{
-                users: {
-                  list: workspaces.byId[workspaceId].users.map(
-                    userId => <IUser>users.byId[userId]
-                  ),
-                },
-              },
-            };
-          }),
-        },
+        list: workspaces.allIds.map(wId => {
+          const ws = workspaces.byId[wId];
+          return {
+            ...ws,
+            users: ws.users.map(id => users.byId[id]),
+          };
+        }),
       };
     });
 }

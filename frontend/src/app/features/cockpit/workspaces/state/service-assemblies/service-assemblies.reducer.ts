@@ -108,8 +108,11 @@ export namespace ServiceAssembliesReducer {
     return putAll(table, payload, serviceAssemblyRowFactory);
   }
 
-  function setCurrent(table: IServiceAssembliesTable, payload: { id: string }) {
-    const res = <IServiceAssembliesTable>{
+  function setCurrent(
+    table: IServiceAssembliesTable,
+    payload: { id: string }
+  ): IServiceAssembliesTable {
+    const res = {
       selectedServiceAssemblyId: payload.id,
     };
 
@@ -190,14 +193,6 @@ export namespace ServiceAssembliesReducer {
     table: IServiceAssembliesTable,
     payload: IServiceAssemblyRow
   ) {
-    const selectedServiceAssemblyId =
-      table.selectedServiceAssemblyId === payload.id
-        ? ''
-        : table.selectedServiceAssemblyId;
-
-    return {
-      ...removeById(table, payload.id),
-      selectedServiceAssemblyId,
-    };
+    return removeById(table, payload.id);
   }
 }

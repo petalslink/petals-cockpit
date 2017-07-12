@@ -99,6 +99,5 @@ export function containersTableFactory(): IContainersTable {
   return {
     ...emptyJsTable<IContainerRow>(),
     selectedContainerId: '',
-    isFetchingDetails: false,
   };
 }

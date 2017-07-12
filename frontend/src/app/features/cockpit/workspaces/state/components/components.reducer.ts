@@ -86,7 +86,7 @@ export namespace ComponentsReducer {
         return fetchDetailsSuccess(table, action.payload);
       }
       case Components.RemovedType: {
-        return remove(table, action.payload);
+        return removed(table, action.payload);
       }
       case Components.ChangeStateType: {
         return changeState(table, action.payload);
@@ -140,8 +140,11 @@ export namespace ComponentsReducer {
     return putAll(table, payload, componentRowFactory);
   }
 
-  function setCurrent(table: IComponentsTable, payload: { id: string }) {
-    const res = <IComponentsTable>{
+  function setCurrent(
+    table: IComponentsTable,
+    payload: { id: string }
+  ): IComponentsTable {
+    const res = {
       selectedComponentId: payload.id,
     };
 
@@ -220,7 +223,7 @@ export namespace ComponentsReducer {
     });
   }
 
-  function remove(table: IComponentsTable, payload: IComponentRow) {
+  function removed(table: IComponentsTable, payload: IComponentRow) {
     return removeById(table, payload.id);
   }
 

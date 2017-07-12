@@ -148,7 +148,7 @@ export class ComponentsEffects {
           action.payload.state,
           action.payload.parameters
         )
-        .mergeMap(_ => Observable.empty())
+        .mergeMap(_ => Observable.empty<Action>())
         .catch(err => {
           if (environment.debug) {
             console.group();
@@ -193,7 +193,7 @@ export class ComponentsEffects {
             action.payload.file,
             action.payload.serviceUnitName
           )
-          .mergeMap(_ => Observable.empty())
+          .mergeMap(_ => Observable.empty<Action>())
           .catch(err => {
             if (environment.debug) {
               console.group();

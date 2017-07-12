@@ -47,10 +47,6 @@ interface IUsersCommon {
 
 export interface IUsersTable extends IUsersCommon, JsTable<IUserRow> {}
 
-export interface IUsers extends IUsersCommon {
-  list: IUser[];
-}
-
 export function userRowFactory(): IUserRow {
   return {
     id: null,

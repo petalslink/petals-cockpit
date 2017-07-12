@@ -15,13 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IUsers } from '../../../../../shared/state/users.interface';
-import { IBuses } from '../buses/buses.interface';
+import { IUser } from '../../../../../shared/state/users.interface';
 import {
-  IWorkspaceBackend,
   IWorkspaceBackendDetails,
   IWorkspaceBackendCommon,
-  IWorkspaceBackendDetailsCommon,
 } from 'app/shared/services/workspaces.service';
 import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
 
@@ -33,18 +30,11 @@ export interface IWorkspaceUI {
 }
 
 // used within table
-export interface IWorkspaceRow
-  extends IWorkspaceUI,
-    IWorkspaceBackend,
-    IWorkspaceBackendDetails {}
+export interface IWorkspaceRow extends IWorkspaceUI, IWorkspaceBackendDetails {}
 
 // used in generated views
-export interface IWorkspace
-  extends IWorkspaceUI,
-    IWorkspaceBackendCommon,
-    IWorkspaceBackendDetailsCommon {
-  buses: IBuses;
-  users: IUsers;
+export interface IWorkspace extends IWorkspaceBackendCommon {
+  users: IUser[];
 }
 
 export function workspaceRowFactory(): IWorkspaceRow {

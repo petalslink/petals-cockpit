@@ -116,7 +116,7 @@ export class SharedLibrariesEffects {
             action.payload.state
           )
           // response will be handled by sse
-          .mergeMap(_ => Observable.empty())
+          .mergeMap(_ => Observable.empty<Action>())
           .catch(err => {
             if (environment.debug) {
               console.group();
