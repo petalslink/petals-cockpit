@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $, by } from 'protractor';
+import { browser, ExpectedConditions as EC, $, $$, by } from 'protractor';
 
 import { urlToMatch, Matcher, textToMatchInElement } from '../utils';
 import { waitTimeout } from '../common';
@@ -192,6 +192,16 @@ export class WorkspaceOverviewPage extends WorkspacePage {
   );
 
   public readonly users = this.component.$(`.workspace-users`);
+  public readonly usersList = this.users.$(`md-list`);
+  public readonly usersAutocompleteInput = this.component.$(
+    `input[formcontrolname="userSearchCtrl"]`
+  );
+  // md-option is not within .workspace-users
+  // it's at the root of the HTML page
+  public readonly usersAutocompleteList = $$(`md-option`);
+  public readonly btnAddUserToWks = this.component.element(
+    by.cssContainingText(`button`, `Add`)
+  );
 
   static waitAndGet(expectedName?: Matcher) {
     super.wait();
@@ -201,5 +211,18 @@ export class WorkspaceOverviewPage extends WorkspacePage {
 
   private constructor() {
     super();
+  }
+
+  getUsersAutocomplete(): Promise<string[]> {
+    this.usersAutocompleteInput.click();
+    return this.usersAutocompleteList.getText() as any;
+  }
+
+  addUser(id: string) {
+    this.usersAutocompleteInput.sendKeys(id);
+
+    expect(this.btnAddUserToWks.isEnabled()).toBe(true);
+
+    this.btnAddUserToWks.click();
   }
 }

@@ -75,6 +75,18 @@ export function getCurrentWorkspaceUsers(
   );
 }
 
+export function getUsersNotInCurrentWorkspace(
+  state$: Store<IStore>
+): Observable<IUserRow[]> {
+  return getCurrentWorkspace(state$)
+    .withLatestFrom(state$.map(state => state.users))
+    .map(([currWks, users]) =>
+      users.allIds
+        .filter(id => !currWks.users.includes(id))
+        .map(id => users.byId[id])
+    );
+}
+
 // -----------------------------------------------------------
 
 export enum WorkspaceElementType {

@@ -41,6 +41,7 @@ import {
   MdToolbarModule,
   MdTooltipModule,
   MdProgressBarModule,
+  MdAutocompleteModule,
 } from '@angular/material';
 
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
@@ -64,6 +65,7 @@ export const MaterialModules = [
   MdTabsModule,
   MdToolbarModule,
   MdTooltipModule,
+  MdAutocompleteModule,
 ];
 
 export const modules = [

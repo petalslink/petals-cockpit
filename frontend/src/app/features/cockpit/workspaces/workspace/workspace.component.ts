@@ -16,8 +16,9 @@
  */
 
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { MdDialog, MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
-import { Store } from '@ngrx/store';
+import { Store, Dispatcher } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
@@ -27,11 +28,15 @@ import {
   getCurrentWorkspace,
   filterWorkspaceFetched,
   getCurrentWorkspaceUsers,
+  getUsersNotInCurrentWorkspace,
 } from '../../../cockpit/workspaces/state/workspaces/workspaces.selectors';
 
 import { Ui } from 'app/shared/state/ui.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { IUserRow } from 'app/shared/state/users.interface';
+import { Users } from 'app/shared/state/users.actions';
+import { SharedValidator } from 'app/shared/validators/shared.validator';
+import { getCurrentUser } from 'app/shared/state/users.selectors';
 
 @Component({
   selector: 'app-workspace',
@@ -43,6 +48,8 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
   workspace$: Observable<IWorkspaceRow>;
   users$: Observable<IUserRow[]>;
+  currentUserId$: Observable<string>;
+  appUsers$: Observable<string[]>;
 
   isRemoving = false;
 
@@ -50,7 +57,15 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   isSettingDescription = false;
   description: string = null;
 
-  constructor(private store$: Store<IStore>, private dialog: MdDialog) {}
+  addUserFormGroup: FormGroup;
+  filteredUsers$: Observable<string[]>;
+
+  constructor(
+    private fb: FormBuilder,
+    private store$: Store<IStore>,
+    private dialog: MdDialog,
+    private dispatcher: Dispatcher
+  ) {}
 
   ngOnInit() {
     this.store$.dispatch(
@@ -60,7 +75,33 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.workspace$ = this.store$.let(getCurrentWorkspace);
+    this.store$.dispatch(new Users.FetchAll());
+
+    this.appUsers$ = this.store$
+      .let(getUsersNotInCurrentWorkspace)
+      .map(us => us.map(u => u.id));
+
+    this.addUserFormGroup = this.fb.group({
+      userSearchCtrl: [
+        '',
+        null,
+        [SharedValidator.isStringInObsArrayValidator(this.appUsers$)],
+      ],
+    });
+
+    this.currentUserId$ = this.store$
+      .let(getCurrentUser())
+      .map(user => user.id);
+
+    this.workspace$ = this.store$
+      .let(getCurrentWorkspace)
+      .do(
+        wk =>
+          wk.isAddingUserToWorkspace
+            ? this.addUserFormGroup.get('userSearchCtrl').disable()
+            : this.addUserFormGroup.get('userSearchCtrl').enable()
+      );
+
     this.users$ = this.store$.let(getCurrentWorkspaceUsers);
 
     this.store$
@@ -89,6 +130,35 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
         this.isSettingDescription = false;
       })
       .subscribe();
+
+    this.filteredUsers$ = this.addUserFormGroup
+      .get('userSearchCtrl')
+      .valueChanges.startWith(null)
+      .combineLatest(this.appUsers$)
+      .map(([userSearch, users]) => this.filterUsers(userSearch, users));
+
+    // when a user is added to the workspace
+    this.dispatcher
+      .takeUntil(this.onDestroy$)
+      .filter(action => action.type === Workspaces.AddUserSuccessType)
+      // reset the form
+      .do(_ => this.addUserFormGroup.reset())
+      .subscribe();
+  }
+
+  filterUsers(username: string, users: string[]) {
+    return !!username
+      ? users.filter(user => user.toLowerCase().includes(username))
+      : users;
+  }
+
+  addUser() {
+    const id = this.addUserFormGroup.get('userSearchCtrl').value;
+    this.store$.dispatch(new Workspaces.AddUser({ id }));
+  }
+
+  removeUser(id: string) {
+    this.store$.dispatch(new Workspaces.DeleteUser({ id }));
   }
 
   editDescription() {

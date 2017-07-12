@@ -25,6 +25,7 @@ export interface IUserUI {
   isAdding: boolean;
   isDeleting: boolean;
   isModifying: boolean;
+  isDeletingFromWorkspace: boolean;
 }
 
 // used within table
@@ -54,6 +55,7 @@ export function userRowFactory(): IUserRow {
     isAdding: false,
     isDeleting: false,
     isModifying: false,
+    isDeletingFromWorkspace: false,
   };
 }
 

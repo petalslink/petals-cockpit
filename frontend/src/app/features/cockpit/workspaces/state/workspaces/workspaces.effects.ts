@@ -18,7 +18,7 @@
 import { Injectable } from '@angular/core';
 
 import { Router } from '@angular/router';
-import { Action } from '@ngrx/store';
+import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
@@ -56,6 +56,7 @@ import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { Users } from 'app/shared/state/users.actions';
 import { Ui } from 'app/shared/state/ui.actions';
+import { IStore } from 'app/shared/state/store.interface';
 
 @Injectable()
 export class WorkspacesEffects {
@@ -64,7 +65,8 @@ export class WorkspacesEffects {
     private router: Router,
     private workspacesService: WorkspacesService,
     private sseService: SseService,
-    private notifications: NotificationsService
+    private notifications: NotificationsService,
+    private store$: Store<IStore>
   ) {}
 
   // tslint:disable-next-line:member-ordering
@@ -281,6 +283,56 @@ export class WorkspacesEffects {
           }
 
           return Observable.of(new Workspaces.DeleteError(action.payload));
+        })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true })
+  addUser$: Observable<Action> = this.actions$
+    .ofType(Workspaces.AddUserType)
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
+    .mergeMap(([action, workspaceId]: [Workspaces.AddUser, string]) =>
+      this.workspacesService
+        .addUser(workspaceId, action.payload.id)
+        .map(_ => new Workspaces.AddUserSuccess(action.payload))
+        .catch(err => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error catched in workspace.effects: ofType(Workspaces.AddUserType)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of(new Workspaces.AddUserError(action.payload));
+        })
+    );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: true })
+  deleteUser$: Observable<Action> = this.actions$
+    .ofType(Workspaces.DeleteUserType)
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
+    .mergeMap(([action, workspaceId]: [Workspaces.AddUser, string]) =>
+      this.workspacesService
+        .removeUser(workspaceId, action.payload.id)
+        .map(_ => new Workspaces.DeleteUserSuccess(action.payload))
+        .catch(err => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error catched in workspace.effects: ofType(Workspaces.DeleteUserType)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of(new Workspaces.DeleteUserError(action.payload));
         })
     );
 }

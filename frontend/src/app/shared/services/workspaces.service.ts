@@ -52,6 +52,13 @@ export abstract class WorkspacesService {
     id: string,
     description: string
   ): Observable<Response>;
+
+  abstract addUser(workspaceId: string, userId: string): Observable<Response>;
+
+  abstract removeUser(
+    workspaceId: string,
+    userId: string
+  ): Observable<Response>;
 }
 
 @Injectable()
@@ -82,5 +89,18 @@ export class WorkspacesServiceImpl extends WorkspacesService {
     return this.http.put(`${environment.urlBackend}/workspaces/${id}`, {
       description,
     });
+  }
+
+  addUser(workspaceId: string, userId: string) {
+    return this.http.post(
+      `${environment.urlBackend}/workspaces/${workspaceId}/users`,
+      userId
+    );
+  }
+
+  removeUser(workspaceId: string, userId: string) {
+    return this.http.delete(
+      `${environment.urlBackend}/workspaces/${workspaceId}/users/${userId}`
+    );
   }
 }

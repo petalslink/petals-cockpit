@@ -162,4 +162,40 @@ export namespace Workspaces {
     readonly type = SetSearchType;
     constructor(public readonly payload: { search: string }) {}
   }
+
+  export const AddUserType = '[Workspaces] Add user';
+  export class AddUser implements Action {
+    readonly type = AddUserType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const AddUserErrorType = '[Workspaces] Add user error';
+  export class AddUserError implements Action {
+    readonly type = AddUserErrorType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const AddUserSuccessType = '[Workspaces] Add user success';
+  export class AddUserSuccess implements Action {
+    readonly type = AddUserSuccessType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const DeleteUserType = '[Workspaces] Delete user';
+  export class DeleteUser implements Action {
+    readonly type = DeleteUserType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const DeleteUserErrorType = '[Workspaces] Delete user error';
+  export class DeleteUserError implements Action {
+    readonly type = DeleteUserErrorType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const DeleteUserSuccessType = '[Workspaces] Delete user success';
+  export class DeleteUserSuccess implements Action {
+    readonly type = DeleteUserSuccessType;
+    constructor(public readonly payload: { id: string }) {}
+  }
 }
