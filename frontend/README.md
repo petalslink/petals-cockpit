@@ -19,7 +19,7 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 ## Running unit tests
 
-Run `yarn run test` or `yarn run test:watch` to execute the unit tests via [Jest](https://facebook.github.io/jest/).
+Run `yarn run test` to execute the unit tests.
 
 ## Running end-to-end tests
 
@@ -41,6 +41,4 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 Angular-cli (configured in `.angular-cli.conf`) uses `src/tsconfig.app.json` to compile the application, `src/tsconfig.spec.json` to compile the tests and `e2e/tsconfig.e2e.json` to compile the e2e tests.
 
-Jest (configured in `package.json`) uses `src/tsconfig.spec.json` to compile the tests.
-
-The IDE will most certainly uses `src/tsconfig.json` for the files in `src/` (in particular using the jest typings) and `src/tsconfig.json` for the files in `e2e/` (in particular using the jasmine typings).
+The IDE will most certainly uses `src/tsconfig.json` for the files in `src/` and `src/tsconfig.json` for the files in `e2e/`.

@@ -166,8 +166,12 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
     this.store$.dispatch(new Ui.CloseSidenavOnSmallScreen());
   }
 
-  fetch(ws: IWorkspace) {
+  fetchWorkspace(ws: IWorkspace) {
     this.workspaceListDialog.close(ws);
+  }
+
+  createWorkspace(name: string) {
+    this.store$.dispatch(new Workspaces.Create({ name }));
   }
 
   private doOpenDeletedWorkspaceDialog() {

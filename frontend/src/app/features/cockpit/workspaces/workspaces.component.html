@@ -48,5 +48,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 </md-sidenav-container>
 
 <ng-template #workspaceList>
-  <app-workspaces-list (fetch)="fetch($event)" [workspaces]="workspaces$ | async" [user]="user$ | async"></app-workspaces-list>
+  <app-workspaces-list
+    (fetch)="fetchWorkspace($event)"
+    (create)="createWorkspace($event)"
+    [workspaces]="workspaces$ | async"
+    [user]="user$ | async">
+  </app-workspaces-list>
 </ng-template>

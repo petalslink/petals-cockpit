@@ -18,7 +18,6 @@
 import {
   Component,
   OnInit,
-  OnDestroy,
   EventEmitter,
   Output,
   Input,
@@ -27,10 +26,6 @@ import {
 import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-import { Store } from '@ngrx/store';
-
-import { IStore } from 'app/shared/state/store.interface';
 
 import {
   IWorkspaces,
@@ -38,61 +33,49 @@ import {
 } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { IUser, ICurrentUser } from 'app/shared/state/users.interface';
 
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
-
 @Component({
   selector: 'app-workspaces-list',
   templateUrl: 'workspaces-list.component.html',
   styleUrls: ['workspaces-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WorkspacesListComponent implements OnInit, OnDestroy {
-  private onDestroy$ = new Subject<void>();
-
-  @Input() workspaces: IWorkspaces;
+export class WorkspacesListComponent implements OnInit {
+  private _workspaces: IWorkspaces;
   @Input() user: ICurrentUser;
   @Output() fetch = new EventEmitter<IWorkspace>();
+  @Output() create = new EventEmitter<string>();
 
   newWksForm: FormGroup;
-  btnSubmitDisabled = true;
+  submitDisabled$: Observable<boolean>;
 
-  constructor(private store$: Store<IStore>, private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder) {}
+
+  @Input()
+  set workspaces(workspaces: IWorkspaces) {
+    this._workspaces = workspaces;
+    if (this.newWksForm) {
+      if (workspaces.isAddingWorkspace) {
+        this.newWksForm.disable();
+      } else {
+        this.newWksForm.enable();
+      }
+    }
+  }
+
+  get workspaces() {
+    return this._workspaces;
+  }
 
   ngOnInit() {
     this.newWksForm = this.fb.group({
       name: [''],
     });
 
-    this.store$
-      .select(state => state.workspaces.isAddingWorkspace)
-      .do(isAddingWorkspace => {
-        if (isAddingWorkspace) {
-          this.newWksForm.disable();
-        } else {
-          this.newWksForm.enable();
-        }
-      })
-      .combineLatest(
-        Observable.empty().concat(
-          this.newWksForm.valueChanges
-            .map(values => values.name)
-            .distinctUntilChanged()
-        )
-      )
-      .do(([isAddingWorkspace, name]) => {
-        if (!name || isAddingWorkspace) {
-          this.btnSubmitDisabled = true;
-        } else {
-          this.btnSubmitDisabled = false;
-        }
-      })
-      .takeUntil(this.onDestroy$)
-      .subscribe();
-  }
-
-  ngOnDestroy() {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
+    this.submitDisabled$ = this.newWksForm.valueChanges
+      .map(values => values.name)
+      .distinctUntilChanged()
+      .map(name => !name || this.workspaces.isAddingWorkspace)
+      .startWith(true);
   }
 
   select(workspace: IWorkspace) {
@@ -100,7 +83,7 @@ export class WorkspacesListComponent implements OnInit, OnDestroy {
   }
 
   onSubmit({ value }) {
-    this.store$.dispatch(new Workspaces.Post({ name: value.name }));
+    this.create.emit(value.name);
     this.newWksForm.reset();
   }
 

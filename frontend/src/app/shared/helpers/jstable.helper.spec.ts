@@ -141,17 +141,19 @@ describe('helpers to manipulate tables', () => {
     it('should not fail if there is no element with that id and in prod', () => {
       environment.strictCoherence = false;
 
-      expect(updateById(table, 'id1', { v: 'value' })).toEqual({
-        ...table,
-        byId: {
-          ...table.byId,
-          // note: this is not valid but it's better than just failing in case of bug
-          id1: {
-            id: 'id1',
-            v: 'value',
+      expect(updateById(table, 'id1', { v: 'value' })).toEqual(
+        <any>{
+          ...table,
+          byId: {
+            ...table.byId,
+            // note: this is not the valid type but it's better than just failing in case of bug
+            id1: {
+              id: 'id1',
+              v: 'value',
+            },
           },
-        },
-      });
+        }
+      );
     });
 
     it('should fail if there is no element with that id and in env', () => {

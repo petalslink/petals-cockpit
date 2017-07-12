@@ -58,21 +58,21 @@ export namespace Workspaces {
     constructor(public readonly payload: JsTable<IWorkspaceBackend>) {}
   }
 
-  export const PostType = '[Workspaces] Post';
-  export class Post implements Action {
-    readonly type = PostType;
+  export const CreateType = '[Workspaces] Create';
+  export class Create implements Action {
+    readonly type = CreateType;
     constructor(public readonly payload: { name: string }) {}
   }
 
-  export const PostErrorType = '[Workspaces] Post error';
-  export class PostError implements Action {
-    readonly type = PostErrorType;
+  export const CreateErrorType = '[Workspaces] Create error';
+  export class CreateError implements Action {
+    readonly type = CreateErrorType;
     constructor() {}
   }
 
-  export const PostSuccessType = '[Workspaces] Post success';
-  export class PostSuccess implements Action {
-    readonly type = PostSuccessType;
+  export const CreateSuccessType = '[Workspaces] Create success';
+  export class CreateSuccess implements Action {
+    readonly type = CreateSuccessType;
     constructor(public readonly payload: IWorkspaceBackend) {}
   }
 

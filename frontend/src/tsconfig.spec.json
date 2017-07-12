@@ -6,13 +6,15 @@
     "target": "es6",
     "baseUrl": "",
     "types": [
-      "jest",
+      "jasmine",
       "node"
-    ],
-    // this is needed by jest to transpile angular2-notifications!
-    "allowJs": true
+    ]
   },
+  "files": [
+    "test.ts"
+  ],
   "include": [
+    "testing/**.ts",
     "**/*.spec.ts",
     "**/*.d.ts"
   ]
