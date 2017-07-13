@@ -64,7 +64,11 @@ export namespace UiReducer {
         return closeWorkspace(table, action.payload);
       }
       case Users.DisconnectSuccessType: {
-        return uiFactory();
+        return {
+          ...uiFactory(),
+          language: table.language,
+          screenSize: table.screenSize,
+        };
       }
       default:
         return table;
