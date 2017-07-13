@@ -17,7 +17,7 @@
 
 import { browser, ExpectedConditions as EC, $ } from 'protractor';
 
-import { urlToMatch } from '../utils';
+import { urlToMatch, waitAndClick } from '../utils';
 import { waitTimeout } from '../common';
 import { ContainerOverviewPage } from './container.po';
 
@@ -45,7 +45,7 @@ export class BusPage {
   private constructor() {}
 
   openContainer(index: number) {
-    this.containers.get(index).$('.swiper-img-container').click();
+    waitAndClick(this.containers.get(index).$('.swiper-img-container'));
     return ContainerOverviewPage.waitAndGet();
   }
 }

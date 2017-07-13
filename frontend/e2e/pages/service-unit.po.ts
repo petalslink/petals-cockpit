@@ -17,7 +17,7 @@
 
 import { browser, ExpectedConditions as EC, $ } from 'protractor';
 
-import { urlToMatch } from '../utils';
+import { urlToMatch, waitAndClick } from '../utils';
 import { waitTimeout } from '../common';
 import { ServiceAssemblyOverviewPage } from './service-assembly.po';
 
@@ -73,7 +73,7 @@ export class ServiceUnitOverviewPage extends ServiceUnitPage {
   }
 
   openServiceAssembly() {
-    this.viewServiceAssembly.$('a.sa').click();
+    waitAndClick(this.viewServiceAssembly.$('a.sa'));
     return ServiceAssemblyOverviewPage.waitAndGet();
   }
 }

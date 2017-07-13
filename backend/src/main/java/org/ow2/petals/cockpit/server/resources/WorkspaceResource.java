@@ -389,12 +389,12 @@ public class WorkspaceResource {
     @POST
     @Path("/users/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void addUsers(@NotEmpty String username) {
+    public void addUsers(@Valid AddUser userToAdd) {
         checkAccess(jooq);
 
         try {
             DSL.using(jooq).insertInto(USERS_WORKSPACES).set(USERS_WORKSPACES.WORKSPACE_ID, wsId)
-                    .set(USERS_WORKSPACES.USERNAME, username).onDuplicateKeyIgnore().execute();
+                    .set(USERS_WORKSPACES.USERNAME, userToAdd.id).onDuplicateKeyIgnore().execute();
         } catch (DataAccessException e) {
             if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
                 throw new WebApplicationException(Status.CONFLICT);
@@ -411,6 +411,17 @@ public class WorkspaceResource {
 
         DSL.using(jooq).delete(USERS_WORKSPACES)
                 .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(username))).execute();
+    }
+
+    public static class AddUser {
+
+        @NotEmpty
+        @JsonProperty
+        public final String id;
+
+        public AddUser(@JsonProperty("id") String id) {
+            this.id = id;
+        }
     }
 
     public static class WorkspaceOverviewContent {

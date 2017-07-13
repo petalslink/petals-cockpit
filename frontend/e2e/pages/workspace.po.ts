@@ -17,7 +17,13 @@
 
 import { browser, ExpectedConditions as EC, $, $$, by } from 'protractor';
 
-import { urlToMatch, Matcher, textToMatchInElement } from '../utils';
+import {
+  urlToMatch,
+  Matcher,
+  textToMatchInElement,
+  waitAndClick,
+  getMultipleElementsTexts,
+} from '../utils';
 import { waitTimeout } from '../common';
 import { ImportBusPage, BusInProgressPage } from './import-bus.po';
 import { BusPage } from './bus.po';
@@ -44,6 +50,7 @@ export abstract class WorkspacePage {
   public readonly busesInProgress = this.sidenav.$$(
     `app-buses-in-progress md-nav-list a`
   );
+  public readonly workspaceButton = WorkspacePage.workspaceButton;
 
   static wait(expectedName?: Matcher) {
     browser.wait(urlToMatch(/\/workspaces\/\w+$/), waitTimeout);
@@ -62,7 +69,12 @@ export abstract class WorkspacePage {
     if (expectedName) {
       test = EC.and(
         test,
-        textToMatchInElement(this.workspaceButton, expectedName)
+        textToMatchInElement(
+          this.workspaceButton,
+          typeof expectedName === 'string'
+            ? expectedName.toUpperCase()
+            : expectedName
+        )
       );
     }
 
@@ -70,22 +82,17 @@ export abstract class WorkspacePage {
   }
 
   openWorkspacesDialog() {
-    browser.wait(
-      EC.elementToBeClickable(this.changeWorkspaceButton),
-      waitTimeout
-    );
-    this.changeWorkspaceButton.click();
+    waitAndClick(this.changeWorkspaceButton);
     return WorkspacesPage.waitAndGet(true);
   }
 
   openImportBus() {
-    browser.wait(EC.elementToBeClickable(this.addBusButton), waitTimeout);
-    this.addBusButton.click();
+    waitAndClick(this.addBusButton);
     return ImportBusPage.waitAndGet();
   }
 
   openBusInProgress(index: number) {
-    this.busesInProgress.get(index).click();
+    waitAndClick(this.busesInProgress.get(index));
     return BusInProgressPage.waitAndGet();
   }
 
@@ -204,13 +211,17 @@ export class WorkspaceOverviewPage extends WorkspacePage {
   );
 
   static waitAndGet(expectedName?: Matcher) {
-    super.wait();
+    super.wait(expectedName);
 
     return new WorkspaceOverviewPage();
   }
 
   private constructor() {
     super();
+  }
+
+  getUsers() {
+    return getMultipleElementsTexts(this.usersList, '.user-id', '.user-name');
   }
 
   getUsersAutocomplete(): Promise<string[]> {
@@ -220,9 +231,12 @@ export class WorkspaceOverviewPage extends WorkspacePage {
 
   addUser(id: string) {
     this.usersAutocompleteInput.sendKeys(id);
-
-    expect(this.btnAddUserToWks.isEnabled()).toBe(true);
-
-    this.btnAddUserToWks.click();
+    waitAndClick(this.btnAddUserToWks);
+    browser.wait(
+      EC.visibilityOf(
+        this.usersList.element(by.cssContainingText('.user-id', id))
+      ),
+      waitTimeout
+    );
   }
 }

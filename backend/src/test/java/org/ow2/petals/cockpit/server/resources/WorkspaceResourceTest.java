@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.AddUser;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceOverview;
@@ -199,18 +200,18 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void addUserToExistingWorkspace() {
         addUser("user1");
 
-        Response add = resource.target("/workspaces/1/users").request().post(Entity.json("user1"));
+        Response add = resource.target("/workspaces/1/users").request().post(Entity.json(new AddUser("user1")));
         assertThat(add.getStatus()).isEqualTo(204);
 
         assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(2)
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin").value().isEqualTo("user1");
 
         // adding an already added user should work
-        Response add2 = resource.target("/workspaces/1/users").request().post(Entity.json("user1"));
+        Response add2 = resource.target("/workspaces/1/users").request().post(Entity.json(new AddUser("user1")));
         assertThat(add2.getStatus()).isEqualTo(204);
 
         // non-existing user
-        Response add3 = resource.target("/workspaces/1/users").request().post(Entity.json("user2"));
+        Response add3 = resource.target("/workspaces/1/users").request().post(Entity.json(new AddUser("user2")));
         assertThat(add3.getStatus()).isEqualTo(409);
 
         // the other workspace wasn't touched
@@ -222,7 +223,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void addUserToExistingWorkspaceForbidden() {
         addUser("user1");
 
-        Response add = resource.target("/workspaces/2/users").request().post(Entity.json("user1"));
+        Response add = resource.target("/workspaces/2/users").request().post(Entity.json(new AddUser("user1")));
         assertThat(add.getStatus()).isEqualTo(403);
 
         assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(1)
@@ -233,7 +234,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void addUserToNonExistingWorkspaceForbidden() {
         addUser("user1");
 
-        Response add = resource.target("/workspaces/3/users").request().post(Entity.json("user1"));
+        Response add = resource.target("/workspaces/3/users").request().post(Entity.json(new AddUser("user1")));
         assertThat(add.getStatus()).isEqualTo(403);
     }
 
