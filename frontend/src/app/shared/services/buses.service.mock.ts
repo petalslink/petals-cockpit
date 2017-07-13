@@ -22,11 +22,11 @@ import { BusesServiceImpl, IBusImport } from './buses.service';
 
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from 'app/shared/services/sse.service.mock';
-import { environment } from './../../../environments/environment';
-import * as helper from './../helpers/mock.helper';
-import { busesService } from './../../../mocks/buses-mock';
-import { workspacesService } from '../../../mocks/workspaces-mock';
-import { IMPORT_HTTP_ERROR_IP } from '../../../mocks/backend-mock';
+import { environment } from 'environments/environment';
+import * as helper from 'app/shared/helpers/mock.helper';
+import { busesService } from 'mocks/buses-mock';
+import { workspacesService } from 'mocks/workspaces-mock';
+import { IMPORT_HTTP_ERROR_IP } from 'mocks/backend-mock';
 import { UsersService } from 'app/shared/services/users.service';
 import { UsersServiceMock } from 'app/shared/services/users.service.mock';
 

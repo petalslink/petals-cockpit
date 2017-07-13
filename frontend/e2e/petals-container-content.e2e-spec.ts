@@ -19,7 +19,6 @@ import * as path from 'path';
 
 import { page } from './common';
 import { WorkspacePage } from './pages/workspace.po';
-import { ComponentOverviewPage } from './pages/component.po';
 import { ServiceAssemblyOverviewPage } from './pages/service-assembly.po';
 import { NotFoundPage } from './pages/not-found';
 import { SharedLibraryOverviewPage } from './pages/shared-library.po';
@@ -194,7 +193,7 @@ describe(`Petals container content`, () => {
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
       // we should be redirected
-      const ops = ComponentOverviewPage.waitAndGet().openOperations();
+      const ops = workspace.openComponent('component').openOperations();
 
       expect(ops.state.getText()).toEqual('Loaded');
 
@@ -350,7 +349,7 @@ describe(`Petals container content`, () => {
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
       // we should get redirected
-      const sa = ServiceAssemblyOverviewPage.waitAndGet();
+      const sa = workspace.openServiceAssembly('SA 12');
 
       expect(sa.state.getText()).toEqual('Shutdown');
 
@@ -497,7 +496,7 @@ describe(`Petals container content`, () => {
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
       // we should get redirected
-      const sl = SharedLibraryOverviewPage.waitAndGet();
+      const sl = workspace.openSharedLibrary('SL 4');
 
       expect(sl.title.getText()).toEqual('SL 4');
       expect(sl.components.getText()).toEqual([]);

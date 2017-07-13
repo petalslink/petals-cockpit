@@ -23,26 +23,20 @@ import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
 
-import { environment } from './../../../../../../environments/environment';
-import { IStore } from '../../../../../shared/state/store.interface';
+import { environment } from 'environments/environment';
+import { IStore } from 'app/shared/state/store.interface';
 import {
   ServiceAssembliesService,
   ServiceAssemblyState,
   EServiceAssemblyState,
   IServiceAssemblyBackendSSE,
 } from 'app/shared/services/service-assemblies.service';
-
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-
 import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
-
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
-
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 
 @Injectable()
 export class ServiceAssembliesEffects {
@@ -60,27 +54,13 @@ export class ServiceAssembliesEffects {
     .ofType(SseWorkspaceEvent.SA_DEPLOYED.action)
     .map(action => {
       const data = action.payload;
-
       const serviceAssemblies = toJsTable<IServiceAssemblyBackendSSE>(
         data.serviceAssemblies
       );
       const serviceUnits = toJsTable<IServiceUnitBackendSSE>(data.serviceUnits);
-
-      const serviceAssemby =
-        serviceAssemblies.byId[serviceAssemblies.allIds[0]];
-
-      this.notifications.success(
-        'Service Assembly Deployed',
-        `${serviceAssemby.name} has been successfully deployed`
-      );
-
       return batchActions([
         new ServiceAssemblies.Added(serviceAssemblies),
         new ServiceUnits.Added(serviceUnits),
-        new Containers.DeployServiceAssemblySuccess(serviceAssemby),
-        ...serviceUnits.allIds.map(
-          id => new Components.DeployServiceUnitSuccess(serviceUnits.byId[id])
-        ),
       ]);
     });
 

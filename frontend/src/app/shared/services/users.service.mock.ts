@@ -27,9 +27,9 @@ import {
   IUserBackend,
   IUserNew,
 } from './users.service';
-import { ICurrentUser } from '../state/users.interface';
+import { ICurrentUser } from 'app/shared/state/users.interface';
 import { environment } from 'environments/environment';
-import * as helper from './../helpers/mock.helper';
+import * as helper from 'app/shared/helpers/mock.helper';
 import { CORRECT_SETUP_TOKEN, GONE_SETUP_TOKEN } from 'mocks/backend-mock';
 import { BackendUser } from 'mocks/users-mock';
 

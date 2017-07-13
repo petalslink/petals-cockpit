@@ -119,8 +119,9 @@ describe(`Workspace Overview`, () => {
       .goToWorkspacesViaLogin()
       .loginToWorkspaces('bescudie', 'bescudie');
 
-    workspaces.inputName.sendKeys(`New workspace`);
-    workspaces.addButton.click();
+    workspaces.inputName
+      .sendKeys(`New workspace`)
+      .then(() => workspaces.addButton.click());
     const workspace = workspaces.selectWorkspace(1, `New workspace`);
 
     expect(workspace.title.getText()).toEqual(`New workspace`);

@@ -20,6 +20,11 @@ import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
+import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
+import { IComponentBackendSSE } from 'app/shared/services/components.service';
+import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
 
 export interface IContainerBackendSSECommon {
   id: string;
@@ -51,19 +56,22 @@ export abstract class ContainersService {
     workspaceId: string,
     containerId: string,
     file: File
-  ): Observable<Response>;
+  ): Observable<JsTable<IComponentBackendSSE>>;
 
   abstract deployServiceAssembly(
     workspaceId: string,
     containerId: string,
     file: File
-  ): Observable<Response>;
+  ): Observable<{
+    serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
+    serviceUnits: JsTable<IServiceUnitBackendSSE>;
+  }>;
 
   abstract deploySharedLibrary(
     workspaceId: string,
     containerId: string,
     file: File
-  ): Observable<Response>;
+  ): Observable<JsTable<ISharedLibraryBackendSSE>>;
 }
 
 @Injectable()
@@ -80,29 +88,45 @@ export class ContainersServiceImpl extends ContainersService {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
 
-    return this.http.post(
-      `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/components`,
-      formData
-    );
+    return this.http
+      .post(
+        `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/components`,
+        formData
+      )
+      .map(res => toJsTable<IComponentBackendSSE>(res.json().components));
   }
 
   deployServiceAssembly(workspaceId: string, containerId: string, file: File) {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
 
-    return this.http.post(
-      `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/serviceassemblies`,
-      formData
-    );
+    return this.http
+      .post(
+        `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/serviceassemblies`,
+        formData
+      )
+      .map(res => {
+        const data = res.json();
+        return {
+          serviceAssemblies: toJsTable<IServiceAssemblyBackendSSE>(
+            data.serviceAssemblies
+          ),
+          serviceUnits: toJsTable<IServiceUnitBackendSSE>(data.serviceUnits),
+        };
+      });
   }
 
   deploySharedLibrary(workspaceId: string, containerId: string, file: File) {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
 
-    return this.http.post(
-      `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/sharedlibraries`,
-      formData
-    );
+    return this.http
+      .post(
+        `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/sharedlibraries`,
+        formData
+      )
+      .map(res =>
+        toJsTable<ISharedLibraryBackendSSE>(res.json().sharedLibraries)
+      );
   }
 }

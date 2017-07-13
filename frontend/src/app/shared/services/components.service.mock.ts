@@ -16,22 +16,22 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { NotificationsService } from 'angular2-notifications';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 
-import { componentsService } from '../../../mocks/components-mock';
-import * as helper from './../helpers/mock.helper';
+import { componentsService } from 'mocks/components-mock';
+import * as helper from 'app/shared/helpers/mock.helper';
 import {
   ComponentsServiceImpl,
   ComponentState,
   EComponentState,
 } from './components.service';
 import { SseService, SseWorkspaceEvent } from './sse.service';
-import { IStore } from '../state/store.interface';
 import { SseServiceMock } from './sse.service.mock';
-import { environment } from '../../../environments/environment';
+import { environment } from 'environments/environment';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
+import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 
 @Injectable()
 export class ComponentsServiceMock extends ComponentsServiceImpl {
@@ -98,34 +98,45 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
     file: File,
     serviceUnitName: string
   ) {
+    let o: Observable<Response>;
     if (serviceUnitName.includes('error')) {
-      return helper.errorBackend(
+      o = helper.errorBackend(
         '[Mock message] An error happened when trying to deploy the service-unit',
         400
       );
+    } else {
+      const component = componentsService.get(componentId);
+      const [serviceAssembly, serviceUnit] = component.container.addServiceUnit(
+        component,
+        'Shutdown',
+        serviceUnitName
+      );
+
+      const response = {
+        serviceAssemblies: serviceAssembly.toObj(),
+        serviceUnits: serviceUnit.toObj(),
+      };
+
+      setTimeout(
+        () =>
+          (this.sseService as SseServiceMock).triggerSseEvent(
+            SseWorkspaceEvent.SA_DEPLOYED.event,
+            response
+          ),
+        environment.mock.sseDelay
+      );
+
+      o = helper.responseBody(response);
     }
 
-    const component = componentsService.get(componentId);
-    const [serviceAssembly, serviceUnit] = component.container.addServiceUnit(
-      component,
-      'Shutdown',
-      serviceUnitName
-    );
-
-    const response = {
-      serviceAssemblies: serviceAssembly.toObj(),
-      serviceUnits: serviceUnit.toObj(),
-    };
-
-    setTimeout(
-      () =>
-        (this.sseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.SA_DEPLOYED.event,
-          response
+    return o.map(res => {
+      const data = res.json();
+      return {
+        serviceAssemblies: toJsTable<IServiceAssemblyBackendSSE>(
+          data.serviceAssemblies
         ),
-      environment.mock.sseDelay
-    );
-
-    return helper.responseBody(response);
+        serviceUnits: toJsTable<IServiceUnitBackendSSE>(data.serviceUnits),
+      };
+    });
   }
 }

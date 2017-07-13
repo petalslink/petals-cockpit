@@ -21,6 +21,9 @@ import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
+import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
 
 // http://stackoverflow.com/a/41631732/2398593
 export const EComponentState = {
@@ -77,7 +80,10 @@ export abstract class ComponentsService {
     componentId: string,
     file: File,
     serviceUnitName: string
-  ): Observable<Response>;
+  ): Observable<{
+    serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
+    serviceUnits: JsTable<IServiceUnitBackendSSE>;
+  }>;
 }
 
 @Injectable()
@@ -112,9 +118,19 @@ export class ComponentsServiceImpl extends ComponentsService {
     formData.append('file', file, file.name);
     formData.append('name', serviceUnitName);
 
-    return this.http.post(
-      `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}/serviceunits`,
-      formData
-    );
+    return this.http
+      .post(
+        `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}/serviceunits`,
+        formData
+      )
+      .map(res => {
+        const data = res.json();
+        return {
+          serviceAssemblies: toJsTable<IServiceAssemblyBackendSSE>(
+            data.serviceAssemblies
+          ),
+          serviceUnits: toJsTable<IServiceUnitBackendSSE>(data.serviceUnits),
+        };
+      });
   }
 }

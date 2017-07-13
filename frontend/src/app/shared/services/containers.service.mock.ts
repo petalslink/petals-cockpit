@@ -16,17 +16,23 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import { Store } from '@ngrx/store';
-import { NotificationsService } from 'angular2-notifications';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 
 import { environment } from 'environments/environment';
 import { ContainersServiceImpl } from './containers.service';
-import { containersService } from '../../../mocks/containers-mock';
-import * as helper from './../helpers/mock.helper';
+import { containersService } from 'mocks/containers-mock';
+import * as helper from 'app/shared/helpers/mock.helper';
 import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
-import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
+import {
+  EServiceAssemblyState,
+  IServiceAssemblyBackendSSE,
+} from 'app/shared/services/service-assemblies.service';
+import { IComponentBackendSSE } from 'app/shared/services/components.service';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
+import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 
 @Injectable()
 export class ContainersServiceMock extends ContainersServiceImpl {
@@ -41,86 +47,102 @@ export class ContainersServiceMock extends ContainersServiceImpl {
   }
 
   deployComponent(workspaceId: string, containerId: string, file: File) {
+    let o: Observable<Response>;
     if (file.name.includes('error')) {
-      return helper.errorBackend(
+      o = helper.errorBackend(
         '[Mock message] An error happened when trying to deploy the component',
         400
       );
+    } else {
+      const name = file.name.replace(/\.zip$/, '');
+      const component = containersService
+        .get(containerId)
+        .addComponent('Loaded', name);
+
+      const response = {
+        components: component.toObj(),
+      };
+
+      setTimeout(
+        () =>
+          (this.sseService as SseServiceMock).triggerSseEvent(
+            SseWorkspaceEvent.COMPONENT_DEPLOYED.event,
+            response
+          ),
+        environment.mock.sseDelay
+      );
+      o = helper.responseBody(response);
     }
 
-    const name = file.name.replace(/\.zip$/, '');
-    const component = containersService
-      .get(containerId)
-      .addComponent('Loaded', name);
-
-    const response = {
-      components: component.toObj(),
-    };
-
-    setTimeout(
-      () =>
-        (this.sseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.COMPONENT_DEPLOYED.event,
-          response
-        ),
-      environment.mock.sseDelay
-    );
-
-    return helper.responseBody(response);
+    return o.map(res => toJsTable<IComponentBackendSSE>(res.json().components));
   }
 
   deployServiceAssembly(workspaceId: string, containerId: string, file: File) {
+    let o: Observable<Response>;
     if (file.name.includes('error')) {
-      return helper.errorBackend(
+      o = helper.errorBackend(
         '[Mock message] An error happened when trying to deploy the service-assembly',
         400
       );
+    } else {
+      const [serviceAssembly, serviceUnits] = containersService
+        .get(containerId)
+        .addServiceAssembly(EServiceAssemblyState.Shutdown);
+
+      const response = {
+        serviceAssemblies: serviceAssembly,
+        serviceUnits: serviceUnits,
+      };
+
+      setTimeout(
+        () =>
+          (this.sseService as SseServiceMock).triggerSseEvent(
+            SseWorkspaceEvent.SA_DEPLOYED.event,
+            response
+          ),
+        environment.mock.sseDelay
+      );
+      o = helper.responseBody(response);
     }
 
-    const [serviceAssembly, serviceUnits] = containersService
-      .get(containerId)
-      .addServiceAssembly(EServiceAssemblyState.Shutdown);
-
-    const response = {
-      serviceAssemblies: serviceAssembly,
-      serviceUnits: serviceUnits,
-    };
-
-    setTimeout(
-      () =>
-        (this.sseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.SA_DEPLOYED.event,
-          response
+    return o.map(res => {
+      const data = res.json();
+      return {
+        serviceAssemblies: toJsTable<IServiceAssemblyBackendSSE>(
+          data.serviceAssemblies
         ),
-      environment.mock.sseDelay
-    );
-
-    return helper.responseBody(response);
+        serviceUnits: toJsTable<IServiceUnitBackendSSE>(data.serviceUnits),
+      };
+    });
   }
 
   deploySharedLibrary(workspaceId: string, containerId: string, file: File) {
+    let o: Observable<Response>;
     if (file.name.includes('error')) {
-      return helper.errorBackend(
+      o = helper.errorBackend(
         '[Mock message] An error happened when trying to deploy the shared library',
         400
       );
+    } else {
+      const sl = containersService.get(containerId).addSharedLibrary();
+
+      const response = {
+        sharedLibraries: sl.toObj(),
+      };
+
+      setTimeout(
+        () =>
+          (this.sseService as SseServiceMock).triggerSseEvent(
+            SseWorkspaceEvent.SL_DEPLOYED.event,
+            response
+          ),
+        environment.mock.sseDelay
+      );
+      o = helper.responseBody(response);
     }
 
-    const sl = containersService.get(containerId).addSharedLibrary();
-
-    const response = {
-      sharedLibraries: sl.toObj(),
-    };
-
-    setTimeout(
-      () =>
-        (this.sseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.SL_DEPLOYED.event,
-          response
-        ),
-      environment.mock.sseDelay
+    return o.map(res =>
+      toJsTable<ISharedLibraryBackendSSE>(res.json().sharedLibraries)
     );
-
-    return helper.responseBody(response);
   }
 }
