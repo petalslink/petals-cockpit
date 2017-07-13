@@ -17,7 +17,7 @@
 
 import { browser, ExpectedConditions as EC, $, by } from 'protractor';
 
-import { urlToMatch } from '../utils';
+import { urlToMatch, waitAndClick } from '../utils';
 import { waitTimeout } from '../common';
 import { UploadComponentPage } from './upload-component.po';
 import { SharedLibraryOverviewPage } from './shared-library.po';
@@ -41,11 +41,11 @@ export abstract class ComponentPage {
   }
 
   openOperations() {
-    this.component
-      .element(
+    waitAndClick(
+      this.component.element(
         by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')
       )
-      .click();
+    );
     return ComponentOperationPage.waitAndGet();
   }
 }
@@ -74,15 +74,16 @@ export class ComponentOverviewPage extends ComponentPage {
   }
 
   openSharedLibrary(identifier: string | number) {
-    if (typeof identifier === 'string') {
-      this.overview
-        .element(
-          by.cssContainingText(`.shared-libraries a.shared-library`, identifier)
-        )
-        .click();
-    } else {
-      this.sharedLibraries.get(identifier).click();
-    }
+    const e =
+      typeof identifier === 'string'
+        ? this.overview.element(
+            by.cssContainingText(
+              `.shared-libraries a.shared-library`,
+              identifier
+            )
+          )
+        : this.sharedLibraries.get(identifier);
+    waitAndClick(e);
     return SharedLibraryOverviewPage.waitAndGet();
   }
 }

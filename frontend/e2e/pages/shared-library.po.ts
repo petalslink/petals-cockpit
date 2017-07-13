@@ -17,7 +17,7 @@
 
 import { browser, ExpectedConditions as EC, $, by } from 'protractor';
 
-import { urlToMatch } from '../utils';
+import { urlToMatch, waitAndClick } from '../utils';
 import { waitTimeout } from '../common';
 import { ComponentOverviewPage } from './component.po';
 
@@ -40,18 +40,20 @@ export abstract class SharedLibraryPage {
   }
 
   openOperations() {
-    this.component
-      .element(
+    waitAndClick(
+      this.component.element(
         by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')
       )
-      .click();
+    );
     return SharedLibraryOperationPage.waitAndGet();
   }
 
   openOverview() {
-    this.component
-      .element(by.cssContainingText(`md-tab-header .mat-tab-label`, 'Overview'))
-      .click();
+    waitAndClick(
+      this.component.element(
+        by.cssContainingText(`md-tab-header .mat-tab-label`, 'Overview')
+      )
+    );
     return SharedLibraryOverviewPage.waitAndGet();
   }
 }
@@ -80,13 +82,13 @@ export class SharedLibraryOverviewPage extends SharedLibraryPage {
   }
 
   openComponent(identifier: string | number) {
-    if (typeof identifier === 'string') {
-      this.overview
-        .element(by.cssContainingText(`.components a.component`, identifier))
-        .click();
-    } else {
-      this.components.get(identifier).click();
-    }
+    const e =
+      typeof identifier === 'string'
+        ? this.overview.element(
+            by.cssContainingText(`.components a.component`, identifier)
+          )
+        : this.components.get(identifier);
+    waitAndClick(e);
     return ComponentOverviewPage.waitAndGet();
   }
 }

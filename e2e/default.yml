@@ -13,9 +13,6 @@ server:
   adminConnectors:
     - type: http
       port: 8082
-  # disable logs
-  requestLog:
-    appenders: []
 
 database:
   driverClass: org.h2.Driver
@@ -26,4 +23,4 @@ database:
   validationQuery: "/* Health Check */ SELECT 1"
 
 logging:
-  level: INFO
+  level: WARN

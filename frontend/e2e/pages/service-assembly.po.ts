@@ -17,7 +17,7 @@
 
 import { browser, ExpectedConditions as EC, $, by } from 'protractor';
 
-import { urlToMatch } from '../utils';
+import { urlToMatch, waitAndClick } from '../utils';
 import { waitTimeout } from '../common';
 import { ServiceUnitOverviewPage } from './service-unit.po';
 import { ComponentOverviewPage } from './component.po';
@@ -69,37 +69,33 @@ export class ServiceAssemblyOverviewPage extends ServiceAssemblyPage {
   }
 
   openOperations() {
-    this.component
-      .element(
+    waitAndClick(
+      this.component.element(
         by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')
       )
-      .click();
+    );
     return ServiceAssemblyOperationPage.waitAndGet();
   }
 
   openServiceUnit(identifier: string | number) {
-    if (typeof identifier === 'string') {
-      this.overview
-        .element(
-          by.cssContainingText(`.service-units a.service-unit`, identifier)
-        )
-        .click();
-    } else {
-      this.serviceUnits.get(identifier).click();
-    }
+    const e =
+      typeof identifier === 'string'
+        ? this.overview.element(
+            by.cssContainingText(`.service-units a.service-unit`, identifier)
+          )
+        : this.serviceUnits.get(identifier);
+    waitAndClick(e);
     return ServiceUnitOverviewPage.waitAndGet();
   }
 
   openComponent(identifier: string | number) {
-    if (typeof identifier === 'string') {
-      this.overview
-        .element(
-          by.cssContainingText(`.service-units a.su-component`, identifier)
-        )
-        .click();
-    } else {
-      this.suComponents.get(identifier).click();
-    }
+    const e =
+      typeof identifier === 'string'
+        ? this.overview.element(
+            by.cssContainingText(`.service-units a.su-component`, identifier)
+          )
+        : this.suComponents.get(identifier);
+    waitAndClick(e);
     return ComponentOverviewPage.waitAndGet();
   }
 }

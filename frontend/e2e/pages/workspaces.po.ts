@@ -17,7 +17,7 @@
 
 import { browser, ExpectedConditions as EC, $ } from 'protractor';
 
-import { urlToMatch, Matcher } from '../utils';
+import { urlToMatch, Matcher, waitAndClick } from '../utils';
 import { waitTimeout } from '../common';
 import { WorkspaceOverviewPage } from './workspace.po';
 
@@ -44,10 +44,9 @@ export class WorkspacesPage {
   private constructor() {}
 
   selectWorkspace(index: number, expectedName?: Matcher) {
-    this.workspacesCard
-      .$$('div.card-workspace md-card-title')
-      .get(index)
-      .click();
+    waitAndClick(
+      this.workspacesCard.$$('div.card-workspace md-card-title').get(index)
+    );
 
     return WorkspaceOverviewPage.waitAndGet(expectedName);
   }

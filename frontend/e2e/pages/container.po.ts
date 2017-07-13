@@ -17,7 +17,7 @@
 
 import { browser, ExpectedConditions as EC, $, by } from 'protractor';
 
-import { urlToMatch } from '../utils';
+import { urlToMatch, waitAndClick } from '../utils';
 import { waitTimeout } from '../common';
 import { UploadComponentPage } from './upload-component.po';
 
@@ -40,11 +40,11 @@ export abstract class ContainerPage {
   }
 
   openOperations() {
-    this.component
-      .element(
+    waitAndClick(
+      this.component.element(
         by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')
       )
-      .click();
+    );
     return ContainerOperationPage.waitAndGet();
   }
 }

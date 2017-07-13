@@ -22,7 +22,7 @@ import {
   ElementFinder,
 } from 'protractor';
 
-import { urlToMatch } from '../utils';
+import { urlToMatch, waitAndClick } from '../utils';
 import { waitTimeout } from '../common';
 import { AdminAddEditUserPage } from './admin-add-edit-user.po';
 
@@ -55,7 +55,7 @@ export class AdminPage {
   }
 
   private openAddEdit(panel: ElementFinder) {
-    panel.click();
+    waitAndClick(panel);
     return AdminAddEditUserPage.waitAndGet(panel);
   }
 }
