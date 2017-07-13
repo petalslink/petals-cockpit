@@ -34,7 +34,6 @@ describe(`Workspaces`, () => {
   });
 
   it(`should not have any workspace selected`, () => {
-    // vnoel has no lastWorkspace, so it will be redirected to /workspaces with no workspace selected
     const workspaces = page
       .goToWorkspacesViaLogin()
       .loginToWorkspaces(`vnoel`, `vnoel`);
@@ -42,34 +41,20 @@ describe(`Workspaces`, () => {
     // the sidebar button should not be visible
     expect($(`app-header .sidenav-toggle`).isPresent()).toBe(false);
 
-    // check that 1 workspace is displayed
     expect(workspaces.workspacesCards.count()).toEqual(1);
-
-    const availableUsersList =
-      'Administrator, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER';
 
     // check the current list content
     browser
       .actions()
       .mouseMove(workspaces.component.$('md-card-subtitle span.dotted'))
       .perform();
-    expect($('md-tooltip-component').getText()).toEqual(availableUsersList);
 
-    // check that no cards have a green background color
-    expect(
-      workspaces.workspacesCard
-        .$$(`div.background-color-light-green-x2`)
-        .count()
-    ).toEqual(0);
-    expect(
-      workspaces.workspacesCard
-        .$$(`div.background-color-light-green-x2 md-icon`)
-        .count()
-    ).toEqual(0);
-
-    const workspacesAndOwners = [`Workspace 1\nShared with you and 4 others.`];
-
-    expect(workspaces.workspacesCards.getText()).toEqual(workspacesAndOwners);
+    expect($('md-tooltip-component').getText()).toEqual(
+      'Administrator, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER'
+    );
+    expect(workspaces.workspacesCards.getText()).toEqual([
+      `Workspace 1\nShared with you and 4 others.`,
+    ]);
   });
 
   it(`should always keep the header above any modal`, () => {
@@ -83,49 +68,16 @@ describe(`Workspaces`, () => {
     page.closeSidenav();
   });
 
-  it(`should have a workspace selected`, () => {
-    // open the workspace dialog from a workspace
-    const workspaces = page
-      .goToLogin()
-      .loginToWorkspace(`admin`, `admin`)
-      .openWorkspacesDialog();
-
-    // check if the card selected has a green background color
-    expect(
-      workspaces.workspacesCard
-        .$$(`div.background-color-light-green-x2`)
-        .count()
-    ).toEqual(1);
-    // check that workspace selected has icon
-    expect(
-      workspaces.workspacesCard
-        .$$(`div.background-color-light-green-x2 md-icon`)
-        .count()
-    ).toEqual(1);
-  });
-
   it(`should create a new workspace and then delete it`, () => {
     let workspaces = page
       .goToWorkspacesViaLogin()
       .loginToWorkspaces(`mrobert`, `mrobert`);
 
-    // check if the input form is empty
-    expect(workspaces.inputName.getText()).toEqual(``);
-
-    // check if add new workspace button is always disabled when input form is empty
-    expect(workspaces.addButton.isEnabled()).toBe(false);
-
     workspaces.inputName.sendKeys(`New workspace`);
-
-    // check if add new workspace button is enabled
-    expect(workspaces.addButton.isEnabled()).toBe(true);
 
     workspaces.addButton.click();
 
     expect(workspaces.workspacesCards.count()).toEqual(2);
-
-    // check if the input is cleared
-    expect(workspaces.inputName.getText()).toEqual(``);
 
     const workspacesAndOwners = [
       `Workspace 1\nShared with you and 4 others.`,

@@ -107,11 +107,11 @@ export class WorkspacesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   postWorkspace$: Observable<Action> = this.actions$
-    .ofType(Workspaces.PostType)
-    .switchMap((action: Workspaces.Post) =>
+    .ofType(Workspaces.CreateType)
+    .switchMap((action: Workspaces.Create) =>
       this.workspacesService
         .postWorkspace(action.payload.name)
-        .map(res => new Workspaces.PostSuccess(res.json()))
+        .map(res => new Workspaces.CreateSuccess(res.json()))
         .catch(err => {
           if (environment.debug) {
             console.group();
@@ -126,7 +126,7 @@ export class WorkspacesEffects {
             `Workspaces`,
             `An error occurred while adding a new workspace.`
           );
-          return Observable.of(new Workspaces.PostError());
+          return Observable.of(new Workspaces.CreateError());
         })
     );
 

@@ -40,9 +40,9 @@ export namespace WorkspacesReducer {
     | Workspaces.FetchAll
     | Workspaces.FetchAllError
     | Workspaces.FetchAllSuccess
-    | Workspaces.Post
-    | Workspaces.PostError
-    | Workspaces.PostSuccess
+    | Workspaces.Create
+    | Workspaces.CreateError
+    | Workspaces.CreateSuccess
     | Workspaces.Fetch
     | Workspaces.FetchError
     | Workspaces.FetchSuccess
@@ -78,13 +78,13 @@ export namespace WorkspacesReducer {
       case Workspaces.FetchAllSuccessType: {
         return fetchAllSuccess(table, action.payload);
       }
-      case Workspaces.PostType: {
+      case Workspaces.CreateType: {
         return post(table);
       }
-      case Workspaces.PostErrorType: {
+      case Workspaces.CreateErrorType: {
         return postError(table);
       }
-      case Workspaces.PostSuccessType: {
+      case Workspaces.CreateSuccessType: {
         return postSuccess(table, action.payload);
       }
       case Workspaces.FetchType: {

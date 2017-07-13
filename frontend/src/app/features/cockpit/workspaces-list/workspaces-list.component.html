@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <span mdPrefix><md-icon color="primary">edit</md-icon></span>
           </md-input-container>
 
-          <button cdk-focus-region-start type="submit" [disabled]="btnSubmitDisabled" md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace"
+          <button cdk-focus-region-start type="submit" [disabled]="submitDisabled$ | async" md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace"
             mdTooltipPosition="below" class="btn-add-workspace">
             <md-icon class="md-24">create_new_folder</md-icon>
           </button>
@@ -39,19 +39,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <span md-line>You don't have any workspace yet</span>
           </div>
 
-          <div>
+          <div *ngIf="workspaces.list.length !== 0" class="workspace-list">
             <md-card>
               <md-card-content>
                 <div fxLayout="row" fxFlex="100%">
-                  <label>Workspaces</label>
-                  <md-spinner class="margin-left-x1" *ngIf="workspaces.isFetchingWorkspaces"></md-spinner>
-                  <div fxFlex></div>
-                  <div fxLayoutAlign="end center">
-                    <span *ngIf="workspaces.list.length === 0" md-line>No workspace yet</span>
-                    <span class="subtitle" *ngIf="workspaces.list.length > 0" md-line>
-                      {{ workspaces.list.length }} item{{ (workspaces.list.length) >= 2 ? 's' : '' }}
-                    </span>
-                  </div>
+                  <md-spinner class="margin-left-x1" *ngIf="workspaces.isFetchingWorkspaces; else fetched"></md-spinner>
+                  <ng-template #fetched>
+                    <label [ngPlural]="workspaces.list.length">
+                      <ng-template ngPluralCase="=1">1 Workspace</ng-template>
+                      <ng-template ngPluralCase="other">{{ workspaces.list.length }} Workspaces</ng-template>
+                    </label>
+                  </ng-template>
                 </div>
               </md-card-content>
             </md-card>
@@ -61,17 +59,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 *ngFor="let workspace of workspaces.list" (click)="select(workspace)"
                 [class.background-color-light-green-x2]="workspaces.selectedWorkspaceId === workspace.id"
               >
-                <div fxLayoutAlign="center start">
-                  <md-icon color="primary" *ngIf="workspaces.selectedWorkspaceId === workspace.id && workspace.users.length === 1">folder_open</md-icon>
-                  <md-icon color="primary" *ngIf="workspaces.selectedWorkspaceId === workspace.id && workspace.users.length > 1">folder_shared</md-icon>
-                </div>
                 <md-card-title-group>
                   <div fxLayout="column" fxLayoutAlign="center start">
                     <md-card-title>{{ workspace.name }}</md-card-title>
                     <md-card-subtitle>
                       <span *ngIf="workspace.users.length === 1" md-line>You are the only one using this workspace.</span>
-                      <span *ngIf="workspace.users.length > 1" md-line>Shared with you and
-                        <span
+                      <span *ngIf="workspace.users.length > 1" md-line>Shared with you and <span
                           class="color-primary-bold dotted"
                           [mdTooltip]="getUsersNames(workspace.users)"
                         >{{ workspace.users.length - 1 }} other{{ (workspace.users.length - 1) >= 2 ? 's' : '' }}</span>.

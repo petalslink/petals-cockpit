@@ -119,7 +119,8 @@ export function putAll<
       if (!environment.strictCoherence) {
         if (environment.debug) {
           console.debug(
-            `putAll called on an already existing element ${id} on: ${table}`
+            `putAll called on an already existing element ${id} on:`,
+            table
           );
         } else {
           console.warn(`putAll called on an already existing element ${id}`);
@@ -162,7 +163,8 @@ export function updateById<I, M extends JsTable<I> = JsTable<I>>(
     if (!environment.strictCoherence) {
       if (environment.debug) {
         console.debug(
-          `updateById called on an unexisting element ${id} on: ${table}`
+          `updateById called on an unexisting element ${id} on`,
+          table
         );
       } else {
         console.warn(`updateById called on an unexisting element ${id}`);
@@ -193,7 +195,8 @@ export function putById<I, M extends JsTable<I> = JsTable<I>>(
     if (!environment.strictCoherence) {
       if (environment.debug) {
         console.debug(
-          `putById called on an already existing element ${id} on: ${table}`
+          `putById called on an already existing element ${id} on`,
+          table
         );
       } else {
         console.warn(`putById called on an already existing element ${id}`);
@@ -230,7 +233,8 @@ export function removeById<I, M extends JsTable<I> = JsTable<I>>(
     if (!environment.strictCoherence) {
       if (environment.debug) {
         console.debug(
-          `removeById called on an unexisting element ${id} on: ${table}`
+          `removeById called on an unexisting element ${id} on`,
+          table
         );
       } else {
         console.warn(`removeById called on an unexisting element ${id}`);
