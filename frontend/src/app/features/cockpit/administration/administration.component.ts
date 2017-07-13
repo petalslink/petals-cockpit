@@ -51,7 +51,9 @@ export class AdministrationComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.users$ = this.store$.let(getAllUsers);
+    this.users$ = this.store$
+      .let(getAllUsers)
+      .map(users => users.sort((u1, u2) => u1.id.localeCompare(u2.id)));
     this.user$ = this.store$.let(getCurrentUser());
     this.isFetchingUsers$ = this.store$.select(
       state => state.users.isFetchingUsers

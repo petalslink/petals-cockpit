@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC } from 'protractor';
+import { browser, ExpectedConditions as EC, $ } from 'protractor';
 
 import { page, waitTimeout } from './common';
 import { WorkspaceOverviewPage } from './pages/workspace.po';
-import { getMultipleElementsTexts } from './utils';
+import { waitAndClick } from './utils';
 
 describe(`Workspace Overview`, () => {
   it(`should have the workspace information in overview`, () => {
@@ -176,29 +176,31 @@ describe(`Workspace Overview`, () => {
     let workspace: WorkspaceOverviewPage;
 
     beforeEach(() => {
-      workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
+      const workspaces = page
+        .goToWorkspacesViaLogin()
+        .loginToWorkspaces('admin', 'admin');
+      workspaces.inputName
+        .sendKeys('Test Users')
+        .then(() => workspaces.addButton.click());
+      workspace = workspaces.selectWorkspace(2);
+    });
+
+    afterEach(() => {
+      // clean for backend
+      workspace.workspaceButton.click();
+      workspace.deleteButton.click();
+      waitAndClick($(`app-workspace-deletion-dialog .btn-confirm-delete-wks`));
+      waitAndClick($(`app-workspace-deleted-dialog button`));
     });
 
     it(`should check users of the workspace`, () => {
-      const wksUsers = getMultipleElementsTexts(
-        workspace.users,
-        '.user-id',
-        '.user-name'
-      );
-
-      expect(wksUsers).toEqual([['admin', 'Administrator']]);
+      expect(workspace.getUsers()).toEqual([['admin', 'Administrator']]);
     });
 
     it(`should add a user into the workspace only if his name is correct`, () => {
       workspace.addUser('bescudie');
 
-      const wksUsers = getMultipleElementsTexts(
-        workspace.users,
-        '.user-id',
-        '.user-name'
-      );
-
-      expect(wksUsers).toEqual([
+      expect(workspace.getUsers()).toEqual([
         ['admin', 'Administrator'],
         ['bescudie', 'Bertrand ESCUDIE'],
       ]);
@@ -215,18 +217,12 @@ describe(`Workspace Overview`, () => {
       workspace.addUser('vnoel');
 
       expect(workspace.getUsersAutocomplete()).toEqual([
-        'mrobert',
         'cchevalier',
         'cdeneux',
+        'mrobert',
       ]);
 
-      const wksUsers = getMultipleElementsTexts(
-        workspace.users,
-        '.user-id',
-        '.user-name'
-      );
-
-      expect(wksUsers).toEqual([
+      expect(workspace.getUsers()).toEqual([
         ['admin', 'Administrator'],
         ['bescudie', 'Bertrand ESCUDIE'],
         ['vnoel', 'Victor NOEL'],
@@ -253,18 +249,12 @@ describe(`Workspace Overview`, () => {
 
       expect(workspace.getUsersAutocomplete()).toEqual([
         'bescudie',
-        'mrobert',
         'cchevalier',
         'cdeneux',
+        'mrobert',
       ]);
 
-      const wksUsers = getMultipleElementsTexts(
-        workspace.users,
-        '.user-id',
-        '.user-name'
-      );
-
-      expect(wksUsers).toEqual([
+      expect(workspace.getUsers()).toEqual([
         ['admin', 'Administrator'],
         ['vnoel', 'Victor NOEL'],
       ]);

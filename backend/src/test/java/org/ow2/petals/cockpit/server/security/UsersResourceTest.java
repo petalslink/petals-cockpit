@@ -30,10 +30,12 @@ import org.ow2.petals.cockpit.server.resources.UsersResource.UpdateUser;
 
 public class UsersResourceTest extends AbstractSecurityTest {
 
-    private void can(Authentication user, String target, String method, @Nullable Entity<?> entity,
+    private void can(@Nullable Authentication user, String target, String method, @Nullable Entity<?> entity,
             int expectedStatus) {
-        final Response login = login(user);
-        assertThat(login.getStatus()).isEqualTo(200);
+        if (user != null) {
+            final Response login = login(user);
+            assertThat(login.getStatus()).isEqualTo(200);
+        }
 
         final Response get = this.app.target(target).request().method(method, entity);
         assertThat(get.getStatus()).isEqualTo(expectedStatus);
@@ -45,8 +47,13 @@ public class UsersResourceTest extends AbstractSecurityTest {
     }
 
     @Test
-    public void testUserCanTListAllUsers() {
-        can(USER, "/users", HttpMethod.GET, null, 403);
+    public void testUserCanListAllUsers() {
+        can(USER, "/users", HttpMethod.GET, null, 200);
+    }
+
+    @Test
+    public void testUnloggedCanTListAllUsers() {
+        can(null, "/users", HttpMethod.GET, null, 401);
     }
 
     @Test

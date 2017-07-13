@@ -79,7 +79,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
     this.appUsers$ = this.store$
       .let(getUsersNotInCurrentWorkspace)
-      .map(us => us.map(u => u.id));
+      .map(us => us.map(u => u.id).sort());
 
     this.addUserFormGroup = this.fb.group({
       userSearchCtrl: [
@@ -147,9 +147,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   }
 
   filterUsers(username: string, users: string[]) {
-    return !!username
-      ? users.filter(user => user.toLowerCase().includes(username))
-      : users;
+    return !!username ? users.filter(user => user === username) : users;
   }
 
   addUser() {

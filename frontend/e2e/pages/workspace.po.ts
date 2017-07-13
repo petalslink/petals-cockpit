@@ -22,6 +22,7 @@ import {
   Matcher,
   textToMatchInElement,
   waitAndClick,
+  getMultipleElementsTexts,
 } from '../utils';
 import { waitTimeout } from '../common';
 import { ImportBusPage, BusInProgressPage } from './import-bus.po';
@@ -49,6 +50,7 @@ export abstract class WorkspacePage {
   public readonly busesInProgress = this.sidenav.$$(
     `app-buses-in-progress md-nav-list a`
   );
+  public readonly workspaceButton = WorkspacePage.workspaceButton;
 
   static wait(expectedName?: Matcher) {
     browser.wait(urlToMatch(/\/workspaces\/\w+$/), waitTimeout);
@@ -218,6 +220,10 @@ export class WorkspaceOverviewPage extends WorkspacePage {
     super();
   }
 
+  getUsers() {
+    return getMultipleElementsTexts(this.usersList, '.user-id', '.user-name');
+  }
+
   getUsersAutocomplete(): Promise<string[]> {
     this.usersAutocompleteInput.click();
     return this.usersAutocompleteList.getText() as any;
@@ -225,9 +231,12 @@ export class WorkspaceOverviewPage extends WorkspacePage {
 
   addUser(id: string) {
     this.usersAutocompleteInput.sendKeys(id);
-
-    expect(this.btnAddUserToWks.isEnabled()).toBe(true);
-
-    this.btnAddUserToWks.click();
+    waitAndClick(this.btnAddUserToWks);
+    browser.wait(
+      EC.visibilityOf(
+        this.usersList.element(by.cssContainingText('.user-id', id))
+      ),
+      waitTimeout
+    );
   }
 }

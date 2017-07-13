@@ -38,10 +38,10 @@ describe(`Administration`, () => {
       ).toEqual([
         ['admin', '(Administrator)'],
         ['bescudie', '(Bertrand ESCUDIE)'],
-        ['mrobert', '(Maxime ROBERT)'],
         ['cchevalier', '(Christophe CHEVALIER)'],
-        ['vnoel', '(Victor NOEL)'],
         ['cdeneux', '(Christophe DENEUX)'],
+        ['mrobert', '(Maxime ROBERT)'],
+        ['vnoel', '(Victor NOEL)'],
       ]);
     });
 
@@ -114,7 +114,7 @@ describe(`Administration`, () => {
       expect(add.passwordInput.getAttribute('value')).toEqual(``);
     });
 
-    it(`should add a new user`, () => {
+    it(`should add and delete a user`, () => {
       const add = admin.openAddUser();
 
       add.usernameInput.sendKeys(`bdylan`);
@@ -133,28 +133,42 @@ describe(`Administration`, () => {
         getMultipleElementsTexts(admin.panelListUsers, '.user-id', '.user-name')
       ).toEqual([
         ['admin', '(Administrator)'],
-        ['bescudie', '(Bertrand ESCUDIE)'],
-        ['mrobert', '(Maxime ROBERT)'],
-        ['cchevalier', '(Christophe CHEVALIER)'],
-        ['vnoel', '(Victor NOEL)'],
-        ['cdeneux', '(Christophe DENEUX)'],
         ['bdylan', '(Bob DYLAN)'],
+        ['bescudie', '(Bertrand ESCUDIE)'],
+        ['cchevalier', '(Christophe CHEVALIER)'],
+        ['cdeneux', '(Christophe DENEUX)'],
+        ['mrobert', '(Maxime ROBERT)'],
+        ['vnoel', '(Victor NOEL)'],
       ]);
 
       const editNewUser = admin.openEditUser('bdylan');
 
       expect(editNewUser.nameInput.getAttribute('value')).toEqual(`Bob DYLAN`);
       expect(editNewUser.passwordInput.getAttribute('value')).toEqual(``);
+
+      // clean for backend
+      editNewUser.deleteButton.click();
+      expect(editNewUser.component.isPresent()).toBe(false);
+
+      expect(
+        getMultipleElementsTexts(admin.panelListUsers, '.user-id', '.user-name')
+      ).toEqual([
+        ['admin', '(Administrator)'],
+        ['bescudie', '(Bertrand ESCUDIE)'],
+        ['cchevalier', '(Christophe CHEVALIER)'],
+        ['cdeneux', '(Christophe DENEUX)'],
+        ['mrobert', '(Maxime ROBERT)'],
+        ['vnoel', '(Victor NOEL)'],
+      ]);
     });
 
     it(`should edit a user`, () => {
       let editVnoel = admin.openEditUser('vnoel');
 
       clearInput(editVnoel.nameInput);
-
       editVnoel.nameInput.sendKeys(`Victor NONO`);
-
       editVnoel.saveButton.click();
+
       expect(editVnoel.component.isDisplayed()).toBe(false);
 
       expect(
@@ -162,34 +176,21 @@ describe(`Administration`, () => {
       ).toEqual([
         ['admin', '(Administrator)'],
         ['bescudie', '(Bertrand ESCUDIE)'],
-        ['mrobert', '(Maxime ROBERT)'],
         ['cchevalier', '(Christophe CHEVALIER)'],
-        ['vnoel', '(Victor NONO)'],
         ['cdeneux', '(Christophe DENEUX)'],
+        ['mrobert', '(Maxime ROBERT)'],
+        ['vnoel', '(Victor NONO)'],
       ]);
 
       editVnoel = admin.openEditUser('vnoel');
 
       expect(editVnoel.nameInput.getAttribute('value')).toEqual(`Victor NONO`);
       expect(editVnoel.passwordInput.getAttribute('value')).toEqual(``);
-    });
 
-    it(`should delete a user`, () => {
-      const editVnoel = admin.openEditUser('vnoel');
-
-      editVnoel.deleteButton.click();
-
-      expect(editVnoel.component.isPresent()).toBe(false);
-
-      expect(
-        getMultipleElementsTexts(admin.panelListUsers, '.user-id', '.user-name')
-      ).toEqual([
-        ['admin', '(Administrator)'],
-        ['bescudie', '(Bertrand ESCUDIE)'],
-        ['mrobert', '(Maxime ROBERT)'],
-        ['cchevalier', '(Christophe CHEVALIER)'],
-        ['cdeneux', '(Christophe DENEUX)'],
-      ]);
+      // clean for backend
+      clearInput(editVnoel.nameInput);
+      editVnoel.nameInput.sendKeys(`Victor NOEL`);
+      editVnoel.saveButton.click();
     });
   });
 

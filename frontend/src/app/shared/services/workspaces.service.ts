@@ -91,10 +91,10 @@ export class WorkspacesServiceImpl extends WorkspacesService {
     });
   }
 
-  addUser(workspaceId: string, userId: string) {
+  addUser(workspaceId: string, id: string) {
     return this.http.post(
       `${environment.urlBackend}/workspaces/${workspaceId}/users`,
-      userId
+      { id }
     );
   }
 

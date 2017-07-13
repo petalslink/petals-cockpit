@@ -66,6 +66,7 @@ public class UsersResource {
     }
 
     @GET
+    @Pac4JSecurity(ignore = true)
     public Collection<UserMin> getAllUsers() {
         return DSL.using(jooq).selectFrom(USERS).stream().map(UserMin::new).collect(Collectors.toList());
     }

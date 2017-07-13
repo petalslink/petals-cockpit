@@ -47,7 +47,7 @@ public class PetalsCockpitApplication extends CockpitApplication<PetalsCockpitCo
         // take over instead of returning index.html
         // Improve when https://github.com/palantir/dropwizard-index-page/issues/38 is fixed
         bootstrap.addBundle(new IndexPageBundle("frontend/index.html",
-                ImmutableSet.of("/", "/index.html", "/setup", "/login", "/workspaces", "/workspaces/*")));
+                ImmutableSet.of("/", "/index.html", "/admin", "/setup", "/login", "/workspaces", "/workspaces/*")));
         // no index file parameter because index is served by IndexPageBundle
         bootstrap.addBundle(new AssetsBundle("/frontend", "/", null));
     }
