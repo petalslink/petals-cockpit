@@ -147,7 +147,7 @@ export class WorkspacesEffects {
   removeWorkspace$: Observable<Action> = this.actions$
     .ofType(SseWorkspaceEvent.WORKSPACE_DELETED.action)
     .do(_ => this.sseService.stopWatchingWorkspace())
-    .map(action => new Workspaces.Removed(action.payload.id));
+    .map(action => new Workspaces.Deleted(action.payload.id));
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })

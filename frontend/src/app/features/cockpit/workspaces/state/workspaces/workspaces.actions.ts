@@ -151,9 +151,13 @@ export namespace Workspaces {
     constructor(public readonly payload: { id: string }) {}
   }
 
-  export const RemovedType = '[Workspaces] Removed';
-  export class Removed implements Action {
-    readonly type = RemovedType;
+  /**
+   * Note: while Delete concerns the HTTP action of deleting a workspace,
+   * Deleted concerns the event coming from the SSE that a workspace has been deleted.
+   */
+  export const DeletedType = '[Workspaces] Deleted';
+  export class Deleted implements Action {
+    readonly type = DeletedType;
     constructor(public readonly payload: { id: string }) {}
   }
 

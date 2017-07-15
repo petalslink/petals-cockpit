@@ -56,7 +56,7 @@ export namespace WorkspacesReducer {
     | Workspaces.DeleteError
     | Workspaces.DeleteSuccess
     | Workspaces.SetSearch
-    | Workspaces.Removed
+    | Workspaces.Deleted
     | Workspaces.Close
     | Workspaces.AddUser
     | Workspaces.AddUserError
@@ -126,8 +126,8 @@ export namespace WorkspacesReducer {
       case Workspaces.SetSearchType: {
         return setSearch(table, action.payload);
       }
-      case Workspaces.RemovedType: {
-        return removed(table, action.payload);
+      case Workspaces.DeletedType: {
+        return deleted(table, action.payload);
       }
       case Workspaces.CloseType: {
         return close(table, action.payload);
@@ -306,11 +306,7 @@ export namespace WorkspacesReducer {
     return updateById(table, payload.id, { isRemoving: false });
   }
 
-  /**
-   * Note: while DELETE_WORKSPACE concerns the HTTP action of deleting a workspace,
-   * REMOVE_WORKSPACE concerns the event coming from the SSE that a workspace has been deleted.
-   */
-  function removed(
+  function deleted(
     table: IWorkspacesTable,
     payload: { id: string }
   ): IWorkspacesTable {
