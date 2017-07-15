@@ -20,7 +20,6 @@ import { Observable } from 'rxjs/Observable';
 
 import { IBusUI } from './buses.interface';
 import { IStore } from 'app/shared/state/store.interface';
-import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import {
   IBusBackendSSECommon,
   IBusBackendDetailsCommon,
@@ -37,7 +36,7 @@ export interface IBusWithContainers
 export function getCurrentBus(
   store$: Store<IStore>
 ): Observable<IBusWithContainers> {
-  return filterWorkspaceFetched(store$)
+  return store$
     .filter(state => !!state.buses.selectedBusId)
     .map(state => {
       const bus = state.buses.byId[state.buses.selectedBusId];

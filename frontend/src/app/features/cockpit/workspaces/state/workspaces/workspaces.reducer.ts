@@ -57,7 +57,7 @@ export namespace WorkspacesReducer {
     | Workspaces.DeleteSuccess
     | Workspaces.SetSearch
     | Workspaces.Deleted
-    | Workspaces.Close
+    | Workspaces.Clean
     | Workspaces.AddUser
     | Workspaces.AddUserError
     | Workspaces.AddUserSuccess
@@ -129,8 +129,8 @@ export namespace WorkspacesReducer {
       case Workspaces.DeletedType: {
         return deleted(table, action.payload);
       }
-      case Workspaces.CloseType: {
-        return close(table, action.payload);
+      case Workspaces.CleanType: {
+        return clean(table);
       }
       case Workspaces.AddUserType: {
         return addUser(table, action.payload);
@@ -206,9 +206,7 @@ export namespace WorkspacesReducer {
   ): IWorkspacesTable {
     return {
       ...table,
-      selectedWorkspaceId: payload.id,
       isSelectedWorkspaceFetchError: false,
-      isSelectedWorkspaceFetched: false,
     };
   }
 
@@ -220,7 +218,7 @@ export namespace WorkspacesReducer {
       ...table.byId[payload.id]
         ? updateById(table, payload.id, payload)
         : putById(table, payload.id, payload, workspaceRowFactory),
-      isSelectedWorkspaceFetched: true,
+      selectedWorkspaceId: payload.id,
     };
   }
 
@@ -320,11 +318,8 @@ export namespace WorkspacesReducer {
     };
   }
 
-  function close(
-    table: IWorkspacesTable,
-    payload: { deleted?: boolean }
-  ): IWorkspacesTable {
-    if (table.selectedWorkspaceId && payload && payload.deleted) {
+  function clean(table: IWorkspacesTable) {
+    if (table.isSelectedWorkspaceDeleted && table.selectedWorkspaceId) {
       return {
         ...removeById(table, table.selectedWorkspaceId),
         selectedWorkspaceId: '',

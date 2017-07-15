@@ -18,11 +18,9 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/state/store.interface';
+import { IStore } from 'app/shared/state/store.interface';
 import { IComponentUI } from './components.interface';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-
 import {
   IComponentBackendSSECommon,
   IComponentBackendDetailsCommon,
@@ -40,7 +38,7 @@ export interface IComponentWithSLsAndSUs
 export function getCurrentComponent(
   store$: Store<IStore>
 ): Observable<IComponentWithSLsAndSUs> {
-  return filterWorkspaceFetched(store$)
+  return store$
     .filter(state => !!state.components.selectedComponentId)
     .map(state => {
       const component =

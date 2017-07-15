@@ -20,8 +20,6 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from 'app/shared/state/store.interface';
-import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 
 export interface IServiceUnitWithSA extends IServiceUnit {
@@ -31,7 +29,7 @@ export interface IServiceUnitWithSA extends IServiceUnit {
 export function getCurrentServiceUnit(
   store$: Store<IStore>
 ): Observable<IServiceUnitWithSA> {
-  return filterWorkspaceFetched(store$)
+  return store$
     .filter(state => !!state.serviceUnits.selectedServiceUnitId)
     .map(state => {
       const su =

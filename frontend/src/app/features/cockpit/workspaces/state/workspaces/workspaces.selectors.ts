@@ -44,31 +44,18 @@ export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
 
 // -----------------------------------------------------------
 
-/**
- * filter the store to only get the state if the current workspace is fetched.
- */
-export function filterWorkspaceFetched(
-  store$: Store<IStore>
-): Observable<IStore> {
-  return store$.filter(
-    state =>
-      state.workspaces.selectedWorkspaceId &&
-      state.workspaces.isSelectedWorkspaceFetched
-  );
-}
-
 export function getCurrentWorkspace(
   store$: Store<IStore>
 ): Observable<IWorkspaceRow> {
-  return filterWorkspaceFetched(store$)
-    .map(state => state.workspaces.byId[state.workspaces.selectedWorkspaceId])
-    .distinctUntilChanged();
+  return store$.select(
+    state => state.workspaces.byId[state.workspaces.selectedWorkspaceId]
+  );
 }
 
 export function getCurrentWorkspaceUsers(
   store$: Store<IStore>
 ): Observable<IUserRow[]> {
-  return filterWorkspaceFetched(store$).map(state =>
+  return store$.select(state =>
     state.workspaces.byId[state.workspaces.selectedWorkspaceId].users.map(
       id => state.users.byId[id]
     )
@@ -110,7 +97,7 @@ export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
 export function getCurrentWorkspaceTree(
   store$: Store<IStore>
 ): Observable<WorkspaceElement[]> {
-  return filterWorkspaceFetched(store$).map(state => {
+  return store$.select(state => {
     const tree = buildTree(state);
     const search = state.workspaces.searchPetals;
 

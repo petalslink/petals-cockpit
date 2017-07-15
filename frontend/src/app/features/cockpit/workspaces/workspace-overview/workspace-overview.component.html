@@ -1,0 +1,148 @@
+<!-- Copyright (C) 2017 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<div *ngIf="workspace$ | async as workspace" fxLayout="column" fxFlex class="wrapper-content">
+  <md-toolbar color="primary" class="toolbar-page-header">
+    <div class="prefix-toolbar-title">
+      <md-icon color="accent" *ngIf="!workspace.isFetchingDetails">grade</md-icon>
+      <md-spinner color="accent" *ngIf="workspace.isFetchingDetails"></md-spinner>
+    </div>
+
+    <h1 class="title" fxFlex [ngClass.lt-md]="'margin-left-x1'">{{ workspace.name }}</h1>
+
+    <button color="warn" type="button" class="btn-delete-wks" (click)="openDeletionDialog()" md-mini-fab mdTooltip="Delete the workspace"
+      mdTooltipPosition="before" [disabled]="workspace.isRemoving || isRemoving">
+      <md-icon>delete</md-icon>
+    </button>
+  </md-toolbar>
+
+  <div fxFlexFill fxLayout="column" class="content content-max-width">
+    <div class="central-content">
+      <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
+        <md-card fxFlex [ngClass.gt-md]="'card-auto-size'">
+          <md-card-title fxLayout="row" *ngIf="!isEditingDescription">
+            <span fxFlex class="text-upper">Whiteboard</span>
+          </md-card-title>
+
+
+          <md-card-content fxLayout="row" fxLayoutAlign="center center" *ngIf="!isEditingDescription; else descriptionEdit" class="workspace-description">
+            <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml"></span>
+            <button class="btn-edit" color="primary" md-icon-button (click)="editDescription()" mdTooltip="Edit" mdTooltipPosition="below">
+              <md-icon>edit</md-icon>
+            </button>
+          </md-card-content>
+
+          <md-card-content>
+
+            <ng-template #descriptionEdit>
+              <div fxLayout="column" *ngIf="description !== null" class="workspace-description-edit">
+                <p>
+                  <md-input-container fxFlex>
+                    <textarea mdInput class="description-wks" mdTextareaAutosize [disabled]="isSettingDescription" [(ngModel)]="description"></textarea>
+                  </md-input-container>
+                </p>
+                <md-card-subtitle>
+                  <span fxFlex class="workspace-description-preview" [innerHTML]="description | MarkdownToHtml"></span>
+                </md-card-subtitle>
+              </div>
+
+              <div align="end">
+                <button
+                  type="button"
+                  class="workspace-description-edit-cancel text-upper"
+                  color="primary"
+                  md-button
+                  [disabled]="isSettingDescription"
+                (click)="cancelDescription()">Cancel</button>
+                <button
+                  type="submit"
+                  class="workspace-description-edit-submit text-upper"
+                  md-button
+                  [disabled]="isSettingDescription"
+                  (click)="validateDescription()"
+                  color="accent" md-raised-button>Submit</button>
+              </div>
+            </ng-template>
+
+          </md-card-content>
+        </md-card>
+
+        <md-card fxFlex [ngClass.gt-md]="'card-auto-size'">
+          <md-card-title fxLayout="row">
+            <span fxFlex class="text-upper">Users</span>
+            <md-icon color="primary">supervisor_account</md-icon>
+          </md-card-title>
+
+          <md-card-content>
+            <div fxLayout="column" *ngIf="(users$ | async) as users" class="workspace-users">
+
+              <md-card-subtitle fxLayout="row" fxLayoutAlign="start center" *ngIf="users.length === 1; else workspaceShared">
+                <md-icon class="margin-right-x1" color="primary">info</md-icon>
+                <span class="color-primary users-in-workspace" fxFlex>You are the only one using this workspace.</span>
+              </md-card-subtitle>
+
+              <ng-template #workspaceShared>
+                <md-card-subtitle fxLayout="row" fxLayoutAlign="start center">
+                  <md-icon class="margin-right-x1" color="primary">info</md-icon>
+                  <span class="color-primary users-in-workspace" fxFlex>{{ users.length }} people are using this workspace.</span>
+                </md-card-subtitle>
+              </ng-template>
+
+              <md-divider></md-divider>
+
+              <form [formGroup]="addUserFormGroup" (ngSubmit)="addUser()">
+                <md-input-container>
+                  <input
+                    mdInput
+                    placeholder="User to add"
+                    [mdAutocomplete]="autocompleteUsers"
+                    formControlName="userSearchCtrl">
+                </md-input-container>
+
+                <md-autocomplete #autocompleteUsers>
+                  <md-option *ngFor="let filteredUser of filteredUsers$ | async" [value]="filteredUser">
+                    {{ filteredUser }}
+                  </md-option>
+                </md-autocomplete>
+
+                <button md-button type="submit" [disabled]="!addUserFormGroup.valid || workspace.isAddingUserToWorkspace">Add</button>
+              </form>
+
+              <md-list *ngIf="currentUserId$ | async as currentUserId">
+                <md-list-item *ngFor="let user of users">
+                  <app-generate-icon md-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
+
+                  <h2 md-line class="user-id">{{ user.id }}</h2>
+
+                  <p md-line>
+                    <span class="user-name">{{ user.name }}</span>
+                  </p>
+
+                  <button md-icon-button
+                    (click)="removeUser(user.id)"
+                    *ngIf="currentUserId !== user.id"
+                    [disabled]="user.isDeletingFromWorkspace"
+                    class="delete">
+                    <md-icon>delete</md-icon>
+                  </button>
+                </md-list-item>
+              </md-list>
+            </div>
+          </md-card-content>
+        </md-card>
+      </div>
+    </div>
+  </div>
+</div>

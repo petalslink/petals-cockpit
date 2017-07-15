@@ -18,31 +18,28 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import {
-  WorkspacesComponent,
-  NoWorkspaceComponent,
-} from './workspaces.component';
-import { WorkspaceResolver } from './workspace-resolver';
+import { NotFound404Component } from 'app/shared/components/not-found-404/not-found-404.component';
+import { WorkspaceComponent } from 'app/features/cockpit/workspaces/workspace/workspace.component';
+import { WorkspaceOverviewComponent } from 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.component';
 
-// /workspaces
 const routes: Routes = [
   {
     path: '',
-    component: WorkspacesComponent,
+    component: WorkspaceComponent,
     children: [
       {
         path: '',
         pathMatch: 'full',
-        component: NoWorkspaceComponent,
+        component: WorkspaceOverviewComponent,
       },
       {
-        path: ':workspaceId',
-        // as we use the store to retrieve our data, no need to pass them
-        // using resolve, but we still need to call the resolver to make sure
-        // they're available before displaying the view
-        resolve: { _: WorkspaceResolver },
+        path: 'not-found',
+        component: NotFound404Component,
+      },
+      {
+        path: 'petals',
         loadChildren:
-          'app/features/cockpit/workspaces/workspace/workspace.module#WorkspaceModule',
+          'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule',
       },
     ],
   },
@@ -51,4 +48,4 @@ const routes: Routes = [
 @NgModule({
   imports: [RouterModule.forChild(routes)],
 })
-export class WorkspacesRoutingModule {}
+export class WorkspaceRoutingModule {}

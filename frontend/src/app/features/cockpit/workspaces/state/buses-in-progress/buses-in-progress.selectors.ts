@@ -24,7 +24,6 @@ import {
 } from './buses-in-progress.interface';
 import { IStore } from '../../../../../shared/state/store.interface';
 import { isNot } from '../../../../../shared/helpers/shared.helper';
-import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
 export function _getBusesInProgress(
   store$: Store<IStore>
@@ -58,14 +57,12 @@ export function getCurrentBusInProgress(
 export function getCurrentBusInProgressOrNull(
   store$: Store<IStore>
 ): Observable<IBusInProgressRow> {
-  return filterWorkspaceFetched(store$)
-    .map(
-      state =>
-        state.busesInProgress.selectedBusInProgressId === ''
-          ? null
-          : state.busesInProgress.byId[
-              state.busesInProgress.selectedBusInProgressId
-            ]
-    )
-    .distinctUntilChanged();
+  return store$.select(
+    state =>
+      state.busesInProgress.selectedBusInProgressId === ''
+        ? null
+        : state.busesInProgress.byId[
+            state.busesInProgress.selectedBusInProgressId
+          ]
+  );
 }

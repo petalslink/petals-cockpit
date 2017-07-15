@@ -16,17 +16,24 @@
  */
 
 import { NgModule } from '@angular/core';
-import { MarkdownToHtmlModule } from 'markdown-to-html-pipe';
 
 import {
   WorkspaceComponent,
-  WorkspaceDeleteDialogComponent,
+  DeletedWorkspaceDialogComponent,
 } from 'app/features/cockpit/workspaces/workspace/workspace.component';
+import { WorkspaceOverviewModule } from 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.module';
 import { SharedModule } from 'app/shared/shared.module';
+import { PetalsMenuModule } from 'app/features/cockpit/workspaces/petals-menu/petals-menu.module';
+import { WorkspaceRoutingModule } from 'app/features/cockpit/workspaces/workspace/workspace-routing.module';
 
 @NgModule({
-  imports: [SharedModule, MarkdownToHtmlModule],
-  declarations: [WorkspaceComponent, WorkspaceDeleteDialogComponent],
-  entryComponents: [WorkspaceDeleteDialogComponent],
+  imports: [
+    SharedModule,
+    WorkspaceOverviewModule,
+    PetalsMenuModule,
+    WorkspaceRoutingModule,
+  ],
+  declarations: [WorkspaceComponent, DeletedWorkspaceDialogComponent],
+  entryComponents: [DeletedWorkspaceDialogComponent],
 })
 export class WorkspaceModule {}

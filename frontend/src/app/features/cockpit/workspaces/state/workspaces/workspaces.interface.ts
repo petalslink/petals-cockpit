@@ -56,7 +56,6 @@ export function workspaceRowFactory(): IWorkspaceRow {
 
 export interface IWorkspacesCommon {
   selectedWorkspaceId: string;
-  isSelectedWorkspaceFetched: boolean;
   isSelectedWorkspaceFetchError: boolean;
 
   // for all users of the workspace that was deleted
@@ -81,7 +80,6 @@ export function workspacesTableFactory(): IWorkspacesTable {
   return {
     ...emptyJsTable<IWorkspaceRow>(),
     selectedWorkspaceId: '',
-    isSelectedWorkspaceFetched: false,
     isSelectedWorkspaceFetchError: false,
     isSelectedWorkspaceDeleted: false,
 

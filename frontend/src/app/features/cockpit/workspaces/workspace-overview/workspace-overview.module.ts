@@ -15,22 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-:host {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
+import { NgModule } from '@angular/core';
+import { MarkdownToHtmlModule } from 'markdown-to-html-pipe';
 
-.central-content {
-  padding: 24px;
-  margin-top: 0;
-}
+import {
+  WorkspaceOverviewComponent,
+  WorkspaceDeleteDialogComponent,
+} from 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.component';
+import { SharedModule } from 'app/shared/shared.module';
 
-h3 {
-  font-size: 16px;
-}
-
-md-dialog-content {
-  height: 100%;
-}
+@NgModule({
+  imports: [SharedModule, MarkdownToHtmlModule],
+  declarations: [WorkspaceOverviewComponent, WorkspaceDeleteDialogComponent],
+  entryComponents: [WorkspaceDeleteDialogComponent],
+})
+export class WorkspaceOverviewModule {}

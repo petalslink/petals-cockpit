@@ -17,7 +17,6 @@
 
 import { Injectable } from '@angular/core';
 
-import { Router } from '@angular/router';
 import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
@@ -62,7 +61,6 @@ import { IStore } from 'app/shared/state/store.interface';
 export class WorkspacesEffects {
   constructor(
     private actions$: Actions,
-    private router: Router,
     private workspacesService: WorkspacesService,
     private sseService: SseService,
     private notifications: NotificationsService,
@@ -131,18 +129,6 @@ export class WorkspacesEffects {
     );
 
   // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
-  closeWorkspace$: Observable<Action> = this.actions$
-    .ofType(Workspaces.CloseType)
-    .do(_ => this.sseService.stopWatchingWorkspace())
-    .do((action: Workspaces.Close) => {
-      if (action.payload && action.payload.goToWorkspaces) {
-        this.router.navigate(['/workspaces']);
-      }
-    })
-    .map(_ => new Workspaces.Clean());
-
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   removeWorkspace$: Observable<Action> = this.actions$
     .ofType(SseWorkspaceEvent.WORKSPACE_DELETED.action)
@@ -154,26 +140,23 @@ export class WorkspacesEffects {
   fetchWorkspace$: Observable<Action> = this.actions$
     .ofType(Workspaces.FetchType)
     .switchMap((action: Workspaces.Fetch) =>
-      this.sseService
-        .watchWorkspaceRealTime(action.payload.id)
-        .startWith(batchActions([new Workspaces.Clean(), new Ui.OpenSidenav()]))
-        .catch(err => {
-          if (environment.debug) {
-            console.group();
-            console.debug(
-              `Error in workspaces.effects: ofType(Workspaces.FetchType)`
-            );
-            console.error(err);
-            console.groupEnd();
-          }
-
-          this.notifications.error(
-            `Workspace Error`,
-            `An error occurred with the workspace connection.`
+      this.sseService.watchWorkspaceRealTime(action.payload.id).catch(err => {
+        if (environment.debug) {
+          console.group();
+          console.debug(
+            `Error in workspaces.effects: ofType(Workspaces.FetchType)`
           );
+          console.error(err);
+          console.groupEnd();
+        }
 
-          return Observable.of(new Workspaces.FetchError(action.payload));
-        })
+        this.notifications.error(
+          `Workspace Error`,
+          `An error occurred with the workspace connection.`
+        );
+
+        return Observable.of(new Workspaces.FetchError(action.payload));
+      })
     );
 
   // tslint:disable-next-line:member-ordering
@@ -183,6 +166,8 @@ export class WorkspacesEffects {
     .map((action: Action) => {
       const data = action.payload;
       return batchActions([
+        new Workspaces.Clean(),
+        new Ui.OpenSidenav(),
         new Workspaces.FetchSuccess(data.workspace),
         new Users.Fetched(toJsTable<IUserBackend>(data.users)),
         new BusesInProgress.Fetched(
