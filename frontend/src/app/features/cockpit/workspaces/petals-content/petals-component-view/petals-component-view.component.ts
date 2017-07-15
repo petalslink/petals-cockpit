@@ -59,6 +59,9 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
         this.store$.dispatch(new Components.SetCurrent({ id }));
         this.store$.dispatch(new Components.FetchDetails({ id }));
       })
+      .finally(() =>
+        this.store$.dispatch(new Components.SetCurrent({ id: '' }))
+      )
       .subscribe();
 
     this.component$ = this.store$.let(getCurrentComponent);
@@ -71,7 +74,5 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
-
-    this.store$.dispatch(new Components.SetCurrent({ id: '' }));
   }
 }
