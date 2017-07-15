@@ -23,10 +23,7 @@ import { PetalsMenuViewComponent } from './petals-menu-view/petals-menu-view.com
 import { BusesInProgressComponent } from './buses-in-progress/buses-in-progress.component';
 
 @NgModule({
-  imports: [
-    SharedModule,
-    // PetalsMenuRoutingModule
-  ],
+  imports: [SharedModule],
   declarations: [
     PetalsMenuViewComponent,
     MaterialTreeComponent,

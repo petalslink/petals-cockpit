@@ -18,48 +18,24 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import {
-  IBusesInProgress,
-  IBusInProgressRow,
-} from './buses-in-progress.interface';
-import { IStore } from '../../../../../shared/state/store.interface';
-import { isNot } from '../../../../../shared/helpers/shared.helper';
+import { IBusInProgressRow } from './buses-in-progress.interface';
+import { IStore } from 'app/shared/state/store.interface';
+import { arrayEquals } from 'app/shared/helpers/shared.helper';
 
-export function _getBusesInProgress(
+export function getBusesInProgress(
   store$: Store<IStore>
-): Observable<IBusesInProgress> {
+): Observable<IBusInProgressRow[]> {
   return store$
-    .select(state => state.busesInProgress)
-    .map(busesInProgressTable => {
-      return <IBusesInProgress>{
-        ...busesInProgressTable,
-        list: busesInProgressTable.allIds.map(busInProgressId => {
-          return busesInProgressTable.byId[busInProgressId];
-        }),
-      };
-    });
+    .select(s => s.busesInProgress.allIds.map(id => s.busesInProgress.byId[id]))
+    .distinctUntilChanged(arrayEquals);
 }
-
-export function getBusesInProgress() {
-  return _getBusesInProgress;
-}
-
-// ------------------------------------------------------------------
-
-export function getCurrentBusInProgress(
-  store$: Store<IStore>
-): Observable<IBusInProgressRow> {
-  return getCurrentBusInProgressOrNull(store$).filter(isNot(null));
-}
-
-// ------------------------------------------------------------------
 
 export function getCurrentBusInProgressOrNull(
   store$: Store<IStore>
 ): Observable<IBusInProgressRow> {
   return store$.select(
     state =>
-      state.busesInProgress.selectedBusInProgressId === ''
+      !state.busesInProgress.selectedBusInProgressId
         ? null
         : state.busesInProgress.byId[
             state.busesInProgress.selectedBusInProgressId

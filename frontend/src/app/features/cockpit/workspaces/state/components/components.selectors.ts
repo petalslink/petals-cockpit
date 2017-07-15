@@ -40,23 +40,21 @@ export function getCurrentComponent(
 ): Observable<IComponentWithSLsAndSUs> {
   return store$
     .filter(state => !!state.components.selectedComponentId)
-    .map(state => {
+    .mergeMap(state => {
       const component =
         state.components.byId[state.components.selectedComponentId];
       if (component) {
-        return {
+        return Observable.of({
           ...component,
           serviceUnits: component.serviceUnits.map(
-            suId => state.serviceUnits.byId[suId]
+            id => state.serviceUnits.byId[id]
           ),
           sharedLibraries: component.sharedLibraries.map(
-            slId => state.sharedLibraries.byId[slId]
+            id => state.sharedLibraries.byId[id]
           ),
-        };
+        });
       } else {
-        return undefined;
+        return Observable.empty();
       }
-    })
-    .filter(c => !!c)
-    .distinctUntilChanged();
+    });
 }

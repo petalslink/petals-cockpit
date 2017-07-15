@@ -31,20 +31,18 @@ export function getCurrentSharedLibrary(
 ): Observable<ISharedLibraryWithComponents> {
   return store$
     .filter(state => !!state.sharedLibraries.selectedSharedLibraryId)
-    .map(state => {
+    .mergeMap(state => {
       const sl =
         state.sharedLibraries.byId[
           state.sharedLibraries.selectedSharedLibraryId
         ];
       if (sl) {
-        return {
+        return Observable.of({
           ...sl,
-          components: sl.components.map(c => state.components.byId[c]),
-        };
+          components: sl.components.map(id => state.components.byId[id]),
+        });
       } else {
-        return undefined;
+        return Observable.empty();
       }
-    })
-    .filter(s => !!s)
-    .distinctUntilChanged();
+    });
 }

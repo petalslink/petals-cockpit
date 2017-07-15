@@ -20,7 +20,10 @@ import { Observable } from 'rxjs/Observable';
 
 import { IWorkspaces, IWorkspaceRow } from './workspaces.interface';
 import { IStore } from 'app/shared/state/store.interface';
-import { escapeStringRegexp } from 'app/shared/helpers/shared.helper';
+import {
+  escapeStringRegexp,
+  arrayEquals,
+} from 'app/shared/helpers/shared.helper';
 import { IUserRow } from 'app/shared/state/users.interface';
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 
@@ -47,31 +50,33 @@ export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
 export function getCurrentWorkspace(
   store$: Store<IStore>
 ): Observable<IWorkspaceRow> {
-  return store$.select(
-    state => state.workspaces.byId[state.workspaces.selectedWorkspaceId]
-  );
+  return store$.select(currentWorkspace);
 }
+
+const currentWorkspace = (s: IStore) =>
+  s.workspaces.byId[s.workspaces.selectedWorkspaceId];
 
 export function getCurrentWorkspaceUsers(
   store$: Store<IStore>
 ): Observable<IUserRow[]> {
-  return store$.select(state =>
-    state.workspaces.byId[state.workspaces.selectedWorkspaceId].users.map(
-      id => state.users.byId[id]
+  return store$
+    .select(state =>
+      currentWorkspace(state).users.map(id => state.users.byId[id])
     )
-  );
+    .distinctUntilChanged(arrayEquals);
 }
 
 export function getUsersNotInCurrentWorkspace(
-  state$: Store<IStore>
+  store$: Store<IStore>
 ): Observable<IUserRow[]> {
-  return getCurrentWorkspace(state$)
-    .withLatestFrom(state$.map(state => state.users))
-    .map(([currWks, users]) =>
-      users.allIds
-        .filter(id => !currWks.users.includes(id))
-        .map(id => users.byId[id])
-    );
+  return store$
+    .map(state => {
+      const wUsers = currentWorkspace(state).users;
+      return state.users.allIds
+        .filter(id => !wUsers.includes(id))
+        .map(id => state.users.byId[id]);
+    })
+    .distinctUntilChanged(arrayEquals);
 }
 
 // -----------------------------------------------------------
@@ -114,8 +119,7 @@ export function getCurrentWorkspaceTree(
 }
 
 function buildTree(state: IStore) {
-  const workspace = state.workspaces.byId[state.workspaces.selectedWorkspaceId];
-  const baseUrl = `/workspaces/${workspace.id}/petals`;
+  const baseUrl = `/workspaces/${state.workspaces.selectedWorkspaceId}/petals`;
   return state.buses.allIds
     .map(id => state.buses.byId[id])
     .map<WorkspaceElement>(bus => ({

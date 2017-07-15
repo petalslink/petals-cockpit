@@ -28,8 +28,12 @@ export function tuple<T extends [void] | {}>(t: T): T {
   return t;
 }
 
-export function arrayEquals<T extends [void]>(ps: T, ns: T): boolean {
-  return ps.every((p, i) => p === ns[i]);
+export function tupleEquals<T extends [void]>(ps: T, ns: T): boolean {
+  return arrayEquals(ps, ns);
+}
+
+export function arrayEquals<T>(ps: T[], ns: T[]): boolean {
+  return ps.length === ns.length && ps.every((p, i) => p === ns[i]);
 }
 
 export function isNot(e: object): (object: any) => boolean {

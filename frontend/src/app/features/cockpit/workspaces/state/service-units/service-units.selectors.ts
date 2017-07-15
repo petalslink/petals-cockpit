@@ -31,18 +31,16 @@ export function getCurrentServiceUnit(
 ): Observable<IServiceUnitWithSA> {
   return store$
     .filter(state => !!state.serviceUnits.selectedServiceUnitId)
-    .map(state => {
+    .mergeMap(state => {
       const su =
         state.serviceUnits.byId[state.serviceUnits.selectedServiceUnitId];
       if (su) {
-        return {
+        return Observable.of({
           ...su,
           serviceAssembly: state.serviceAssemblies.byId[su.serviceAssemblyId],
-        };
+        });
       } else {
-        return undefined;
+        return Observable.empty();
       }
-    })
-    .filter(s => !!s)
-    .distinctUntilChanged();
+    });
 }

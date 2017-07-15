@@ -59,9 +59,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.workspace$ = this.store$.let(getCurrentWorkspace);
-    this.busesInProgress$ = this.store$
-      .let(getBusesInProgress())
-      .map(bips => bips.list);
+    this.busesInProgress$ = this.store$.let(getBusesInProgress);
     this.tree$ = this.store$.let(getCurrentWorkspaceTree);
 
     // sidenav

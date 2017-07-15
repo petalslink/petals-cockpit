@@ -30,20 +30,18 @@ export function getCurrentContainer(
 ): Observable<IContainerWithSiblings> {
   return store$
     .filter(state => !!state.containers.selectedContainerId)
-    .map(state => {
+    .mergeMap(state => {
       const container =
         state.containers.byId[state.containers.selectedContainerId];
       if (container) {
-        return {
+        return Observable.of({
           ...container,
           siblings: state.buses.byId[container.busId].containers
-            .filter(cid => cid !== container.id)
-            .map(cid => state.containers.byId[cid]),
-        };
+            .filter(id => id !== container.id)
+            .map(id => state.containers.byId[id]),
+        });
       } else {
-        return undefined;
+        return Observable.empty();
       }
-    })
-    .filter(c => !!c)
-    .distinctUntilChanged();
+    });
 }
