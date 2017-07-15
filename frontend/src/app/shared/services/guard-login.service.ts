@@ -42,7 +42,7 @@ export class GuardLoginService implements CanActivate {
 
   canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     return this.store$
-      .select(s => s.users.connectedUser)
+      .select(s => s.users.connectedUser && !s.users.isDisconnecting)
       .first()
       .switchMap(connectedUser => {
         const url = state.url;

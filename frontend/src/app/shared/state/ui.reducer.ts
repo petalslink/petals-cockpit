@@ -32,7 +32,7 @@ export namespace UiReducer {
     | Ui.ChangeScreenSize
     | Ui.SetTitles
     | Workspaces.Close
-    | Users.DisconnectSuccess;
+    | Users.Disconnected;
 
   export function reducer(table = uiFactory(), action: All): IUi {
     switch (action.type) {
@@ -63,7 +63,7 @@ export namespace UiReducer {
       case Workspaces.CloseType: {
         return closeWorkspace(table, action.payload);
       }
-      case Users.DisconnectSuccessType: {
+      case Users.DisconnectedType: {
         return {
           ...uiFactory(),
           language: table.language,

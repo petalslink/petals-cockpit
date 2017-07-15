@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
@@ -24,13 +24,14 @@ import { IUi } from 'app/shared/state/ui.interface';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { ICurrentUser } from 'app/shared/state/users.interface';
 import { getCurrentUser } from 'app/shared/state/users.selectors';
+import { Users } from 'app/shared/state/users.actions';
 
 @Component({
   selector: 'app-cockpit',
   templateUrl: './cockpit.component.html',
   styleUrls: ['./cockpit.component.scss'],
 })
-export class CockpitComponent implements OnInit {
+export class CockpitComponent implements OnInit, OnDestroy {
   isLargeScreen$: Observable<boolean>;
   ui$: Observable<IUi>;
   user$: Observable<ICurrentUser>;
@@ -50,5 +51,9 @@ export class CockpitComponent implements OnInit {
       state => !!state.workspaces.selectedWorkspaceId
     );
     this.ui$ = this.store$.select(state => state.ui);
+  }
+
+  ngOnDestroy() {
+    this.store$.dispatch(new Users.Disconnected());
   }
 }

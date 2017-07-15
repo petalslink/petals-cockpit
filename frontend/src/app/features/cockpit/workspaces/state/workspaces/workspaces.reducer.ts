@@ -62,7 +62,7 @@ export namespace WorkspacesReducer {
     | Workspaces.AddUserError
     | Workspaces.AddUserSuccess
     | Workspaces.DeleteUserSuccess
-    | Users.DisconnectSuccess;
+    | Users.Disconnected;
 
   export function reducer(
     table = workspacesTableFactory(),
@@ -144,7 +144,7 @@ export namespace WorkspacesReducer {
       case Workspaces.DeleteUserSuccessType: {
         return deleteUserSuccess(table, action.payload);
       }
-      case Users.DisconnectSuccessType: {
+      case Users.DisconnectedType: {
         return workspacesTableFactory();
       }
       default:

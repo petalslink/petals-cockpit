@@ -153,7 +153,12 @@ export namespace Users {
   export const DisconnectSuccessType = '[Users] Disconnect success';
   export class DisconnectSuccess implements Action {
     readonly type = DisconnectSuccessType;
-    readonly payload: never;
+    constructor() {}
+  }
+
+  export const DisconnectedType = '[Users] Disconnected';
+  export class Disconnected implements Action {
+    readonly type = DisconnectedType;
     constructor() {}
   }
 }

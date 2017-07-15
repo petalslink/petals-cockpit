@@ -55,7 +55,7 @@ export namespace UsersReducer {
     | Users.ConnectSuccess
     | Users.Disconnect
     | Users.DisconnectError
-    | Users.DisconnectSuccess
+    | Users.Disconnected
     | Workspaces.DeleteUser
     | Workspaces.DeleteUserSuccess
     | Workspaces.DeleteUserError;
@@ -116,7 +116,7 @@ export namespace UsersReducer {
       case Users.DisconnectErrorType: {
         return disconnectError(table);
       }
-      case Users.DisconnectSuccessType: {
+      case Users.DisconnectedType: {
         return usersTableFactory();
       }
       case Workspaces.DeleteUserType: {
