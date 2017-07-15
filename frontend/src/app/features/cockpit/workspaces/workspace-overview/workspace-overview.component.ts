@@ -142,8 +142,8 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  filterUsers(username: string, users: string[]) {
-    return !!username ? users.filter(user => user === username) : users;
+  filterUsers(search: string, users: string[]) {
+    return !!search ? users.filter(user => user.includes(search)) : users;
   }
 
   addUser() {
