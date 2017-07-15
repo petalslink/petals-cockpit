@@ -58,6 +58,5 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  providers: [],
 })
 export class WorkspacesRoutingModule {}
