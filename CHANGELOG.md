@@ -1,3 +1,25 @@
+<a name="0.11.0"></a>
+# [0.11.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.10.1...v0.11.0) (2017-07-17)
+
+
+### Bug Fixes
+
+* **frontend:** do not close sidenav when escape key is pressed ([462378e](https://gitlab.com/linagora/petals-cockpit/commit/462378e))
+* **frontend:** fix redirect when event received via SSE ([efb2309](https://gitlab.com/linagora/petals-cockpit/commit/efb2309)), closes [#306](https://gitlab.com/linagora/petals-cockpit/issues/306)
+* **frontend:** simplify selectors to avoid undefined on workspace clean ([d4f366a](https://gitlab.com/linagora/petals-cockpit/commit/d4f366a)), closes [#369](https://gitlab.com/linagora/petals-cockpit/issues/369)
+* **product:** fix 404 when deploying artefacts ([4c8c16f](https://gitlab.com/linagora/petals-cockpit/commit/4c8c16f))
+
+
+### Features
+
+* Manage application users as an admin, closes [#361](https://gitlab.com/linagora/petals-cockpit/issues/361)
+* workspace administration, closes [#9](https://gitlab.com/linagora/petals-cockpit/issues/9)
+* **backend:** explicit error on setup failure ([f3e6fc7](https://gitlab.com/linagora/petals-cockpit/commit/f3e6fc7))
+* **frontend:** group artifacts by type in the tree ([e529a90](https://gitlab.com/linagora/petals-cockpit/commit/e529a90)), closes [#342](https://gitlab.com/linagora/petals-cockpit/issues/342) [#368](https://gitlab.com/linagora/petals-cockpit/issues/368)
+* **product:** add --debug flag to start script [ci skip] ([9e7bcc7](https://gitlab.com/linagora/petals-cockpit/commit/9e7bcc7))
+
+
+
 <a name="0.10.1"></a>
 ## [0.10.1](https://gitlab.com/linagora/petals-cockpit/compare/v0.10.0...v0.10.1) (2017-06-23)
 
