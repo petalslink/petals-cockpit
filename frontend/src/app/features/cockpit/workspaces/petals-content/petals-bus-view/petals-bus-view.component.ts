@@ -67,6 +67,7 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
         this.store$.dispatch(new Buses.SetCurrent({ id }));
         this.store$.dispatch(new Buses.FetchDetails({ id }));
       })
+      .finally(() => this.store$.dispatch(new Buses.SetCurrent({ id: '' })))
       .switchMap(busId =>
         this.bus$
           .first()
@@ -83,8 +84,6 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
-
-    this.store$.dispatch(new Buses.SetCurrent({ id: '' }));
   }
 
   openDeletionDialog() {

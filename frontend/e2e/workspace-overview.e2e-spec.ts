@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $ } from 'protractor';
+import { browser, ExpectedConditions as EC, $, Key } from 'protractor';
 
 import { page, waitTimeout } from './common';
 import { WorkspaceOverviewPage } from './pages/workspace.po';
@@ -205,8 +205,13 @@ describe(`Workspace Overview`, () => {
         ['bescudie', 'Bertrand ESCUDIE'],
       ]);
 
-      // if we try with an wrong name, the button should be disabled
-      workspace.usersAutocompleteInput.sendKeys('vnoe');
+      // if we try with an incomplete name, the button should be disabled
+      // but the list should be filtered
+      workspace.usersAutocompleteInput.sendKeys('o');
+      expect(workspace.getUsersAutocomplete()).toEqual(['mrobert', 'vnoel']);
+      expect(workspace.btnAddUserToWks.isEnabled()).toBe(false);
+      workspace.usersAutocompleteInput.sendKeys(Key.BACK_SPACE, 'vnoe');
+      expect(workspace.getUsersAutocomplete()).toEqual(['vnoel']);
       expect(workspace.btnAddUserToWks.isEnabled()).toBe(false);
       workspace.usersAutocompleteInput.sendKeys('l');
       expect(workspace.btnAddUserToWks.isEnabled()).toBe(true);

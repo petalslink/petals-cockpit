@@ -15,20 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
+.selected-workspace {
+  font-weight: bold;
+}
 
-import { SharedModule } from 'app/shared/shared.module';
-import { MaterialTreeComponent } from './material-tree/material-tree.component';
-import { PetalsMenuViewComponent } from './petals-menu-view/petals-menu-view.component';
-import { BusesInProgressComponent } from './buses-in-progress/buses-in-progress.component';
+.description-wks {
+  resize: none;
+  border: none;
+  overflow: auto;
+}
 
-@NgModule({
-  imports: [SharedModule],
-  declarations: [
-    PetalsMenuViewComponent,
-    MaterialTreeComponent,
-    BusesInProgressComponent,
-  ],
-  exports: [PetalsMenuViewComponent],
-})
-export class PetalsMenuModule {}
+.mat-card-title {
+  font-size: 16px;
+}

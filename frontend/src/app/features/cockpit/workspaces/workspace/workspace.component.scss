@@ -15,16 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.selected-workspace {
-  font-weight: bold;
+:host {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.description-wks {
-  resize: none;
-  border: none;
-  overflow: auto;
-}
-
-.mat-card-title {
-  font-size: 16px;
+// all menu views have the same size (petals, service, api)
+md-sidenav {
+  height: 100%;
+  // customize the buttons of petals menu view
+  .pnl-buttons-workspaces > .no-border-radius {
+    border-radius: 0;
+  }
 }

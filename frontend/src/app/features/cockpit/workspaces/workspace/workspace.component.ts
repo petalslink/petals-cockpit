@@ -15,28 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
-import { MdDialog, MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
-import { Store, Dispatcher } from '@ngrx/store';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { MdDialog } from '@angular/material';
+import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { IStore } from '../../../../shared/state/store.interface';
-import { IWorkspaceRow } from './../state/workspaces/workspaces.interface';
-import {
-  getCurrentWorkspace,
-  filterWorkspaceFetched,
-  getCurrentWorkspaceUsers,
-  getUsersNotInCurrentWorkspace,
-} from '../../../cockpit/workspaces/state/workspaces/workspaces.selectors';
-
+import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
-import { IUserRow } from 'app/shared/state/users.interface';
-import { Users } from 'app/shared/state/users.actions';
-import { SharedValidator } from 'app/shared/validators/shared.validator';
-import { getCurrentUser } from 'app/shared/state/users.selectors';
+import { isSmallScreen } from 'app/shared/state/ui.selectors';
+import {
+  WorkspaceElement,
+  getCurrentWorkspaceTree,
+  getCurrentWorkspace,
+} from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
+import { IWorkspaceRow } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
+import { getBusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.selectors';
+import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 
 @Component({
   selector: 'app-workspace',
@@ -46,163 +43,43 @@ import { getCurrentUser } from 'app/shared/state/users.selectors';
 export class WorkspaceComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
+  sidenavVisible$: Observable<boolean>;
+  sidenavMode$: Observable<string>;
   workspace$: Observable<IWorkspaceRow>;
-  users$: Observable<IUserRow[]>;
-  currentUserId$: Observable<string>;
-  appUsers$: Observable<string[]>;
+  busesInProgress$: Observable<IBusInProgress[]>;
+  tree$: Observable<WorkspaceElement[]>;
 
-  isRemoving = false;
-
-  isEditingDescription = false;
-  isSettingDescription = false;
-  description: string = null;
-
-  addUserFormGroup: FormGroup;
-  filteredUsers$: Observable<string[]>;
+  showShadow = true;
 
   constructor(
-    private fb: FormBuilder,
     private store$: Store<IStore>,
-    private dialog: MdDialog,
-    private dispatcher: Dispatcher
+    private router: Router,
+    private dialog: MdDialog
   ) {}
 
   ngOnInit() {
-    this.store$.dispatch(
-      new Ui.SetTitles({
-        titleMainPart1: 'Workspace',
-        titleMainPart2: 'Petals',
-      })
+    this.workspace$ = this.store$.let(getCurrentWorkspace);
+    this.busesInProgress$ = this.store$.let(getBusesInProgress);
+    this.tree$ = this.store$.let(getCurrentWorkspaceTree);
+
+    // sidenav
+    this.sidenavVisible$ = this.store$.select(
+      state => state.ui.isSidenavVisible
     );
+    this.sidenavMode$ = this.store$
+      .let(isSmallScreen)
+      .map(ss => (ss ? `over` : `side`));
 
-    this.store$.dispatch(new Users.FetchAll());
-
-    this.appUsers$ = this.store$
-      .let(getUsersNotInCurrentWorkspace)
-      .map(us => us.map(u => u.id).sort());
-
-    this.addUserFormGroup = this.fb.group({
-      userSearchCtrl: [
-        '',
-        null,
-        [SharedValidator.isStringInObsArrayValidator(this.appUsers$)],
-      ],
-    });
-
-    this.currentUserId$ = this.store$
-      .let(getCurrentUser())
-      .map(user => user.id);
-
-    this.workspace$ = this.store$
-      .let(getCurrentWorkspace)
-      .do(
-        wk =>
-          wk.isAddingUserToWorkspace
-            ? this.addUserFormGroup.get('userSearchCtrl').disable()
-            : this.addUserFormGroup.get('userSearchCtrl').enable()
-      );
-
-    this.users$ = this.store$.let(getCurrentWorkspaceUsers);
-
+    // open deleted warning if the workspace has been deleted
     this.store$
-      .let(filterWorkspaceFetched)
+      .select(state => state.workspaces.isSelectedWorkspaceDeleted)
+      .filter(d => d)
       .takeUntil(this.onDestroy$)
-      // only when we change workspace!
-      .map(state => state.workspaces.selectedWorkspaceId)
-      .distinctUntilChanged()
-      .do(id => {
-        // we reinit these in case one change workspace while editing
-        this.description = null;
-        this.isEditingDescription = false;
-        this.isSettingDescription = false;
-        this.store$.dispatch(new Workspaces.FetchDetails({ id }));
-      })
-      .subscribe();
-
-    this.workspace$
-      .takeUntil(this.onDestroy$)
-      // only when we are setting the description and it has finished
-      .filter(ws => !ws.isSettingDescription && this.isSettingDescription)
-      .do(ws => {
-        // we reinit these, and it will show the current value of the description in the store
-        this.description = null;
-        this.isEditingDescription = false;
-        this.isSettingDescription = false;
-      })
-      .subscribe();
-
-    this.filteredUsers$ = this.addUserFormGroup
-      .get('userSearchCtrl')
-      .valueChanges.startWith(null)
-      .combineLatest(this.appUsers$)
-      .map(([userSearch, users]) => this.filterUsers(userSearch, users));
-
-    // when a user is added to the workspace
-    this.dispatcher
-      .takeUntil(this.onDestroy$)
-      .filter(action => action.type === Workspaces.AddUserSuccessType)
-      // reset the form
-      .do(_ => this.addUserFormGroup.reset())
-      .subscribe();
-  }
-
-  filterUsers(username: string, users: string[]) {
-    return !!username ? users.filter(user => user === username) : users;
-  }
-
-  addUser() {
-    const id = this.addUserFormGroup.get('userSearchCtrl').value;
-    this.store$.dispatch(new Workspaces.AddUser({ id }));
-  }
-
-  removeUser(id: string) {
-    this.store$.dispatch(new Workspaces.DeleteUser({ id }));
-  }
-
-  editDescription() {
-    this.isEditingDescription = true;
-    // note: there could be a small moment where description is not set!
-    this.workspace$
-      .first()
-      .do(ws => {
-        this.description = ws.description;
-      })
-      .subscribe();
-  }
-
-  cancelDescription() {
-    this.description = null;
-    this.isEditingDescription = false;
-    this.isSettingDescription = false;
-  }
-
-  validateDescription() {
-    this.isSettingDescription = true;
-    const description = this.description;
-    this.workspace$
-      .first()
-      .do(ws => {
-        this.store$.dispatch(
-          new Workspaces.SetDescription({ id: ws.id, description })
-        );
-      })
-      .subscribe();
-  }
-
-  openDeletionDialog() {
-    this.isRemoving = true;
-    this.workspace$
-      .first()
-      .switchMap(ws =>
+      .switchMap(() =>
         this.dialog
-          .open(WorkspaceDeleteDialogComponent, {
-            data: { name: ws.name },
-          })
+          .open(DeletedWorkspaceDialogComponent)
           .afterClosed()
-          .map(res => !!res)
-          .do(result => (this.isRemoving = result))
-          .filter(result => result)
-          .do(_ => this.store$.dispatch(new Workspaces.Delete({ id: ws.id })))
+          .do(() => this.router.navigate(['/workspaces']))
       )
       .subscribe();
   }
@@ -210,30 +87,41 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+
+    this.store$.dispatch(new Workspaces.Clean());
+  }
+
+  closeSidenav() {
+    this.store$.dispatch(new Ui.CloseSidenav());
+  }
+
+  closeSidenavOnSmallScreen() {
+    this.store$.dispatch(new Ui.CloseSidenavOnSmallScreen());
+  }
+
+  openWorkspacesDialog() {
+    this.store$.dispatch(new Ui.OpenWorkspaces());
   }
 }
 
 @Component({
-  selector: 'app-workspace-deletion-dialog',
+  selector: 'app-workspace-deleted-dialog',
   template: `
     <div fxLayout="column" class="content content-max-width">
       <div class="central-content">
         <div fxLayout="row" md-dialog-title fxLayoutAlign="start start">
           <span fxLayoutAlign="start center">
-            <md-icon color="warn">warning</md-icon>
-            <span class="margin-left-x1">Delete workspace?</span>
+            <md-icon color="primary">check_circle</md-icon>
+            <span class="margin-left-x1">Workspace deleted!</span>
           </span>
         </div>
         <md-dialog-content>
-          <p fxLayout="column">
-            <span>Everything in the workspace will be deleted! <b>Please, be certain</b>.</span>
-            <span class="margin-top-x1">Are you sure you want to delete <b>{{ data.name }}</b>?</span>
-          </p>
+          <div fxLayout="column" fxFill>
+              <p>This workspace was deleted, <b>click on OK</b> to go back to the workspaces list.</p>
+          </div>
         </md-dialog-content>
-
         <md-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
-          <button md-button md-dialog-close class="btn-cancel-delete-wks margin-right-x1">Cancel</button>
-          <button md-raised-button color="warn" class="btn-confirm-delete-wks" (click)="dialogRef.close(true)">Delete</button>
+          <button md-raised-button md-dialog-close color="primary">OK</button>
         </md-dialog-actions>
       </div>
     </div>
@@ -242,10 +130,4 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     'md-dialog-content { height: 100%; } .central-content { padding: 24px; }',
   ],
 })
-export class WorkspaceDeleteDialogComponent {
-  constructor(
-    public dialogRef: MdDialogRef<WorkspaceDeleteDialogComponent>,
-    // TODO add some type for data when https://github.com/angular/angular/issues/15424 is fixed
-    @Inject(MD_DIALOG_DATA) public data: any
-  ) {}
-}
+export class DeletedWorkspaceDialogComponent {}

@@ -22,11 +22,15 @@
   flex-direction: column;
 }
 
-// all menu views have the same size (petals, service, api)
-md-sidenav {
+.central-content {
+  padding: 24px;
+  margin-top: 0;
+}
+
+h3 {
+  font-size: 16px;
+}
+
+md-dialog-content {
   height: 100%;
-  // customize the buttons of petals menu view
-  .pnl-buttons-workspaces > .no-border-radius {
-    border-radius: 0;
-  }
 }

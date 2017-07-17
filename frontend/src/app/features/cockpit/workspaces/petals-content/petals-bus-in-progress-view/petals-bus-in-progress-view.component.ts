@@ -101,6 +101,9 @@ export class PetalsBusInProgressViewComponent
       .map(paramMap => paramMap.get('busInProgressId'))
       .distinctUntilChanged()
       .do(id => this.store$.dispatch(new BusesInProgress.SetCurrent({ id })))
+      .finally(() =>
+        this.store$.dispatch(new BusesInProgress.SetCurrent({ id: '' }))
+      )
       .subscribe();
 
     this.busInProgress$
@@ -158,8 +161,6 @@ export class PetalsBusInProgressViewComponent
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
-
-    this.store$.dispatch(new BusesInProgress.SetCurrent({ id: '' }));
   }
 
   onSubmit({ value }: { value: IBusImport; valid: boolean }) {

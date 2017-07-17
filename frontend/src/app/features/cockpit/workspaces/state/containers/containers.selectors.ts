@@ -18,10 +18,8 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/state/store.interface';
+import { IStore } from 'app/shared/state/store.interface';
 import { IContainerRow } from './containers.interface';
-
-import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
 export interface IContainerWithSiblings extends IContainerRow {
   siblings: IContainerRow[];
@@ -30,22 +28,20 @@ export interface IContainerWithSiblings extends IContainerRow {
 export function getCurrentContainer(
   store$: Store<IStore>
 ): Observable<IContainerWithSiblings> {
-  return filterWorkspaceFetched(store$)
+  return store$
     .filter(state => !!state.containers.selectedContainerId)
-    .map(state => {
+    .mergeMap(state => {
       const container =
         state.containers.byId[state.containers.selectedContainerId];
       if (container) {
-        return {
+        return Observable.of({
           ...container,
           siblings: state.buses.byId[container.busId].containers
-            .filter(cid => cid !== container.id)
-            .map(cid => state.containers.byId[cid]),
-        };
+            .filter(id => id !== container.id)
+            .map(id => state.containers.byId[id]),
+        });
       } else {
-        return undefined;
+        return Observable.empty();
       }
-    })
-    .filter(c => !!c)
-    .distinctUntilChanged();
+    });
 }

@@ -17,9 +17,12 @@
 
 export interface IUi {
   language: string;
-  isSidenavVisible: boolean;
   screenSize: string;
+  // workspace
+  isSidenavVisible: boolean;
+  // workspaces
   isPopupListWorkspacesVisible: boolean;
+  // header
   titleMainPart1: string;
   titleMainPart2: string;
   titleSubPart: string;
@@ -28,7 +31,7 @@ export interface IUi {
 export function uiFactory(): IUi {
   return {
     language: '',
-    isSidenavVisible: false,
+    isSidenavVisible: true,
     screenSize: '',
     isPopupListWorkspacesVisible: false,
     titleMainPart1: 'Petals Cockpit',

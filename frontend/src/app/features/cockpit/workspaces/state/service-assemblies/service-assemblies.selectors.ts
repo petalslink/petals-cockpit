@@ -19,8 +19,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { IServiceAssembly } from './service-assemblies.interface';
 
-import { IStore } from '../../../../../shared/state/store.interface';
-import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
+import { IStore } from 'app/shared/state/store.interface';
 import { tuple } from 'app/shared/helpers/shared.helper';
 import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
@@ -32,25 +31,23 @@ export interface IServiceAssemblyWithSUsAndComponents extends IServiceAssembly {
 export function getCurrentServiceAssembly(
   store$: Store<IStore>
 ): Observable<IServiceAssemblyWithSUsAndComponents> {
-  return filterWorkspaceFetched(store$)
+  return store$
     .filter(state => !!state.serviceAssemblies.selectedServiceAssemblyId)
-    .map(state => {
+    .mergeMap(state => {
       const sa =
         state.serviceAssemblies.byId[
           state.serviceAssemblies.selectedServiceAssemblyId
         ];
       if (sa) {
-        return {
+        return Observable.of({
           ...sa,
-          serviceUnitsAndComponent: sa.serviceUnits.map(suId => {
-            const su = state.serviceUnits.byId[suId];
+          serviceUnitsAndComponent: sa.serviceUnits.map(id => {
+            const su = state.serviceUnits.byId[id];
             return tuple([su, state.components.byId[su.componentId]]);
           }),
-        };
+        });
       } else {
-        return undefined;
+        return Observable.empty();
       }
-    })
-    .filter(s => !!s)
-    .distinctUntilChanged();
+    });
 }

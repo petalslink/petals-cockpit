@@ -22,7 +22,6 @@ import { Store } from '@ngrx/store';
 
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
-import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { JsTable } from 'app/shared/helpers/jstable.helper';
 
 @Injectable()
@@ -30,8 +29,6 @@ export class ResourceByIdResolver implements Resolve<any> {
   constructor(private router: Router, private store$: Store<IStore>) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<boolean> | boolean {
-    const workspaceId = route.params['workspaceId'];
-
     let id: string;
     let resourceState: (state: IStore) => JsTable<object>;
 
@@ -60,10 +57,13 @@ export class ResourceByIdResolver implements Resolve<any> {
     }
 
     return this.store$
-      .let(filterWorkspaceFetched)
-      .map(state => {
+      .select(state => {
         if (!resourceState(state).byId[id]) {
-          this.router.navigate(['/workspaces', workspaceId, 'not-found']);
+          this.router.navigate([
+            '/workspaces',
+            state.workspaces.selectedWorkspaceId,
+            'not-found',
+          ]);
         }
 
         return true;

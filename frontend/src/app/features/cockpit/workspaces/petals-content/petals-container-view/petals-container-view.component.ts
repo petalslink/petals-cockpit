@@ -64,6 +64,9 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
         this.store$.dispatch(new Containers.SetCurrent({ id }));
         this.store$.dispatch(new Containers.FetchDetails({ id }));
       })
+      .finally(() =>
+        this.store$.dispatch(new Containers.SetCurrent({ id: '' }))
+      )
       .switchMap(busId =>
         this.container$
           .first()
@@ -80,7 +83,5 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
-
-    this.store$.dispatch(new Containers.SetCurrent({ id: '' }));
   }
 }

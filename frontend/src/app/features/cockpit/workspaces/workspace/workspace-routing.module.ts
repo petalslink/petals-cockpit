@@ -18,11 +18,34 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-const routes: Routes = [];
+import { NotFound404Component } from 'app/shared/components/not-found-404/not-found-404.component';
+import { WorkspaceComponent } from 'app/features/cockpit/workspaces/workspace/workspace.component';
+import { WorkspaceOverviewComponent } from 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: WorkspaceComponent,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: WorkspaceOverviewComponent,
+      },
+      {
+        path: 'not-found',
+        component: NotFound404Component,
+      },
+      {
+        path: 'petals',
+        loadChildren:
+          'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule',
+      },
+    ],
+  },
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
-  providers: [],
 })
-export class PetalsMenuRoutingModule {}
+export class WorkspaceRoutingModule {}

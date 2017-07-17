@@ -58,6 +58,9 @@ export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
         this.store$.dispatch(new SharedLibraries.SetCurrent({ id }));
         this.store$.dispatch(new SharedLibraries.FetchDetails({ id }));
       })
+      .finally(() =>
+        this.store$.dispatch(new SharedLibraries.SetCurrent({ id: '' }))
+      )
       .subscribe();
 
     this.sharedLibrary$ = this.store$.let(getCurrentSharedLibrary);
@@ -70,7 +73,5 @@ export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
-
-    this.store$.dispatch(new SharedLibraries.SetCurrent({ id: '' }));
   }
 }

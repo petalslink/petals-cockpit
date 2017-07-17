@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 // until ts 2.4 is released, see https://github.com/palantir/tslint/issues/2470 https://github.com/Microsoft/TypeScript/issues/14953
 // tslint:disable-next-line:no-unused-variable
@@ -28,7 +28,7 @@ import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/wor
 
 @Injectable()
 export class WorkspaceResolver implements Resolve<Observable<any>> {
-  constructor(private store$: Store<IStore>) {}
+  constructor(private store$: Store<IStore>, private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot) {
     const id = route.paramMap.get('workspaceId');
@@ -39,16 +39,13 @@ export class WorkspaceResolver implements Resolve<Observable<any>> {
       .select(state => state.workspaces)
       .filter(
         workspaces =>
-          workspaces.isSelectedWorkspaceFetched ||
+          !!workspaces.selectedWorkspaceId ||
           workspaces.isSelectedWorkspaceFetchError
       )
       .first()
       .do(workspaces => {
-        if (
-          workspaces.isSelectedWorkspaceFetchError &&
-          !workspaces.isSelectedWorkspaceFetched
-        ) {
-          this.store$.dispatch(new Workspaces.Close({ goToWorkspaces: true }));
+        if (workspaces.isSelectedWorkspaceFetchError) {
+          this.router.navigate(['/workspaces']);
         }
       });
   }

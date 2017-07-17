@@ -56,13 +56,13 @@ export namespace WorkspacesReducer {
     | Workspaces.DeleteError
     | Workspaces.DeleteSuccess
     | Workspaces.SetSearch
-    | Workspaces.Removed
-    | Workspaces.Close
+    | Workspaces.Deleted
+    | Workspaces.Clean
     | Workspaces.AddUser
     | Workspaces.AddUserError
     | Workspaces.AddUserSuccess
     | Workspaces.DeleteUserSuccess
-    | Users.DisconnectSuccess;
+    | Users.Disconnected;
 
   export function reducer(
     table = workspacesTableFactory(),
@@ -126,11 +126,11 @@ export namespace WorkspacesReducer {
       case Workspaces.SetSearchType: {
         return setSearch(table, action.payload);
       }
-      case Workspaces.RemovedType: {
-        return removed(table, action.payload);
+      case Workspaces.DeletedType: {
+        return deleted(table, action.payload);
       }
-      case Workspaces.CloseType: {
-        return close(table, action.payload);
+      case Workspaces.CleanType: {
+        return clean(table);
       }
       case Workspaces.AddUserType: {
         return addUser(table, action.payload);
@@ -144,7 +144,7 @@ export namespace WorkspacesReducer {
       case Workspaces.DeleteUserSuccessType: {
         return deleteUserSuccess(table, action.payload);
       }
-      case Users.DisconnectSuccessType: {
+      case Users.DisconnectedType: {
         return workspacesTableFactory();
       }
       default:
@@ -206,9 +206,7 @@ export namespace WorkspacesReducer {
   ): IWorkspacesTable {
     return {
       ...table,
-      selectedWorkspaceId: payload.id,
       isSelectedWorkspaceFetchError: false,
-      isSelectedWorkspaceFetched: false,
     };
   }
 
@@ -220,7 +218,7 @@ export namespace WorkspacesReducer {
       ...table.byId[payload.id]
         ? updateById(table, payload.id, payload)
         : putById(table, payload.id, payload, workspaceRowFactory),
-      isSelectedWorkspaceFetched: true,
+      selectedWorkspaceId: payload.id,
     };
   }
 
@@ -306,11 +304,7 @@ export namespace WorkspacesReducer {
     return updateById(table, payload.id, { isRemoving: false });
   }
 
-  /**
-   * Note: while DELETE_WORKSPACE concerns the HTTP action of deleting a workspace,
-   * REMOVE_WORKSPACE concerns the event coming from the SSE that a workspace has been deleted.
-   */
-  function removed(
+  function deleted(
     table: IWorkspacesTable,
     payload: { id: string }
   ): IWorkspacesTable {
@@ -324,11 +318,8 @@ export namespace WorkspacesReducer {
     };
   }
 
-  function close(
-    table: IWorkspacesTable,
-    payload: { deleted?: boolean }
-  ): IWorkspacesTable {
-    if (table.selectedWorkspaceId && payload && payload.deleted) {
+  function clean(table: IWorkspacesTable) {
+    if (table.isSelectedWorkspaceDeleted && table.selectedWorkspaceId) {
       return {
         ...removeById(table, table.selectedWorkspaceId),
         selectedWorkspaceId: '',

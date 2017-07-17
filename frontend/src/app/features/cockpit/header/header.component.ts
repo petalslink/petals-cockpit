@@ -28,7 +28,6 @@ import { IUi } from 'app/shared/state/ui.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 import { ICurrentUser } from 'app/shared/state/users.interface';
 import { Users } from 'app/shared/state/users.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 
 @Component({
   selector: 'app-header',
@@ -61,9 +60,5 @@ export class HeaderComponent implements OnInit {
 
   disconnect() {
     this.store$.dispatch(new Users.Disconnect());
-  }
-
-  closeWorkspace() {
-    this.store$.dispatch(new Workspaces.Close({ goToWorkspaces: true }));
   }
 }

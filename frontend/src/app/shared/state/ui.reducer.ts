@@ -18,7 +18,6 @@
 import { IUi, uiFactory } from './ui.interface';
 
 import { Ui } from 'app/shared/state/ui.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { Users } from 'app/shared/state/users.actions';
 
 export namespace UiReducer {
@@ -31,8 +30,7 @@ export namespace UiReducer {
     | Ui.CloseWorkspaces
     | Ui.ChangeScreenSize
     | Ui.SetTitles
-    | Workspaces.Close
-    | Users.DisconnectSuccess;
+    | Users.Disconnected;
 
   export function reducer(table = uiFactory(), action: All): IUi {
     switch (action.type) {
@@ -60,10 +58,7 @@ export namespace UiReducer {
       case Ui.SetTitlesType: {
         return setTitles(table, action.payload);
       }
-      case Workspaces.CloseType: {
-        return closeWorkspace(table, action.payload);
-      }
-      case Users.DisconnectSuccessType: {
+      case Users.DisconnectedType: {
         return {
           ...uiFactory(),
           language: table.language,
@@ -144,16 +139,5 @@ export namespace UiReducer {
       ...ui,
       screenSize: payload.screenSize,
     };
-  }
-
-  function closeWorkspace(ui: IUi, payload: { goToWorkspaces?: boolean }): IUi {
-    if (payload && payload.goToWorkspaces) {
-      return {
-        ...ui,
-        isSidenavVisible: false,
-      };
-    } else {
-      return ui;
-    }
   }
 }

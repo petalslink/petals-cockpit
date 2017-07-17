@@ -64,6 +64,9 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
         this.store$.dispatch(new ServiceUnits.SetCurrent({ id }));
         this.store$.dispatch(new ServiceUnits.FetchDetails({ id }));
       })
+      .finally(() =>
+        this.store$.dispatch(new ServiceUnits.SetCurrent({ id: '' }))
+      )
       .subscribe();
 
     this.workspaceId$ = this.store$.select(
@@ -74,7 +77,5 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
-
-    this.store$.dispatch(new ServiceUnits.SetCurrent({ id: '' }));
   }
 }

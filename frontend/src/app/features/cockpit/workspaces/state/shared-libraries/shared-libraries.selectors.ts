@@ -18,10 +18,8 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/state/store.interface';
+import { IStore } from 'app/shared/state/store.interface';
 import { ISharedLibrary } from './shared-libraries.interface';
-import { filterWorkspaceFetched } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 
 export interface ISharedLibraryWithComponents extends ISharedLibrary {
@@ -31,22 +29,20 @@ export interface ISharedLibraryWithComponents extends ISharedLibrary {
 export function getCurrentSharedLibrary(
   store$: Store<IStore>
 ): Observable<ISharedLibraryWithComponents> {
-  return filterWorkspaceFetched(store$)
+  return store$
     .filter(state => !!state.sharedLibraries.selectedSharedLibraryId)
-    .map(state => {
+    .mergeMap(state => {
       const sl =
         state.sharedLibraries.byId[
           state.sharedLibraries.selectedSharedLibraryId
         ];
       if (sl) {
-        return {
+        return Observable.of({
           ...sl,
-          components: sl.components.map(c => state.components.byId[c]),
-        };
+          components: sl.components.map(id => state.components.byId[id]),
+        });
       } else {
-        return undefined;
+        return Observable.empty();
       }
-    })
-    .filter(s => !!s)
-    .distinctUntilChanged();
+    });
 }
