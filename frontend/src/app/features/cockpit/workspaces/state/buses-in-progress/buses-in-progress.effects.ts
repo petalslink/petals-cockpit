@@ -24,8 +24,6 @@ import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
 
 import { IStore } from 'app/shared/state/store.interface';
-import { IBusInProgressRow } from './buses-in-progress.interface';
-import { BusesInProgressReducer } from './buses-in-progress.reducer';
 import {
   BusesService,
   IBusInProgressBackend,

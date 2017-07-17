@@ -17,23 +17,19 @@
 
 import { Injectable } from '@angular/core';
 
-import { Router } from '@angular/router';
 import { Action, Store } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
 
-import { environment } from './../../../../../../environments/environment';
-
-import { ContainersService } from './../../../../../shared/services/containers.service';
+import { environment } from 'environments/environment';
+import { ContainersService } from 'app/shared/services/containers.service';
 import { IStore } from 'app/shared/state/store.interface';
-
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 
 @Injectable()
 export class ContainersEffects {
   constructor(
-    private router: Router,
     private store$: Store<IStore>,
     private actions$: Actions,
     private containersService: ContainersService,
@@ -80,7 +76,12 @@ export class ContainersEffects {
     .switchMap(([action, workspaceId]: [Containers.DeployComponent, string]) =>
       this.containersService
         .deployComponent(workspaceId, action.payload.id, action.payload.file)
-        .mergeMap(_ => Observable.empty<Action>())
+        .map(
+          components =>
+            new Containers.DeployComponentSuccess(
+              components.byId[components.allIds[0]]
+            )
+        )
         .catch(err => {
           if (environment.debug) {
             console.group();
@@ -114,13 +115,10 @@ export class ContainersEffects {
     )
     .do(
       ([action, workspaceId]: [Containers.DeployComponentSuccess, string]) => {
-        this.router.navigate([
-          'workspaces',
-          workspaceId,
-          'petals',
-          'components',
-          action.payload.id,
-        ]);
+        this.notifications.success(
+          'Component Deployed',
+          `${action.payload.name} has been successfully deployed`
+        );
       }
     )
     .mapTo(null);
@@ -140,7 +138,14 @@ export class ContainersEffects {
             action.payload.id,
             action.payload.file
           )
-          .mergeMap(_ => Observable.empty<Action>())
+          .map(
+            tables =>
+              new Containers.DeployServiceAssemblySuccess(
+                tables.serviceAssemblies.byId[
+                  tables.serviceAssemblies.allIds[0]
+                ]
+              )
+          )
           .catch(err => {
             if (environment.debug) {
               console.group();
@@ -176,13 +181,10 @@ export class ContainersEffects {
       (
         [action, workspaceId]: [Containers.DeployServiceAssemblySuccess, string]
       ) => {
-        this.router.navigate([
-          'workspaces',
-          workspaceId,
-          'petals',
-          'service-assemblies',
-          action.payload.id,
-        ]);
+        this.notifications.success(
+          'Service Assembly Deployed',
+          `${action.payload.name} has been successfully deployed`
+        );
       }
     )
     .mapTo(null);
@@ -202,7 +204,10 @@ export class ContainersEffects {
             action.payload.id,
             action.payload.file
           )
-          .mergeMap(_ => Observable.empty<Action>())
+          .map(
+            sls =>
+              new Containers.DeploySharedLibrarySuccess(sls.byId[sls.allIds[0]])
+          )
           .catch(err => {
             if (environment.debug) {
               console.group();
@@ -238,13 +243,10 @@ export class ContainersEffects {
       (
         [action, workspaceId]: [Containers.DeploySharedLibrarySuccess, string]
       ) => {
-        this.router.navigate([
-          'workspaces',
-          workspaceId,
-          'petals',
-          'shared-libraries',
-          action.payload.id,
-        ]);
+        this.notifications.success(
+          'Shared Library Deployed',
+          `${action.payload.name} has been successfully deployed`
+        );
       }
     )
     .mapTo(null);

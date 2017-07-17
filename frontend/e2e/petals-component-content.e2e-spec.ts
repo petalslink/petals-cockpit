@@ -20,7 +20,6 @@ import * as path from 'path';
 import { page } from './common';
 import { WorkspacePage, WorkspaceOverviewPage } from './pages/workspace.po';
 import { ComponentOverviewPage } from './pages/component.po';
-import { ServiceAssemblyOverviewPage } from './pages/service-assembly.po';
 import { NotFoundPage } from './pages/not-found';
 import { waitAndClick } from './utils';
 
@@ -270,8 +269,7 @@ describe(`Petals component content`, () => {
 
     expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
-    // we should get redirected after
-    ServiceAssemblyOverviewPage.waitAndGet();
+    workspace.openServiceUnit('su');
   });
 
   it(`should display an error if component change state (install) fails`, () => {
@@ -285,8 +283,7 @@ describe(`Petals component content`, () => {
     deploy.fileInput.sendKeys(filePath);
     page.clickAndExpectNotification(deploy.deployButton);
 
-    // we should be redirected
-    const ops = ComponentOverviewPage.waitAndGet().openOperations();
+    const ops = workspace.openComponent('component').openOperations();
 
     // change state to install with some parameters (with error in http-port to make it fail)
     const inputHttpPort = ops.parameter('http-port');

@@ -23,21 +23,18 @@ import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
 
-import { environment } from './../../../../../../environments/environment';
+import { environment } from 'environments/environment';
 
 import {
   ComponentsService,
   ComponentState,
   EComponentState,
   IComponentBackendSSE,
-} from './../../../../../shared/services/components.service';
-import { IStore } from '../../../../../shared/state/store.interface';
+} from 'app/shared/services/components.service';
+import { IStore } from 'app/shared/state/store.interface';
 import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 
 @Injectable()
 export class ComponentsEffects {
@@ -55,23 +52,8 @@ export class ComponentsEffects {
     .ofType(SseWorkspaceEvent.COMPONENT_DEPLOYED.action)
     .map(action => {
       const data = action.payload;
-
       const components = toJsTable<IComponentBackendSSE>(data.components);
-
-      // there is only one component deployed here
-      const component = components.byId[components.allIds[0]];
-
-      this.notifications.success(
-        'Component Deployed',
-        `${component.name} has been successfully deployed`
-      );
-
-      return batchActions([
-        // add the component
-        new Components.Added(components),
-        // add it to the container
-        new Containers.DeployComponentSuccess(component),
-      ]);
+      return new Components.Added(components);
     });
 
   // tslint:disable-next-line:member-ordering
@@ -193,7 +175,12 @@ export class ComponentsEffects {
             action.payload.file,
             action.payload.serviceUnitName
           )
-          .mergeMap(_ => Observable.empty<Action>())
+          .map(
+            tables =>
+              new Components.DeployServiceUnitSuccess(
+                tables.serviceUnits.byId[tables.serviceUnits.allIds[0]]
+              )
+          )
           .catch(err => {
             if (environment.debug) {
               console.group();
@@ -217,4 +204,23 @@ export class ComponentsEffects {
             );
           })
     );
+
+  // tslint:disable-next-line:member-ordering
+  @Effect({ dispatch: false })
+  deployServiceUnitSuccess$: Observable<void> = this.actions$
+    .ofType(Components.DeployServiceUnitSuccessType)
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
+    .do(
+      (
+        [action, workspaceId]: [Components.DeployServiceUnitSuccess, string]
+      ) => {
+        this.notifications.success(
+          'Service Unit Deployed',
+          `${action.payload.name} has been successfully deployed`
+        );
+      }
+    )
+    .mapTo(null);
 }

@@ -29,13 +29,9 @@ import {
   SharedLibraryState,
   ESharedLibraryState,
 } from 'app/shared/services/shared-libraries.service';
-
 import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { IStore } from 'app/shared/state/store.interface';
 
 @Injectable()
@@ -55,21 +51,7 @@ export class SharedLibrariesEffects {
     .map(action => {
       const data = action.payload;
       const sls = toJsTable<ISharedLibraryBackendSSE>(data.sharedLibraries);
-
-      // there is only one sl deployed here
-      const sl = sls.byId[sls.allIds[0]];
-
-      this.notifications.success(
-        'Shared Library Deployed',
-        `${sl.name} has been successfully deployed`
-      );
-
-      return batchActions([
-        // add the component
-        new SharedLibraries.Added(sls),
-        // add it to the container
-        new Containers.DeploySharedLibrarySuccess(sl),
-      ]);
+      return new SharedLibraries.Added(sls);
     });
 
   // tslint:disable-next-line:member-ordering

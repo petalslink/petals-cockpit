@@ -23,10 +23,10 @@ import { UsersService } from './users.service';
 import { UsersServiceMock } from './users.service.mock';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
-import { workspacesService } from '../../../mocks/workspaces-mock';
-import { BackendUser } from '../../../mocks/users-mock';
-import * as helper from './../helpers/mock.helper';
-import { environment } from '../../../environments/environment';
+import { workspacesService } from 'mocks/workspaces-mock';
+import { BackendUser } from 'mocks/users-mock';
+import * as helper from 'app/shared/helpers/mock.helper';
+import { environment } from 'environments/environment';
 
 @Injectable()
 export class WorkspacesServiceMock extends WorkspacesServiceImpl {

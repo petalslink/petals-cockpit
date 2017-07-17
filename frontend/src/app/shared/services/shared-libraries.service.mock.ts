@@ -18,7 +18,7 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 
-import * as helper from './../helpers/mock.helper';
+import * as helper from 'app/shared/helpers/mock.helper';
 import {
   SharedLibrariesServiceImpl,
   ISharedLibraryBackendDetails,

@@ -65,8 +65,11 @@ export namespace ContainersReducer {
     | Containers.DeployComponent
     | Containers.DeployComponentError
     | Containers.DeployComponentSuccess
+    | Components.Added
     | Components.Removed
+    | ServiceAssemblies.Added
     | ServiceAssemblies.Removed
+    | SharedLibraries.Added
     | SharedLibraries.Removed
     | Workspaces.Clean;
 
@@ -141,11 +144,20 @@ export namespace ContainersReducer {
       case Containers.DeployComponentSuccessType: {
         return deployComponentSuccess(table, action.payload);
       }
+      case ServiceAssemblies.AddedType: {
+        return serviceAssembliesAdded(table, action.payload);
+      }
       case ServiceAssemblies.RemovedType: {
         return removeServiceAssembly(table, action.payload);
       }
+      case Components.AddedType: {
+        return componentsAdded(table, action.payload);
+      }
       case Components.RemovedType: {
         return removeComponent(table, action.payload);
+      }
+      case SharedLibraries.AddedType: {
+        return sharedLibrariesAdded(table, action.payload);
       }
       case SharedLibraries.RemovedType: {
         return removeSharedLibrary(table, action.payload);
@@ -251,10 +263,7 @@ export namespace ContainersReducer {
     table: IContainersTable,
     payload: IComponentBackendSSE
   ) {
-    const container = table.byId[payload.containerId];
-
     return updateById(table, payload.containerId, {
-      components: [...container.components, payload.id],
       isDeployingComponent: false,
       errorDeploymentComponent: '',
     });
@@ -284,10 +293,6 @@ export namespace ContainersReducer {
     payload: IServiceAssemblyBackendSSE
   ) {
     return updateById(table, payload.containerId, {
-      serviceAssemblies: [
-        ...table.byId[payload.containerId].serviceAssemblies,
-        payload.id,
-      ],
       isDeployingServiceAssembly: false,
       errorDeploymentServiceAssembly: '',
     });
@@ -317,13 +322,54 @@ export namespace ContainersReducer {
     payload: ISharedLibraryBackendSSE
   ) {
     return updateById(table, payload.containerId, {
-      sharedLibraries: [
-        ...table.byId[payload.containerId].sharedLibraries,
-        payload.id,
-      ],
       isDeployingSharedLibrary: false,
       errorDeploymentSharedLibrary: '',
     });
+  }
+
+  function componentsAdded(
+    table: IContainersTable,
+    payload: JsTable<IComponentBackendSSE>
+  ) {
+    return payload.allIds.reduce((t, c) => {
+      const component = payload.byId[c];
+      const container = t.byId[component.containerId];
+      return updateById(t, container.id, {
+        components: Array.from(
+          new Set([...container.components, component.id])
+        ),
+      });
+    }, table);
+  }
+
+  function serviceAssembliesAdded(
+    table: IContainersTable,
+    payload: JsTable<IServiceAssemblyBackendSSE>
+  ) {
+    return payload.allIds.reduce((t, c) => {
+      const sa = payload.byId[c];
+      const container = t.byId[sa.containerId];
+      return updateById(t, container.id, {
+        serviceAssemblies: Array.from(
+          new Set([...container.serviceAssemblies, sa.id])
+        ),
+      });
+    }, table);
+  }
+
+  function sharedLibrariesAdded(
+    table: IContainersTable,
+    payload: JsTable<ISharedLibraryBackendSSE>
+  ) {
+    return payload.allIds.reduce((t, c) => {
+      const sl = payload.byId[c];
+      const container = t.byId[sl.containerId];
+      return updateById(t, container.id, {
+        sharedLibraries: Array.from(
+          new Set([...container.sharedLibraries, sl.id])
+        ),
+      });
+    }, table);
   }
 
   function removeComponent(table: IContainersTable, payload: IComponentRow) {

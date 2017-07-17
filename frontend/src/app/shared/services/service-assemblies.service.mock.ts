@@ -19,10 +19,10 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 
 import { serviceAssembliesService } from 'mocks/service-assemblies-mock';
-import * as helper from './../helpers/mock.helper';
+import * as helper from 'app/shared/helpers/mock.helper';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
-import { environment } from '../../../environments/environment';
+import { environment } from 'environments/environment';
 
 import {
   ServiceAssembliesServiceImpl,

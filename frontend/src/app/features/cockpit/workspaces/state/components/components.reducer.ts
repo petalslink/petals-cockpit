@@ -59,6 +59,7 @@ export namespace ComponentsReducer {
     | Components.DeployServiceUnit
     | Components.DeployServiceUnitError
     | Components.DeployServiceUnitSuccess
+    | ServiceUnits.Added
     | ServiceUnits.Removed
     | Workspaces.Clean;
 
@@ -114,6 +115,9 @@ export namespace ComponentsReducer {
       }
       case Components.DeployServiceUnitSuccessType: {
         return deployServiceUnitSuccess(table, action.payload);
+      }
+      case ServiceUnits.AddedType: {
+        return addedServiceUnits(table, action.payload);
       }
       case ServiceUnits.RemovedType: {
         return removeServiceUnit(table, action.payload);
@@ -248,14 +252,22 @@ export namespace ComponentsReducer {
     payload: IServiceUnitBackendSSE
   ) {
     return updateById(table, payload.componentId, {
-      serviceUnits: [
-        ...table.byId[payload.componentId].serviceUnits,
-        payload.id,
-      ],
-      // TODO that's not totally correct, because we don't really know if this was deployed by us and from a component
       isDeployingServiceUnit: false,
       errorDeployment: '',
     });
+  }
+
+  function addedServiceUnits(
+    table: IComponentsTable,
+    payload: JsTable<IServiceUnitBackendSSE>
+  ) {
+    return payload.allIds.reduce((t, c) => {
+      const su = payload.byId[c];
+      const component = t.byId[su.componentId];
+      return updateById(t, component.id, {
+        serviceUnits: Array.from(new Set([...component.serviceUnits, su.id])),
+      });
+    }, table);
   }
 
   function removeServiceUnit(
