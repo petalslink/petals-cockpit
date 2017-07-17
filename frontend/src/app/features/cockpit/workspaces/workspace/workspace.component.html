@@ -17,7 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <md-sidenav fxLayout="column" [class.mat-elevation-z6]="showShadow"
               *ngIf="workspace$ | async as workspace"
               [opened]="sidenavVisible$ | async"
-              [mode]="sidenavMode$ | async">
+              [mode]="sidenavMode$ | async"
+              [disableClose]="true">
     <div fxLayout="row" class="pnl-buttons-workspaces">
       <button fxFlex="100" md-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', workspace.id]"
         class="workspace-name width-full no-border-radius text-upper" color="accent">
