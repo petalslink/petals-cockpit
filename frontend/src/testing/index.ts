@@ -1,4 +1,6 @@
 import { DebugElement } from '@angular/core';
+import { ComponentFixture } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 
 // See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 /** Button events to pass to `DebugElement.triggerEventHandler` for RouterLink event handler */
@@ -37,4 +39,36 @@ export function elementText(n: any): string {
   }
 
   return n.textContent;
+}
+
+export function getElementBySelector<T = any>(
+  fixture: ComponentFixture<any>,
+  selectorCss: string
+): T {
+  const el = fixture.debugElement.query(By.css(selectorCss));
+
+  if (el) {
+    return el.nativeElement;
+  }
+
+  return null;
+}
+
+export function getInputByName(
+  fixture: ComponentFixture<any>,
+  name: string
+): HTMLInputElement {
+  return getElementBySelector(fixture, `input[formControlName="${name}"]`);
+}
+
+export function getButtonByClass(
+  fixture: ComponentFixture<any>,
+  className: string
+): HTMLButtonElement {
+  return getElementBySelector(fixture, `button.${className}`);
+}
+
+export function setInputValue(input: HTMLInputElement, value: string) {
+  input.value = value;
+  input.dispatchEvent(new Event('input'));
 }

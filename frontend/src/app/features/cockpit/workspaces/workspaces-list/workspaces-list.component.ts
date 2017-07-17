@@ -87,7 +87,7 @@ export class WorkspacesListComponent implements OnInit {
     this.newWksForm.reset();
   }
 
-  getUsersNames(users: Array<IUser>) {
+  getUsersNames(users: IUser[]) {
     return users
       .filter(u => u.id !== this.user.id)
       .map(user => user.name)

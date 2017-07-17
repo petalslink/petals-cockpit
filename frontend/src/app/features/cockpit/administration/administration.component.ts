@@ -23,7 +23,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { Ui } from 'app/shared/state/ui.actions';
 import { IStore } from 'app/shared/state/store.interface';
-import { IUser, ICurrentUser } from 'app/shared/state/users.interface';
+import { ICurrentUser, IUserRow } from 'app/shared/state/users.interface';
 import { getAllUsers, getCurrentUser } from 'app/shared/state/users.selectors';
 import { Users } from 'app/shared/state/users.actions';
 
@@ -37,7 +37,7 @@ import { IUserNew } from 'app/shared/services/users.service';
 export class AdministrationComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  users$: Observable<IUser[]>;
+  users$: Observable<IUserRow[]>;
   user$: Observable<ICurrentUser>;
   isFetchingUsers$: Observable<boolean>;
 

@@ -23,6 +23,8 @@ import {
   ChangeDetectionStrategy,
   OnInit,
   OnDestroy,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Subject } from 'rxjs/Subject';
@@ -37,16 +39,18 @@ import { getFormErrors } from 'app/shared/helpers/form.helper';
   styleUrls: ['./add-edit-user.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddEditUserComponent implements OnInit, OnDestroy {
+export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
   onDestroy$ = new Subject<void>();
 
   @Input() user?: IUser;
-  @Input() canDelete = true;
+  @Input() canDelete = false;
 
   @Output()
-  submit = new EventEmitter<IUserNew | { name?: string; password?: string }>();
-  @Output() delete = new EventEmitter<IUser | { id?: string }>();
-  @Output() cancel = new EventEmitter<void>();
+  onSubmit = new EventEmitter<
+    IUserNew | { name?: string; password?: string }
+  >();
+  @Output() onDelete = new EventEmitter<void>();
+  @Output() onCancel = new EventEmitter<void>();
 
   userManagementForm: FormGroup;
 
@@ -60,9 +64,9 @@ export class AddEditUserComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.userManagementForm = this.fb.group({
-      username: ['', [Validators.required]],
-      name: ['', [Validators.required]],
-      password: ['', this.user ? [] : [Validators.required]],
+      username: ['', Validators.required],
+      name: ['', Validators.required],
+      password: '',
     });
 
     this.reset();
@@ -78,12 +82,30 @@ export class AddEditUserComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['user']) {
+      this.reset();
+    }
+  }
+
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
   }
 
   reset() {
+    if (!this.userManagementForm) {
+      return;
+    }
+
+    if (this.user) {
+      this.userManagementForm.controls['password'].clearValidators();
+    } else {
+      this.userManagementForm.controls['password'].setValidators([
+        Validators.required,
+      ]);
+    }
+
     this.userManagementForm.reset({
       username: this.user ? this.user.id : '',
       name: this.user ? this.user.name : '',
@@ -92,7 +114,7 @@ export class AddEditUserComponent implements OnInit, OnDestroy {
   }
 
   doCancel() {
-    this.cancel.emit();
+    this.onCancel.emit();
     this.reset();
   }
 
@@ -107,18 +129,17 @@ export class AddEditUserComponent implements OnInit, OnDestroy {
         u.password = value.password;
       }
       if (u.name || u.password) {
-        this.submit.emit(u);
+        this.onSubmit.emit(u);
       } else {
-        this.cancel.emit();
+        this.onCancel.emit();
       }
     } else {
-      this.submit.emit(value);
+      this.onSubmit.emit(value);
     }
     this.reset();
   }
 
   doDelete() {
-    const value: IUser = this.userManagementForm.value;
-    this.delete.emit(value);
+    this.onDelete.emit();
   }
 }
