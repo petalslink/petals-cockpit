@@ -23,6 +23,7 @@ import {
 } from '@angular/core';
 
 import { IBusWithContainers } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 
 @Component({
   selector: 'app-petals-bus-overview',
@@ -54,4 +55,8 @@ export class PetalsBusOverviewComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {}
+
+  trackByContainer(i: number, container: IContainerRow) {
+    return container.id;
+  }
 }

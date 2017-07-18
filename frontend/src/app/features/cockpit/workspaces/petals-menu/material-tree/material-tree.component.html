@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-nav-list dense *ngFor="let item of tree; let i = index" [style.marginLeft.px]="margin" class="nav-list-petals-tree">
+<md-nav-list dense *ngFor="let item of tree; index as i" [style.marginLeft.px]="margin" class="nav-list-petals-tree">
   <div class="item-list">
     <a md-list-item [class]="item.cssClass" [routerLink]="item.link ? [item.link] : []" [routerLinkActive]="item.link ? 'active-link' : ''" (click)="select({deepLevel: deepLevel, index: i, item: item})"
      ng-style="deepLevel === 0 && {'background-color':'green'} || deepLevel === 1 && {'background-color':'yellow'}">

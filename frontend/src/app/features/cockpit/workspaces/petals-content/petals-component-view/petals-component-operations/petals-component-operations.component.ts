@@ -92,7 +92,7 @@ export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
     );
   }
 
-  componentState(index: number, item: any) {
+  trackByComponentState(index: number, item: any) {
     return item.actionName;
   }
 

@@ -50,7 +50,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <md-divider></md-divider>
       <md-card class="card-workspaces">
         <div fxLayout="row" class="cursor-pointer background-color-hover-light-green-x2 card-workspace"
-          *ngFor="let workspace of workspaces.list" (click)="select(workspace)"
+          *ngFor="let workspace of workspaces.list; trackBy:trackByWorkspace" (click)="select(workspace)"
           [class.background-color-light-green-x2]="workspaces.selectedWorkspaceId === workspace.id"
         >
           <md-card-title-group>

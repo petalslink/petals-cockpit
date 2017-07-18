@@ -207,6 +207,10 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
   }
+
+  trackByUser(i: number, user: IUserRow) {
+    return user.id;
+  }
 }
 
 @Component({

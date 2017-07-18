@@ -27,6 +27,7 @@ import { Observable } from 'rxjs/Observable';
 import { IStore } from '../../../../../../shared/state/store.interface';
 
 import { IServiceAssemblyWithSUsAndComponents } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
+import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 
 @Component({
   selector: 'app-petals-service-assembly-overview',
@@ -46,5 +47,9 @@ export class PetalsServiceAssemblyOverviewComponent implements OnInit {
     this.workspaceId$ = this.store$.select(
       state => state.workspaces.selectedWorkspaceId
     );
+  }
+
+  trackBySu(i: number, su: IServiceUnitRow) {
+    return su.id;
   }
 }

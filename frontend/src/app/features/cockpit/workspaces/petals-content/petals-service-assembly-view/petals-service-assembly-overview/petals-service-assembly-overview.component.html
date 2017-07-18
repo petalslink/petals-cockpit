@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <md-divider></md-divider>
 
         <md-nav-list dense fxLayout="column" class="padding-top-x1">
-          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let su of serviceAssembly.serviceUnitsAndComponent">
+          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let su of serviceAssembly.serviceUnitsAndComponent; trackBy:trackBySu">
             <a md-raised-button [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su[0].id]"
               class="service-unit">
               <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">

@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </md-card-content>
 
         <md-nav-list dense fxLayout="column" class="padding-top-x1">
-          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let component of sharedLibrary.components">
+          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let component of sharedLibrary.components; trackBy:trackByComponent">
             <a md-raised-button [routerLink]="['/workspaces', workspaceId, 'petals', 'components', component.id]"
               class="component">
               <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">

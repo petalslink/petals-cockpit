@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <md-card-content>
         <swiper class="swiper-container" [config]="config">
           <div class="swiper-wrapper">
-            <div *ngFor="let container of bus.containers" class="swiper-slide">
+            <div *ngFor="let container of bus.containers; trackBy:trackByContainer" class="swiper-slide">
               <div fxFlex fxLayout="column" fxLayoutAlign="center center">
                 <div class="swiper-description padding-x1" fxLayout="column" fxLayoutAlign="center end">
                   <p class="swiper-border" fxLayout="column" fxFill fxLayoutAlign="center end">
