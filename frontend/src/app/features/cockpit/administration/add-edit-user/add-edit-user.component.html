@@ -52,7 +52,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <md-icon color="primary">cancel</md-icon>
         <span class="cancel-name">Cancel</span>
       </button>
-      <button md-raised-button type="button" class="btn-delete-form margin-right-x1 text-upper" (click)="doDelete()" *ngIf="user" [disabled]="user.isDeleting || !canDelete">
+      <button md-raised-button type="button" class="btn-delete-form margin-right-x1 text-upper" (click)="doDelete()" *ngIf="user" [disabled]="!canDelete">
         <md-icon color="warn">delete</md-icon>
         <span class="delete-name">Delete</span>
       </button>

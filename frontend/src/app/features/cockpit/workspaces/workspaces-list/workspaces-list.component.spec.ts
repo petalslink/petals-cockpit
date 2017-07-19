@@ -60,29 +60,26 @@ describe('WorkspacesListComponent', () => {
     fixture.detectChanges();
   });
 
-  it(
-    'should create a workspace',
-    async(() => {
-      const input: HTMLInputElement = fixture.debugElement.query(
-        By.css('input[formControlName="name"]')
-      ).nativeElement;
-      const button: HTMLButtonElement = fixture.debugElement.query(
-        By.css('.btn-add-workspace')
-      ).nativeElement;
-      expect(button.disabled).toBe(true);
+  it('should create a workspace', () => {
+    const input: HTMLInputElement = fixture.debugElement.query(
+      By.css('input[formControlName="name"]')
+    ).nativeElement;
+    const button: HTMLButtonElement = fixture.debugElement.query(
+      By.css('.btn-add-workspace')
+    ).nativeElement;
+    expect(button.disabled).toBe(true);
 
-      input.value = 'test';
-      input.dispatchEvent(new Event('input'));
-      fixture.detectChanges();
-      expect(button.disabled).toBe(false);
+    input.value = 'test';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    expect(button.disabled).toBe(false);
 
-      click(button);
-      fixture.detectChanges();
-      expect(input.value).toEqual('');
-      expect(button.disabled).toBe(true);
-      expect(component.created).toEqual('test');
-    })
-  );
+    click(button);
+    fixture.detectChanges();
+    expect(input.value).toEqual('');
+    expect(button.disabled).toBe(true);
+    expect(component.created).toEqual('test');
+  });
 
   it('should show no workspaces', () => {
     const msg: HTMLDivElement = fixture.debugElement.query(
@@ -154,35 +151,32 @@ describe('WorkspacesListComponent', () => {
     ).toEqual('WKS0');
   });
 
-  it(
-    'should fetch clicked workspace',
-    async(() => {
-      component.workspaces = {
-        ...workspacesTableFactory() as IWorkspacesCommon,
-        list: [
-          {
-            id: '1',
-            name: 'WKS1',
-            users: [{ id: 'admin', name: 'Admin' }],
-          },
-        ],
-      };
-      fixture.detectChanges();
+  it('should fetch clicked workspace', () => {
+    component.workspaces = {
+      ...workspacesTableFactory() as IWorkspacesCommon,
+      list: [
+        {
+          id: '1',
+          name: 'WKS1',
+          users: [{ id: 'admin', name: 'Admin' }],
+        },
+      ],
+    };
+    fixture.detectChanges();
 
-      expect(
-        elementText(
-          fixture.debugElement.query(By.css('.workspace-list label'))
-            .nativeElement
-        ).trim()
-      ).toEqual('1 Workspace');
+    expect(
+      elementText(
+        fixture.debugElement.query(By.css('.workspace-list label'))
+          .nativeElement
+      ).trim()
+    ).toEqual('1 Workspace');
 
-      click(
-        fixture.debugElement.query(By.css('div.card-workspace')).nativeElement
-      );
-      fixture.detectChanges();
-      expect(component.fetched.id).toEqual('1');
-    })
-  );
+    click(
+      fixture.debugElement.query(By.css('div.card-workspace')).nativeElement
+    );
+    fixture.detectChanges();
+    expect(component.fetched.id).toEqual('1');
+  });
 });
 
 @Component({

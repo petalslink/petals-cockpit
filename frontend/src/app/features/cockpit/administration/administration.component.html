@@ -60,8 +60,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </md-expansion-panel-header>
 
               <app-add-edit-user #addEditUser
-                (submit)="onAdd($event); el.close()"
-                (cancel)="el.close()">
+                (onSubmit)="onAdd($event); el.close()"
+                (onCancel)="el.close()">
               </app-add-edit-user>
 
             </md-expansion-panel>
@@ -81,11 +81,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </md-expansion-panel-header>
 
                 <app-add-edit-user #addEditUser
-                  [canDelete]="user.id !== currentUser.id"
+                  [canDelete]="user.id !== currentUser.id && !user.isDeleting"
                   [user]="user"
-                  (submit)="onSave(user.id, $event); el.close()"
-                  (delete)="onDelete(user.id, $event); el.close()"
-                  (cancel)="el.close()">
+                  (onSubmit)="onSave(user.id, $event); el.close()"
+                  (onDelete)="onDelete(user.id); el.close()"
+                  (onCancel)="el.close()">
                 </app-add-edit-user>
 
               </md-expansion-panel>

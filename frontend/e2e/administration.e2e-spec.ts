@@ -45,27 +45,6 @@ describe(`Administration`, () => {
       ]);
     });
 
-    it(`should open add user`, () => {
-      const add = admin.openAddUser();
-
-      expect(add.usernameInput.getAttribute('value')).toEqual(``);
-      expect(add.nameInput.getAttribute('value')).toEqual(``);
-      expect(add.passwordInput.getAttribute('value')).toEqual(``);
-
-      expect(add.addButton.isEnabled()).toBe(false);
-      expect(add.cancelButton.isEnabled()).toBe(true);
-      expect(add.deleteButton.isPresent()).toBe(false);
-
-      add.usernameInput.sendKeys('a');
-      expect(add.addButton.isEnabled()).toBe(false);
-      add.nameInput.sendKeys('a');
-      expect(add.addButton.isEnabled()).toBe(false);
-      add.passwordInput.sendKeys('a');
-      expect(add.addButton.isEnabled()).toBe(true);
-      clearInput(add.passwordInput);
-      expect(add.addButton.isEnabled()).toBe(false);
-    });
-
     it('should open edit user', () => {
       let editVnoel = admin.openEditUser('vnoel');
 
