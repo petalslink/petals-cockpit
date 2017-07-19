@@ -93,4 +93,8 @@ export class WorkspacesListComponent implements OnInit {
       .map(user => user.name)
       .join(', ');
   }
+
+  trackByWorkspace(i: number, workspace: IWorkspace) {
+    return workspace.id;
+  }
 }

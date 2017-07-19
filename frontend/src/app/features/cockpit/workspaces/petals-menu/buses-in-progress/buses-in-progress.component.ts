@@ -45,4 +45,8 @@ export class BusesInProgressComponent implements OnInit {
   closeSidenavOnSmallScreen() {
     this.store$.dispatch(new Ui.CloseSidenavOnSmallScreen());
   }
+
+  trackByBusInProgress(i: number, busInProgress: IBusInProgress) {
+    return busInProgress.id;
+  }
 }

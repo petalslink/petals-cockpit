@@ -69,7 +69,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
           <div fxFlex [ngClass.gt-md]="'card-auto-size'" class="pnl-list-users margin-top-x1">
             <md-accordion displayMode="default" [multi]="false">
-              <md-expansion-panel #el [hideToggle]="false" fxLayout="column" *ngFor="let user of users" [class]="'exp-pnl-user-'+user.id" (closed)="addEditUser.reset()">
+              <md-expansion-panel #el [hideToggle]="false" fxLayout="column" *ngFor="let user of users; trackBy:trackByUser" [class]="'exp-pnl-user-'+user.id" (closed)="addEditUser.reset()">
 
                 <md-expansion-panel-header class="mat-body" fxLayout="row">
                   <mat-panel-title fxLayout="row" fxLayoutAlign="star center">

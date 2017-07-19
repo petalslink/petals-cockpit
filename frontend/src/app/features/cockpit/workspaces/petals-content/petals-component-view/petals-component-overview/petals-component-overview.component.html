@@ -53,7 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </md-card-content>
 
         <md-nav-list dense fxLayout="column" class="padding-top-x1">
-          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let sl of component.sharedLibraries">
+          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let sl of component.sharedLibraries; trackBy:trackBySl">
             <a md-raised-button [routerLink]="['/workspaces', workspaceId, 'petals', 'shared-libraries', sl.id]"
               class="shared-library">
               <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">

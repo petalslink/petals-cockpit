@@ -23,6 +23,7 @@ import {
 } from '@angular/core';
 
 import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
+import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 
 @Component({
   selector: 'app-petals-component-overview',
@@ -37,4 +38,8 @@ export class PetalsComponentOverviewComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {}
+
+  trackBySl(i: number, sl: ISharedLibraryRow) {
+    return sl.id;
+  }
 }

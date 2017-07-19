@@ -23,7 +23,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { Ui } from 'app/shared/state/ui.actions';
 import { IStore } from 'app/shared/state/store.interface';
-import { ICurrentUser, IUserRow } from 'app/shared/state/users.interface';
+import { ICurrentUser, IUser } from 'app/shared/state/users.interface';
 import { getAllUsers, getCurrentUser } from 'app/shared/state/users.selectors';
 import { Users } from 'app/shared/state/users.actions';
 
@@ -37,7 +37,7 @@ import { IUserNew } from 'app/shared/services/users.service';
 export class AdministrationComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  users$: Observable<IUserRow[]>;
+  users$: Observable<IUser[]>;
   user$: Observable<ICurrentUser>;
   isFetchingUsers$: Observable<boolean>;
 
@@ -54,7 +54,9 @@ export class AdministrationComponent implements OnInit, OnDestroy {
     this.users$ = this.store$
       .let(getAllUsers)
       .map(users => users.sort((u1, u2) => u1.id.localeCompare(u2.id)));
+
     this.user$ = this.store$.let(getCurrentUser());
+
     this.isFetchingUsers$ = this.store$.select(
       state => state.users.isFetchingUsers
     );
@@ -81,5 +83,9 @@ export class AdministrationComponent implements OnInit, OnDestroy {
 
   onDelete(id: string) {
     this.store$.dispatch(new Users.Delete({ id }));
+  }
+
+  trackByUser(i: number, user: IUser) {
+    return user.id;
   }
 }

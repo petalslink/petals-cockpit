@@ -148,7 +148,7 @@ describe(`Administration`, () => {
       editVnoel.nameInput.sendKeys(`Victor NONO`);
       editVnoel.saveButton.click();
 
-      expect(editVnoel.component.isDisplayed()).toBe(false);
+      browser.wait(EC.invisibilityOf(editVnoel.component), waitTimeout);
 
       expect(
         getMultipleElementsTexts(admin.panelListUsers, '.user-id', '.user-name')

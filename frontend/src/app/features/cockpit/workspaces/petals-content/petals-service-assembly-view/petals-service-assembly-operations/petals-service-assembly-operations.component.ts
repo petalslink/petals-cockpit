@@ -47,7 +47,7 @@ export class PetalsServiceAssemblyOperationsComponent implements OnInit {
     return stateNameToPossibleActionsServiceAssembly(state);
   }
 
-  saState(index: number, item: any) {
+  trackBySaState(index: number, item: any) {
     return item.newStateAction;
   }
 

@@ -45,7 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </div>
 
         <md-card-content fxLayoutWrap fxLayout="row" class="margin-top-x1" *ngIf="component.state">
-          <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:componentState" class="color-primary padding-bottom-x1">
+          <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:trackByComponentState" class="color-primary padding-bottom-x1">
             <button
               class="text-upper margin-right-x1"
               md-raised-button

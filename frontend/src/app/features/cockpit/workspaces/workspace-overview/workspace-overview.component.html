@@ -121,7 +121,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </form>
 
               <md-list *ngIf="currentUserId$ | async as currentUserId">
-                <md-list-item *ngFor="let user of users">
+                <md-list-item *ngFor="let user of users; trackBy:trackByUser">
                   <app-generate-icon md-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
 
                   <h2 md-line class="user-id">{{ user.id }}</h2>
