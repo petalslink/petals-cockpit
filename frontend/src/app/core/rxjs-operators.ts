@@ -22,6 +22,7 @@ import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/from';
+import 'rxjs/add/observable/fromEvent';
 
 // operators
 import 'rxjs/add/operator/catch';
@@ -39,3 +40,6 @@ import 'rxjs/add/operator/materialize';
 import 'rxjs/add/operator/dematerialize';
 import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/operator/finally';
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/startWith';
