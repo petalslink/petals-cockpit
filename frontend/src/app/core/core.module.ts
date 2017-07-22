@@ -15,56 +15,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
+import { NgModule, ModuleWithProviders } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule, Actions } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import './rxjs-operators';
-import { environment } from '../../environments/environment';
-import { getRootReducer } from '../shared/state/root.reducer';
-import { WorkspacesEffects } from '../features/cockpit/workspaces/state/workspaces/workspaces.effects';
-import { BusesInProgressEffects } from './../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.effects';
-import { UsersEffects } from '../shared/state/users.effects';
-import { UiEffects } from '../shared/state/ui.effects';
-import { BusesEffects } from './../features/cockpit/workspaces/state/buses/buses.effects';
-import { ContainersEffects } from './../features/cockpit/workspaces/state/containers/containers.effects';
-import { ComponentsEffects } from './../features/cockpit/workspaces/state/components/components.effects';
-import { ServiceUnitsEffects } from './../features/cockpit/workspaces/state/service-units/service-units.effects';
-import { SseService, SseServiceImpl } from '../shared/services/sse.service';
-import { SseServiceMock } from '../shared/services/sse.service.mock';
+import { environment } from 'environments/environment';
+import { getRootReducer } from 'app/shared/state/root.reducer';
+import { WorkspacesEffects } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.effects';
+import { BusesInProgressEffects } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.effects';
+import { UsersEffects } from 'app/shared/state/users.effects';
+import { UiEffects } from 'app/shared/state/ui.effects';
+import { BusesEffects } from 'app/features/cockpit/workspaces/state/buses/buses.effects';
+import { ContainersEffects } from 'app/features/cockpit/workspaces/state/containers/containers.effects';
+import { ComponentsEffects } from 'app/features/cockpit/workspaces/state/components/components.effects';
+import { ServiceUnitsEffects } from 'app/features/cockpit/workspaces/state/service-units/service-units.effects';
+import { SseService, SseServiceImpl } from 'app/shared/services/sse.service';
+import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import {
   WorkspacesService,
   WorkspacesServiceImpl,
-} from '../shared/services/workspaces.service';
-import { WorkspacesServiceMock } from '../shared/services/workspaces.service.mock';
-import { UsersServiceMock } from '../shared/services/users.service.mock';
+} from 'app/shared/services/workspaces.service';
+import { WorkspacesServiceMock } from 'app/shared/services/workspaces.service.mock';
+import { UsersServiceMock } from 'app/shared/services/users.service.mock';
 import {
   UsersService,
   UsersServiceImpl,
-} from '../shared/services/users.service';
-import { GuardLoginService } from '../shared/services/guard-login.service';
+} from 'app/shared/services/users.service';
+import { GuardLoginService } from 'app/shared/services/guard-login.service';
 import {
   BusesService,
   BusesServiceImpl,
-} from '../shared/services/buses.service';
-import { BusesServiceMock } from '../shared/services/buses.service.mock';
+} from 'app/shared/services/buses.service';
+import { BusesServiceMock } from 'app/shared/services/buses.service.mock';
 import {
   ContainersService,
   ContainersServiceImpl,
-} from './../shared/services/containers.service';
-import { ContainersServiceMock } from './../shared/services/containers.service.mock';
+} from 'app/shared/services/containers.service';
+import { ContainersServiceMock } from 'app/shared/services/containers.service.mock';
 import {
   ComponentsService,
   ComponentsServiceImpl,
-} from './../shared/services/components.service';
-import { ComponentsServiceMock } from './../shared/services/components.service.mock';
+} from 'app/shared/services/components.service';
+import { ComponentsServiceMock } from 'app/shared/services/components.service.mock';
 import {
   ServiceUnitsService,
   ServiceUnitsServiceImpl,
-} from './../shared/services/service-units.service';
-import { ServiceUnitsServiceMock } from './../shared/services/service-units.service.mock';
+} from 'app/shared/services/service-units.service';
+import { ServiceUnitsServiceMock } from 'app/shared/services/service-units.service.mock';
 import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
 import {
   ServiceAssembliesService,
@@ -155,6 +155,12 @@ export const providers = [
     StoreDevtoolsModule.instrumentOnlyWithExtension(),
     SimpleNotificationsModule.forRoot(),
   ],
-  providers,
 })
-export class CoreModule {}
+export class CoreModule {
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: CoreModule,
+      providers,
+    };
+  }
+}
