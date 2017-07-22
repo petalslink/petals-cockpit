@@ -30,4 +30,4 @@ export function bootstrapApp() {
 }
 
 // some lags are noticed at startup if no delay
-setTimeout(bootstrapApp, 100);
+setTimeout(bootstrapApp);

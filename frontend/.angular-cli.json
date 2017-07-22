@@ -66,6 +66,9 @@
   },
   "defaults": {
     "styleExt": "scss",
-    "component": {}
+    "component": {},
+    "build": {
+      "namedChunks": true
+    }
   }
 }
