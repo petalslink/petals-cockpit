@@ -22,7 +22,6 @@ import { Users } from 'app/shared/state/users.actions';
 
 export namespace UiReducer {
   type All =
-    | Ui.SetLanguage
     | Ui.OpenSidenav
     | Ui.CloseSidenav
     | Ui.ToggleSidenav
@@ -34,9 +33,6 @@ export namespace UiReducer {
 
   export function reducer(table = uiFactory(), action: All): IUi {
     switch (action.type) {
-      case Ui.SetLanguageType: {
-        return setLanguage(table, action.payload);
-      }
       case Ui.OpenSidenavType: {
         return openSidenav(table);
       }
@@ -61,20 +57,12 @@ export namespace UiReducer {
       case Users.DisconnectedType: {
         return {
           ...uiFactory(),
-          language: table.language,
           screenSize: table.screenSize,
         };
       }
       default:
         return table;
     }
-  }
-
-  function setLanguage(ui: IUi, payload: { language: string }): IUi {
-    return {
-      ...ui,
-      language: payload.language,
-    };
   }
 
   function toggleSidenav(ui: IUi): IUi {

@@ -16,16 +16,12 @@
  */
 
 import { NgModule } from '@angular/core';
-import { Http } from '@angular/http';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule, Actions } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { TranslateModule, TranslateLoader } from 'ng2-translate';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import './rxjs-operators';
-import { createTranslateLoader } from '../shared/helpers/aot.helper';
-import { LANGUAGES } from './opaque-tokens';
 import { environment } from '../../environments/environment';
 import { getRootReducer } from '../shared/state/root.reducer';
 import { WorkspacesEffects } from '../features/cockpit/workspaces/state/workspaces/workspaces.effects';
@@ -86,11 +82,6 @@ import { ResourceByIdResolver } from 'app/shared/services/guard-resource-by-id.r
 import { WorkspaceResolver } from 'app/features/cockpit/workspaces/workspace-resolver';
 
 export const providers = [
-  {
-    provide: LANGUAGES,
-    // order matters : The first one will be used by default
-    useValue: ['en', 'fr'],
-  },
   GuardLoginService,
   WorkspaceResolver,
   ResourceByIdResolver,
@@ -162,11 +153,6 @@ export const providers = [
     EffectsModule.run(ServiceUnitsEffects),
     EffectsModule.run(SharedLibrariesEffects),
     StoreDevtoolsModule.instrumentOnlyWithExtension(),
-    TranslateModule.forRoot({
-      provide: TranslateLoader,
-      useFactory: createTranslateLoader,
-      deps: [Http],
-    }),
     SimpleNotificationsModule.forRoot(),
   ],
   providers,

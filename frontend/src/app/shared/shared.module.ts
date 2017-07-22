@@ -22,7 +22,6 @@ import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { StoreModule } from '@ngrx/store';
-import { TranslateModule } from 'ng2-translate';
 import { PrettyJsonModule } from 'angular2-prettyjson';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { NgObjectPipesModule } from 'ngx-pipes';
@@ -76,7 +75,6 @@ export const modules = [
   RouterModule,
   FlexLayoutModule,
   StoreModule,
-  TranslateModule,
   PrettyJsonModule,
   SimpleNotificationsModule,
   NgObjectPipesModule,

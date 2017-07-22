@@ -15,15 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ObservableMedia } from '@angular/flex-layout';
 import { MdIconRegistry } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
-import { TranslateService } from 'ng2-translate';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs/Subject';
 
-import { LANGUAGES } from './core/opaque-tokens';
 import { IStore } from './shared/state/store.interface';
 
 import { Ui } from 'app/shared/state/ui.actions';
@@ -46,8 +44,6 @@ export class AppComponent implements OnInit, OnDestroy {
   };
 
   constructor(
-    private translate: TranslateService,
-    @Inject(LANGUAGES) public languages: any,
     private store$: Store<IStore>,
     private media$: ObservableMedia,
     private mdIconRegistry: MdIconRegistry,
@@ -55,22 +51,6 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // default and fallback language
-    // if a translation isn't found in a language,
-    // it'll try to get it on the default language
-    // by default here, we take the first of the array
-    this.translate.setDefaultLang(this.languages[0]);
-    this.store$.dispatch(new Ui.SetLanguage({ language: this.languages[0] }));
-
-    // when the language changes in store,
-    // change it in translate provider
-    this.store$
-      .select(state => state.ui.language)
-      .filter(language => language !== '')
-      .takeUntil(this.onDestroy$)
-      .do(language => this.translate.use(language))
-      .subscribe();
-
     this.media$
       .asObservable()
       .map(change => change.mqAlias)

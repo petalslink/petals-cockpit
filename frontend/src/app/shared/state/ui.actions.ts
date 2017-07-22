@@ -18,12 +18,6 @@
 import { Action } from '@ngrx/store';
 
 export namespace Ui {
-  export const SetLanguageType = '[UI] Set language';
-  export class SetLanguage implements Action {
-    readonly type = SetLanguageType;
-    constructor(public readonly payload: { language: string }) {}
-  }
-
   export const OpenSidenavType = '[UI] Open sidenav';
   export class OpenSidenav implements Action {
     readonly type = OpenSidenavType;
