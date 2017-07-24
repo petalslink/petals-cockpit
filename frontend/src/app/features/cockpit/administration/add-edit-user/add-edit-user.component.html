@@ -47,12 +47,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </div>
     </div>
 
-    <md-action-row class="pnl-actions-user-management" fxLayoutAlign="end center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center">
-      <button md-raised-button type="button" class="btn-cancel-form margin-right-x1 text-upper" (click)="doCancel()">
+    <md-action-row class="pnl-actions-user-management"
+      fxLayoutAlign="end center"
+      fxLayoutAlign.md="center center"
+      fxLayoutAlign.sm="center center"
+      fxLayout.lt-md="column"
+      fxLayoutWrap
+      fxLayoutGap="10px">
+      <button md-raised-button type="button" class="btn-cancel-form text-upper" (click)="doCancel()">
         <md-icon color="primary">cancel</md-icon>
         <span class="cancel-name">Cancel</span>
       </button>
-      <button md-raised-button type="button" class="btn-delete-form margin-right-x1 text-upper" (click)="doDelete()" *ngIf="user" [disabled]="!canDelete">
+      <button md-raised-button type="button" class="btn-delete-form text-upper" (click)="doDelete()" *ngIf="user" [disabled]="!canDelete">
         <md-icon color="warn">delete</md-icon>
         <span class="delete-name">Delete</span>
       </button>

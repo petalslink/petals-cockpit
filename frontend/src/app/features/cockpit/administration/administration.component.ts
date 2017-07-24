@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -25,6 +25,7 @@ import { Ui } from 'app/shared/state/ui.actions';
 import { IStore } from 'app/shared/state/store.interface';
 import { ICurrentUser, IUser } from 'app/shared/state/users.interface';
 import { getAllUsers, getCurrentUser } from 'app/shared/state/users.selectors';
+import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { Users } from 'app/shared/state/users.actions';
 
 import { IUserNew } from 'app/shared/services/users.service';
@@ -40,6 +41,9 @@ export class AdministrationComponent implements OnInit, OnDestroy {
   users$: Observable<IUser[]>;
   user$: Observable<ICurrentUser>;
   isFetchingUsers$: Observable<boolean>;
+  isLargeScreen$: Observable<boolean>;
+
+  @Input() displayMode = 'flat';
 
   constructor(private store$: Store<IStore>) {}
 
@@ -66,6 +70,8 @@ export class AdministrationComponent implements OnInit, OnDestroy {
       .filter(u => u.isAdmin)
       .do(() => this.store$.dispatch(new Users.FetchAll()))
       .subscribe();
+
+    this.isLargeScreen$ = this.store$.let(isLargeScreen);
   }
 
   ngOnDestroy() {

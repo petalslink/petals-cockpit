@@ -68,14 +68,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </div>
 
           <div fxFlex [ngClass.gt-md]="'card-auto-size'" class="pnl-list-users margin-top-x1">
-            <md-accordion displayMode="default" [multi]="false">
+            <md-accordion [displayMode]="flat" [multi]="false">
               <md-expansion-panel #el [hideToggle]="false" fxLayout="column" *ngFor="let user of users; trackBy:trackByUser" [class]="'exp-pnl-user-'+user.id" (closed)="addEditUser.reset()">
 
                 <md-expansion-panel-header class="mat-body" fxLayout="row">
                   <mat-panel-title fxLayout="row" fxLayoutAlign="star center">
                     <app-generate-icon md-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
                     <span class="margin-left-x1 user-id">{{ user.id }}</span>
-                    <span class="margin-left-x1 light-bold user-name">({{ user.name }})</span>
+                    <span class="margin-left-x1 light-bold user-name" *ngIf="isLargeScreen$ | async">({{ user.name }})</span>
                     <md-spinner class="margin-left-x1" *ngIf="user.isAdding || user.isModifying"></md-spinner>
                   </mat-panel-title>
                 </md-expansion-panel-header>

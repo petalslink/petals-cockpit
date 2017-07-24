@@ -14,7 +14,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <md-sidenav-container fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">
-  <md-sidenav fxLayout="column" [class.mat-elevation-z6]="showShadow"
+  <md-sidenav fxLayout="column"
+              [class.mat-elevation-z6]="showShadow"
               *ngIf="workspace$ | async as workspace"
               [opened]="sidenavVisible$ | async"
               [mode]="sidenavMode$ | async"
