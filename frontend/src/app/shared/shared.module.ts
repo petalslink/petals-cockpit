@@ -15,14 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
+import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { StoreModule } from '@ngrx/store';
-import { TranslateModule } from 'ng2-translate';
 import { PrettyJsonModule } from 'angular2-prettyjson';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { NgObjectPipesModule } from 'ngx-pipes';
@@ -51,12 +50,8 @@ import { NotFound404Component } from './components/not-found-404/not-found-404.c
 import { StateLedComponent } from './components/state-led/state-led.component';
 
 export const MaterialModules = [
-  MdButtonModule,
-  MdCardModule,
   MdDialogModule,
   MdExpansionModule,
-  MdIconModule,
-  MdInputModule,
   MdListModule,
   MdProgressBarModule,
   MdProgressSpinnerModule,
@@ -68,19 +63,15 @@ export const MaterialModules = [
   MdAutocompleteModule,
 ];
 
-export const modules = [
+// used by the components in declarations below
+export const imports = [
   CommonModule,
-  ReactiveFormsModule,
-  FormsModule,
-  HttpModule,
-  RouterModule,
+  MdCardModule,
+  MdInputModule,
+  MdIconModule,
+  MdButtonModule,
   FlexLayoutModule,
-  StoreModule,
-  TranslateModule,
-  PrettyJsonModule,
-  SimpleNotificationsModule,
-  NgObjectPipesModule,
-  ...MaterialModules,
+  FormsModule,
 ];
 
 export const declarations = [
@@ -91,9 +82,29 @@ export const declarations = [
   StateLedComponent,
 ];
 
+export const exportss = [
+  ReactiveFormsModule,
+  HttpModule,
+  RouterModule,
+  StoreModule,
+  PrettyJsonModule,
+  SimpleNotificationsModule,
+  NgObjectPipesModule,
+  ...imports,
+  ...MaterialModules,
+  ...declarations,
+];
+
 @NgModule({
-  imports: modules,
-  exports: [...modules, ...declarations],
+  imports,
+  exports: exportss,
   declarations,
 })
-export class SharedModule {}
+export class SharedModule {
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: SharedModule,
+      providers: [],
+    };
+  }
+}

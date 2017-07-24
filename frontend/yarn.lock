@@ -3510,10 +3510,6 @@ negotiator@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.1.tgz#2b327184e8992101177b28563fb5e7102acd0ca9"
 
-ng2-translate@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/ng2-translate/-/ng2-translate-5.0.0.tgz#0adbb510eb5007a2d6ded5f5d26888c14760aca5"
-
 ng2-vis@0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/ng2-vis/-/ng2-vis-0.0.6.tgz#e541e9d7c728970002b53e6d505124821f2b952a"

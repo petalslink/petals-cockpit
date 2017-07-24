@@ -16,7 +16,6 @@
  */
 
 export interface IUi {
-  language: string;
   screenSize: string;
   // workspace
   isSidenavVisible: boolean;
@@ -30,7 +29,6 @@ export interface IUi {
 
 export function uiFactory(): IUi {
   return {
-    language: '',
     isSidenavVisible: true,
     screenSize: '',
     isPopupListWorkspacesVisible: false,

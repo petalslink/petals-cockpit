@@ -30,8 +30,8 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    CoreModule,
-    SharedModule,
+    CoreModule.forRoot(),
+    SharedModule.forRoot(),
     AppRoutingModule,
   ],
   bootstrap: [AppComponent],
