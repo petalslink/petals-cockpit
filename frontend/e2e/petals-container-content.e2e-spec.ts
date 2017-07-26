@@ -199,10 +199,10 @@ describe(`Petals container content`, () => {
         ops.lifecycleCard.$('.component-parameters span').getText()
       ).toEqual('Install parameters');
       expect(ops.parameters.$$('input').count()).toBe(2);
-      expect(ops.parameter('http-port').getAttribute('value')).toEqual('8080');
       expect(ops.parameter('enable-https').getAttribute('value')).toEqual(
         'false'
       );
+      expect(ops.parameter('http-port').getAttribute('value')).toEqual('8080');
 
       expect(ops.installButton.isEnabled()).toBe(true);
       expect(ops.unloadButton.isEnabled()).toBe(true);

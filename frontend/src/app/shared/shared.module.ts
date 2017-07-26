@@ -41,9 +41,8 @@ import { RouterModule } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { PrettyJsonModule } from 'angular2-prettyjson';
-import { NgObjectPipesModule } from 'ngx-pipes';
-
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
+import { NgArrayPipesModule, NgObjectPipesModule } from 'ngx-pipes';
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { NotFound404Component } from './components/not-found-404/not-found-404.component';
 import { StateLedComponent } from './components/state-led/state-led.component';
@@ -90,6 +89,7 @@ export const exportss = [
   PrettyJsonModule,
   SimpleNotificationsModule,
   NgObjectPipesModule,
+  NgArrayPipesModule,
   ...imports,
   ...MaterialModules,
   ...declarations,

@@ -102,8 +102,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
               <md-divider></md-divider>
 
-              <form [formGroup]="addUserFormGroup" (ngSubmit)="addUser()">
-                <md-input-container>
+              <form [formGroup]="addUserFormGroup" (ngSubmit)="addUser()" class="margin-top-x1">
+                <md-input-container class="margin-right-x1">
                   <input
                     mdInput
                     placeholder="User to add"
@@ -117,7 +117,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   </md-option>
                 </md-autocomplete>
 
-                <button md-button type="submit" [disabled]="!addUserFormGroup.valid || workspace.isAddingUserToWorkspace">Add</button>
+                <button md-raised-button type="submit" class="text-upper" color="accent" [disabled]="!addUserFormGroup.valid || workspace.isAddingUserToWorkspace">Add</button>
               </form>
 
               <md-list *ngIf="currentUserId$ | async as currentUserId">

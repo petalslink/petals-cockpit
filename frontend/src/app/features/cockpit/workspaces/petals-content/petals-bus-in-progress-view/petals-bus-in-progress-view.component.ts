@@ -59,14 +59,14 @@ export class PetalsBusInProgressViewComponent
 
   @ViewChild('ipInput') ipInput: MdInputContainer;
 
-  public busesInProgressTable$: Observable<IBusesInProgressTable>;
-  public busInProgress$: Observable<IBusInProgressRow>;
+  busesInProgressTable$: Observable<IBusesInProgressTable>;
+  busInProgress$: Observable<IBusInProgressRow>;
   // needed because it is so much easier to use that than an async object in the html
-  public busInProgress: IBusInProgressRow;
+  busInProgress: IBusInProgressRow;
 
-  public busImportForm: FormGroup;
+  busImportForm: FormGroup;
 
-  public formErrors = {
+  formErrors = {
     ip: '',
     port: '',
     username: '',
