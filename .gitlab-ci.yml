@@ -114,7 +114,7 @@ build-frontend:
   script:
     - cd frontend
     # build the final frontend for the product
-    - time yarn run build:product:ci && mv dist ../frontend-dist
+    - time yarn run build:product:ci && yarn run postbuild && mv dist ../frontend-dist
   artifacts:
     expire_in: 1 week
     paths:
@@ -129,7 +129,7 @@ build-frontend-pages:
   script:
     - cd frontend
     # build the demo for the gitlab pages
-    - time yarn run build:demo:ci && mv dist ../frontend-demo || true # this can fail
+    - time yarn run build:demo:ci && yarn run postbuild && mv dist ../frontend-demo || true # this can fail
   artifacts:
     expire_in: 1 day
     paths:
