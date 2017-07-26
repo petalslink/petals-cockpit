@@ -23,12 +23,19 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  NgForm,
+  Validators,
+} from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { IStore } from '../../../../../../shared/state/store.interface';
 
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
+import { formErrorStateMatcher } from 'app/shared/helpers/form.helper';
 import {
   ComponentState,
   EComponentState,
@@ -72,6 +79,13 @@ export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
         {}
       )
     );
+  }
+
+  createFormErrorStateMatcher(
+    control: FormControl,
+    formToCheck: FormGroupDirective | NgForm
+  ): boolean {
+    return formErrorStateMatcher(control, formToCheck);
   }
 
   getPossibleStateActions(state: ComponentState) {

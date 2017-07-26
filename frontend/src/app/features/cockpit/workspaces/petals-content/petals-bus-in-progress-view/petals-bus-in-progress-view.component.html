@@ -42,7 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                    See: https://github.com/angular/flex-layout/issues/235 -->
               <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
                 <md-input-container #ipInput fxFill>
-                  <input mdInput placeholder="IP or hostname" formControlName="ip" required>
+                  <input type="text" mdInput placeholder="IP or hostname" formControlName="ip" required [errorStateMatcher]="createFormErrorStateMatcher">
                   <span mdPrefix><md-icon color="primary">star_half</md-icon></span>
                   <md-error *ngIf="formErrors.ip">
                     {{ formErrors.ip }}
@@ -52,7 +52,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
               <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
                 <md-input-container fxFill>
-                  <input mdInput placeholder="Port" formControlName="port" required>
+                  <input type="text" mdInput placeholder="Port" formControlName="port" required [errorStateMatcher]="createFormErrorStateMatcher">
                   <span mdPrefix><md-icon color="primary">settings_ethernet</md-icon></span>
                   <md-error *ngIf="formErrors.port">
                     {{ formErrors.port }}
@@ -62,7 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
               <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
                 <md-input-container fxFill>
-                  <input mdInput placeholder="Username" formControlName="username" required>
+                  <input type="text" mdInput placeholder="Username" formControlName="username" required [errorStateMatcher]="createFormErrorStateMatcher">
                   <span mdPrefix><md-icon color="primary">person</md-icon></span>
                   <md-error *ngIf="formErrors.username">
                     {{ formErrors.username }}
@@ -72,7 +72,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
               <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
                 <md-input-container fxFill>
-                  <input mdInput type="password" placeholder="Password" formControlName="password" required>
+                  <input type="password" mdInput placeholder="Password" formControlName="password" required [errorStateMatcher]="createFormErrorStateMatcher">
                   <span mdPrefix><md-icon color="primary">vpn_key</md-icon></span>
                   <md-error *ngIf="formErrors.password">
                     {{ formErrors.password }}
@@ -82,7 +82,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
               <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
                 <md-input-container fxFill>
-                  <input mdInput type="password" placeholder="Topology passphrase" formControlName="passphrase" required>
+                  <input type="password" mdInput placeholder="Topology passphrase" formControlName="passphrase" required [errorStateMatcher]="createFormErrorStateMatcher">
                   <span mdPrefix><md-icon color="primary">security</md-icon></span>
                   <md-error *ngIf="formErrors.passphrase">
                     {{ formErrors.passphrase }}

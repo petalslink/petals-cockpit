@@ -15,7 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { FormGroup } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  NgForm,
+} from '@angular/forms';
 
 export const validationMessages = {
   ip: {
@@ -86,4 +91,12 @@ export function _enableOrDisableAllFormFields(
       }
     }
   }
+}
+
+export function formErrorStateMatcher(
+  control: FormControl,
+  formToCheck: FormGroupDirective | NgForm
+): boolean {
+  const isSubmitted = formToCheck && formToCheck.submitted;
+  return !!(control.invalid && (control.dirty || isSubmitted));
 }

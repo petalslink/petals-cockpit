@@ -23,7 +23,14 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  NgForm,
+  Validators,
+} from '@angular/forms';
 import { MdInputContainer } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -39,6 +46,7 @@ import {
 import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
 import {
   disableAllFormFields,
+  formErrorStateMatcher,
   getFormErrors,
 } from './../../../../../shared/helpers/form.helper';
 import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
@@ -144,6 +152,13 @@ export class PetalsBusInProgressViewComponent
         this.formErrors = getFormErrors(this.busImportForm, this.formErrors);
       })
       .subscribe();
+  }
+
+  createFormErrorStateMatcher(
+    control: FormControl,
+    formToCheck: FormGroupDirective | NgForm
+  ): boolean {
+    return formErrorStateMatcher(control, formToCheck);
   }
 
   ngAfterViewInit() {

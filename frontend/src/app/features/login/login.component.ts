@@ -23,7 +23,14 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  NgForm,
+  Validators,
+} from '@angular/forms';
 import { MdInputContainer } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -32,6 +39,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../shared/state/store.interface';
 
+import { formErrorStateMatcher } from 'app/shared/helpers/form.helper';
 import { IUserLogin } from 'app/shared/services/users.service';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { Users } from 'app/shared/state/users.actions';
@@ -77,6 +85,13 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       })
       .subscribe();
+  }
+
+  createFormErrorStateMatcher(
+    control: FormControl,
+    formToCheck: FormGroupDirective | NgForm
+  ): boolean {
+    return formErrorStateMatcher(control, formToCheck);
   }
 
   ngOnDestroy() {
