@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <input #deploy class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="disabled">
 
       <md-input-container fxFlex *ngIf="fileToDeploy && placeholderChangeFileName" class="change-file-input">
-        <input mdInput type="text" [(ngModel)]="changeFileName" name="changeFileName" [placeholder]="placeholderChangeFileName" [disabled]="changeFileName?.trim().length === 0 || disabled">
+        <input mdInput type="text" [(ngModel)]="changeFileName" name="changeFileName" [placeholder]="placeholderChangeFileName" [disabled]="disabled">
       </md-input-container>
 
       <div class="color-primary">
