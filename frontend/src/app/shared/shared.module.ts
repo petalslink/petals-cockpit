@@ -45,8 +45,8 @@ import { NgObjectPipesModule } from 'ngx-pipes';
 
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
+import { LedComponent } from './components/led/led.component';
 import { NotFound404Component } from './components/not-found-404/not-found-404.component';
-import { StateLedComponent } from './components/state-led/state-led.component';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
 
 export const MaterialModules = [
@@ -79,7 +79,7 @@ export const declarations = [
   ColorSearchedLettersDirective,
   UploadComponent,
   NotFound404Component,
-  StateLedComponent,
+  LedComponent,
 ];
 
 export const exportss = [

@@ -22,12 +22,12 @@ import {
   OnInit,
 } from '@angular/core';
 
-import { Led } from 'app/shared/components/state-led/state-led.interface';
+import { Led } from 'app/shared/components/led/led.interface';
 
 @Component({
-  selector: 'app-state-led',
-  templateUrl: './state-led.component.html',
-  styleUrls: ['./state-led.component.scss'],
+  selector: 'app-led',
+  templateUrl: './led.component.html',
+  styleUrls: ['./led.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LedComponent {
