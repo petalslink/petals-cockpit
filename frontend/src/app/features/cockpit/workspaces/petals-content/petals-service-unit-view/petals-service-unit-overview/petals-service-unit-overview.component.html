@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <md-card-title>State</md-card-title>
             <md-card-subtitle class="sa-state" fxLayoutAlign="start center">
               {{ serviceUnit.serviceAssembly.state }}
-              <app-state-led [state]="serviceUnit.serviceAssembly.state"></app-state-led>
+              <app-led [color]="getLedColorFromState(serviceUnit.serviceAssembly.state)" class="margin-left-x1"></app-led>
             </md-card-subtitle>
           </md-card-header>
         </div>

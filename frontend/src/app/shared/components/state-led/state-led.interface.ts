@@ -15,38 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// all types of leds
-@mixin led($bg, $shadow1, $shadow2) {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: $bg;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 3px 1px, inset $shadow1 0 -1px 3px,
-    $shadow2 0 1px 3px;
+export enum ELed {
+  GREEN = 'GREEN',
+  RED = 'RED',
+  YELLOW = 'YELLOW',
+  GREY = 'GREY',
+  BLACK = 'BLACK',
+  WHITE = 'WHITE',
 }
 
-.led {
-  &.green {
-    @include led(#ABFF00, #304701, #89FF00);
-  }
-
-  &.red {
-    @include led(#F00, #441313, rgba(255, 0, 0, 0.5));
-  }
-
-  &.yellow {
-    @include led(#FF0, #808002, #FF0);
-  }
-
-  &.grey {
-    @include led(#DDD, #444, #DDD);
-  }
-
-  &.black {
-    @include led(#000000, #DDD, #DDD);
-  }
-
-  &.white {
-    @include led(#DDD, #DDD, #000000);
-  }
-}
+export type Led = keyof typeof ELed;

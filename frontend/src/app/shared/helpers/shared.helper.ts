@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { ComponentState } from 'app/shared/services/components.service';
+import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
+import { ESharedLibraryState } from 'app/shared/services/shared-libraries.service';
+
 const matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
 
 export function escapeStringRegexp(str: string) {
@@ -39,3 +43,28 @@ export function arrayEquals<T>(ps: T[], ns: T[]): boolean {
 export function isNot(e: object): (object: any) => boolean {
   return e2 => e !== e2;
 }
+
+export const stateToLedColor = (
+  state: ComponentState | EServiceAssemblyState | ESharedLibraryState
+) => {
+  switch (state) {
+    case 'Started': {
+      return 'green';
+    }
+    case 'Loaded': {
+      return 'grey';
+    }
+    case 'Shutdown': {
+      return 'red';
+    }
+    case 'Stopped': {
+      return 'yellow';
+    }
+    case 'Unknown': {
+      return 'black';
+    }
+    case 'Unloaded': {
+      return 'white';
+    }
+  }
+};

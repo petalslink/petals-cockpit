@@ -22,16 +22,14 @@ import {
   OnInit,
 } from '@angular/core';
 
+import { Led } from 'app/shared/components/state-led/state-led.interface';
+
 @Component({
   selector: 'app-state-led',
   templateUrl: './state-led.component.html',
   styleUrls: ['./state-led.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StateLedComponent implements OnInit {
-  @Input() state: string;
-
-  constructor() {}
-
-  ngOnInit() {}
+export class LedComponent {
+  @Input() color: Led;
 }

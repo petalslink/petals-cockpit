@@ -23,8 +23,8 @@ import { environment } from './../../../environments/environment';
 
 export enum ESharedLibraryState {
   Loaded = 'Loaded',
-  Unloaded =  'Unloaded',
-};
+  Unloaded = 'Unloaded',
+}
 
 export type SharedLibraryState = keyof typeof ESharedLibraryState;
 

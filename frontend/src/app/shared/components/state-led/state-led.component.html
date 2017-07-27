@@ -13,8 +13,4 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div class="margin-left-x1"
-  [class.green-led]="state === 'Started'"
-  [class.yellow-led]="state === 'Stopped'"
-  [class.red-led]="state === 'Shutdown'"
-  [class.grey-led]="state === 'Loaded'"></div>
+<div class="led" [ngClass]="color"></div>

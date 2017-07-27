@@ -24,6 +24,8 @@ import {
 
 import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
+import { stateToLedColor } from 'app/shared/helpers/shared.helper';
+import { ComponentState } from 'app/shared/services/components.service';
 
 @Component({
   selector: 'app-petals-component-overview',
@@ -41,5 +43,9 @@ export class PetalsComponentOverviewComponent implements OnInit {
 
   trackBySl(i: number, sl: ISharedLibraryRow) {
     return sl.id;
+  }
+
+  getLedColorFromState(state: ComponentState) {
+    return stateToLedColor(state);
   }
 }
