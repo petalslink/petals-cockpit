@@ -16,24 +16,29 @@
  */
 
 import { Store } from '@ngrx/store';
+import { createSelector } from 'reselect';
 import { Observable } from 'rxjs/Observable';
 
 import { isNot } from '../helpers/shared.helper';
 import { IStore } from './store.interface';
 import { ICurrentUser, IUserRow } from './users.interface';
 
-export function _getCurrentUser(
+export const getUsers = (state: IStore) => state.users;
+
+export const getConnectedUser = (state: IStore) => state.users.connectedUser;
+
+export const getUsersAllIds = (state: IStore) => state.users.allIds;
+
+export const getUsersById = (state: IStore) => state.users.byId;
+
+export const getAllUsers = createSelector(
+  getUsersAllIds,
+  getUsersById,
+  (ids, byId) => ids.map(id => byId[id])
+);
+
+export const getCurrentUser = (
   store$: Store<IStore>
-): Observable<ICurrentUser> {
-  return store$.select(state => state.users.connectedUser).filter(isNot(null));
-}
-
-export function getCurrentUser() {
-  return _getCurrentUser;
-}
-
-export function getAllUsers(store$: Store<IStore>): Observable<IUserRow[]> {
-  return store$.select(state =>
-    state.users.allIds.map(id => state.users.byId[id])
-  );
-}
+): Observable<ICurrentUser> => {
+  return store$.select(getConnectedUser).filter(isNot(null));
+};

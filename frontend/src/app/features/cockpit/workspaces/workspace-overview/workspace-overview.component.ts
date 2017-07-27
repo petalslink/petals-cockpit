@@ -87,9 +87,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       ],
     });
 
-    this.currentUserId$ = this.store$
-      .let(getCurrentUser())
-      .map(user => user.id);
+    this.currentUserId$ = this.store$.let(getCurrentUser).map(user => user.id);
 
     this.workspace$ = this.store$
       .let(getCurrentWorkspace)

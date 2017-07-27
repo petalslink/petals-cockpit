@@ -25,20 +25,21 @@ import {
 } from 'app/shared/helpers/shared.helper';
 import { IStore } from 'app/shared/state/store.interface';
 import { IUserRow } from 'app/shared/state/users.interface';
+import { getUsersById } from 'app/shared/state/users.selectors';
 import { IWorkspaceRow, IWorkspaces } from './workspaces.interface';
 
 export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
   return store$
     .select(state => state.workspaces)
-    .withLatestFrom(store$.select(state => state.users))
-    .map(([workspaces, users]) => {
+    .withLatestFrom(store$.select(getUsersById))
+    .map(([workspaces, usersById]) => {
       return {
         ...workspaces,
         list: workspaces.allIds.map(wId => {
           const ws = workspaces.byId[wId];
           return {
             ...ws,
-            users: ws.users.map(id => users.byId[id]),
+            users: ws.users.map(id => usersById.byId[id]),
           };
         }),
       };

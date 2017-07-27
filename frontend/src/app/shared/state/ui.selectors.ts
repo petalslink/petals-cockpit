@@ -20,20 +20,18 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from './store.interface';
 
-export function isSmallScreen(store$: Store<IStore>): Observable<boolean> {
-  return isLargeScreen(store$).map(b => !b);
-}
+const _isLargeScreen = ss =>
+  ss === 'md' || ss === 'lg' || ss === 'gt-lg' || ss === 'xl' || ss === 'gt-md';
 
-export function isLargeScreen(store$: Store<IStore>): Observable<boolean> {
+const getScreenSize = (state: IStore) => state.ui.screenSize;
+
+export const isLargeScreen = (store$: Store<IStore>): Observable<boolean> => {
   return store$
-    .select(state => state.ui.screenSize)
-    .map(
-      ss =>
-        ss === 'md' ||
-        ss === 'lg' ||
-        ss === 'gt-lg' ||
-        ss === 'xl' ||
-        ss === 'gt-md'
-    )
+    .select(getScreenSize)
+    .map(_isLargeScreen)
     .distinctUntilChanged();
-}
+};
+
+export const isSmallScreen = (store$: Store<IStore>): Observable<boolean> => {
+  return isLargeScreen(store$).map(b => !b);
+};

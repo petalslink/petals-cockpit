@@ -35,6 +35,7 @@ import { IStore } from '../../shared/state/store.interface';
 import { IUserLogin } from 'app/shared/services/users.service';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { Users } from 'app/shared/state/users.actions';
+import { getUsers } from 'app/shared/state/users.selectors';
 import { IUsersTable } from '../../shared/state/users.interface';
 
 @Component({
@@ -58,7 +59,7 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    this.users$ = this.store$.select(state => state.users);
+    this.users$ = this.store$.select(getUsers);
 
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
