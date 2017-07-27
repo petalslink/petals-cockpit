@@ -22,14 +22,13 @@ import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
 
-// http://stackoverflow.com/a/41631732/2398593
-export const EServiceAssemblyState = {
-  Started: 'Started' as 'Started',
-  Stopped: 'Stopped' as 'Stopped',
-  Unloaded: 'Unloaded' as 'Unloaded',
-  Shutdown: 'Shutdown' as 'Shutdown',
-  Unknown: 'Unknown' as 'Unknown',
-};
+export enum EServiceAssemblyState {
+  Started = 'Started',
+  Stopped = 'Stopped',
+  Unloaded = 'Unloaded',
+  Shutdown = 'Shutdown',
+  Unknown = 'Unknown',
+}
 
 export type ServiceAssemblyState = keyof typeof EServiceAssemblyState;
 
