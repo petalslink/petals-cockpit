@@ -15,26 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Directive, ElementRef, Input, OnInit, Renderer } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnInit,
+  Renderer,
+  SimpleChanges,
+} from '@angular/core';
 
 import { escapeStringRegexp } from '../helpers/shared.helper';
 
 @Directive({
   selector: '[appColorSearchedLetters]',
 })
-export class ColorSearchedLettersDirective implements OnInit {
+export class ColorSearchedLettersDirective implements OnInit, OnChanges {
   @Input() search: string;
   @Input() text: string;
   @Input() classToApply: string;
 
   constructor(private el: ElementRef, private renderer: Renderer) {}
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ngOnChanges(changes: SimpleChanges): void {
     if (!this.classToApply) {
       this.classToApply = '';
     }
 
-    if (!this.search || !this.search.trim()) {
+    if (!this.search || !this.search.trim() || !this.classToApply) {
       this.renderer.setElementProperty(
         this.el.nativeElement,
         'innerHTML',
