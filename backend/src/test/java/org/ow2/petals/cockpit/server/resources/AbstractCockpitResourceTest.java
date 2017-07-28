@@ -89,8 +89,7 @@ import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitF
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.rules.CockpitResourceRule;
-import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations;
-import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.WorkspaceDbWitness;
+import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations.WorkspaceDbWitness;
 
 import com.google.common.collect.ImmutableList;
 
@@ -257,8 +256,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                 busDb.attach(conf);
                 busDb.insert();
 
-                WorkspaceDbOperations.saveDomainToDatabase(conf, busDb, bus, WorkspaceDbWitness.NOP,
-                        resource.new WDbWitness());
+                resource.new TestWorkspaceDbOperations().saveDomainToDatabase(conf, busDb, bus, WorkspaceDbWitness.NOP);
 
                 for (Container c : containers) {
                     c.addProperty("petals.topology.passphrase", passphrase);

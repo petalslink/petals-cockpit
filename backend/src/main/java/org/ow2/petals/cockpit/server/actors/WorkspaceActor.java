@@ -96,8 +96,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullCo
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
-import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations;
-import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.SaveWorkspaceDbWitness;
+import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,13 +135,13 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
     private final long wId;
 
     @Inject
-    protected PetalsAdmin petals;
+    private PetalsAdmin petals;
 
     @Inject
-    protected PetalsDb db;
+    private PetalsDb db;
 
     @Inject
-    protected SaveWorkspaceDbWitness wDbWitness;
+    private WorkspaceDbOperations workspaceDb;
 
     public WorkspaceActor(long wId) {
         this.wId = wId;
@@ -246,7 +245,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
             assert ws != null;
 
             WorkspaceContentBuilder c = WorkspaceContent.builder();
-            WorkspaceDbOperations.fetchWorkspaceFromDatabase(conf, ws, c);
+            workspaceDb.fetchWorkspaceFromDatabase(conf, ws, c);
 
             List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
                     .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wId)).fetchInto(USERS);
@@ -367,7 +366,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
                         return res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
                             WorkspaceContentBuilder b = WorkspaceContent.builder();
                             DSL.using(conf).transaction(
-                                    c -> WorkspaceDbOperations.saveDomainToDatabase(c, bDb, topology, b, wDbWitness));
+                                    c -> workspaceDb.saveDomainToDatabase(c, bDb, topology, b));
                             return Either.right(b.build());
                         }).fold(error -> {
                             LOG.info("Can't import bus from container {}:{}: {}", bDb.getImportIp(),
@@ -639,7 +638,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         int saDbi = saDb.insert();
         assert saDbi == 1;
 
-        wDbWitness.serviceAssemblyAdded(deployedSA, saDb);
+        workspaceDb.serviceAssemblyAdded(deployedSA, saDb);
 
         Map<String, ServiceUnitFull> serviceUnitsDb = new HashMap<>();
         for (ServiceUnit su : deployedSA.getServiceUnits()) {
@@ -688,7 +687,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         int compDbi = compDb.insert();
         assert compDbi == 1;
 
-        wDbWitness.componentAdded(deployedComp, compDb);
+        workspaceDb.componentAdded(deployedComp, compDb);
 
         Set<String> sls = new HashSet<>();
         for (SharedLibrary sl : deployedComp.getSharedLibraries()) {
@@ -735,7 +734,7 @@ public class WorkspaceActor extends BasicActor<Msg, @Nullable Void> {
         int slDbi = slDb.insert();
         assert slDbi == 1;
 
-        wDbWitness.sharedLibraryAdded(deployedSL, slDb);
+        workspaceDb.sharedLibraryAdded(deployedSL, slDb);
 
         WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                 ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),

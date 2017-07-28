@@ -82,8 +82,8 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContent
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.ArtifactServer.ServicedArtifact;
+import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
 import org.ow2.petals.cockpit.server.utils.PetalsUtils;
-import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations;
 import org.ow2.petals.jbi.descriptor.JBIDescriptorException;
 import org.ow2.petals.jbi.descriptor.original.JBIDescriptorBuilder;
 import org.ow2.petals.jbi.descriptor.original.generated.Jbi;
@@ -113,14 +113,17 @@ public class WorkspaceResource {
 
     private final ArtifactServer httpServer;
 
+    private final WorkspaceDbOperations workspaceDb;
+
     @Inject
     public WorkspaceResource(@NotNull @PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
-            CockpitActors as, Configuration jooq, ArtifactServer httpServer) {
+            CockpitActors as, Configuration jooq, ArtifactServer httpServer, WorkspaceDbOperations workspaceDb) {
         this.profile = profile;
         this.as = as;
         this.wsId = wsId;
         this.jooq = jooq;
         this.httpServer = httpServer;
+        this.workspaceDb = workspaceDb;
     }
 
     private void checkAccess(Configuration conf) {
@@ -188,8 +191,7 @@ public class WorkspaceResource {
             WorkspacesRecord ws = get(conf);
 
             WorkspaceContentBuilder c = WorkspaceContent.builder();
-
-            WorkspaceDbOperations.fetchWorkspaceFromDatabase(conf, ws, c);
+            workspaceDb.fetchWorkspaceFromDatabase(conf, ws, c);
 
             List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
                     .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)).fetchInto(USERS);

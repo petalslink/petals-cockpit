@@ -60,8 +60,8 @@ import org.ow2.petals.cockpit.server.resources.SetupResource;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
+import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
 import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
-import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.SaveWorkspaceDbWitness;
 import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule;
 import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
@@ -110,7 +110,7 @@ public class CockpitResourceRule implements TestRule {
                         bind(PetalsAdmin.class).to(PetalsAdmin.class).in(Singleton.class);
                         bind(PetalsDb.class).to(PetalsDb.class).in(Singleton.class);
                         bind(ADMIN_TOKEN).to(String.class).named(SetupResource.ADMIN_TOKEN);
-                        bind(new WDbWitness()).to(SaveWorkspaceDbWitness.class);
+                        bind(new TestWorkspaceDbOperations()).to(WorkspaceDbOperations.class);
                     }
                 }).setClientConfigurator(cc -> cc.register(MultiPartFeature.class));
         builder.addProvider(new PetalsAdminExceptionMapper(true));
@@ -170,8 +170,7 @@ public class CockpitResourceRule implements TestRule {
         return DSL.using(db.getConnectionJdbcUrl());
     }
 
-    public class WDbWitness implements SaveWorkspaceDbWitness {
-
+    public class TestWorkspaceDbOperations extends WorkspaceDbOperations {
         @Override
         public void busAdded(Domain bus, BusesRecord bDb) {
             setWorkspaceId(bus, bDb.getId());
@@ -201,6 +200,5 @@ public class CockpitResourceRule implements TestRule {
         public void serviceUnitAdded(ServiceUnit su, ServiceunitsRecord suDb) {
             setWorkspaceId(su, suDb.getId());
         }
-
     }
 }

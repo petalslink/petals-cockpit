@@ -40,9 +40,9 @@ import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitF
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
-import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.WorkspaceDbBusBuilder;
-import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.WorkspaceDbContainerBuilder;
-import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.WorkspaceDbWitness;
+import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations.WorkspaceDbBusBuilder;
+import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations.WorkspaceDbContainerBuilder;
+import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations.WorkspaceDbWitness;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
