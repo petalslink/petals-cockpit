@@ -111,7 +111,7 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe();
   }
 
-  onSubmit({ value }: { value: IUserLogin }) {
+  onSubmit(value: IUserLogin) {
     this.store$.dispatch(
       new Users.Connect({
         user: value,
