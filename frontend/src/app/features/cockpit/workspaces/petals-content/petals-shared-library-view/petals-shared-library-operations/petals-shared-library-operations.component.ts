@@ -16,10 +16,10 @@
  */
 
 import {
-  Component,
-  OnInit,
-  Input,
   ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
 } from '@angular/core';
 
 import { Store } from '@ngrx/store';
@@ -28,8 +28,8 @@ import { IStore } from 'app/shared/state/store.interface';
 
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 
-import { ESharedLibraryState } from 'app/shared/services/shared-libraries.service';
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
+import { ESharedLibraryState } from 'app/shared/services/shared-libraries.service';
 
 @Component({
   selector: 'app-petals-shared-library-operations',

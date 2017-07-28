@@ -16,11 +16,11 @@
  */
 
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 
-import { NotFound404Component } from 'app/shared/components/not-found-404/not-found-404.component';
-import { WorkspaceComponent } from 'app/features/cockpit/workspaces/workspace/workspace.component';
 import { WorkspaceOverviewComponent } from 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.component';
+import { WorkspaceComponent } from 'app/features/cockpit/workspaces/workspace/workspace.component';
+import { NotFound404Component } from 'app/shared/components/not-found-404/not-found-404.component';
 
 const routes: Routes = [
   {

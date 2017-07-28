@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { IBusesInProgressTable } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
+import { IBusesTable } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
+import { IComponentsTable } from 'app/features/cockpit/workspaces/state/components/components.interface';
+import { IContainersTable } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
+import { IServiceAssembliesTable } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
+import { IServiceUnitsTable } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+import { ISharedLibrariesTable } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
+import { IWorkspacesTable } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { IUi } from 'app/shared/state/ui.interface';
 import { IUsersTable } from './users.interface';
-import { IWorkspacesTable } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
-import { IBusesTable } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
-import { IBusesInProgressTable } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
-import { IContainersTable } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
-import { IComponentsTable } from 'app/features/cockpit/workspaces/state/components/components.interface';
-import { IServiceUnitsTable } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
-import { IServiceAssembliesTable } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
-import { ISharedLibrariesTable } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 
 export interface IStore {
   ui: IUi;

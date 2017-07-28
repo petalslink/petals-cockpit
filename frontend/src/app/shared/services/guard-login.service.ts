@@ -17,18 +17,18 @@
 
 import { Injectable } from '@angular/core';
 import {
-  Router,
-  CanActivate,
-  RouterStateSnapshot,
   ActivatedRouteSnapshot,
+  CanActivate,
+  Router,
+  RouterStateSnapshot,
 } from '@angular/router';
 
-import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 
-import { UsersService } from './users.service';
-import { environment } from './../../../environments/environment';
 import { IStore } from '../state/store.interface';
+import { environment } from './../../../environments/environment';
+import { UsersService } from './users.service';
 
 import { Users } from 'app/shared/state/users.actions';
 

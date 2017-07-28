@@ -22,8 +22,8 @@ import {
   GONE_SETUP_TOKEN,
 } from '../src/mocks/backend-mock';
 import { page } from './common';
-import { expectFocused, clearInput } from './utils';
 import { SetupPage } from './pages/setup.po';
+import { clearInput, expectFocused } from './utils';
 
 describe(`Setup`, () => {
   describe('No token', () => {

@@ -16,25 +16,25 @@
  */
 
 import {
-  IServiceUnitsTable,
-  serviceUnitsTableFactory,
-  serviceUnitRowFactory,
   IServiceUnitRow,
+  IServiceUnitsTable,
+  serviceUnitRowFactory,
+  serviceUnitsTableFactory,
 } from './service-units.interface';
 
-import {
-  putAll,
-  updateById,
-  removeById,
-  mergeOnly,
-  JsTable,
-} from 'app/shared/helpers/jstable.helper';
-import {
-  IServiceUnitBackendSSE,
-  IServiceUnitBackendDetails,
-} from 'app/shared/services/service-units.service';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import {
+  JsTable,
+  mergeOnly,
+  putAll,
+  removeById,
+  updateById,
+} from 'app/shared/helpers/jstable.helper';
+import {
+  IServiceUnitBackendDetails,
+  IServiceUnitBackendSSE,
+} from 'app/shared/services/service-units.service';
 
 export namespace ServiceUnitsReducer {
   type All =

@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $, by } from 'protractor';
+import { $, browser, by, ExpectedConditions as EC } from 'protractor';
 
-import { urlToMatch, waitAndClick } from '../utils';
 import { waitTimeout } from '../common';
+import { urlToMatch, waitAndClick } from '../utils';
 import { ComponentOverviewPage } from './component.po';
 
 export abstract class SharedLibraryPage {

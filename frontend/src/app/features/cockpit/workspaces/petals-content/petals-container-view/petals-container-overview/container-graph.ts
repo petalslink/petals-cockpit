@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { VisNetworkOptions, VisNodes, VisEdges } from 'ng2-vis';
+import { VisEdges, VisNetworkOptions, VisNodes } from 'ng2-vis';
 
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 import { IContainerWithSiblings } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';

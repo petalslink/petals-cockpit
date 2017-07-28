@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $ } from 'protractor';
+import { $, browser, ExpectedConditions as EC } from 'protractor';
 
-import { urlToMatch, Matcher, waitAndClick } from '../utils';
 import { waitTimeout } from '../common';
+import { Matcher, urlToMatch, waitAndClick } from '../utils';
 import { WorkspaceOverviewPage } from './workspace.po';
 
 export class WorkspacesPage {

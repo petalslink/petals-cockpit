@@ -19,8 +19,12 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
-import { componentsService } from 'mocks/components-mock';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import * as helper from 'app/shared/helpers/mock.helper';
+import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+import { environment } from 'environments/environment';
+import { componentsService } from 'mocks/components-mock';
 import {
   ComponentsServiceImpl,
   ComponentState,
@@ -28,10 +32,6 @@ import {
 } from './components.service';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
-import { environment } from 'environments/environment';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 
 @Injectable()
 export class ComponentsServiceMock extends ComponentsServiceImpl {

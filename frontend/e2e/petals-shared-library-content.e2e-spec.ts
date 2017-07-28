@@ -16,8 +16,8 @@
  */
 
 import { page } from './common';
-import { WorkspacePage, WorkspaceOverviewPage } from './pages/workspace.po';
 import { NotFoundPage } from './pages/not-found';
+import { WorkspaceOverviewPage, WorkspacePage } from './pages/workspace.po';
 import { waitAndClick } from './utils';
 
 describe(`Petals shared library content`, () => {

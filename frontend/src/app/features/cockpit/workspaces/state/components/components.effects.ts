@@ -18,23 +18,23 @@
 import { Injectable } from '@angular/core';
 
 import { Router } from '@angular/router';
+import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
-import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
+import { Observable } from 'rxjs/Observable';
 
 import { environment } from 'environments/environment';
 
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import {
   ComponentsService,
   ComponentState,
   EComponentState,
   IComponentBackendSSE,
 } from 'app/shared/services/components.service';
-import { IStore } from 'app/shared/state/store.interface';
 import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
+import { IStore } from 'app/shared/state/store.interface';
 
 @Injectable()
 export class ComponentsEffects {

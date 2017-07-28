@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Container } from './containers-mock';
-import { Component } from './components-mock';
 import {
-  ISharedLibraryBackendSSE,
   ISharedLibraryBackendDetails,
+  ISharedLibraryBackendSSE,
 } from 'app/shared/services/shared-libraries.service';
+import { Component } from './components-mock';
+import { Container } from './containers-mock';
 
 class SharedLibraries {
   private readonly sharedLibraries = new Map<string, SharedLibrary>();

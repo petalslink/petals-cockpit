@@ -19,20 +19,20 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
-import { environment } from 'environments/environment';
-import { ContainersServiceImpl } from './containers.service';
-import { containersService } from 'mocks/containers-mock';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import * as helper from 'app/shared/helpers/mock.helper';
-import { SseServiceMock } from 'app/shared/services/sse.service.mock';
-import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { IComponentBackendSSE } from 'app/shared/services/components.service';
 import {
   EServiceAssemblyState,
   IServiceAssemblyBackendSSE,
 } from 'app/shared/services/service-assemblies.service';
-import { IComponentBackendSSE } from 'app/shared/services/components.service';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
+import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { SseServiceMock } from 'app/shared/services/sse.service.mock';
+import { environment } from 'environments/environment';
+import { containersService } from 'mocks/containers-mock';
+import { ContainersServiceImpl } from './containers.service';
 
 @Injectable()
 export class ContainersServiceMock extends ContainersServiceImpl {

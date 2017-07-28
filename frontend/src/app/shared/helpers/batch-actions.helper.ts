@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Injectable, Inject } from '@angular/core';
-import { Action, Dispatcher, ActionReducer } from '@ngrx/store';
+import { Inject, Injectable } from '@angular/core';
+import { Actions } from '@ngrx/effects';
+import { Action, ActionReducer, Dispatcher } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { MergeMapOperator } from 'rxjs/operator/mergeMap';
-import { Actions } from '@ngrx/effects';
 
 export const BATCH = 'BATCHING_REDUCER.BATCH';
 

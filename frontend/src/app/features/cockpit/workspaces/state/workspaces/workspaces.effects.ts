@@ -17,45 +17,45 @@
 
 import { Injectable } from '@angular/core';
 
+import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
 import { NotificationsService } from 'angular2-notifications';
 
 import {
-  WorkspacesService,
   IWorkspaceBackend,
+  WorkspacesService,
 } from 'app/shared/services/workspaces.service';
 
 import { environment } from 'environments/environment';
 
-import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { batchActions } from 'app/shared/helpers/batch-actions.helper';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import {
-  IBusInProgressBackend,
   IBusBackendSSE,
+  IBusInProgressBackend,
 } from 'app/shared/services/buses.service';
 import { IComponentBackendSSE } from 'app/shared/services/components.service';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { IContainerBackendSSE } from 'app/shared/services/containers.service';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
+import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
 
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { IUserBackend } from 'app/shared/services/users.service';
 
-import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
-import { Users } from 'app/shared/state/users.actions';
-import { Ui } from 'app/shared/state/ui.actions';
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
 import { IStore } from 'app/shared/state/store.interface';
+import { Ui } from 'app/shared/state/ui.actions';
+import { Users } from 'app/shared/state/users.actions';
 
 @Injectable()
 export class WorkspacesEffects {

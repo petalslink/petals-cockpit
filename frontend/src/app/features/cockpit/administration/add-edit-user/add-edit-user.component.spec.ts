@@ -16,7 +16,7 @@
  */
 
 import { Component } from '@angular/core';
-import { TestBed, async, ComponentFixture } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AddEditUserComponent } from 'app/features/cockpit/administration/add-edit-user/add-edit-user.component';
@@ -24,8 +24,8 @@ import { SharedModule } from 'app/shared/shared.module';
 import { IUser } from 'app/shared/state/users.interface';
 import {
   click,
-  getInputByName,
   getButtonByClass,
+  getInputByName,
   setInputValue,
 } from 'testing';
 

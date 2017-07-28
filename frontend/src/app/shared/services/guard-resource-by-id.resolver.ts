@@ -16,13 +16,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Router, ActivatedRouteSnapshot, Resolve } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { ActivatedRouteSnapshot, Resolve, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 
+import { JsTable } from 'app/shared/helpers/jstable.helper';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
-import { JsTable } from 'app/shared/helpers/jstable.helper';
 
 @Injectable()
 export class ResourceByIdResolver implements Resolve<any> {

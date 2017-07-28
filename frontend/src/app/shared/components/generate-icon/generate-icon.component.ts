@@ -16,11 +16,11 @@
  */
 
 import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   Input,
-  ChangeDetectionStrategy,
   OnChanges,
-  AfterViewInit,
   SimpleChanges,
 } from '@angular/core';
 

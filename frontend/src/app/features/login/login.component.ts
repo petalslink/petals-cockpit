@@ -16,26 +16,26 @@
  */
 
 import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild,
   AfterViewInit,
   ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MdInputContainer } from '@angular/material';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../shared/state/store.interface';
 
-import { IUsersTable } from '../../shared/state/users.interface';
+import { IUserLogin } from 'app/shared/services/users.service';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { Users } from 'app/shared/state/users.actions';
-import { IUserLogin } from 'app/shared/services/users.service';
+import { IUsersTable } from '../../shared/state/users.interface';
 
 @Component({
   selector: 'app-login',

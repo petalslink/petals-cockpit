@@ -18,9 +18,9 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IBusInProgressRow } from './buses-in-progress.interface';
-import { IStore } from 'app/shared/state/store.interface';
 import { arrayEquals } from 'app/shared/helpers/shared.helper';
+import { IStore } from 'app/shared/state/store.interface';
+import { IBusInProgressRow } from './buses-in-progress.interface';
 
 export function getBusesInProgress(
   store$: Store<IStore>

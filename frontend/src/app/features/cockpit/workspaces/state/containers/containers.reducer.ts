@@ -15,35 +15,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import {
-  IContainerBackendSSE,
   IContainerBackendDetails,
+  IContainerBackendSSE,
 } from 'app/shared/services/containers.service';
 import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
 import {
-  IContainersTable,
-  containersTableFactory,
   containerRowFactory,
+  containersTableFactory,
   IContainerRow,
+  IContainersTable,
 } from './containers.interface';
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 
-import {
-  putAll,
-  updateById,
-  mergeOnly,
-  JsTable,
-} from 'app/shared/helpers/jstable.helper';
-import { fold, unfold, toggleFold } from 'app/shared/helpers/reducers.helper';
-import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
-import { IComponentBackendSSE } from 'app/shared/services/components.service';
-import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
+import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import {
+  JsTable,
+  mergeOnly,
+  putAll,
+  updateById,
+} from 'app/shared/helpers/jstable.helper';
+import { fold, toggleFold, unfold } from 'app/shared/helpers/reducers.helper';
+import { IComponentBackendSSE } from 'app/shared/services/components.service';
+import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
 
 export namespace ContainersReducer {
   type All =

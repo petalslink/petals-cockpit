@@ -17,13 +17,13 @@
 
 import { Action } from '@ngrx/store';
 
+import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import { JsTable } from 'app/shared/helpers/jstable.helper';
 import {
+  ComponentState,
   IComponentBackendDetails,
   IComponentBackendSSE,
-  ComponentState,
 } from 'app/shared/services/components.service';
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 
 export namespace Components {

@@ -18,25 +18,25 @@
 import { Injectable } from '@angular/core';
 
 import { Router } from '@angular/router';
+import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
-import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
+import { Observable } from 'rxjs/Observable';
 
-import { environment } from 'environments/environment';
-import { IStore } from 'app/shared/state/store.interface';
-import {
-  ServiceAssembliesService,
-  ServiceAssemblyState,
-  EServiceAssemblyState,
-  IServiceAssemblyBackendSSE,
-} from 'app/shared/services/service-assemblies.service';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
+import { batchActions } from 'app/shared/helpers/batch-actions.helper';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
+import {
+  EServiceAssemblyState,
+  IServiceAssemblyBackendSSE,
+  ServiceAssembliesService,
+  ServiceAssemblyState,
+} from 'app/shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { IStore } from 'app/shared/state/store.interface';
+import { environment } from 'environments/environment';
 
 @Injectable()
 export class ServiceAssembliesEffects {

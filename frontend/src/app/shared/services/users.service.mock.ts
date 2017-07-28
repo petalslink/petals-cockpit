@@ -19,19 +19,19 @@ import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
-import {
-  UsersService,
-  IUserLogin,
-  IUserSetup,
-  ICurrentUserBackend,
-  IUserBackend,
-  IUserNew,
-} from './users.service';
+import * as helper from 'app/shared/helpers/mock.helper';
 import { ICurrentUser } from 'app/shared/state/users.interface';
 import { environment } from 'environments/environment';
-import * as helper from 'app/shared/helpers/mock.helper';
 import { CORRECT_SETUP_TOKEN, GONE_SETUP_TOKEN } from 'mocks/backend-mock';
 import { BackendUser } from 'mocks/users-mock';
+import {
+  ICurrentUserBackend,
+  IUserBackend,
+  IUserLogin,
+  IUserNew,
+  IUserSetup,
+  UsersService,
+} from './users.service';
 
 @Injectable()
 export class UsersServiceMock extends UsersService {

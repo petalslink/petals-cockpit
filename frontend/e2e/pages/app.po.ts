@@ -16,17 +16,17 @@
  */
 
 import {
-  browser,
-  ExpectedConditions as EC,
-  ElementFinder,
   $,
+  browser,
+  ElementFinder,
+  ExpectedConditions as EC,
 } from 'protractor';
 
 import { Matcher, textToMatchInElement, waitAndClick } from '../utils';
 
-import { SetupPage } from './setup.po';
-import { LoginPage } from './login.po';
 import { AdminPage } from './administration.po';
+import { LoginPage } from './login.po';
+import { SetupPage } from './setup.po';
 import { WorkspacesPage } from './workspaces.po';
 
 export class PetalsCockpitPage {

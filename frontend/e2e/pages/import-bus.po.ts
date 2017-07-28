@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $ } from 'protractor';
+import { $, browser, ExpectedConditions as EC } from 'protractor';
 
-import { urlToMatch } from '../utils';
 import { waitTimeout } from '../common';
+import { urlToMatch } from '../utils';
 
 export abstract class BusInProgressFields {
   public static readonly component = $(`app-petals-bus-in-progress-view`);

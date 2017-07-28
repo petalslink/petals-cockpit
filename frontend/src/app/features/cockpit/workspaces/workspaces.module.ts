@@ -17,14 +17,14 @@
 
 import { NgModule } from '@angular/core';
 
+import { WorkspaceModule } from 'app/features/cockpit/workspaces/workspace/workspace.module';
+import { WorkspacesListComponent } from 'app/features/cockpit/workspaces/workspaces-list/workspaces-list.component';
 import { SharedModule } from '../../../shared/shared.module';
 import { WorkspacesRoutingModule } from './workspaces-routing.module';
 import {
-  WorkspacesComponent,
   NoWorkspaceComponent,
+  WorkspacesComponent,
 } from './workspaces.component';
-import { WorkspacesListComponent } from 'app/features/cockpit/workspaces/workspaces-list/workspaces-list.component';
-import { WorkspaceModule } from 'app/features/cockpit/workspaces/workspace/workspace.module';
 
 @NgModule({
   imports: [SharedModule, WorkspacesRoutingModule, WorkspaceModule],

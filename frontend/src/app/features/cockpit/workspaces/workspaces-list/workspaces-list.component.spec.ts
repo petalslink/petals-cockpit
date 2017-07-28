@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
-import { WorkspacesListComponent } from './workspaces-list.component';
-import { SharedModule } from 'app/shared/shared.module';
 import {
-  workspacesTableFactory,
   IWorkspacesCommon,
+  workspacesTableFactory,
 } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
+import { SharedModule } from 'app/shared/shared.module';
 import { click, elementText } from 'testing';
+import { WorkspacesListComponent } from './workspaces-list.component';
 
 import 'rxjs/add/observable/timer';
 

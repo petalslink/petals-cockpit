@@ -18,9 +18,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { SharedModule } from 'app/shared/shared.module';
-import { AdministrationComponent } from 'app/features/cockpit/administration/administration.component';
 import { AddEditUserComponent } from 'app/features/cockpit/administration/add-edit-user/add-edit-user.component';
+import { AdministrationComponent } from 'app/features/cockpit/administration/administration.component';
+import { SharedModule } from 'app/shared/shared.module';
 
 @NgModule({
   imports: [

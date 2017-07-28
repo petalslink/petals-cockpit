@@ -16,7 +16,7 @@
  */
 
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
+import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 import { environment } from './../environments/environment';
 import { GuardLoginService } from './shared/services/guard-login.service';

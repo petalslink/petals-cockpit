@@ -18,10 +18,10 @@
 import * as path from 'path';
 
 import { page } from './common';
-import { WorkspacePage } from './pages/workspace.po';
-import { ServiceAssemblyOverviewPage } from './pages/service-assembly.po';
 import { NotFoundPage } from './pages/not-found';
+import { ServiceAssemblyOverviewPage } from './pages/service-assembly.po';
 import { SharedLibraryOverviewPage } from './pages/shared-library.po';
+import { WorkspacePage } from './pages/workspace.po';
 
 describe(`Petals container content`, () => {
   it(`should open the 404 page if the container doesn't exists`, () => {

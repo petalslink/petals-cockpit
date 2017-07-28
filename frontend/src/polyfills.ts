@@ -14,7 +14,7 @@
  * Learn more in https://angular.io/docs/ts/latest/guide/browser-support.html
  */
 
- // tslint:disable:ordered-imports
+// tslint:disable:ordered-imports
 /***************************************************************************************************
  * BROWSER POLYFILLS
  */

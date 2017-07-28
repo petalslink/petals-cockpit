@@ -16,22 +16,22 @@
  */
 
 import {
-  Input,
-  Output,
-  EventEmitter,
-  Component,
   ChangeDetectionStrategy,
-  OnInit,
-  OnDestroy,
+  Component,
+  EventEmitter,
+  Input,
   OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
   SimpleChanges,
 } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs/Subject';
 
-import { IUser } from 'app/shared/state/users.interface';
-import { IUserNew } from 'app/shared/services/users.service';
 import { getFormErrors } from 'app/shared/helpers/form.helper';
+import { IUserNew } from 'app/shared/services/users.service';
+import { IUser } from 'app/shared/state/users.interface';
 
 @Component({
   selector: 'app-add-edit-user',

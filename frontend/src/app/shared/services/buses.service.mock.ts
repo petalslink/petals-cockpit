@@ -20,15 +20,15 @@ import { Http } from '@angular/http';
 
 import { BusesServiceImpl, IBusImport } from './buses.service';
 
-import { SseService, SseWorkspaceEvent } from './sse.service';
-import { SseServiceMock } from 'app/shared/services/sse.service.mock';
-import { environment } from 'environments/environment';
 import * as helper from 'app/shared/helpers/mock.helper';
-import { busesService } from 'mocks/buses-mock';
-import { workspacesService } from 'mocks/workspaces-mock';
-import { IMPORT_HTTP_ERROR_IP } from 'mocks/backend-mock';
+import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import { UsersService } from 'app/shared/services/users.service';
 import { UsersServiceMock } from 'app/shared/services/users.service.mock';
+import { environment } from 'environments/environment';
+import { IMPORT_HTTP_ERROR_IP } from 'mocks/backend-mock';
+import { busesService } from 'mocks/buses-mock';
+import { workspacesService } from 'mocks/workspaces-mock';
+import { SseService, SseWorkspaceEvent } from './sse.service';
 
 @Injectable()
 export class BusesServiceMock extends BusesServiceImpl {

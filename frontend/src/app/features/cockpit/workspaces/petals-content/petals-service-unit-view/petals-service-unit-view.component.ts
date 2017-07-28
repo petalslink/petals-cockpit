@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -28,8 +28,8 @@ import {
   IServiceUnitWithSA,
 } from '../../state/service-units/service-units.selectors';
 
-import { Ui } from 'app/shared/state/ui.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
+import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
   selector: 'app-petals-service-unit-view',

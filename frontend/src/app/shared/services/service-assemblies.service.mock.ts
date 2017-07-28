@@ -18,16 +18,16 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 
-import { serviceAssembliesService } from 'mocks/service-assemblies-mock';
 import * as helper from 'app/shared/helpers/mock.helper';
+import { environment } from 'environments/environment';
+import { serviceAssembliesService } from 'mocks/service-assemblies-mock';
 import { SseService, SseWorkspaceEvent } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
-import { environment } from 'environments/environment';
 
 import {
+  EServiceAssemblyState,
   ServiceAssembliesServiceImpl,
   ServiceAssemblyState,
-  EServiceAssemblyState,
 } from 'app/shared/services/service-assemblies.service';
 
 @Injectable()

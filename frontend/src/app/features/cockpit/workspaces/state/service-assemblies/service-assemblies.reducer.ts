@@ -17,25 +17,25 @@
 
 import {
   IServiceAssembliesTable,
+  IServiceAssemblyRow,
   serviceAssembliesTableFactory,
   serviceAssemblyRowFactory,
-  IServiceAssemblyRow,
 } from './service-assemblies.interface';
 
-import {
-  putAll,
-  updateById,
-  removeById,
-  mergeOnly,
-  JsTable,
-} from 'app/shared/helpers/jstable.helper';
-import {
-  IServiceAssemblyBackendSSE,
-  IServiceAssemblyBackendDetails,
-  ServiceAssemblyState,
-} from 'app/shared/services/service-assemblies.service';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import {
+  JsTable,
+  mergeOnly,
+  putAll,
+  removeById,
+  updateById,
+} from 'app/shared/helpers/jstable.helper';
+import {
+  IServiceAssemblyBackendDetails,
+  IServiceAssemblyBackendSSE,
+  ServiceAssemblyState,
+} from 'app/shared/services/service-assemblies.service';
 
 export namespace ServiceAssembliesReducer {
   type All =

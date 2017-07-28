@@ -18,9 +18,9 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
+import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import { IStore } from 'app/shared/state/store.interface';
 import { ISharedLibrary } from './shared-libraries.interface';
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 
 export interface ISharedLibraryWithComponents extends ISharedLibrary {
   components: IComponentRow[];

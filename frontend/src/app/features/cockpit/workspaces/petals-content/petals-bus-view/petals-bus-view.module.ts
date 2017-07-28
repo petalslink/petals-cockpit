@@ -19,12 +19,12 @@ import { NgModule } from '@angular/core';
 import { SwiperModule } from 'angular2-useful-swiper';
 
 import { SharedModule } from '../../../../../shared/shared.module';
+import { PetalsBusOverviewComponent } from './petals-bus-overview/petals-bus-overview.component';
 import { PetalsBusViewRoutingModule } from './petals-bus-view-routing.module';
 import {
-  PetalsBusViewComponent,
   BusDeleteDialogComponent,
+  PetalsBusViewComponent,
 } from './petals-bus-view.component';
-import { PetalsBusOverviewComponent } from './petals-bus-overview/petals-bus-overview.component';
 
 @NgModule({
   imports: [SharedModule, PetalsBusViewRoutingModule, SwiperModule],

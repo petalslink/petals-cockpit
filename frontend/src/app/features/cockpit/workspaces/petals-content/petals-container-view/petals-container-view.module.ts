@@ -19,10 +19,10 @@ import { NgModule } from '@angular/core';
 import { VisModule } from 'ng2-vis';
 
 import { SharedModule } from '../../../../../shared/shared.module';
+import { PetalsContainerOperationsComponent } from './petals-container-operations/petals-container-operations.component';
+import { PetalsContainerOverviewComponent } from './petals-container-overview/petals-container-overview.component';
 import { PetalsContainerViewRoutingModule } from './petals-container-view-routing.module';
 import { PetalsContainerViewComponent } from './petals-container-view.component';
-import { PetalsContainerOverviewComponent } from './petals-container-overview/petals-container-overview.component';
-import { PetalsContainerOperationsComponent } from './petals-container-operations/petals-container-operations.component';
 
 @NgModule({
   imports: [SharedModule, PetalsContainerViewRoutingModule, VisModule],

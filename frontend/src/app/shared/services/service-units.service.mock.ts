@@ -18,9 +18,9 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 
-import { ServiceUnitsServiceImpl } from './service-units.service';
-import { serviceUnitsService } from 'mocks/service-units-mock';
 import * as helper from 'app/shared/helpers/mock.helper';
+import { serviceUnitsService } from 'mocks/service-units-mock';
+import { ServiceUnitsServiceImpl } from './service-units.service';
 
 @Injectable()
 export class ServiceUnitsServiceMock extends ServiceUnitsServiceImpl {

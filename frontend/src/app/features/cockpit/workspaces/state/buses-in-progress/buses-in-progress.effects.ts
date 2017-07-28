@@ -18,20 +18,20 @@
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Router } from '@angular/router';
-import { Store, Action } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
-import { Observable } from 'rxjs/Observable';
+import { Actions, Effect } from '@ngrx/effects';
+import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
+import { Observable } from 'rxjs/Observable';
 
-import { IStore } from 'app/shared/state/store.interface';
+import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import {
   BusesService,
   IBusInProgressBackend,
 } from 'app/shared/services/buses.service';
-import { environment } from 'environments/environment';
 import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
+import { IStore } from 'app/shared/state/store.interface';
+import { environment } from 'environments/environment';
 
 @Injectable()
 export class BusesInProgressEffects {

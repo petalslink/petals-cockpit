@@ -17,21 +17,21 @@
 
 import { IBusInProgressBackend } from 'app/shared/services/buses.service';
 import {
-  IBusesInProgressTable,
   busesInProgressTableFactory,
   busInProgressRowFactory,
+  IBusesInProgressTable,
   IBusInProgressRow,
 } from './buses-in-progress.interface';
 
-import {
-  putAll,
-  updateById,
-  removeById,
-  mergeOnly,
-  JsTable,
-} from 'app/shared/helpers/jstable.helper';
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import {
+  JsTable,
+  mergeOnly,
+  putAll,
+  removeById,
+  updateById,
+} from 'app/shared/helpers/jstable.helper';
 
 export namespace BusesInProgressReducer {
   type All =

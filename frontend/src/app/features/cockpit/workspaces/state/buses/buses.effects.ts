@@ -18,35 +18,35 @@
 import { Injectable } from '@angular/core';
 
 import { Router } from '@angular/router';
+import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
-import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
+import { Observable } from 'rxjs/Observable';
 
-import { IStore } from 'app/shared/state/store.interface';
+import { batchActions } from 'app/shared/helpers/batch-actions.helper';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import {
   BusesService,
   IBusBackendSSE,
 } from 'app/shared/services/buses.service';
-import { environment } from 'environments/environment';
 import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
+import { IStore } from 'app/shared/state/store.interface';
+import { environment } from 'environments/environment';
 
-import { IContainerBackendSSE } from 'app/shared/services/containers.service';
 import { IComponentBackendSSE } from 'app/shared/services/components.service';
+import { IContainerBackendSSE } from 'app/shared/services/containers.service';
 
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 
-import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
-import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
+import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
+import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
+import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
 
 @Injectable()
 export class BusesEffects {

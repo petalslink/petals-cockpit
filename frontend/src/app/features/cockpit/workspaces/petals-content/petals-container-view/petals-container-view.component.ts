@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -23,12 +23,12 @@ import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/state/store.interface';
 
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import {
   getCurrentContainer,
   IContainerWithSiblings,
 } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 import { Ui } from 'app/shared/state/ui.actions';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 
 @Component({
   selector: 'app-petals-container-view',

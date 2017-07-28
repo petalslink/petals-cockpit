@@ -17,22 +17,22 @@
 
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
-import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
+import { Observable } from 'rxjs/Observable';
 
-import { environment } from 'environments/environment';
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import {
-  SharedLibrariesService,
-  ISharedLibraryBackendSSE,
-  SharedLibraryState,
   ESharedLibraryState,
+  ISharedLibraryBackendSSE,
+  SharedLibrariesService,
+  SharedLibraryState,
 } from 'app/shared/services/shared-libraries.service';
 import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import { IStore } from 'app/shared/state/store.interface';
+import { environment } from 'environments/environment';
 
 @Injectable()
 export class SharedLibrariesEffects {

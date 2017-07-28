@@ -17,15 +17,15 @@
 
 import { Injectable } from '@angular/core';
 
+import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
-import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
+import { Observable } from 'rxjs/Observable';
 
-import { environment } from 'environments/environment';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { ContainersService } from 'app/shared/services/containers.service';
 import { IStore } from 'app/shared/state/store.interface';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { environment } from 'environments/environment';
 
 @Injectable()
 export class ContainersEffects {

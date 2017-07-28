@@ -16,25 +16,25 @@
  */
 
 import {
-  Component,
-  OnInit,
-  Input,
   ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
 } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
-import { IStore } from 'app/shared/state/store.interface';
+import { TreeEvent } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
+import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
+import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   WorkspaceElement,
   WorkspaceElementType,
 } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { TreeEvent } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
-import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
-import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({

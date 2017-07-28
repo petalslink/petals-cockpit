@@ -18,9 +18,9 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
+import { isNot } from '../helpers/shared.helper';
 import { IStore } from './store.interface';
 import { ICurrentUser, IUserRow } from './users.interface';
-import { isNot } from '../helpers/shared.helper';
 
 export function _getCurrentUser(
   store$: Store<IStore>

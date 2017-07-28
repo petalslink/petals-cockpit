@@ -16,25 +16,25 @@
  */
 
 import {
-  Component,
-  OnInit,
-  Input,
   ChangeDetectionStrategy,
-  SimpleChanges,
+  Component,
+  Input,
   OnChanges,
+  OnInit,
+  SimpleChanges,
 } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
 import { IStore } from '../../../../../../shared/state/store.interface';
 
-import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
+import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
 import {
   ComponentState,
   EComponentState,
 } from 'app/shared/services/components.service';
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
+import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
 
 @Component({
   selector: 'app-petals-component-operations',

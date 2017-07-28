@@ -16,10 +16,10 @@
  */
 
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 
-import { PetalsBusInProgressViewComponent } from './petals-bus-in-progress-view.component';
 import { ResourceByIdResolver } from 'app/shared/services/guard-resource-by-id.resolver';
+import { PetalsBusInProgressViewComponent } from './petals-bus-in-progress-view.component';
 
 // /workspaces/:workspaceId/petals/buses-in-progress
 const routes: Routes = [

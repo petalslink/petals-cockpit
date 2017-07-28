@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { flatMap, assign } from 'lodash';
+import { assign, flatMap } from 'lodash';
 
-import {
-  Bus,
-  BusInProgress,
-  busesService,
-  busesInProgressService,
-} from './buses-mock';
 import { IBusImport } from 'app/shared/services/buses.service';
-import { BackendUser } from 'mocks/users-mock';
+import { IUserBackend } from 'app/shared/services/users.service';
 import {
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
 } from 'app/shared/services/workspaces.service';
-import { IUserBackend } from 'app/shared/services/users.service';
 import { validContainers } from 'mocks/backend-mock';
+import { BackendUser } from 'mocks/users-mock';
+import {
+  Bus,
+  busesInProgressService,
+  busesService,
+  BusInProgress,
+} from './buses-mock';
 
 function toObj<A>(arr: { toObj: () => A }[]): A {
   return assign.apply({}, arr.map(c => c.toObj()));

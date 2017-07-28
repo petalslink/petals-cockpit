@@ -17,8 +17,8 @@
 
 import {
   ICurrentUserBackend,
-  IUserNew,
   IUserBackend,
+  IUserNew,
 } from 'app/shared/services/users.service';
 import { workspacesService } from 'mocks/workspaces-mock';
 

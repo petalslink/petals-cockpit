@@ -17,12 +17,12 @@
 
 import {
   ComponentState,
-  IComponentBackendSSE,
   EComponentType,
   IComponentBackendDetails,
+  IComponentBackendSSE,
 } from 'app/shared/services/components.service';
-import { ServiceUnit } from './service-units-mock';
 import { Container } from './containers-mock';
+import { ServiceUnit } from './service-units-mock';
 import { SharedLibrary } from './shared-libraries-mock';
 
 export class Components {

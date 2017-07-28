@@ -18,14 +18,14 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IWorkspaces, IWorkspaceRow } from './workspaces.interface';
-import { IStore } from 'app/shared/state/store.interface';
-import {
-  escapeStringRegexp,
-  arrayEquals,
-} from 'app/shared/helpers/shared.helper';
-import { IUserRow } from 'app/shared/state/users.interface';
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
+import {
+  arrayEquals,
+  escapeStringRegexp,
+} from 'app/shared/helpers/shared.helper';
+import { IStore } from 'app/shared/state/store.interface';
+import { IUserRow } from 'app/shared/state/users.interface';
+import { IWorkspaceRow, IWorkspaces } from './workspaces.interface';
 
 export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
   return store$

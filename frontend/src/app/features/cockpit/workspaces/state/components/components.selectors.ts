@@ -18,14 +18,14 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from 'app/shared/state/store.interface';
-import { IComponentUI } from './components.interface';
+import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import {
-  IComponentBackendSSECommon,
   IComponentBackendDetailsCommon,
+  IComponentBackendSSECommon,
 } from 'app/shared/services/components.service';
-import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+import { IStore } from 'app/shared/state/store.interface';
+import { IComponentUI } from './components.interface';
 
 export interface IComponentWithSLsAndSUs
   extends IComponentUI,

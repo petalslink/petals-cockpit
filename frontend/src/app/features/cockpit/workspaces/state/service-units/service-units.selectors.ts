@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IServiceUnit } from './service-units.interface';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { IServiceUnit } from './service-units.interface';
 
-import { IStore } from 'app/shared/state/store.interface';
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
+import { IStore } from 'app/shared/state/store.interface';
 
 export interface IServiceUnitWithSA extends IServiceUnit {
   serviceAssembly: IServiceAssemblyRow;
