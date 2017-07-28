@@ -16,25 +16,25 @@
  */
 
 import {
-  IBusBackendSSE,
   IBusBackendDetails,
+  IBusBackendSSE,
 } from 'app/shared/services/buses.service';
 import {
-  IBusesTable,
   busesTableFactory,
   busRowFactory,
+  IBusesTable,
 } from './buses.interface';
 
-import {
-  updateById,
-  removeById,
-  mergeOnly,
-  putAll,
-  JsTable,
-} from 'app/shared/helpers/jstable.helper';
-import { fold, unfold, toggleFold } from 'app/shared/helpers/reducers.helper';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import {
+  JsTable,
+  mergeOnly,
+  putAll,
+  removeById,
+  updateById,
+} from 'app/shared/helpers/jstable.helper';
+import { fold, toggleFold, unfold } from 'app/shared/helpers/reducers.helper';
 
 export namespace BusesReducer {
   type All =

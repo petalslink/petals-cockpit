@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $, by } from 'protractor';
+import { $, browser, by, ExpectedConditions as EC } from 'protractor';
 
-import { urlToMatch, waitAndClick } from '../utils';
 import { waitTimeout } from '../common';
-import { UploadComponentPage } from './upload-component.po';
+import { urlToMatch, waitAndClick } from '../utils';
 import { SharedLibraryOverviewPage } from './shared-library.po';
+import { UploadComponentPage } from './upload-component.po';
 
 export abstract class ComponentPage {
   public static readonly component = $(`app-petals-component-view`);

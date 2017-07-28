@@ -19,9 +19,9 @@ import { Action } from '@ngrx/store';
 import { JsTable } from 'app/shared/helpers/jstable.helper';
 
 import {
-  IUserLogin,
-  IUserBackend,
   ICurrentUserBackend,
+  IUserBackend,
+  IUserLogin,
   IUserNew,
 } from 'app/shared/services/users.service';
 

@@ -19,10 +19,10 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { IServiceAssembly } from './service-assemblies.interface';
 
-import { IStore } from 'app/shared/state/store.interface';
-import { tuple } from 'app/shared/helpers/shared.helper';
-import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
+import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+import { tuple } from 'app/shared/helpers/shared.helper';
+import { IStore } from 'app/shared/state/store.interface';
 
 export interface IServiceAssemblyWithSUsAndComponents extends IServiceAssembly {
   serviceUnitsAndComponent: [IServiceUnitRow, IComponentRow][];

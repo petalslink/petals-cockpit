@@ -15,24 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $, $$, by } from 'protractor';
+import { $, $$, browser, by, ExpectedConditions as EC } from 'protractor';
 
+import { waitTimeout } from '../common';
 import {
-  urlToMatch,
+  getMultipleElementsTexts,
   Matcher,
   textToMatchInElement,
+  urlToMatch,
   waitAndClick,
-  getMultipleElementsTexts,
 } from '../utils';
-import { waitTimeout } from '../common';
-import { ImportBusPage, BusInProgressPage } from './import-bus.po';
 import { BusPage } from './bus.po';
 import { ComponentOverviewPage } from './component.po';
 import { ContainerOverviewPage } from './container.po';
-import { ServiceUnitOverviewPage } from './service-unit.po';
-import { WorkspacesPage } from './workspaces.po';
+import { BusInProgressPage, ImportBusPage } from './import-bus.po';
 import { ServiceAssemblyOverviewPage } from './service-assembly.po';
+import { ServiceUnitOverviewPage } from './service-unit.po';
 import { SharedLibraryOverviewPage } from './shared-library.po';
+import { WorkspacesPage } from './workspaces.po';
 
 export abstract class WorkspacePage {
   public static readonly component = $(`app-cockpit`);

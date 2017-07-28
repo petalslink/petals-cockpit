@@ -16,13 +16,13 @@
  */
 
 import { Injectable } from '@angular/core';
+import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from 'app/shared/state/store.interface';
-import { isSmallScreen } from 'app/shared/state/ui.selectors';
 import { Ui } from 'app/shared/state/ui.actions';
+import { isSmallScreen } from 'app/shared/state/ui.selectors';
 
 @Injectable()
 export class UiEffects {

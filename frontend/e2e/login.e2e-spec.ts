@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, $ } from 'protractor';
+import { $, browser } from 'protractor';
 
 import { page } from './common';
-import { expectFocused } from './utils';
-import { LoginPage } from './pages/login.po';
 import { ImportBusPage } from './pages/import-bus.po';
+import { LoginPage } from './pages/login.po';
+import { expectFocused } from './utils';
 
 describe(`Login`, () => {
   it(`should be redirected to login if a user is trying to access a protected route without being logged`, () => {

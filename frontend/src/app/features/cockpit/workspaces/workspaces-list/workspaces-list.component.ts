@@ -16,22 +16,22 @@
  */
 
 import {
-  Component,
-  OnInit,
-  EventEmitter,
-  Output,
-  Input,
   ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { Observable } from 'rxjs/Observable';
 
 import {
-  IWorkspaces,
   IWorkspace,
+  IWorkspaces,
 } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
-import { IUser, ICurrentUser } from 'app/shared/state/users.interface';
+import { ICurrentUser, IUser } from 'app/shared/state/users.interface';
 
 @Component({
   selector: 'app-workspaces-list',

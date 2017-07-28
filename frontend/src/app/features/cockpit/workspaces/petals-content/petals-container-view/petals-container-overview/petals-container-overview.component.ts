@@ -18,30 +18,30 @@
 import {
   Component,
   Input,
-  OnInit,
-  OnDestroy,
   OnChanges,
+  OnDestroy,
+  OnInit,
   SimpleChanges,
 } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 import {
-  VisNodes,
   VisEdges,
-  VisNetworkService,
   VisNetworkData,
   VisNetworkOptions,
+  VisNetworkService,
+  VisNodes,
 } from 'ng2-vis';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
-import { IStore } from 'app/shared/state/store.interface';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
-import {
-  containerNetworkOptions,
-  buildVisNetworkData,
-} from './container-graph';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { IContainerWithSiblings } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
+import { IStore } from 'app/shared/state/store.interface';
+import { isLargeScreen } from 'app/shared/state/ui.selectors';
+import {
+  buildVisNetworkData,
+  containerNetworkOptions,
+} from './container-graph';
 
 class NetworkData implements VisNetworkData {
   public nodes: VisNodes;

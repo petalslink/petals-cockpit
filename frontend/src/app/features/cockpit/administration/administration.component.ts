@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { Ui } from 'app/shared/state/ui.actions';
 import { IStore } from 'app/shared/state/store.interface';
-import { ICurrentUser, IUser } from 'app/shared/state/users.interface';
-import { getAllUsers, getCurrentUser } from 'app/shared/state/users.selectors';
+import { Ui } from 'app/shared/state/ui.actions';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { Users } from 'app/shared/state/users.actions';
+import { ICurrentUser, IUser } from 'app/shared/state/users.interface';
+import { getAllUsers, getCurrentUser } from 'app/shared/state/users.selectors';
 
 import { IUserNew } from 'app/shared/services/users.service';
 

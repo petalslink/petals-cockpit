@@ -16,13 +16,13 @@
  */
 
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 
-import {
-  WorkspacesComponent,
-  NoWorkspaceComponent,
-} from './workspaces.component';
 import { WorkspaceResolver } from './workspace-resolver';
+import {
+  NoWorkspaceComponent,
+  WorkspacesComponent,
+} from './workspaces.component';
 
 // /workspaces
 const routes: Routes = [

@@ -18,13 +18,13 @@
 import { Action } from '@ngrx/store';
 
 import { JsTable } from 'app/shared/helpers/jstable.helper';
+import { IComponentBackendSSE } from 'app/shared/services/components.service';
 import {
-  IContainerBackendSSE,
   IContainerBackendDetails,
+  IContainerBackendSSE,
 } from 'app/shared/services/containers.service';
 import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
 import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
-import { IComponentBackendSSE } from 'app/shared/services/components.service';
 
 export namespace Containers {
   export const FetchedType = '[Containers] Fetched';

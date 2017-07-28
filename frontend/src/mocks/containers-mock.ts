@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  ServiceAssembly,
-  serviceAssembliesService,
-} from './service-assemblies-mock';
 import { ComponentState } from 'app/shared/services/components.service';
-import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 import {
-  IContainerBackendSSE,
   IContainerBackendDetails,
+  IContainerBackendSSE,
 } from 'app/shared/services/containers.service';
-import { sharedLibrariesService, SharedLibrary } from './shared-libraries-mock';
-import { componentsService, Component } from './components-mock';
+import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 import { Bus } from './buses-mock';
+import { Component, componentsService } from './components-mock';
+import {
+  serviceAssembliesService,
+  ServiceAssembly,
+} from './service-assemblies-mock';
+import { sharedLibrariesService, SharedLibrary } from './shared-libraries-mock';
 
 export class Containers {
   private readonly containers = new Map<string, Container>();

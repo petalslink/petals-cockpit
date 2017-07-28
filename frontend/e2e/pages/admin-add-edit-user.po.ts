@@ -17,9 +17,9 @@
 
 import {
   browser,
-  ExpectedConditions as EC,
-  ElementFinder,
   by,
+  ElementFinder,
+  ExpectedConditions as EC,
 } from 'protractor';
 import { waitTimeout } from '../common';
 

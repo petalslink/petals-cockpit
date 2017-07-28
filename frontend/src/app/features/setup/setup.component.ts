@@ -16,23 +16,23 @@
  */
 
 import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild,
   AfterViewInit,
   ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MdInputContainer } from '@angular/material';
-import { Observable } from 'rxjs/Observable';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
+import { IUserSetup, UsersService } from 'app/shared/services/users.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
-import { UsersService, IUserSetup } from 'app/shared/services/users.service';
 
 @Component({
   selector: 'app-setup',

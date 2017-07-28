@@ -16,18 +16,18 @@
  */
 
 import {
-  Component,
-  OnInit,
   ChangeDetectionStrategy,
+  Component,
   Input,
+  OnInit,
 } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../../shared/state/store.interface';
 
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { IServiceUnitWithSA } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
+import { isLargeScreen } from 'app/shared/state/ui.selectors';
 
 @Component({
   selector: 'app-petals-service-unit-overview',

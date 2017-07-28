@@ -16,10 +16,10 @@
  */
 
 import {
-  Component,
-  OnInit,
-  Input,
   ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
 } from '@angular/core';
 
 @Component({

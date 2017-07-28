@@ -17,8 +17,8 @@
 
 import { Action } from '@ngrx/store';
 
-import { JsTable } from 'app/shared/helpers/jstable.helper';
 import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+import { JsTable } from 'app/shared/helpers/jstable.helper';
 import {
   IServiceUnitBackendDetails,
   IServiceUnitBackendSSE,

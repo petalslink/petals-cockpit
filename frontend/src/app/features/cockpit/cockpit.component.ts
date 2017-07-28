@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { IStore } from 'app/shared/state/store.interface';
 import { IUi } from 'app/shared/state/ui.interface';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
+import { Users } from 'app/shared/state/users.actions';
 import { ICurrentUser } from 'app/shared/state/users.interface';
 import { getCurrentUser } from 'app/shared/state/users.selectors';
-import { Users } from 'app/shared/state/users.actions';
 
 @Component({
   selector: 'app-cockpit',

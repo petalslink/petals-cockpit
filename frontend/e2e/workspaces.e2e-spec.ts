@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, ExpectedConditions as EC, $ } from 'protractor';
+import { $, browser, ExpectedConditions as EC } from 'protractor';
 
 import { page, waitTimeout } from './common';
 import { WorkspacesPage } from './pages/workspaces.po';

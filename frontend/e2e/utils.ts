@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { range } from 'lodash';
 import {
+  $,
   browser,
   ElementFinder,
-  $,
   ExpectedConditions as EC,
   Key,
 } from 'protractor';
 import * as util from 'protractor/built/util';
-import { range } from 'lodash';
 
 import { waitTimeout } from './common';
 

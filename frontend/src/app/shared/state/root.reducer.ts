@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { combineReducers } from '@ngrx/store';
 import { compose } from '@ngrx/core/compose';
+import { combineReducers } from '@ngrx/store';
 import { storeFreeze } from 'ngrx-store-freeze';
 
-import { environment } from '../../../environments/environment';
-import { UiReducer } from '../state/ui.reducer';
-import { UsersReducer } from './users.reducer';
-import { WorkspacesReducer } from '../../features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { BusesReducer } from '../../features/cockpit/workspaces/state/buses/buses.reducer';
-import { BusesInProgressReducer } from '../../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
-import { ContainersReducer } from '../../features/cockpit/workspaces/state/containers/containers.reducer';
-import { ComponentsReducer } from '../../features/cockpit/workspaces/state/components/components.reducer';
-import { ServiceUnitsReducer } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
-import { enableBatching } from 'app/shared/helpers/batch-actions.helper';
 import { ServiceAssembliesReducer } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
 import { SharedLibrariesReducer } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
+import { enableBatching } from 'app/shared/helpers/batch-actions.helper';
+import { environment } from '../../../environments/environment';
+import { BusesInProgressReducer } from '../../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
+import { BusesReducer } from '../../features/cockpit/workspaces/state/buses/buses.reducer';
+import { ComponentsReducer } from '../../features/cockpit/workspaces/state/components/components.reducer';
+import { ContainersReducer } from '../../features/cockpit/workspaces/state/containers/containers.reducer';
+import { ServiceUnitsReducer } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
+import { WorkspacesReducer } from '../../features/cockpit/workspaces/state/workspaces/workspaces.reducer';
+import { UiReducer } from '../state/ui.reducer';
+import { UsersReducer } from './users.reducer';
 
 const reducers = {
   ui: UiReducer.reducer,

@@ -17,25 +17,25 @@
 
 import {
   Component,
-  OnInit,
   OnDestroy,
-  ViewChild,
+  OnInit,
   TemplateRef,
+  ViewChild,
 } from '@angular/core';
-import { Router } from '@angular/router';
 import { MdDialog, MdDialogRef } from '@angular/material';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
-import { getWorkspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import {
   IWorkspace,
   IWorkspaces,
 } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
+import { getWorkspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
+import { IStore } from 'app/shared/state/store.interface';
+import { Ui } from 'app/shared/state/ui.actions';
 import { ICurrentUser } from 'app/shared/state/users.interface';
 import { getCurrentUser } from 'app/shared/state/users.selectors';
 

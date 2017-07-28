@@ -16,16 +16,16 @@
  */
 
 import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild,
   AfterViewInit,
   ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { MdInputContainer } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MdInputContainer } from '@angular/material';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
@@ -36,17 +36,17 @@ import {
   IBusInProgressRow,
 } from './../../state/buses-in-progress/buses-in-progress.interface';
 
-import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
 import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
 import {
-  getFormErrors,
   disableAllFormFields,
+  getFormErrors,
 } from './../../../../../shared/helpers/form.helper';
+import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
 
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
+import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 import { IBusImport } from 'app/shared/services/buses.service';
 import { Ui } from 'app/shared/state/ui.actions';
-import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
+import { isLargeScreen } from 'app/shared/state/ui.selectors';
 
 @Component({
   selector: 'app-petals-bus-in-progress-view',

@@ -17,13 +17,13 @@
 
 import { Injectable } from '@angular/core';
 
+import { Action } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
-import { Action } from '@ngrx/store';
 
 import { environment } from '../../../environments/environment';
-import { SseWorkspaceEvent, SseService } from './sse.service';
 import { workspacesService } from '../../../mocks/workspaces-mock';
+import { SseService, SseWorkspaceEvent } from './sse.service';
 
 @Injectable()
 export class SseServiceMock extends SseService {

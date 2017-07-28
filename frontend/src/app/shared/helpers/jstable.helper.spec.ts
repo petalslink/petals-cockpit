@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { environment } from 'environments/environment';
 import {
   emptyJsTable,
-  toJsTable,
-  putById,
-  removeById,
-  updateById,
-  putAll,
   mergeInto,
   mergeOnly,
+  putAll,
+  putById,
+  removeById,
+  toJsTable,
+  updateById,
 } from 'app/shared/helpers/jstable.helper';
+import { environment } from 'environments/environment';
 
 describe('helpers to manipulate tables', () => {
   interface T {

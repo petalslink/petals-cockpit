@@ -16,7 +16,7 @@
  */
 
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { ResourceByIdResolver } from 'app/shared/services/guard-resource-by-id.resolver';
 
 // /workspaces/:workspaceId/petals

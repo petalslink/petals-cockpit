@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
+import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
 import {
-  IBusInProgressBackendCommon,
   IBusInProgressBackend,
+  IBusInProgressBackendCommon,
 } from 'app/shared/services/buses.service';
 
 export interface IBusInProgressUI {

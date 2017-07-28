@@ -20,8 +20,8 @@
  * @returns The possible new actions according to the state
  */
 import {
-  ServiceAssemblyState,
   EServiceAssemblyState,
+  ServiceAssemblyState,
 } from 'app/shared/services/service-assemblies.service';
 
 export function stateNameToPossibleActionsServiceAssembly(

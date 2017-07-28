@@ -15,26 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
-import { MdDialog, MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
-import { Store, Dispatcher } from '@ngrx/store';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { MD_DIALOG_DATA, MdDialog, MdDialogRef } from '@angular/material';
+import { Dispatcher, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { IStore } from 'app/shared/state/store.interface';
+import { Ui } from 'app/shared/state/ui.actions';
+import { Users } from 'app/shared/state/users.actions';
+import { IUserRow } from 'app/shared/state/users.interface';
+import { getCurrentUser } from 'app/shared/state/users.selectors';
+import { SharedValidator } from 'app/shared/validators/shared.validator';
 import { IWorkspaceRow } from '../state/workspaces/workspaces.interface';
 import {
   getCurrentWorkspace,
   getCurrentWorkspaceUsers,
   getUsersNotInCurrentWorkspace,
 } from '../state/workspaces/workspaces.selectors';
-import { Ui } from 'app/shared/state/ui.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
-import { IUserRow } from 'app/shared/state/users.interface';
-import { Users } from 'app/shared/state/users.actions';
-import { SharedValidator } from 'app/shared/validators/shared.validator';
-import { getCurrentUser } from 'app/shared/state/users.selectors';
 
 @Component({
   selector: 'app-workspace-overview',

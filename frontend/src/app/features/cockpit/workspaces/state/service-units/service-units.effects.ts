@@ -17,12 +17,12 @@
 
 import { Injectable } from '@angular/core';
 
+import { Actions, Effect } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 
-import { environment } from 'environments/environment';
 import { ServiceUnitsService } from 'app/shared/services/service-units.service';
+import { environment } from 'environments/environment';
 
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 

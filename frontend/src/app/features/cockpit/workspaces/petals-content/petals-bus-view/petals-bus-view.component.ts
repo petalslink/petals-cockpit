@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
-import { MdDialog, MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { MD_DIALOG_DATA, MdDialog, MdDialogRef } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import { Store } from '@ngrx/store';
 
 import { IStore } from '../../../../../shared/state/store.interface';
 import {
@@ -28,9 +28,9 @@ import {
   IBusWithContainers,
 } from '../../state/buses/buses.selectors';
 
-import { Ui } from 'app/shared/state/ui.actions';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
   selector: 'app-petals-bus-view',

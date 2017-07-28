@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
 import {
-  IUserBackend,
   ICurrentUserBackend,
+  IUserBackend,
 } from 'app/shared/services/users.service';
-import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
 
 export interface IUserUI {
   isAdding: boolean;

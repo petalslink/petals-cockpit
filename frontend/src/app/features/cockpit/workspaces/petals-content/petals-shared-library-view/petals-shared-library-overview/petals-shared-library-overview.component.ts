@@ -16,14 +16,14 @@
  */
 
 import {
-  Component,
-  OnInit,
-  Input,
   ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
 } from '@angular/core';
 
-import { ISharedLibraryWithComponents } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
+import { ISharedLibraryWithComponents } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
 
 @Component({
   selector: 'app-petals-shared-library-overview',

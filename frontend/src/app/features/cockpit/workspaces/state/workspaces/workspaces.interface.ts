@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IUser } from '../../../../../shared/state/users.interface';
+import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
 import {
-  IWorkspaceBackendDetails,
   IWorkspaceBackendCommon,
+  IWorkspaceBackendDetails,
 } from 'app/shared/services/workspaces.service';
-import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
+import { IUser } from '../../../../../shared/state/users.interface';
 
 export interface IWorkspaceUI {
   // from UI

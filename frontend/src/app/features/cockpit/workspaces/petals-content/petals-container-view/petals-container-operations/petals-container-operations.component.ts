@@ -16,15 +16,15 @@
  */
 
 import {
+  ChangeDetectionStrategy,
   Component,
   Input,
-  ChangeDetectionStrategy,
   OnInit,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import { IContainerRow } from '../../../state/containers/containers.interface';
 import { IStore } from 'app/shared/state/store.interface';
+import { IContainerRow } from '../../../state/containers/containers.interface';
 
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 

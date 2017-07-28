@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser, $ } from 'protractor';
+import { $, browser } from 'protractor';
 
 import { page } from './common';
-import { WorkspacePage } from './pages/workspace.po';
 import { NotFoundPage } from './pages/not-found';
+import { WorkspacePage } from './pages/workspace.po';
 
 describe(`Petals bus content`, () => {
   it(`should open the 404 page if the bus doesn't exists`, () => {

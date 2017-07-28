@@ -15,71 +15,71 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule, ModuleWithProviders } from '@angular/core';
+import { ModuleWithProviders, NgModule } from '@angular/core';
+import { Actions, EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
-import { EffectsModule, Actions } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 
-import './rxjs-operators';
-import { environment } from 'environments/environment';
-import { getRootReducer } from 'app/shared/state/root.reducer';
-import { WorkspacesEffects } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.effects';
 import { BusesInProgressEffects } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.effects';
-import { UsersEffects } from 'app/shared/state/users.effects';
-import { UiEffects } from 'app/shared/state/ui.effects';
 import { BusesEffects } from 'app/features/cockpit/workspaces/state/buses/buses.effects';
-import { ContainersEffects } from 'app/features/cockpit/workspaces/state/containers/containers.effects';
 import { ComponentsEffects } from 'app/features/cockpit/workspaces/state/components/components.effects';
+import { ContainersEffects } from 'app/features/cockpit/workspaces/state/containers/containers.effects';
+import { ServiceAssembliesEffects } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.effects';
 import { ServiceUnitsEffects } from 'app/features/cockpit/workspaces/state/service-units/service-units.effects';
-import { SseService, SseServiceImpl } from 'app/shared/services/sse.service';
-import { SseServiceMock } from 'app/shared/services/sse.service.mock';
-import {
-  WorkspacesService,
-  WorkspacesServiceImpl,
-} from 'app/shared/services/workspaces.service';
-import { WorkspacesServiceMock } from 'app/shared/services/workspaces.service.mock';
-import { UsersServiceMock } from 'app/shared/services/users.service.mock';
-import {
-  UsersService,
-  UsersServiceImpl,
-} from 'app/shared/services/users.service';
-import { GuardLoginService } from 'app/shared/services/guard-login.service';
+import { SharedLibrariesEffects } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.effects';
+import { WorkspacesEffects } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.effects';
+import { WorkspaceResolver } from 'app/features/cockpit/workspaces/workspace-resolver';
+import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
 import {
   BusesService,
   BusesServiceImpl,
 } from 'app/shared/services/buses.service';
 import { BusesServiceMock } from 'app/shared/services/buses.service.mock';
 import {
-  ContainersService,
-  ContainersServiceImpl,
-} from 'app/shared/services/containers.service';
-import { ContainersServiceMock } from 'app/shared/services/containers.service.mock';
-import {
   ComponentsService,
   ComponentsServiceImpl,
 } from 'app/shared/services/components.service';
 import { ComponentsServiceMock } from 'app/shared/services/components.service.mock';
 import {
-  ServiceUnitsService,
-  ServiceUnitsServiceImpl,
-} from 'app/shared/services/service-units.service';
-import { ServiceUnitsServiceMock } from 'app/shared/services/service-units.service.mock';
-import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
+  ContainersService,
+  ContainersServiceImpl,
+} from 'app/shared/services/containers.service';
+import { ContainersServiceMock } from 'app/shared/services/containers.service.mock';
+import { GuardLoginService } from 'app/shared/services/guard-login.service';
+import { ResourceByIdResolver } from 'app/shared/services/guard-resource-by-id.resolver';
 import {
   ServiceAssembliesService,
   ServiceAssembliesServiceImpl,
 } from 'app/shared/services/service-assemblies.service';
 import { ServiceAssembliesServiceMock } from 'app/shared/services/service-assemblies.service.mock';
-import { ServiceAssembliesEffects } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.effects';
-import { SharedLibrariesEffects } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.effects';
-import { SharedLibrariesServiceMock } from 'app/shared/services/shared-libraries.service.mock';
+import {
+  ServiceUnitsService,
+  ServiceUnitsServiceImpl,
+} from 'app/shared/services/service-units.service';
+import { ServiceUnitsServiceMock } from 'app/shared/services/service-units.service.mock';
 import {
   SharedLibrariesService,
   SharedLibrariesServiceImpl,
 } from 'app/shared/services/shared-libraries.service';
-import { ResourceByIdResolver } from 'app/shared/services/guard-resource-by-id.resolver';
-import { WorkspaceResolver } from 'app/features/cockpit/workspaces/workspace-resolver';
+import { SharedLibrariesServiceMock } from 'app/shared/services/shared-libraries.service.mock';
+import { SseService, SseServiceImpl } from 'app/shared/services/sse.service';
+import { SseServiceMock } from 'app/shared/services/sse.service.mock';
+import {
+  UsersService,
+  UsersServiceImpl,
+} from 'app/shared/services/users.service';
+import { UsersServiceMock } from 'app/shared/services/users.service.mock';
+import {
+  WorkspacesService,
+  WorkspacesServiceImpl,
+} from 'app/shared/services/workspaces.service';
+import { WorkspacesServiceMock } from 'app/shared/services/workspaces.service.mock';
+import { getRootReducer } from 'app/shared/state/root.reducer';
+import { UiEffects } from 'app/shared/state/ui.effects';
+import { UsersEffects } from 'app/shared/state/users.effects';
+import { environment } from 'environments/environment';
+import './rxjs-operators';
 
 export const providers = [
   GuardLoginService,

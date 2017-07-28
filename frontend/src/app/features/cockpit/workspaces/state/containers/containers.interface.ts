@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { JsTable, emptyJsTable } from 'app/shared/helpers/jstable.helper';
-import { IComponents } from '../components/components.interface';
 import { IServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
-import {
-  IContainerBackendSSE,
-  IContainerBackendDetails,
-  IContainerBackendSSECommon,
-  IContainerBackendDetailsCommon,
-} from 'app/shared/services/containers.service';
 import { ISharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
+import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
+import {
+  IContainerBackendDetails,
+  IContainerBackendDetailsCommon,
+  IContainerBackendSSE,
+  IContainerBackendSSECommon,
+} from 'app/shared/services/containers.service';
+import { IComponents } from '../components/components.interface';
 
 export interface IContainerUI {
   // for UI

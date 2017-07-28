@@ -18,14 +18,14 @@
 import { Injectable } from '@angular/core';
 
 import { Router } from '@angular/router';
+import { Actions, Effect } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
-import { Observable } from 'rxjs/Observable';
 import { NotificationsService } from 'angular2-notifications';
+import { Observable } from 'rxjs/Observable';
 
-import { UsersService, IUserBackend } from '../services/users.service';
-import { environment } from '../../../environments/environment';
 import { Users } from 'app/shared/state/users.actions';
+import { environment } from '../../../environments/environment';
+import { IUserBackend, UsersService } from '../services/users.service';
 
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
 

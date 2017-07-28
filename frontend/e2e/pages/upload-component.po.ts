@@ -16,10 +16,10 @@
  */
 
 import {
-  browser,
-  ExpectedConditions as EC,
   $,
+  browser,
   ElementFinder,
+  ExpectedConditions as EC,
 } from 'protractor';
 import { waitTimeout } from '../common';
 

@@ -17,22 +17,22 @@
 
 import {
   IWorkspacesTable,
-  workspacesTableFactory,
   workspaceRowFactory,
+  workspacesTableFactory,
 } from './workspaces.interface';
 
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
-  updateById,
-  removeById,
+  JsTable,
   mergeInto,
   putById,
-  JsTable,
+  removeById,
+  updateById,
 } from 'app/shared/helpers/jstable.helper';
 import {
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
 } from 'app/shared/services/workspaces.service';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { Users } from 'app/shared/state/users.actions';
 
 export namespace WorkspacesReducer {

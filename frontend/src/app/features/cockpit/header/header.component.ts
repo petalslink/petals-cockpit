@@ -16,18 +16,18 @@
  */
 
 import {
-  Component,
-  OnInit,
-  Input,
   ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { IStore } from 'app/shared/state/store.interface';
-import { IUi } from 'app/shared/state/ui.interface';
 import { Ui } from 'app/shared/state/ui.actions';
-import { ICurrentUser } from 'app/shared/state/users.interface';
+import { IUi } from 'app/shared/state/ui.interface';
 import { Users } from 'app/shared/state/users.actions';
+import { ICurrentUser } from 'app/shared/state/users.interface';
 
 @Component({
   selector: 'app-header',

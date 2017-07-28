@@ -17,12 +17,12 @@
 
 import { Action } from '@ngrx/store';
 
-import { JsTable } from 'app/shared/helpers/jstable.helper';
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
+import { JsTable } from 'app/shared/helpers/jstable.helper';
 import {
-  ServiceAssemblyState,
   IServiceAssemblyBackendDetails,
   IServiceAssemblyBackendSSE,
+  ServiceAssemblyState,
 } from 'app/shared/services/service-assemblies.service';
 
 export namespace ServiceAssemblies {

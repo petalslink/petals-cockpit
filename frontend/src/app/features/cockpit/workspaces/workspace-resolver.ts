@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, Resolve, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 // until ts 2.4 is released, see https://github.com/palantir/tslint/issues/2470 https://github.com/Microsoft/TypeScript/issues/14953
 // tslint:disable-next-line:no-unused-variable

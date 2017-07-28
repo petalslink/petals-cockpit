@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { containersService, Container } from './containers-mock';
-import { Workspace } from './workspaces-mock';
 import {
-  IBusImport,
-  IBusBackendSSE,
   IBusBackendDetails,
+  IBusBackendSSE,
+  IBusImport,
   IBusInProgressBackend,
 } from 'app/shared/services/buses.service';
+import { Container, containersService } from './containers-mock';
+import { Workspace } from './workspaces-mock';
 
 export class Buses {
   private readonly buses = new Map<string, Bus>();

@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {
+  IServiceAssemblyBackendDetails,
+  IServiceAssemblyBackendSSE,
+  ServiceAssemblyState,
+} from 'app/shared/services/service-assemblies.service';
+import { Component } from './components-mock';
 import { Container } from './containers-mock';
 import { ServiceUnit, serviceUnitsService } from './service-units-mock';
-import { Component } from './components-mock';
-import {
-  ServiceAssemblyState,
-  IServiceAssemblyBackendSSE,
-  IServiceAssemblyBackendDetails,
-} from 'app/shared/services/service-assemblies.service';
 
 class ServiceAssemblies {
   private readonly serviceAssemblies = new Map<string, ServiceAssembly>();

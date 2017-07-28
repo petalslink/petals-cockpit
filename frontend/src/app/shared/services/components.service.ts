@@ -20,10 +20,10 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
-import { environment } from './../../../environments/environment';
 import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+import { environment } from './../../../environments/environment';
 
 // http://stackoverflow.com/a/41631732/2398593
 export const EComponentState = {

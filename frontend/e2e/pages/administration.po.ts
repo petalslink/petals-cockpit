@@ -16,14 +16,14 @@
  */
 
 import {
-  browser,
-  ExpectedConditions as EC,
   $,
+  browser,
   ElementFinder,
+  ExpectedConditions as EC,
 } from 'protractor';
 
-import { urlToMatch, waitAndClick } from '../utils';
 import { waitTimeout } from '../common';
+import { urlToMatch, waitAndClick } from '../utils';
 import { AdminAddEditUserPage } from './admin-add-edit-user.po';
 
 export class AdminPage {

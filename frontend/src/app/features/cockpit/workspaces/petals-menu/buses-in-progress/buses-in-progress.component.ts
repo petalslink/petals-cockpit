@@ -16,15 +16,15 @@
  */
 
 import {
-  Component,
-  OnInit,
-  Input,
   ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import { IBusInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
 import { IStore } from '../../../../../shared/state/store.interface';
+import { IBusInProgress } from '../../state/buses-in-progress/buses-in-progress.interface';
 
 import { Ui } from 'app/shared/state/ui.actions';
 

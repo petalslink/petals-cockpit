@@ -17,8 +17,8 @@
 
 import { Action } from '@ngrx/store';
 
-import { JsTable } from 'app/shared/helpers/jstable.helper';
 import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
+import { JsTable } from 'app/shared/helpers/jstable.helper';
 import {
   IBusBackendDetails,
   IBusBackendSSE,

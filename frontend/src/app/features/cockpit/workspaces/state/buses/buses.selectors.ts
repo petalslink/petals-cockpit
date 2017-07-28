@@ -18,13 +18,13 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IBusUI } from './buses.interface';
-import { IStore } from 'app/shared/state/store.interface';
-import {
-  IBusBackendSSECommon,
-  IBusBackendDetailsCommon,
-} from 'app/shared/services/buses.service';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
+import {
+  IBusBackendDetailsCommon,
+  IBusBackendSSECommon,
+} from 'app/shared/services/buses.service';
+import { IStore } from 'app/shared/state/store.interface';
+import { IBusUI } from './buses.interface';
 
 export interface IBusWithContainers
   extends IBusUI,

@@ -15,26 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
-  putById,
-  updateById,
-  mergeInto,
   JsTable,
+  mergeInto,
+  putById,
   removeById,
+  updateById,
 } from 'app/shared/helpers/jstable.helper';
 import {
-  IUsersTable,
-  usersTableFactory,
-  userRowFactory,
-  IUserRow,
-} from 'app/shared/state/users.interface';
-import {
-  IUserBackend,
   ICurrentUserBackend,
+  IUserBackend,
   IUserNew,
 } from 'app/shared/services/users.service';
 import { Users } from 'app/shared/state/users.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import {
+  IUserRow,
+  IUsersTable,
+  userRowFactory,
+  usersTableFactory,
+} from 'app/shared/state/users.interface';
 
 export namespace UsersReducer {
   type All =

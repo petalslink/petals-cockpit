@@ -19,8 +19,8 @@ import { NgModule } from '@angular/core';
 import { MarkdownToHtmlModule } from 'markdown-to-html-pipe';
 
 import {
-  WorkspaceOverviewComponent,
   WorkspaceDeleteDialogComponent,
+  WorkspaceOverviewComponent,
 } from 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.component';
 import { SharedModule } from 'app/shared/shared.module';
 

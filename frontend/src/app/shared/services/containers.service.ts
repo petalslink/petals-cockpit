@@ -19,12 +19,12 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
-import { environment } from './../../../environments/environment';
 import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
 import { IComponentBackendSSE } from 'app/shared/services/components.service';
 import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
+import { environment } from './../../../environments/environment';
 
 export interface IContainerBackendSSECommon {
   id: string;

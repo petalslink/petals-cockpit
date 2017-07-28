@@ -18,10 +18,10 @@
 import { NgModule } from '@angular/core';
 
 import { SharedModule } from '../../../../../shared/shared.module';
-import { PetalsComponentViewComponent } from './petals-component-view.component';
-import { PetalsComponentViewRoutingModule } from './petals-component-view-routing.module';
-import { PetalsComponentOverviewComponent } from './petals-component-overview/petals-component-overview.component';
 import { PetalsComponentOperationsComponent } from './petals-component-operations/petals-component-operations.component';
+import { PetalsComponentOverviewComponent } from './petals-component-overview/petals-component-overview.component';
+import { PetalsComponentViewRoutingModule } from './petals-component-view-routing.module';
+import { PetalsComponentViewComponent } from './petals-component-view.component';
 
 @NgModule({
   imports: [SharedModule, PetalsComponentViewRoutingModule],

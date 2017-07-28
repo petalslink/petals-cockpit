@@ -16,8 +16,8 @@
  */
 
 import { page } from './common';
-import { WorkspacePage } from './pages/workspace.po';
 import { NotFoundPage } from './pages/not-found';
+import { WorkspacePage } from './pages/workspace.po';
 
 describe(`Petals service-unit content`, () => {
   it(`should open the 404 page if the service-unit doesn't exists`, () => {
