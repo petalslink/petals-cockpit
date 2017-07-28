@@ -46,8 +46,8 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.PetalsDb;
+import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
 import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
-import org.ow2.petals.cockpit.server.utils.WorkspaceDbOperations.SaveWorkspaceDbWitness;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,6 +147,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 .minThreads(availableProcessors).maxThreads(availableProcessors).build();
 
         Configuration jooqConf = jooq.getConfiguration();
+        assert jooqConf != null;
 
         String adminConsoleToken = RandomStringUtils.randomAlphanumeric(20);
 
@@ -161,7 +162,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 bind(PetalsAdmin.class).to(PetalsAdmin.class).in(Singleton.class);
                 bind(PetalsDb.class).to(PetalsDb.class).in(Singleton.class);
                 bind(adminConsoleToken).to(String.class).named(SetupResource.ADMIN_TOKEN);
-                bind(SaveWorkspaceDbWitness.NOP).to(SaveWorkspaceDbWitness.class);
+                bind(WorkspaceDbOperations.class).to(WorkspaceDbOperations.class).in(Singleton.class);
             }
         });
 
@@ -187,7 +188,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         environment.jersey().register(SetupResource.class);
         environment.jersey().register(UsersResource.class);
 
-        if (!DSL.using(jooq.getConfiguration()).fetchExists(USERS, USERS.ADMIN.eq(true))) {
+        if (!DSL.using(jooqConf).fetchExists(USERS, USERS.ADMIN.eq(true))) {
             environment.lifecycle().addServerLifecycleListener(new ServerLifecycleListener() {
                 @Override
                 public void serverStarted(@Nullable Server server) {

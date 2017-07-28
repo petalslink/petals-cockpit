@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.utils;
+package org.ow2.petals.cockpit.server.services;
 
 import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
@@ -52,62 +52,8 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
 
 public class WorkspaceDbOperations {
-
-    private WorkspaceDbOperations() {
-        // utility
-    }
-
-    public interface SaveWorkspaceDbWitness {
-
-        public final static SaveWorkspaceDbWitness NOP = new SaveWorkspaceDbWitness() {
-
-            @Override
-            public void busAdded(Domain bus, BusesRecord bDb) {
-                // NOP
-            }
-
-            @Override
-            public void containerAdded(Container container, ContainersRecord cDb) {
-                // NOP
-            }
-
-            @Override
-            public void componentAdded(Component component, ComponentsRecord compDb) {
-                // NOP
-            }
-
-            @Override
-            public void sharedLibraryAdded(SharedLibrary sl, SharedlibrariesRecord slDb) {
-                // NOP
-            }
-
-            @Override
-            public void serviceAssemblyAdded(ServiceAssembly sa, ServiceassembliesRecord saDb) {
-                // NOP
-            }
-
-            @Override
-            public void serviceUnitAdded(ServiceUnit su, ServiceunitsRecord suDb) {
-                // NOP
-            }
-
-        };
-
-        public void busAdded(Domain bus, BusesRecord bDb);
-
-        public void containerAdded(Container container, ContainersRecord cDb);
-
-        public void componentAdded(Component component, ComponentsRecord compDb);
-
-        public void sharedLibraryAdded(SharedLibrary sl, SharedlibrariesRecord slDb);
-
-        public void serviceAssemblyAdded(ServiceAssembly sa, ServiceassembliesRecord saDb);
-
-        public void serviceUnitAdded(ServiceUnit su, ServiceunitsRecord suDb);
-    }
-
     public interface WorkspaceDbWitness {
-        public final static WorkspaceDbWitness NOP = new WorkspaceDbWitness() {
+        public static final WorkspaceDbWitness NOP = new WorkspaceDbWitness() {
             @Override
             public void addBusInProgress(BusesRecord bDb) {
                 // NOP
@@ -170,15 +116,14 @@ public class WorkspaceDbOperations {
         public void addServiceUnit(ServiceunitsRecord suDb);
     }
 
-    public static void saveDomainToDatabase(Configuration jooq, BusesRecord bDb, Domain topology,
-            WorkspaceDbWitness witness, SaveWorkspaceDbWitness saveWitness) {
+    public void saveDomainToDatabase(Configuration conf, BusesRecord bDb, Domain topology, WorkspaceDbWitness witness) {
         bDb.setImported(true);
         bDb.setName(topology.getName());
-        bDb.attach(jooq);
+        bDb.attach(conf);
         bDb.update();
 
         WorkspaceDbBusBuilder busBuilder = witness.addImportedBus(bDb);
-        saveWitness.busAdded(topology, bDb);
+        busAdded(topology, bDb);
 
         for (Container container : topology.getContainers()) {
             Integer port = container.getPorts().get(PortType.JMX);
@@ -186,11 +131,11 @@ public class WorkspaceDbOperations {
 
             ContainersRecord cDb = new ContainersRecord(null, bDb.getId(), container.getContainerName(),
                     container.getHost(), port, container.getJmxUsername(), container.getJmxPassword());
-            cDb.attach(jooq);
+            cDb.attach(conf);
             int cDbi = cDb.insert();
             assert cDbi == 1;
             WorkspaceDbContainerBuilder containerBuilder = busBuilder.addContainer(cDb);
-            saveWitness.containerAdded(container, cDb);
+            containerAdded(container, cDb);
 
             long containerId = cDb.getId();
 
@@ -201,12 +146,12 @@ public class WorkspaceDbOperations {
                 ComponentMin.Type compType = ComponentMin.Type.from(component.getComponentType());
                 ComponentsRecord compDb = new ComponentsRecord(null, containerId, component.getName(), compState.name(),
                         compType.name());
-                compDb.attach(jooq);
+                compDb.attach(conf);
                 int compDbi = compDb.insert();
                 assert compDbi == 1;
 
                 containerBuilder.addComponent(compDb);
-                saveWitness.componentAdded(component, compDb);
+                componentAdded(component, compDb);
 
                 components.put(component.getName(), compDb.getId());
                 for (SharedLibrary sl : component.getSharedLibraries()) {
@@ -217,17 +162,17 @@ public class WorkspaceDbOperations {
             for (SharedLibrary sl : container.getSharedLibraries()) {
                 SharedlibrariesRecord slDb = new SharedlibrariesRecord(null, sl.getName(), sl.getVersion(),
                         containerId);
-                slDb.attach(jooq);
+                slDb.attach(conf);
                 int slDbi = slDb.insert();
                 assert slDbi == 1;
                 containerBuilder.addSharedLibrary(slDb);
-                saveWitness.sharedLibraryAdded(sl, slDb);
+                sharedLibraryAdded(sl, slDb);
 
                 for (Long componentId : componentsBySL.get(sl)) {
                     assert componentId != null;
                     SharedlibrariesComponentsRecord slCompDb = new SharedlibrariesComponentsRecord(slDb.getId(),
                             componentId);
-                    slCompDb.attach(jooq);
+                    slCompDb.attach(conf);
                     int slCompDbi = slCompDb.insert();
                     assert slCompDbi == 1;
                     containerBuilder.addSharedLibraryComponent(slCompDb);
@@ -238,28 +183,52 @@ public class WorkspaceDbOperations {
                 ServiceAssemblyMin.State state = ServiceAssemblyMin.State.from(sa.getState());
                 ServiceassembliesRecord saDb = new ServiceassembliesRecord(null, containerId, sa.getName(),
                         state.name());
-                saDb.attach(jooq);
+                saDb.attach(conf);
                 int saDbi = saDb.insert();
                 assert saDbi == 1;
                 containerBuilder.addServiceAssembly(saDb);
-                saveWitness.serviceAssemblyAdded(sa, saDb);
+                serviceAssemblyAdded(sa, saDb);
 
                 for (ServiceUnit su : sa.getServiceUnits()) {
                     Long componentId = components.get(su.getTargetComponent());
                     assert componentId != null;
                     ServiceunitsRecord suDb = new ServiceunitsRecord(null, componentId, su.getName(), saDb.getId(),
                             containerId);
-                    suDb.attach(jooq);
+                    suDb.attach(conf);
                     int suDbi = suDb.insert();
                     assert suDbi == 1;
                     containerBuilder.addServiceUnit(suDb);
-                    saveWitness.serviceUnitAdded(su, suDb);
+                    serviceUnitAdded(su, suDb);
                 }
             }
         }
     }
 
-    public static void fetchWorkspaceFromDatabase(Configuration conf, WorkspacesRecord w, WorkspaceDbWitness builder) {
+    public void busAdded(Domain bus, BusesRecord bDb) {
+        // NOP
+    }
+
+    public void containerAdded(Container container, ContainersRecord cDb) {
+        // NOP
+    }
+
+    public void componentAdded(Component component, ComponentsRecord compDb) {
+        // NOP
+    }
+
+    public void sharedLibraryAdded(SharedLibrary sl, SharedlibrariesRecord slDb) {
+        // NOP
+    }
+
+    public void serviceAssemblyAdded(ServiceAssembly sa, ServiceassembliesRecord saDb) {
+        // NOP
+    }
+
+    public void serviceUnitAdded(ServiceUnit su, ServiceunitsRecord suDb) {
+        // NOP
+    }
+
+    public void fetchWorkspaceFromDatabase(Configuration conf, WorkspacesRecord w, WorkspaceDbWitness builder) {
         DSLContext ctx = DSL.using(conf);
         for (BusesRecord b : ctx.selectFrom(BUSES).where(BUSES.WORKSPACE_ID.eq(w.getId())).fetchInto(BUSES)) {
             if (b.getImported()) {
