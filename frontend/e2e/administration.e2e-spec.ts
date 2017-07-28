@@ -60,10 +60,8 @@ describe(`Administration`, () => {
       expect(editVnoel.saveButton.isEnabled()).toBe(false);
 
       const editAdmin = admin.openEditUser('admin');
-      browser.wait(EC.invisibilityOf(editVnoel.component), waitTimeout);
-
       // the previously panel should have been closed
-      expect(editVnoel.component.isDisplayed()).toBe(false);
+      browser.wait(EC.invisibilityOf(editVnoel.component), waitTimeout);
 
       // the current user can't delete itself
       expect(editAdmin.deleteButton.isEnabled()).toBe(false);
@@ -71,7 +69,7 @@ describe(`Administration`, () => {
       expect(editAdmin.saveButton.isEnabled()).toBe(true);
 
       editVnoel = admin.openEditUser('vnoel');
-      expect(editAdmin.component.isDisplayed()).toBe(false);
+      browser.wait(EC.invisibilityOf(editAdmin.component), waitTimeout);
       // we cleared it before, it should have been reset now
       expect(editVnoel.nameInput.getAttribute('value')).toEqual(`Victor NOEL`);
     });
@@ -106,8 +104,6 @@ describe(`Administration`, () => {
       add.addButton.click();
       browser.wait(EC.invisibilityOf(add.component), waitTimeout);
 
-      expect(add.component.isDisplayed()).toBe(false);
-
       expect(
         getMultipleElementsTexts(admin.panelListUsers, '.user-id', '.user-name')
       ).toEqual([
@@ -127,7 +123,7 @@ describe(`Administration`, () => {
 
       // clean for backend
       editNewUser.deleteButton.click();
-      expect(editNewUser.component.isPresent()).toBe(false);
+      browser.wait(EC.invisibilityOf(editNewUser.component), waitTimeout);
 
       expect(
         getMultipleElementsTexts(admin.panelListUsers, '.user-id', '.user-name')
