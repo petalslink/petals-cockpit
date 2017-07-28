@@ -39,12 +39,11 @@
     <argLine></argLine>
 
     <liquibase.version>3.5.3</liquibase.version>
-    <!-- 0.7.8 is not usable because of https://github.com/puniverse/quasar/issues/279 -->
-    <quasar.version>0.7.7</quasar.version>
-    <pac4j.version>2.0.0</pac4j.version>
+    <quasar.version>0.7.9</quasar.version>
+    <pac4j.version>2.1.0</pac4j.version>
     <h2.version>1.4.196</h2.version>
     <slf4j.version>1.7.25</slf4j.version>
-    <jooq.version>3.9.3</jooq.version>
+    <jooq.version>3.9.4</jooq.version>
     <petals-admin.version>2.0.0-SNAPSHOT</petals-admin.version>
     <petals-jmx-api.version>1.1.0-SNAPSHOT</petals-jmx-api.version>
     <enunciate.version>2.9.1</enunciate.version>
@@ -144,12 +143,33 @@
         <groupId>co.paralleluniverse</groupId>
         <artifactId>quasar-actors</artifactId>
         <version>${quasar.version}</version>
+        <exclusions>
+          <exclusion>
+            <!-- until dropwizard-core bring a newer version of
+                 metrics-core or there is a bom for metrics -->
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>co.paralleluniverse</groupId>
         <artifactId>quasar-core</artifactId>
         <version>${quasar.version}</version>
         <classifier>jdk8</classifier>
+        <exclusions>
+          <exclusion>
+            <!-- until dropwizard-core bring a newer version of
+                 metrics-core or there is a bom for metrics -->
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>${h2.version}</version>
       </dependency>
       <dependency>
         <groupId>org.zapodot</groupId>
@@ -171,7 +191,7 @@
         <artifactId>assertj-db</artifactId>
         <version>1.2.0</version>
       </dependency>
-        <dependency>
+      <dependency>
         <groupId>com.webcohesion.enunciate</groupId>
         <artifactId>enunciate-core-annotations</artifactId>
         <version>${enunciate.version}</version>
@@ -179,9 +199,9 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <!-- force version because of quasar-core -->
         <groupId>org.hdrhistogram</groupId>
         <artifactId>HdrHistogram</artifactId>
+        <!-- because of quasar-core -->
         <version>2.1.9</version>
       </dependency>
       <dependency>
@@ -195,12 +215,6 @@
         <artifactId>byte-buddy-agent</artifactId>
         <!-- because of quasar-actors, mockito-core and embedded-db-junit -->
         <version>1.7.1</version>
-      </dependency>
-      <dependency>
-        <!-- force version because of dropwizard-bom and embedded-db-junit -->
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <version>${h2.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
