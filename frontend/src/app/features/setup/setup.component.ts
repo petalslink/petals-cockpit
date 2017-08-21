@@ -17,7 +17,6 @@
 
 import {
   AfterViewInit,
-  ChangeDetectorRef,
   Component,
   OnDestroy,
   OnInit,
@@ -55,8 +54,7 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     private users: UsersService,
     private route: ActivatedRoute,
-    private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private fb: FormBuilder
   ) {}
 
   ngOnInit() {
@@ -80,14 +78,15 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       .let(isLargeScreen)
       .first()
       .filter(ss => ss)
-      .do(_ => {
-        if (this.form.controls['token'].value !== '') {
-          this.usernameInput._focusInput();
-        } else {
-          this.tokenInput._focusInput();
-        }
-        this.cdr.detectChanges();
-      })
+      .do(() =>
+        // this prevent change detection errors
+        setTimeout(
+          () =>
+            !this.form.controls['token'].value
+              ? this.tokenInput._focusInput()
+              : this.usernameInput._focusInput()
+        )
+      )
       .subscribe();
   }
 
