@@ -37,8 +37,7 @@ variables:
     - du -hs $PWD/$YARN_CACHE_DIRECTORY || true
     - cd frontend
     - export PATH=`yarn bin`:$PATH
-    # because of https://github.com/yarnpkg/yarn/issues/2629 (fixed in 0.24)
-    - time yarn --frozen-lockfile --link-duplicates --non-interactive || yarn --frozen-lockfile --link-duplicates --non-interactive
+    - time yarn --frozen-lockfile --link-duplicates --non-interactive
     - du -hs node_modules || true
     - cd ..
   cache:
@@ -101,7 +100,7 @@ test-frontend:
     # unit tests
     - time yarn run test:ci
     # e2e
-    - time ../ci/xrun.sh ../ci/wmrun.sh yarn run e2e:ci
+    - time yarn run e2e:ci
 
 build-frontend:
   <<: *node-java-yarn
@@ -205,5 +204,4 @@ e2e-product:
     - time $COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml
     - nohup $COCKPIT server $COCKPIT_CONFIG &
     - cd frontend
-    # TODO the exclude does not work, see https://github.com/angular/angular-cli/issues/5172
-    - time ../ci/xrun.sh ../ci/wmrun.sh yarn run e2e:product
+    - time yarn run e2e:product
