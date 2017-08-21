@@ -15,30 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { createSelector } from 'reselect';
 
-import { arrayEquals } from 'app/shared/helpers/shared.helper';
 import { IStore } from 'app/shared/state/store.interface';
-import { IBusInProgressRow } from './buses-in-progress.interface';
 
-export function getBusesInProgress(
-  store$: Store<IStore>
-): Observable<IBusInProgressRow[]> {
-  return store$
-    .select(s => s.busesInProgress.allIds.map(id => s.busesInProgress.byId[id]))
-    .distinctUntilChanged(arrayEquals);
-}
+export const getBusesInProgressAllIds = (state: IStore) =>
+  state.busesInProgress.allIds;
 
-export function getCurrentBusInProgressOrNull(
-  store$: Store<IStore>
-): Observable<IBusInProgressRow> {
-  return store$.select(
-    state =>
-      !state.busesInProgress.selectedBusInProgressId
-        ? null
-        : state.busesInProgress.byId[
-            state.busesInProgress.selectedBusInProgressId
-          ]
-  );
-}
+export const getBusesInProgressByIds = (state: IStore) =>
+  state.busesInProgress.byId;
+
+export const getBusesInProgress = createSelector(
+  getBusesInProgressAllIds,
+  getBusesInProgressByIds,
+  (allIds, byId) => allIds.map(id => byId[id])
+);
+
+const getSelectedBusInProgressId = (state: IStore) =>
+  state.busesInProgress.selectedBusInProgressId;
+
+export const getCurrentBusInProgressOrNull = createSelector(
+  getSelectedBusInProgressId,
+  getBusesInProgressByIds,
+  (selectedBusInProgressId, busesInProgressById) =>
+    !selectedBusInProgressId
+      ? null
+      : busesInProgressById[selectedBusInProgressId]
+);

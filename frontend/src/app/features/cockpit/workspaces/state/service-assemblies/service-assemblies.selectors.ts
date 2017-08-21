@@ -51,3 +51,9 @@ export function getCurrentServiceAssembly(
       }
     });
 }
+
+export const getServiceAssembliesByIds = (state: IStore) =>
+  state.serviceAssemblies.byId;
+
+export const getServiceAssembliesAllIds = (state: IStore) =>
+  state.serviceAssemblies.allIds;

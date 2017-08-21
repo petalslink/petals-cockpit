@@ -16,17 +16,27 @@
  */
 
 import { Store } from '@ngrx/store';
+import { createSelector } from 'reselect';
 import { Observable } from 'rxjs/Observable';
 
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 import {
-  arrayEquals,
-  escapeStringRegexp,
-} from 'app/shared/helpers/shared.helper';
+  getBusesAllIds,
+  getBusesByIds,
+} from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
+import { getComponentsByIds } from 'app/features/cockpit/workspaces/state/components/components.selectors';
+import { getContainersByIds } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
+import { getServiceAssembliesByIds } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
+import { getServiceUnitsByIds } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
+import { getSharedLibrariesByIds } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
+import { escapeStringRegexp } from 'app/shared/helpers/shared.helper';
 import { IStore } from 'app/shared/state/store.interface';
 import { IUserRow } from 'app/shared/state/users.interface';
-import { getUsersById } from 'app/shared/state/users.selectors';
-import { IWorkspaceRow, IWorkspaces } from './workspaces.interface';
+import { getUsersAllIds, getUsersById } from 'app/shared/state/users.selectors';
+import { IWorkspaces } from './workspaces.interface';
+
+const getSelectedWorkspaceId = (state: IStore) =>
+  state.workspaces.selectedWorkspaceId;
 
 export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
   return store$
@@ -39,7 +49,7 @@ export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
           const ws = workspaces.byId[wId];
           return {
             ...ws,
-            users: ws.users.map(id => usersById.byId[id]),
+            users: ws.users.map(id => usersById[id]),
           };
         }),
       };
@@ -48,37 +58,30 @@ export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
 
 // -----------------------------------------------------------
 
-export function getCurrentWorkspace(
-  store$: Store<IStore>
-): Observable<IWorkspaceRow> {
-  return store$.select(currentWorkspace);
-}
+export const getCurrentWorkspace = (store: IStore) =>
+  store.workspaces.byId[store.workspaces.selectedWorkspaceId];
 
-const currentWorkspace = (s: IStore) =>
-  s.workspaces.byId[s.workspaces.selectedWorkspaceId];
+const getCurrentWorkspaceUsersById = createSelector(
+  (state: IStore) => getCurrentWorkspace(state).users,
+  getUsersById,
+  (usersIds, usersById) => usersIds.map(id => usersById[id])
+);
 
 export function getCurrentWorkspaceUsers(
   store$: Store<IStore>
 ): Observable<IUserRow[]> {
-  return store$
-    .select(state =>
-      currentWorkspace(state).users.map(id => state.users.byId[id])
-    )
-    .distinctUntilChanged(arrayEquals);
+  return store$.select(getCurrentWorkspaceUsersById);
 }
 
-export function getUsersNotInCurrentWorkspace(
-  store$: Store<IStore>
-): Observable<IUserRow[]> {
-  return store$
-    .map(state => {
-      const wUsers = currentWorkspace(state).users;
-      return state.users.allIds
-        .filter(id => !wUsers.includes(id))
-        .map(id => state.users.byId[id]);
-    })
-    .distinctUntilChanged(arrayEquals);
-}
+export const getUsersNotInCurrentWorkspace = createSelector(
+  getUsersAllIds,
+  getUsersById,
+  (state: IStore) => getCurrentWorkspace(state).users,
+  (usersAllIds, usersById, currentWorkspaceUsersSe) =>
+    usersAllIds
+      .filter(id => !currentWorkspaceUsersSe.includes(id))
+      .map(id => usersById[id])
+);
 
 // -----------------------------------------------------------
 
@@ -100,30 +103,28 @@ export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
   name: string;
 }
 
-export function getCurrentWorkspaceTree(
-  store$: Store<IStore>
-): Observable<WorkspaceElement[]> {
-  return store$.select(state => {
-    const tree = buildTree(state);
-    const search = state.workspaces.searchPetals;
+const buildTree = createSelector(
+  getSelectedWorkspaceId,
+  getBusesAllIds,
+  getBusesByIds,
+  getContainersByIds,
+  getComponentsByIds,
+  getServiceUnitsByIds,
+  getServiceAssembliesByIds,
+  getSharedLibrariesByIds,
+  (
+    selectedWorkspaceId,
+    busesAllIds,
+    busesByIds,
+    containersByIds,
+    componentsByIds,
+    serviceUnitsByIds,
+    serviceAssembliesByIds,
+    sharedLibrariesByIds
+  ) => {
+    const baseUrl = `/workspaces/${selectedWorkspaceId}/petals`;
 
-    if (typeof search !== 'string' || search === '') {
-      return tree;
-    }
-
-    const escaped = escapeStringRegexp(search);
-
-    return tree
-      .map(e => filterElement(escaped.toLowerCase(), e))
-      .filter(e => e !== null);
-  });
-}
-
-function buildTree(state: IStore) {
-  const baseUrl = `/workspaces/${state.workspaces.selectedWorkspaceId}/petals`;
-  return state.buses.allIds
-    .map(id => state.buses.byId[id])
-    .map<WorkspaceElement>(bus => ({
+    return busesAllIds.map(id => busesByIds[id]).map<WorkspaceElement>(bus => ({
       id: bus.id,
       type: WorkspaceElementType.BUS,
       name: bus.name,
@@ -133,7 +134,7 @@ function buildTree(state: IStore) {
       svgIcon: `bus`,
 
       children: bus.containers
-        .map(id => state.containers.byId[id])
+        .map(id => containersByIds[id])
         .map<WorkspaceElement>(container => ({
           id: container.id,
           type: WorkspaceElementType.CONTAINER,
@@ -151,7 +152,7 @@ function buildTree(state: IStore) {
               isFolded: container.isComponentsCategoryFolded,
               cssClass: `workspace-element-type-category-components`,
               children: container.components
-                .map(id => state.components.byId[id])
+                .map(id => componentsByIds[id])
                 .map<WorkspaceElement>(component => ({
                   id: component.id,
                   type: WorkspaceElementType.COMPONENT,
@@ -162,7 +163,7 @@ function buildTree(state: IStore) {
                   svgIcon: `component`,
 
                   children: component.serviceUnits
-                    .map(id => state.serviceUnits.byId[id])
+                    .map(id => serviceUnitsByIds[id])
                     .map<WorkspaceElement>(serviceUnit => ({
                       id: serviceUnit.id,
                       type: WorkspaceElementType.SERVICEUNIT,
@@ -182,7 +183,7 @@ function buildTree(state: IStore) {
               isFolded: container.isServiceAssembliesCategoryFolded,
               cssClass: `workspace-element-type-category-service-assemblies`,
               children: container.serviceAssemblies
-                .map(id => state.serviceAssemblies.byId[id])
+                .map(id => serviceAssembliesByIds[id])
                 .map<WorkspaceElement>(serviceAssembly => ({
                   id: serviceAssembly.id,
                   type: WorkspaceElementType.SERVICEASSEMBLY,
@@ -201,7 +202,7 @@ function buildTree(state: IStore) {
               isFolded: container.isSharedLibrariesCategoryFolded,
               cssClass: `workspace-element-type-category-shared-libraries`,
               children: container.sharedLibraries
-                .map(id => state.sharedLibraries.byId[id])
+                .map(id => sharedLibrariesByIds[id])
                 .map<WorkspaceElement>(sl => ({
                   id: sl.id,
                   type: WorkspaceElementType.SHAREDLIBRARY,
@@ -216,7 +217,24 @@ function buildTree(state: IStore) {
           ],
         })),
     }));
-}
+  }
+);
+
+export const getCurrentWorkspaceTree = createSelector(
+  buildTree,
+  (state: IStore) => state.workspaces.searchPetals,
+  (tree, search) => {
+    if (typeof search !== 'string' || search === '') {
+      return tree;
+    }
+
+    const escaped = escapeStringRegexp(search);
+
+    return tree
+      .map(e => filterElement(escaped.toLowerCase(), e))
+      .filter(e => e !== null);
+  }
+);
 
 function filterElement(filter: string, element: any): any {
   if (element.name.toLowerCase().trim().match(filter)) {

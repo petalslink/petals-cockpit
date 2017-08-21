@@ -45,3 +45,7 @@ export function getCurrentContainer(
       }
     });
 }
+
+export const getContainersByIds = (state: IStore) => state.containers.byId;
+
+export const getContainersAllIds = (state: IStore) => state.containers.allIds;

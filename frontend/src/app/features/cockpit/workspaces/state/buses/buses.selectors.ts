@@ -48,3 +48,7 @@ export function getCurrentBus(
     }
   });
 }
+
+export const getBusesByIds = (state: IStore) => state.buses.byId;
+
+export const getBusesAllIds = (state: IStore) => state.buses.allIds;
