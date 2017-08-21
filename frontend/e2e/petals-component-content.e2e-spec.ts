@@ -18,7 +18,6 @@
 import * as path from 'path';
 
 import { page } from './common';
-import { ComponentOverviewPage } from './pages/component.po';
 import { NotFoundPage } from './pages/not-found';
 import { WorkspaceOverviewPage, WorkspacePage } from './pages/workspace.po';
 import { waitAndClick } from './utils';

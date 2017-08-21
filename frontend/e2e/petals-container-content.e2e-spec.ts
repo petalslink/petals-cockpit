@@ -19,8 +19,6 @@ import * as path from 'path';
 
 import { page } from './common';
 import { NotFoundPage } from './pages/not-found';
-import { ServiceAssemblyOverviewPage } from './pages/service-assembly.po';
-import { SharedLibraryOverviewPage } from './pages/shared-library.po';
 import { WorkspacePage } from './pages/workspace.po';
 
 describe(`Petals container content`, () => {
