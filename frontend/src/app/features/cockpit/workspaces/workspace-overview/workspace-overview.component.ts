@@ -76,7 +76,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     this.store$.dispatch(new Users.FetchAll());
 
     this.appUsers$ = this.store$
-      .let(getUsersNotInCurrentWorkspace)
+      .select(getUsersNotInCurrentWorkspace)
       .map(us => us.map(u => u.id).sort());
 
     this.addUserFormGroup = this.fb.group({
@@ -87,12 +87,10 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       ],
     });
 
-    this.currentUserId$ = this.store$
-      .let(getCurrentUser())
-      .map(user => user.id);
+    this.currentUserId$ = this.store$.let(getCurrentUser).map(user => user.id);
 
     this.workspace$ = this.store$
-      .let(getCurrentWorkspace)
+      .select(getCurrentWorkspace)
       .do(
         wk =>
           wk.isAddingUserToWorkspace

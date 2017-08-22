@@ -27,6 +27,8 @@ import { Observable } from 'rxjs/Observable';
 import { IStore } from '../../../../../../shared/state/store.interface';
 
 import { IServiceUnitWithSA } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
+import { stateToLedColor } from 'app/shared/helpers/shared.helper';
+import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 
 @Component({
@@ -47,5 +49,9 @@ export class PetalsServiceUnitOverviewComponent implements OnInit {
     this.btnByScreenSize$ = this.store$
       .let(isLargeScreen)
       .map(ls => (ls ? `mat-raised-button` : `mat-mini-fab`));
+  }
+
+  getLedColorFromState(state: ServiceAssemblyState) {
+    return stateToLedColor(state);
   }
 }

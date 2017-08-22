@@ -15,25 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  // disabled for now because of
+  // https://github.com/angular/angular/issues/12313
+  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UploadComponent implements OnInit {
   @Input() title: string;
   @Input() disabled: boolean;
-  @Input() error: boolean;
+  @Input() error: string;
   @Input() placeholderChangeFileName?: string;
 
   @Output()

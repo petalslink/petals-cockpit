@@ -78,7 +78,10 @@ export function getInputByName(
   fixture: ComponentFixture<any>,
   name: string
 ): HTMLInputElement {
-  return getElementBySelector(fixture, `input[formControlName="${name}"]`);
+  return getElementBySelector(
+    fixture,
+    `input[formControlName="${name}"],input[name="${name}"]`
+  );
 }
 
 export function getButtonByClass(

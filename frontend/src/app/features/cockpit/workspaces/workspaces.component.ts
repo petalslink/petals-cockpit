@@ -61,7 +61,7 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.workspaces$ = this.store$.let(getWorkspaces);
-    this.user$ = this.store$.let(getCurrentUser());
+    this.user$ = this.store$.let(getCurrentUser);
 
     // open workspace dialog when needed
     this.store$

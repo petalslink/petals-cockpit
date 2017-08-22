@@ -15,23 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+export enum ELed {
+  GREEN = 'GREEN',
+  RED = 'RED',
+  YELLOW = 'YELLOW',
+  GREY = 'GREY',
+  BLACK = 'BLACK',
+  WHITE = 'WHITE',
+}
 
-import { IStore } from './store.interface';
-
-const _isLargeScreen = ss =>
-  ss === 'md' || ss === 'lg' || ss === 'gt-lg' || ss === 'xl' || ss === 'gt-md';
-
-const getScreenSize = (state: IStore) => state.ui.screenSize;
-
-export const isLargeScreen = (store$: Store<IStore>): Observable<boolean> => {
-  return store$
-    .select(getScreenSize)
-    .map(_isLargeScreen)
-    .distinctUntilChanged();
-};
-
-export const isSmallScreen = (store$: Store<IStore>): Observable<boolean> => {
-  return isLargeScreen(store$).map(b => !b);
-};
+export type Led = keyof typeof ELed;

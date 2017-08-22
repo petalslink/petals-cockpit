@@ -21,11 +21,10 @@ import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
 
-// http://stackoverflow.com/a/41631732/2398593
-export const ESharedLibraryState = {
-  Loaded: 'Loaded' as 'Loaded',
-  Unloaded: 'Unloaded' as 'Unloaded',
-};
+export enum ESharedLibraryState {
+  Loaded = 'Loaded',
+  Unloaded = 'Unloaded',
+}
 
 export type SharedLibraryState = keyof typeof ESharedLibraryState;
 

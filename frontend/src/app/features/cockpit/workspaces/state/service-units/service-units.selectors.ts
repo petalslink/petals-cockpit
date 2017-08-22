@@ -44,3 +44,8 @@ export function getCurrentServiceUnit(
       }
     });
 }
+
+export const getServiceUnitsByIds = (state: IStore) => state.serviceUnits.byId;
+
+export const getServiceUnitsAllIds = (state: IStore) =>
+  state.serviceUnits.allIds;

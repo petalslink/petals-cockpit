@@ -46,3 +46,9 @@ export function getCurrentSharedLibrary(
       }
     });
 }
+
+export const getSharedLibrariesByIds = (state: IStore) =>
+  state.sharedLibraries.byId;
+
+export const getSharedLibrariesAllIds = (state: IStore) =>
+  state.sharedLibraries.allIds;

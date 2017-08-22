@@ -25,22 +25,21 @@ import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assembli
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { environment } from './../../../environments/environment';
 
-// http://stackoverflow.com/a/41631732/2398593
-export const EComponentState = {
-  Started: 'Started' as 'Started',
-  Stopped: 'Stopped' as 'Stopped',
-  Loaded: 'Loaded' as 'Loaded',
-  Unloaded: 'Unloaded' as 'Unloaded',
-  Shutdown: 'Shutdown' as 'Shutdown',
-  Unknown: 'Unknown' as 'Unknown',
-};
+export enum EComponentState {
+  Started = 'Started',
+  Stopped = 'Stopped',
+  Loaded = 'Loaded',
+  Unloaded = 'Unloaded',
+  Shutdown = 'Shutdown',
+  Unknown = 'Unknown',
+}
 
 export type ComponentState = keyof typeof EComponentState;
 
-export const EComponentType = {
-  BC: 'BC' as 'BC',
-  SE: 'SE' as 'SE',
-};
+export enum EComponentType {
+  BC = 'BC',
+  SE = 'SE',
+}
 
 export type ComponentType = keyof typeof EComponentType;
 

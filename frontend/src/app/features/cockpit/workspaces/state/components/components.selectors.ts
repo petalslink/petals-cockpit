@@ -58,3 +58,7 @@ export function getCurrentComponent(
       }
     });
 }
+
+export const getComponentsByIds = (state: IStore) => state.components.byId;
+
+export const getComponentsAllIds = (state: IStore) => state.components.allIds;

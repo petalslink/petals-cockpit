@@ -16,6 +16,7 @@ data-mongodb
 .settings/
 target/
 .factorypath
+.history
 
 # ------------------------------------
 #              BACKEND

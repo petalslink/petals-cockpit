@@ -15,23 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+
+import { Led } from 'app/shared/components/led/led.interface';
 
 @Component({
-  selector: 'app-state-led',
-  templateUrl: './state-led.component.html',
-  styleUrls: ['./state-led.component.scss'],
+  selector: 'app-led',
+  templateUrl: './led.component.html',
+  styleUrls: ['./led.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StateLedComponent implements OnInit {
-  @Input() state: string;
-
-  constructor() {}
-
-  ngOnInit() {}
+export class LedComponent {
+  @Input() color: Led;
 }

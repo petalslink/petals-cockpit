@@ -100,7 +100,7 @@ export class PetalsBusInProgressViewComponent
     this.busesInProgressTable$ = this.store$.select(
       state => state.busesInProgress
     );
-    this.busInProgress$ = this.store$.let(getCurrentBusInProgressOrNull);
+    this.busInProgress$ = this.store$.select(getCurrentBusInProgressOrNull);
 
     this.createFormImportBus();
 
