@@ -21,9 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <md-input-container *ngIf="!user" fxFlex fxFlex.md="50%" fxFlex.sm="50%">
           <input type="text" autocomplete="off" mdInput placeholder="Username" formControlName="username">
           <span mdPrefix><md-icon color="primary">person</md-icon></span>
-          <md-hint *ngIf="formErrors.username" class="form-error">
+          <md-error *ngIf="formErrors.username">
             {{ formErrors.username }}
-          </md-hint>
+          </md-error>
         </md-input-container>
       </div>
 
@@ -31,18 +31,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <md-input-container fxFlex fxFlex.md="50%" fxFlex.sm="50%">
           <input type="text" autocomplete="off" mdInput placeholder="Name" formControlName="name">
           <span mdPrefix><md-icon color="primary">assignment_ind</md-icon></span>
-          <md-hint *ngIf="formErrors.name" class="form-error">
+          <md-error *ngIf="formErrors.name">
             {{ formErrors.name }}
-          </md-hint>
+          </md-error>
         </md-input-container>
       </div>
       <div fxLayoutAlign="start center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center">
         <md-input-container fxFlex fxFlex.md="50%" fxFlex.sm="50%">
           <input type="password" autocomplete="new-password" mdInput placeholder="Password" formControlName="password">
           <span mdPrefix><md-icon color="primary">vpn_key</md-icon></span>
-          <md-hint *ngIf="formErrors.password" class="form-error">
+          <md-error *ngIf="formErrors.password">
             {{ formErrors.password }}
-          </md-hint>
+          </md-error>
         </md-input-container>
       </div>
     </div>

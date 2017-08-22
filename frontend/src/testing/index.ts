@@ -54,6 +54,26 @@ export function getElementBySelector<T = any>(
   return null;
 }
 
+export function getElementsBySelector<T = any>(
+  fixture: ComponentFixture<any>,
+  selectorCss: string
+): T[] {
+  const elems = fixture.debugElement.queryAll(By.css(selectorCss));
+
+  if (elems) {
+    return elems.map(elem => elem.nativeElement);
+  }
+
+  return null;
+}
+
+export function getInputListBySelector(
+  fixture: ComponentFixture<any>,
+  listName: string
+): HTMLInputElement[] {
+  return getElementsBySelector(fixture, `${listName} input`);
+}
+
 export function getInputByName(
   fixture: ComponentFixture<any>,
   name: string

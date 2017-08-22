@@ -23,9 +23,8 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-
 import { IStore } from '../../../../../../shared/state/store.interface';
 
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
@@ -44,9 +43,8 @@ import { stateNameToPossibleActionsComponent } from '../../../../../../shared/he
 })
 export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
   @Input() component: IComponentWithSLsAndSUs;
-  public fileToDeploy: File;
-  public serviceUnitName: string;
-  public parametersForm: FormGroup;
+
+  parametersForm: FormGroup;
 
   constructor(private store$: Store<IStore>) {}
 
@@ -67,7 +65,10 @@ export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
 
     this.parametersForm = new FormGroup(
       keysParameters.reduce(
-        (acc, key) => ({ ...acc, [key]: new FormControl(parameters[key]) }),
+        (acc, key) => ({
+          ...acc,
+          [key]: new FormControl(parameters[key], Validators.required),
+        }),
         {}
       )
     );
