@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import '../../../../../styles/themes/_light.theme';
+@import '../../../../../styles/shared/_colors';
+
 :host {
   width: 100%;
   height: 100%;
@@ -22,11 +25,16 @@
   flex-direction: column;
 }
 
-// all menu views have the same size (petals, service, api)
-md-sidenav {
-  height: 100%;
-  // customize the buttons of petals menu view
-  .pnl-buttons-workspaces > .no-border-radius {
-    border-radius: 0;
+md-sidenav-container {
+  background-image: url(../../../../../assets/img/gray_jean.png);
+  color: mat-color($theme-primary, default-contrast);
+
+  // all menu views have the same size (petals, service, api)
+  > md-sidenav {
+    height: 100%;
+    // customize the buttons of petals menu view
+    .pnl-buttons-workspaces > .no-border-radius {
+      border-radius: 0;
+    }
   }
 }
