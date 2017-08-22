@@ -16,7 +16,7 @@
  */
 
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MD_DIALOG_DATA, MdDialog, MdDialogRef } from '@angular/material';
 import { Dispatcher, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -82,7 +82,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     this.addUserFormGroup = this.fb.group({
       userSearchCtrl: [
         '',
-        null,
+        Validators.required,
         [SharedValidator.isStringInObsArrayValidator(this.appUsers$)],
       ],
     });

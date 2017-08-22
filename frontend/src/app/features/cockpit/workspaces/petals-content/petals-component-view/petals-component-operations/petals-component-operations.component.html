@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <form formnovalidate *ngIf="parametersForm" [formGroup]="parametersForm">
               <div *ngFor="let param of parametersForm.controls | keys | orderBy">
                 <md-input-container floatPlaceholder="always" class="margin-top-x1">
-                  <input mdInput [placeholder]="param" type="text" [formControlName]="param" required>
+                  <input mdInput [placeholder]="param" type="text" [formControlName]="param" [errorStateMatcher]="createFormErrorStateMatcher" required>
                   <md-error>Required!</md-error>
                 </md-input-container>
               </div>

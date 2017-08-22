@@ -108,7 +108,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     mdInput
                     placeholder="User to add"
                     [mdAutocomplete]="autocompleteUsers"
-                    formControlName="userSearchCtrl">
+                    formControlName="userSearchCtrl"
+                    required>
+                  <md-error>Select a user on the list</md-error>
                 </md-input-container>
 
                 <md-autocomplete #autocompleteUsers>
@@ -117,7 +119,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   </md-option>
                 </md-autocomplete>
 
-                <button md-raised-button type="submit" class="text-upper" color="accent" [disabled]="!addUserFormGroup.valid || workspace.isAddingUserToWorkspace">Add</button>
+                <button md-raised-button type="submit" class="text-upper" color="accent" [disabled]="addUserFormGroup.invalid || workspace.isAddingUserToWorkspace">Add</button>
               </form>
 
               <md-list *ngIf="currentUserId$ | async as currentUserId">
