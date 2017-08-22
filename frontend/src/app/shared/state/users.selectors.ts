@@ -21,7 +21,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { isNot } from '../helpers/shared.helper';
 import { IStore } from './store.interface';
-import { ICurrentUser, IUserRow } from './users.interface';
+import { ICurrentUser } from './users.interface';
 
 export const getUsers = (state: IStore) => state.users;
 

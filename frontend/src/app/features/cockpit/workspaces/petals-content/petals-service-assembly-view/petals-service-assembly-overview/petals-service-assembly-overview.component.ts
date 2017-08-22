@@ -24,11 +24,11 @@ import {
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../../shared/state/store.interface';
 import { IServiceAssemblyWithSUsAndComponents } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
 import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
-import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 import { stateToLedColor } from 'app/shared/helpers/shared.helper';
+import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
+import { IStore } from 'app/shared/state/store.interface';
 
 @Component({
   selector: 'app-petals-service-assembly-overview',

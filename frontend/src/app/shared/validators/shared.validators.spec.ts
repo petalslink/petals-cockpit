@@ -18,8 +18,8 @@
 import { async } from '@angular/core/testing';
 import { Observable } from 'rxjs/Observable';
 
-import { SharedValidator } from 'app/shared/validators/shared.validator';
 import { AbstractControl } from '@angular/forms';
+import { SharedValidator } from 'app/shared/validators/shared.validator';
 
 describe(`SharedValidator`, () => {
   describe(`isStringInObsArrayValidator`, () => {
