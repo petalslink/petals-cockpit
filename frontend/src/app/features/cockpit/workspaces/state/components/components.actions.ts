@@ -128,6 +128,7 @@ export namespace Components {
         id: string;
         file: File;
         serviceUnitName: string;
+        correlationId: string;
       }
     ) {}
   }
@@ -145,6 +146,10 @@ export namespace Components {
     '[Components] Deploy service unit success';
   export class DeployServiceUnitSuccess implements Action {
     readonly type = DeployServiceUnitSuccessType;
-    constructor(public readonly payload: IServiceUnitBackendSSE) {}
+    constructor(
+      public readonly payload: IServiceUnitBackendSSE & {
+        correlationId: string;
+      }
+    ) {}
   }
 }

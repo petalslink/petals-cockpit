@@ -177,9 +177,10 @@ export class ComponentsEffects {
           )
           .map(
             tables =>
-              new Components.DeployServiceUnitSuccess(
-                tables.serviceUnits.byId[tables.serviceUnits.allIds[0]]
-              )
+              new Components.DeployServiceUnitSuccess({
+                ...tables.serviceUnits.byId[tables.serviceUnits.allIds[0]],
+                correlationId: action.payload.correlationId,
+              })
           )
           .catch(err => {
             if (environment.debug) {

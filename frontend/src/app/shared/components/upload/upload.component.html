@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <!-- https://github.com/angular/material2/issues/3758 -->
 <!-- the trick here consists in hiding the input, and bind the click on a button to that input -->
 <md-card [ngClass.gt-md]="'card-auto-size'">
-  <form (ngSubmit)="onDeploy.emit({file: fileToDeploy, name: changeFileName})">
+  <form #formUpload="ngForm" (ngSubmit)="onDeploy.emit({file: fileToDeploy, name: changeFileName})">
     <md-card-title fxLayout="row">
       <span fxFlex class="text-upper title">{{ title }}</span>
       <md-icon color="primary">file_upload</md-icon>
@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <!-- https://github.com/angular/material2/issues/3758 -->
     <!--the trick here consists in hiding the input, and bind the click on a button to that input-->
     <md-card-content fxLayout="column" fxLayout.gt-sm="row">
-      <input #deploy class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="disabled">
+      <input #deploy name="deployModel" class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="disabled" [(ngModel)]="deployModel">
 
       <md-input-container fxFlex *ngIf="fileToDeploy && placeholderChangeFileName" class="change-file-input">
         <input mdInput type="text" [(ngModel)]="changeFileName" name="changeFileName" [placeholder]="placeholderChangeFileName" [disabled]="disabled">

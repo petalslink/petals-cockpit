@@ -16,10 +16,19 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { Store } from '@ngrx/store';
+import { Actions } from '@ngrx/effects';
+import { Action, Store } from '@ngrx/store';
+import { Subject } from 'rxjs/Subject';
+import { v4 as uuid } from 'uuid';
 
 import { PetalsComponentOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-operations/petals-component-operations.component';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
@@ -32,7 +41,7 @@ import {
   getInputListBySelector,
 } from 'testing';
 
-describe('Administration edit user', () => {
+describe('Petals component operations', () => {
   let component: TestHostPetalsComponentOperationsComponent;
   let fixture: ComponentFixture<TestHostPetalsComponentOperationsComponent>;
 
@@ -65,6 +74,10 @@ describe('Administration edit user', () => {
           {
             provide: Store,
             useClass: MockStore,
+          },
+          {
+            provide: Actions,
+            useClass: MockActions,
           },
         ],
         declarations: [
@@ -159,24 +172,57 @@ describe('Administration edit user', () => {
     });
   });
 
-  it(`should deploy a Service Unit`, () => {
-    const child: PetalsComponentOperationsComponent = fixture.debugElement.query(
-      By.css('app-petals-component-operations')
-    ).componentInstance;
+  describe(`should test deploy method`, () => {
+    let child: PetalsComponentOperationsComponent;
 
-    const store = fixture.debugElement.injector.get(Store);
+    beforeEach(() => {
+      child = fixture.debugElement.query(
+        By.css('app-petals-component-operations')
+      ).componentInstance;
+    });
 
-    spyOn(store, 'dispatch').and.callThrough();
+    it(`should deploy a Service Unit`, () => {
+      const store = fixture.debugElement.injector.get(Store);
 
-    expect(store.dispatch).not.toHaveBeenCalled();
+      spyOn(store, 'dispatch').and.callThrough();
 
-    child.deploy(<any>'some file', 'Su name');
+      child.deploy(<any>'some file', 'Su name');
 
-    expect(store.dispatch).toHaveBeenCalledWith(
-      new Components.DeployServiceUnit({
-        id: 'contId0',
-        file: 'some file' as any,
-        serviceUnitName: 'Su name',
+      expect(store.dispatch).toHaveBeenCalledWith(
+        new Components.DeployServiceUnit({
+          id: 'contId0',
+          file: 'some file' as any,
+          serviceUnitName: 'Su name',
+          correlationId: <any>jasmine.any(String),
+        })
+      );
+    });
+
+    it(
+      `should reset upload form once service unit has been deployed`,
+      fakeAsync(() => {
+        const actions: MockActions = fixture.debugElement.injector.get(
+          Actions as any
+        );
+
+        spyOn(uuid, 'v4').and.returnValue('id1');
+
+        spyOn(child.uploadSu, 'resetForm');
+
+        child.deploy(<any>'some file', 'Su name');
+
+        // simulate the effect
+        actions.next(
+          new Components.DeployServiceUnitSuccess(
+            <any>{
+              correlationId: 'id1',
+            }
+          )
+        );
+
+        tick();
+
+        expect(child.uploadSu.resetForm).toHaveBeenCalled();
       })
     );
   });
@@ -216,4 +262,10 @@ class TestHostPetalsComponentOperationsComponent implements OnInit {
 
 export class MockStore {
   dispatch(data: any) {}
+}
+
+class MockActions extends Subject<Action> {
+  ofType(actionType: string) {
+    return this.filter(a => a.type === actionType);
+  }
 }

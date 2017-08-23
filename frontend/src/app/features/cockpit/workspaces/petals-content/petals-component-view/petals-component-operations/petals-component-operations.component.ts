@@ -20,8 +20,10 @@ import {
   Component,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import {
   FormControl,
@@ -30,17 +32,21 @@ import {
   NgForm,
   Validators,
 } from '@angular/forms';
+import { Actions } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { IStore } from '../../../../../../shared/state/store.interface';
+import { Subject } from 'rxjs/Subject';
+import { v4 as uuid } from 'uuid';
 
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
+import { UploadComponent } from 'app/shared/components/upload/upload.component';
 import { formErrorStateMatcher } from 'app/shared/helpers/form.helper';
 import {
   ComponentState,
   EComponentState,
 } from 'app/shared/services/components.service';
 import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
+import { IStore } from '../../../../../../shared/state/store.interface';
 
 @Component({
   selector: 'app-petals-component-operations',
@@ -48,14 +54,24 @@ import { stateNameToPossibleActionsComponent } from '../../../../../../shared/he
   styleUrls: ['./petals-component-operations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
+export class PetalsComponentOperationsComponent
+  implements OnInit, OnChanges, OnDestroy {
+  onDestroy$ = new Subject<void>();
+
   @Input() component: IComponentWithSLsAndSUs;
+
+  @ViewChild('uploadSu') uploadSu: UploadComponent;
 
   parametersForm: FormGroup;
 
-  constructor(private store$: Store<IStore>) {}
+  constructor(private store$: Store<IStore>, private actions: Actions) {}
 
   ngOnInit() {}
+
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     // if an error happen, without that control the form will be reset to the values in store
@@ -112,11 +128,25 @@ export class PetalsComponentOperationsComponent implements OnInit, OnChanges {
   }
 
   deploy(file: File, serviceUnitName: string) {
+    const correlationId = uuid();
+
+    this.actions
+      .ofType(Components.DeployServiceUnitSuccessType)
+      .takeUntil(this.onDestroy$)
+      .filter(
+        (u: Components.DeployServiceUnitSuccess) =>
+          u.payload.correlationId === correlationId
+      )
+      .first()
+      .do(_ => this.uploadSu.resetForm())
+      .subscribe();
+
     this.store$.dispatch(
       new Components.DeployServiceUnit({
         id: this.component.id,
         file,
         serviceUnitName: serviceUnitName.trim(),
+        correlationId,
       })
     );
   }
