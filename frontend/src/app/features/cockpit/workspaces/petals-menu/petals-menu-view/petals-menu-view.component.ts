@@ -24,7 +24,6 @@ import {
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
-import { TreeEvent } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
@@ -65,44 +64,44 @@ export class PetalsMenuViewComponent implements OnInit {
       .subscribe();
   }
 
-  onTreeSelect(e: TreeEvent<WorkspaceElement>) {
-    if (e.item.link) {
+  onTreeSelect(e: WorkspaceElement) {
+    if (e.link) {
       this.closeSidenavOnSmallScreen();
     } else {
       this.onTreeToggleFold(e);
     }
   }
 
-  onTreeToggleFold(e: TreeEvent<WorkspaceElement>) {
-    switch (e.item.type) {
+  onTreeToggleFold(e: WorkspaceElement) {
+    switch (e.type) {
       case WorkspaceElementType.BUS:
-        this.store$.dispatch(new Buses.ToggleFold({ id: e.item.id }));
+        this.store$.dispatch(new Buses.ToggleFold(e));
         break;
       case WorkspaceElementType.CONTAINER:
         this.store$.dispatch(
-          new Containers.ToggleFold({ id: e.item.id, type: 'container' })
+          new Containers.ToggleFold({ id: e.id, type: 'container' })
         );
         break;
       case WorkspaceElementType.COMPCATEGORY:
         this.store$.dispatch(
-          new Containers.ToggleFold({ id: e.item.id, type: 'components' })
+          new Containers.ToggleFold({ id: e.id, type: 'components' })
         );
         break;
       case WorkspaceElementType.SLCATEGORY:
         this.store$.dispatch(
-          new Containers.ToggleFold({ id: e.item.id, type: 'shared-libraries' })
+          new Containers.ToggleFold({ id: e.id, type: 'shared-libraries' })
         );
         break;
       case WorkspaceElementType.SACATEGORY:
         this.store$.dispatch(
           new Containers.ToggleFold({
-            id: e.item.id,
+            id: e.id,
             type: 'service-assemblies',
           })
         );
         break;
       case WorkspaceElementType.COMPONENT:
-        this.store$.dispatch(new Components.ToggleFold({ id: e.item.id }));
+        this.store$.dispatch(new Components.ToggleFold(e));
         break;
     }
   }

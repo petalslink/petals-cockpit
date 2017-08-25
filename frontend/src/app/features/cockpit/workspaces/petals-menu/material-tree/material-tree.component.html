@@ -13,17 +13,17 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-nav-list dense *ngFor="let item of tree; index as i" [style.marginLeft.px]="margin" class="nav-list-petals-tree">
+<md-nav-list dense *ngFor="let item of tree" [style.marginLeft.px]="margin" class="nav-list-petals-tree">
   <div class="item-list">
-    <a md-list-item [class]="item.cssClass" [routerLink]="item.link ? [item.link] : []" [routerLinkActive]="item.link ? 'active-link' : ''" (click)="select({deepLevel: deepLevel, index: i, item: item})"
+    <a md-list-item [class]="item.cssClass" [routerLink]="item.link ? [item.link] : []" [routerLinkActive]="item.link ? 'active-link' : ''" (click)="select(item)"
      ng-style="deepLevel === 0 && {'background-color':'green'} || deepLevel === 1 && {'background-color':'yellow'}">
       <div fxLayout="row" fxLayoutAlign="start center" class="item-content">
         <md-icon
-          *ngIf="item.children && item.children.length > 0; else noIconChildren"
+          *ngIf="item.children.length > 0; else noIconChildren"
           md-list-icon
           fxLayoutAlign="center center"
           class="arrow-size"
-          (click)="toggleFold({deepLevel: deepLevel, index: i, item: item})"
+          (click)="toggleFold(item)"
           [class.disable-fold-unfold]="search !== ''"
           [class.rotate-minus-90]="item.isFolded">arrow_drop_down</md-icon>
 
@@ -40,7 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   </div>
 
   <app-material-tree
-    *ngIf="!item.isFolded && item.children"
+    *ngIf="!item.isFolded && item.children.length > 0"
     [tree]="item.children"
     [search]="search"
     [marginLeft]="marginLeft"

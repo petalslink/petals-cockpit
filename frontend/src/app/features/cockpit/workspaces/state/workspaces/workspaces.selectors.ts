@@ -100,7 +100,6 @@ export enum WorkspaceElementType {
 export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
   id: string;
   type: WorkspaceElementType;
-  name: string;
 }
 
 const buildTree = createSelector(
