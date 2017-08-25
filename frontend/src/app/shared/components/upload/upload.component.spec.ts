@@ -161,17 +161,45 @@ describe(`UploadComponent`, () => {
 
     expect(DOM.errorText).toEqual('some error!');
   });
+
+  describe(`should test reset method`, () => {
+    let child: UploadComponent;
+
+    beforeEach(() => {
+      child = hostFixture.debugElement.query(By.css('app-upload'))
+        .componentInstance;
+    });
+
+    it(`should check if upload form has been resetted`, () => {
+      spyOn(child.formUpload, 'reset');
+
+      child.fileToDeploy = null;
+      child.changeFileName = null;
+      child.deployModel = null;
+
+      child.resetForm();
+
+      expect(child.formUpload.reset).toHaveBeenCalled();
+      expect(child.fileToDeploy).toBe(undefined);
+      expect(child.changeFileName).toBe(undefined);
+      expect(child.deployModel).toBe(undefined);
+
+      // check that the template has been updated
+      hostFixture.detectChanges();
+      expect(DOM.selectedFileNameInpt).toBe(null);
+      expect(DOM.selectedFileNameTxt).toBe(null);
+    });
+  });
 });
 
 @Component({
-  selector: 'app-host-component',
   template: `
     <app-upload
       [title]="title"
       [disabled]="disabled"
       [error]="error"
       [placeholderChangeFileName]="placeholderChangeFileName"
-    ></app-upload>
+      (onDeploy)="deploy($event)"></app-upload>
   `,
 })
 class HostComponent {
@@ -179,4 +207,6 @@ class HostComponent {
   disabled: boolean;
   error: string;
   placeholderChangeFileName: string;
+
+  onDeploy() {}
 }

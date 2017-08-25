@@ -15,7 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-upload',
@@ -34,8 +42,11 @@ export class UploadComponent implements OnInit {
   @Output()
   onDeploy: EventEmitter<{ file: File; name: string }> = new EventEmitter();
 
-  public fileToDeploy: File;
-  public changeFileName: string;
+  @ViewChild('formUpload') formUpload: NgForm;
+  deployModel;
+
+  fileToDeploy: File;
+  changeFileName: string;
 
   constructor() {}
 
@@ -52,5 +63,12 @@ export class UploadComponent implements OnInit {
         this.fileToDeploy.name.length - 4
       );
     }
+  }
+
+  resetForm() {
+    this.fileToDeploy = undefined;
+    this.changeFileName = undefined;
+    this.deployModel = undefined;
+    this.formUpload.reset();
   }
 }

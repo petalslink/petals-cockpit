@@ -76,16 +76,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </md-card>
 
       <app-upload
-      [style.opacity]="component.state && component.state === 'Loaded' ? 0.5 : 1"
-      [title]="'Service Unit Deployment'"
-      [disabled]="component.isDeployingServiceUnit || (component.state && component.state === 'Loaded')"
-      [error]="component.errorDeployment"
-      [placeholderChangeFileName]="'Service unit name'"
-      (onDeploy)="deploy($event.file, $event.name)"
-      class="deploy-service-unit"
-      fxFlex
+        #uploadSu
+        [style.opacity]="component.state && component.state === 'Loaded' ? 0.5 : 1"
+        [title]="'Service Unit Deployment'"
+        [disabled]="component.isDeployingServiceUnit || (component.state && component.state === 'Loaded')"
+        [error]="component.errorDeployment"
+        [placeholderChangeFileName]="'Service unit name'"
+        (onDeploy)="deploy($event.file, $event.name)"
+        class="deploy-service-unit"
+        fxFlex
       ></app-upload>
-
     </div>
   </div>
 </div>
