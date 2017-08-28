@@ -16,23 +16,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div *ngIf="bus$ | async as bus" fxLayout="column" class="wrapper-content">
   <md-toolbar color="primary" class="toolbar-page-header">
     <div class="prefix-toolbar-title">
-      <md-icon color="accent" *ngIf="!bus.isFetchingDetails">grade</md-icon>
+      <md-icon color="accent" *ngIf="!bus.value.isFetchingDetails">grade</md-icon>
 
-      <md-spinner color="accent" *ngIf="bus.isFetchingDetails"></md-spinner>
+      <md-spinner color="accent" *ngIf="bus.value.isFetchingDetails"></md-spinner>
     </div>
 
-    <h1 class="title" fxFlex [ngClass.lt-md]="'margin-left-x1'">{{ bus.name }}</h1>
+    <h1 class="title" fxFlex [ngClass.lt-md]="'margin-left-x1'">{{ bus.value.name }}</h1>
 
     <button color="warn" type="button" class="btn-delete-bus" (click)="openDeletionDialog()" md-mini-fab mdTooltip="Delete the bus"
-      mdTooltipPosition="before" [disabled]="bus.isRemoving">
+      mdTooltipPosition="before" [disabled]="bus.value.isRemoving">
       <md-icon>delete</md-icon>
     </button>
   </md-toolbar>
 
   <md-tab-group fxFlex>
     <md-tab label="Overview">
-      <!-- TODO: Create a component for every tab -->
-      <app-petals-bus-overview [bus]="bus" [workspaceId]="workspaceId$ | async" fxFill></app-petals-bus-overview>
+      <app-removable [isHoverVisible]="bus.isDeleted" [message]="'This bus has been removed'" fxFill>
+        <app-petals-bus-overview [bus]="bus.value" [workspaceId]="workspaceId$ | async" fxFill></app-petals-bus-overview>
+      </app-removable>
     </md-tab>
   </md-tab-group>
 </div>

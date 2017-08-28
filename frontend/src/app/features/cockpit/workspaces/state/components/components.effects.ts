@@ -17,7 +17,6 @@
 
 import { Injectable } from '@angular/core';
 
-import { Router } from '@angular/router';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
@@ -41,7 +40,6 @@ export class ComponentsEffects {
   constructor(
     private store$: Store<IStore>,
     private actions$: Actions,
-    private router: Router,
     private componentsService: ComponentsService,
     private notifications: NotificationsService
   ) {}
@@ -66,13 +64,6 @@ export class ComponentsEffects {
 
       if (data.state === EComponentState.Unloaded) {
         const component = store.components.byId[data.id];
-
-        if (store.components.selectedComponentId === component.id) {
-          this.router.navigate([
-            '/workspaces',
-            store.workspaces.selectedWorkspaceId,
-          ]);
-        }
 
         this.notifications.success(
           'Component unloaded',

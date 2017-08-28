@@ -16,20 +16,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div *ngIf="sharedLibrary$ | async as sharedLibrary" fxLayout="column" class="wrapper-content">
   <md-toolbar color="primary" class="toolbar-page-header">
     <div class="prefix-toolbar-title">
-      <md-icon color="accent" *ngIf="!sharedLibrary.isFetchingDetails">grade</md-icon>
+      <md-icon color="accent" *ngIf="!sharedLibrary.value.isFetchingDetails">grade</md-icon>
 
-      <md-spinner color="accent" *ngIf="sharedLibrary.isFetchingDetails"></md-spinner>
+      <md-spinner color="accent" *ngIf="sharedLibrary.value.isFetchingDetails"></md-spinner>
     </div>
 
-    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ sharedLibrary.name }}</h1>
+    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ sharedLibrary.value.name }}</h1>
   </md-toolbar>
 
   <md-tab-group fxFlex>
     <md-tab label="Overview">
-      <app-petals-shared-library-overview [sharedLibrary]="sharedLibrary" [workspaceId]="workspaceId$ | async" fxFill></app-petals-shared-library-overview>
+      <app-removable [isHoverVisible]="sharedLibrary.isDeleted" [message]="'This shared library has been removed'" fxFill>
+        <app-petals-shared-library-overview [sharedLibrary]="sharedLibrary.value" [workspaceId]="workspaceId$ | async" fxFill></app-petals-shared-library-overview>
+      </app-removable>
     </md-tab>
     <md-tab label="Operations">
-      <app-petals-shared-library-operations [sharedLibrary]="sharedLibrary" fxFill></app-petals-shared-library-operations>
+      <app-removable [isHoverVisible]="sharedLibrary.isDeleted" [message]="'This shared library has been removed'" fxFill>
+        <app-petals-shared-library-operations [sharedLibrary]="sharedLibrary.value" fxFill></app-petals-shared-library-operations>
+      </app-removable>
     </md-tab>
   </md-tab-group>
 </div>

@@ -29,6 +29,7 @@ import {
 } from '../../state/components/components.selectors';
 
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
+import { deletable, IDeletable } from 'app/shared/operators/deletable.operator';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
@@ -39,7 +40,7 @@ import { Ui } from 'app/shared/state/ui.actions';
 export class PetalsComponentViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  public component$: Observable<IComponentWithSLsAndSUs>;
+  public component$: Observable<IDeletable<IComponentWithSLsAndSUs>>;
   public workspaceId$: Observable<string>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
@@ -64,7 +65,7 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
-    this.component$ = this.store$.let(getCurrentComponent);
+    this.component$ = this.store$.let(getCurrentComponent).let(deletable);
 
     this.workspaceId$ = this.store$.select(
       state => state.workspaces.selectedWorkspaceId

@@ -41,6 +41,9 @@ import { RouterModule } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { PrettyJsonModule } from 'angular2-prettyjson';
+import { NgxHoverOpacityModule } from 'ngx-hover-opacity';
+
+import { RemovableComponent } from 'app/shared/components/removable/removable.component';
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
 import { NgArrayPipesModule, NgObjectPipesModule } from 'ngx-pipes';
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
@@ -71,6 +74,7 @@ export const imports = [
   MdButtonModule,
   FlexLayoutModule,
   FormsModule,
+  NgxHoverOpacityModule,
 ];
 
 export const declarations = [
@@ -79,6 +83,7 @@ export const declarations = [
   UploadComponent,
   NotFound404Component,
   LedComponent,
+  RemovableComponent,
 ];
 
 export const exportss = [

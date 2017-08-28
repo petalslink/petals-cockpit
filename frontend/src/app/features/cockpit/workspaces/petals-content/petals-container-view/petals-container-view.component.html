@@ -16,22 +16,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div *ngIf="container$ | async as container" fxLayout="column" class="wrapper-content">
   <md-toolbar color="primary" class="toolbar-page-header">
     <div class="prefix-toolbar-title">
-      <md-icon color="accent" *ngIf="!container.isFetchingDetails">grade</md-icon>
+      <md-icon color="accent" *ngIf="!container.value.isFetchingDetails">grade</md-icon>
 
-      <md-spinner color="accent" *ngIf="container.isFetchingDetails"></md-spinner>
+      <md-spinner color="accent" *ngIf="container.value.isFetchingDetails"></md-spinner>
     </div>
 
-    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ container.name }}</h1>
+    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ container.value.name }}</h1>
   </md-toolbar>
 
   <md-tab-group fxFlex>
     <md-tab label="Overview">
-      <!-- TODO: Create a component for every tab -->
-      <app-petals-container-overview [workspaceId]="(workspaceId$ | async)" [container]="container"
-        fxFill></app-petals-container-overview>
+      <app-removable [isHoverVisible]="container.isDeleted" [message]="'This container has been removed'" fxFill>
+        <app-petals-container-overview [workspaceId]="(workspaceId$ | async)" [container]="container.value" fxFill></app-petals-container-overview>
+      </app-removable>
     </md-tab>
+
     <md-tab label="Operations">
-      <app-petals-container-operations [container]="container" fxFill></app-petals-container-operations>
+      <app-removable [isHoverVisible]="container.isDeleted" [message]="'This container has been removed'" fxFill>
+        <app-petals-container-operations [container]="container.value" fxFill></app-petals-container-operations>
+      </app-removable>
     </md-tab>
   </md-tab-group>
 </div>

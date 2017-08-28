@@ -33,21 +33,21 @@ export function getCurrentServiceAssembly(
 ): Observable<IServiceAssemblyWithSUsAndComponents> {
   return store$
     .filter(state => !!state.serviceAssemblies.selectedServiceAssemblyId)
-    .mergeMap(state => {
+    .map(state => {
       const sa =
         state.serviceAssemblies.byId[
           state.serviceAssemblies.selectedServiceAssemblyId
         ];
       if (sa) {
-        return Observable.of({
+        return {
           ...sa,
           serviceUnitsAndComponent: sa.serviceUnits.map(id => {
             const su = state.serviceUnits.byId[id];
             return tuple([su, state.components.byId[su.componentId]]);
           }),
-        });
+        };
       } else {
-        return Observable.empty();
+        return null;
       }
     });
 }

@@ -16,7 +16,6 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
@@ -39,7 +38,6 @@ export class SharedLibrariesEffects {
   constructor(
     private store$: Store<IStore>,
     private actions$: Actions,
-    private router: Router,
     private sharedLibrariesService: SharedLibrariesService,
     private notifications: NotificationsService
   ) {}
@@ -130,13 +128,6 @@ export class SharedLibrariesEffects {
       const sl = store.sharedLibraries.byId[data.id];
 
       if (data.state === ESharedLibraryState.Unloaded) {
-        if (store.sharedLibraries.selectedSharedLibraryId === sl.id) {
-          this.router.navigate([
-            '/workspaces',
-            store.workspaces.selectedWorkspaceId,
-          ]);
-        }
-
         this.notifications.success(
           'Shared Library Unloaded',
           `'${sl.name}' has been unloaded`

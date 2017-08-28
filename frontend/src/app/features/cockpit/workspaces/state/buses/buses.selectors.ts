@@ -36,15 +36,15 @@ export interface IBusWithContainers
 export function getCurrentBus(
   store$: Store<IStore>
 ): Observable<IBusWithContainers> {
-  return store$.filter(state => !!state.buses.selectedBusId).mergeMap(state => {
+  return store$.filter(state => !!state.buses.selectedBusId).map(state => {
     const bus = state.buses.byId[state.buses.selectedBusId];
     if (bus) {
-      return Observable.of({
+      return {
         ...bus,
         containers: bus.containers.map(c => state.containers.byId[c]),
-      });
+      };
     } else {
-      return Observable.empty();
+      return null;
     }
   });
 }

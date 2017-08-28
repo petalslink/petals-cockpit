@@ -16,18 +16,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div *ngIf="serviceUnit$ | async as serviceUnit" fxLayout="column" class="wrapper-content">
   <md-toolbar color="primary" class="toolbar-page-header">
     <div class="prefix-toolbar-title">
-      <md-icon color="accent" *ngIf="!serviceUnit.isFetchingDetails">grade</md-icon>
+      <md-icon color="accent" *ngIf="!serviceUnit.value.isFetchingDetails">grade</md-icon>
 
-      <md-spinner color="accent" *ngIf="serviceUnit.isFetchingDetails"></md-spinner>
+      <md-spinner color="accent" *ngIf="serviceUnit.value.isFetchingDetails"></md-spinner>
     </div>
 
-    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ serviceUnit.name }}</h1>
+    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ serviceUnit.value.name }}</h1>
   </md-toolbar>
 
   <md-tab-group fxFlex>
     <md-tab label="Overview">
-      <!-- TODO: Create a component for every tab -->
-      <app-petals-service-unit-overview [serviceUnit]="serviceUnit" [workspaceId]="workspaceId$ | async" fxFill></app-petals-service-unit-overview>
+      <app-removable [isHoverVisible]="serviceUnit.isDeleted" [message]="'This service unit has been removed'" fxFill>
+        <app-petals-service-unit-overview
+          [serviceUnit]="serviceUnit.value"
+          [workspaceId]="workspaceId$ | async"
+          fxFill
+        ></app-petals-service-unit-overview>
+      </app-removable>
     </md-tab>
   </md-tab-group>
 </div>

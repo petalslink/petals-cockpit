@@ -22,13 +22,13 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/state/store.interface';
-
 import {
   getCurrentServiceUnit,
   IServiceUnitWithSA,
 } from '../../state/service-units/service-units.selectors';
 
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
+import { deletable, IDeletable } from 'app/shared/operators/deletable.operator';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
@@ -39,7 +39,7 @@ import { Ui } from 'app/shared/state/ui.actions';
 export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  serviceUnit$: Observable<IServiceUnitWithSA>;
+  serviceUnit$: Observable<IDeletable<IServiceUnitWithSA>>;
   workspaceId$: Observable<string>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
@@ -49,7 +49,7 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
       .map(pm => pm.get('serviceUnitId'))
       .distinctUntilChanged();
 
-    this.serviceUnit$ = this.store$.let(getCurrentServiceUnit);
+    this.serviceUnit$ = this.store$.let(getCurrentServiceUnit).let(deletable);
 
     this.store$.dispatch(
       new Ui.SetTitles({

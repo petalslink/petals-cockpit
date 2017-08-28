@@ -30,6 +30,7 @@ import {
 
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { deletable, IDeletable } from 'app/shared/operators/deletable.operator';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
@@ -41,7 +42,7 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   public workspaceId$: Observable<string>;
-  public bus$: Observable<IBusWithContainers>;
+  public bus$: Observable<IDeletable<IBusWithContainers>>;
 
   constructor(
     private store$: Store<IStore>,
@@ -58,7 +59,7 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
       state => state.workspaces.selectedWorkspaceId
     );
 
-    this.bus$ = this.store$.let(getCurrentBus);
+    this.bus$ = this.store$.let(getCurrentBus).let(deletable);
 
     this.route.paramMap
       .map(pm => pm.get('busId'))
@@ -72,7 +73,7 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
         this.bus$
           .first()
           .do(bus =>
-            bus.containers.forEach(c =>
+            bus.value.containers.forEach(c =>
               this.store$.dispatch(new Containers.FetchDetails(c))
             )
           )
@@ -89,14 +90,14 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
   openDeletionDialog() {
     this.bus$
       .first()
-      .switchMap(b =>
+      .switchMap(bus =>
         this.dialog
           .open(BusDeleteDialogComponent, {
-            data: { bus: b },
+            data: { bus },
           })
           .afterClosed()
           .filter((result: boolean) => result)
-          .do(_ => this.store$.dispatch(new Buses.Delete(b)))
+          .do(_ => this.store$.dispatch(new Buses.Delete(bus.value)))
       )
       .subscribe();
   }

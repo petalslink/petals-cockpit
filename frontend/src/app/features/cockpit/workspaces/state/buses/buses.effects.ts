@@ -70,13 +70,6 @@ export class BusesEffects {
 
       this.notifications.info(bus.name, reason);
 
-      if (state.buses.selectedBusId === id) {
-        this.router.navigate([
-          '/workspaces',
-          state.workspaces.selectedWorkspaceId,
-        ]);
-      }
-
       return new Buses.Removed(bus);
     });
 
