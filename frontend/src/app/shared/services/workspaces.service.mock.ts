@@ -68,28 +68,37 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
   }
 
   deleteWorkspace(id: string) {
-    return helper.response(204).delay(environment.mock.httpDelay).do(_ => {
-      // simulate the backend sending the answer on the SSE
-      setTimeout(() => {
-        workspacesService.delete(id);
-        (this.sseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.WORKSPACE_DELETED.event,
-          { id }
-        );
-      }, environment.mock.sseDelay);
-    });
+    return helper
+      .response(204)
+      .delay(environment.mock.httpDelay)
+      .do(_ => {
+        // simulate the backend sending the answer on the SSE
+        setTimeout(() => {
+          workspacesService.delete(id);
+          (this.sseService as SseServiceMock).triggerSseEvent(
+            SseWorkspaceEvent.WORKSPACE_DELETED.event,
+            { id }
+          );
+        }, environment.mock.sseDelay);
+      });
   }
 
   addUser(workspaceId: string, userId: string) {
-    return helper.response(204).delay(environment.mock.httpDelay).do(_ => {
-      const user: BackendUser = BackendUser.get(userId);
-      workspacesService.get(workspaceId).addUser(user);
-    });
+    return helper
+      .response(204)
+      .delay(environment.mock.httpDelay)
+      .do(_ => {
+        const user: BackendUser = BackendUser.get(userId);
+        workspacesService.get(workspaceId).addUser(user);
+      });
   }
 
   removeUser(workspaceId: string, userId: string) {
-    return helper.response(204).delay(environment.mock.httpDelay).do(_ => {
-      workspacesService.get(workspaceId).removeUser(userId);
-    });
+    return helper
+      .response(204)
+      .delay(environment.mock.httpDelay)
+      .do(_ => {
+        workspacesService.get(workspaceId).removeUser(userId);
+      });
   }
 }

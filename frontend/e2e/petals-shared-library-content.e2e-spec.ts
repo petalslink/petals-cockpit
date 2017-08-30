@@ -56,7 +56,10 @@ describe(`Petals shared library content`, () => {
     expect(ops.unloadButton.isEnabled()).toBe(false);
 
     // unload the component
-    const comp = ops.openOverview().openComponent(0).openOperations();
+    const comp = ops
+      .openOverview()
+      .openComponent(0)
+      .openOperations();
     waitAndClick(comp.stopButton);
     page.clickAndExpectNotification(comp.unloadButton);
 

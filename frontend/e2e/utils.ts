@@ -59,15 +59,21 @@ export function expectNothingFocused() {
 }
 
 export function expectNotFocused(element: ElementFinder) {
-  return expect(browser.switchTo().activeElement().getId()).not.toEqual(
-    element.getId()
-  );
+  return expect(
+    browser
+      .switchTo()
+      .activeElement()
+      .getId()
+  ).not.toEqual(element.getId());
 }
 
 export function expectFocused(element: ElementFinder) {
-  return expect(browser.switchTo().activeElement().getId()).toEqual(
-    element.getId()
-  );
+  return expect(
+    browser
+      .switchTo()
+      .activeElement()
+      .getId()
+  ).toEqual(element.getId());
 }
 
 export function waitAndClick(el: ElementFinder) {

@@ -22,7 +22,10 @@ import { expectNotFocused, expectNothingFocused } from './utils';
 
 describe(`Mobile`, () => {
   beforeEach(() => {
-    browser.manage().window().setSize(412, 732);
+    browser
+      .manage()
+      .window()
+      .setSize(412, 732);
   });
 
   it(`should not select the first input of import bus form on mobile`, () => {

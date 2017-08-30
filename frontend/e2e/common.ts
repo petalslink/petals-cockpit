@@ -25,7 +25,10 @@ export let waitTimeout = 5000;
 
 beforeEach(() => {
   page = new PetalsCockpitPage();
-  browser.manage().window().setSize(1280, 1024);
+  browser
+    .manage()
+    .window()
+    .setSize(1280, 1024);
 });
 
 afterEach(() => {

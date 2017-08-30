@@ -169,7 +169,10 @@ describe(`Administration`, () => {
     });
 
     it('should not show a user-name in panel list users', () => {
-      browser.manage().window().setSize(412, 732);
+      browser
+        .manage()
+        .window()
+        .setSize(412, 732);
 
       expect(
         getMultipleElementsTexts(admin.panelListUsers, '.user-id')
