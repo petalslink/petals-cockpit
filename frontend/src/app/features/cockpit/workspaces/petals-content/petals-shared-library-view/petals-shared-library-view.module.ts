@@ -18,13 +18,18 @@
 import { NgModule } from '@angular/core';
 
 import { PetalsSharedLibraryOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-shared-library-view/petals-shared-library-operations/petals-shared-library-operations.component';
+import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
 import { SharedModule } from '../../../../../shared/shared.module';
 import { PetalsSharedLibraryOverviewComponent } from './petals-shared-library-overview/petals-shared-library-overview.component';
 import { PetalsSharedLibraryViewRoutingModule } from './petals-shared-library-view-routing.module';
 import { PetalsSharedLibraryViewComponent } from './petals-shared-library-view.component';
 
 @NgModule({
-  imports: [SharedModule, PetalsSharedLibraryViewRoutingModule],
+  imports: [
+    SharedModule,
+    PetalsSharedLibraryViewRoutingModule,
+    WorkspaceSharedModule,
+  ],
   declarations: [
     PetalsSharedLibraryViewComponent,
     PetalsSharedLibraryOverviewComponent,

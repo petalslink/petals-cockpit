@@ -13,27 +13,19 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="sharedLibrary$ | async as sharedLibrary" fxLayout="column" class="wrapper-content">
-  <md-toolbar color="primary" class="toolbar-page-header">
-    <div class="prefix-toolbar-title">
-      <md-icon color="accent" *ngIf="!sharedLibrary.value.isFetchingDetails">grade</md-icon>
+<app-workspace-element [resourceObservable]="sharedLibrary$" deletedMessage="This shared library has been removed">
 
-      <md-spinner color="accent" *ngIf="sharedLibrary.value.isFetchingDetails"></md-spinner>
-    </div>
+  <app-petals-shared-library-overview
+    *appWorkspaceElementTab="'Overview'"
+    [sharedLibrary]="we.resource"
+    [workspaceId]="workspaceId$ | async"
+    fxFill
+  ></app-petals-shared-library-overview>
 
-    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ sharedLibrary.value.name }}</h1>
-  </md-toolbar>
+  <app-petals-shared-library-operations
+    *appWorkspaceElementTab="'Operations'"
+    [sharedLibrary]="we.resource"
+    fxFill
+  ></app-petals-shared-library-operations>
 
-  <md-tab-group fxFlex>
-    <md-tab label="Overview">
-      <app-removable [isHoverVisible]="sharedLibrary.isDeleted" [message]="'This shared library has been removed'" fxFill>
-        <app-petals-shared-library-overview [sharedLibrary]="sharedLibrary.value" [workspaceId]="workspaceId$ | async" fxFill></app-petals-shared-library-overview>
-      </app-removable>
-    </md-tab>
-    <md-tab label="Operations">
-      <app-removable [isHoverVisible]="sharedLibrary.isDeleted" [message]="'This shared library has been removed'" fxFill>
-        <app-petals-shared-library-operations [sharedLibrary]="sharedLibrary.value" fxFill></app-petals-shared-library-operations>
-      </app-removable>
-    </md-tab>
-  </md-tab-group>
-</div>
+</app-workspace-element>

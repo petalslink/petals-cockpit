@@ -13,28 +13,19 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="serviceAssembly$ | async as serviceAssembly" fxLayout="column" class="wrapper-content">
-  <md-toolbar color="primary" class="toolbar-page-header">
-    <div class="prefix-toolbar-title">
-      <md-icon color="accent" *ngIf="!serviceAssembly.value.isFetchingDetails">grade</md-icon>
+<app-workspace-element [resourceObservable]="serviceAssembly$" deletedMessage="This service assembly has been removed" #we>
 
-      <md-spinner color="accent" *ngIf="serviceAssembly.value.isFetchingDetails"></md-spinner>
-    </div>
+  <app-petals-service-assembly-overview
+    *appWorkspaceElementTab="'Overview'"
+    [serviceAssembly]="we.resource"
+    [workspaceId]="workspaceId$ | async"
+    fxFill
+  ></app-petals-service-assembly-overview>
 
-    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ serviceAssembly.value.name }}</h1>
-  </md-toolbar>
+  <app-petals-service-assembly-operations
+    *appWorkspaceElementTab="'Operations'"
+    [serviceAssembly]="we.resource"
+    fxFill
+  ></app-petals-service-assembly-operations>
 
-  <md-tab-group fxFlex>
-    <md-tab label="Overview">
-      <app-removable [isHoverVisible]="serviceAssembly.isDeleted" [message]="'This service assembly has been removed'" fxFill>
-        <app-petals-service-assembly-overview [serviceAssembly]="serviceAssembly.value" [workspaceId]="workspaceId$ | async" fxFill></app-petals-service-assembly-overview>
-      </app-removable>
-    </md-tab>
-
-    <md-tab label="Operations">
-      <app-removable [isHoverVisible]="serviceAssembly.isDeleted" [message]="'This service assembly has been removed'" fxFill>
-        <app-petals-service-assembly-operations [serviceAssembly]="serviceAssembly.value" fxFill></app-petals-service-assembly-operations>
-      </app-removable>
-    </md-tab>
-  </md-tab-group>
-</div>
+</app-workspace-element>

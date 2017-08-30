@@ -15,10 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.removable {
-  .message {
-    padding: 10px;
-    background: rgba(255, 0, 0, 0.2);
-    text-align: center;
-  }
-}
+import { NgModule } from '@angular/core';
+
+import {
+  WorkspaceElementComponent,
+  WorkspaceElementTabDirective,
+} from 'app/features/cockpit/workspaces/workspace-element/workspace-element.component';
+import { SharedModule } from 'app/shared/shared.module';
+
+const declarationsAndExports = [
+  WorkspaceElementComponent,
+  WorkspaceElementTabDirective,
+];
+
+@NgModule({
+  imports: [SharedModule],
+  declarations: declarationsAndExports,
+  exports: declarationsAndExports,
+})
+export class WorkspaceSharedModule {}

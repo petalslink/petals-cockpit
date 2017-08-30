@@ -13,27 +13,10 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="component$ | async as component" fxLayout="column" class="wrapper-content">
-  <md-toolbar color="primary" class="toolbar-page-header">
-    <div class="prefix-toolbar-title">
-      <md-icon color="accent" *ngIf="!component.value.isFetchingDetails">grade</md-icon>
+<app-workspace-element [resourceObservable]="component$" deletedMessage="This component has been removed" #we>
 
-      <md-spinner color="accent" *ngIf="component.value.isFetchingDetails"></md-spinner>
-    </div>
+  <app-petals-component-overview *appWorkspaceElementTab="'Overview'" [component]="we.resource" [workspaceId]="workspaceId$ | async" fxFill></app-petals-component-overview>
 
-    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ component.value.name }}</h1>
-  </md-toolbar>
+  <app-petals-component-operations *appWorkspaceElementTab="'Operations'" [component]="we.resource" fxFill></app-petals-component-operations>
 
-  <md-tab-group fxFlex>
-    <md-tab label="Overview">
-      <app-removable [isHoverVisible]="component.isDeleted" [message]="'This component has been removed'" fxFill>
-        <app-petals-component-overview [component]="component.value" [workspaceId]="workspaceId$ | async" fxFill></app-petals-component-overview>
-      </app-removable>
-    </md-tab>
-    <md-tab label="Operations">
-      <app-removable [isHoverVisible]="component.isDeleted" [message]="'This component has been removed'" fxFill>
-        <app-petals-component-operations [component]="component.value" fxFill></app-petals-component-operations>
-      </app-removable>
-    </md-tab>
-  </md-tab-group>
-</div>
+</app-workspace-element>

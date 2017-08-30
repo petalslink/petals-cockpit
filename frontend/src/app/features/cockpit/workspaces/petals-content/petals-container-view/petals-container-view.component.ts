@@ -28,7 +28,6 @@ import {
   getCurrentContainer,
   IContainerWithSiblings,
 } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
-import { deletable, IDeletable } from 'app/shared/operators/deletable.operator';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
@@ -40,7 +39,7 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   workspaceId$: Observable<string>;
-  container$: Observable<IDeletable<IContainerWithSiblings>>;
+  container$: Observable<IContainerWithSiblings>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
 
@@ -56,7 +55,7 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
       state => state.workspaces.selectedWorkspaceId
     );
 
-    this.container$ = this.store$.let(getCurrentContainer).let(deletable);
+    this.container$ = this.store$.let(getCurrentContainer);
 
     this.route.paramMap
       .map(p => p.get('containerId'))
@@ -72,7 +71,7 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
         this.container$
           .first()
           .do(cont =>
-            cont.value.siblings.forEach(c =>
+            cont.siblings.forEach(c =>
               this.store$.dispatch(new Containers.FetchDetails(c))
             )
           )

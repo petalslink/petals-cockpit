@@ -28,7 +28,6 @@ import {
   getCurrentSharedLibrary,
   ISharedLibraryWithComponents,
 } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
-import { deletable, IDeletable } from 'app/shared/operators/deletable.operator';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
@@ -39,7 +38,7 @@ import { Ui } from 'app/shared/state/ui.actions';
 export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  sharedLibrary$: Observable<IDeletable<ISharedLibraryWithComponents>>;
+  sharedLibrary$: Observable<ISharedLibraryWithComponents>;
   workspaceId$: Observable<string>;
 
   constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
@@ -64,9 +63,7 @@ export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
-    this.sharedLibrary$ = this.store$
-      .let(getCurrentSharedLibrary)
-      .let(deletable);
+    this.sharedLibrary$ = this.store$.let(getCurrentSharedLibrary);
 
     this.workspaceId$ = this.store$.select(
       state => state.workspaces.selectedWorkspaceId

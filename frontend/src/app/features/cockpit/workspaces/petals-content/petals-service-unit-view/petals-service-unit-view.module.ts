@@ -17,13 +17,18 @@
 
 import { NgModule } from '@angular/core';
 
+import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
 import { SharedModule } from '../../../../../shared/shared.module';
 import { PetalsServiceUnitOverviewComponent } from './petals-service-unit-overview/petals-service-unit-overview.component';
 import { PetalsServiceUnitViewRoutingModule } from './petals-service-unit-view-routing.module';
 import { PetalsServiceUnitViewComponent } from './petals-service-unit-view.component';
 
 @NgModule({
-  imports: [SharedModule, PetalsServiceUnitViewRoutingModule],
+  imports: [
+    SharedModule,
+    PetalsServiceUnitViewRoutingModule,
+    WorkspaceSharedModule,
+  ],
   declarations: [
     PetalsServiceUnitViewComponent,
     PetalsServiceUnitOverviewComponent,

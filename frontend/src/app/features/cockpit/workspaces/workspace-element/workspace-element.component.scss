@@ -15,18 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+md-icon {
+  padding-right: 10px;
+}
 
-@Component({
-  selector: 'app-removable',
-  templateUrl: './removable.component.html',
-  styleUrls: ['./removable.component.scss'],
-})
-export class RemovableComponent implements OnInit {
-  @Input() message: string;
-  @Input() isHoverVisible: boolean;
-
-  constructor() {}
-
-  ngOnInit() {}
+.wrapper-content {
+  .message {
+    padding: 10px;
+    background: rgba(255, 0, 0, 0.2);
+    text-align: center;
+  }
 }
