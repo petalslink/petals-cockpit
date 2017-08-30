@@ -58,7 +58,10 @@ describe(`Workspaces`, () => {
   });
 
   it(`should always keep the header above any modal`, () => {
-    page.goToLogin().loginToWorkspace(`admin`, `admin`).openWorkspacesDialog();
+    page
+      .goToLogin()
+      .loginToWorkspace(`admin`, `admin`)
+      .openWorkspacesDialog();
 
     // the workspace dialog hides stuffs so we must check if
 

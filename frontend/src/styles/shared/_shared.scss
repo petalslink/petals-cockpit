@@ -190,14 +190,14 @@ pre {
   border-left: 1px solid rgba(0, 0, 0, 0.17);
 }
 ::-webkit-scrollbar-track:vertical:active {
-  border-left: 1px solid rgba(0, 0, 0, 0.20);
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
 }
 ::-webkit-scrollbar-track:horizontal,
 ::-webkit-scrollbar-track:horizontal:hover {
   border-top: 1px solid rgba(0, 0, 0, 0.17);
 }
 ::-webkit-scrollbar-track:horizontal:active {
-  border-top: 1px solid rgba(0, 0, 0, 0.20);
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .prefix-toolbar-title {
@@ -250,7 +250,6 @@ app-header .header-toolbar,
 
 app-header .toolbar-page-header,
 .toolbar-page-header > .mat-toolbar-layout > .mat-toolbar-row,
-// use the style here because
 .admin-page > md-toolbar.toolbar-page-header,
 .admin-page
   > md-toolbar.toolbar-page-header
@@ -313,7 +312,7 @@ app-material-tree
   height: 24px;
   border-bottom-width: 1px;
   border-bottom-style: solid;
-  border-color: rgba(0, 0, 0, .02);
+  border-color: rgba(0, 0, 0, 0.02);
 
   .item-content > .item-name {
     display: inline-block;
@@ -367,8 +366,8 @@ app-material-tree > .nav-list-petals-tree > .item-list {
     > .mat-list-item-content:hover,
   .workspace-element-type-category-shared-libraries
     > .mat-list-item-content:hover {
-    background: rgba(0, 0, 0, .08);
-    color: rgba(0, 0, 0, .54);
+    background: rgba(0, 0, 0, 0.08);
+    color: rgba(0, 0, 0, 0.54);
     font-weight: 500;
   }
   // customize focus categories of elements
@@ -377,8 +376,8 @@ app-material-tree > .nav-list-petals-tree > .item-list {
     > .mat-list-item-content:focus,
   .workspace-element-type-category-shared-libraries
     > .mat-list-item-content:focus {
-    background: rgba(0, 0, 0, .02);
-    color: rgba(0, 0, 0, .54);
+    background: rgba(0, 0, 0, 0.02);
+    color: rgba(0, 0, 0, 0.54);
     font-weight: 500;
   }
 

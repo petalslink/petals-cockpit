@@ -237,7 +237,12 @@ export const getCurrentWorkspaceTree = createSelector(
 );
 
 function filterElement(filter: string, element: any): any {
-  if (element.name.toLowerCase().trim().match(filter)) {
+  if (
+    element.name
+      .toLowerCase()
+      .trim()
+      .match(filter)
+  ) {
     return element;
   } else if (!element.children) {
     return null;

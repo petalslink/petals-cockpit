@@ -213,11 +213,9 @@ describe('Petals component operations', () => {
 
         // simulate the effect
         actions.next(
-          new Components.DeployServiceUnitSuccess(
-            <any>{
-              correlationId: 'id1',
-            }
-          )
+          new Components.DeployServiceUnitSuccess(<any>{
+            correlationId: 'id1',
+          })
         );
 
         tick();

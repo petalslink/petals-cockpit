@@ -138,9 +138,12 @@ describe(`Import Bus`, () => {
     // but cannot connect to the bus
     expect(importBus.error.getText()).toEqual(`Can't connect to hostname:7700`);
     expect(workspace.busesInProgress.count()).toEqual(3);
-    expect(workspace.busesInProgress.get(2).$(`.ip-port`).getText()).toEqual(
-      'hostname:7700'
-    );
+    expect(
+      workspace.busesInProgress
+        .get(2)
+        .$(`.ip-port`)
+        .getText()
+    ).toEqual('hostname:7700');
     expect(
       workspace.busesInProgress
         .get(2)

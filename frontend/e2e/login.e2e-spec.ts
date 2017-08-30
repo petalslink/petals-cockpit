@@ -40,7 +40,10 @@ describe(`Login`, () => {
   });
 
   it(`should redirect to original url after login`, () => {
-    page.goToLogin().loginToWorkspace(`admin`, `admin`).openImportBus();
+    page
+      .goToLogin()
+      .loginToWorkspace(`admin`, `admin`)
+      .openImportBus();
 
     // delete session and refresh to retrigger login
     browser.manage().deleteAllCookies();
