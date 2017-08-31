@@ -235,7 +235,10 @@ export const getCurrentWorkspaceTree = createSelector(
   }
 );
 
-function filterElement(filter: string, element: any): any {
+function filterElement(
+  filter: string,
+  element: WorkspaceElement
+): WorkspaceElement {
   if (
     element.name
       .toLowerCase()
@@ -246,7 +249,7 @@ function filterElement(filter: string, element: any): any {
   } else if (!element.children) {
     return null;
   } else {
-    const es = (element.children as any[])
+    const es = element.children
       .map(e => filterElement(filter, e))
       .filter(e => e !== null);
 
