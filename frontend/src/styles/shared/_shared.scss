@@ -330,7 +330,7 @@ app-material-tree
 .active-link:hover {
   .mat-list-item-content,
   .mat-list-item-content:hover {
-    // background-color: mat-color($theme-primary-x);
+    background-color: mat-color($theme-primary-x);
     @extend .color-primary-bold;
     margin: 0;
   }

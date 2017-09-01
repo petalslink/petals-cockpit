@@ -25,18 +25,13 @@ import {
 } from '@angular/core';
 
 export interface TreeElement<T extends TreeElement<T>> {
+  name: string;
   link?: string;
   isFolded: boolean;
   children: T[];
   cssClass: string;
   svgIcon?: string;
   icon?: string;
-}
-
-export interface TreeEvent<T extends TreeElement<T>> {
-  deepLevel: number;
-  index: number;
-  item: T;
 }
 
 @Component({
@@ -56,9 +51,9 @@ export class MaterialTreeComponent<TE extends TreeElement<TE>>
   // only used internally
   @Input() deepLevel? = 0;
   // event when the user select a line
-  @Output() onSelect = new EventEmitter<TreeEvent<TE>>();
+  @Output() onSelect = new EventEmitter<TE>();
   // event when the user toggle a line
-  @Output() onToggleFold = new EventEmitter<TreeEvent<TE>>();
+  @Output() onToggleFold = new EventEmitter<TE>();
 
   constructor() {}
 
@@ -68,15 +63,16 @@ export class MaterialTreeComponent<TE extends TreeElement<TE>>
     return this.deepLevel === 0 ? 0 : this.marginLeft;
   }
 
-  select(treeEvent: TreeEvent<TE>) {
-    this.onSelect.emit(treeEvent);
+  select(element: TE) {
+    this.onSelect.emit(element);
   }
 
-  toggleFold(treeEvent: TreeEvent<TE>) {
+  toggleFold(element: TE) {
     if (!this.search || !this.search.trim()) {
-      this.onToggleFold.emit(treeEvent);
+      this.onToggleFold.emit(element);
     }
 
+    // prevent the navigate
     return false;
   }
 }
