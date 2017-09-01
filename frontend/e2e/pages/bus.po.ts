@@ -32,6 +32,9 @@ export class BusPage {
   public readonly deleteButton = this.component.$(
     'md-toolbar-row .btn-delete-bus'
   );
+  public readonly hasBeenDeletedMessage = this.component.$(
+    'app-workspace-element .message'
+  );
 
   static waitAndGet() {
     browser.wait(

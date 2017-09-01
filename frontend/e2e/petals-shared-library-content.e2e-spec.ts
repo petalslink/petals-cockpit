@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { browser } from 'protractor/built';
 import { page } from './common';
 import { NotFoundPage } from './pages/not-found';
-import { WorkspaceOverviewPage, WorkspacePage } from './pages/workspace.po';
+import { WorkspacePage } from './pages/workspace.po';
 import { waitAndClick } from './utils';
 
 describe(`Petals shared library content`, () => {
@@ -70,8 +71,13 @@ describe(`Petals shared library content`, () => {
 
     page.clickAndExpectNotification(ops.unloadButton);
 
-    // we should be redirected to the workspace page ...
-    WorkspaceOverviewPage.waitAndGet();
+    expect(browser.getCurrentUrl()).toMatch(
+      /\/workspaces\/\w+\/petals\/shared-libraries\/\w+$/
+    );
+
+    expect(ops.hasBeenDeletedMessage.getText()).toEqual(
+      `This shared library has been removed`
+    );
 
     // and the sl should have been deleted from petals tree
     expect(workspace.treeElement(`SL 0`, 'shared-library').isPresent()).toBe(

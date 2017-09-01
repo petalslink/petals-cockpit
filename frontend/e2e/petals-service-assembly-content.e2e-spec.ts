@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { browser } from 'protractor/built';
 import { page } from './common';
 import { NotFoundPage } from './pages/not-found';
-import { WorkspaceOverviewPage, WorkspacePage } from './pages/workspace.po';
+import { WorkspacePage } from './pages/workspace.po';
 import { waitAndClick } from './utils';
 
 describe(`Petals service-assembly content`, () => {
@@ -73,8 +74,13 @@ describe(`Petals service-assembly content`, () => {
       '"SA 0" has been unloaded'
     );
 
-    // we should be redirected to the workspace page ...
-    WorkspaceOverviewPage.waitAndGet();
+    expect(browser.getCurrentUrl()).toMatch(
+      /\/workspaces\/\w+\/petals\/service-assemblies\/\w+$/
+    );
+
+    expect(ops.hasBeenDeletedMessage.getText()).toEqual(
+      `This service assembly has been removed`
+    );
 
     // the SU should have been deleted from petals tree
     expect(workspace.treeElement(`SU 0`, 'service-unit').isPresent()).toBe(

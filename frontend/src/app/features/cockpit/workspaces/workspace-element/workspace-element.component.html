@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     {{ deletedMessage }}
   </div>
 
-  <md-tab-group fxFlex>
+  <md-tab-group [(selectedIndex)]="activeTabIndex" fxFlex>
     <md-tab *ngFor="let tab of tabs" [label]="tab.label">
       <ngx-hover-opacity [isHoverVisible]="resourceDeletable.isDeleted">
         <ng-container [ngTemplateOutlet]="tab.templateRef"></ng-container>

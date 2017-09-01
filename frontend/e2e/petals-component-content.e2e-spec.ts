@@ -17,9 +17,10 @@
 
 import * as path from 'path';
 
+import { browser } from 'protractor/built';
 import { page } from './common';
 import { NotFoundPage } from './pages/not-found';
-import { WorkspaceOverviewPage, WorkspacePage } from './pages/workspace.po';
+import { WorkspacePage } from './pages/workspace.po';
 import { waitAndClick } from './utils';
 
 describe(`Petals component content`, () => {
@@ -78,10 +79,15 @@ describe(`Petals component content`, () => {
     // once unloaded ...
     page.clickAndExpectNotification(ops.unloadButton);
 
-    // we should be redirected to the workspace page ...
-    WorkspaceOverviewPage.waitAndGet();
+    expect(browser.getCurrentUrl()).toMatch(
+      /\/workspaces\/\w+\/petals\/components\/\w+$/
+    );
 
-    // and the component should have been deleted from petals tree
+    expect(ops.hasBeenDeletedMessage.getText()).toEqual(
+      `This component has been removed`
+    );
+
+    // the component should have been deleted from petals tree
     expect(workspace.treeElement(`Comp 0`, 'component').isPresent()).toBe(
       false
     );

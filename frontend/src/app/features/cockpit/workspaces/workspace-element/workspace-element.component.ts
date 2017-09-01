@@ -44,9 +44,10 @@ export class WorkspaceElementTabDirective {
   styleUrls: ['./workspace-element.component.scss'],
 })
 export class WorkspaceElementComponent<
-  T extends { name: string; isFetchingDetails: boolean }
+  T extends { id: string; name: string; isFetchingDetails: boolean }
 > implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
+  activeTabIndex = 0;
 
   @Input() resourceObservable: Observable<T>;
   @Input() deletedMessage: string;
@@ -64,6 +65,9 @@ export class WorkspaceElementComponent<
       .takeUntil(this.onDestroy$)
       .let(deletable)
       .do(resourceDeletable => {
+        if (this.resource && this.resource.id !== resourceDeletable.value.id) {
+          this.activeTabIndex = 0;
+        }
         this.resourceDeletable = resourceDeletable;
         this.resource = resourceDeletable.value;
       })

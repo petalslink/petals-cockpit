@@ -80,7 +80,7 @@ describe(`Petals bus content`, () => {
     expect(c2p.title.getText()).toEqual('Cont 1');
   });
 
-  it(`should delete a bus and redirect to the current workspace`, () => {
+  it(`should delete a bus and hover it with blank opacity saying it has been removed withtout redirecting somewhere else`, () => {
     const bus = workspace.openBus('Bus 0');
 
     bus.deleteButton.click();
@@ -95,8 +95,14 @@ describe(`Petals bus content`, () => {
       $(`app-bus-deletion-dialog .btn-confirm-delete-bus`)
     );
 
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
+    expect(browser.getCurrentUrl()).toMatch(
+      /\/workspaces\/\w+\/petals\/buses\/\w+$/
+    );
 
     expect(workspace.getWorkspaceTree()).toEqual([]);
+
+    expect(bus.hasBeenDeletedMessage.getText()).toEqual(
+      `This bus has been removed`
+    );
   });
 });

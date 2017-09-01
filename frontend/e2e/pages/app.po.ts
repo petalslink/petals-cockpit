@@ -96,10 +96,10 @@ export class PetalsCockpitPage {
 
     browser.ignoreSynchronization = true;
     return browser
-      .wait(test, 10000)
+      .wait(test, 20000)
       .then(() => {
         browser.ignoreSynchronization = false;
-        return browser.wait(EC.invisibilityOf(simpleNotification), 10000);
+        return browser.wait(EC.invisibilityOf(simpleNotification), 20000);
       })
       .catch(_ => {
         browser.ignoreSynchronization = false;
