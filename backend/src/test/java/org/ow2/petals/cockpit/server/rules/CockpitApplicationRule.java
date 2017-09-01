@@ -65,7 +65,7 @@ public class CockpitApplicationRule implements TestRule {
         assert description != null;
 
         return RulesHelper.chain(base, description, dw, RulesHelper.dropDbAfter(db), db, petals,
-                RulesHelper.jerseyCookies(), RulesHelper.quasar());
+                RulesHelper.jerseyCookies());
     }
 
     public WebTarget target(String url) {

@@ -204,8 +204,6 @@ public class ImportBusTest extends AbstractBasicResourceTest {
                 try {
                     doneSignal.await();
                 } catch (InterruptedException e) {
-                    // TODO for now interruption are not propagated but it's ok, the result will be ignored anyway
-                    // see https://github.com/puniverse/quasar/issues/245
                     ImportBusTest.<@Nullable RuntimeException> doThrow0(e);
                 }
                 return State.REACHABLE;

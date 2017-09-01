@@ -22,10 +22,6 @@
   <version>0.12.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <prerequisites>
-    <maven>3.0</maven>
-  </prerequisites>
-
   <properties>
     <java-version>1.8</java-version>
     <maven.compiler.source>${java-version}</maven.compiler.source>
@@ -33,13 +29,7 @@
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <!-- Provided by dependency:properties -->
-    <quasar.path>${co.paralleluniverse:quasar-core:jar:jdk8}</quasar.path>
-    <!-- empty by default (if not, @{argLine} is not replaced in surefire and failsafe -->
-    <argLine></argLine>
-
     <liquibase.version>3.5.3</liquibase.version>
-    <quasar.version>0.7.9</quasar.version>
     <pac4j.version>2.1.0</pac4j.version>
     <h2.version>1.4.196</h2.version>
     <slf4j.version>1.7.25</slf4j.version>
@@ -140,33 +130,6 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <groupId>co.paralleluniverse</groupId>
-        <artifactId>quasar-actors</artifactId>
-        <version>${quasar.version}</version>
-        <exclusions>
-          <exclusion>
-            <!-- until dropwizard-core bring a newer version of
-                 metrics-core or there is a bom for metrics -->
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>co.paralleluniverse</groupId>
-        <artifactId>quasar-core</artifactId>
-        <version>${quasar.version}</version>
-        <classifier>jdk8</classifier>
-        <exclusions>
-          <exclusion>
-            <!-- until dropwizard-core bring a newer version of
-                 metrics-core or there is a bom for metrics -->
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
         <version>${h2.version}</version>
@@ -199,21 +162,15 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <groupId>org.hdrhistogram</groupId>
-        <artifactId>HdrHistogram</artifactId>
-        <!-- because of quasar-core -->
-        <version>2.1.9</version>
-      </dependency>
-      <dependency>
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy</artifactId>
-        <!-- because of quasar-actors, mockito-core and embedded-db-junit -->
+        <!-- because of mockito-core and embedded-db-junit -->
         <version>1.7.1</version>
       </dependency>
       <dependency>
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy-agent</artifactId>
-        <!-- because of quasar-actors, mockito-core and embedded-db-junit -->
+        <!-- because of mockito-core and embedded-db-junit -->
         <version>1.7.1</version>
       </dependency>
       <dependency>
@@ -282,20 +239,6 @@
                 <ignoredResourcePattern>^versioneye\.properties$</ignoredResourcePattern>
               </ignoredResourcePatterns>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <!-- Needed for surefire -->
-              <goal>properties</goal>
-              <!-- Only for information -->
-              <goal>analyze-only</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
@@ -394,27 +337,6 @@
               </goals>
             </execution>
           </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.19.1</version>
-          <configuration>
-            <argLine>@{argLine} -javaagent:${quasar.path}</argLine>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.19.1</version>
-          <configuration>
-            <argLine>@{argLine} -javaagent:${quasar.path}</argLine>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.0.0</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>

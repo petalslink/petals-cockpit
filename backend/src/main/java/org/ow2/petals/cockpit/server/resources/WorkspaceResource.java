@@ -58,17 +58,6 @@ import org.jooq.Configuration;
 import org.jooq.exception.DataAccessException;
 import org.jooq.exception.SQLStateClass;
 import org.jooq.impl.DSL;
-import org.ow2.petals.cockpit.server.actors.CockpitActors;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeComponentState;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeServiceAssemblyState;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ChangeSharedLibraryState;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteBus;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeleteWorkspace;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployComponent;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeployServiceAssembly;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.DeploySharedLibrary;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.ImportBus;
-import org.ow2.petals.cockpit.server.actors.WorkspaceActor.NewWorkspaceClient;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
@@ -83,6 +72,8 @@ import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.ArtifactServer.ServicedArtifact;
 import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
+import org.ow2.petals.cockpit.server.services.WorkspacesService;
+import org.ow2.petals.cockpit.server.services.WorkspacesService.WorkspaceService;
 import org.ow2.petals.cockpit.server.utils.PetalsUtils;
 import org.ow2.petals.jbi.descriptor.JBIDescriptorException;
 import org.ow2.petals.jbi.descriptor.original.JBIDescriptorBuilder;
@@ -103,7 +94,7 @@ import com.webcohesion.enunciate.metadata.rs.Warnings;
 @Path("/workspaces/{wsId}")
 public class WorkspaceResource {
 
-    private final CockpitActors as;
+    private final WorkspaceService workspace;
 
     private final long wsId;
 
@@ -117,26 +108,17 @@ public class WorkspaceResource {
 
     @Inject
     public WorkspaceResource(@NotNull @PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
-            CockpitActors as, Configuration jooq, ArtifactServer httpServer, WorkspaceDbOperations workspaceDb) {
+            WorkspacesService workspaces, Configuration jooq, ArtifactServer httpServer,
+            WorkspaceDbOperations workspaceDb) {
         this.profile = profile;
-        this.as = as;
         this.wsId = wsId;
         this.jooq = jooq;
         this.httpServer = httpServer;
         this.workspaceDb = workspaceDb;
-    }
-
-    private void checkAccess(Configuration conf) {
-        // TODO merge queries with others?
-        if (!DSL.using(conf).fetchExists(USERS_WORKSPACES,
-                USERS_WORKSPACES.USERNAME.eq(profile.getId()).and(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)))) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        }
+        this.workspace = workspaces.get(wsId, profile.getId());
     }
 
     private WorkspacesRecord get(Configuration conf) {
-        checkAccess(conf);
-
         WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId)).fetchOne();
 
         if (ws == null) {
@@ -206,41 +188,29 @@ public class WorkspaceResource {
     @GET
     @Path("/content")
     @Produces(SseFeature.SERVER_SENT_EVENTS + ";qs=0.5")
-    public EventOutput sse() throws InterruptedException {
-
-        checkAccess(jooq);
-
-        return as.call(wsId, new NewWorkspaceClient(profile.getId()));
+    public EventOutput sse() throws IOException {
+        return workspace.addBroadcastClient(profile.getId());
     }
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public WorkspaceDeleted delete() throws InterruptedException {
-
-        checkAccess(jooq);
-
-        return as.call(wsId, new DeleteWorkspace());
+    public WorkspaceDeleted delete() {
+        return workspace.delete();
     }
 
     @POST
     @Path("/buses")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public BusInProgress addBus(@NotNull @Valid BusImport nb) throws InterruptedException {
-
-        checkAccess(jooq);
-
-        return as.call(wsId, new ImportBus(nb));
+    public BusInProgress addBus(@NotNull @Valid BusImport nb) {
+        return workspace.importBus(nb);
     }
 
     @DELETE
     @Path("/buses/{bId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public BusDeleted delete(@NotNull @PathParam("bId") @Min(1) long bId) throws InterruptedException {
-
-        checkAccess(jooq);
-
-        return as.call(wsId, new DeleteBus(profile.getId(), bId));
+    public BusDeleted delete(@NotNull @PathParam("bId") @Min(1) long bId) {
+        return workspace.deleteBus(profile.getId(), bId);
     }
 
     @PUT
@@ -248,11 +218,8 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public SLStateChanged changeSLState(@NotNull @PathParam("slId") @Min(1) long slId,
-            @NotNull @Valid SLChangeState action) throws InterruptedException {
-
-        checkAccess(jooq);
-
-        return as.call(wsId, new ChangeSharedLibraryState(slId, action));
+            @NotNull @Valid SLChangeState action) {
+        return workspace.changeSLState(slId, action);
     }
 
     @PUT
@@ -261,11 +228,8 @@ public class WorkspaceResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
     public SAStateChanged changeSAState(@NotNull @PathParam("saId") @Min(1) long saId,
-            @NotNull @Valid SAChangeState action) throws InterruptedException {
-
-        checkAccess(jooq);
-
-        return as.call(wsId, new ChangeServiceAssemblyState(saId, action));
+            @NotNull @Valid SAChangeState action) {
+        return workspace.changeSAState(saId, action);
     }
 
     @PUT
@@ -274,11 +238,8 @@ public class WorkspaceResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
     public ComponentStateChanged changeComponentState(@NotNull @PathParam("compId") @Min(1) long compId,
-            @NotNull @Valid ComponentChangeState action) throws InterruptedException {
-
-        checkAccess(jooq);
-
-        return as.call(wsId, new ChangeComponentState(compId, action));
+            @NotNull @Valid ComponentChangeState action) {
+        return workspace.changeComponentState(compId, action);
     }
 
     @POST
@@ -288,10 +249,7 @@ public class WorkspaceResource {
     public WorkspaceContent deploySharedLibrary(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition)
-            throws IOException, JBIDescriptorException, InterruptedException {
-
-        checkAccess(jooq);
-
+            throws IOException, JBIDescriptorException {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
@@ -301,8 +259,8 @@ public class WorkspaceResource {
         try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
             Jbi descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptorFromArchive(sa.getFile());
 
-            return as.call(wsId, new DeploySharedLibrary(descriptor.getSharedLibrary().getIdentification().getName(),
-                    descriptor.getSharedLibrary().getVersion(), sa.getArtifactExternalUrl(), containerId));
+            return workspace.deploySharedLibrary(descriptor.getSharedLibrary().getIdentification().getName(),
+                    descriptor.getSharedLibrary().getVersion(), sa.getArtifactExternalUrl(), containerId);
         }
     }
 
@@ -313,11 +271,7 @@ public class WorkspaceResource {
     public WorkspaceContent deployServiceUnit(@NotNull @PathParam("componentId") @Min(1) long componentId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
-            @NotEmpty @FormDataParam("name") String name)
-            throws IOException, InterruptedException, JBIDescriptorException {
-
-        checkAccess(jooq);
-
+            @NotEmpty @FormDataParam("name") String name) throws IOException, JBIDescriptorException {
         ComponentsRecord component = DSL.using(jooq).selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(componentId))
                 .fetchOne();
 
@@ -329,8 +283,7 @@ public class WorkspaceResource {
 
         try (ServicedArtifact sa = httpServer.serve(saName + ".zip",
                 os -> PetalsUtils.createSAfromSU(file, os, saName, name, component.getName()))) {
-            return as.call(wsId,
-                    new DeployServiceAssembly(saName, sa.getArtifactExternalUrl(), component.getContainerId()));
+            return workspace.deployServiceAssembly(saName, sa.getArtifactExternalUrl(), component.getContainerId());
         }
     }
 
@@ -341,10 +294,7 @@ public class WorkspaceResource {
     public WorkspaceContent deployComponent(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition)
-            throws IOException, InterruptedException, JBIDescriptorException {
-
-        checkAccess(jooq);
-
+            throws IOException, JBIDescriptorException {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
@@ -355,10 +305,9 @@ public class WorkspaceResource {
         try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
             Jbi descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptorFromArchive(sa.getFile());
 
-            return as.call(wsId,
-                    new DeployComponent(descriptor.getComponent().getIdentification().getName(),
-                            ComponentMin.Type.from(descriptor.getComponent().getType()), sa.getArtifactExternalUrl(),
-                            containerId));
+            return workspace.deployComponent(descriptor.getComponent().getIdentification().getName(),
+                    ComponentMin.Type.from(descriptor.getComponent().getType()), sa.getArtifactExternalUrl(),
+                    containerId);
         }
     }
 
@@ -369,10 +318,7 @@ public class WorkspaceResource {
     public WorkspaceContent deployServiceAssembly(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition)
-            throws IOException, InterruptedException, JBIDescriptorException {
-
-        checkAccess(jooq);
-
+            throws IOException, JBIDescriptorException {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
@@ -382,9 +328,8 @@ public class WorkspaceResource {
         try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
             Jbi descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptorFromArchive(sa.getFile());
 
-            return as.call(wsId,
-                    new DeployServiceAssembly(descriptor.getServiceAssembly().getIdentification().getName(),
-                            sa.getArtifactExternalUrl(), containerId));
+            return workspace.deployServiceAssembly(descriptor.getServiceAssembly().getIdentification().getName(),
+                    sa.getArtifactExternalUrl(), containerId);
         }
     }
 
@@ -392,8 +337,6 @@ public class WorkspaceResource {
     @Path("/users/")
     @Consumes(MediaType.APPLICATION_JSON)
     public void addUsers(@Valid AddUser userToAdd) {
-        checkAccess(jooq);
-
         try {
             DSL.using(jooq).insertInto(USERS_WORKSPACES).set(USERS_WORKSPACES.WORKSPACE_ID, wsId)
                     .set(USERS_WORKSPACES.USERNAME, userToAdd.id).onDuplicateKeyIgnore().execute();
@@ -409,8 +352,6 @@ public class WorkspaceResource {
     @DELETE
     @Path("/users/{id}")
     public void deleteUser(@NotEmpty @PathParam("id") String username) {
-        checkAccess(jooq);
-
         DSL.using(jooq).delete(USERS_WORKSPACES)
                 .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(username))).execute();
     }
