@@ -94,13 +94,14 @@ describe(`Petals component content`, () => {
       .getSUUpload();
 
     expect(deploy.chooseFileName.getText()).toEqual(`CHOOSE A FILE TO UPLOAD`);
-    deploy.fileInput.sendKeys('/test.zip');
+    const filePath = path.resolve(__dirname, './resources/su.zip');
+    deploy.fileInput.sendKeys(filePath);
 
     expect(deploy.fileName.isDisplayed()).toBe(true);
-    expect(deploy.fileName.getText()).toEqual(`test.zip`);
+    expect(deploy.fileName.getText()).toEqual(`su.zip`);
     expect(deploy.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
 
-    expect(deploy.fileNameInput.getAttribute('value')).toEqual(`test`);
+    expect(deploy.fileNameInput.getAttribute('value')).toEqual(`su`);
 
     expect(deploy.deployButton.getText()).toMatch(`DEPLOY`);
     expect(deploy.deployButton.isEnabled()).toBe(true);

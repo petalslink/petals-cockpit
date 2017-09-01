@@ -64,10 +64,11 @@ describe(`Petals container content`, () => {
       expect(upload.chooseFileName.getText()).toEqual(
         `CHOOSE A FILE TO UPLOAD`
       );
-      upload.fileInput.sendKeys('/test.zip');
+      const filePath = path.resolve(__dirname, './resources/component.zip');
+      upload.fileInput.sendKeys(filePath);
 
       expect(upload.fileNameInput.isPresent()).toBe(false);
-      expect(upload.fileName.getText()).toEqual(`test.zip`);
+      expect(upload.fileName.getText()).toEqual(`component.zip`);
       expect(upload.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
 
       expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
@@ -219,10 +220,11 @@ describe(`Petals container content`, () => {
       expect(upload.chooseFileName.getText()).toEqual(
         `CHOOSE A FILE TO UPLOAD`
       );
-      upload.fileInput.sendKeys('/test.zip');
+      const filePath = path.resolve(__dirname, './resources/sa.zip');
+      upload.fileInput.sendKeys(filePath);
 
       expect(upload.fileNameInput.isPresent()).toBe(false);
-      expect(upload.fileName.getText()).toEqual(`test.zip`);
+      expect(upload.fileName.getText()).toEqual(`sa.zip`);
       expect(upload.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
 
       expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
@@ -366,10 +368,11 @@ describe(`Petals container content`, () => {
       expect(upload.chooseFileButton.getText()).toEqual(
         `CHOOSE A FILE TO UPLOAD insert_drive_file`
       );
-      upload.fileInput.sendKeys('/test.zip');
+      const filePath = path.resolve(__dirname, './resources/sl.zip');
+      upload.fileInput.sendKeys(filePath);
 
       expect(upload.fileNameInput.isPresent()).toBe(false);
-      expect(upload.fileName.getText()).toEqual(`test.zip`);
+      expect(upload.fileName.getText()).toEqual(`sl.zip`);
       expect(upload.chooseFileButton.getText()).toEqual(
         `CHANGE THE FILE insert_drive_file`
       );
