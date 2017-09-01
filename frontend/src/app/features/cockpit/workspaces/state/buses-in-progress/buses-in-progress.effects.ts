@@ -24,7 +24,6 @@ import { NotificationsService } from 'angular2-notifications';
 import { Observable } from 'rxjs/Observable';
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import {
   BusesService,
   IBusInProgressBackend,
@@ -47,24 +46,7 @@ export class BusesInProgressEffects {
   @Effect({ dispatch: true })
   watchBusImport$: Observable<Action> = this.actions$
     .ofType(SseWorkspaceEvent.BUS_IMPORT.action)
-    .withLatestFrom(this.store$)
-    .map(([action, state]) => {
-      const bip: IBusInProgressBackend = action.payload;
-
-      if (state.busesInProgress.importBusId === bip.id) {
-        this.router.navigate([
-          '/workspaces',
-          state.workspaces.selectedWorkspaceId,
-          'petals',
-          'buses-in-progress',
-          bip.id,
-        ]);
-      }
-
-      return new BusesInProgress.Added(
-        toJsTable<IBusInProgressBackend>({ [bip.id]: bip })
-      );
-    });
+    .map(action => new BusesInProgress.Added(action.payload));
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
@@ -106,13 +88,26 @@ export class BusesInProgressEffects {
   @Effect({ dispatch: true })
   postBus$: Observable<Action> = this.actions$
     .ofType(BusesInProgress.PostType)
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .switchMap(([action, idWorkspace]: [BusesInProgress.Post, string]) =>
+    .withLatestFrom(this.store$)
+    .switchMap(([action, state]: [BusesInProgress.Post, IStore]) =>
       this.busesService
-        .postBus(idWorkspace, action.payload)
-        .map(res => new BusesInProgress.PostSuccess(res.json()))
+        .postBus(state.workspaces.selectedWorkspaceId, action.payload)
+        .map(res => res.json() as IBusInProgressBackend)
+        .do(bip => {
+          // if we are still on the import page (bc if we change it is set
+          // back to false and we are in a switchMap) and the import event
+          // already arrived
+          if (state.busesInProgress.isImportingBus) {
+            this.router.navigate([
+              '/workspaces',
+              state.workspaces.selectedWorkspaceId,
+              'petals',
+              'buses-in-progress',
+              bip.id,
+            ]);
+          }
+        })
+        .map(bip => new BusesInProgress.PostSuccess(bip))
         .catch((res: Response) => {
           const err = res.json();
           return Observable.of(

@@ -46,7 +46,6 @@ export interface IBusesInProgressCommon {
   // there can be only one import at a time
   isImportingBus: boolean;
   importBusError: string;
-  importBusId: string;
 }
 
 export interface IBusesInProgressTable
@@ -77,6 +76,5 @@ export function busesInProgressTableFactory(): IBusesInProgressTable {
     selectedBusInProgressId: '',
     isImportingBus: false,
     importBusError: '',
-    importBusId: '',
   };
 }
