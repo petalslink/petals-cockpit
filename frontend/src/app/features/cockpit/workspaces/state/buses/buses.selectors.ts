@@ -36,8 +36,14 @@ export interface IBusWithContainers
 export function getCurrentBus(
   store$: Store<IStore>
 ): Observable<IBusWithContainers> {
-  return store$.filter(state => !!state.buses.selectedBusId).map(state => {
-    const bus = state.buses.byId[state.buses.selectedBusId];
+  return store$
+    .filter(state => !!state.buses.selectedBusId)
+    .map(state => getBusWithContainers(state.buses.selectedBusId)(state));
+}
+
+export function getBusWithContainers(busId: string) {
+  return (state: IStore) => {
+    const bus = state.buses.byId[busId];
     if (bus) {
       return {
         ...bus,
@@ -46,7 +52,7 @@ export function getCurrentBus(
     } else {
       return null;
     }
-  });
+  };
 }
 
 export const getBusesByIds = (state: IStore) => state.buses.byId;

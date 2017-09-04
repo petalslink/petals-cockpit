@@ -16,10 +16,8 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/state/store.interface';
 
@@ -37,18 +35,12 @@ import { Ui } from 'app/shared/state/ui.actions';
   styleUrls: ['./petals-service-assembly-view.component.scss'],
 })
 export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
-  private onDestroy$ = new Subject<void>();
-
   serviceAssembly$: Observable<IServiceAssemblyWithSUsAndComponents>;
   workspaceId$: Observable<string>;
 
-  constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
+  constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    const serviceAssemblyId$ = this.route.paramMap
-      .map(pm => pm.get('serviceAssemblyId'))
-      .distinctUntilChanged();
-
     this.serviceAssembly$ = this.store$.let(getCurrentServiceAssembly);
 
     this.store$.dispatch(
@@ -58,24 +50,12 @@ export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
       })
     );
 
-    serviceAssemblyId$
-      .takeUntil(this.onDestroy$)
-      .do(id => {
-        this.store$.dispatch(new ServiceAssemblies.SetCurrent({ id }));
-        this.store$.dispatch(new ServiceAssemblies.FetchDetails({ id }));
-      })
-      .finally(() =>
-        this.store$.dispatch(new ServiceAssemblies.SetCurrent({ id: '' }))
-      )
-      .subscribe();
-
     this.workspaceId$ = this.store$.select(
       state => state.workspaces.selectedWorkspaceId
     );
   }
 
   ngOnDestroy() {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
+    this.store$.dispatch(new ServiceAssemblies.SetCurrent({ id: '' }));
   }
 }

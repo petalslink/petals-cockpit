@@ -16,10 +16,8 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/state/store.interface';
 
@@ -36,12 +34,10 @@ import { Ui } from 'app/shared/state/ui.actions';
   styleUrls: ['./petals-container-view.component.scss'],
 })
 export class PetalsContainerViewComponent implements OnInit, OnDestroy {
-  private onDestroy$ = new Subject<void>();
-
   workspaceId$: Observable<string>;
   container$: Observable<IContainerWithSiblings>;
 
-  constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
+  constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
     this.store$.dispatch(
@@ -56,32 +52,9 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
     );
 
     this.container$ = this.store$.let(getCurrentContainer);
-
-    this.route.paramMap
-      .map(p => p.get('containerId'))
-      .takeUntil(this.onDestroy$)
-      .do(id => {
-        this.store$.dispatch(new Containers.SetCurrent({ id }));
-        this.store$.dispatch(new Containers.FetchDetails({ id }));
-      })
-      .finally(() =>
-        this.store$.dispatch(new Containers.SetCurrent({ id: '' }))
-      )
-      .switchMap(busId =>
-        this.container$
-          .first()
-          .do(cont =>
-            cont.siblings.forEach(c =>
-              this.store$.dispatch(new Containers.FetchDetails(c))
-            )
-          )
-          .map(_ => busId)
-      )
-      .subscribe();
   }
 
   ngOnDestroy() {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
+    this.store$.dispatch(new Containers.SetCurrent({ id: '' }));
   }
 }

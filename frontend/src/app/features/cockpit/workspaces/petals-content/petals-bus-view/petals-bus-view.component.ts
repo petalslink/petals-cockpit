@@ -17,10 +17,8 @@
 
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MD_DIALOG_DATA, MdDialog, MdDialogRef } from '@angular/material';
-import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/state/store.interface';
 import {
@@ -29,7 +27,6 @@ import {
 } from '../../state/buses/buses.selectors';
 
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
@@ -38,16 +35,10 @@ import { Ui } from 'app/shared/state/ui.actions';
   styleUrls: ['./petals-bus-view.component.scss'],
 })
 export class PetalsBusViewComponent implements OnInit, OnDestroy {
-  private onDestroy$ = new Subject<void>();
-
   public workspaceId$: Observable<string>;
   public bus$: Observable<IBusWithContainers>;
 
-  constructor(
-    private store$: Store<IStore>,
-    private route: ActivatedRoute,
-    public dialog: MdDialog
-  ) {}
+  constructor(private store$: Store<IStore>, public dialog: MdDialog) {}
 
   ngOnInit() {
     this.store$.dispatch(
@@ -59,31 +50,10 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
     );
 
     this.bus$ = this.store$.let(getCurrentBus);
-
-    this.route.paramMap
-      .map(pm => pm.get('busId'))
-      .takeUntil(this.onDestroy$)
-      .do(id => {
-        this.store$.dispatch(new Buses.SetCurrent({ id }));
-        this.store$.dispatch(new Buses.FetchDetails({ id }));
-      })
-      .finally(() => this.store$.dispatch(new Buses.SetCurrent({ id: '' })))
-      .switchMap(busId =>
-        this.bus$
-          .first()
-          .do(bus =>
-            bus.containers.forEach(c =>
-              this.store$.dispatch(new Containers.FetchDetails(c))
-            )
-          )
-          .map(_ => busId)
-      )
-      .subscribe();
   }
 
   ngOnDestroy() {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
+    this.store$.dispatch(new Buses.SetCurrent({ id: '' }));
   }
 
   openDeletionDialog() {
