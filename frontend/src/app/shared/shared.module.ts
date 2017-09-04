@@ -41,6 +41,8 @@ import { RouterModule } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { PrettyJsonModule } from 'angular2-prettyjson';
+import { NgxHoverOpacityModule } from 'ngx-hover-opacity';
+
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
 import { NgArrayPipesModule, NgObjectPipesModule } from 'ngx-pipes';
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
@@ -49,6 +51,10 @@ import { NotFound404Component } from './components/not-found-404/not-found-404.c
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
 
 export const MaterialModules = [
+  MdButtonModule,
+  MdCardModule,
+  MdIconModule,
+  MdInputModule,
   MdDialogModule,
   MdExpansionModule,
   MdListModule,
@@ -64,13 +70,11 @@ export const MaterialModules = [
 
 // used by the components in declarations below
 export const imports = [
+  ...MaterialModules,
   CommonModule,
-  MdCardModule,
-  MdInputModule,
-  MdIconModule,
-  MdButtonModule,
   FlexLayoutModule,
   FormsModule,
+  NgxHoverOpacityModule,
 ];
 
 export const declarations = [

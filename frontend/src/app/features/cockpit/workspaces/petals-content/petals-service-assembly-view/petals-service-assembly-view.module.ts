@@ -23,9 +23,14 @@ import { PetalsServiceAssemblyOperationsComponent } from 'app/features/cockpit/w
 import { PetalsServiceAssemblyOverviewComponent } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-overview/petals-service-assembly-overview.component';
 import { PetalsServiceAssemblyViewRoutingModule } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view-routing.module';
 import { PetalsServiceAssemblyViewComponent } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.component';
+import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
 
 @NgModule({
-  imports: [SharedModule, PetalsServiceAssemblyViewRoutingModule],
+  imports: [
+    SharedModule,
+    PetalsServiceAssemblyViewRoutingModule,
+    WorkspaceSharedModule,
+  ],
   declarations: [
     PetalsServiceAssemblyViewComponent,
     PetalsServiceAssemblyOverviewComponent,

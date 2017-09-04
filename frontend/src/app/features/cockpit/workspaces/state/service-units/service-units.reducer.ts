@@ -73,9 +73,6 @@ export namespace ServiceUnitsReducer {
       case ServiceUnits.RemovedType: {
         return removed(table, action.payload);
       }
-      case ServiceUnits.RemovedType: {
-        return removed(table, action.payload);
-      }
       case Workspaces.CleanType: {
         return serviceUnitsTableFactory();
       }

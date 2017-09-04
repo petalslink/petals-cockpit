@@ -1,0 +1,42 @@
+<!-- Copyright (C) 2017 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<div *ngIf="resourceDeletable?.value" fxLayout="column" class="wrapper-content">
+  <md-toolbar color="primary" class="toolbar-page-header">
+    <div class="prefix-toolbar-title">
+      <md-icon color="accent" *ngIf="!resourceDeletable.value.isFetchingDetails; else loadingTpl">grade</md-icon>
+
+      <ng-template #loadingTpl>
+        <md-spinner color="accent"></md-spinner>
+      </ng-template>
+    </div>
+
+    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'" fxFlex>{{ resourceDeletable.value.name }}</h1>
+
+    <ng-content select="[appWorkspaceElementHeaderExtra]"></ng-content>
+  </md-toolbar>
+
+  <div class="message" *ngIf="resourceDeletable.isDeleted">
+    {{ deletedMessage }}
+  </div>
+
+  <md-tab-group [(selectedIndex)]="activeTabIndex" fxFlex>
+    <md-tab *ngFor="let tab of tabs" [label]="tab.label">
+      <ngx-hover-opacity [isHoverVisible]="resourceDeletable.isDeleted">
+        <ng-container [ngTemplateOutlet]="tab.templateRef"></ng-container>
+      </ngx-hover-opacity>
+    </md-tab>
+  </md-tab-group>
+</div>

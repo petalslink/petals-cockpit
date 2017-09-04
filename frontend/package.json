@@ -73,6 +73,7 @@
     "material-design-icons-iconfont": "3.0.3",
     "ng2-vis": "0.0.6",
     "ngrx-store-freeze": "0.1.9",
+    "ngx-hover-opacity": "0.2.0",
     "ngx-pipes": "1.6.3",
     "node-uuid": "1.4.8",
     "reselect": "3.0.1",

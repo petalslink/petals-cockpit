@@ -14,3 +14,30 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import { Observable } from 'rxjs/Observable';
+
+export interface IDeletable<T> {
+  isDeleted: boolean;
+  value: T;
+}
+
+export function deletable<T>(obs: Observable<T>): Observable<IDeletable<T>> {
+  return obs
+    .scan((acc: IDeletable<T>, curr: T) => {
+      if (acc !== null && (curr === null || curr === undefined)) {
+        return {
+          isDeleted: true,
+          value: acc.value,
+        };
+      } else {
+        return {
+          isDeleted: false,
+          value: curr,
+        };
+      }
+    }, null)
+    .distinctUntilChanged(
+      (p, n) => p.isDeleted === n.isDeleted && p.value === n.value
+    );
+}

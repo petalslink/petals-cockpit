@@ -17,7 +17,6 @@
 
 import { Injectable } from '@angular/core';
 
-import { Router } from '@angular/router';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
@@ -43,7 +42,6 @@ export class ServiceAssembliesEffects {
   constructor(
     private store$: Store<IStore>,
     private actions$: Actions,
-    private router: Router,
     private serviceAssembliesService: ServiceAssembliesService,
     private notifications: NotificationsService
   ) {}
@@ -75,13 +73,6 @@ export class ServiceAssembliesEffects {
       const sa = store.serviceAssemblies.byId[data.id];
 
       if (data.state === EServiceAssemblyState.Unloaded) {
-        if (store.serviceAssemblies.selectedServiceAssemblyId === sa.id) {
-          this.router.navigate([
-            '/workspaces',
-            store.workspaces.selectedWorkspaceId,
-          ]);
-        }
-
         this.notifications.success(
           'Service assembly unloaded',
           `'${sa.name}' has been unloaded`

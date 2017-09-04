@@ -21,7 +21,7 @@ import { PetalsCockpitPage } from './pages/app.po';
 
 export let page: PetalsCockpitPage;
 
-export let waitTimeout = 5000;
+export let waitTimeout = 15000;
 
 beforeEach(() => {
   page = new PetalsCockpitPage();

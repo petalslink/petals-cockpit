@@ -13,21 +13,13 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="serviceUnit$ | async as serviceUnit" fxLayout="column" class="wrapper-content">
-  <md-toolbar color="primary" class="toolbar-page-header">
-    <div class="prefix-toolbar-title">
-      <md-icon color="accent" *ngIf="!serviceUnit.isFetchingDetails">grade</md-icon>
+<app-workspace-element [resourceObservable]="serviceUnit$" deletedMessage="This service unit has been removed" #we>
 
-      <md-spinner color="accent" *ngIf="serviceUnit.isFetchingDetails"></md-spinner>
-    </div>
+  <app-petals-service-unit-overview
+    *appWorkspaceElementTab="'Overview'"
+    [serviceUnit]="we.resource"
+    [workspaceId]="workspaceId$ | async"
+    fxFill
+  ></app-petals-service-unit-overview>
 
-    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ serviceUnit.name }}</h1>
-  </md-toolbar>
-
-  <md-tab-group fxFlex>
-    <md-tab label="Overview">
-      <!-- TODO: Create a component for every tab -->
-      <app-petals-service-unit-overview [serviceUnit]="serviceUnit" [workspaceId]="workspaceId$ | async" fxFill></app-petals-service-unit-overview>
-    </md-tab>
-  </md-tab-group>
-</div>
+</app-workspace-element>

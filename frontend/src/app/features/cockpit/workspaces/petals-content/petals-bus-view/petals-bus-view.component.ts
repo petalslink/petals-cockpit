@@ -89,14 +89,14 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
   openDeletionDialog() {
     this.bus$
       .first()
-      .switchMap(b =>
+      .switchMap(bus =>
         this.dialog
           .open(BusDeleteDialogComponent, {
-            data: { bus: b },
+            data: { bus },
           })
           .afterClosed()
           .filter((result: boolean) => result)
-          .do(_ => this.store$.dispatch(new Buses.Delete(b)))
+          .do(_ => this.store$.dispatch(new Buses.Delete(bus)))
       )
       .subscribe();
   }

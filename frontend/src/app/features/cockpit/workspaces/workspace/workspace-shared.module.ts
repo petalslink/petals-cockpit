@@ -14,3 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import { NgModule } from '@angular/core';
+
+import {
+  WorkspaceElementComponent,
+  WorkspaceElementTabDirective,
+} from 'app/features/cockpit/workspaces/workspace-element/workspace-element.component';
+import { SharedModule } from 'app/shared/shared.module';
+
+const declarationsAndExports = [
+  WorkspaceElementComponent,
+  WorkspaceElementTabDirective,
+];
+
+@NgModule({
+  imports: [SharedModule],
+  declarations: declarationsAndExports,
+  exports: declarationsAndExports,
+})
+export class WorkspaceSharedModule {}

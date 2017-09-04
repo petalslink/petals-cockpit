@@ -27,6 +27,9 @@ export abstract class ComponentPage {
 
   public readonly component = ComponentPage.component;
   public readonly title = this.component.$(`md-toolbar .title`);
+  public readonly hasBeenDeletedMessage = this.component.$(
+    'app-workspace-element .message'
+  );
 
   protected static wait() {
     browser.wait(
