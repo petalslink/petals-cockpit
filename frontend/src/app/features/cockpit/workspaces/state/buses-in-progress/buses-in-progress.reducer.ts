@@ -28,7 +28,7 @@ import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/wor
 import {
   JsTable,
   mergeOnly,
-  putAll,
+  putById,
   removeById,
   updateById,
 } from 'app/shared/helpers/jstable.helper';
@@ -68,7 +68,7 @@ export namespace BusesInProgressReducer {
         return postError(table, action.payload);
       }
       case BusesInProgress.PostSuccessType: {
-        return postSuccess(table, action.payload);
+        return added(table, action.payload);
       }
       case BusesInProgress.RemovedType: {
         return removed(table, action.payload);
@@ -97,11 +97,10 @@ export namespace BusesInProgressReducer {
     return mergeOnly(table, payload, busInProgressRowFactory);
   }
 
-  function added(
-    table: IBusesInProgressTable,
-    payload: JsTable<IBusInProgressBackend>
-  ) {
-    return putAll(table, payload, busInProgressRowFactory);
+  function added(table: IBusesInProgressTable, payload: IBusInProgressBackend) {
+    return table.byId[payload.id]
+      ? updateById(table, payload.id, payload)
+      : putById(table, payload.id, payload, busInProgressRowFactory);
   }
 
   function setCurrent(
@@ -113,7 +112,6 @@ export namespace BusesInProgressReducer {
       selectedBusInProgressId: payload.id,
       isImportingBus: false,
       importBusError: '',
-      importBusId: '',
     };
   }
 
@@ -122,19 +120,6 @@ export namespace BusesInProgressReducer {
       ...table,
       isImportingBus: true,
       importBusError: '',
-      importBusId: '',
-    };
-  }
-
-  // once the http request is done
-  // the bus itself will be added from buses reducer
-  function postSuccess(
-    table: IBusesInProgressTable,
-    payload: { id: string }
-  ): IBusesInProgressTable {
-    return {
-      ...table,
-      importBusId: payload.id,
     };
   }
 
@@ -149,7 +134,6 @@ export namespace BusesInProgressReducer {
         ...table,
         isImportingBus: false,
         importBusError: payload.importBusError,
-        importBusId: '',
       };
     } else {
       return table;

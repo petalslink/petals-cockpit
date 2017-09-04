@@ -62,10 +62,6 @@
       <artifactId>jersey-media-sse</artifactId>
     </dependency>
     <dependency>
-      <groupId>co.paralleluniverse</groupId>
-      <artifactId>quasar-actors</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.pac4j</groupId>
       <artifactId>dropwizard-pac4j</artifactId>
       <version>2.0.0</version>
@@ -79,12 +75,6 @@
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-crypto</artifactId>
       <version>4.2.3.RELEASE</version>
-    </dependency>
-    <!-- Quasar instrumentation dependencies -->
-    <dependency>
-      <groupId>co.paralleluniverse</groupId>
-      <artifactId>quasar-core</artifactId>
-      <classifier>jdk8</classifier>
     </dependency>
     <!-- Database dependencies -->
     <dependency>
@@ -270,7 +260,7 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Run with: mvn compile dependency:properties exec:exec@server-->
+            <!-- Run with: mvn compile exec:exec@server-->
             <id>server</id>
             <goals>
               <goal>exec</goal>
@@ -278,18 +268,6 @@
             <configuration>
               <executable>${java.home}/bin/java</executable>
               <arguments>
-                <!-- Debug -->
-                <!-- argument>-Xdebug</argument -->
-                <!-- argument>-agentlib:jdwp=transport=dt_socket,server=y,address=8000</argument-->
-
-                <!-- Configure memory settings as needed -->
-                <!-- argument>-Xmx1000m</argument -->
-
-                <argument>-Dco.paralleluniverse.fibers.verifyInstrumentation=true</argument>
-
-                <!-- Quasar Agent for JDK 8 -->
-                <argument>-javaagent:${quasar.path}</argument>
-
                 <argument>-ea</argument>
 
                 <!-- Classpath -->

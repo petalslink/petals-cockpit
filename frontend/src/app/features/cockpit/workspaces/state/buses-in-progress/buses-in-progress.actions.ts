@@ -34,7 +34,7 @@ export namespace BusesInProgress {
   export const AddedType = '[Buses In Progress] Added';
   export class Added implements Action {
     readonly type = AddedType;
-    constructor(public readonly payload: JsTable<IBusInProgressBackend>) {}
+    constructor(public readonly payload: IBusInProgressBackend) {}
   }
 
   export const SetCurrentType = '[Buses In Progress] Set Current';
@@ -58,7 +58,7 @@ export namespace BusesInProgress {
   export const PostSuccessType = '[Buses In Progress] Post success';
   export class PostSuccess implements Action {
     readonly type = PostSuccessType;
-    constructor(public readonly payload: { id: string }) {}
+    constructor(public readonly payload: IBusInProgressBackend) {}
   }
 
   export const DeleteType = '[Buses In Progress] Delete';

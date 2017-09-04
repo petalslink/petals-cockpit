@@ -21,8 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.inject.Singleton;
 import javax.ws.rs.client.WebTarget;
@@ -46,8 +44,6 @@ import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
@@ -59,8 +55,8 @@ import org.ow2.petals.cockpit.server.mocks.MockArtifactServer;
 import org.ow2.petals.cockpit.server.resources.SetupResource;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
-import org.ow2.petals.cockpit.server.services.PetalsDb;
 import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
+import org.ow2.petals.cockpit.server.services.WorkspacesService;
 import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
 import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule;
 import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
@@ -103,12 +99,9 @@ public class CockpitResourceRule implements TestRule {
                     @Override
                     protected void configure() {
                         bind(DSL.using(db.getConnectionJdbcUrl()).configuration()).to(Configuration.class);
-                        bind(Executors.newFixedThreadPool(4)).named(CockpitApplication.BLOCKING_TASK_ES)
-                                .to(ExecutorService.class);
-                        bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
+                        bind(WorkspacesService.class).to(WorkspacesService.class).in(Singleton.class);
                         bind(httpServer).to(ArtifactServer.class);
                         bind(PetalsAdmin.class).to(PetalsAdmin.class).in(Singleton.class);
-                        bind(PetalsDb.class).to(PetalsDb.class).in(Singleton.class);
                         bind(ADMIN_TOKEN).to(String.class).named(SetupResource.ADMIN_TOKEN);
                         bind(new TestWorkspaceDbOperations()).to(WorkspaceDbOperations.class);
                     }
@@ -153,7 +146,7 @@ public class CockpitResourceRule implements TestRule {
         assert base != null;
         assert description != null;
         return RulesHelper.chain(base, description, resource, httpServer, RulesHelper.dropDbAfter(db), db, petals, jmx,
-                RulesHelper.jerseyCookies(), RulesHelper.quasar(), RulesHelper.after(() -> currentProfile = null));
+                RulesHelper.jerseyCookies(), RulesHelper.after(() -> currentProfile = null));
 
     }
 

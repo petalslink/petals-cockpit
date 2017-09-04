@@ -1,0 +1,4 @@
+class java/util/concurrent/CompletableFuture
+runAsync
+ (Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/lang/Runnable;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;

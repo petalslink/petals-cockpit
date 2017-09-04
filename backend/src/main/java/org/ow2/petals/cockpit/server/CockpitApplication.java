@@ -18,8 +18,6 @@ package org.ow2.petals.cockpit.server;
 
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 
-import java.util.concurrent.ExecutorService;
-
 import javax.inject.Singleton;
 import javax.ws.rs.ext.ContextResolver;
 
@@ -29,7 +27,6 @@ import org.eclipse.jetty.server.Server;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.jooq.Configuration;
 import org.jooq.impl.DSL;
-import org.ow2.petals.cockpit.server.actors.CockpitActors;
 import org.ow2.petals.cockpit.server.bundles.artifactserver.HttpArtifactServerBundle;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
@@ -45,8 +42,8 @@ import org.ow2.petals.cockpit.server.resources.UsersResource;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
-import org.ow2.petals.cockpit.server.services.PetalsDb;
 import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
+import org.ow2.petals.cockpit.server.services.WorkspacesService;
 import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
 import org.pac4j.dropwizard.Pac4jBundle;
 import org.slf4j.Logger;
@@ -72,8 +69,6 @@ import io.dropwizard.setup.Environment;
  *
  */
 public class CockpitApplication<C extends CockpitConfiguration> extends Application<C> {
-
-    public static final String BLOCKING_TASK_ES = "quasar-blocking-exec-service";
 
     // this logger is meant to be shown in the console at the INFO level
     protected static final Logger LOG = LoggerFactory.getLogger(CockpitApplication.class);
@@ -137,15 +132,6 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         // serialization/deserialization
         environment.getObjectMapper().registerModule(new AfterburnerModule());
 
-        // TODO add these ExecutorService to the metrics
-        // TODO choose adequate parameters?
-        // TODO or rely on the global JVM ForkJoinPool instead (with managedBlocks)
-
-        // This is needed for executing database and petals admin requests from within a fiber (actors)
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        ExecutorService jdbcExec = environment.lifecycle().executorService("quasar-blocking-worker-%d")
-                .minThreads(availableProcessors).maxThreads(availableProcessors).build();
-
         Configuration jooqConf = jooq.getConfiguration();
         assert jooqConf != null;
 
@@ -156,11 +142,9 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
             protected void configure() {
                 bind(configuration).to(CockpitConfiguration.class);
                 bind(environment).to(Environment.class);
-                bind(jdbcExec).named(BLOCKING_TASK_ES).to(ExecutorService.class);
-                bind(CockpitActors.class).to(CockpitActors.class).in(Singleton.class);
+                bind(WorkspacesService.class).to(WorkspacesService.class).in(Singleton.class);
                 bind(jooqConf).to(Configuration.class);
                 bind(PetalsAdmin.class).to(PetalsAdmin.class).in(Singleton.class);
-                bind(PetalsDb.class).to(PetalsDb.class).in(Singleton.class);
                 bind(adminConsoleToken).to(String.class).named(SetupResource.ADMIN_TOKEN);
                 bind(WorkspaceDbOperations.class).to(WorkspaceDbOperations.class).in(Singleton.class);
             }

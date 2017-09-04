@@ -98,10 +98,6 @@ import javaslang.Tuple2;
 /**
  * Note: to override one of the already implemented method in {@link #workspaces} or {@link #buses}, it is needed to use
  * {@link Mockito#doReturn(Object)} and not {@link Mockito#when(Object)}!!
- * 
- * Note: because the backend is implemented using actors, it can happen that some of those are initialised late or even
- * after the test is finished and thus exceptions are printed in the console. TODO It's ok, but it would be better not
- * to have that, see https://groups.google.com/d/msg/quasar-pulsar-user/LLhGRQDiykY/F8apfp8JCQAJ
  *
  * @author vnoel
  *

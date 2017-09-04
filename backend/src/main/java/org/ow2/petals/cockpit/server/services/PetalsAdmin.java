@@ -20,11 +20,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.admin.api.ArtifactAdministration;
@@ -42,7 +40,6 @@ import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.jmx.api.api.InstallerComponentClient;
@@ -61,11 +58,6 @@ import org.ow2.petals.jmx.api.api.exception.MissingServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import co.paralleluniverse.common.util.CheckedCallable;
-import co.paralleluniverse.fibers.FiberAsync;
-import co.paralleluniverse.fibers.SuspendExecution;
-import co.paralleluniverse.fibers.Suspendable;
-import co.paralleluniverse.strands.Strand;
 import javaslang.Function1;
 import javaslang.Tuple;
 import javaslang.Tuple2;
@@ -76,24 +68,20 @@ public class PetalsAdmin {
 
     private final PetalsAdministrationFactory adminFactory;
 
-    private final ExecutorService executor;
-
     private final PetalsJmxApiFactory jmxFactory;
 
     @Inject
-    public PetalsAdmin(@Named(CockpitApplication.BLOCKING_TASK_ES) ExecutorService executor) {
+    public PetalsAdmin() {
         this.adminFactory = PetalsAdministrationFactory.getInstance();
         try {
             this.jmxFactory = PetalsJmxApiFactory.getInstance();
         } catch (DuplicatedServiceException | MissingServiceException e) {
             throw new AssertionError(e);
         }
-        this.executor = executor;
     }
 
-    public Domain getTopology(String ip, int port, String username, String password, String passphrase)
-            throws SuspendExecution, InterruptedException {
-        Domain topology = runMaybeBlockingAdmin(ip, port, username, password, petals -> {
+    public Domain getTopology(String ip, int port, String username, String password, String passphrase) {
+        Domain topology = runAdmin(ip, port, username, password, petals -> {
             try {
                 return petals.newContainerAdministration().getTopology(passphrase, true);
             } catch (ContainerAdministrationException e) {
@@ -104,10 +92,9 @@ public class PetalsAdmin {
         return topology;
     }
 
-    @Suspendable
     @SuppressWarnings("null")
     public Tuple2<List<Container>, String> getContainerInfos(String ip, int port, String username, String password) {
-        return runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
+        return runAdmin(ip, port, username, password, petals -> {
             try {
                 ContainerAdministration admin = petals.newContainerAdministration();
                 Domain domain = admin.getTopology(null, false);
@@ -121,10 +108,9 @@ public class PetalsAdmin {
         });
     }
 
-    @Suspendable
     public ComponentMin.State changeComponentState(String ip, int port, String username, String password, String type,
             String name, ComponentMin.State current, ComponentMin.State next, Map<String, String> parameters) {
-        return runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
+        return runAdmin(ip, port, username, password, petals -> {
             try {
                 ArtifactAdministration aa = petals.newArtifactAdministration();
                 Artifact a = aa.getArtifact(type, name, null);
@@ -142,10 +128,9 @@ public class PetalsAdmin {
         });
     }
 
-    @Suspendable
     public ServiceAssemblyMin.State changeSAState(String ip, int port, String username, String password, String saName,
             ServiceAssemblyMin.State next) {
-        return runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
+        return runAdmin(ip, port, username, password, petals -> {
             try {
                 ArtifactAdministration aa = petals.newArtifactAdministration();
                 Artifact a = aa.getArtifact(ServiceAssembly.TYPE, saName, null);
@@ -158,9 +143,8 @@ public class PetalsAdmin {
         });
     }
 
-    @Suspendable
     public void undeploySL(String ip, int port, String username, String password, String slName) {
-        this.<@Nullable Void> runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
+        this.<@Nullable Void> runAdmin(ip, port, username, password, petals -> {
             try {
                 ArtifactAdministration aa = petals.newArtifactAdministration();
                 Artifact a = aa.getArtifact(SharedLibrary.TYPE, slName, null);
@@ -174,9 +158,8 @@ public class PetalsAdmin {
         });
     }
 
-    @Suspendable
     public ServiceAssembly deploySA(String ip, int port, String username, String password, String saName, URL saUrl) {
-        ServiceAssembly deployedSA = runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
+        ServiceAssembly deployedSA = runAdmin(ip, port, username, password, petals -> {
             try {
                 // TODO handle partially deployed SAs??!!
                 petals.newArtifactLifecycleFactory().createServiceAssemblyLifecycle(new ServiceAssembly(saName))
@@ -191,10 +174,9 @@ public class PetalsAdmin {
         return deployedSA;
     }
 
-    @Suspendable
     public Component deployComponent(String ip, int port, String username, String password, ComponentType type,
             String name, URL compUrl) {
-        Component deployedComp = runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
+        Component deployedComp = runAdmin(ip, port, username, password, petals -> {
             try {
                 petals.newArtifactLifecycleFactory().createComponentLifecycle(new Component(name, type)).deploy(compUrl,
                         true);
@@ -207,10 +189,9 @@ public class PetalsAdmin {
         return deployedComp;
     }
 
-    @Suspendable
     public SharedLibrary deploySL(String ip, int port, String username, String password, String name, String version,
             URL slUrl) {
-        SharedLibrary deployedSL = runMaybeBlockingAdminNoSuspend(ip, port, username, password, petals -> {
+        SharedLibrary deployedSL = runAdmin(ip, port, username, password, petals -> {
             try {
                 petals.newArtifactLifecycleFactory().createSharedLibraryLifecycle(new SharedLibrary(name, version))
                         .deploy(slUrl);
@@ -302,32 +283,10 @@ public class PetalsAdmin {
         }
     }
 
-    @Suspendable
-    private <R> R runMaybeBlockingAdminNoSuspend(String ip, int port, String username, String password,
+    private <R> R runAdmin(String ip, int port, String username, String password,
             Function1<PetalsAdministration, R> f) {
-        try {
-            return runMaybeBlockingAdmin(ip, port, username, password, f);
-        } catch (SuspendExecution | InterruptedException e) {
-            // TODO interruption?
-            throw new AssertionError(e);
-        }
-    }
-
-    private <R> R runMaybeBlockingAdmin(String ip, int port, String username, String password,
-            Function1<PetalsAdministration, R> f) throws SuspendExecution, InterruptedException {
-        if (Strand.isCurrentFiber()) {
-            return FiberAsync.runBlocking(executor, new CheckedCallable<R, RuntimeException>() {
-                @Override
-                public R call() {
-                    try (PAC p = new PAC(ip, port, username, password)) {
-                        return f.apply(p.petals);
-                    }
-                }
-            });
-        } else {
-            try (PAC p = new PAC(ip, port, username, password)) {
-                return f.apply(p.petals);
-            }
+        try (PAC p = new PAC(ip, port, username, password)) {
+            return f.apply(p.petals);
         }
     }
 

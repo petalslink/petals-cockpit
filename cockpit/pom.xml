@@ -40,7 +40,7 @@
     <dependency>
       <groupId>com.palantir.indexpage</groupId>
       <artifactId>dropwizard-index-page</artifactId>
-      <version>1.1.0</version>
+      <version>1.2.0</version>
     </dependency>
     <!-- Code quality dependencies -->
     <dependency>
@@ -117,10 +117,6 @@
             <entry>
               <key>Min-Java-Version</key>
               <value>${java-version}</value>
-            </entry>
-            <entry>
-              <key>Java-Agents</key>
-              <value>co.paralleluniverse:quasar-core:${quasar.version}:jdk8</value>
             </entry>
           </manifest>
         </configuration>

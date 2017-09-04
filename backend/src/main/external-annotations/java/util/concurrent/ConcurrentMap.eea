@@ -1,0 +1,4 @@
+class java/util/concurrent/ConcurrentMap
+computeIfAbsent
+ (TK;Ljava/util/function/Function<-TK;+TV;>;)TV;
+ (T1K;L1java/util/function/Function<-TK;+TV;>;)TV;

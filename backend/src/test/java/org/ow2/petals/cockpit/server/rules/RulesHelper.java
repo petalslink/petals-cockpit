@@ -16,8 +16,6 @@
  */
 package org.ow2.petals.cockpit.server.rules;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.net.CookieHandler;
 import java.net.CookieManager;
 
@@ -26,9 +24,6 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
-
-import co.paralleluniverse.actors.ActorRegistry;
-import co.paralleluniverse.common.util.Debug;
 
 public class RulesHelper {
 
@@ -73,12 +68,6 @@ public class RulesHelper {
 
     public static TestRule dropDbAfter(EmbeddedDatabaseRule db) {
         return after(() -> DSL.using(db.getConnectionJdbcUrl()).execute("DROP ALL OBJECTS"));
-    }
-
-    public static TestRule quasar() {
-        // the before ensure this doesn't get called in a non-unit test thread
-        // and return false later when clearing the registry
-        return around(() -> assertThat(Debug.isUnitTest()).isTrue(), () -> ActorRegistry.clear());
     }
 
     public static TestRule jerseyCookies() {
