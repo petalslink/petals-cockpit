@@ -92,7 +92,7 @@ describe(`UploadComponent`, () => {
   it(`should display the custom title of the card`, () => {
     hostComponent.title = 'Test title';
     hostFixture.detectChanges();
-    expect(DOM.titleText).toEqual('Test title');
+    expect(DOM.titleText).toEqual('TEST TITLE');
   });
 
   it(`should only have the button to choose a file at the beginning`, () => {

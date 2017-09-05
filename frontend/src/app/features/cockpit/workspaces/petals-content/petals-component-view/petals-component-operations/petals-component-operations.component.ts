@@ -137,7 +137,8 @@ export class PetalsComponentOperationsComponent
         (u: Components.DeployServiceUnitSuccess) =>
           u.payload.correlationId === correlationId
       )
-      .first()
+      // we want 1 or 0 (first wants exactly one) because of takeUntil
+      .take(1)
       .do(_ => this.uploadSu.resetForm())
       .subscribe();
 

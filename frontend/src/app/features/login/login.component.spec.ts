@@ -81,7 +81,7 @@ describe(`Login component`, () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    store = fixture.debugElement.injector.get(Store as any);
+    store = TestBed.get(Store);
   });
 
   it(`should have enabled inputs for name and password`, () => {

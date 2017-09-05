@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import '~@angular/material/theming';
+// not using ~ because of https://github.com/angular/material2/issues/4056#issuecomment-318311853
+@import 'node_modules/@angular/material/theming';
 @include mat-core();
 
 $primary: mat-palette($mat-deep-purple, 700);
