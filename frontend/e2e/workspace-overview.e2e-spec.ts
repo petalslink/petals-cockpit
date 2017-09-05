@@ -119,9 +119,8 @@ describe(`Workspace Overview`, () => {
       .goToWorkspacesViaLogin()
       .loginToWorkspaces('bescudie', 'bescudie');
 
-    workspaces.inputName
-      .sendKeys(`New workspace`)
-      .then(() => workspaces.addButton.click());
+    workspaces.addWorkspace('New workspace');
+
     const workspace = workspaces.selectWorkspace(1, `New workspace`);
 
     expect(workspace.title.getText()).toEqual(`New workspace`);
@@ -180,9 +179,9 @@ describe(`Workspace Overview`, () => {
       const workspaces = page
         .goToWorkspacesViaLogin()
         .loginToWorkspaces('admin', 'admin');
-      workspaces.inputName
-        .sendKeys('Test Users')
-        .then(() => workspaces.addButton.click());
+
+      workspaces.addWorkspace('Test Users');
+
       workspace = workspaces.selectWorkspace(2);
     });
 

@@ -35,7 +35,7 @@ import { SharedLibraryOverviewPage } from './shared-library.po';
 import { WorkspacesPage } from './workspaces.po';
 
 export abstract class WorkspacePage {
-  public static readonly component = $(`app-cockpit`);
+  public static readonly component = $(`app-workspace`);
   public static readonly sidenav = WorkspacePage.component.$('md-sidenav');
   public static readonly workspaceButton = WorkspacePage.sidenav.$(
     'button.workspace-name'

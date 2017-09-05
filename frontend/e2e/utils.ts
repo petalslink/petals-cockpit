@@ -22,6 +22,7 @@ import {
   ElementFinder,
   ExpectedConditions as EC,
   Key,
+  promise,
 } from 'protractor';
 import * as util from 'protractor/built/util';
 
@@ -44,14 +45,18 @@ export function urlToMatch(matcher: Matcher): Function {
   return () => browser.getCurrentUrl().then(url => match(url, matcher));
 }
 
+export function stringToMatch(
+  p: () => promise.Promise<string>,
+  matcher: Matcher
+): Function {
+  return () => p().then(text => match(text, matcher), util.falseIfMissing);
+}
+
 export function textToMatchInElement(
   elementFinder: ElementFinder,
   matcher: Matcher
 ): Function {
-  return () =>
-    elementFinder
-      .getText()
-      .then(text => match(text, matcher), util.falseIfMissing);
+  return stringToMatch(() => elementFinder.getText(), matcher);
 }
 
 export function expectNothingFocused() {
@@ -82,13 +87,8 @@ export function waitAndClick(el: ElementFinder) {
 }
 
 export function clearInput(input: ElementFinder) {
-  return input.getAttribute('value').then(v => {
-    if (v === '') {
-      return;
-    } else {
-      return input.sendKeys(Key.BACK_SPACE).then(() => clearInput(input));
-    }
-  });
+  input.sendKeys(Key.chord(Key.CONTROL, 'a'));
+  input.sendKeys(Key.DELETE);
 }
 
 export function getMultipleElementsTexts(
