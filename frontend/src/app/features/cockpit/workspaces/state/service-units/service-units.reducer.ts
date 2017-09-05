@@ -99,22 +99,9 @@ export namespace ServiceUnitsReducer {
     table: IServiceUnitsTable,
     payload: { id: string }
   ): IServiceUnitsTable {
-    const res = {
-      selectedServiceUnitId: payload.id,
-    };
-
-    if (payload.id) {
-      return {
-        ...updateById(table, payload.id, {
-          errorChangeState: '',
-        }),
-        ...res,
-      };
-    }
-
     return {
       ...table,
-      ...res,
+      selectedServiceUnitId: payload.id,
     };
   }
 

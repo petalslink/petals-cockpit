@@ -23,22 +23,12 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  FormGroupDirective,
-  NgForm,
-  Validators,
-} from '@angular/forms';
-
-import { Observable } from 'rxjs/Observable';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
   IWorkspace,
   IWorkspaces,
 } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
-import { formErrorStateMatcher } from 'app/shared/helpers/form.helper';
 import { ICurrentUser, IUser } from 'app/shared/state/users.interface';
 
 @Component({
@@ -54,7 +44,6 @@ export class WorkspacesListComponent implements OnInit {
   @Output() create = new EventEmitter<string>();
 
   newWksForm: FormGroup;
-  submitDisabled$: Observable<boolean>;
 
   constructor(private fb: FormBuilder) {}
 
@@ -78,19 +67,6 @@ export class WorkspacesListComponent implements OnInit {
     this.newWksForm = this.fb.group({
       name: ['', Validators.required],
     });
-
-    this.submitDisabled$ = this.newWksForm.valueChanges
-      .map(values => values.name)
-      .distinctUntilChanged()
-      .map(name => !name || this.workspaces.isAddingWorkspace)
-      .startWith(true);
-  }
-
-  createFormErrorStateMatcher(
-    control: FormControl,
-    formToCheck: FormGroupDirective | NgForm
-  ): boolean {
-    return formErrorStateMatcher(control, formToCheck);
   }
 
   select(workspace: IWorkspace) {

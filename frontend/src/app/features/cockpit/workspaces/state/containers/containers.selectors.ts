@@ -30,20 +30,25 @@ export function getCurrentContainer(
 ): Observable<IContainerWithSiblings> {
   return store$
     .filter(state => !!state.containers.selectedContainerId)
-    .mergeMap(state => {
-      const container =
-        state.containers.byId[state.containers.selectedContainerId];
-      if (container) {
-        return Observable.of({
-          ...container,
-          siblings: state.buses.byId[container.busId].containers
-            .filter(id => id !== container.id)
-            .map(id => state.containers.byId[id]),
-        });
-      } else {
-        return Observable.empty();
-      }
-    });
+    .map(state =>
+      getContainerWithSiblings(state.containers.selectedContainerId)(state)
+    );
+}
+
+export function getContainerWithSiblings(containerId: string) {
+  return (state: IStore) => {
+    const container = state.containers.byId[containerId];
+    if (container) {
+      return {
+        ...container,
+        siblings: state.buses.byId[container.busId].containers
+          .filter(id => id !== container.id)
+          .map(id => state.containers.byId[id]),
+      };
+    } else {
+      return null;
+    }
+  };
 }
 
 export const getContainersByIds = (state: IStore) => state.containers.byId;

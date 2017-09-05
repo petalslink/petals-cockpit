@@ -17,12 +17,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div fxLayout="column" fxFill>
   <form [formGroup]="newWksForm" (ngSubmit)="onSubmit(newWksForm)" fxLayout="row" fxLayoutGap="10px">
     <md-input-container fxFlex>
-      <input type="text" mdInput placeholder="New workspace name" [errorStateMatcher]="createFormErrorStateMatcher" formControlName="name" required>
-      <md-error>Required!</md-error>
+      <input type="text" mdInput placeholder="New workspace name" formControlName="name">
       <span mdPrefix><md-icon color="primary">edit</md-icon></span>
     </md-input-container>
 
-    <button cdk-focus-region-start type="submit" [disabled]="submitDisabled$ | async" md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace"
+    <button cdk-focus-region-start type="submit" [disabled]="newWksForm.invalid || workspaces.isAddingWorkspace" md-mini-fab color="primary" fxFlex="40px" mdTooltip="Add a workspace"
       mdTooltipPosition="below" class="btn-add-workspace">
       <md-icon class="md-24">create_new_folder</md-icon>
     </button>

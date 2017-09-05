@@ -26,8 +26,6 @@ import {
 export interface IServiceUnitUI {
   // for UI
   isFolded: boolean;
-  isUpdatingState: boolean;
-  errorChangeState: string;
   isFetchingDetails: boolean;
 }
 
@@ -66,8 +64,6 @@ export function serviceUnitRowFactory(): IServiceUnitRow {
     serviceAssemblyId: null,
 
     isFolded: false,
-    isUpdatingState: false,
-    errorChangeState: '',
     isFetchingDetails: false,
   };
 }

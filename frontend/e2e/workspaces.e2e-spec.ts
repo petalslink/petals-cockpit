@@ -76,9 +76,7 @@ describe(`Workspaces`, () => {
       .goToWorkspacesViaLogin()
       .loginToWorkspaces(`mrobert`, `mrobert`);
 
-    workspaces.inputName
-      .sendKeys(`New workspace`)
-      .then(() => workspaces.addButton.click());
+    workspaces.addWorkspace(`New workspace`);
 
     expect(workspaces.workspacesCards.count()).toEqual(2);
 

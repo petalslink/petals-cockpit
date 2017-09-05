@@ -16,10 +16,8 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
 
 import { IStore } from '../../../../../shared/state/store.interface';
 import {
@@ -36,18 +34,12 @@ import { Ui } from 'app/shared/state/ui.actions';
   styleUrls: ['./petals-service-unit-view.component.scss'],
 })
 export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
-  private onDestroy$ = new Subject<void>();
-
   serviceUnit$: Observable<IServiceUnitWithSA>;
   workspaceId$: Observable<string>;
 
-  constructor(private store$: Store<IStore>, private route: ActivatedRoute) {}
+  constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    const serviceUnitId$ = this.route.paramMap
-      .map(pm => pm.get('serviceUnitId'))
-      .distinctUntilChanged();
-
     this.serviceUnit$ = this.store$.let(getCurrentServiceUnit);
 
     this.store$.dispatch(
@@ -57,24 +49,12 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
       })
     );
 
-    serviceUnitId$
-      .takeUntil(this.onDestroy$)
-      .do(id => {
-        this.store$.dispatch(new ServiceUnits.SetCurrent({ id }));
-        this.store$.dispatch(new ServiceUnits.FetchDetails({ id }));
-      })
-      .finally(() =>
-        this.store$.dispatch(new ServiceUnits.SetCurrent({ id: '' }))
-      )
-      .subscribe();
-
     this.workspaceId$ = this.store$.select(
       state => state.workspaces.selectedWorkspaceId
     );
   }
 
   ngOnDestroy() {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
+    this.store$.dispatch(new ServiceUnits.SetCurrent({ id: '' }));
   }
 }

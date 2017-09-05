@@ -43,6 +43,17 @@ export class WorkspacesPage {
 
   private constructor() {}
 
+  addWorkspace(name: string) {
+    // because of
+    // https://github.com/angular/protractor/issues/3196
+    // https://github.com/angular/protractor/issues/4280
+    // https://github.com/angular/protractor/issues/698
+    for (let i = 0; i < name.length; i++) {
+      this.inputName.sendKeys(name.charAt(i));
+    }
+    waitAndClick(this.addButton);
+  }
+
   selectWorkspace(index: number, expectedName?: Matcher) {
     waitAndClick(
       this.workspacesCard.$$('div.card-workspace md-card-title').get(index)

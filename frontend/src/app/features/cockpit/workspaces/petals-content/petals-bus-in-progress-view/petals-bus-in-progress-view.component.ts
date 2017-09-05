@@ -17,7 +17,6 @@
 
 import {
   AfterViewInit,
-  ChangeDetectorRef,
   Component,
   OnDestroy,
   OnInit,
@@ -85,8 +84,7 @@ export class PetalsBusInProgressViewComponent
   constructor(
     private store$: Store<IStore>,
     private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
@@ -166,10 +164,10 @@ export class PetalsBusInProgressViewComponent
       .let(isLargeScreen)
       .first()
       .filter(ss => ss)
-      .do(_ => {
-        this.ipInput._focusInput();
-        this.cdr.detectChanges();
-      })
+      .do(() =>
+        // this prevent change detection errors
+        setTimeout(() => this.ipInput._focusInput())
+      )
       .subscribe();
   }
 

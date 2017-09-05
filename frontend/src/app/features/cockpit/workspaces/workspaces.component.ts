@@ -101,16 +101,21 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
     this.store$
       .select(state => !state.workspaces.selectedWorkspaceId)
       .first()
-      .do(noWorkspace => {
-        this.workspacesDialog = this.dialog.open(this.template, {
-          disableClose: noWorkspace,
-        });
+      .do(noWorkspace =>
+        // until https://github.com/angular/angular/issues/15634 is fixed
+        setTimeout(() => {
+          this.workspacesDialog = this.dialog.open(this.template, {
+            disableClose: noWorkspace,
+          });
 
-        this.workspacesDialog
-          .afterClosed()
-          .do((selected: IWorkspace) => this.onWorkspacesDialogClose(selected))
-          .subscribe();
-      })
+          this.workspacesDialog
+            .afterClosed()
+            .do((selected: IWorkspace) =>
+              this.onWorkspacesDialogClose(selected)
+            )
+            .subscribe();
+        })
+      )
       .subscribe();
   }
 
