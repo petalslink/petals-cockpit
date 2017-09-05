@@ -126,7 +126,7 @@ describe('Petals component operations', () => {
       const actionsName = DOM.actionsNamesList.map(
         actionName => actionName.innerText
       );
-      expect(actionsName).toEqual(['Install', 'Unload']);
+      expect(actionsName).toEqual(['INSTALL', 'UNLOAD']);
     });
 
     it(`should have start, uninstall, and unload if shutdown`, () => {
@@ -140,7 +140,7 @@ describe('Petals component operations', () => {
       const actionsName = DOM.actionsNamesList.map(
         actionName => actionName.innerText
       );
-      expect(actionsName).toEqual(['Start', 'Uninstall', 'Unload']);
+      expect(actionsName).toEqual(['START', 'UNINSTALL', 'UNLOAD']);
     });
 
     it(`should have stop if started`, () => {
@@ -154,7 +154,7 @@ describe('Petals component operations', () => {
       const actionsName = DOM.actionsNamesList.map(
         actionName => actionName.innerText
       );
-      expect(actionsName).toEqual(['Stop']);
+      expect(actionsName).toEqual(['STOP']);
     });
 
     it(`should have start, uninstall, and unload if stopped`, () => {
@@ -168,7 +168,7 @@ describe('Petals component operations', () => {
       const actionsName = DOM.actionsNamesList.map(
         actionName => actionName.innerText
       );
-      expect(actionsName).toEqual(['Start', 'Uninstall', 'Unload']);
+      expect(actionsName).toEqual(['START', 'UNINSTALL', 'UNLOAD']);
     });
   });
 
@@ -182,7 +182,7 @@ describe('Petals component operations', () => {
     });
 
     it(`should deploy a Service Unit`, () => {
-      const store = fixture.debugElement.injector.get(Store);
+      const store = TestBed.get(Store);
 
       spyOn(store, 'dispatch').and.callThrough();
 
@@ -201,9 +201,7 @@ describe('Petals component operations', () => {
     it(
       `should reset upload form once service unit has been deployed`,
       fakeAsync(() => {
-        const actions: MockActions = fixture.debugElement.injector.get(
-          Actions as any
-        );
+        const actions: MockActions = TestBed.get(Actions);
 
         spyOn(uuid, 'v4').and.returnValue('id1');
 
