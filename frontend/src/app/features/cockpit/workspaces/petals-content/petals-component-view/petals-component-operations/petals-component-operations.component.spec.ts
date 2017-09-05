@@ -222,6 +222,32 @@ describe('Petals component operations', () => {
       })
     );
   });
+
+  it(`
+    should reset upload SU form if user changes from a component to another
+    (with at least a change of the parameters)`, () => {
+    let child: PetalsComponentOperationsComponent;
+
+    child = fixture.debugElement.query(
+      By.css('app-petals-component-operations')
+    ).componentInstance;
+
+    spyOn(child.uploadSu, 'resetForm');
+
+    fixture.detectChanges();
+
+    expect(child.uploadSu.resetForm).not.toHaveBeenCalled();
+
+    component.component = {
+      ...component.component,
+      // need a new ref for parameters otherwise won't trigger the resetForm
+      parameters: {},
+    };
+
+    fixture.detectChanges();
+
+    expect(child.uploadSu.resetForm).toHaveBeenCalled();
+  });
 });
 
 @Component({

@@ -95,6 +95,8 @@ export class PetalsComponentOperationsComponent
         {}
       )
     );
+
+    this.uploadSu.resetForm();
   }
 
   createFormErrorStateMatcher(

@@ -19,7 +19,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   Input,
-  OnInit,
+  OnChanges,
+  SimpleChange,
+  SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 
@@ -27,6 +30,7 @@ import { IStore } from 'app/shared/state/store.interface';
 import { IContainerRow } from '../../../state/containers/containers.interface';
 
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { UploadComponent } from 'app/shared/components/upload/upload.component';
 
 @Component({
   selector: 'app-petals-container-operations',
@@ -34,14 +38,24 @@ import { Containers } from 'app/features/cockpit/workspaces/state/containers/con
   styleUrls: ['./petals-container-operations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PetalsContainerOperationsComponent implements OnInit {
+export class PetalsContainerOperationsComponent implements OnChanges {
   @Input() container: IContainerRow;
   public fileToDeployComponent: File = null;
   public fileToDeployServiceAssembly: File = null;
 
+  @ViewChild('deployComponent') deployComponent: UploadComponent;
+  @ViewChild('deployServiceAssembly') deployServiceAssembly: UploadComponent;
+  @ViewChild('deploySharedLibrary') deploySharedLibrary: UploadComponent;
+
   constructor(private store$: Store<IStore>) {}
 
-  ngOnInit() {}
+  ngOnChanges(changes: SimpleChanges) {
+    if (hasContainerChanged(changes.container)) {
+      this.deployComponent.resetForm();
+      this.deployServiceAssembly.resetForm();
+      this.deploySharedLibrary.resetForm();
+    }
+  }
 
   deploy(
     whatToDeploy: 'component' | 'service-assembly' | 'shared-library',
@@ -61,4 +75,15 @@ export class PetalsContainerOperationsComponent implements OnInit {
       );
     }
   }
+}
+
+function hasContainerChanged(containerChanges: SimpleChange) {
+  const oldContainer = containerChanges.previousValue;
+  const newContainer = containerChanges.currentValue;
+
+  if (!oldContainer) {
+    return false;
+  }
+
+  return oldContainer.id !== newContainer.id;
 }
