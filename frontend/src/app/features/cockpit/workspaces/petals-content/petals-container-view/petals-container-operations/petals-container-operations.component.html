@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="central-content">
     <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px" class="deploys">
       <app-upload
+        #deployComponent
         [title]="'Component Deployment'"
         [disabled]="container.isDeployingComponent"
         [error]="container.errorDeploymentComponent"
@@ -25,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         fxFlex></app-upload>
 
       <app-upload
+        #deployServiceAssembly
         [title]="'Service assembly Deployment'"
         [disabled]="container.isDeployingServiceAssembly"
         [error]="container.errorDeploymentServiceAssembly"
@@ -33,6 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         fxFlex></app-upload>
 
       <app-upload
+         #deploySharedLibrary
         [title]="'Shared library'"
         [disabled]="container.isDeployingSharedLibrary"
         [error]="container.errorDeploymentSharedLibrary"
