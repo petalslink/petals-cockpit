@@ -25,6 +25,7 @@ import { Subject } from 'rxjs/Subject';
 import { IStore } from './shared/state/store.interface';
 
 import { Ui } from 'app/shared/state/ui.actions';
+import { ScreenSize } from 'app/shared/state/ui.interface';
 
 @Component({
   selector: 'app-root',
@@ -53,7 +54,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.media$
       .asObservable()
-      .map(change => change.mqAlias)
+      .map(change => change.mqAlias as ScreenSize)
       .distinctUntilChanged()
       .takeUntil(this.onDestroy$)
       .do(screenSize =>

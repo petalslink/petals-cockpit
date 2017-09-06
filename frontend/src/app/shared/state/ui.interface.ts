@@ -15,8 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+export type ScreenSize =
+  | ''
+  | 'xs'
+  | 'sm'
+  | 'md'
+  | 'lg'
+  | 'xl'
+  | 'lt-sm'
+  | 'lt-md'
+  | 'lt-lg'
+  | 'lt-xl'
+  | 'gt-xs'
+  | 'gt-sm'
+  | 'gt-md'
+  | 'gt-lg';
+
 export interface IUi {
-  screenSize: string;
+  screenSize: ScreenSize;
   // workspace
   isSidenavVisible: boolean;
   // workspaces

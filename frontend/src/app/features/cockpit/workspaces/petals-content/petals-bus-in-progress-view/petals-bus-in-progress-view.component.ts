@@ -15,13 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  AfterViewInit,
-  Component,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -30,7 +24,6 @@ import {
   NgForm,
   Validators,
 } from '@angular/forms';
-import { MdInput } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -39,7 +32,6 @@ import { Subject } from 'rxjs/Subject';
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 import { IBusImport } from 'app/shared/services/buses.service';
 import { Ui } from 'app/shared/state/ui.actions';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { IStore } from '../../../../../shared/state/store.interface';
 import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
 import {
@@ -58,11 +50,8 @@ import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/b
   templateUrl: './petals-bus-in-progress-view.component.html',
   styleUrls: ['./petals-bus-in-progress-view.component.scss'],
 })
-export class PetalsBusInProgressViewComponent
-  implements OnInit, OnDestroy, AfterViewInit {
+export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
-
-  @ViewChild('ipInput') ipInput: MdInput;
 
   busesInProgressTable$: Observable<IBusesInProgressTable>;
   busInProgress$: Observable<IBusInProgressRow>;
@@ -155,18 +144,6 @@ export class PetalsBusInProgressViewComponent
     formToCheck: FormGroupDirective | NgForm
   ): boolean {
     return formErrorStateMatcher(control, formToCheck);
-  }
-
-  ngAfterViewInit() {
-    this.store$
-      .let(isLargeScreen)
-      .first()
-      .filter(ss => ss)
-      .do(() =>
-        // this prevent change detection errors
-        setTimeout(() => this.ipInput.focus())
-      )
-      .subscribe();
   }
 
   ngOnDestroy() {

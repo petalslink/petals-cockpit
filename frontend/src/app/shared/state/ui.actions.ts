@@ -17,6 +17,8 @@
 
 import { Action } from '@ngrx/store';
 
+import { ScreenSize } from 'app/shared/state/ui.interface';
+
 export namespace Ui {
   export const OpenSidenavType = '[UI] Open sidenav';
   export class OpenSidenav implements Action {
@@ -58,7 +60,7 @@ export namespace Ui {
   export const ChangeScreenSizeType = '[UI] Change screen size';
   export class ChangeScreenSize implements Action {
     readonly type = ChangeScreenSizeType;
-    constructor(public readonly payload: { screenSize: string }) {}
+    constructor(public readonly payload: { screenSize: ScreenSize }) {}
   }
 
   export const SetTitlesType = '[UI] Set titles';

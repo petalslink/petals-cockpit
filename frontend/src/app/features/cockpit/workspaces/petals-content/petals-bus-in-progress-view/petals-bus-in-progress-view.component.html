@@ -42,7 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                    See: https://github.com/angular/flex-layout/issues/235 -->
               <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
                 <md-form-field fxFill>
-                  <input type="text" mdInput placeholder="IP or hostname" formControlName="ip" required [errorStateMatcher]="createFormErrorStateMatcher">
+                  <input type="text" mdInput appFocusInputIfLargeScreen placeholder="IP or hostname" formControlName="ip" required [errorStateMatcher]="createFormErrorStateMatcher">
                   <span mdPrefix><md-icon color="primary">star_half</md-icon></span>
                   <md-error *ngIf="formErrors.ip">
                     {{ formErrors.ip }}

@@ -44,6 +44,7 @@ import { PrettyJsonModule } from 'angular2-prettyjson';
 import { NgxHoverOpacityModule } from 'ngx-hover-opacity';
 
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
+import { FocusInputIfLargeScreenDirective } from 'app/shared/directives/focus-input-based-on-screen-size.directive';
 import { NgArrayPipesModule, NgObjectPipesModule } from 'ngx-pipes';
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { LedComponent } from './components/led/led.component';
@@ -83,6 +84,7 @@ export const declarations = [
   UploadComponent,
   NotFound404Component,
   LedComponent,
+  FocusInputIfLargeScreenDirective,
 ];
 
 export const exportss = [
