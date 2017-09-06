@@ -27,6 +27,7 @@ import { Matcher, textToMatchInElement, waitAndClick } from '../utils';
 import { AdminPage } from './administration.po';
 import { LoginPage } from './login.po';
 import { SetupPage } from './setup.po';
+import { WorkspacePage } from './workspace.po';
 import { WorkspacesPage } from './workspaces.po';
 
 export class PetalsCockpitPage {
@@ -107,23 +108,19 @@ export class PetalsCockpitPage {
   }
 
   openSidenav() {
-    return $(`app-cockpit md-sidenav.mat-sidenav-closed`)
-      .isPresent()
-      .then(present => {
-        if (present) {
-          return this.toggleSidenavButton.click();
-        }
-      });
+    return WorkspacePage.sidenav.isDisplayed().then(displayed => {
+      if (!displayed) {
+        return this.toggleSidenavButton.click();
+      }
+    });
   }
 
   closeSidenav() {
-    return $(`app-cockpit md-sidenav.mat-sidenav-opened`)
-      .isPresent()
-      .then(present => {
-        if (present) {
-          return this.toggleSidenavButton.click();
-        }
-      });
+    return WorkspacePage.sidenav.isDisplayed().then(displayed => {
+      if (displayed) {
+        return this.toggleSidenavButton.click();
+      }
+    });
   }
 
   openAdmin() {

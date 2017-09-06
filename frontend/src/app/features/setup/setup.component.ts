@@ -23,7 +23,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MdInputContainer } from '@angular/material';
+import { MdInput } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -41,8 +41,8 @@ import { isLargeScreen } from 'app/shared/state/ui.selectors';
 export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   private onDestroy$ = new Subject<void>();
 
-  @ViewChild('usernameInput') usernameInput: MdInputContainer;
-  @ViewChild('tokenInput') tokenInput: MdInputContainer;
+  @ViewChild('usernameInput') usernameInput: MdInput;
+  @ViewChild('tokenInput') tokenInput: MdInput;
 
   form: FormGroup;
   settingUp = false;
@@ -83,8 +83,8 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
         setTimeout(
           () =>
             !this.form.controls['token'].value
-              ? this.tokenInput._focusInput()
-              : this.usernameInput._focusInput()
+              ? this.tokenInput.focus()
+              : this.usernameInput.focus()
         )
       )
       .subscribe();

@@ -30,7 +30,7 @@ import {
   NgForm,
   Validators,
 } from '@angular/forms';
-import { MdInputContainer } from '@angular/material';
+import { MdInput } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -53,7 +53,7 @@ import { IUsersTable } from '../../shared/state/users.interface';
 export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   private onDestroy$ = new Subject<void>();
 
-  @ViewChild('usernameInput') usernameInput: MdInputContainer;
+  @ViewChild('usernameInput') usernameInput: MdInput;
 
   loginForm: FormGroup;
   users$: Observable<IUsersTable>;
@@ -105,7 +105,7 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
       .filter(ss => ss)
       .do(() =>
         // this prevent change detection errors
-        setTimeout(() => this.usernameInput._focusInput())
+        setTimeout(() => this.usernameInput.focus())
       )
       .subscribe();
   }

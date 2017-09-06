@@ -17,21 +17,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <h3 class="color-primary">Add your first user</h3>
   <form [formGroup]="form" (ngSubmit)="onSubmit(form)" fxLayout="column" autocomplete="off">
 
-    <md-input-container #tokenInput class="margin-top-x1">
+    <md-form-field #tokenInput class="margin-top-x1">
       <input mdInput type="text" placeholder="Token" formControlName="token" required>
-    </md-input-container>
+    </md-form-field>
 
-    <md-input-container #usernameInput class="margin-top-x1">
+    <md-form-field #usernameInput class="margin-top-x1">
       <input mdInput type="text" placeholder="Username" formControlName="username" required>
-    </md-input-container>
+    </md-form-field>
 
-    <md-input-container class="margin-top-x1">
+    <md-form-field class="margin-top-x1">
       <input mdInput type="password" placeholder="Password" formControlName="password" required>
-    </md-input-container>
+    </md-form-field>
 
-    <md-input-container class="margin-top-x1">
+    <md-form-field class="margin-top-x1">
       <input mdInput type="text" placeholder="Name" formControlName="name" required>
-    </md-input-container>
+    </md-form-field>
 
     <div fxLayout="row" fxFlex="100%" fxLayoutAlign="start center" class="form-error" *ngIf="setupFailed">
       <md-icon color="warn">error</md-icon>

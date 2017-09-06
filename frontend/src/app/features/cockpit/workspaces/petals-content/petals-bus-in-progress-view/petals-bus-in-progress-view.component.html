@@ -41,53 +41,53 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <!-- To have more deterministic behavour, we should be able to set 50 to say 2 per line
                    See: https://github.com/angular/flex-layout/issues/235 -->
               <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
-                <md-input-container #ipInput fxFill>
+                <md-form-field fxFill>
                   <input type="text" mdInput placeholder="IP or hostname" formControlName="ip" required [errorStateMatcher]="createFormErrorStateMatcher">
                   <span mdPrefix><md-icon color="primary">star_half</md-icon></span>
                   <md-error *ngIf="formErrors.ip">
                     {{ formErrors.ip }}
                   </md-error>
-                </md-input-container>
+                </md-form-field>
               </div>
 
               <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
-                <md-input-container fxFill>
+                <md-form-field fxFill>
                   <input type="text" mdInput placeholder="Port" formControlName="port" required [errorStateMatcher]="createFormErrorStateMatcher">
                   <span mdPrefix><md-icon color="primary">settings_ethernet</md-icon></span>
                   <md-error *ngIf="formErrors.port">
                     {{ formErrors.port }}
                   </md-error>
-                </md-input-container>
+                </md-form-field>
               </div>
 
               <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
-                <md-input-container fxFill>
+                <md-form-field fxFill>
                   <input type="text" mdInput placeholder="Username" formControlName="username" required [errorStateMatcher]="createFormErrorStateMatcher">
                   <span mdPrefix><md-icon color="primary">person</md-icon></span>
                   <md-error *ngIf="formErrors.username">
                     {{ formErrors.username }}
                   </md-error>
-                </md-input-container>
+                </md-form-field>
               </div>
 
               <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
-                <md-input-container fxFill>
+                <md-form-field fxFill>
                   <input type="password" mdInput placeholder="Password" formControlName="password" required [errorStateMatcher]="createFormErrorStateMatcher">
                   <span mdPrefix><md-icon color="primary">vpn_key</md-icon></span>
                   <md-error *ngIf="formErrors.password">
                     {{ formErrors.password }}
                   </md-error>
-                </md-input-container>
+                </md-form-field>
               </div>
 
               <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
-                <md-input-container fxFill>
+                <md-form-field fxFill>
                   <input type="password" mdInput placeholder="Topology passphrase" formControlName="passphrase" required [errorStateMatcher]="createFormErrorStateMatcher">
                   <span mdPrefix><md-icon color="primary">security</md-icon></span>
                   <md-error *ngIf="formErrors.passphrase">
                     {{ formErrors.passphrase }}
                   </md-error>
-                </md-input-container>
+                </md-form-field>
               </div>
             </div>
           </md-card-content>

@@ -49,9 +49,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <ng-template #descriptionEdit>
               <div fxLayout="column" *ngIf="description !== null" class="workspace-description-edit">
                 <p>
-                  <md-input-container fxFlex>
+                  <md-form-field fxFlex>
                     <textarea mdInput class="description-wks" mdTextareaAutosize [disabled]="isSettingDescription" [(ngModel)]="description"></textarea>
-                  </md-input-container>
+                  </md-form-field>
                 </p>
                 <md-card-subtitle>
                   <span fxFlex class="workspace-description-preview" [innerHTML]="description | MarkdownToHtml"></span>
@@ -103,7 +103,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <md-divider></md-divider>
 
               <form [formGroup]="addUserFormGroup" (ngSubmit)="addUser()" class="margin-top-x1">
-                <md-input-container class="margin-right-x1">
+                <md-form-field class="margin-right-x1">
                   <input
                     mdInput
                     placeholder="User to add"
@@ -111,7 +111,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     formControlName="userSearchCtrl"
                     required>
                   <md-error>Select a user on the list</md-error>
-                </md-input-container>
+                </md-form-field>
 
                 <md-autocomplete #autocompleteUsers>
                   <md-option *ngFor="let filteredUser of filteredUsers$ | async" [value]="filteredUser">
@@ -126,9 +126,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 <md-list-item *ngFor="let user of users; trackBy:trackByUser">
                   <app-generate-icon md-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
 
-                  <h2 md-line class="user-id">{{ user.id }}</h2>
+                  <h2 mdLine class="user-id">{{ user.id }}</h2>
 
-                  <p md-line>
+                  <p mdLine>
                     <span class="user-name">{{ user.name }}</span>
                   </p>
 

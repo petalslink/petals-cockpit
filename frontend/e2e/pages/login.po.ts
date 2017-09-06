@@ -60,6 +60,6 @@ export class LoginPage {
   loginNoCheck(user: string, pass: string) {
     this.username.sendKeys(user);
     this.password.sendKeys(pass);
-    $(`app-login button`).click();
+    this.button.click();
   }
 }

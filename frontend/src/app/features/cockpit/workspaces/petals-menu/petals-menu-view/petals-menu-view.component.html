@@ -17,10 +17,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <div class="wrapper-search-add-bus" fxLayout="row">
     <form [formGroup]="searchForm">
-      <md-input-container fxFlex>
+      <md-form-field fxFlex>
         <input class="search" mdInput placeholder="Search" formControlName="search">
         <span mdPrefix><md-icon color="primary">search</md-icon></span>
-      </md-input-container>
+      </md-form-field>
     </form>
 
     <a md-mini-fab class="btn-add-bus" color="primary" fxFlex="40px" mdTooltip="Import a bus" mdTooltipPosition="below"

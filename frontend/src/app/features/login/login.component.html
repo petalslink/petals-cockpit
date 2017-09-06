@@ -15,21 +15,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <md-card *ngIf="users$ | async as users">
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm.value)" fxLayout="column">
-    <md-input-container #usernameInput class="margin-top-x1">
+    <md-form-field #usernameInput class="margin-top-x1">
       <span mdPrefix>
           <md-icon color="primary">person</md-icon>
         </span>
       <input mdInput type="text" placeholder="Username" formControlName="username" [errorStateMatcher]="createFormErrorStateMatcher" required>
       <md-error>Required!</md-error>
-    </md-input-container>
+    </md-form-field>
 
-    <md-input-container class="margin-top-x1">
+    <md-form-field class="margin-top-x1">
       <span mdPrefix>
           <md-icon color="primary">vpn_key</md-icon>
         </span>
       <input mdInput type="password" placeholder="Password" formControlName="password" [errorStateMatcher]="createFormErrorStateMatcher" required>
       <md-error>Required!</md-error>
-    </md-input-container>
+    </md-form-field>
 
     <div fxLayout="row" fxFlex="100%" fxLayoutAlign="start center" class="form-error" *ngIf="users.connectionFailed">
       <md-icon color="warn">error</md-icon>

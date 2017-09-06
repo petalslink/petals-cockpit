@@ -30,30 +30,28 @@ import {
   NgForm,
   Validators,
 } from '@angular/forms';
-import { MdInputContainer } from '@angular/material';
+import { MdInput } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
+import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
+import { IBusImport } from 'app/shared/services/buses.service';
+import { Ui } from 'app/shared/state/ui.actions';
+import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { IStore } from '../../../../../shared/state/store.interface';
-import {
-  IBusesInProgressTable,
-  IBusInProgressRow,
-} from './../../state/buses-in-progress/buses-in-progress.interface';
-
 import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
 import {
   disableAllFormFields,
   formErrorStateMatcher,
   getFormErrors,
 } from './../../../../../shared/helpers/form.helper';
+import {
+  IBusesInProgressTable,
+  IBusInProgressRow,
+} from './../../state/buses-in-progress/buses-in-progress.interface';
 import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
-
-import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
-import { IBusImport } from 'app/shared/services/buses.service';
-import { Ui } from 'app/shared/state/ui.actions';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
 
 @Component({
   selector: 'app-petals-bus-in-progress-view',
@@ -64,7 +62,7 @@ export class PetalsBusInProgressViewComponent
   implements OnInit, OnDestroy, AfterViewInit {
   private onDestroy$ = new Subject<void>();
 
-  @ViewChild('ipInput') ipInput: MdInputContainer;
+  @ViewChild('ipInput') ipInput: MdInput;
 
   busesInProgressTable$: Observable<IBusesInProgressTable>;
   busInProgress$: Observable<IBusInProgressRow>;
@@ -166,7 +164,7 @@ export class PetalsBusInProgressViewComponent
       .filter(ss => ss)
       .do(() =>
         // this prevent change detection errors
-        setTimeout(() => this.ipInput._focusInput())
+        setTimeout(() => this.ipInput.focus())
       )
       .subscribe();
   }
