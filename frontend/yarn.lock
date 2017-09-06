@@ -117,9 +117,11 @@
   dependencies:
     tslib "^1.7.1"
 
-"@angular/flex-layout@2.0.0-beta.8":
-  version "2.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/@angular/flex-layout/-/flex-layout-2.0.0-beta.8.tgz#b9cf57865a93ca158fe56d850952423f248d103b"
+"@angular/flex-layout@2.0.0-beta.9":
+  version "2.0.0-beta.9"
+  resolved "https://registry.yarnpkg.com/@angular/flex-layout/-/flex-layout-2.0.0-beta.9.tgz#3e54f898e805d0b1426d15e6139db415d04ee75f"
+  dependencies:
+    tslib "^1.7.1"
 
 "@angular/forms@4.3.6":
   version "4.3.6"
@@ -6984,6 +6986,6 @@ yn@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/yn/-/yn-2.0.0.tgz#e5adabc8acf408f6385fc76495684c88e6af689a"
 
-zone.js@0.8.17, zone.js@^0.8.14, zone.js@0.8.12:
+zone.js@0.8.17, zone.js@^0.8.14:
   version "0.8.17"
   resolved "https://registry.yarnpkg.com/zone.js/-/zone.js-0.8.17.tgz#4c5e5185a857da8da793daf3919371c5a36b2a0b"
