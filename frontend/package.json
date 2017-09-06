@@ -9,7 +9,7 @@
     "test": "ng test",
     "test:ci": "yarn run test -- --single-run --progress=false",
     "check": "yarn run tslint-config-prettier-check ./tslint.json && yarn run lint:check && yarn run copyrights:check && yarn run prettier:check",
-    "check:fix": "yarn run lint:fix && yarn run copyrights:fix && yarn run prettier:fix",
+    "check:fix": "yarn run lint:fix; yarn run copyrights:fix; yarn run prettier:fix",
     "lint:check": "ng lint --type-check",
     "lint:fix": "yarn run lint:check -- --fix",
     "copyrights:fix": "node generate-headers.js",
