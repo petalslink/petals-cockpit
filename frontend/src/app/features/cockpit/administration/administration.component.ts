@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -42,8 +42,6 @@ export class AdministrationComponent implements OnInit, OnDestroy {
   user$: Observable<ICurrentUser>;
   isFetchingUsers$: Observable<boolean>;
   isLargeScreen$: Observable<boolean>;
-
-  @Input() displayMode = 'flat';
 
   constructor(private store$: Store<IStore>) {}
 
