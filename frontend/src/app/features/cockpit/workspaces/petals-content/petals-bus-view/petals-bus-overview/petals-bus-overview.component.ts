@@ -35,7 +35,7 @@ export class PetalsBusOverviewComponent implements OnInit {
   @Input() bus: IBusWithContainers;
   @Input() workspaceId: string;
 
-  public config: any = {
+  public config: SwiperOptions = {
     pagination: '.swiper-pagination',
     nextButton: '.swiper-button-next',
     prevButton: '.swiper-button-prev',
