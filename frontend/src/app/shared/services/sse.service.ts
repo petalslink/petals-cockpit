@@ -21,50 +21,177 @@ import { Action } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 
-import { environment } from '../../../environments/environment';
+import {
+  IBusBackendSSE,
+  IBusInProgressBackend,
+} from 'app/shared/services/buses.service';
+import {
+  ComponentState,
+  IComponentBackendSSE,
+} from 'app/shared/services/components.service';
+import { IContainerBackendSSE } from 'app/shared/services/containers.service';
+import {
+  IServiceAssemblyBackendSSE,
+  ServiceAssemblyState,
+} from 'app/shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+import {
+  ISharedLibraryBackendSSE,
+  SharedLibraryState,
+} from 'app/shared/services/shared-libraries.service';
+import { IUserBackend } from 'app/shared/services/users.service';
+import { IWorkspaceBackend } from 'app/shared/services/workspaces.service';
+import { environment } from 'environments/environment';
 
-export class SseWorkspaceEvent {
-  public static readonly events: SseWorkspaceEvent[] = [];
-
-  public static readonly BUS_IMPORT = new SseWorkspaceEvent('BUS_IMPORT');
-  public static readonly BUS_IMPORT_OK = new SseWorkspaceEvent('BUS_IMPORT_OK');
-  public static readonly WORKSPACE_CONTENT = new SseWorkspaceEvent(
-    'WORKSPACE_CONTENT'
-  );
-  public static readonly BUS_IMPORT_ERROR = new SseWorkspaceEvent(
-    'BUS_IMPORT_ERROR'
-  );
-  public static readonly SA_STATE_CHANGE = new SseWorkspaceEvent(
-    'SA_STATE_CHANGE'
-  );
-  public static readonly COMPONENT_STATE_CHANGE = new SseWorkspaceEvent(
-    'COMPONENT_STATE_CHANGE'
-  );
-  public static readonly BUS_DELETED = new SseWorkspaceEvent('BUS_DELETED');
-  public static readonly WORKSPACE_DELETED = new SseWorkspaceEvent(
-    'WORKSPACE_DELETED'
-  );
-  public static readonly SA_DEPLOYED = new SseWorkspaceEvent('SA_DEPLOYED');
-  public static readonly COMPONENT_DEPLOYED = new SseWorkspaceEvent(
-    'COMPONENT_DEPLOYED'
-  );
-  public static readonly SL_DEPLOYED = new SseWorkspaceEvent('SL_DEPLOYED');
-  public static readonly SL_STATE_CHANGE = new SseWorkspaceEvent(
-    'SL_STATE_CHANGE'
-  );
-
-  public static readonly ON_MESSAGE = SseWorkspaceEvent.toAction('On Message');
-
-  public readonly action: string;
-
-  public static toAction(event: string) {
-    return `[SSE Event] ${event}`;
+export namespace SseActions {
+  export const BusImportSse = 'BUS_IMPORT';
+  export const BusImportType = '[Sse] Bus import';
+  export class BusImport implements Action {
+    readonly type = BusImportType;
+    constructor(public readonly payload: IBusInProgressBackend) {}
   }
 
-  private constructor(public readonly event: string) {
-    this.action = SseWorkspaceEvent.toAction(event);
-    SseWorkspaceEvent.events.push(this);
+  export const BusImportOkSse = 'BUS_IMPORT_OK';
+  export const BusImportOkType = '[Sse] Bus import ok';
+  export class BusImportOk implements Action {
+    readonly type = BusImportOkType;
+    constructor(
+      public readonly payload: {
+        buses: { [key: string]: IBusBackendSSE };
+        containers: { [key: string]: IContainerBackendSSE };
+        serviceAssemblies: { [key: string]: IServiceAssemblyBackendSSE };
+        components: { [key: string]: IComponentBackendSSE };
+        serviceUnits: { [key: string]: IServiceUnitBackendSSE };
+        sharedLibraries: { [key: string]: ISharedLibraryBackendSSE };
+      }
+    ) {}
   }
+
+  export const WorkspaceContentSse = 'WORKSPACE_CONTENT';
+  export const WorkspaceContentType = '[Sse] Workspace content';
+  export class WorkspaceContent implements Action {
+    readonly type = WorkspaceContentType;
+    constructor(
+      public readonly payload: {
+        workspace: IWorkspaceBackend;
+        users: { [key: string]: IUserBackend };
+        busesInProgress: { [key: string]: IBusInProgressBackend };
+        buses: { [key: string]: IBusBackendSSE };
+        containers: { [key: string]: IContainerBackendSSE };
+        components: { [key: string]: IComponentBackendSSE };
+        serviceAssemblies: { [key: string]: IServiceAssemblyBackendSSE };
+        serviceUnits: { [key: string]: IServiceUnitBackendSSE };
+        sharedLibraries: { [key: string]: ISharedLibraryBackendSSE };
+      }
+    ) {}
+  }
+
+  export const BusImportErrorSse = 'BUS_IMPORT_ERROR';
+  export const BusImportErrorType = '[Sse] Bus import error';
+  export class BusImportError implements Action {
+    readonly type = BusImportErrorType;
+    constructor(public readonly payload: IBusInProgressBackend) {}
+  }
+
+  export const SaStateChangeSse = 'SA_STATE_CHANGE';
+  export const SaStateChangeType = '[Sse] Sa state change';
+  export class SaStateChange implements Action {
+    readonly type = SaStateChangeType;
+    constructor(
+      public readonly payload: { id: string; state: ServiceAssemblyState }
+    ) {}
+  }
+
+  export const ComponentStateChangeSse = 'COMPONENT_STATE_CHANGE';
+  export const ComponentStateChangeType = '[Sse] Component state change';
+  export class ComponentStateChange implements Action {
+    readonly type = ComponentStateChangeType;
+    constructor(
+      public readonly payload: { id: string; state: ComponentState }
+    ) {}
+  }
+
+  export const BusDeletedSse = 'BUS_DELETED';
+  export const BusDeletedType = '[Sse] Bus deleted';
+  export class BusDeleted implements Action {
+    readonly type = BusDeletedType;
+    constructor(public readonly payload: { id: string; reason: string }) {}
+  }
+
+  export const WorkspaceDeletedSse = 'WORKSPACE_DELETED';
+  export const WorkspaceDeletedType = '[Sse] Workspace deleted';
+  export class WorkspaceDeleted implements Action {
+    readonly type = WorkspaceDeletedType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const SaDeployedSse = 'SA_DEPLOYED';
+  export const SaDeployedType = '[Sse] Sa deployed';
+  export class SaDeployed implements Action {
+    readonly type = SaDeployedType;
+    constructor(
+      public readonly payload: {
+        serviceAssemblies: { [key: string]: IServiceAssemblyBackendSSE };
+        serviceUnits: { [key: string]: IServiceUnitBackendSSE };
+      }
+    ) {}
+  }
+
+  export const ComponentDeployedSse = 'COMPONENT_DEPLOYED';
+  export const ComponentDeployedType = '[Sse] Component deployed';
+  export class ComponentDeployed implements Action {
+    readonly type = ComponentDeployedType;
+    constructor(
+      public readonly payload: {
+        components: { [key: string]: IComponentBackendSSE };
+      }
+    ) {}
+  }
+
+  export const SlDeployedSse = 'SL_DEPLOYED';
+  export const SlDeployedType = '[Sse] Sl deployed';
+  export class SlDeployed implements Action {
+    readonly type = SlDeployedType;
+    constructor(
+      public readonly payload: {
+        sharedLibraries: { [key: string]: ISharedLibraryBackendSSE };
+      }
+    ) {}
+  }
+
+  export const SlStateChangeSse = 'SL_STATE_CHANGE';
+  export const SlStateChangeType = '[Sse] Sl state change';
+  export class SlStateChange implements Action {
+    readonly type = SlStateChangeType;
+    constructor(
+      public readonly payload: { id: string; state: SharedLibraryState }
+    ) {}
+  }
+
+  /**
+   * events his a map to find a Redux action based on the name of an SSE action
+   */
+  export const events: { [key: string]: (payload: any) => Action } = {
+    [SseActions.BusImportSse]: payload => new SseActions.BusImport(payload),
+    [SseActions.BusImportOkSse]: payload => new SseActions.BusImportOk(payload),
+    [SseActions.WorkspaceContentSse]: payload =>
+      new SseActions.WorkspaceContent(payload),
+    [SseActions.BusImportErrorSse]: payload =>
+      new SseActions.BusImportError(payload),
+    [SseActions.SaStateChangeSse]: payload =>
+      new SseActions.SaStateChange(payload),
+    [SseActions.ComponentStateChangeSse]: payload =>
+      new SseActions.ComponentStateChange(payload),
+    [SseActions.BusDeletedSse]: payload => new SseActions.BusDeleted(payload),
+    [SseActions.WorkspaceDeletedSse]: payload =>
+      new SseActions.WorkspaceDeleted(payload),
+    [SseActions.SaDeployedSse]: payload => new SseActions.SaDeployed(payload),
+    [SseActions.ComponentDeployedSse]: payload =>
+      new SseActions.ComponentDeployed(payload),
+    [SseActions.SlDeployedSse]: payload => new SseActions.SlDeployed(payload),
+    [SseActions.SlStateChangeSse]: payload =>
+      new SseActions.SlStateChange(payload),
+  };
 }
 
 export abstract class SseService {
@@ -106,26 +233,30 @@ export class SseServiceImpl extends SseService {
         }
       };
 
-      SseWorkspaceEvent.events.forEach(event => {
-        es.addEventListener(event.event, ev => {
+      for (const event of Object.keys(SseActions.events)) {
+        es.addEventListener(event, ev => {
           if (!cleanup()) {
             const json = JSON.parse((ev as any).data);
-            observer.next({
-              type: event.action,
-              payload: json,
-            });
+            const generateEvent = SseActions.events[event];
+
+            if (generateEvent) {
+              observer.next(generateEvent(json));
+            } else if (environment.debug) {
+              console.error(
+                'SseServiceImpl: Unknown action name "${eventName}"'
+              );
+            }
           }
         });
-      });
+      }
 
-      es.onmessage = ev => {
-        if (!cleanup()) {
-          observer.next({
-            type: SseWorkspaceEvent.ON_MESSAGE,
-            payload: ev.data,
-          });
-        }
-      };
+      if (environment.debug) {
+        es.onmessage = ev => {
+          if (!cleanup()) {
+            console.error('SseServiceImpl: Unknown message from SSE');
+          }
+        };
+      }
 
       es.onerror = ev => {
         if (!cleanup()) {

@@ -21,7 +21,7 @@ import { Http } from '@angular/http';
 import * as helper from 'app/shared/helpers/mock.helper';
 import { environment } from 'environments/environment';
 import { serviceAssembliesService } from 'mocks/service-assemblies-mock';
-import { SseService, SseWorkspaceEvent } from './sse.service';
+import { SseActions, SseService } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
 
 import {
@@ -65,7 +65,7 @@ export class ServiceAssembliesServiceMock extends ServiceAssembliesServiceImpl {
     setTimeout(
       () =>
         (this.sseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.SA_STATE_CHANGE.event,
+          SseActions.SaStateChangeSse,
           response
         ),
       environment.mock.sseDelay

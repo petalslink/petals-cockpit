@@ -27,9 +27,8 @@ import {
   ESharedLibraryState,
   ISharedLibraryBackendSSE,
   SharedLibrariesService,
-  SharedLibraryState,
 } from 'app/shared/services/shared-libraries.service';
-import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { SseActions } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
 
@@ -45,7 +44,7 @@ export class SharedLibrariesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchDelpoyed$: Observable<Action> = this.actions$
-    .ofType(SseWorkspaceEvent.SL_DEPLOYED.action)
+    .ofType<SseActions.SlDeployed>(SseActions.SlDeployedType)
     .map(action => {
       const data = action.payload;
       const sls = toJsTable<ISharedLibraryBackendSSE>(data.sharedLibraries);
@@ -55,8 +54,8 @@ export class SharedLibrariesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchDetails$: Observable<Action> = this.actions$
-    .ofType(SharedLibraries.FetchDetailsType)
-    .switchMap((action: SharedLibraries.FetchDetails) =>
+    .ofType<SharedLibraries.FetchDetails>(SharedLibraries.FetchDetailsType)
+    .switchMap(action =>
       this.sharedLibrariesService
         .getDetails(action.payload.id)
         .map(
@@ -70,7 +69,7 @@ export class SharedLibrariesEffects {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in shared-libraries.effects: ofType(SharedLibraries.FetchDetailsType)'
+              'Error caught in shared-libraries.effects: ofType(SharedLibraries.FetchDetails)'
             );
             console.error(err);
             console.groupEnd();
@@ -85,9 +84,9 @@ export class SharedLibrariesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   changeState$: Observable<Action> = this.actions$
-    .ofType(SharedLibraries.ChangeStateType)
+    .ofType<SharedLibraries.ChangeState>(SharedLibraries.ChangeStateType)
     .withLatestFrom(this.store$)
-    .switchMap(([action, store]: [SharedLibraries.ChangeState, IStore]) => {
+    .switchMap(([action, store]) => {
       return (
         this.sharedLibrariesService
           .putState(
@@ -101,7 +100,7 @@ export class SharedLibrariesEffects {
             if (environment.debug) {
               console.group();
               console.warn(
-                'Error caught in share-libraries.effects: ofType(SharedLibraries.ChangeStateType)'
+                'Error caught in share-libraries.effects: ofType(SharedLibraries.ChangeState)'
               );
               console.error(err);
               console.groupEnd();
@@ -120,10 +119,10 @@ export class SharedLibrariesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchStateChanged$: Observable<Action> = this.actions$
-    .ofType(SseWorkspaceEvent.SL_STATE_CHANGE.action)
+    .ofType<SseActions.SlStateChange>(SseActions.SlStateChangeType)
     .withLatestFrom(this.store$)
     .flatMap(([action, store]) => {
-      const data: { id: string; state: SharedLibraryState } = action.payload;
+      const data = action.payload;
 
       const sl = store.sharedLibraries.byId[data.id];
 

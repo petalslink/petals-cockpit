@@ -36,8 +36,8 @@ export class ServiceUnitsEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchServiceUnitDetails$: Observable<Action> = this.actions$
-    .ofType(ServiceUnits.FetchDetailsType)
-    .switchMap((action: ServiceUnits.FetchDetails) =>
+    .ofType<ServiceUnits.FetchDetails>(ServiceUnits.FetchDetailsType)
+    .switchMap(action =>
       this.serviceUnitsService
         .getDetailsServiceUnit(action.payload.id)
         .map(
@@ -51,7 +51,7 @@ export class ServiceUnitsEffects {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in service-unit.effects: ofType(ServiceUnits.FetchDetailsType)'
+              'Error caught in service-unit.effects: ofType(ServiceUnits.FetchDetails)'
             );
             console.error(err);
             console.groupEnd();

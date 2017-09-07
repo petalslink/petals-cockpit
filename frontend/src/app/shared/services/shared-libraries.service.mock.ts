@@ -25,7 +25,7 @@ import {
   SharedLibrariesServiceImpl,
   SharedLibraryState,
 } from 'app/shared/services/shared-libraries.service';
-import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { SseActions, SseService } from 'app/shared/services/sse.service';
 import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import { environment } from 'environments/environment';
 import { sharedLibrariesService } from 'mocks/shared-libraries-mock';
@@ -55,7 +55,7 @@ export class SharedLibrariesServiceMock extends SharedLibrariesServiceImpl {
     setTimeout(
       () =>
         (this.sseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.SL_STATE_CHANGE.event,
+          SseActions.SlStateChangeSse,
           response
         ),
       environment.mock.sseDelay

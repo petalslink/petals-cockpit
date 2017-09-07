@@ -16,18 +16,16 @@
  */
 
 import { Injectable } from '@angular/core';
-
 import { Router } from '@angular/router';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { Observable } from 'rxjs/Observable';
 
-import { Users } from 'app/shared/state/users.actions';
-import { environment } from '../../../environments/environment';
-import { IUserBackend, UsersService } from '../services/users.service';
-
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
+import { IUserBackend, UsersService } from 'app/shared/services/users.service';
+import { Users } from 'app/shared/state/users.actions';
+import { environment } from 'environments/environment';
 
 @Injectable()
 export class UsersEffects {
@@ -41,8 +39,8 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchAll$: Observable<Action> = this.actions$
-    .ofType(Users.FetchAllType)
-    .switchMap((action: Users.FetchAll) =>
+    .ofType<Users.FetchAll>(Users.FetchAllType)
+    .switchMap(action =>
       this.usersService
         .getAll()
         .map(
@@ -57,7 +55,7 @@ export class UsersEffects {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in users.effects.ts: ofType(Users.FetchAllType)'
+              'Error caught in users.effects.ts: ofType(Users.FetchAll)'
             );
             console.error(err);
             console.groupEnd();
@@ -70,8 +68,8 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   add$: Observable<Action> = this.actions$
-    .ofType(Users.AddType)
-    .flatMap((action: Users.Add) =>
+    .ofType<Users.Add>(Users.AddType)
+    .flatMap(action =>
       this.usersService
         .add(action.payload)
         .map(
@@ -84,9 +82,7 @@ export class UsersEffects {
         .catch(err => {
           if (environment.debug) {
             console.group();
-            console.warn(
-              'Error caught in users.effects.ts: ofType(Users.AddType)'
-            );
+            console.warn('Error caught in users.effects.ts: ofType(Users.Add)');
             console.error(err);
             console.groupEnd();
           }
@@ -100,8 +96,8 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   delete$: Observable<Action> = this.actions$
-    .ofType(Users.DeleteType)
-    .flatMap((action: Users.Delete) =>
+    .ofType<Users.Delete>(Users.DeleteType)
+    .flatMap(action =>
       this.usersService
         .delete(action.payload.id)
         .map(() => new Users.DeleteSuccess({ id: action.payload.id }))
@@ -109,7 +105,7 @@ export class UsersEffects {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in users.effects.ts: ofType(Users.DeleteType)'
+              'Error caught in users.effects.ts: ofType(Users.Delete)'
             );
             console.error(err);
             console.groupEnd();
@@ -122,8 +118,8 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   modify$: Observable<Action> = this.actions$
-    .ofType(Users.ModifyType)
-    .flatMap((action: Users.Modify) =>
+    .ofType<Users.Modify>(Users.ModifyType)
+    .flatMap(action =>
       this.usersService
         .modify(action.payload.id, action.payload.changes)
         .map(() => new Users.ModifySuccess(action.payload))
@@ -131,7 +127,7 @@ export class UsersEffects {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in users.effects.ts: ofType(Users.ModifyType)'
+              'Error caught in users.effects.ts: ofType(Users.Modify)'
             );
             console.error(err);
             console.groupEnd();
@@ -144,8 +140,8 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   connectUser$: Observable<Action> = this.actions$
-    .ofType(Users.ConnectType)
-    .switchMap((action: Users.Connect) =>
+    .ofType<Users.Connect>(Users.ConnectType)
+    .switchMap(action =>
       this.usersService
         .connectUser(action.payload.user)
         .map(
@@ -160,7 +156,7 @@ export class UsersEffects {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in users.effects.ts: ofType(Users.ConnectType)'
+              'Error caught in users.effects.ts: ofType(Users.Connect)'
             );
             console.error(err);
             console.groupEnd();
@@ -173,8 +169,8 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   connectUserSuccess$: Observable<void> = this.actions$
-    .ofType(Users.ConnectSuccessType)
-    .filter((action: Users.ConnectSuccess) => action.payload.navigate)
+    .ofType<Users.ConnectSuccess>(Users.ConnectSuccessType)
+    .filter(action => action.payload.navigate)
     .map((action: Users.ConnectSuccess) => {
       if (action.payload.previousUrl) {
         this.router.navigate([action.payload.previousUrl]);
@@ -191,7 +187,7 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   disconnectUser$: Observable<Action> = this.actions$
-    .ofType(Users.DisconnectType)
+    .ofType<Users.Disconnect>(Users.DisconnectType)
     .switchMap(() =>
       this.usersService
         .disconnectUser()
@@ -204,7 +200,7 @@ export class UsersEffects {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in users.effects.ts: ofType(Users.DisconnectType)'
+              'Error caught in users.effects.ts: ofType(Users.Disconnect)'
             );
             console.error(err);
             console.groupEnd();
@@ -217,7 +213,7 @@ export class UsersEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   disconnectUserSuccess$: Observable<Action> = this.actions$
-    .ofType(Users.DisconnectSuccessType)
+    .ofType<Users.DisconnectSuccess>(Users.DisconnectSuccessType)
     .do(() =>
       this.notification.success('Log out !', `You're now disconnected.`)
     );

@@ -30,7 +30,7 @@ import {
   ComponentState,
   EComponentState,
 } from './components.service';
-import { SseService, SseWorkspaceEvent } from './sse.service';
+import { SseActions, SseService } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
 
 @Injectable()
@@ -83,7 +83,7 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
     setTimeout(
       () =>
         (this.sseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.COMPONENT_STATE_CHANGE.event,
+          SseActions.ComponentStateChangeSse,
           response
         ),
       environment.mock.sseDelay
@@ -120,7 +120,7 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
       setTimeout(
         () =>
           (this.sseService as SseServiceMock).triggerSseEvent(
-            SseWorkspaceEvent.SA_DEPLOYED.event,
+            SseActions.SaDeployedSse,
             response
           ),
         environment.mock.sseDelay

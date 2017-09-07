@@ -30,10 +30,9 @@ import {
   EServiceAssemblyState,
   IServiceAssemblyBackendSSE,
   ServiceAssembliesService,
-  ServiceAssemblyState,
 } from 'app/shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
-import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { SseActions } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
 
@@ -49,7 +48,7 @@ export class ServiceAssembliesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchDeployed$: Observable<Action> = this.actions$
-    .ofType(SseWorkspaceEvent.SA_DEPLOYED.action)
+    .ofType<SseActions.SaDeployed>(SseActions.SaDeployedType)
     .map(action => {
       const data = action.payload;
       const serviceAssemblies = toJsTable<IServiceAssemblyBackendSSE>(
@@ -65,10 +64,10 @@ export class ServiceAssembliesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchStateChanged$: Observable<Action> = this.actions$
-    .ofType(SseWorkspaceEvent.SA_STATE_CHANGE.action)
+    .ofType<SseActions.SaStateChange>(SseActions.SaStateChangeType)
     .withLatestFrom(this.store$)
     .map(([action, store]) => {
-      const data: { id: string; state: ServiceAssemblyState } = action.payload;
+      const data = action.payload;
 
       const sa = store.serviceAssemblies.byId[data.id];
 
@@ -95,8 +94,8 @@ export class ServiceAssembliesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchServiceAssemblyDetails$: Observable<Action> = this.actions$
-    .ofType(ServiceAssemblies.FetchDetailsType)
-    .switchMap((action: ServiceAssemblies.FetchDetails) =>
+    .ofType<ServiceAssemblies.FetchDetails>(ServiceAssemblies.FetchDetailsType)
+    .switchMap(action =>
       this.serviceAssembliesService
         .getDetailsServiceAssembly(action.payload.id)
         .map(
@@ -110,7 +109,7 @@ export class ServiceAssembliesEffects {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in service-assemblies.effects: ofType(ServiceAssemblies.FetchDetailsType)'
+              'Error caught in service-assemblies.effects: ofType(ServiceAssemblies.FetchDetails)'
             );
             console.error(err);
             console.groupEnd();
@@ -125,9 +124,9 @@ export class ServiceAssembliesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   changeState$: Observable<Action> = this.actions$
-    .ofType(ServiceAssemblies.ChangeStateType)
+    .ofType<ServiceAssemblies.ChangeState>(ServiceAssemblies.ChangeStateType)
     .withLatestFrom(this.store$)
-    .switchMap(([action, store]: [ServiceAssemblies.ChangeState, IStore]) => {
+    .switchMap(([action, store]) => {
       return (
         this.serviceAssembliesService
           .putState(
@@ -141,7 +140,7 @@ export class ServiceAssembliesEffects {
             if (environment.debug) {
               console.group();
               console.warn(
-                'Error caught in service-assemblies.effects: ofType(ServiceAssemblies.ChangeStateType)'
+                'Error caught in service-assemblies.effects: ofType(ServiceAssemblies.ChangeState)'
               );
               console.error(err);
               console.groupEnd();
@@ -160,9 +159,8 @@ export class ServiceAssembliesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   changeStateSuccess$: Observable<Action> = this.actions$
-    .ofType(ServiceAssemblies.ChangeStateSuccessType)
-    .map(
-      (action: ServiceAssemblies.ChangeStateSuccess) =>
-        new ServiceAssemblies.FetchDetails(action.payload)
-    );
+    .ofType<ServiceAssemblies.ChangeStateSuccess>(
+      ServiceAssemblies.ChangeStateSuccessType
+    )
+    .map(action => new ServiceAssemblies.FetchDetails(action.payload));
 }
