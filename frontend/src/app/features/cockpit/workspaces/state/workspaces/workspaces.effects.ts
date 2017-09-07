@@ -309,4 +309,86 @@ export class WorkspacesEffects {
           return Observable.of(new Workspaces.DeleteUserError(action.payload));
         })
     );
+
+  @Effect()
+  unfoldCurrentElementParents$: Observable<Action> = this.actions$
+    .ofType<SetCurrentActions>(
+      Containers.SetCurrentType,
+      Components.SetCurrentType,
+      ServiceUnits.SetCurrentType,
+      ServiceAssemblies.SetCurrentType,
+      SharedLibraries.SetCurrentType
+    )
+    .filter(action => !!action.payload.id)
+    .withLatestFrom(this.store$)
+    .map(([action, state]: [SetCurrentActions, IStore]) =>
+      batchActions(unfoldWithParents(action, state, false))
+    );
+}
+
+type SetCurrentActions =
+  | Containers.SetCurrent
+  | Components.SetCurrent
+  | ServiceUnits.SetCurrent
+  | ServiceAssemblies.SetCurrent
+  | SharedLibraries.SetCurrent;
+
+function unfoldWithParents(
+  action: SetCurrentActions | Buses.SetCurrent,
+  state: IStore,
+  alsoCurrent = true
+): Action[] {
+  const id = action.payload.id;
+
+  switch (action.type) {
+    case Buses.SetCurrentType: {
+      return alsoCurrent ? [new Buses.Unfold({ id })] : [];
+    }
+
+    case Containers.SetCurrentType: {
+      return [
+        ...(alsoCurrent
+          ? [new Containers.Unfold({ id, type: 'container' })]
+          : []),
+        ...unfoldWithParents(
+          new Buses.SetCurrent({ id: state.containers.byId[id].busId }),
+          state
+        ),
+      ];
+    }
+
+    case Components.SetCurrentType: {
+      const cId = state.components.byId[id].containerId;
+      return [
+        ...(alsoCurrent ? [new Components.Unfold({ id })] : []),
+        new Containers.Unfold({ id: cId, type: 'components' }),
+        ...unfoldWithParents(new Containers.SetCurrent({ id: cId }), state),
+      ];
+    }
+
+    case ServiceAssemblies.SetCurrentType: {
+      const cId = state.serviceAssemblies.byId[id].containerId;
+      return [
+        new Containers.Unfold({ id: cId, type: 'service-assemblies' }),
+        ...unfoldWithParents(new Containers.SetCurrent({ id: cId }), state),
+      ];
+    }
+
+    case SharedLibraries.SetCurrentType: {
+      const cId = state.sharedLibraries.byId[id].containerId;
+      return [
+        new Containers.Unfold({ id: cId, type: 'shared-libraries' }),
+        ...unfoldWithParents(new Containers.SetCurrent({ id: cId }), state),
+      ];
+    }
+
+    case ServiceUnits.SetCurrentType: {
+      return unfoldWithParents(
+        new Components.SetCurrent({
+          id: state.serviceUnits.byId[id].componentId,
+        }),
+        state
+      );
+    }
+  }
 }
