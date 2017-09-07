@@ -51,14 +51,14 @@ export class UiEffects {
 
   @Effect({ dispatch: true })
   unfoldCurrentElementParents$: Observable<Action> = this.actions$
-    .ofType(
+    .ofType<SetCurrentActions>(
       Containers.SetCurrentType,
       Components.SetCurrentType,
       ServiceUnits.SetCurrentType,
       ServiceAssemblies.SetCurrentType,
       SharedLibraries.SetCurrentType
     )
-    .filter((action: SetCurrentActions) => !!action.payload.id)
+    .filter(action => !!action.payload.id)
     .withLatestFrom(this.store$)
     .map(([action, state]: [SetCurrentActions, IStore]) =>
       batchActions(unfoldParents(action, state))

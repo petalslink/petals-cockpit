@@ -53,9 +53,9 @@ describe(`Petals component content`, () => {
   it(`should stop/start/stop/unload a component`, () => {
     let ops = workspace.openComponent('Comp 0').openOperations();
 
-    ops.stopButton.click();
-    ops.startButton.click();
-    ops.stopButton.click();
+    waitAndClick(ops.stopButton);
+    waitAndClick(ops.startButton);
+    waitAndClick(ops.stopButton);
 
     // unload the 2 SU
     const sa0 = workspace.openServiceAssembly('SA 0').openOperations();
@@ -69,12 +69,12 @@ describe(`Petals component content`, () => {
     // we should now be able to unload the comp 0
     ops = workspace.openComponent('Comp 0').openOperations();
 
-    ops.uninstallButton.click();
+    waitAndClick(ops.uninstallButton);
 
     expect(ops.getSUUpload().chooseFileButton.isEnabled()).toBe(false);
 
-    ops.installButton.click();
-    ops.uninstallButton.click();
+    waitAndClick(ops.installButton);
+    waitAndClick(ops.uninstallButton);
 
     // once unloaded ...
     page.clickAndExpectNotification(ops.unloadButton);
@@ -252,7 +252,7 @@ describe(`Petals component content`, () => {
     const inputHttpPort = ops.parameter('http-port');
 
     inputHttpPort.sendKeys('error');
-    ops.installButton.click();
+    waitAndClick(ops.installButton);
 
     // check if the error is displayed
     expect(ops.changeStateError.getText()).toEqual(

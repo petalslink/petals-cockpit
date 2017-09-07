@@ -15,24 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { compose } from '@ngrx/core/compose';
-import { combineReducers } from '@ngrx/store';
+import { ActionReducerMap } from '@ngrx/store';
 import { storeFreeze } from 'ngrx-store-freeze';
 
+import { BusesInProgressReducer } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
+import { BusesReducer } from 'app/features/cockpit/workspaces/state/buses/buses.reducer';
+import { ComponentsReducer } from 'app/features/cockpit/workspaces/state/components/components.reducer';
+import { ContainersReducer } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
 import { ServiceAssembliesReducer } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
+import { ServiceUnitsReducer } from 'app/features/cockpit/workspaces/state/service-units/service-units.reducer';
 import { SharedLibrariesReducer } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
+import { WorkspacesReducer } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 import { enableBatching } from 'app/shared/helpers/batch-actions.helper';
-import { environment } from '../../../environments/environment';
-import { BusesInProgressReducer } from '../../features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
-import { BusesReducer } from '../../features/cockpit/workspaces/state/buses/buses.reducer';
-import { ComponentsReducer } from '../../features/cockpit/workspaces/state/components/components.reducer';
-import { ContainersReducer } from '../../features/cockpit/workspaces/state/containers/containers.reducer';
-import { ServiceUnitsReducer } from '../../features/cockpit/workspaces/state/service-units/service-units.reducer';
-import { WorkspacesReducer } from '../../features/cockpit/workspaces/state/workspaces/workspaces.reducer';
+import { IStore } from 'app/shared/state/store.interface';
+import { environment } from 'environments/environment';
 import { UiReducer } from '../state/ui.reducer';
 import { UsersReducer } from './users.reducer';
 
-const reducers = {
+export const reducers: ActionReducerMap<IStore> = {
   ui: UiReducer.reducer,
   users: UsersReducer.reducer,
   workspaces: WorkspacesReducer.reducer,
@@ -47,20 +47,10 @@ const reducers = {
 
 // if environment is != from production
 // use storeFreeze to avoid state mutation
-const developmentReducer = compose(
-  storeFreeze,
-  enableBatching,
-  combineReducers
-)(reducers);
-const productionReducer = compose(enableBatching, combineReducers)(reducers);
+const metaReducersDev = [storeFreeze, enableBatching];
 
-// enableBatching allows us to dispatch multiple actions
-// without letting the subscribers being warned between the actions
-// only at the end. It is very handy when normalizing HTTP response
-export function getRootReducer(state: any, action: any) {
-  if (environment.production) {
-    return productionReducer(state, action);
-  } else {
-    return developmentReducer(state, action);
-  }
-}
+const metaReducersProd = [enableBatching];
+
+export const metaReducers = environment.production
+  ? metaReducersProd
+  : metaReducersDev;

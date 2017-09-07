@@ -22,7 +22,7 @@ import * as helper from 'app/shared/helpers/mock.helper';
 import { environment } from 'environments/environment';
 import { BackendUser } from 'mocks/users-mock';
 import { workspacesService } from 'mocks/workspaces-mock';
-import { SseService, SseWorkspaceEvent } from './sse.service';
+import { SseActions, SseService } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
 import { UsersService } from './users.service';
 import { UsersServiceMock } from './users.service.mock';
@@ -75,8 +75,9 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
         // simulate the backend sending the answer on the SSE
         setTimeout(() => {
           workspacesService.delete(id);
-          (this.sseService as SseServiceMock).triggerSseEvent(
-            SseWorkspaceEvent.WORKSPACE_DELETED.event,
+          (this
+            .sseService as SseServiceMock).triggerSseEvent(
+            SseActions.WorkspaceDeletedSse,
             { id }
           );
         }, environment.mock.sseDelay);

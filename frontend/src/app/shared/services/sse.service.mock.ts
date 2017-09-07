@@ -23,7 +23,7 @@ import { Subscriber } from 'rxjs/Subscriber';
 
 import { environment } from '../../../environments/environment';
 import { workspacesService } from '../../../mocks/workspaces-mock';
-import { SseService, SseWorkspaceEvent } from './sse.service';
+import { SseActions, SseService } from './sse.service';
 
 @Injectable()
 export class SseServiceMock extends SseService {
@@ -39,10 +39,13 @@ export class SseServiceMock extends SseService {
       console.debug('SSE: ', eventName, data);
     }
 
-    this.current.next({
-      type: SseWorkspaceEvent.toAction(eventName),
-      payload: data,
-    });
+    const generateEvent = SseActions.events[eventName];
+
+    if (generateEvent) {
+      this.current.next(generateEvent(data));
+    } else {
+      throw new Error(`${eventName} does not exist? bug!`);
+    }
   }
 
   public watchWorkspaceRealTime(id: string): Observable<Action> {
@@ -62,7 +65,7 @@ export class SseServiceMock extends SseService {
         setTimeout(
           () =>
             this.triggerSseEvent(
-              SseWorkspaceEvent.WORKSPACE_CONTENT.event,
+              SseActions.WorkspaceContentSse,
               workspace.toFullObj()
             ),
           500

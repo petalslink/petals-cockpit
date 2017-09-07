@@ -18,7 +18,8 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MD_DIALOG_DATA, MdDialog, MdDialogRef } from '@angular/material';
-import { Dispatcher, Store } from '@ngrx/store';
+import { Actions } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
@@ -62,7 +63,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private store$: Store<IStore>,
     private dialog: MdDialog,
-    private dispatcher: Dispatcher
+    private actions$: Actions
   ) {}
 
   ngOnInit() {
@@ -132,9 +133,9 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       .map(([userSearch, users]) => this.filterUsers(userSearch, users));
 
     // when a user is added to the workspace
-    this.dispatcher
+    this.actions$
+      .ofType(Workspaces.AddUserSuccessType)
       .takeUntil(this.onDestroy$)
-      .filter(action => action.type === Workspaces.AddUserSuccessType)
       // reset the form
       .do(_ => this.addUserFormGroup.reset())
       .subscribe();

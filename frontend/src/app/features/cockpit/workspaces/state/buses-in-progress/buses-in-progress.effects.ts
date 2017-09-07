@@ -28,7 +28,7 @@ import {
   BusesService,
   IBusInProgressBackend,
 } from 'app/shared/services/buses.service';
-import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { SseActions } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
 
@@ -45,15 +45,15 @@ export class BusesInProgressEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchBusImport$: Observable<Action> = this.actions$
-    .ofType(SseWorkspaceEvent.BUS_IMPORT.action)
+    .ofType<SseActions.BusImport>(SseActions.BusImportType)
     .map(action => new BusesInProgress.Added(action.payload));
 
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchBusImportError$: Observable<Action> = this.actions$
-    .ofType(SseWorkspaceEvent.BUS_IMPORT_ERROR.action)
+    .ofType<SseActions.BusImportError>(SseActions.BusImportErrorType)
     .map(action => {
-      const busInError: IBusInProgressBackend = action.payload;
+      const busInError = action.payload;
       this.notifications.alert(
         `Bus import error`,
         `The import of a bus from the IP ${busInError.ip}:${busInError.port} failed`
@@ -64,7 +64,7 @@ export class BusesInProgressEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchBusDeleted$: Observable<Action> = this.actions$
-    .ofType(SseWorkspaceEvent.BUS_DELETED.action)
+    .ofType<SseActions.BusDeleted>(SseActions.BusDeletedType)
     .withLatestFrom(this.store$)
     .filter(
       ([action, state]) => !!state.busesInProgress.byId[action.payload.id]
@@ -87,9 +87,9 @@ export class BusesInProgressEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   postBus$: Observable<Action> = this.actions$
-    .ofType(BusesInProgress.PostType)
+    .ofType<BusesInProgress.Post>(BusesInProgress.PostType)
     .withLatestFrom(this.store$)
-    .switchMap(([action, state]: [BusesInProgress.Post, IStore]) =>
+    .switchMap(([action, state]) =>
       this.busesService
         .postBus(state.workspaces.selectedWorkspaceId, action.payload)
         .map(res => res.json() as IBusInProgressBackend)
@@ -121,11 +121,11 @@ export class BusesInProgressEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deleteBusInProgress$: Observable<Action> = this.actions$
-    .ofType(BusesInProgress.DeleteType)
+    .ofType<BusesInProgress.Delete>(BusesInProgress.DeleteType)
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
-    .switchMap(([action, idWorkspace]: [BusesInProgress.Delete, string]) =>
+    .switchMap(([action, idWorkspace]) =>
       this.busesService
         .deleteBus(idWorkspace, action.payload.id)
         .mergeMap(_ => Observable.empty<Action>())
@@ -133,7 +133,7 @@ export class BusesInProgressEffects {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error catched in buses-in-progress.effects: ofType(BusesInProgress.DeleteType)'
+              'Error catched in buses-in-progress.effects: ofType(BusesInProgress.Delete)'
             );
             console.error(err);
             console.groupEnd();

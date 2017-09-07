@@ -133,12 +133,11 @@ export class PetalsComponentOperationsComponent
     const correlationId = uuid();
 
     this.actions
-      .ofType(Components.DeployServiceUnitSuccessType)
-      .takeUntil(this.onDestroy$)
-      .filter(
-        (u: Components.DeployServiceUnitSuccess) =>
-          u.payload.correlationId === correlationId
+      .ofType<Components.DeployServiceUnitSuccess>(
+        Components.DeployServiceUnitSuccessType
       )
+      .takeUntil(this.onDestroy$)
+      .filter(u => u.payload.correlationId === correlationId)
       // we want 1 or 0 (first wants exactly one) because of takeUntil
       .take(1)
       .do(_ => this.uploadSu.resetForm())

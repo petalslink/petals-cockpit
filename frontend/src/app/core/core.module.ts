@@ -75,7 +75,7 @@ import {
   WorkspacesServiceImpl,
 } from 'app/shared/services/workspaces.service';
 import { WorkspacesServiceMock } from 'app/shared/services/workspaces.service.mock';
-import { getRootReducer } from 'app/shared/state/root.reducer';
+import { metaReducers, reducers } from 'app/shared/state/root.reducer';
 import { UiEffects } from 'app/shared/state/ui.effects';
 import { UsersEffects } from 'app/shared/state/users.effects';
 import { environment } from 'environments/environment';
@@ -136,23 +136,28 @@ export const providers = [
 
 @NgModule({
   imports: [
-    // TODO : Keep an eye on ngrx V3 to have lazy loaded reducers
-    // https://github.com/ngrx/store/pull/269
-    StoreModule.provideStore(getRootReducer),
+    StoreModule.forRoot(reducers, { metaReducers }),
     // Note: the order of declaration is important for batch actions
     // all the sub-actions will be triggered first on WorkspacesEffects,
     // then BusesInProgressEffects, and so on!
-    EffectsModule.run(WorkspacesEffects),
-    EffectsModule.run(BusesInProgressEffects),
-    EffectsModule.run(UsersEffects),
-    EffectsModule.run(UiEffects),
-    EffectsModule.run(BusesEffects),
-    EffectsModule.run(ContainersEffects),
-    EffectsModule.run(ComponentsEffects),
-    EffectsModule.run(ServiceAssembliesEffects),
-    EffectsModule.run(ServiceUnitsEffects),
-    EffectsModule.run(SharedLibrariesEffects),
-    StoreDevtoolsModule.instrumentOnlyWithExtension(),
+    EffectsModule.forRoot([
+      WorkspacesEffects,
+      BusesInProgressEffects,
+      UsersEffects,
+      UiEffects,
+      BusesEffects,
+      ContainersEffects,
+      ComponentsEffects,
+      ServiceAssembliesEffects,
+      ServiceUnitsEffects,
+      SharedLibrariesEffects,
+    ]),
+    // it'd be nice to have the possibility to activate redux devtools
+    // even if we're in prod but only with the extension
+    // since ngrx v4, no idea how to do that
+    !environment.production
+      ? StoreDevtoolsModule.instrument({ maxAge: 50 })
+      : [],
     SimpleNotificationsModule.forRoot(),
   ],
 })

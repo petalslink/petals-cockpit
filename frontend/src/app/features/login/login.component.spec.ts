@@ -19,16 +19,14 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
-import { select } from '@ngrx/core';
-import { Store } from '@ngrx/store';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Store, StoreModule } from '@ngrx/store';
 
 import { LoginComponent } from 'app/features/login/login.component';
 import { IUserLogin } from 'app/shared/services/users.service';
 import { SharedModule } from 'app/shared/shared.module';
-import { uiFactory } from 'app/shared/state/ui.interface';
+import { UiReducer } from 'app/shared/state/ui.reducer';
 import { Users } from 'app/shared/state/users.actions';
-import { usersTableFactory } from 'app/shared/state/users.interface';
+import { UsersReducer } from 'app/shared/state/users.reducer';
 import {
   click,
   elementText,
@@ -40,7 +38,7 @@ import {
 describe(`Login component`, () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let store: MockStore;
+  let store: Store<any>;
 
   const DOM = {
     get usernameInpt() {
@@ -60,13 +58,17 @@ describe(`Login component`, () => {
   beforeEach(
     async(() => {
       TestBed.configureTestingModule({
-        imports: [SharedModule, ReactiveFormsModule, NoopAnimationsModule],
+        imports: [
+          StoreModule.forRoot({
+            users: UsersReducer.reducer,
+            ui: UiReducer.reducer,
+          }),
+          SharedModule,
+          ReactiveFormsModule,
+          NoopAnimationsModule,
+        ],
         declarations: [LoginComponent],
         providers: [
-          {
-            provide: Store,
-            useClass: MockStore,
-          },
           {
             provide: ActivatedRoute,
             useClass: MockActivatedRoute,
@@ -101,99 +103,53 @@ describe(`Login component`, () => {
     expect(DOM.loginButton.disabled).toBe(false);
   });
 
-  it(`should disable the login button if the user 'isConnecting'' or 'connectedUser' and that even if the form is valid`, () => {
-    setInputValue(DOM.usernameInpt, 'admin');
-    setInputValue(DOM.passwordInpt, 'admin');
-    fixture.detectChanges();
-    expect(DOM.loginButton.disabled).toBe(false);
-
-    store.setUserIsConnecting(true);
-    fixture.detectChanges();
-    expect(DOM.loginButton.disabled).toBe(true);
-    store.setUserIsConnecting(false);
-
-    store.setConnectedUser('someUserId');
-    fixture.detectChanges();
-    expect(DOM.loginButton.disabled).toBe(true);
-  });
-
-  it(`should show an error message if username and password do not match`, () => {
-    store.setConnectionFailed(true);
-    fixture.detectChanges();
-    expect(DOM.errorTxt).toEqual(`Username and password do not match`);
-  });
-
-  it(`should show 'log in' or 'Logging in' according to state`, () => {
-    expect(DOM.loginButton.innerText).toEqual(`Log in`);
-
-    store.setUserIsConnecting(true);
-    fixture.detectChanges();
-    expect(DOM.loginButton.innerText.trim()).toEqual(`Logging in`);
-    store.setUserIsConnecting(false);
-
-    store.setConnectedUser('someUserId');
-    fixture.detectChanges();
-    expect(DOM.loginButton.innerText.trim()).toEqual(`Logging in`);
-  });
-
-  it(`should dispatch a connect on submit`, () => {
+  it(`should change the login button during connect`, () => {
     spyOn(component, 'onSubmit').and.callThrough();
-    spyOn(store, 'dispatch');
+    spyOn(store, 'dispatch').and.callThrough();
 
     const user: IUserLogin = {
-      username: 'admin id',
-      password: 'admin pwd',
+      username: 'admin',
+      password: 'pass',
     };
 
     setInputValue(DOM.usernameInpt, user.username);
     setInputValue(DOM.passwordInpt, user.password);
     fixture.detectChanges();
+    expect(DOM.loginButton.disabled).toBe(false);
+    expect(DOM.loginButton.innerText).toEqual(`Log in`);
+
     click(DOM.loginButton);
     fixture.detectChanges();
-
+    expect(DOM.loginButton.disabled).toBe(true);
+    expect(DOM.loginButton.innerText.trim()).toEqual(`Logging in`);
     expect(component.onSubmit).toHaveBeenCalledWith(user);
-
     expect(store.dispatch).toHaveBeenCalledWith(
       new Users.Connect({
         user,
         previousUrl: 'some-previous-url-if-any',
       })
     );
+
+    it('if connect succeeds', () => {
+      store.dispatch(
+        new Users.ConnectSuccess({
+          user: { id: user.username, name: 'Admin' } as any,
+        } as any)
+      );
+      fixture.detectChanges();
+      expect(DOM.loginButton.disabled).toBe(true);
+      expect(DOM.loginButton.innerText.trim()).toEqual(`Logging in`);
+    });
+
+    it('if connect fails', () => {
+      store.dispatch(new Users.ConnectError());
+      fixture.detectChanges();
+      expect(DOM.loginButton.disabled).toBe(false);
+      expect(DOM.loginButton.innerText).toEqual(`Log in`);
+      expect(DOM.errorTxt).toEqual(`Username and password do not match`);
+    });
   });
 });
-
-class MockStore extends BehaviorSubject<any> {
-  select = select.bind(this);
-
-  constructor() {
-    super({ users: usersTableFactory(), ui: uiFactory() });
-  }
-
-  dispatch(action) {}
-
-  // helpers to simulate changes in store
-  private setUsersTableValue(obj) {
-    this.next({
-      ...this.value,
-      users: {
-        ...this.value.users,
-        ...obj,
-      },
-    });
-  }
-
-  setUserIsConnecting(isConnecting: boolean) {
-    this.setUsersTableValue({ isConnecting });
-  }
-
-  setConnectedUser(connectedUser: string) {
-    this.setUsersTableValue({ connectedUser });
-  }
-
-  setConnectionFailed(connectionFailed: boolean) {
-    this.setUsersTableValue({ connectionFailed });
-  }
-}
 
 class MockActivatedRoute {
   constructor() {}
@@ -201,7 +157,7 @@ class MockActivatedRoute {
   snapshot = {
     queryParamMap: {
       get(param: string) {
-        return 'some-previous-url-if-any';
+        return param === 'previousUrl' ? 'some-previous-url-if-any' : null;
       },
     },
   };

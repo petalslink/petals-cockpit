@@ -29,7 +29,7 @@ import {
   BusesService,
   IBusBackendSSE,
 } from 'app/shared/services/buses.service';
-import { SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { SseActions } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
 
@@ -61,7 +61,7 @@ export class BusesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchDeleted$: Observable<Action> = this.actions$
-    .ofType(SseWorkspaceEvent.BUS_DELETED.action)
+    .ofType<SseActions.BusDeleted>(SseActions.BusDeletedType)
     .withLatestFrom(this.store$)
     .filter(([action, state]) => !!state.buses.byId[action.payload.id])
     .map(([action, state]) => {
@@ -76,7 +76,7 @@ export class BusesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchImportOk$: Observable<Action> = this.actions$
-    .ofType(SseWorkspaceEvent.BUS_IMPORT_OK.action)
+    .ofType<SseActions.BusImportOk>(SseActions.BusImportOkType)
     .withLatestFrom(this.store$)
     .map(([action, state]) => {
       const data = action.payload;
@@ -120,8 +120,8 @@ export class BusesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchBusDetails$: Observable<Action> = this.actions$
-    .ofType(Buses.FetchDetailsType)
-    .switchMap((action: Buses.FetchDetails) =>
+    .ofType<Buses.FetchDetails>(Buses.FetchDetailsType)
+    .switchMap(action =>
       this.busesService
         .getDetailsBus(action.payload.id)
         .map(
@@ -135,7 +135,7 @@ export class BusesEffects {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error caught in buses.effects.ts: ofType(Buses.FetchDetailsType)'
+              'Error caught in buses.effects.ts: ofType(Buses.FetchDetails)'
             );
             console.error(err);
             console.groupEnd();
@@ -148,11 +148,11 @@ export class BusesEffects {
   // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deleteBus$: Observable<Action> = this.actions$
-    .ofType(Buses.DeleteType)
+    .ofType<Buses.Delete>(Buses.DeleteType)
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
-    .switchMap(([action, idWorkspace]: [Buses.Delete, string]) =>
+    .switchMap(([action, idWorkspace]) =>
       this.busesService
         .deleteBus(idWorkspace, action.payload.id)
         .mergeMap(_ => Observable.empty<Action>())
@@ -160,7 +160,7 @@ export class BusesEffects {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error catched in buses.effects: ofType(Buses.DeleteType)'
+              'Error catched in buses.effects: ofType<Buses.Delete>(Buses.DeleteType)'
             );
             console.error(err);
             console.groupEnd();

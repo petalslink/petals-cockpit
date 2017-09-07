@@ -17,24 +17,24 @@
 
 import { Inject, Injectable } from '@angular/core';
 import { Actions } from '@ngrx/effects';
-import { Action, ActionReducer, Dispatcher } from '@ngrx/store';
+import { Action, ActionReducer, ScannedActionsSubject } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { MergeMapOperator } from 'rxjs/operator/mergeMap';
 
-export const BATCH = 'BATCHING_REDUCER.BATCH';
-
-export interface BatchAction extends Action {
-  payload: Action[];
+export const BatchType = 'BATCHING_REDUCER.BATCH';
+export class Batch implements Action {
+  readonly type = BatchType;
+  constructor(public readonly payload: Action[]) {}
 }
 
-export function batchActions(actions: Action[]): BatchAction {
-  return { type: BATCH, payload: actions };
+export function batchActions(actions: Action[]): Batch {
+  return new Batch(actions);
 }
 
 export function enableBatching<S>(reduce: ActionReducer<S>): ActionReducer<S> {
-  return function batchingReducer(state, action): S {
-    if (action.type === BATCH) {
-      return (action as BatchAction).payload.reduce(batchingReducer, state);
+  return function batchingReducer(state: S, action: Action): S {
+    if (action.type === BatchType) {
+      return (action as Batch).payload.reduce(batchingReducer, state);
     } else {
       return reduce(state, action);
     }
@@ -46,26 +46,28 @@ export function explodeBatchActionsOperator(keepBatchAction = true) {
 }
 
 export class ExplodeBatchActionsOperator extends MergeMapOperator<
-  any,
+  Action,
   Action,
   Action
 > {
   constructor(keepBatchAction: boolean) {
-    super(
-      (action: Action) =>
-        action.type === BATCH
-          ? Observable.from(
-              keepBatchAction ? [action, ...action.payload] : action.payload
-            )
-          : Observable.of(action)
-    );
+    super(action => {
+      if (action.type === BatchType) {
+        const batch = action as Batch;
+        return Observable.from(
+          keepBatchAction ? [batch, ...batch.payload] : batch.payload
+        );
+      } else {
+        return Observable.of(action);
+      }
+    });
   }
 }
 
 @Injectable()
-export class ActionsWithBatched extends Actions {
-  constructor(@Inject(Dispatcher) actionsSubject: Observable<Action>) {
-    super(actionsSubject);
+export class ActionsWithBatched extends Actions<Action> {
+  constructor(@Inject(ScannedActionsSubject) source?: Observable<Action>) {
+    super(source);
     this.operator = explodeBatchActionsOperator();
   }
 }

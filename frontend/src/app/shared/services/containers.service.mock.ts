@@ -28,7 +28,7 @@ import {
 } from 'app/shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
-import { SseService, SseWorkspaceEvent } from 'app/shared/services/sse.service';
+import { SseActions, SseService } from 'app/shared/services/sse.service';
 import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import { environment } from 'environments/environment';
 import { containersService } from 'mocks/containers-mock';
@@ -66,7 +66,7 @@ export class ContainersServiceMock extends ContainersServiceImpl {
       setTimeout(
         () =>
           (this.sseService as SseServiceMock).triggerSseEvent(
-            SseWorkspaceEvent.COMPONENT_DEPLOYED.event,
+            SseActions.ComponentDeployedSse,
             response
           ),
         environment.mock.sseDelay
@@ -97,7 +97,7 @@ export class ContainersServiceMock extends ContainersServiceImpl {
       setTimeout(
         () =>
           (this.sseService as SseServiceMock).triggerSseEvent(
-            SseWorkspaceEvent.SA_DEPLOYED.event,
+            SseActions.SaDeployedSse,
             response
           ),
         environment.mock.sseDelay
@@ -133,7 +133,7 @@ export class ContainersServiceMock extends ContainersServiceImpl {
       setTimeout(
         () =>
           (this.sseService as SseServiceMock).triggerSseEvent(
-            SseWorkspaceEvent.SL_DEPLOYED.event,
+            SseActions.SlDeployedSse,
             response
           ),
         environment.mock.sseDelay

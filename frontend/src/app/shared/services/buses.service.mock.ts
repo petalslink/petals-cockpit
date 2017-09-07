@@ -28,7 +28,7 @@ import { environment } from 'environments/environment';
 import { IMPORT_HTTP_ERROR_IP } from 'mocks/backend-mock';
 import { busesService } from 'mocks/buses-mock';
 import { workspacesService } from 'mocks/workspaces-mock';
-import { SseService, SseWorkspaceEvent } from './sse.service';
+import { SseActions, SseService } from './sse.service';
 
 @Injectable()
 export class BusesServiceMock extends BusesServiceImpl {
@@ -50,9 +50,9 @@ export class BusesServiceMock extends BusesServiceImpl {
 
     let event: string;
     if (newBus.eventData.importError) {
-      event = SseWorkspaceEvent.BUS_IMPORT_ERROR.event;
+      event = SseActions.BusImportErrorSse;
     } else {
-      event = SseWorkspaceEvent.BUS_IMPORT_OK.event;
+      event = SseActions.BusImportOkSse;
     }
 
     const detailsBus = {
@@ -64,7 +64,7 @@ export class BusesServiceMock extends BusesServiceImpl {
       // simulate the backend sending the bus in progress on the SSE
       setTimeout(() => {
         (this.sseService as SseServiceMock).triggerSseEvent(
-          SseWorkspaceEvent.BUS_IMPORT.event,
+          SseActions.BusImportSse,
           detailsBus
         );
         // simulate the backend sending the imported bus on the SSE
@@ -85,8 +85,9 @@ export class BusesServiceMock extends BusesServiceImpl {
       // simulate the backend sending the answer on the SSE
       setTimeout(
         () =>
-          (this.sseService as SseServiceMock).triggerSseEvent(
-            SseWorkspaceEvent.BUS_DELETED.event,
+          (this
+            .sseService as SseServiceMock).triggerSseEvent(
+            SseActions.BusDeletedSse,
             {
               id,
               reason: `bus deleted by ${(this

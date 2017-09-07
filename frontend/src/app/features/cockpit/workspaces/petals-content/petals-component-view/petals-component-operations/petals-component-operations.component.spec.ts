@@ -25,9 +25,8 @@ import {
 } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { Actions } from '@ngrx/effects';
-import { Action, Store } from '@ngrx/store';
-import { Subject } from 'rxjs/Subject';
+import { EffectsModule } from '@ngrx/effects';
+import { Store, StoreModule } from '@ngrx/store';
 import { v4 as uuid } from 'uuid';
 
 import { PetalsComponentOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-operations/petals-component-operations.component';
@@ -69,16 +68,11 @@ describe('Petals component operations', () => {
   beforeEach(
     async(() => {
       TestBed.configureTestingModule({
-        imports: [SharedModule, NoopAnimationsModule],
-        providers: [
-          {
-            provide: Store,
-            useClass: MockStore,
-          },
-          {
-            provide: Actions,
-            useClass: MockActions,
-          },
+        imports: [
+          StoreModule.forRoot({}),
+          EffectsModule.forRoot([]),
+          SharedModule,
+          NoopAnimationsModule,
         ],
         declarations: [
           TestHostPetalsComponentOperationsComponent,
@@ -205,8 +199,6 @@ describe('Petals component operations', () => {
     it(
       `should reset upload form once service unit has been deployed`,
       fakeAsync(() => {
-        const actions: MockActions = TestBed.get(Actions);
-
         spyOn(uuid, 'v4').and.returnValue('id1');
 
         spyOn(child.uploadSu, 'resetForm');
@@ -214,7 +206,7 @@ describe('Petals component operations', () => {
         child.deploy(<any>'some file', 'Su name');
 
         // simulate the effect
-        actions.next(
+        TestBed.get(Store).dispatch(
           new Components.DeployServiceUnitSuccess(<any>{
             correlationId: 'id1',
           })
@@ -283,15 +275,5 @@ class TestHostPetalsComponentOperationsComponent implements OnInit {
       sharedLibraries: [],
       type: 'BC',
     };
-  }
-}
-
-export class MockStore {
-  dispatch(data: any) {}
-}
-
-class MockActions extends Subject<Action> {
-  ofType(actionType: string) {
-    return this.filter(a => a.type === actionType);
   }
 }
