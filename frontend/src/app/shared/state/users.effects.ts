@@ -36,8 +36,7 @@ export class UsersEffects {
     private notification: NotificationsService
   ) {}
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   fetchAll$: Observable<Action> = this.actions$
     .ofType<Users.FetchAll>(Users.FetchAllType)
     .switchMap(action =>
@@ -65,8 +64,7 @@ export class UsersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   add$: Observable<Action> = this.actions$
     .ofType<Users.Add>(Users.AddType)
     .flatMap(action =>
@@ -93,8 +91,7 @@ export class UsersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   delete$: Observable<Action> = this.actions$
     .ofType<Users.Delete>(Users.DeleteType)
     .flatMap(action =>
@@ -115,8 +112,7 @@ export class UsersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   modify$: Observable<Action> = this.actions$
     .ofType<Users.Modify>(Users.ModifyType)
     .flatMap(action =>
@@ -137,8 +133,7 @@ export class UsersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   connectUser$: Observable<Action> = this.actions$
     .ofType<Users.Connect>(Users.ConnectType)
     .switchMap(action =>
@@ -166,7 +161,6 @@ export class UsersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   connectUserSuccess$: Observable<void> = this.actions$
     .ofType<Users.ConnectSuccess>(Users.ConnectSuccessType)
@@ -184,8 +178,7 @@ export class UsersEffects {
       }
     });
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   disconnectUser$: Observable<Action> = this.actions$
     .ofType<Users.Disconnect>(Users.DisconnectType)
     .switchMap(() =>
@@ -210,7 +203,6 @@ export class UsersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   disconnectUserSuccess$: Observable<Action> = this.actions$
     .ofType<Users.DisconnectSuccess>(Users.DisconnectSuccessType)

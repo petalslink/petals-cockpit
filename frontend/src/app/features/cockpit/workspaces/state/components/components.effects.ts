@@ -43,8 +43,7 @@ export class ComponentsEffects {
     private notifications: NotificationsService
   ) {}
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   watchDeployed$: Observable<Action> = this.actions$
     .ofType<SseActions.ComponentDeployed>(SseActions.ComponentDeployedType)
     .map(action => {
@@ -53,8 +52,7 @@ export class ComponentsEffects {
       return new Components.Added(components);
     });
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   watchStateChange$: Observable<Action> = this.actions$
     .ofType<SseActions.ComponentStateChange>(
       SseActions.ComponentStateChangeType
@@ -77,8 +75,7 @@ export class ComponentsEffects {
       }
     });
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   fetchContainersDetails$: Observable<Action> = this.actions$
     .ofType<Components.FetchDetails>(Components.FetchDetailsType)
     .switchMap(action =>
@@ -107,8 +104,7 @@ export class ComponentsEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   changeState$: Observable<Action> = this.actions$
     .ofType<Components.ChangeState>(Components.ChangeStateType)
     .withLatestFrom(
@@ -142,14 +138,12 @@ export class ComponentsEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   changeStateSuccess$: Observable<Action> = this.actions$
     .ofType<Components.ChangeStateSuccess>(Components.ChangeStateSuccessType)
     .map(action => new Components.FetchDetails(action.payload));
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   deployServiceUnit$: Observable<Action> = this.actions$
     .ofType<Components.DeployServiceUnit>(Components.DeployServiceUnitType)
     .withLatestFrom(
@@ -194,7 +188,6 @@ export class ComponentsEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   deployServiceUnitSuccess$: Observable<void> = this.actions$
     .ofType<Components.DeployServiceUnitSuccess>(

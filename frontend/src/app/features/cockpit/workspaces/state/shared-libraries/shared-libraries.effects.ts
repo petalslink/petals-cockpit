@@ -41,8 +41,7 @@ export class SharedLibrariesEffects {
     private notifications: NotificationsService
   ) {}
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   watchDelpoyed$: Observable<Action> = this.actions$
     .ofType<SseActions.SlDeployed>(SseActions.SlDeployedType)
     .map(action => {
@@ -51,8 +50,7 @@ export class SharedLibrariesEffects {
       return new SharedLibraries.Added(sls);
     });
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   fetchDetails$: Observable<Action> = this.actions$
     .ofType<SharedLibraries.FetchDetails>(SharedLibraries.FetchDetailsType)
     .switchMap(action =>
@@ -81,8 +79,7 @@ export class SharedLibrariesEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   changeState$: Observable<Action> = this.actions$
     .ofType<SharedLibraries.ChangeState>(SharedLibraries.ChangeStateType)
     .withLatestFrom(this.store$)
@@ -116,8 +113,7 @@ export class SharedLibrariesEffects {
       );
     });
 
-  // tslint:disable-next-line:member-ordering
-  @Effect({ dispatch: true })
+  @Effect()
   watchStateChanged$: Observable<Action> = this.actions$
     .ofType<SseActions.SlStateChange>(SseActions.SlStateChangeType)
     .withLatestFrom(this.store$)
