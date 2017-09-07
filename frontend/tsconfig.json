@@ -17,8 +17,7 @@
     ],
     "plugins": [
       {
-          "name": "tslint-language-service",
-          "disableNoUnusedVariableRule": false
+        "name": "tslint-language-service"
       }
     ]
   }
