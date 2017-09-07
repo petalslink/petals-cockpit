@@ -45,7 +45,6 @@ export class ServiceAssembliesEffects {
     private notifications: NotificationsService
   ) {}
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchDeployed$: Observable<Action> = this.actions$
     .ofType<SseActions.SaDeployed>(SseActions.SaDeployedType)
@@ -61,7 +60,6 @@ export class ServiceAssembliesEffects {
       ]);
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchStateChanged$: Observable<Action> = this.actions$
     .ofType<SseActions.SaStateChange>(SseActions.SaStateChangeType)
@@ -91,7 +89,6 @@ export class ServiceAssembliesEffects {
       }
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchServiceAssemblyDetails$: Observable<Action> = this.actions$
     .ofType<ServiceAssemblies.FetchDetails>(ServiceAssemblies.FetchDetailsType)
@@ -121,7 +118,6 @@ export class ServiceAssembliesEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   changeState$: Observable<Action> = this.actions$
     .ofType<ServiceAssemblies.ChangeState>(ServiceAssemblies.ChangeStateType)
@@ -156,7 +152,6 @@ export class ServiceAssembliesEffects {
       );
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   changeStateSuccess$: Observable<Action> = this.actions$
     .ofType<ServiceAssemblies.ChangeStateSuccess>(

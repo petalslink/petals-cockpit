@@ -58,7 +58,6 @@ export class BusesEffects {
     private notifications: NotificationsService
   ) {}
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchDeleted$: Observable<Action> = this.actions$
     .ofType<SseActions.BusDeleted>(SseActions.BusDeletedType)
@@ -73,7 +72,6 @@ export class BusesEffects {
       return new Buses.Removed(bus);
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchImportOk$: Observable<Action> = this.actions$
     .ofType<SseActions.BusImportOk>(SseActions.BusImportOkType)
@@ -117,7 +115,6 @@ export class BusesEffects {
       ]);
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchBusDetails$: Observable<Action> = this.actions$
     .ofType<Buses.FetchDetails>(Buses.FetchDetailsType)
@@ -145,7 +142,6 @@ export class BusesEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deleteBus$: Observable<Action> = this.actions$
     .ofType<Buses.Delete>(Buses.DeleteType)

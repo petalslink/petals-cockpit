@@ -62,7 +62,6 @@ export class WorkspacesEffects {
     private store$: Store<IStore>
   ) {}
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchWorkspaces$: Observable<Action> = this.actions$
     .ofType<Workspaces.FetchAll>(Workspaces.FetchAllType)
@@ -97,7 +96,6 @@ export class WorkspacesEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   postWorkspace$: Observable<Action> = this.actions$
     .ofType<Workspaces.Create>(Workspaces.CreateType)
@@ -123,7 +121,6 @@ export class WorkspacesEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   removeWorkspace$: Observable<Action> = this.actions$
     .ofType(SseActions.WorkspaceDeletedType)
@@ -133,7 +130,6 @@ export class WorkspacesEffects {
         new Workspaces.Deleted({ id: action.payload.id })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchWorkspace$: Observable<Action> = this.actions$
     .ofType<Workspaces.Fetch>(Workspaces.FetchType)
@@ -157,7 +153,6 @@ export class WorkspacesEffects {
       })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchWorkspaceSseSuccess$: Observable<Action> = this.actions$
     .ofType<SseActions.WorkspaceContent>(SseActions.WorkspaceContentType)
@@ -191,7 +186,6 @@ export class WorkspacesEffects {
       ]);
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchWorkspaceDetails$: Observable<Action> = this.actions$
     .ofType<Workspaces.FetchDetails>(Workspaces.FetchDetailsType)
@@ -224,7 +218,6 @@ export class WorkspacesEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   setDescription$: Observable<Action> = this.actions$
     .ofType<Workspaces.SetDescription>(Workspaces.SetDescriptionType)
@@ -248,7 +241,6 @@ export class WorkspacesEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deleteWorkspace$: Observable<Action> = this.actions$
     .ofType<Workspaces.Delete>(Workspaces.DeleteType)
@@ -270,7 +262,6 @@ export class WorkspacesEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   addUser$: Observable<Action> = this.actions$
     .ofType<Workspaces.AddUser>(Workspaces.AddUserType)
@@ -295,7 +286,6 @@ export class WorkspacesEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deleteUser$: Observable<Action> = this.actions$
     .ofType<Workspaces.DeleteUser>(Workspaces.DeleteUserType)

@@ -42,13 +42,11 @@ export class BusesInProgressEffects {
     private notifications: NotificationsService
   ) {}
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchBusImport$: Observable<Action> = this.actions$
     .ofType<SseActions.BusImport>(SseActions.BusImportType)
     .map(action => new BusesInProgress.Added(action.payload));
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchBusImportError$: Observable<Action> = this.actions$
     .ofType<SseActions.BusImportError>(SseActions.BusImportErrorType)
@@ -61,7 +59,6 @@ export class BusesInProgressEffects {
       return new BusesInProgress.UpdateError(busInError);
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchBusDeleted$: Observable<Action> = this.actions$
     .ofType<SseActions.BusDeleted>(SseActions.BusDeletedType)
@@ -84,7 +81,6 @@ export class BusesInProgressEffects {
       return new BusesInProgress.Removed(bip);
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   postBus$: Observable<Action> = this.actions$
     .ofType<BusesInProgress.Post>(BusesInProgress.PostType)
@@ -118,7 +114,6 @@ export class BusesInProgressEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deleteBusInProgress$: Observable<Action> = this.actions$
     .ofType<BusesInProgress.Delete>(BusesInProgress.DeleteType)

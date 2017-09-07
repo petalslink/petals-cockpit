@@ -43,7 +43,6 @@ export class ComponentsEffects {
     private notifications: NotificationsService
   ) {}
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchDeployed$: Observable<Action> = this.actions$
     .ofType<SseActions.ComponentDeployed>(SseActions.ComponentDeployedType)
@@ -53,7 +52,6 @@ export class ComponentsEffects {
       return new Components.Added(components);
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchStateChange$: Observable<Action> = this.actions$
     .ofType<SseActions.ComponentStateChange>(
@@ -77,7 +75,6 @@ export class ComponentsEffects {
       }
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchContainersDetails$: Observable<Action> = this.actions$
     .ofType<Components.FetchDetails>(Components.FetchDetailsType)
@@ -107,7 +104,6 @@ export class ComponentsEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   changeState$: Observable<Action> = this.actions$
     .ofType<Components.ChangeState>(Components.ChangeStateType)
@@ -142,13 +138,11 @@ export class ComponentsEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   changeStateSuccess$: Observable<Action> = this.actions$
     .ofType<Components.ChangeStateSuccess>(Components.ChangeStateSuccessType)
     .map(action => new Components.FetchDetails(action.payload));
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deployServiceUnit$: Observable<Action> = this.actions$
     .ofType<Components.DeployServiceUnit>(Components.DeployServiceUnitType)
@@ -194,7 +188,6 @@ export class ComponentsEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   deployServiceUnitSuccess$: Observable<void> = this.actions$
     .ofType<Components.DeployServiceUnitSuccess>(

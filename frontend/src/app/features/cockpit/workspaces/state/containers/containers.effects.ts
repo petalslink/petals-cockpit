@@ -36,7 +36,6 @@ export class ContainersEffects {
     private notifications: NotificationsService
   ) {}
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchContainersDetails$: Observable<Action> = this.actions$
     .ofType<Containers.FetchDetails>(Containers.FetchDetailsType)
@@ -66,7 +65,6 @@ export class ContainersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deployComponent$: Observable<Action> = this.actions$
     .ofType<Containers.DeployComponent>(Containers.DeployComponentType)
@@ -106,7 +104,6 @@ export class ContainersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   deployComponentSuccess$: Observable<void> = this.actions$
     .ofType<Containers.DeployComponentSuccess>(
@@ -123,7 +120,6 @@ export class ContainersEffects {
     })
     .mapTo(null);
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deployServiceAssembly$: Observable<Action> = this.actions$
     .ofType<Containers.DeployServiceAssembly>(
@@ -169,7 +165,6 @@ export class ContainersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   deployServiceAssemblySuccess$: Observable<void> = this.actions$
     .ofType<Containers.DeployServiceAssemblySuccess>(
@@ -186,7 +181,6 @@ export class ContainersEffects {
     })
     .mapTo(null);
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   deploySharedLibrary$: Observable<Action> = this.actions$
     .ofType<Containers.DeploySharedLibrary>(Containers.DeploySharedLibraryType)
@@ -228,7 +222,6 @@ export class ContainersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   deploySharedLibrarySuccess$: Observable<void> = this.actions$
     .ofType<Containers.DeploySharedLibrarySuccess>(

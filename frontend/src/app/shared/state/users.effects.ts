@@ -36,7 +36,6 @@ export class UsersEffects {
     private notification: NotificationsService
   ) {}
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchAll$: Observable<Action> = this.actions$
     .ofType<Users.FetchAll>(Users.FetchAllType)
@@ -65,7 +64,6 @@ export class UsersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   add$: Observable<Action> = this.actions$
     .ofType<Users.Add>(Users.AddType)
@@ -93,7 +91,6 @@ export class UsersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   delete$: Observable<Action> = this.actions$
     .ofType<Users.Delete>(Users.DeleteType)
@@ -115,7 +112,6 @@ export class UsersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   modify$: Observable<Action> = this.actions$
     .ofType<Users.Modify>(Users.ModifyType)
@@ -137,7 +133,6 @@ export class UsersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   connectUser$: Observable<Action> = this.actions$
     .ofType<Users.Connect>(Users.ConnectType)
@@ -166,7 +161,6 @@ export class UsersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   connectUserSuccess$: Observable<void> = this.actions$
     .ofType<Users.ConnectSuccess>(Users.ConnectSuccessType)
@@ -184,7 +178,6 @@ export class UsersEffects {
       }
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   disconnectUser$: Observable<Action> = this.actions$
     .ofType<Users.Disconnect>(Users.DisconnectType)
@@ -210,7 +203,6 @@ export class UsersEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: false })
   disconnectUserSuccess$: Observable<Action> = this.actions$
     .ofType<Users.DisconnectSuccess>(Users.DisconnectSuccessType)

@@ -41,7 +41,6 @@ export class SharedLibrariesEffects {
     private notifications: NotificationsService
   ) {}
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchDelpoyed$: Observable<Action> = this.actions$
     .ofType<SseActions.SlDeployed>(SseActions.SlDeployedType)
@@ -51,7 +50,6 @@ export class SharedLibrariesEffects {
       return new SharedLibraries.Added(sls);
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchDetails$: Observable<Action> = this.actions$
     .ofType<SharedLibraries.FetchDetails>(SharedLibraries.FetchDetailsType)
@@ -81,7 +79,6 @@ export class SharedLibrariesEffects {
         })
     );
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   changeState$: Observable<Action> = this.actions$
     .ofType<SharedLibraries.ChangeState>(SharedLibraries.ChangeStateType)
@@ -116,7 +113,6 @@ export class SharedLibrariesEffects {
       );
     });
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   watchStateChanged$: Observable<Action> = this.actions$
     .ofType<SseActions.SlStateChange>(SseActions.SlStateChangeType)

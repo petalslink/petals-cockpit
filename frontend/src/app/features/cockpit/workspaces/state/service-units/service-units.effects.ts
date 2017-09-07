@@ -33,7 +33,6 @@ export class ServiceUnitsEffects {
     private serviceUnitsService: ServiceUnitsService
   ) {}
 
-  // tslint:disable-next-line:member-ordering
   @Effect({ dispatch: true })
   fetchServiceUnitDetails$: Observable<Action> = this.actions$
     .ofType<ServiceUnits.FetchDetails>(ServiceUnits.FetchDetailsType)
