@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <div fxFlex fxLayoutAlign="end center" class="margin-right-x1">
                 <md-spinner class="margin-right-x1" *ngIf="isFetchingUsers$ | async; else usersFetched"></md-spinner>
                 <ng-template #usersFetched>
-                  <span class="subtitle" *ngIf="users.length > 0" md-line>
+                  <span class="subtitle" *ngIf="users.length > 0" mdLine>
                       {{ users.length }} user{{ (users.length) >= 2 ? 's' : '' }}
                     </span>
                 </ng-template>

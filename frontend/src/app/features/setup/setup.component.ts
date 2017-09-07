@@ -15,34 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  AfterViewInit,
-  Component,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MdInputContainer } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 import { IUserSetup, UsersService } from 'app/shared/services/users.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
 
 @Component({
   selector: 'app-setup',
   templateUrl: './setup.component.html',
   styleUrls: ['./setup.component.scss'],
 })
-export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
+export class SetupComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  @ViewChild('usernameInput') usernameInput: MdInputContainer;
-  @ViewChild('tokenInput') tokenInput: MdInputContainer;
+  focusUsernameInput = false;
+  focusTokenInput = false;
 
   form: FormGroup;
   settingUp = false;
@@ -50,7 +40,6 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
   setupSucceeded = false;
 
   constructor(
-    private store$: Store<IStore>,
     private router: Router,
     private users: UsersService,
     private route: ActivatedRoute,
@@ -66,28 +55,17 @@ export class SetupComponent implements OnInit, OnDestroy, AfterViewInit {
       token: [token || '', Validators.required],
       name: ['', Validators.required],
     });
+
+    if (!token) {
+      this.focusTokenInput = true;
+    } else {
+      this.focusUsernameInput = true;
+    }
   }
 
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
-  }
-
-  ngAfterViewInit() {
-    this.store$
-      .let(isLargeScreen)
-      .first()
-      .filter(ss => ss)
-      .do(() =>
-        // this prevent change detection errors
-        setTimeout(
-          () =>
-            !this.form.controls['token'].value
-              ? this.tokenInput._focusInput()
-              : this.usernameInput._focusInput()
-        )
-      )
-      .subscribe();
   }
 
   onSubmit({ value }: { value: IUserSetup }) {

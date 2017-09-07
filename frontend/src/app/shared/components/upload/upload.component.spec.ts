@@ -20,8 +20,8 @@ import {
   async,
   ComponentFixture,
   fakeAsync,
+  flush,
   TestBed,
-  tick,
 } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -121,7 +121,7 @@ describe(`UploadComponent`, () => {
       // choose the file
       uploadComponent.fileChange({ target: { files } });
       hostFixture.detectChanges();
-      tick();
+      flush();
 
       expect(DOM.selectedFileNameInpt.value).toBe('some-file');
 
@@ -146,7 +146,7 @@ describe(`UploadComponent`, () => {
 
       uploadComponent.fileChange({ target: { files } });
       hostFixture.detectChanges();
-      tick();
+      flush();
 
       // check that inputs and buttons are disabled
       expect(DOM.selectedFileNameInpt.disabled).toBe(true);

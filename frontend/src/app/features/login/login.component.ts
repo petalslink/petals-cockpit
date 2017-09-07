@@ -15,13 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  AfterViewInit,
-  Component,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -30,30 +24,25 @@ import {
   NgForm,
   Validators,
 } from '@angular/forms';
-import { MdInputContainer } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { IStore } from '../../shared/state/store.interface';
-
 import { formErrorStateMatcher } from 'app/shared/helpers/form.helper';
 import { IUserLogin } from 'app/shared/services/users.service';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
+import { IStore } from 'app/shared/state/store.interface';
 import { Users } from 'app/shared/state/users.actions';
+import { IUsersTable } from 'app/shared/state/users.interface';
 import { getUsers } from 'app/shared/state/users.selectors';
-import { IUsersTable } from '../../shared/state/users.interface';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
+export class LoginComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
-
-  @ViewChild('usernameInput') usernameInput: MdInputContainer;
 
   loginForm: FormGroup;
   users$: Observable<IUsersTable>;
@@ -96,18 +85,6 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
-  }
-
-  ngAfterViewInit() {
-    this.store$
-      .let(isLargeScreen)
-      .first()
-      .filter(ss => ss)
-      .do(() =>
-        // this prevent change detection errors
-        setTimeout(() => this.usernameInput._focusInput())
-      )
-      .subscribe();
   }
 
   onSubmit(value: IUserLogin) {

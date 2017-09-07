@@ -32,6 +32,7 @@ import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/dematerialize';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/finally';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/last';

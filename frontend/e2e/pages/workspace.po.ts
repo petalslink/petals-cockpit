@@ -56,10 +56,7 @@ export abstract class WorkspacePage {
     browser.wait(urlToMatch(/\/workspaces\/\w+$/), waitTimeout);
 
     browser.wait(EC.visibilityOf(this.component), waitTimeout);
-    browser.wait(
-      EC.visibilityOf(this.component.$(`md-sidenav.mat-sidenav-opened`)),
-      waitTimeout
-    );
+    browser.wait(EC.visibilityOf(WorkspacePage.sidenav), waitTimeout);
     browser.wait(
       EC.stalenessOf(this.component.$('md-toolbar md-spinner')),
       waitTimeout

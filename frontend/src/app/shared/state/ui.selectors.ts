@@ -18,9 +18,10 @@
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
+import { ScreenSize } from 'app/shared/state/ui.interface';
 import { IStore } from './store.interface';
 
-const _isLargeScreen = ss =>
+const _isLargeScreen = (ss: ScreenSize) =>
   ss === 'md' || ss === 'lg' || ss === 'gt-lg' || ss === 'xl' || ss === 'gt-md';
 
 const getScreenSize = (state: IStore) => state.ui.screenSize;
