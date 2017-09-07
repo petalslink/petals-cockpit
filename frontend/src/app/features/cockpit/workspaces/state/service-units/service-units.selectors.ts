@@ -15,8 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { createSelector } from '@ngrx/store';
 import { IServiceUnit } from './service-units.interface';
 
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
@@ -26,26 +25,28 @@ export interface IServiceUnitWithSA extends IServiceUnit {
   serviceAssembly: IServiceAssemblyRow;
 }
 
-export function getCurrentServiceUnit(
-  store$: Store<IStore>
-): Observable<IServiceUnitWithSA> {
-  return store$
-    .filter(state => !!state.serviceUnits.selectedServiceUnitId)
-    .map(state => {
-      const su =
-        state.serviceUnits.byId[state.serviceUnits.selectedServiceUnitId];
-      if (su) {
-        return {
-          ...su,
-          serviceAssembly: state.serviceAssemblies.byId[su.serviceAssemblyId],
-        };
-      } else {
-        return null;
-      }
-    });
-}
-
-export const getServiceUnitsByIds = (state: IStore) => state.serviceUnits.byId;
+export const getServiceUnitsById = (state: IStore) => state.serviceUnits.byId;
 
 export const getServiceUnitsAllIds = (state: IStore) =>
   state.serviceUnits.allIds;
+
+export const getSelectedServiceUnit = createSelector(
+  (state: IStore) => state.serviceUnits.selectedServiceUnitId,
+  getServiceUnitsById,
+  (id, sus) => sus[id]
+);
+
+export const getCurrentServiceUnit = createSelector(
+  getSelectedServiceUnit,
+  (state: IStore) => state.serviceAssemblies.byId,
+  (su, sas) => {
+    if (su) {
+      return {
+        ...su,
+        serviceAssembly: sas[su.serviceAssemblyId],
+      };
+    } else {
+      return undefined;
+    }
+  }
+);

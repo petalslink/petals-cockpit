@@ -15,8 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { createSelector } from '@ngrx/store';
 
 import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
@@ -35,30 +34,29 @@ export interface IComponentWithSLsAndSUs
   sharedLibraries: ISharedLibraryRow[];
 }
 
-export function getCurrentComponent(
-  store$: Store<IStore>
-): Observable<IComponentWithSLsAndSUs> {
-  return store$
-    .filter(state => !!state.components.selectedComponentId)
-    .map(state => {
-      const component =
-        state.components.byId[state.components.selectedComponentId];
-      if (component) {
-        return {
-          ...component,
-          serviceUnits: component.serviceUnits.map(
-            id => state.serviceUnits.byId[id]
-          ),
-          sharedLibraries: component.sharedLibraries.map(
-            id => state.sharedLibraries.byId[id]
-          ),
-        };
-      } else {
-        return null;
-      }
-    });
-}
-
-export const getComponentsByIds = (state: IStore) => state.components.byId;
+export const getComponentsById = (state: IStore) => state.components.byId;
 
 export const getComponentsAllIds = (state: IStore) => state.components.allIds;
+
+export const getSelectedComponent = createSelector(
+  (state: IStore) => state.components.selectedComponentId,
+  getComponentsById,
+  (id, components) => components[id]
+);
+
+export const getCurrentComponent = createSelector(
+  getSelectedComponent,
+  (state: IStore) => state.serviceUnits.byId,
+  (state: IStore) => state.sharedLibraries.byId,
+  (component, sus, sls) => {
+    if (component) {
+      return {
+        ...component,
+        serviceUnits: component.serviceUnits.map(suId => sus[suId]),
+        sharedLibraries: component.sharedLibraries.map(slId => sls[slId]),
+      };
+    } else {
+      return undefined;
+    }
+  }
+);

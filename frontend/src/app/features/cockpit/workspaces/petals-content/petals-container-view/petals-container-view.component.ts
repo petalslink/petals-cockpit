@@ -19,13 +19,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/state/store.interface';
-
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import {
   getCurrentContainer,
   IContainerWithSiblings,
 } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
+import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
@@ -51,7 +50,7 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
       state => state.workspaces.selectedWorkspaceId
     );
 
-    this.container$ = this.store$.let(getCurrentContainer);
+    this.container$ = this.store$.select(getCurrentContainer);
   }
 
   ngOnDestroy() {

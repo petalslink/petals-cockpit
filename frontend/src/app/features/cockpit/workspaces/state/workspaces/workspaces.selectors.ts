@@ -16,19 +16,19 @@
  */
 
 import { Store } from '@ngrx/store';
-import { createSelector } from 'reselect';
+import { createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 import {
   getBusesAllIds,
-  getBusesByIds,
+  getBusesById,
 } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
-import { getComponentsByIds } from 'app/features/cockpit/workspaces/state/components/components.selectors';
-import { getContainersByIds } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
-import { getServiceAssembliesByIds } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
-import { getServiceUnitsByIds } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
-import { getSharedLibrariesByIds } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
+import { getComponentsById } from 'app/features/cockpit/workspaces/state/components/components.selectors';
+import { getContainersById } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
+import { getServiceAssembliesById } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
+import { getServiceUnitsById } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
+import { getSharedLibrariesById } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
 import { escapeStringRegexp } from 'app/shared/helpers/shared.helper';
 import { IStore } from 'app/shared/state/store.interface';
 import { IUserRow } from 'app/shared/state/users.interface';
@@ -105,12 +105,12 @@ export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
 const buildTree = createSelector(
   getSelectedWorkspaceId,
   getBusesAllIds,
-  getBusesByIds,
-  getContainersByIds,
-  getComponentsByIds,
-  getServiceUnitsByIds,
-  getServiceAssembliesByIds,
-  getSharedLibrariesByIds,
+  getBusesById,
+  getContainersById,
+  getComponentsById,
+  getServiceUnitsById,
+  getServiceAssembliesById,
+  getSharedLibrariesById,
   (
     selectedWorkspaceId,
     busesAllIds,

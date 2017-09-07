@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createSelector } from 'reselect';
+import { createSelector } from '@ngrx/store';
 
 import { IStore } from 'app/shared/state/store.interface';
 
@@ -31,14 +31,9 @@ export const getBusesInProgress = createSelector(
   (allIds, byId) => allIds.map(id => byId[id])
 );
 
-const getSelectedBusInProgressId = (state: IStore) =>
-  state.busesInProgress.selectedBusInProgressId;
-
-export const getCurrentBusInProgressOrNull = createSelector(
-  getSelectedBusInProgressId,
+export const getCurrentBusInProgress = createSelector(
+  (state: IStore) => state.busesInProgress.selectedBusInProgressId,
   getBusesInProgressByIds,
   (selectedBusInProgressId, busesInProgressById) =>
-    !selectedBusInProgressId
-      ? null
-      : busesInProgressById[selectedBusInProgressId]
+    busesInProgressById[selectedBusInProgressId]
 );

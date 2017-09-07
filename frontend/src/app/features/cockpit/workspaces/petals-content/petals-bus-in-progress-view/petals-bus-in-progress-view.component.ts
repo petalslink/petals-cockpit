@@ -43,7 +43,7 @@ import {
   IBusesInProgressTable,
   IBusInProgressRow,
 } from './../../state/buses-in-progress/buses-in-progress.interface';
-import { getCurrentBusInProgressOrNull } from './../../state/buses-in-progress/buses-in-progress.selectors';
+import { getCurrentBusInProgress } from './../../state/buses-in-progress/buses-in-progress.selectors';
 
 @Component({
   selector: 'app-petals-bus-in-progress-view',
@@ -85,7 +85,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
     this.busesInProgressTable$ = this.store$.select(
       state => state.busesInProgress
     );
-    this.busInProgress$ = this.store$.select(getCurrentBusInProgressOrNull);
+    this.busInProgress$ = this.store$.select(getCurrentBusInProgress);
 
     this.createFormImportBus();
 
