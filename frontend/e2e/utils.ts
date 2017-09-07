@@ -87,8 +87,15 @@ export function waitAndClick(el: ElementFinder) {
 }
 
 export function clearInput(input: ElementFinder) {
-  input.sendKeys(Key.chord(Key.CONTROL, 'a'));
-  input.sendKeys(Key.DELETE);
+  return input.getAttribute('value').then(v => {
+    if (v === '') {
+      return;
+    } else if (!v) {
+      throw new Error('No value attribute');
+    } else {
+      return input.sendKeys(Key.BACK_SPACE).then(() => clearInput(input));
+    }
+  });
 }
 
 export function getMultipleElementsTexts(
