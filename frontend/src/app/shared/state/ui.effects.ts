@@ -28,7 +28,7 @@ import { isSmallScreen } from 'app/shared/state/ui.selectors';
 export class UiEffects {
   constructor(private actions$: Actions, private store$: Store<IStore>) {}
 
-  @Effect({ dispatch: true })
+  @Effect()
   closeSidenavOnSmallScreen$: Observable<Action> = this.actions$
     .ofType(Ui.CloseSidenavOnSmallScreenType)
     .withLatestFrom(this.store$.let(isSmallScreen))

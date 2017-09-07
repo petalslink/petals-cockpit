@@ -45,7 +45,7 @@ export class ServiceAssembliesEffects {
     private notifications: NotificationsService
   ) {}
 
-  @Effect({ dispatch: true })
+  @Effect()
   watchDeployed$: Observable<Action> = this.actions$
     .ofType<SseActions.SaDeployed>(SseActions.SaDeployedType)
     .map(action => {
@@ -60,7 +60,7 @@ export class ServiceAssembliesEffects {
       ]);
     });
 
-  @Effect({ dispatch: true })
+  @Effect()
   watchStateChanged$: Observable<Action> = this.actions$
     .ofType<SseActions.SaStateChange>(SseActions.SaStateChangeType)
     .withLatestFrom(this.store$)
@@ -89,7 +89,7 @@ export class ServiceAssembliesEffects {
       }
     });
 
-  @Effect({ dispatch: true })
+  @Effect()
   fetchServiceAssemblyDetails$: Observable<Action> = this.actions$
     .ofType<ServiceAssemblies.FetchDetails>(ServiceAssemblies.FetchDetailsType)
     .switchMap(action =>
@@ -118,7 +118,7 @@ export class ServiceAssembliesEffects {
         })
     );
 
-  @Effect({ dispatch: true })
+  @Effect()
   changeState$: Observable<Action> = this.actions$
     .ofType<ServiceAssemblies.ChangeState>(ServiceAssemblies.ChangeStateType)
     .withLatestFrom(this.store$)
@@ -152,7 +152,7 @@ export class ServiceAssembliesEffects {
       );
     });
 
-  @Effect({ dispatch: true })
+  @Effect()
   changeStateSuccess$: Observable<Action> = this.actions$
     .ofType<ServiceAssemblies.ChangeStateSuccess>(
       ServiceAssemblies.ChangeStateSuccessType

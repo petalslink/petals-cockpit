@@ -62,7 +62,7 @@ export class WorkspacesEffects {
     private store$: Store<IStore>
   ) {}
 
-  @Effect({ dispatch: true })
+  @Effect()
   fetchWorkspaces$: Observable<Action> = this.actions$
     .ofType<Workspaces.FetchAll>(Workspaces.FetchAllType)
     .switchMap(action =>
@@ -96,7 +96,7 @@ export class WorkspacesEffects {
         })
     );
 
-  @Effect({ dispatch: true })
+  @Effect()
   postWorkspace$: Observable<Action> = this.actions$
     .ofType<Workspaces.Create>(Workspaces.CreateType)
     .switchMap(action =>
@@ -130,7 +130,7 @@ export class WorkspacesEffects {
         new Workspaces.Deleted({ id: action.payload.id })
     );
 
-  @Effect({ dispatch: true })
+  @Effect()
   fetchWorkspace$: Observable<Action> = this.actions$
     .ofType<Workspaces.Fetch>(Workspaces.FetchType)
     .switchMap(action =>
@@ -153,7 +153,7 @@ export class WorkspacesEffects {
       })
     );
 
-  @Effect({ dispatch: true })
+  @Effect()
   fetchWorkspaceSseSuccess$: Observable<Action> = this.actions$
     .ofType<SseActions.WorkspaceContent>(SseActions.WorkspaceContentType)
     .map(action => {
@@ -186,7 +186,7 @@ export class WorkspacesEffects {
       ]);
     });
 
-  @Effect({ dispatch: true })
+  @Effect()
   fetchWorkspaceDetails$: Observable<Action> = this.actions$
     .ofType<Workspaces.FetchDetails>(Workspaces.FetchDetailsType)
     .switchMap(action =>
@@ -218,7 +218,7 @@ export class WorkspacesEffects {
         })
     );
 
-  @Effect({ dispatch: true })
+  @Effect()
   setDescription$: Observable<Action> = this.actions$
     .ofType<Workspaces.SetDescription>(Workspaces.SetDescriptionType)
     .switchMap(action =>
@@ -241,7 +241,7 @@ export class WorkspacesEffects {
         })
     );
 
-  @Effect({ dispatch: true })
+  @Effect()
   deleteWorkspace$: Observable<Action> = this.actions$
     .ofType<Workspaces.Delete>(Workspaces.DeleteType)
     .switchMap(action =>
@@ -262,7 +262,7 @@ export class WorkspacesEffects {
         })
     );
 
-  @Effect({ dispatch: true })
+  @Effect()
   addUser$: Observable<Action> = this.actions$
     .ofType<Workspaces.AddUser>(Workspaces.AddUserType)
     .withLatestFrom(
@@ -286,7 +286,7 @@ export class WorkspacesEffects {
         })
     );
 
-  @Effect({ dispatch: true })
+  @Effect()
   deleteUser$: Observable<Action> = this.actions$
     .ofType<Workspaces.DeleteUser>(Workspaces.DeleteUserType)
     .withLatestFrom(

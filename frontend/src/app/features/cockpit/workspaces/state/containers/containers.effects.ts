@@ -36,7 +36,7 @@ export class ContainersEffects {
     private notifications: NotificationsService
   ) {}
 
-  @Effect({ dispatch: true })
+  @Effect()
   fetchContainersDetails$: Observable<Action> = this.actions$
     .ofType<Containers.FetchDetails>(Containers.FetchDetailsType)
     .flatMap(action =>
@@ -65,7 +65,7 @@ export class ContainersEffects {
         })
     );
 
-  @Effect({ dispatch: true })
+  @Effect()
   deployComponent$: Observable<Action> = this.actions$
     .ofType<Containers.DeployComponent>(Containers.DeployComponentType)
     .withLatestFrom(
@@ -120,7 +120,7 @@ export class ContainersEffects {
     })
     .mapTo(null);
 
-  @Effect({ dispatch: true })
+  @Effect()
   deployServiceAssembly$: Observable<Action> = this.actions$
     .ofType<Containers.DeployServiceAssembly>(
       Containers.DeployServiceAssemblyType
@@ -181,7 +181,7 @@ export class ContainersEffects {
     })
     .mapTo(null);
 
-  @Effect({ dispatch: true })
+  @Effect()
   deploySharedLibrary$: Observable<Action> = this.actions$
     .ofType<Containers.DeploySharedLibrary>(Containers.DeploySharedLibraryType)
     .withLatestFrom(

@@ -58,7 +58,7 @@ export class BusesEffects {
     private notifications: NotificationsService
   ) {}
 
-  @Effect({ dispatch: true })
+  @Effect()
   watchDeleted$: Observable<Action> = this.actions$
     .ofType<SseActions.BusDeleted>(SseActions.BusDeletedType)
     .withLatestFrom(this.store$)
@@ -72,7 +72,7 @@ export class BusesEffects {
       return new Buses.Removed(bus);
     });
 
-  @Effect({ dispatch: true })
+  @Effect()
   watchImportOk$: Observable<Action> = this.actions$
     .ofType<SseActions.BusImportOk>(SseActions.BusImportOkType)
     .withLatestFrom(this.store$)
@@ -115,7 +115,7 @@ export class BusesEffects {
       ]);
     });
 
-  @Effect({ dispatch: true })
+  @Effect()
   fetchBusDetails$: Observable<Action> = this.actions$
     .ofType<Buses.FetchDetails>(Buses.FetchDetailsType)
     .switchMap(action =>
@@ -142,7 +142,7 @@ export class BusesEffects {
         })
     );
 
-  @Effect({ dispatch: true })
+  @Effect()
   deleteBus$: Observable<Action> = this.actions$
     .ofType<Buses.Delete>(Buses.DeleteType)
     .withLatestFrom(

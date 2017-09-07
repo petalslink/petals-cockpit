@@ -33,7 +33,7 @@ export class ServiceUnitsEffects {
     private serviceUnitsService: ServiceUnitsService
   ) {}
 
-  @Effect({ dispatch: true })
+  @Effect()
   fetchServiceUnitDetails$: Observable<Action> = this.actions$
     .ofType<ServiceUnits.FetchDetails>(ServiceUnits.FetchDetailsType)
     .switchMap(action =>
