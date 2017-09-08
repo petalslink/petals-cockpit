@@ -19,13 +19,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/state/store.interface';
+import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import {
   getCurrentServiceUnit,
   IServiceUnitWithSA,
-} from '../../state/service-units/service-units.selectors';
-
-import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
+} from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
+import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
@@ -40,7 +39,7 @@ export class PetalsServiceUnitViewComponent implements OnInit, OnDestroy {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.serviceUnit$ = this.store$.let(getCurrentServiceUnit);
+    this.serviceUnit$ = this.store$.select(getCurrentServiceUnit);
 
     this.store$.dispatch(
       new Ui.SetTitles({

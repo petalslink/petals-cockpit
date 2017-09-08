@@ -15,8 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { createSelector } from '@ngrx/store';
 
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 import {
@@ -33,28 +32,27 @@ export interface IBusWithContainers
   containers: IContainerRow[];
 }
 
-export function getCurrentBus(
-  store$: Store<IStore>
-): Observable<IBusWithContainers> {
-  return store$
-    .filter(state => !!state.buses.selectedBusId)
-    .map(state => getBusWithContainers(state.buses.selectedBusId)(state));
-}
+export const getBusesById = (state: IStore) => state.buses.byId;
 
-export function getBusWithContainers(busId: string) {
-  return (state: IStore) => {
-    const bus = state.buses.byId[busId];
+export const getBusesAllIds = (state: IStore) => state.buses.allIds;
+
+export const getSelectedBus = createSelector(
+  (state: IStore) => state.buses.selectedBusId,
+  getBusesById,
+  (id, buses) => buses[id]
+);
+
+export const getCurrentBus = createSelector(
+  getSelectedBus,
+  (state: IStore) => state.containers.byId,
+  (bus, containers) => {
     if (bus) {
       return {
         ...bus,
-        containers: bus.containers.map(c => state.containers.byId[c]),
+        containers: bus.containers.map(c => containers[c]),
       };
     } else {
-      return null;
+      return undefined;
     }
-  };
-}
-
-export const getBusesByIds = (state: IStore) => state.buses.byId;
-
-export const getBusesAllIds = (state: IStore) => state.buses.allIds;
+  }
+);

@@ -20,13 +20,12 @@ import { MD_DIALOG_DATA, MdDialog, MdDialogRef } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/state/store.interface';
+import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import {
   getCurrentBus,
   IBusWithContainers,
-} from '../../state/buses/buses.selectors';
-
-import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
+} from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
+import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
@@ -49,7 +48,7 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
       state => state.workspaces.selectedWorkspaceId
     );
 
-    this.bus$ = this.store$.let(getCurrentBus);
+    this.bus$ = this.store$.select(getCurrentBus);
   }
 
   ngOnDestroy() {

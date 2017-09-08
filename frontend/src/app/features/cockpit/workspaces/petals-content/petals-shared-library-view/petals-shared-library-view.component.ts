@@ -19,13 +19,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/state/store.interface';
-
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import {
   getCurrentSharedLibrary,
   ISharedLibraryWithComponents,
 } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
+import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
@@ -47,7 +46,7 @@ export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.sharedLibrary$ = this.store$.let(getCurrentSharedLibrary);
+    this.sharedLibrary$ = this.store$.select(getCurrentSharedLibrary);
 
     this.workspaceId$ = this.store$.select(
       state => state.workspaces.selectedWorkspaceId

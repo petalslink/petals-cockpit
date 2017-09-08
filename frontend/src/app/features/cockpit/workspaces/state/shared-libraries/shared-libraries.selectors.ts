@@ -15,8 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { createSelector } from '@ngrx/store';
 
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import { IStore } from 'app/shared/state/store.interface';
@@ -26,29 +25,29 @@ export interface ISharedLibraryWithComponents extends ISharedLibrary {
   components: IComponentRow[];
 }
 
-export function getCurrentSharedLibrary(
-  store$: Store<IStore>
-): Observable<ISharedLibraryWithComponents> {
-  return store$
-    .filter(state => !!state.sharedLibraries.selectedSharedLibraryId)
-    .map(state => {
-      const sl =
-        state.sharedLibraries.byId[
-          state.sharedLibraries.selectedSharedLibraryId
-        ];
-      if (sl) {
-        return {
-          ...sl,
-          components: sl.components.map(id => state.components.byId[id]),
-        };
-      } else {
-        return null;
-      }
-    });
-}
-
-export const getSharedLibrariesByIds = (state: IStore) =>
+export const getSharedLibrariesById = (state: IStore) =>
   state.sharedLibraries.byId;
 
 export const getSharedLibrariesAllIds = (state: IStore) =>
   state.sharedLibraries.allIds;
+
+export const getSelectedSharedLibrary = createSelector(
+  (state: IStore) => state.sharedLibraries.selectedSharedLibraryId,
+  getSharedLibrariesById,
+  (id, sls) => sls[id]
+);
+
+export const getCurrentSharedLibrary = createSelector(
+  getSelectedSharedLibrary,
+  (state: IStore) => state.components.byId,
+  (sl, components) => {
+    if (sl) {
+      return {
+        ...sl,
+        components: sl.components.map(id => components[id]),
+      };
+    } else {
+      return undefined;
+    }
+  }
+);

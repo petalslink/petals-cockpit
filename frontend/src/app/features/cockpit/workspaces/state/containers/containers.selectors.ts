@@ -15,8 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { createSelector } from '@ngrx/store';
 
 import { IStore } from 'app/shared/state/store.interface';
 import { IContainerRow } from './containers.interface';
@@ -25,32 +24,36 @@ export interface IContainerWithSiblings extends IContainerRow {
   siblings: IContainerRow[];
 }
 
-export function getCurrentContainer(
-  store$: Store<IStore>
-): Observable<IContainerWithSiblings> {
-  return store$
-    .filter(state => !!state.containers.selectedContainerId)
-    .map(state =>
-      getContainerWithSiblings(state.containers.selectedContainerId)(state)
-    );
-}
+export const getContainersById = (state: IStore) => state.containers.byId;
 
-export function getContainerWithSiblings(containerId: string) {
-  return (state: IStore) => {
-    const container = state.containers.byId[containerId];
+export const getContainersAllIds = (state: IStore) => state.containers.allIds;
+
+export const getSelectedContainer = createSelector(
+  (state: IStore) => state.containers.selectedContainerId,
+  getContainersById,
+  (id, containers) => containers[id]
+);
+
+export const getCurrentContainerBus = createSelector(
+  getSelectedContainer,
+  (state: IStore) => state.buses.byId,
+  (container, buses) => buses[container.busId]
+);
+
+export const getCurrentContainer = createSelector(
+  getSelectedContainer,
+  getCurrentContainerBus,
+  getContainersById,
+  (container, bus, containers) => {
     if (container) {
       return {
         ...container,
-        siblings: state.buses.byId[container.busId].containers
+        siblings: bus.containers
           .filter(id => id !== container.id)
-          .map(id => state.containers.byId[id]),
+          .map(id => containers[id]),
       };
     } else {
-      return null;
+      return undefined;
     }
-  };
-}
-
-export const getContainersByIds = (state: IStore) => state.containers.byId;
-
-export const getContainersAllIds = (state: IStore) => state.containers.allIds;
+  }
+);

@@ -19,14 +19,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/state/store.interface';
-
+import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import {
   getCurrentServiceAssembly,
   IServiceAssemblyWithSUsAndComponents,
 } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
-
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
+import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
@@ -41,7 +39,7 @@ export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.serviceAssembly$ = this.store$.let(getCurrentServiceAssembly);
+    this.serviceAssembly$ = this.store$.select(getCurrentServiceAssembly);
 
     this.store$.dispatch(
       new Ui.SetTitles({

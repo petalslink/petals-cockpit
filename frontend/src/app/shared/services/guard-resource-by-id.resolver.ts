@@ -21,10 +21,10 @@ import { Action, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
-import { getBusWithContainers } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
+import { getCurrentBus } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
-import { getContainerWithSiblings } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
+import { getCurrentContainer } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
@@ -47,18 +47,26 @@ export class ResourceByIdResolver implements Resolve<any> {
       resourceInitActions = state => [
         new Buses.SetCurrent({ id }),
         new Buses.FetchDetails({ id }),
-        ...getBusWithContainers(id)(state).containers.map(
-          c => new Containers.FetchDetails(c)
-        ),
+        ...getCurrentBus({
+          ...state,
+          buses: {
+            ...state.buses,
+            selectedBusId: id,
+          },
+        }).containers.map(c => new Containers.FetchDetails(c)),
       ];
     } else if ((id = route.params['containerId'])) {
       resourceState = state => state.containers;
       resourceInitActions = state => [
         new Containers.SetCurrent({ id }),
         new Containers.FetchDetails({ id }),
-        ...getContainerWithSiblings(id)(state).siblings.map(
-          c => new Containers.FetchDetails(c)
-        ),
+        ...getCurrentContainer({
+          ...state,
+          containers: {
+            ...state.containers,
+            selectedContainerId: id,
+          },
+        }).siblings.map(c => new Containers.FetchDetails(c)),
       ];
     } else if ((id = route.params['serviceAssemblyId'])) {
       resourceState = state => state.serviceAssemblies;

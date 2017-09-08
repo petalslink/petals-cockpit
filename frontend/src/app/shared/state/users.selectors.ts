@@ -16,7 +16,7 @@
  */
 
 import { Store } from '@ngrx/store';
-import { createSelector } from 'reselect';
+import { createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import { isNot } from '../helpers/shared.helper';

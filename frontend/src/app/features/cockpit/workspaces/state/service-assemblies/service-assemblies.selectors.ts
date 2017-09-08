@@ -15,8 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { createSelector } from '@ngrx/store';
 import { IServiceAssembly } from './service-assemblies.interface';
 
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
@@ -28,32 +27,33 @@ export interface IServiceAssemblyWithSUsAndComponents extends IServiceAssembly {
   serviceUnitsAndComponent: [IServiceUnitRow, IComponentRow][];
 }
 
-export function getCurrentServiceAssembly(
-  store$: Store<IStore>
-): Observable<IServiceAssemblyWithSUsAndComponents> {
-  return store$
-    .filter(state => !!state.serviceAssemblies.selectedServiceAssemblyId)
-    .map(state => {
-      const sa =
-        state.serviceAssemblies.byId[
-          state.serviceAssemblies.selectedServiceAssemblyId
-        ];
-      if (sa) {
-        return {
-          ...sa,
-          serviceUnitsAndComponent: sa.serviceUnits.map(id => {
-            const su = state.serviceUnits.byId[id];
-            return tuple([su, state.components.byId[su.componentId]]);
-          }),
-        };
-      } else {
-        return null;
-      }
-    });
-}
-
-export const getServiceAssembliesByIds = (state: IStore) =>
+export const getServiceAssembliesById = (state: IStore) =>
   state.serviceAssemblies.byId;
 
 export const getServiceAssembliesAllIds = (state: IStore) =>
   state.serviceAssemblies.allIds;
+
+export const getSelectedServiceAssembly = createSelector(
+  (state: IStore) => state.serviceAssemblies.selectedServiceAssemblyId,
+  getServiceAssembliesById,
+  (id, sas) => sas[id]
+);
+
+export const getCurrentServiceAssembly = createSelector(
+  getSelectedServiceAssembly,
+  (state: IStore) => state.serviceUnits.byId,
+  (state: IStore) => state.components.byId,
+  (sa, sus, components) => {
+    if (sa) {
+      return {
+        ...sa,
+        serviceUnitsAndComponent: sa.serviceUnits.map(id => {
+          const su = sus[id];
+          return tuple([su, components[su.componentId]]);
+        }),
+      };
+    } else {
+      return undefined;
+    }
+  }
+);

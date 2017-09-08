@@ -48,7 +48,7 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.component$ = this.store$.let(getCurrentComponent);
+    this.component$ = this.store$.select(getCurrentComponent);
 
     this.workspaceId$ = this.store$.select(
       state => state.workspaces.selectedWorkspaceId
