@@ -74,10 +74,10 @@
     "ngrx-store-freeze": "0.1.9",
     "ngx-hover-opacity": "0.2.0",
     "ngx-pipes": "1.6.4",
-    "node-uuid": "1.4.8",
     "rxjs": "5.4.3",
     "swiper": "4.0.0-beta.2",
     "ts-helpers": "1.1.2",
+    "uuid": "3.1.0",
     "zone.js": "0.8.17"
   },
   "devDependencies": {
