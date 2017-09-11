@@ -17,7 +17,8 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ResourceByIdResolver } from 'app/shared/services/guard-resource-by-id.resolver';
+
+import { ResourceByIdGuard } from 'app/features/cockpit/workspaces/petals-content/resource-by-id.guard';
 
 // /workspaces/:workspaceId/petals
 const routes: Routes = [
@@ -33,43 +34,42 @@ const routes: Routes = [
   },
   {
     path: 'buses/:busId',
-    resolve: { _: ResourceByIdResolver },
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-bus-view/petals-bus-view.module#PetalsBusViewModule',
   },
   {
     path: 'containers/:containerId',
-    resolve: { _: ResourceByIdResolver },
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-view.module#PetalsContainerViewModule',
   },
   {
     path: 'service-assemblies/:serviceAssemblyId',
-    resolve: { _: ResourceByIdResolver },
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.module#PetalsServiceAssemblyViewModule',
   },
   {
     path: 'components/:componentId',
-    resolve: { _: ResourceByIdResolver },
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-view.module#PetalsComponentViewModule',
   },
   {
     path: 'service-units/:serviceUnitId',
-    resolve: { _: ResourceByIdResolver },
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-service-unit-view/petals-service-unit-view.module#PetalsServiceUnitViewModule',
   },
   {
     path: 'shared-libraries/:sharedLibraryId',
-    resolve: { _: ResourceByIdResolver },
     loadChildren:
       'app/features/cockpit/workspaces/petals-content/petals-shared-library-view/petals-shared-library-view.module#PetalsSharedLibraryViewModule',
   },
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [
+    RouterModule.forChild([
+      { path: '', canActivateChild: [ResourceByIdGuard], children: routes },
+    ]),
+  ],
+  providers: [ResourceByIdGuard],
 })
 export class PetalsContentRoutingModule {}

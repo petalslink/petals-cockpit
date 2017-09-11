@@ -38,6 +38,7 @@ export namespace BusesInProgressReducer {
     | BusesInProgress.Fetched
     | BusesInProgress.Added
     | BusesInProgress.SetCurrent
+    | BusesInProgress.ResetImport
     | BusesInProgress.Post
     | BusesInProgress.PostError
     | BusesInProgress.PostSuccess
@@ -60,6 +61,9 @@ export namespace BusesInProgressReducer {
       }
       case BusesInProgress.SetCurrentType: {
         return setCurrent(table, action.payload);
+      }
+      case BusesInProgress.ResetImportType: {
+        return resetImport(table);
       }
       case BusesInProgress.PostType: {
         return post(table);
@@ -108,8 +112,14 @@ export namespace BusesInProgressReducer {
     payload: { id: string }
   ): IBusesInProgressTable {
     return {
-      ...table,
+      ...resetImport(table),
       selectedBusInProgressId: payload.id,
+    };
+  }
+
+  function resetImport(table: IBusesInProgressTable): IBusesInProgressTable {
+    return {
+      ...table,
       isImportingBus: false,
       importBusError: '',
     };

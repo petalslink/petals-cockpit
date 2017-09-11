@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MD_DIALOG_DATA, MdDialog, MdDialogRef } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -33,7 +33,7 @@ import { Ui } from 'app/shared/state/ui.actions';
   templateUrl: './petals-bus-view.component.html',
   styleUrls: ['./petals-bus-view.component.scss'],
 })
-export class PetalsBusViewComponent implements OnInit, OnDestroy {
+export class PetalsBusViewComponent implements OnInit {
   public workspaceId$: Observable<string>;
   public bus$: Observable<IBusWithContainers>;
 
@@ -49,10 +49,6 @@ export class PetalsBusViewComponent implements OnInit, OnDestroy {
     );
 
     this.bus$ = this.store$.select(getCurrentBus);
-  }
-
-  ngOnDestroy() {
-    this.store$.dispatch(new Buses.SetCurrent({ id: '' }));
   }
 
   openDeletionDialog() {

@@ -15,11 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import {
   getCurrentServiceAssembly,
   IServiceAssemblyWithSUsAndComponents,
@@ -32,7 +31,7 @@ import { Ui } from 'app/shared/state/ui.actions';
   templateUrl: './petals-service-assembly-view.component.html',
   styleUrls: ['./petals-service-assembly-view.component.scss'],
 })
-export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
+export class PetalsServiceAssemblyViewComponent implements OnInit {
   serviceAssembly$: Observable<IServiceAssemblyWithSUsAndComponents>;
   workspaceId$: Observable<string>;
 
@@ -51,9 +50,5 @@ export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
     this.workspaceId$ = this.store$.select(
       state => state.workspaces.selectedWorkspaceId
     );
-  }
-
-  ngOnDestroy() {
-    this.store$.dispatch(new ServiceAssemblies.SetCurrent({ id: '' }));
   }
 }

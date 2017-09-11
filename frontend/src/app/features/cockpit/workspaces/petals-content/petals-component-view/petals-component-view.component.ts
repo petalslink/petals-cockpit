@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
@@ -26,7 +26,6 @@ import {
   IComponentWithSLsAndSUs,
 } from '../../state/components/components.selectors';
 
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
@@ -34,7 +33,7 @@ import { Ui } from 'app/shared/state/ui.actions';
   templateUrl: './petals-component-view.component.html',
   styleUrls: ['./petals-component-view.component.scss'],
 })
-export class PetalsComponentViewComponent implements OnInit, OnDestroy {
+export class PetalsComponentViewComponent implements OnInit {
   public component$: Observable<IComponentWithSLsAndSUs>;
   public workspaceId$: Observable<string>;
 
@@ -53,9 +52,5 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
     this.workspaceId$ = this.store$.select(
       state => state.workspaces.selectedWorkspaceId
     );
-  }
-
-  ngOnDestroy() {
-    this.store$.dispatch(new Components.SetCurrent({ id: '' }));
   }
 }

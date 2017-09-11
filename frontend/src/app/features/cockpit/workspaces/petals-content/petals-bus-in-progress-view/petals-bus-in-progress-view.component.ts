@@ -24,7 +24,6 @@ import {
   NgForm,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs/Subject';
 
@@ -38,10 +37,7 @@ import {
   formErrorStateMatcher,
   getFormErrors,
 } from './../../../../../shared/helpers/form.helper';
-import {
-  IBusesInProgressTable,
-  IBusInProgressRow,
-} from './../../state/buses-in-progress/buses-in-progress.interface';
+import { IBusInProgressRow } from './../../state/buses-in-progress/buses-in-progress.interface';
 import { getCurrentBusInProgress } from './../../state/buses-in-progress/buses-in-progress.selectors';
 
 @Component({
@@ -143,9 +139,6 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
-    if (!this.newImportData) {
-      this.store$.dispatch(new BusesInProgress.SetCurrent({ id: '' }));
-    }
   }
 
   onSubmit({ value }: { value: IBusImport; valid: boolean }) {
@@ -158,7 +151,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
 
   reset() {
     this.busImportForm.reset();
-    this.store$.dispatch(new BusesInProgress.SetCurrent({ id: '' }));
+    this.store$.dispatch(new BusesInProgress.ResetImport());
   }
 
   isStillImporting() {

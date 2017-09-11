@@ -46,7 +46,6 @@ import {
 } from 'app/shared/services/containers.service';
 import { ContainersServiceMock } from 'app/shared/services/containers.service.mock';
 import { GuardLoginService } from 'app/shared/services/guard-login.service';
-import { ResourceByIdResolver } from 'app/shared/services/guard-resource-by-id.resolver';
 import {
   ServiceAssembliesService,
   ServiceAssembliesServiceImpl,
@@ -82,7 +81,6 @@ import './rxjs-operators';
 
 export const providers = [
   GuardLoginService,
-  ResourceByIdResolver,
   {
     provide: SseService,
     useClass: environment.mock ? SseServiceMock : SseServiceImpl,
