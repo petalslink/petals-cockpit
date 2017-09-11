@@ -36,6 +36,8 @@ import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.admin.api.artifact.lifecycle.ComponentLifecycle;
 import org.ow2.petals.admin.api.artifact.lifecycle.ServiceAssemblyLifecycle;
 import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
+import org.ow2.petals.admin.api.exception.ArtifactDeployedException;
+import org.ow2.petals.admin.api.exception.ArtifactNotFoundException;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
@@ -158,8 +160,17 @@ public class PetalsAdmin {
     public Component deployComponent(String ip, int port, String username, String password, ComponentType type,
             String name, URL compUrl) {
         try (PAC p = new PAC(ip, port, username, password)) {
-            p.petals.newArtifactLifecycleFactory().createComponentLifecycle(new Component(name, type)).deploy(compUrl,
-                    true);
+            ComponentLifecycle lc = p.petals.newArtifactLifecycleFactory()
+                    .createComponentLifecycle(new Component(name, type));
+            // petals admin doesn't see any problem if the component is already loaded but we do
+            try {
+                lc.updateState();
+                throw new PetalsAdminException(
+                        new ArtifactDeployedException(name, lc.getComponent().getState().toString()));
+            } catch (ArtifactNotFoundException e) {
+                // good, that's expected!
+            }
+            lc.deploy(compUrl, true);
             return (Component) p.petals.newArtifactAdministration().getArtifactInfo(type.toString(), name, null);
         } catch (ArtifactAdministrationException e) {
             throw new PetalsAdminException(e);
