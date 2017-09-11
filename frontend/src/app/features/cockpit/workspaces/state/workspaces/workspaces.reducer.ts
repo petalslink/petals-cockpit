@@ -43,8 +43,6 @@ export namespace WorkspacesReducer {
     | Workspaces.Create
     | Workspaces.CreateError
     | Workspaces.CreateSuccess
-    | Workspaces.Fetch
-    | Workspaces.FetchError
     | Workspaces.FetchSuccess
     | Workspaces.FetchDetails
     | Workspaces.FetchDetailsError
@@ -86,12 +84,6 @@ export namespace WorkspacesReducer {
       }
       case Workspaces.CreateSuccessType: {
         return postSuccess(table, action.payload);
-      }
-      case Workspaces.FetchType: {
-        return fetch(table, action.payload);
-      }
-      case Workspaces.FetchErrorType: {
-        return fetchError(table);
       }
       case Workspaces.FetchSuccessType: {
         return fetchSuccess(table, action.payload);
@@ -200,16 +192,6 @@ export namespace WorkspacesReducer {
     };
   }
 
-  function fetch(
-    table: IWorkspacesTable,
-    payload: { id: string }
-  ): IWorkspacesTable {
-    return {
-      ...table,
-      isSelectedWorkspaceFetchError: false,
-    };
-  }
-
   function fetchSuccess(
     table: IWorkspacesTable,
     payload: IWorkspaceBackend
@@ -219,13 +201,6 @@ export namespace WorkspacesReducer {
         ? updateById(table, payload.id, payload)
         : putById(table, payload.id, payload, workspaceRowFactory),
       selectedWorkspaceId: payload.id,
-    };
-  }
-
-  function fetchError(table: IWorkspacesTable): IWorkspacesTable {
-    return {
-      ...table,
-      isSelectedWorkspaceFetchError: true,
     };
   }
 

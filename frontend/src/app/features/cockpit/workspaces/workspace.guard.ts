@@ -16,36 +16,39 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Resolve, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
+import { Actions } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-// until ts 2.4 is released, see https://github.com/palantir/tslint/issues/2470 https://github.com/Microsoft/TypeScript/issues/14953
-// tslint:disable-next-line:no-unused-variable
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../shared/state/store.interface';
-
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { IStore } from 'app/shared/state/store.interface';
 
 @Injectable()
-export class WorkspaceResolver implements Resolve<Observable<any>> {
-  constructor(private store$: Store<IStore>, private router: Router) {}
+export class WorkspaceGuard implements CanActivate {
+  constructor(
+    private store$: Store<IStore>,
+    private router: Router,
+    private actions$: Actions
+  ) {}
 
-  resolve(route: ActivatedRouteSnapshot) {
+  canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
     const id = route.paramMap.get('workspaceId');
 
     this.store$.dispatch(new Workspaces.Fetch({ id }));
 
-    return this.store$
-      .select(state => state.workspaces)
-      .filter(
-        workspaces =>
-          !!workspaces.selectedWorkspaceId ||
-          workspaces.isSelectedWorkspaceFetchError
+    return this.actions$
+      .ofType<Workspaces.FetchSuccess | Workspaces.FetchError>(
+        Workspaces.FetchSuccessType,
+        Workspaces.FetchErrorType
       )
       .first()
-      .do(workspaces => {
-        if (workspaces.isSelectedWorkspaceFetchError) {
+      .map(action => {
+        if (action instanceof Workspaces.FetchError) {
           this.router.navigate(['/workspaces']);
+          return false;
+        } else {
+          return true;
         }
       });
   }

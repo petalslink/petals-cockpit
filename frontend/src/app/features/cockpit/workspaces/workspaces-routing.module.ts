@@ -18,7 +18,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { WorkspaceResolver } from './workspace-resolver';
+import { WorkspaceGuard } from './workspace.guard';
 import {
   NoWorkspaceComponent,
   WorkspacesComponent,
@@ -37,10 +37,7 @@ const routes: Routes = [
       },
       {
         path: ':workspaceId',
-        // as we use the store to retrieve our data, no need to pass them
-        // using resolve, but we still need to call the resolver to make sure
-        // they're available before displaying the view
-        resolve: { _: WorkspaceResolver },
+        canActivate: [WorkspaceGuard],
         loadChildren:
           'app/features/cockpit/workspaces/workspace/workspace.module#WorkspaceModule',
       },
@@ -50,5 +47,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
+  providers: [WorkspaceGuard],
 })
 export class WorkspacesRoutingModule {}
