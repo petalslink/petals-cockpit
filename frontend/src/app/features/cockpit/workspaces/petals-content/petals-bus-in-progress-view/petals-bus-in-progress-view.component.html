@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <md-icon>edit</md-icon>
     </div>
 
-    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">Description</h1>
+    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">Workspace Bus Import</h1>
   </md-toolbar>
 
   <div fxFlexFill fxLayout="column" class="content content-max-width">
@@ -28,10 +28,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <md-card fxLayout="column">
 
           <md-card-title fxLayout="row">
-            <span fxFlex class="text-upper">Import Bus</span>
+            <span fxFlex class="text-upper">Import Details</span>
             <md-icon color="primary">archive</md-icon>
           </md-card-title>
-          <md-card-subtitle fxLayout="row" fxLayoutAlign="start center">
+          <md-card-subtitle *ngIf="!isStillImporting()" fxLayout="row" fxLayoutAlign="start center">
             <md-icon color="primary">info</md-icon>
             <span class="color-primary">After completing all the required fields, click <b>IMPORT</b>.</span>
           </md-card-subtitle>
@@ -94,11 +94,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
           <md-card-content
             fxLayout="column"
-            *ngIf="(busesInProgressTable$ | async).importBusError || (busInProgress && busInProgress.importError)"
+            *ngIf="(busInProgress && busInProgress.importError) || (newImportData && newImportData.error) as error"
             class="error">
             <div fxLayout="row" fxLayoutAlign="start center">
               <md-icon color="warn">warning</md-icon>
-              <span class="error-details">{{ (busInProgress && busInProgress.importError) ? busInProgress.importError : (busesInProgressTable$ | async).importBusError }}</span>
+              <span class="error-details">{{ error }}</span>
             </div>
           </md-card-content>
 
@@ -107,7 +107,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               md-raised-button
               color="accent"
               type="button"
-              *ngIf="!busInProgress && !(busesInProgressTable$ | async).isImportingBus && !(busesInProgressTable$ | async).selectedBusInProgressId"
+              *ngIf="newImportData && !newImportData.isImporting"
               class="btn-clear-form margin-right-x1 text-upper"
               (click)="reset()">
               <md-icon>clear_all</md-icon>
@@ -119,29 +119,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               type="button"
               *ngIf="busInProgress"
               (click)="discard(busInProgress)"
-              [disabled]="busInProgress && busInProgress.isRemoving"
+              [disabled]="busInProgress.isRemoving"
               class="margin-right-x1 btn-discard-form text-upper">
-              <md-icon *ngIf="busInProgress.importError">remove_circle</md-icon>
-              <md-icon *ngIf="cancel && !busInProgress.importError">cancel</md-icon>
-              <span class="discard-name" *ngIf="busInProgress.importError; else cancel">Discard</span>
-              <ng-template #cancel><span class="cancel-name">Cancel</span></ng-template>
+              <ng-template [ngIf]="busInProgress.importError" [ngIfElse]="cancel">
+                <md-icon>remove_circle</md-icon><span class="discard-name">Discard</span>
+              </ng-template>
+              <ng-template #cancel>
+                <md-icon>cancel</md-icon><span class="cancel-name">Cancel</span>
+              </ng-template>
             </button>
             <button
               md-raised-button
               color="primary"
               type="submit"
               class="btn-import-form text-upper"
-              [disabled]="busImportForm.invalid || (busesInProgressTable$ | async).isImportingBus || busInProgress">
-              <md-icon *ngIf="!((busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError))">import_export</md-icon>
-              <span
-                class="import-name"
-                *ngIf="!((busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError))">
-                Import
-              </span>
-              <span  fxFill fxLayout="row" fxLayoutAlign="center center"
-                *ngIf="(busesInProgressTable$ | async).isImportingBus || (busInProgress && !busInProgress.importError)">
+              [disabled]="busImportForm.invalid || !newImportData || newImportData.isImporting">
+              <span *ngIf="isStillImporting(); else canImport" fxFill fxLayout="row" fxLayoutAlign="center center">
                 Importing <md-spinner></md-spinner>
               </span>
+              <ng-template #canImport>
+                <md-icon>import_export</md-icon><span class="import-name">Import</span>
+              </ng-template>
             </button>
           </md-card-actions>
 

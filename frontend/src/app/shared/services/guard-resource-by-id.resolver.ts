@@ -20,6 +20,7 @@ import { ActivatedRouteSnapshot, Resolve, Router } from '@angular/router';
 import { Action, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
+import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import { getCurrentBus } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
@@ -94,7 +95,7 @@ export class ResourceByIdResolver implements Resolve<any> {
       ];
     } else if ((id = route.params['busInProgressId'])) {
       resourceState = state => state.busesInProgress;
-      resourceInitActions = state => [];
+      resourceInitActions = state => [new BusesInProgress.SetCurrent({ id })];
     } else {
       if (environment.debug) {
         console.error(

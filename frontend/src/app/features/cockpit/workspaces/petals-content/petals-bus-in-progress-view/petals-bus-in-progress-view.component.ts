@@ -26,7 +26,6 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
@@ -53,8 +52,8 @@ import { getCurrentBusInProgress } from './../../state/buses-in-progress/buses-i
 export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  busesInProgressTable$: Observable<IBusesInProgressTable>;
-  busInProgress$: Observable<IBusInProgressRow>;
+  newImportData: { isImporting: boolean; error: string };
+
   // needed because it is so much easier to use that than an async object in the html
   busInProgress: IBusInProgressRow;
 
@@ -68,11 +67,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
     passphrase: '',
   };
 
-  constructor(
-    private store$: Store<IStore>,
-    private fb: FormBuilder,
-    private route: ActivatedRoute
-  ) {}
+  constructor(private store$: Store<IStore>, private fb: FormBuilder) {}
 
   ngOnInit() {
     this.store$.dispatch(
@@ -82,24 +77,23 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.busesInProgressTable$ = this.store$.select(
-      state => state.busesInProgress
-    );
-    this.busInProgress$ = this.store$.select(getCurrentBusInProgress);
+    this.store$
+      .select(state => state.busesInProgress)
+      .takeUntil(this.onDestroy$)
+      .do(bip => {
+        if (!bip.selectedBusInProgressId) {
+          this.newImportData = {
+            isImporting: bip.isImportingBus,
+            error: bip.importBusError,
+          };
+        }
+      })
+      .subscribe();
 
     this.createFormImportBus();
 
-    this.route.paramMap
-      .takeUntil(this.onDestroy$)
-      .map(paramMap => paramMap.get('busInProgressId'))
-      .distinctUntilChanged()
-      .do(id => this.store$.dispatch(new BusesInProgress.SetCurrent({ id })))
-      .finally(() =>
-        this.store$.dispatch(new BusesInProgress.SetCurrent({ id: '' }))
-      )
-      .subscribe();
-
-    this.busInProgress$
+    this.store$
+      .select(getCurrentBusInProgress)
       .takeUntil(this.onDestroy$)
       .do(busInProgress => {
         this.busInProgress = busInProgress;
@@ -149,6 +143,9 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+    if (!this.newImportData) {
+      this.store$.dispatch(new BusesInProgress.SetCurrent({ id: '' }));
+    }
   }
 
   onSubmit({ value }: { value: IBusImport; valid: boolean }) {
@@ -162,5 +159,12 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   reset() {
     this.busImportForm.reset();
     this.store$.dispatch(new BusesInProgress.SetCurrent({ id: '' }));
+  }
+
+  isStillImporting() {
+    return (
+      (this.newImportData && this.newImportData.isImporting) ||
+      (this.busInProgress && !this.busInProgress.importError)
+    );
   }
 }
