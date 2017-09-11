@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.admin.api.ArtifactAdministration;
 import org.ow2.petals.admin.api.ContainerAdministration;
 import org.ow2.petals.admin.api.PetalsAdministration;
@@ -37,6 +36,8 @@ import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.admin.api.artifact.lifecycle.ComponentLifecycle;
 import org.ow2.petals.admin.api.artifact.lifecycle.ServiceAssemblyLifecycle;
 import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
+import org.ow2.petals.admin.api.exception.ArtifactDeployedException;
+import org.ow2.petals.admin.api.exception.ArtifactNotFoundException;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
@@ -58,7 +59,6 @@ import org.ow2.petals.jmx.api.api.exception.MissingServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javaslang.Function1;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 
@@ -81,128 +81,112 @@ public class PetalsAdmin {
     }
 
     public Domain getTopology(String ip, int port, String username, String password, String passphrase) {
-        Domain topology = runAdmin(ip, port, username, password, petals -> {
-            try {
-                return petals.newContainerAdministration().getTopology(passphrase, true);
-            } catch (ContainerAdministrationException e) {
-                throw new PetalsAdminException(e);
-            }
-        });
-        assert topology != null;
-        return topology;
+        try (PAC p = new PAC(ip, port, username, password)) {
+            return p.petals.newContainerAdministration().getTopology(passphrase, true);
+        } catch (ContainerAdministrationException e) {
+            throw new PetalsAdminException(e);
+        }
     }
 
     @SuppressWarnings("null")
     public Tuple2<List<Container>, String> getContainerInfos(String ip, int port, String username, String password) {
-        return runAdmin(ip, port, username, password, petals -> {
-            try {
-                ContainerAdministration admin = petals.newContainerAdministration();
-                Domain domain = admin.getTopology(null, false);
+        try (PAC p = new PAC(ip, port, username, password)) {
+            ContainerAdministration admin = p.petals.newContainerAdministration();
+            Domain domain = admin.getTopology(null, false);
 
-                String sysInfo = admin.getSystemInfo();
+            String sysInfo = admin.getSystemInfo();
 
-                return Tuple.of(domain.getContainers(), sysInfo);
-            } catch (ContainerAdministrationException e) {
-                throw new PetalsAdminException(e);
-            }
-        });
+            return Tuple.of(domain.getContainers(), sysInfo);
+        } catch (ContainerAdministrationException e) {
+            throw new PetalsAdminException(e);
+        }
     }
 
     public ComponentMin.State changeComponentState(String ip, int port, String username, String password, String type,
             String name, ComponentMin.State current, ComponentMin.State next, Map<String, String> parameters) {
-        return runAdmin(ip, port, username, password, petals -> {
-            try {
-                ArtifactAdministration aa = petals.newArtifactAdministration();
-                Artifact a = aa.getArtifact(type, name, null);
-                assert a instanceof Component;
-                Component compo = (Component) a;
+        try (PAC p = new PAC(ip, port, username, password)) {
+            ArtifactAdministration aa = p.petals.newArtifactAdministration();
+            Artifact a = aa.getArtifact(type, name, null);
+            assert a instanceof Component;
+            Component compo = (Component) a;
 
-                if (current == ComponentMin.State.Loaded && next != ComponentMin.State.Unloaded) {
-                    compo.getParameters().putAll(parameters);
-                }
-
-                return changeComponentState(petals, compo, current, next);
-            } catch (ArtifactAdministrationException e) {
-                throw new PetalsAdminException(e);
+            if (current == ComponentMin.State.Loaded && next != ComponentMin.State.Unloaded) {
+                compo.getParameters().putAll(parameters);
             }
-        });
+
+            return changeComponentState(p.petals, compo, current, next);
+        } catch (ArtifactAdministrationException e) {
+            throw new PetalsAdminException(e);
+        }
     }
 
     public ServiceAssemblyMin.State changeSAState(String ip, int port, String username, String password, String saName,
             ServiceAssemblyMin.State next) {
-        return runAdmin(ip, port, username, password, petals -> {
-            try {
-                ArtifactAdministration aa = petals.newArtifactAdministration();
-                Artifact a = aa.getArtifact(ServiceAssembly.TYPE, saName, null);
-                assert a instanceof ServiceAssembly;
-                ServiceAssembly sa = (ServiceAssembly) a;
-                return changeSAState(petals, sa, next);
-            } catch (ArtifactAdministrationException e) {
-                throw new PetalsAdminException(e);
-            }
-        });
+        try (PAC p = new PAC(ip, port, username, password)) {
+            ArtifactAdministration aa = p.petals.newArtifactAdministration();
+            Artifact a = aa.getArtifact(ServiceAssembly.TYPE, saName, null);
+            assert a instanceof ServiceAssembly;
+            ServiceAssembly sa = (ServiceAssembly) a;
+            return changeSAState(p.petals, sa, next);
+        } catch (ArtifactAdministrationException e) {
+            throw new PetalsAdminException(e);
+        }
     }
 
     public void undeploySL(String ip, int port, String username, String password, String slName) {
-        this.<@Nullable Void> runAdmin(ip, port, username, password, petals -> {
-            try {
-                ArtifactAdministration aa = petals.newArtifactAdministration();
-                Artifact a = aa.getArtifact(SharedLibrary.TYPE, slName, null);
-                assert a instanceof SharedLibrary;
-                SharedLibrary sl = (SharedLibrary) a;
-                petals.newArtifactLifecycleFactory().createSharedLibraryLifecycle(sl).undeploy();
-                return null;
-            } catch (ArtifactAdministrationException e) {
-                throw new PetalsAdminException(e);
-            }
-        });
+        try (PAC p = new PAC(ip, port, username, password)) {
+            ArtifactAdministration aa = p.petals.newArtifactAdministration();
+            Artifact a = aa.getArtifact(SharedLibrary.TYPE, slName, null);
+            assert a instanceof SharedLibrary;
+            SharedLibrary sl = (SharedLibrary) a;
+            p.petals.newArtifactLifecycleFactory().createSharedLibraryLifecycle(sl).undeploy();
+        } catch (ArtifactAdministrationException e) {
+            throw new PetalsAdminException(e);
+        }
     }
 
     public ServiceAssembly deploySA(String ip, int port, String username, String password, String saName, URL saUrl) {
-        ServiceAssembly deployedSA = runAdmin(ip, port, username, password, petals -> {
-            try {
-                // TODO handle partially deployed SAs??!!
-                petals.newArtifactLifecycleFactory().createServiceAssemblyLifecycle(new ServiceAssembly(saName))
-                        .deploy(saUrl);
-                return (ServiceAssembly) petals.newArtifactAdministration().getArtifactInfo(ServiceAssembly.TYPE,
-                        saName, null);
-            } catch (ArtifactAdministrationException e) {
-                throw new PetalsAdminException(e);
-            }
-        });
-        assert deployedSA != null;
-        return deployedSA;
+        try (PAC p = new PAC(ip, port, username, password)) {
+            // TODO handle partially deployed SAs??!!
+            p.petals.newArtifactLifecycleFactory().createServiceAssemblyLifecycle(new ServiceAssembly(saName))
+                    .deploy(saUrl);
+            return (ServiceAssembly) p.petals.newArtifactAdministration().getArtifactInfo(ServiceAssembly.TYPE, saName,
+                    null);
+        } catch (ArtifactAdministrationException e) {
+            throw new PetalsAdminException(e);
+        }
     }
 
     public Component deployComponent(String ip, int port, String username, String password, ComponentType type,
             String name, URL compUrl) {
-        Component deployedComp = runAdmin(ip, port, username, password, petals -> {
+        try (PAC p = new PAC(ip, port, username, password)) {
+            ComponentLifecycle lc = p.petals.newArtifactLifecycleFactory()
+                    .createComponentLifecycle(new Component(name, type));
+            // petals admin doesn't see any problem if the component is already loaded but we do
             try {
-                petals.newArtifactLifecycleFactory().createComponentLifecycle(new Component(name, type)).deploy(compUrl,
-                        true);
-                return (Component) petals.newArtifactAdministration().getArtifactInfo(type.toString(), name, null);
-            } catch (ArtifactAdministrationException e) {
-                throw new PetalsAdminException(e);
+                lc.updateState();
+                throw new PetalsAdminException(
+                        new ArtifactDeployedException(name, lc.getComponent().getState().toString()));
+            } catch (ArtifactNotFoundException e) {
+                // good, that's expected!
             }
-        });
-        assert deployedComp != null;
-        return deployedComp;
+            lc.deploy(compUrl, true);
+            return (Component) p.petals.newArtifactAdministration().getArtifactInfo(type.toString(), name, null);
+        } catch (ArtifactAdministrationException e) {
+            throw new PetalsAdminException(e);
+        }
     }
 
     public SharedLibrary deploySL(String ip, int port, String username, String password, String name, String version,
             URL slUrl) {
-        SharedLibrary deployedSL = runAdmin(ip, port, username, password, petals -> {
-            try {
-                petals.newArtifactLifecycleFactory().createSharedLibraryLifecycle(new SharedLibrary(name, version))
-                        .deploy(slUrl);
-                return (SharedLibrary) petals.newArtifactAdministration().getArtifactInfo(SharedLibrary.TYPE, name,
-                        version);
-            } catch (ArtifactAdministrationException e) {
-                throw new PetalsAdminException(e);
-            }
-        });
-        assert deployedSL != null;
-        return deployedSL;
+        try (PAC p = new PAC(ip, port, username, password)) {
+            p.petals.newArtifactLifecycleFactory().createSharedLibraryLifecycle(new SharedLibrary(name, version))
+                    .deploy(slUrl);
+            return (SharedLibrary) p.petals.newArtifactAdministration().getArtifactInfo(SharedLibrary.TYPE, name,
+                    version);
+        } catch (ArtifactAdministrationException e) {
+            throw new PetalsAdminException(e);
+        }
     }
 
     public Map<String, String> getInstallParameters(String ip, int port, String username, String password,
@@ -280,13 +264,6 @@ public class PetalsAdmin {
         } else {
             // we can't call updateState for this one, it will fail since it has been unloaded
             return ServiceAssemblyMin.State.Unloaded;
-        }
-    }
-
-    private <R> R runAdmin(String ip, int port, String username, String password,
-            Function1<PetalsAdministration, R> f) {
-        try (PAC p = new PAC(ip, port, username, password)) {
-            return f.apply(p.petals);
         }
     }
 

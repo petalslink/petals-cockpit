@@ -25,13 +25,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import {
-  FormControl,
-  FormGroup,
-  FormGroupDirective,
-  NgForm,
-  Validators,
-} from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Actions } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs/Subject';
@@ -40,7 +34,6 @@ import { v4 as uuid } from 'uuid';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
-import { formErrorStateMatcher } from 'app/shared/helpers/form.helper';
 import {
   ComponentState,
   EComponentState,
@@ -88,22 +81,12 @@ export class PetalsComponentOperationsComponent
 
     this.parametersForm = new FormGroup(
       keysParameters.reduce(
-        (acc, key) => ({
-          ...acc,
-          [key]: new FormControl(parameters[key], Validators.required),
-        }),
+        (acc, key) => ({ ...acc, [key]: new FormControl(parameters[key]) }),
         {}
       )
     );
 
     this.uploadSu.resetForm();
-  }
-
-  createFormErrorStateMatcher(
-    control: FormControl,
-    formToCheck: FormGroupDirective | NgForm
-  ): boolean {
-    return formErrorStateMatcher(control, formToCheck);
   }
 
   getPossibleStateActions(state: ComponentState) {

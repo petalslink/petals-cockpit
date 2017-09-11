@@ -17,6 +17,8 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.db.api.Assertions.assertThat;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 
 import java.util.Arrays;
 
@@ -189,6 +191,7 @@ public class DeployComponentTest extends AbstractBasicResourceTest {
             assertThat(resource.httpServer.wasCalled()).isTrue();
             assertThat(resource.httpServer.wasClosed()).isTrue();
 
+            assertThat(requestBy(COMPONENTS.NAME, "petals-component")).hasNumberOfRows(1);
             assertThat(container.getComponents()).hasSize(1);
             Component comp = container.getComponents().iterator().next();
             assertThat(comp.getName()).isEqualTo(postC.component.name);
@@ -197,6 +200,22 @@ public class DeployComponentTest extends AbstractBasicResourceTest {
 
             resource.target("/components/" + postC.component.id).request().get(ComponentOverview.class);
         }
+    }
+
+    @Test
+    public void deployComponentTwice() throws Exception {
+        deployComponent();
+
+        MultiPart mpe = getComponentMultiPart();
+        Response post = resource.target("/workspaces/1/containers/" + getId(container) + "/components").request()
+                .post(Entity.entity(mpe, mpe.getMediaType()));
+
+        assertThat(post.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
+        ErrorMessage err = post.readEntity(ErrorMessage.class);
+        assertThat(err.getCode()).isEqualTo(Status.CONFLICT.getStatusCode());
+        assertThat(err.getMessage()).isEqualTo("The artifact 'petals-component' is deployed, in state 'Loaded'.");
+
+        assertThat(requestBy(COMPONENTS.NAME, "petals-component")).hasNumberOfRows(1);
     }
 
     @Test
