@@ -152,12 +152,9 @@ export const providers = [
       ServiceUnitsEffects,
       SharedLibrariesEffects,
     ]),
-    // it'd be nice to have the possibility to activate redux devtools
-    // even if we're in prod but only with the extension
-    // since ngrx v4, no idea how to do that
-    !environment.production
-      ? StoreDevtoolsModule.instrument({ maxAge: 50 })
-      : [],
+    // it's not clear if the module is enabled when the extension is not present...
+    // !environment.production ? StoreDevtoolsModule.instrument({ maxAge: 50 }) : [],
+    StoreDevtoolsModule.instrument({ maxAge: 50 }),
     SimpleNotificationsModule.forRoot(),
   ],
 })
