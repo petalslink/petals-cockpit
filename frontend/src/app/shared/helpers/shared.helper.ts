@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpErrorResponse } from '@angular/common/http';
+
 import { ComponentState } from 'app/shared/services/components.service';
 import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 import { ESharedLibraryState } from 'app/shared/services/shared-libraries.service';
@@ -68,3 +70,22 @@ export const stateToLedColor = (
     }
   }
 };
+
+/**
+ * as our backend sends an object instead of a simple string within
+ * the `err.error` object, this function let us know which kind of
+ * error it is
+ */
+function isBackendError(
+  value: any
+): value is { code: number; message: string } {
+  return typeof value.code === 'number' && typeof value.message === 'string';
+}
+
+export function getErrorMessage(err: HttpErrorResponse) {
+  if (isBackendError(err.error)) {
+    return err.error.message;
+  } else {
+    return `${err.status}: ${err.statusText}`;
+  }
+}

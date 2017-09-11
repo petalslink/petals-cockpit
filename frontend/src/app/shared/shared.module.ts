@@ -16,6 +16,7 @@
  */
 
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -89,6 +90,9 @@ export const declarations = [
 
 export const exportss = [
   ReactiveFormsModule,
+  HttpClientModule,
+  // we do need to keep HttpModule for now because
+  // MdIconModule is relying on it
   HttpModule,
   RouterModule,
   StoreModule,

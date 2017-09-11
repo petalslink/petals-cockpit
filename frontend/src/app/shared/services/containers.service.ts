@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
@@ -50,7 +50,9 @@ export interface IContainerBackendDetails
 }
 
 export abstract class ContainersService {
-  abstract getDetailsContainer(containerId: string): Observable<Response>;
+  abstract getDetailsContainer(
+    containerId: string
+  ): Observable<IContainerBackendDetails>;
 
   abstract deployComponent(
     workspaceId: string,
@@ -76,12 +78,14 @@ export abstract class ContainersService {
 
 @Injectable()
 export class ContainersServiceImpl extends ContainersService {
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
     super();
   }
 
   getDetailsContainer(containerId: string) {
-    return this.http.get(`${environment.urlBackend}/containers/${containerId}`);
+    return this.http.get<IContainerBackendDetails>(
+      `${environment.urlBackend}/containers/${containerId}`
+    );
   }
 
   deployComponent(workspaceId: string, containerId: string, file: File) {
@@ -89,11 +93,11 @@ export class ContainersServiceImpl extends ContainersService {
     formData.append('file', file, file.name);
 
     return this.http
-      .post(
+      .post<{ components: { [id: string]: IComponentBackendSSE } }>(
         `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/components`,
         formData
       )
-      .map(res => toJsTable<IComponentBackendSSE>(res.json().components));
+      .map(res => toJsTable(res.components));
   }
 
   deployServiceAssembly(workspaceId: string, containerId: string, file: File) {
@@ -101,19 +105,17 @@ export class ContainersServiceImpl extends ContainersService {
     formData.append('file', file, file.name);
 
     return this.http
-      .post(
+      .post<{
+        serviceAssemblies: { [id: string]: IServiceAssemblyBackendSSE };
+        serviceUnits: { [id: string]: IServiceUnitBackendSSE };
+      }>(
         `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/serviceassemblies`,
         formData
       )
-      .map(res => {
-        const data = res.json();
-        return {
-          serviceAssemblies: toJsTable<IServiceAssemblyBackendSSE>(
-            data.serviceAssemblies
-          ),
-          serviceUnits: toJsTable<IServiceUnitBackendSSE>(data.serviceUnits),
-        };
-      });
+      .map(res => ({
+        serviceAssemblies: toJsTable(res.serviceAssemblies),
+        serviceUnits: toJsTable(res.serviceUnits),
+      }));
   }
 
   deploySharedLibrary(workspaceId: string, containerId: string, file: File) {
@@ -121,12 +123,10 @@ export class ContainersServiceImpl extends ContainersService {
     formData.append('file', file, file.name);
 
     return this.http
-      .post(
+      .post<{ sharedLibraries: { [id: string]: ISharedLibraryBackendSSE } }>(
         `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/sharedlibraries`,
         formData
       )
-      .map(res =>
-        toJsTable<ISharedLibraryBackendSSE>(res.json().sharedLibraries)
-      );
+      .map(res => toJsTable(res.sharedLibraries));
   }
 }

@@ -15,28 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
 import { Router } from '@angular/router';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { Observable } from 'rxjs/Observable';
-
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import {
-  BusesService,
-  IBusBackendSSE,
-} from 'app/shared/services/buses.service';
-import { SseActions } from 'app/shared/services/sse.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { environment } from 'environments/environment';
-
-import { IComponentBackendSSE } from 'app/shared/services/components.service';
-import { IContainerBackendSSE } from 'app/shared/services/containers.service';
-
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
@@ -45,8 +30,12 @@ import { Containers } from 'app/features/cockpit/workspaces/state/containers/con
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
-import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
-import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
+import { batchActions } from 'app/shared/helpers/batch-actions.helper';
+import { toJsTable } from 'app/shared/helpers/jstable.helper';
+import { BusesService } from 'app/shared/services/buses.service';
+import { SseActions } from 'app/shared/services/sse.service';
+import { IStore } from 'app/shared/state/store.interface';
+import { environment } from 'environments/environment';
 
 @Injectable()
 export class BusesEffects {
@@ -78,7 +67,7 @@ export class BusesEffects {
     .withLatestFrom(this.store$)
     .map(([action, state]) => {
       const data = action.payload;
-      const buses = toJsTable<IBusBackendSSE>(data.buses);
+      const buses = toJsTable(data.buses);
 
       // there should be only one element in there!
       const bus = buses.byId[buses.allIds[0]];
@@ -101,17 +90,11 @@ export class BusesEffects {
       return batchActions([
         new BusesInProgress.Removed(bus),
         new Buses.Added(buses),
-        new Containers.Added(toJsTable<IContainerBackendSSE>(data.containers)),
-        new ServiceAssemblies.Added(
-          toJsTable<IServiceAssemblyBackendSSE>(data.serviceAssemblies)
-        ),
-        new Components.Added(toJsTable<IComponentBackendSSE>(data.components)),
-        new ServiceUnits.Added(
-          toJsTable<IServiceUnitBackendSSE>(data.serviceUnits)
-        ),
-        new SharedLibraries.Added(
-          toJsTable<ISharedLibraryBackendSSE>(data.sharedLibraries)
-        ),
+        new Containers.Added(toJsTable(data.containers)),
+        new ServiceAssemblies.Added(toJsTable(data.serviceAssemblies)),
+        new Components.Added(toJsTable(data.components)),
+        new ServiceUnits.Added(toJsTable(data.serviceUnits)),
+        new SharedLibraries.Added(toJsTable(data.sharedLibraries)),
       ]);
     });
 
@@ -125,10 +108,10 @@ export class BusesEffects {
           res =>
             new Buses.FetchDetailsSuccess({
               id: action.payload.id,
-              data: res.json(),
+              data: res,
             })
         )
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -152,7 +135,7 @@ export class BusesEffects {
       this.busesService
         .deleteBus(idWorkspace, action.payload.id)
         .mergeMap(_ => Observable.empty<Action>())
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(

@@ -15,14 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
 
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import * as helper from 'app/shared/helpers/mock.helper';
-import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { environment } from 'environments/environment';
 import { componentsService } from 'mocks/components-mock';
 import {
@@ -35,7 +32,7 @@ import { SseServiceMock } from './sse.service.mock';
 
 @Injectable()
 export class ComponentsServiceMock extends ComponentsServiceImpl {
-  constructor(http: Http, private sseService: SseService) {
+  constructor(http: HttpClient, private sseService: SseService) {
     super(http);
   }
 
@@ -98,9 +95,8 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
     file: File,
     serviceUnitName: string
   ) {
-    let o: Observable<Response>;
     if (serviceUnitName.includes('error')) {
-      o = helper.errorBackend(
+      return helper.errorBackend(
         '[Mock message] An error happened when trying to deploy the service-unit',
         400
       );
@@ -126,17 +122,10 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
         environment.mock.sseDelay
       );
 
-      o = helper.responseBody(response);
+      return helper.responseBody({
+        serviceAssemblies: toJsTable(response.serviceAssemblies),
+        serviceUnits: toJsTable(response.serviceUnits),
+      });
     }
-
-    return o.map(res => {
-      const data = res.json();
-      return {
-        serviceAssemblies: toJsTable<IServiceAssemblyBackendSSE>(
-          data.serviceAssemblies
-        ),
-        serviceUnits: toJsTable<IServiceUnitBackendSSE>(data.serviceUnits),
-      };
-    });
   }
 }

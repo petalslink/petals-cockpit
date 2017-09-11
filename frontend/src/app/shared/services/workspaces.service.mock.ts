@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 
 import * as helper from 'app/shared/helpers/mock.helper';
 import { environment } from 'environments/environment';
@@ -31,7 +31,7 @@ import { WorkspacesServiceImpl } from './workspaces.service';
 @Injectable()
 export class WorkspacesServiceMock extends WorkspacesServiceImpl {
   constructor(
-    http: Http,
+    http: HttpClient,
     private sseService: SseService,
     private usersService: UsersService
   ) {

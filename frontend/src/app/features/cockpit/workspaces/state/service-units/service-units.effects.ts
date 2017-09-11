@@ -15,16 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
 import { Actions, Effect } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
+import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { ServiceUnitsService } from 'app/shared/services/service-units.service';
 import { environment } from 'environments/environment';
-
-import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 
 @Injectable()
 export class ServiceUnitsEffects {
@@ -43,10 +42,10 @@ export class ServiceUnitsEffects {
           res =>
             new ServiceUnits.FetchDetailsSuccess({
               id: action.payload.id,
-              data: res.json(),
+              data: res,
             })
         )
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(

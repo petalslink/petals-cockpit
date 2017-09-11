@@ -106,7 +106,7 @@ describe(`Import Bus`, () => {
     // the first one should fail
     expect(
       $(`app-petals-bus-in-progress-view .error-details`).getText()
-    ).toEqual('Error 500: Error backend');
+    ).toEqual('Error backend');
 
     // clear the form and the error
     importBus.clearButton.click();

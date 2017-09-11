@@ -15,14 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { Observable } from 'rxjs/Observable';
 
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { getErrorMessage } from 'app/shared/helpers/shared.helper';
 import { ContainersService } from 'app/shared/services/containers.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
@@ -46,10 +47,10 @@ export class ContainersEffects {
           res =>
             new Containers.FetchDetailsSuccess({
               id: action.payload.id,
-              data: res.json(),
+              data: res,
             })
         )
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -80,7 +81,7 @@ export class ContainersEffects {
               components.byId[components.allIds[0]]
             )
         )
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -98,7 +99,7 @@ export class ContainersEffects {
           return Observable.of(
             new Containers.DeployComponentError({
               id: action.payload.id,
-              errorDeployment: err.json().message,
+              errorDeployment: getErrorMessage(err),
             })
           );
         })
@@ -141,7 +142,7 @@ export class ContainersEffects {
               tables.serviceAssemblies.byId[tables.serviceAssemblies.allIds[0]]
             )
         )
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -159,7 +160,7 @@ export class ContainersEffects {
           return Observable.of(
             new Containers.DeployServiceAssemblyError({
               id: action.payload.id,
-              errorDeployment: err.json().message,
+              errorDeployment: getErrorMessage(err),
             })
           );
         })
@@ -198,7 +199,7 @@ export class ContainersEffects {
           sls =>
             new Containers.DeploySharedLibrarySuccess(sls.byId[sls.allIds[0]])
         )
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -216,7 +217,7 @@ export class ContainersEffects {
           return Observable.of(
             new Containers.DeploySharedLibraryError({
               id: action.payload.id,
-              errorDeployment: err.json().message,
+              errorDeployment: getErrorMessage(err),
             })
           );
         })

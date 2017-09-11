@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
@@ -23,9 +24,9 @@ import { Observable } from 'rxjs/Observable';
 
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
+import { getErrorMessage } from 'app/shared/helpers/shared.helper';
 import {
   ESharedLibraryState,
-  ISharedLibraryBackendSSE,
   SharedLibrariesService,
 } from 'app/shared/services/shared-libraries.service';
 import { SseActions } from 'app/shared/services/sse.service';
@@ -46,7 +47,7 @@ export class SharedLibrariesEffects {
     .ofType<SseActions.SlDeployed>(SseActions.SlDeployedType)
     .map(action => {
       const data = action.payload;
-      const sls = toJsTable<ISharedLibraryBackendSSE>(data.sharedLibraries);
+      const sls = toJsTable(data.sharedLibraries);
       return new SharedLibraries.Added(sls);
     });
 
@@ -63,7 +64,7 @@ export class SharedLibrariesEffects {
               data,
             })
         )
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -93,7 +94,7 @@ export class SharedLibrariesEffects {
           )
           // response will be handled by sse
           .mergeMap(_ => Observable.empty<Action>())
-          .catch(err => {
+          .catch((err: HttpErrorResponse) => {
             if (environment.debug) {
               console.group();
               console.warn(
@@ -106,7 +107,7 @@ export class SharedLibrariesEffects {
             return Observable.of(
               new SharedLibraries.ChangeStateError({
                 id: action.payload.id,
-                errorChangeState: err.json().message,
+                errorChangeState: getErrorMessage(err),
               })
             );
           })

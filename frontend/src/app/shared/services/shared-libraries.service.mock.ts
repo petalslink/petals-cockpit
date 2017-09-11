@@ -15,13 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 
 import * as helper from 'app/shared/helpers/mock.helper';
 import {
   ESharedLibraryState,
-  ISharedLibraryBackendDetails,
   SharedLibrariesServiceImpl,
   SharedLibraryState,
 } from 'app/shared/services/shared-libraries.service';
@@ -32,16 +31,14 @@ import { sharedLibrariesService } from 'mocks/shared-libraries-mock';
 
 @Injectable()
 export class SharedLibrariesServiceMock extends SharedLibrariesServiceImpl {
-  constructor(private sseService: SseService, http: Http) {
+  constructor(private sseService: SseService, http: HttpClient) {
     super(http);
   }
 
   getDetails(id: string) {
     const details = sharedLibrariesService.get(id).getDetails();
 
-    return helper
-      .responseBody(details)
-      .map(res => res.json() as ISharedLibraryBackendDetails);
+    return helper.responseBody(details);
   }
 
   putState(_workspaceId: string, id: string, state: SharedLibraryState) {

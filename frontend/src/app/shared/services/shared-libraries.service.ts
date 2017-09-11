@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
@@ -52,23 +52,29 @@ export abstract class SharedLibrariesService {
     workspaceId: string,
     id: string,
     state: SharedLibraryState
-  ): Observable<Response>;
+  ): Observable<{
+    id: string;
+    state: SharedLibraryState;
+  }>;
 }
 
 @Injectable()
 export class SharedLibrariesServiceImpl extends SharedLibrariesService {
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
     super();
   }
 
   getDetails(id: string) {
-    return this.http
-      .get(`${environment.urlBackend}/sharedlibraries/${id}`)
-      .map(res => res.json() as ISharedLibraryBackendDetails);
+    return this.http.get<ISharedLibraryBackendDetails>(
+      `${environment.urlBackend}/sharedlibraries/${id}`
+    );
   }
 
   putState(workspaceId: string, id: string, state: SharedLibraryState) {
-    return this.http.put(
+    return this.http.put<{
+      id: string;
+      state: SharedLibraryState;
+    }>(
       `${environment.urlBackend}/workspaces/${workspaceId}/sharedlibraries/${id}`,
       { state }
     );

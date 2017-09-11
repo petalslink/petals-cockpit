@@ -15,10 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-
-import { BusesServiceImpl, IBusImport } from './buses.service';
 
 import * as helper from 'app/shared/helpers/mock.helper';
 import { SseServiceMock } from 'app/shared/services/sse.service.mock';
@@ -28,12 +26,13 @@ import { environment } from 'environments/environment';
 import { IMPORT_HTTP_ERROR_IP } from 'mocks/backend-mock';
 import { busesService } from 'mocks/buses-mock';
 import { workspacesService } from 'mocks/workspaces-mock';
+import { BusesServiceImpl, IBusImport } from './buses.service';
 import { SseActions, SseService } from './sse.service';
 
 @Injectable()
 export class BusesServiceMock extends BusesServiceImpl {
   constructor(
-    http: Http,
+    http: HttpClient,
     private sseService: SseService,
     private userService: UsersService
   ) {
@@ -58,6 +57,7 @@ export class BusesServiceMock extends BusesServiceImpl {
     const detailsBus = {
       ...bus,
       id: newBus.id,
+      importError: '',
     };
 
     return helper.responseBody(detailsBus).do(_ => {

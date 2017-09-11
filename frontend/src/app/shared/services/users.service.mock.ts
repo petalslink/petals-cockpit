@@ -16,7 +16,6 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import * as helper from 'app/shared/helpers/mock.helper';
@@ -26,7 +25,6 @@ import { CORRECT_SETUP_TOKEN, GONE_SETUP_TOKEN } from 'mocks/backend-mock';
 import { BackendUser } from 'mocks/users-mock';
 import {
   ICurrentUserBackend,
-  IUserBackend,
   IUserLogin,
   IUserNew,
   IUserSetup,
@@ -56,9 +54,9 @@ export class UsersServiceMock extends UsersService {
       this.currentUser = u.getDetails();
     }
 
-    return (valid
-      ? helper.responseBody(this.currentUser)
-      : helper.response(401)).map(res => res.json() as ICurrentUserBackend);
+    return valid
+      ? helper.responseBody<ICurrentUserBackend>(this.currentUser)
+      : helper.response<ICurrentUserBackend>(401);
   }
 
   disconnectUser() {
@@ -69,9 +67,9 @@ export class UsersServiceMock extends UsersService {
   }
 
   getCurrentUserInformations() {
-    return (this.currentUser
-      ? helper.responseBody(this.currentUser)
-      : helper.response(401)).map(res => res.json() as ICurrentUserBackend);
+    return this.currentUser
+      ? helper.responseBody<ICurrentUserBackend>(this.currentUser)
+      : helper.response<ICurrentUserBackend>(401);
   }
 
   setupUser(value: IUserSetup) {
@@ -86,29 +84,32 @@ export class UsersServiceMock extends UsersService {
     return helper.errorBackend('Invalid token', 403);
   }
 
-  private responseAdmin(res: Observable<Response>) {
+  private responseAdmin<T>(res: Observable<T>) {
     return this.currentUser
       ? this.currentUser.isAdmin ? res : helper.response(403)
       : helper.response(401);
   }
 
   getAll() {
-    return this.responseAdmin(
-      helper.responseBody(
-        BackendUser.getAll().map(u => ({ id: u.id, name: u.name }))
-      )
-    ).map(res => res.json() as IUserBackend[]);
+    const usersIdAndName = BackendUser.getAll().map(u => ({
+      id: u.id,
+      name: u.name,
+    }));
+
+    return this.responseAdmin(helper.responseBody(usersIdAndName));
   }
 
   getOne(id: string) {
     const u = BackendUser.get(id);
+
     return this.responseAdmin(
       u ? helper.responseBody({ id: u.id, name: u.name }) : helper.response(404)
-    ).map(res => res.json() as IUserBackend);
+    );
   }
 
   add(user: IUserNew) {
     const added = BackendUser.create(user);
+
     return this.responseAdmin(
       added ? helper.response(204) : helper.response(409)
     );
@@ -116,6 +117,7 @@ export class UsersServiceMock extends UsersService {
 
   delete(id: string) {
     const deleted = BackendUser.delete(id);
+
     return this.responseAdmin(
       deleted ? helper.response(204) : helper.response(409)
     );
@@ -123,10 +125,12 @@ export class UsersServiceMock extends UsersService {
 
   modify(id: string, props: { name?: string; password?: string }) {
     const user = BackendUser.get(id);
+
     if (user) {
       user.name = props.name || user.name;
       user.password = props.password || user.password;
     }
+
     return this.responseAdmin(
       user ? helper.response(204) : helper.response(409)
     );
