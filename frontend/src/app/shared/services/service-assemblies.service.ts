@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
 
@@ -52,23 +52,26 @@ export interface IServiceAssemblyBackendDetails
 export abstract class ServiceAssembliesService {
   abstract getDetailsServiceAssembly(
     serviceAssemblyId: string
-  ): Observable<Response>;
+  ): Observable<IServiceAssemblyBackendDetails>;
 
   abstract putState(
     workspaceId: string,
     serviceAssemblyId: string,
     newState: ServiceAssemblyState
-  ): Observable<Response>;
+  ): Observable<{
+    id: string;
+    state: ServiceAssemblyState;
+  }>;
 }
 
 @Injectable()
 export class ServiceAssembliesServiceImpl extends ServiceAssembliesService {
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
     super();
   }
 
   getDetailsServiceAssembly(serviceAssemblyId: string) {
-    return this.http.get(
+    return this.http.get<IServiceAssemblyBackendDetails>(
       `${environment.urlBackend}/serviceassemblies/${serviceAssemblyId}`
     );
   }
@@ -78,7 +81,10 @@ export class ServiceAssembliesServiceImpl extends ServiceAssembliesService {
     serviceAssemblyId: string,
     newState: ServiceAssemblyState
   ) {
-    return this.http.put(
+    return this.http.put<{
+      id: string;
+      state: ServiceAssemblyState;
+    }>(
       `${environment.urlBackend}/workspaces/${workspaceId}/serviceassemblies/${serviceAssemblyId}`,
       { state: newState }
     );

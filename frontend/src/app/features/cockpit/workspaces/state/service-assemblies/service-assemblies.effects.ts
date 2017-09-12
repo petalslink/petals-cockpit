@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
@@ -26,12 +26,11 @@ import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
+import { getErrorMessage } from 'app/shared/helpers/shared.helper';
 import {
   EServiceAssemblyState,
-  IServiceAssemblyBackendSSE,
   ServiceAssembliesService,
 } from 'app/shared/services/service-assemblies.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { SseActions } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
@@ -50,10 +49,8 @@ export class ServiceAssembliesEffects {
     .ofType<SseActions.SaDeployed>(SseActions.SaDeployedType)
     .map(action => {
       const data = action.payload;
-      const serviceAssemblies = toJsTable<IServiceAssemblyBackendSSE>(
-        data.serviceAssemblies
-      );
-      const serviceUnits = toJsTable<IServiceUnitBackendSSE>(data.serviceUnits);
+      const serviceAssemblies = toJsTable(data.serviceAssemblies);
+      const serviceUnits = toJsTable(data.serviceUnits);
       return batchActions([
         new ServiceAssemblies.Added(serviceAssemblies),
         new ServiceUnits.Added(serviceUnits),
@@ -99,10 +96,10 @@ export class ServiceAssembliesEffects {
           res =>
             new ServiceAssemblies.FetchDetailsSuccess({
               id: action.payload.id,
-              data: res.json(),
+              data: res,
             })
         )
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -132,7 +129,7 @@ export class ServiceAssembliesEffects {
           )
           // response will be handled by sse
           .mergeMap(_ => Observable.empty<Action>())
-          .catch(err => {
+          .catch((err: HttpErrorResponse) => {
             if (environment.debug) {
               console.group();
               console.warn(
@@ -145,7 +142,7 @@ export class ServiceAssembliesEffects {
             return Observable.of(
               new ServiceAssemblies.ChangeStateError({
                 id: action.payload.id,
-                errorChangeState: err.json().message,
+                errorChangeState: getErrorMessage(err),
               })
             );
           })

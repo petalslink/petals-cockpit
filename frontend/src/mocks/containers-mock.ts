@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { tuple } from 'app/shared/helpers/shared.helper';
 import { ComponentState } from 'app/shared/services/components.service';
 import {
   IContainerBackendDetails,
@@ -123,7 +124,7 @@ export class Container {
     c2.registerServiceUnit(su2);
     this.serviceAssemblies.set(serviceAssembly.id, serviceAssembly);
 
-    return [serviceAssembly.toObj(), { ...su1.toObj(), ...su2.toObj() }];
+    return tuple([serviceAssembly.toObj(), { ...su1.toObj(), ...su2.toObj() }]);
   }
 
   removeServiceAssembly(id: string) {
@@ -149,7 +150,7 @@ export class Container {
     component.registerServiceUnit(serviceUnit);
     this.serviceAssemblies.set(serviceAssembly.id, serviceAssembly);
 
-    return [serviceAssembly, serviceUnit];
+    return tuple([serviceAssembly, serviceUnit]);
   }
 
   addSharedLibrary(name?: string, version?: string) {

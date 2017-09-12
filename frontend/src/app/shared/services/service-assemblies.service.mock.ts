@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 
 import * as helper from 'app/shared/helpers/mock.helper';
 import { environment } from 'environments/environment';
@@ -32,7 +32,7 @@ import {
 
 @Injectable()
 export class ServiceAssembliesServiceMock extends ServiceAssembliesServiceImpl {
-  constructor(private sseService: SseService, http: Http) {
+  constructor(private sseService: SseService, http: HttpClient) {
     super(http);
   }
 

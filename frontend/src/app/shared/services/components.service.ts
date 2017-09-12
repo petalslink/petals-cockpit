@@ -15,9 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
-import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
@@ -65,14 +64,19 @@ export interface IComponentBackendDetails
   extends IComponentBackendDetailsCommon {}
 
 export abstract class ComponentsService {
-  abstract getDetailsComponent(componentId: string): Observable<Response>;
+  abstract getDetailsComponent(
+    componentId: string
+  ): Observable<IComponentBackendDetails>;
 
   abstract putState(
     workspaceId: string,
     componentId: string,
     newState: ComponentState,
     parameters: { [key: string]: string }
-  ): Observable<Response>;
+  ): Observable<{
+    id: string;
+    state: ComponentState;
+  }>;
 
   abstract deploySu(
     workspaceId: string,
@@ -87,12 +91,14 @@ export abstract class ComponentsService {
 
 @Injectable()
 export class ComponentsServiceImpl extends ComponentsService {
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
     super();
   }
 
   getDetailsComponent(componentId: string) {
-    return this.http.get(`${environment.urlBackend}/components/${componentId}`);
+    return this.http.get<IComponentBackendDetails>(
+      `${environment.urlBackend}/components/${componentId}`
+    );
   }
 
   putState(
@@ -101,7 +107,10 @@ export class ComponentsServiceImpl extends ComponentsService {
     newState: ComponentState,
     parameters: { [key: string]: string }
   ) {
-    return this.http.put(
+    return this.http.put<{
+      id: string;
+      state: ComponentState;
+    }>(
       `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}`,
       { state: newState, parameters }
     );
@@ -118,18 +127,16 @@ export class ComponentsServiceImpl extends ComponentsService {
     formData.append('name', serviceUnitName);
 
     return this.http
-      .post(
+      .post<{
+        serviceAssemblies: { [id: string]: IServiceAssemblyBackendSSE };
+        serviceUnits: { [id: string]: IServiceUnitBackendSSE };
+      }>(
         `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}/serviceunits`,
         formData
       )
-      .map(res => {
-        const data = res.json();
-        return {
-          serviceAssemblies: toJsTable<IServiceAssemblyBackendSSE>(
-            data.serviceAssemblies
-          ),
-          serviceUnits: toJsTable<IServiceUnitBackendSSE>(data.serviceUnits),
-        };
-      });
+      .map(res => ({
+        serviceAssemblies: toJsTable(res.serviceAssemblies),
+        serviceUnits: toJsTable(res.serviceUnits),
+      }));
   }
 }

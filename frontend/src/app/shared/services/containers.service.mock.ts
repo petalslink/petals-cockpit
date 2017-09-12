@@ -15,19 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
 
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import * as helper from 'app/shared/helpers/mock.helper';
-import { IComponentBackendSSE } from 'app/shared/services/components.service';
-import {
-  EServiceAssemblyState,
-  IServiceAssemblyBackendSSE,
-} from 'app/shared/services/service-assemblies.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
-import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
+import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 import { SseActions, SseService } from 'app/shared/services/sse.service';
 import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import { environment } from 'environments/environment';
@@ -36,7 +29,7 @@ import { ContainersServiceImpl } from './containers.service';
 
 @Injectable()
 export class ContainersServiceMock extends ContainersServiceImpl {
-  constructor(http: Http, private sseService: SseService) {
+  constructor(http: HttpClient, private sseService: SseService) {
     super(http);
   }
 
@@ -47,9 +40,8 @@ export class ContainersServiceMock extends ContainersServiceImpl {
   }
 
   deployComponent(workspaceId: string, containerId: string, file: File) {
-    let o: Observable<Response>;
     if (file.name.includes('error')) {
-      o = helper.errorBackend(
+      return helper.errorBackend(
         '[Mock message] An error happened when trying to deploy the component',
         400
       );
@@ -71,16 +63,13 @@ export class ContainersServiceMock extends ContainersServiceImpl {
           ),
         environment.mock.sseDelay
       );
-      o = helper.responseBody(response);
+      return helper.responseBody(toJsTable(response.components));
     }
-
-    return o.map(res => toJsTable<IComponentBackendSSE>(res.json().components));
   }
 
   deployServiceAssembly(workspaceId: string, containerId: string, file: File) {
-    let o: Observable<Response>;
     if (file.name.includes('error')) {
-      o = helper.errorBackend(
+      return helper.errorBackend(
         '[Mock message] An error happened when trying to deploy the service-assembly',
         400
       );
@@ -102,24 +91,16 @@ export class ContainersServiceMock extends ContainersServiceImpl {
           ),
         environment.mock.sseDelay
       );
-      o = helper.responseBody(response);
+      return helper.responseBody({
+        serviceAssemblies: toJsTable(response.serviceAssemblies),
+        serviceUnits: toJsTable(response.serviceUnits),
+      });
     }
-
-    return o.map(res => {
-      const data = res.json();
-      return {
-        serviceAssemblies: toJsTable<IServiceAssemblyBackendSSE>(
-          data.serviceAssemblies
-        ),
-        serviceUnits: toJsTable<IServiceUnitBackendSSE>(data.serviceUnits),
-      };
-    });
   }
 
   deploySharedLibrary(workspaceId: string, containerId: string, file: File) {
-    let o: Observable<Response>;
     if (file.name.includes('error')) {
-      o = helper.errorBackend(
+      return helper.errorBackend(
         '[Mock message] An error happened when trying to deploy the shared library',
         400
       );
@@ -138,11 +119,7 @@ export class ContainersServiceMock extends ContainersServiceImpl {
           ),
         environment.mock.sseDelay
       );
-      o = helper.responseBody(response);
+      return helper.responseBody(toJsTable(response.sharedLibraries));
     }
-
-    return o.map(res =>
-      toJsTable<ISharedLibraryBackendSSE>(res.json().sharedLibraries)
-    );
   }
 }

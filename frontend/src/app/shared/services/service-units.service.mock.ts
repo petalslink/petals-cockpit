@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 
 import * as helper from 'app/shared/helpers/mock.helper';
 import { serviceUnitsService } from 'mocks/service-units-mock';
@@ -24,7 +24,7 @@ import { ServiceUnitsServiceImpl } from './service-units.service';
 
 @Injectable()
 export class ServiceUnitsServiceMock extends ServiceUnitsServiceImpl {
-  constructor(http: Http) {
+  constructor(http: HttpClient) {
     super(http);
   }
 

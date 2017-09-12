@@ -15,12 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
+import { getErrorMessage } from 'app/shared/helpers/shared.helper';
 import { IUserSetup, UsersService } from 'app/shared/services/users.service';
 
 @Component({
@@ -81,9 +83,8 @@ export class SetupComponent implements OnInit, OnDestroy {
           this.setupSucceeded = true;
           this.settingUp = false;
         })
-        .catch(err => {
-          this.setupFailed =
-            err.json().message || `${err.status} ${err.statusText}`;
+        .catch((err: HttpErrorResponse) => {
+          this.setupFailed = getErrorMessage(err);
           this.settingUp = false;
           return Observable.of();
         })

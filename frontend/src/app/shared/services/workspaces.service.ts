@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
+import { IUserBackend } from 'app/shared/services/users.service';
 import { environment } from './../../../environments/environment';
 
 export interface IWorkspaceBackendCommon {
@@ -40,66 +41,87 @@ export interface IWorkspaceBackendDetails
     IWorkspaceBackendDetailsCommon {}
 
 export abstract class WorkspacesService {
-  abstract fetchWorkspaces(): Observable<Response>;
+  abstract fetchWorkspaces(): Observable<{
+    workspaces: {
+      [id: string]: IWorkspaceBackend;
+    };
+    users: {
+      [id: string]: IUserBackend;
+    };
+  }>;
 
-  abstract postWorkspace(name: string): Observable<Response>;
+  abstract postWorkspace(name: string): Observable<IWorkspaceBackendDetails>;
 
-  abstract fetchWorkspace(id: string): Observable<Response>;
+  abstract fetchWorkspace(
+    id: string
+  ): Observable<{
+    workspace: IWorkspaceBackendDetails;
+    users: {
+      [id: string]: IUserBackend;
+    };
+  }>;
 
-  abstract deleteWorkspace(id: string): Observable<Response>;
+  abstract deleteWorkspace(id: string): Observable<void>;
 
-  abstract setDescription(
-    id: string,
-    description: string
-  ): Observable<Response>;
+  abstract setDescription(id: string, description: string): Observable<void>;
 
-  abstract addUser(workspaceId: string, userId: string): Observable<Response>;
+  abstract addUser(workspaceId: string, userId: string): Observable<void>;
 
-  abstract removeUser(
-    workspaceId: string,
-    userId: string
-  ): Observable<Response>;
+  abstract removeUser(workspaceId: string, userId: string): Observable<void>;
 }
 
 @Injectable()
 export class WorkspacesServiceImpl extends WorkspacesService {
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
     super();
   }
 
   fetchWorkspaces() {
-    return this.http.get(`${environment.urlBackend}/workspaces`);
+    return this.http.get<{
+      workspaces: {
+        [id: string]: IWorkspaceBackend;
+      };
+      users: {
+        [id: string]: IUserBackend;
+      };
+    }>(`${environment.urlBackend}/workspaces`);
   }
 
   postWorkspace(name: string) {
-    return this.http.post(`${environment.urlBackend}/workspaces`, {
+    return this.http.post<
+      IWorkspaceBackendDetails
+    >(`${environment.urlBackend}/workspaces`, {
       name: name,
     });
   }
 
   fetchWorkspace(id: string) {
-    return this.http.get(`${environment.urlBackend}/workspaces/${id}`);
+    return this.http.get<{
+      workspace: IWorkspaceBackendDetails;
+      users: {
+        [id: string]: IUserBackend;
+      };
+    }>(`${environment.urlBackend}/workspaces/${id}`);
   }
 
   deleteWorkspace(id: string) {
-    return this.http.delete(`${environment.urlBackend}/workspaces/${id}`);
+    return this.http.delete<void>(`${environment.urlBackend}/workspaces/${id}`);
   }
 
   setDescription(id: string, description: string) {
-    return this.http.put(`${environment.urlBackend}/workspaces/${id}`, {
+    return this.http.put<void>(`${environment.urlBackend}/workspaces/${id}`, {
       description,
     });
   }
 
   addUser(workspaceId: string, id: string) {
-    return this.http.post(
-      `${environment.urlBackend}/workspaces/${workspaceId}/users`,
-      { id }
-    );
+    return this.http.post<
+      void
+    >(`${environment.urlBackend}/workspaces/${workspaceId}/users`, { id });
   }
 
   removeUser(workspaceId: string, userId: string) {
-    return this.http.delete(
+    return this.http.delete<void>(
       `${environment.urlBackend}/workspaces/${workspaceId}/users/${userId}`
     );
   }

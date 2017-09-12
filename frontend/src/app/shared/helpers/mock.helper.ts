@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Response, ResponseOptions } from '@angular/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
@@ -24,24 +24,23 @@ import { environment } from './../../../environments/environment';
  * This simulates the behaviour of Angular's http module:
  * if the status code is not a 2XX, it will return a failing Observable
  */
-export function response(status: number): Observable<Response> {
-  return responseBody(null, status);
+export function response<T = undefined>(status: number): Observable<T> {
+  return responseBody<T>(undefined, status);
 }
 
 /**
  * This simulates the behaviour of Angular's http module:
  * if the status code is not a 2XX, it will return a failing Observable
  */
-export function responseBody(
-  body: string | Object | ArrayBuffer,
-  status = 200
-): Observable<Response> {
-  const res = new Response(new ResponseOptions({ status, body }));
-
+export function responseBody<T = undefined>(
+  body: T,
+  status = 200,
+  error?: { code: number; message: string }
+): Observable<T> {
   if (status >= 200 && status < 300) {
-    return Observable.of(res).delay(environment.mock.httpDelay);
+    return Observable.of(body).delay(environment.mock.httpDelay);
   } else {
-    return Observable.throw(res)
+    return Observable.throw(new HttpErrorResponse({ status, error }))
       .materialize()
       .delay(environment.mock.httpDelay)
       .dematerialize();
@@ -51,6 +50,9 @@ export function responseBody(
 /**
  * The backend answers errors like this
  */
-export function errorBackend(message: string, code: number) {
-  return responseBody({ code, message }, code);
+export function errorBackend<T = undefined>(
+  message: string,
+  code: number
+): Observable<T> {
+  return responseBody(undefined, code, { code, message });
 }

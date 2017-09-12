@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
 import { Router } from '@angular/router';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
@@ -24,10 +24,8 @@ import { NotificationsService } from 'angular2-notifications';
 import { Observable } from 'rxjs/Observable';
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
-import {
-  BusesService,
-  IBusInProgressBackend,
-} from 'app/shared/services/buses.service';
+import { getErrorMessage } from 'app/shared/helpers/shared.helper';
+import { BusesService } from 'app/shared/services/buses.service';
 import { SseActions } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
@@ -88,7 +86,6 @@ export class BusesInProgressEffects {
     .switchMap(([action, state]) =>
       this.busesService
         .postBus(state.workspaces.selectedWorkspaceId, action.payload)
-        .map(res => res.json() as IBusInProgressBackend)
         .do(bip => {
           // if we are still on the import page (bc if we change it is set
           // back to false and we are in a switchMap) and the import event
@@ -104,11 +101,10 @@ export class BusesInProgressEffects {
           }
         })
         .map(bip => new BusesInProgress.PostSuccess(bip))
-        .catch((res: Response) => {
-          const err = res.json();
+        .catch((err: HttpErrorResponse) => {
           return Observable.of(
             new BusesInProgress.PostError({
-              importBusError: `Error ${err.code}: ${err.message}`,
+              importBusError: getErrorMessage(err),
             })
           );
         })
@@ -124,7 +120,7 @@ export class BusesInProgressEffects {
       this.busesService
         .deleteBus(idWorkspace, action.payload.id)
         .mergeMap(_ => Observable.empty<Action>())
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(

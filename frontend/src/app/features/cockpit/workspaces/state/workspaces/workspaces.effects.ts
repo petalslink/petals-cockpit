@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
@@ -32,21 +32,8 @@ import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-li
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import {
-  IBusBackendSSE,
-  IBusInProgressBackend,
-} from 'app/shared/services/buses.service';
-import { IComponentBackendSSE } from 'app/shared/services/components.service';
-import { IContainerBackendSSE } from 'app/shared/services/containers.service';
-import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
-import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
 import { SseActions, SseService } from 'app/shared/services/sse.service';
-import { IUserBackend } from 'app/shared/services/users.service';
-import {
-  IWorkspaceBackend,
-  WorkspacesService,
-} from 'app/shared/services/workspaces.service';
+import { WorkspacesService } from 'app/shared/services/workspaces.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 import { Users } from 'app/shared/state/users.actions';
@@ -68,16 +55,13 @@ export class WorkspacesEffects {
     .switchMap(action =>
       this.workspacesService
         .fetchWorkspaces()
-        .map(res => {
-          const data = res.json();
-          return batchActions([
-            new Workspaces.FetchAllSuccess(
-              toJsTable<IWorkspaceBackend>(data.workspaces)
-            ),
-            new Users.Fetched(toJsTable<IUserBackend>(data.users)),
-          ]);
-        })
-        .catch(err => {
+        .map(res =>
+          batchActions([
+            new Workspaces.FetchAllSuccess(toJsTable(res.workspaces)),
+            new Users.Fetched(toJsTable(res.users)),
+          ])
+        )
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.debug(
@@ -102,8 +86,8 @@ export class WorkspacesEffects {
     .switchMap(action =>
       this.workspacesService
         .postWorkspace(action.payload.name)
-        .map(res => new Workspaces.CreateSuccess(res.json()))
-        .catch(err => {
+        .map(res => new Workspaces.CreateSuccess(res))
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.debug(
@@ -163,26 +147,14 @@ export class WorkspacesEffects {
         new Workspaces.Clean(),
         new Ui.OpenSidenav(),
         new Workspaces.FetchSuccess(data.workspace),
-        new Users.Fetched(toJsTable<IUserBackend>(data.users)),
-        new BusesInProgress.Fetched(
-          toJsTable<IBusInProgressBackend>(data.busesInProgress)
-        ),
-        new Buses.Fetched(toJsTable<IBusBackendSSE>(data.buses)),
-        new Containers.Fetched(
-          toJsTable<IContainerBackendSSE>(data.containers)
-        ),
-        new Components.Fetched(
-          toJsTable<IComponentBackendSSE>(data.components)
-        ),
-        new ServiceAssemblies.Fetched(
-          toJsTable<IServiceAssemblyBackendSSE>(data.serviceAssemblies)
-        ),
-        new ServiceUnits.Fetched(
-          toJsTable<IServiceUnitBackendSSE>(data.serviceUnits)
-        ),
-        new SharedLibraries.Fetched(
-          toJsTable<ISharedLibraryBackendSSE>(data.sharedLibraries)
-        ),
+        new Users.Fetched(toJsTable(data.users)),
+        new BusesInProgress.Fetched(toJsTable(data.busesInProgress)),
+        new Buses.Fetched(toJsTable(data.buses)),
+        new Containers.Fetched(toJsTable(data.containers)),
+        new Components.Fetched(toJsTable(data.components)),
+        new ServiceAssemblies.Fetched(toJsTable(data.serviceAssemblies)),
+        new ServiceUnits.Fetched(toJsTable(data.serviceUnits)),
+        new SharedLibraries.Fetched(toJsTable(data.sharedLibraries)),
       ]);
     });
 
@@ -192,17 +164,16 @@ export class WorkspacesEffects {
     .switchMap(action =>
       this.workspacesService
         .fetchWorkspace(action.payload.id)
-        .map(res => {
-          const data = res.json();
-          return batchActions([
+        .map(res =>
+          batchActions([
             new Workspaces.FetchDetailsSuccess({
               id: action.payload.id,
-              data: data.workspace,
+              data: res.workspace,
             }),
-            new Users.Fetched(toJsTable<IUserBackend>(data.users)),
-          ]);
-        })
-        .catch(err => {
+            new Users.Fetched(toJsTable(res.users)),
+          ])
+        )
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -225,7 +196,7 @@ export class WorkspacesEffects {
       this.workspacesService
         .setDescription(action.payload.id, action.payload.description)
         .map(_ => new Workspaces.SetDescriptionSuccess(action.payload))
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -248,7 +219,7 @@ export class WorkspacesEffects {
       this.workspacesService
         .deleteWorkspace(action.payload.id)
         .map(_ => new Workspaces.DeleteSuccess(action.payload))
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -272,7 +243,7 @@ export class WorkspacesEffects {
       this.workspacesService
         .addUser(workspaceId, action.payload.id)
         .map(_ => new Workspaces.AddUserSuccess(action.payload))
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -296,7 +267,7 @@ export class WorkspacesEffects {
       this.workspacesService
         .removeUser(workspaceId, action.payload.id)
         .map(_ => new Workspaces.DeleteUserSuccess(action.payload))
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(

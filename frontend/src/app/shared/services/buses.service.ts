@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
 
@@ -56,33 +56,41 @@ export interface IBusInProgressBackend extends IBusInProgressBackendCommon {}
 export interface IBusBackendDetails extends IBusBackendDetailsCommon {}
 
 export abstract class BusesService {
-  abstract postBus(idWorkspace: string, bus: IBusImport): Observable<Response>;
+  abstract postBus(
+    idWorkspace: string,
+    bus: IBusImport
+  ): Observable<IBusInProgressBackend>;
 
-  abstract deleteBus(idWorkspace: string, id: string): Observable<Response>;
+  abstract deleteBus(
+    idWorkspace: string,
+    id: string
+  ): Observable<{ id: string; reason: string }>;
 
-  abstract getDetailsBus(busId: string): Observable<Response>;
+  abstract getDetailsBus(busId: string): Observable<IBusBackendDetails>;
 }
 
 @Injectable()
 export class BusesServiceImpl extends BusesService {
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
     super();
   }
 
   postBus(idWorkspace: string, bus: IBusImport) {
-    return this.http.post(
+    return this.http.post<IBusInProgressBackend>(
       `${environment.urlBackend}/workspaces/${idWorkspace}/buses`,
       bus
     );
   }
 
   deleteBus(idWorkspace: string, id: string) {
-    return this.http.delete(
+    return this.http.delete<{ id: string; reason: string }>(
       `${environment.urlBackend}/workspaces/${idWorkspace}/buses/${id}`
     );
   }
 
   getDetailsBus(busId: string) {
-    return this.http.get(`${environment.urlBackend}/buses/${busId}`);
+    return this.http.get<IBusBackendDetails>(
+      `${environment.urlBackend}/buses/${busId}`
+    );
   }
 }

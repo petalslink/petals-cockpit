@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
@@ -47,73 +47,70 @@ export interface IUserSetup extends IUserNew {
 export abstract class UsersService {
   abstract connectUser(user: IUserLogin): Observable<ICurrentUserBackend>;
 
-  abstract disconnectUser(): Observable<Response>;
+  abstract disconnectUser(): Observable<void>;
 
   abstract getCurrentUserInformations(): Observable<ICurrentUserBackend>;
 
-  abstract setupUser(value: IUserSetup): Observable<Response>;
+  abstract setupUser(value: IUserSetup): Observable<void>;
 
   abstract getAll(): Observable<IUserBackend[]>;
 
   abstract getOne(id: string): Observable<IUserBackend>;
 
-  abstract add(user: IUserNew): Observable<Response>;
+  abstract add(user: IUserNew): Observable<void>;
 
-  abstract delete(id: string): Observable<Response>;
+  abstract delete(id: string): Observable<void>;
 
   abstract modify(
     id: string,
     props: { name?: string; password?: string }
-  ): Observable<Response>;
+  ): Observable<void>;
 }
 
 @Injectable()
 export class UsersServiceImpl extends UsersService {
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
     super();
   }
 
   connectUser(user: IUserLogin) {
-    return this.http
-      .post(`${environment.urlBackend}/user/session`, user)
-      .map(res => res.json() as ICurrentUserBackend);
+    return this.http.post<ICurrentUserBackend>(
+      `${environment.urlBackend}/user/session`,
+      user
+    );
   }
 
   disconnectUser() {
-    return this.http.delete(`${environment.urlBackend}/user/session`);
+    return this.http.delete<void>(`${environment.urlBackend}/user/session`);
   }
 
   getCurrentUserInformations() {
-    return this.http
-      .get(`${environment.urlBackend}/user/session`)
-      .map(res => res.json() as ICurrentUserBackend);
+    return this.http.get<ICurrentUserBackend>(
+      `${environment.urlBackend}/user/session`
+    );
   }
 
   setupUser(value: IUserSetup) {
-    return this.http.post(`${environment.urlBackend}/setup`, value);
+    return this.http.post<void>(`${environment.urlBackend}/setup`, value);
   }
 
   getAll() {
-    return this.http
-      .get(`${environment.urlBackend}/users`)
-      .map(res => res.json() as IUserBackend[]);
+    return this.http.get<IUserBackend[]>(`${environment.urlBackend}/users`);
   }
 
   getOne(id: string) {
-    return this.http
-      .get(`${environment.urlBackend}/users/${id}`)
-      .map(res => res.json() as IUserBackend);
+    return this.http.get<IUserBackend>(`${environment.urlBackend}/users/${id}`);
   }
 
   add(user: IUserNew) {
-    return this.http.post(`${environment.urlBackend}/users/`, user);
+    return this.http.post<void>(`${environment.urlBackend}/users/`, user);
   }
 
   delete(id: string) {
-    return this.http.delete(`${environment.urlBackend}/users/${id}`);
+    return this.http.delete<void>(`${environment.urlBackend}/users/${id}`);
   }
 
   modify(id: string, props: { name?: string; password?: string }) {
-    return this.http.put(`${environment.urlBackend}/users/${id}`, props);
+    return this.http.put<void>(`${environment.urlBackend}/users/${id}`, props);
   }
 }

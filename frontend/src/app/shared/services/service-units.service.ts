@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { environment } from './../../../environments/environment';
@@ -37,17 +37,19 @@ export interface IServiceUnitBackendDetails
   extends IServiceUnitBackendDetailsCommon {}
 
 export abstract class ServiceUnitsService {
-  abstract getDetailsServiceUnit(serviceUnitId: string): Observable<Response>;
+  abstract getDetailsServiceUnit(
+    serviceUnitId: string
+  ): Observable<IServiceUnitBackendDetails>;
 }
 
 @Injectable()
 export class ServiceUnitsServiceImpl extends ServiceUnitsService {
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
     super();
   }
 
   getDetailsServiceUnit(serviceUnitId: string) {
-    return this.http.get(
+    return this.http.get<IServiceUnitBackendDetails>(
       `${environment.urlBackend}/serviceunits/${serviceUnitId}`
     );
   }

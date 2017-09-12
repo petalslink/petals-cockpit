@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
@@ -26,10 +26,10 @@ import { environment } from 'environments/environment';
 
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
+import { getErrorMessage } from 'app/shared/helpers/shared.helper';
 import {
   ComponentsService,
   EComponentState,
-  IComponentBackendSSE,
 } from 'app/shared/services/components.service';
 import { SseActions } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/state/store.interface';
@@ -48,7 +48,7 @@ export class ComponentsEffects {
     .ofType<SseActions.ComponentDeployed>(SseActions.ComponentDeployedType)
     .map(action => {
       const data = action.payload;
-      const components = toJsTable<IComponentBackendSSE>(data.components);
+      const components = toJsTable(data.components);
       return new Components.Added(components);
     });
 
@@ -85,10 +85,10 @@ export class ComponentsEffects {
           res =>
             new Components.FetchDetailsSuccess({
               id: action.payload.id,
-              data: res.json(),
+              data: res,
             })
         )
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -119,7 +119,7 @@ export class ComponentsEffects {
           action.payload.parameters
         )
         .mergeMap(_ => Observable.empty<Action>())
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -132,7 +132,7 @@ export class ComponentsEffects {
           return Observable.of(
             new Components.ChangeStateError({
               id: action.payload.id,
-              errorChangeState: err.json().message,
+              errorChangeState: getErrorMessage(err),
             })
           );
         })
@@ -164,7 +164,7 @@ export class ComponentsEffects {
               correlationId: action.payload.correlationId,
             })
         )
-        .catch(err => {
+        .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
@@ -182,7 +182,7 @@ export class ComponentsEffects {
           return Observable.of(
             new Components.DeployServiceUnitError({
               id: action.payload.id,
-              errorDeployment: err.json().message,
+              errorDeployment: getErrorMessage(err),
             })
           );
         })
