@@ -16,6 +16,7 @@
  */
 
 import { async } from '@angular/core/testing';
+import { cold } from 'jasmine-marbles';
 import { Observable } from 'rxjs/Observable';
 
 import { deletable } from 'app/shared/operators/deletable.operator';
@@ -24,130 +25,136 @@ describe(`Deletable operator`, () => {
   it(
     `should wrap the initial value and set it as not deleted`,
     async(() => {
-      const obs$ = Observable.of({ a: 1, b: 2 }).let(deletable);
+      const obs$ = cold('a|', { a: 'a value' });
 
-      obs$
-        .do(obs =>
-          expect(obs).toEqual({
+      expect(obs$.let(deletable)).toBeObservable(
+        cold('a|', {
+          a: {
             isDeleted: false,
-            value: { a: 1, b: 2 },
-          })
-        )
-        .subscribe();
+            value: 'a value',
+          },
+        })
+      );
     })
   );
 
   it(
-    `
-    should set isDeleted to true if the value is null or undefined
+    `should return undefined as long as the value is null/undefined from the beginning`,
+    async(() => {
+      const obs$ = cold('abcd|', {
+        a: null,
+        b: undefined,
+        c: null,
+        d: 'a value',
+      });
+
+      expect(obs$.let(deletable)).toBeObservable(
+        cold('a--b|', {
+          a: undefined,
+          b: {
+            isDeleted: false,
+            value: 'a value',
+          },
+        })
+      );
+    })
+  );
+
+  it(
+    `should set isDeleted to true if the value is null
     and return the latest non null/undefined value available`,
     async(() => {
-      const obs$ = Observable.from([{ a: 1, b: 2 }, null]).let(deletable);
+      const obs$ = cold('ab|', { a: 'a value', b: null });
 
-      obs$
-        .last()
-        .do(obs =>
-          expect(obs).toEqual({
+      expect(obs$.let(deletable)).toBeObservable(
+        cold('ab|', {
+          a: {
+            isDeleted: false,
+            value: 'a value',
+          },
+          b: {
             isDeleted: true,
-            value: { a: 1, b: 2 },
-          })
-        )
-        .subscribe();
+            value: 'a value',
+          },
+        })
+      );
+    })
+  );
+
+  it(
+    `should set isDeleted to true if the value is undefined
+    and return the latest non null/undefined value available`,
+    async(() => {
+      const obs$ = cold('ab|', { a: 'a value', b: undefined });
+
+      expect(obs$.let(deletable)).toBeObservable(
+        cold('ab|', {
+          a: {
+            isDeleted: false,
+            value: 'a value',
+          },
+          b: {
+            isDeleted: true,
+            value: 'a value',
+          },
+        })
+      );
     })
   );
 
   it(
     `should continue to send non null/undefined values even after one value deleted value`,
     async(() => {
-      const obs$ = Observable.from([{ a: 1, b: 2 }, null, { c: 3, d: 4 }]).let(
-        deletable
-      );
+      const obs$ = cold('abc|', { a: 'a value', b: null, c: 'another value' });
 
-      obs$
-        .last()
-        .do(obs =>
-          expect(obs).toEqual({
+      expect(obs$.let(deletable)).toBeObservable(
+        cold('abc|', {
+          a: {
             isDeleted: false,
-            value: { c: 3, d: 4 },
-          })
-        )
-        .subscribe();
+            value: 'a value',
+          },
+          b: {
+            isDeleted: true,
+            value: 'a value',
+          },
+          c: {
+            isDeleted: false,
+            value: 'another value',
+          },
+        })
+      );
     })
   );
 
-  describe(`
-    shouldn't emit values again if it's the same than previous value,
-    except is isDeleted changes`, () => {
-    it(
-      `for primitive types`,
-      async(() => {
-        const obs$ = Observable.from([1, 2, 3, 3, 4, true, true, false]).let(
-          deletable
-        );
+  it(
+    `should compare values by reference`,
+    async(() => {
+      const obj1 = { a: 1 };
+      const obj2 = { b: 2 };
+      const obs$ = Observable.from([obj1, obj1, obj2, obj2]).let(deletable);
 
-        let cpt = 1;
-        obs$
-          .do(obs => {
-            switch (cpt) {
-              case 1:
-                expect(obs).toEqual({ isDeleted: false, value: 1 });
-                break;
+      let cpt = 1;
+      obs$
+        .do(obs => {
+          switch (cpt) {
+            case 1:
+              expect(obs.isDeleted).toBe(false);
+              expect(obs.value).toBe(obj1);
+              break;
 
-              case 2:
-                expect(obs).toEqual({ isDeleted: false, value: 2 });
-                break;
+            case 2:
+              expect(obs.isDeleted).toBe(false);
+              expect(obs.value).toBe(obj2);
+              break;
 
-              case 3:
-                expect(obs).toEqual({ isDeleted: false, value: 3 });
-                break;
+            case 3:
+              expect('this').toBe('never called');
+              break;
+          }
 
-              case 4:
-                expect(obs).toEqual({ isDeleted: false, value: 4 });
-                break;
-
-              case 5:
-                expect(obs).toEqual({ isDeleted: false, value: true });
-                break;
-
-              case 6:
-                expect(obs).toEqual({ isDeleted: false, value: false });
-                break;
-            }
-
-            cpt++;
-          })
-          .subscribe();
-      })
-    );
-
-    it(
-      `for objects (by reference)`,
-      async(() => {
-        const obj1 = { a: 1 };
-        const obj2 = { b: 2 };
-        const obs$ = Observable.from([obj1, obj1, obj2, obj2]).let(deletable);
-
-        let cpt = 1;
-        obs$
-          .do(obs => {
-            switch (cpt) {
-              case 1:
-                expect(obs).toEqual({ isDeleted: false, value: obj1 });
-                break;
-
-              case 2:
-                expect(obs).toEqual({ isDeleted: false, value: obj2 });
-                break;
-
-              case 3:
-                expect('this').toBe('never called');
-                break;
-            }
-
-            cpt++;
-          })
-          .subscribe();
-      })
-    );
-  });
+          cpt++;
+        })
+        .subscribe();
+    })
+  );
 });
