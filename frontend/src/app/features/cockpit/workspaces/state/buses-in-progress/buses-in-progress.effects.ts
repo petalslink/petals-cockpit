@@ -69,13 +69,6 @@ export class BusesInProgressEffects {
       const bip = state.busesInProgress.byId[id];
       this.notifications.info(`${bip.ip}:${bip.port}`, reason);
 
-      if (state.busesInProgress.selectedBusInProgressId === id) {
-        this.router.navigate([
-          '/workspaces',
-          state.workspaces.selectedWorkspaceId,
-        ]);
-      }
-
       return new BusesInProgress.Removed(bip);
     });
 

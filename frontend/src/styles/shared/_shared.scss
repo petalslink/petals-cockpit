@@ -91,6 +91,9 @@ div > .mat-dialog-container {
       padding: 10px;
     }
   }
+  ngx-hover-opacity > div.content {
+    @extend .padding-x0;
+  }
 }
 
 .cursor-pointer:hover {

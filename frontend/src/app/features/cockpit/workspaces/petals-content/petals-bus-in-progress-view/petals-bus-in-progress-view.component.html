@@ -22,8 +22,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">Workspace Bus Import</h1>
   </md-toolbar>
 
+  <div class="deleted-message" *ngIf="busInProgress?.isDeleted">
+    This import has been removed
+  </div>
+
   <div fxFlexFill fxLayout="column" class="content content-max-width">
     <div class="central-content">
+    <ngx-hover-opacity [isHoverVisible]="busInProgress?.isDeleted">
       <form formnovalidate [formGroup]="busImportForm" (ngSubmit)="onSubmit(busImportForm) && busImportForm.reset()">
         <md-card fxLayout="column">
 
@@ -94,7 +99,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
           <md-card-content
             fxLayout="column"
-            *ngIf="(busInProgress && busInProgress.importError) || (newImportData && newImportData.error) as error"
+            *ngIf="(busInProgress && busInProgress.value.importError) || (newImportData && newImportData.error) as error"
             class="error">
             <div fxLayout="row" fxLayoutAlign="start center">
               <md-icon color="warn">warning</md-icon>
@@ -118,8 +123,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               color="warn"
               type="button"
               *ngIf="busInProgress"
-              (click)="discard(busInProgress)"
-              [disabled]="busInProgress.isRemoving"
+              (click)="discard(busInProgress.value)"
+              [disabled]="busInProgress.value.isRemoving"
               class="margin-right-x1 btn-discard-form text-upper">
               <ng-template [ngIf]="busInProgress.importError" [ngIfElse]="cancel">
                 <md-icon>remove_circle</md-icon><span class="discard-name">Discard</span>
@@ -145,6 +150,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         </md-card>
       </form>
+    </ngx-hover-opacity>
     </div>
   </div>
 </div>

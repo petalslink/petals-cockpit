@@ -28,17 +28,18 @@ import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs/Subject';
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
-import { IBusImport } from 'app/shared/services/buses.service';
-import { Ui } from 'app/shared/state/ui.actions';
-import { IStore } from '../../../../../shared/state/store.interface';
-import { CustomValidators } from './../../../../../shared/helpers/custom-validators';
+import { IBusInProgressRow } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
+import { getCurrentBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.selectors';
+import { CustomValidators } from 'app/shared/helpers/custom-validators';
 import {
   disableAllFormFields,
   formErrorStateMatcher,
   getFormErrors,
-} from './../../../../../shared/helpers/form.helper';
-import { IBusInProgressRow } from './../../state/buses-in-progress/buses-in-progress.interface';
-import { getCurrentBusInProgress } from './../../state/buses-in-progress/buses-in-progress.selectors';
+} from 'app/shared/helpers/form.helper';
+import { deletable, IDeletable } from 'app/shared/operators/deletable.operator';
+import { IBusImport } from 'app/shared/services/buses.service';
+import { IStore } from 'app/shared/state/store.interface';
+import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
   selector: 'app-petals-bus-in-progress-view',
@@ -51,7 +52,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   newImportData: { isImporting: boolean; error: string };
 
   // needed because it is so much easier to use that than an async object in the html
-  busInProgress: IBusInProgressRow;
+  busInProgress: IDeletable<IBusInProgressRow>;
 
   busImportForm: FormGroup;
 
@@ -90,17 +91,18 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
 
     this.store$
       .select(getCurrentBusInProgress)
+      .let(deletable)
       .takeUntil(this.onDestroy$)
       .do(busInProgress => {
         this.busInProgress = busInProgress;
 
         if (this.busInProgress) {
           this.busImportForm.patchValue({
-            ip: busInProgress.ip,
-            port: busInProgress.port,
-            username: busInProgress.username,
-            password: busInProgress.password,
-            passphrase: busInProgress.passphrase,
+            ip: busInProgress.value.ip,
+            port: busInProgress.value.port,
+            username: busInProgress.value.username,
+            password: busInProgress.value.password,
+            passphrase: busInProgress.value.passphrase,
           });
 
           disableAllFormFields(this.busImportForm);
@@ -157,7 +159,7 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   isStillImporting() {
     return (
       (this.newImportData && this.newImportData.isImporting) ||
-      (this.busInProgress && !this.busInProgress.importError)
+      (this.busInProgress && !this.busInProgress.value.importError)
     );
   }
 }
