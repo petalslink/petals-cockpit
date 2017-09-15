@@ -43,6 +43,12 @@ export namespace BusesInProgress {
     constructor(public readonly payload: { id: string }) {}
   }
 
+  export const ResetImportType = '[Buses In Progress] Reset Import';
+  export class ResetImport implements Action {
+    readonly type = ResetImportType;
+    constructor() {}
+  }
+
   export const PostType = '[Buses In Progress] Post';
   export class Post implements Action {
     readonly type = PostType;

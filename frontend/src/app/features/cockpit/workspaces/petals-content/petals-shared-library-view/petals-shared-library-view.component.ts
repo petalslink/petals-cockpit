@@ -15,11 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import {
   getCurrentSharedLibrary,
   ISharedLibraryWithComponents,
@@ -32,7 +31,7 @@ import { Ui } from 'app/shared/state/ui.actions';
   templateUrl: './petals-shared-library-view.component.html',
   styleUrls: ['./petals-shared-library-view.component.scss'],
 })
-export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
+export class PetalsSharedLibraryViewComponent implements OnInit {
   sharedLibrary$: Observable<ISharedLibraryWithComponents>;
   workspaceId$: Observable<string>;
 
@@ -51,9 +50,5 @@ export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
     this.workspaceId$ = this.store$.select(
       state => state.workspaces.selectedWorkspaceId
     );
-  }
-
-  ngOnDestroy() {
-    this.store$.dispatch(new SharedLibraries.SetCurrent({ id: '' }));
   }
 }

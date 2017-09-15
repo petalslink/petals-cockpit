@@ -29,7 +29,6 @@ import { ServiceAssembliesEffects } from 'app/features/cockpit/workspaces/state/
 import { ServiceUnitsEffects } from 'app/features/cockpit/workspaces/state/service-units/service-units.effects';
 import { SharedLibrariesEffects } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.effects';
 import { WorkspacesEffects } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.effects';
-import { WorkspaceResolver } from 'app/features/cockpit/workspaces/workspace-resolver';
 import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
 import {
   BusesService,
@@ -47,7 +46,6 @@ import {
 } from 'app/shared/services/containers.service';
 import { ContainersServiceMock } from 'app/shared/services/containers.service.mock';
 import { GuardLoginService } from 'app/shared/services/guard-login.service';
-import { ResourceByIdResolver } from 'app/shared/services/guard-resource-by-id.resolver';
 import {
   ServiceAssembliesService,
   ServiceAssembliesServiceImpl,
@@ -83,8 +81,6 @@ import './rxjs-operators';
 
 export const providers = [
   GuardLoginService,
-  WorkspaceResolver,
-  ResourceByIdResolver,
   {
     provide: SseService,
     useClass: environment.mock ? SseServiceMock : SseServiceImpl,

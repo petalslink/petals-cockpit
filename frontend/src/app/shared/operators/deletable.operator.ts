@@ -25,19 +25,25 @@ export interface IDeletable<T> {
 export function deletable<T>(obs: Observable<T>): Observable<IDeletable<T>> {
   return obs
     .scan((acc: IDeletable<T>, curr: T) => {
-      if (acc !== null && (curr === null || curr === undefined)) {
-        return {
-          isDeleted: true,
-          value: acc.value,
-        };
+      if (curr === null || curr === undefined) {
+        if (acc === undefined) {
+          return undefined;
+        } else {
+          return {
+            isDeleted: true,
+            value: acc.value,
+          };
+        }
       } else {
         return {
           isDeleted: false,
           value: curr,
         };
       }
-    }, null)
+    }, undefined)
     .distinctUntilChanged(
-      (p, n) => p.isDeleted === n.isDeleted && p.value === n.value
+      (p, n) =>
+        p === n ||
+        (p && n && p.isDeleted === n.isDeleted && p.value === n.value)
     );
 }

@@ -37,7 +37,7 @@ export const getSelectedContainer = createSelector(
 export const getCurrentContainerBus = createSelector(
   getSelectedContainer,
   (state: IStore) => state.buses.byId,
-  (container, buses) => buses[container.busId]
+  (container, buses) => (container ? buses[container.busId] : undefined)
 );
 
 export const getCurrentContainer = createSelector(

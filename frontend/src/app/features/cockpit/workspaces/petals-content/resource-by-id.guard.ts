@@ -16,10 +16,16 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Resolve, Router } from '@angular/router';
+import {
+  ActivatedRouteSnapshot,
+  CanActivateChild,
+  Router,
+  RouterStateSnapshot,
+} from '@angular/router';
 import { Action, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
+import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import { getCurrentBus } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
@@ -34,17 +40,32 @@ import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
 
 @Injectable()
-export class ResourceByIdResolver implements Resolve<any> {
+export class ResourceByIdGuard implements CanActivateChild {
+  private previousDestroyAction: Action;
+
   constructor(private router: Router, private store$: Store<IStore>) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<void> | void {
+  canActivateChild(
+    route: ActivatedRouteSnapshot,
+    rstate: RouterStateSnapshot
+  ): Observable<boolean> | boolean {
+    // we are only interested by leafs!
+    // TODO if only we could define the if/else below on something more specific,
+    // such as the component type, it would be better...
+    if (route.firstChild) {
+      return true;
+    }
+
     let id: string;
     let resourceState: (state: IStore) => JsTable<object>;
-    let resourceInitActions: (state: IStore) => Action[];
+    let initActions: (state: IStore) => Action[];
+
+    const destroyAction = this.previousDestroyAction;
+    this.previousDestroyAction = undefined;
 
     if ((id = route.params['busId'])) {
       resourceState = state => state.buses;
-      resourceInitActions = state => [
+      initActions = state => [
         new Buses.SetCurrent({ id }),
         new Buses.FetchDetails({ id }),
         ...getCurrentBus({
@@ -55,9 +76,10 @@ export class ResourceByIdResolver implements Resolve<any> {
           },
         }).containers.map(c => new Containers.FetchDetails(c)),
       ];
+      this.previousDestroyAction = new Buses.SetCurrent({ id: '' });
     } else if ((id = route.params['containerId'])) {
       resourceState = state => state.containers;
-      resourceInitActions = state => [
+      initActions = state => [
         new Containers.SetCurrent({ id }),
         new Containers.FetchDetails({ id }),
         ...getCurrentContainer({
@@ -68,56 +90,80 @@ export class ResourceByIdResolver implements Resolve<any> {
           },
         }).siblings.map(c => new Containers.FetchDetails(c)),
       ];
+      this.previousDestroyAction = new Containers.SetCurrent({ id: '' });
     } else if ((id = route.params['serviceAssemblyId'])) {
       resourceState = state => state.serviceAssemblies;
-      resourceInitActions = state => [
+      initActions = state => [
         new ServiceAssemblies.SetCurrent({ id }),
         new ServiceAssemblies.FetchDetails({ id }),
       ];
+      this.previousDestroyAction = new ServiceAssemblies.SetCurrent({ id: '' });
     } else if ((id = route.params['sharedLibraryId'])) {
       resourceState = state => state.sharedLibraries;
-      resourceInitActions = state => [
+      initActions = state => [
         new SharedLibraries.SetCurrent({ id }),
         new SharedLibraries.FetchDetails({ id }),
       ];
+      this.previousDestroyAction = new SharedLibraries.SetCurrent({ id: '' });
     } else if ((id = route.params['componentId'])) {
       resourceState = state => state.components;
-      resourceInitActions = state => [
+      initActions = state => [
         new Components.SetCurrent({ id }),
         new Components.FetchDetails({ id }),
       ];
+      this.previousDestroyAction = new Components.SetCurrent({ id: '' });
     } else if ((id = route.params['serviceUnitId'])) {
       resourceState = state => state.serviceUnits;
-      resourceInitActions = state => [
+      initActions = state => [
         new ServiceUnits.SetCurrent({ id }),
         new ServiceUnits.FetchDetails({ id }),
       ];
+      this.previousDestroyAction = new ServiceUnits.SetCurrent({ id: '' });
     } else if ((id = route.params['busInProgressId'])) {
       resourceState = state => state.busesInProgress;
-      resourceInitActions = state => [];
+      initActions = state => [new BusesInProgress.SetCurrent({ id })];
+      this.previousDestroyAction = new BusesInProgress.SetCurrent({ id: '' });
     } else {
-      if (environment.debug) {
-        console.error(
-          `Error in ResourceByIdResolver: You're trying to use it on a wrong URL`
-        );
+      if (destroyAction) {
+        this.store$.dispatch(destroyAction);
       }
 
-      return null;
+      // bus-in-progress without an id is also valid in this context...
+      if (!rstate.url.endsWith('buses-in-progress')) {
+        const msg =
+          'Impossible, the resolver is setup on the wrong url or something...';
+        if (environment.strictCoherence) {
+          throw new Error(msg);
+        } else if (environment.debug) {
+          console.error(msg);
+        }
+      }
+
+      return true;
     }
 
     return this.store$.first().map(state => {
       if (!resourceState(state).byId[id]) {
+        if (destroyAction) {
+          this.store$.dispatch(destroyAction);
+        }
+
         this.router.navigate([
           '/workspaces',
           state.workspaces.selectedWorkspaceId,
           'not-found',
         ]);
-        return null;
+
+        return false;
       }
 
-      this.store$.dispatch(batchActions(resourceInitActions(state)));
+      const actions = initActions(state);
 
-      return null;
+      this.store$.dispatch(
+        batchActions(destroyAction ? [destroyAction, ...actions] : actions)
+      );
+
+      return true;
     });
   }
 }

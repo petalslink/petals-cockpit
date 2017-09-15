@@ -15,11 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import {
   getCurrentContainer,
   IContainerWithSiblings,
@@ -32,7 +31,7 @@ import { Ui } from 'app/shared/state/ui.actions';
   templateUrl: './petals-container-view.component.html',
   styleUrls: ['./petals-container-view.component.scss'],
 })
-export class PetalsContainerViewComponent implements OnInit, OnDestroy {
+export class PetalsContainerViewComponent implements OnInit {
   workspaceId$: Observable<string>;
   container$: Observable<IContainerWithSiblings>;
 
@@ -51,9 +50,5 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
     );
 
     this.container$ = this.store$.select(getCurrentContainer);
-  }
-
-  ngOnDestroy() {
-    this.store$.dispatch(new Containers.SetCurrent({ id: '' }));
   }
 }
