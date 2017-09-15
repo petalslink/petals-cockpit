@@ -36,6 +36,7 @@ import {
   formErrorStateMatcher,
   getFormErrors,
 } from 'app/shared/helpers/form.helper';
+import { assert } from 'app/shared/helpers/shared.helper';
 import { deletable, IDeletable } from 'app/shared/operators/deletable.operator';
 import { IBusImport } from 'app/shared/services/buses.service';
 import { IStore } from 'app/shared/state/store.interface';
@@ -49,10 +50,10 @@ import { Ui } from 'app/shared/state/ui.actions';
 export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  newImportData: { isImporting: boolean; error: string };
+  private newImportData: { isImporting: boolean; error: string };
 
   // needed because it is so much easier to use that than an async object in the html
-  busInProgress: IDeletable<IBusInProgressRow>;
+  private busInProgress: IDeletable<IBusInProgressRow>;
 
   busImportForm: FormGroup;
 
@@ -144,22 +145,63 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   }
 
   onSubmit({ value }: { value: IBusImport; valid: boolean }) {
+    assert(this.isNewBus());
     this.store$.dispatch(new BusesInProgress.Post(value));
   }
 
-  discard(busInProgress: IBusInProgressRow) {
-    this.store$.dispatch(new BusesInProgress.Delete(busInProgress));
+  discardSelectedBus() {
+    assert(this.isSelectedBus());
+    this.store$.dispatch(new BusesInProgress.Delete(this.busInProgress.value));
   }
 
   reset() {
+    assert(this.isNewBus());
     this.busImportForm.reset();
     this.store$.dispatch(new BusesInProgress.ResetImport());
   }
 
   isStillImporting() {
-    return (
-      (this.newImportData && this.newImportData.isImporting) ||
-      (this.busInProgress && !this.busInProgress.value.importError)
-    );
+    if (this.isSelectedBus()) {
+      return !this.busInProgress.value.importError;
+    } else if (this.isNewBus()) {
+      return this.newImportData.isImporting;
+    } else {
+      assert(false, 'impossible');
+      return false;
+    }
+  }
+
+  isSelectedBus() {
+    return !!this.busInProgress;
+  }
+
+  isNewBus() {
+    return !!this.newImportData;
+  }
+
+  newBusData() {
+    assert(this.isNewBus());
+    return this.newImportData;
+  }
+
+  selectedBus() {
+    assert(this.isSelectedBus());
+    return this.busInProgress.value;
+  }
+
+  isSelectedBusDeleted() {
+    assert(this.isSelectedBus());
+    return this.busInProgress.isDeleted;
+  }
+
+  getError() {
+    if (this.isSelectedBus()) {
+      return this.busInProgress.value.importError;
+    } else if (this.isNewBus()) {
+      return this.newImportData.error;
+    } else {
+      assert(false, 'impossible');
+      return undefined;
+    }
   }
 }

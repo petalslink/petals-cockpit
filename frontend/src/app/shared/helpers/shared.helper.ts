@@ -20,8 +20,21 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentState } from 'app/shared/services/components.service';
 import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 import { ESharedLibraryState } from 'app/shared/services/shared-libraries.service';
+import { environment } from 'environments/environment';
 
 const matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
+
+export function assert(
+  condition: boolean | (() => boolean),
+  message = 'Assertion error'
+): void {
+  if (
+    environment.strictCoherence &&
+    !(typeof condition === 'function' ? condition() : condition)
+  ) {
+    throw new Error(message);
+  }
+}
 
 export function escapeStringRegexp(str: string) {
   return str.replace(matchOperatorsRe, '\\$&');
