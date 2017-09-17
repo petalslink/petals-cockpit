@@ -54,7 +54,7 @@ describe('WorkspacesListComponent', () => {
       isAdmin: true,
     };
     component.workspaces = {
-      ...workspacesTableFactory() as IWorkspacesCommon,
+      ...(workspacesTableFactory() as IWorkspacesCommon),
       list: [],
     };
     fixture.detectChanges();
@@ -91,7 +91,7 @@ describe('WorkspacesListComponent', () => {
 
   it('should show the workspaces', () => {
     component.workspaces = {
-      ...workspacesTableFactory() as IWorkspacesCommon,
+      ...(workspacesTableFactory() as IWorkspacesCommon),
       list: [
         {
           id: '0',
@@ -153,7 +153,7 @@ describe('WorkspacesListComponent', () => {
 
   it('should fetch clicked workspace', () => {
     component.workspaces = {
-      ...workspacesTableFactory() as IWorkspacesCommon,
+      ...(workspacesTableFactory() as IWorkspacesCommon),
       list: [
         {
           id: '1',

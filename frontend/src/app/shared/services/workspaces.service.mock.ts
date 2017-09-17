@@ -59,7 +59,8 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
 
     return (ws
       ? helper.responseBody(ws.getDetails())
-      : helper.response(404)).delay(environment.mock.httpDelay);
+      : helper.response(404)
+    ).delay(environment.mock.httpDelay);
   }
 
   setDescription(id: string, description: string) {
