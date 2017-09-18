@@ -27,7 +27,7 @@
 
 .led {
   &.green {
-    @include led(#ABFF00, #304701, #89FF00);
+    @include led(#ABFF00, #304701, #89ff00);
   }
 
   &.red {
