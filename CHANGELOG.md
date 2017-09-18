@@ -1,3 +1,31 @@
+<a name="0.12.0"></a>
+# [0.12.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.11.0...v0.12.0) (2017-09-18)
+
+
+### Bug Fixes
+
+* **backend:** we shouldn't be able to deploy the same component twice ([4675b2b](https://gitlab.com/linagora/petals-cockpit/commit/4675b2b)), closes [#386](https://gitlab.com/linagora/petals-cockpit/issues/386)
+* **frontend:** 404 image broken (because of absolute path) ([c5225c8](https://gitlab.com/linagora/petals-cockpit/commit/c5225c8)), closes [#382](https://gitlab.com/linagora/petals-cockpit/issues/382)
+* **frontend:** reset deploy (COMP/SA/SL) when changing from a container to another ([a363e70](https://gitlab.com/linagora/petals-cockpit/commit/a363e70))
+* **frontend:** reset deploy SU when changing from a component to another ([ee08569](https://gitlab.com/linagora/petals-cockpit/commit/ee08569)), closes [#380](https://gitlab.com/linagora/petals-cockpit/issues/380)
+
+
+### Features
+
+* **frontend:** display an hover with opacity when a component is deleted instead of redirecting somewhere else ([c9029bb](https://gitlab.com/linagora/petals-cockpit/commit/c9029bb))
+* **frontend:** keep the redux devstore extension on even in prod ([c976efb](https://gitlab.com/linagora/petals-cockpit/commit/c976efb))
+* **frontend:** order component install parameter alphabetically ([bda1742](https://gitlab.com/linagora/petals-cockpit/commit/bda1742)), closes [#378](https://gitlab.com/linagora/petals-cockpit/issues/378)
+* **frontend:** proper deletion message for bus in progresses ([fb1a542](https://gitlab.com/linagora/petals-cockpit/commit/fb1a542)), closes [#251](https://gitlab.com/linagora/petals-cockpit/issues/251)
+* **frontend:** reset upload component's input on upload success ([30ba42c](https://gitlab.com/linagora/petals-cockpit/commit/30ba42c)), closes [#381](https://gitlab.com/linagora/petals-cockpit/issues/381)
+* **frontend:** unfold element parents in tree when selected ([81b4fd5](https://gitlab.com/linagora/petals-cockpit/commit/81b4fd5)), closes [#384](https://gitlab.com/linagora/petals-cockpit/issues/384)
+
+
+### Performance Improvements
+
+* **frontend:** add trackBy on multiple ngFor ([943059c](https://gitlab.com/linagora/petals-cockpit/commit/943059c))
+
+
+
 <a name="0.11.0"></a>
 # [0.11.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.10.1...v0.11.0) (2017-07-17)
 
