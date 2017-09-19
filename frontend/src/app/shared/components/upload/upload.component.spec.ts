@@ -119,7 +119,7 @@ describe(`UploadComponent`, () => {
       expect(!!DOM.deployBtn).toBe(false);
 
       // choose the file
-      uploadComponent.fileChange({ target: { files } });
+      uploadComponent.fileChange(<any>{ target: { files } });
       hostFixture.detectChanges();
       flush();
 
@@ -144,7 +144,7 @@ describe(`UploadComponent`, () => {
 
       const files = [{ name: 'some-file.zip' }];
 
-      uploadComponent.fileChange({ target: { files } });
+      uploadComponent.fileChange(<any>{ target: { files } });
       hostFixture.detectChanges();
       flush();
 

@@ -21,14 +21,15 @@ import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import {
+  IWorkspace,
+  IWorkspaces,
   IWorkspacesCommon,
   workspacesTableFactory,
 } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { SharedModule } from 'app/shared/shared.module';
+import { ICurrentUser } from 'app/shared/state/users.interface';
 import { click, elementText } from 'testing';
 import { WorkspacesListComponent } from './workspaces-list.component';
-
-import 'rxjs/add/observable/timer';
 
 describe('WorkspacesListComponent', () => {
   let component: TestHostComponent;
@@ -190,14 +191,14 @@ describe('WorkspacesListComponent', () => {
   `,
 })
 class TestHostComponent {
-  user;
-  workspaces;
-  created;
-  fetched;
-  create(name) {
+  user: ICurrentUser;
+  workspaces: IWorkspaces;
+  created: string;
+  fetched: IWorkspace;
+  create(name: string) {
     this.created = name;
   }
-  fetch(workspace) {
+  fetch(workspace: IWorkspace) {
     this.fetched = workspace;
   }
 }

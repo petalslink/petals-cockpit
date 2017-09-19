@@ -24,17 +24,17 @@ import {
 import { waitTimeout } from '../common';
 
 export class UploadComponentPage {
-  public readonly title;
-  public readonly fileInput;
-  public readonly fileName;
-  public readonly chooseFileButton;
-  public readonly chooseFileName;
-  public readonly changeFileName;
-  public readonly deployButton;
-  public readonly fileNameInput;
-  public readonly fileNamePlaceholder;
-  public readonly errorTitle;
-  public readonly errorMsg;
+  public readonly title: ElementFinder;
+  public readonly fileInput: ElementFinder;
+  public readonly fileName: ElementFinder;
+  public readonly chooseFileButton: ElementFinder;
+  public readonly chooseFileName: ElementFinder;
+  public readonly changeFileName: ElementFinder;
+  public readonly deployButton: ElementFinder;
+  public readonly fileNameInput: ElementFinder;
+  public readonly fileNamePlaceholder: ElementFinder;
+  public readonly errorTitle: ElementFinder;
+  public readonly errorMsg: ElementFinder;
 
   static waitAndGet(selectorClass: string) {
     const component = $(`app-upload.${selectorClass}`);

@@ -1,6 +1,7 @@
+import { IEnvironment } from './environment.interface';
 import { environment as prod } from './environment.prod';
 
-export const environment = {
+export const environment: IEnvironment = {
   ...prod,
   hashLocationStrategy: true,
   debug: true,

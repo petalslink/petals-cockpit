@@ -43,7 +43,7 @@ export class UploadComponent implements OnInit {
   onDeploy: EventEmitter<{ file: File; name: string }> = new EventEmitter();
 
   @ViewChild('formUpload') formUpload: NgForm;
-  deployModel;
+  deployModel: string;
 
   fileToDeploy: File;
   changeFileName: string;
@@ -52,7 +52,7 @@ export class UploadComponent implements OnInit {
 
   ngOnInit() {}
 
-  fileChange(event) {
+  fileChange(event: { target: { files: FileList } }) {
     const fileList: FileList = event.target.files;
 
     if (fileList.length > 0) {
