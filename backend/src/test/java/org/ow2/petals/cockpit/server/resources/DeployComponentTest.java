@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.junit.Before;
@@ -42,8 +43,6 @@ import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentOverview;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
-import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule.ComponentType;
-import org.ow2.petals.jmx.api.mock.junit.configuration.component.InstallationConfigurationServiceClientMock;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -85,15 +84,13 @@ public class DeployComponentTest extends AbstractBasicResourceTest {
         resource.petals.registerContainer(container);
         resource.petals.registerArtifact(sl, container);
 
-        resource.jmx.addComponentInstallerClient(COMP_NAME, ComponentType.BINDING,
-                new InstallationConfigurationServiceClientMock(), null);
 
         setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
 
         failDeployment = false;
     }
 
-    private MultiPart getComponentMultiPart() throws Exception {
+    private FormDataMultiPart getComponentMultiPart() throws Exception {
         return getMultiPart("component-jbi.xml", "fakeComponent");
     }
 
@@ -191,7 +188,42 @@ public class DeployComponentTest extends AbstractBasicResourceTest {
             assertThat(resource.httpServer.wasCalled()).isTrue();
             assertThat(resource.httpServer.wasClosed()).isTrue();
 
-            assertThat(requestBy(COMPONENTS.NAME, "petals-component")).hasNumberOfRows(1);
+            assertThat(requestBy(COMPONENTS.NAME, COMP_NAME)).hasNumberOfRows(1);
+            assertThat(container.getComponents()).hasSize(1);
+            Component comp = container.getComponents().iterator().next();
+            assertThat(comp.getName()).isEqualTo(postC.component.name);
+            assertThat(comp.getState()).isEqualTo(ArtifactState.State.LOADED);
+            assertThat(comp.getType()).isEqualTo("BC");
+
+            resource.target("/components/" + postC.component.id).request().get(ComponentOverview.class);
+        }
+    }
+
+    @Test
+    public void deployComponentChangeName() throws Exception {
+        try (EventInput eventInput = resource.sse(1)) {
+            expectWorkspaceContent(eventInput);
+
+            String componentName = "test-compo-name";
+
+            MultiPart mpe = getComponentMultiPart().field("component-name", componentName);
+
+            WorkspaceContent post = resource.target("/workspaces/1/containers/" + getId(container) + "/components")
+                    .request().post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
+
+            ComponentFull postC = assertComponentContent(post, container, componentName);
+
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("COMPONENT_DEPLOYED");
+                WorkspaceContent data = e.readData(WorkspaceContent.class);
+
+                assertComponentContent(a, data, post);
+            });
+
+            assertThat(resource.httpServer.wasCalled()).isTrue();
+            assertThat(resource.httpServer.wasClosed()).isTrue();
+
+            assertThat(requestBy(COMPONENTS.NAME, componentName)).hasNumberOfRows(1);
             assertThat(container.getComponents()).hasSize(1);
             Component comp = container.getComponents().iterator().next();
             assertThat(comp.getName()).isEqualTo(postC.component.name);
