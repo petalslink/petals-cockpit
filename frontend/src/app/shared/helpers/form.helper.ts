@@ -22,7 +22,30 @@ import {
   NgForm,
 } from '@angular/forms';
 
-export const validationMessages = {
+interface IValidationMessages {
+  ip?: {
+    required: string;
+    isIp: string;
+  };
+  port?: {
+    required: string;
+    isPort: string;
+  };
+  username?: {
+    required: string;
+  };
+  name?: {
+    required: string;
+  };
+  password?: {
+    required: string;
+  };
+  passphrase?: {
+    required: string;
+  };
+}
+
+const validationMessages: IValidationMessages = {
   ip: {
     required: 'Required!',
     isIp: 'Invalid IP format',
@@ -47,19 +70,24 @@ export const validationMessages = {
 
 export function getFormErrors(
   form: FormGroup,
-  formFields: { [key: string]: string }
+  formFields: { [key in keyof IValidationMessages]: string }
 ): any {
-  const formFieldsTmp = { ...formFields };
+  const formFieldsCopy = { ...formFields };
 
-  for (const field in formFieldsTmp) {
-    if (formFieldsTmp.hasOwnProperty(field)) {
-      formFieldsTmp[field] = '';
+  for (const field in formFieldsCopy) {
+    if (formFieldsCopy.hasOwnProperty(field)) {
+      const validationMessageField = <keyof IValidationMessages>field;
+
+      formFieldsCopy[validationMessageField] = '';
+
       const control = form.get(field);
       if (control && control.dirty && !control.valid) {
-        const messages = validationMessages[field];
+        const messages = validationMessages[validationMessageField];
+
         for (const key in control.errors) {
           if (control.errors.hasOwnProperty(key)) {
-            formFieldsTmp[field] += messages[key] + ' ';
+            formFieldsCopy[validationMessageField] +=
+              (messages as any)[key] + ' ';
             break;
           }
         }
@@ -67,7 +95,7 @@ export function getFormErrors(
     }
   }
 
-  return formFieldsTmp;
+  return formFieldsCopy;
 }
 
 export function enableAllFormFields(form: FormGroup) {

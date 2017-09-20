@@ -27,7 +27,7 @@ import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { EffectsModule } from '@ngrx/effects';
 import { Store, StoreModule } from '@ngrx/store';
-import { v4 as uuid } from 'uuid';
+import * as uuid from 'uuid';
 
 import { PetalsComponentOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-operations/petals-component-operations.component';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';

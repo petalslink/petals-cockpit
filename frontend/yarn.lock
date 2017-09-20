@@ -223,6 +223,10 @@
   version "0.0.27"
   resolved "https://registry.yarnpkg.com/@types/marked/-/marked-0.0.27.tgz#c71445465f2280ee79edc83e2c3bdcd8edf53554"
 
+"@types/node@*":
+  version "8.0.28"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.28.tgz#86206716f8d9251cf41692e384264cbd7058ad60"
+
 "@types/node@8.0.27":
   version "8.0.27"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.27.tgz#13fbe7e92afeecebb843d7cea6c15b521e0000e1"
@@ -242,6 +246,12 @@
 "@types/swiper@^3.4.4":
   version "3.4.4"
   resolved "https://registry.yarnpkg.com/@types/swiper/-/swiper-3.4.4.tgz#70ea3215ff336dcb6043596419e0a6c73b5567ea"
+
+"@types/uuid@3.4.2":
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-3.4.2.tgz#b8cde3c32c273d3fc658b96f810e8ff091e1b723"
+  dependencies:
+    "@types/node" "*"
 
 "@types/vis@4.17.4":
   version "4.17.4"

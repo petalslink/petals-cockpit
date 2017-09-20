@@ -73,7 +73,7 @@ export class WorkspacesListComponent implements OnInit {
     this.fetch.emit(workspace);
   }
 
-  onSubmit({ value }) {
+  onSubmit({ value }: { value: { name: string } }) {
     this.create.emit(value.name);
     this.newWksForm.reset();
   }

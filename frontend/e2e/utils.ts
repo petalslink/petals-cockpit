@@ -86,7 +86,7 @@ export function waitAndClick(el: ElementFinder) {
   el.click();
 }
 
-export function clearInput(input: ElementFinder) {
+export function clearInput(input: ElementFinder): any {
   return input.getAttribute('value').then(v => {
     if (v === '') {
       return;

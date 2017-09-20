@@ -24,8 +24,8 @@ import {
   SimpleChanges,
 } from '@angular/core';
 
-declare const jdenticon;
-declare const md5;
+declare const jdenticon: () => void;
+declare const md5: (text: string) => string;
 
 @Component({
   selector: 'app-generate-icon',
@@ -35,7 +35,7 @@ declare const md5;
 })
 export class GenerateIconComponent implements AfterViewInit, OnChanges {
   @Input() size: number;
-  @Input() text: number;
+  @Input() text: string;
 
   public hashMd5: string;
 

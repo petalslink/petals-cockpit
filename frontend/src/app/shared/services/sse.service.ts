@@ -196,7 +196,7 @@ export namespace SseActions {
 
 export abstract class SseService {
   abstract watchWorkspaceRealTime(workspaceId: string): Observable<Action>;
-  abstract stopWatchingWorkspace();
+  abstract stopWatchingWorkspace(): void;
 }
 
 @Injectable()

@@ -102,7 +102,7 @@ export class PetalsCockpitPage {
         browser.ignoreSynchronization = false;
         return browser.wait(EC.invisibilityOf(simpleNotification), 20000);
       })
-      .catch(_ => {
+      .catch(() => {
         browser.ignoreSynchronization = false;
       });
   }
