@@ -59,6 +59,8 @@ import org.ow2.petals.jmx.api.api.exception.MissingServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableMap;
+
 import javaslang.Tuple;
 import javaslang.Tuple2;
 
@@ -198,10 +200,13 @@ public class PetalsAdmin {
 
             InstallationConfigurationComponentClient configuration = installer.getInstallationConfigurationClient();
 
-            assert configuration != null;
-
-            return configuration.getConfigurationMBeanAttributes().entrySet().stream()
-                    .collect(Collectors.toMap(e -> e.getKey().getName(), e -> Objects.toString(e.getValue())));
+            if (configuration != null) {
+                return configuration.getConfigurationMBeanAttributes().entrySet().stream()
+                        .collect(Collectors.toMap(e -> e.getKey().getName(), e -> Objects.toString(e.getValue())));
+            } else {
+                // it can be null by design if the components does not expose an extension mbean
+                return ImmutableMap.of();
+            }
         } catch (InstallerComponentDoesNotExistException | ConnectionErrorException | InstallerComponentErrorException
                 | ConfigurationComponentDoesNotExistException | ConfigurationComponentErrorException
                 | InstallationServiceErrorException | InstallationServiceDoesNotExistException e) {
