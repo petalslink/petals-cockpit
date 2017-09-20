@@ -70,6 +70,8 @@ public class ComponentParametersTest extends AbstractBasicResourceTest {
         resource.petals.registerArtifact(component1, container);
         resource.petals.registerArtifact(component2, container);
 
+        setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
+
         resource.jmx.addComponentInstallerClient(component1.getName(),
                 org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule.ComponentType.ENGINE,
                 new InstallationConfigurationServiceClientMock(new Config(InstallerConfig.class)), null);
@@ -77,8 +79,6 @@ public class ComponentParametersTest extends AbstractBasicResourceTest {
         resource.jmx.addComponentClient(component2.getName(),
                 org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule.ComponentType.ENGINE, null,
                 new RuntimeConfigurationServiceClientMock(new Config(RuntimeConfig.class)), null, null);
-
-        setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
     }
 
     @Test

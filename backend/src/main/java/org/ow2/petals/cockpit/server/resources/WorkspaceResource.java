@@ -25,6 +25,10 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
@@ -293,7 +297,8 @@ public class WorkspaceResource {
     @Produces(MediaType.APPLICATION_JSON)
     public WorkspaceContent deployComponent(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
-            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition)
+            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
+            @FormDataParam("component-name") String componentName)
             throws IOException, JBIDescriptorException {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -303,7 +308,20 @@ public class WorkspaceResource {
                 : fileDisposition.getFileName();
 
         try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
-            Jbi descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptorFromArchive(sa.getFile());
+            Jbi descriptor;
+            try (FileSystem fs = FileSystems.newFileSystem(sa.getFile().toPath(), null)) {
+                java.nio.file.Path jbiPath = fs.getPath(JBIDescriptorBuilder.JBI_DESCRIPTOR_RESOURCE_IN_ARCHIVE);
+                try (InputStream jbiIn = Files.newInputStream(jbiPath)) {
+                    descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptor(jbiIn);
+                }
+                if (componentName != null && !componentName.trim().isEmpty()) {
+                    descriptor.getComponent().getIdentification().setName(componentName);
+                    Files.delete(jbiPath);
+                    try(OutputStream jbiOut = Files.newOutputStream(jbiPath)) {
+                        JBIDescriptorBuilder.getInstance().writeXMLJBIdescriptor(descriptor, jbiOut);
+                    }
+                }
+            }
 
             return workspace.deployComponent(descriptor.getComponent().getIdentification().getName(),
                     ComponentMin.Type.from(descriptor.getComponent().getType()), sa.getArtifactExternalUrl(),

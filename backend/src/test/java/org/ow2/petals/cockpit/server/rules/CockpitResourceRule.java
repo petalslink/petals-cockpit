@@ -59,6 +59,7 @@ import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
 import org.ow2.petals.cockpit.server.services.WorkspacesService;
 import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
 import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule;
+import org.ow2.petals.jmx.api.mock.junit.configuration.component.InstallationConfigurationServiceClientMock;
 import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
 import org.zapodot.junit.db.plugin.LiquibaseInitializer;
@@ -177,6 +178,13 @@ public class CockpitResourceRule implements TestRule {
         @Override
         public void componentAdded(Component component, ComponentsRecord compDb) {
             setWorkspaceId(component, compDb.getId());
+            // The JXM client is only used by components, to retrieve their parameters
+            // TODO it would be good to remove client on component undeploy...
+            jmx.addComponentInstallerClient(component.getName(),
+                    Component.ComponentType.BC.toString().equals(component.getType())
+                            ? PetalsJmxApiJunitRule.ComponentType.BINDING
+                            : PetalsJmxApiJunitRule.ComponentType.ENGINE,
+                    new InstallationConfigurationServiceClientMock(), null);
         }
 
         @Override
