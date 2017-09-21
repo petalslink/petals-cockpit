@@ -22,12 +22,14 @@ In order to create an executable product, simply build the frontend, the backend
 
 - Build the frontend
 ```
-$ cd frontend && yarn run prod && cd ..
+$ cd frontend && yarn run build:product && cd ..
 ```
 - Build Petals Cockpit (it will also build the backend)
 ```
-$ mvn -s ci/settings.xml clean package
+$ mvn -s ci/settings.xml clean verify antrun:run@build-product-dist
 ```
+The final distribution directory will be in `cockpit/target/dist`.
+
 
 ### Running
 
