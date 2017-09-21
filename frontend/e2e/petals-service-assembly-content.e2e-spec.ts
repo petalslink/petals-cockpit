@@ -56,6 +56,10 @@ describe(`Petals service-assembly content`, () => {
   it(`should stop/start/stop/unload a service-assembly`, () => {
     const ops = workspace.openServiceAssembly('SA 0').openOperations();
 
+    ops
+      .getInfoLifecycleMessage()
+      .expectToBe('info', `Changing the state of an SA will affect its SUs.`);
+
     waitAndClick(ops.stopButton);
     expect(ops.state.getText()).toEqual('Stopped');
 

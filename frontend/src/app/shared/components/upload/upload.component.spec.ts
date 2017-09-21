@@ -65,7 +65,10 @@ describe(`UploadComponent`, () => {
     },
     get errorText() {
       return getInnerTextIfNotNull(
-        getElementBySelector<HTMLSpanElement>(hostFixture, '.error .message')
+        getElementBySelector<HTMLSpanElement>(
+          hostFixture,
+          '.msg-content .msg-details'
+        )
       );
     },
   };

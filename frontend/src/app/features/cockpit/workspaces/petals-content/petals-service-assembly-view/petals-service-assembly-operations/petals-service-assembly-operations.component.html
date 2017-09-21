@@ -26,12 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <div fxLayout="column">
           <md-card-subtitle>State: <b><span class="service-assembly-state">{{ serviceAssembly.state }}</span></b></md-card-subtitle>
 
-          <md-divider></md-divider>
-
-          <md-card-subtitle fxLayout="row" fxLayoutAlign="start center" class="margin-top-x1">
-            <md-icon class="margin-right-x1" color="primary">info</md-icon>
-            <span class="color-primary" fxFlex>Changing the state of an SA will affect its SUs.</span>
-          </md-card-subtitle>
+          <app-message class="info-lifecycle-sa" type="info" msg="Changing the state of an SA will affect its SUs."></app-message>
         </div>
 
         <md-card-content fxLayoutWrap fxLayout="row" *ngIf="serviceAssembly.state">
@@ -50,10 +45,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </span>
         </md-card-content>
 
-        <md-card-content fxLayout="column" *ngIf="serviceAssembly.errorChangeState" class="error">
-          <div class="bold margin-bottom-x1">An error occurred:</div>
-          <span class="italic">{{ serviceAssembly.errorChangeState }}</span>
-        </md-card-content>
+        <app-message class="error-change-state" type="error" [msg]="serviceAssembly.errorChangeState"></app-message>
+
       </md-card>
 
     </div>

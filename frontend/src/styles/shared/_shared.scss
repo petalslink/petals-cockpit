@@ -455,25 +455,3 @@ app-buses-in-progress > .nav-list-imports-in-progress > .item-list {
     color: #fff;
   }
 }
-
-// all types of messages
-@mixin message($bg, $color) {
-  padding: 12px;
-  overflow-wrap: break-word;
-  display: inline-block;
-  width: 100%;
-  background-color: $bg;
-  color: $color;
-}
-
-.error {
-  @include message (rgba(255, 0, 0, 0.2), mat-color($mat-red, 500, 1));
-}
-
-.info {
-  @include message (rgba(206, 227, 255, 0.4), #4c83ef);
-}
-
-.warning {
-  @include message (rgba(255, 234, 206, 0.4), orange);
-}

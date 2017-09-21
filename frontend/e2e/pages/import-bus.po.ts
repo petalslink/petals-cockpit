@@ -19,6 +19,7 @@ import { $, browser, ExpectedConditions as EC } from 'protractor';
 
 import { waitTimeout } from '../common';
 import { urlToMatch } from '../utils';
+import { MessageComponentPage } from './message-component.po';
 
 export abstract class BusInProgressFields {
   public static readonly component = $(`app-petals-bus-in-progress-view`);
@@ -49,8 +50,6 @@ export abstract class BusInProgressFields {
   public readonly cancelName = this.discardButton.$(`span.cancel-name`);
   public readonly importName = this.importButton.$(`span.import-name`);
   public readonly clearName = this.clearButton.$(`span.clear-name`);
-
-  public readonly error = this.component.$(`.error-details`);
 }
 
 export class ImportBusPage extends BusInProgressFields {
@@ -65,6 +64,20 @@ export class ImportBusPage extends BusInProgressFields {
 
   private constructor() {
     super();
+  }
+
+  getInfoImportDetailsMessage() {
+    return MessageComponentPage.waitAndGet(
+      this.component,
+      `info-import-details`
+    );
+  }
+
+  getErrorImportDetailsMessage() {
+    return MessageComponentPage.waitAndGet(
+      this.component,
+      `error-import-details`
+    );
   }
 }
 

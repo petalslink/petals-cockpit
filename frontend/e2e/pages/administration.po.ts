@@ -25,6 +25,7 @@ import {
 import { waitTimeout } from '../common';
 import { urlToMatch, waitAndClick } from '../utils';
 import { AdminAddEditUserPage } from './admin-add-edit-user.po';
+import { MessageComponentPage } from './message-component.po';
 
 export class AdminPage {
   public static readonly component = $(`app-administration`);
@@ -45,6 +46,17 @@ export class AdminPage {
   }
 
   private constructor() {}
+
+  getInfoUserManagementMessage() {
+    return MessageComponentPage.waitAndGet(
+      this.component,
+      `info-user-management`
+    );
+  }
+
+  getNotAdminMessage() {
+    return MessageComponentPage.waitAndGet(this.component, `warning-not-admin`);
+  }
 
   openAddUser() {
     return this.openAddEdit(this.panelAddUser.$('.exp-pnl-add-user'));

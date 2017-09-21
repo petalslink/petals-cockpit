@@ -42,10 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </div>
           </md-card-content>
 
-          <md-card-subtitle fxLayout="row" fxLayoutAlign="start center">
-            <md-icon color="primary">info</md-icon>
-            <span class="color-primary">As an administrator, you can <b>ADD</b>, <b>EDIT</b>, and <b>DELETE</b> any user.</span>
-          </md-card-subtitle>
+          <app-message class="info-user-management" type="info" msg="As an administrator, you can ADD, EDIT, and DELETE any user."></app-message>
         </md-card>
 
         <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px" class="user-management-panels">
@@ -59,9 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </div>
               </md-expansion-panel-header>
 
-              <app-add-edit-user #addEditUser
-                (onSubmit)="onAdd($event); el.close()"
-                (onCancel)="el.close()">
+              <app-add-edit-user #addEditUser (onSubmit)="onAdd($event); el.close()" (onCancel)="el.close()">
               </app-add-edit-user>
 
             </md-expansion-panel>
@@ -69,7 +64,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
           <div fxFlex [ngClass.gt-md]="'card-auto-size'" class="pnl-list-users margin-top-x1">
             <md-accordion displayMode="flat" [multi]="false">
-              <md-expansion-panel #el [hideToggle]="false" fxLayout="column" *ngFor="let user of users; trackBy:trackByUser" [class]="'exp-pnl-user-'+user.id" (closed)="addEditUser.reset()">
+              <md-expansion-panel #el [hideToggle]="false" fxLayout="column" *ngFor="let user of users; trackBy:trackByUser" [class]="'exp-pnl-user-'+user.id"
+                (closed)="addEditUser.reset()">
 
                 <md-expansion-panel-header class="mat-body" fxLayout="row">
                   <mat-panel-title fxLayout="row" fxLayoutAlign="star center">
@@ -98,16 +94,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
     <ng-template #notAdmin>
       <div class="central-content">
-        <div fxLayout="column">
-          <md-card fxFlex [ngClass.gt-md]="'card-auto-size'" class="warning-not-admin margin-top-x1">
-            <md-card-title fxLayout="row">
-              <span fxFlex class="text-upper">Warning</span>
-              <md-icon color="warn">warning</md-icon>
-            </md-card-title>
-            <md-card-subtitle fxLayout="row" fxLayoutAlign="start center">
-              <md-icon class="margin-right-x1" color="primary">info</md-icon>
-              <span class="color-primary" fxFlex>You are not an administrator.</span>
-            </md-card-subtitle>
+        <div fxLayout="column" fxFlex>
+          <md-card fxLayout="column">
+            <app-message class="warning-not-admin" type="warning" msg="You are not an administrator."></app-message>
           </md-card>
         </div>
       </div>

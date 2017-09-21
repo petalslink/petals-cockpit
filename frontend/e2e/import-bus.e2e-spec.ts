@@ -15,14 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { $, $$, by } from 'protractor';
+import { $$, by } from 'protractor';
 
-import { IMPORT_HTTP_ERROR_IP } from '../src/mocks/backend-mock';
+import {
+  errorBackendLongText,
+  errorBackendTroncateTxt,
+  IMPORT_HTTP_ERROR_IP_LONG_TEXT,
+} from '../src/mocks/backend-mock';
 
 import { page } from './common';
 import { NotFoundPage } from './pages/not-found';
 import { WorkspacePage } from './pages/workspace.po';
-import { expectFocused } from './utils';
+import { expectFocused, waitAndClick } from './utils';
 
 describe(`Import Bus`, () => {
   it(`should open the 404 page if the bus in progress doesn't exists`, () => {
@@ -94,27 +98,31 @@ describe(`Import Bus`, () => {
     // only 2 buses in progress
     expect(workspace.busesInProgress.count()).toEqual(2);
 
-    importBus.ip.sendKeys(IMPORT_HTTP_ERROR_IP);
+    importBus
+      .getInfoImportDetailsMessage()
+      .expectToBe(
+        'info',
+        `After completing all the required fields, click IMPORT.`
+      );
+
+    importBus.ip.sendKeys(IMPORT_HTTP_ERROR_IP_LONG_TEXT);
     importBus.port.sendKeys(`7700`);
     importBus.username.sendKeys(`admin`);
     importBus.password.sendKeys(`password`);
     importBus.passphrase.sendKeys(`passphrase`);
 
+    const error = importBus.getErrorImportDetailsMessage();
+
+    error.expectHidden();
+
     // try to import a new one
     importBus.importButton.click();
 
-    // the first one should fail
-    expect(
-      $(`app-petals-bus-in-progress-view .error-details`).getText()
-    ).toEqual('Error backend');
+    error.expectToBe('error', errorBackendTroncateTxt);
+    error.openAndCheckDialog(errorBackendLongText);
 
     // clear the form and the error
-    importBus.clearButton.click();
-
-    // check if the error for import bus is not displayed
-    expect(
-      $(`app-petals-bus-in-progress-view .error-details`).isPresent()
-    ).toBe(false);
+    waitAndClick(importBus.clearButton);
 
     // still 2 buses in progress
     expect(workspace.busesInProgress.count()).toEqual(2);
@@ -132,11 +140,15 @@ describe(`Import Bus`, () => {
     importBus.password.sendKeys(`password`);
     importBus.passphrase.sendKeys(`passphrase`);
 
+    const error = importBus.getErrorImportDetailsMessage();
+
+    error.expectHidden();
+
     // try to import
     importBus.importButton.click();
 
-    // but cannot connect to the bus
-    expect(importBus.error.getText()).toEqual(`Can't connect to hostname:7700`);
+    error.expectToBe('error', `Can't connect to hostname:7700`);
+
     expect(workspace.busesInProgress.count()).toEqual(3);
     expect(
       workspace.busesInProgress

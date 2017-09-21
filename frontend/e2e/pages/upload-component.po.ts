@@ -22,6 +22,7 @@ import {
   ExpectedConditions as EC,
 } from 'protractor';
 import { waitTimeout } from '../common';
+import { MessageComponentPage } from './message-component.po';
 
 export class UploadComponentPage {
   public readonly title: ElementFinder;
@@ -33,8 +34,6 @@ export class UploadComponentPage {
   public readonly deployButton: ElementFinder;
   public readonly fileNameInput: ElementFinder;
   public readonly fileNamePlaceholder: ElementFinder;
-  public readonly errorTitle: ElementFinder;
-  public readonly errorMsg: ElementFinder;
 
   static waitAndGet(selectorClass: string) {
     const component = $(`app-upload.${selectorClass}`);
@@ -54,7 +53,9 @@ export class UploadComponentPage {
     this.fileNamePlaceholder = this.component.$(
       '.change-file-input .mat-input-placeholder'
     );
-    this.errorTitle = this.component.$('.error-deploy .title');
-    this.errorMsg = this.component.$('.error-deploy .message');
+  }
+
+  getErrorDeployMessage() {
+    return MessageComponentPage.waitAndGet(this.component, `error-deployment`);
   }
 }

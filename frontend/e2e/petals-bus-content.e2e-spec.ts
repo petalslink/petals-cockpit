@@ -46,6 +46,10 @@ describe(`Petals bus content`, () => {
   it(`should have the containers information belonging to the bus`, () => {
     let bus = workspace.openBus('Bus 0');
 
+    bus
+      .getInfoPetalsServersMessage()
+      .expectToBe('info', `Click on a container to access its page.`);
+
     // check that all containers are displayed
     expect(bus.containers.count()).toEqual(2);
 

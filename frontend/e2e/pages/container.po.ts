@@ -19,6 +19,7 @@ import { $, browser, by, ExpectedConditions as EC } from 'protractor';
 
 import { waitTimeout } from '../common';
 import { urlToMatch, waitAndClick } from '../utils';
+import { MessageComponentPage } from './message-component.po';
 import { UploadComponentPage } from './upload-component.po';
 
 export abstract class ContainerPage {
@@ -78,6 +79,13 @@ export class ContainerOverviewPage extends ContainerPage {
 
   private constructor() {
     super();
+  }
+
+  getInfoContainerReachabilitiesMessage() {
+    return MessageComponentPage.waitAndGet(
+      this.component,
+      `info-container-reachabilities`
+    );
   }
 }
 

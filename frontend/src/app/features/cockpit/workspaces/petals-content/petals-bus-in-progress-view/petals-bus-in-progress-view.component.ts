@@ -49,7 +49,6 @@ import { Ui } from 'app/shared/state/ui.actions';
 })
 export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
-
   private newImportData: { isImporting: boolean; error: string };
 
   // needed because it is so much easier to use that than an async object in the html

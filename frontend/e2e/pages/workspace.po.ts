@@ -29,6 +29,7 @@ import { BusPage } from './bus.po';
 import { ComponentOverviewPage } from './component.po';
 import { ContainerOverviewPage } from './container.po';
 import { BusInProgressPage, ImportBusPage } from './import-bus.po';
+import { MessageComponentPage } from './message-component.po';
 import { ServiceAssemblyOverviewPage } from './service-assembly.po';
 import { ServiceUnitOverviewPage } from './service-unit.po';
 import { SharedLibraryOverviewPage } from './shared-library.po';
@@ -215,6 +216,20 @@ export class WorkspaceOverviewPage extends WorkspacePage {
 
   private constructor() {
     super();
+  }
+
+  getInfoUserWorkspaceMessage() {
+    return MessageComponentPage.waitAndGet(
+      this.component,
+      `info-user-workspace`
+    );
+  }
+
+  getInfoUserWorkspaceSharedMessage() {
+    return MessageComponentPage.waitAndGet(
+      this.component,
+      `info-user-workspace-shared`
+    );
   }
 
   getUsers() {

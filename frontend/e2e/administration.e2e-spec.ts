@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { $, browser, ExpectedConditions as EC } from 'protractor';
+import { browser, ExpectedConditions as EC } from 'protractor';
 
 import { page, waitTimeout } from './common';
 import { AdminPage } from './pages/administration.po';
@@ -43,6 +43,13 @@ describe(`Administration`, () => {
         ['mrobert', '(Maxime ROBERT)'],
         ['vnoel', '(Victor NOEL)'],
       ]);
+
+      admin
+        .getInfoUserManagementMessage()
+        .expectToBe(
+          'info',
+          `As an administrator, you can ADD, EDIT, and DELETE any user.`
+        );
     });
 
     it('should open edit user', () => {
@@ -196,6 +203,8 @@ describe(`Administration`, () => {
   it('should show a warning to non-admin', () => {
     page.goToViaLogin('/admin').loginNoCheck('vnoel', 'vnoel');
 
-    expect($('.warning-not-admin').isPresent()).toEqual(true);
+    AdminPage.waitAndGet()
+      .getNotAdminMessage()
+      .expectToBe('warning', `You are not an administrator.`);
   });
 });

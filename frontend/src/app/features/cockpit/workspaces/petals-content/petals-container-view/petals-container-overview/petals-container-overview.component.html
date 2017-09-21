@@ -56,11 +56,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </div>
         <md-icon fxLayoutAlign="end center" color="primary">dns</md-icon>
       </md-card-title>
-      <md-card-subtitle fxLayout="row" fxLayoutAlign="start center">
-        <md-icon class="margin-right-x1" color="primary">info</md-icon>
-        <span *ngIf="container.reachabilities.length > 0" class="color-primary" fxFlex>Click on a container to see its parameters.</span>
-        <span *ngIf="container.reachabilities.length === 0" class="color-primary" fxFlex>There is no other containers in this bus.</span>
-      </md-card-subtitle>
+
+      <app-message class="info-container-reachabilities" *ngIf="container.reachabilities.length > 0 else noContainerReachable" type="info" msg="Click on a container to see its parameters."></app-message>
+
+      <ng-template #noContainerReachable>
+        <app-message type="info" msg="There is no other containers in this bus."></app-message>
+      </ng-template>
+
     </md-card>
 
     <md-card class="graph-containers">

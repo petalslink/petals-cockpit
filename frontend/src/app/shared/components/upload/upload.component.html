@@ -52,9 +52,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </div>
     </md-card-content>
 
-    <md-card-content fxLayout="column" *ngIf="error" class="error error-deploy">
-      <div class="title bold margin-bottom-x1">An error occurred:</div>
-      <span class="message italic">{{ error }}</span>
-    </md-card-content>
+    <app-message class="error-deployment" type="error" [msg]="error"></app-message>
   </form>
 </md-card>

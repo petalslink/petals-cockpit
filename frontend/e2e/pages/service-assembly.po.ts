@@ -20,6 +20,7 @@ import { $, browser, by, ExpectedConditions as EC } from 'protractor';
 import { waitTimeout } from '../common';
 import { urlToMatch, waitAndClick } from '../utils';
 import { ComponentOverviewPage } from './component.po';
+import { MessageComponentPage } from './message-component.po';
 import { ServiceUnitOverviewPage } from './service-unit.po';
 
 export abstract class ServiceAssemblyPage {
@@ -129,5 +130,9 @@ export class ServiceAssemblyOperationPage extends ServiceAssemblyPage {
 
   private constructor() {
     super();
+  }
+
+  getInfoLifecycleMessage() {
+    return MessageComponentPage.waitAndGet(this.component, `info-lifecycle-sa`);
   }
 }

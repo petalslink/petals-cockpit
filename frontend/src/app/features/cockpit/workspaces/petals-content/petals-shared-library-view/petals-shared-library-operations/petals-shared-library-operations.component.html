@@ -40,10 +40,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </span>
         </md-card-content>
 
-        <md-card-content fxLayout="column" *ngIf="sharedLibrary.errorChangeState" class="error">
-          <div class="bold margin-bottom-x1">An error occurred:</div>
-          <span class="italic">{{ sharedLibrary.errorChangeState }}</span>
-        </md-card-content>
+        <app-message type="error" [msg]="sharedLibrary.errorChangeState"></app-message>
+
       </md-card>
     </div>
   </div>

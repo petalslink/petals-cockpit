@@ -61,7 +61,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </md-nav-list>
 
           <ng-template #nosl>
-            <span class="no-sl">This component doesn't use any shared library.</span>
+            <app-message class="info-no-sl" type="info" msg="This component doesn't use any shared library."></app-message>
           </ng-template>
       </md-card-content>
       </md-card>
@@ -98,8 +98,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </md-nav-list>
 
         <ng-template #nosu>
-          <span class="no-su">This component doesn't have any service unit.</span>
+          <app-message class="info-no-su" type="info" msg="This component doesn't have any service unit."></app-message>
         </ng-template>
+
       </md-card-content>
     </md-card>
 
