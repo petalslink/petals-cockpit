@@ -37,7 +37,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -47,7 +49,6 @@ import org.assertj.core.api.SoftAssertions;
 import org.assertj.db.api.RequestRowAssert;
 import org.assertj.db.type.Request;
 import org.assertj.db.type.Table;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
@@ -513,6 +514,8 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             a.assertThat(contentC.component.name).isEqualTo(componentName);
             a.assertThat(contentC.component.type).isEqualTo(ComponentMin.Type.BC);
             a.assertThat(contentC.state).isEqualTo(ComponentMin.State.Loaded);
+            a.assertThat(contentC.sharedLibraries).hasSameElementsAs(getIds(component.getSharedLibraries()));
+            a.assertThat(contentC.serviceUnits).hasSameElementsAs(getIds(getComponentSUs(container, component)));
         } else {
             ComponentFull controlC = content.components.values().iterator().next();
             a.assertThat(contentC).isEqualToComparingFieldByFieldRecursively(controlC);
@@ -552,7 +555,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             a.assertThat(b.bus.id).isEqualTo(id);
             a.assertThat(b.bus.name).isEqualTo(bus.getName());
             a.assertThat(b.workspaceId).isEqualTo(wsId);
-            a.assertThat(b.containers).containsExactlyInAnyOrder(getIds(bus.getContainers()));
+            a.assertThat(b.containers).hasSameElementsAs(getIds(bus.getContainers()));
 
             BusesRecord bDb = resource.db().selectFrom(BUSES).where(BUSES.ID.eq(id).and(BUSES.WORKSPACE_ID.eq(wsId)))
                     .fetchOne();
@@ -563,12 +566,12 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         assertThat(content.buses).hasSameSizeAs(buses);
     }
 
-    protected @NonNull String[] getIds(Collection<?> coll) {
+    protected Set<String> getIds(Collection<?> coll) {
         return getIds(coll.stream());
     }
 
-    protected @NonNull String[] getIds(Stream<?> stream) {
-        return stream.map(e -> Long.toString(getId(e))).toArray(String[]::new);
+    protected Set<String> getIds(Stream<?> stream) {
+        return stream.map(e -> Long.toString(getId(e))).collect(Collectors.toSet());
     }
 
     protected void assertWorkspaceContentForContainers(SoftAssertions a, WorkspaceContent content, Domain... buses) {
@@ -582,9 +585,9 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                 a.assertThat(c.container.id).isEqualTo(id);
                 a.assertThat(c.container.name).isEqualTo(cont.getContainerName());
                 a.assertThat(c.busId).isEqualTo(busId);
-                a.assertThat(c.components).containsExactlyInAnyOrder(getIds(cont.getComponents()));
-                a.assertThat(c.serviceAssemblies).containsExactlyInAnyOrder(getIds(cont.getServiceAssemblies()));
-                a.assertThat(c.sharedLibraries).containsExactlyInAnyOrder(getIds(cont.getSharedLibraries()));
+                a.assertThat(c.components).hasSameElementsAs(getIds(cont.getComponents()));
+                a.assertThat(c.serviceAssemblies).hasSameElementsAs(getIds(cont.getServiceAssemblies()));
+                a.assertThat(c.sharedLibraries).hasSameElementsAs(getIds(cont.getSharedLibraries()));
 
                 ContainersRecord cDb = resource.db().selectFrom(CONTAINERS)
                         .where(CONTAINERS.ID.eq(id).and(CONTAINERS.BUS_ID.eq(busId))).fetchOne();
@@ -606,16 +609,14 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                     ComponentFull c = content.components.get(Long.toString(id));
                     assert c != null;
 
-                    String[] slsIds = getIds(comp.getSharedLibraries());
+                    Set<String> slsIds = getIds(comp.getSharedLibraries());
 
                     a.assertThat(c.component.id).isEqualTo(id);
                     a.assertThat(c.component.name).isEqualTo(comp.getName());
                     a.assertThat(c.containerId).isEqualTo(contId);
                     a.assertThat(c.state.toString()).isEqualTo(comp.getState().toString());
-                    a.assertThat(c.sharedLibraries).containsExactlyInAnyOrder(slsIds);
-                    a.assertThat(c.serviceUnits).containsExactlyInAnyOrder(
-                            getIds(cont.getServiceAssemblies().stream().flatMap(sa -> sa.getServiceUnits().stream()
-                                    .filter(su -> su.getTargetComponent().equals(comp.getName())))));
+                    a.assertThat(c.sharedLibraries).hasSameElementsAs(slsIds);
+                    a.assertThat(c.serviceUnits).hasSameElementsAs(getIds(getComponentSUs(cont, comp)));
 
                     ComponentsRecord compDb = resource.db().selectFrom(COMPONENTS)
                             .where(COMPONENTS.ID.eq(id).and(COMPONENTS.CONTAINER_ID.eq(contId))).fetchOne();
@@ -624,7 +625,8 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
                     a.assertThat(resource.db().selectFrom(SHAREDLIBRARIES_COMPONENTS)
                             .where(SHAREDLIBRARIES_COMPONENTS.COMPONENT_ID.eq(id)).fetch().stream()
-                            .map(sl -> Long.toString(sl.getSharedlibraryId()))).containsExactlyInAnyOrder(slsIds);
+                            .map(sl -> Long.toString(sl.getSharedlibraryId())).collect(Collectors.toSet()))
+                            .hasSameElementsAs(slsIds);
 
                 }
             }
@@ -633,6 +635,10 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         assertThat(content.components).hasSameSizeAs(
                 Arrays.stream(buses).flatMap(b -> b.getContainers().stream().flatMap(c -> c.getComponents().stream()))
                         .toArray(Component[]::new));
+    }
+
+    private Stream<ServiceUnit> getComponentSUs(Container cont, Component comp) {
+        return getContainerSUs(cont).filter(su -> su.getTargetComponent().equals(comp.getName()));
     }
 
     protected void assertWorkspaceContentForServiceAssemblies(SoftAssertions a, WorkspaceContent content,
@@ -649,7 +655,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                     a.assertThat(s.serviceAssembly.name).isEqualTo(sa.getName());
                     a.assertThat(s.containerId).isEqualTo(contId);
                     a.assertThat(s.state.toString()).isEqualTo(sa.getState().toString());
-                    a.assertThat(s.serviceUnits).containsExactlyInAnyOrder(getIds(sa.getServiceUnits()));
+                    a.assertThat(s.serviceUnits).hasSameElementsAs(getIds(sa.getServiceUnits()));
 
                     ServiceassembliesRecord saDb = resource.db().selectFrom(SERVICEASSEMBLIES)
                             .where(SERVICEASSEMBLIES.ID.eq(id).and(SERVICEASSEMBLIES.CONTAINER_ID.eq(contId)))
@@ -698,9 +704,11 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         }
 
         assertThat(content.serviceUnits).hasSameSizeAs(Arrays.stream(buses)
-                .flatMap(b -> b.getContainers().stream()
-                        .flatMap(c -> c.getServiceAssemblies().stream().flatMap(sa -> sa.getServiceUnits().stream())))
-                .toArray(ServiceUnit[]::new));
+                .flatMap(b -> b.getContainers().stream().flatMap(this::getContainerSUs)).toArray(ServiceUnit[]::new));
+    }
+
+    private Stream<ServiceUnit> getContainerSUs(Container c) {
+        return c.getServiceAssemblies().stream().flatMap(sa -> sa.getServiceUnits().stream());
     }
 
     protected void assertWorkspaceContentForSharedLibraries(SoftAssertions a, WorkspaceContent content,
@@ -717,7 +725,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                     a.assertThat(s.sharedLibrary.name).isEqualTo(sl.getName());
                     a.assertThat(s.sharedLibrary.version).isEqualTo(sl.getVersion());
                     a.assertThat(s.containerId).isEqualTo(contId);
-                    a.assertThat(s.components).containsExactlyInAnyOrder(
+                    a.assertThat(s.components).hasSameElementsAs(
                             getIds(cont.getComponents().stream().filter(c -> c.getSharedLibraries().contains(sl))));
 
                     SharedlibrariesRecord slDb = resource.db().selectFrom(SHAREDLIBRARIES)
