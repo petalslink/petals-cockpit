@@ -40,14 +40,34 @@ describe(`Petals component content`, () => {
     workspace = page.goToLogin().loginToWorkspace(`admin`, `admin`);
   });
 
-  it(`should open the content page`, () => {
-    const comp = workspace.openComponent('Comp 2');
+  it(`should open the content page, check the state and related service-units in overview tab`, () => {
+    // we should get redirected to Comp 2
+    const comp2 = workspace.openComponent('Comp 2');
 
-    expect(comp.title.getText()).toEqual('Comp 2');
-    expect(comp.state.getText()).toEqual('Started');
-    expect(comp.type.getText()).toEqual('BC');
+    expect(comp2.title.getText()).toEqual('Comp 2');
+    expect(comp2.state.getText()).toEqual('Started');
+    expect(comp2.type.getText()).toEqual('BC');
 
-    expect(comp.sharedLibraries.getText()).toEqual([`SL 0`]);
+    expect(comp2.sharedLibraries.getText()).toEqual([`SL 0`]);
+    expect(comp2.noServiceUnitMessage.getText()).toEqual([
+      `This component doesn't have any service unit.`,
+    ]);
+
+    // we should get redirected to Comp 1
+    const comp1 = workspace.openComponent('Comp 1');
+
+    expect(comp1.title.getText()).toEqual('Comp 1');
+    expect(comp1.state.getText()).toEqual('Started');
+    expect(comp1.type.getText()).toEqual('BC');
+
+    expect(comp1.serviceUnits.getText()).toEqual([`SU 1`, `SU 3`]);
+    expect(comp1.suServiceAssemblies.getText()).toEqual([`SA 1`, `SA 2`]);
+    expect(comp1.noSharedLibraryMessage.getText()).toEqual([
+      `This component doesn't use any shared library.`,
+    ]);
+
+    // clicking on SU's name should open SU's page
+    comp1.openServiceUnit('SU 1');
   });
 
   it(`should stop/start/stop/unload a component`, () => {

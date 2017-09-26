@@ -19,6 +19,8 @@ import { $, browser, by, ExpectedConditions as EC } from 'protractor';
 
 import { waitTimeout } from '../common';
 import { urlToMatch, waitAndClick } from '../utils';
+import { ServiceAssemblyOverviewPage } from './service-assembly.po';
+import { ServiceUnitOverviewPage } from './service-unit.po';
 import { SharedLibraryOverviewPage } from './shared-library.po';
 import { UploadComponentPage } from './upload-component.po';
 
@@ -64,6 +66,18 @@ export class ComponentOverviewPage extends ComponentPage {
   public readonly sharedLibraries = this.overview.$$(
     `.shared-libraries a.shared-library .sl-name`
   );
+  public readonly noSharedLibraryMessage = this.overview.$$(
+    `.shared-libraries .no-sl-message`
+  );
+  public readonly serviceUnits = this.overview.$$(
+    `.sus-and-sas a.service-unit .su-name`
+  );
+  public readonly noServiceUnitMessage = this.overview.$$(
+    `.sus-and-sas .no-su-message`
+  );
+  public readonly suServiceAssemblies = this.overview.$$(
+    `.sus-and-sas a.service-assembly .su-service-assembly-name`
+  );
 
   static waitAndGet() {
     super.wait();
@@ -88,6 +102,28 @@ export class ComponentOverviewPage extends ComponentPage {
         : this.sharedLibraries.get(identifier);
     waitAndClick(e);
     return SharedLibraryOverviewPage.waitAndGet();
+  }
+
+  openServiceUnit(identifier: string | number) {
+    const e =
+      typeof identifier === 'string'
+        ? this.overview.element(
+            by.cssContainingText(`.sus-and-sas a.service-unit`, identifier)
+          )
+        : this.serviceUnits.get(identifier);
+    waitAndClick(e);
+    return ServiceUnitOverviewPage.waitAndGet();
+  }
+
+  openServiceAssembly(identifier: string | number) {
+    const e =
+      typeof identifier === 'string'
+        ? this.overview.element(
+            by.cssContainingText(`.sus-and-sas a.service-assembly`, identifier)
+          )
+        : this.suServiceAssemblies.get(identifier);
+    waitAndClick(e);
+    return ServiceAssemblyOverviewPage.waitAndGet();
   }
 }
 
