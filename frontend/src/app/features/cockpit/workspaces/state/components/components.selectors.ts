@@ -17,20 +17,20 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+import { IServiceUnitWithSA } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import {
   IComponentBackendDetailsCommon,
   IComponentBackendSSECommon,
 } from 'app/shared/services/components.service';
 import { IStore } from 'app/shared/state/store.interface';
-import { IComponentUI } from './components.interface';
+import { IComponentRow, IComponentUI } from './components.interface';
 
 export interface IComponentWithSLsAndSUs
   extends IComponentUI,
     IComponentBackendSSECommon,
     IComponentBackendDetailsCommon {
-  serviceUnits: IServiceUnitRow[];
+  serviceUnits: IServiceUnitWithSA[];
   sharedLibraries: ISharedLibraryRow[];
 }
 
@@ -41,18 +41,25 @@ export const getComponentsAllIds = (state: IStore) => state.components.allIds;
 export const getSelectedComponent = createSelector(
   (state: IStore) => state.components.selectedComponentId,
   getComponentsById,
-  (id, components) => components[id]
+  (id, components): IComponentRow => components[id]
 );
 
 export const getCurrentComponent = createSelector(
   getSelectedComponent,
   (state: IStore) => state.serviceUnits.byId,
   (state: IStore) => state.sharedLibraries.byId,
-  (component, sus, sls) => {
+  (state: IStore) => state.serviceAssemblies.byId,
+  (component, sus, sls, sas): IComponentWithSLsAndSUs => {
     if (component) {
       return {
         ...component,
-        serviceUnits: component.serviceUnits.map(suId => sus[suId]),
+        serviceUnits: component.serviceUnits.map(suId => {
+          const su = sus[suId];
+          return {
+            ...su,
+            serviceAssembly: sas[su.serviceAssemblyId],
+          };
+        }),
         sharedLibraries: component.sharedLibraries.map(slId => sls[slId]),
       };
     } else {
