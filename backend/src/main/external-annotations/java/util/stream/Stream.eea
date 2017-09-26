@@ -33,5 +33,8 @@ of
  <T:Ljava/lang/Object;>([TT;)Ljava/util/stream/Stream<TT;>;
  <T:Ljava/lang/Object;>([TT;)L1java/util/stream/Stream<TT;>;
 toArray
+ ()[Ljava/lang/Object;
+ ()[1Ljava/lang/Object;
+toArray
  <A:Ljava/lang/Object;>(Ljava/util/function/IntFunction<[TA;>;)[TA;
- <A:Ljava/lang/Object;>(Ljava/util/function/IntFunction<[TA;>;)[1TA;
+ <A:Ljava/lang/Object;>(Ljava/util/function/IntFunction<[TA;>;)[1T1A;

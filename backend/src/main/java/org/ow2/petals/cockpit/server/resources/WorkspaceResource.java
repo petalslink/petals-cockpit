@@ -31,6 +31,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -62,6 +63,7 @@ import org.jooq.Configuration;
 import org.jooq.exception.DataAccessException;
 import org.jooq.exception.SQLStateClass;
 import org.jooq.impl.DSL;
+import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
@@ -81,6 +83,7 @@ import org.ow2.petals.cockpit.server.services.WorkspacesService.WorkspaceService
 import org.ow2.petals.cockpit.server.utils.PetalsUtils;
 import org.ow2.petals.jbi.descriptor.JBIDescriptorException;
 import org.ow2.petals.jbi.descriptor.original.JBIDescriptorBuilder;
+import org.ow2.petals.jbi.descriptor.original.generated.Component;
 import org.ow2.petals.jbi.descriptor.original.generated.Jbi;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
@@ -91,6 +94,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.webcohesion.enunciate.metadata.rs.ResponseCode;
 import com.webcohesion.enunciate.metadata.rs.Warnings;
 
@@ -298,7 +302,7 @@ public class WorkspaceResource {
     public WorkspaceContent deployComponent(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
-            @FormDataParam("component-name") String componentName)
+            @Nullable @FormDataParam("overrides") ComponentDeployOverrides overrides)
             throws IOException, JBIDescriptorException {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -314,11 +318,29 @@ public class WorkspaceResource {
                 try (InputStream jbiIn = Files.newInputStream(jbiPath)) {
                     descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptor(jbiIn);
                 }
-                if (componentName != null && !componentName.trim().isEmpty()) {
-                    descriptor.getComponent().getIdentification().setName(componentName);
-                    Files.delete(jbiPath);
-                    try(OutputStream jbiOut = Files.newOutputStream(jbiPath)) {
-                        JBIDescriptorBuilder.getInstance().writeXMLJBIdescriptor(descriptor, jbiOut);
+
+                if (overrides != null) {
+                    boolean descriptorOverriden = false;
+                    Set<SharedLibraryIdentifier> newSharedLibs = overrides.sharedLibraries;
+
+                    if (newSharedLibs != null) {
+                        List<Component.SharedLibrary> sharedLibraryList = descriptor.getComponent()
+                                .getSharedLibraryList();
+                        sharedLibraryList.clear();
+                        newSharedLibs.forEach(sl -> sharedLibraryList.add(sl.toJbiXml()));
+                        descriptorOverriden = true;
+                    }
+
+                    if (overrides.name != null && !overrides.name.trim().isEmpty()) {
+                        descriptor.getComponent().getIdentification().setName(overrides.name);
+                        descriptorOverriden = true;
+                    }
+
+                    if (descriptorOverriden) {
+                        Files.delete(jbiPath);
+                        try (OutputStream jbiOut = Files.newOutputStream(jbiPath)) {
+                            JBIDescriptorBuilder.getInstance().writeXMLJBIdescriptor(descriptor, jbiOut);
+                        }
                     }
                 }
             }
@@ -775,6 +797,87 @@ public class WorkspaceResource {
 
         public SLChangeState(@JsonProperty("state") SharedLibraryMin.State state) {
             this.state = state;
+        }
+    }
+
+    public static class SharedLibraryIdentifier {
+
+        @NotEmpty
+        @JsonProperty
+        public final String name;
+
+        @NotEmpty
+        @JsonProperty
+        public final String version;
+
+        public SharedLibraryIdentifier(@JsonProperty("name") String name, @JsonProperty("version") String version) {
+            this.name = name;
+            this.version = version;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + name.hashCode();
+            result = prime * result + version.hashCode();
+            return result;
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            SharedLibraryIdentifier other = (SharedLibraryIdentifier) obj;
+            if (!name.equals(other.name))
+                return false;
+            if (!version.equals(other.version))
+                return false;
+            return true;
+        }
+
+        public static SharedLibraryIdentifier from(SharedLibrary sl) {
+            return new SharedLibraryIdentifier(sl.getName(), sl.getVersion());
+        }
+
+        public Component.SharedLibrary toJbiXml() {
+            Component.SharedLibrary sharedLibrary = new Component.SharedLibrary();
+            sharedLibrary.setContent(name);
+            sharedLibrary.setVersion(version);
+            return sharedLibrary;
+        }
+
+        public SharedLibrary toAdmin() {
+            return new SharedLibrary(name, version);
+        }
+    }
+
+    public static class ComponentDeployOverrides {
+
+        @Nullable
+        @JsonProperty
+        public final String name;
+
+        @Nullable
+        @JsonProperty
+        public final ImmutableSet<SharedLibraryIdentifier> sharedLibraries;
+
+        public ComponentDeployOverrides(String name) {
+            this(name, null);
+        }
+
+        public ComponentDeployOverrides(Set<SharedLibraryIdentifier> sharedLibraries) {
+            this(null, sharedLibraries);
+        }
+
+        public ComponentDeployOverrides(@JsonProperty("name") @Nullable String name,
+                @JsonProperty("sharedLibraries") @Nullable Set<SharedLibraryIdentifier> sharedLibraries) {
+            this.name = name;
+            this.sharedLibraries = sharedLibraries == null ? null : ImmutableSet.copyOf(sharedLibraries);
         }
     }
 }
