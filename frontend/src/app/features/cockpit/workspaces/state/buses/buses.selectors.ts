@@ -23,7 +23,7 @@ import {
   IBusBackendSSECommon,
 } from 'app/shared/services/buses.service';
 import { IStore } from 'app/shared/state/store.interface';
-import { IBusUI } from './buses.interface';
+import { IBusRow, IBusUI } from './buses.interface';
 
 export interface IBusWithContainers
   extends IBusUI,
@@ -39,13 +39,13 @@ export const getBusesAllIds = (state: IStore) => state.buses.allIds;
 export const getSelectedBus = createSelector(
   (state: IStore) => state.buses.selectedBusId,
   getBusesById,
-  (id, buses) => buses[id]
+  (id, buses): IBusRow => buses[id]
 );
 
 export const getCurrentBus = createSelector(
   getSelectedBus,
   (state: IStore) => state.containers.byId,
-  (bus, containers) => {
+  (bus, containers): IBusWithContainers => {
     if (bus) {
       return {
         ...bus,

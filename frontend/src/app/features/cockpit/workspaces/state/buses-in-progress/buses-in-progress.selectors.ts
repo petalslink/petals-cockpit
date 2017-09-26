@@ -17,6 +17,10 @@
 
 import { createSelector } from '@ngrx/store';
 
+import {
+  IBusInProgress,
+  IBusInProgressRow,
+} from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 import { IStore } from 'app/shared/state/store.interface';
 
 export const getBusesInProgressAllIds = (state: IStore) =>
@@ -28,12 +32,12 @@ export const getBusesInProgressByIds = (state: IStore) =>
 export const getBusesInProgress = createSelector(
   getBusesInProgressAllIds,
   getBusesInProgressByIds,
-  (allIds, byId) => allIds.map(id => byId[id])
+  (allIds, byId): IBusInProgressRow[] => allIds.map(id => byId[id])
 );
 
 export const getCurrentBusInProgress = createSelector(
   (state: IStore) => state.busesInProgress.selectedBusInProgressId,
   getBusesInProgressByIds,
-  (selectedBusInProgressId, busesInProgressById) =>
+  (selectedBusInProgressId, busesInProgressById): IBusInProgress =>
     busesInProgressById[selectedBusInProgressId]
 );

@@ -16,7 +16,7 @@
  */
 
 import { createSelector } from '@ngrx/store';
-import { IServiceUnit } from './service-units.interface';
+import { IServiceUnit, IServiceUnitRow } from './service-units.interface';
 
 import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 import { IStore } from 'app/shared/state/store.interface';
@@ -33,13 +33,13 @@ export const getServiceUnitsAllIds = (state: IStore) =>
 export const getSelectedServiceUnit = createSelector(
   (state: IStore) => state.serviceUnits.selectedServiceUnitId,
   getServiceUnitsById,
-  (id, sus) => sus[id]
+  (id, sus): IServiceUnitRow => sus[id]
 );
 
 export const getCurrentServiceUnit = createSelector(
   getSelectedServiceUnit,
   (state: IStore) => state.serviceAssemblies.byId,
-  (su, sas) => {
+  (su, sas): IServiceUnitWithSA => {
     if (su) {
       return {
         ...su,
