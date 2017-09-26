@@ -17,6 +17,7 @@ data-mongodb
 target/
 .factorypath
 .history
+.angulardoc.json
 
 # ------------------------------------
 #              BACKEND
