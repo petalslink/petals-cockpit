@@ -95,7 +95,7 @@ public class DeploySUTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySUExistingComponentForbidden() throws Exception {
+    public void existingComponentForbidden() throws Exception {
         addUser("anotheruser");
 
         Domain fDomain = new Domain("domf");
@@ -118,7 +118,7 @@ public class DeploySUTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySUNonExistingComponentForbidden() throws Exception {
+    public void nonExistingComponentForbidden() throws Exception {
         addUser("anotheruser");
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -135,7 +135,7 @@ public class DeploySUTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySUWrongComponentForbidden() throws Exception {
+    public void wrongComponentForbidden() throws Exception {
         addUser("anotheruser");
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -153,7 +153,7 @@ public class DeploySUTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySUButComponentNotFound() throws Exception {
+    public void componentNotFound() throws Exception {
         final MultiPart mpe = getSUMultiPart();
 
         Response post = resource.target("/workspaces/1/components/3987981/serviceunits").request()
@@ -166,7 +166,7 @@ public class DeploySUTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySU() throws Exception {
+    public void nominal() throws Exception {
         try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);
@@ -198,7 +198,7 @@ public class DeploySUTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySUConflictContainerError() throws Exception {
+    public void conflictContainerError() throws Exception {
         failDeployment = true;
 
         MultiPart mpe = getSUMultiPart();

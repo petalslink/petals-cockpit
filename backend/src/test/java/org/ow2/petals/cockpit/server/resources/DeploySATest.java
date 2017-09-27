@@ -98,7 +98,7 @@ public class DeploySATest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySAExistingContainerForbidden() throws Exception {
+    public void existingContainerForbidden() throws Exception {
         addUser("anotheruser");
 
         Domain fDomain = new Domain("domf");
@@ -119,7 +119,7 @@ public class DeploySATest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySANonExistingContainerForbidden() throws Exception {
+    public void nonExistingContainerForbidden() throws Exception {
         addUser("anotheruser");
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -136,7 +136,7 @@ public class DeploySATest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySAWrongContainerForbidden() throws Exception {
+    public void wrongContainerForbidden() throws Exception {
         addUser("anotheruser");
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -167,7 +167,7 @@ public class DeploySATest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySA() throws Exception {
+    public void nominal() throws Exception {
         try (EventInput eventInput = resource.sse(1)) {
             expectWorkspaceContent(eventInput);
 
@@ -206,7 +206,7 @@ public class DeploySATest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySAConflictContainerError() throws Exception {
+    public void conflictContainerError() throws Exception {
         failDeployment = true;
 
         MultiPart mpe = getSAMultiPart();
