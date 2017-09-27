@@ -51,12 +51,9 @@ export class ServiceAssemblyOverviewPage extends ServiceAssemblyPage {
 
   public readonly overview = ServiceAssemblyOverviewPage.overview;
   public readonly state = this.overview.$(`.sa-infos .sa-state`);
-  public readonly serviceUnits = this.overview.$$(
-    `.service-units a.service-unit .su-name`
-  );
-  public readonly suComponents = this.overview.$$(
-    `.service-units a.su-component .su-component-name`
-  );
+  public readonly serviceUnits = this.overview
+    .$(`.service-units`)
+    .$$('.su-name,.component-name');
 
   static waitAndGet() {
     super.wait();
@@ -81,23 +78,21 @@ export class ServiceAssemblyOverviewPage extends ServiceAssemblyPage {
   }
 
   openServiceUnit(identifier: string | number) {
+    const css = `.service-units a.service-unit`;
     const e =
       typeof identifier === 'string'
-        ? this.overview.element(
-            by.cssContainingText(`.service-units a.service-unit`, identifier)
-          )
-        : this.serviceUnits.get(identifier);
+        ? this.overview.element(by.cssContainingText(css, identifier))
+        : this.overview.$$(css).get(identifier);
     waitAndClick(e);
     return ServiceUnitOverviewPage.waitAndGet();
   }
 
   openComponent(identifier: string | number) {
+    const css = `.service-units a.su-component`;
     const e =
       typeof identifier === 'string'
-        ? this.overview.element(
-            by.cssContainingText(`.service-units a.su-component`, identifier)
-          )
-        : this.suComponents.get(identifier);
+        ? this.overview.element(by.cssContainingText(css, identifier))
+        : this.overview.$$(css).get(identifier);
     waitAndClick(e);
     return ComponentOverviewPage.waitAndGet();
   }

@@ -48,6 +48,7 @@ describe(`Petals shared library content`, () => {
     expect(comp.title.getText()).toEqual('Comp 2');
 
     expect(comp.sharedLibraries.getText()).toEqual(['SL 0']);
+
     comp.openSharedLibrary('SL 0');
   });
 

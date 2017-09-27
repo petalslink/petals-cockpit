@@ -49,7 +49,7 @@ describe(`Petals component content`, () => {
     expect(comp2.type.getText()).toEqual('BC');
 
     expect(comp2.sharedLibraries.getText()).toEqual([`SL 0`]);
-    expect(comp2.noServiceUnitMessage.getText()).toEqual([
+    expect(comp2.serviceUnits.getText()).toEqual([
       `This component doesn't have any service unit.`,
     ]);
 
@@ -60,9 +60,13 @@ describe(`Petals component content`, () => {
     expect(comp1.state.getText()).toEqual('Started');
     expect(comp1.type.getText()).toEqual('BC');
 
-    expect(comp1.serviceUnits.getText()).toEqual([`SU 1`, `SU 3`]);
-    expect(comp1.suServiceAssemblies.getText()).toEqual([`SA 1`, `SA 2`]);
-    expect(comp1.noSharedLibraryMessage.getText()).toEqual([
+    expect(comp1.serviceUnits.getText()).toEqual([
+      `SU 1`,
+      `SA 1`,
+      `SU 3`,
+      `SA 2`,
+    ]);
+    expect(comp1.sharedLibraries.getText()).toEqual([
       `This component doesn't use any shared library.`,
     ]);
 

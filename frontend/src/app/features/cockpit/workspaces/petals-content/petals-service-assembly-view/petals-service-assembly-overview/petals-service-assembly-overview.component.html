@@ -42,28 +42,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <md-divider></md-divider>
 
-        <md-nav-list dense fxLayout="column" class="padding-top-x1">
-          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let su of serviceAssembly.serviceUnits; trackBy:trackBySu">
-            <a md-raised-button [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su.id]"
-              class="service-unit">
-              <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
-                <span class="su-name margin-right-x1">{{ su.name }}</span>
-                <md-icon md-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
-              </div>
-            </a>
+        <md-card-content class="margin-top-x1 shared-libraries-content">
+          <md-nav-list dense fxLayout="column" class="padding-top-x1">
+            <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let su of serviceAssembly.serviceUnits; trackBy:trackBySu">
+              <a md-raised-button [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su.id]"
+                class="service-unit">
+                <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
+                  <span class="su-name margin-right-x1">{{ su.name }}</span>
+                  <md-icon md-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
+                </div>
+              </a>
 
-            <span fxFlex md-subheader fxLayoutAlign="center center">deployed on component</span>
+              <span fxFlex md-subheader fxLayoutAlign="center center">deployed on component</span>
 
-            <a md-raised-button
-              [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', su.component.id]"
-              class="su-component">
-              <div fxFlex fxLayout="row" fxLayoutAlign="end center" class="color-primary">
-                <span class="su-component-name margin-right-x1">{{ su.component.name }}</span>
-                <md-icon md-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
-              </div>
-            </a>
-          </div>
-        </md-nav-list>
+              <a md-raised-button
+                [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', su.component.id]"
+                class="su-component">
+                <div fxFlex fxLayout="row" fxLayoutAlign="end center" class="color-primary">
+                  <span class="component-name margin-right-x1">{{ su.component.name }}</span>
+                  <md-icon md-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
+                </div>
+              </a>
+            </div>
+          </md-nav-list>
+        </md-card-content>
       </md-card>
 
     </div>
