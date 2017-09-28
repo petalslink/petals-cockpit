@@ -22,10 +22,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.junit.Before;
@@ -42,6 +44,7 @@ import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SADeployOverrides;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
 
 import com.google.common.collect.ImmutableList;
@@ -93,12 +96,12 @@ public class DeploySATest extends AbstractBasicResourceTest {
         failDeployment = false;
     }
 
-    private MultiPart getSAMultiPart() throws Exception {
+    private FormDataMultiPart getSAMultiPart() throws Exception {
         return getMultiPart("sa-jbi.xml", "fakeSA");
     }
 
     @Test
-    public void deploySAExistingContainerForbidden() throws Exception {
+    public void existingContainerForbidden() throws Exception {
         addUser("anotheruser");
 
         Domain fDomain = new Domain("domf");
@@ -119,7 +122,7 @@ public class DeploySATest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySANonExistingContainerForbidden() throws Exception {
+    public void nonExistingContainerForbidden() throws Exception {
         addUser("anotheruser");
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -136,7 +139,7 @@ public class DeploySATest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySAWrongContainerForbidden() throws Exception {
+    public void wrongContainerForbidden() throws Exception {
         addUser("anotheruser");
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -167,7 +170,7 @@ public class DeploySATest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySA() throws Exception {
+    public void nominal() throws Exception {
         try (EventInput eventInput = resource.sse(1)) {
             expectWorkspaceContent(eventInput);
 
@@ -206,7 +209,51 @@ public class DeploySATest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySAConflictContainerError() throws Exception {
+    public void overrideName() throws Exception {
+        try (EventInput eventInput = resource.sse(1)) {
+            expectWorkspaceContent(eventInput);
+
+            String newSAName = "test-SA-name";
+
+            SADeployOverrides overrides = new SADeployOverrides(newSAName);
+            FormDataMultiPart mpe = getSAMultiPart().field("overrides", overrides, MediaType.APPLICATION_JSON_TYPE);
+
+            WorkspaceContent post = resource
+                    .target("/workspaces/1/containers/" + getId(container) + "/serviceassemblies").request()
+                    .post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
+
+            ServiceAssemblyFull postDataSA = assertSAContent(post, container, newSAName,
+                    ImmutableList.of(component1, component1));
+
+            Iterator<ServiceUnitFull> iterator = post.serviceUnits.values().iterator();
+            ServiceUnitFull postSU1 = iterator.next();
+            ServiceUnitFull postSU2 = iterator.next();
+            assertThat(iterator.hasNext()).isFalse();
+
+            assertThat(postSU1.serviceUnit.name).isEqualTo(SU1_NAME);
+            assertThat(postSU2.serviceUnit.name).isEqualTo(SU2_NAME);
+
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("SA_DEPLOYED");
+                WorkspaceContent data = e.readData(WorkspaceContent.class);
+
+                assertSAContent(a, data, post);
+            });
+
+            assertThat(resource.httpServer.wasCalled()).isTrue();
+            assertThat(resource.httpServer.wasClosed()).isTrue();
+
+            assertThat(container.getServiceAssemblies()).hasSize(1);
+
+            resource.target("/serviceassemblies/" + postDataSA.serviceAssembly.id).request()
+                    .get(ServiceUnitOverview.class);
+            resource.target("/serviceunits/" + postSU1.serviceUnit.id).request().get(ServiceUnitOverview.class);
+            resource.target("/serviceunits/" + postSU2.serviceUnit.id).request().get(ServiceUnitOverview.class);
+        }
+    }
+
+    @Test
+    public void conflictContainerError() throws Exception {
         failDeployment = true;
 
         MultiPart mpe = getSAMultiPart();

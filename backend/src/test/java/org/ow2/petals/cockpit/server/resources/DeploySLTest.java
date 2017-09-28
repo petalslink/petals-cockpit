@@ -85,7 +85,7 @@ public class DeploySLTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySLExistingContainerForbidden() throws Exception {
+    public void existingContainerForbidden() throws Exception {
         addUser("anotheruser");
 
         Domain fDomain = new Domain("domf");
@@ -106,7 +106,7 @@ public class DeploySLTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySLNonExistingContainerForbidden() throws Exception {
+    public void nonExistingContainerForbidden() throws Exception {
         addUser("anotheruser");
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -123,7 +123,7 @@ public class DeploySLTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySLWrongContainerForbidden() throws Exception {
+    public void wrongContainerForbidden() throws Exception {
         addUser("anotheruser");
 
         setupWorkspace(2, "test2", Arrays.asList(), "anotheruser");
@@ -141,7 +141,7 @@ public class DeploySLTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySLButContainerNotFound() throws Exception {
+    public void containerNotFound() throws Exception {
         final MultiPart mpe = getSLMultiPart();
 
         Response post = resource.target("/workspaces/1/containers/3987981/sharedlibraries").request()
@@ -154,7 +154,7 @@ public class DeploySLTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySL() throws Exception {
+    public void nominal() throws Exception {
         try (EventInput eventInput = resource.sse(1)) {
             expectWorkspaceContent(eventInput);
 
@@ -183,7 +183,7 @@ public class DeploySLTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void deploySLConflictContainerError() throws Exception {
+    public void conflictContainerError() throws Exception {
         failDeployment = true;
 
         MultiPart mpe = getSLMultiPart();

@@ -357,7 +357,8 @@ public class WorkspaceResource {
     @Produces(MediaType.APPLICATION_JSON)
     public WorkspaceContent deployServiceAssembly(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
-            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition)
+            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
+            @Nullable @FormDataParam("overrides") SADeployOverrides overrides)
             throws IOException, JBIDescriptorException {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -366,8 +367,21 @@ public class WorkspaceResource {
         String filename = StringUtils.isEmpty(fileDisposition.getFileName()) ? "sa.zip" : fileDisposition.getFileName();
 
         try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
-            Jbi descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptorFromArchive(sa.getFile());
+            Jbi descriptor;
+            try (FileSystem fs = FileSystems.newFileSystem(sa.getFile().toPath(), null)) {
+                java.nio.file.Path jbiPath = fs.getPath(JBIDescriptorBuilder.JBI_DESCRIPTOR_RESOURCE_IN_ARCHIVE);
+                try (InputStream jbiIn = Files.newInputStream(jbiPath)) {
+                    descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptor(jbiIn);
+                }
 
+                if (overrides != null && overrides.name != null && !overrides.name.trim().isEmpty()) {
+                    descriptor.getServiceAssembly().getIdentification().setName(overrides.name);
+                    Files.delete(jbiPath);
+                    try (OutputStream jbiOut = Files.newOutputStream(jbiPath)) {
+                        JBIDescriptorBuilder.getInstance().writeXMLJBIdescriptor(descriptor, jbiOut);
+                    }
+                }
+            }
             return workspace.deployServiceAssembly(descriptor.getServiceAssembly().getIdentification().getName(),
                     sa.getArtifactExternalUrl(), containerId);
         }
@@ -880,4 +894,16 @@ public class WorkspaceResource {
             this.sharedLibraries = sharedLibraries == null ? null : ImmutableSet.copyOf(sharedLibraries);
         }
     }
+
+    public static class SADeployOverrides {
+
+        @Nullable
+        @JsonProperty
+        public final String name;
+
+        public SADeployOverrides(@JsonProperty("name") @Nullable String name) {
+            this.name = name;
+        }
+    }
+
 }

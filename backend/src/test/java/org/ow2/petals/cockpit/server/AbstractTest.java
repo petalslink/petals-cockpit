@@ -32,9 +32,13 @@ public class AbstractTest {
         ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME))
                 .setLevel(Level.INFO);
         // if needed, use this to set more specific log levels
+        // log debug sql requests
         // setLevel(LoggerListener.class, Level.DEBUG);
         setLevel(PetalsAdminExceptionMapper.class, Level.DEBUG);
         setLevel("liquibase", Level.WARN);
+
+        // TODO: look into this logger (why can't we log jersey exceptions ?)
+        // setLevel("io.dropwizard", Level.DEBUG);
     }
 
     private static void setLevel(Class<?> logger, Level level) {
