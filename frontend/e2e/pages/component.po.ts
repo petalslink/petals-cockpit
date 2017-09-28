@@ -19,6 +19,8 @@ import { $, browser, by, ExpectedConditions as EC } from 'protractor';
 
 import { waitTimeout } from '../common';
 import { urlToMatch, waitAndClick } from '../utils';
+import { ServiceAssemblyOverviewPage } from './service-assembly.po';
+import { ServiceUnitOverviewPage } from './service-unit.po';
 import { SharedLibraryOverviewPage } from './shared-library.po';
 import { UploadComponentPage } from './upload-component.po';
 
@@ -61,9 +63,12 @@ export class ComponentOverviewPage extends ComponentPage {
   public readonly overview = ComponentOverviewPage.overview;
   public readonly state = this.overview.$(`.component-infos .component-state`);
   public readonly type = this.overview.$(`.component-infos .component-type`);
-  public readonly sharedLibraries = this.overview.$$(
-    `.shared-libraries a.shared-library .sl-name`
-  );
+  public readonly sharedLibraries = this.overview
+    .$(`.shared-libraries-content`)
+    .$$(`.sl-name,.no-sl`);
+  public readonly serviceUnits = this.overview
+    .$(`.service-units-content`)
+    .$$('.su-name,.sa-name,.no-su');
 
   static waitAndGet() {
     super.wait();
@@ -77,17 +82,33 @@ export class ComponentOverviewPage extends ComponentPage {
   }
 
   openSharedLibrary(identifier: string | number) {
+    const css = `.shared-libraries-content a.shared-library`;
     const e =
       typeof identifier === 'string'
-        ? this.overview.element(
-            by.cssContainingText(
-              `.shared-libraries a.shared-library`,
-              identifier
-            )
-          )
-        : this.sharedLibraries.get(identifier);
+        ? this.overview.element(by.cssContainingText(css, identifier))
+        : this.overview.$$(css).get(identifier);
     waitAndClick(e);
     return SharedLibraryOverviewPage.waitAndGet();
+  }
+
+  openServiceUnit(identifier: string | number) {
+    const css = `.service-units-content a.service-unit`;
+    const e =
+      typeof identifier === 'string'
+        ? this.overview.element(by.cssContainingText(css, identifier))
+        : this.overview.$$(css).get(identifier);
+    waitAndClick(e);
+    return ServiceUnitOverviewPage.waitAndGet();
+  }
+
+  openServiceAssembly(identifier: string | number) {
+    const css = `.service-units-content a.service-assembly`;
+    const e =
+      typeof identifier === 'string'
+        ? this.overview.element(by.cssContainingText(css, identifier))
+        : this.serviceUnits.$$(css).get(identifier);
+    waitAndClick(e);
+    return ServiceAssemblyOverviewPage.waitAndGet();
   }
 }
 

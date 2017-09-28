@@ -67,9 +67,9 @@ export class SharedLibraryOverviewPage extends SharedLibraryPage {
   );
 
   public readonly overview = SharedLibraryOverviewPage.overview;
-  public readonly components = this.overview.$$(
-    `.components a.component .component-name`
-  );
+  public readonly components = this.overview
+    .$(`.components`)
+    .$$('.component-name,.no-component');
 
   static waitAndGet() {
     super.wait();
@@ -85,12 +85,11 @@ export class SharedLibraryOverviewPage extends SharedLibraryPage {
   }
 
   openComponent(identifier: string | number) {
+    const css = `.components a.component`;
     const e =
       typeof identifier === 'string'
-        ? this.overview.element(
-            by.cssContainingText(`.components a.component`, identifier)
-          )
-        : this.components.get(identifier);
+        ? this.overview.element(by.cssContainingText(css, identifier))
+        : this.overview.$$(css).get(identifier);
     waitAndClick(e);
     return ComponentOverviewPage.waitAndGet();
   }

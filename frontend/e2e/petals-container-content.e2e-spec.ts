@@ -353,8 +353,12 @@ describe(`Petals container content`, () => {
 
       expect(sa.state.getText()).toEqual('Shutdown');
 
-      expect(sa.serviceUnits.getText()).toEqual(['SU 16', 'SU 17']);
-      expect(sa.suComponents.getText()).toEqual(['Comp 0', 'Comp 1']);
+      expect(sa.serviceUnits.getText()).toEqual([
+        'SU 16',
+        'Comp 0',
+        'SU 17',
+        'Comp 1',
+      ]);
     });
   });
 
@@ -500,7 +504,9 @@ describe(`Petals container content`, () => {
       const sl = workspace.openSharedLibrary('SL 4');
 
       expect(sl.title.getText()).toEqual('SL 4');
-      expect(sl.components.getText()).toEqual([]);
+      expect(sl.components.getText()).toEqual([
+        `This shared library isn't used by any component.`,
+      ]);
     });
   });
 });

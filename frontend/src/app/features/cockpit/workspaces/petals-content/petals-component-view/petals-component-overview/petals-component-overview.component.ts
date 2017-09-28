@@ -22,10 +22,14 @@ import {
   OnInit,
 } from '@angular/core';
 
+import { Store } from '@ngrx/store';
 import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
+import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import { stateToLedColor } from 'app/shared/helpers/shared.helper';
 import { ComponentState } from 'app/shared/services/components.service';
+import { IStore } from 'app/shared/state/store.interface';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-petals-component-overview',
@@ -37,12 +41,22 @@ export class PetalsComponentOverviewComponent implements OnInit {
   @Input() component: IComponentWithSLsAndSUs;
   @Input() workspaceId: string;
 
-  constructor() {}
+  public workspaceId$: Observable<string>;
 
-  ngOnInit() {}
+  constructor(private store$: Store<IStore>) {}
+
+  ngOnInit() {
+    this.workspaceId$ = this.store$.select(
+      state => state.workspaces.selectedWorkspaceId
+    );
+  }
 
   trackBySl(i: number, sl: ISharedLibraryRow) {
     return sl.id;
+  }
+
+  trackBySu(i: number, su: IServiceUnitRow) {
+    return su.id;
   }
 
   getLedColorFromState(state: ComponentState) {

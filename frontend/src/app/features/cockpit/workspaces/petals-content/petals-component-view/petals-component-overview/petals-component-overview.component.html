@@ -17,13 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="central-content">
     <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
 
-      <md-card fxFlex class="component-infos" [ngClass.gt-md]="'card-auto-size'">
+      <md-card fxFlex class="component-infos">
         <md-card-title fxLayout="row">
           <span fxFlex class="text-upper">About <b>{{ component.name }}</b></span>
           <md-icon color="primary">info_outline</md-icon>
         </md-card-title>
 
-        <div fxLayout="row" fxLayoutAlign="start center">
+        <div fxLayout="row" fxLayoutAlign="start center" class="margin-top-x1">
           <md-card-header fxFlex *ngIf="component.state">
             <md-card-title>State</md-card-title>
             <md-card-subtitle class="component-state" fxLayoutAlign="start center">
@@ -48,23 +48,60 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <md-divider></md-divider>
 
-        <md-card-content *ngIf="component.sharedLibraries.length === 0" class="margin-top-x1">
-          This component doesn't use any shared library.
-        </md-card-content>
+        <md-card-content class="margin-top-x1 shared-libraries-content">
+          <md-nav-list *ngIf="component.sharedLibraries.length !== 0 else nosl"  dense fxLayout="column" class="padding-top-x1">
+            <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let sl of component.sharedLibraries; trackBy:trackBySl">
+              <a md-raised-button [routerLink]="['/workspaces', workspaceId, 'petals', 'shared-libraries', sl.id]" class="shared-library">
+                <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
+                  <span class="sl-name margin-right-x1">{{ sl.name }}</span>
+                  <md-icon md-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
+                </div>
+              </a>
+            </div>
+          </md-nav-list>
 
-        <md-nav-list dense fxLayout="column" class="padding-top-x1">
-          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let sl of component.sharedLibraries; trackBy:trackBySl">
-            <a md-raised-button [routerLink]="['/workspaces', workspaceId, 'petals', 'shared-libraries', sl.id]"
-              class="shared-library">
+          <ng-template #nosl>
+            <span class="no-sl">This component doesn't use any shared library.</span>
+          </ng-template>
+      </md-card-content>
+      </md-card>
+    </div>
+
+    <md-card fxLayout="column" class="margin-top-x1 service-units">
+      <md-card-title fxLayout="row">
+        <span fxFlex class="text-upper">Service units</span>
+        <md-icon svgIcon="su"></md-icon>
+      </md-card-title>
+
+      <md-divider></md-divider>
+
+      <md-card-content class="margin-top-x1 service-units-content">
+        <md-nav-list *ngIf="component.serviceUnits.length !== 0 else nosu" dense fxLayout="column" class="padding-top-x1">
+          <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let su of component.serviceUnits; trackBy:trackBySu">
+            <a md-raised-button [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su.id]" class="service-unit">
               <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
-                <span class="sl-name margin-right-x1">{{ sl.name }}</span>
+                <span class="su-name margin-right-x1">{{ su.name }}</span>
+                <md-icon md-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
+              </div>
+            </a>
+
+            <span fxFlex md-subheader fxLayoutAlign="center center">belongs to</span>
+
+            <a md-raised-button [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-assemblies', su.serviceAssembly.id]"
+              class="service-assembly">
+              <div fxFlex fxLayout="row" fxLayoutAlign="end center" class="color-primary">
+                <span class="sa-name margin-right-x1">{{ su.serviceAssembly.name }}</span>
                 <md-icon md-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
               </div>
             </a>
           </div>
         </md-nav-list>
-      </md-card>
 
-    </div>
+        <ng-template #nosu>
+          <span class="no-su">This component doesn't have any service unit.</span>
+        </ng-template>
+      </md-card-content>
+    </md-card>
+
   </div>
 </div>
