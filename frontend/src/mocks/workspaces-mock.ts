@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { assign, flatMap } from 'lodash';
+import assign from 'lodash-es/assign';
+import flatMap from 'lodash-es/flatMap';
 
 import { IBusImport } from 'app/shared/services/buses.service';
 import { IUserBackend } from 'app/shared/services/users.service';
