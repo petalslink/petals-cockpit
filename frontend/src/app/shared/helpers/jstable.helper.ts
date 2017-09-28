@@ -15,10 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { environment } from 'environments/environment';
-import { omit } from 'lodash';
+import omit from 'lodash-es/omit';
 
-// TODO replace all of this with robustly implemented immutable maps?
+import { environment } from 'environments/environment';
 
 export interface JsTable<I> {
   readonly byId: { readonly [id: string]: I & { id: string } };
