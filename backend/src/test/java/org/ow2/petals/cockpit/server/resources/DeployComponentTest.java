@@ -22,6 +22,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES_COMPONENTS;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.client.Entity;
@@ -49,6 +50,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentDeploy
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SharedLibraryIdentifier;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -56,6 +58,10 @@ import io.dropwizard.jersey.errors.ErrorMessage;
 import javaslang.Tuple;
 
 public class DeployComponentTest extends AbstractBasicResourceTest {
+
+    private static final String COMPONENT_WITH_SL_JBI_XML = "component-with-sl-jbi.xml";
+
+    private static final String COMPONENT_WITH_SL1_JBI_XML = "component-with-sl1-jbi.xml";
 
     private static final String NOMINAL_JBI_XML = "component-jbi.xml";
 
@@ -177,96 +183,6 @@ public class DeployComponentTest extends AbstractBasicResourceTest {
         assertThat(resource.httpServer.wasCalled()).isFalse();
     }
 
-    @Test
-    public void nominal() throws Exception {
-        try (EventInput eventInput = resource.sse(1)) {
-            expectWorkspaceContent(eventInput);
-
-            MultiPart mpe = getComponentMultiPart();
-            WorkspaceContent post = resource.target("/workspaces/1/containers/" + getId(container) + "/components")
-                    .request().post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
-
-            ComponentFull postC = assertComponentContent(post, container, COMP_NAME);
-
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("COMPONENT_DEPLOYED");
-                WorkspaceContent data = e.readData(WorkspaceContent.class);
-
-                assertComponentContent(a, data, post);
-            });
-
-            assertThat(resource.httpServer.wasCalled()).isTrue();
-            assertThat(resource.httpServer.wasClosed()).isTrue();
-
-            assertThat(requestBy(COMPONENTS.NAME, COMP_NAME)).hasNumberOfRows(1);
-            assertThat(container.getComponents()).hasSize(1);
-            Component comp = container.getComponents().iterator().next();
-            assertThat(comp.getName()).isEqualTo(postC.component.name);
-            assertThat(comp.getState()).isEqualTo(ArtifactState.State.LOADED);
-            assertThat(comp.getType()).isEqualTo("BC");
-
-            resource.target("/components/" + postC.component.id).request().get(ComponentOverview.class);
-        }
-    }
-
-    @Test
-    public void overrideNoSLWithExistingSL() throws Exception {
-        overrideWithExistingSL(NOMINAL_JBI_XML);
-    }
-
-    @Test
-    public void overrideWrongSLWithExistingSL() throws Exception {
-        overrideWithExistingSL("component-with-sl1-jbi.xml");
-    }
-
-    @Test
-    public void overrideNoSLWithTwoExistingSL() throws Exception {
-        overrideWithSL(NOMINAL_JBI_XML,
-                ImmutableSet.of(SharedLibraryIdentifier.from(sl), SharedLibraryIdentifier.from(sl2)));
-    }
-
-    private void overrideWithExistingSL(String jbiXml) throws Exception {
-        overrideWithSL(jbiXml, ImmutableSet.of(SharedLibraryIdentifier.from(sl)));
-    }
-
-    private void overrideWithSL(String jbiXml, Set<SharedLibraryIdentifier> sls) throws Exception {
-        try (EventInput eventInput = resource.sse(1)) {
-            expectWorkspaceContent(eventInput);
-
-            ComponentDeployOverrides overrides = new ComponentDeployOverrides(sls);
-
-            FormDataMultiPart mpe = getMultiPart(jbiXml, "fakeComponent").field("overrides", overrides,
-                    MediaType.APPLICATION_JSON_TYPE);
-            WorkspaceContent post = resource.target("/workspaces/1/containers/" + getId(container) + "/components")
-                    .request().post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
-
-            ComponentFull postC = assertComponentContent(post, container, COMP_NAME);
-
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("COMPONENT_DEPLOYED");
-                WorkspaceContent data = e.readData(WorkspaceContent.class);
-
-                assertComponentContent(a, data, post);
-            });
-
-            assertThat(resource.httpServer.wasCalled()).isTrue();
-            assertThat(resource.httpServer.wasClosed()).isTrue();
-
-            assertThat(requestBy(COMPONENTS.NAME, COMP_NAME)).hasNumberOfRows(1);
-            assertThat(requestBy(SHAREDLIBRARIES_COMPONENTS.COMPONENT_ID, postC.component.id))
-                    .hasNumberOfRows(sls.size()).column(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID.getName())
-                    .containsValues(sls.stream().map(sl -> sl.toAdmin()).map(sl -> getId(sl)).toArray());
-            assertThat(container.getComponents()).hasSize(1);
-            Component comp = container.getComponents().iterator().next();
-            assertThat(comp.getName()).isEqualTo(postC.component.name);
-            assertThat(comp.getState()).isEqualTo(ArtifactState.State.LOADED);
-            assertThat(comp.getType()).isEqualTo("BC");
-            assertThat(comp.getSharedLibraries())
-                    .containsOnly(sls.stream().map(sl -> sl.toAdmin()).toArray(SharedLibrary[]::new));
-
-            resource.target("/components/" + postC.component.id).request().get(ComponentOverview.class);
-        }
-    }
 
     @Test
     public void overrideWithNonExistingSL() throws Exception {
@@ -277,42 +193,6 @@ public class DeployComponentTest extends AbstractBasicResourceTest {
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
         assertMissingSL(post);
-    }
-
-    @Test
-    public void overrideName() throws Exception {
-        try (EventInput eventInput = resource.sse(1)) {
-            expectWorkspaceContent(eventInput);
-
-            String componentName = "test-compo-name";
-
-            ComponentDeployOverrides overrides = new ComponentDeployOverrides(componentName);
-            MultiPart mpe = getComponentMultiPart().field("overrides", overrides, MediaType.APPLICATION_JSON_TYPE);
-
-            WorkspaceContent post = resource.target("/workspaces/1/containers/" + getId(container) + "/components")
-                    .request().post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
-
-            ComponentFull postC = assertComponentContent(post, container, componentName);
-
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("COMPONENT_DEPLOYED");
-                WorkspaceContent data = e.readData(WorkspaceContent.class);
-
-                assertComponentContent(a, data, post);
-            });
-
-            assertThat(resource.httpServer.wasCalled()).isTrue();
-            assertThat(resource.httpServer.wasClosed()).isTrue();
-
-            assertThat(requestBy(COMPONENTS.NAME, componentName)).hasNumberOfRows(1);
-            assertThat(container.getComponents()).hasSize(1);
-            Component comp = container.getComponents().iterator().next();
-            assertThat(comp.getName()).isEqualTo(postC.component.name);
-            assertThat(comp.getState()).isEqualTo(ArtifactState.State.LOADED);
-            assertThat(comp.getType()).isEqualTo("BC");
-
-            resource.target("/components/" + postC.component.id).request().get(ComponentOverview.class);
-        }
     }
 
     @Test
@@ -352,7 +232,7 @@ public class DeployComponentTest extends AbstractBasicResourceTest {
 
     @Test
     public void missingSL() throws Exception {
-        MultiPart mpe = getMultiPart("component-with-sl1-jbi.xml", "fakeComponentWithSL");
+        MultiPart mpe = getMultiPart(COMPONENT_WITH_SL1_JBI_XML, "fakeComponentWithSL");
         Response post = resource.target("/workspaces/1/containers/" + getId(container) + "/components").request()
                 .post(Entity.entity(mpe, mpe.getMediaType()));
 
@@ -371,15 +251,64 @@ public class DeployComponentTest extends AbstractBasicResourceTest {
     }
 
     @Test
+    public void overrideNoSLWithExistingSL() throws Exception {
+        overrideWithExistingSL(NOMINAL_JBI_XML);
+    }
+
+    @Test
+    public void overrideWrongSLWithExistingSL() throws Exception {
+        overrideWithExistingSL(COMPONENT_WITH_SL1_JBI_XML);
+    }
+
+    private void overrideWithExistingSL(String jbiXml)
+            throws Exception {
+        overrideWith(jbiXml, true, null, ImmutableSet.of(SharedLibraryIdentifier.from(sl)), 
+                COMP_NAME, Arrays.asList(sl));
+    }
+
+    @Test
+    public void nominal() throws Exception {
+        overrideWith(NOMINAL_JBI_XML, false, null, null, COMP_NAME, Arrays.asList());
+    }
+
+    @Test
     public void nominalWithSL() throws Exception {
+        overrideWith(COMPONENT_WITH_SL_JBI_XML, false, null, null, COMP_NAME, Arrays.asList(sl));
+    }
+
+    @Test
+    public void overrideName() throws Exception {
+        overrideWith(NOMINAL_JBI_XML, true, "test-compo-name", null, "test-compo-name", Arrays.asList());
+    }
+
+    @Test
+    public void overrideNoSLWithTwoExistingSL() throws Exception {
+        overrideWith(NOMINAL_JBI_XML, true, null,
+                ImmutableSet.of(SharedLibraryIdentifier.from(sl), SharedLibraryIdentifier.from(sl2)), COMP_NAME,
+                ImmutableList.of(sl, sl2));
+    }
+
+    @Test
+    public void overrideWithNull() throws Exception {
+        overrideWith(NOMINAL_JBI_XML, true, null, null, COMP_NAME, Arrays.asList());
+    }
+
+    private void overrideWith(String jbiXml, boolean overriding, @Nullable String name,
+            @Nullable Set<SharedLibraryIdentifier> sls,
+            String expectedComponentName, final List<SharedLibrary> expectedComponentSLs) throws Exception {
         try (EventInput eventInput = resource.sse(1)) {
             expectWorkspaceContent(eventInput);
 
-            MultiPart mpe = getMultiPart("component-with-sl-jbi.xml", "fakeComponentWithSL");
+            ComponentDeployOverrides overrides = new ComponentDeployOverrides(name, sls);
+
+            FormDataMultiPart mpe = getMultiPart(jbiXml, "fakeComponent");
+            if (overriding) {
+                mpe = mpe.field("overrides", overrides, MediaType.APPLICATION_JSON_TYPE);
+            }
             WorkspaceContent post = resource.target("/workspaces/1/containers/" + getId(container) + "/components")
                     .request().post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
 
-            ComponentFull postC = assertComponentContent(post, container, COMP_NAME);
+            ComponentFull postC = assertComponentContent(post, container, expectedComponentName);
 
             expectEvent(eventInput, (e, a) -> {
                 a.assertThat(e.getName()).isEqualTo("COMPONENT_DEPLOYED");
@@ -391,15 +320,17 @@ public class DeployComponentTest extends AbstractBasicResourceTest {
             assertThat(resource.httpServer.wasCalled()).isTrue();
             assertThat(resource.httpServer.wasClosed()).isTrue();
 
-            assertThat(requestBy(SHAREDLIBRARIES_COMPONENTS.COMPONENT_ID, postC.component.id)).hasNumberOfRows(1)
-                    .column(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID.getName()).value().isEqualTo(getId(sl));
-
+            assertThat(requestBy(COMPONENTS.NAME, expectedComponentName)).hasNumberOfRows(1);
+            assertThat(requestBy(SHAREDLIBRARIES_COMPONENTS.COMPONENT_ID, postC.component.id))
+                    .hasNumberOfRows(expectedComponentSLs.size())
+                    .column(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID.getName())
+                    .containsValues(getLongIds(expectedComponentSLs).toArray());
             assertThat(container.getComponents()).hasSize(1);
             Component comp = container.getComponents().iterator().next();
             assertThat(comp.getName()).isEqualTo(postC.component.name);
             assertThat(comp.getState()).isEqualTo(ArtifactState.State.LOADED);
             assertThat(comp.getType()).isEqualTo("BC");
-            assertThat(comp.getSharedLibraries()).containsOnly(sl);
+            assertThat(comp.getSharedLibraries()).hasSameElementsAs(expectedComponentSLs);
 
             resource.target("/components/" + postC.component.id).request().get(ComponentOverview.class);
         }

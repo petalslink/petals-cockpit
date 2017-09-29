@@ -209,20 +209,51 @@ public class DeploySATest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void overrideName() throws Exception {
+    public void conflictContainerError() throws Exception {
+        failDeployment = true;
+
+        MultiPart mpe = getSAMultiPart();
+        Response post = resource.target("/workspaces/1/containers/" + getId(container) + "/serviceassemblies").request()
+                .post(Entity.entity(mpe, mpe.getMediaType()));
+
+        assertThat(post.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
+        ErrorMessage err = post.readEntity(ErrorMessage.class);
+        assertThat(err.getCode()).isEqualTo(Status.CONFLICT.getStatusCode());
+        assertThat(err.getMessage()).isEqualTo("error");
+        assertThat(err.getDetails()).contains(DeploySATest.class.getName() + "$1.addServiceAssembly");
+
+        assertThat(container.getServiceAssemblies()).isEmpty();
+        assertThat(resource.httpServer.wasCalled()).isTrue();
+        assertThat(resource.httpServer.wasClosed()).isTrue();
+    }
+
+    @Test
+    public void overrideValidName() throws Exception {
+        overrideName("test-SA-name", "test-SA-name");
+    }
+
+    @Test
+    public void overrideEmptyName() throws Exception {
+        overrideName("", SA_NAME);
+    }
+
+    @Test
+    public void overrideNullName() throws Exception {
+        overrideName(null, SA_NAME);
+    }
+
+    private void overrideName(@Nullable String newName, String expectedName) throws Exception {
         try (EventInput eventInput = resource.sse(1)) {
             expectWorkspaceContent(eventInput);
 
-            String newSAName = "test-SA-name";
-
-            SADeployOverrides overrides = new SADeployOverrides(newSAName);
+            SADeployOverrides overrides = new SADeployOverrides(newName);
             FormDataMultiPart mpe = getSAMultiPart().field("overrides", overrides, MediaType.APPLICATION_JSON_TYPE);
 
             WorkspaceContent post = resource
                     .target("/workspaces/1/containers/" + getId(container) + "/serviceassemblies").request()
                     .post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
 
-            ServiceAssemblyFull postDataSA = assertSAContent(post, container, newSAName,
+            ServiceAssemblyFull postDataSA = assertSAContent(post, container, expectedName,
                     ImmutableList.of(component1, component1));
 
             Iterator<ServiceUnitFull> iterator = post.serviceUnits.values().iterator();
@@ -250,24 +281,5 @@ public class DeploySATest extends AbstractBasicResourceTest {
             resource.target("/serviceunits/" + postSU1.serviceUnit.id).request().get(ServiceUnitOverview.class);
             resource.target("/serviceunits/" + postSU2.serviceUnit.id).request().get(ServiceUnitOverview.class);
         }
-    }
-
-    @Test
-    public void conflictContainerError() throws Exception {
-        failDeployment = true;
-
-        MultiPart mpe = getSAMultiPart();
-        Response post = resource.target("/workspaces/1/containers/" + getId(container) + "/serviceassemblies").request()
-                .post(Entity.entity(mpe, mpe.getMediaType()));
-
-        assertThat(post.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
-        ErrorMessage err = post.readEntity(ErrorMessage.class);
-        assertThat(err.getCode()).isEqualTo(Status.CONFLICT.getStatusCode());
-        assertThat(err.getMessage()).isEqualTo("error");
-        assertThat(err.getDetails()).contains(DeploySATest.class.getName() + "$1.addServiceAssembly");
-
-        assertThat(container.getServiceAssemblies()).isEmpty();
-        assertThat(resource.httpServer.wasCalled()).isTrue();
-        assertThat(resource.httpServer.wasClosed()).isTrue();
     }
 }

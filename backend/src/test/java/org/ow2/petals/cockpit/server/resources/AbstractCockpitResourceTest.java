@@ -571,7 +571,15 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     protected Set<String> getIds(Stream<?> stream) {
-        return stream.map(e -> Long.toString(getId(e))).collect(Collectors.toSet());
+        return getLongIds(stream).map(id -> Long.toString(id)).collect(Collectors.toSet());
+    }
+
+    protected Stream<Long> getLongIds(Collection<?> coll) {
+        return getLongIds(coll.stream());
+    }
+
+    protected Stream<Long> getLongIds(Stream<?> stream) {
+        return stream.map(e -> getId(e));
     }
 
     protected void assertWorkspaceContentForContainers(SoftAssertions a, WorkspaceContent content, Domain... buses) {

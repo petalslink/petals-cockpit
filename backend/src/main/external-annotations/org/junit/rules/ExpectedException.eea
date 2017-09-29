@@ -1,0 +1,4 @@
+class org/junit/rules/ExpectedException
+none
+ ()Lorg/junit/rules/ExpectedException;
+ ()L1org/junit/rules/ExpectedException;
