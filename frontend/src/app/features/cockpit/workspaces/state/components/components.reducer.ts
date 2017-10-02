@@ -52,6 +52,9 @@ export namespace ComponentsReducer {
     | Components.ChangeState
     | Components.ChangeStateError
     | Components.ChangeStateSuccess
+    | Components.SetParameters
+    | Components.SetParametersError
+    | Components.SetParametersSuccess
     | Components.Removed
     | Components.Fold
     | Components.Unfold
@@ -97,6 +100,15 @@ export namespace ComponentsReducer {
       }
       case Components.ChangeStateSuccessType: {
         return changeStateSuccess(table, action.payload);
+      }
+      case Components.SetParametersType: {
+        return setParameters(table, action.payload);
+      }
+      case Components.SetParametersErrorType: {
+        return setParametersError(table, action.payload);
+      }
+      case Components.SetParametersSuccessType: {
+        return setParametersSuccess(table, action.payload);
       }
       case Components.FoldType: {
         return fold(table, action.payload);
@@ -155,8 +167,8 @@ export namespace ComponentsReducer {
     if (payload.id) {
       return {
         ...updateById(table, payload.id, {
-          errorChangeState: '',
-          errorDeployment: '',
+          updateError: '',
+          deployError: '',
         }),
         ...res,
       };
@@ -170,7 +182,7 @@ export namespace ComponentsReducer {
 
   function fetchDetails(table: IComponentsTable, payload: { id: string }) {
     return updateById(table, payload.id, {
-      isFetchingDetails: true,
+      isUpdating: true,
     });
   }
 
@@ -180,13 +192,13 @@ export namespace ComponentsReducer {
   ) {
     return updateById(table, payload.id, {
       ...payload.data,
-      isFetchingDetails: false,
+      isUpdating: false,
     });
   }
 
   function fetchDetailsError(table: IComponentsTable, payload: { id: string }) {
     return updateById(table, payload.id, {
-      isFetchingDetails: false,
+      isUpdating: false,
     });
   }
 
@@ -194,12 +206,10 @@ export namespace ComponentsReducer {
     table: IComponentsTable,
     payload: {
       id: string;
-      state: ComponentState;
-      parameters: { [key: string]: string };
     }
   ) {
     return updateById(table, payload.id, {
-      isUpdatingState: true,
+      isUpdating: true,
     });
   }
 
@@ -212,18 +222,51 @@ export namespace ComponentsReducer {
   ) {
     return updateById(table, payload.id, {
       state: payload.state,
-      isUpdatingState: false,
-      errorChangeState: '',
+      isUpdating: false,
+      updateError: '',
     });
   }
 
   function changeStateError(
     table: IComponentsTable,
-    payload: { id: string; errorChangeState: string }
+    payload: { id: string; error: string }
   ) {
     return updateById(table, payload.id, {
-      isUpdatingState: false,
-      errorChangeState: payload.errorChangeState,
+      isUpdating: false,
+      updateError: payload.error,
+    });
+  }
+
+  function setParameters(
+    table: IComponentsTable,
+    payload: {
+      id: string;
+    }
+  ) {
+    return updateById(table, payload.id, {
+      isUpdating: true,
+    });
+  }
+
+  function setParametersSuccess(
+    table: IComponentsTable,
+    payload: {
+      id: string;
+    }
+  ) {
+    return updateById(table, payload.id, {
+      isUpdating: false,
+      updateError: '',
+    });
+  }
+
+  function setParametersError(
+    table: IComponentsTable,
+    payload: { id: string; error: string }
+  ) {
+    return updateById(table, payload.id, {
+      isUpdating: false,
+      updateError: payload.error,
     });
   }
 
@@ -233,7 +276,7 @@ export namespace ComponentsReducer {
 
   function deployServiceUnit(table: IComponentsTable, payload: { id: string }) {
     return updateById(table, payload.id, {
-      isDeployingServiceUnit: true,
+      isUpdating: true,
     });
   }
 
@@ -242,8 +285,8 @@ export namespace ComponentsReducer {
     payload: { id: string; errorDeployment: string }
   ) {
     return updateById(table, payload.id, {
-      isDeployingServiceUnit: false,
-      errorDeployment: payload.errorDeployment,
+      isUpdating: false,
+      deployError: payload.errorDeployment,
     });
   }
 
@@ -252,8 +295,8 @@ export namespace ComponentsReducer {
     payload: IServiceUnitBackendSSE
   ) {
     return updateById(table, payload.componentId, {
-      isDeployingServiceUnit: false,
-      errorDeployment: '',
+      isUpdating: false,
+      deployError: '',
     });
   }
 

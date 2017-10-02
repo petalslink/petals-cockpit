@@ -33,7 +33,7 @@ import { escapeStringRegexp } from 'app/shared/helpers/shared.helper';
 import { IStore } from 'app/shared/state/store.interface';
 import { IUserRow } from 'app/shared/state/users.interface';
 import { getUsersAllIds, getUsersById } from 'app/shared/state/users.selectors';
-import { IWorkspaces } from './workspaces.interface';
+import { IWorkspaceRow, IWorkspaces } from './workspaces.interface';
 
 const getSelectedWorkspaceId = (state: IStore) =>
   state.workspaces.selectedWorkspaceId;
@@ -58,13 +58,13 @@ export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
 
 // -----------------------------------------------------------
 
-export const getCurrentWorkspace = (store: IStore) =>
+export const getCurrentWorkspace = (store: IStore): IWorkspaceRow =>
   store.workspaces.byId[store.workspaces.selectedWorkspaceId];
 
 const getCurrentWorkspaceUsersById = createSelector(
   (state: IStore) => getCurrentWorkspace(state).users,
   getUsersById,
-  (usersIds, usersById) => usersIds.map(id => usersById[id])
+  (usersIds, usersById): IUserRow[] => usersIds.map(id => usersById[id])
 );
 
 export function getCurrentWorkspaceUsers(
@@ -77,7 +77,7 @@ export const getUsersNotInCurrentWorkspace = createSelector(
   getUsersAllIds,
   getUsersById,
   (state: IStore) => getCurrentWorkspace(state).users,
-  (usersAllIds, usersById, currentWorkspaceUsersSe) =>
+  (usersAllIds, usersById, currentWorkspaceUsersSe): IUserRow[] =>
     usersAllIds
       .filter(id => !currentWorkspaceUsersSe.includes(id))
       .map(id => usersById[id])
@@ -120,7 +120,7 @@ const buildTree = createSelector(
     serviceUnitsByIds,
     serviceAssembliesByIds,
     sharedLibrariesByIds
-  ) => {
+  ): WorkspaceElement[] => {
     const baseUrl = `/workspaces/${selectedWorkspaceId}/petals`;
 
     return busesAllIds.map(id => busesByIds[id]).map<WorkspaceElement>(bus => ({
@@ -222,7 +222,7 @@ const buildTree = createSelector(
 export const getCurrentWorkspaceTree = createSelector(
   buildTree,
   (state: IStore) => state.workspaces.searchPetals,
-  (tree, search) => {
+  (tree, search): WorkspaceElement[] => {
     if (typeof search !== 'string' || search === '') {
       return tree;
     }

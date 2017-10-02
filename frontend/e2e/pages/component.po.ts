@@ -142,7 +142,10 @@ export class ComponentOperationPage extends ComponentPage {
     by.cssContainingText(`button`, `Unload`)
   );
   public readonly changeStateError = this.lifecycleCard.$(`.error .italic`);
-  public readonly parameters = this.lifecycleCard.$(`.parameters`);
+  public readonly setParametersButton = this.lifecycleCard.element(
+    by.cssContainingText(`button`, `Set`)
+  );
+  public readonly parameters = this.lifecycleCard.$(`.component-parameters`);
 
   public readonly deploys = this.operations.$(`.deploys`);
 

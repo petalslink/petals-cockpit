@@ -36,7 +36,6 @@ import { SharedModule } from 'app/shared/shared.module';
 import {
   getElementBySelector,
   getElementsBySelector,
-  getInputByName,
   getInputListBySelector,
 } from 'testing';
 
@@ -45,14 +44,8 @@ describe('Petals component operations', () => {
   let fixture: ComponentFixture<TestHostPetalsComponentOperationsComponent>;
 
   const DOM = {
-    get enableHttpsInpt() {
-      return getInputByName(fixture, 'enable-https');
-    },
-    get httpPortInpt() {
-      return getInputByName(fixture, 'http-port');
-    },
     get inputsParameters() {
-      return getInputListBySelector(fixture, '.parameters');
+      return getInputListBySelector(fixture, '.component-parameters');
     },
     get compState() {
       return getElementBySelector<HTMLSpanElement>(fixture, '.component-state');
@@ -258,17 +251,14 @@ class TestHostPetalsComponentOperationsComponent implements OnInit {
     this.component = {
       containerId: 'contId0',
       state: 'Loaded',
-      isUpdatingState: false,
-      isFetchingDetails: false,
+      isUpdating: false,
       serviceUnits: [],
-      errorChangeState: '',
-      isDeployingServiceUnit: false,
+      updateError: '',
+      deployError: '',
       parameters: {
         'http-port': '8080',
         'enable-https': 'false',
       },
-
-      errorDeployment: '',
       id: 'contId0',
       isFolded: false,
       name: 'Container 0',

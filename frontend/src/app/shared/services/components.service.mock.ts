@@ -17,6 +17,8 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import has from 'lodash-es/has';
+import pickBy from 'lodash-es/pickBy';
 
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import * as helper from 'app/shared/helpers/mock.helper';
@@ -42,38 +44,17 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
     return helper.responseBody(detailsComponent);
   }
 
-  putState(
-    _workspaceId: string,
-    componentId: string,
-    newState: ComponentState,
-    parameters: { [key: string]: string }
-  ) {
-    // in order to simulate an error, at least for E2E tests, if the http-port contains 'error', throw an error
-    if (
-      parameters &&
-      parameters['http-port'] &&
-      parameters['http-port'].includes('error')
-    ) {
-      return helper.errorBackend(
-        '[Mock message] An error happened when trying to change the state of that component',
-        400
-      );
-    }
-
+  putState(_workspaceId: string, componentId: string, state: ComponentState) {
     const component = componentsService.get(componentId);
-    if (newState === EComponentState.Unloaded) {
+    if (state === EComponentState.Unloaded) {
       componentsService.remove(componentId);
     } else {
-      component.state = newState;
-    }
-
-    if (parameters) {
-      component.parameters = parameters;
+      component.state = state;
     }
 
     const response = {
       id: componentId,
-      state: newState,
+      state,
     };
 
     // when the state changes, trigger a fake SSE event
@@ -87,6 +68,45 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
     );
 
     return helper.responseBody(response);
+  }
+
+  setParameters(
+    _workspaceId: string,
+    componentId: string,
+    parameters: { [key: string]: string }
+  ) {
+    // in order to simulate an error, at least for E2E tests
+    if (parameters['httpThreadPoolSizeMax'] === 'error') {
+      return helper.errorBackend(
+        '[Mock message] An error happened when trying to change the parameters of that component',
+        400
+      );
+    }
+
+    const component = componentsService.get(componentId);
+
+    function updateParameters(
+      params: { [key: string]: string },
+      newParams: { [key: string]: string }
+    ) {
+      return {
+        ...params,
+        ...pickBy(newParams, (v, k) => has(params, k)),
+      };
+    }
+
+    if (component.state === EComponentState.Loaded) {
+      component.installParameters = updateParameters(
+        component.installParameters,
+        parameters
+      );
+    }
+    component.runtimeParameters = updateParameters(
+      component.runtimeParameters,
+      parameters
+    );
+
+    return helper.response(204);
   }
 
   deploySu(
