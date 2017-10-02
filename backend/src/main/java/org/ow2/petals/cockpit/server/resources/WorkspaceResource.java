@@ -256,7 +256,8 @@ public class WorkspaceResource {
     @Produces(MediaType.APPLICATION_JSON)
     public WorkspaceContent deploySharedLibrary(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
-            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition)
+            @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
+            @Nullable @Valid @FormDataParam("overrides") SLDeployOverrides overrides)
             throws IOException, JBIDescriptorException {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -265,7 +266,24 @@ public class WorkspaceResource {
         String filename = StringUtils.isEmpty(fileDisposition.getFileName()) ? "sl.zip" : fileDisposition.getFileName();
 
         try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
-            Jbi descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptorFromArchive(sa.getFile());
+
+            Jbi descriptor;
+            try (FileSystem fs = FileSystems.newFileSystem(sa.getFile().toPath(), null)) {
+                java.nio.file.Path jbiPath = fs.getPath(JBIDescriptorBuilder.JBI_DESCRIPTOR_RESOURCE_IN_ARCHIVE);
+                try (InputStream jbiIn = Files.newInputStream(jbiPath)) {
+                    descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptorFromArchive(sa.getFile());
+                }
+
+                if (overrides != null && overrides.sharedLibrary != null) {
+                    SharedLibraryIdentifier slOverrides = overrides.sharedLibrary;
+                    descriptor.getSharedLibrary().getIdentification().setName(slOverrides.name);
+                    descriptor.getSharedLibrary().setVersion(slOverrides.version);
+                    Files.delete(jbiPath);
+                    try (OutputStream jbiOut = Files.newOutputStream(jbiPath)) {
+                        JBIDescriptorBuilder.getInstance().writeXMLJBIdescriptor(descriptor, jbiOut);
+                    }
+                }
+            }
 
             return workspace.deploySharedLibrary(descriptor.getSharedLibrary().getIdentification().getName(),
                     descriptor.getSharedLibrary().getVersion(), sa.getArtifactExternalUrl(), containerId);
@@ -302,7 +320,7 @@ public class WorkspaceResource {
     public WorkspaceContent deployComponent(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
-            @Nullable @FormDataParam("overrides") ComponentDeployOverrides overrides)
+            @Nullable @Valid @FormDataParam("overrides") ComponentDeployOverrides overrides)
             throws IOException, JBIDescriptorException {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -358,7 +376,7 @@ public class WorkspaceResource {
     public WorkspaceContent deployServiceAssembly(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
-            @Nullable @FormDataParam("overrides") SADeployOverrides overrides)
+            @Nullable @Valid @FormDataParam("overrides") SADeployOverrides overrides)
             throws IOException, JBIDescriptorException {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -833,11 +851,12 @@ public class WorkspaceResource {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + name.hashCode();
-            result = prime * result + version.hashCode();
+            result = prime * result + ((name == null) ? 0 : name.hashCode());
+            result = prime * result + ((version == null) ? 0 : version.hashCode());
             return result;
         }
 
+        @SuppressWarnings("unused")
         @Override
         public boolean equals(@Nullable Object obj) {
             if (this == obj)
@@ -847,12 +866,19 @@ public class WorkspaceResource {
             if (getClass() != obj.getClass())
                 return false;
             SharedLibraryIdentifier other = (SharedLibraryIdentifier) obj;
-            if (!name.equals(other.name))
+            if (name == null) {
+                if (other.name != null)
+                    return false;
+            } else if (!name.equals(other.name))
                 return false;
-            if (!version.equals(other.version))
+            if (version == null) {
+                if (other.version != null)
+                    return false;
+            } else if (!version.equals(other.version))
                 return false;
             return true;
         }
+
 
         public static SharedLibraryIdentifier from(SharedLibrary sl) {
             return new SharedLibraryIdentifier(sl.getName(), sl.getVersion());
@@ -877,6 +903,7 @@ public class WorkspaceResource {
         public final String name;
 
         @Nullable
+        @Valid
         @JsonProperty
         public final ImmutableSet<SharedLibraryIdentifier> sharedLibraries;
 
@@ -903,6 +930,18 @@ public class WorkspaceResource {
 
         public SADeployOverrides(@JsonProperty("name") @Nullable String name) {
             this.name = name;
+        }
+    }
+
+    public static class SLDeployOverrides {
+
+        @Nullable
+        @Valid
+        @JsonProperty
+        public final SharedLibraryIdentifier sharedLibrary;
+
+        public SLDeployOverrides(@JsonProperty("sharedLibrary") @Nullable SharedLibraryIdentifier sharedLibrary) {
+            this.sharedLibrary = sharedLibrary;
         }
     }
 

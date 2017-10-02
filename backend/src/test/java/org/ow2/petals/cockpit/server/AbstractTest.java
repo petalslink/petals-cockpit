@@ -16,6 +16,8 @@
  */
 package org.ow2.petals.cockpit.server;
 
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,9 @@ import ch.qos.logback.classic.Level;
 import io.dropwizard.logging.BootstrapLogging;
 
 public class AbstractTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     static {
         // the level parameter corresponds to the maximum level to be printed on the console

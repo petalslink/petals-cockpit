@@ -20,11 +20,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.junit.Before;
@@ -37,6 +41,8 @@ import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryOverview;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SLDeployOverrides;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SharedLibraryIdentifier;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
 
 import com.google.common.collect.ImmutableMap;
@@ -80,7 +86,7 @@ public class DeploySLTest extends AbstractBasicResourceTest {
         failDeployment = false;
     }
 
-    private MultiPart getSLMultiPart() throws Exception {
+    private FormDataMultiPart getSLMultiPart() throws Exception {
         return getMultiPart("sl-jbi.xml", "fakeSL");
     }
 
@@ -200,4 +206,82 @@ public class DeploySLTest extends AbstractBasicResourceTest {
         assertThat(resource.httpServer.wasCalled()).isTrue();
         assertThat(resource.httpServer.wasClosed()).isTrue();
     }
+
+    @Test
+    @SuppressWarnings("null")
+    public void overrideWithNullVersion() throws Exception {
+        thrown.expect(ClientErrorException.class);
+        thrown.expectMessage("HTTP 422");
+        // without the cast, eclipse would complain (and he would be right!)
+        overrideWith(new SharedLibraryIdentifier(SL_NAME + "-test", (@NonNull String) null));
+    }
+
+    @Test
+    @SuppressWarnings("null")
+    public void overrideWithNullName() throws Exception {
+        thrown.expect(ClientErrorException.class);
+        thrown.expectMessage("HTTP 422");
+        // without the cast, eclipse would complain (and he would be right!)
+        overrideWith(new SharedLibraryIdentifier((@NonNull String) null, "3.2.1"));
+    }
+
+    @Test
+    @SuppressWarnings("null")
+    public void overrideWithNullNameAndName() throws Exception {
+        thrown.expect(ClientErrorException.class);
+        thrown.expectMessage("HTTP 422");
+        // without the cast, eclipse would complain (and he would be right!)
+        overrideWith(new SharedLibraryIdentifier((@NonNull String) null, (@NonNull String) null));
+    }
+
+    @Test
+    public void overridewithEmptyVersion() throws Exception {
+        thrown.expect(ClientErrorException.class);
+        thrown.expectMessage("HTTP 422");
+        overrideWith(new SharedLibraryIdentifier(SL_NAME + "-test", ""));
+    }
+
+    @Test
+    public void overridewithEmptyName() throws Exception {
+        thrown.expect(ClientErrorException.class);
+        thrown.expectMessage("HTTP 422");
+        overrideWith(new SharedLibraryIdentifier("", "6.6.6"));
+    }
+
+    @Test
+    public void overrideNameAndVersion() throws Exception {
+        // expected to succeed
+        overrideWith(new SharedLibraryIdentifier(SL_NAME + "-test", "1.0.0"));
+    }
+
+    private void overrideWith(SharedLibraryIdentifier sl) throws Exception {
+        try (EventInput eventInput = resource.sse(1)) {
+            expectWorkspaceContent(eventInput);
+
+            SLDeployOverrides overrides = new SLDeployOverrides(sl);
+
+            FormDataMultiPart mpe = getSLMultiPart().field("overrides", overrides, MediaType.APPLICATION_JSON_TYPE);
+            WorkspaceContent post = resource.target("/workspaces/1/containers/" + getId(container) + "/sharedlibraries")
+                    .request().post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
+
+            SharedLibraryFull postDataSL = assertSLContent(post, container, sl.name, sl.version);
+            assertThat(postDataSL.components).isEmpty();
+
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("SL_DEPLOYED");
+                WorkspaceContent data = e.readData(WorkspaceContent.class);
+
+                assertSLContent(a, data, post);
+            });
+
+            assertThat(resource.httpServer.wasCalled()).isTrue();
+            assertThat(resource.httpServer.wasClosed()).isTrue();
+
+            assertThat(container.getSharedLibraries()).hasSize(1);
+
+            resource.target("/sharedlibraries/" + postDataSL.sharedLibrary.id).request()
+                    .get(SharedLibraryOverview.class);
+        }
+    }
+
 }
