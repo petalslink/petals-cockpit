@@ -58,8 +58,6 @@ import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
 import org.ow2.petals.cockpit.server.services.WorkspacesService;
 import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
-import org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule;
-import org.ow2.petals.jmx.api.mock.junit.configuration.component.InstallationConfigurationServiceClientMock;
 import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
 import org.zapodot.junit.db.plugin.LiquibaseInitializer;
@@ -78,8 +76,6 @@ public class CockpitResourceRule implements TestRule {
     public final EmbeddedDatabaseRule db;
 
     public final MockArtifactServer httpServer = new MockArtifactServer();
-
-    public final PetalsJmxApiJunitRule jmx = new PetalsJmxApiJunitRule("localhost", 7700, "user", "pass");
 
     public final ResourceTestRule resource;
 
@@ -146,7 +142,7 @@ public class CockpitResourceRule implements TestRule {
     public Statement apply(@Nullable Statement base, @Nullable Description description) {
         assert base != null;
         assert description != null;
-        return RulesHelper.chain(base, description, resource, httpServer, RulesHelper.dropDbAfter(db), db, petals, jmx,
+        return RulesHelper.chain(base, description, resource, httpServer, RulesHelper.dropDbAfter(db), db, petals,
                 RulesHelper.jerseyCookies(), RulesHelper.after(() -> currentProfile = null));
 
     }
@@ -178,13 +174,6 @@ public class CockpitResourceRule implements TestRule {
         @Override
         public void componentAdded(Component component, ComponentsRecord compDb) {
             setWorkspaceId(component, compDb.getId());
-            // The JXM client is only used by components, to retrieve their parameters
-            // TODO it would be good to remove client on component undeploy...
-            jmx.addComponentInstallerClient(component.getName(),
-                    Component.ComponentType.BC.toString().equals(component.getType())
-                            ? PetalsJmxApiJunitRule.ComponentType.BINDING
-                            : PetalsJmxApiJunitRule.ComponentType.ENGINE,
-                    new InstallationConfigurationServiceClientMock(), null);
         }
 
         @Override

@@ -85,6 +85,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContent
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusImport;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChangeParameters;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentStateChanged;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAChangeState;
@@ -349,6 +350,30 @@ public class WorkspacesService {
             }
         }
 
+        public synchronized void changeComponentParameters(long compId, ComponentChangeParameters action) {
+            DSL.using(jooq).transaction(conf -> {
+                ComponentsRecord comp = DSL.using(conf).select(COMPONENTS.fields()).from(COMPONENTS).join(CONTAINERS)
+                        .onKey(FK_COMPONENTS_CONTAINERS_ID).join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
+                        .where(COMPONENTS.ID.eq(compId).and(BUSES.WORKSPACE_ID.eq(wId)))
+                        .fetchOneInto(ComponentsRecord.class);
+
+                if (comp == null) {
+                    throw new WebApplicationException(Status.NOT_FOUND);
+                }
+
+                ComponentMin.Type type = ComponentMin.Type.from(comp.getType());
+                assert type != null;
+
+                // TODO merge with previous requests...
+                ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS)
+                        .where(CONTAINERS.ID.eq(comp.getContainerId())).fetchOne();
+                assert cont != null;
+
+                petals.setParameters(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
+                        comp.getName(), type.to(), action.parameters);
+            });
+        }
+
         public synchronized ComponentStateChanged changeComponentState(long compId, ComponentChangeState action) {
             return DSL.using(jooq).transactionResult(conf -> {
 
@@ -365,18 +390,7 @@ public class WorkspacesService {
                 ComponentMin.State newState = action.state;
 
                 if (currentState.equals(newState)) {
-                    return new ComponentStateChanged(compId, currentState);
-                }
-
-                if (!isComponentStateTransitionOk(comp, currentState, newState)) {
-                    // TODO or should I rely on the information from the container instead of my own?
-                    throw new WebApplicationException(Status.CONFLICT);
-                }
-
-                if (newState == ComponentMin.State.Unloaded
-                        && DSL.using(conf).fetchExists(SERVICEUNITS, SERVICEUNITS.COMPONENT_ID.eq(comp.getId()))) {
-                    // TODO or should I rely on the information from the container instead of my own?
-                    throw new WebApplicationException(Status.CONFLICT);
+                    return new ComponentStateChanged(comp.getId(), newState);
                 }
 
                 // TODO merge with previous requests...
@@ -385,8 +399,7 @@ public class WorkspacesService {
                 assert cont != null;
 
                 ComponentMin.State newCurrentState = petals.changeComponentState(cont.getIp(), cont.getPort(),
-                        cont.getUsername(), cont.getPassword(), comp.getType(), comp.getName(), currentState, newState,
-                        action.parameters);
+                        cont.getUsername(), cont.getPassword(), comp.getType(), comp.getName(), newState);
 
                 ComponentStateChanged res = new ComponentStateChanged(comp.getId(), newCurrentState);
 
@@ -394,35 +407,6 @@ public class WorkspacesService {
 
                 return res;
             });
-        }
-
-        /**
-         * Note : petals admin does not expose a way to go to shutdown (except from {@link ComponentMin.State#Unloaded}
-         * via {@link ArtifactLifecycle#deploy(java.net.URL)}, but we don't support it yet!)
-         */
-        private boolean isComponentStateTransitionOk(ComponentsRecord comp, ComponentMin.State from,
-                ComponentMin.State to) {
-            switch (from) {
-                case Loaded:
-                    return to == ComponentMin.State.Shutdown // via install()
-                            || to == ComponentMin.State.Unloaded; // via undeploy()
-                case Shutdown:
-                    return to == ComponentMin.State.Unloaded // via undeploy()
-                            || to == ComponentMin.State.Loaded // via uninstall()
-                            || to == ComponentMin.State.Started; // via start()
-                case Started:
-                    return to == ComponentMin.State.Stopped; // via stop()
-                case Stopped:
-                    return to == ComponentMin.State.Started // via start()
-                            || to == ComponentMin.State.Loaded // via uninstall()
-                            || to == ComponentMin.State.Unloaded; // via undeploy()
-                case Unknown:
-                    return to == ComponentMin.State.Unloaded; // via undeploy()
-                default:
-                    LOG.warn("Impossible case for state transition check from {} to {} for Component {} ({})", from, to,
-                            comp.getName(), comp.getId());
-                    return false;
-            }
         }
 
         private void componentStateUpdated(ComponentStateChanged comp, Configuration conf) {
@@ -587,8 +571,8 @@ public class WorkspacesService {
                 serviceUnitsDb.put(Long.toString(suDb.getId()), new ServiceUnitFull(suDb));
             }
 
-            WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(),
-                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap
+            WorkspaceContent res = new WorkspaceContent(
+                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap
                             .of(Long.toString(saDb.getId()), new ServiceAssemblyFull(saDb, serviceUnitsDb.keySet())),
                     serviceUnitsDb, ImmutableMap.of());
 

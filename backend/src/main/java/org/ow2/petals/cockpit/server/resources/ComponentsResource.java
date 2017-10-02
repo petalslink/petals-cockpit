@@ -96,17 +96,15 @@ public class ComponentsResource {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
 
-            final Map<String, String> parameters;
-            if (ComponentMin.State.valueOf(comp.getState()) == ComponentMin.State.Loaded) {
-                ContainersRecord container = DSL.using(conf).selectFrom(CONTAINERS)
-                        .where(CONTAINERS.ID.eq(comp.getContainerId())).fetchOne();
-                assert container != null;
+            ContainersRecord container = DSL.using(conf).selectFrom(CONTAINERS)
+                    .where(CONTAINERS.ID.eq(comp.getContainerId())).fetchOne();
+            assert container != null;
 
-                parameters = petals.getInstallParameters(container.getIp(), container.getPort(),
-                        container.getUsername(), container.getPassword(), comp.getName());
-            } else {
-                parameters = ImmutableMap.of();
-            }
+            ComponentMin.Type type = ComponentMin.Type.from(comp.getType());
+            assert type != null;
+
+            Map<String, String> parameters = petals.getParameters(container.getIp(), container.getPort(),
+                    container.getUsername(), container.getPassword(), comp.getName(), type.to());
 
             return new ComponentOverview(parameters);
         });

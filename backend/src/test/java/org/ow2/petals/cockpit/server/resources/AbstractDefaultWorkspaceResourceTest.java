@@ -56,8 +56,8 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractBasic
 
     protected final Component component = new Component("comp", ComponentType.SE, ArtifactState.State.STARTED);
 
-    protected final Component componentWithSL = new Component("compSL", ComponentType.SE, ArtifactState.State.STARTED,
-            ImmutableSet.of(sharedLibrary.copy()));
+    protected final Component componentWithSL = new Component("compSL", ComponentType.SE,
+            ArtifactState.State.STARTED, ImmutableSet.of(sharedLibrary.copy()));
 
     protected final ServiceUnit serviceUnit = new ServiceUnit("su", component.getName());
 
