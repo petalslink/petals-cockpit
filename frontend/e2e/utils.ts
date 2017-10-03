@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// tslint:disable:import-blacklist because lodash-es imports doesn't work with e2e tsconfig
 import { range } from 'lodash';
 import {
   $,
