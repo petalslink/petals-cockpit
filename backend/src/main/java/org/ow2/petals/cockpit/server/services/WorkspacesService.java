@@ -185,7 +185,6 @@ public class WorkspacesService {
             LOG.debug("New SSE client for workspace {}", wId);
 
             WorkspaceFullContent content = DSL.using(jooq).transactionResult(conf -> {
-                // TODO merge queries
                 WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wId)).fetchOne();
 
                 // this should never happen!
@@ -304,7 +303,7 @@ public class WorkspacesService {
                 CompletableFuture.runAsync(() -> finishImport(bDb, res));
             };
 
-            // store it before starting to prevent race condition TODO ??
+            // TODO store it before starting to prevent race condition (not likely to happen but well...)
             importsInProgress.put(bDb.getId(), CompletableFuture.runAsync(importer));
         }
 
@@ -332,12 +331,13 @@ public class WorkspacesService {
         // TODO in the future, there should be multiple methods like this for multiple type of imports
         private Either<String, Domain> doImportExistingBus(BusImport bus) {
             try {
-                // TODO even though getTopology can be interrupted, the petals admin code is based on RMI which cannot
-                // be
-                // interrupted, so it will continue to be executed even after InterruptedException is thrown. There is
-                // nothing we can do for this until petals admin is changed, but it's ok since there is no side effect
-                // in this operation: it will run in the background while we consider the operation interrupted on our
-                // side.
+                /*
+                 * TODO even though getTopology can be interrupted, the petals admin code is based on RMI which cannot
+                 * be interrupted, so it will continue to be executed even after InterruptedException is thrown. There
+                 * is nothing we can do for this until petals admin is changed, but it's ok since there is no side
+                 * effect in this operation: it will run in the background while we consider the operation interrupted
+                 * on our side.
+                 */
                 Domain topology = petals.getTopology(bus.ip, bus.port, bus.username, bus.password, bus.passphrase);
                 return Either.right(topology);
             } catch (Exception e) {
@@ -364,7 +364,6 @@ public class WorkspacesService {
                 ComponentMin.Type type = ComponentMin.Type.from(comp.getType());
                 assert type != null;
 
-                // TODO merge with previous requests...
                 ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS)
                         .where(CONTAINERS.ID.eq(comp.getContainerId())).fetchOne();
                 assert cont != null;
@@ -393,7 +392,6 @@ public class WorkspacesService {
                     return new ComponentStateChanged(comp.getId(), newState);
                 }
 
-                // TODO merge with previous requests...
                 ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS)
                         .where(CONTAINERS.ID.eq(comp.getContainerId())).fetchOne();
                 assert cont != null;
@@ -410,7 +408,6 @@ public class WorkspacesService {
         }
 
         private void componentStateUpdated(ComponentStateChanged comp, Configuration conf) {
-            // TODO error handling???
             if (comp.state != ComponentMin.State.Unloaded) {
                 DSL.using(conf).update(COMPONENTS).set(COMPONENTS.STATE, comp.state.name())
                         .where(COMPONENTS.ID.eq(comp.id)).execute();
@@ -444,7 +441,6 @@ public class WorkspacesService {
                     throw new WebApplicationException(Status.CONFLICT);
                 }
 
-                // TODO merge with previous request...
                 ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS)
                         .where(CONTAINERS.ID.eq(sa.getContainerId())).fetchOne();
                 assert cont != null;
@@ -486,7 +482,6 @@ public class WorkspacesService {
         }
 
         private void serviceAssemblyStateUpdated(SAStateChanged sa, Configuration conf) {
-            // TODO error handling???
             if (sa.state != ServiceAssemblyMin.State.Unloaded) {
                 DSL.using(conf).update(SERVICEASSEMBLIES).set(SERVICEASSEMBLIES.STATE, sa.state.name())
                         .where(SERVICEASSEMBLIES.ID.eq(sa.id)).execute();
@@ -512,7 +507,6 @@ public class WorkspacesService {
                     return new SLStateChanged(slId, SharedLibraryMin.State.Loaded);
                 }
 
-                // TODO merge with previous request...
                 ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS)
                         .where(CONTAINERS.ID.eq(sl.getContainerId())).fetchOne();
                 assert cont != null;
@@ -626,8 +620,6 @@ public class WorkspacesService {
                     ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(compDb, ImmutableSet.of(), sls)),
                     ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
 
-            // we want the event to be sent after we answered
-            // TODO after response?
             broadcast(WorkspaceEvent.componentDeployed(res));
 
             return res;
