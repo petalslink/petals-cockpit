@@ -62,7 +62,6 @@ import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.api.artifact.SharedLibrary;
-import org.ow2.petals.admin.api.artifact.lifecycle.ArtifactLifecycle;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
@@ -77,7 +76,6 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent;
@@ -436,11 +434,6 @@ public class WorkspacesService {
                     return new SAStateChanged(saId, currentState);
                 }
 
-                if (!isSAStateTransitionOk(sa, currentState, newState)) {
-                    // TODO or should I rely on the information from the container instead of my own?
-                    throw new WebApplicationException(Status.CONFLICT);
-                }
-
                 ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS)
                         .where(CONTAINERS.ID.eq(sa.getContainerId())).fetchOne();
                 assert cont != null;
@@ -454,31 +447,6 @@ public class WorkspacesService {
 
                 return res;
             });
-        }
-
-        /**
-         * Note : petals admin does not expose a way to go to shutdown (except from
-         * {@link ServiceUnitMin.State#Unloaded} via {@link ArtifactLifecycle#deploy(java.net.URL)}, but we don't
-         * support it yet!)
-         */
-        private boolean isSAStateTransitionOk(ServiceassembliesRecord sa, ServiceAssemblyMin.State from,
-                ServiceAssemblyMin.State to) {
-            switch (from) {
-                case Shutdown:
-                    return to == ServiceAssemblyMin.State.Unloaded // via undeploy()
-                            || to == ServiceAssemblyMin.State.Started; // via start()
-                case Started:
-                    return to == ServiceAssemblyMin.State.Stopped; // via stop()
-                case Stopped:
-                    return to == ServiceAssemblyMin.State.Started // via start()
-                            || to == ServiceAssemblyMin.State.Unloaded; // via undeploy()
-                case Unknown:
-                    return to == ServiceAssemblyMin.State.Unloaded; // via undeploy()
-                default:
-                    LOG.warn("Impossible case for state transition check from {} to {} for SA {} ({})", from, to,
-                            sa.getName(), sa.getId());
-                    return false;
-            }
         }
 
         private void serviceAssemblyStateUpdated(SAStateChanged sa, Configuration conf) {
