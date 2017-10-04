@@ -33,7 +33,7 @@
     <pac4j.version>2.1.0</pac4j.version>
     <h2.version>1.4.196</h2.version>
     <slf4j.version>1.7.25</slf4j.version>
-    <jooq.version>3.9.5</jooq.version>
+    <jooq.version>3.9.6</jooq.version>
     <petals-admin.version>2.0.0-SNAPSHOT</petals-admin.version>
     <petals-jmx-api.version>1.1.0-SNAPSHOT</petals-jmx-api.version>
     <enunciate.version>2.9.1</enunciate.version>
@@ -46,18 +46,18 @@
 
   <dependencyManagement>
     <dependencies>
-      <!-- BOM for 9.4.6 wasn't released but dropwizard 1.1.4 relies on it
-           See https://github.com/eclipse/jetty.project/issues/1736 -->
-      <!-- dependency>
+      <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-bom</artifactId>
-        <version>9.4.5.v20170502</version>
+        <version>9.4.7.v20170914</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency-->
+      </dependency>
       <dependency>
         <groupId>org.glassfish.jersey</groupId>
         <artifactId>jersey-bom</artifactId>
+        <!-- since 2.26, there was a lot of breaking change,
+             see https://github.com/dropwizard/dropwizard/issues/2148 -->
         <version>2.25.1</version>
         <type>pom</type>
         <scope>import</scope>
@@ -77,7 +77,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>23.0</version>
+        <version>23.1-jre</version>
       </dependency>
       <dependency>
         <groupId>io.javaslang</groupId>
