@@ -25,9 +25,7 @@ if (environment.production) {
   enableProdMode();
 }
 
-export function bootstrapApp() {
-  platformBrowserDynamic().bootstrapModule(AppModule);
-}
-
-// some lags are noticed at startup if no delay
-setTimeout(bootstrapApp);
+platformBrowserDynamic()
+  .bootstrapModule(AppModule)
+  // tslint:disable-next-line:no-console
+  .catch(err => console.log(err));
