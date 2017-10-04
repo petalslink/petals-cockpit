@@ -81,7 +81,13 @@ export class UsersServiceImpl extends UsersService {
   }
 
   disconnectUser() {
-    return this.http.delete<void>(`${environment.urlBackend}/user/session`);
+    // the backend returns an empty text response with a 200 status code and not a json response or a 204 for logout!
+    // Note that even if it did, it wouldn't work currently because of https://github.com/angular/angular/issues/19413
+    return this.http
+      .delete(`${environment.urlBackend}/user/session`, {
+        responseType: 'text',
+      })
+      .mapTo(undefined);
   }
 
   getCurrentUserInformations() {

@@ -97,6 +97,10 @@ public class UserSession {
     @DELETE
     @Path("/session")
     @Pac4JLogout(destroySession = true)
+    // pac4j returns a 200 code with an empty body instead of 204 (see https://github.com/pac4j/pac4j/issues/701 and
+    // https://github.com/pac4j/pac4j/issues/755) and so we should be careful to use a text content type to prevent
+    // parsing errors on the client side!
+    @Produces(MediaType.TEXT_PLAIN)
     public void logout() {
         // the method is never called, everything is handled by pac4j
         throw new AssertionError("impossible");
