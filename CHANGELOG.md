@@ -1,3 +1,19 @@
+<a name="0.13.0"></a>
+# [0.13.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.12.0...v0.13.0) (2017-10-04)
+
+
+### Bug Fixes
+
+* **backend:** improved Cockpit behaviour when Petals ESB is not exposing components MBean configuration ([48b4bd2](https://gitlab.com/linagora/petals-cockpit/commit/48b4bd2)), closes [#379](https://gitlab.com/linagora/petals-cockpit/issues/379)
+
+
+### Features
+
+Show and modify component configuration parameters, closes [#184](https://gitlab.com/linagora/petals-cockpit/issues/184)
+* **frontend:** add a list of all its SUs and SA in component overview ([9afe29b](https://gitlab.com/linagora/petals-cockpit/commit/9afe29b)), closes [#327](https://gitlab.com/linagora/petals-cockpit/issues/327)
+
+
+
 <a name="0.12.0"></a>
 # [0.12.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.11.0...v0.12.0) (2017-09-18)
 
