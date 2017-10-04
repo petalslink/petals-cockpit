@@ -62,7 +62,6 @@ import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.api.artifact.SharedLibrary;
-import org.ow2.petals.admin.api.artifact.lifecycle.ArtifactLifecycle;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
@@ -77,7 +76,6 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
-import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitMin;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent;
@@ -85,6 +83,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContent
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusImport;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChangeParameters;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentStateChanged;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAChangeState;
@@ -184,7 +183,6 @@ public class WorkspacesService {
             LOG.debug("New SSE client for workspace {}", wId);
 
             WorkspaceFullContent content = DSL.using(jooq).transactionResult(conf -> {
-                // TODO merge queries
                 WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wId)).fetchOne();
 
                 // this should never happen!
@@ -303,7 +301,7 @@ public class WorkspacesService {
                 CompletableFuture.runAsync(() -> finishImport(bDb, res));
             };
 
-            // store it before starting to prevent race condition TODO ??
+            // TODO store it before starting to prevent race condition (not likely to happen but well...)
             importsInProgress.put(bDb.getId(), CompletableFuture.runAsync(importer));
         }
 
@@ -331,12 +329,13 @@ public class WorkspacesService {
         // TODO in the future, there should be multiple methods like this for multiple type of imports
         private Either<String, Domain> doImportExistingBus(BusImport bus) {
             try {
-                // TODO even though getTopology can be interrupted, the petals admin code is based on RMI which cannot
-                // be
-                // interrupted, so it will continue to be executed even after InterruptedException is thrown. There is
-                // nothing we can do for this until petals admin is changed, but it's ok since there is no side effect
-                // in this operation: it will run in the background while we consider the operation interrupted on our
-                // side.
+                /*
+                 * TODO even though getTopology can be interrupted, the petals admin code is based on RMI which cannot
+                 * be interrupted, so it will continue to be executed even after InterruptedException is thrown. There
+                 * is nothing we can do for this until petals admin is changed, but it's ok since there is no side
+                 * effect in this operation: it will run in the background while we consider the operation interrupted
+                 * on our side.
+                 */
                 Domain topology = petals.getTopology(bus.ip, bus.port, bus.username, bus.password, bus.passphrase);
                 return Either.right(topology);
             } catch (Exception e) {
@@ -347,6 +346,29 @@ public class WorkspacesService {
 
                 return Either.left(message);
             }
+        }
+
+        public synchronized void changeComponentParameters(long compId, ComponentChangeParameters action) {
+            DSL.using(jooq).transaction(conf -> {
+                ComponentsRecord comp = DSL.using(conf).select(COMPONENTS.fields()).from(COMPONENTS).join(CONTAINERS)
+                        .onKey(FK_COMPONENTS_CONTAINERS_ID).join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
+                        .where(COMPONENTS.ID.eq(compId).and(BUSES.WORKSPACE_ID.eq(wId)))
+                        .fetchOneInto(ComponentsRecord.class);
+
+                if (comp == null) {
+                    throw new WebApplicationException(Status.NOT_FOUND);
+                }
+
+                ComponentMin.Type type = ComponentMin.Type.from(comp.getType());
+                assert type != null;
+
+                ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS)
+                        .where(CONTAINERS.ID.eq(comp.getContainerId())).fetchOne();
+                assert cont != null;
+
+                petals.setParameters(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(),
+                        comp.getName(), type.to(), action.parameters);
+            });
         }
 
         public synchronized ComponentStateChanged changeComponentState(long compId, ComponentChangeState action) {
@@ -365,28 +387,15 @@ public class WorkspacesService {
                 ComponentMin.State newState = action.state;
 
                 if (currentState.equals(newState)) {
-                    return new ComponentStateChanged(compId, currentState);
+                    return new ComponentStateChanged(comp.getId(), newState);
                 }
 
-                if (!isComponentStateTransitionOk(comp, currentState, newState)) {
-                    // TODO or should I rely on the information from the container instead of my own?
-                    throw new WebApplicationException(Status.CONFLICT);
-                }
-
-                if (newState == ComponentMin.State.Unloaded
-                        && DSL.using(conf).fetchExists(SERVICEUNITS, SERVICEUNITS.COMPONENT_ID.eq(comp.getId()))) {
-                    // TODO or should I rely on the information from the container instead of my own?
-                    throw new WebApplicationException(Status.CONFLICT);
-                }
-
-                // TODO merge with previous requests...
                 ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS)
                         .where(CONTAINERS.ID.eq(comp.getContainerId())).fetchOne();
                 assert cont != null;
 
                 ComponentMin.State newCurrentState = petals.changeComponentState(cont.getIp(), cont.getPort(),
-                        cont.getUsername(), cont.getPassword(), comp.getType(), comp.getName(), currentState, newState,
-                        action.parameters);
+                        cont.getUsername(), cont.getPassword(), comp.getType(), comp.getName(), newState);
 
                 ComponentStateChanged res = new ComponentStateChanged(comp.getId(), newCurrentState);
 
@@ -396,37 +405,7 @@ public class WorkspacesService {
             });
         }
 
-        /**
-         * Note : petals admin does not expose a way to go to shutdown (except from {@link ComponentMin.State#Unloaded}
-         * via {@link ArtifactLifecycle#deploy(java.net.URL)}, but we don't support it yet!)
-         */
-        private boolean isComponentStateTransitionOk(ComponentsRecord comp, ComponentMin.State from,
-                ComponentMin.State to) {
-            switch (from) {
-                case Loaded:
-                    return to == ComponentMin.State.Shutdown // via install()
-                            || to == ComponentMin.State.Unloaded; // via undeploy()
-                case Shutdown:
-                    return to == ComponentMin.State.Unloaded // via undeploy()
-                            || to == ComponentMin.State.Loaded // via uninstall()
-                            || to == ComponentMin.State.Started; // via start()
-                case Started:
-                    return to == ComponentMin.State.Stopped; // via stop()
-                case Stopped:
-                    return to == ComponentMin.State.Started // via start()
-                            || to == ComponentMin.State.Loaded // via uninstall()
-                            || to == ComponentMin.State.Unloaded; // via undeploy()
-                case Unknown:
-                    return to == ComponentMin.State.Unloaded; // via undeploy()
-                default:
-                    LOG.warn("Impossible case for state transition check from {} to {} for Component {} ({})", from, to,
-                            comp.getName(), comp.getId());
-                    return false;
-            }
-        }
-
         private void componentStateUpdated(ComponentStateChanged comp, Configuration conf) {
-            // TODO error handling???
             if (comp.state != ComponentMin.State.Unloaded) {
                 DSL.using(conf).update(COMPONENTS).set(COMPONENTS.STATE, comp.state.name())
                         .where(COMPONENTS.ID.eq(comp.id)).execute();
@@ -455,12 +434,6 @@ public class WorkspacesService {
                     return new SAStateChanged(saId, currentState);
                 }
 
-                if (!isSAStateTransitionOk(sa, currentState, newState)) {
-                    // TODO or should I rely on the information from the container instead of my own?
-                    throw new WebApplicationException(Status.CONFLICT);
-                }
-
-                // TODO merge with previous request...
                 ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS)
                         .where(CONTAINERS.ID.eq(sa.getContainerId())).fetchOne();
                 assert cont != null;
@@ -476,33 +449,7 @@ public class WorkspacesService {
             });
         }
 
-        /**
-         * Note : petals admin does not expose a way to go to shutdown (except from
-         * {@link ServiceUnitMin.State#Unloaded} via {@link ArtifactLifecycle#deploy(java.net.URL)}, but we don't
-         * support it yet!)
-         */
-        private boolean isSAStateTransitionOk(ServiceassembliesRecord sa, ServiceAssemblyMin.State from,
-                ServiceAssemblyMin.State to) {
-            switch (from) {
-                case Shutdown:
-                    return to == ServiceAssemblyMin.State.Unloaded // via undeploy()
-                            || to == ServiceAssemblyMin.State.Started; // via start()
-                case Started:
-                    return to == ServiceAssemblyMin.State.Stopped; // via stop()
-                case Stopped:
-                    return to == ServiceAssemblyMin.State.Started // via start()
-                            || to == ServiceAssemblyMin.State.Unloaded; // via undeploy()
-                case Unknown:
-                    return to == ServiceAssemblyMin.State.Unloaded; // via undeploy()
-                default:
-                    LOG.warn("Impossible case for state transition check from {} to {} for SA {} ({})", from, to,
-                            sa.getName(), sa.getId());
-                    return false;
-            }
-        }
-
         private void serviceAssemblyStateUpdated(SAStateChanged sa, Configuration conf) {
-            // TODO error handling???
             if (sa.state != ServiceAssemblyMin.State.Unloaded) {
                 DSL.using(conf).update(SERVICEASSEMBLIES).set(SERVICEASSEMBLIES.STATE, sa.state.name())
                         .where(SERVICEASSEMBLIES.ID.eq(sa.id)).execute();
@@ -528,7 +475,6 @@ public class WorkspacesService {
                     return new SLStateChanged(slId, SharedLibraryMin.State.Loaded);
                 }
 
-                // TODO merge with previous request...
                 ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS)
                         .where(CONTAINERS.ID.eq(sl.getContainerId())).fetchOne();
                 assert cont != null;
@@ -587,8 +533,8 @@ public class WorkspacesService {
                 serviceUnitsDb.put(Long.toString(suDb.getId()), new ServiceUnitFull(suDb));
             }
 
-            WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(),
-                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap
+            WorkspaceContent res = new WorkspaceContent(
+                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap
                             .of(Long.toString(saDb.getId()), new ServiceAssemblyFull(saDb, serviceUnitsDb.keySet())),
                     serviceUnitsDb, ImmutableMap.of());
 
@@ -642,8 +588,6 @@ public class WorkspacesService {
                     ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(compDb, ImmutableSet.of(), sls)),
                     ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
 
-            // we want the event to be sent after we answered
-            // TODO after response?
             broadcast(WorkspaceEvent.componentDeployed(res));
 
             return res;

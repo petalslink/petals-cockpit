@@ -112,12 +112,7 @@ export class ComponentsEffects {
     )
     .switchMap(([action, workspaceId]) =>
       this.componentsService
-        .putState(
-          workspaceId,
-          action.payload.id,
-          action.payload.state,
-          action.payload.parameters
-        )
+        .putState(workspaceId, action.payload.id, action.payload.state)
         .mergeMap(_ => Observable.empty<Action>())
         .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
@@ -132,7 +127,7 @@ export class ComponentsEffects {
           return Observable.of(
             new Components.ChangeStateError({
               id: action.payload.id,
-              errorChangeState: getErrorMessage(err),
+              error: getErrorMessage(err),
             })
           );
         })
@@ -141,6 +136,46 @@ export class ComponentsEffects {
   @Effect()
   changeStateSuccess$: Observable<Action> = this.actions$
     .ofType<Components.ChangeStateSuccess>(Components.ChangeStateSuccessType)
+    .map(action => new Components.FetchDetails(action.payload));
+
+  @Effect()
+  setParameters$: Observable<Action> = this.actions$
+    .ofType<Components.SetParameters>(Components.SetParametersType)
+    .withLatestFrom(
+      this.store$.select(state => state.workspaces.selectedWorkspaceId)
+    )
+    .switchMap(([action, workspaceId]) =>
+      this.componentsService
+        .setParameters(
+          workspaceId,
+          action.payload.id,
+          action.payload.parameters
+        )
+        .mapTo(new Components.SetParametersSuccess({ id: action.payload.id }))
+        .catch((err: HttpErrorResponse) => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error catched in components.effects: ofType(Components.ChangeState)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return Observable.of(
+            new Components.ChangeStateError({
+              id: action.payload.id,
+              error: getErrorMessage(err),
+            })
+          );
+        })
+    );
+
+  @Effect()
+  setParametersSuccess$: Observable<Action> = this.actions$
+    .ofType<Components.SetParametersSuccess>(
+      Components.SetParametersSuccessType
+    )
     .map(action => new Components.FetchDetails(action.payload));
 
   @Effect()

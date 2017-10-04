@@ -20,8 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 
-import javax.management.NotCompliantMBeanException;
-import javax.management.StandardMBean;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -34,12 +32,8 @@ import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
-import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentOverview;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChangeState;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentStateChanged;
-import org.ow2.petals.jmx.api.mock.junit.configuration.component.InstallationConfigurationServiceClientMock;
-import org.ow2.petals.jmx.api.mock.junit.configuration.component.RuntimeConfigurationServiceClientMock;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChangeParameters;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -72,17 +66,21 @@ public class ComponentParametersTest extends AbstractBasicResourceTest {
 
         setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
 
-        resource.jmx.addComponentInstallerClient(component1.getName(),
-                org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule.ComponentType.ENGINE,
-                new InstallationConfigurationServiceClientMock(new Config(InstallerConfig.class)), null);
-
-        resource.jmx.addComponentClient(component2.getName(),
-                org.ow2.petals.jmx.api.mock.junit.PetalsJmxApiJunitRule.ComponentType.ENGINE, null,
-                new RuntimeConfigurationServiceClientMock(new Config(RuntimeConfig.class)), null, null);
+        // since petals admin mock cannot properly represent runtime versus non-runtime parameters
+        // we simulate it with two different components here, this makes the tests a bit weak for now
+        // because we don't really test that the proper parameters are returned when desired in practice.
+        component1.getParameters().setProperty("HttpPort", "8080");
+        component1.getParameters().setProperty("EnableHttps", "false");
+        component1.getParameters().setProperty("MaxPoolSize", "10");
+        component2.getParameters().setProperty("MaxPoolSize", "10");
     }
 
+    /**
+     * Note: functionally, this test and {@link #shouldShowOnlyTheRuntimeParametersWhenInstalled()} test the same thing,
+     * see {@link #setUp()} for explanations.
+     */
     @Test
-    public void whenLoadedShouldShowTheInstallAndRuntimeParameters() {
+    public void shouldShowTheInstallAndRuntimeParametersWhenUninstalled() {
         ComponentOverview get = resource.target("/components/" + getId(component1)).request()
                 .get(ComponentOverview.class);
 
@@ -90,133 +88,127 @@ public class ComponentParametersTest extends AbstractBasicResourceTest {
                 .isEqualTo(ImmutableMap.of("HttpPort", "8080", "EnableHttps", "false", "MaxPoolSize", "10"));
     }
 
+    /**
+     * See {@link #shouldShowTheInstallAndRuntimeParametersWhenUninstalled()}.
+     */
     @Test
-    public void onceStartedShouldShowNoParameters() {
+    public void shouldShowOnlyTheRuntimeParametersWhenInstalled() {
         ComponentOverview get = resource.target("/components/" + getId(component2)).request()
                 .get(ComponentOverview.class);
 
-        assertThat(get.parameters).isEqualTo(ImmutableMap.of());
+        assertThat(get.parameters).isEqualTo(ImmutableMap.of("MaxPoolSize", "10"));
     }
 
     @Test
-    public void installWithoutParameters() {
-        ComponentStateChanged put = resource.target("/workspaces/1/components/" + getId(component1)).request()
-                .put(Entity.json(new ComponentChangeState(ComponentMin.State.Shutdown)), ComponentStateChanged.class);
+    public void setWithoutParametersWhenUninstalled() {
+        Response put = resource.target("/workspaces/1/components/" + getId(component1) + "/parameters").request()
+                .put(Entity.json(new ComponentChangeParameters(ImmutableMap.of())));
 
-        assertThat(put.state).isEqualTo(ComponentMin.State.Shutdown);
-
-        assertThatComponentState(component1, ArtifactState.State.SHUTDOWN);
-    }
-
-    @Test
-    public void installWithValidInstallParameters() {
-        component1.getParameters().put("HttpPort", "20");
-
-        ComponentStateChanged put = resource.target("/workspaces/1/components/" + getId(component1)).request().put(
-                Entity.json(new ComponentChangeState(ComponentMin.State.Shutdown, ImmutableMap.of("HttpPort", "80"))),
-                ComponentStateChanged.class);
-
-        assertThat(put.state).isEqualTo(ComponentMin.State.Shutdown);
-
-        assertThatComponentState(component1, ArtifactState.State.SHUTDOWN);
-
-        assertThat(component1.getParameters()).isEqualTo(ImmutableMap.of("HttpPort", "80"));
-    }
-
-    @Test
-    @Ignore("Setting invalid parameters is not a problem with the petals-admin-mocks for now...")
-    public void installWithInvalidInstallParameters() {
-        component1.getParameters().put("HttpPort", "20");
-
-        Response put = resource.target("/workspaces/1/components/" + getId(component1)).request().put(
-                Entity.json(new ComponentChangeState(ComponentMin.State.Shutdown, ImmutableMap.of("HttpPort", "lol"))));
-
-        assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
-        ErrorMessage err = put.readEntity(ErrorMessage.class);
-        assertThat(err.getCode()).isEqualTo(Status.CONFLICT.getStatusCode());
-        // TODO
-        assertThat(err.getMessage()).isEqualTo("???");
+        assertThat(put.getStatus()).isEqualTo(422);
 
         assertThatComponentState(component1, ArtifactState.State.LOADED);
-
-        assertThat(component1.getParameters()).isEqualTo(ImmutableMap.of("HttpPort", "20"));
     }
 
     @Test
-    public void installWithValidRuntimeParameters() {
-        component1.getParameters().put("MaxPoolSize", "10");
+    public void setWithoutParametersWhenInstalled() {
+        Response put = resource.target("/workspaces/1/components/" + getId(component2) + "/parameters").request()
+                .put(Entity.json(new ComponentChangeParameters(ImmutableMap.of())));
 
-        ComponentStateChanged put = resource.target("/workspaces/1/components/" + getId(component1)).request()
-                .put(Entity.json(
-                        new ComponentChangeState(ComponentMin.State.Shutdown, ImmutableMap.of("MaxPoolSize", "20"))),
-                        ComponentStateChanged.class);
+        assertThat(put.getStatus()).isEqualTo(422);
 
-        assertThat(put.state).isEqualTo(ComponentMin.State.Shutdown);
-
-        assertThatComponentState(component1, ArtifactState.State.SHUTDOWN);
-
-        assertThat(component1.getParameters()).isEqualTo(ImmutableMap.of("MaxPoolSize", "20"));
+        assertThatComponentState(component2, ArtifactState.State.SHUTDOWN);
     }
 
     @Test
-    public void installWithValidRuntimeAndInstallParameters() {
-        component1.getParameters().put("HttpPort", "8080");
-        component1.getParameters().put("MaxPoolSize", "10");
-        ComponentStateChanged put = resource.target("/workspaces/1/components/" + getId(component1)).request()
-                .put(Entity.json(new ComponentChangeState(ComponentMin.State.Shutdown,
-                        ImmutableMap.of("HttpPort", "80", "MaxPoolSize", "20"))), ComponentStateChanged.class);
+    public void setValidInstallParametersWhenUninstalled() {
+        Response put = resource.target("/workspaces/1/components/" + getId(component1) + "/parameters").request()
+                .put(Entity.json(new ComponentChangeParameters(ImmutableMap.of("HttpPort", "80"))));
 
-        assertThat(put.state).isEqualTo(ComponentMin.State.Shutdown);
+        assertThat(put.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
-        assertThatComponentState(component1, ArtifactState.State.SHUTDOWN);
-
-        assertThat(component1.getParameters()).isEqualTo(ImmutableMap.of("HttpPort", "80", "MaxPoolSize", "20"));
+        assertThat(component1.getParameters())
+                .isEqualTo(ImmutableMap.of("HttpPort", "80", "EnableHttps", "false", "MaxPoolSize", "10"));
     }
 
     @Test
-    public void installWithUnknownParameters() {
-        component1.getParameters().put("HttpPort", "8080");
-        Response put = resource.target("/workspaces/1/components/" + getId(component1)).request().put(Entity
-                .json(new ComponentChangeState(ComponentMin.State.Shutdown, ImmutableMap.of("Parameter", "lol"))));
+    public void setValidRuntimeParametersWhenInstalled() {
+        Response put = resource.target("/workspaces/1/components/" + getId(component2) + "/parameters").request()
+                .put(Entity.json(new ComponentChangeParameters(ImmutableMap.of("MaxPoolSize", "20"))));
+
+        assertThat(put.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+
+        assertThat(component2.getParameters()).isEqualTo(ImmutableMap.of("MaxPoolSize", "20"));
+    }
+
+    @Test
+    @Ignore("Since petals-admin-mock does not validate parameters, this doesn't fail as it should")
+    public void setInvalidInstallParametersWhenUninstalled() {
+        Response put = resource.target("/workspaces/1/components/" + getId(component1) + "/parameters").request()
+                .put(Entity.json(new ComponentChangeParameters(ImmutableMap.of("HttpPort", "lol"))));
 
         assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
         ErrorMessage err = put.readEntity(ErrorMessage.class);
         assertThat(err.getCode()).isEqualTo(Status.CONFLICT.getStatusCode());
         assertThat(err.getMessage())
-                .isEqualTo("Unknown or unsettable parameter in installer configuration MBeanParameter");
+                .isEqualTo("The value 'lol' of the parameter 'HttpPort' is incorrect for type 'int'");
 
-        assertThatComponentState(component1, ArtifactState.State.LOADED);
+        assertThat(component1.getParameters()).isEqualTo(ImmutableMap.of("HttpPort", "10"));
     }
 
-    public static class Config extends StandardMBean implements InstallerConfig {
+    @Test
+    @Ignore("Since petals-admin-mock does not validate parameters, this doesn't fail as it should")
+    public void setInvalidRuntimeParametersWhenInstalled() {
+        Response put = resource.target("/workspaces/1/components/" + getId(component2) + "/parameters").request()
+                .put(Entity.json(new ComponentChangeParameters(ImmutableMap.of("MaxPoolSize", "lol"))));
 
-        public Config(Class<?> implementing) throws NotCompliantMBeanException {
-            super(implementing);
-        }
+        assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
+        ErrorMessage err = put.readEntity(ErrorMessage.class);
+        assertThat(err.getCode()).isEqualTo(Status.CONFLICT.getStatusCode());
+        assertThat(err.getMessage())
+                .isEqualTo("The value 'lol' of the parameter 'MaxPoolSize' is incorrect for type 'int'");
 
-        @Override
-        public boolean isEnableHttps() {
-            return false;
-        }
-
-        @Override
-        public int getHttpPort() {
-            return 8080;
-        }
-
-        @Override
-        public int getMaxPoolSize() {
-            return 10;
-        }
+        assertThat(component2.getParameters()).isEqualTo(ImmutableMap.of("MaxPoolSize", "10"));
     }
 
-    public interface InstallerConfig extends RuntimeConfig {
-        public int getHttpPort();
+    @Test
+    public void setValidRuntimeParametersWhenUninstalled() {
+        Response put = resource.target("/workspaces/1/components/" + getId(component1) + "/parameters").request()
+                .put(Entity.json(new ComponentChangeParameters(ImmutableMap.of("MaxPoolSize", "20"))));
 
-        public boolean isEnableHttps();
+        assertThat(put.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+
+        assertThat(component1.getParameters())
+                .isEqualTo(ImmutableMap.of("HttpPort", "8080", "EnableHttps", "false", "MaxPoolSize", "20"));
     }
 
-    public interface RuntimeConfig {
-        public int getMaxPoolSize();
+    @Test
+    public void setValidRuntimeAndInstallParametersWhenUninstalled() {
+        Response put = resource.target("/workspaces/1/components/" + getId(component1) + "/parameters").request().put(
+                Entity.json(new ComponentChangeParameters(ImmutableMap.of("HttpPort", "80", "MaxPoolSize", "20"))));
+
+        assertThat(put.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+
+        assertThat(component1.getParameters())
+                .isEqualTo(ImmutableMap.of("EnableHttps", "false", "HttpPort", "80", "MaxPoolSize", "20"));
+    }
+
+    @Test
+    public void setUnknownParametersWhenUninstalled() {
+        setUnknownParametersWhenInstalled(component1);
+    }
+
+    @Test
+    public void setUnknownParametersWhenInstalled() {
+        setUnknownParametersWhenInstalled(component2);
+    }
+
+    public void setUnknownParametersWhenInstalled(Component component) {
+        Response put = resource.target("/workspaces/1/components/" + getId(component) + "/parameters").request()
+                .put(Entity.json(new ComponentChangeParameters(ImmutableMap.of("Parameter", "lol"))));
+
+        assertThat(put.getStatus()).isEqualTo(Status.CONFLICT.getStatusCode());
+        ErrorMessage err = put.readEntity(ErrorMessage.class);
+        assertThat(err.getCode()).isEqualTo(Status.CONFLICT.getStatusCode());
+        assertThat(err.getMessage()).isEqualTo("Unknown or unsettable parameter in configuration MBean: Parameter");
     }
 }

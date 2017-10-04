@@ -19,8 +19,7 @@ package org.ow2.petals.cockpit.server.services;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Properties;
 
 import javax.inject.Inject;
 
@@ -43,19 +42,6 @@ import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
-import org.ow2.petals.jmx.api.api.InstallerComponentClient;
-import org.ow2.petals.jmx.api.api.JMXClient;
-import org.ow2.petals.jmx.api.api.PetalsJmxApiFactory;
-import org.ow2.petals.jmx.api.api.configuration.component.InstallationConfigurationComponentClient;
-import org.ow2.petals.jmx.api.api.configuration.component.exception.ConfigurationComponentDoesNotExistException;
-import org.ow2.petals.jmx.api.api.configuration.component.exception.ConfigurationComponentErrorException;
-import org.ow2.petals.jmx.api.api.exception.ConnectionErrorException;
-import org.ow2.petals.jmx.api.api.exception.DuplicatedServiceException;
-import org.ow2.petals.jmx.api.api.exception.InstallationServiceDoesNotExistException;
-import org.ow2.petals.jmx.api.api.exception.InstallationServiceErrorException;
-import org.ow2.petals.jmx.api.api.exception.InstallerComponentDoesNotExistException;
-import org.ow2.petals.jmx.api.api.exception.InstallerComponentErrorException;
-import org.ow2.petals.jmx.api.api.exception.MissingServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,16 +56,9 @@ public class PetalsAdmin {
 
     private final PetalsAdministrationFactory adminFactory;
 
-    private final PetalsJmxApiFactory jmxFactory;
-
     @Inject
     public PetalsAdmin() {
         this.adminFactory = PetalsAdministrationFactory.getInstance();
-        try {
-            this.jmxFactory = PetalsJmxApiFactory.getInstance();
-        } catch (DuplicatedServiceException | MissingServiceException e) {
-            throw new AssertionError(e);
-        }
     }
 
     public Domain getTopology(String ip, int port, String username, String password, String passphrase) {
@@ -105,18 +84,14 @@ public class PetalsAdmin {
     }
 
     public ComponentMin.State changeComponentState(String ip, int port, String username, String password, String type,
-            String name, ComponentMin.State current, ComponentMin.State next, Map<String, String> parameters) {
+            String name, ComponentMin.State next) {
         try (PAC p = new PAC(ip, port, username, password)) {
             ArtifactAdministration aa = p.petals.newArtifactAdministration();
             Artifact a = aa.getArtifact(type, name, null);
             assert a instanceof Component;
             Component compo = (Component) a;
 
-            if (current == ComponentMin.State.Loaded && next != ComponentMin.State.Unloaded) {
-                compo.getParameters().putAll(parameters);
-            }
-
-            return changeComponentState(p.petals, compo, current, next);
+            return changeComponentState(p.petals, compo, next);
         } catch (ArtifactAdministrationException e) {
             throw new PetalsAdminException(e);
         }
@@ -191,31 +166,38 @@ public class PetalsAdmin {
         }
     }
 
-    public Map<String, String> getInstallParameters(String ip, int port, String username, String password,
-            String name) {
-        try (JMXC c = new JMXC(ip, port, username, password)) {
-            InstallerComponentClient installer = c.client.getInstallationServiceClient().loadInstaller(name);
+    public void setParameters(String ip, int port, String username, String password, String name, ComponentType type,
+            Map<String, String> parameters) {
+        try (PAC p = new PAC(ip, port, username, password)) {
+            Component c = new Component(name, type);
+            c.getParameters().putAll(parameters);
+            ComponentLifecycle ccl = p.petals.newArtifactLifecycleFactory().createComponentLifecycle(c);
+            ccl.setParameters();
+        } catch (ArtifactAdministrationException e) {
+            throw new PetalsAdminException(e);
+        }
+    }
 
-            assert !installer.isInstalled();
+    public Map<String, String> getParameters(String ip, int port, String username, String password, String name,
+            ComponentType type) {
+        try (PAC p = new PAC(ip, port, username, password)) {
+            Component c = new Component(name, type);
+            ComponentLifecycle ccl = p.petals.newArtifactLifecycleFactory().createComponentLifecycle(c);
+            ccl.updateStateAndParameters();
 
-            InstallationConfigurationComponentClient configuration = installer.getInstallationConfigurationClient();
-
-            if (configuration != null) {
-                return configuration.getConfigurationMBeanAttributes().entrySet().stream()
-                        .collect(Collectors.toMap(e -> e.getKey().getName(), e -> Objects.toString(e.getValue())));
-            } else {
-                // it can be null by design if the components does not expose an extension mbean
-                return ImmutableMap.of();
-            }
-        } catch (InstallerComponentDoesNotExistException | ConnectionErrorException | InstallerComponentErrorException
-                | ConfigurationComponentDoesNotExistException | ConfigurationComponentErrorException
-                | InstallationServiceErrorException | InstallationServiceDoesNotExistException e) {
+            Properties parameters = c.getParameters();
+            return parameters.stringPropertyNames().stream()
+                    .collect(ImmutableMap.toImmutableMap(prop -> prop, prop -> {
+                        String value = parameters.getProperty(prop);
+                        return value == null ? "" : value;
+                    }));
+        } catch (ArtifactAdministrationException e) {
             throw new PetalsAdminException(e);
         }
     }
 
     private ComponentMin.State changeComponentState(PetalsAdministration petals, Component comp,
-            ComponentMin.State currentState, ComponentMin.State desiredState) throws ArtifactAdministrationException {
+            ComponentMin.State desiredState) throws ArtifactAdministrationException {
         ComponentLifecycle cl = petals.newArtifactLifecycleFactory().createComponentLifecycle(comp);
         switch (desiredState) {
             case Loaded:
@@ -269,33 +251,6 @@ public class PetalsAdmin {
         } else {
             // we can't call updateState for this one, it will fail since it has been unloaded
             return ServiceAssemblyMin.State.Unloaded;
-        }
-    }
-
-    private class JMXC implements AutoCloseable {
-
-        public final JMXClient client;
-
-        private final String name;
-
-        public JMXC(String ip, int port, String username, String password) {
-            this.name = ip + ":" + port;
-            try {
-                JMXClient c = jmxFactory.createJMXClient(ip, port, username, password);
-                assert c != null;
-                client = c;
-            } catch (ConnectionErrorException e) {
-                throw new PetalsAdminException(e);
-            }
-        }
-
-        @Override
-        public void close() {
-            try {
-                client.disconnect();
-            } catch (Exception e) {
-                LOG.warn("Error while disconnecting from container " + name, e);
-            }
         }
     }
 

@@ -21,7 +21,7 @@ import { browser } from 'protractor/built';
 import { page } from './common';
 import { NotFoundPage } from './pages/not-found';
 import { WorkspacePage } from './pages/workspace.po';
-import { waitAndClick } from './utils';
+import { clearInput, waitAndClick } from './utils';
 
 describe(`Petals component content`, () => {
   it(`should open the 404 page if the component doesn't exists`, () => {
@@ -77,7 +77,20 @@ describe(`Petals component content`, () => {
   it(`should stop/start/stop/unload a component`, () => {
     let ops = workspace.openComponent('Comp 0').openOperations();
 
+    expect(ops.parameter('httpPort').isPresent()).toBe(false);
+    expect(ops.parameter('httpsEnabled').isPresent()).toBe(false);
+    expect(
+      ops.parameter('httpThreadPoolSizeMax').getAttribute('value')
+    ).toEqual('10');
+
     waitAndClick(ops.stopButton);
+
+    expect(ops.parameter('httpPort').isPresent()).toBe(false);
+    expect(ops.parameter('httpsEnabled').isPresent()).toBe(false);
+    expect(
+      ops.parameter('httpThreadPoolSizeMax').getAttribute('value')
+    ).toEqual('10');
+
     waitAndClick(ops.startButton);
     waitAndClick(ops.stopButton);
 
@@ -97,7 +110,22 @@ describe(`Petals component content`, () => {
 
     expect(ops.getSUUpload().chooseFileButton.isEnabled()).toBe(false);
 
+    expect(ops.parameter('httpPort').getAttribute('value')).toEqual('8080');
+    expect(ops.parameter('httpsEnabled').getAttribute('value')).toEqual(
+      'false'
+    );
+    expect(
+      ops.parameter('httpThreadPoolSizeMax').getAttribute('value')
+    ).toEqual('10');
+
     waitAndClick(ops.installButton);
+
+    expect(ops.parameter('httpPort').isPresent()).toBe(false);
+    expect(ops.parameter('httpsEnabled').isPresent()).toBe(false);
+    expect(
+      ops.parameter('httpThreadPoolSizeMax').getAttribute('value')
+    ).toEqual('10');
+
     waitAndClick(ops.uninstallButton);
 
     // once unloaded ...
@@ -115,6 +143,57 @@ describe(`Petals component content`, () => {
     expect(workspace.treeElement(`Comp 0`, 'component').isPresent()).toBe(
       false
     );
+  });
+
+  it(`should set a component's parameters`, () => {
+    const ops = workspace.openComponent('Comp 2').openOperations();
+
+    expect(ops.parameter('httpPort').isPresent()).toBe(false);
+    expect(ops.parameter('httpsEnabled').isPresent()).toBe(false);
+    expect(
+      ops.parameter('httpThreadPoolSizeMax').getAttribute('value')
+    ).toEqual('10');
+    expect(ops.setParametersButton.isEnabled()).toBe(false);
+
+    ops.parameter('httpThreadPoolSizeMax').sendKeys('0');
+
+    waitAndClick(ops.setParametersButton);
+    waitAndClick(ops.stopButton);
+
+    expect(
+      ops.parameter('httpThreadPoolSizeMax').getAttribute('value')
+    ).toEqual('100');
+
+    waitAndClick(ops.uninstallButton);
+
+    expect(ops.parameter('httpPort').getAttribute('value')).toEqual('8080');
+    expect(ops.parameter('httpsEnabled').getAttribute('value')).toEqual(
+      'false'
+    );
+    expect(
+      ops.parameter('httpThreadPoolSizeMax').getAttribute('value')
+    ).toEqual('100');
+
+    clearInput(ops.parameter('httpsEnabled'));
+    ops.parameter('httpsEnabled').sendKeys('true');
+    ops.parameter('httpThreadPoolSizeMax').sendKeys('1');
+
+    waitAndClick(ops.setParametersButton);
+    waitAndClick(ops.installButton);
+
+    expect(ops.parameter('httpPort').isPresent()).toBe(false);
+    expect(ops.parameter('httpsEnabled').isPresent()).toBe(false);
+    expect(
+      ops.parameter('httpThreadPoolSizeMax').getAttribute('value')
+    ).toEqual('1001');
+
+    waitAndClick(ops.uninstallButton);
+
+    expect(ops.parameter('httpPort').getAttribute('value')).toEqual('8080');
+    expect(ops.parameter('httpsEnabled').getAttribute('value')).toEqual('true');
+    expect(
+      ops.parameter('httpThreadPoolSizeMax').getAttribute('value')
+    ).toEqual('1001');
   });
 
   it('should have a correct SU deployment form', () => {
@@ -271,20 +350,23 @@ describe(`Petals component content`, () => {
 
     const ops = workspace.openComponent('component').openOperations();
 
-    // change state to install with some parameters (with error in http-port to make it fail)
-    const inputEnableHttps = ops.parameter('enable-https');
-    const inputHttpPort = ops.parameter('http-port');
+    // change state to install with some parameters (with error in httpThreadPoolSizeMax to make it fail)
+    const poolSizeInput = ops.parameter('httpThreadPoolSizeMax');
 
-    inputHttpPort.sendKeys('error');
-    waitAndClick(ops.installButton);
+    clearInput(poolSizeInput);
+    poolSizeInput.sendKeys('error');
+    waitAndClick(ops.setParametersButton);
 
     // check if the error is displayed
     expect(ops.changeStateError.getText()).toEqual(
-      `[Mock message] An error happened when trying to change the state of that component`
+      `[Mock message] An error happened when trying to change the parameters of that component`
     );
 
     // make sure the form isn't reset
-    expect(inputEnableHttps.getAttribute('value')).toEqual(`false`);
-    expect(inputHttpPort.getAttribute('value')).toEqual(`8080error`);
+    expect(ops.parameter('httpsEnabled').getAttribute('value')).toEqual(
+      `false`
+    );
+    expect(ops.parameter('httpPort').getAttribute('value')).toEqual(`8080`);
+    expect(poolSizeInput.getAttribute('value')).toEqual(`error`);
   });
 });

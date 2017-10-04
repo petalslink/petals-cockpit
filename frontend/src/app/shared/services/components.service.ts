@@ -71,12 +71,17 @@ export abstract class ComponentsService {
   abstract putState(
     workspaceId: string,
     componentId: string,
-    newState: ComponentState,
-    parameters: { [key: string]: string }
+    state: ComponentState
   ): Observable<{
     id: string;
     state: ComponentState;
   }>;
+
+  abstract setParameters(
+    workspaceId: string,
+    componentId: string,
+    parameters: { [key: string]: string }
+  ): Observable<void>;
 
   abstract deploySu(
     workspaceId: string,
@@ -101,18 +106,26 @@ export class ComponentsServiceImpl extends ComponentsService {
     );
   }
 
-  putState(
-    workspaceId: string,
-    componentId: string,
-    newState: ComponentState,
-    parameters: { [key: string]: string }
-  ) {
+  putState(workspaceId: string, componentId: string, state: ComponentState) {
     return this.http.put<{
       id: string;
       state: ComponentState;
     }>(
       `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}`,
-      { state: newState, parameters }
+      { state }
+    );
+  }
+
+  setParameters(
+    workspaceId: string,
+    componentId: string,
+    parameters: { [key: string]: string }
+  ) {
+    return this.http.put<
+      void
+    >(
+      `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}/parameters`,
+      { parameters }
     );
   }
 

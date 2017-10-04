@@ -27,11 +27,9 @@ import {
 export interface IComponentUI {
   // for UI
   isFolded: boolean;
-  isFetchingDetails: boolean;
-  isUpdatingState: boolean;
-  isDeployingServiceUnit: boolean;
-  errorChangeState: string;
-  errorDeployment: string;
+  isUpdating: boolean;
+  updateError: string;
+  deployError: string;
 }
 
 export interface IComponentRow
@@ -68,11 +66,9 @@ export function componentRowFactory(): IComponentRow {
     parameters: {},
 
     isFolded: false,
-    isFetchingDetails: false,
-    isUpdatingState: false,
-    isDeployingServiceUnit: false,
-    errorChangeState: '',
-    errorDeployment: '',
+    isUpdating: false,
+    updateError: '',
+    deployError: '',
 
     serviceUnits: [],
     sharedLibraries: [],

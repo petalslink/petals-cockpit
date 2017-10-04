@@ -18,6 +18,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   Input,
   OnChanges,
   OnDestroy,
@@ -34,10 +35,7 @@ import { v4 as uuid } from 'uuid';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
-import {
-  ComponentState,
-  EComponentState,
-} from 'app/shared/services/components.service';
+import { ComponentState } from 'app/shared/services/components.service';
 import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
 import { IStore } from '../../../../../../shared/state/store.interface';
 
@@ -54,6 +52,7 @@ export class PetalsComponentOperationsComponent
   @Input() component: IComponentWithSLsAndSUs;
 
   @ViewChild('uploadSu') uploadSu: UploadComponent;
+  @ViewChild('top') top: ElementRef;
 
   parametersForm: FormGroup;
 
@@ -94,18 +93,21 @@ export class PetalsComponentOperationsComponent
   }
 
   changeState(state: ComponentState) {
-    let parameters = null;
-
-    if (
-      this.component.state === EComponentState.Loaded &&
-      state !== EComponentState.Unloaded
-    ) {
-      parameters = this.parametersForm.value;
-    }
-
     this.store$.dispatch(
-      new Components.ChangeState({ id: this.component.id, state, parameters })
+      new Components.ChangeState({ id: this.component.id, state })
     );
+  }
+
+  setParameters() {
+    this.store$.dispatch(
+      new Components.SetParameters({
+        id: this.component.id,
+        parameters: this.parametersForm.value,
+      })
+    );
+    // if it's succeeds, we want to go back to top to continue our business
+    // if it fails, we want to go back to top to see the error
+    this.top.nativeElement.scrollIntoView();
   }
 
   trackByComponentState(index: number, item: any) {

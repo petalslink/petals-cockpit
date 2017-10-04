@@ -250,6 +250,15 @@ public class WorkspaceResource {
         return workspace.changeComponentState(compId, action);
     }
 
+    @PUT
+    @Path("/components/{compId}/parameters")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void changeComponentParameters(@NotNull @PathParam("compId") @Min(1) long compId,
+            @NotNull @Valid ComponentChangeParameters action) {
+        workspace.changeComponentParameters(compId, action);
+    }
+
     @POST
     @Path("/containers/{containerId}/sharedlibraries")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -806,18 +815,19 @@ public class WorkspaceResource {
         @JsonProperty
         public final ComponentMin.State state;
 
-        @NotNull
+        public ComponentChangeState(@JsonProperty("state") ComponentMin.State state) {
+            this.state = state;
+        }
+    }
+
+    public static class ComponentChangeParameters {
+
+        @NotEmpty
         @JsonProperty
         public final ImmutableMap<String, String> parameters;
 
-        public ComponentChangeState(@JsonProperty("state") ComponentMin.State state,
-                @Nullable @JsonProperty("parameters") Map<String, String> parameters) {
-            this.state = state;
-            this.parameters = parameters != null ? ImmutableMap.copyOf(parameters) : ImmutableMap.of();
-        }
-
-        public ComponentChangeState(ComponentMin.State state) {
-            this(state, null);
+        public ComponentChangeParameters(@JsonProperty("parameters") Map<String, String> parameters) {
+            this.parameters = ImmutableMap.copyOf(parameters);
         }
     }
 

@@ -93,7 +93,6 @@ export namespace Components {
       public readonly payload: {
         id: string;
         state: ComponentState;
-        parameters: { [key: string]: string };
       }
     ) {}
   }
@@ -101,9 +100,7 @@ export namespace Components {
   export const ChangeStateErrorType = '[Components] Change state error';
   export class ChangeStateError implements Action {
     readonly type = ChangeStateErrorType;
-    constructor(
-      public readonly payload: { id: string; errorChangeState: string }
-    ) {}
+    constructor(public readonly payload: { id: string; error: string }) {}
   }
 
   export const ChangeStateSuccessType = '[Components] Change state success';
@@ -112,6 +109,29 @@ export namespace Components {
     constructor(
       public readonly payload: { id: string; state: ComponentState }
     ) {}
+  }
+
+  export const SetParametersType = '[Components] Set parameters';
+  export class SetParameters implements Action {
+    readonly type = SetParametersType;
+    constructor(
+      public readonly payload: {
+        id: string;
+        parameters: { [key: string]: string };
+      }
+    ) {}
+  }
+
+  export const SetParametersErrorType = '[Components] Set parameters error';
+  export class SetParametersError implements Action {
+    readonly type = SetParametersErrorType;
+    constructor(public readonly payload: { id: string; error: string }) {}
+  }
+
+  export const SetParametersSuccessType = '[Components] Set parameters success';
+  export class SetParametersSuccess implements Action {
+    readonly type = SetParametersSuccessType;
+    constructor(public readonly payload: { id: string }) {}
   }
 
   export const RemovedType = '[Components] Removed';
