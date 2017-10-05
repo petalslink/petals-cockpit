@@ -97,7 +97,8 @@ public abstract class CockpitSecurityBundle<C extends Configuration> extends Pac
     }
 
     /**
-     * According to the HTTP/1.1 specification, we should use 303 and not 302 when redirecting from a POST to a GET
+     * According to the HTTP/1.1 specification, we should use 303 and not 302 when redirecting from a POST to a GET (see
+     * https://github.com/pac4j/pac4j/issues/866).
      */
     public static class HttpActionAdapter303 extends JaxRsHttpActionAdapter {
         @Override
