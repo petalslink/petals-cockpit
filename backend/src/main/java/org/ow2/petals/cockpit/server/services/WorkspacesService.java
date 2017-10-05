@@ -271,8 +271,7 @@ public class WorkspacesService {
 
         public synchronized BusInProgress importBus(BusImport nb) {
             final BusesRecord bDb = DSL.using(jooq).transactionResult(conf -> {
-                BusesRecord br = new BusesRecord(null, wId, false, nb.ip, nb.port, nb.username, nb.password,
-                        nb.passphrase, null, null);
+                BusesRecord br = new BusesRecord(null, wId, false, nb.ip, nb.port, nb.username, null, null);
                 br.attach(conf);
                 br.insert();
                 return br;

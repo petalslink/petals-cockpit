@@ -139,8 +139,6 @@ public class ImportBusTest extends AbstractBasicResourceTest {
             assertThat(bus.getImportIp()).isEqualTo(container.getHost());
             assertThat(bus.getImportPort()).isEqualTo(getPort(container));
             assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
-            assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
-            assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
             assertThat(bus.getWorkspaceId()).isEqualTo(1);
             assertThat(post.id).isEqualTo(bus.getId());
             busId = bus.getId();
@@ -162,8 +160,6 @@ public class ImportBusTest extends AbstractBasicResourceTest {
         assertThat(bus.getImportIp()).isEqualTo(container.getHost());
         assertThat(bus.getImportPort()).isEqualTo(getPort(container));
         assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
-        assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
-        assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
         assertThat(bus.getWorkspaceId()).isEqualTo(1);
 
         // these should have been set now
@@ -236,8 +232,6 @@ public class ImportBusTest extends AbstractBasicResourceTest {
             assertThat(bus.getImportIp()).isEqualTo(container.getHost());
             assertThat(bus.getImportPort()).isEqualTo(getPort(container));
             assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
-            assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
-            assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
             assertThat(bus.getWorkspaceId()).isEqualTo(1);
             assertThat(post.id).isEqualTo(bus.getId());
 
@@ -290,8 +284,6 @@ public class ImportBusTest extends AbstractBasicResourceTest {
             assertThat(bus.getImportIp()).isEqualTo(incorrectHost);
             assertThat(bus.getImportPort()).isEqualTo(incorrectPort);
             assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
-            assertThat(bus.getImportPassword()).isEqualTo(container.getJmxPassword());
-            assertThat(bus.getImportPassphrase()).isEqualTo("phrase");
             assertThat(bus.getWorkspaceId()).isEqualTo(1);
             assertThat(bus.getImported()).isEqualTo(false);
             assertThat(post.id).isEqualTo(bus.getId());
@@ -313,8 +305,6 @@ public class ImportBusTest extends AbstractBasicResourceTest {
         assertThat(busDb.getImportIp()).isEqualTo(incorrectHost);
         assertThat(busDb.getImportPort()).isEqualTo(incorrectPort);
         assertThat(busDb.getImportUsername()).isEqualTo(container.getJmxUsername());
-        assertThat(busDb.getImportPassword()).isEqualTo(container.getJmxPassword());
-        assertThat(busDb.getImportPassphrase()).isEqualTo("phrase");
         assertThat(busDb.getWorkspaceId()).isEqualTo(1);
         // these should have been set now
         assertThat(busDb.getImported()).isEqualTo(false);

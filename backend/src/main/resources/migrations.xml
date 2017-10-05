@@ -299,4 +299,10 @@
   <changeSet id="v0.11.0-2" author="vnoel">
     <addPrimaryKey columnNames="username, workspace_id" constraintName="pk_users_workspaces" tableName="users_workspaces" />
   </changeSet>
+  
+  <changeSet id="v0.14.0-1" author="psouquet">
+    <dropColumn tableName="buses" columnName="import_password"/>
+    <dropColumn tableName="buses" columnName="import_passphrase"/>
+  </changeSet>
+  
 </databaseChangeLog>
