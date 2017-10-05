@@ -1,0 +1,54 @@
+<!-- Copyright (C) 2017 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<md-card-content *ngIf="msg && !isHidden" fxLayout="column" class="msg-content" [ngClass]="type">
+  <div fxLayout="row" fxLayoutAlign="start center">
+    <md-icon [ngClass]="type">{{ type }}</md-icon>
+    <span fxFlex class="msg-details italic margin-left-x1">{{ msg | shorten: maxLength: '...' }}</span>
+    <button class="btn-view-more-message text-upper" md-button *ngIf="msg.length > maxLength" fxLayoutAlign="end center" type="button" (click)="openDialog()">
+      <span class="view-more-name">View more</span>
+    </button>
+    <button class="btn-cancel-message" *ngIf="msg.length < maxLength && type !== 'error'" type="button" (click)="hideMessage()" md-icon-button>
+      <md-icon [ngClass]="type">cancel</md-icon>
+    </button>
+  </div>
+</md-card-content>
+
+<ng-template #dialog>
+  <div fxLayout="column" class="content content-max-width msg-dialog">
+    <div class="central-content">
+      <div class="msg-dialog-type" fxLayout="row" md-dialog-title fxLayoutAlign="start start" [ngClass]="type + 'Dialog'">
+        <span fxLayoutAlign="start center">
+          <md-icon [ngClass]="type + 'Dialog'">{{ type }}</md-icon>
+          <span class="margin-left-x1 msg-dialog-title">Complete {{ type }}:</span>
+        </span>
+      </div>
+
+      <md-dialog-content>
+        <p fxLayout="column" *ngIf="msg">
+          <span class="msg-dialog-details">{{ msg }}</span>
+        </p>
+      </md-dialog-content>
+
+      <md-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
+        <!-- we can't simply use md-dialog-close because of https://github.com/angular/material2/issues/5412 -->
+        <button class="btn-close-dialog" type="button" md-button (click)="dialogRef.close()">
+        <md-icon class="margin-right-x1" color="warn">close</md-icon>
+        <span class="text-upper">Close</span>
+      </button>
+      </md-dialog-actions>
+    </div>
+  </div>
+</ng-template>

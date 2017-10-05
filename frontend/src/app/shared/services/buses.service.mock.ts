@@ -23,7 +23,12 @@ import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import { UsersService } from 'app/shared/services/users.service';
 import { UsersServiceMock } from 'app/shared/services/users.service.mock';
 import { environment } from 'environments/environment';
-import { IMPORT_HTTP_ERROR_IP } from 'mocks/backend-mock';
+import {
+  errorBackend,
+  errorBackendLongText,
+  IMPORT_HTTP_ERROR_IP,
+  IMPORT_HTTP_ERROR_IP_LONG_TEXT,
+} from 'mocks/backend-mock';
 import { busesService } from 'mocks/buses-mock';
 import { workspacesService } from 'mocks/workspaces-mock';
 import { BusesServiceImpl, IBusImport } from './buses.service';
@@ -42,7 +47,9 @@ export class BusesServiceMock extends BusesServiceImpl {
   postBus(idWorkspace: string, bus: IBusImport) {
     // only used by the tests to verify an error coming from the backend...
     if (bus.ip === IMPORT_HTTP_ERROR_IP) {
-      return helper.errorBackend('Error backend', 500);
+      return helper.errorBackend(errorBackend, 500);
+    } else if (bus.ip === IMPORT_HTTP_ERROR_IP_LONG_TEXT) {
+      return helper.errorBackend(errorBackendLongText, 500);
     }
 
     const newBus = workspacesService.get(idWorkspace).tryAddBus(bus);

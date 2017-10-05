@@ -20,6 +20,7 @@ import { $, browser, by, ExpectedConditions as EC } from 'protractor';
 import { waitTimeout } from '../common';
 import { urlToMatch, waitAndClick } from '../utils';
 import { ComponentOverviewPage } from './component.po';
+import { MessageComponentPage } from './message-component.po';
 
 export abstract class SharedLibraryPage {
   public static readonly component = $(`app-petals-shared-library-view`);
@@ -84,6 +85,13 @@ export class SharedLibraryOverviewPage extends SharedLibraryPage {
     super();
   }
 
+  getInfoSlNoComponent() {
+    return MessageComponentPage.waitAndGet(
+      this.component,
+      `info-sl-no-component`
+    );
+  }
+
   openComponent(identifier: string | number) {
     const css = `.components a.component`;
     const e =
@@ -109,9 +117,6 @@ export class SharedLibraryOperationPage extends SharedLibraryPage {
   public readonly unloadButton = this.lifecycleCard.element(
     by.cssContainingText(`button`, `Unload`)
   );
-  public readonly changeStateError = this.lifecycleCard.$(`.error .italic`);
-
-  // deploy a su
 
   static waitAndGet() {
     super.wait();

@@ -19,6 +19,7 @@ import { $, browser, by, ExpectedConditions as EC } from 'protractor';
 
 import { waitTimeout } from '../common';
 import { urlToMatch, waitAndClick } from '../utils';
+import { MessageComponentPage } from './message-component.po';
 import { ServiceAssemblyOverviewPage } from './service-assembly.po';
 import { ServiceUnitOverviewPage } from './service-unit.po';
 import { SharedLibraryOverviewPage } from './shared-library.po';
@@ -79,6 +80,14 @@ export class ComponentOverviewPage extends ComponentPage {
 
   private constructor() {
     super();
+  }
+
+  getInfoNoSuMessage() {
+    return MessageComponentPage.waitAndGet(this.component, `info-no-su`);
+  }
+
+  getInfoNoSlMessage() {
+    return MessageComponentPage.waitAndGet(this.component, `info-no-sl`);
   }
 
   openSharedLibrary(identifier: string | number) {
@@ -146,7 +155,6 @@ export class ComponentOperationPage extends ComponentPage {
     by.cssContainingText(`button`, `Set`)
   );
   public readonly parameters = this.lifecycleCard.$(`.component-parameters`);
-
   public readonly deploys = this.operations.$(`.deploys`);
 
   // deploy a su
@@ -162,6 +170,13 @@ export class ComponentOperationPage extends ComponentPage {
 
   private constructor() {
     super();
+  }
+
+  getErrorChangeStateMessage() {
+    return MessageComponentPage.waitAndGet(
+      this.component,
+      `error-change-state`
+    );
   }
 
   getSUUpload() {

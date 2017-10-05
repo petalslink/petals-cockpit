@@ -219,7 +219,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       <div class="central-content">
         <div fxLayout="row" md-dialog-title fxLayoutAlign="start start">
           <span fxLayoutAlign="start center">
-            <md-icon color="warn">warning</md-icon>
+            <md-icon color="accent">warning</md-icon>
             <span class="margin-left-x1">Delete workspace?</span>
           </span>
         </div>

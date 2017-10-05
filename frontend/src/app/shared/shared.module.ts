@@ -43,12 +43,17 @@ import { StoreModule } from '@ngrx/store';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { PrettyJsonModule } from 'angular2-prettyjson';
 import { NgxHoverOpacityModule } from 'ngx-hover-opacity';
+import {
+  NgArrayPipesModule,
+  NgObjectPipesModule,
+  NgStringPipesModule,
+} from 'ngx-pipes';
 
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
 import { FocusInputIfLargeScreenDirective } from 'app/shared/directives/focus-input-based-on-screen-size.directive';
-import { NgArrayPipesModule, NgObjectPipesModule } from 'ngx-pipes';
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { LedComponent } from './components/led/led.component';
+import { MessageComponent } from './components/message/message.component';
 import { NotFound404Component } from './components/not-found-404/not-found-404.component';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
 
@@ -77,6 +82,9 @@ export const imports = [
   FlexLayoutModule,
   FormsModule,
   NgxHoverOpacityModule,
+  NgArrayPipesModule,
+  NgObjectPipesModule,
+  NgStringPipesModule,
 ];
 
 export const declarations = [
@@ -86,20 +94,17 @@ export const declarations = [
   NotFound404Component,
   LedComponent,
   FocusInputIfLargeScreenDirective,
+  MessageComponent,
 ];
 
 export const exportss = [
   ReactiveFormsModule,
-  HttpClientModule,
-  // we do need to keep HttpModule for now because
-  // MdIconModule is relying on it
+  HttpClientModule, // MdIconModule is relying on it // we do need to keep HttpModule for now because
   HttpModule,
   RouterModule,
   StoreModule,
   PrettyJsonModule,
   SimpleNotificationsModule,
-  NgObjectPipesModule,
-  NgArrayPipesModule,
   ...imports,
   ...MaterialModules,
   ...declarations,

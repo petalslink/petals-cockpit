@@ -1,0 +1,73 @@
+/**
+ * Copyright (C) 2017 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+md-dialog-content {
+  height: 100%;
+}
+
+.central-content {
+  padding: 24px;
+}
+
+// all types of messages
+@mixin msg-content($bg, $color) {
+  padding: 12px;
+  overflow-wrap: break-word;
+  display: inline-block;
+  width: 100%;
+  background-color: $bg;
+  color: $color;
+}
+
+.msg-content {
+  &.error {
+    @include msg-content (rgb(251, 225, 225), #e53935);
+  }
+
+  &.info {
+    @include msg-content (rgb(217, 237, 248), #0288d1);
+    .info-color {
+      color: #0288d1;
+    }
+  }
+
+  &.warning {
+    @include msg-content (rgb(253, 233, 217), #EF6C00);
+  }
+}
+
+// all types of messages dialog
+@mixin msg-dialog-type($color) {
+  overflow-wrap: break-word;
+  display: inline-block;
+  width: 100%;
+  color: $color;
+}
+
+.msg-dialog-type {
+  &.errorDialog {
+    @include msg-dialog-type (#e53935);
+  }
+
+  &.infoDialog {
+    @include msg-dialog-type (#0288d1);
+  }
+
+  &.warningDialog {
+    @include msg-dialog-type (#EF6C00);
+  }
+}

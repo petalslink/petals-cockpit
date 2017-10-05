@@ -54,6 +54,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <span class="italic">{{ component.updateError }}</span>
         </md-card-content>
 
+        <app-message class="error-change-state" type="error" [msg]="component.updateError"></app-message>
+
         <md-divider></md-divider>
 
         <md-card-subtitle class="margin-top-x1 component-parameters-title" fxLayoutAlign="start center">
@@ -75,6 +77,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </span>
           </form>
         </md-card-content>
+
       </md-card>
 
       <app-upload

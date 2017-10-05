@@ -42,58 +42,66 @@ describe(`Petals container content`, () => {
     const cont = workspace.openContainer('Cont 0');
 
     expect(cont.title.getText()).toEqual('Cont 0');
-
     expect(cont.ip.getText()).toEqual('192.168.0.0');
     expect(cont.port.getText()).toEqual('7700');
-
     expect(cont.systemInfo.getText()).toEqual(
       [
         'Petals ESB µKernel 4.0.2 Petals Standalone Shared Memory 4.0.2 OpenJDK',
         'Runtime Environment 1.7.0_111-b01 Oracle Corporation Linux 3.16.0-4-amd64 amd64',
       ].join(' ')
     );
+
+    cont
+      .getInfoContainerReachabilitiesMessage()
+      .expectToBe('info', `Click on a container to see its parameters.`);
   });
 
   describe('Deploy component', () => {
     it('should have a correct component deployment form', () => {
-      const upload = workspace
+      const deploy = workspace
         .openContainer('Cont 0')
         .openOperations()
         .getComponentUpload();
 
-      expect(upload.chooseFileName.getText()).toEqual(
+      expect(deploy.chooseFileName.getText()).toEqual(
         `CHOOSE A FILE TO UPLOAD`
       );
       const filePath = path.resolve(__dirname, './resources/component.zip');
-      upload.fileInput.sendKeys(filePath);
+      deploy.fileInput.sendKeys(filePath);
 
-      expect(upload.fileNameInput.isPresent()).toBe(false);
-      expect(upload.fileName.getText()).toEqual(`component.zip`);
-      expect(upload.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
+      expect(deploy.fileNameInput.isPresent()).toBe(false);
+      expect(deploy.fileName.getText()).toEqual(`component.zip`);
+      expect(deploy.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
 
-      expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
-      expect(upload.deployButton.isEnabled()).toBe(true);
+      expect(deploy.deployButton.getText()).toMatch(`DEPLOY`);
+      expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 
     it(`should show a detailed error if the component deployment fails`, () => {
-      const upload = workspace
+      const deploy = workspace
         .openContainer('Cont 0')
         .openOperations()
         .getComponentUpload();
 
+      expect(deploy.getErrorDeployMessage().content.isPresent()).toBe(false);
+
       const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
-      upload.fileInput.sendKeys(filePath);
+      deploy.fileInput.sendKeys(filePath);
+
+      const error = deploy.getErrorDeployMessage();
+
+      error.expectHidden();
 
       // deploy the component
       page.clickAndExpectNotification(
-        upload.deployButton,
+        deploy.deployButton,
         'Component Deployment Failed',
         'An error occurred while deploying error-deploy.zip'
       );
 
-      expect(upload.errorTitle.getText()).toEqual('An error occurred:');
-      expect(upload.errorMsg.getText()).toEqual(
-        '[Mock message] An error happened when trying to deploy the component'
+      error.expectToBe(
+        'error',
+        `[Mock message] An error happened when trying to deploy the component`
       );
     });
 
@@ -215,55 +223,61 @@ describe(`Petals container content`, () => {
 
   describe('Deploy service assembly', () => {
     it('should have a correct service-assembly deployment form', () => {
-      const upload = workspace
+      const deploy = workspace
         .openContainer('Cont 0')
         .openOperations()
         .getServiceAssemblyUpload();
 
-      expect(upload.chooseFileName.getText()).toEqual(
+      expect(deploy.chooseFileName.getText()).toEqual(
         `CHOOSE A FILE TO UPLOAD`
       );
       const filePath = path.resolve(__dirname, './resources/sa.zip');
-      upload.fileInput.sendKeys(filePath);
+      deploy.fileInput.sendKeys(filePath);
 
-      expect(upload.fileNameInput.isPresent()).toBe(false);
-      expect(upload.fileName.getText()).toEqual(`sa.zip`);
-      expect(upload.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
+      expect(deploy.fileNameInput.isPresent()).toBe(false);
+      expect(deploy.fileName.getText()).toEqual(`sa.zip`);
+      expect(deploy.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
 
-      expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
-      expect(upload.deployButton.isEnabled()).toBe(true);
+      expect(deploy.deployButton.getText()).toMatch(`DEPLOY`);
+      expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 
     it(`should show a detailed error if the service-assembly deployment fails`, () => {
-      const upload = workspace
+      const deploy = workspace
         .openContainer('Cont 0')
         .openOperations()
         .getServiceAssemblyUpload();
 
+      expect(deploy.getErrorDeployMessage().content.isPresent()).toBe(false);
+
       const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
-      upload.fileInput.sendKeys(filePath);
+      deploy.fileInput.sendKeys(filePath);
+
+      const error = deploy.getErrorDeployMessage();
+
+      error.expectHidden();
 
       // deploy the service-assembly
       page.clickAndExpectNotification(
-        upload.deployButton,
+        deploy.deployButton,
         'Service Assembly Deployment Failed',
         'An error occurred while deploying error-deploy.zip'
       );
 
-      expect(upload.errorTitle.getText()).toEqual('An error occurred:');
-      expect(upload.errorMsg.getText()).toEqual(
-        '[Mock message] An error happened when trying to deploy the service-assembly'
+      error.expectToBe(
+        'error',
+        `[Mock message] An error happened when trying to deploy the service-assembly`
       );
     });
 
     it(`should deploy a service-assembly`, () => {
-      const upload = workspace
+      const deploy = workspace
         .openContainer('Cont 0')
         .openOperations()
         .getServiceAssemblyUpload();
 
       const filePath = path.resolve(__dirname, './resources/sa.zip');
-      upload.fileInput.sendKeys(filePath);
+      deploy.fileInput.sendKeys(filePath);
 
       const expectedTreeBeforeDeploy = [
         `Bus 0`,
@@ -302,11 +316,11 @@ describe(`Petals container content`, () => {
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
 
       // make sure we can't change the name of the component we want to deploy
-      expect(upload.fileNameInput.isPresent()).toBe(false);
+      expect(deploy.fileNameInput.isPresent()).toBe(false);
 
       // deploy the component
       page.clickAndExpectNotification(
-        upload.deployButton,
+        deploy.deployButton,
         'Service Assembly Deployed',
         'SA 12 has been successfully deployed'
       );
@@ -367,57 +381,63 @@ describe(`Petals container content`, () => {
 
   describe('Deploy shared library', () => {
     it('should have a correct shared library deployment form', () => {
-      const upload = workspace
+      const deploy = workspace
         .openContainer('Cont 0')
         .openOperations()
         .getSharedLibraryUpload();
 
-      expect(upload.chooseFileButton.getText()).toEqual(
+      expect(deploy.chooseFileButton.getText()).toEqual(
         `CHOOSE A FILE TO UPLOAD insert_drive_file`
       );
       const filePath = path.resolve(__dirname, './resources/sl.zip');
-      upload.fileInput.sendKeys(filePath);
+      deploy.fileInput.sendKeys(filePath);
 
-      expect(upload.fileNameInput.isPresent()).toBe(false);
-      expect(upload.fileName.getText()).toEqual(`sl.zip`);
-      expect(upload.chooseFileButton.getText()).toEqual(
+      expect(deploy.fileNameInput.isPresent()).toBe(false);
+      expect(deploy.fileName.getText()).toEqual(`sl.zip`);
+      expect(deploy.chooseFileButton.getText()).toEqual(
         `CHANGE THE FILE insert_drive_file`
       );
 
-      expect(upload.deployButton.getText()).toMatch(`DEPLOY`);
-      expect(upload.deployButton.isEnabled()).toBe(true);
+      expect(deploy.deployButton.getText()).toMatch(`DEPLOY`);
+      expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 
     it(`should show a detailed error if the shared library deployment fails`, () => {
-      const upload = workspace
+      const deploy = workspace
         .openContainer('Cont 0')
         .openOperations()
         .getSharedLibraryUpload();
 
+      expect(deploy.getErrorDeployMessage().content.isPresent()).toBe(false);
+
       const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
-      upload.fileInput.sendKeys(filePath);
+      deploy.fileInput.sendKeys(filePath);
+
+      const error = deploy.getErrorDeployMessage();
+
+      error.expectHidden();
 
       // deploy the service-assembly
       page.clickAndExpectNotification(
-        upload.deployButton,
+        deploy.deployButton,
         'Shared Library Deployment Failed',
         'An error occurred while deploying error-deploy.zip'
       );
 
-      expect(upload.errorTitle.getText()).toEqual('An error occurred:');
-      expect(upload.errorMsg.getText()).toEqual(
-        '[Mock message] An error happened when trying to deploy the shared library'
+      error.expectToBe(
+        'error',
+        `[Mock message] An error happened when trying to deploy the shared library`
       );
     });
 
     it(`should deploy a shared library`, () => {
-      const upload = workspace
+      const deploy = workspace
         .openContainer('Cont 0')
         .openOperations()
         .getSharedLibraryUpload();
 
       const filePath = path.resolve(__dirname, './resources/sl.zip');
-      upload.fileInput.sendKeys(filePath);
+      deploy.fileInput.sendKeys(filePath);
 
       const expectedTreeBeforeDeploy = [
         `Bus 0`,
@@ -456,11 +476,11 @@ describe(`Petals container content`, () => {
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
 
       // make sure we can't change the name of the component we want to deploy
-      expect(upload.fileNameInput.isPresent()).toBe(false);
+      expect(deploy.fileNameInput.isPresent()).toBe(false);
 
       // deploy the component
       page.clickAndExpectNotification(
-        upload.deployButton,
+        deploy.deployButton,
         'Shared Library Deployed',
         'SL 4 has been successfully deployed'
       );
@@ -505,11 +525,11 @@ describe(`Petals container content`, () => {
 
       // we should get redirected
       const sl = workspace.openSharedLibrary('SL 4');
-
       expect(sl.title.getText()).toEqual('SL 4');
-      expect(sl.components.getText()).toEqual([
-        `This shared library isn't used by any component.`,
-      ]);
+
+      sl
+        .getInfoSlNoComponent()
+        .expectToBe('info', `This shared library isn't used by any component.`);
     });
   });
 });

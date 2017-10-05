@@ -20,6 +20,7 @@ import { $, browser, ExpectedConditions as EC } from 'protractor';
 import { waitTimeout } from '../common';
 import { urlToMatch, waitAndClick } from '../utils';
 import { ContainerOverviewPage } from './container.po';
+import { MessageComponentPage } from './message-component.po';
 
 export class BusPage {
   public static readonly component = $(`app-petals-bus-view`);
@@ -46,6 +47,10 @@ export class BusPage {
   }
 
   private constructor() {}
+
+  getInfoPetalsServersMessage() {
+    return MessageComponentPage.waitAndGet(this.component);
+  }
 
   openContainer(index: number) {
     waitAndClick(this.containers.get(index).$('.swiper-img-container'));

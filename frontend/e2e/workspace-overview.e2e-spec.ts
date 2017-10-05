@@ -33,9 +33,9 @@ describe(`Workspace Overview`, () => {
     );
     expect(workspace.descriptionArea.isPresent()).toBe(false);
 
-    expect(workspace.users.$(`.users-in-workspace`).getText()).toEqual(
-      `You are the only one using this workspace.`
-    );
+    workspace
+      .getInfoUserWorkspaceMessage()
+      .expectToBe('info', `You are the only one using this workspace.`);
 
     expect(
       workspace.users.$$(`md-list-item .mat-list-text`).getText()
@@ -60,9 +60,9 @@ describe(`Workspace Overview`, () => {
     );
     expect(workspace.descriptionArea.isPresent()).toBe(false);
 
-    expect(workspace.users.$(`.users-in-workspace`).getText()).toEqual(
-      `5 people are using this workspace.`
-    );
+    ws2
+      .getInfoUserWorkspaceSharedMessage()
+      .expectToBe('info', `5 people are using this workspace.`);
 
     expect(
       workspace.users.$$(`md-list-item .mat-list-text`).getText()

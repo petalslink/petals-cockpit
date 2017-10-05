@@ -49,9 +49,10 @@ describe(`Petals component content`, () => {
     expect(comp2.type.getText()).toEqual('BC');
 
     expect(comp2.sharedLibraries.getText()).toEqual([`SL 0`]);
-    expect(comp2.serviceUnits.getText()).toEqual([
-      `This component doesn't have any service unit.`,
-    ]);
+
+    comp2
+      .getInfoNoSuMessage()
+      .expectToBe('info', `This component doesn't have any service unit.`);
 
     // we should get redirected to Comp 1
     const comp1 = workspace.openComponent('Comp 1');
@@ -66,9 +67,10 @@ describe(`Petals component content`, () => {
       `SU 3`,
       `SA 2`,
     ]);
-    expect(comp1.sharedLibraries.getText()).toEqual([
-      `This component doesn't use any shared library.`,
-    ]);
+
+    comp1
+      .getInfoNoSlMessage()
+      .expectToBe('info', `This component doesn't use any shared library.`);
 
     // clicking on SU's name should open SU's page
     comp1.openServiceUnit('SU 1');
@@ -225,6 +227,10 @@ describe(`Petals component content`, () => {
     const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
     deploy.fileInput.sendKeys(filePath);
 
+    const error = deploy.getErrorDeployMessage();
+
+    error.expectHidden();
+
     // deploy the component
     page.clickAndExpectNotification(
       deploy.deployButton,
@@ -232,9 +238,9 @@ describe(`Petals component content`, () => {
       'An error occurred while deploying error-deploy.zip'
     );
 
-    expect(deploy.errorTitle.getText()).toEqual('An error occurred:');
-    expect(deploy.errorMsg.getText()).toEqual(
-      '[Mock message] An error happened when trying to deploy the service-unit'
+    error.expectToBe(
+      'error',
+      `[Mock message] An error happened when trying to deploy the service-unit`
     );
   });
 
@@ -355,10 +361,15 @@ describe(`Petals component content`, () => {
 
     clearInput(poolSizeInput);
     poolSizeInput.sendKeys('error');
+
+    const error = ops.getErrorChangeStateMessage();
+
+    error.expectHidden();
+
     waitAndClick(ops.setParametersButton);
 
-    // check if the error is displayed
-    expect(ops.changeStateError.getText()).toEqual(
+    error.expectToBe(
+      'error',
       `[Mock message] An error happened when trying to change the parameters of that component`
     );
 

@@ -74,12 +74,14 @@ export class PetalsBusViewComponent implements OnInit {
       <div class="central-content">
         <div fxLayout="row" md-dialog-title fxLayoutAlign="start start">
           <span fxLayoutAlign="start center">
-            <md-icon color="warn">warning</md-icon>
-            <span class="margin-left-x1">Delete bus?</span>
+            <md-icon color="accent">warning</md-icon>
+            <span class="warning-title margin-left-x1">Delete bus?</span>
           </span>
         </div>
         <md-dialog-content>
-          <p>Are you sure you want to delete <b>{{ data.bus.name }}</b>?</p>
+          <p fxLayout="column">
+            <span class="warning-message">Are you sure you want to delete <b>{{ data.bus.name }}</b>?</span>
+          </p>
         </md-dialog-content>
 
         <md-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
