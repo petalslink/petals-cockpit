@@ -1,3 +1,14 @@
+import { Type } from '@angular/core';
+import { BusesService } from 'app/shared/services/buses.service';
+import { ComponentsService } from 'app/shared/services/components.service';
+import { ContainersService } from 'app/shared/services/containers.service';
+import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
+import { ServiceUnitsService } from 'app/shared/services/service-units.service';
+import { SharedLibrariesService } from 'app/shared/services/shared-libraries.service';
+import { SseService } from 'app/shared/services/sse.service';
+import { UsersService } from 'app/shared/services/users.service';
+import { WorkspacesService } from 'app/shared/services/workspaces.service';
+
 export interface IEnvironment {
   /**
    * angular can optimize some part of his code
@@ -33,6 +44,8 @@ export interface IEnvironment {
    */
   debug: boolean;
 
+  services: IMockableServices;
+
   /**
    * should you keep mocks when building the app
    * or hit the real API
@@ -57,3 +70,42 @@ export interface IEnvironment {
     alreadyConnected: boolean;
   };
 }
+
+export type IMockableServices = [
+  {
+    provide: typeof SseService;
+    useClass: Type<any>;
+  },
+  {
+    provide: typeof BusesService;
+    useClass: Type<any>;
+  },
+  {
+    provide: typeof ContainersService;
+    useClass: Type<any>;
+  },
+  {
+    provide: typeof ComponentsService;
+    useClass: Type<any>;
+  },
+  {
+    provide: typeof ServiceAssembliesService;
+    useClass: Type<any>;
+  },
+  {
+    provide: typeof ServiceUnitsService;
+    useClass: Type<any>;
+  },
+  {
+    provide: typeof SharedLibrariesService;
+    useClass: Type<any>;
+  },
+  {
+    provide: typeof WorkspacesService;
+    useClass: Type<any>;
+  },
+  {
+    provide: typeof UsersService;
+    useClass: Type<any>;
+  }
+];

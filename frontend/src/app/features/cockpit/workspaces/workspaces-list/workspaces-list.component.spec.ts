@@ -40,7 +40,6 @@ describe('WorkspacesListComponent', () => {
       TestBed.configureTestingModule({
         imports: [SharedModule, NoopAnimationsModule],
         declarations: [TestHostComponent, WorkspacesListComponent],
-        providers: [],
       }).compileComponents();
     })
   );
