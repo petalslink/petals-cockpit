@@ -99,7 +99,8 @@ export const declarations = [
 
 export const exportss = [
   ReactiveFormsModule,
-  HttpClientModule, // MdIconModule is relying on it // we do need to keep HttpModule for now because
+  // MdIconModule is relying on it so we do need to keep HttpModule for now because
+  HttpClientModule,
   HttpModule,
   RouterModule,
   StoreModule,

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ModuleWithProviders, NgModule } from '@angular/core';
+import { ModuleWithProviders, NgModule, Provider } from '@angular/core';
 import { Actions, EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
@@ -30,99 +30,16 @@ import { ServiceUnitsEffects } from 'app/features/cockpit/workspaces/state/servi
 import { SharedLibrariesEffects } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.effects';
 import { WorkspacesEffects } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.effects';
 import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
-import {
-  BusesService,
-  BusesServiceImpl,
-} from 'app/shared/services/buses.service';
-import { BusesServiceMock } from 'app/shared/services/buses.service.mock';
-import {
-  ComponentsService,
-  ComponentsServiceImpl,
-} from 'app/shared/services/components.service';
-import { ComponentsServiceMock } from 'app/shared/services/components.service.mock';
-import {
-  ContainersService,
-  ContainersServiceImpl,
-} from 'app/shared/services/containers.service';
-import { ContainersServiceMock } from 'app/shared/services/containers.service.mock';
 import { GuardLoginService } from 'app/shared/services/guard-login.service';
-import {
-  ServiceAssembliesService,
-  ServiceAssembliesServiceImpl,
-} from 'app/shared/services/service-assemblies.service';
-import { ServiceAssembliesServiceMock } from 'app/shared/services/service-assemblies.service.mock';
-import {
-  ServiceUnitsService,
-  ServiceUnitsServiceImpl,
-} from 'app/shared/services/service-units.service';
-import { ServiceUnitsServiceMock } from 'app/shared/services/service-units.service.mock';
-import {
-  SharedLibrariesService,
-  SharedLibrariesServiceImpl,
-} from 'app/shared/services/shared-libraries.service';
-import { SharedLibrariesServiceMock } from 'app/shared/services/shared-libraries.service.mock';
-import { SseService, SseServiceImpl } from 'app/shared/services/sse.service';
-import { SseServiceMock } from 'app/shared/services/sse.service.mock';
-import {
-  UsersService,
-  UsersServiceImpl,
-} from 'app/shared/services/users.service';
-import { UsersServiceMock } from 'app/shared/services/users.service.mock';
-import {
-  WorkspacesService,
-  WorkspacesServiceImpl,
-} from 'app/shared/services/workspaces.service';
-import { WorkspacesServiceMock } from 'app/shared/services/workspaces.service.mock';
 import { metaReducers, reducers } from 'app/shared/state/root.reducer';
 import { UiEffects } from 'app/shared/state/ui.effects';
 import { UsersEffects } from 'app/shared/state/users.effects';
 import { environment } from 'environments/environment';
 import './rxjs-operators';
 
-export const providers = [
+export const providers: Provider[] = [
+  ...environment.services,
   GuardLoginService,
-  {
-    provide: SseService,
-    useClass: environment.mock ? SseServiceMock : SseServiceImpl,
-  },
-  {
-    provide: BusesService,
-    useClass: environment.mock ? BusesServiceMock : BusesServiceImpl,
-  },
-  {
-    provide: ContainersService,
-    useClass: environment.mock ? ContainersServiceMock : ContainersServiceImpl,
-  },
-  {
-    provide: ComponentsService,
-    useClass: environment.mock ? ComponentsServiceMock : ComponentsServiceImpl,
-  },
-  {
-    provide: ServiceAssembliesService,
-    useClass: environment.mock
-      ? ServiceAssembliesServiceMock
-      : ServiceAssembliesServiceImpl,
-  },
-  {
-    provide: ServiceUnitsService,
-    useClass: environment.mock
-      ? ServiceUnitsServiceMock
-      : ServiceUnitsServiceImpl,
-  },
-  {
-    provide: SharedLibrariesService,
-    useClass: environment.mock
-      ? SharedLibrariesServiceMock
-      : SharedLibrariesServiceImpl,
-  },
-  {
-    provide: WorkspacesService,
-    useClass: environment.mock ? WorkspacesServiceMock : WorkspacesServiceImpl,
-  },
-  {
-    provide: UsersService,
-    useClass: environment.mock ? UsersServiceMock : UsersServiceImpl,
-  },
   // we override the default one with ours aware of batch actions
   {
     provide: Actions,
