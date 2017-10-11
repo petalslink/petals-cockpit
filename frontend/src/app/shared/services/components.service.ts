@@ -15,14 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
 import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
 import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
-import { environment } from './../../../environments/environment';
+import { environment } from 'environments/environment';
 
 export enum EComponentState {
   Started = 'Started',
@@ -88,10 +89,13 @@ export abstract class ComponentsService {
     componentId: string,
     file: File,
     serviceUnitName: string
-  ): Observable<{
-    serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
-    serviceUnits: JsTable<IServiceUnitBackendSSE>;
-  }>;
+  ): {
+    progress$: Observable<number>;
+    result$: Observable<{
+      serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
+      serviceUnits: JsTable<IServiceUnitBackendSSE>;
+    }>;
+  };
 }
 
 @Injectable()
@@ -139,17 +143,52 @@ export class ComponentsServiceImpl extends ComponentsService {
     formData.append('file', file, file.name);
     formData.append('name', serviceUnitName);
 
-    return this.http
-      .post<{
-        serviceAssemblies: { [id: string]: IServiceAssemblyBackendSSE };
-        serviceUnits: { [id: string]: IServiceUnitBackendSSE };
-      }>(
-        `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}/serviceunits`,
-        formData
-      )
-      .map(res => ({
-        serviceAssemblies: toJsTable(res.serviceAssemblies),
-        serviceUnits: toJsTable(res.serviceUnits),
-      }));
+    const req = new HttpRequest(
+      'POST',
+      `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}/serviceunits`,
+      formData,
+      {
+        reportProgress: true,
+      }
+    );
+
+    const progress$ = new BehaviorSubject<number>(0);
+
+    return {
+      progress$: progress$.asObservable(),
+      result$: this.http
+        .request(req)
+        .flatMap(event => {
+          if (event.type === HttpEventType.UploadProgress) {
+            const percentDone = Math.round(100 * event.loaded / event.total);
+
+            progress$.next(percentDone);
+            return Observable.empty<{
+              serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
+              serviceUnits: JsTable<IServiceUnitBackendSSE>;
+            }>();
+          } else if (event.type === HttpEventType.Response) {
+            const body = event.body as {
+              serviceAssemblies: {
+                [id: string]: IServiceAssemblyBackendSSE;
+              };
+              serviceUnits: {
+                [id: string]: IServiceUnitBackendSSE;
+              };
+            };
+
+            progress$.next(100);
+            progress$.complete();
+
+            return Observable.of({
+              serviceAssemblies: toJsTable(body.serviceAssemblies),
+              serviceUnits: toJsTable(body.serviceUnits),
+            });
+          } else {
+            return Observable.empty<JsTable<IServiceUnitBackendSSE>>();
+          }
+        })
+        .last(),
+    };
   }
 }

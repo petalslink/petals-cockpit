@@ -81,15 +81,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </md-card>
 
       <app-upload
-        #uploadSu
-        [style.opacity]="component.state && component.state === 'Loaded' ? 0.5 : 1"
-        [title]="'Service Unit Deployment'"
-        [disabled]="component.isUpdating || (component.state && component.state === 'Loaded')"
-        [error]="component.deployError"
-        [placeholderChangeFileName]="'Service unit name'"
-        (onDeploy)="deploy($event.file, $event.name)"
         class="deploy-service-unit"
         fxFlex
+        #deployServiceUnit
+        [style.opacity]="component.state && component.state === 'Loaded' ? 0.5 : 1"
+        [title]="'Service Unit Deployment'"
+        [uploadStatus]="uploadServiceUnitStatus"
+        [disabled]="component.isUpdating || (component.state && component.state === 'Loaded')"
+        [error]="component.deployError"
+        (onUploadFile)="deploy($event.selectedFileInformation.file, $event.selectedFileInformation.fileName)"
       ></app-upload>
     </div>
   </div>

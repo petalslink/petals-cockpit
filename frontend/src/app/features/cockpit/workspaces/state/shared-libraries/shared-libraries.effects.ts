@@ -43,7 +43,7 @@ export class SharedLibrariesEffects {
   ) {}
 
   @Effect()
-  watchDelpoyed$: Observable<Action> = this.actions$
+  watchDeployed$: Observable<Action> = this.actions$
     .ofType<SseActions.SlDeployed>(SseActions.SlDeployedType)
     .map(action => {
       const data = action.payload;

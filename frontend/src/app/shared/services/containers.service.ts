@@ -15,11 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
+import { streamHttpProgressAndSuccess } from 'app/shared/helpers/shared.helper';
 import { IComponentBackendSSE } from 'app/shared/services/components.service';
 import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
@@ -58,22 +59,31 @@ export abstract class ContainersService {
     workspaceId: string,
     containerId: string,
     file: File
-  ): Observable<JsTable<IComponentBackendSSE>>;
+  ): {
+    progress$: Observable<number>;
+    result$: Observable<JsTable<IComponentBackendSSE>>;
+  };
 
   abstract deployServiceAssembly(
     workspaceId: string,
     containerId: string,
     file: File
-  ): Observable<{
-    serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
-    serviceUnits: JsTable<IServiceUnitBackendSSE>;
-  }>;
+  ): {
+    progress$: Observable<number>;
+    result$: Observable<{
+      serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
+      serviceUnits: JsTable<IServiceUnitBackendSSE>;
+    }>;
+  };
 
   abstract deploySharedLibrary(
     workspaceId: string,
     containerId: string,
     file: File
-  ): Observable<JsTable<ISharedLibraryBackendSSE>>;
+  ): {
+    progress$: Observable<number>;
+    result$: Observable<JsTable<ISharedLibraryBackendSSE>>;
+  };
 }
 
 @Injectable()
@@ -92,41 +102,65 @@ export class ContainersServiceImpl extends ContainersService {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
 
-    return this.http
-      .post<{ components: { [id: string]: IComponentBackendSSE } }>(
-        `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/components`,
-        formData
-      )
-      .map(res => toJsTable(res.components));
+    const req = new HttpRequest(
+      'POST',
+      `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/components`,
+      formData,
+      {
+        reportProgress: true,
+      }
+    );
+
+    return streamHttpProgressAndSuccess<
+      { components: { [id: string]: IComponentBackendSSE } },
+      JsTable<IComponentBackendSSE>
+    >(this.http.request(req), result => toJsTable(result.components));
   }
 
   deployServiceAssembly(workspaceId: string, containerId: string, file: File) {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
 
-    return this.http
-      .post<{
+    const req = new HttpRequest(
+      'POST',
+      `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/serviceassemblies`,
+      formData,
+      {
+        reportProgress: true,
+      }
+    );
+
+    return streamHttpProgressAndSuccess<
+      {
         serviceAssemblies: { [id: string]: IServiceAssemblyBackendSSE };
         serviceUnits: { [id: string]: IServiceUnitBackendSSE };
-      }>(
-        `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/serviceassemblies`,
-        formData
-      )
-      .map(res => ({
-        serviceAssemblies: toJsTable(res.serviceAssemblies),
-        serviceUnits: toJsTable(res.serviceUnits),
-      }));
+      },
+      {
+        serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
+        serviceUnits: JsTable<IServiceUnitBackendSSE>;
+      }
+    >(this.http.request(req), result => ({
+      serviceAssemblies: toJsTable(result.serviceAssemblies),
+      serviceUnits: toJsTable(result.serviceUnits),
+    }));
   }
 
   deploySharedLibrary(workspaceId: string, containerId: string, file: File) {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
 
-    return this.http
-      .post<{ sharedLibraries: { [id: string]: ISharedLibraryBackendSSE } }>(
-        `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/sharedlibraries`,
-        formData
-      )
-      .map(res => toJsTable(res.sharedLibraries));
+    const req = new HttpRequest(
+      'POST',
+      `${environment.urlBackend}/workspaces/${workspaceId}/containers/${containerId}/sharedlibraries`,
+      formData,
+      {
+        reportProgress: true,
+      }
+    );
+
+    return streamHttpProgressAndSuccess<
+      { sharedLibraries: { [id: string]: ISharedLibraryBackendSSE } },
+      JsTable<ISharedLibraryBackendSSE>
+    >(this.http.request(req), result => toJsTable(result.sharedLibraries));
   }
 }

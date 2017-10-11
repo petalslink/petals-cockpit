@@ -16,7 +16,6 @@
  */
 
 import {
-  ChangeDetectionStrategy,
   Component,
   ElementRef,
   Input,
@@ -35,15 +34,18 @@ import { v4 as uuid } from 'uuid';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
+import { stateNameToPossibleActionsComponent } from 'app/shared/helpers/component.helper';
 import { ComponentState } from 'app/shared/services/components.service';
-import { stateNameToPossibleActionsComponent } from '../../../../../../shared/helpers/component.helper';
-import { IStore } from '../../../../../../shared/state/store.interface';
+import {
+  HttpProgress,
+  HttpProgressType,
+} from 'app/shared/services/http-progress-tracker.service';
+import { IStore } from 'app/shared/state/store.interface';
 
 @Component({
   selector: 'app-petals-component-operations',
   templateUrl: './petals-component-operations.component.html',
   styleUrls: ['./petals-component-operations.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetalsComponentOperationsComponent
   implements OnInit, OnChanges, OnDestroy {
@@ -51,12 +53,16 @@ export class PetalsComponentOperationsComponent
 
   @Input() component: IComponentWithSLsAndSUs;
 
-  @ViewChild('uploadSu') uploadSu: UploadComponent;
+  @ViewChild('deployServiceUnit') deployServiceUnit: UploadComponent;
   @ViewChild('top') top: ElementRef;
 
   parametersForm: FormGroup;
 
-  constructor(private store$: Store<IStore>, private actions: Actions) {}
+  uploadServiceUnitStatus: {
+    percentage: number;
+  };
+
+  constructor(private store$: Store<IStore>, private actions$: Actions) {}
 
   ngOnInit() {}
 
@@ -85,7 +91,7 @@ export class PetalsComponentOperationsComponent
       )
     );
 
-    this.uploadSu.resetForm();
+    this.deployServiceUnit.reset();
   }
 
   getPossibleStateActions(state: ComponentState) {
@@ -117,15 +123,25 @@ export class PetalsComponentOperationsComponent
   deploy(file: File, serviceUnitName: string) {
     const correlationId = uuid();
 
-    this.actions
-      .ofType<Components.DeployServiceUnitSuccess>(
-        Components.DeployServiceUnitSuccessType
-      )
+    this.actions$
+      .ofType<HttpProgress>(HttpProgressType)
       .takeUntil(this.onDestroy$)
-      .filter(u => u.payload.correlationId === correlationId)
+      .filter(action => action.payload.correlationId === correlationId)
       // we want 1 or 0 (first wants exactly one) because of takeUntil
       .take(1)
-      .do(_ => this.uploadSu.resetForm())
+      .switchMap(action =>
+        action.payload
+          .getProgress()
+          .do(
+            percentage =>
+              (this.uploadServiceUnitStatus = {
+                percentage,
+              })
+          )
+          .do({
+            complete: () => this.deployServiceUnit.reset(),
+          })
+      )
       .subscribe();
 
     this.store$.dispatch(

@@ -18,6 +18,7 @@
 import { Action } from '@ngrx/store';
 
 import { JsTable } from 'app/shared/helpers/jstable.helper';
+import { ICorrelationId } from 'app/shared/interfaces/correlation-id.interface';
 import { IComponentBackendSSE } from 'app/shared/services/components.service';
 import {
   IContainerBackendDetails,
@@ -103,7 +104,7 @@ export namespace Containers {
       public readonly payload: {
         id: string;
         file: File;
-      }
+      } & ICorrelationId
     ) {}
   }
 
@@ -112,7 +113,10 @@ export namespace Containers {
   export class DeployServiceAssemblyError implements Action {
     readonly type = DeployServiceAssemblyErrorType;
     constructor(
-      public readonly payload: { id: string; errorDeployment: string }
+      public readonly payload: {
+        id: string;
+        errorDeployment: string;
+      } & ICorrelationId
     ) {}
   }
 
@@ -120,7 +124,9 @@ export namespace Containers {
     '[Containers] Deploy service assembly success';
   export class DeployServiceAssemblySuccess implements Action {
     readonly type = DeployServiceAssemblySuccessType;
-    constructor(public readonly payload: IServiceAssemblyBackendSSE) {}
+    constructor(
+      public readonly payload: IServiceAssemblyBackendSSE & ICorrelationId
+    ) {}
   }
 
   export const DeploySharedLibraryType = '[Containers] Deploy shared library';
@@ -130,7 +136,7 @@ export namespace Containers {
       public readonly payload: {
         id: string;
         file: File;
-      }
+      } & ICorrelationId
     ) {}
   }
 
@@ -139,7 +145,10 @@ export namespace Containers {
   export class DeploySharedLibraryError implements Action {
     readonly type = DeploySharedLibraryErrorType;
     constructor(
-      public readonly payload: { id: string; errorDeployment: string }
+      public readonly payload: {
+        id: string;
+        errorDeployment: string;
+      } & ICorrelationId
     ) {}
   }
 
@@ -147,7 +156,9 @@ export namespace Containers {
     '[Containers] Deploy shared library success';
   export class DeploySharedLibrarySuccess implements Action {
     readonly type = DeploySharedLibrarySuccessType;
-    constructor(public readonly payload: ISharedLibraryBackendSSE) {}
+    constructor(
+      public readonly payload: ISharedLibraryBackendSSE & ICorrelationId
+    ) {}
   }
 
   export const DeployComponentType = '[Containers] Deploy component';
@@ -157,7 +168,7 @@ export namespace Containers {
       public readonly payload: {
         id: string;
         file: File;
-      }
+      } & ICorrelationId
     ) {}
   }
 
@@ -165,7 +176,10 @@ export namespace Containers {
   export class DeployComponentError implements Action {
     readonly type = DeployComponentErrorType;
     constructor(
-      public readonly payload: { id: string; errorDeployment: string }
+      public readonly payload: {
+        id: string;
+        errorDeployment: string;
+      } & ICorrelationId
     ) {}
   }
 
@@ -173,6 +187,8 @@ export namespace Containers {
     '[Containers] Deploy component success';
   export class DeployComponentSuccess implements Action {
     readonly type = DeployComponentSuccessType;
-    constructor(public readonly payload: IComponentBackendSSE) {}
+    constructor(
+      public readonly payload: IComponentBackendSSE & ICorrelationId
+    ) {}
   }
 }

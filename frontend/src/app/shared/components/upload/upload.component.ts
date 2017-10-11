@@ -17,58 +17,94 @@
 
 import {
   Component,
+  ContentChild,
   EventEmitter,
   Input,
-  OnInit,
   Output,
-  ViewChild,
 } from '@angular/core';
-import { NgForm } from '@angular/forms';
+
+import { UpdateFileInformationDirective } from './update-file-information.directive';
+import {
+  IEventFileSelected,
+  ISelectedFileInformation,
+} from './upload.interface';
 
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.scss'],
-  // disabled for now because of
-  // https://github.com/angular/angular/issues/12313
-  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UploadComponent implements OnInit {
-  @Input() title: string;
-  @Input() disabled: boolean;
-  @Input() error: string;
-  @Input() placeholderChangeFileName?: string;
-
-  @Output()
-  onDeploy: EventEmitter<{ file: File; name: string }> = new EventEmitter();
-
-  @ViewChild('formUpload') formUpload: NgForm;
-  deployModel: string;
-
-  fileToDeploy: File;
-  changeFileName: string;
-
-  constructor() {}
-
-  ngOnInit() {}
-
-  fileChange(event: { target: { files: FileList } }) {
-    const fileList: FileList = event.target.files;
-
-    if (fileList.length > 0) {
-      const selectedFile = fileList[0];
-      this.fileToDeploy = selectedFile;
-      this.changeFileName = this.fileToDeploy.name.substring(
-        0,
-        this.fileToDeploy.name.length - 4
-      );
+export class UploadComponent {
+  @Input() title = `Upload a file`;
+  @Input() acceptedFileType?: string;
+  @Input() error?: string;
+  @Input() disabled = false;
+  @Input()
+  set uploadStatus(uploadStatus: { percentage: number }) {
+    if (!!uploadStatus && typeof uploadStatus.percentage === 'number') {
+      this.isUploading = true;
+      this.percentage = uploadStatus.percentage;
+    } else {
+      this.isUploading = false;
+      this.percentage = undefined;
     }
   }
+  @ContentChild(UpdateFileInformationDirective)
+  updateFileInformation: UpdateFileInformationDirective;
 
-  resetForm() {
-    this.fileToDeploy = undefined;
-    this.changeFileName = undefined;
-    this.deployModel = undefined;
-    this.formUpload.reset();
+  // when selecting a file
+  selectedFileInformation: ISelectedFileInformation;
+
+  // when uploading
+  @Output()
+  onUploadFile = new EventEmitter<{
+    selectedFileInformation: ISelectedFileInformation;
+  }>();
+  isUploading = false;
+  percentage: number;
+
+  fileChange(event: IEventFileSelected) {
+    this.reset();
+
+    this.selectedFileInformation = this.getSelectedFileInformation(
+      event.target.files
+    );
+  }
+
+  removeFile() {
+    this.selectedFileInformation = undefined;
+  }
+
+  uploadFile() {
+    this.isUploading = true;
+    this.onUploadFile.emit({
+      selectedFileInformation: this.selectedFileInformation,
+    });
+  }
+
+  reset() {
+    this.selectedFileInformation = undefined;
+    this.isUploading = false;
+    this.percentage = undefined;
+    this.error = undefined;
+  }
+
+  private getSelectedFileInformation(files: File[]): ISelectedFileInformation {
+    if (files.length <= 0) {
+      return null;
+    }
+
+    const [file] = files;
+    const fileExtension = file.name.split('.').pop();
+    const fileName = file.name.substr(
+      0,
+      file.name.length - fileExtension.length - 1
+    );
+
+    return {
+      file,
+      fileName,
+      fileExtension,
+    };
   }
 }

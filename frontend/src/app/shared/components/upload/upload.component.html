@@ -13,45 +13,85 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<!-- Material doesn't support inputs of type file -->
-<!-- https://github.com/angular/material2/issues/3262 -->
-<!-- https://github.com/angular/material2/issues/3758 -->
-<!-- the trick here consists in hiding the input, and bind the click on a button to that input -->
-<md-card [ngClass.gt-md]="'card-auto-size'">
-  <form #formUpload="ngForm" (ngSubmit)="onDeploy.emit({file: fileToDeploy, name: changeFileName})">
-    <md-card-title fxLayout="row">
-      <span fxFlex class="text-upper title">{{ title }}</span>
-      <md-icon color="primary">file_upload</md-icon>
-    </md-card-title>
+<app-md-card-toolbar [title]="title" titleIcon="file_upload">
+  <md-card-content>
+    <div *ngIf="!selectedFileInformation">
+      <input
+        type="file"
+        name="choose-file-hidden"
+        #selectFile
+        [accept]="acceptedFileType"
+        (change)="fileChange($event)"
+      >
 
-    <md-card-subtitle *ngIf="fileToDeploy" class="selected-file">Selected file:
-      <b><span class="file-name">{{ fileToDeploy.name }}</span></b>
-    </md-card-subtitle>
+      <button
+        class="choose-file"
+        md-button
+        [disabled]="disabled"
+        (click)="selectFile.click()"
+      >
+        Choose a file to upload
+      </button>
+    </div>
 
-    <!-- Material doesn't support inputs of type file -->
-    <!-- https://github.com/angular/material2/issues/3262 -->
-    <!-- https://github.com/angular/material2/issues/3758 -->
-    <!--the trick here consists in hiding the input, and bind the click on a button to that input-->
-    <md-card-content fxLayout="column" fxLayout.gt-sm="row">
-      <input #deploy name="deployModel" class="hidden" type="file" accept=".zip" (change)="fileChange($event)" [disabled]="disabled" [(ngModel)]="deployModel">
+    <div
+      class="when-selected-file"
+      *ngIf="selectedFileInformation"
+    >
+      <div
+        class="selected-file"
+        fxLayout="row"
+        fxLayout.lt-md="column"
+        fxLayoutAlign="start center"
+      >
+        <span class="file-name">
+          {{ selectedFileInformation.file.name }}
+        </span>
 
-      <md-form-field fxFlex *ngIf="fileToDeploy && placeholderChangeFileName" class="change-file-input">
-        <input mdInput type="text" [(ngModel)]="changeFileName" name="changeFileName" [placeholder]="placeholderChangeFileName" [disabled]="disabled">
-      </md-form-field>
+        <div fxFlex.lt-md></div>
 
-      <div class="color-primary">
-        <button md-raised-button type="button" (click)="deploy.click()" class="choose-file text-upper margin-right-x1" [disabled]="disabled">
-          <span *ngIf="!fileToDeploy; else changeFile" class="choose-file-name">Choose a file to upload</span>
-          <ng-template #changeFile><span class="change-file-name">Change the file</span></ng-template>
-          <md-icon color="primary">insert_drive_file</md-icon>
-        </button>
+        <div
+          class="edit-information"
+          *ngIf="updateFileInformation"
+          fxFlex
+        >
+          <app-md-card-toolbar [title]="'Edit information'" titleIcon="mode_edit">
+            <ng-container [ngTemplateOutlet]="updateFileInformation.templateRef"></ng-container>
+          </app-md-card-toolbar>
+        </div>
 
-        <button class="text-upper deploy" md-raised-button color="accent" type="submit" *ngIf="fileToDeploy" [disabled]="disabled">
-          Deploy
-        </button>
+        <div
+          class="upload-actions"
+          *ngIf="!isUploading"
+          fxLayout="row"
+          fxLayoutAlign="center center"
+          fxLayoutGap="15px"
+          [ngStyle.lt-md]="{'margin-top.px': 15}"
+        >
+          <button md-mini-fab class="btn-remove-file" (click)="removeFile()">
+            <md-icon>delete</md-icon>
+          </button>
+
+          <button md-raised-button class="btn-upload" (click)="uploadFile()">Upload</button>
+        </div>
       </div>
-    </md-card-content>
 
-    <app-message class="error-deployment" type="error" [msg]="error"></app-message>
-  </form>
-</md-card>
+      <div fxLayout="column" fxLayoutAlign="center center" *ngIf="isUploading">
+        <p>Uploading the file...</p>
+
+        <md-progress-bar
+          color="primary"
+          mode="determinate"
+          [value]="percentage"
+          >
+        </md-progress-bar>
+      </div>
+    </div>
+
+    <app-message
+      class="error-upload"
+      type="error"
+      [msg]="error"
+    ></app-message>
+  </md-card-content>
+</app-md-card-toolbar>

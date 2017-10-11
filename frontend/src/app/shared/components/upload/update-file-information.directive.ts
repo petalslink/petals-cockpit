@@ -15,28 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-app-md-card-toolbar {
-  input[type='file'] {
-    display: none;
-  }
+import { Directive, TemplateRef } from '@angular/core';
 
-  app-message.error-upload {
-    margin-top: 10px;
-  }
-
-  .when-selected-file {
-    .selected-file {
-      border: 2px dotted #e8e8e8;
-      padding: 10px;
-
-      .file-name {
-        font-weight: bold;
-      }
-
-      .edit-information {
-        margin-top: 15px;
-        width: 100%;
-      }
-    }
-  }
+@Directive({
+  // tslint:disable-next-line:directive-selector
+  selector: '[updateFileInformation]',
+})
+export class UpdateFileInformationDirective {
+  constructor(public templateRef: TemplateRef<any>) {}
 }

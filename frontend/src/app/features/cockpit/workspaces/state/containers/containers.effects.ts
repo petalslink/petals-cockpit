@@ -24,6 +24,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { getErrorMessage } from 'app/shared/helpers/shared.helper';
+import { httpResponseWithProgress } from 'app/shared/helpers/shared.helper';
 import { ContainersService } from 'app/shared/services/containers.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
@@ -72,14 +73,24 @@ export class ContainersEffects {
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
-    .switchMap(([action, workspaceId]) =>
-      this.containersService
-        .deployComponent(workspaceId, action.payload.id, action.payload.file)
-        .map(
-          components =>
-            new Containers.DeployComponentSuccess(
-              components.byId[components.allIds[0]]
-            )
+    .switchMap(([action, workspaceId]) => {
+      const { progress$, result$ } = this.containersService.deployComponent(
+        workspaceId,
+        action.payload.id,
+        action.payload.file
+      );
+
+      return result$
+        .let(
+          httpResponseWithProgress(
+            action.payload.correlationId,
+            progress$,
+            result =>
+              new Containers.DeployComponentSuccess({
+                ...result.byId[result.allIds[0]],
+                correlationId: action.payload.correlationId,
+              })
+          )
         )
         .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
@@ -98,12 +109,13 @@ export class ContainersEffects {
 
           return Observable.of(
             new Containers.DeployComponentError({
+              correlationId: action.payload.correlationId,
               id: action.payload.id,
               errorDeployment: getErrorMessage(err),
             })
           );
-        })
-    );
+        });
+    });
 
   @Effect({ dispatch: false })
   deployComponentSuccess$: Observable<void> = this.actions$
@@ -129,18 +141,29 @@ export class ContainersEffects {
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
-    .switchMap(([action, workspaceId]) =>
-      this.containersService
-        .deployServiceAssembly(
-          workspaceId,
-          action.payload.id,
-          action.payload.file
-        )
-        .map(
-          tables =>
-            new Containers.DeployServiceAssemblySuccess(
-              tables.serviceAssemblies.byId[tables.serviceAssemblies.allIds[0]]
-            )
+    .switchMap(([action, workspaceId]) => {
+      const {
+        progress$,
+        result$,
+      } = this.containersService.deployServiceAssembly(
+        workspaceId,
+        action.payload.id,
+        action.payload.file
+      );
+
+      return result$
+        .let(
+          httpResponseWithProgress(
+            action.payload.correlationId,
+            progress$,
+            result =>
+              new Containers.DeployServiceAssemblySuccess({
+                ...result.serviceAssemblies.byId[
+                  result.serviceAssemblies.allIds[0]
+                ],
+                correlationId: action.payload.correlationId,
+              })
+          )
         )
         .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
@@ -153,18 +176,19 @@ export class ContainersEffects {
           }
 
           this.notifications.error(
-            'Service Assembly Deployment Failed',
+            'Service Assembly deployment failed',
             `An error occurred while deploying ${action.payload.file.name}`
           );
 
           return Observable.of(
             new Containers.DeployServiceAssemblyError({
+              correlationId: action.payload.correlationId,
               id: action.payload.id,
               errorDeployment: getErrorMessage(err),
             })
           );
-        })
-    );
+        });
+    });
 
   @Effect({ dispatch: false })
   deployServiceAssemblySuccess$: Observable<void> = this.actions$
@@ -188,16 +212,24 @@ export class ContainersEffects {
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
-    .switchMap(([action, workspaceId]) =>
-      this.containersService
-        .deploySharedLibrary(
-          workspaceId,
-          action.payload.id,
-          action.payload.file
-        )
-        .map(
-          sls =>
-            new Containers.DeploySharedLibrarySuccess(sls.byId[sls.allIds[0]])
+    .switchMap(([action, workspaceId]) => {
+      const { progress$, result$ } = this.containersService.deploySharedLibrary(
+        workspaceId,
+        action.payload.id,
+        action.payload.file
+      );
+
+      return result$
+        .let(
+          httpResponseWithProgress(
+            action.payload.correlationId,
+            progress$,
+            result =>
+              new Containers.DeploySharedLibrarySuccess({
+                ...result.byId[result.allIds[0]],
+                correlationId: action.payload.correlationId,
+              })
+          )
         )
         .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
@@ -216,12 +248,13 @@ export class ContainersEffects {
 
           return Observable.of(
             new Containers.DeploySharedLibraryError({
+              correlationId: action.payload.correlationId,
               id: action.payload.id,
               errorDeployment: getErrorMessage(err),
             })
           );
-        })
-    );
+        });
+    });
 
   @Effect({ dispatch: false })
   deploySharedLibrarySuccess$: Observable<void> = this.actions$

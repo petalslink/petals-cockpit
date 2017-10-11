@@ -31,6 +31,7 @@ import {
   ComponentsService,
   EComponentState,
 } from 'app/shared/services/components.service';
+import { HttpProgress } from 'app/shared/services/http-progress-tracker.service';
 import { SseActions } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/state/store.interface';
 
@@ -184,20 +185,27 @@ export class ComponentsEffects {
     .withLatestFrom(
       this.store$.select(state => state.workspaces.selectedWorkspaceId)
     )
-    .switchMap(([action, workspaceId]) =>
-      this.componentsService
-        .deploySu(
-          workspaceId,
-          action.payload.id,
-          action.payload.file,
-          action.payload.serviceUnitName
-        )
+    .switchMap(([action, workspaceId]) => {
+      const { progress$, result$ } = this.componentsService.deploySu(
+        workspaceId,
+        action.payload.id,
+        action.payload.file,
+        action.payload.serviceUnitName
+      );
+
+      return result$
         .map(
-          tables =>
+          (result): Action =>
             new Components.DeployServiceUnitSuccess({
-              ...tables.serviceUnits.byId[tables.serviceUnits.allIds[0]],
+              ...result.serviceUnits.byId[result.serviceUnits.allIds[0]],
               correlationId: action.payload.correlationId,
             })
+        )
+        .startWith(
+          new HttpProgress({
+            correlationId: action.payload.correlationId,
+            getProgress: () => progress$,
+          })
         )
         .catch((err: HttpErrorResponse) => {
           if (environment.debug) {
@@ -220,8 +228,8 @@ export class ComponentsEffects {
               errorDeployment: getErrorMessage(err),
             })
           );
-        })
-    );
+        });
+    });
 
   @Effect({ dispatch: false })
   deployServiceUnitSuccess$: Observable<void> = this.actions$

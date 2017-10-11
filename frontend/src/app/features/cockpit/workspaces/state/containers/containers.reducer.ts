@@ -249,6 +249,7 @@ export namespace ContainersReducer {
       isDeployingComponent: true,
     });
   }
+
   function deployComponentError(
     table: IContainersTable,
     payload: { id: string; errorDeployment: string }

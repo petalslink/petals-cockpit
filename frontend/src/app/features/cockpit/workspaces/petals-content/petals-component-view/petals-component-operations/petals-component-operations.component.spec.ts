@@ -27,11 +27,13 @@ import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { EffectsModule } from '@ngrx/effects';
 import { Store, StoreModule } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 import * as uuid from 'uuid';
 
 import { PetalsComponentOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-operations/petals-component-operations.component';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
+import { HttpProgress } from 'app/shared/services/http-progress-tracker.service';
 import { SharedModule } from 'app/shared/shared.module';
 import {
   getElementBySelector,
@@ -194,20 +196,21 @@ describe('Petals component operations', () => {
       fakeAsync(() => {
         spyOn(uuid, 'v4').and.returnValue('id1');
 
-        spyOn(child.uploadSu, 'resetForm');
+        spyOn(child.deployServiceUnit, 'reset');
 
         child.deploy(<any>'some file', 'Su name');
 
         // simulate the effect
         TestBed.get(Store).dispatch(
-          new Components.DeployServiceUnitSuccess(<any>{
+          new HttpProgress({
             correlationId: 'id1',
+            getProgress: () => Observable.of(0, 50, 100),
           })
         );
 
         flush();
 
-        expect(child.uploadSu.resetForm).toHaveBeenCalled();
+        expect(child.deployServiceUnit.reset).toHaveBeenCalled();
       })
     );
   });
@@ -221,21 +224,21 @@ describe('Petals component operations', () => {
       By.css('app-petals-component-operations')
     ).componentInstance;
 
-    spyOn(child.uploadSu, 'resetForm');
+    spyOn(child.deployServiceUnit, 'reset');
 
     fixture.detectChanges();
 
-    expect(child.uploadSu.resetForm).not.toHaveBeenCalled();
+    expect(child.deployServiceUnit.reset).not.toHaveBeenCalled();
 
     component.component = {
       ...component.component,
-      // need a new ref for parameters otherwise won't trigger the resetForm
+      // need a new ref for parameters otherwise won't trigger the reset
       parameters: {},
     };
 
     fixture.detectChanges();
 
-    expect(child.uploadSu.resetForm).toHaveBeenCalled();
+    expect(child.deployServiceUnit.reset).toHaveBeenCalled();
   });
 });
 

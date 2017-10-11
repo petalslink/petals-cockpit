@@ -16,29 +16,37 @@
  */
 
 import {
-  ChangeDetectionStrategy,
   Component,
   Input,
   OnChanges,
+  OnDestroy,
   SimpleChange,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { Store } from '@ngrx/store';
-
-import { IStore } from 'app/shared/state/store.interface';
-import { IContainerRow } from '../../../state/containers/containers.interface';
+import { Actions } from '@ngrx/effects';
+import { Action, Store } from '@ngrx/store';
+import { Subject } from 'rxjs/Subject';
+import { v4 as uuid } from 'uuid';
 
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
+import {
+  HttpProgress,
+  HttpProgressType,
+} from 'app/shared/services/http-progress-tracker.service';
+import { IStore } from 'app/shared/state/store.interface';
 
 @Component({
   selector: 'app-petals-container-operations',
   templateUrl: './petals-container-operations.component.html',
   styleUrls: ['./petals-container-operations.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PetalsContainerOperationsComponent implements OnChanges {
+export class PetalsContainerOperationsComponent
+  implements OnChanges, OnDestroy {
+  private onDestroy$ = new Subject<void>();
+
   @Input() container: IContainerRow;
   public fileToDeployComponent: File = null;
   public fileToDeployServiceAssembly: File = null;
@@ -47,13 +55,32 @@ export class PetalsContainerOperationsComponent implements OnChanges {
   @ViewChild('deployServiceAssembly') deployServiceAssembly: UploadComponent;
   @ViewChild('deploySharedLibrary') deploySharedLibrary: UploadComponent;
 
-  constructor(private store$: Store<IStore>) {}
+  uploadComponentStatus: {
+    percentage: number;
+  };
+  uploadServiceAssemblyStatus: {
+    percentage: number;
+  };
+  uploadSharedLibraryStatus: {
+    percentage: number;
+  };
+
+  constructor(private store$: Store<IStore>, private actions$: Actions) {}
+
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (hasContainerChanged(changes.container)) {
-      this.deployComponent.resetForm();
-      this.deployServiceAssembly.resetForm();
-      this.deploySharedLibrary.resetForm();
+      this.deployComponent.reset();
+      this.deployServiceAssembly.reset();
+      this.deploySharedLibrary.reset();
+
+      this.uploadComponentStatus = undefined;
+      this.uploadServiceAssemblyStatus = undefined;
+      this.uploadSharedLibraryStatus = undefined;
     }
   }
 
@@ -61,19 +88,72 @@ export class PetalsContainerOperationsComponent implements OnChanges {
     whatToDeploy: 'component' | 'service-assembly' | 'shared-library',
     file: File
   ) {
+    let deployActions: {
+      onProgressUpdate: (percentage: number) => void;
+      onComplete: () => void;
+      actionToDispatch: Action;
+    };
+
+    const correlationId = uuid();
+
     if (whatToDeploy === 'component') {
-      this.store$.dispatch(
-        new Containers.DeployComponent({ id: this.container.id, file })
-      );
+      deployActions = {
+        onProgressUpdate: percentage =>
+          (this.uploadComponentStatus = {
+            percentage,
+          }),
+        onComplete: () => this.deployComponent.reset(),
+        actionToDispatch: new Containers.DeployComponent({
+          correlationId,
+          id: this.container.id,
+          file,
+        }),
+      };
     } else if (whatToDeploy === 'service-assembly') {
-      this.store$.dispatch(
-        new Containers.DeployServiceAssembly({ id: this.container.id, file })
-      );
+      deployActions = {
+        onProgressUpdate: percentage =>
+          (this.uploadServiceAssemblyStatus = {
+            percentage,
+          }),
+        onComplete: () => this.deployServiceAssembly.reset(),
+        actionToDispatch: new Containers.DeployServiceAssembly({
+          correlationId,
+          id: this.container.id,
+          file,
+        }),
+      };
     } else if (whatToDeploy === 'shared-library') {
-      this.store$.dispatch(
-        new Containers.DeploySharedLibrary({ id: this.container.id, file })
-      );
+      deployActions = {
+        onProgressUpdate: percentage =>
+          (this.uploadSharedLibraryStatus = {
+            percentage,
+          }),
+        onComplete: () => this.deploySharedLibrary.reset(),
+        actionToDispatch: new Containers.DeploySharedLibrary({
+          correlationId,
+          id: this.container.id,
+          file,
+        }),
+      };
     }
+
+    this.actions$
+      .ofType<HttpProgress>(HttpProgressType)
+      .takeUntil(this.onDestroy$)
+      .filter(action => action.payload.correlationId === correlationId)
+      // we want 1 or 0 (first wants exactly one) because of takeUntil
+      .take(1)
+      .switchMap(action =>
+        action.payload
+          .getProgress()
+          .do(deployActions.onProgressUpdate)
+          .do({
+            complete: deployActions.onComplete,
+          })
+      )
+      .subscribe();
+
+    this.store$.dispatch(deployActions.actionToDispatch);
   }
 }
 

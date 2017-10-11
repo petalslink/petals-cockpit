@@ -15,28 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-app-md-card-toolbar {
-  input[type='file'] {
-    display: none;
-  }
+import { Action } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 
-  app-message.error-upload {
-    margin-top: 10px;
-  }
-
-  .when-selected-file {
-    .selected-file {
-      border: 2px dotted #e8e8e8;
-      padding: 10px;
-
-      .file-name {
-        font-weight: bold;
-      }
-
-      .edit-information {
-        margin-top: 15px;
-        width: 100%;
-      }
+export const HttpProgressType = 'HttpProgress';
+export class HttpProgress implements Action {
+  readonly type = HttpProgressType;
+  constructor(
+    public readonly payload: {
+      correlationId: string;
+      // here we can't return an Observable directly because of
+      // `storeFreeze` which is also freezing `action.payload`
+      getProgress: () => Observable<number>;
     }
-  }
+  ) {}
 }
