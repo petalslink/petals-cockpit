@@ -280,7 +280,7 @@ public class WorkspaceResource {
             try (FileSystem fs = FileSystems.newFileSystem(sa.getFile().toPath(), null)) {
                 java.nio.file.Path jbiPath = fs.getPath(JBIDescriptorBuilder.JBI_DESCRIPTOR_RESOURCE_IN_ARCHIVE);
                 try (InputStream jbiIn = Files.newInputStream(jbiPath)) {
-                    descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptorFromArchive(sa.getFile());
+                    descriptor = JBIDescriptorBuilder.getInstance().buildJavaJBIDescriptor(jbiIn);
                 }
 
                 if (overrides != null && overrides.sharedLibrary != null) {

@@ -42,14 +42,17 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
+import org.ow2.petals.admin.api.exception.ConnectionFailedException;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
+import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -96,8 +99,17 @@ public class ContainersResource {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
 
-            Tuple2<List<Container>, String> infos = petals.getContainerInfos(container.getIp(), container.getPort(),
-                    container.getUsername(), container.getPassword());
+            Tuple2<List<Container>, String> infos;
+            try {
+                infos = petals.getContainerInfos(container.getIp(), container.getPort(), container.getUsername(),
+                        container.getPassword());
+            } catch (PetalsAdminException e) {
+                if (e.getCause() instanceof ConnectionFailedException) {
+                    return ContainerOverview.unreachable(container.getIp(), container.getPort());
+                } else {
+                    throw e;
+                }
+            }
 
             Map<String, Long> ids;
             try (Stream<ContainersRecord> s = DSL.using(conf).selectFrom(CONTAINERS)
@@ -115,7 +127,7 @@ public class ContainersResource {
                     // convert it to strings
                     .map(String::valueOf).toJavaList();
 
-            return new ContainerOverview(container.getIp(), container.getPort(), reachabilities, infos._2());
+            return ContainerOverview.reachable(container.getIp(), container.getPort(), reachabilities, infos._2());
         });
     }
 
@@ -164,8 +176,8 @@ public class ContainersResource {
         @JsonProperty
         public final ImmutableSet<String> sharedLibraries;
 
-        private ContainerFull(ContainerMin container, long busId, Set<String> components,
-                Set<String> serviceAssemblies, Set<String> sharedLibraries) {
+        private ContainerFull(ContainerMin container, long busId, Set<String> components, Set<String> serviceAssemblies,
+                Set<String> sharedLibraries) {
             this.container = container;
             this.busId = busId;
             this.components = ImmutableSet.copyOf(components);
@@ -201,21 +213,36 @@ public class ContainersResource {
         @JsonProperty
         public final int port;
 
+        @Nullable
         @JsonProperty
         public final ImmutableList<String> reachabilities;
 
-        @NotNull
+        @Nullable
         @JsonProperty
         public final String systemInfo;
 
-        @JsonCreator
-        public ContainerOverview(@JsonProperty("ip") String ip, @JsonProperty("port") int port,
-                @JsonProperty("reachabilities") List<String> reachabilities,
-                @JsonProperty("systemInfo") String systemInfo) {
+        @NotNull
+        @JsonProperty
+        public final boolean isReachable;
+
+        public static ContainerOverview reachable(String ip, int port, List<String> reachabilities, String systemInfo) {
+            return new ContainerOverview(ip, port, reachabilities, systemInfo, true);
+        }
+
+        public static ContainerOverview unreachable(String ip, int port) {
+            return new ContainerOverview(ip, port, null, null, false);
+        }
+
+        private ContainerOverview(@JsonProperty("ip") String ip, @JsonProperty("port") int port,
+                @Nullable @JsonProperty("reachabilities") List<String> reachabilities,
+                @Nullable @JsonProperty("systemInfo") String systemInfo,
+                @JsonProperty("isReachable") boolean isReachable) {
+            assert !isReachable ^ (reachabilities != null && systemInfo != null);
             this.ip = ip;
             this.port = port;
-            this.reachabilities = ImmutableList.copyOf(reachabilities);
+            this.reachabilities = reachabilities == null ? null : ImmutableList.copyOf(reachabilities);
             this.systemInfo = systemInfo;
+            this.isReachable = isReachable;
         }
     }
 }

@@ -43,10 +43,23 @@ public class ContainersResourceTest extends AbstractDefaultWorkspaceResourceTest
         ContainerOverview get = resource.target("/containers/" + getId(container2)).request()
                 .get(ContainerOverview.class);
 
+        assertThat(get.isReachable).isTrue();
         assertThat(get.ip).isEqualTo(container2.getHost());
         assertThat(get.port).isEqualTo(containerPort);
         assertThat(get.reachabilities).containsOnly("" + getId(container1));
         assertThat(get.systemInfo).isEqualTo(SYSINFO);
+    }
+
+    @Test
+    public void getExistingContainerUnreachable() {
+        ContainerOverview get = resource.target("/containers/" + getId(container3)).request()
+                .get(ContainerOverview.class);
+
+        assertThat(get.isReachable).isFalse();
+        assertThat(get.ip).isEqualTo(container3.getHost());
+        assertThat(get.port).isEqualTo(containerPort);
+        assertThat(get.reachabilities).isNull();
+        assertThat(get.systemInfo).isNull();
     }
 
     @Test
@@ -56,4 +69,5 @@ public class ContainersResourceTest extends AbstractDefaultWorkspaceResourceTest
 
         assertThat(get.getStatus()).isEqualTo(404);
     }
+
 }
