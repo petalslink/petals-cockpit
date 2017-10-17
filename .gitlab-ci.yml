@@ -202,7 +202,7 @@ e2e-product:
   script:
     # TODO reuse script?
     - export JAR=$(ls -1 petals-cockpit-*/lib/petals-cockpit-*.jar 2>/dev/null)
-    - export COCKPIT="java -jar $JAR"
+    - export COCKPIT="java -ea -jar $JAR"
     - time $COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml
     - nohup $COCKPIT server $COCKPIT_CONFIG &
     - cd frontend
