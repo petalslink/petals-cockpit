@@ -50,7 +50,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -76,7 +75,7 @@ import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContentBuilder;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
-import org.ow2.petals.cockpit.server.services.ArtifactServer.ServicedArtifact;
+import org.ow2.petals.cockpit.server.services.ArtifactServer.ServedArtifact;
 import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
 import org.ow2.petals.cockpit.server.services.WorkspacesService;
 import org.ow2.petals.cockpit.server.services.WorkspacesService.WorkspaceService;
@@ -274,7 +273,7 @@ public class WorkspaceResource {
 
         String filename = StringUtils.isEmpty(fileDisposition.getFileName()) ? "sl.zip" : fileDisposition.getFileName();
 
-        try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
+        try (ServedArtifact sa = httpServer.serve(filename, file)) {
 
             Jbi descriptor;
             try (FileSystem fs = FileSystems.newFileSystem(sa.getFile().toPath(), null)) {
@@ -316,7 +315,7 @@ public class WorkspaceResource {
 
         String saName = "sa-" + name;
 
-        try (ServicedArtifact sa = httpServer.serve(saName + ".zip",
+        try (ServedArtifact sa = httpServer.serve(saName + ".zip",
                 os -> PetalsUtils.createSAfromSU(file, os, saName, name, component.getName()))) {
             return workspace.deployServiceAssembly(saName, sa.getArtifactExternalUrl(), component.getContainerId());
         }
@@ -338,7 +337,7 @@ public class WorkspaceResource {
         String filename = StringUtils.isEmpty(fileDisposition.getFileName()) ? "component.zip"
                 : fileDisposition.getFileName();
 
-        try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
+        try (ServedArtifact sa = httpServer.serve(filename, file)) {
             Jbi descriptor;
             try (FileSystem fs = FileSystems.newFileSystem(sa.getFile().toPath(), null)) {
                 java.nio.file.Path jbiPath = fs.getPath(JBIDescriptorBuilder.JBI_DESCRIPTOR_RESOURCE_IN_ARCHIVE);
@@ -393,7 +392,7 @@ public class WorkspaceResource {
 
         String filename = StringUtils.isEmpty(fileDisposition.getFileName()) ? "sa.zip" : fileDisposition.getFileName();
 
-        try (ServicedArtifact sa = httpServer.serve(filename, os -> IOUtils.copy(file, os))) {
+        try (ServedArtifact sa = httpServer.serve(filename, file)) {
             Jbi descriptor;
             try (FileSystem fs = FileSystems.newFileSystem(sa.getFile().toPath(), null)) {
                 java.nio.file.Path jbiPath = fs.getPath(JBIDescriptorBuilder.JBI_DESCRIPTOR_RESOURCE_IN_ARCHIVE);

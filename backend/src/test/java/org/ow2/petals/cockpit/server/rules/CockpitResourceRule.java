@@ -79,7 +79,7 @@ public class CockpitResourceRule implements TestRule {
 
     public final ResourceTestRule resource;
 
-    private final Map<Object, Long> workspaceIds = new HashMap<>();
+    private final Map<Object, Long> dbObjectIds = new HashMap<>();
 
     public CockpitResourceRule(Class<?>... resources) {
         this.resource = buildResourceTestRule(resources);
@@ -115,19 +115,19 @@ public class CockpitResourceRule implements TestRule {
         return builder.build();
     }
 
-    public long getWorkspaceId(Object o) {
+    public long getDbObjectId(Object o) {
         assertThat(o).isNotNull();
-        Long id = workspaceIds.get(o);
+        Long id = dbObjectIds.get(o);
         // System.out.println(">" + o + ": " + id);
         assertThat(id).isNotNull();
         assert id != null;
         return id;
     }
 
-    private void setWorkspaceId(Object o, long id) {
+    private void setDbObjectId(Object o, long id) {
         // System.out.println("<" + o + ": " + id);
         assertThat(o).isNotNull();
-        Long old = workspaceIds.putIfAbsent(o, id);
+        Long old = dbObjectIds.putIfAbsent(o, id);
         assertThat(old).isNull();
     }
 
@@ -163,32 +163,32 @@ public class CockpitResourceRule implements TestRule {
     public class TestWorkspaceDbOperations extends WorkspaceDbOperations {
         @Override
         public void busAdded(Domain bus, BusesRecord bDb) {
-            setWorkspaceId(bus, bDb.getId());
+            setDbObjectId(bus, bDb.getId());
         }
 
         @Override
         public void containerAdded(Container container, ContainersRecord cDb) {
-            setWorkspaceId(container, cDb.getId());
+            setDbObjectId(container, cDb.getId());
         }
 
         @Override
         public void componentAdded(Component component, ComponentsRecord compDb) {
-            setWorkspaceId(component, compDb.getId());
+            setDbObjectId(component, compDb.getId());
         }
 
         @Override
         public void sharedLibraryAdded(SharedLibrary sl, SharedlibrariesRecord slDb) {
-            setWorkspaceId(sl, slDb.getId());
+            setDbObjectId(sl, slDb.getId());
         }
 
         @Override
         public void serviceAssemblyAdded(ServiceAssembly sa, ServiceassembliesRecord saDb) {
-            setWorkspaceId(sa, saDb.getId());
+            setDbObjectId(sa, saDb.getId());
         }
 
         @Override
         public void serviceUnitAdded(ServiceUnit su, ServiceunitsRecord suDb) {
-            setWorkspaceId(su, suDb.getId());
+            setDbObjectId(su, suDb.getId());
         }
     }
 }

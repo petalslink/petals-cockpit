@@ -18,19 +18,26 @@ package org.ow2.petals.cockpit.server.services;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
+import org.apache.commons.io.IOUtils;
+
 public interface ArtifactServer {
 
-    <E extends Throwable> ServicedArtifact serve(String fileName, ArtifactProducer<E> producer) throws IOException, E;
+    <E extends Throwable> ServedArtifact serve(String fileName, ArtifactProducer<E> producer) throws IOException, E;
+
+    default ServedArtifact serve(String fileName, InputStream file) throws IOException {
+        return serve(fileName, os -> IOUtils.copy(file, os));
+    }
 
     @FunctionalInterface
     public interface ArtifactProducer<E extends Throwable> {
         void produce(OutputStream t) throws IOException, E;
     }
 
-    public interface ServicedArtifact extends AutoCloseable {
+    public interface ServedArtifact extends AutoCloseable {
         URL getArtifactExternalUrl();
 
         File getFile();

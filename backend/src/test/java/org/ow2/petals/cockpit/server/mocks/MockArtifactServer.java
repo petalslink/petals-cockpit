@@ -40,6 +40,7 @@ public class MockArtifactServer extends ExternalResource implements ArtifactServ
     @Override
     protected void before() throws Throwable {
         wasCalled = false;
+        wasClosed = false;
         folder = File.createTempFile("artifact-server", "");
         folder.delete();
         folder.mkdir();
@@ -61,7 +62,7 @@ public class MockArtifactServer extends ExternalResource implements ArtifactServ
     }
 
     @Override
-    public <E extends Throwable> ServicedArtifact serve(String fileName, ArtifactProducer<E> producer)
+    public <E extends Throwable> ServedArtifact serve(String fileName, ArtifactProducer<E> producer)
             throws IOException, E {
 
         File file = File.createTempFile("artifact-", null, folder);
@@ -73,7 +74,7 @@ public class MockArtifactServer extends ExternalResource implements ArtifactServ
 
         wasCalled = true;
 
-        return new ServicedArtifact() {
+        return new ServedArtifact() {
 
             @Override
             public URL getArtifactExternalUrl() {

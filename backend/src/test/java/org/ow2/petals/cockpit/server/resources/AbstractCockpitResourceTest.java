@@ -125,7 +125,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     protected long getId(Object o) {
-        return resource.getWorkspaceId(o);
+        return resource.getDbObjectId(o);
     }
 
     protected Table table(org.jooq.Table<?> table) {
