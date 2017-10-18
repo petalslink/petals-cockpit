@@ -45,7 +45,7 @@ public class HttpArtifactServer implements ArtifactServer {
     }
 
     @Override
-    public <E extends Throwable> ServicedArtifact serve(String fileName, ArtifactProducer<E> producer)
+    public <E extends Throwable> ServedArtifact serve(String fileName, ArtifactProducer<E> producer)
             throws IOException, E {
         String randomDirectoryName = UUID.randomUUID().toString();
         File tmpDir = new File(temporaryDirectory, randomDirectoryName);
@@ -68,16 +68,16 @@ public class HttpArtifactServer implements ArtifactServer {
 
         LOG.info("Created " + file + ", serviced from " + url);
 
-        return new ServicedArtifactImpl(file, url);
+        return new ServedArtifactImpl(file, url);
     }
 
-    public class ServicedArtifactImpl implements ServicedArtifact {
+    public class ServedArtifactImpl implements ServedArtifact {
 
         private final File artifact;
 
         private final URL url;
 
-        public ServicedArtifactImpl(File artifact, URL url) {
+        public ServedArtifactImpl(File artifact, URL url) {
             this.artifact = artifact;
             this.url = url;
         }
