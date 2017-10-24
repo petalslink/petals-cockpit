@@ -1,6 +1,6 @@
 # Release process
 
-- change the version to a stable number in the 3 pom.xml: mvn versions:set -DnewVersion=X.X.X
+- change the version to a stable number in the 3 pom.xml: `mvn versions:set -DnewVersion=X.X.X`
 - change the version to the next number in the package.json
 - change the version in the appropriate places in the README.md
 - generate the changelog from within frontend directory:
@@ -19,4 +19,4 @@ git tag -a vX.X.X -m "Release version X.X.X"
 ```
 - prepare for next development version (bump to -SNAPSHOT in poms and to -alpha in package.json)
 - commit with message: `chore: prepare for next development`
-- push that on master with --follow-tags option
+- push that on master with `--follow-tags` option
