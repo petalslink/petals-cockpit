@@ -1,3 +1,13 @@
+<a name="0.14.0"></a>
+# [0.14.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.13.0...v0.14.0) (2017-10-24)
+
+
+### Features
+
+* **frontend:** Display errors in a separated modal ([c3a9401](https://gitlab.com/linagora/petals-cockpit/commit/c3a9401)), closes [#373](https://gitlab.com/linagora/petals-cockpit/issues/373)
+
+
+
 <a name="0.13.0"></a>
 # [0.13.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.12.0...v0.13.0) (2017-10-04)
 
