@@ -228,6 +228,30 @@ public class DeploySATest extends AbstractBasicResourceTest {
     }
 
     @Test
+    public void emptyZip() throws Exception {
+        FormDataMultiPart mpe = getMultiPartEmptyZip("fakeSA");
+
+        Response post = resource.target("/workspaces/1/containers/" + getId(container) + "/serviceassemblies").request()
+                .post(Entity.entity(mpe, mpe.getMediaType()));
+
+        assertThat(resource.httpServer.wasCalled()).isTrue();
+        assertThat(resource.httpServer.wasClosed()).isTrue();
+        assertThat(post.getStatus()).isEqualTo(422);
+    }
+
+    @Test
+    public void notAZip() throws Exception {
+        FormDataMultiPart mpe = getMultiPartFakeZip("fakeSA");
+
+        Response post = resource.target("/workspaces/1/containers/" + getId(container) + "/serviceassemblies").request()
+                .post(Entity.entity(mpe, mpe.getMediaType()));
+
+        assertThat(resource.httpServer.wasCalled()).isTrue();
+        assertThat(resource.httpServer.wasClosed()).isTrue();
+        assertThat(post.getStatus()).isEqualTo(422);
+    }
+
+    @Test
     public void overrideValidName() throws Exception {
         overrideName("test-SA-name", "test-SA-name");
     }

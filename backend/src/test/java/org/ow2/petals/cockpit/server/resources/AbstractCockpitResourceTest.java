@@ -525,6 +525,24 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     @SuppressWarnings({ "resource" })
+    protected FormDataMultiPart getMultiPartFakeZip(String zipFilename) throws Exception {
+        File file = new File(zipFolder.newFolder(), zipFilename + ".zip");
+        file.createNewFile();
+        return (FormDataMultiPart) new FormDataMultiPart()
+                .bodyPart(new FileDataBodyPart("file", file));
+    }
+
+    @SuppressWarnings({ "resource" })
+    protected FormDataMultiPart getMultiPartEmptyZip(String zipFilename) throws Exception {
+        File zip = new File(zipFolder.newFolder(), zipFilename + ".zip");
+        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zip))) {
+                zos.closeEntry();
+        }
+        return (FormDataMultiPart) new FormDataMultiPart()
+                .bodyPart(new FileDataBodyPart("file", zip));
+    }
+
+    @SuppressWarnings({ "resource" })
     protected FormDataMultiPart getMultiPart(String jbiFilename, String zipFilename) throws Exception {
         return (FormDataMultiPart) new FormDataMultiPart()
                 .bodyPart(new FileDataBodyPart("file", createZipFromJBIFile(jbiFilename, zipFilename)));
