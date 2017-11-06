@@ -24,6 +24,7 @@ import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import * as helper from 'app/shared/helpers/mock.helper';
 import { environment } from 'environments/environment';
 import { componentsService } from 'mocks/components-mock';
+import { deployMockAndTriggerSse } from 'mocks/utils';
 import {
   ComponentsServiceImpl,
   ComponentState,
@@ -115,37 +116,38 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
     file: File,
     serviceUnitName: string
   ) {
-    if (serviceUnitName.includes('error')) {
-      return helper.errorBackend(
-        '[Mock message] An error happened when trying to deploy the service-unit',
-        400
-      );
-    } else {
-      const component = componentsService.get(componentId);
-      const [serviceAssembly, serviceUnit] = component.container.addServiceUnit(
-        component,
-        'Shutdown',
-        serviceUnitName
-      );
+    return deployMockAndTriggerSse({
+      ifError: {
+        isThereAnError: () => file.name.includes('error'),
+        error: {
+          message:
+            '[Mock message] An error happened when trying to deploy the service-unit',
+          code: 400,
+        },
+      },
+      ifSuccess: {
+        file,
+        addResourceToMock: () => {
+          const component = componentsService.get(componentId);
+          const [
+            serviceAssembly,
+            serviceUnit,
+          ] = component.container.addServiceUnit(component, 'Shutdown');
 
-      const response = {
-        serviceAssemblies: serviceAssembly.toObj(),
-        serviceUnits: serviceUnit.toObj(),
-      };
-
-      setTimeout(
-        () =>
-          (this.sseService as SseServiceMock).triggerSseEvent(
-            SseActions.SaDeployedSse,
-            response
-          ),
-        environment.mock.sseDelay
-      );
-
-      return helper.responseBody({
-        serviceAssemblies: toJsTable(response.serviceAssemblies),
-        serviceUnits: toJsTable(response.serviceUnits),
-      });
-    }
+          return {
+            sseResult: {
+              serviceAssemblies: serviceAssembly.toObj(),
+              serviceUnits: serviceUnit.toObj(),
+            },
+            httpResult: {
+              serviceAssemblies: toJsTable(serviceAssembly.toObj()),
+              serviceUnits: toJsTable(serviceUnit.toObj()),
+            },
+          };
+        },
+        sseService: this.sseService,
+        sseSuccessEvent: SseActions.SaDeployedSse,
+      },
+    });
   }
 }

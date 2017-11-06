@@ -44,6 +44,20 @@ import { IWorkspaceBackend } from 'app/shared/services/workspaces.service';
 import { environment } from 'environments/environment';
 
 export namespace SseActions {
+  export type All =
+    | typeof BusImportSse
+    | typeof BusImportOkSse
+    | typeof SseActions.WorkspaceContentSse
+    | typeof SseActions.BusImportErrorSse
+    | typeof SseActions.SaStateChangeSse
+    | typeof SseActions.ComponentStateChangeSse
+    | typeof SseActions.BusDeletedSse
+    | typeof SseActions.WorkspaceDeletedSse
+    | typeof SseActions.SaDeployedSse
+    | typeof SseActions.ComponentDeployedSse
+    | typeof SseActions.SlDeployedSse
+    | typeof SseActions.SlStateChangeSse;
+
   export const BusImportSse = 'BUS_IMPORT';
   export const BusImportType = '[Sse] Bus import';
   export class BusImport implements Action {

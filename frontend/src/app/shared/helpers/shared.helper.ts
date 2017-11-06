@@ -15,9 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpErrorResponse,
+  HttpEvent,
+  HttpEventType,
+} from '@angular/common/http';
+import { Action } from '@ngrx/store';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
 
 import { ComponentState } from 'app/shared/services/components.service';
+import { HttpProgress } from 'app/shared/services/http-progress-tracker.service';
 import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 import { ESharedLibraryState } from 'app/shared/services/shared-libraries.service';
 import { environment } from 'environments/environment';
@@ -101,4 +109,49 @@ export function getErrorMessage(err: HttpErrorResponse) {
   } else {
     return `${err.status}: ${err.statusText}`;
   }
+}
+
+export function httpResponseWithProgress<T>(
+  correlationId: string,
+  progress$: Observable<number>,
+  success: (result: T) => any
+) {
+  return (obs$: Observable<T>): Observable<Action> => {
+    return obs$.map(success).startWith(
+      new HttpProgress({
+        correlationId,
+        getProgress: () => progress$,
+      })
+    );
+  };
+}
+
+export function streamHttpProgressAndSuccess<T, U>(
+  result$: Observable<HttpEvent<any>>,
+  success: (result: T) => U
+): { progress$: Observable<number>; result$: Observable<U> } {
+  const progress$ = new BehaviorSubject<number>(0);
+
+  return {
+    progress$: progress$.asObservable(),
+    result$: result$
+      .flatMap(event => {
+        if (event.type === HttpEventType.UploadProgress) {
+          const percentDone = Math.round(100 * event.loaded / event.total);
+
+          progress$.next(percentDone);
+          return Observable.empty<T>();
+        } else if (event.type === HttpEventType.Response) {
+          const body = event.body as T;
+
+          progress$.next(100);
+          progress$.complete();
+
+          return Observable.of(success(body));
+        } else {
+          return Observable.empty<T>();
+        }
+      })
+      .last(),
+  };
 }

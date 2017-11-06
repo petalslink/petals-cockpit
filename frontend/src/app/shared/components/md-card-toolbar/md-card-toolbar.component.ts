@@ -15,28 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-app-md-card-toolbar {
-  input[type='file'] {
-    display: none;
-  }
+import { Component, Input } from '@angular/core';
 
-  app-message.error-upload {
-    margin-top: 10px;
-  }
-
-  .when-selected-file {
-    .selected-file {
-      border: 2px dotted #e8e8e8;
-      padding: 10px;
-
-      .file-name {
-        font-weight: bold;
-      }
-
-      .edit-information {
-        margin-top: 15px;
-        width: 100%;
-      }
-    }
-  }
+@Component({
+  selector: 'app-md-card-toolbar',
+  templateUrl: './md-card-toolbar.component.html',
+  styleUrls: ['./md-card-toolbar.component.scss'],
+})
+export class MdCardToolbarComponent {
+  @Input() title: string;
+  @Input() titleIcon: string;
 }

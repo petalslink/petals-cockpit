@@ -19,6 +19,7 @@ import { Action } from '@ngrx/store';
 
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import { JsTable } from 'app/shared/helpers/jstable.helper';
+import { ICorrelationId } from 'app/shared/interfaces/correlation-id.interface';
 import {
   ComponentState,
   IComponentBackendDetails,
@@ -148,8 +149,7 @@ export namespace Components {
         id: string;
         file: File;
         serviceUnitName: string;
-        correlationId: string;
-      }
+      } & ICorrelationId
     ) {}
   }
 
@@ -167,9 +167,7 @@ export namespace Components {
   export class DeployServiceUnitSuccess implements Action {
     readonly type = DeployServiceUnitSuccessType;
     constructor(
-      public readonly payload: IServiceUnitBackendSSE & {
-        correlationId: string;
-      }
+      public readonly payload: IServiceUnitBackendSSE & ICorrelationId
     ) {}
   }
 }

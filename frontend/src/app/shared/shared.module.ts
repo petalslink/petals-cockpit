@@ -49,10 +49,12 @@ import {
   NgStringPipesModule,
 } from 'ngx-pipes';
 
+import { UpdateFileInformationDirective } from 'app/shared/components/upload/update-file-information.directive';
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
 import { FocusInputIfLargeScreenDirective } from 'app/shared/directives/focus-input-based-on-screen-size.directive';
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { LedComponent } from './components/led/led.component';
+import { MdCardToolbarComponent } from './components/md-card-toolbar/md-card-toolbar.component';
 import { MessageComponent } from './components/message/message.component';
 import { NotFound404Component } from './components/not-found-404/not-found-404.component';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
@@ -90,11 +92,13 @@ export const imports = [
 export const declarations = [
   GenerateIconComponent,
   ColorSearchedLettersDirective,
-  UploadComponent,
   NotFound404Component,
   LedComponent,
   FocusInputIfLargeScreenDirective,
   MessageComponent,
+  MdCardToolbarComponent,
+  UploadComponent,
+  UpdateFileInformationDirective,
 ];
 
 export const exportss = [

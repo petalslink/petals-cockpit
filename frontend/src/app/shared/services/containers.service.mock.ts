@@ -22,9 +22,8 @@ import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import * as helper from 'app/shared/helpers/mock.helper';
 import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 import { SseActions, SseService } from 'app/shared/services/sse.service';
-import { SseServiceMock } from 'app/shared/services/sse.service.mock';
-import { environment } from 'environments/environment';
 import { containersService } from 'mocks/containers-mock';
+import { deployMockAndTriggerSse } from 'mocks/utils';
 import { ContainersServiceImpl } from './containers.service';
 
 @Injectable()
@@ -40,86 +39,98 @@ export class ContainersServiceMock extends ContainersServiceImpl {
   }
 
   deployComponent(workspaceId: string, containerId: string, file: File) {
-    if (file.name.includes('error')) {
-      return helper.errorBackend(
-        '[Mock message] An error happened when trying to deploy the component',
-        400
-      );
-    } else {
-      const name = file.name.replace(/\.zip$/, '');
-      const component = containersService
-        .get(containerId)
-        .addComponent('Loaded', name);
+    return deployMockAndTriggerSse({
+      ifError: {
+        isThereAnError: () => file.name.includes('error'),
+        error: {
+          message:
+            '[Mock message] An error happened when trying to deploy the component',
+          code: 400,
+        },
+      },
+      ifSuccess: {
+        file,
+        addResourceToMock: () => {
+          const components = containersService
+            .get(containerId)
+            .addComponent('Loaded')
+            .toObj();
 
-      const response = {
-        components: component.toObj(),
-      };
-
-      setTimeout(
-        () =>
-          (this.sseService as SseServiceMock).triggerSseEvent(
-            SseActions.ComponentDeployedSse,
-            response
-          ),
-        environment.mock.sseDelay
-      );
-      return helper.responseBody(toJsTable(response.components));
-    }
+          return {
+            sseResult: {
+              components,
+            },
+            httpResult: toJsTable(components),
+          };
+        },
+        sseService: this.sseService,
+        sseSuccessEvent: SseActions.ComponentDeployedSse,
+      },
+    });
   }
 
   deployServiceAssembly(workspaceId: string, containerId: string, file: File) {
-    if (file.name.includes('error')) {
-      return helper.errorBackend(
-        '[Mock message] An error happened when trying to deploy the service-assembly',
-        400
-      );
-    } else {
-      const [serviceAssembly, serviceUnits] = containersService
-        .get(containerId)
-        .addServiceAssembly(EServiceAssemblyState.Shutdown);
+    return deployMockAndTriggerSse({
+      ifError: {
+        isThereAnError: () => file.name.includes('error'),
+        error: {
+          message:
+            '[Mock message] An error happened when trying to deploy the service-assembly',
+          code: 400,
+        },
+      },
+      ifSuccess: {
+        file,
+        addResourceToMock: () => {
+          const [serviceAssembly, serviceUnits] = containersService
+            .get(containerId)
+            .addServiceAssembly(EServiceAssemblyState.Shutdown);
 
-      const response = {
-        serviceAssemblies: serviceAssembly,
-        serviceUnits: serviceUnits,
-      };
-
-      setTimeout(
-        () =>
-          (this.sseService as SseServiceMock).triggerSseEvent(
-            SseActions.SaDeployedSse,
-            response
-          ),
-        environment.mock.sseDelay
-      );
-      return helper.responseBody({
-        serviceAssemblies: toJsTable(response.serviceAssemblies),
-        serviceUnits: toJsTable(response.serviceUnits),
-      });
-    }
+          return {
+            sseResult: {
+              serviceAssemblies: serviceAssembly,
+              serviceUnits,
+            },
+            httpResult: {
+              serviceAssemblies: toJsTable(serviceAssembly),
+              serviceUnits: toJsTable(serviceUnits),
+            },
+          };
+        },
+        sseService: this.sseService,
+        sseSuccessEvent: SseActions.SaDeployedSse,
+      },
+    });
   }
 
   deploySharedLibrary(workspaceId: string, containerId: string, file: File) {
-    if (file.name.includes('error')) {
-      return helper.errorBackend(
-        '[Mock message] An error happened when trying to deploy the shared library',
-        400
-      );
-    } else {
-      const sl = containersService.get(containerId).addSharedLibrary();
+    return deployMockAndTriggerSse({
+      ifError: {
+        isThereAnError: () => file.name.includes('error'),
+        error: {
+          message:
+            '[Mock message] An error happened when trying to deploy the shared library',
+          code: 400,
+        },
+      },
+      ifSuccess: {
+        file,
+        addResourceToMock: () => {
+          const sharedLibraries = containersService
+            .get(containerId)
+            .addSharedLibrary()
+            .toObj();
 
-      const response = {
-        sharedLibraries: sl.toObj(),
-      };
-
-      setTimeout(
-        () =>
-          (this.sseService as SseServiceMock).triggerSseEvent(
-            SseActions.SlDeployedSse,
-            response
-          ),
-        environment.mock.sseDelay
-      );
-      return helper.responseBody(toJsTable(response.sharedLibraries));
-    }
+          return {
+            sseResult: {
+              sharedLibraries,
+            },
+            httpResult: toJsTable(sharedLibraries),
+          };
+        },
+        sseService: this.sseService,
+        sseSuccessEvent: SseActions.SlDeployedSse,
+      },
+    });
   }
 }

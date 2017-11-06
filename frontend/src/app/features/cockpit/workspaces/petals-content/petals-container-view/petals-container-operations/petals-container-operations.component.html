@@ -17,30 +17,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="central-content">
     <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px" class="deploys">
       <app-upload
-        #deployComponent
-        [title]="'Component Deployment'"
-        [disabled]="container.isDeployingComponent"
-        [error]="container.errorDeploymentComponent"
-        (onDeploy)="deploy('component', $event.file)"
         class="deploy-component"
-        fxFlex></app-upload>
+        #deployComponent
+        acceptedFileType=".zip"
+        [title]="'Component deployment'"
+        [uploadStatus]="uploadComponentStatus"
+        [error]="container.errorDeploymentComponent"
+        (onUploadFile)="deploy('component', $event.selectedFileInformation.file)"
+      ></app-upload>
 
       <app-upload
-        #deployServiceAssembly
-        [title]="'Service assembly Deployment'"
-        [disabled]="container.isDeployingServiceAssembly"
-        [error]="container.errorDeploymentServiceAssembly"
-        (onDeploy)="deploy('service-assembly', $event.file)"
         class="deploy-service-assembly"
-        fxFlex></app-upload>
+        fxFlex
+        #deployServiceAssembly
+        acceptedFileType=".zip"
+        [title]="'Service assembly deployment'"
+        [uploadStatus]="uploadServiceAssemblyStatus"
+        [error]="container.errorDeploymentServiceAssembly"
+        (onUploadFile)="deploy('service-assembly', $event.selectedFileInformation.file)"
+      ></app-upload>
 
       <app-upload
-         #deploySharedLibrary
-        [title]="'Shared library'"
-        [disabled]="container.isDeployingSharedLibrary"
-        [error]="container.errorDeploymentSharedLibrary"
-        (onDeploy)="deploy('shared-library', $event.file)"
         class="deploy-shared-library margin-bottom-x2"
-        fxFlex></app-upload>
+        fxFlex
+        #deploySharedLibrary
+        [title]="'Shared library'"
+        [uploadStatus]="uploadSharedLibraryStatus"
+        [error]="container.errorDeploymentSharedLibrary"
+        (onUploadFile)="deploy('shared-library', $event.selectedFileInformation.file)"
+      ></app-upload>
   </div>
 </div>

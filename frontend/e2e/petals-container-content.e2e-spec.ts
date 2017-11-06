@@ -63,17 +63,12 @@ describe(`Petals container content`, () => {
         .openOperations()
         .getComponentUpload();
 
-      expect(deploy.chooseFileName.getText()).toEqual(
-        `CHOOSE A FILE TO UPLOAD`
-      );
       const filePath = path.resolve(__dirname, './resources/component.zip');
       deploy.fileInput.sendKeys(filePath);
 
-      expect(deploy.fileNameInput.isPresent()).toBe(false);
       expect(deploy.fileName.getText()).toEqual(`component.zip`);
-      expect(deploy.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
 
-      expect(deploy.deployButton.getText()).toMatch(`DEPLOY`);
+      expect(deploy.deployButton.getText()).toMatch(`Upload`);
       expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 
@@ -150,9 +145,6 @@ describe(`Petals container content`, () => {
 
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
 
-      // make sure we can't change the name of the component we want to deploy
-      expect(upload.fileNameInput.isPresent()).toBe(false);
-
       // deploy the component
       page.clickAndExpectNotification(
         upload.deployButton,
@@ -173,7 +165,7 @@ describe(`Petals container content`, () => {
         `SU 3`,
         `Comp 2`,
         // this one should have been deployed
-        `component`,
+        `Comp 12`,
         `SERVICE ASSEMBLIES`,
         `SA 0`,
         `SA 1`,
@@ -200,7 +192,7 @@ describe(`Petals container content`, () => {
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
       // we should be redirected
-      const ops = workspace.openComponent('component').openOperations();
+      const ops = workspace.openComponent('Comp 12').openOperations();
 
       expect(ops.state.getText()).toEqual('Loaded');
 
@@ -228,17 +220,12 @@ describe(`Petals container content`, () => {
         .openOperations()
         .getServiceAssemblyUpload();
 
-      expect(deploy.chooseFileName.getText()).toEqual(
-        `CHOOSE A FILE TO UPLOAD`
-      );
       const filePath = path.resolve(__dirname, './resources/sa.zip');
       deploy.fileInput.sendKeys(filePath);
 
-      expect(deploy.fileNameInput.isPresent()).toBe(false);
       expect(deploy.fileName.getText()).toEqual(`sa.zip`);
-      expect(deploy.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
 
-      expect(deploy.deployButton.getText()).toMatch(`DEPLOY`);
+      expect(deploy.deployButton.getText()).toMatch(`Upload`);
       expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 
@@ -315,9 +302,6 @@ describe(`Petals container content`, () => {
 
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
 
-      // make sure we can't change the name of the component we want to deploy
-      expect(deploy.fileNameInput.isPresent()).toBe(false);
-
       // deploy the component
       page.clickAndExpectNotification(
         deploy.deployButton,
@@ -387,18 +371,14 @@ describe(`Petals container content`, () => {
         .getSharedLibraryUpload();
 
       expect(deploy.chooseFileButton.getText()).toEqual(
-        `CHOOSE A FILE TO UPLOAD insert_drive_file`
+        `Choose a file to upload`
       );
       const filePath = path.resolve(__dirname, './resources/sl.zip');
       deploy.fileInput.sendKeys(filePath);
 
-      expect(deploy.fileNameInput.isPresent()).toBe(false);
       expect(deploy.fileName.getText()).toEqual(`sl.zip`);
-      expect(deploy.chooseFileButton.getText()).toEqual(
-        `CHANGE THE FILE insert_drive_file`
-      );
 
-      expect(deploy.deployButton.getText()).toMatch(`DEPLOY`);
+      expect(deploy.deployButton.getText()).toMatch(`Upload`);
       expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 
@@ -474,9 +454,6 @@ describe(`Petals container content`, () => {
       ];
 
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
-
-      // make sure we can't change the name of the component we want to deploy
-      expect(deploy.fileNameInput.isPresent()).toBe(false);
 
       // deploy the component
       page.clickAndExpectNotification(

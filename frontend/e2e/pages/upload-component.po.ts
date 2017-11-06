@@ -29,11 +29,8 @@ export class UploadComponentPage {
   public readonly fileInput: ElementFinder;
   public readonly fileName: ElementFinder;
   public readonly chooseFileButton: ElementFinder;
-  public readonly chooseFileName: ElementFinder;
-  public readonly changeFileName: ElementFinder;
+  public readonly removeFileButton: ElementFinder;
   public readonly deployButton: ElementFinder;
-  public readonly fileNameInput: ElementFinder;
-  public readonly fileNamePlaceholder: ElementFinder;
 
   static waitAndGet(selectorClass: string) {
     const component = $(`app-upload.${selectorClass}`);
@@ -42,20 +39,15 @@ export class UploadComponentPage {
   }
 
   private constructor(public readonly component: ElementFinder) {
-    this.title = this.component.$('md-card-subtitle.title');
+    this.title = this.component.$('.mct-title');
     this.fileInput = this.component.$('input[type="file"]');
     this.fileName = this.component.$('.file-name');
     this.chooseFileButton = this.component.$('.choose-file');
-    this.chooseFileName = this.chooseFileButton.$('.choose-file-name');
-    this.changeFileName = this.chooseFileButton.$('.change-file-name');
-    this.deployButton = this.component.$('.deploy');
-    this.fileNameInput = this.component.$('input[name="changeFileName"]');
-    this.fileNamePlaceholder = this.component.$(
-      '.change-file-input .mat-input-placeholder'
-    );
+    this.removeFileButton = this.component.$('.btn-remove-file');
+    this.deployButton = this.component.$('.btn-upload');
   }
 
   getErrorDeployMessage() {
-    return MessageComponentPage.waitAndGet(this.component, `error-deployment`);
+    return MessageComponentPage.waitAndGet(this.component, `error-upload`);
   }
 }

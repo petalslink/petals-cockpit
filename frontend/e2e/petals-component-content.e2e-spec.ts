@@ -204,17 +204,17 @@ describe(`Petals component content`, () => {
       .openOperations()
       .getSUUpload();
 
-    expect(deploy.chooseFileName.getText()).toEqual(`CHOOSE A FILE TO UPLOAD`);
+    expect(deploy.chooseFileButton.getText()).toEqual(
+      `Choose a file to upload`
+    );
     const filePath = path.resolve(__dirname, './resources/su.zip');
     deploy.fileInput.sendKeys(filePath);
 
     expect(deploy.fileName.isDisplayed()).toBe(true);
     expect(deploy.fileName.getText()).toEqual(`su.zip`);
-    expect(deploy.changeFileName.getText()).toEqual(`CHANGE THE FILE`);
+    expect(deploy.chooseFileButton.isPresent()).toBe(false);
 
-    expect(deploy.fileNameInput.getAttribute('value')).toEqual(`su`);
-
-    expect(deploy.deployButton.getText()).toMatch(`DEPLOY`);
+    expect(deploy.deployButton.getText()).toMatch(`Upload`);
     expect(deploy.deployButton.isEnabled()).toBe(true);
   });
 
@@ -252,9 +252,7 @@ describe(`Petals component content`, () => {
 
     const filePath = path.resolve(__dirname, './resources/su.zip');
 
-    expect(deploy.fileNameInput.isPresent()).toBe(false);
     deploy.fileInput.sendKeys(filePath);
-    expect(deploy.fileNameInput.isDisplayed()).toBe(true);
 
     const expectedTreeBeforeDeploy = [
       `Bus 0`,
@@ -308,7 +306,7 @@ describe(`Petals component content`, () => {
       `SU 0`,
       `SU 2`,
       // this one should have been deployed
-      `su`,
+      `SU 16`,
       `Comp 1`,
       `SU 1`,
       `SU 3`,
@@ -318,7 +316,7 @@ describe(`Petals component content`, () => {
       `SA 1`,
       `SA 2`,
       // the corresponding SA should have been added
-      `sa-su`,
+      `SA 12`,
       `SHARED LIBRARIES`,
       `SL 0`,
       `Cont 1`,
@@ -340,7 +338,7 @@ describe(`Petals component content`, () => {
 
     expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
-    workspace.openServiceUnit('su');
+    workspace.openServiceUnit('SU 16');
   });
 
   it(`should display an error if component change state (install) fails`, () => {
@@ -354,7 +352,7 @@ describe(`Petals component content`, () => {
     deploy.fileInput.sendKeys(filePath);
     page.clickAndExpectNotification(deploy.deployButton);
 
-    const ops = workspace.openComponent('component').openOperations();
+    const ops = workspace.openComponent('Comp 12').openOperations();
 
     // change state to install with some parameters (with error in httpThreadPoolSizeMax to make it fail)
     const poolSizeInput = ops.parameter('httpThreadPoolSizeMax');

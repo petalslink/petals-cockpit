@@ -38,10 +38,10 @@ export function elementText(n: any): string {
     n = n.nativeElement;
   }
 
-  return n.textContent;
+  return n.textContent.trim();
 }
 
-export function getElementBySelector<T = any>(
+export function getElementBySelector<T = HTMLElement>(
   fixture: ComponentFixture<any>,
   selectorCss: string
 ): T {

@@ -33,8 +33,8 @@ import { ICurrentUser, IUser } from 'app/shared/state/users.interface';
 
 @Component({
   selector: 'app-workspaces-list',
-  templateUrl: 'workspaces-list.component.html',
-  styleUrls: ['workspaces-list.component.scss'],
+  templateUrl: './workspaces-list.component.html',
+  styleUrls: ['./workspaces-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorkspacesListComponent implements OnInit {
