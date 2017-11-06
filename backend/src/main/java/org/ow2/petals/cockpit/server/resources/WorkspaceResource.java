@@ -29,9 +29,12 @@ import java.io.OutputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.ProviderNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipError;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -85,6 +88,8 @@ import org.ow2.petals.jbi.descriptor.original.JBIDescriptorBuilder;
 import org.ow2.petals.jbi.descriptor.original.generated.Component;
 import org.ow2.petals.jbi.descriptor.original.generated.Jbi;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -100,6 +105,8 @@ import com.webcohesion.enunciate.metadata.rs.Warnings;
 @RequestScoped
 @Path("/workspaces/{wsId}")
 public class WorkspaceResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(WorkspaceResource.class);
 
     private final WorkspaceService workspace;
 
@@ -266,7 +273,7 @@ public class WorkspaceResource {
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
             @Nullable @Valid @FormDataParam("overrides") SLDeployOverrides overrides)
-            throws IOException, JBIDescriptorException {
+            throws Exception {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
@@ -291,6 +298,10 @@ public class WorkspaceResource {
                         JBIDescriptorBuilder.getInstance().writeXMLJBIdescriptor(descriptor, jbiOut);
                     }
                 }
+            } catch (Exception e) {
+                throw filterFileExceptions(e);
+            } catch (ZipError e) {
+                throw filterZipError(e);
             }
 
             return workspace.deploySharedLibrary(descriptor.getSharedLibrary().getIdentification().getName(),
@@ -328,8 +339,7 @@ public class WorkspaceResource {
     public WorkspaceContent deployComponent(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
-            @Nullable @Valid @FormDataParam("overrides") ComponentDeployOverrides overrides)
-            throws IOException, JBIDescriptorException {
+            @Nullable @Valid @FormDataParam("overrides") ComponentDeployOverrides overrides) throws Exception {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
@@ -369,6 +379,10 @@ public class WorkspaceResource {
                         }
                     }
                 }
+            } catch (Exception e) {
+                throw filterFileExceptions(e);
+            } catch (ZipError e) {
+                throw filterZipError(e);
             }
 
             return workspace.deployComponent(descriptor.getComponent().getIdentification().getName(),
@@ -385,7 +399,7 @@ public class WorkspaceResource {
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
             @Nullable @Valid @FormDataParam("overrides") SADeployOverrides overrides)
-            throws IOException, JBIDescriptorException {
+            throws Exception {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
@@ -407,10 +421,31 @@ public class WorkspaceResource {
                         JBIDescriptorBuilder.getInstance().writeXMLJBIdescriptor(descriptor, jbiOut);
                     }
                 }
+            } catch (Exception e) {
+                throw filterFileExceptions(e);
+            } catch (ZipError e) {
+                throw filterZipError(e);
             }
+
             return workspace.deployServiceAssembly(descriptor.getServiceAssembly().getIdentification().getName(),
                     sa.getArtifactExternalUrl(), containerId);
         }
+    }
+
+    private Exception filterFileExceptions(Exception e) {
+        if (e instanceof NoSuchFileException || e instanceof ProviderNotFoundException) {
+            LOG.debug("Returning 422 Unprocessable entity because of :", e);
+            return new WebApplicationException("Unprocessable entity", e, 422);
+        } else if (e instanceof JBIDescriptorException) {
+            LOG.debug("Returning 422 Unprocessable JBI entity because of :", e);
+            return new WebApplicationException("Unprocessable JBI entity", e, 422);
+        }
+            return e;
+    }
+
+    private WebApplicationException filterZipError(ZipError e) {
+        LOG.debug("Returning 422 Unprocessable zip entity because of :", e);
+        return new WebApplicationException("Unprocessable zip entity", e, 422);
     }
 
     @POST

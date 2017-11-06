@@ -208,6 +208,30 @@ public class DeploySLTest extends AbstractBasicResourceTest {
     }
 
     @Test
+    public void emptyZip() throws Exception {
+        FormDataMultiPart mpe = getMultiPartEmptyZip("fakeSL");
+
+        Response post = resource.target("/workspaces/1/containers/" + getId(container) + "/sharedlibraries").request()
+                .post(Entity.entity(mpe, mpe.getMediaType()));
+
+        assertThat(resource.httpServer.wasCalled()).isTrue();
+        assertThat(resource.httpServer.wasClosed()).isTrue();
+        assertThat(post.getStatus()).isEqualTo(422);
+    }
+
+    @Test
+    public void notAZip() throws Exception {
+        FormDataMultiPart mpe = getMultiPartFakeZip("fakeSL");
+
+        Response post = resource.target("/workspaces/1/containers/" + getId(container) + "/sharedlibraries").request()
+                .post(Entity.entity(mpe, mpe.getMediaType()));
+
+        assertThat(resource.httpServer.wasCalled()).isTrue();
+        assertThat(resource.httpServer.wasClosed()).isTrue();
+        assertThat(post.getStatus()).isEqualTo(422);
+    }
+
+    @Test
     @SuppressWarnings("null")
     public void overrideWithNullVersion() throws Exception {
         thrown.expect(ClientErrorException.class);
