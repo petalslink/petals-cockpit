@@ -58,7 +58,8 @@ export abstract class ContainersService {
   abstract deployComponent(
     workspaceId: string,
     containerId: string,
-    file: File
+    file: File,
+    name: string
   ): {
     progress$: Observable<number>;
     result$: Observable<JsTable<IComponentBackendSSE>>;
@@ -98,9 +99,15 @@ export class ContainersServiceImpl extends ContainersService {
     );
   }
 
-  deployComponent(workspaceId: string, containerId: string, file: File) {
+  deployComponent(
+    workspaceId: string,
+    containerId: string,
+    file: File,
+    name: string
+  ) {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
+    formData.append('name', name);
 
     const req = new HttpRequest(
       'POST',

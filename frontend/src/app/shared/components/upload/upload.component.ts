@@ -63,16 +63,22 @@ export class UploadComponent {
   isUploading = false;
   percentage: number;
 
+  @Output() onResetFile = new EventEmitter<void>();
+  @Output() onFileSelected = new EventEmitter<{ file: File }>();
+
   fileChange(event: IEventFileSelected) {
     this.reset();
 
     this.selectedFileInformation = this.getSelectedFileInformation(
       event.target.files
     );
+
+    this.onFileSelected.emit({ file: this.selectedFileInformation.file });
   }
 
   removeFile() {
     this.selectedFileInformation = undefined;
+    this.onResetFile.emit();
   }
 
   uploadFile() {
@@ -87,6 +93,7 @@ export class UploadComponent {
     this.isUploading = false;
     this.percentage = undefined;
     this.error = undefined;
+    this.onResetFile.emit();
   }
 
   private getSelectedFileInformation(files: File[]): ISelectedFileInformation {

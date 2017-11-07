@@ -20,10 +20,12 @@ import {
   Input,
   OnChanges,
   OnDestroy,
+  OnInit,
   SimpleChange,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Actions } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { Subject } from 'rxjs/Subject';
@@ -37,6 +39,7 @@ import {
   HttpProgressType,
 } from 'app/shared/services/http-progress-tracker.service';
 import { IStore } from 'app/shared/state/store.interface';
+import { SharedValidator } from 'app/shared/validators/shared.validator';
 
 @Component({
   selector: 'app-petals-container-operations',
@@ -44,16 +47,22 @@ import { IStore } from 'app/shared/state/store.interface';
   styleUrls: ['./petals-container-operations.component.scss'],
 })
 export class PetalsContainerOperationsComponent
-  implements OnChanges, OnDestroy {
+  implements OnInit, OnChanges, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   @Input() container: IContainerRow;
-  public fileToDeployComponent: File = null;
-  public fileToDeployServiceAssembly: File = null;
+  @Input()
+  componentsByName: {
+    [name: string]: boolean;
+  };
+  fileToDeployComponent: File = null;
+  fileToDeployServiceAssembly: File = null;
 
   @ViewChild('deployComponent') deployComponent: UploadComponent;
   @ViewChild('deployServiceAssembly') deployServiceAssembly: UploadComponent;
   @ViewChild('deploySharedLibrary') deploySharedLibrary: UploadComponent;
+
+  updateComponentDeployInfoFormGroup: FormGroup;
 
   uploadComponentStatus: {
     percentage: number;
@@ -65,7 +74,11 @@ export class PetalsContainerOperationsComponent
     percentage: number;
   };
 
-  constructor(private store$: Store<IStore>, private actions$: Actions) {}
+  constructor(
+    private fb: FormBuilder,
+    private store$: Store<IStore>,
+    private actions$: Actions
+  ) {}
 
   ngOnDestroy() {
     this.onDestroy$.next();
@@ -73,7 +86,7 @@ export class PetalsContainerOperationsComponent
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (hasContainerChanged(changes.container)) {
+    if (hasContainerIdChanged(changes.container)) {
       this.deployComponent.reset();
       this.deployServiceAssembly.reset();
       this.deploySharedLibrary.reset();
@@ -82,6 +95,22 @@ export class PetalsContainerOperationsComponent
       this.uploadServiceAssemblyStatus = undefined;
       this.uploadSharedLibraryStatus = undefined;
     }
+  }
+
+  ngOnInit() {
+    this.updateComponentDeployInfoFormGroup = this.fb.group({
+      name: [
+        '',
+        [SharedValidator.isKeyPresentInObject(() => this.componentsByName)],
+      ],
+    });
+  }
+
+  onFileSelected(file: File) {
+    // when using md-error with material, if there's an error it'll be display
+    // only when the control is set to touched and thus we won't have a
+    // "real time" feedback, especially when there's only one input
+    this.updateComponentDeployInfoFormGroup.get('name').markAsTouched();
   }
 
   deploy(
@@ -107,6 +136,7 @@ export class PetalsContainerOperationsComponent
           correlationId,
           id: this.container.id,
           file,
+          name: this.updateComponentDeployInfoFormGroup.get('name').value,
         }),
       };
     } else if (whatToDeploy === 'service-assembly') {
@@ -157,7 +187,7 @@ export class PetalsContainerOperationsComponent
   }
 }
 
-function hasContainerChanged(containerChanges: SimpleChange) {
+function hasContainerIdChanged(containerChanges: SimpleChange) {
   const oldContainer = containerChanges.previousValue;
   const newContainer = containerChanges.currentValue;
 

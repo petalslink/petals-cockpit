@@ -20,6 +20,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
 import {
+  componentsOfCurrentContainerByName,
   getCurrentContainer,
   IContainerWithSiblings,
 } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
@@ -34,6 +35,9 @@ import { Ui } from 'app/shared/state/ui.actions';
 export class PetalsContainerViewComponent implements OnInit {
   workspaceId$: Observable<string>;
   container$: Observable<IContainerWithSiblings>;
+  componentsOfCurrentContainerByName$: Observable<{
+    [name: string]: boolean;
+  }>;
 
   constructor(private store$: Store<IStore>) {}
 
@@ -50,5 +54,9 @@ export class PetalsContainerViewComponent implements OnInit {
     );
 
     this.container$ = this.store$.select(getCurrentContainer);
+
+    this.componentsOfCurrentContainerByName$ = this.store$.select(
+      componentsOfCurrentContainerByName
+    );
   }
 }

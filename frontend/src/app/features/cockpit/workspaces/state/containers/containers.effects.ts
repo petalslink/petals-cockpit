@@ -77,7 +77,8 @@ export class ContainersEffects {
       const { progress$, result$ } = this.containersService.deployComponent(
         workspaceId,
         action.payload.id,
-        action.payload.file
+        action.payload.file,
+        action.payload.name
       );
 
       return result$

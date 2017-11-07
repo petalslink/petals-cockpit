@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <app-petals-container-operations
     *appWorkspaceElementTab="'Operations'"
     [container]="we.resource"
+    [componentsByName]="componentsOfCurrentContainerByName$ | async"
     fxFill
   ></app-petals-container-operations>
 
