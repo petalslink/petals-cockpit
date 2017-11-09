@@ -42,8 +42,6 @@ export class HeaderComponent implements OnInit {
   @Input() isDisconnecting: boolean;
   @Input() isOnWorkspace: boolean;
 
-  showShadow = true;
-
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {}

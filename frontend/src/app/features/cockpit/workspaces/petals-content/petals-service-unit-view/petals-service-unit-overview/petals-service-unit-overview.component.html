@@ -17,49 +17,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="central-content">
     <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
 
-      <md-card fxFlex class="su-infos" [ngClass.gt-md]="'card-auto-size'">
-        <md-card-title fxLayout="row">
+      <mat-card fxFlex class="su-infos" [ngClass.gt-md]="'card-auto-size'">
+        <mat-card-title fxLayout="row">
           <span fxFlex class="text-upper">About <b>{{ serviceUnit.name }}</b></span>
-          <md-icon color="primary">info_outline</md-icon>
-        </md-card-title>
+          <mat-icon color="primary">info_outline</mat-icon>
+        </mat-card-title>
 
         <div fxLayout="row" fxLayoutAlign="start center">
-          <md-card-header fxFlex>
-            <md-card-title>State</md-card-title>
-            <md-card-subtitle class="sa-state" fxLayoutAlign="start center">
+          <mat-card-header fxFlex>
+            <mat-card-title>State</mat-card-title>
+            <mat-card-subtitle class="sa-state" fxLayoutAlign="start center">
               {{ serviceUnit.serviceAssembly.state }}
               <app-led [color]="getLedColorFromState(serviceUnit.serviceAssembly.state)" class="margin-left-x1"></app-led>
-            </md-card-subtitle>
-          </md-card-header>
+            </mat-card-subtitle>
+          </mat-card-header>
         </div>
 
-      </md-card>
+      </mat-card>
 
-      <md-card fxFlex class="su-infos-sa">
-        <md-card-title fxLayout="row">
+      <mat-card fxFlex class="su-infos-sa">
+        <mat-card-title fxLayout="row">
           <span fxFlex class="text-upper">Service Assembly</span>
-          <md-icon svgIcon="sa-overview"></md-icon>
-        </md-card-title>
+          <mat-icon svgIcon="sa-overview"></mat-icon>
+        </mat-card-title>
 
         <div fxLayout="row" fxLayoutWrap fxLayoutAlign="start center">
-          <md-card-header fxFlex fxLayout="row" class="service-assembly">
-            <md-card-title>Name</md-card-title>
-            <md-card-subtitle class="sa-name" fxLayoutAlign="start center">
+          <mat-card-header fxFlex fxLayout="row" class="service-assembly">
+            <mat-card-title>Name</mat-card-title>
+            <mat-card-subtitle class="sa-name" fxLayoutAlign="start center">
               {{ serviceUnit.serviceAssembly.name }}
-            </md-card-subtitle>
-          </md-card-header>
+            </mat-card-subtitle>
+          </mat-card-header>
 
-          <md-card-content fxLayout="row" fxLayoutAlign="start center" class="view-sa">
-            <a md-raised-button [routerLink]="['/workspaces', workspaceId, 'petals', 'service-assemblies', serviceUnit.serviceAssembly.id]"
+          <mat-card-content fxLayout="row" fxLayoutAlign="start center" class="view-sa">
+            <a mat-raised-button [routerLink]="['/workspaces', workspaceId, 'petals', 'service-assemblies', serviceUnit.serviceAssembly.id]"
               class="sa">
               <div fxFlex fxLayout="row" fxLayoutAlign="end center" class="color-primary">
                 <span class="text-upper view-sa-name margin-right-x1">View this sa</span>
-                <md-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
+                <mat-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></mat-icon>
               </div>
             </a>
-          </md-card-content>
+          </mat-card-content>
         </div>
-      </md-card>
+      </mat-card>
 
     </div>
   </div>

@@ -17,19 +17,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <ng-template #workspaceList>
   <div class="dialog-workspaces-list" fxLayout="column" class="content content-max-width">
-    <md-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
-      <h3 class="md-dialog-title margin-left-x1">SELECT THE WORKSPACE</h3>
-    </md-toolbar>
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h3 class="matDialogTitle margin-left-x1">SELECT THE WORKSPACE</h3>
+    </mat-toolbar>
 
     <div class="central-content">
-      <md-dialog-content>
+      <mat-dialog-content>
         <app-workspaces-list
           (fetch)="fetchWorkspace($event)"
           (create)="createWorkspace($event)"
           [workspaces]="workspaces$ | async"
           [user]="user$ | async">
         </app-workspaces-list>
-      </md-dialog-content>
+      </mat-dialog-content>
     </div>
   </div>
 </ng-template>

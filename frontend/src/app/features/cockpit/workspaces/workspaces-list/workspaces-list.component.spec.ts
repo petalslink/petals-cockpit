@@ -118,12 +118,12 @@ describe('WorkspacesListComponent', () => {
     ).toEqual('2 Workspaces');
     expect(
       fixture.debugElement
-        .queryAll(By.css('div.card-workspace md-card-title'))
+        .queryAll(By.css('div.card-workspace mat-card-title'))
         .map(elementText)
     ).toEqual(['WKS0', 'WKS1']);
     expect(
       fixture.debugElement
-        .queryAll(By.css('div.card-workspace md-card-subtitle'))
+        .queryAll(By.css('div.card-workspace mat-card-subtitle'))
         .map(elementText)
         .map(s => s.trim())
     ).toEqual([
@@ -147,7 +147,7 @@ describe('WorkspacesListComponent', () => {
     );
     expect(greenWorkspaces.length).toEqual(1);
     expect(
-      elementText(greenWorkspaces[0].query(By.css('md-card-title')))
+      elementText(greenWorkspaces[0].query(By.css('mat-card-title')))
     ).toEqual('WKS0');
   });
 

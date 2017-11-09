@@ -26,12 +26,12 @@ export class BusPage {
   public static readonly component = $(`app-petals-bus-view`);
 
   public readonly component = BusPage.component;
-  public readonly title = this.component.$(`md-toolbar-row .title`);
+  public readonly title = this.component.$(`mat-toolbar .title`);
   public readonly containers = this.component.$$(
     `.swiper-container .swiper-slide`
   );
   public readonly deleteButton = this.component.$(
-    'md-toolbar-row .btn-delete-bus'
+    'mat-toolbar .btn-delete-bus'
   );
   public readonly hasBeenDeletedMessage = this.component.$(
     'app-workspace-element .message'

@@ -17,68 +17,68 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="central-content">
     <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px" #top>
 
-      <md-card fxFlex class="component-lifecycle" [ngClass.gt-md]="'card-auto-size'">
-        <md-card-title>
+      <mat-card fxFlex class="component-lifecycle" [ngClass.gt-md]="'card-auto-size'">
+        <mat-card-title>
           <span fxFlex class="text-upper">Lifecycle</span>
-          <md-icon color="primary">play_for_work</md-icon>
-        </md-card-title>
+          <mat-icon color="primary">play_for_work</mat-icon>
+        </mat-card-title>
 
-        <md-card-subtitle>State: <b><span class="component-state">{{ component.state }}</span></b></md-card-subtitle>
+        <mat-card-subtitle>State: <b><span class="component-state">{{ component.state }}</span></b></mat-card-subtitle>
 
-        <md-card-content fxLayoutWrap class="margin-top-x1 list-actions-name" *ngIf="component.state">
+        <mat-card-content fxLayoutWrap class="margin-top-x1 list-actions-name" *ngIf="component.state">
           <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:trackByComponentState" class="color-primary padding-bottom-x1">
             <button
               class="text-upper margin-right-x1"
-              md-raised-button
+              mat-raised-button
               (click)="changeState(possibleState.newStateAfterAction)"
               [disabled]="component.isUpdating || ((possibleState.actionName === 'Unload' || possibleState.actionName === 'Uninstall') && component.serviceUnits.length > 0)"
             >
-              <md-icon *ngIf="possibleState.actionName === 'Install'">build</md-icon>
-              <md-icon *ngIf="possibleState.actionName === 'Stop'">stop</md-icon>
-              <md-icon *ngIf="possibleState.actionName === 'Start'">play_arrow</md-icon>
-              <md-icon *ngIf="possibleState.actionName === 'Unload' && component.serviceUnits.length > 0"
-                mdTooltip="To unload a component, all service units of the component should be unloaded first"
-                mdTooltipPosition="above">info</md-icon>
-              <md-icon *ngIf="possibleState.actionName === 'Unload' && component.serviceUnits.length === 0">remove_circle_outline</md-icon>
-              <md-icon *ngIf="possibleState.actionName === 'Uninstall' && component.serviceUnits.length > 0"
-                mdTooltip="To uninstall a component, all service units of the component should be unloaded first"
-                mdTooltipPosition="above">info</md-icon>
-              <md-icon *ngIf="possibleState.actionName === 'Uninstall' && component.serviceUnits.length === 0">build</md-icon>
+              <mat-icon *ngIf="possibleState.actionName === 'Install'">build</mat-icon>
+              <mat-icon *ngIf="possibleState.actionName === 'Stop'">stop</mat-icon>
+              <mat-icon *ngIf="possibleState.actionName === 'Start'">play_arrow</mat-icon>
+              <mat-icon *ngIf="possibleState.actionName === 'Unload' && component.serviceUnits.length > 0"
+                matTooltip="To unload a component, all service units of the component should be unloaded first"
+                matTooltipPosition="above">info</mat-icon>
+              <mat-icon *ngIf="possibleState.actionName === 'Unload' && component.serviceUnits.length === 0">remove_circle_outline</mat-icon>
+              <mat-icon *ngIf="possibleState.actionName === 'Uninstall' && component.serviceUnits.length > 0"
+                matTooltip="To uninstall a component, all service units of the component should be unloaded first"
+                matTooltipPosition="above">info</mat-icon>
+              <mat-icon *ngIf="possibleState.actionName === 'Uninstall' && component.serviceUnits.length === 0">build</mat-icon>
               <span class="action-name">{{ possibleState.actionName }}</span>
             </button>
           </span>
-        </md-card-content>
+        </mat-card-content>
 
-        <md-card-content fxLayout="column" *ngIf="component.updateError" class="error">
+        <mat-card-content fxLayout="column" *ngIf="component.updateError" class="error">
           <div class="bold margin-bottom-x1">An error occurred:</div>
           <span class="italic">{{ component.updateError }}</span>
-        </md-card-content>
+        </mat-card-content>
 
         <app-message class="error-change-state" type="error" [msg]="component.updateError"></app-message>
 
-        <md-divider></md-divider>
+        <mat-divider></mat-divider>
 
-        <md-card-subtitle class="margin-top-x1 component-parameters-title" fxLayoutAlign="start center">
+        <mat-card-subtitle class="margin-top-x1 component-parameters-title" fxLayoutAlign="start center">
           <span fxFlex>Component parameters</span>
-          <md-icon class="margin-left-x1" color="primary">settings</md-icon>
-        </md-card-subtitle>
+          <mat-icon class="margin-left-x1" color="primary">settings</mat-icon>
+        </mat-card-subtitle>
 
-        <md-card-content fxLayout="column" class="component-parameters">
+        <mat-card-content fxLayout="column" class="component-parameters">
           <form formnovalidate *ngIf="parametersForm" [formGroup]="parametersForm">
             <div *ngFor="let param of parametersForm.controls | keys | orderBy">
-              <md-form-field floatPlaceholder="always" class="margin-top-x1">
-                <input mdInput [placeholder]="param" type="text" [formControlName]="param">
-              </md-form-field>
+              <mat-form-field floatPlaceholder="always" class="margin-top-x1">
+                <input matInput [placeholder]="param" type="text" [formControlName]="param">
+              </mat-form-field>
             </div>
             <span class="color-primary">
-              <button class="text-upper" md-raised-button (click)="setParameters()" [disabled]="component.isUpdating || parametersForm.pristine">
+              <button class="text-upper" mat-raised-button (click)="setParameters()" [disabled]="component.isUpdating || parametersForm.pristine">
                 Set
               </button>
             </span>
           </form>
-        </md-card-content>
+        </mat-card-content>
 
-      </md-card>
+      </mat-card>
 
       <app-upload
         class="deploy-service-unit"

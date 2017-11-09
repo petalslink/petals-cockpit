@@ -14,13 +14,13 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFlex class="wrapper-content">
-  <md-toolbar color="primary" class="toolbar-page-header">
+  <mat-toolbar color="primary" class="toolbar-page-header">
     <div class="prefix-toolbar-title">
-      <md-icon>edit</md-icon>
+      <mat-icon>edit</mat-icon>
     </div>
 
     <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">Workspace Bus Import</h1>
-  </md-toolbar>
+  </mat-toolbar>
 
   <div class="deleted-message" *ngIf="isSelectedBus() && isSelectedBusDeleted()">
     This import has been removed
@@ -30,99 +30,99 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <div class="central-content">
       <ngx-hover-opacity [isHoverVisible]="isSelectedBus() && isSelectedBusDeleted()">
         <form class="bus-import-form" formnovalidate [formGroup]="busImportForm" (ngSubmit)="onSubmit(busImportForm) && busImportForm.reset()">
-          <md-card>
+          <mat-card>
 
-            <md-card-title fxLayout="row">
+            <mat-card-title fxLayout="row">
               <span fxFlex class="text-upper">Import Details</span>
-              <md-icon color="primary">archive</md-icon>
-            </md-card-title>
+              <mat-icon color="primary">archive</mat-icon>
+            </mat-card-title>
 
             <app-message class="info-import-details" *ngIf="busImportForm.invalid" type="info" msg="After completing all the required fields, click IMPORT."></app-message>
 
-            <md-card-content>
+            <mat-card-content>
               <div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="10px">
                 <!-- To have more deterministic behavour, we should be able to set 50 to say 2 per line
                    See: https://github.com/angular/flex-layout/issues/235 -->
                 <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
-                  <md-form-field fxFill>
-                    <input type="text" mdInput appFocusInputIfLargeScreen placeholder="IP or hostname" formControlName="ip" required [errorStateMatcher]="createFormErrorStateMatcher">
-                    <span mdPrefix><md-icon color="primary">star_half</md-icon></span>
-                    <md-error *ngIf="formErrors.ip">
+                  <mat-form-field fxFill>
+                    <input type="text" matInput appFocusInputIfLargeScreen placeholder="IP or hostname" formControlName="ip" required [errorStateMatcher]="matcher">
+                    <span matPrefix><mat-icon color="primary">star_half</mat-icon></span>
+                    <mat-error *ngIf="formErrors.ip">
                       {{ formErrors.ip }}
-                    </md-error>
-                  </md-form-field>
+                    </mat-error>
+                  </mat-form-field>
                 </div>
 
                 <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
-                  <md-form-field fxFill>
-                    <input type="text" mdInput placeholder="Port" formControlName="port" required [errorStateMatcher]="createFormErrorStateMatcher">
-                    <span mdPrefix><md-icon color="primary">settings_ethernet</md-icon></span>
-                    <md-error *ngIf="formErrors.port">
+                  <mat-form-field fxFill>
+                    <input type="text" matInput placeholder="Port" formControlName="port" required [errorStateMatcher]="matcher">
+                    <span matPrefix><mat-icon color="primary">settings_ethernet</mat-icon></span>
+                    <mat-error *ngIf="formErrors.port">
                       {{ formErrors.port }}
-                    </md-error>
-                  </md-form-field>
+                    </mat-error>
+                  </mat-form-field>
                 </div>
 
                 <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
-                  <md-form-field fxFill>
-                    <input type="text" mdInput placeholder="Username" formControlName="username" required [errorStateMatcher]="createFormErrorStateMatcher">
-                    <span mdPrefix><md-icon color="primary">person</md-icon></span>
-                    <md-error *ngIf="formErrors.username">
+                  <mat-form-field fxFill>
+                    <input type="text" matInput placeholder="Username" formControlName="username" required [errorStateMatcher]="matcher">
+                    <span matPrefix><mat-icon color="primary">person</mat-icon></span>
+                    <mat-error *ngIf="formErrors.username">
                       {{ formErrors.username }}
-                    </md-error>
-                  </md-form-field>
+                    </mat-error>
+                  </mat-form-field>
                 </div>
 
                 <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
-                  <md-form-field fxFill>
-                    <input type="password" mdInput placeholder="Password" formControlName="password" required [errorStateMatcher]="createFormErrorStateMatcher">
-                    <span mdPrefix><md-icon color="primary">vpn_key</md-icon></span>
-                    <md-error *ngIf="formErrors.password">
+                  <mat-form-field fxFill>
+                    <input type="password" matInput placeholder="Password" formControlName="password" required [errorStateMatcher]="matcher">
+                    <span matPrefix><mat-icon color="primary">vpn_key</mat-icon></span>
+                    <mat-error *ngIf="formErrors.password">
                       {{ formErrors.password }}
-                    </md-error>
-                  </md-form-field>
+                    </mat-error>
+                  </mat-form-field>
                 </div>
 
                 <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">
-                  <md-form-field fxFill>
-                    <input type="password" mdInput placeholder="Topology passphrase" formControlName="passphrase" required [errorStateMatcher]="createFormErrorStateMatcher">
-                    <span mdPrefix><md-icon color="primary">security</md-icon></span>
-                    <md-error *ngIf="formErrors.passphrase">
+                  <mat-form-field fxFill>
+                    <input type="password" matInput placeholder="Topology passphrase" formControlName="passphrase" required [errorStateMatcher]="matcher">
+                    <span matPrefix><mat-icon color="primary">security</mat-icon></span>
+                    <mat-error *ngIf="formErrors.passphrase">
                       {{ formErrors.passphrase }}
-                    </md-error>
-                  </md-form-field>
+                    </mat-error>
+                  </mat-form-field>
                 </div>
               </div>
-            </md-card-content>
+            </mat-card-content>
 
             <app-message class="error-import-details" type="error" [msg]="getError()"></app-message>
 
-            <md-card-actions class="padding-right-x1 margin-bottom-x1" fxLayoutAlign="end center">
-              <button md-raised-button color="accent" type="button" *ngIf="isNewBus() && !newBusData().isImporting" class="btn-clear-form margin-right-x1 text-upper"
+            <mat-card-actions class="padding-right-x1 margin-bottom-x1" fxLayoutAlign="end center">
+              <button mat-raised-button color="accent" type="button" *ngIf="isNewBus() && !newBusData().isImporting" class="btn-clear-form margin-right-x1 text-upper"
                 (click)="reset()">
-              <md-icon>clear_all</md-icon>
+              <mat-icon>clear_all</mat-icon>
               <span class="clear-name">Clear</span>
             </button>
-              <button md-raised-button color="warn" type="button" *ngIf="isSelectedBus()" (click)="discardSelectedBus()" [disabled]="selectedBus().isRemoving"
+              <button mat-raised-button color="warn" type="button" *ngIf="isSelectedBus()" (click)="discardSelectedBus()" [disabled]="selectedBus().isRemoving"
                 class="margin-right-x1 btn-discard-form text-upper">
               <ng-template [ngIf]="selectedBus().importError" [ngIfElse]="cancel">
-                <md-icon>remove_circle</md-icon><span class="discard-name">Discard</span>
+                <mat-icon>remove_circle</mat-icon><span class="discard-name">Discard</span>
               </ng-template>
               <ng-template #cancel>
-                <md-icon>cancel</md-icon><span class="cancel-name">Cancel</span>
+                <mat-icon>cancel</mat-icon><span class="cancel-name">Cancel</span>
               </ng-template>
             </button>
-              <button md-raised-button color="primary" type="submit" class="btn-import-form text-upper" [disabled]="busImportForm.invalid || isSelectedBus() || (isNewBus() && newBusData().isImporting)">
+              <button mat-raised-button color="primary" type="submit" class="btn-import-form text-upper" [disabled]="busImportForm.invalid || isSelectedBus() || (isNewBus() && newBusData().isImporting)">
               <span *ngIf="isStillImporting(); else canImport" fxFill fxLayout="row" fxLayoutAlign="center center">
-                Importing <md-spinner></md-spinner>
+                Importing <mat-spinner [diameter]="16" [strokeWidth]="1"></mat-spinner>
               </span>
               <ng-template #canImport>
-                <md-icon>import_export</md-icon><span class="import-name">Import</span>
+                <mat-icon>import_export</mat-icon><span class="import-name">Import</span>
               </ng-template>
             </button>
-            </md-card-actions>
+            </mat-card-actions>
 
-          </md-card>
+          </mat-card>
         </form>
       </ngx-hover-opacity>
     </div>

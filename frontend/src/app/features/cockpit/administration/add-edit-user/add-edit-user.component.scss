@@ -15,16 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-md-form-field [mdprefix] {
+mat-form-field [matprefix] {
   margin-right: 10px;
 }
 
-md-icon {
+mat-icon {
   padding-right: 10px;
-}
-
-md-spinner {
-  display: inline-block;
-  width: 20px;
-  height: 100%;
 }

@@ -82,7 +82,7 @@ describe(`Login`, () => {
       .actions()
       .mouseMove($('app-generate-icon.btn-avatar-user'))
       .perform();
-    expect($('md-tooltip-component').getText()).toEqual('Administrator');
+    expect($('mat-tooltip-component').getText()).toEqual('Administrator');
   });
 
   it(`should select the first input of the login form on desktop`, () => {

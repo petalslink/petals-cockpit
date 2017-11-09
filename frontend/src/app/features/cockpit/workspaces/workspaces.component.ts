@@ -22,7 +22,7 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { MdDialog, MdDialogRef } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -47,7 +47,7 @@ import { getCurrentUser } from 'app/shared/state/users.selectors';
 export class WorkspacesComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  private workspacesDialog: MdDialogRef<any>;
+  private workspacesDialog: MatDialogRef<any>;
   @ViewChild('workspaceList') template: TemplateRef<any>;
 
   workspaces$: Observable<IWorkspaces>;
@@ -56,7 +56,7 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
   constructor(
     private store$: Store<IStore>,
     private router: Router,
-    private dialog: MdDialog
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {

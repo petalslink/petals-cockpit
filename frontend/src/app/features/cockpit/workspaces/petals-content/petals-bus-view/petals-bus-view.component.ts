@@ -16,7 +16,7 @@
  */
 
 import { Component, Inject, OnInit } from '@angular/core';
-import { MD_DIALOG_DATA, MdDialog, MdDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
@@ -37,7 +37,7 @@ export class PetalsBusViewComponent implements OnInit {
   public workspaceId$: Observable<string>;
   public bus$: Observable<IBusWithContainers>;
 
-  constructor(private store$: Store<IStore>, public dialog: MdDialog) {}
+  constructor(private store$: Store<IStore>, public dialog: MatDialog) {}
 
   ngOnInit() {
     this.store$.dispatch(
@@ -72,33 +72,33 @@ export class PetalsBusViewComponent implements OnInit {
   template: `
     <div fxLayout="column" class="content content-max-width">
       <div class="central-content">
-        <div fxLayout="row" md-dialog-title fxLayoutAlign="start start">
+        <div fxLayout="row" matDialogTitle fxLayoutAlign="start start">
           <span fxLayoutAlign="start center">
-            <md-icon color="accent">warning</md-icon>
+            <mat-icon color="accent">warning</mat-icon>
             <span class="warning-title margin-left-x1">Delete bus?</span>
           </span>
         </div>
-        <md-dialog-content>
+        <mat-dialog-content>
           <p fxLayout="column">
             <span class="warning-message">Are you sure you want to delete <b>{{ data.bus.name }}</b>?</span>
           </p>
-        </md-dialog-content>
+        </mat-dialog-content>
 
-        <md-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
-          <button md-button md-dialog-close class="margin-right-x1">Cancel</button>
-          <button md-raised-button color="warn" class="btn-confirm-delete-bus" (click)="dialogRef.close(true)">Delete</button>
-        </md-dialog-actions>
+        <mat-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
+          <button mat-button matDialogClose class="margin-right-x1">Cancel</button>
+          <button mat-raised-button color="warn" class="btn-confirm-delete-bus" (click)="dialogRef.close(true)">Delete</button>
+        </mat-dialog-actions>
       </div>
     </div>
   `,
   styles: [
-    'md-dialog-content { height: 100%; } .central-content { padding: 24px; }',
+    'mat-dialog-content { height: 100%; } .central-content { padding: 24px; }',
   ],
 })
 export class BusDeleteDialogComponent {
   constructor(
-    public dialogRef: MdDialogRef<BusDeleteDialogComponent>,
+    public dialogRef: MatDialogRef<BusDeleteDialogComponent>,
     // TODO add some type for data when https://github.com/angular/angular/issues/15424 is fixed
-    @Inject(MD_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
 }

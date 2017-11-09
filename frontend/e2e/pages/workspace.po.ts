@@ -37,7 +37,7 @@ import { WorkspacesPage } from './workspaces.po';
 
 export abstract class WorkspacePage {
   public static readonly component = $(`app-workspace`);
-  public static readonly sidenav = WorkspacePage.component.$('md-sidenav');
+  public static readonly sidenav = WorkspacePage.component.$('mat-sidenav');
   public static readonly workspaceButton = WorkspacePage.sidenav.$(
     'button.workspace-name'
   );
@@ -49,7 +49,7 @@ export abstract class WorkspacePage {
     `button.change-workspace`
   );
   public readonly busesInProgress = this.sidenav.$$(
-    `app-buses-in-progress md-nav-list a`
+    `app-buses-in-progress mat-nav-list a`
   );
   public readonly workspaceButton = WorkspacePage.workspaceButton;
 
@@ -59,7 +59,7 @@ export abstract class WorkspacePage {
     browser.wait(EC.visibilityOf(this.component), waitTimeout);
     browser.wait(EC.visibilityOf(WorkspacePage.sidenav), waitTimeout);
     browser.wait(
-      EC.stalenessOf(this.component.$('md-toolbar md-spinner')),
+      EC.stalenessOf(this.component.$('mat-toolbar mat-spinner')),
       waitTimeout
     );
 
@@ -104,14 +104,14 @@ export abstract class WorkspacePage {
       );
     } else {
       return this.sidenav
-        .$$(`app-material-tree md-nav-list a.workspace-element-type-${type}`)
+        .$$(`app-material-tree mat-nav-list a.workspace-element-type-${type}`)
         .get(identifier);
     }
   }
 
   treeElementFolder(identifier: string | number, type: string) {
     return this.treeElement(identifier, type).element(
-      by.cssContainingText('md-icon', 'arrow_drop_down')
+      by.cssContainingText('mat-icon', 'arrow_drop_down')
     );
   }
 
@@ -174,11 +174,11 @@ export abstract class WorkspacePage {
 
 export class WorkspaceOverviewPage extends WorkspacePage {
   public readonly component = $(`app-workspace`);
-  public readonly title = this.component.$(`md-toolbar-row .title`);
+  public readonly title = this.component.$(`mat-toolbar .title`);
   public readonly deleteButton = this.component.$(`.btn-delete-wks`);
 
   public readonly description = this.component.$(
-    `md-card-content.workspace-description > span`
+    `mat-card-content.workspace-description > span`
   );
   public readonly editButton = this.component.$(
     `.workspace-description button`
@@ -187,7 +187,7 @@ export class WorkspaceOverviewPage extends WorkspacePage {
     `.workspace-description-edit textarea`
   );
   public readonly descriptionPreview = this.component.$(
-    `.workspace-description-edit md-card-subtitle span.workspace-description-preview`
+    `.workspace-description-edit mat-card-subtitle span.workspace-description-preview`
   );
   public readonly descriptionCancel = this.component.$(
     `button.workspace-description-edit-cancel`
@@ -197,13 +197,13 @@ export class WorkspaceOverviewPage extends WorkspacePage {
   );
 
   public readonly users = this.component.$(`.workspace-users`);
-  public readonly usersList = this.users.$(`md-list`);
+  public readonly usersList = this.users.$(`mat-list`);
   public readonly usersAutocompleteInput = this.component.$(
     `input[formcontrolname="userSearchCtrl"]`
   );
-  // md-option is not within .workspace-users
+  // mat-option is not within .workspace-users
   // it's at the root of the HTML page
-  public readonly usersAutocompleteList = $$(`md-option`);
+  public readonly usersAutocompleteList = $$(`mat-option`);
   public readonly btnAddUserToWks = this.component.element(
     by.cssContainingText(`button`, `Add`)
   );

@@ -18,7 +18,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-md-card-toolbar',
+  selector: 'app-mat-card-toolbar',
   templateUrl: './md-card-toolbar.component.html',
   styleUrls: ['./md-card-toolbar.component.scss'],
 })

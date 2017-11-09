@@ -14,48 +14,48 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div *ngIf="workspace$ | async as workspace" fxLayout="column" fxFlex class="wrapper-content">
-  <md-toolbar color="primary" class="toolbar-page-header">
+  <mat-toolbar color="primary" class="toolbar-page-header">
     <div class="prefix-toolbar-title">
-      <md-icon color="accent" *ngIf="!workspace.isFetchingDetails">grade</md-icon>
-      <md-spinner color="accent" *ngIf="workspace.isFetchingDetails"></md-spinner>
+      <mat-icon color="accent" *ngIf="!workspace.isFetchingDetails">grade</mat-icon>
+      <mat-spinner [diameter]="16" [strokeWidth]="1" color="accent" *ngIf="workspace.isFetchingDetails"></mat-spinner>
     </div>
 
     <h1 class="title" fxFlex [ngClass.lt-md]="'margin-left-x1'">{{ workspace.name }}</h1>
 
-    <button color="warn" type="button" class="btn-delete-wks" (click)="openDeletionDialog()" md-mini-fab mdTooltip="Delete the workspace"
-      mdTooltipPosition="before" [disabled]="workspace.isRemoving || isRemoving">
-      <md-icon>delete</md-icon>
+    <button color="warn" type="button" class="btn-delete-wks" (click)="openDeletionDialog()" mat-mini-fab matTooltip="Delete the workspace"
+      matTooltipPosition="before" [disabled]="workspace.isRemoving || isRemoving">
+      <mat-icon>delete</mat-icon>
     </button>
-  </md-toolbar>
+  </mat-toolbar>
 
   <div fxFlexFill fxLayout="column" class="content content-max-width">
     <div class="central-content">
       <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
-        <md-card fxFlex [ngClass.gt-md]="'card-auto-size'">
-          <md-card-title fxLayout="row" *ngIf="!isEditingDescription">
+        <mat-card fxFlex [ngClass.gt-md]="'card-auto-size'">
+          <mat-card-title fxLayout="row" *ngIf="!isEditingDescription">
             <span fxFlex class="text-upper">Whiteboard</span>
-          </md-card-title>
+          </mat-card-title>
 
 
-          <md-card-content fxLayout="row" fxLayoutAlign="center center" *ngIf="!isEditingDescription; else descriptionEdit" class="workspace-description">
+          <mat-card-content fxLayout="row" fxLayoutAlign="center center" *ngIf="!isEditingDescription; else descriptionEdit" class="workspace-description">
             <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml"></span>
-            <button class="btn-edit" color="primary" md-icon-button (click)="editDescription()" mdTooltip="Edit" mdTooltipPosition="below">
-              <md-icon>edit</md-icon>
+            <button class="btn-edit" color="primary" mat-icon-button (click)="editDescription()" matTooltip="Edit" matTooltipPosition="below">
+              <mat-icon>edit</mat-icon>
             </button>
-          </md-card-content>
+          </mat-card-content>
 
-          <md-card-content>
+          <mat-card-content>
 
             <ng-template #descriptionEdit>
               <div fxLayout="column" *ngIf="description !== null" class="workspace-description-edit">
                 <p>
-                  <md-form-field fxFlex>
-                    <textarea mdInput class="description-wks" mdTextareaAutosize [disabled]="isSettingDescription" [(ngModel)]="description"></textarea>
-                  </md-form-field>
+                  <mat-form-field fxFlex>
+                    <textarea matInput class="description-wks" matTextareaAutosize [disabled]="isSettingDescription" [(ngModel)]="description"></textarea>
+                  </mat-form-field>
                 </p>
-                <md-card-subtitle>
+                <mat-card-subtitle>
                   <span fxFlex class="workspace-description-preview" [innerHTML]="description | MarkdownToHtml"></span>
-                </md-card-subtitle>
+                </mat-card-subtitle>
               </div>
 
               <div align="end">
@@ -63,29 +63,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   type="button"
                   class="workspace-description-edit-cancel text-upper"
                   color="primary"
-                  md-button
+                  mat-button
                   [disabled]="isSettingDescription"
                 (click)="cancelDescription()">Cancel</button>
                 <button
                   type="submit"
                   class="workspace-description-edit-submit text-upper"
-                  md-button
+                  mat-button
                   [disabled]="isSettingDescription"
                   (click)="validateDescription()"
-                  color="accent" md-raised-button>Submit</button>
+                  color="accent" mat-raised-button>Submit</button>
               </div>
             </ng-template>
 
-          </md-card-content>
-        </md-card>
+          </mat-card-content>
+        </mat-card>
 
-        <md-card fxFlex [ngClass.gt-md]="'card-auto-size'">
-          <md-card-title fxLayout="row">
+        <mat-card fxFlex [ngClass.gt-md]="'card-auto-size'">
+          <mat-card-title fxLayout="row">
             <span fxFlex class="text-upper">Users</span>
-            <md-icon color="primary">supervisor_account</md-icon>
-          </md-card-title>
+            <mat-icon color="primary">supervisor_account</mat-icon>
+          </mat-card-title>
 
-          <md-card-content>
+          <mat-card-content>
             <div fxLayout="column" *ngIf="(users$ | async) as users" class="workspace-users">
 
               <app-message class="info-user-workspace" *ngIf="users.length === 1; else workspaceShared" type="info" msg="You are the only one using this workspace."></app-message>
@@ -94,50 +94,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 <app-message class="info-user-workspace-shared" type="info" msg="{{users.length}} people are using this workspace."></app-message>
               </ng-template>
 
-              <md-divider></md-divider>
+              <mat-divider></mat-divider>
 
               <form [formGroup]="addUserFormGroup" (ngSubmit)="addUser()" class="margin-top-x1">
-                <md-form-field class="margin-right-x1">
+                <mat-form-field class="margin-right-x1">
                   <input
-                    mdInput
+                    matInput
                     placeholder="User to add"
-                    [mdAutocomplete]="autocompleteUsers"
+                    [matAutocomplete]="autocompleteUsers"
                     formControlName="userSearchCtrl"
                     required>
-                  <md-error>Select a user on the list</md-error>
-                </md-form-field>
+                  <mat-error>Select a user on the list</mat-error>
+                </mat-form-field>
 
-                <md-autocomplete #autocompleteUsers>
-                  <md-option *ngFor="let filteredUser of filteredUsers$ | async" [value]="filteredUser">
+                <mat-autocomplete #autocompleteUsers>
+                  <mat-option *ngFor="let filteredUser of filteredUsers$ | async" [value]="filteredUser">
                     {{ filteredUser }}
-                  </md-option>
-                </md-autocomplete>
+                  </mat-option>
+                </mat-autocomplete>
 
-                <button md-raised-button type="submit" class="text-upper" color="accent" [disabled]="addUserFormGroup.invalid || workspace.isAddingUserToWorkspace">Add</button>
+                <button mat-raised-button type="submit" class="text-upper" color="accent" [disabled]="addUserFormGroup.invalid || workspace.isAddingUserToWorkspace">Add</button>
               </form>
 
-              <md-list *ngIf="currentUserId$ | async as currentUserId">
-                <md-list-item *ngFor="let user of users; trackBy:trackByUser">
-                  <app-generate-icon md-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
+              <mat-list *ngIf="currentUserId$ | async as currentUserId">
+                <mat-list-item *ngFor="let user of users; trackBy:trackByUser">
+                  <app-generate-icon mat-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
 
-                  <h2 mdLine class="user-id">{{ user.id }}</h2>
+                  <h2 matLine class="user-id">{{ user.id }}</h2>
 
-                  <p mdLine>
+                  <p matLine>
                     <span class="user-name">{{ user.name }}</span>
                   </p>
 
-                  <button md-icon-button
+                  <button mat-icon-button
                     (click)="removeUser(user.id)"
                     *ngIf="currentUserId !== user.id"
                     [disabled]="user.isDeletingFromWorkspace"
                     class="delete">
-                    <md-icon>delete</md-icon>
+                    <mat-icon>delete</mat-icon>
                   </button>
-                </md-list-item>
-              </md-list>
+                </mat-list-item>
+              </mat-list>
             </div>
-          </md-card-content>
-        </md-card>
+          </mat-card-content>
+        </mat-card>
       </div>
     </div>
   </div>

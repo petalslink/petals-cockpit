@@ -31,7 +31,7 @@ export class AdminPage {
   public static readonly component = $(`app-administration`);
 
   public readonly component = AdminPage.component;
-  public readonly title = this.component.$(`md-toolbar-row .title`);
+  public readonly title = this.component.$(`mat-toolbar .title`);
 
   public readonly panels = this.component.$(
     `.user-management-page .user-management-panels`

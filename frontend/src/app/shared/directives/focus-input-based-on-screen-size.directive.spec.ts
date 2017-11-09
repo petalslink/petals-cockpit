@@ -30,7 +30,6 @@ import { ScreenSize } from 'app/shared/state/ui.interface';
 import { getInputByName } from 'testing';
 
 describe(`appFocusInputIfLargeScreen`, () => {
-  let componentDefault: HostDefaultComponent;
   let fixtureDefault: ComponentFixture<HostDefaultComponent>;
 
   let componentParams: HostWithParamsComponent;
@@ -59,7 +58,6 @@ describe(`appFocusInputIfLargeScreen`, () => {
   describe(`directive without any parameter passed`, () => {
     beforeEach(() => {
       fixtureDefault = TestBed.createComponent(HostDefaultComponent);
-      componentDefault = fixtureDefault.componentInstance;
     });
 
     it(

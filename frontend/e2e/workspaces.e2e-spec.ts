@@ -46,10 +46,10 @@ describe(`Workspaces`, () => {
     // check the current list content
     browser
       .actions()
-      .mouseMove(workspaces.component.$('md-card-subtitle span.dotted'))
+      .mouseMove(workspaces.component.$('mat-card-subtitle span.dotted'))
       .perform();
 
-    expect($('md-tooltip-component').getText()).toEqual(
+    expect($('mat-tooltip-component').getText()).toEqual(
       'Administrator, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER'
     );
     expect(workspaces.workspacesCards.getText()).toEqual([
@@ -128,7 +128,7 @@ describe(`Workspaces`, () => {
     workspaces = WorkspacesPage.waitAndGet();
 
     // ensure the sidebar is closed as expected
-    browser.wait(EC.invisibilityOf($(`app-cockpit md-sidenav`)), waitTimeout);
+    browser.wait(EC.invisibilityOf($(`app-cockpit mat-sidenav`)), waitTimeout);
 
     // now that the previous workspace is deleted, check that only 1 workspace is displayed
     expect(workspaces.workspacesCards.count()).toEqual(1);
@@ -139,13 +139,13 @@ describe(`Workspaces`, () => {
       .goToWorkspacesViaLogin()
       .loginToWorkspaces(`admin`, `admin`);
 
-    let admin = page.openAdmin();
+    page.openAdmin();
     browser.wait(EC.stalenessOf(workspaces.component), waitTimeout);
 
     const workspace = page.openWorkspaces().selectWorkspace(0);
     workspaces = workspace.openWorkspacesDialog();
 
-    admin = page.openAdmin();
+    page.openAdmin();
     browser.wait(EC.stalenessOf(workspaces.component), waitTimeout);
   });
 

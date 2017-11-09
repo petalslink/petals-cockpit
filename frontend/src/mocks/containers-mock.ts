@@ -15,13 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { tuple } from 'app/shared/helpers/shared.helper';
 import { ComponentState } from 'app/shared/services/components.service';
 import {
   IContainerBackendDetails,
   IContainerBackendSSE,
 } from 'app/shared/services/containers.service';
-import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
+import {
+  IServiceAssemblyBackendSSE,
+  ServiceAssemblyState,
+} from 'app/shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+import { ServiceUnit } from 'mocks/service-units-mock';
 import { Bus } from './buses-mock';
 import { Component, componentsService } from './components-mock';
 import {
@@ -104,7 +108,13 @@ export class Container {
     component.getSharedLibraries().forEach(sl => sl.unregisterComponent(id));
   }
 
-  addServiceAssembly(state?: ServiceAssemblyState, name?: string) {
+  addServiceAssembly(
+    state?: ServiceAssemblyState,
+    name?: string
+  ): [
+    { [id: string]: IServiceAssemblyBackendSSE },
+    { [id: string]: IServiceUnitBackendSSE }
+  ] {
     const serviceAssembly = serviceAssembliesService.create(this, name, state);
 
     const it = this.components.values();
@@ -124,7 +134,7 @@ export class Container {
     c2.registerServiceUnit(su2);
     this.serviceAssemblies.set(serviceAssembly.id, serviceAssembly);
 
-    return tuple([serviceAssembly.toObj(), { ...su1.toObj(), ...su2.toObj() }]);
+    return [serviceAssembly.toObj(), { ...su1.toObj(), ...su2.toObj() }];
   }
 
   removeServiceAssembly(id: string) {
@@ -139,7 +149,7 @@ export class Container {
     component: Component,
     state?: ServiceAssemblyState,
     name?: string
-  ) {
+  ): [ServiceAssembly, ServiceUnit] {
     const serviceAssembly = serviceAssembliesService.create(
       this,
       name ? `sa-${name}` : undefined,
@@ -150,7 +160,7 @@ export class Container {
     component.registerServiceUnit(serviceUnit);
     this.serviceAssemblies.set(serviceAssembly.id, serviceAssembly);
 
-    return tuple([serviceAssembly, serviceUnit]);
+    return [serviceAssembly, serviceUnit];
   }
 
   addSharedLibrary(name?: string, version?: string) {

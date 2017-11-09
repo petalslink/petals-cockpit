@@ -13,43 +13,47 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-sidenav-container fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">
-  <md-sidenav fxLayout="column"
-              [class.mat-elevation-z6]="showShadow"
+<mat-sidenav-container fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">
+  <mat-sidenav fxLayout="column"
+              class="mat-elevation-z6"
               *ngIf="workspace$ | async as workspace"
               [opened]="sidenavVisible$ | async"
               [mode]="sidenavMode$ | async"
               [disableClose]="true">
     <div fxLayout="row" class="pnl-buttons-workspaces">
-      <button fxFlex="100" md-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', workspace.id]"
+      <button fxFlex="100" mat-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', workspace.id]"
         class="workspace-name width-full no-border-radius text-upper" color="accent">
         {{ workspace.name }}
       </button>
 
-      <button fxFlex md-raised-button (click)="openWorkspacesDialog()" class="change-workspace width-full no-border-radius" color="accent">
-        <md-icon>view_list</md-icon>
+      <button fxFlex
+        mat-raised-button
+        (click)="openWorkspacesDialog()"
+        class="change-workspace width-full no-border-radius"
+        color="accent">
+        <mat-icon>view_list</mat-icon>
       </button>
     </div>
 
-    <md-tab-group fxFlex md-stretch-tabs>
-      <md-tab label="Petals">
+    <mat-tab-group fxFlex mat-stretch-tabs>
+      <mat-tab label="Petals">
         <app-petals-menu-view
           [busesInProgress]="busesInProgress$ | async"
           [tree]="tree$ | async"
           [workspaceId]="workspace.id">
         </app-petals-menu-view>
-      </md-tab>
+      </mat-tab>
 
-      <md-tab label="Service">
+      <mat-tab label="Service">
         Some more tab content
-      </md-tab>
+      </mat-tab>
 
-      <md-tab label="Api">
+      <mat-tab label="Api">
         Some more tab content
-      </md-tab>
-    </md-tab-group>
+      </mat-tab>
+    </mat-tab-group>
     <!--<router-outlet name="aux"></router-outlet>-->
-  </md-sidenav>
+  </mat-sidenav>
 
   <router-outlet></router-outlet>
-</md-sidenav-container>
+</mat-sidenav-container>

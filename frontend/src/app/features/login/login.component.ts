@@ -16,20 +16,13 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  FormGroupDirective,
-  NgForm,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { formErrorStateMatcher } from 'app/shared/helpers/form.helper';
+import { FormErrorStateMatcher } from 'app/shared/helpers/form.helper';
 import { IUserLogin } from 'app/shared/services/users.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { Users } from 'app/shared/state/users.actions';
@@ -46,6 +39,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   loginForm: FormGroup;
   users$: Observable<IUsersTable>;
+  matcher = new FormErrorStateMatcher();
 
   constructor(
     private store$: Store<IStore>,
@@ -73,13 +67,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         }
       })
       .subscribe();
-  }
-
-  createFormErrorStateMatcher(
-    control: FormControl,
-    formToCheck: FormGroupDirective | NgForm
-  ): boolean {
-    return formErrorStateMatcher(control, formToCheck);
   }
 
   ngOnDestroy() {

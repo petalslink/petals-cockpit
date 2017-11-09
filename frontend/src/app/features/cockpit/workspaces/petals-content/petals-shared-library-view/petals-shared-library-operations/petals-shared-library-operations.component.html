@@ -17,32 +17,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="central-content">
     <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
 
-      <md-card fxFlex class="shared-library-lifecycle" [ngClass.gt-md]="'card-auto-size'">
-        <md-card-title fxLayout="row">
+      <mat-card fxFlex class="shared-library-lifecycle" [ngClass.gt-md]="'card-auto-size'">
+        <mat-card-title fxLayout="row">
           <span fxFlex class="text-upper">Lifecycle</span>
-          <md-icon color="primary">play_for_work</md-icon>
-        </md-card-title>
+          <mat-icon color="primary">play_for_work</mat-icon>
+        </mat-card-title>
 
-        <md-card-content fxLayout="row" fxLayoutWrap class="margin-top-x1">
+        <mat-card-content fxLayout="row" fxLayoutWrap class="margin-top-x1">
           <span class="color-primary padding-bottom-x1">
             <button
               class="text-upper margin-right-x1"
-              md-raised-button
+              mat-raised-button
               (click)="unload()"
               [disabled]="sharedLibrary.isFetchingDetails || sharedLibrary.isUpdatingState || sharedLibrary.components.length > 0"
             >
-              <md-icon *ngIf="sharedLibrary.components.length > 0"
-                mdTooltip="To unload a shared library, all components that use it should be unloaded first"
-                mdTooltipPosition="above">info</md-icon>
-              <md-icon *ngIf="sharedLibrary.components.length === 0">remove_circle_outline</md-icon>
+              <mat-icon *ngIf="sharedLibrary.components.length > 0"
+                matTooltip="To unload a shared library, all components that use it should be unloaded first"
+                matTooltipPosition="above">info</mat-icon>
+              <mat-icon *ngIf="sharedLibrary.components.length === 0">remove_circle_outline</mat-icon>
               <span>Unload</span>
             </button>
           </span>
-        </md-card-content>
+        </mat-card-content>
 
         <app-message type="error" [msg]="sharedLibrary.errorChangeState"></app-message>
 
-      </md-card>
+      </mat-card>
     </div>
   </div>
 </div>

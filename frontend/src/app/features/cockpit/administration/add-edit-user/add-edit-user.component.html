@@ -18,60 +18,60 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <div fxLayout="column" fxLayoutWrap fxLayoutGap="10px">
 
       <div fxLayoutAlign="start center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center" class="margin-top-x1">
-        <md-form-field *ngIf="!user" fxFlex fxFlex.md="50%" fxFlex.sm="50%">
-          <input type="text" autocomplete="off" mdInput placeholder="Username" formControlName="username">
-          <span mdPrefix><md-icon color="primary">person</md-icon></span>
-          <md-error *ngIf="formErrors.username">
+        <mat-form-field *ngIf="!user" fxFlex fxFlex.md="50%" fxFlex.sm="50%">
+          <input type="text" autocomplete="off" matInput placeholder="Username" formControlName="username">
+          <span matPrefix><mat-icon color="primary">person</mat-icon></span>
+          <mat-error *ngIf="formErrors.username">
             {{ formErrors.username }}
-          </md-error>
-        </md-form-field>
+          </mat-error>
+        </mat-form-field>
       </div>
 
       <div fxLayoutAlign="start center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center">
-        <md-form-field fxFlex fxFlex.md="50%" fxFlex.sm="50%">
-          <input type="text" autocomplete="off" mdInput placeholder="Name" formControlName="name">
-          <span mdPrefix><md-icon color="primary">assignment_ind</md-icon></span>
-          <md-error *ngIf="formErrors.name">
+        <mat-form-field fxFlex fxFlex.md="50%" fxFlex.sm="50%">
+          <input type="text" autocomplete="off" matInput placeholder="Name" formControlName="name">
+          <span matPrefix><mat-icon color="primary">assignment_ind</mat-icon></span>
+          <mat-error *ngIf="formErrors.name">
             {{ formErrors.name }}
-          </md-error>
-        </md-form-field>
+          </mat-error>
+        </mat-form-field>
       </div>
       <div fxLayoutAlign="start center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center">
-        <md-form-field fxFlex fxFlex.md="50%" fxFlex.sm="50%">
-          <input type="password" autocomplete="new-password" mdInput placeholder="Password" formControlName="password">
-          <span mdPrefix><md-icon color="primary">vpn_key</md-icon></span>
-          <md-error *ngIf="formErrors.password">
+        <mat-form-field fxFlex fxFlex.md="50%" fxFlex.sm="50%">
+          <input type="password" autocomplete="new-password" matInput placeholder="Password" formControlName="password">
+          <span matPrefix><mat-icon color="primary">vpn_key</mat-icon></span>
+          <mat-error *ngIf="formErrors.password">
             {{ formErrors.password }}
-          </md-error>
-        </md-form-field>
+          </mat-error>
+        </mat-form-field>
       </div>
     </div>
 
-    <md-action-row class="pnl-actions-user-management"
+    <mat-action-row class="pnl-actions-user-management"
       fxLayoutAlign="end center"
       fxLayoutAlign.md="center center"
       fxLayoutAlign.sm="center center"
       fxLayout.lt-md="column"
       fxLayoutWrap
       fxLayoutGap="10px">
-      <button md-raised-button type="button" class="btn-cancel-form text-upper" (click)="doCancel()">
-        <md-icon color="primary">cancel</md-icon>
+      <button mat-raised-button type="button" class="btn-cancel-form text-upper" (click)="doCancel()">
+        <mat-icon color="primary">cancel</mat-icon>
         <span class="cancel-name">Cancel</span>
       </button>
-      <button md-raised-button type="button" class="btn-delete-form text-upper" (click)="doDelete()" *ngIf="user" [disabled]="!canDelete">
-        <md-icon color="warn">delete</md-icon>
+      <button mat-raised-button type="button" class="btn-delete-form text-upper" (click)="doDelete()" *ngIf="user" [disabled]="!canDelete">
+        <mat-icon color="warn">delete</mat-icon>
         <span class="delete-name">Delete</span>
       </button>
       <button
-        md-raised-button
+        mat-raised-button
         color="accent"
         type="button"
         (click)="doSubmit()"
         class="btn-add-user-form text-upper"
         [disabled]="userManagementForm.invalid">
-        <md-icon>{{ user ? 'done' : 'person_add' }}</md-icon>
+        <mat-icon>{{ user ? 'done' : 'person_add' }}</mat-icon>
         <span class="save-name">{{ user ? 'Save' : 'Add' }}</span>
       </button>
-    </md-action-row>
+    </mat-action-row>
   </div>
 </form>

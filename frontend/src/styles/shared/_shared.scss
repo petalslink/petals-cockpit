@@ -36,7 +36,7 @@ app-root {
 
 $sidebar-width: 320px;
 
-md-sidenav {
+mat-sidenav {
   width: $sidebar-width;
 }
 
@@ -137,27 +137,6 @@ div > .mat-dialog-container {
   font-weight: bold;
 }
 
-// lib to have a pretty json display
-// use <prettyjson [obj]="someObj"></prettyjson>
-// instead of json pipe to have a pretty debug
-pre {
-  .string {
-    color: green;
-  }
-  .number {
-    color: darkorange;
-  }
-  .boolean {
-    color: blue;
-  }
-  .null {
-    color: magenta;
-  }
-  .key {
-    color: red;
-  }
-}
-
 // custom scrollbar only for chrome
 ::-webkit-scrollbar {
   width: 5px;
@@ -205,12 +184,6 @@ pre {
 .prefix-toolbar-title {
   width: 20px;
   text-align: center;
-
-  md-spinner {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-  }
 }
 
 // temporary fix https://github.com/angular/material2/issues/2829
@@ -241,25 +214,19 @@ app-workspace
 
 // customize toolbars
 app-header .header-toolbar,
-.header-toolbar > .mat-toolbar-layout > .mat-toolbar-row,
-.admin-page
-  > md-toolbar.toolbar-page-header
-  > .mat-toolbar-layout
-  > .mat-toolbar-row {
+.header-toolbar,
+.admin-page > mat-toolbar.toolbar-page-header {
   height: 56px;
   min-height: 56px;
 }
 
 app-header .toolbar-page-header,
-.toolbar-page-header > .mat-toolbar-layout > .mat-toolbar-row,
-.admin-page > md-toolbar.toolbar-page-header,
-.admin-page
-  > md-toolbar.toolbar-page-header
-  > .mat-toolbar-layout
-  > .mat-toolbar-row {
+.toolbar-page-header,
+.admin-page > mat-toolbar.toolbar-page-header,
+.admin-page > mat-toolbar.toolbar-page-header {
   height: 140px;
   min-height: 140px;
-  h1 {
+  h1.title {
     font-size: 30px;
     font-weight: 300;
     margin: 0;
@@ -269,21 +236,15 @@ app-header .toolbar-page-header,
 
 @media screen and (max-width: 840px) {
   app-header .toolbar-page-header,
-  .toolbar-page-header > .mat-toolbar-layout > .mat-toolbar-row,
-  .admin-page > md-toolbar.toolbar-page-header,
-  .admin-page
-    > md-toolbar.toolbar-page-header
-    > .mat-toolbar-layout
-    > .mat-toolbar-row {
+  .toolbar-page-header,
+  .admin-page > mat-toolbar.toolbar-page-header,
+  .admin-page > mat-toolbar.toolbar-page-header {
     height: 80px;
     min-height: 80px;
-    h1 {
+    h1.title {
       padding: 24px 8px;
       font-size: 20px;
     }
-  }
-  .md-icon {
-    padding-right: 30px;
   }
 }
 
@@ -304,13 +265,8 @@ app-header .toolbar-page-header,
 app-buses-in-progress
   > .nav-list-imports-in-progress
   > .item-list
-  > .mat-list-item
-  > .mat-list-item-content,
-app-material-tree
-  > .nav-list-petals-tree
-  > .item-list
-  > .mat-list-item
-  > .mat-list-item-content {
+  > .mat-list-item,
+app-material-tree > .nav-list-petals-tree > .item-list > .mat-list-item {
   height: 24px;
   border-bottom-width: 1px;
   border-bottom-style: solid;
@@ -430,11 +386,11 @@ app-buses-in-progress > .nav-list-imports-in-progress > .item-list {
 
 // use in all administration component
 .user-management-page > .user-management-panels {
-  .pnl-add-user > md-expansion-panel > md-expansion-panel-header.mat-expanded,
+  .pnl-add-user > mat-expansion-panel > mat-expansion-panel-header.mat-expanded,
   .pnl-list-users
     > .mat-accordion
-    > md-expansion-panel
-    > md-expansion-panel-header.mat-expanded {
+    > mat-expansion-panel
+    > mat-expansion-panel-header.mat-expanded {
     background-color: mat-color($theme-accent-x5);
   }
 }
