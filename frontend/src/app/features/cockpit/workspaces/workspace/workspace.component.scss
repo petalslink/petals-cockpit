@@ -25,12 +25,12 @@
   flex-direction: column;
 }
 
-md-sidenav-container {
+mat-sidenav-container {
   background-image: url(../../../../../assets/img/gray_jean.png);
   color: mat-color($theme-primary, default-contrast);
 
   // all menu views have the same size (petals, service, api)
-  > md-sidenav {
+  > mat-sidenav {
     height: 100%;
     // customize the buttons of petals menu view
     .pnl-buttons-workspaces > .no-border-radius {

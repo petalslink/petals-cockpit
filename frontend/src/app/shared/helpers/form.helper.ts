@@ -21,6 +21,7 @@ import {
   FormGroupDirective,
   NgForm,
 } from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material/core';
 
 interface IValidationMessages {
   ip?: {
@@ -121,10 +122,12 @@ export function _enableOrDisableAllFormFields(
   }
 }
 
-export function formErrorStateMatcher(
-  control: FormControl,
-  formToCheck: FormGroupDirective | NgForm
-): boolean {
-  const isSubmitted = formToCheck && formToCheck.submitted;
-  return !!(control.invalid && (control.dirty || isSubmitted));
+export class FormErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(
+    control: FormControl,
+    formToCheck: FormGroupDirective | NgForm
+  ): boolean {
+    const isSubmitted = formToCheck && formToCheck.submitted;
+    return !!(control.invalid && (control.dirty || isSubmitted));
+  }
 }

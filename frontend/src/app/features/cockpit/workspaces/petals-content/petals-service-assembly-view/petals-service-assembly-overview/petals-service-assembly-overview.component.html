@@ -17,56 +17,56 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="central-content">
     <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
 
-      <md-card fxFlex class="sa-infos" [ngClass.gt-md]="'card-auto-size'">
-        <md-card-title fxLayout="row">
+      <mat-card fxFlex class="sa-infos" [ngClass.gt-md]="'card-auto-size'">
+        <mat-card-title fxLayout="row">
           <span fxFlex class="text-upper">About <b>{{ serviceAssembly.name }}</b></span>
-          <md-icon color="primary">info_outline</md-icon>
-        </md-card-title>
+          <mat-icon color="primary">info_outline</mat-icon>
+        </mat-card-title>
 
         <div fxLayout="row" fxLayoutAlign="start center">
-          <md-card-header fxFlex *ngIf="serviceAssembly.state">
-            <md-card-title>State</md-card-title>
-            <md-card-subtitle class="sa-state" fxLayoutAlign="start center">
+          <mat-card-header fxFlex *ngIf="serviceAssembly.state">
+            <mat-card-title>State</mat-card-title>
+            <mat-card-subtitle class="sa-state" fxLayoutAlign="start center">
               {{ serviceAssembly.state }}
               <app-led [color]="getLedColorFromState(serviceAssembly.state)" class="margin-left-x1"></app-led>
-            </md-card-subtitle>
-          </md-card-header>
+            </mat-card-subtitle>
+          </mat-card-header>
         </div>
-      </md-card>
+      </mat-card>
 
-      <md-card fxFlex class="service-units">
-        <md-card-title fxLayout="row">
+      <mat-card fxFlex class="service-units">
+        <mat-card-title fxLayout="row">
           <span fxFlex class="text-upper">Service Units</span>
-          <md-icon svgIcon="su"></md-icon>
-        </md-card-title>
+          <mat-icon svgIcon="su"></mat-icon>
+        </mat-card-title>
 
-        <md-divider></md-divider>
+        <mat-divider></mat-divider>
 
-        <md-card-content class="margin-top-x1 shared-libraries-content">
-          <md-nav-list dense fxLayout="column" class="padding-top-x1">
+        <mat-card-content class="margin-top-x1 shared-libraries-content">
+          <mat-nav-list dense fxLayout="column" class="padding-top-x1">
             <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let su of serviceAssembly.serviceUnits; trackBy:trackBySu">
-              <a md-raised-button [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su.id]"
+              <a mat-raised-button [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su.id]"
                 class="service-unit">
                 <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
                   <span class="su-name margin-right-x1">{{ su.name }}</span>
-                  <md-icon md-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
+                  <mat-icon mat-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></mat-icon>
                 </div>
               </a>
 
-              <span fxFlex md-subheader fxLayoutAlign="center center">deployed on component</span>
+              <span fxFlex matSubheader fxLayoutAlign="center center">deployed on component</span>
 
-              <a md-raised-button
+              <a mat-raised-button
                 [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', su.component.id]"
                 class="su-component">
                 <div fxFlex fxLayout="row" fxLayoutAlign="end center" class="color-primary">
                   <span class="component-name margin-right-x1">{{ su.component.name }}</span>
-                  <md-icon md-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
+                  <mat-icon mat-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></mat-icon>
                 </div>
               </a>
             </div>
-          </md-nav-list>
-        </md-card-content>
-      </md-card>
+          </mat-nav-list>
+        </mat-card-content>
+      </mat-card>
 
     </div>
   </div>

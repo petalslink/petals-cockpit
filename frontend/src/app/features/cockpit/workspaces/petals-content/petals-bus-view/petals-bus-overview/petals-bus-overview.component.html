@@ -16,24 +16,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div fxLayout="column" class="content content-max-width">
   <div class="central-content">
 
-    <md-card class="bus-description">
-      <md-card-title fxLayout="row">
+    <mat-card class="bus-description">
+      <mat-card-title fxLayout="row">
         <span fxFlex class="text-upper">Description</span>
-        <md-icon color="primary">description</md-icon>
-      </md-card-title>
-    </md-card>
+        <mat-icon color="primary">description</mat-icon>
+      </mat-card-title>
+    </mat-card>
 
-    <md-card class="petals-servers margin-top-x1">
-      <md-card-title fxLayout="row">
+    <mat-card class="petals-servers margin-top-x1">
+      <mat-card-title fxLayout="row">
         <span fxFlex class="text-upper">Petals Servers</span>
-        <md-icon color="primary">swap_horiz</md-icon>
-      </md-card-title>
+        <mat-icon color="primary">swap_horiz</mat-icon>
+      </mat-card-title>
 
       <app-message type="info" msg="Click on a container to access its page."></app-message>
 
-      <md-divider></md-divider>
+      <mat-divider></mat-divider>
 
-      <md-card-content>
+      <mat-card-content>
         <swiper class="swiper-container" [config]="config">
           <div class="swiper-wrapper">
             <div *ngFor="let container of bus.containers; trackBy:trackByContainer" class="swiper-slide">
@@ -47,7 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     <span class="port">Port: {{ container.port }}</span>
                   </p>
                   <p fxLayout="column" fxFill fxLayoutAlign="center center" *ngIf="container.isFetchingDetails">
-                    <md-spinner></md-spinner>
+                    <mat-spinner [diameter]="16" [strokeWidth]="1"></mat-spinner>
                   </p>
                 </div>
                 <div class="swiper-img-container cursor-pointer" [routerLink]="['/workspaces', workspaceId, 'petals','containers', container.id]">
@@ -59,8 +59,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <div class="swiper-button-next"></div>
           <div class="swiper-button-prev"></div>
         </swiper>
-      </md-card-content>
+      </mat-card-content>
 
-    </md-card>
+    </mat-card>
   </div>
 </div>

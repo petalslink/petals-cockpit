@@ -159,7 +159,7 @@ describe(`Import Bus`, () => {
     expect(
       workspace.busesInProgress
         .get(2)
-        .element(by.cssContainingText(`md-icon`, `warning`))
+        .element(by.cssContainingText(`mat-icon`, `warning`))
         .isDisplayed()
     ).toEqual(true);
 
@@ -172,7 +172,7 @@ describe(`Import Bus`, () => {
 
     expect(
       $$(
-        `app-petals-menu-view app-material-tree md-nav-list a.workspace-element-type-bus`
+        `app-petals-menu-view app-material-tree mat-nav-list a.workspace-element-type-bus`
       ).count()
     ).toEqual(1);
 

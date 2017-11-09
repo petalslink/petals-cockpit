@@ -17,7 +17,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ObservableMedia } from '@angular/flex-layout';
-import { MdIconRegistry } from '@angular/material';
+import { MatIconRegistry } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs/Subject';
@@ -47,7 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private store$: Store<IStore>,
     private media$: ObservableMedia,
-    private mdIconRegistry: MdIconRegistry,
+    private matIconRegistry: MatIconRegistry,
     private sanitizer: DomSanitizer
   ) {}
 
@@ -88,14 +88,14 @@ export class AppComponent implements OnInit, OnDestroy {
       './assets/icons/svg/goto-logo.svg'
     );
 
-    this.mdIconRegistry.addSvgIcon('bus', busLogo);
-    this.mdIconRegistry.addSvgIcon('component', compLogo);
-    this.mdIconRegistry.addSvgIcon('sa', saLogo);
-    this.mdIconRegistry.addSvgIcon('sl', slLogo);
-    this.mdIconRegistry.addSvgIcon('sl-overview', slOverviewLogo);
-    this.mdIconRegistry.addSvgIcon('sa-overview', saOverviewLogo);
-    this.mdIconRegistry.addSvgIcon('su', suLogo);
-    this.mdIconRegistry.addSvgIcon('goto', gotoLogo);
+    this.matIconRegistry.addSvgIcon('bus', busLogo);
+    this.matIconRegistry.addSvgIcon('component', compLogo);
+    this.matIconRegistry.addSvgIcon('sa', saLogo);
+    this.matIconRegistry.addSvgIcon('sl', slLogo);
+    this.matIconRegistry.addSvgIcon('sl-overview', slOverviewLogo);
+    this.matIconRegistry.addSvgIcon('sa-overview', saOverviewLogo);
+    this.matIconRegistry.addSvgIcon('su', suLogo);
+    this.matIconRegistry.addSvgIcon('goto', gotoLogo);
   }
 
   ngOnDestroy() {

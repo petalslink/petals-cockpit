@@ -22,12 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     type="button"
     class="btn-delete-bus"
     (click)="openDeletionDialog()"
-    md-mini-fab
-    mdTooltip="Delete the bus"
-    mdTooltipPosition="before"
+    mat-mini-fab
+    matTooltip="Delete the bus"
+    matTooltipPosition="before"
     [disabled]="we.resource.isRemoving"
   >
-    <md-icon>delete</md-icon>
+    <mat-icon>delete</mat-icon>
   </button>
 
   <app-petals-bus-overview

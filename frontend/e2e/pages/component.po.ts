@@ -29,7 +29,7 @@ export abstract class ComponentPage {
   public static readonly component = $(`app-petals-component-view`);
 
   public readonly component = ComponentPage.component;
-  public readonly title = this.component.$(`md-toolbar .title`);
+  public readonly title = this.component.$(`mat-toolbar .title`);
   public readonly hasBeenDeletedMessage = this.component.$(
     'app-workspace-element .message'
   );
@@ -41,7 +41,7 @@ export abstract class ComponentPage {
     );
     browser.wait(EC.visibilityOf(ComponentPage.component), waitTimeout);
     browser.wait(
-      EC.stalenessOf(ComponentPage.component.$('md-toolbar md-spinner')),
+      EC.stalenessOf(ComponentPage.component.$('mat-toolbar mat-spinner')),
       waitTimeout
     );
   }
@@ -49,7 +49,7 @@ export abstract class ComponentPage {
   openOperations() {
     waitAndClick(
       this.component.element(
-        by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')
+        by.cssContainingText(`mat-tab-header .mat-tab-label`, 'Operations')
       )
     );
     return ComponentOperationPage.waitAndGet();
@@ -129,11 +129,11 @@ export class ComponentOperationPage extends ComponentPage {
   public readonly operations = ComponentOperationPage.operations;
 
   public readonly lifecycleCard = this.operations.$(
-    `md-card.component-lifecycle`
+    `mat-card.component-lifecycle`
   );
 
   public readonly state = this.lifecycleCard.$(
-    `md-card-subtitle span.component-state`
+    `mat-card-subtitle span.component-state`
   );
   public readonly stopButton = this.lifecycleCard.element(
     by.cssContainingText(`button`, `Stop`)

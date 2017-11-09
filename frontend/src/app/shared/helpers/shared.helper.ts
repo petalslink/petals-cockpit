@@ -48,17 +48,6 @@ export function escapeStringRegexp(str: string) {
   return str.replace(matchOperatorsRe, '\\$&');
 }
 
-/**
- * useful to force type inference to take an array as a tuple!
- */
-export function tuple<T extends [void] | {}>(t: T): T {
-  return t;
-}
-
-export function tupleEquals<T extends [void]>(ps: T, ns: T): boolean {
-  return arrayEquals(ps, ns);
-}
-
 export function arrayEquals<T>(ps: T[], ns: T[]): boolean {
   return ps.length === ns.length && ps.every((p, i) => p === ns[i]);
 }

@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { ObserversModule } from '@angular/cdk/observers';
+import { PlatformModule } from '@angular/cdk/platform';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
@@ -22,26 +24,26 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import {
-  MdAutocompleteModule,
-  MdButtonModule,
-  MdCardModule,
-  MdDialogModule,
-  MdExpansionModule,
-  MdIconModule,
-  MdInputModule,
-  MdListModule,
-  MdProgressBarModule,
-  MdProgressSpinnerModule,
-  MdRippleModule,
-  MdSidenavModule,
-  MdTabsModule,
-  MdToolbarModule,
-  MdTooltipModule,
+  MatAutocompleteModule,
+  MatButtonModule,
+  MatCardModule,
+  MatDialogModule,
+  MatExpansionModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule,
+  MatProgressBarModule,
+  MatProgressSpinnerModule,
+  MatRippleModule,
+  MatSidenavModule,
+  MatTabsModule,
+  MatToolbarModule,
+  MatTooltipModule,
 } from '@angular/material';
+
 import { RouterModule } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { SimpleNotificationsModule } from 'angular2-notifications';
-import { PrettyJsonModule } from 'angular2-prettyjson';
 import { NgxHoverOpacityModule } from 'ngx-hover-opacity';
 import {
   NgArrayPipesModule,
@@ -60,21 +62,24 @@ import { NotFound404Component } from './components/not-found-404/not-found-404.c
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
 
 export const MaterialModules = [
-  MdButtonModule,
-  MdCardModule,
-  MdIconModule,
-  MdInputModule,
-  MdDialogModule,
-  MdExpansionModule,
-  MdListModule,
-  MdProgressBarModule,
-  MdProgressSpinnerModule,
-  MdRippleModule,
-  MdSidenavModule,
-  MdTabsModule,
-  MdToolbarModule,
-  MdTooltipModule,
-  MdAutocompleteModule,
+  MatButtonModule,
+  MatCardModule,
+  MatIconModule,
+  MatInputModule,
+  MatDialogModule,
+  MatExpansionModule,
+  MatListModule,
+  MatProgressBarModule,
+  MatProgressSpinnerModule,
+  MatRippleModule,
+  MatSidenavModule,
+  MatTabsModule,
+  MatToolbarModule,
+  MatTooltipModule,
+  MatAutocompleteModule,
+  MatRippleModule,
+  ObserversModule,
+  PlatformModule,
 ];
 
 // used by the components in declarations below
@@ -103,12 +108,11 @@ export const declarations = [
 
 export const exportss = [
   ReactiveFormsModule,
-  // MdIconModule is relying on it so we do need to keep HttpModule for now because
+  // MatIconModule is relying on it so we do need to keep HttpModule for now because
   HttpClientModule,
   HttpModule,
   RouterModule,
   StoreModule,
-  PrettyJsonModule,
   SimpleNotificationsModule,
   ...imports,
   ...MaterialModules,

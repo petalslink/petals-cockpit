@@ -17,21 +17,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <div class="wrapper-search-add-bus" fxLayout="row">
     <form [formGroup]="searchForm">
-      <md-form-field fxFlex>
-        <input class="search" mdInput placeholder="Search" formControlName="search">
-        <span mdPrefix><md-icon color="primary">search</md-icon></span>
-      </md-form-field>
+      <mat-form-field fxFlex>
+        <input class="search" matInput placeholder="Search" formControlName="search">
+        <span matPrefix><mat-icon color="primary">search</mat-icon></span>
+      </mat-form-field>
     </form>
 
-    <a md-mini-fab class="btn-add-bus" color="primary" fxFlex="40px" mdTooltip="Import a bus" mdTooltipPosition="below"
+    <a mat-mini-fab class="btn-add-bus" color="primary" fxFlex="40px" matTooltip="Import a bus" matTooltipPosition="below"
       [routerLink]="['/workspaces', workspaceId, 'petals', 'buses-in-progress']" (click)="closeSidenavOnSmallScreen()">
-      <md-icon class="md-24">add</md-icon>
+      <mat-icon>add</mat-icon>
     </a>
   </div>
 
   <div class="pnl-title" *ngIf="busesInProgress.length > 0">
     <div class="margin-left-x1" fxLayout="row" fxLayoutAlign="start center">
-      <md-icon class="margin-right-x1" color="primary">import_export</md-icon>
+      <mat-icon class="margin-right-x1" color="primary">import_export</mat-icon>
       <span class="text-upper title" fxFlex>Imports in progress</span>
     </div>
   </div>
@@ -39,15 +39,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <div class="pnl-title" *ngIf="busesInProgress.length > 0">
     <div class="margin-left-x1" fxLayout="row" fxLayoutAlign="start center">
-      <md-icon class="margin-right-x1" color="primary">star</md-icon>
+      <mat-icon class="margin-right-x1" color="primary">star</mat-icon>
       <span class="text-upper title" fxFlex>Buses</span>
     </div>
   </div>
   <app-material-tree [tree]="tree" [search]="search" [marginLeft]="14" (onToggleFold)="onTreeToggleFold($event)"
     (onSelect)="onTreeSelect($event)"></app-material-tree>
 
-  <div *ngIf="tree.length === 0 && search" class="info no-match">
-    There is <b><i>no match</i></b> with <b><i>"{{ search }}</i></b>".
-  </div>
+  <app-message *ngIf="tree.length === 0 && search" class="info no-match" type="info"
+    msg="There is no match with &quot;{{ search }}&quot;."></app-message>
 
 </div>

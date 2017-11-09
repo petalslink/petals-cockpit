@@ -17,7 +17,7 @@
 
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MD_DIALOG_DATA, MdDialog, MdDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material';
 import { Actions } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -62,7 +62,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private store$: Store<IStore>,
-    private dialog: MdDialog,
+    private dialog: MatDialog,
     private actions$: Actions
   ) {}
 
@@ -217,34 +217,34 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   template: `
     <div fxLayout="column" class="content content-max-width">
       <div class="central-content">
-        <div fxLayout="row" md-dialog-title fxLayoutAlign="start start">
+        <div fxLayout="row" matDialogTitle fxLayoutAlign="start start">
           <span fxLayoutAlign="start center">
-            <md-icon color="accent">warning</md-icon>
+            <mat-icon color="accent">warning</mat-icon>
             <span class="margin-left-x1">Delete workspace?</span>
           </span>
         </div>
-        <md-dialog-content>
+        <mat-dialog-content>
           <p fxLayout="column">
             <span>Everything in the workspace will be deleted! <b>Please, be certain</b>.</span>
             <span class="margin-top-x1">Are you sure you want to delete <b>{{ data.name }}</b>?</span>
           </p>
-        </md-dialog-content>
+        </mat-dialog-content>
 
-        <md-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
-          <button md-button md-dialog-close class="btn-cancel-delete-wks margin-right-x1">Cancel</button>
-          <button md-raised-button color="warn" class="btn-confirm-delete-wks" (click)="dialogRef.close(true)">Delete</button>
-        </md-dialog-actions>
+        <mat-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
+          <button mat-button matDialogClose class="btn-cancel-delete-wks margin-right-x1">Cancel</button>
+          <button mat-raised-button color="warn" class="btn-confirm-delete-wks" (click)="dialogRef.close(true)">Delete</button>
+        </mat-dialog-actions>
       </div>
     </div>
   `,
   styles: [
-    'md-dialog-content { height: 100%; } .central-content { padding: 24px; }',
+    'mat-dialog-content { height: 100%; } .central-content { padding: 24px; }',
   ],
 })
 export class WorkspaceDeleteDialogComponent {
   constructor(
-    public dialogRef: MdDialogRef<WorkspaceDeleteDialogComponent>,
+    public dialogRef: MatDialogRef<WorkspaceDeleteDialogComponent>,
     // TODO add some type for data when https://github.com/angular/angular/issues/15424 is fixed
-    @Inject(MD_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
 }

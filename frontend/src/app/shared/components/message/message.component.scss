@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-md-dialog-content {
+mat-dialog-content {
   height: 100%;
 }
 
@@ -40,6 +40,7 @@ md-dialog-content {
 
   &.info {
     @include msg-content (rgb(217, 237, 248), #0288d1);
+    white-space: normal;
     .info-color {
       color: #0288d1;
     }
@@ -64,10 +65,16 @@ md-dialog-content {
   }
 
   &.infoDialog {
+    white-space: normal;
     @include msg-dialog-type (#0288d1);
   }
 
   &.warningDialog {
     @include msg-dialog-type (#EF6C00);
   }
+}
+
+.msg-details {
+  width: 200px;
+  white-space: normal;
 }

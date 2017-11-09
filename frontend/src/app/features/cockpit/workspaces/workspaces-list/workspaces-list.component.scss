@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-md-form-field [mdprefix] {
+mat-form-field [matprefix] {
   margin-right: 10px;
 }
 
-.info-add-workspace md-icon {
+.info-add-workspace mat-icon {
   padding-right: 5px;
 }
 
@@ -27,13 +27,7 @@ md-form-field [mdprefix] {
   border-bottom: 1px dotted black;
 }
 
-md-spinner {
-  display: inline-block;
-  width: 20px;
-  height: 100%;
-}
-
-md-card-title {
+mat-card-title {
   font-size: 16px;
 }
 

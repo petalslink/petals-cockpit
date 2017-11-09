@@ -143,9 +143,11 @@ describe(`Workspaces Tree`, () => {
     // test 3 : When no match, should display a message and search bar should still be enabled
     workspace.search(`Some random search`);
 
-    expect($(`app-cockpit md-sidenav .info.no-match`).getText()).toEqual(
-      `There is no match with "Some random search".`
-    );
+    expect(
+      $(
+        `app-cockpit mat-sidenav app-message.info.no-match .msg-details`
+      ).getText()
+    ).toEqual(`There is no match with "Some random search".`);
 
     // there shouldn't be any match
     expect(workspace.getWorkspaceTree()).toEqual([]);

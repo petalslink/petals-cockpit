@@ -22,7 +22,7 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { MdDialog, MdDialogRef } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material';
 
 @Component({
   selector: 'app-message',
@@ -36,10 +36,10 @@ export class MessageComponent implements OnInit {
 
   isHidden = false;
 
-  dialogRef: MdDialogRef<any>;
+  dialogRef: MatDialogRef<any>;
   @ViewChild('dialog') template: TemplateRef<any>;
 
-  constructor(public dialog: MdDialog) {}
+  constructor(public dialog: MatDialog) {}
 
   ngOnInit() {}
 

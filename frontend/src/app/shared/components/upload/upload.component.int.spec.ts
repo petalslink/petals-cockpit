@@ -59,7 +59,7 @@ describe(`[Integration test] UploadComponent`, () => {
     },
     progressBar: {
       get percentage() {
-        const progressElem = getElementBySelector(fixture, 'md-progress-bar');
+        const progressElem = getElementBySelector(fixture, 'mat-progress-bar');
         return +progressElem.getAttribute('aria-valuenow');
       },
     },

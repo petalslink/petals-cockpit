@@ -26,7 +26,7 @@ export abstract class ContainerPage {
   public static readonly component = $(`app-petals-container-view`);
 
   public readonly component = ContainerPage.component;
-  public readonly title = this.component.$(`md-toolbar .title`);
+  public readonly title = this.component.$(`mat-toolbar .title`);
   public readonly hasBeenDeletedMessage = this.component.$(
     'app-workspace-element .message'
   );
@@ -38,7 +38,7 @@ export abstract class ContainerPage {
     );
     browser.wait(EC.visibilityOf(ContainerPage.component), waitTimeout);
     browser.wait(
-      EC.stalenessOf(ContainerPage.component.$('md-toolbar md-spinner')),
+      EC.stalenessOf(ContainerPage.component.$('mat-toolbar mat-spinner')),
       waitTimeout
     );
   }
@@ -46,7 +46,7 @@ export abstract class ContainerPage {
   openOperations() {
     waitAndClick(
       this.component.element(
-        by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')
+        by.cssContainingText(`mat-tab-header .mat-tab-label`, 'Operations')
       )
     );
     return ContainerOperationPage.waitAndGet();
@@ -61,14 +61,14 @@ export class ContainerOverviewPage extends ContainerPage {
   public readonly overview = ContainerOverviewPage.overview;
 
   public readonly ip = this.overview.$(
-    `.container-infos md-card-subtitle.container-ip`
+    `.container-infos mat-card-subtitle.container-ip`
   );
   public readonly port = this.overview.$(
-    `.container-infos md-card-subtitle.container-port`
+    `.container-infos mat-card-subtitle.container-port`
   );
 
   public readonly systemInfo = this.overview.$(
-    `md-card md-card-content.system-info`
+    `mat-card mat-card-content.system-info`
   );
 
   static waitAndGet() {

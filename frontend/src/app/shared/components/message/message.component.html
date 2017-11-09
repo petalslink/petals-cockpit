@@ -13,42 +13,42 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-card-content *ngIf="msg && !isHidden" fxLayout="column" class="msg-content" [ngClass]="type">
+<mat-card-content *ngIf="msg && !isHidden" fxLayout="column" class="msg-content" [ngClass]="type">
   <div fxLayout="row" fxLayoutAlign="start center">
-    <md-icon [ngClass]="type">{{ type }}</md-icon>
+    <mat-icon [ngClass]="type">{{ type }}</mat-icon>
     <span fxFlex class="msg-details italic margin-left-x1">{{ msg | shorten: maxLength: '...' }}</span>
-    <button class="btn-view-more-message text-upper" md-button *ngIf="msg.length > maxLength" fxLayoutAlign="end center" type="button" (click)="openDialog()">
+    <button class="btn-view-more-message text-upper" mat-button *ngIf="msg.length > maxLength" fxLayoutAlign="end center" type="button" (click)="openDialog()">
       <span class="view-more-name">View more</span>
     </button>
-    <button class="btn-cancel-message" *ngIf="msg.length < maxLength && type !== 'error'" type="button" (click)="hideMessage()" md-icon-button>
-      <md-icon [ngClass]="type">cancel</md-icon>
+    <button class="btn-cancel-message" *ngIf="msg.length < maxLength && type !== 'error'" type="button" (click)="hideMessage()" mat-icon-button>
+      <mat-icon [ngClass]="type">cancel</mat-icon>
     </button>
   </div>
-</md-card-content>
+</mat-card-content>
 
 <ng-template #dialog>
   <div fxLayout="column" class="content content-max-width msg-dialog">
     <div class="central-content">
-      <div class="msg-dialog-type" fxLayout="row" md-dialog-title fxLayoutAlign="start start" [ngClass]="type + 'Dialog'">
+      <div class="msg-dialog-type" fxLayout="row" matDialogTitle fxLayoutAlign="start start" [ngClass]="type + 'Dialog'">
         <span fxLayoutAlign="start center">
-          <md-icon [ngClass]="type + 'Dialog'">{{ type }}</md-icon>
+          <mat-icon [ngClass]="type + 'Dialog'">{{ type }}</mat-icon>
           <span class="margin-left-x1 msg-dialog-title">Complete {{ type }}:</span>
         </span>
       </div>
 
-      <md-dialog-content>
+      <mat-dialog-content>
         <p fxLayout="column" *ngIf="msg">
           <span class="msg-dialog-details">{{ msg }}</span>
         </p>
-      </md-dialog-content>
+      </mat-dialog-content>
 
-      <md-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
-        <!-- we can't simply use md-dialog-close because of https://github.com/angular/material2/issues/5412 -->
-        <button class="btn-close-dialog" type="button" md-button (click)="dialogRef.close()">
-        <md-icon class="margin-right-x1" color="warn">close</md-icon>
+      <mat-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
+        <!-- we can't simply use matDialogClose because of https://github.com/angular/material2/issues/5412 -->
+        <button class="btn-close-dialog" type="button" mat-button (click)="dialogRef.close()">
+        <mat-icon class="margin-right-x1" color="warn">close</mat-icon>
         <span class="text-upper">Close</span>
       </button>
-      </md-dialog-actions>
+      </mat-dialog-actions>
     </div>
   </div>
 </ng-template>

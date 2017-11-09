@@ -14,29 +14,29 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div *ngIf="resourceDeletable?.value" fxLayout="column" class="wrapper-content">
-  <md-toolbar color="primary" class="toolbar-page-header">
-    <div class="prefix-toolbar-title">
-      <md-icon color="accent" *ngIf="!resourceDeletable.value.isFetchingDetails; else loadingTpl">grade</md-icon>
+  <mat-toolbar color="primary" class="toolbar-page-header">
+    <div class="prefix-toolbar-title" fxLayout="row">
+      <mat-icon color="accent" *ngIf="!resourceDeletable.value.isFetchingDetails && !resourceDeletable.value.isUpdating; else loadingTpl">grade</mat-icon>
 
       <ng-template #loadingTpl>
-        <md-spinner color="accent"></md-spinner>
+        <mat-spinner [diameter]="16" [strokeWidth]="1" color="accent"></mat-spinner>
       </ng-template>
     </div>
 
     <h1 class="title" [ngClass.lt-md]="'margin-left-x1'" fxFlex>{{ resourceDeletable.value.name }}</h1>
 
     <ng-content select="[appWorkspaceElementHeaderExtra]"></ng-content>
-  </md-toolbar>
+  </mat-toolbar>
 
   <div class="message" *ngIf="resourceDeletable.isDeleted">
     {{ deletedMessage }}
   </div>
 
-  <md-tab-group [(selectedIndex)]="activeTabIndex" fxFlex>
-    <md-tab *ngFor="let tab of tabs" [label]="tab.label">
+  <mat-tab-group [(selectedIndex)]="activeTabIndex" fxFlex>
+    <mat-tab *ngFor="let tab of tabs" [label]="tab.label">
       <ngx-hover-opacity [isHoverVisible]="resourceDeletable.isDeleted">
         <ng-container [ngTemplateOutlet]="tab.templateRef"></ng-container>
       </ngx-hover-opacity>
-    </md-tab>
-  </md-tab-group>
+    </mat-tab>
+  </mat-tab-group>
 </div>

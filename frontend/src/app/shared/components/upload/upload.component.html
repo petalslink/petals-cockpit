@@ -13,8 +13,8 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<app-md-card-toolbar [title]="title" titleIcon="file_upload">
-  <md-card-content>
+<app-mat-card-toolbar [title]="title" titleIcon="file_upload">
+  <mat-card-content>
     <div *ngIf="!selectedFileInformation">
       <input
         type="file"
@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
       <button
         class="choose-file"
-        md-button
+        mat-button
         [disabled]="disabled"
         (click)="selectFile.click()"
       >
@@ -55,9 +55,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           *ngIf="updateFileInformation"
           fxFlex
         >
-          <app-md-card-toolbar [title]="'Edit information'" titleIcon="mode_edit">
+          <app-mat-card-toolbar [title]="'Edit information'" titleIcon="mode_edit">
             <ng-container [ngTemplateOutlet]="updateFileInformation.templateRef"></ng-container>
-          </app-md-card-toolbar>
+          </app-mat-card-toolbar>
         </div>
 
         <div
@@ -68,23 +68,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           fxLayoutGap="15px"
           [ngStyle.lt-md]="{'margin-top.px': 15}"
         >
-          <button md-mini-fab class="btn-remove-file" (click)="removeFile()">
-            <md-icon>delete</md-icon>
+          <button mat-mini-fab class="btn-remove-file" (click)="removeFile()">
+            <mat-icon>delete</mat-icon>
           </button>
 
-          <button md-raised-button class="btn-upload" (click)="uploadFile()">Upload</button>
+          <button mat-raised-button class="btn-upload" (click)="uploadFile()">Upload</button>
         </div>
       </div>
 
       <div fxLayout="column" fxLayoutAlign="center center" *ngIf="isUploading">
         <p>Uploading the file...</p>
 
-        <md-progress-bar
+        <mat-progress-bar
           color="primary"
           mode="determinate"
           [value]="percentage"
           >
-        </md-progress-bar>
+        </mat-progress-bar>
       </div>
     </div>
 
@@ -93,5 +93,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       type="error"
       [msg]="error"
     ></app-message>
-  </md-card-content>
-</app-md-card-toolbar>
+  </mat-card-content>
+</app-mat-card-toolbar>

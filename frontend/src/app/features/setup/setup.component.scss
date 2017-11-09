@@ -23,21 +23,18 @@
   align-items: center;
   justify-content: center;
 
-  md-card {
+  mat-card {
     margin-left: 16px;
     margin-right: 16px;
     max-width: 400px;
     width: 75%;
 
-    md-icon {
+    mat-icon {
       padding-right: 10px;
     }
   }
 
-  md-spinner {
-    width: 12px;
-    height: 30px;
-    display: inline-block;
+  mat-spinner {
     margin-left: 10px;
   }
 }

@@ -25,7 +25,7 @@ export abstract class ServiceUnitPage {
   public static readonly component = $(`app-petals-service-unit-view`);
 
   public readonly component = ServiceUnitPage.component;
-  public readonly title = this.component.$(`md-toolbar .title`);
+  public readonly title = this.component.$(`mat-toolbar .title`);
   public readonly hasBeenDeletedMessage = this.component.$(
     'app-workspace-element .message'
   );
@@ -37,7 +37,7 @@ export abstract class ServiceUnitPage {
     );
     browser.wait(EC.visibilityOf(ServiceUnitPage.component), waitTimeout);
     browser.wait(
-      EC.stalenessOf(ServiceUnitPage.component.$('md-toolbar md-spinner')),
+      EC.stalenessOf(ServiceUnitPage.component.$('mat-toolbar mat-spinner')),
       waitTimeout
     );
   }

@@ -14,32 +14,32 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxFlex fxLayout="column">
-  <md-toolbar color="primary" class="header-toolbar" [class.mat-elevation-z6]="showShadow">
-    <button md-button class="toolbar-logo" [routerLink]="['/workspaces']">
+  <mat-toolbar role="header" color="primary" class="header-toolbar mat-elevation-z6">
+    <button mat-button class="toolbar-logo" [routerLink]="['/workspaces']">
       <img class="logo-toolbar" [src]="logo()">
     </button>
 
-    <button *ngIf="isOnWorkspace" md-button (click)="toggleSidenav()" class="sidenav-toggle">
-      <md-icon>menu</md-icon>
+    <button *ngIf="isOnWorkspace" mat-button (click)="toggleSidenav()" class="sidenav-toggle">
+      <mat-icon>menu</mat-icon>
     </button>
 
     <span fxLayout="row" fxFlex class="text-upper" [ngClass.gt-sm]="'margin-right-x1'">
       <span [hidden]="!isLargeScreen" *ngIf="ui.titleMainPart1">{{ ui.titleMainPart1 }}</span>
       <span *ngIf="ui.titleMainPart2" fxLayoutAlign="center center">
-        <md-icon *ngIf="isLargeScreen">chevron_right</md-icon>
+        <mat-icon *ngIf="isLargeScreen">chevron_right</mat-icon>
         <span class="color-accent-light-bold text-upper" [ngClass.lt-sm]="'pnl-title-main'">{{ ui.titleMainPart2 }}</span>
     </span>
     </span>
 
-    <button md-button class="btn-usr-admin" *ngIf="user.isAdmin" [routerLink]="['/admin']">
-      <md-icon>settings</md-icon>
+    <button mat-button class="btn-usr-admin" *ngIf="user.isAdmin" [routerLink]="['/admin']">
+      <mat-icon>settings</mat-icon>
     </button>
 
-    <button md-icon-button class="btn-logout-user margin-right-x1" [disabled]="isDisconnecting" (click)="disconnect()">
-      <md-icon>power_settings_new</md-icon>
+    <button mat-icon-button class="btn-logout-user margin-right-x1" [disabled]="isDisconnecting" (click)="disconnect()">
+      <mat-icon>power_settings_new</mat-icon>
     </button>
 
-    <app-generate-icon class="btn-avatar-user margin-right-x0" [mdTooltip]="user.name" mdTooltipPosition="below" [size]="24"
+    <app-generate-icon class="btn-avatar-user margin-right-x0" [matTooltip]="user.name" matTooltipPosition="below" [size]="24"
       [text]="user.id"></app-generate-icon>
-  </md-toolbar>
+  </mat-toolbar>
 </div>

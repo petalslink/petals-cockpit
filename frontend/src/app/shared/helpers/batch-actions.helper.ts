@@ -19,7 +19,7 @@ import { Inject, Injectable } from '@angular/core';
 import { Actions } from '@ngrx/effects';
 import { Action, ActionReducer, ScannedActionsSubject } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { MergeMapOperator } from 'rxjs/operator/mergeMap';
+import { MergeMapOperator } from 'rxjs/operators/mergeMap';
 
 export const BatchType = 'BATCHING_REDUCER.BATCH';
 export class Batch implements Action {

@@ -17,45 +17,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="central-content">
     <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
 
-      <md-card fxFlex class="container-infos">
-        <md-card-title fxLayout="row">
+      <mat-card fxFlex class="container-infos">
+        <mat-card-title fxLayout="row">
           <span fxFlex class="text-upper">About <b>{{ container.name }}</b></span>
-          <md-icon color="primary">info_outline</md-icon>
-        </md-card-title>
+          <mat-icon color="primary">info_outline</mat-icon>
+        </mat-card-title>
 
         <div fxLayout="row" fxLayoutAlign="start center" class="margin-top-x1">
-          <md-card-header fxFlex>
-            <div mdCardAvatar class="img-card-ip"></div>
-            <md-card-title>IP</md-card-title>
-            <md-card-subtitle class="container-ip">{{ container.ip }}</md-card-subtitle>
-          </md-card-header>
+          <mat-card-header fxFlex>
+            <div matCardAvatar class="img-card-ip"></div>
+            <mat-card-title>IP</mat-card-title>
+            <mat-card-subtitle class="container-ip">{{ container.ip }}</mat-card-subtitle>
+          </mat-card-header>
 
-          <md-card-header fxFlex>
-            <div mdCardAvatar class="img-card-port"></div>
-            <md-card-title>Port</md-card-title>
-            <md-card-subtitle class="container-port">{{ container.port }}</md-card-subtitle>
-          </md-card-header>
+          <mat-card-header fxFlex>
+            <div matCardAvatar class="img-card-port"></div>
+            <mat-card-title>Port</mat-card-title>
+            <mat-card-subtitle class="container-port">{{ container.port }}</mat-card-subtitle>
+          </mat-card-header>
         </div>
-      </md-card>
+      </mat-card>
 
-      <md-card fxFlex class="petals-servers">
-        <md-card-title fxLayout="row">
+      <mat-card fxFlex class="petals-servers">
+        <mat-card-title fxLayout="row">
           <span fxFlex class="text-upper">System Info</span>
-          <md-icon color="primary">description</md-icon>
-        </md-card-title>
-        <md-card-content class="system-info">{{ container.systemInfo }}</md-card-content>
-      </md-card>
+          <mat-icon color="primary">description</mat-icon>
+        </mat-card-title>
+        <mat-card-content class="system-info">{{ container.systemInfo }}</mat-card-content>
+      </mat-card>
 
     </div>
 
-    <md-card fxLayout="column" class="margin-top-x1">
-      <md-card-title fxLayout="row">
+    <mat-card fxLayout="column" class="margin-top-x1">
+      <mat-card-title fxLayout="row">
         <div fxFlex class="text-upper" fxLayout="row">
           <span class="margin-right-x1">Containers Reachabilities</span>
-          <md-spinner fxLayoutAlign="start center" *ngIf="container.isFetchingDetails"></md-spinner>
+          <mat-spinner [diameter]="16" [strokeWidth]="1" fxLayoutAlign="start center" *ngIf="container.isFetchingDetails"></mat-spinner>
         </div>
-        <md-icon fxLayoutAlign="end center" color="primary">dns</md-icon>
-      </md-card-title>
+        <mat-icon fxLayoutAlign="end center" color="primary">dns</mat-icon>
+      </mat-card-title>
 
       <app-message class="info-container-reachabilities" *ngIf="container.reachabilities.length > 0 else noContainerReachable" type="info" msg="Click on a container to see its parameters."></app-message>
 
@@ -63,53 +63,53 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <app-message type="info" msg="There is no other containers in this bus."></app-message>
       </ng-template>
 
-    </md-card>
+    </mat-card>
 
-    <md-card class="graph-containers">
+    <mat-card class="graph-containers">
       <div fxFill class="network-canvas"
         *ngIf="!container.isFetchingDetails"
         [visNetwork]="visNetwork"
         [visNetworkData]="visNetworkData"
         [visNetworkOptions]="visNetworkOptions"
         (initialized)="networkInitialized()"></div>
-    </md-card>
+    </mat-card>
 
-    <md-card fxLayout="column" class="container-infos-selected margin-bottom-x1" *ngIf="selectedContainer && container.id !== selectedContainer.id">
-      <md-card-title fxLayout="row">
+    <mat-card fxLayout="column" class="container-infos-selected margin-bottom-x1" *ngIf="selectedContainer && container.id !== selectedContainer.id">
+      <mat-card-title fxLayout="row">
         <div fxFlex fxLayout="row" fxLayoutAlign="start center">
           <span fxFlex class="text-upper"><b>{{ selectedContainer.name }}</b> Selected</span>
 
-          <md-nav-list dense fxLayout="row">
+          <mat-nav-list dense fxLayout="row">
             <div fxFlex fxLayout="row" fxLayoutAlign="end center">
-              <a md-raised-button class="container" [routerLink]="['/workspaces', workspaceId, 'petals', 'containers', selectedContainer.id]">
+              <a mat-raised-button class="container" [routerLink]="['/workspaces', workspaceId, 'petals', 'containers', selectedContainer.id]">
                 <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
                   <span class="text-upper view-container margin-right-x1">View this container</span>
-                  <md-icon md-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></md-icon>
+                  <mat-icon mat-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></mat-icon>
                 </div>
               </a>
             </div>
-          </md-nav-list>
+          </mat-nav-list>
         </div>
-      </md-card-title>
+      </mat-card-title>
 
       <div fxLayout="row">
         <div fxFlex fxLayout="row">
-          <md-card-header>
-            <div mdCardAvatar class="img-card-ip"></div>
-            <md-card-title>IP</md-card-title>
-            <md-card-subtitle class="selected-container-ip">{{ selectedContainer.ip }}</md-card-subtitle>
-          </md-card-header>
+          <mat-card-header>
+            <div matCardAvatar class="img-card-ip"></div>
+            <mat-card-title>IP</mat-card-title>
+            <mat-card-subtitle class="selected-container-ip">{{ selectedContainer.ip }}</mat-card-subtitle>
+          </mat-card-header>
         </div>
 
         <div fxFlex fxLayout="row">
-          <md-card-header fxFlex>
-            <div mdCardAvatar class="img-card-port"></div>
-            <md-card-title>Port</md-card-title>
-            <md-card-subtitle class="selected-container-port">{{ selectedContainer.port }}</md-card-subtitle>
-          </md-card-header>
+          <mat-card-header fxFlex>
+            <div matCardAvatar class="img-card-port"></div>
+            <mat-card-title>Port</mat-card-title>
+            <mat-card-subtitle class="selected-container-port">{{ selectedContainer.port }}</mat-card-subtitle>
+          </mat-card-header>
         </div>
       </div>
-    </md-card>
+    </mat-card>
 
   </div>
 </div>

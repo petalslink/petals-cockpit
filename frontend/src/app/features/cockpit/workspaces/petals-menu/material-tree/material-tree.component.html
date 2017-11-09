@@ -13,26 +13,24 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-nav-list dense *ngFor="let item of tree" [style.marginLeft.px]="margin" class="nav-list-petals-tree">
+<mat-nav-list dense *ngFor="let item of tree" [ngStyle]="{'marginLeft.px': margin}" class="nav-list-petals-tree">
   <div class="item-list">
-    <a md-list-item [class]="item.cssClass" [routerLink]="item.link ? [item.link] : []" [routerLinkActive]="item.link ? 'active-link' : ''" (click)="select(item)"
-     ng-style="deepLevel === 0 && {'background-color':'green'} || deepLevel === 1 && {'background-color':'yellow'}">
+    <a mat-list-item [ngClass]="item.cssClass" [routerLink]="item.link ? [item.link] : []" [routerLinkActive]="item.link ? 'active-link' : ''" (click)="select(item)">
       <div fxLayout="row" fxLayoutAlign="start center" class="item-content">
-        <md-icon
+        <mat-icon
           *ngIf="item.children.length > 0; else noIconChildren"
-          md-list-icon
+          mat-list-icon
           fxLayoutAlign="center center"
           class="arrow-size"
           (click)="toggleFold(item)"
-          [class.disable-fold-unfold]="search !== ''"
-          [class.rotate-minus-90]="item.isFolded">arrow_drop_down</md-icon>
+          [ngClass]="{'disable-fold-unfold': search !== '', 'rotate-minus-90': item.isFolded}">arrow_drop_down</mat-icon>
 
         <ng-template #noIconChildren>
           <span class="no-icon-children"></span>
         </ng-template>
 
-        <md-icon *ngIf="item.svgIcon" md-list-icon [svgIcon]="item.svgIcon"></md-icon>
-        <md-icon *ngIf="item.icon" md-list-icon color="primary">{{ item.icon }}</md-icon>
+        <mat-icon *ngIf="item.svgIcon" mat-list-icon [svgIcon]="item.svgIcon"></mat-icon>
+        <mat-icon *ngIf="item.icon" mat-list-icon color="primary">{{ item.icon }}</mat-icon>
 
         <span [title]="item.name" class="item-name" appColorSearchedLetters [search]="search" classToApply="highlight" [text]="item.name"></span>
       </div>
@@ -47,4 +45,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     [deepLevel]="deepLevel + 1"
     (onToggleFold)="toggleFold($event)"
     (onSelect)="select($event)"></app-material-tree>
-</md-nav-list>
+</mat-nav-list>

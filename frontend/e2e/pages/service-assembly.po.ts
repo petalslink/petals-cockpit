@@ -27,7 +27,7 @@ export abstract class ServiceAssemblyPage {
   public static readonly component = $(`app-petals-service-assembly-view`);
 
   public readonly component = ServiceAssemblyPage.component;
-  public readonly title = this.component.$(`md-toolbar .title`);
+  public readonly title = this.component.$(`mat-toolbar .title`);
   public readonly hasBeenDeletedMessage = this.component.$(
     'app-workspace-element .message'
   );
@@ -39,7 +39,9 @@ export abstract class ServiceAssemblyPage {
     );
     browser.wait(EC.visibilityOf(ServiceAssemblyPage.component), waitTimeout);
     browser.wait(
-      EC.stalenessOf(ServiceAssemblyPage.component.$('md-toolbar md-spinner')),
+      EC.stalenessOf(
+        ServiceAssemblyPage.component.$('mat-toolbar mat-spinner')
+      ),
       waitTimeout
     );
   }
@@ -72,7 +74,7 @@ export class ServiceAssemblyOverviewPage extends ServiceAssemblyPage {
   openOperations() {
     waitAndClick(
       this.component.element(
-        by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')
+        by.cssContainingText(`mat-tab-header .mat-tab-label`, 'Operations')
       )
     );
     return ServiceAssemblyOperationPage.waitAndGet();

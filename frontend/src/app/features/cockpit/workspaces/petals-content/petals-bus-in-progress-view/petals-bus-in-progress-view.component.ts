@@ -16,14 +16,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  FormGroupDirective,
-  NgForm,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs/Subject';
 
@@ -33,7 +26,7 @@ import { getCurrentBusInProgress } from 'app/features/cockpit/workspaces/state/b
 import { CustomValidators } from 'app/shared/helpers/custom-validators';
 import {
   disableAllFormFields,
-  formErrorStateMatcher,
+  FormErrorStateMatcher,
   getFormErrors,
 } from 'app/shared/helpers/form.helper';
 import { assert } from 'app/shared/helpers/shared.helper';
@@ -63,6 +56,8 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
     password: '',
     passphrase: '',
   };
+
+  matcher = new FormErrorStateMatcher();
 
   constructor(private store$: Store<IStore>, private fb: FormBuilder) {}
 
@@ -129,13 +124,6 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
         this.formErrors = getFormErrors(this.busImportForm, this.formErrors);
       })
       .subscribe();
-  }
-
-  createFormErrorStateMatcher(
-    control: FormControl,
-    formToCheck: FormGroupDirective | NgForm
-  ): boolean {
-    return formErrorStateMatcher(control, formToCheck);
   }
 
   ngOnDestroy() {

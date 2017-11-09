@@ -38,7 +38,7 @@ describe(`Workspace Overview`, () => {
       .expectToBe('info', `You are the only one using this workspace.`);
 
     expect(
-      workspace.users.$$(`md-list-item .mat-list-text`).getText()
+      workspace.users.$$(`mat-list-item .mat-list-text`).getText()
     ).toEqual(['admin\nAdministrator']);
   });
 
@@ -65,7 +65,7 @@ describe(`Workspace Overview`, () => {
       .expectToBe('info', `5 people are using this workspace.`);
 
     expect(
-      workspace.users.$$(`md-list-item .mat-list-text`).getText()
+      workspace.users.$$(`mat-list-item .mat-list-text`).getText()
     ).toEqual([
       'admin\nAdministrator',
       'bescudie\nBertrand ESCUDIE',
@@ -238,7 +238,7 @@ describe(`Workspace Overview`, () => {
       workspace.addUser('bescudie');
       workspace.addUser('vnoel');
 
-      const usersList = workspace.usersList.$$('md-list-item');
+      const usersList = workspace.usersList.$$('mat-list-item');
 
       expect(usersList.getText()).toEqual([
         // admin shouldn't be able to delete himself

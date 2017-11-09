@@ -26,7 +26,7 @@ export abstract class SharedLibraryPage {
   public static readonly component = $(`app-petals-shared-library-view`);
 
   public readonly component = SharedLibraryPage.component;
-  public readonly title = this.component.$(`md-toolbar .title`);
+  public readonly title = this.component.$(`mat-toolbar .title`);
   public readonly hasBeenDeletedMessage = this.component.$(
     'app-workspace-element .message'
   );
@@ -38,7 +38,7 @@ export abstract class SharedLibraryPage {
     );
     browser.wait(EC.visibilityOf(SharedLibraryPage.component), waitTimeout);
     browser.wait(
-      EC.stalenessOf(SharedLibraryPage.component.$('md-toolbar md-spinner')),
+      EC.stalenessOf(SharedLibraryPage.component.$('mat-toolbar mat-spinner')),
       waitTimeout
     );
   }
@@ -46,7 +46,7 @@ export abstract class SharedLibraryPage {
   openOperations() {
     waitAndClick(
       this.component.element(
-        by.cssContainingText(`md-tab-header .mat-tab-label`, 'Operations')
+        by.cssContainingText(`mat-tab-header .mat-tab-label`, 'Operations')
       )
     );
     return SharedLibraryOperationPage.waitAndGet();
@@ -55,7 +55,7 @@ export abstract class SharedLibraryPage {
   openOverview() {
     waitAndClick(
       this.component.element(
-        by.cssContainingText(`md-tab-header .mat-tab-label`, 'Overview')
+        by.cssContainingText(`mat-tab-header .mat-tab-label`, 'Overview')
       )
     );
     return SharedLibraryOverviewPage.waitAndGet();
@@ -111,7 +111,7 @@ export class SharedLibraryOperationPage extends SharedLibraryPage {
   public readonly operations = SharedLibraryOperationPage.operations;
 
   public readonly lifecycleCard = this.operations.$(
-    `md-card.shared-library-lifecycle`
+    `mat-card.shared-library-lifecycle`
   );
 
   public readonly unloadButton = this.lifecycleCard.element(

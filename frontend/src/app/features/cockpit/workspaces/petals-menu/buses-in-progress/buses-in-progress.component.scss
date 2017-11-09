@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-md-list[dense],
-md-nav-list[dense],
-md-nav-list {
+mat-list[dense],
+mat-nav-list[dense],
+mat-nav-list {
   padding-top: 0;
 }
 
@@ -25,12 +25,11 @@ md-nav-list {
   width: 30px;
   text-align: center;
 
-  md-spinner {
-    width: 12px;
+  mat-spinner {
     margin: auto;
   }
 
-  md-icon {
+  mat-icon {
     margin: auto;
   }
 }

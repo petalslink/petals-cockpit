@@ -16,7 +16,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MdDialog } from '@angular/material';
+import { MatDialog } from '@angular/material';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -49,12 +49,10 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   busesInProgress$: Observable<IBusInProgress[]>;
   tree$: Observable<WorkspaceElement[]>;
 
-  showShadow = true;
-
   constructor(
     private store$: Store<IStore>,
     private router: Router,
-    private dialog: MdDialog
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -109,25 +107,25 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   template: `
     <div fxLayout="column" class="content content-max-width">
       <div class="central-content">
-        <div fxLayout="row" md-dialog-title fxLayoutAlign="start start">
+        <div fxLayout="row" matDialogTitle fxLayoutAlign="start start">
           <span fxLayoutAlign="start center">
-            <md-icon color="primary">check_circle</md-icon>
+            <mat-icon color="primary">check_circle</mat-icon>
             <span class="margin-left-x1">Workspace deleted!</span>
           </span>
         </div>
-        <md-dialog-content>
+        <mat-dialog-content>
           <div fxLayout="column" fxFill>
               <p>This workspace was deleted, <b>click on OK</b> to go back to the workspaces list.</p>
           </div>
-        </md-dialog-content>
-        <md-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
-          <button md-raised-button md-dialog-close color="primary">OK</button>
-        </md-dialog-actions>
+        </mat-dialog-content>
+        <mat-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
+          <button mat-raised-button matDialogClose color="primary">OK</button>
+        </mat-dialog-actions>
       </div>
     </div>
   `,
   styles: [
-    'md-dialog-content { height: 100%; } .central-content { padding: 24px; }',
+    'mat-dialog-content { height: 100%; } .central-content { padding: 24px; }',
   ],
 })
 export class DeletedWorkspaceDialogComponent {}

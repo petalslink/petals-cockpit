@@ -13,38 +13,38 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<md-card>
+<mat-card>
   <h3 class="color-primary">Add your first user</h3>
   <form [formGroup]="form" (ngSubmit)="onSubmit(form)" fxLayout="column" autocomplete="off">
 
-    <md-form-field class="margin-top-x1">
-      <input mdInput [appFocusInputIfLargeScreen]="focusTokenInput" type="text" placeholder="Token" formControlName="token" required>
-    </md-form-field>
+    <mat-form-field class="margin-top-x1">
+      <input matInput [appFocusInputIfLargeScreen]="focusTokenInput" type="text" placeholder="Token" formControlName="token" required>
+    </mat-form-field>
 
-    <md-form-field class="margin-top-x1">
-      <input mdInput [appFocusInputIfLargeScreen]="focusUsernameInput" type="text" placeholder="Username" formControlName="username" required>
-    </md-form-field>
+    <mat-form-field class="margin-top-x1">
+      <input matInput [appFocusInputIfLargeScreen]="focusUsernameInput" type="text" placeholder="Username" formControlName="username" required>
+    </mat-form-field>
 
-    <md-form-field class="margin-top-x1">
-      <input mdInput type="password" placeholder="Password" formControlName="password" required>
-    </md-form-field>
+    <mat-form-field class="margin-top-x1">
+      <input matInput type="password" placeholder="Password" formControlName="password" required>
+    </mat-form-field>
 
-    <md-form-field class="margin-top-x1">
-      <input mdInput type="text" placeholder="Name" formControlName="name" required>
-    </md-form-field>
+    <mat-form-field class="margin-top-x1">
+      <input matInput type="text" placeholder="Name" formControlName="name" required>
+    </mat-form-field>
 
     <div fxLayout="row" fxFlex="100%" fxLayoutAlign="start center" class="form-error" *ngIf="setupFailed">
-      <md-icon color="warn">error</md-icon>
+      <mat-icon color="warn">error</mat-icon>
       <p>{{setupFailed}}</p>
     </div>
 
-    <button md-raised-button color="primary" class="margin-top-x1" [disabled]="form.invalid || settingUp">
+    <button mat-raised-button color="primary" class="margin-top-x1" [disabled]="form.invalid || settingUp">
       <span *ngIf="!settingUp && !setupSucceeded">
         Add
       </span>
 
       <span *ngIf="settingUp" fxLayout="row" fxLayoutAlign="center center">
-        Adding <md-spinner></md-spinner>
+        Adding <mat-spinner [diameter]="16" [strokeWidth]="1"></mat-spinner>
       </span>
 
       <span *ngIf="setupSucceeded" fxLayout="row" fxLayoutAlign="center center">
@@ -52,4 +52,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </span>
     </button>
   </form>
-</md-card>
+</mat-card>
