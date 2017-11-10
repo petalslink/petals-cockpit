@@ -45,11 +45,7 @@ import { RouterModule } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { NgxHoverOpacityModule } from 'ngx-hover-opacity';
-import {
-  NgArrayPipesModule,
-  NgObjectPipesModule,
-  NgStringPipesModule,
-} from 'ngx-pipes';
+import { NgPipesModule } from 'ngx-pipes';
 
 import { UpdateFileInformationDirective } from 'app/shared/components/upload/update-file-information.directive';
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
@@ -89,9 +85,7 @@ export const imports = [
   FlexLayoutModule,
   FormsModule,
   NgxHoverOpacityModule,
-  NgArrayPipesModule,
-  NgObjectPipesModule,
-  NgStringPipesModule,
+  NgPipesModule,
 ];
 
 export const declarations = [
