@@ -22,7 +22,9 @@ import {
 } from './service-assemblies.interface';
 
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
+import { getComponentsById } from 'app/features/cockpit/workspaces/state/components/components.selectors';
 import { IServiceUnit } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+import { getServiceUnitsById } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
 import { IStore } from 'app/shared/state/store.interface';
 
 export interface IServiceAssemblyWithSUsAndComponents extends IServiceAssembly {
@@ -33,11 +35,13 @@ export interface IServiceUnitWithComponent extends IServiceUnit {
   component: IComponentRow;
 }
 
-export const getServiceAssembliesById = (state: IStore) =>
-  state.serviceAssemblies.byId;
+export function getServiceAssembliesById(state: IStore) {
+  return state.serviceAssemblies.byId;
+}
 
-export const getServiceAssembliesAllIds = (state: IStore) =>
-  state.serviceAssemblies.allIds;
+export function getServiceAssembliesAllIds(state: IStore) {
+  return state.serviceAssemblies.allIds;
+}
 
 export const getSelectedServiceAssembly = createSelector(
   (state: IStore) => state.serviceAssemblies.selectedServiceAssemblyId,
@@ -47,18 +51,15 @@ export const getSelectedServiceAssembly = createSelector(
 
 export const getCurrentServiceAssembly = createSelector(
   getSelectedServiceAssembly,
-  (state: IStore) => state.serviceUnits.byId,
-  (state: IStore) => state.components.byId,
+  getServiceUnitsById,
+  getComponentsById,
   (sa, sus, components): IServiceAssemblyWithSUsAndComponents => {
     if (sa) {
       return {
         ...sa,
         serviceUnits: sa.serviceUnits.map(id => {
           const su = sus[id];
-          return {
-            ...su,
-            component: components[su.componentId],
-          };
+          return { ...su, component: components[su.componentId] };
         }),
       };
     } else {

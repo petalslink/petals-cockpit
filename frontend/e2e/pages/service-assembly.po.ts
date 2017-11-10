@@ -108,16 +108,16 @@ export class ServiceAssemblyOperationPage extends ServiceAssemblyPage {
 
   public readonly operations = ServiceAssemblyOperationPage.operations;
 
-  public readonly lifecycleCard = this.operations.$(`.sa-lifecycle`);
+  public readonly lifecycleInfos = this.operations.$(`.sa-lifecycle`);
 
-  public readonly state = this.lifecycleCard.$(`span.service-assembly-state`);
-  public readonly stopButton = this.lifecycleCard.element(
+  public readonly state = this.lifecycleInfos.$(`span.service-assembly-state`);
+  public readonly stopButton = this.lifecycleInfos.element(
     by.cssContainingText(`button`, `Stop`)
   );
-  public readonly startButton = this.lifecycleCard.element(
+  public readonly startButton = this.lifecycleInfos.element(
     by.cssContainingText(`button`, `Start`)
   );
-  public readonly unloadButton = this.lifecycleCard.element(
+  public readonly unloadButton = this.lifecycleInfos.element(
     by.cssContainingText(`button`, `Unload`)
   );
 

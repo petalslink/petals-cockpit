@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
       <div fxLayoutAlign="start center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center" class="margin-top-x1">
         <mat-form-field *ngIf="!user" fxFlex fxFlex.md="50%" fxFlex.sm="50%">
-          <input type="text" autocomplete="off" matInput placeholder="Username" formControlName="username">
           <span matPrefix><mat-icon color="primary">person</mat-icon></span>
+          <input type="text" autocomplete="off" matInput placeholder="Username" formControlName="username">
           <mat-error *ngIf="formErrors.username">
             {{ formErrors.username }}
           </mat-error>
@@ -29,8 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
       <div fxLayoutAlign="start center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center">
         <mat-form-field fxFlex fxFlex.md="50%" fxFlex.sm="50%">
-          <input type="text" autocomplete="off" matInput placeholder="Name" formControlName="name">
           <span matPrefix><mat-icon color="primary">assignment_ind</mat-icon></span>
+          <input type="text" autocomplete="off" matInput placeholder="Name" formControlName="name">
           <mat-error *ngIf="formErrors.name">
             {{ formErrors.name }}
           </mat-error>
@@ -38,8 +38,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </div>
       <div fxLayoutAlign="start center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center">
         <mat-form-field fxFlex fxFlex.md="50%" fxFlex.sm="50%">
-          <input type="password" autocomplete="new-password" matInput placeholder="Password" formControlName="password">
           <span matPrefix><mat-icon color="primary">vpn_key</mat-icon></span>
+          <input type="password" matInput placeholder="Password" formControlName="password">
           <mat-error *ngIf="formErrors.password">
             {{ formErrors.password }}
           </mat-error>

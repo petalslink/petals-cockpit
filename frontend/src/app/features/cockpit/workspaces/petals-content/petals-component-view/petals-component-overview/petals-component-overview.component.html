@@ -52,9 +52,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <mat-nav-list *ngIf="component.sharedLibraries.length !== 0 else nosl"  dense fxLayout="column" class="padding-top-x1">
             <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let sl of component.sharedLibraries; trackBy:trackBySl">
               <a mat-raised-button [routerLink]="['/workspaces', workspaceId, 'petals', 'shared-libraries', sl.id]" class="shared-library">
-                <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
+                <div fxFlex fxLayout="row" fxLayoutAlign="start center">
                   <span class="sl-name margin-right-x1">{{ sl.name }}</span>
-                  <mat-icon mat-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></mat-icon>
+                  <mat-icon svgIcon="goto" class="icon-x1" fxLayoutAlign="center center"></mat-icon>
                 </div>
               </a>
             </div>
@@ -78,20 +78,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <mat-card-content class="margin-top-x1 service-units-content">
         <mat-nav-list *ngIf="component.serviceUnits.length !== 0 else nosu" dense fxLayout="column" class="padding-top-x1">
           <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let su of component.serviceUnits; trackBy:trackBySu">
-            <a mat-raised-button [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su.id]" class="service-unit">
-              <div fxFlex fxLayout="row" fxLayoutAlign="start center" class="color-primary">
+            <a mat-raised-button color="primary" [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su.id]" class="service-unit">
+              <div fxFlex fxLayout="row" fxLayoutAlign="start center">
                 <span class="su-name margin-right-x1">{{ su.name }}</span>
-                <mat-icon mat-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></mat-icon>
+                <mat-icon svgIcon="goto" class="icon-x1" fxLayoutAlign="center center"></mat-icon>
               </div>
             </a>
 
             <span fxFlex matSubheader fxLayoutAlign="center center">belongs to</span>
 
-            <a mat-raised-button [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-assemblies', su.serviceAssembly.id]"
+            <a mat-raised-button color="primary" [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-assemblies', su.serviceAssembly.id]"
               class="service-assembly">
-              <div fxFlex fxLayout="row" fxLayoutAlign="end center" class="color-primary">
+              <div fxFlex fxLayout="row" fxLayoutAlign="end center">
                 <span class="sa-name margin-right-x1">{{ su.serviceAssembly.name }}</span>
-                <mat-icon mat-list-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></mat-icon>
+                <mat-icon svgIcon="goto" class="icon-x1" fxLayoutAlign="center center"></mat-icon>
               </div>
             </a>
           </div>

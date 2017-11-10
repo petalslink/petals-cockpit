@@ -18,6 +18,7 @@
 import { createSelector } from '@ngrx/store';
 
 import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
+import { getBusesById } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
 import { IStore } from 'app/shared/state/store.interface';
 import { IContainerRow } from './containers.interface';
 
@@ -25,9 +26,13 @@ export interface IContainerWithSiblings extends IContainerRow {
   siblings: IContainerRow[];
 }
 
-export const getContainersById = (state: IStore) => state.containers.byId;
+export function getContainersById(state: IStore) {
+  return state.containers.byId;
+}
 
-export const getContainersAllIds = (state: IStore) => state.containers.allIds;
+export function getContainersAllIds(state: IStore) {
+  return state.containers.allIds;
+}
 
 export const getSelectedContainer = createSelector(
   (state: IStore) => state.containers.selectedContainerId,
@@ -37,7 +42,7 @@ export const getSelectedContainer = createSelector(
 
 export const getCurrentContainerBus = createSelector(
   getSelectedContainer,
-  (state: IStore) => state.buses.byId,
+  getBusesById,
   (container, buses): IBusRow =>
     container ? buses[container.busId] : undefined
 );

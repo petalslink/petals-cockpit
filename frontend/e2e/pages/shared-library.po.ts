@@ -111,7 +111,7 @@ export class SharedLibraryOperationPage extends SharedLibraryPage {
   public readonly operations = SharedLibraryOperationPage.operations;
 
   public readonly lifecycleCard = this.operations.$(
-    `mat-card.shared-library-lifecycle`
+    `.shared-library-lifecycle`
   );
 
   public readonly unloadButton = this.lifecycleCard.element(

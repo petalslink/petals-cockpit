@@ -18,6 +18,7 @@
 import { createSelector } from '@ngrx/store';
 
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
+import { getComponentsById } from 'app/features/cockpit/workspaces/state/components/components.selectors';
 import { IStore } from 'app/shared/state/store.interface';
 import { ISharedLibrary } from './shared-libraries.interface';
 
@@ -39,7 +40,7 @@ export const getSelectedSharedLibrary = createSelector(
 
 export const getCurrentSharedLibrary = createSelector(
   getSelectedSharedLibrary,
-  (state: IStore) => state.components.byId,
+  getComponentsById,
   (sl, components) => {
     if (sl) {
       return {

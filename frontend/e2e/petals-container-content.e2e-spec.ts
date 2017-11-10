@@ -197,7 +197,7 @@ describe(`Petals container content`, () => {
       expect(ops.state.getText()).toEqual('Loaded');
 
       expect(
-        ops.lifecycleCard.$('.component-parameters-title span').getText()
+        ops.lifecycleInfo.$('.component-parameters-title span').getText()
       ).toEqual('Component parameters');
       expect(ops.parameters.$$('input').count()).toBe(3);
       expect(ops.parameter('httpsEnabled').getAttribute('value')).toEqual(

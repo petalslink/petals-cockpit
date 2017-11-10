@@ -118,12 +118,12 @@ describe('WorkspacesListComponent', () => {
     ).toEqual('2 Workspaces');
     expect(
       fixture.debugElement
-        .queryAll(By.css('div.card-workspace mat-card-title'))
+        .queryAll(By.css('div.info-workspace .workspace-name'))
         .map(elementText)
     ).toEqual(['WKS0', 'WKS1']);
     expect(
       fixture.debugElement
-        .queryAll(By.css('div.card-workspace mat-card-subtitle'))
+        .queryAll(By.css('div.info-workspace .workspace-description'))
         .map(elementText)
         .map(s => s.trim())
     ).toEqual([
@@ -147,7 +147,7 @@ describe('WorkspacesListComponent', () => {
     );
     expect(greenWorkspaces.length).toEqual(1);
     expect(
-      elementText(greenWorkspaces[0].query(By.css('mat-card-title')))
+      elementText(greenWorkspaces[0].query(By.css('.workspace-name')))
     ).toEqual('WKS0');
   });
 
@@ -172,7 +172,7 @@ describe('WorkspacesListComponent', () => {
     ).toEqual('1 Workspace');
 
     click(
-      fixture.debugElement.query(By.css('div.card-workspace')).nativeElement
+      fixture.debugElement.query(By.css('div.info-workspace')).nativeElement
     );
     fixture.detectChanges();
     expect(component.fetched.id).toEqual('1');

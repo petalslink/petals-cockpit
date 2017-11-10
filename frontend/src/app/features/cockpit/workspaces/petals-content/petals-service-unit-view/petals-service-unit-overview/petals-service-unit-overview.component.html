@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
       </mat-card>
 
-      <mat-card fxFlex class="su-infos-sa">
+      <mat-card fxFlex class="su-info-sa">
         <mat-card-title fxLayout="row">
           <span fxFlex class="text-upper">Service Assembly</span>
           <mat-icon svgIcon="sa-overview"></mat-icon>
@@ -50,11 +50,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </mat-card-header>
 
           <mat-card-content fxLayout="row" fxLayoutAlign="start center" class="view-sa">
-            <a mat-raised-button [routerLink]="['/workspaces', workspaceId, 'petals', 'service-assemblies', serviceUnit.serviceAssembly.id]"
+            <a mat-raised-button color="primary" [routerLink]="['/workspaces', workspaceId, 'petals', 'service-assemblies', serviceUnit.serviceAssembly.id]"
               class="sa">
-              <div fxFlex fxLayout="row" fxLayoutAlign="end center" class="color-primary">
+              <div fxFlex fxLayout="row" fxLayoutAlign="end center">
                 <span class="text-upper view-sa-name margin-right-x1">View this sa</span>
-                <mat-icon svgIcon="goto" class="goto-icon" fxLayoutAlign="center center"></mat-icon>
+                <mat-icon svgIcon="goto" class="icon-x1" fxLayoutAlign="center center"></mat-icon>
+              </div>
+            </a>
+          </mat-card-content>
+        </div>
+      </mat-card>
+
+      <mat-card fxFlex class="su-info-comp">
+        <mat-card-title fxLayout="row">
+          <span fxFlex class="text-upper">Component</span>
+          <mat-icon class="icon-x3" svgIcon="component"></mat-icon>
+        </mat-card-title>
+
+        <div fxLayout="row" fxLayoutWrap fxLayoutAlign="start center">
+          <mat-card-header fxFlex fxLayout="row" class="component">
+            <mat-card-title>Name</mat-card-title>
+            <mat-card-subtitle class="component-name" fxLayoutAlign="start center">
+              {{ serviceUnit.component.name }}
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content fxLayout="row" fxLayoutAlign="start center" class="view-component">
+            <a mat-raised-button color="primary" [routerLink]="['/workspaces', workspaceId, 'petals', 'components', serviceUnit.component.id]"
+              class="comp">
+              <div fxFlex fxLayout="row" fxLayoutAlign="end center">
+                <span class="text-upper view-component-name margin-right-x1">View this component</span>
+                <mat-icon svgIcon="goto" class="icon-x1" fxLayoutAlign="center center"></mat-icon>
               </div>
             </a>
           </mat-card-content>
