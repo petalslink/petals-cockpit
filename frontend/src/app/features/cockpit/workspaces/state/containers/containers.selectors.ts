@@ -76,14 +76,16 @@ export const componentsOfCurrentContainerByName = createSelector(
   getCurrentContainer,
   getComponentsById,
   (currentContainer, componentsById) =>
-    currentContainer.components.reduce(
-      (acc, componentId) => {
-        const component = componentsById[componentId];
-        const componentName = component.name.trim().toLowerCase();
+    !currentContainer
+      ? {}
+      : currentContainer.components.reduce(
+          (acc, componentId) => {
+            const component = componentsById[componentId];
+            const componentName = component.name.trim().toLowerCase();
 
-        acc[componentName] = true;
-        return acc;
-      },
-      <{ [name: string]: boolean }>{}
-    )
+            acc[componentName] = true;
+            return acc;
+          },
+          <{ [name: string]: boolean }>{}
+        )
 );

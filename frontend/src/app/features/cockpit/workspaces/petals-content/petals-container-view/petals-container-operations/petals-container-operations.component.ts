@@ -28,12 +28,15 @@ import {
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Actions } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
+import { NotificationsService } from 'angular2-notifications';
+import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { v4 as uuid } from 'uuid';
 
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
+import { ComponentsService } from 'app/shared/services/components.service';
 import {
   HttpProgress,
   HttpProgressType,
@@ -77,7 +80,9 @@ export class PetalsContainerOperationsComponent
   constructor(
     private fb: FormBuilder,
     private store$: Store<IStore>,
-    private actions$: Actions
+    private actions$: Actions,
+    private notifications: NotificationsService,
+    private componentsService: ComponentsService
   ) {}
 
   ngOnDestroy() {
@@ -107,10 +112,24 @@ export class PetalsContainerOperationsComponent
   }
 
   onFileSelected(file: File) {
-    // when using md-error with material, if there's an error it'll be display
+    // when using mat-error with material, if there's an error it'll be display
     // only when the control is set to touched and thus we won't have a
     // "real time" feedback, especially when there's only one input
     this.updateComponentDeployInfoFormGroup.get('name').markAsTouched();
+
+    this.componentsService
+      .getComponentNameFromZipFile(file)
+      .takeUntil(this.onDestroy$)
+      .do(x => this.updateComponentDeployInfoFormGroup.get('name').setValue(x))
+      .catch(err => {
+        this.notifications.warn(
+          'File error',
+          `An error occurred while trying to read the component's name from zip file`
+        );
+
+        return Observable.empty();
+      })
+      .subscribe();
   }
 
   deploy(

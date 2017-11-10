@@ -20,7 +20,11 @@ import { $, browser, by, ExpectedConditions as EC } from 'protractor';
 import { waitTimeout } from '../common';
 import { urlToMatch, waitAndClick } from '../utils';
 import { MessageComponentPage } from './message-component.po';
-import { UploadComponentPage } from './upload-component.po';
+import {
+  ComponentDeploymentPage,
+  ServiceAssemblyDeploymentPage,
+  SharedLibraryDeploymentPage,
+} from './upload-component.po';
 
 export abstract class ContainerPage {
   public static readonly component = $(`app-petals-container-view`);
@@ -108,14 +112,14 @@ export class ContainerOperationPage extends ContainerPage {
   }
 
   getComponentUpload() {
-    return UploadComponentPage.waitAndGet('deploy-component');
+    return ComponentDeploymentPage.waitAndGet('deploy-component');
   }
 
   getServiceAssemblyUpload() {
-    return UploadComponentPage.waitAndGet('deploy-service-assembly');
+    return ServiceAssemblyDeploymentPage.waitAndGet('deploy-service-assembly');
   }
 
   getSharedLibraryUpload() {
-    return UploadComponentPage.waitAndGet('deploy-shared-library');
+    return SharedLibraryDeploymentPage.waitAndGet('deploy-shared-library');
   }
 }

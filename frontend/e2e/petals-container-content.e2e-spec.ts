@@ -83,6 +83,13 @@ describe(`Petals container content`, () => {
       const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
       deploy.fileInput.sendKeys(filePath);
 
+      // shouldn't be able to find the component's name from the zip
+      expect(deploy.nameInput.getAttribute('value')).toEqual('');
+      page.expectNotification(
+        'File error',
+        `An error occurred while trying to read the component's name from zip file`
+      );
+
       const error = deploy.getErrorDeployMessage();
 
       error.expectHidden();
@@ -106,8 +113,16 @@ describe(`Petals container content`, () => {
         .openOperations()
         .getComponentUpload();
 
-      const filePath = path.resolve(__dirname, './resources/component.zip');
+      const filePath = path.resolve(
+        __dirname,
+        './resources/META-INF/metainf.zip'
+      );
       upload.fileInput.sendKeys(filePath);
+
+      // should be able to find the component's name from the zip
+      expect(upload.nameInput.getAttribute('value')).toEqual(
+        'petals-component'
+      );
 
       const expectedTreeBeforeDeploy = [
         `Bus 0`,
@@ -165,7 +180,7 @@ describe(`Petals container content`, () => {
         `SU 3`,
         `Comp 2`,
         // this one should have been deployed
-        `Comp 12`,
+        `petals-component`,
         `SERVICE ASSEMBLIES`,
         `SA 0`,
         `SA 1`,
@@ -192,7 +207,7 @@ describe(`Petals container content`, () => {
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
       // we should be redirected
-      const ops = workspace.openComponent('Comp 12').openOperations();
+      const ops = workspace.openComponent('petals-component').openOperations();
 
       expect(ops.state.getText()).toEqual('Loaded');
 

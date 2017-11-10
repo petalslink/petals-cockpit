@@ -74,13 +74,7 @@ export class PetalsCockpitPage {
     return LoginPage.waitAndGet();
   }
 
-  clickAndExpectNotification(
-    el: ElementFinder,
-    title?: Matcher,
-    content?: Matcher
-  ) {
-    waitAndClick(el);
-
+  expectNotification(title?: Matcher, content?: Matcher) {
     const simpleNotification = $(`simple-notification`);
 
     let test = EC.visibilityOf(simpleNotification);
@@ -105,6 +99,16 @@ export class PetalsCockpitPage {
       .catch(() => {
         browser.ignoreSynchronization = false;
       });
+  }
+
+  clickAndExpectNotification(
+    el: ElementFinder,
+    title?: Matcher,
+    content?: Matcher
+  ) {
+    waitAndClick(el);
+
+    this.expectNotification(title, content);
   }
 
   openSidenav() {
