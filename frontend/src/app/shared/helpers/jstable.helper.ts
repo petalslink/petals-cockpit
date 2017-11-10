@@ -121,8 +121,6 @@ export function putAll<
             `putAll called on an already existing element ${id} on:`,
             table
           );
-        } else {
-          console.warn(`putAll called on an already existing element ${id}`);
         }
         return table;
       } else {
@@ -165,8 +163,6 @@ export function updateById<I, M extends JsTable<I> = JsTable<I>>(
           `updateById called on an unexisting element ${id} on`,
           table
         );
-      } else {
-        console.warn(`updateById called on an unexisting element ${id}`);
       }
     } else {
       throw Error(`${id} does not exist in this table! This is a bug!`);
@@ -197,8 +193,6 @@ export function putById<I, M extends JsTable<I> = JsTable<I>>(
           `putById called on an already existing element ${id} on`,
           table
         );
-      } else {
-        console.warn(`putById called on an already existing element ${id}`);
       }
     } else {
       throw Error(`${id} already exists in this table! This is a bug!`);
@@ -235,8 +229,6 @@ export function removeById<I, M extends JsTable<I> = JsTable<I>>(
           `removeById called on an unexisting element ${id} on`,
           table
         );
-      } else {
-        console.warn(`removeById called on an unexisting element ${id}`);
       }
       return table;
     } else {
