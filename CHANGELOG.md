@@ -1,3 +1,18 @@
+<a name="0.15.0"></a>
+# [0.15.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.14.0...v0.15.0) (2017-11-13)
+
+
+### Bug Fixes
+
+* **backend:** unprocessable zip now returns HTTP 422 ([c438ec4](https://gitlab.com/linagora/petals-cockpit/commit/c438ec4)), closes [#400](https://gitlab.com/linagora/petals-cockpit/issues/400)
+
+
+### Features
+
+* **frontend:** display upload progress when uploading component|SA|SL|SU ([2cee8aa](https://gitlab.com/linagora/petals-cockpit/commit/2cee8aa))
+* **frontend:** show the component in the SU overview ([4861cac](https://gitlab.com/linagora/petals-cockpit/commit/4861cac)), closes [#391](https://gitlab.com/linagora/petals-cockpit/issues/391)
+
+
 <a name="0.14.0"></a>
 # [0.14.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.13.0...v0.14.0) (2017-10-24)
 
