@@ -27,13 +27,21 @@ database:
   # see http://stackoverflow.com/a/3670000
   validationQuery: "/* Health Check */ SELECT 1"
 
+
 logging:
+#Global logging setting
   level: INFO
+
+#Specific cockpit loggers settings
+#(will override the console threshold & filter)
   loggers:
-    org.ow2.petals.cockpit.CockpitApplication:
-      appenders:
+    "org.ow2.petals.cockpit.server":
+      level: INFO
+      appenders: 
         - type: console
-          threshold: INFO
+
+#File logging uses global setting, console filters out global cockpit output
+#(to avoid duplicates from previous specific logger)
   appenders:
     - type: file
       currentLogFilename: ./logs/cockpit.log
@@ -41,3 +49,5 @@ logging:
       archivedFileCount: 5
     - type: console
       threshold: WARN
+      filterFactories:
+      - type: cockpit-server-filter-factory
