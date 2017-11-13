@@ -60,16 +60,10 @@ export class ContainerOverviewPage extends ContainerPage {
 
   public readonly overview = ContainerOverviewPage.overview;
 
-  public readonly ip = this.overview.$(
-    `.container-infos mat-card-subtitle.container-ip`
-  );
-  public readonly port = this.overview.$(
-    `.container-infos mat-card-subtitle.container-port`
-  );
+  public readonly ip = this.overview.$(`.container-infos .container-ip`);
+  public readonly port = this.overview.$(`.container-infos .container-port`);
 
-  public readonly systemInfo = this.overview.$(
-    `mat-card mat-card-content.system-info`
-  );
+  public readonly systemInfo = this.overview.$(`.system-info`);
 
   static waitAndGet() {
     super.wait();

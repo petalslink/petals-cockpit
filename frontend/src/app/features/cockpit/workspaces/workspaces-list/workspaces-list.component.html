@@ -48,15 +48,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </mat-card-content>
       </mat-card>
       <mat-divider></mat-divider>
-      <mat-card class="card-workspaces">
-        <div fxLayout="row" class="cursor-pointer background-color-hover-light-green-x2 card-workspace"
+      <mat-card class="info-workspaces">
+        <div fxLayout="row" class="cursor-pointer background-color-hover-light-green-x2 info-workspace"
           *ngFor="let workspace of workspaces.list; trackBy:trackByWorkspace" (click)="select(workspace)"
           [class.background-color-light-green-x2]="workspaces.selectedWorkspaceId === workspace.id"
         >
           <mat-card-title-group>
             <div fxLayout="column" fxLayoutAlign="center start">
-              <mat-card-title>{{ workspace.name }}</mat-card-title>
-              <mat-card-subtitle>
+              <mat-card-title class="workspace-name">{{ workspace.name }}</mat-card-title>
+              <mat-card-subtitle class="workspace-description">
                 <span *ngIf="workspace.users.length === 1" matLine>You are the only one using this workspace.</span>
                 <span *ngIf="workspace.users.length > 1" matLine>Shared with you and <span
                     class="color-primary-bold dotted"

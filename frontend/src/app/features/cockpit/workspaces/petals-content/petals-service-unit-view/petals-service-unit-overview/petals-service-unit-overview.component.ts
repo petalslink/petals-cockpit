@@ -26,7 +26,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { IStore } from '../../../../../../shared/state/store.interface';
 
-import { IServiceUnitWithSA } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
+import { IServiceUnitWithSAAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
 import { stateToLedColor } from 'app/shared/helpers/shared.helper';
 import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
@@ -40,7 +40,7 @@ import { isLargeScreen } from 'app/shared/state/ui.selectors';
 export class PetalsServiceUnitOverviewComponent implements OnInit {
   public btnByScreenSize$: Observable<string>;
 
-  @Input() serviceUnit: IServiceUnitWithSA;
+  @Input() serviceUnit: IServiceUnitWithSAAndComponent;
   @Input() workspaceId: string;
 
   constructor(private store$: Store<IStore>) {}

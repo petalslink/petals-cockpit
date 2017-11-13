@@ -88,6 +88,32 @@ $directions: '', '-left', '-right', '-top', '-bottom';
 
 // ---------------------------------------------------------------
 
+// generate size + px
+@mixin mat-icon-size($size) {
+  font-size: $size !important;
+  line-height: $size !important;
+  height: $size !important;
+  width: $size !important;
+}
+
+.icon-x1 {
+  @include mat-icon-size(16px);
+}
+
+.icon-x2 {
+  @include mat-icon-size(24px);
+}
+
+.icon-x3 {
+  @include mat-icon-size(32px);
+}
+
+.icon-x4 {
+  @include mat-icon-size(48px);
+}
+
+// ---------------------------------------------------------------
+
 // generate the color palette
 @mixin generate-colors($name, $colorHexa, $index, $lightOrDark) {
   // @debug ".color-#{$name}-x#{$index}";

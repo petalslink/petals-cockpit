@@ -41,7 +41,7 @@ describe(`Workspaces`, () => {
     // the sidebar button should not be visible
     expect($(`app-header .sidenav-toggle`).isPresent()).toBe(false);
 
-    expect(workspaces.workspacesCards.count()).toEqual(1);
+    expect(workspaces.workspacesInfos.count()).toEqual(1);
 
     // check the current list content
     browser
@@ -52,7 +52,7 @@ describe(`Workspaces`, () => {
     expect($('mat-tooltip-component').getText()).toEqual(
       'Administrator, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER'
     );
-    expect(workspaces.workspacesCards.getText()).toEqual([
+    expect(workspaces.workspacesInfos.getText()).toEqual([
       `Workspace 1\nShared with you and 4 others.`,
     ]);
   });
@@ -78,14 +78,14 @@ describe(`Workspaces`, () => {
 
     workspaces.addWorkspace(`New workspace`);
 
-    expect(workspaces.workspacesCards.count()).toEqual(2);
+    expect(workspaces.workspacesInfos.count()).toEqual(2);
 
     const workspacesAndOwners = [
       `Workspace 1\nShared with you and 4 others.`,
       `New workspace\nYou are the only one using this workspace.`,
     ];
 
-    expect(workspaces.workspacesCards.getText()).toEqual(workspacesAndOwners);
+    expect(workspaces.workspacesInfos.getText()).toEqual(workspacesAndOwners);
 
     ///// DELETION
     const workspace = workspaces.selectWorkspace(1, `New workspace`);
@@ -131,7 +131,7 @@ describe(`Workspaces`, () => {
     browser.wait(EC.invisibilityOf($(`app-cockpit mat-sidenav`)), waitTimeout);
 
     // now that the previous workspace is deleted, check that only 1 workspace is displayed
-    expect(workspaces.workspacesCards.count()).toEqual(1);
+    expect(workspaces.workspacesInfos.count()).toEqual(1);
   });
 
   it(`should open the administration page and ensure that the workspaces list is closed`, () => {

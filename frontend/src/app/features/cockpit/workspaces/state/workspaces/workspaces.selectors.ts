@@ -35,8 +35,9 @@ import { IUserRow } from 'app/shared/state/users.interface';
 import { getUsersAllIds, getUsersById } from 'app/shared/state/users.selectors';
 import { IWorkspaceRow, IWorkspaces } from './workspaces.interface';
 
-const getSelectedWorkspaceId = (state: IStore) =>
-  state.workspaces.selectedWorkspaceId;
+function getSelectedWorkspaceId(state: IStore) {
+  return state.workspaces.selectedWorkspaceId;
+}
 
 export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
   return store$
@@ -58,8 +59,9 @@ export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
 
 // -----------------------------------------------------------
 
-export const getCurrentWorkspace = (store: IStore): IWorkspaceRow =>
-  store.workspaces.byId[store.workspaces.selectedWorkspaceId];
+export function getCurrentWorkspace(store: IStore): IWorkspaceRow {
+  return store.workspaces.byId[store.workspaces.selectedWorkspaceId];
+}
 
 const getCurrentWorkspaceUsersById = createSelector(
   (state: IStore) => getCurrentWorkspace(state).users,

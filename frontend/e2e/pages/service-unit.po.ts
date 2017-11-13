@@ -19,6 +19,7 @@ import { $, browser, ExpectedConditions as EC } from 'protractor';
 
 import { waitTimeout } from '../common';
 import { urlToMatch, waitAndClick } from '../utils';
+import { ComponentOverviewPage } from './component.po';
 import { ServiceAssemblyOverviewPage } from './service-assembly.po';
 
 export abstract class ServiceUnitPage {
@@ -51,15 +52,21 @@ export class ServiceUnitOverviewPage extends ServiceUnitPage {
   public readonly overview = ServiceUnitOverviewPage.overview;
   public readonly state = this.overview.$(`.sa-state`);
 
-  public readonly serviceAssemblyCard = this.overview.$(
-    '.su-infos-sa .service-assembly'
+  public readonly serviceAssemblyInfos = this.overview.$(
+    '.su-info-sa .service-assembly'
   );
-  public readonly serviceAssembly = this.serviceAssemblyCard.$('.sa-name');
-  public readonly viewServiceAssembly = this.overview.$(
-    '.su-infos-sa .view-sa'
-  );
+  public readonly serviceAssembly = this.serviceAssemblyInfos.$('.sa-name');
+  public readonly viewServiceAssembly = this.overview.$('.su-info-sa .view-sa');
   public readonly viewServiceAssemblyName = this.viewServiceAssembly.$(
     '.view-sa-name'
+  );
+  public readonly componentInfos = this.overview.$('.su-info-comp .component');
+  public readonly component = this.componentInfos.$('.component-name');
+  public readonly viewComponent = this.overview.$(
+    '.su-info-comp .view-component'
+  );
+  public readonly viewComponentName = this.viewComponent.$(
+    '.view-component-name'
   );
 
   static waitAndGet() {
@@ -78,5 +85,10 @@ export class ServiceUnitOverviewPage extends ServiceUnitPage {
   openServiceAssembly() {
     waitAndClick(this.viewServiceAssembly.$('a.sa'));
     return ServiceAssemblyOverviewPage.waitAndGet();
+  }
+
+  openComponent() {
+    waitAndClick(this.viewComponent.$('a.comp'));
+    return ComponentOverviewPage.waitAndGet();
   }
 }

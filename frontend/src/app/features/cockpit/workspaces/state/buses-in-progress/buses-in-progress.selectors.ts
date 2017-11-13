@@ -23,11 +23,13 @@ import {
 } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 import { IStore } from 'app/shared/state/store.interface';
 
-export const getBusesInProgressAllIds = (state: IStore) =>
-  state.busesInProgress.allIds;
+export function getBusesInProgressAllIds(state: IStore) {
+  return state.busesInProgress.allIds;
+}
 
-export const getBusesInProgressByIds = (state: IStore) =>
-  state.busesInProgress.byId;
+export function getBusesInProgressByIds(state: IStore) {
+  return state.busesInProgress.byId;
+}
 
 export const getBusesInProgress = createSelector(
   getBusesInProgressAllIds,

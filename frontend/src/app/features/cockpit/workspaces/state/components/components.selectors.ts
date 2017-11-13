@@ -17,8 +17,13 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { IServiceUnitWithSA } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
+import { getServiceAssembliesById } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
+import {
+  getServiceUnitsById,
+  IServiceUnitWithSA,
+} from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
 import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
+import { getSharedLibrariesById } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
 import {
   IComponentBackendDetailsCommon,
   IComponentBackendSSECommon,
@@ -34,9 +39,13 @@ export interface IComponentWithSLsAndSUs
   sharedLibraries: ISharedLibraryRow[];
 }
 
-export const getComponentsById = (state: IStore) => state.components.byId;
+export function getComponentsById(state: IStore) {
+  return state.components.byId;
+}
 
-export const getComponentsAllIds = (state: IStore) => state.components.allIds;
+export function getComponentsAllIds(state: IStore) {
+  return state.components.allIds;
+}
 
 export const getSelectedComponent = createSelector(
   (state: IStore) => state.components.selectedComponentId,
@@ -46,9 +55,9 @@ export const getSelectedComponent = createSelector(
 
 export const getCurrentComponent = createSelector(
   getSelectedComponent,
-  (state: IStore) => state.serviceUnits.byId,
-  (state: IStore) => state.sharedLibraries.byId,
-  (state: IStore) => state.serviceAssemblies.byId,
+  getServiceUnitsById,
+  getSharedLibrariesById,
+  getServiceAssembliesById,
   (component, sus, sls, sas): IComponentWithSLsAndSUs => {
     if (component) {
       return {
