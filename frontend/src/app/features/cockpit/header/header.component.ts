@@ -47,9 +47,11 @@ export class HeaderComponent implements OnInit {
   ngOnInit() {}
 
   logo() {
-    return `./assets/img/${this.isLargeScreen
-      ? 'logo-petals-cockpit'
-      : 'logo-petals-cockpit-without-text'}.png`;
+    return `./assets/img/${
+      this.isLargeScreen
+        ? 'logo-petals-cockpit'
+        : 'logo-petals-cockpit-without-text'
+    }.png`;
   }
 
   toggleSidenav() {

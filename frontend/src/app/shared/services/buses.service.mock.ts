@@ -92,13 +92,13 @@ export class BusesServiceMock extends BusesServiceImpl {
       // simulate the backend sending the answer on the SSE
       setTimeout(
         () =>
-          (this
-            .sseService as SseServiceMock).triggerSseEvent(
+          (this.sseService as SseServiceMock).triggerSseEvent(
             SseActions.BusDeletedSse,
             {
               id,
-              reason: `bus deleted by ${(this
-                .userService as UsersServiceMock).getCurrentUser().id}`,
+              reason: `bus deleted by ${
+                (this.userService as UsersServiceMock).getCurrentUser().id
+              }`,
             }
           ),
         environment.mock.sseDelay

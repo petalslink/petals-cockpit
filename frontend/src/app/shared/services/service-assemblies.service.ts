@@ -85,7 +85,9 @@ export class ServiceAssembliesServiceImpl extends ServiceAssembliesService {
       id: string;
       state: ServiceAssemblyState;
     }>(
-      `${environment.urlBackend}/workspaces/${workspaceId}/serviceassemblies/${serviceAssemblyId}`,
+      `${environment.urlBackend}/workspaces/${workspaceId}/serviceassemblies/${
+        serviceAssemblyId
+      }`,
       { state: newState }
     );
   }

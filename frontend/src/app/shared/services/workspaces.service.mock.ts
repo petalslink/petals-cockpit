@@ -76,8 +76,7 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
         // simulate the backend sending the answer on the SSE
         setTimeout(() => {
           workspacesService.delete(id);
-          (this
-            .sseService as SseServiceMock).triggerSseEvent(
+          (this.sseService as SseServiceMock).triggerSseEvent(
             SseActions.WorkspaceDeletedSse,
             { id }
           );
