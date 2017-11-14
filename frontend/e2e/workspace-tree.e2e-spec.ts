@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { $, browser } from 'protractor';
+import { $, browser, ExpectedConditions as EC } from 'protractor';
 
 import { page } from './common';
 import { WorkspacePage } from './pages/workspace.po';
+import { expectFocused } from './utils';
 
 describe(`Workspaces Tree`, () => {
   let workspace: WorkspacePage;
@@ -334,5 +335,19 @@ describe(`Workspaces Tree`, () => {
     ];
 
     expect(workspace.getWorkspaceTree()).toEqual(availableBusesFiltered);
+  });
+
+  it(`should clear input and focus search bar when the message saying no match is closed`, () => {
+    workspace.search(`Some random search`);
+
+    expectFocused(workspace.searchBar);
+
+    const searchMessage = workspace.getSearchMessage();
+
+    searchMessage.cancelButton.click();
+
+    EC.stalenessOf(searchMessage.component);
+
+    expectFocused(workspace.searchBar);
   });
 });

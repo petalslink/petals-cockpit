@@ -48,6 +48,7 @@ export abstract class WorkspacePage {
   public readonly changeWorkspaceButton = this.sidenav.$(
     `button.change-workspace`
   );
+  public readonly searchBar = this.sidenav.$(`input.search`);
   public readonly busesInProgress = this.sidenav.$$(
     `app-buses-in-progress mat-nav-list a`
   );
@@ -146,9 +147,12 @@ export abstract class WorkspacePage {
   }
 
   search(search: string) {
-    const input = $(`input.search`);
-    input.clear();
-    input.sendKeys(search);
+    this.searchBar.clear();
+    this.searchBar.sendKeys(search);
+  }
+
+  getSearchMessage() {
+    return MessageComponentPage.waitAndGet(WorkspacePage.sidenav);
   }
 
   getWorkspaceTree() {

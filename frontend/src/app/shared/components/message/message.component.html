@@ -17,12 +17,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div fxLayout="row" fxLayoutAlign="start center">
     <mat-icon [ngClass]="type">{{ type }}</mat-icon>
     <span fxFlex class="msg-details italic margin-left-x1">{{ msg | shorten: maxLength: '...' }}</span>
-    <button class="btn-view-more-message text-upper" mat-button *ngIf="msg.length > maxLength" fxLayoutAlign="end center" type="button" (click)="openDialog()">
+    <button
+      class="btn-view-more-message text-upper"
+      type="button"
+      mat-button
+      *ngIf="msg.length > maxLength; else cancelMessage"
+      fxLayoutAlign="end center"
+      (click)="openDialog()"
+    >
       <span class="view-more-name">View more</span>
     </button>
-    <button class="btn-cancel-message" *ngIf="msg.length < maxLength && type !== 'error'" type="button" (click)="hideMessage()" mat-icon-button>
-      <mat-icon [ngClass]="type">cancel</mat-icon>
-    </button>
+
+    <ng-template #cancelMessage>
+      <button class="btn-cancel-message" *ngIf="type !== 'error' && isClosable" type="button" (click)="hideMessage()" mat-icon-button>
+        <mat-icon [ngClass]="type">cancel</mat-icon>
+      </button>
+    </ng-template>
   </div>
 </mat-card-content>
 
@@ -45,9 +55,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <mat-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
         <!-- we can't simply use matDialogClose because of https://github.com/angular/material2/issues/5412 -->
         <button class="btn-close-dialog" type="button" mat-button (click)="dialogRef.close()">
-        <mat-icon class="margin-right-x1" color="warn">close</mat-icon>
-        <span class="text-upper">Close</span>
-      </button>
+          <mat-icon class="margin-right-x1" color="warn">close</mat-icon>
+          <span class="text-upper">Close</span>
+        </button>
       </mat-dialog-actions>
     </div>
   </div>

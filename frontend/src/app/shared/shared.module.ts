@@ -50,6 +50,7 @@ import { NgPipesModule } from 'ngx-pipes';
 import { UpdateFileInformationDirective } from 'app/shared/components/upload/update-file-information.directive';
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
 import { FocusInputIfLargeScreenDirective } from 'app/shared/directives/focus-input-based-on-screen-size.directive';
+import { FocusInputDirective } from 'app/shared/directives/focus-input.directive';
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { LedComponent } from './components/led/led.component';
 import { MdCardToolbarComponent } from './components/md-card-toolbar/md-card-toolbar.component';
@@ -93,6 +94,7 @@ export const declarations = [
   ColorSearchedLettersDirective,
   NotFound404Component,
   LedComponent,
+  FocusInputDirective,
   FocusInputIfLargeScreenDirective,
   MessageComponent,
   MdCardToolbarComponent,

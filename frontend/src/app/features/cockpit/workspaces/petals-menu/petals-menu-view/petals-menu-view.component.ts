@@ -23,6 +23,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { Subject } from 'rxjs/Subject';
 
 import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
@@ -50,6 +51,9 @@ export class PetalsMenuViewComponent implements OnInit {
   searchForm: FormGroup;
   search = '';
 
+  private _focusSearchInput$ = new Subject<boolean>();
+  focusSearchInput$ = this._focusSearchInput$.asObservable();
+
   constructor(private fb: FormBuilder, private store$: Store<IStore>) {}
 
   ngOnInit() {
@@ -62,6 +66,20 @@ export class PetalsMenuViewComponent implements OnInit {
       .do(search => (this.search = search))
       .do(search => this.store$.dispatch(new Workspaces.SetSearch({ search })))
       .subscribe();
+
+    this.store$
+      .select(state => state.workspaces.searchPetals)
+      .do(searchPetals =>
+        this.searchForm.get('search').setValue(searchPetals, {
+          emitEvent: false,
+        })
+      )
+      .subscribe();
+  }
+
+  focusSearch() {
+    this.store$.dispatch(new Workspaces.SetSearch({ search: '' }));
+    this._focusSearchInput$.next(true);
   }
 
   onTreeSelect(e: WorkspaceElement) {
