@@ -33,7 +33,7 @@ logging:
   level: INFO
 
 #Specific cockpit loggers settings
-#(will override the console threshold & filter)
+#(will bypass the console threshold & filter)
   loggers:
     "org.ow2.petals.cockpit.server":
       level: INFO
