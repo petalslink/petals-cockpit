@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <ng-template updateFileInformation>
           <form [formGroup]="updateComponentDeployInfoFormGroup">
             <mat-form-field>
-              <input type="text" matInput placeholder="name" autocomplete="off" formControlName="name">
+              <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
 
               <mat-error *ngIf="updateComponentDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')">
                 You can't upload a component with a name that already exists in this container

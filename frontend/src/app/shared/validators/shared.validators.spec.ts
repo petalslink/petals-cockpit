@@ -93,4 +93,36 @@ describe(`SharedValidator`, () => {
       })
     );
   });
+
+  describe(`isKeyPresentInObject`, () => {
+    const getObj = () => ({ key1: 'value1', key2: 'value2', key3: 'value3' });
+
+    it(`should return an object if the input text is also a key of the object passed as parameter`, () => {
+      const fakeAbstractControl = {
+        // there shouldn't be any problem with untrimmed values
+        value: '   key1   ',
+      } as AbstractControl;
+
+      const result = SharedValidator.isKeyPresentInObject(getObj)(
+        fakeAbstractControl
+      );
+
+      expect(result).toEqual({
+        isKeyPresentInObject: true,
+      });
+    });
+
+    it(`should return null if the input text is not a key of the object passed as a parameter`, () => {
+      const fakeAbstractControl = {
+        // there shouldn't be any problem with untrimmed values
+        value: '   unknownKey   ',
+      } as AbstractControl;
+
+      const result = SharedValidator.isKeyPresentInObject(getObj)(
+        fakeAbstractControl
+      );
+
+      expect(result).toBeNull();
+    });
+  });
 });
