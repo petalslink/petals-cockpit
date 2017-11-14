@@ -40,8 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     >
       <div
         class="selected-file"
-        fxLayout="row"
-        fxLayout.lt-md="column"
+        fxLayout="column"
         fxLayoutAlign="start center"
       >
         <span class="file-name">
@@ -72,7 +71,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <mat-icon>delete</mat-icon>
           </button>
 
-          <button mat-raised-button class="btn-upload" (click)="uploadFile()">Upload</button>
+          <button mat-raised-button class="btn-upload" (click)="uploadFile()" [disabled]="disabled">Upload</button>
         </div>
       </div>
 

@@ -38,7 +38,12 @@ export class ContainersServiceMock extends ContainersServiceImpl {
     return helper.responseBody(detailsContainer);
   }
 
-  deployComponent(workspaceId: string, containerId: string, file: File) {
+  deployComponent(
+    workspaceId: string,
+    containerId: string,
+    file: File,
+    name: string
+  ) {
     return deployMockAndTriggerSse({
       ifError: {
         isThereAnError: () => file.name.includes('error'),
@@ -53,7 +58,7 @@ export class ContainersServiceMock extends ContainersServiceImpl {
         addResourceToMock: () => {
           const components = containersService
             .get(containerId)
-            .addComponent('Loaded')
+            .addComponent('Loaded', name)
             .toObj();
 
           return {

@@ -19,8 +19,9 @@ import { createSelector } from '@ngrx/store';
 
 import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
 import { getBusesById } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
+import { getComponentsById } from 'app/features/cockpit/workspaces/state/components/components.selectors';
+import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 import { IStore } from 'app/shared/state/store.interface';
-import { IContainerRow } from './containers.interface';
 
 export interface IContainerWithSiblings extends IContainerRow {
   siblings: IContainerRow[];
@@ -63,4 +64,28 @@ export const getCurrentContainer = createSelector(
       return undefined;
     }
   }
+);
+
+/**
+ * useful to know whether a component already has a given container
+ * without having to loop on the whole component.containers array,
+ * only by trying to access it's key
+ * @returns
+ */
+export const componentsOfCurrentContainerByName = createSelector(
+  getCurrentContainer,
+  getComponentsById,
+  (currentContainer, componentsById) =>
+    !currentContainer
+      ? {}
+      : currentContainer.components.reduce(
+          (acc, componentId) => {
+            const component = componentsById[componentId];
+            const componentName = component.name.trim().toLowerCase();
+
+            acc[componentName] = true;
+            return acc;
+          },
+          <{ [name: string]: boolean }>{}
+        )
 );

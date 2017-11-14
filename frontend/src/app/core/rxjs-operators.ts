@@ -19,6 +19,7 @@
 // see node_module/rxjs/Rxjs.js
 // statics
 import 'rxjs/add/observable/empty';
+import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/observable/interval';

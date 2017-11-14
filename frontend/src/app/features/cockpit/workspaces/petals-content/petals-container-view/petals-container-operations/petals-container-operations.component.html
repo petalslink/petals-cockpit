@@ -23,8 +23,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         [title]="'Component deployment'"
         [uploadStatus]="uploadComponentStatus"
         [error]="container.errorDeploymentComponent"
+        [disabled]="updateComponentDeployInfoFormGroup.invalid"
         (onUploadFile)="deploy('component', $event.selectedFileInformation.file)"
-      ></app-upload>
+        (onFileSelected)="onFileSelected($event.file)"
+        (onResetFile)="updateComponentDeployInfoFormGroup.reset()"
+      >
+        <ng-template updateFileInformation>
+          <form [formGroup]="updateComponentDeployInfoFormGroup">
+            <mat-form-field>
+              <input type="text" matInput placeholder="name" autocomplete="off" formControlName="name">
+
+              <mat-error *ngIf="updateComponentDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')">
+                You can't upload a component with a name that already exists in this container
+              </mat-error>
+            </mat-form-field>
+          </form>
+        </ng-template>
+      </app-upload>
 
       <app-upload
         class="deploy-service-assembly"

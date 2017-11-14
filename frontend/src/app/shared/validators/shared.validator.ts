@@ -34,4 +34,21 @@ export class SharedValidator {
               { isIncluded: false }
       );
   }
+
+  /**
+   * sync validator to determine whether an object
+   * contains a given key
+   */
+  static isKeyPresentInObject(getObj: () => Object) {
+    return (control: AbstractControl) => {
+      const value = (<string>control.value || '').trim().toLowerCase();
+      const obj = getObj();
+
+      return obj && obj.hasOwnProperty(value)
+        ? {
+            isKeyPresentInObject: true,
+          }
+        : null;
+    };
+  }
 }

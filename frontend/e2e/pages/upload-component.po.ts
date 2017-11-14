@@ -24,21 +24,25 @@ import {
 import { waitTimeout } from '../common';
 import { MessageComponentPage } from './message-component.po';
 
-export class UploadComponentPage {
+export abstract class UploadComponentPage {
   public readonly title: ElementFinder;
   public readonly fileInput: ElementFinder;
   public readonly fileName: ElementFinder;
   public readonly chooseFileButton: ElementFinder;
   public readonly removeFileButton: ElementFinder;
   public readonly deployButton: ElementFinder;
+  protected readonly editInformation = this.component.$('.edit-information');
 
-  static waitAndGet(selectorClass: string) {
-    const component = $(`app-upload.${selectorClass}`);
-    browser.wait(EC.visibilityOf(component), waitTimeout);
-    return new UploadComponentPage(component);
+  protected static _waitAndGet<T>(
+    selectorClass: string,
+    UploadPage: new (elementFinder: ElementFinder) => T
+  ): T {
+    const uploadComponent = $(`app-upload.${selectorClass}`);
+    browser.wait(EC.visibilityOf(uploadComponent), waitTimeout);
+    return new UploadPage(uploadComponent);
   }
 
-  private constructor(public readonly component: ElementFinder) {
+  constructor(public readonly component: ElementFinder) {
     this.title = this.component.$('.mct-title');
     this.fileInput = this.component.$('input[type="file"]');
     this.fileName = this.component.$('.file-name');
@@ -49,5 +53,31 @@ export class UploadComponentPage {
 
   getErrorDeployMessage() {
     return MessageComponentPage.waitAndGet(this.component, `error-upload`);
+  }
+}
+
+export class ComponentDeploymentPage extends UploadComponentPage {
+  public nameInput = this.editInformation.$('input[formControlName="name"]');
+
+  static waitAndGet(selectorClass: string) {
+    return super._waitAndGet(selectorClass, ComponentDeploymentPage);
+  }
+}
+
+export class ServiceAssemblyDeploymentPage extends UploadComponentPage {
+  static waitAndGet(selectorClass: string) {
+    return super._waitAndGet(selectorClass, ServiceAssemblyDeploymentPage);
+  }
+}
+
+export class ServiceUnitDeploymentPage extends UploadComponentPage {
+  static waitAndGet(selectorClass: string) {
+    return super._waitAndGet(selectorClass, ServiceUnitDeploymentPage);
+  }
+}
+
+export class SharedLibraryDeploymentPage extends UploadComponentPage {
+  static waitAndGet(selectorClass: string) {
+    return super._waitAndGet(selectorClass, SharedLibraryDeploymentPage);
   }
 }

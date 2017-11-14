@@ -19,8 +19,10 @@ import { HttpClient, HttpEventType, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
+import * as xmltojson from 'xmltojson';
 
 import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
+import { loadFilesContentFromZip } from 'app/shared/helpers/zip.helper';
 import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
 import { environment } from 'environments/environment';
@@ -96,6 +98,8 @@ export abstract class ComponentsService {
       serviceUnits: JsTable<IServiceUnitBackendSSE>;
     }>;
   };
+
+  abstract getComponentNameFromZipFile(file: File): Observable<string>;
 }
 
 @Injectable()
@@ -190,5 +194,22 @@ export class ComponentsServiceImpl extends ComponentsService {
         })
         .last(),
     };
+  }
+
+  getComponentNameFromZipFile(file: File) {
+    return loadFilesContentFromZip(file, filePath =>
+      filePath.includes('jbi.xml')
+    ).map(([firstFileContent]) => this.getNameFromXml(firstFileContent));
+  }
+
+  private getNameFromXml(xml: string): string {
+    const json: any = xmltojson.parseString(xml, {});
+    let name = '';
+
+    try {
+      name = json.jbi[0].component[0].identification[0].name[0]._text;
+    } catch (err) {}
+
+    return name;
   }
 }

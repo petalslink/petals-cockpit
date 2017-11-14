@@ -23,7 +23,7 @@ import { MessageComponentPage } from './message-component.po';
 import { ServiceAssemblyOverviewPage } from './service-assembly.po';
 import { ServiceUnitOverviewPage } from './service-unit.po';
 import { SharedLibraryOverviewPage } from './shared-library.po';
-import { UploadComponentPage } from './upload-component.po';
+import { ServiceUnitDeploymentPage } from './upload-component.po';
 
 export abstract class ComponentPage {
   public static readonly component = $(`app-petals-component-view`);
@@ -176,7 +176,7 @@ export class ComponentOperationPage extends ComponentPage {
   }
 
   getSUUpload() {
-    return UploadComponentPage.waitAndGet('deploy-service-unit');
+    return ServiceUnitDeploymentPage.waitAndGet('deploy-service-unit');
   }
 
   parameter(name: string) {
