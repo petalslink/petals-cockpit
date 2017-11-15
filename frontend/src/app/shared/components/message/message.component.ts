@@ -17,8 +17,10 @@
 
 import {
   Component,
+  EventEmitter,
   Input,
   OnInit,
+  Output,
   TemplateRef,
   ViewChild,
 } from '@angular/core';
@@ -32,7 +34,9 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 export class MessageComponent implements OnInit {
   @Input() msg: string;
   @Input() type: 'error' | 'warning' | 'info';
+  @Input() isClosable? = true;
   @Input() maxLength = 200;
+  @Output() onClose = new EventEmitter();
 
   isHidden = false;
 
@@ -49,5 +53,6 @@ export class MessageComponent implements OnInit {
 
   hideMessage() {
     this.isHidden = true;
+    this.onClose.emit();
   }
 }

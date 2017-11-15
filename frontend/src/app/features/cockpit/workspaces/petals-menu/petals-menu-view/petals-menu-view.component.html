@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="wrapper-search-add-bus" fxLayout="row">
     <form [formGroup]="searchForm">
       <mat-form-field fxFlex>
-        <input class="search" matInput placeholder="Search" formControlName="search">
+        <input class="search" [appFocusInput]="focusSearchInput$" matInput placeholder="Search" formControlName="search">
         <span matPrefix><mat-icon color="primary">search</mat-icon></span>
       </mat-form-field>
     </form>
@@ -46,7 +46,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <app-material-tree [tree]="tree" [search]="search" [marginLeft]="14" (onToggleFold)="onTreeToggleFold($event)"
     (onSelect)="onTreeSelect($event)"></app-material-tree>
 
-  <app-message *ngIf="tree.length === 0 && search" class="info no-match" type="info"
-    msg="There is no match with &quot;{{ search }}&quot;."></app-message>
+  <app-message
+    class="info no-match"
+    *ngIf="tree.length === 0 && search"
+    type="info"
+    msg="There is no match with &quot;{{ search }}&quot;."
+    (onClose)="focusSearch()"
+  ></app-message>
 
 </div>

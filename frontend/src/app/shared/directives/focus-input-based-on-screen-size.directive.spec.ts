@@ -52,7 +52,9 @@ describe(`appFocusInputIfLargeScreen`, () => {
 
   beforeEach(() => {
     store = TestBed.get(Store);
-    store.sendMockValue({ ui: { screenSize: 'lg' } });
+    store.sendMockValue({
+      ui: { screenSize: 'lg' },
+    });
   });
 
   describe(`directive without any parameter passed`, () => {
@@ -112,7 +114,9 @@ describe(`appFocusInputIfLargeScreen`, () => {
     it(
       `should not focus an element on small screen even if the directive is called with true`,
       fakeAsync(() => {
-        store.sendMockValue({ ui: { screenSize: 'sm' } });
+        store.sendMockValue({
+          ui: { screenSize: 'sm' },
+        });
 
         componentParams.isFocusActivated = true;
 
@@ -124,7 +128,7 @@ describe(`appFocusInputIfLargeScreen`, () => {
     );
 
     it(
-      `should focus an elemen with the directivecalled with true (previously called with false)`,
+      `should focus an element with the directive called with true (previously called with false)`,
       fakeAsync(() => {
         componentParams.isFocusActivated = false;
 
