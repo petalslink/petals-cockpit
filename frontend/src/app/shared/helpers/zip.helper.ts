@@ -30,7 +30,7 @@ export function loadFilesContentFromZip(
       // it's the one provided by JSZip
       zip.forEach((relativePath, zipEntry) => {
         if (shouldKeepFile(relativePath)) {
-          filesContent.push(getTextFromZip(zip, relativePath));
+          filesContent.push(_getTextFromZip(zip, relativePath));
         }
       });
 
@@ -45,7 +45,7 @@ export function loadFilesContentFromZip(
     );
 }
 
-function getTextFromZip(
+export function _getTextFromZip(
   zipFile: JSZip,
   relativePath: string
 ): Observable<string> {
