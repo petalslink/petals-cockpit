@@ -17,6 +17,7 @@
 
 import {
   $,
+  $$,
   browser,
   ElementFinder,
   ExpectedConditions as EC,
@@ -75,7 +76,7 @@ export class PetalsCockpitPage {
   }
 
   expectNotification(title?: Matcher, content?: Matcher) {
-    const simpleNotification = $(`simple-notification`);
+    const simpleNotification = $$(`simple-notification`).get(0);
 
     let test = EC.visibilityOf(simpleNotification);
 
@@ -94,6 +95,7 @@ export class PetalsCockpitPage {
       .wait(test, 20000)
       .then(() => {
         browser.ignoreSynchronization = false;
+        simpleNotification.click();
         return browser.wait(EC.invisibilityOf(simpleNotification), 20000);
       })
       .catch(() => {
