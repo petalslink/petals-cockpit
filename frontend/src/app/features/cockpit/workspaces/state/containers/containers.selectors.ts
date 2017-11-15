@@ -21,6 +21,7 @@ import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/buses.inter
 import { getBusesById } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
 import { getComponentsById } from 'app/features/cockpit/workspaces/state/components/components.selectors';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
+import { getSharedLibrariesById } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
 import { IStore } from 'app/shared/state/store.interface';
 
 export interface IContainerWithSiblings extends IContainerRow {
@@ -84,6 +85,24 @@ export const componentsOfCurrentContainerByName = createSelector(
             const componentName = component.name.trim().toLowerCase();
 
             acc[componentName] = true;
+            return acc;
+          },
+          <{ [name: string]: boolean }>{}
+        )
+);
+
+export const sharedLibrariesOfCurrentContainerByName = createSelector(
+  getCurrentContainer,
+  getSharedLibrariesById,
+  (currentContainer, sharedLibrariesById) =>
+    !currentContainer
+      ? {}
+      : currentContainer.sharedLibraries.reduce(
+          (acc, sharedLibraryId) => {
+            const sharedLibrary = sharedLibrariesById[sharedLibraryId];
+            const sharedLibraryName = sharedLibrary.name.trim().toLowerCase();
+
+            acc[sharedLibraryName] = true;
             return acc;
           },
           <{ [name: string]: boolean }>{}

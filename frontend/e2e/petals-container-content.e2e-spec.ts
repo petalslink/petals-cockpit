@@ -115,7 +115,7 @@ describe(`Petals container content`, () => {
 
       const filePath = path.resolve(
         __dirname,
-        './resources/META-INF/metainf.zip'
+        './resources/petals-zip/components/petals-bc-jms-2.0.zip'
       );
       upload.fileInput.sendKeys(filePath);
 
@@ -431,7 +431,10 @@ describe(`Petals container content`, () => {
         .openOperations()
         .getSharedLibraryUpload();
 
-      const filePath = path.resolve(__dirname, './resources/sl.zip');
+      const filePath = path.resolve(
+        __dirname,
+        './resources/petals-zip/shared-libraries/petals-sl-saxonhe-9.6.0.6.zip'
+      );
       deploy.fileInput.sendKeys(filePath);
 
       const expectedTreeBeforeDeploy = [

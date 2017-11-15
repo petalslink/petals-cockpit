@@ -49,6 +49,7 @@ import {
   HttpProgress,
   HttpProgressType,
 } from 'app/shared/services/http-progress-tracker.service';
+import { SharedLibrariesService } from 'app/shared/services/shared-libraries.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { SharedValidator } from 'app/shared/validators/shared.validator';
 
@@ -66,6 +67,9 @@ export class PetalsContainerOperationsComponent
   componentsByName: {
     [name: string]: boolean;
   };
+  sharedLibrariesByName: {
+    [name: string]: boolean;
+  };
   fileToDeployComponent: File = null;
   fileToDeployServiceAssembly: File = null;
 
@@ -74,6 +78,7 @@ export class PetalsContainerOperationsComponent
   @ViewChild('deploySharedLibrary') deploySharedLibrary: UploadComponent;
 
   updateComponentDeployInfoFormGroup: FormGroup;
+  updateSharedLibraryDeployInfoFormGroup: FormGroup;
 
   uploadComponentStatus: {
     percentage: number;
@@ -90,7 +95,8 @@ export class PetalsContainerOperationsComponent
     private store$: Store<IStore>,
     private actions$: Actions,
     private notifications: NotificationsService,
-    private componentsService: ComponentsService
+    private componentsService: ComponentsService,
+    private sharedLibrariesService: SharedLibrariesService
   ) {}
 
   ngOnDestroy() {
@@ -117,6 +123,16 @@ export class PetalsContainerOperationsComponent
         [SharedValidator.isKeyPresentInObject(() => this.componentsByName)],
       ],
     });
+    this.updateSharedLibraryDeployInfoFormGroup = this.fb.group({
+      name: [
+        '',
+        [
+          SharedValidator.isKeyPresentInObject(
+            () => this.sharedLibrariesByName
+          ),
+        ],
+      ],
+    });
   }
 
   onFileSelected(file: File) {
@@ -124,6 +140,7 @@ export class PetalsContainerOperationsComponent
     // only when the control is set to touched and thus we won't have a
     // "real time" feedback, especially when there's only one input
     this.updateComponentDeployInfoFormGroup.get('name').markAsTouched();
+    this.updateSharedLibraryDeployInfoFormGroup.get('name').markAsTouched();
 
     this.componentsService
       .getComponentNameFromZipFile(file)
@@ -141,6 +158,22 @@ export class PetalsContainerOperationsComponent
           return empty();
         })
       )
+      .subscribe();
+
+    this.sharedLibrariesService
+      .getSharedLibraryNameFromZipFile(file)
+      .takeUntil(this.onDestroy$)
+      .do(x =>
+        this.updateSharedLibraryDeployInfoFormGroup.get('name').setValue(x)
+      )
+      .catch(err => {
+        this.notifications.warn(
+          'File error',
+          `An error occurred while trying to read the shared library's name from zip file`
+        );
+
+        return Observable.empty();
+      })
       .subscribe();
   }
 
@@ -194,6 +227,7 @@ export class PetalsContainerOperationsComponent
           correlationId,
           id: this.container.id,
           file,
+          name: this.updateSharedLibraryDeployInfoFormGroup.get('name').value,
         }),
       };
     }
