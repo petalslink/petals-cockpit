@@ -110,7 +110,9 @@ export class GuardLoginService implements CanActivate {
               } else {
                 if (environment.debug) {
                   console.debug(
-                    `Guard App: User not logged. Redirecting to /login (and then to ${url}).`
+                    `Guard App: User not logged. Redirecting to /login (and then to ${
+                      url
+                    }).`
                   );
                 }
 

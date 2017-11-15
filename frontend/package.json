@@ -28,16 +28,15 @@
     "postbuild": "gulp compress",
     "electron": "yarn run build-electron; electron dist/",
     "prettier:base": "yarn run prettier --single-quote --trailing-comma es5",
-    "prettier:base-files": "yarn run prettier:base './{e2e,src}/**/*.{scss,ts}'",
+    "prettier:base-files": "yarn run prettier:base './{e2e,src}/**/*.{scss,ts}' '../!(node_modules)*.md'",
     "prettier:fix": "yarn run prettier:base-files --write",
     "prettier:check": "yarn run prettier:base-files -l",
     "precommit": "lint-staged",
     "prepush": "yarn run lint:check && yarn run copyrights:check"
   },
   "lint-staged": {
-    "gitDir": "../",
     "linters": {
-      "*.{ts,scss}": [
+      "*.{ts,scss,md}": [
         "yarn run prettier:base -l"
       ]
     }
@@ -106,9 +105,9 @@
     "karma-jasmine": "1.1.0",
     "karma-jasmine-html-reporter": "0.2.2",
     "karma-scss-preprocessor": "3.0.0",
-    "lint-staged": "4.3.0",
+    "lint-staged": "5.0.0",
     "lodash": "4.17.4",
-    "prettier": "1.7.4",
+    "prettier": "1.8.2",
     "protractor": "5.2.0",
     "ts-node": "3.3.0",
     "tslint": "5.8.0",

@@ -52,7 +52,9 @@ export class BusesInProgressEffects {
       const busInError = action.payload;
       this.notifications.alert(
         `Bus import error`,
-        `The import of a bus from the IP ${busInError.ip}:${busInError.port} failed`
+        `The import of a bus from the IP ${busInError.ip}:${
+          busInError.port
+        } failed`
       );
       return new BusesInProgress.UpdateError(busInError);
     });

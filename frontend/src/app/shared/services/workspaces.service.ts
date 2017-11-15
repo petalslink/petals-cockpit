@@ -88,11 +88,12 @@ export class WorkspacesServiceImpl extends WorkspacesService {
   }
 
   postWorkspace(name: string) {
-    return this.http.post<
-      IWorkspaceBackendDetails
-    >(`${environment.urlBackend}/workspaces`, {
-      name: name,
-    });
+    return this.http.post<IWorkspaceBackendDetails>(
+      `${environment.urlBackend}/workspaces`,
+      {
+        name: name,
+      }
+    );
   }
 
   fetchWorkspace(id: string) {
@@ -115,9 +116,10 @@ export class WorkspacesServiceImpl extends WorkspacesService {
   }
 
   addUser(workspaceId: string, id: string) {
-    return this.http.post<
-      void
-    >(`${environment.urlBackend}/workspaces/${workspaceId}/users`, { id });
+    return this.http.post<void>(
+      `${environment.urlBackend}/workspaces/${workspaceId}/users`,
+      { id }
+    );
   }
 
   removeUser(workspaceId: string, userId: string) {

@@ -119,7 +119,9 @@ export class ComponentsServiceImpl extends ComponentsService {
       id: string;
       state: ComponentState;
     }>(
-      `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}`,
+      `${environment.urlBackend}/workspaces/${workspaceId}/components/${
+        componentId
+      }`,
       { state }
     );
   }
@@ -129,10 +131,10 @@ export class ComponentsServiceImpl extends ComponentsService {
     componentId: string,
     parameters: { [key: string]: string }
   ) {
-    return this.http.put<
-      void
-    >(
-      `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}/parameters`,
+    return this.http.put<void>(
+      `${environment.urlBackend}/workspaces/${workspaceId}/components/${
+        componentId
+      }/parameters`,
       { parameters }
     );
   }
@@ -149,7 +151,9 @@ export class ComponentsServiceImpl extends ComponentsService {
 
     const req = new HttpRequest(
       'POST',
-      `${environment.urlBackend}/workspaces/${workspaceId}/components/${componentId}/serviceunits`,
+      `${environment.urlBackend}/workspaces/${workspaceId}/components/${
+        componentId
+      }/serviceunits`,
       formData,
       {
         reportProgress: true,
