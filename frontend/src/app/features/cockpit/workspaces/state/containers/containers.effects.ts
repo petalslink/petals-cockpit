@@ -237,7 +237,9 @@ export class ContainersEffects {
         } = this.containersService.deploySharedLibrary(
           workspaceId,
           action.payload.id,
-          action.payload.file
+          action.payload.file,
+          action.payload.name,
+          action.payload.version
         );
 
         return result$.pipe(

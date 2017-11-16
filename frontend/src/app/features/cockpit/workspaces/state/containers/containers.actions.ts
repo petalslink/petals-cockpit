@@ -137,6 +137,7 @@ export namespace Containers {
         id: string;
         file: File;
         name: string;
+        version: string;
       } & ICorrelationId
     ) {}
   }

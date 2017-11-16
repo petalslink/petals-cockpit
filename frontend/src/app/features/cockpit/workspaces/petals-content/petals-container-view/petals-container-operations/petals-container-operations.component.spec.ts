@@ -70,7 +70,7 @@ describe(`Petals container operations`, () => {
 
   describe(`change component name`, () => {
     it(`should mark the name as touched into component form when a file is selected`, () => {
-      pcoComponent.onFileSelected(null);
+      pcoComponent.onFileSelected('component', null);
 
       expect(
         pcoComponent.updateComponentDeployInfoFormGroup.get('name').touched
@@ -89,7 +89,7 @@ describe(`Petals container operations`, () => {
           'getComponentNameFromZipFile'
         ).and.callThrough();
 
-        pcoComponent.onFileSelected(null);
+        pcoComponent.onFileSelected('component', null);
         flush();
 
         expect(
@@ -114,7 +114,7 @@ describe(`Petals container operations`, () => {
           _throw(new Error('Error while reading ZIP'))
         );
 
-        pcoComponent.onFileSelected(null);
+        pcoComponent.onFileSelected('component', null);
         flush();
 
         expect(
@@ -130,16 +130,20 @@ describe(`Petals container operations`, () => {
   });
 
   describe(`change shared library name`, () => {
-    it(`should mark the name as touched into shared library form when a file is selected`, () => {
-      pcoComponent.onFileSelected(null);
+    it(`should mark the name and version as touched into shared library form when a file is selected`, () => {
+      pcoComponent.onFileSelected('shared-library', null);
 
       expect(
         pcoComponent.updateSharedLibraryDeployInfoFormGroup.get('name').touched
       ).toBe(true);
+      expect(
+        pcoComponent.updateSharedLibraryDeployInfoFormGroup.get('version')
+          .touched
+      ).toBe(true);
     });
 
     it(
-      `should get the name of the shared library into the selected zip file and display it into the form`,
+      `should get the name and version of the shared library into the selected zip file and display it into the form`,
       fakeAsync(() => {
         const sharedLibrariesService: SharedLibrariesMockService = TestBed.get(
           SharedLibrariesService
@@ -147,18 +151,22 @@ describe(`Petals container operations`, () => {
 
         spyOn(
           sharedLibrariesService,
-          'getSharedLibraryNameFromZipFile'
+          'getSharedLibraryInformationFromZipFile'
         ).and.callThrough();
 
-        pcoComponent.onFileSelected(null);
+        pcoComponent.onFileSelected('shared-library', null);
         flush();
 
         expect(
-          sharedLibrariesService.getSharedLibraryNameFromZipFile
+          sharedLibrariesService.getSharedLibraryInformationFromZipFile
         ).toHaveBeenCalled();
         expect(
           pcoComponent.updateSharedLibraryDeployInfoFormGroup.get('name').value
         ).toEqual('some content from zip');
+        expect(
+          pcoComponent.updateSharedLibraryDeployInfoFormGroup.get('version')
+            .value
+        ).toEqual('1.0');
       })
     );
 
@@ -173,10 +181,10 @@ describe(`Petals container operations`, () => {
 
         spyOn(
           sharedLibrariesService,
-          'getSharedLibraryNameFromZipFile'
+          'getSharedLibraryInformationFromZipFile'
         ).and.returnValue(_throw(new Error('Error while reading ZIP')));
 
-        pcoComponent.onFileSelected(null);
+        pcoComponent.onFileSelected('shared-library', null);
         flush();
 
         expect(
@@ -185,7 +193,7 @@ describe(`Petals container operations`, () => {
 
         expect((<any>pcoComponent).notifications.warn).toHaveBeenCalledWith(
           'File error',
-          `An error occurred while trying to read the shared library's name from zip file`
+          `An error occurred while trying to read the shared library's information from zip file`
         );
       })
     );
@@ -205,7 +213,7 @@ export class ComponentsMockService {
 export class SharedLibrariesMockService {
   constructor() {}
 
-  getSharedLibraryNameFromZipFile() {
-    return of('some content from zip');
+  getSharedLibraryInformationFromZipFile() {
+    return of({ name: 'some content from zip', version: '1.0' });
   }
 }

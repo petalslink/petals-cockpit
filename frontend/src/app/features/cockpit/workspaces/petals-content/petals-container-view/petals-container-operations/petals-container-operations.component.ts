@@ -33,6 +33,7 @@ import { empty } from 'rxjs/observable/empty';
 import {
   catchError,
   filter,
+  map,
   switchMap,
   take,
   takeUntil,
@@ -67,11 +68,14 @@ export class PetalsContainerOperationsComponent
   componentsByName: {
     [name: string]: boolean;
   };
+  @Input()
   sharedLibrariesByName: {
     [name: string]: boolean;
   };
-  fileToDeployComponent: File = null;
-  fileToDeployServiceAssembly: File = null;
+  @Input()
+  sharedLibrariesByVersion: {
+    [version: string]: boolean;
+  };
 
   @ViewChild('deployComponent') deployComponent: UploadComponent;
   @ViewChild('deployServiceAssembly') deployServiceAssembly: UploadComponent;
@@ -79,6 +83,11 @@ export class PetalsContainerOperationsComponent
 
   updateComponentDeployInfoFormGroup: FormGroup;
   updateSharedLibraryDeployInfoFormGroup: FormGroup;
+
+  formControls = {
+    name: '',
+    version: '',
+  };
 
   uploadComponentStatus: {
     percentage: number;
@@ -89,6 +98,9 @@ export class PetalsContainerOperationsComponent
   uploadSharedLibraryStatus: {
     percentage: number;
   };
+  cpNameReadFromZip: string;
+  slNameReadFromZip: string;
+  slVersionReadFromZip: string;
 
   constructor(
     private fb: FormBuilder,
@@ -132,49 +144,78 @@ export class PetalsContainerOperationsComponent
           ),
         ],
       ],
+      version: '',
     });
   }
 
-  onFileSelected(file: File) {
-    // when using mat-error with material, if there's an error it'll be display
-    // only when the control is set to touched and thus we won't have a
-    // "real time" feedback, especially when there's only one input
-    this.updateComponentDeployInfoFormGroup.get('name').markAsTouched();
-    this.updateSharedLibraryDeployInfoFormGroup.get('name').markAsTouched();
+  onFileSelected(
+    type: 'component' | 'service-assembly' | 'shared-library',
+    file: File
+  ) {
+    switch (type) {
+      case 'component': {
+        // when using mat-error with material, if there's an error it'll be display
+        // only when the control is set to touched and thus we won't have a
+        // "real time" feedback, especially when there's only one input
+        this.updateComponentDeployInfoFormGroup.get('name').markAsTouched();
 
-    this.componentsService
-      .getComponentNameFromZipFile(file)
-      .pipe(
-        takeUntil(this.onDestroy$),
-        tap(x =>
-          this.updateComponentDeployInfoFormGroup.get('name').setValue(x)
-        ),
-        catchError(err => {
-          this.notifications.warn(
-            'File error',
-            `An error occurred while trying to read the component's name from zip file`
-          );
+        this.componentsService
+          .getComponentNameFromZipFile(file)
+          .pipe(
+            takeUntil(this.onDestroy$),
+            tap(x =>
+              this.updateComponentDeployInfoFormGroup.get('name').setValue(x)
+            ),
+            catchError(err => {
+              this.notifications.warn(
+                'File error',
+                `An error occurred while trying to read the component's name from zip file`
+              );
 
-          return empty();
-        })
-      )
-      .subscribe();
+              return empty();
+            })
+          )
+          .subscribe();
+        break;
+      }
 
-    this.sharedLibrariesService
-      .getSharedLibraryNameFromZipFile(file)
-      .takeUntil(this.onDestroy$)
-      .do(x =>
-        this.updateSharedLibraryDeployInfoFormGroup.get('name').setValue(x)
-      )
-      .catch(err => {
-        this.notifications.warn(
-          'File error',
-          `An error occurred while trying to read the shared library's name from zip file`
+      case 'service-assembly': {
+        break;
+      }
+
+      case 'shared-library': {
+        ['name', 'version'].forEach(attr =>
+          this.updateSharedLibraryDeployInfoFormGroup.get(attr).markAsTouched()
         );
 
-        return Observable.empty();
-      })
-      .subscribe();
+        this.sharedLibrariesService
+          .getSharedLibraryInformationFromZipFile(file)
+          .pipe(
+            takeUntil(this.onDestroy$),
+            map(x => {
+              this.slNameReadFromZip = x.name;
+              this.updateSharedLibraryDeployInfoFormGroup
+                .get('name')
+                .setValue(x.name);
+
+              this.slVersionReadFromZip = x.version;
+              this.updateSharedLibraryDeployInfoFormGroup
+                .get('version')
+                .setValue(x.version);
+            }),
+            catchError(err => {
+              this.notifications.warn(
+                'File error',
+                `An error occurred while trying to read the shared library's information from zip file`
+              );
+
+              return empty();
+            })
+          )
+          .subscribe();
+        break;
+      }
+    }
   }
 
   deploy(
@@ -228,6 +269,8 @@ export class PetalsContainerOperationsComponent
           id: this.container.id,
           file,
           name: this.updateSharedLibraryDeployInfoFormGroup.get('name').value,
+          version: this.updateSharedLibraryDeployInfoFormGroup.get('version')
+            .value,
         }),
       };
     }

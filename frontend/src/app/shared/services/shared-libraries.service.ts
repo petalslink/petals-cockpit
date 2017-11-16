@@ -60,7 +60,9 @@ export abstract class SharedLibrariesService {
     state: SharedLibraryState;
   }>;
 
-  abstract getSharedLibraryNameFromZipFile(file: File): Observable<string>;
+  abstract getSharedLibraryInformationFromZipFile(
+    file: File
+  ): Observable<{ name: string; version: string }>;
 }
 
 @Injectable()
@@ -87,20 +89,31 @@ export class SharedLibrariesServiceImpl extends SharedLibrariesService {
     );
   }
 
-  getSharedLibraryNameFromZipFile(file: File) {
+  getSharedLibraryInformationFromZipFile(file: File) {
     return loadFilesContentFromZip(file, filePath =>
       filePath.includes('jbi.xml')
-    ).pipe(map(([firstFileContent]) => this.getNameFromXml(firstFileContent)));
+    ).pipe(
+      map(([firstFileContent]) => {
+        const infos = this.getInformationsFromXml(firstFileContent);
+        return infos;
+      })
+    );
   }
 
-  private getNameFromXml(xml: string): string {
+  private getInformationsFromXml(
+    xml: string
+  ): { name: string; version: string } {
     const json: any = xmltojson.parseString(xml, {});
     let name = '';
+    let version = '';
 
     try {
-      name = json.jbi[0].sharedLibrary[0].identification[0].name[0]._text;
+      const sl = json.jbi[0]['shared-library'][0];
+
+      name = sl.identification[0].name[0]._text;
+      version = sl._attr.version._value;
     } catch (err) {}
 
-    return name;
+    return { name, version };
   }
 }

@@ -80,7 +80,9 @@ export abstract class ContainersService {
   abstract deploySharedLibrary(
     workspaceId: string,
     containerId: string,
-    file: File
+    file: File,
+    name: string,
+    version: string
   ): {
     progress$: Observable<number>;
     result$: Observable<JsTable<ISharedLibraryBackendSSE>>;
@@ -107,7 +109,7 @@ export class ContainersServiceImpl extends ContainersService {
   ) {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
-    formData.append('name', name);
+    formData.append('overrides', JSON.stringify(name));
 
     const req = new HttpRequest(
       'POST',
@@ -156,9 +158,20 @@ export class ContainersServiceImpl extends ContainersService {
     }));
   }
 
-  deploySharedLibrary(workspaceId: string, containerId: string, file: File) {
+  deploySharedLibrary(
+    workspaceId: string,
+    containerId: string,
+    file: File,
+    name: string,
+    version: string
+  ) {
     const formData: FormData = new FormData();
+    const overrides = { sharedLibrary: { name, version } };
+    const blob = new Blob([JSON.stringify(overrides)], {
+      type: 'application/json',
+    });
     formData.append('file', file, file.name);
+    formData.append('overrides', blob);
 
     const req = new HttpRequest(
       'POST',

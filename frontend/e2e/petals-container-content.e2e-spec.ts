@@ -120,9 +120,7 @@ describe(`Petals container content`, () => {
       upload.fileInput.sendKeys(filePath);
 
       // should be able to find the component's name from the zip
-      expect(upload.nameInput.getAttribute('value')).toEqual(
-        'petals-component'
-      );
+      expect(upload.nameInput.getAttribute('value')).toEqual('petals-bc-jms');
 
       const expectedTreeBeforeDeploy = [
         `Bus 0`,
@@ -164,7 +162,7 @@ describe(`Petals container content`, () => {
       page.clickAndExpectNotification(
         upload.deployButton,
         'Component Deployed',
-        'component has been successfully deployed'
+        'petals-bc-jms has been successfully deployed'
       );
 
       // check that the component is now added to the tree and that we've been redirected to it
@@ -179,8 +177,7 @@ describe(`Petals container content`, () => {
         `SU 1`,
         `SU 3`,
         `Comp 2`,
-        // this one should have been deployed
-        `petals-component`,
+        `petals-bc-jms`,
         `SERVICE ASSEMBLIES`,
         `SA 0`,
         `SA 1`,
@@ -207,7 +204,7 @@ describe(`Petals container content`, () => {
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
       // we should be redirected
-      const ops = workspace.openComponent('petals-component').openOperations();
+      const ops = workspace.openComponent('petals-bc-jms').openOperations();
 
       expect(ops.state.getText()).toEqual('Loaded');
 
@@ -473,11 +470,11 @@ describe(`Petals container content`, () => {
 
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeBeforeDeploy);
 
-      // deploy the component
+      // deploy the shared library
       page.clickAndExpectNotification(
         deploy.deployButton,
         'Shared Library Deployed',
-        'SL 4 has been successfully deployed'
+        'petals-sl-saxonhe-9.6.0.6 has been successfully deployed'
       );
 
       // check that the component is now added to the tree and that we've been redirected to it
@@ -498,7 +495,7 @@ describe(`Petals container content`, () => {
         `SA 2`,
         `SHARED LIBRARIES`,
         `SL 0`,
-        `SL 4`, // <-- added
+        `petals-sl-saxonhe-9.6.0.6`,
         `Cont 1`,
         `COMPONENTS`,
         `Comp 3`,
@@ -519,8 +516,8 @@ describe(`Petals container content`, () => {
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
       // we should get redirected
-      const sl = workspace.openSharedLibrary('SL 4');
-      expect(sl.title.getText()).toEqual('SL 4');
+      const sl = workspace.openSharedLibrary('petals-sl-saxonhe-9.6.0.6');
+      expect(sl.title.getText()).toEqual('petals-sl-saxonhe-9.6.0.6');
 
       sl
         .getInfoSlNoComponent()
