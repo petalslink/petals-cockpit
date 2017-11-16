@@ -16,19 +16,18 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { filter, first, map, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
+import { IUserNew } from 'app/shared/services/users.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 import { Users } from 'app/shared/state/users.actions';
 import { ICurrentUser, IUser } from 'app/shared/state/users.interface';
 import { getAllUsers, getCurrentUser } from 'app/shared/state/users.selectors';
-
-import { IUserNew } from 'app/shared/services/users.service';
 
 @Component({
   selector: 'app-administration',
@@ -55,21 +54,23 @@ export class AdministrationComponent implements OnInit, OnDestroy {
 
     this.users$ = this.store$
       .select(getAllUsers)
-      .map(users => users.sort((u1, u2) => u1.id.localeCompare(u2.id)));
+      .pipe(map(users => users.sort((u1, u2) => u1.id.localeCompare(u2.id))));
 
-    this.user$ = this.store$.let(getCurrentUser);
+    this.user$ = this.store$.pipe(getCurrentUser);
 
     this.isFetchingUsers$ = this.store$.select(
       state => state.users.isFetchingUsers
     );
 
     this.user$
-      .first()
-      .filter(u => u.isAdmin)
-      .do(() => this.store$.dispatch(new Users.FetchAll()))
+      .pipe(
+        first(),
+        filter(u => u.isAdmin),
+        tap(() => this.store$.dispatch(new Users.FetchAll()))
+      )
       .subscribe();
 
-    this.isLargeScreen$ = this.store$.let(isLargeScreen);
+    this.isLargeScreen$ = this.store$.pipe(isLargeScreen);
   }
 
   ngOnDestroy() {

@@ -19,6 +19,9 @@ import { HttpClient, HttpEventType, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
+import { empty } from 'rxjs/observable/empty';
+import { of } from 'rxjs/observable/of';
+import { flatMap, last, map } from 'rxjs/operators';
 import * as xmltojson from 'xmltojson';
 
 import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
@@ -164,14 +167,13 @@ export class ComponentsServiceImpl extends ComponentsService {
 
     return {
       progress$: progress$.asObservable(),
-      result$: this.http
-        .request(req)
-        .flatMap(event => {
+      result$: this.http.request(req).pipe(
+        flatMap(event => {
           if (event.type === HttpEventType.UploadProgress) {
             const percentDone = Math.round(100 * event.loaded / event.total);
 
             progress$.next(percentDone);
-            return Observable.empty<{
+            return empty<{
               serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
               serviceUnits: JsTable<IServiceUnitBackendSSE>;
             }>();
@@ -188,22 +190,23 @@ export class ComponentsServiceImpl extends ComponentsService {
             progress$.next(100);
             progress$.complete();
 
-            return Observable.of({
+            return of({
               serviceAssemblies: toJsTable(body.serviceAssemblies),
               serviceUnits: toJsTable(body.serviceUnits),
             });
           } else {
-            return Observable.empty<JsTable<IServiceUnitBackendSSE>>();
+            return empty<JsTable<IServiceUnitBackendSSE>>();
           }
-        })
-        .last(),
+        }),
+        last()
+      ),
     };
   }
 
   getComponentNameFromZipFile(file: File) {
     return loadFilesContentFromZip(file, filePath =>
       filePath.includes('jbi.xml')
-    ).map(([firstFileContent]) => this.getNameFromXml(firstFileContent));
+    ).pipe(map(([firstFileContent]) => this.getNameFromXml(firstFileContent)));
   }
 
   private getNameFromXml(xml: string): string {

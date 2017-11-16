@@ -19,7 +19,7 @@ import { NgModule } from '@angular/core';
 import { SwiperModule } from 'angular2-useful-swiper';
 
 import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
-import { SharedModule } from '../../../../../shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 import { PetalsBusOverviewComponent } from './petals-bus-overview/petals-bus-overview.component';
 import { PetalsBusViewRoutingModule } from './petals-bus-view-routing.module';
 import {

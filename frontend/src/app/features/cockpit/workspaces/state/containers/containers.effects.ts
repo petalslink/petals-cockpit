@@ -21,6 +21,16 @@ import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+import {
+  catchError,
+  flatMap,
+  map,
+  mapTo,
+  switchMap,
+  tap,
+  withLatestFrom,
+} from 'rxjs/operators';
 
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { getErrorMessage } from 'app/shared/helpers/shared.helper';
@@ -41,48 +51,48 @@ export class ContainersEffects {
   @Effect()
   fetchContainersDetails$: Observable<Action> = this.actions$
     .ofType<Containers.FetchDetails>(Containers.FetchDetailsType)
-    .flatMap(action =>
-      this.containersService
-        .getDetailsContainer(action.payload.id)
-        .map(
-          res =>
-            new Containers.FetchDetailsSuccess({
-              id: action.payload.id,
-              data: res,
-            })
-        )
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error caught in containers.effects.ts: ofType(Containers.FetchDetails)'
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      flatMap(action =>
+        this.containersService.getDetailsContainer(action.payload.id).pipe(
+          map(
+            res =>
+              new Containers.FetchDetailsSuccess({
+                id: action.payload.id,
+                data: res,
+              })
+          ),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in containers.effects.ts: ofType(Containers.FetchDetails)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          return Observable.of(
-            new Containers.FetchDetailsError(action.payload)
-          );
-        })
+            return of(new Containers.FetchDetailsError(action.payload));
+          })
+        )
+      )
     );
 
   @Effect()
   deployComponent$: Observable<Action> = this.actions$
     .ofType<Containers.DeployComponent>(Containers.DeployComponentType)
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .switchMap(([action, workspaceId]) => {
-      const { progress$, result$ } = this.containersService.deployComponent(
-        workspaceId,
-        action.payload.id,
-        action.payload.file,
-        action.payload.name
-      );
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      switchMap(([action, workspaceId]) => {
+        const { progress$, result$ } = this.containersService.deployComponent(
+          workspaceId,
+          action.payload.id,
+          action.payload.file,
+          action.payload.name
+        );
 
-      return result$
-        .let(
+        return result$.pipe(
           httpResponseWithProgress(
             action.payload.correlationId,
             progress$,
@@ -91,69 +101,72 @@ export class ContainersEffects {
                 ...result.byId[result.allIds[0]],
                 correlationId: action.payload.correlationId,
               })
-          )
-        )
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error caught in containers.effects: ofType(Containers.DeployComponent)'
+          ),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in containers.effects: ofType(Containers.DeployComponent)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            this.notifications.error(
+              'Component Deployment Failed',
+              `An error occurred while deploying ${action.payload.file.name}`
             );
-            console.error(err);
-            console.groupEnd();
-          }
 
-          this.notifications.error(
-            'Component Deployment Failed',
-            `An error occurred while deploying ${action.payload.file.name}`
-          );
-
-          return Observable.of(
-            new Containers.DeployComponentError({
-              correlationId: action.payload.correlationId,
-              id: action.payload.id,
-              errorDeployment: getErrorMessage(err),
-            })
-          );
-        });
-    });
+            return of(
+              new Containers.DeployComponentError({
+                correlationId: action.payload.correlationId,
+                id: action.payload.id,
+                errorDeployment: getErrorMessage(err),
+              })
+            );
+          })
+        );
+      })
+    );
 
   @Effect({ dispatch: false })
   deployComponentSuccess$: Observable<void> = this.actions$
     .ofType<Containers.DeployComponentSuccess>(
       Containers.DeployComponentSuccessType
     )
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .do(([action, workspaceId]) => {
-      this.notifications.success(
-        'Component Deployed',
-        `${action.payload.name} has been successfully deployed`
-      );
-    })
-    .mapTo(null);
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      tap(([action, workspaceId]) => {
+        this.notifications.success(
+          'Component Deployed',
+          `${action.payload.name} has been successfully deployed`
+        );
+      }),
+      mapTo(null)
+    );
 
   @Effect()
   deployServiceAssembly$: Observable<Action> = this.actions$
     .ofType<Containers.DeployServiceAssembly>(
       Containers.DeployServiceAssemblyType
     )
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .switchMap(([action, workspaceId]) => {
-      const {
-        progress$,
-        result$,
-      } = this.containersService.deployServiceAssembly(
-        workspaceId,
-        action.payload.id,
-        action.payload.file
-      );
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      switchMap(([action, workspaceId]) => {
+        const {
+          progress$,
+          result$,
+        } = this.containersService.deployServiceAssembly(
+          workspaceId,
+          action.payload.id,
+          action.payload.file
+        );
 
-      return result$
-        .let(
+        return result$.pipe(
           httpResponseWithProgress(
             action.payload.correlationId,
             progress$,
@@ -164,64 +177,70 @@ export class ContainersEffects {
                 ],
                 correlationId: action.payload.correlationId,
               })
-          )
-        )
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error caught in containers.effects: ofType(Containers.DeployServiceAssembly)'
+          ),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in containers.effects: ofType(Containers.DeployServiceAssembly)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            this.notifications.error(
+              'Service Assembly deployment failed',
+              `An error occurred while deploying ${action.payload.file.name}`
             );
-            console.error(err);
-            console.groupEnd();
-          }
 
-          this.notifications.error(
-            'Service Assembly deployment failed',
-            `An error occurred while deploying ${action.payload.file.name}`
-          );
-
-          return Observable.of(
-            new Containers.DeployServiceAssemblyError({
-              correlationId: action.payload.correlationId,
-              id: action.payload.id,
-              errorDeployment: getErrorMessage(err),
-            })
-          );
-        });
-    });
+            return of(
+              new Containers.DeployServiceAssemblyError({
+                correlationId: action.payload.correlationId,
+                id: action.payload.id,
+                errorDeployment: getErrorMessage(err),
+              })
+            );
+          })
+        );
+      })
+    );
 
   @Effect({ dispatch: false })
   deployServiceAssemblySuccess$: Observable<void> = this.actions$
     .ofType<Containers.DeployServiceAssemblySuccess>(
       Containers.DeployServiceAssemblySuccessType
     )
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .do(([action, workspaceId]) => {
-      this.notifications.success(
-        'Service Assembly Deployed',
-        `${action.payload.name} has been successfully deployed`
-      );
-    })
-    .mapTo(null);
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      tap(([action, workspaceId]) => {
+        this.notifications.success(
+          'Service Assembly Deployed',
+          `${action.payload.name} has been successfully deployed`
+        );
+      }),
+      mapTo(null)
+    );
 
   @Effect()
   deploySharedLibrary$: Observable<Action> = this.actions$
     .ofType<Containers.DeploySharedLibrary>(Containers.DeploySharedLibraryType)
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .switchMap(([action, workspaceId]) => {
-      const { progress$, result$ } = this.containersService.deploySharedLibrary(
-        workspaceId,
-        action.payload.id,
-        action.payload.file
-      );
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      switchMap(([action, workspaceId]) => {
+        const {
+          progress$,
+          result$,
+        } = this.containersService.deploySharedLibrary(
+          workspaceId,
+          action.payload.id,
+          action.payload.file
+        );
 
-      return result$
-        .let(
+        return result$.pipe(
           httpResponseWithProgress(
             action.payload.correlationId,
             progress$,
@@ -230,46 +249,49 @@ export class ContainersEffects {
                 ...result.byId[result.allIds[0]],
                 correlationId: action.payload.correlationId,
               })
-          )
-        )
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error caught in containers.effects: ofType(Containers.DeploySharedLibrary)'
+          ),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in containers.effects: ofType(Containers.DeploySharedLibrary)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            this.notifications.error(
+              'Shared Library Deployment Failed',
+              `An error occurred while deploying ${action.payload.file.name}`
             );
-            console.error(err);
-            console.groupEnd();
-          }
 
-          this.notifications.error(
-            'Shared Library Deployment Failed',
-            `An error occurred while deploying ${action.payload.file.name}`
-          );
-
-          return Observable.of(
-            new Containers.DeploySharedLibraryError({
-              correlationId: action.payload.correlationId,
-              id: action.payload.id,
-              errorDeployment: getErrorMessage(err),
-            })
-          );
-        });
-    });
+            return of(
+              new Containers.DeploySharedLibraryError({
+                correlationId: action.payload.correlationId,
+                id: action.payload.id,
+                errorDeployment: getErrorMessage(err),
+              })
+            );
+          })
+        );
+      })
+    );
 
   @Effect({ dispatch: false })
   deploySharedLibrarySuccess$: Observable<void> = this.actions$
     .ofType<Containers.DeploySharedLibrarySuccess>(
       Containers.DeploySharedLibrarySuccessType
     )
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .do(([action, workspaceId]) => {
-      this.notifications.success(
-        'Shared Library Deployed',
-        `${action.payload.name} has been successfully deployed`
-      );
-    })
-    .mapTo(null);
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      tap(([action, workspaceId]) => {
+        this.notifications.success(
+          'Shared Library Deployed',
+          `${action.payload.name} has been successfully deployed`
+        );
+      }),
+      mapTo(null)
+    );
 }

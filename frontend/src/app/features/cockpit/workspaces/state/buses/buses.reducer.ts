@@ -15,16 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  IBusBackendDetails,
-  IBusBackendSSE,
-} from 'app/shared/services/buses.service';
-import {
-  busesTableFactory,
-  busRowFactory,
-  IBusesTable,
-} from './buses.interface';
-
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
@@ -35,6 +25,15 @@ import {
   updateById,
 } from 'app/shared/helpers/jstable.helper';
 import { fold, toggleFold, unfold } from 'app/shared/helpers/reducers.helper';
+import {
+  IBusBackendDetails,
+  IBusBackendSSE,
+} from 'app/shared/services/buses.service';
+import {
+  busesTableFactory,
+  busRowFactory,
+  IBusesTable,
+} from './buses.interface';
 
 export namespace BusesReducer {
   type All =

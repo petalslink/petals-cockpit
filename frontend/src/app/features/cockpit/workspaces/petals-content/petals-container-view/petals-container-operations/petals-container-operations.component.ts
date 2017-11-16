@@ -29,7 +29,15 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Actions } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { Observable } from 'rxjs/Observable';
+import { empty } from 'rxjs/observable/empty';
+import {
+  catchError,
+  filter,
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 import { v4 as uuid } from 'uuid';
 
@@ -119,16 +127,20 @@ export class PetalsContainerOperationsComponent
 
     this.componentsService
       .getComponentNameFromZipFile(file)
-      .takeUntil(this.onDestroy$)
-      .do(x => this.updateComponentDeployInfoFormGroup.get('name').setValue(x))
-      .catch(err => {
-        this.notifications.warn(
-          'File error',
-          `An error occurred while trying to read the component's name from zip file`
-        );
+      .pipe(
+        takeUntil(this.onDestroy$),
+        tap(x =>
+          this.updateComponentDeployInfoFormGroup.get('name').setValue(x)
+        ),
+        catchError(err => {
+          this.notifications.warn(
+            'File error',
+            `An error occurred while trying to read the component's name from zip file`
+          );
 
-        return Observable.empty();
-      })
+          return empty();
+        })
+      )
       .subscribe();
   }
 
@@ -188,17 +200,16 @@ export class PetalsContainerOperationsComponent
 
     this.actions$
       .ofType<HttpProgress>(HttpProgressType)
-      .takeUntil(this.onDestroy$)
-      .filter(action => action.payload.correlationId === correlationId)
-      // we want 1 or 0 (first wants exactly one) because of takeUntil
-      .take(1)
-      .switchMap(action =>
-        action.payload
-          .getProgress()
-          .do(deployActions.onProgressUpdate)
-          .do({
-            complete: deployActions.onComplete,
-          })
+      .pipe(
+        takeUntil(this.onDestroy$),
+        filter(action => action.payload.correlationId === correlationId),
+        // we want 1 or 0 (first wants exactly one) because of takeUntil
+        take(1),
+        switchMap(action => action.payload.getProgress()),
+        tap(deployActions.onProgressUpdate),
+        tap({
+          complete: deployActions.onComplete,
+        })
       )
       .subscribe();
 

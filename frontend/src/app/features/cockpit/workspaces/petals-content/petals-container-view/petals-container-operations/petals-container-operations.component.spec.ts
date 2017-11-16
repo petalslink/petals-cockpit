@@ -26,11 +26,12 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { SimpleNotificationsModule } from 'angular2-notifications';
+import { of } from 'rxjs/observable/of';
+import { _throw } from 'rxjs/observable/throw';
 
 import { PetalsContainerOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-operations/petals-container-operations.component';
 import { ComponentsService } from 'app/shared/services/components.service';
 import { metaReducers, reducers } from 'app/shared/state/root.reducer';
-import { Observable } from 'rxjs/Observable';
 
 describe(`Petals container operations`, () => {
   let pcoFixture: ComponentFixture<PetalsContainerOperationsComponent>;
@@ -99,7 +100,7 @@ describe(`Petals container operations`, () => {
       spyOn((<any>pcoComponent).notifications, 'warn');
 
       spyOn(componentsService, 'getComponentNameFromZipFile').and.returnValue(
-        Observable.throw(new Error('Error while reading ZIP'))
+        _throw(new Error('Error while reading ZIP'))
       );
 
       pcoComponent.onFileSelected(null);
@@ -122,6 +123,6 @@ export class ComponentsMockService {
   constructor() {}
 
   getComponentNameFromZipFile() {
-    return Observable.of('some content from zip');
+    return of('some content from zip');
   }
 }

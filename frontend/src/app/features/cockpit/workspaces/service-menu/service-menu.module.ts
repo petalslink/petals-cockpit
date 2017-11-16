@@ -17,7 +17,7 @@
 
 import { NgModule } from '@angular/core';
 
-import { SharedModule } from '../../../../shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 import { PetalsServiceMenuComponent } from './petals-service-menu/petals-service-menu.component';
 import { ServiceMenuRoutingModule } from './service-menu-routing.module';
 

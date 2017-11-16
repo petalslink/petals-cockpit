@@ -20,6 +20,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { FormErrorStateMatcher } from 'app/shared/helpers/form.helper';
@@ -56,16 +57,18 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
 
     this.users$
-      .takeUntil(this.onDestroy$)
-      .do(users => {
-        if (users.isConnecting || users.connectedUser) {
-          this.loginForm.disable();
-          this.loginForm.disable();
-        } else {
-          this.loginForm.enable();
-          this.loginForm.enable();
-        }
-      })
+      .pipe(
+        takeUntil(this.onDestroy$),
+        tap(users => {
+          if (users.isConnecting || users.connectedUser) {
+            this.loginForm.disable();
+            this.loginForm.disable();
+          } else {
+            this.loginForm.enable();
+            this.loginForm.enable();
+          }
+        })
+      )
       .subscribe();
   }
 

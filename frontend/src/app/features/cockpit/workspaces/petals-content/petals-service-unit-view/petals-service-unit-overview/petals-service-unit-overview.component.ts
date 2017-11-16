@@ -23,12 +23,12 @@ import {
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-
-import { IStore } from '../../../../../../shared/state/store.interface';
+import { map } from 'rxjs/operators';
 
 import { IServiceUnitWithSAAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
 import { stateToLedColor } from 'app/shared/helpers/shared.helper';
 import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
+import { IStore } from 'app/shared/state/store.interface';
 import { isLargeScreen } from 'app/shared/state/ui.selectors';
 
 @Component({
@@ -46,9 +46,10 @@ export class PetalsServiceUnitOverviewComponent implements OnInit {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.btnByScreenSize$ = this.store$
-      .let(isLargeScreen)
-      .map(ls => (ls ? `mat-raised-button` : `mat-mini-fab`));
+    this.btnByScreenSize$ = this.store$.pipe(
+      isLargeScreen,
+      map(ls => (ls ? `mat-raised-button` : `mat-mini-fab`))
+    );
   }
 
   getLedColorFromState(state: ServiceAssemblyState) {

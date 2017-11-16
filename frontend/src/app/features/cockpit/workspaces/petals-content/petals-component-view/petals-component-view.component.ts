@@ -19,14 +19,12 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 
-import { IStore } from '../../../../../shared/state/store.interface';
-
+import { IStore } from 'app/shared/state/store.interface';
+import { Ui } from 'app/shared/state/ui.actions';
 import {
   getCurrentComponent,
   IComponentWithSLsAndSUs,
 } from '../../state/components/components.selectors';
-
-import { Ui } from 'app/shared/state/ui.actions';
 
 @Component({
   selector: 'app-petals-component-view',

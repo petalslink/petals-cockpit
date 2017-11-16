@@ -18,6 +18,7 @@
 import { Store } from '@ngrx/store';
 import { createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { filter } from 'rxjs/operators';
 
 import { isNot } from '../helpers/shared.helper';
 import { IStore } from './store.interface';
@@ -40,5 +41,5 @@ export const getAllUsers = createSelector(
 export const getCurrentUser = (
   store$: Store<IStore>
 ): Observable<ICurrentUser> => {
-  return store$.select(getConnectedUser).filter(isNot(null));
+  return store$.select(getConnectedUser).pipe(filter(isNot(null)));
 };

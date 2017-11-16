@@ -18,6 +18,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { fakeAsync } from '@angular/core/testing';
 import { flush } from '@angular/core/testing';
+import { tap } from 'rxjs/operators';
 
 import { SharedModule } from 'app/shared/shared.module';
 import { UploadComponent } from './upload.component';
@@ -86,13 +87,15 @@ describe(`UploadComponent`, () => {
 
       uploadComponent.onUploadFile
         .asObservable()
-        .do(information => {
-          expect(information).toEqual(<any>{
-            selectedFileInformation: 'information',
-          });
+        .pipe(
+          tap(information => {
+            expect(information).toEqual(<any>{
+              selectedFileInformation: 'information',
+            });
 
-          expect(uploadComponent.isUploading).toBe(true);
-        })
+            expect(uploadComponent.isUploading).toBe(true);
+          })
+        )
         .subscribe();
 
       uploadComponent.uploadFile();

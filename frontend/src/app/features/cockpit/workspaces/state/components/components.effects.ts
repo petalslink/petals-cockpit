@@ -21,8 +21,18 @@ import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { Observable } from 'rxjs/Observable';
-
-import { environment } from 'environments/environment';
+import { empty } from 'rxjs/observable/empty';
+import { of } from 'rxjs/observable/of';
+import {
+  catchError,
+  map,
+  mapTo,
+  mergeMap,
+  startWith,
+  switchMap,
+  tap,
+  withLatestFrom,
+} from 'rxjs/operators';
 
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
@@ -34,6 +44,7 @@ import {
 import { HttpProgress } from 'app/shared/services/http-progress-tracker.service';
 import { SseActions } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/state/store.interface';
+import { environment } from 'environments/environment';
 
 @Injectable()
 export class ComponentsEffects {
@@ -47,129 +58,143 @@ export class ComponentsEffects {
   @Effect()
   watchDeployed$: Observable<Action> = this.actions$
     .ofType<SseActions.ComponentDeployed>(SseActions.ComponentDeployedType)
-    .map(action => {
-      const data = action.payload;
-      const components = toJsTable(data.components);
-      return new Components.Added(components);
-    });
+    .pipe(
+      map(action => {
+        const data = action.payload;
+        const components = toJsTable(data.components);
+        return new Components.Added(components);
+      })
+    );
 
   @Effect()
   watchStateChange$: Observable<Action> = this.actions$
     .ofType<SseActions.ComponentStateChange>(
       SseActions.ComponentStateChangeType
     )
-    .withLatestFrom(this.store$)
-    .map(([action, store]) => {
-      const data = action.payload;
+    .pipe(
+      withLatestFrom(this.store$),
+      map(([action, store]) => {
+        const data = action.payload;
 
-      if (data.state === EComponentState.Unloaded) {
-        const component = store.components.byId[data.id];
+        if (data.state === EComponentState.Unloaded) {
+          const component = store.components.byId[data.id];
 
-        this.notifications.success(
-          'Component unloaded',
-          `"${component.name}" has been unloaded`
-        );
+          this.notifications.success(
+            'Component unloaded',
+            `"${component.name}" has been unloaded`
+          );
 
-        return new Components.Removed(component);
-      } else {
-        return new Components.ChangeStateSuccess(data);
-      }
-    });
+          return new Components.Removed(component);
+        } else {
+          return new Components.ChangeStateSuccess(data);
+        }
+      })
+    );
 
   @Effect()
   fetchContainersDetails$: Observable<Action> = this.actions$
     .ofType<Components.FetchDetails>(Components.FetchDetailsType)
-    .switchMap(action =>
-      this.componentsService
-        .getDetailsComponent(action.payload.id)
-        .map(
-          res =>
-            new Components.FetchDetailsSuccess({
-              id: action.payload.id,
-              data: res,
-            })
-        )
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error caught in components.effects.ts: ofType(Components.FetchDetails)'
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      switchMap(action =>
+        this.componentsService.getDetailsComponent(action.payload.id).pipe(
+          map(
+            res =>
+              new Components.FetchDetailsSuccess({
+                id: action.payload.id,
+                data: res,
+              })
+          ),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in components.effects.ts: ofType(Components.FetchDetails)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          return Observable.of(
-            new Components.FetchDetailsError(action.payload)
-          );
-        })
+            return of(new Components.FetchDetailsError(action.payload));
+          })
+        )
+      )
     );
 
   @Effect()
   changeState$: Observable<Action> = this.actions$
     .ofType<Components.ChangeState>(Components.ChangeStateType)
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .switchMap(([action, workspaceId]) =>
-      this.componentsService
-        .putState(workspaceId, action.payload.id, action.payload.state)
-        .mergeMap(_ => Observable.empty<Action>())
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error catched in components.effects: ofType(Components.ChangeState)'
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      switchMap(([action, workspaceId]) =>
+        this.componentsService
+          .putState(workspaceId, action.payload.id, action.payload.state)
+          .pipe(
+            mergeMap(_ => empty<Action>()),
+            catchError((err: HttpErrorResponse) => {
+              if (environment.debug) {
+                console.group();
+                console.warn(
+                  'Error catched in components.effects: ofType(Components.ChangeState)'
+                );
+                console.error(err);
+                console.groupEnd();
+              }
 
-          return Observable.of(
-            new Components.ChangeStateError({
-              id: action.payload.id,
-              error: getErrorMessage(err),
+              return of(
+                new Components.ChangeStateError({
+                  id: action.payload.id,
+                  error: getErrorMessage(err),
+                })
+              );
             })
-          );
-        })
+          )
+      )
     );
 
   @Effect()
   changeStateSuccess$: Observable<Action> = this.actions$
     .ofType<Components.ChangeStateSuccess>(Components.ChangeStateSuccessType)
-    .map(action => new Components.FetchDetails(action.payload));
+    .pipe(map(action => new Components.FetchDetails(action.payload)));
 
   @Effect()
   setParameters$: Observable<Action> = this.actions$
     .ofType<Components.SetParameters>(Components.SetParametersType)
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .switchMap(([action, workspaceId]) =>
-      this.componentsService
-        .setParameters(
-          workspaceId,
-          action.payload.id,
-          action.payload.parameters
-        )
-        .mapTo(new Components.SetParametersSuccess({ id: action.payload.id }))
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error catched in components.effects: ofType(Components.ChangeState)'
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      switchMap(([action, workspaceId]) =>
+        this.componentsService
+          .setParameters(
+            workspaceId,
+            action.payload.id,
+            action.payload.parameters
+          )
+          .pipe(
+            mapTo(
+              new Components.SetParametersSuccess({ id: action.payload.id })
+            ),
+            catchError((err: HttpErrorResponse) => {
+              if (environment.debug) {
+                console.group();
+                console.warn(
+                  'Error catched in components.effects: ofType(Components.ChangeState)'
+                );
+                console.error(err);
+                console.groupEnd();
+              }
 
-          return Observable.of(
-            new Components.ChangeStateError({
-              id: action.payload.id,
-              error: getErrorMessage(err),
+              return of(
+                new Components.ChangeStateError({
+                  id: action.payload.id,
+                  error: getErrorMessage(err),
+                })
+              );
             })
-          );
-        })
+          )
+      )
     );
 
   @Effect()
@@ -177,73 +202,78 @@ export class ComponentsEffects {
     .ofType<Components.SetParametersSuccess>(
       Components.SetParametersSuccessType
     )
-    .map(action => new Components.FetchDetails(action.payload));
+    .pipe(map(action => new Components.FetchDetails(action.payload)));
 
   @Effect()
   deployServiceUnit$: Observable<Action> = this.actions$
     .ofType<Components.DeployServiceUnit>(Components.DeployServiceUnitType)
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .switchMap(([action, workspaceId]) => {
-      const { progress$, result$ } = this.componentsService.deploySu(
-        workspaceId,
-        action.payload.id,
-        action.payload.file,
-        action.payload.serviceUnitName
-      );
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      switchMap(([action, workspaceId]) => {
+        const { progress$, result$ } = this.componentsService.deploySu(
+          workspaceId,
+          action.payload.id,
+          action.payload.file,
+          action.payload.serviceUnitName
+        );
 
-      return result$
-        .map(
-          (result): Action =>
-            new Components.DeployServiceUnitSuccess({
-              ...result.serviceUnits.byId[result.serviceUnits.allIds[0]],
+        return result$.pipe(
+          map(
+            (result): Action =>
+              new Components.DeployServiceUnitSuccess({
+                ...result.serviceUnits.byId[result.serviceUnits.allIds[0]],
+                correlationId: action.payload.correlationId,
+              })
+          ),
+          startWith(
+            new HttpProgress({
               correlationId: action.payload.correlationId,
+              getProgress: () => progress$,
             })
-        )
-        .startWith(
-          new HttpProgress({
-            correlationId: action.payload.correlationId,
-            getProgress: () => progress$,
-          })
-        )
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error caught in components.effects: ofType(Components.DeployServiceUnit)'
+          ),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in components.effects: ofType(Components.DeployServiceUnit)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            this.notifications.error(
+              'Service Unit Deployment Failed',
+              `An error occurred while deploying ${action.payload.file.name}`
             );
-            console.error(err);
-            console.groupEnd();
-          }
 
-          this.notifications.error(
-            'Service Unit Deployment Failed',
-            `An error occurred while deploying ${action.payload.file.name}`
-          );
-
-          return Observable.of(
-            new Components.DeployServiceUnitError({
-              id: action.payload.id,
-              errorDeployment: getErrorMessage(err),
-            })
-          );
-        });
-    });
+            return of(
+              new Components.DeployServiceUnitError({
+                id: action.payload.id,
+                errorDeployment: getErrorMessage(err),
+              })
+            );
+          })
+        );
+      })
+    );
 
   @Effect({ dispatch: false })
   deployServiceUnitSuccess$: Observable<void> = this.actions$
     .ofType<Components.DeployServiceUnitSuccess>(
       Components.DeployServiceUnitSuccessType
     )
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .do(([action, workspaceId]) => {
-      this.notifications.success(
-        'Service Unit Deployed',
-        `${action.payload.name} has been successfully deployed`
-      );
-    })
-    .mapTo(null);
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      tap(([action, workspaceId]) => {
+        this.notifications.success(
+          'Service Unit Deployed',
+          `${action.payload.name} has been successfully deployed`
+        );
+      }),
+      mapTo(null)
+    );
 }

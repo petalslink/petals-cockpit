@@ -19,6 +19,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { filter, map, withLatestFrom } from 'rxjs/operators';
 
 import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
@@ -31,7 +32,9 @@ export class UiEffects {
   @Effect()
   closeSidenavOnSmallScreen$: Observable<Action> = this.actions$
     .ofType(Ui.CloseSidenavOnSmallScreenType)
-    .withLatestFrom(this.store$.let(isSmallScreen))
-    .filter(([_, ss]) => ss)
-    .map(_ => new Ui.CloseSidenav());
+    .pipe(
+      withLatestFrom(this.store$.pipe(isSmallScreen)),
+      filter(([_, ss]) => ss),
+      map(_ => new Ui.CloseSidenav())
+    );
 }

@@ -20,7 +20,7 @@ import {
   IWorkspaceBackendCommon,
   IWorkspaceBackendDetails,
 } from 'app/shared/services/workspaces.service';
-import { IUser } from '../../../../../shared/state/users.interface';
+import { IUser } from 'app/shared/state/users.interface';
 
 export interface IWorkspaceUI {
   // from UI

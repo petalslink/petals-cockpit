@@ -35,7 +35,6 @@ import { metaReducers, reducers } from 'app/shared/state/root.reducer';
 import { UiEffects } from 'app/shared/state/ui.effects';
 import { UsersEffects } from 'app/shared/state/users.effects';
 import { environment } from 'environments/environment';
-import './rxjs-operators';
 
 export const providers: Provider[] = [
   ...environment.services,

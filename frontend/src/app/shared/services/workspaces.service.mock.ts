@@ -17,6 +17,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { delay, tap } from 'rxjs/operators';
 
 import * as helper from 'app/shared/helpers/mock.helper';
 import { environment } from 'environments/environment';
@@ -51,7 +52,9 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
       .create([mock.getCurrentUser().id], name)
       .getDetails().workspace;
 
-    return helper.responseBody(workspace).delay(environment.mock.httpDelay);
+    return helper
+      .responseBody(workspace)
+      .pipe(delay(environment.mock.httpDelay));
   }
 
   fetchWorkspace(id: string) {
@@ -60,19 +63,18 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
     return (ws
       ? helper.responseBody(ws.getDetails())
       : helper.response(404)
-    ).delay(environment.mock.httpDelay);
+    ).pipe(delay(environment.mock.httpDelay));
   }
 
   setDescription(id: string, description: string) {
     workspacesService.get(id).description = description;
-    return helper.response(204).delay(environment.mock.httpDelay);
+    return helper.response(204).pipe(delay(environment.mock.httpDelay));
   }
 
   deleteWorkspace(id: string) {
-    return helper
-      .response(204)
-      .delay(environment.mock.httpDelay)
-      .do(_ => {
+    return helper.response(204).pipe(
+      delay(environment.mock.httpDelay),
+      tap(_ => {
         // simulate the backend sending the answer on the SSE
         setTimeout(() => {
           workspacesService.delete(id);
@@ -81,25 +83,26 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
             { id }
           );
         }, environment.mock.sseDelay);
-      });
+      })
+    );
   }
 
   addUser(workspaceId: string, userId: string) {
-    return helper
-      .response(204)
-      .delay(environment.mock.httpDelay)
-      .do(_ => {
+    return helper.response(204).pipe(
+      delay(environment.mock.httpDelay),
+      tap(_ => {
         const user: BackendUser = BackendUser.get(userId);
         workspacesService.get(workspaceId).addUser(user);
-      });
+      })
+    );
   }
 
   removeUser(workspaceId: string, userId: string) {
-    return helper
-      .response(204)
-      .delay(environment.mock.httpDelay)
-      .do(_ => {
+    return helper.response(204).pipe(
+      delay(environment.mock.httpDelay),
+      tap(_ => {
         workspacesService.get(workspaceId).removeUser(userId);
-      });
+      })
+    );
   }
 }

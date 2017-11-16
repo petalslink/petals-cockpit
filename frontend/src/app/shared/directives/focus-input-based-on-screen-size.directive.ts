@@ -26,6 +26,7 @@ import {
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { filter, takeUntil, tap, withLatestFrom } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { IStore } from 'app/shared/state/store.interface';
@@ -45,15 +46,18 @@ export class FocusInputIfLargeScreenDirective
   constructor(private el: ElementRef, private store$: Store<IStore>) {}
 
   ngOnInit() {
-    const largeScreen$ = this.store$
-      .let(isLargeScreen)
-      .filter(pIsLargeScreen => pIsLargeScreen);
+    const largeScreen$ = this.store$.pipe(
+      isLargeScreen,
+      filter(pIsLargeScreen => pIsLargeScreen)
+    );
 
     this.isFocusInputActivated$
-      .takeUntil(this.onDestroy$)
-      .filter(shouldFocus => shouldFocus)
-      .withLatestFrom(largeScreen$)
-      .do(() => this.el.nativeElement.focus())
+      .pipe(
+        takeUntil(this.onDestroy$),
+        filter(shouldFocus => shouldFocus),
+        withLatestFrom(largeScreen$),
+        tap(() => this.el.nativeElement.focus())
+      )
       .subscribe();
   }
 

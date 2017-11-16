@@ -21,6 +21,7 @@ import {
   ElementFinder,
   ExpectedConditions as EC,
 } from 'protractor';
+
 import { waitTimeout } from '../common';
 import { MessageComponentPage } from './message-component.po';
 

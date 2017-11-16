@@ -20,6 +20,7 @@ import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { Actions } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { first, map } from 'rxjs/operators';
 
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { IStore } from 'app/shared/state/store.interface';
@@ -42,14 +43,16 @@ export class WorkspaceGuard implements CanActivate {
         Workspaces.FetchSuccessType,
         Workspaces.FetchErrorType
       )
-      .first()
-      .map(action => {
-        if (action instanceof Workspaces.FetchError) {
-          this.router.navigate(['/workspaces']);
-          return false;
-        } else {
-          return true;
-        }
-      });
+      .pipe(
+        first(),
+        map(action => {
+          if (action instanceof Workspaces.FetchError) {
+            this.router.navigate(['/workspaces']);
+            return false;
+          } else {
+            return true;
+          }
+        })
+      );
   }
 }

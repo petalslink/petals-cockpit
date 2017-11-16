@@ -18,6 +18,7 @@
 import { Store } from '@ngrx/store';
 import { createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { map, withLatestFrom } from 'rxjs/operators';
 
 import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 import {
@@ -40,10 +41,9 @@ function getSelectedWorkspaceId(state: IStore) {
 }
 
 export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
-  return store$
-    .select(state => state.workspaces)
-    .withLatestFrom(store$.select(getUsersById))
-    .map(([workspaces, usersById]) => {
+  return store$.select(state => state.workspaces).pipe(
+    withLatestFrom(store$.select(getUsersById)),
+    map(([workspaces, usersById]) => {
       return {
         ...workspaces,
         list: workspaces.allIds.map(wId => {
@@ -54,7 +54,8 @@ export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
           };
         }),
       };
-    });
+    })
+  );
 }
 
 // -----------------------------------------------------------

@@ -15,13 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
+import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import {
   ISharedLibrariesTable,
   ISharedLibraryRow,
   sharedLibrariesTableFactory,
   sharedLibraryRowFactory,
 } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   JsTable,
   mergeOnly,
@@ -29,16 +33,11 @@ import {
   removeById,
   updateById,
 } from 'app/shared/helpers/jstable.helper';
+import { IComponentBackendSSE } from 'app/shared/services/components.service';
 import {
   ISharedLibraryBackendDetails,
   ISharedLibraryBackendSSE,
 } from 'app/shared/services/shared-libraries.service';
-
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
-import { IComponentBackendSSE } from 'app/shared/services/components.service';
 
 export namespace SharedLibrariesReducer {
   type All =

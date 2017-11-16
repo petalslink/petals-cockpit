@@ -20,6 +20,8 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { ServiceUnitsService } from 'app/shared/services/service-units.service';
@@ -35,29 +37,29 @@ export class ServiceUnitsEffects {
   @Effect()
   fetchServiceUnitDetails$: Observable<Action> = this.actions$
     .ofType<ServiceUnits.FetchDetails>(ServiceUnits.FetchDetailsType)
-    .switchMap(action =>
-      this.serviceUnitsService
-        .getDetailsServiceUnit(action.payload.id)
-        .map(
-          res =>
-            new ServiceUnits.FetchDetailsSuccess({
-              id: action.payload.id,
-              data: res,
-            })
-        )
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error caught in service-unit.effects: ofType(ServiceUnits.FetchDetails)'
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      switchMap(action =>
+        this.serviceUnitsService.getDetailsServiceUnit(action.payload.id).pipe(
+          map(
+            res =>
+              new ServiceUnits.FetchDetailsSuccess({
+                id: action.payload.id,
+                data: res,
+              })
+          ),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in service-unit.effects: ofType(ServiceUnits.FetchDetails)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          return Observable.of(
-            new ServiceUnits.FetchDetailsError(action.payload)
-          );
-        })
+            return of(new ServiceUnits.FetchDetailsError(action.payload));
+          })
+        )
+      )
     );
 }

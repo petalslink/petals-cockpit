@@ -16,8 +16,8 @@
  */
 
 import * as path from 'path';
-
 import { browser } from 'protractor/built';
+
 import { page } from './common';
 import { NotFoundPage } from './pages/not-found';
 import { WorkspacePage } from './pages/workspace.po';

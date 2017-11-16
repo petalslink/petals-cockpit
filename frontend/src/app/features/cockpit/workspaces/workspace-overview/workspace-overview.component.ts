@@ -21,6 +21,16 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material';
 import { Actions } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import {
+  combineLatest,
+  filter,
+  first,
+  map,
+  startWith,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
@@ -78,7 +88,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
     this.appUsers$ = this.store$
       .select(getUsersNotInCurrentWorkspace)
-      .map(us => us.map(u => u.id).sort());
+      .pipe(map(us => us.map(u => u.id).sort()));
 
     this.addUserFormGroup = this.fb.group({
       userSearchCtrl: [
@@ -88,56 +98,69 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       ],
     });
 
-    this.currentUserId$ = this.store$.let(getCurrentUser).map(user => user.id);
+    this.currentUserId$ = this.store$.pipe(
+      getCurrentUser,
+      map(user => user.id)
+    );
 
     this.workspace$ = this.store$
       .select(getCurrentWorkspace)
-      .do(
-        wk =>
-          wk.isAddingUserToWorkspace
-            ? this.addUserFormGroup.get('userSearchCtrl').disable()
-            : this.addUserFormGroup.get('userSearchCtrl').enable()
+      .pipe(
+        tap(
+          wk =>
+            wk.isAddingUserToWorkspace
+              ? this.addUserFormGroup.get('userSearchCtrl').disable()
+              : this.addUserFormGroup.get('userSearchCtrl').enable()
+        )
       );
 
-    this.users$ = this.store$.let(getCurrentWorkspaceUsers);
+    this.users$ = this.store$.pipe(getCurrentWorkspaceUsers);
 
     this.store$
       // when we change workspace
       .select(state => state.workspaces.selectedWorkspaceId)
-      .takeUntil(this.onDestroy$)
-      .do(id => {
-        // we reinit these in case one change workspace while editing
-        this.description = null;
-        this.isEditingDescription = false;
-        this.isSettingDescription = false;
-        this.store$.dispatch(new Workspaces.FetchDetails({ id }));
-      })
+      .pipe(
+        takeUntil(this.onDestroy$),
+        tap(id => {
+          // we reinit these in case one change workspace while editing
+          this.description = null;
+          this.isEditingDescription = false;
+          this.isSettingDescription = false;
+          this.store$.dispatch(new Workspaces.FetchDetails({ id }));
+        })
+      )
       .subscribe();
 
     this.workspace$
-      .takeUntil(this.onDestroy$)
-      // only when we are setting the description and it has finished
-      .filter(ws => !ws.isSettingDescription && this.isSettingDescription)
-      .do(ws => {
-        // we reinit these, and it will show the current value of the description in the store
-        this.description = null;
-        this.isEditingDescription = false;
-        this.isSettingDescription = false;
-      })
+      .pipe(
+        takeUntil(this.onDestroy$),
+        // only when we are setting the description and it has finished
+        filter(ws => !ws.isSettingDescription && this.isSettingDescription),
+        tap(ws => {
+          // we reinit these, and it will show the current value of the description in the store
+          this.description = null;
+          this.isEditingDescription = false;
+          this.isSettingDescription = false;
+        })
+      )
       .subscribe();
 
     this.filteredUsers$ = this.addUserFormGroup
       .get('userSearchCtrl')
-      .valueChanges.startWith(null)
-      .combineLatest(this.appUsers$)
-      .map(([userSearch, users]) => this.filterUsers(userSearch, users));
+      .valueChanges.pipe(
+        startWith(null),
+        combineLatest(this.appUsers$),
+        map(([userSearch, users]) => this.filterUsers(userSearch, users))
+      );
 
     // when a user is added to the workspace
     this.actions$
       .ofType(Workspaces.AddUserSuccessType)
-      .takeUntil(this.onDestroy$)
-      // reset the form
-      .do(_ => this.addUserFormGroup.reset())
+      .pipe(
+        takeUntil(this.onDestroy$),
+        // reset the form
+        tap(_ => this.addUserFormGroup.reset())
+      )
       .subscribe();
   }
 
@@ -158,10 +181,12 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     this.isEditingDescription = true;
     // note: there could be a small moment where description is not set!
     this.workspace$
-      .first()
-      .do(ws => {
-        this.description = ws.description;
-      })
+      .pipe(
+        first(),
+        tap(ws => {
+          this.description = ws.description;
+        })
+      )
       .subscribe();
   }
 
@@ -175,30 +200,39 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     this.isSettingDescription = true;
     const description = this.description;
     this.workspace$
-      .first()
-      .do(ws => {
-        this.store$.dispatch(
-          new Workspaces.SetDescription({ id: ws.id, description })
-        );
-      })
+      .pipe(
+        first(),
+        tap(ws => {
+          this.store$.dispatch(
+            new Workspaces.SetDescription({ id: ws.id, description })
+          );
+        })
+      )
       .subscribe();
   }
 
   openDeletionDialog() {
     this.isRemoving = true;
     this.workspace$
-      .first()
-      .switchMap(ws =>
-        this.dialog
-          .open(WorkspaceDeleteDialogComponent, {
-            data: { name: ws.name },
-          })
-          .afterClosed()
-          .map(res => !!res)
-          .do(result => (this.isRemoving = result))
-          .filter(result => result)
-          .do(_ => this.store$.dispatch(new Workspaces.Delete({ id: ws.id })))
+      .pipe(
+        first(),
+        switchMap(ws =>
+          this.dialog
+            .open(WorkspaceDeleteDialogComponent, {
+              data: { name: ws.name },
+            })
+            .afterClosed()
+            .pipe(
+              map(res => !!res),
+              tap(result => (this.isRemoving = result)),
+              filter(result => result),
+              tap(_ =>
+                this.store$.dispatch(new Workspaces.Delete({ id: ws.id }))
+              )
+            )
+        )
       )
+
       .subscribe();
   }
 

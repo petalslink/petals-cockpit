@@ -17,7 +17,9 @@
 
 import { async } from '@angular/core/testing';
 import * as JSZip from 'jszip';
-import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+import { _throw } from 'rxjs/observable/throw';
+import { catchError, tap } from 'rxjs/operators';
 
 import {
   _getTextFromZip,
@@ -37,7 +39,7 @@ describe(`Zip helper`, () => {
 
         const text$ = _getTextFromZip(zipFile, './some-path');
 
-        text$.do(text => expect(text).toEqual('some text')).subscribe();
+        text$.pipe(tap(text => expect(text).toEqual('some text'))).subscribe();
       })
     );
   });
@@ -66,8 +68,10 @@ describe(`Zip helper`, () => {
         );
 
         filesContent$
-          .do(filesContent =>
-            expect(filesContent).toEqual(['Content of first file'])
+          .pipe(
+            tap(filesContent =>
+              expect(filesContent).toEqual(['Content of first file'])
+            )
           )
           .subscribe();
       })
@@ -77,7 +81,7 @@ describe(`Zip helper`, () => {
       `should throw an error within the observable if an error occurred while reading a file`,
       async(() => {
         spyOn(JSZip, 'loadAsync').and.callFake(() =>
-          Observable.throw('some error while reading zip file')
+          _throw('some error while reading zip file')
         );
 
         const zipFile: any = {
@@ -87,12 +91,16 @@ describe(`Zip helper`, () => {
         const filesContent$ = loadFilesContentFromZip(zipFile, null);
 
         filesContent$
-          .catch((err: Error) => {
-            expect(err.message).toEqual(
-              `An error occured while trying to read the zip "${zipFile.name}"`
-            );
-            return Observable.of();
-          })
+          .pipe(
+            catchError((err: Error) => {
+              expect(err.message).toEqual(
+                `An error occured while trying to read the zip "${
+                  zipFile.name
+                }"`
+              );
+              return of();
+            })
+          )
           .subscribe();
       })
     );

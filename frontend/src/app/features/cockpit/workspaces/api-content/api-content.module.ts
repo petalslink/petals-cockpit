@@ -17,7 +17,7 @@
 
 import { NgModule } from '@angular/core';
 
-import { SharedModule } from './../../../../shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 import { ApiContentRoutingModule } from './api-content-routing.module';
 import { ApiContentViewComponent } from './api-content-view/api-content-view.component';
 

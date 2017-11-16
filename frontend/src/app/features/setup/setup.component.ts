@@ -19,7 +19,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { getErrorMessage } from 'app/shared/helpers/shared.helper';
@@ -78,16 +79,18 @@ export class SetupComponent implements OnInit, OnDestroy {
       this.settingUp = true;
       this.users
         .setupUser(value)
-        .takeUntil(this.onDestroy$)
-        .map(res => {
-          this.setupSucceeded = true;
-          this.settingUp = false;
-        })
-        .catch((err: HttpErrorResponse) => {
-          this.setupFailed = getErrorMessage(err);
-          this.settingUp = false;
-          return Observable.of();
-        })
+        .pipe(
+          takeUntil(this.onDestroy$),
+          map(res => {
+            this.setupSucceeded = true;
+            this.settingUp = false;
+          }),
+          catchError((err: HttpErrorResponse) => {
+            this.setupFailed = getErrorMessage(err);
+            this.settingUp = false;
+            return of();
+          })
+        )
         .subscribe();
     }
   }

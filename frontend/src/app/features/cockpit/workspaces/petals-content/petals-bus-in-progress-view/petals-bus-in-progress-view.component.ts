@@ -18,6 +18,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
@@ -71,38 +72,42 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
 
     this.store$
       .select(state => state.busesInProgress)
-      .takeUntil(this.onDestroy$)
-      .do(bip => {
-        if (!bip.selectedBusInProgressId) {
-          this.newImportData = {
-            isImporting: bip.isImportingBus,
-            error: bip.importBusError,
-          };
-        }
-      })
+      .pipe(
+        takeUntil(this.onDestroy$),
+        tap(bip => {
+          if (!bip.selectedBusInProgressId) {
+            this.newImportData = {
+              isImporting: bip.isImportingBus,
+              error: bip.importBusError,
+            };
+          }
+        })
+      )
       .subscribe();
 
     this.createFormImportBus();
 
     this.store$
       .select(getCurrentBusInProgress)
-      .let(deletable)
-      .takeUntil(this.onDestroy$)
-      .do(busInProgress => {
-        this.busInProgress = busInProgress;
+      .pipe(
+        deletable,
+        takeUntil(this.onDestroy$),
+        tap(busInProgress => {
+          this.busInProgress = busInProgress;
 
-        if (this.busInProgress) {
-          this.busImportForm.patchValue({
-            ip: busInProgress.value.ip,
-            port: busInProgress.value.port,
-            username: busInProgress.value.username,
-            password: busInProgress.value.password,
-            passphrase: busInProgress.value.passphrase,
-          });
+          if (this.busInProgress) {
+            this.busImportForm.patchValue({
+              ip: busInProgress.value.ip,
+              port: busInProgress.value.port,
+              username: busInProgress.value.username,
+              password: busInProgress.value.password,
+              passphrase: busInProgress.value.passphrase,
+            });
 
-          disableAllFormFields(this.busImportForm);
-        }
-      })
+            disableAllFormFields(this.busImportForm);
+          }
+        })
+      )
       .subscribe();
   }
 
@@ -119,10 +124,12 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
     });
 
     this.busImportForm.valueChanges
-      .takeUntil(this.onDestroy$)
-      .do(() => {
-        this.formErrors = getFormErrors(this.busImportForm, this.formErrors);
-      })
+      .pipe(
+        takeUntil(this.onDestroy$),
+        tap(() => {
+          this.formErrors = getFormErrors(this.busImportForm, this.formErrors);
+        })
+      )
       .subscribe();
   }
 

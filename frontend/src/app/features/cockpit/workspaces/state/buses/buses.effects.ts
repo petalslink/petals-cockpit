@@ -22,6 +22,16 @@ import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { Observable } from 'rxjs/Observable';
+import { empty } from 'rxjs/observable/empty';
+import { of } from 'rxjs/observable/of';
+import {
+  catchError,
+  filter,
+  map,
+  mergeMap,
+  switchMap,
+  withLatestFrom,
+} from 'rxjs/operators';
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
@@ -50,102 +60,110 @@ export class BusesEffects {
   @Effect()
   watchDeleted$: Observable<Action> = this.actions$
     .ofType<SseActions.BusDeleted>(SseActions.BusDeletedType)
-    .withLatestFrom(this.store$)
-    .filter(([action, state]) => !!state.buses.byId[action.payload.id])
-    .map(([action, state]) => {
-      const { id, reason } = action.payload;
-      const bus = state.buses.byId[id];
+    .pipe(
+      withLatestFrom(this.store$),
+      filter(([action, state]) => !!state.buses.byId[action.payload.id]),
+      map(([action, state]) => {
+        const { id, reason } = action.payload;
+        const bus = state.buses.byId[id];
 
-      this.notifications.info(bus.name, reason);
+        this.notifications.info(bus.name, reason);
 
-      return new Buses.Removed(bus);
-    });
+        return new Buses.Removed(bus);
+      })
+    );
 
   @Effect()
   watchImportOk$: Observable<Action> = this.actions$
     .ofType<SseActions.BusImportOk>(SseActions.BusImportOkType)
-    .withLatestFrom(this.store$)
-    .map(([action, state]) => {
-      const data = action.payload;
-      const buses = toJsTable(data.buses);
+    .pipe(
+      withLatestFrom(this.store$),
+      map(([action, state]) => {
+        const data = action.payload;
+        const buses = toJsTable(data.buses);
 
-      // there should be only one element in there!
-      const bus = buses.byId[buses.allIds[0]];
+        // there should be only one element in there!
+        const bus = buses.byId[buses.allIds[0]];
 
-      this.notifications.success(
-        `Bus import success`,
-        `The import of the bus ${bus.name} succeeded`
-      );
+        this.notifications.success(
+          `Bus import success`,
+          `The import of the bus ${bus.name} succeeded`
+        );
 
-      if (state.busesInProgress.selectedBusInProgressId === bus.id) {
-        this.router.navigate([
-          '/workspaces',
-          state.workspaces.selectedWorkspaceId,
-          'petals',
-          'buses',
-          bus.id,
+        if (state.busesInProgress.selectedBusInProgressId === bus.id) {
+          this.router.navigate([
+            '/workspaces',
+            state.workspaces.selectedWorkspaceId,
+            'petals',
+            'buses',
+            bus.id,
+          ]);
+        }
+
+        return batchActions([
+          new BusesInProgress.Removed(bus),
+          new Buses.Added(buses),
+          new Containers.Added(toJsTable(data.containers)),
+          new ServiceAssemblies.Added(toJsTable(data.serviceAssemblies)),
+          new Components.Added(toJsTable(data.components)),
+          new ServiceUnits.Added(toJsTable(data.serviceUnits)),
+          new SharedLibraries.Added(toJsTable(data.sharedLibraries)),
         ]);
-      }
-
-      return batchActions([
-        new BusesInProgress.Removed(bus),
-        new Buses.Added(buses),
-        new Containers.Added(toJsTable(data.containers)),
-        new ServiceAssemblies.Added(toJsTable(data.serviceAssemblies)),
-        new Components.Added(toJsTable(data.components)),
-        new ServiceUnits.Added(toJsTable(data.serviceUnits)),
-        new SharedLibraries.Added(toJsTable(data.sharedLibraries)),
-      ]);
-    });
+      })
+    );
 
   @Effect()
   fetchBusDetails$: Observable<Action> = this.actions$
     .ofType<Buses.FetchDetails>(Buses.FetchDetailsType)
-    .switchMap(action =>
-      this.busesService
-        .getDetailsBus(action.payload.id)
-        .map(
-          res =>
-            new Buses.FetchDetailsSuccess({
-              id: action.payload.id,
-              data: res,
-            })
-        )
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error caught in buses.effects.ts: ofType(Buses.FetchDetails)'
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      switchMap(action =>
+        this.busesService.getDetailsBus(action.payload.id).pipe(
+          map(
+            res =>
+              new Buses.FetchDetailsSuccess({
+                id: action.payload.id,
+                data: res,
+              })
+          ),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in buses.effects.ts: ofType(Buses.FetchDetails)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          return Observable.of(new Buses.FetchDetailsError(action.payload));
-        })
+            return of(new Buses.FetchDetailsError(action.payload));
+          })
+        )
+      )
     );
 
   @Effect()
   deleteBus$: Observable<Action> = this.actions$
     .ofType<Buses.Delete>(Buses.DeleteType)
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .switchMap(([action, idWorkspace]) =>
-      this.busesService
-        .deleteBus(idWorkspace, action.payload.id)
-        .mergeMap(_ => Observable.empty<Action>())
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error catched in buses.effects: ofType<Buses.Delete>(Buses.DeleteType)'
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      switchMap(([action, idWorkspace]) =>
+        this.busesService.deleteBus(idWorkspace, action.payload.id).pipe(
+          mergeMap(_ => empty<Action>()),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error catched in buses.effects: ofType<Buses.Delete>(Buses.DeleteType)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          return Observable.of(new Buses.DeleteError(action.payload));
-        })
+            return of(new Buses.DeleteError(action.payload));
+          })
+        )
+      )
     );
 }

@@ -26,6 +26,7 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { finalize, first, takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
@@ -60,25 +61,27 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.workspaces$ = this.store$.let(getWorkspaces);
-    this.user$ = this.store$.let(getCurrentUser);
+    this.workspaces$ = this.store$.pipe(getWorkspaces);
+    this.user$ = this.store$.pipe(getCurrentUser);
 
     // open workspace dialog when needed
     this.store$
       .select(state => state.ui.isPopupListWorkspacesVisible)
-      .takeUntil(this.onDestroy$)
-      .do(isPopupListWorkspacesVisible => {
-        if (isPopupListWorkspacesVisible) {
-          this.openWorkspacesDialog();
-        } else if (this.workspacesDialog) {
-          this.workspacesDialog.close();
-        }
-      })
-      .finally(() => {
-        if (this.workspacesDialog) {
-          this.workspacesDialog.close();
-        }
-      })
+      .pipe(
+        takeUntil(this.onDestroy$),
+        tap(isPopupListWorkspacesVisible => {
+          if (isPopupListWorkspacesVisible) {
+            this.openWorkspacesDialog();
+          } else if (this.workspacesDialog) {
+            this.workspacesDialog.close();
+          }
+        }),
+        finalize(() => {
+          if (this.workspacesDialog) {
+            this.workspacesDialog.close();
+          }
+        })
+      )
       .subscribe();
   }
 
@@ -100,21 +103,25 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
 
     this.store$
       .select(state => !state.workspaces.selectedWorkspaceId)
-      .first()
-      .do(noWorkspace =>
-        // until https://github.com/angular/angular/issues/15634 is fixed
-        setTimeout(() => {
-          this.workspacesDialog = this.dialog.open(this.template, {
-            disableClose: noWorkspace,
-          });
+      .pipe(
+        first(),
+        tap(noWorkspace =>
+          // until https://github.com/angular/angular/issues/15634 is fixed
+          setTimeout(() => {
+            this.workspacesDialog = this.dialog.open(this.template, {
+              disableClose: noWorkspace,
+            });
 
-          this.workspacesDialog
-            .afterClosed()
-            .do((selected: IWorkspace) =>
-              this.onWorkspacesDialogClose(selected)
-            )
-            .subscribe();
-        })
+            this.workspacesDialog
+              .afterClosed()
+              .pipe(
+                tap((selected: IWorkspace) =>
+                  this.onWorkspacesDialogClose(selected)
+                )
+              )
+              .subscribe();
+          })
+        )
       )
       .subscribe();
   }
@@ -124,12 +131,14 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
     if (selected) {
       this.store$
         .select(state => state.workspaces.selectedWorkspaceId)
-        .first()
-        .do(wsId => {
-          if (wsId !== selected.id) {
-            this.router.navigate(['/workspaces', selected.id]);
-          }
-        })
+        .pipe(
+          first(),
+          tap(wsId => {
+            if (wsId !== selected.id) {
+              this.router.navigate(['/workspaces', selected.id]);
+            }
+          })
+        )
         .subscribe();
     }
     // ensure the store is in a valid state

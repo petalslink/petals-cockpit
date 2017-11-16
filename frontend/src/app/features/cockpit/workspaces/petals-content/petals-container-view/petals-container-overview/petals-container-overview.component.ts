@@ -32,6 +32,8 @@ import {
   VisNodes,
 } from 'ng2-vis';
 import { Observable } from 'rxjs/Observable';
+import { fromEvent } from 'rxjs/observable/fromEvent';
+import { debounceTime, filter, map, takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
@@ -79,22 +81,25 @@ export class PetalsContainerOverviewComponent
 
   ngOnInit() {
     // because of https://github.com/seveves/ng2-vis/issues/36
-    Observable.fromEvent(window, 'resize')
-      .takeUntil(this.onDestroy$)
-      .debounceTime(500)
-      .map(_ => (this.visNetworkService as any).networks[this.visNetwork])
-      .filter(net => !!net)
-      .do(net => {
-        const sizeChanged = net.setSize();
-        if (sizeChanged) {
-          net.redraw();
-        }
-      })
+    fromEvent(window, 'resize')
+      .pipe(
+        takeUntil(this.onDestroy$),
+        debounceTime(500),
+        map(_ => (this.visNetworkService as any).networks[this.visNetwork]),
+        filter(net => !!net),
+        tap(net => {
+          const sizeChanged = net.setSize();
+          if (sizeChanged) {
+            net.redraw();
+          }
+        })
+      )
       .subscribe();
 
-    this.btnByScreenSize$ = this.store$
-      .let(isLargeScreen)
-      .map(ls => (ls ? `mat-raised-button` : `mat-mini-fab`));
+    this.btnByScreenSize$ = this.store$.pipe(
+      isLargeScreen,
+      map(ls => (ls ? `mat-raised-button` : `mat-mini-fab`))
+    );
   }
 
   networkInitialized() {

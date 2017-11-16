@@ -18,8 +18,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { mapTo } from 'rxjs/operators';
 
-import { environment } from './../../../environments/environment';
+import { environment } from 'environments/environment';
 
 export interface IUserBackend {
   id: string;
@@ -87,7 +88,7 @@ export class UsersServiceImpl extends UsersService {
       .delete(`${environment.urlBackend}/user/session`, {
         responseType: 'text',
       })
-      .mapTo(undefined);
+      .pipe(mapTo(undefined));
   }
 
   getCurrentUserInformations() {

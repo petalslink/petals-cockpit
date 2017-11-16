@@ -23,13 +23,10 @@ import {
 } from '@angular/core';
 
 import { Store } from '@ngrx/store';
-
-import { IStore } from 'app/shared/state/store.interface';
-
-import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
+import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import { ESharedLibraryState } from 'app/shared/services/shared-libraries.service';
+import { IStore } from 'app/shared/state/store.interface';
 
 @Component({
   selector: 'app-petals-shared-library-operations',

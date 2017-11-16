@@ -24,6 +24,7 @@ import {
 } from '@angular/router';
 import { Action, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { first, map } from 'rxjs/operators';
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
@@ -142,28 +143,31 @@ export class ResourceByIdGuard implements CanActivateChild {
       return true;
     }
 
-    return this.store$.first().map(state => {
-      if (!resourceState(state).byId[id]) {
-        if (destroyAction) {
-          this.store$.dispatch(destroyAction);
+    return this.store$.pipe(
+      first(),
+      map(state => {
+        if (!resourceState(state).byId[id]) {
+          if (destroyAction) {
+            this.store$.dispatch(destroyAction);
+          }
+
+          this.router.navigate([
+            '/workspaces',
+            state.workspaces.selectedWorkspaceId,
+            'not-found',
+          ]);
+
+          return false;
         }
 
-        this.router.navigate([
-          '/workspaces',
-          state.workspaces.selectedWorkspaceId,
-          'not-found',
-        ]);
+        const actions = initActions(state);
 
-        return false;
-      }
+        this.store$.dispatch(
+          batchActions(destroyAction ? [destroyAction, ...actions] : actions)
+        );
 
-      const actions = initActions(state);
-
-      this.store$.dispatch(
-        batchActions(destroyAction ? [destroyAction, ...actions] : actions)
-      );
-
-      return true;
-    });
+        return true;
+      })
+    );
   }
 }

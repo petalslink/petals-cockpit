@@ -19,6 +19,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { filter, first, switchMap, tap } from 'rxjs/operators';
 
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import {
@@ -53,15 +54,19 @@ export class PetalsBusViewComponent implements OnInit {
 
   openDeletionDialog() {
     this.bus$
-      .first()
-      .switchMap(bus =>
-        this.dialog
-          .open(BusDeleteDialogComponent, {
-            data: { bus },
-          })
-          .afterClosed()
-          .filter((result: boolean) => result)
-          .do(_ => this.store$.dispatch(new Buses.Delete(bus)))
+      .pipe(
+        first(),
+        switchMap(bus =>
+          this.dialog
+            .open(BusDeleteDialogComponent, {
+              data: { bus },
+            })
+            .afterClosed()
+            .pipe(
+              filter((result: boolean) => result),
+              tap(_ => this.store$.dispatch(new Buses.Delete(bus)))
+            )
+        )
       )
       .subscribe();
   }

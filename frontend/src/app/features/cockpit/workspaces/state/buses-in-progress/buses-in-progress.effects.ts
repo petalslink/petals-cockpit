@@ -22,6 +22,17 @@ import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { Observable } from 'rxjs/Observable';
+import { empty } from 'rxjs/observable/empty';
+import { of } from 'rxjs/observable/of';
+import {
+  catchError,
+  filter,
+  map,
+  mergeMap,
+  switchMap,
+  tap,
+  withLatestFrom,
+} from 'rxjs/operators';
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 import { getErrorMessage } from 'app/shared/helpers/shared.helper';
@@ -43,89 +54,100 @@ export class BusesInProgressEffects {
   @Effect()
   watchBusImport$: Observable<Action> = this.actions$
     .ofType<SseActions.BusImport>(SseActions.BusImportType)
-    .map(action => new BusesInProgress.Added(action.payload));
+    .pipe(map(action => new BusesInProgress.Added(action.payload)));
 
   @Effect()
   watchBusImportError$: Observable<Action> = this.actions$
     .ofType<SseActions.BusImportError>(SseActions.BusImportErrorType)
-    .map(action => {
-      const busInError = action.payload;
-      this.notifications.alert(
-        `Bus import error`,
-        `The import of a bus from the IP ${busInError.ip}:${
-          busInError.port
-        } failed`
-      );
-      return new BusesInProgress.UpdateError(busInError);
-    });
+    .pipe(
+      map(action => {
+        const busInError = action.payload;
+        this.notifications.alert(
+          `Bus import error`,
+          `The import of a bus from the IP ${busInError.ip}:${
+            busInError.port
+          } failed`
+        );
+
+        return new BusesInProgress.UpdateError(busInError);
+      })
+    );
 
   @Effect()
   watchBusDeleted$: Observable<Action> = this.actions$
     .ofType<SseActions.BusDeleted>(SseActions.BusDeletedType)
-    .withLatestFrom(this.store$)
-    .filter(
-      ([action, state]) => !!state.busesInProgress.byId[action.payload.id]
-    )
-    .map(([action, state]) => {
-      const { id, reason } = action.payload;
-      const bip = state.busesInProgress.byId[id];
-      this.notifications.info(`${bip.ip}:${bip.port}`, reason);
+    .pipe(
+      withLatestFrom(this.store$),
+      filter(
+        ([action, state]) => !!state.busesInProgress.byId[action.payload.id]
+      ),
+      map(([action, state]) => {
+        const { id, reason } = action.payload;
+        const bip = state.busesInProgress.byId[id];
+        this.notifications.info(`${bip.ip}:${bip.port}`, reason);
 
-      return new BusesInProgress.Removed(bip);
-    });
+        return new BusesInProgress.Removed(bip);
+      })
+    );
 
   @Effect()
   postBus$: Observable<Action> = this.actions$
     .ofType<BusesInProgress.Post>(BusesInProgress.PostType)
-    .withLatestFrom(this.store$)
-    .switchMap(([action, state]) =>
-      this.busesService
-        .postBus(state.workspaces.selectedWorkspaceId, action.payload)
-        .do(bip => {
-          // if we are still on the import page (bc if we change it is set
-          // back to false and we are in a switchMap) and the import event
-          // already arrived
-          if (state.busesInProgress.isImportingBus) {
-            this.router.navigate([
-              '/workspaces',
-              state.workspaces.selectedWorkspaceId,
-              'petals',
-              'buses-in-progress',
-              bip.id,
-            ]);
-          }
-        })
-        .map(bip => new BusesInProgress.PostSuccess(bip))
-        .catch((err: HttpErrorResponse) => {
-          return Observable.of(
-            new BusesInProgress.PostError({
-              importBusError: getErrorMessage(err),
+    .pipe(
+      withLatestFrom(this.store$),
+      switchMap(([action, state]) =>
+        this.busesService
+          .postBus(state.workspaces.selectedWorkspaceId, action.payload)
+          .pipe(
+            tap(bip => {
+              // if we are still on the import page (bc if we change it is set
+              // back to false and we are in a switchMap) and the import event
+              // already arrived
+              if (state.busesInProgress.isImportingBus) {
+                this.router.navigate([
+                  '/workspaces',
+                  state.workspaces.selectedWorkspaceId,
+                  'petals',
+                  'buses-in-progress',
+                  bip.id,
+                ]);
+              }
+            }),
+            map(bip => new BusesInProgress.PostSuccess(bip)),
+            catchError((err: HttpErrorResponse) => {
+              return of(
+                new BusesInProgress.PostError({
+                  importBusError: getErrorMessage(err),
+                })
+              );
             })
-          );
-        })
+          )
+      )
     );
 
   @Effect()
   deleteBusInProgress$: Observable<Action> = this.actions$
     .ofType<BusesInProgress.Delete>(BusesInProgress.DeleteType)
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .switchMap(([action, idWorkspace]) =>
-      this.busesService
-        .deleteBus(idWorkspace, action.payload.id)
-        .mergeMap(_ => Observable.empty<Action>())
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error catched in buses-in-progress.effects: ofType(BusesInProgress.Delete)'
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      switchMap(([action, idWorkspace]) =>
+        this.busesService.deleteBus(idWorkspace, action.payload.id).pipe(
+          mergeMap(_ => empty<Action>()),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error catched in buses-in-progress.effects: ofType(BusesInProgress.Delete)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          return Observable.of(new BusesInProgress.DeleteError(action.payload));
-        })
+            return of(new BusesInProgress.DeleteError(action.payload));
+          })
+        )
+      )
     );
 }

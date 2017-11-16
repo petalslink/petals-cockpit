@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { IUserBackend } from 'app/shared/services/users.service';
-import { environment } from './../../../environments/environment';
+import { environment } from 'environments/environment';
 
 export interface IWorkspaceBackendCommon {
   id: string;

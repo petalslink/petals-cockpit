@@ -16,7 +16,8 @@
  */
 
 import { async } from '@angular/core/testing';
-import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+import { finalize, tap } from 'rxjs/operators';
 
 import { AbstractControl } from '@angular/forms';
 import { SharedValidator } from 'app/shared/validators/shared.validator';
@@ -26,14 +27,14 @@ describe(`SharedValidator`, () => {
     it(
       `should return null if an Observable containing an array of strings contains a given string`,
       async(() => {
-        const arr$ = Observable.of(['string 1', 'string 2', 'string 3']);
+        const arr$ = of(['string 1', 'string 2', 'string 3']);
 
         const fakeAbstractControl = {
           value: 'string 2',
         } as AbstractControl;
 
         SharedValidator.isStringInObsArrayValidator(arr$)(fakeAbstractControl)
-          .do(x => expect(x).toBeNull())
+          .pipe(tap(x => expect(x).toBeNull()))
           .subscribe();
       })
     );
@@ -41,19 +42,19 @@ describe(`SharedValidator`, () => {
     it(
       `should return an object containing isIncluded: false if the Observable containing the array of strings does not contains a given string`,
       async(() => {
-        const arr$ = Observable.of(['string 1', 'string 2', 'string 3']);
+        const arr$ = of(['string 1', 'string 2', 'string 3']);
 
         const fakeAbstractControl1 = {
           value: 'some random string',
         } as AbstractControl;
 
         SharedValidator.isStringInObsArrayValidator(arr$)(fakeAbstractControl1)
-          .do(x => expect(x).toEqual({ isIncluded: false }))
+          .pipe(tap(x => expect(x).toEqual({ isIncluded: false })))
           .subscribe();
 
         // --------------------------------------
 
-        const arr2$ = Observable.of(['string 1', 'string 2', 'string 3']);
+        const arr2$ = of(['string 1', 'string 2', 'string 3']);
 
         // even if the string is partially correct it should return the object
         const fakeAbstractControl2 = {
@@ -61,7 +62,7 @@ describe(`SharedValidator`, () => {
         } as AbstractControl;
 
         SharedValidator.isStringInObsArrayValidator(arr2$)(fakeAbstractControl2)
-          .do(x => expect(x).toEqual({ isIncluded: false }))
+          .pipe(tap(x => expect(x).toEqual({ isIncluded: false })))
           .subscribe();
       })
     );
@@ -69,7 +70,7 @@ describe(`SharedValidator`, () => {
     it(
       `should only use the first emission from the observable and close right after`,
       async(() => {
-        const arr$ = Observable.of(
+        const arr$ = of(
           ['string 1', 'string 2', 'string 3'],
           // if we're looking for 'string 4', as it's in the second emission it should return the object (which means not found)
           ['string 4', 'string 5']
@@ -82,13 +83,13 @@ describe(`SharedValidator`, () => {
         let emitCpt = 0;
 
         SharedValidator.isStringInObsArrayValidator(arr$)(fakeAbstractControl)
-          .do(x => {
-            expect(x).toEqual({ isIncluded: false });
-            emitCpt++;
-          })
-          .finally(() => {
-            expect(emitCpt).toEqual(1);
-          })
+          .pipe(
+            tap(x => {
+              expect(x).toEqual({ isIncluded: false });
+              emitCpt++;
+            }),
+            finalize(() => expect(emitCpt).toEqual(1))
+          )
           .subscribe();
       })
     );

@@ -23,6 +23,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { map, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
@@ -62,17 +63,23 @@ export class PetalsMenuViewComponent implements OnInit {
     });
 
     this.searchForm.valueChanges
-      .map(value => value.search)
-      .do(search => (this.search = search))
-      .do(search => this.store$.dispatch(new Workspaces.SetSearch({ search })))
+      .pipe(
+        map(value => value.search),
+        tap(search => (this.search = search)),
+        tap(search =>
+          this.store$.dispatch(new Workspaces.SetSearch({ search }))
+        )
+      )
       .subscribe();
 
     this.store$
       .select(state => state.workspaces.searchPetals)
-      .do(searchPetals =>
-        this.searchForm.get('search').setValue(searchPetals, {
-          emitEvent: false,
-        })
+      .pipe(
+        tap(searchPetals =>
+          this.searchForm.get('search').setValue(searchPetals, {
+            emitEvent: false,
+          })
+        )
       )
       .subscribe();
   }
