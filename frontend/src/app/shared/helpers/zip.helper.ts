@@ -17,13 +17,17 @@
 
 import * as JSZip from 'jszip';
 import { Observable } from 'rxjs/Observable';
+import { forkJoin } from 'rxjs/observable/forkJoin';
+import { from } from 'rxjs/observable/from';
+import { _throw } from 'rxjs/observable/throw';
+import { catchError, switchMap } from 'rxjs/operators';
 
 export function loadFilesContentFromZip(
   zipFile: File,
   shouldKeepFile?: (relativePath: string) => boolean
 ): Observable<string[]> {
-  return Observable.from(JSZip.loadAsync(zipFile))
-    .switchMap(zip => {
+  return from(JSZip.loadAsync(zipFile)).pipe(
+    switchMap(zip => {
       const filesContent: Observable<string>[] = [];
 
       // forEach is not the one from Array.prototype
@@ -34,20 +38,21 @@ export function loadFilesContentFromZip(
         }
       });
 
-      return Observable.forkJoin(filesContent);
-    })
-    .catch(err =>
-      Observable.throw(
+      return forkJoin(filesContent);
+    }),
+    catchError(err =>
+      _throw(
         new Error(
           `An error occured while trying to read the zip "${zipFile.name}"`
         )
       )
-    );
+    )
+  );
 }
 
 export function _getTextFromZip(
   zipFile: JSZip,
   relativePath: string
 ): Observable<string> {
-  return Observable.from(zipFile.file(relativePath).async('text'));
+  return from(zipFile.file(relativePath).async('text'));
 }

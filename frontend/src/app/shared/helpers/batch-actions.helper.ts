@@ -19,6 +19,8 @@ import { Inject, Injectable } from '@angular/core';
 import { Actions } from '@ngrx/effects';
 import { Action, ActionReducer, ScannedActionsSubject } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { from } from 'rxjs/observable/from';
+import { of } from 'rxjs/observable/of';
 import { MergeMapOperator } from 'rxjs/operators/mergeMap';
 
 export const BatchType = 'BATCHING_REDUCER.BATCH';
@@ -54,11 +56,11 @@ export class ExplodeBatchActionsOperator extends MergeMapOperator<
     super(action => {
       if (action.type === BatchType) {
         const batch = action as Batch;
-        return Observable.from(
+        return from(
           keepBatchAction ? [batch, ...batch.payload] : batch.payload
         );
       } else {
-        return Observable.of(action);
+        return of(action);
       }
     });
   }

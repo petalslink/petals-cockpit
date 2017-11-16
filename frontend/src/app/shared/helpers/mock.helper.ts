@@ -17,8 +17,11 @@
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+import { _throw } from 'rxjs/observable/throw';
+import { delay, dematerialize, materialize } from 'rxjs/operators';
 
-import { environment } from './../../../environments/environment';
+import { environment } from 'environments/environment';
 
 /**
  * This simulates the behaviour of Angular's http module:
@@ -38,12 +41,13 @@ export function responseBody<T = undefined>(
   error?: { code: number; message: string }
 ): Observable<T> {
   if (status >= 200 && status < 300) {
-    return Observable.of(body).delay(environment.mock.httpDelay);
+    return of(body).pipe(delay(environment.mock.httpDelay));
   } else {
-    return Observable.throw(new HttpErrorResponse({ status, error }))
-      .materialize()
-      .delay(environment.mock.httpDelay)
-      .dematerialize();
+    return _throw(new HttpErrorResponse({ status, error })).pipe(
+      materialize(),
+      delay(environment.mock.httpDelay),
+      dematerialize()
+    );
   }
 }
 

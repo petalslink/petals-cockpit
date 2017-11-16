@@ -41,8 +41,8 @@ export class CockpitComponent implements OnInit, OnDestroy {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.isLargeScreen$ = this.store$.let(isLargeScreen);
-    this.user$ = this.store$.let(getCurrentUser);
+    this.isLargeScreen$ = this.store$.pipe(isLargeScreen);
+    this.user$ = this.store$.pipe(getCurrentUser);
     this.isDisconnecting$ = this.store$.select(
       state => state.users.isDisconnecting
     );

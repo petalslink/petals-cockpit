@@ -17,6 +17,7 @@
 
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 
 import { ScreenSize } from 'app/shared/state/ui.interface';
 import { IStore } from './store.interface';
@@ -29,10 +30,9 @@ const getScreenSize = (state: IStore) => state.ui.screenSize;
 export const isLargeScreen = (store$: Store<IStore>): Observable<boolean> => {
   return store$
     .select(getScreenSize)
-    .map(_isLargeScreen)
-    .distinctUntilChanged();
+    .pipe(map(_isLargeScreen), distinctUntilChanged());
 };
 
 export const isSmallScreen = (store$: Store<IStore>): Observable<boolean> => {
-  return isLargeScreen(store$).map(b => !b);
+  return isLargeScreen(store$).pipe(map(b => !b));
 };

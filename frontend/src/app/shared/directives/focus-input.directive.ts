@@ -17,6 +17,7 @@
 
 import { Directive, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { filter, takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 @Directive({
@@ -31,9 +32,11 @@ export class FocusInputDirective implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.appFocusInput
-      .takeUntil(this.onDestroy$)
-      .filter(shouldFocus => !!shouldFocus)
-      .do(() => this.el.nativeElement.focus())
+      .pipe(
+        takeUntil(this.onDestroy$),
+        filter(shouldFocus => !!shouldFocus),
+        tap(() => this.el.nativeElement.focus())
+      )
       .subscribe();
   }
 

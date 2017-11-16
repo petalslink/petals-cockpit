@@ -28,6 +28,7 @@ import {
 import { FormControl, FormGroup } from '@angular/forms';
 import { Actions } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
+import { filter, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 import { v4 as uuid } from 'uuid';
 
@@ -125,22 +126,24 @@ export class PetalsComponentOperationsComponent
 
     this.actions$
       .ofType<HttpProgress>(HttpProgressType)
-      .takeUntil(this.onDestroy$)
-      .filter(action => action.payload.correlationId === correlationId)
-      // we want 1 or 0 (first wants exactly one) because of takeUntil
-      .take(1)
-      .switchMap(action =>
-        action.payload
-          .getProgress()
-          .do(
-            percentage =>
-              (this.uploadServiceUnitStatus = {
-                percentage,
-              })
+      .pipe(
+        takeUntil(this.onDestroy$),
+        filter(action => action.payload.correlationId === correlationId),
+        // we want 1 or 0 (first wants exactly one) because of takeUntil
+        take(1),
+        switchMap(action =>
+          action.payload.getProgress().pipe(
+            tap(
+              percentage =>
+                (this.uploadServiceUnitStatus = {
+                  percentage,
+                })
+            ),
+            tap({
+              complete: () => this.deployServiceUnit.reset(),
+            })
           )
-          .do({
-            complete: () => this.deployServiceUnit.reset(),
-          })
+        )
       )
       .subscribe();
 

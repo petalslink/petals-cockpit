@@ -19,7 +19,7 @@ import { NgModule } from '@angular/core';
 
 import { WorkspaceModule } from 'app/features/cockpit/workspaces/workspace/workspace.module';
 import { WorkspacesListComponent } from 'app/features/cockpit/workspaces/workspaces-list/workspaces-list.component';
-import { SharedModule } from '../../../shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 import { WorkspacesRoutingModule } from './workspaces-routing.module';
 import {
   NoWorkspaceComponent,

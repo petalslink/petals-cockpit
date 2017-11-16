@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import { Observable } from 'rxjs/Observable';
+import { interval } from 'rxjs/observable/interval';
+import { of } from 'rxjs/observable/of';
+import { delay, last, map, share, take } from 'rxjs/operators';
 
 import * as helper from 'app/shared/helpers/mock.helper';
 import { SseActions, SseService } from 'app/shared/services/sse.service';
@@ -48,19 +50,17 @@ export const deployMockAndTriggerSse = (conf: {
     const { error } = conf.ifError;
 
     return {
-      progress$: Observable.of(0),
+      progress$: of(0),
       result$: helper.errorBackend(error.message, error.code),
     };
   }
 
-  const progress$ = Observable.interval(20)
-    .take(100 + 1)
-    .share();
+  const progress$ = interval(20).pipe(take(100 + 1), share());
 
-  const result$ = progress$
-    .last()
-    .delay(environment.mock.httpDelay)
-    .map(() => {
+  const result$ = progress$.pipe(
+    last(),
+    delay(environment.mock.httpDelay),
+    map(() => {
       const resource = conf.ifSuccess.addResourceToMock();
 
       setTimeout(
@@ -73,7 +73,8 @@ export const deployMockAndTriggerSse = (conf: {
       );
 
       return resource.httpResult;
-    });
+    })
+  );
 
   return { progress$, result$ };
 };

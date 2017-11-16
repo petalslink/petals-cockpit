@@ -15,14 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IBusInProgressBackend } from 'app/shared/services/buses.service';
-import {
-  busesInProgressTableFactory,
-  busInProgressRowFactory,
-  IBusesInProgressTable,
-  IBusInProgressRow,
-} from './buses-in-progress.interface';
-
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
@@ -32,6 +24,13 @@ import {
   removeById,
   updateById,
 } from 'app/shared/helpers/jstable.helper';
+import { IBusInProgressBackend } from 'app/shared/services/buses.service';
+import {
+  busesInProgressTableFactory,
+  busInProgressRowFactory,
+  IBusesInProgressTable,
+  IBusInProgressRow,
+} from './buses-in-progress.interface';
 
 export namespace BusesInProgressReducer {
   type All =

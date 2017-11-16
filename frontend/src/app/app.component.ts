@@ -20,6 +20,7 @@ import { ObservableMedia } from '@angular/flex-layout';
 import { MatIconRegistry } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Store } from '@ngrx/store';
+import { distinctUntilChanged, map, takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { IStore } from './shared/state/store.interface';
@@ -54,11 +55,13 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.media$
       .asObservable()
-      .map(change => change.mqAlias as ScreenSize)
-      .distinctUntilChanged()
-      .takeUntil(this.onDestroy$)
-      .do(screenSize =>
-        this.store$.dispatch(new Ui.ChangeScreenSize({ screenSize }))
+      .pipe(
+        map(change => change.mqAlias as ScreenSize),
+        distinctUntilChanged(),
+        takeUntil(this.onDestroy$),
+        tap(screenSize =>
+          this.store$.dispatch(new Ui.ChangeScreenSize({ screenSize }))
+        )
       )
       .subscribe();
 

@@ -20,7 +20,6 @@ import { browser } from 'protractor';
 import { PetalsCockpitPage } from './pages/app.po';
 
 export let page: PetalsCockpitPage;
-
 export let waitTimeout = 15000;
 
 beforeEach(() => {

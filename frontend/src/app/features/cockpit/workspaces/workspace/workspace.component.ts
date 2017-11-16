@@ -20,6 +20,7 @@ import { MatDialog } from '@angular/material';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
@@ -64,20 +65,21 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.sidenavVisible$ = this.store$.select(
       state => state.ui.isSidenavVisible
     );
-    this.sidenavMode$ = this.store$
-      .let(isSmallScreen)
-      .map(ss => (ss ? `over` : `side`));
+    this.sidenavMode$ = this.store$.pipe(
+      isSmallScreen,
+      map(ss => (ss ? `over` : `side`))
+    );
 
     // open deleted warning if the workspace has been deleted
     this.store$
       .select(state => state.workspaces.isSelectedWorkspaceDeleted)
-      .filter(d => d)
-      .takeUntil(this.onDestroy$)
-      .switchMap(() =>
-        this.dialog
-          .open(DeletedWorkspaceDialogComponent)
-          .afterClosed()
-          .do(() => this.router.navigate(['/workspaces']))
+      .pipe(
+        filter(d => d),
+        takeUntil(this.onDestroy$),
+        switchMap(() =>
+          this.dialog.open(DeletedWorkspaceDialogComponent).afterClosed()
+        ),
+        tap(() => this.router.navigate(['/workspaces']))
       )
       .subscribe();
   }

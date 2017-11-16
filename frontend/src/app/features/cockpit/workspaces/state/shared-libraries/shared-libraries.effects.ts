@@ -21,6 +21,16 @@ import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { Observable } from 'rxjs/Observable';
+import { empty } from 'rxjs/observable/empty';
+import { of } from 'rxjs/observable/of';
+import {
+  catchError,
+  flatMap,
+  map,
+  mergeMap,
+  switchMap,
+  withLatestFrom,
+} from 'rxjs/operators';
 
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
@@ -45,93 +55,99 @@ export class SharedLibrariesEffects {
   @Effect()
   watchDeployed$: Observable<Action> = this.actions$
     .ofType<SseActions.SlDeployed>(SseActions.SlDeployedType)
-    .map(action => {
-      const data = action.payload;
-      const sls = toJsTable(data.sharedLibraries);
-      return new SharedLibraries.Added(sls);
-    });
+    .pipe(
+      map(action => {
+        const data = action.payload;
+        const sls = toJsTable(data.sharedLibraries);
+        return new SharedLibraries.Added(sls);
+      })
+    );
 
   @Effect()
   fetchDetails$: Observable<Action> = this.actions$
     .ofType<SharedLibraries.FetchDetails>(SharedLibraries.FetchDetailsType)
-    .switchMap(action =>
-      this.sharedLibrariesService
-        .getDetails(action.payload.id)
-        .map(
-          data =>
-            new SharedLibraries.FetchDetailsSuccess({
-              id: action.payload.id,
-              data,
-            })
-        )
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error caught in shared-libraries.effects: ofType(SharedLibraries.FetchDetails)'
-            );
-            console.error(err);
-            console.groupEnd();
-          }
-
-          return Observable.of(
-            new SharedLibraries.FetchDetailsError(action.payload)
-          );
-        })
-    );
-
-  @Effect()
-  changeState$: Observable<Action> = this.actions$
-    .ofType<SharedLibraries.ChangeState>(SharedLibraries.ChangeStateType)
-    .withLatestFrom(this.store$)
-    .switchMap(([action, store]) => {
-      return (
-        this.sharedLibrariesService
-          .putState(
-            store.workspaces.selectedWorkspaceId,
-            action.payload.id,
-            action.payload.state
-          )
-          // response will be handled by sse
-          .mergeMap(_ => Observable.empty<Action>())
-          .catch((err: HttpErrorResponse) => {
+    .pipe(
+      switchMap(action =>
+        this.sharedLibrariesService.getDetails(action.payload.id).pipe(
+          map(
+            data =>
+              new SharedLibraries.FetchDetailsSuccess({
+                id: action.payload.id,
+                data,
+              })
+          ),
+          catchError((err: HttpErrorResponse) => {
             if (environment.debug) {
               console.group();
               console.warn(
-                'Error caught in share-libraries.effects: ofType(SharedLibraries.ChangeState)'
+                'Error caught in shared-libraries.effects: ofType(SharedLibraries.FetchDetails)'
               );
               console.error(err);
               console.groupEnd();
             }
 
-            return Observable.of(
-              new SharedLibraries.ChangeStateError({
-                id: action.payload.id,
-                errorChangeState: getErrorMessage(err),
-              })
-            );
+            return of(new SharedLibraries.FetchDetailsError(action.payload));
           })
-      );
-    });
+        )
+      )
+    );
+
+  @Effect()
+  changeState$: Observable<Action> = this.actions$
+    .ofType<SharedLibraries.ChangeState>(SharedLibraries.ChangeStateType)
+    .pipe(
+      withLatestFrom(this.store$),
+      switchMap(([action, store]) => {
+        return this.sharedLibrariesService
+          .putState(
+            store.workspaces.selectedWorkspaceId,
+            action.payload.id,
+            action.payload.state
+          )
+          .pipe(
+            // response will be handled by sse
+            mergeMap(_ => empty<Action>()),
+            catchError((err: HttpErrorResponse) => {
+              if (environment.debug) {
+                console.group();
+                console.warn(
+                  'Error caught in share-libraries.effects: ofType(SharedLibraries.ChangeState)'
+                );
+                console.error(err);
+                console.groupEnd();
+              }
+
+              return of(
+                new SharedLibraries.ChangeStateError({
+                  id: action.payload.id,
+                  errorChangeState: getErrorMessage(err),
+                })
+              );
+            })
+          );
+      })
+    );
 
   @Effect()
   watchStateChanged$: Observable<Action> = this.actions$
     .ofType<SseActions.SlStateChange>(SseActions.SlStateChangeType)
-    .withLatestFrom(this.store$)
-    .flatMap(([action, store]) => {
-      const data = action.payload;
+    .pipe(
+      withLatestFrom(this.store$),
+      flatMap(([action, store]) => {
+        const data = action.payload;
 
-      const sl = store.sharedLibraries.byId[data.id];
+        const sl = store.sharedLibraries.byId[data.id];
 
-      if (data.state === ESharedLibraryState.Unloaded) {
-        this.notifications.success(
-          'Shared Library Unloaded',
-          `'${sl.name}' has been unloaded`
-        );
+        if (data.state === ESharedLibraryState.Unloaded) {
+          this.notifications.success(
+            'Shared Library Unloaded',
+            `'${sl.name}' has been unloaded`
+          );
 
-        return Observable.of(new SharedLibraries.Removed(sl));
-      } else {
-        return Observable.empty();
-      }
-    });
+          return of(new SharedLibraries.Removed(sl));
+        } else {
+          return empty();
+        }
+      })
+    );
 }

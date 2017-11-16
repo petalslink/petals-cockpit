@@ -19,7 +19,7 @@ import { NgModule } from '@angular/core';
 import { VisModule } from 'ng2-vis';
 
 import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
-import { SharedModule } from '../../../../../shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 import { PetalsContainerOperationsComponent } from './petals-container-operations/petals-container-operations.component';
 import { PetalsContainerOverviewComponent } from './petals-container-overview/petals-container-overview.component';
 import { PetalsContainerViewRoutingModule } from './petals-container-view-routing.module';

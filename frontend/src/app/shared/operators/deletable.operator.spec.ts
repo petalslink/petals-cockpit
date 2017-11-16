@@ -17,7 +17,8 @@
 
 import { async } from '@angular/core/testing';
 import { cold } from 'jasmine-marbles';
-import { Observable } from 'rxjs/Observable';
+import { from } from 'rxjs/observable/from';
+import { tap } from 'rxjs/operators';
 
 import { deletable } from 'app/shared/operators/deletable.operator';
 
@@ -27,7 +28,7 @@ describe(`Deletable operator`, () => {
     async(() => {
       const obs$ = cold('a|', { a: 'a value' });
 
-      expect(obs$.let(deletable)).toBeObservable(
+      expect(obs$.pipe(deletable)).toBeObservable(
         cold('a|', {
           a: {
             isDeleted: false,
@@ -48,7 +49,7 @@ describe(`Deletable operator`, () => {
         d: 'a value',
       });
 
-      expect(obs$.let(deletable)).toBeObservable(
+      expect(obs$.pipe(deletable)).toBeObservable(
         cold('a--b|', {
           a: undefined,
           b: {
@@ -66,7 +67,7 @@ describe(`Deletable operator`, () => {
     async(() => {
       const obs$ = cold('ab|', { a: 'a value', b: null });
 
-      expect(obs$.let(deletable)).toBeObservable(
+      expect(obs$.pipe(deletable)).toBeObservable(
         cold('ab|', {
           a: {
             isDeleted: false,
@@ -87,7 +88,7 @@ describe(`Deletable operator`, () => {
     async(() => {
       const obs$ = cold('ab|', { a: 'a value', b: undefined });
 
-      expect(obs$.let(deletable)).toBeObservable(
+      expect(obs$.pipe(deletable)).toBeObservable(
         cold('ab|', {
           a: {
             isDeleted: false,
@@ -107,7 +108,7 @@ describe(`Deletable operator`, () => {
     async(() => {
       const obs$ = cold('abc|', { a: 'a value', b: null, c: 'another value' });
 
-      expect(obs$.let(deletable)).toBeObservable(
+      expect(obs$.pipe(deletable)).toBeObservable(
         cold('abc|', {
           a: {
             isDeleted: false,
@@ -131,29 +132,31 @@ describe(`Deletable operator`, () => {
     async(() => {
       const obj1 = { a: 1 };
       const obj2 = { b: 2 };
-      const obs$ = Observable.from([obj1, obj1, obj2, obj2]).let(deletable);
+      const obs$ = from([obj1, obj1, obj2, obj2]).pipe(deletable);
 
       let cpt = 1;
       obs$
-        .do(obs => {
-          switch (cpt) {
-            case 1:
-              expect(obs.isDeleted).toBe(false);
-              expect(obs.value).toBe(obj1);
-              break;
+        .pipe(
+          tap(obs => {
+            switch (cpt) {
+              case 1:
+                expect(obs.isDeleted).toBe(false);
+                expect(obs.value).toBe(obj1);
+                break;
 
-            case 2:
-              expect(obs.isDeleted).toBe(false);
-              expect(obs.value).toBe(obj2);
-              break;
+              case 2:
+                expect(obs.isDeleted).toBe(false);
+                expect(obs.value).toBe(obj2);
+                break;
 
-            case 3:
-              expect('this').toBe('never called');
-              break;
-          }
+              case 3:
+                expect('this').toBe('never called');
+                break;
+            }
 
-          cpt++;
-        })
+            cpt++;
+          })
+        )
         .subscribe();
     })
   );

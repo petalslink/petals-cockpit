@@ -17,7 +17,7 @@
 
 import { NgModule } from '@angular/core';
 
-import { SharedModule } from '../../../../shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 import { PetalsServiceContentComponent } from './petals-service-content/petals-service-content.component';
 import { ServiceContentRoutingModule } from './service-content-routing.module';
 

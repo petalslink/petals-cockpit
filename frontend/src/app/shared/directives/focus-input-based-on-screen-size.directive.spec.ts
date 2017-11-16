@@ -24,6 +24,7 @@ import {
 } from '@angular/core/testing';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 
 import { SharedModule } from 'app/shared/shared.module';
 import { ScreenSize } from 'app/shared/state/ui.interface';
@@ -178,7 +179,7 @@ export class MockStore extends BehaviorSubject<MinimalStore> {
   }
 
   select(fn: () => any) {
-    return this.map(fn).distinctUntilChanged();
+    return this.pipe(map(fn), distinctUntilChanged());
   }
 
   sendMockValue(value: MinimalStore) {

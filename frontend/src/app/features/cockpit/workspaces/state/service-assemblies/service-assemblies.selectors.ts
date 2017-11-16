@@ -16,16 +16,16 @@
  */
 
 import { createSelector } from '@ngrx/store';
-import {
-  IServiceAssembly,
-  IServiceAssemblyRow,
-} from './service-assemblies.interface';
 
 import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import { getComponentsById } from 'app/features/cockpit/workspaces/state/components/components.selectors';
 import { IServiceUnit } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 import { getServiceUnitsById } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
 import { IStore } from 'app/shared/state/store.interface';
+import {
+  IServiceAssembly,
+  IServiceAssemblyRow,
+} from './service-assemblies.interface';
 
 export interface IServiceAssemblyWithSUsAndComponents extends IServiceAssembly {
   serviceUnits: IServiceUnitWithComponent[];

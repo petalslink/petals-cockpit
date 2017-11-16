@@ -23,6 +23,9 @@ import {
 import { Action } from '@ngrx/store';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
+import { empty } from 'rxjs/observable/empty';
+import { of } from 'rxjs/observable/of';
+import { flatMap, last, map, startWith } from 'rxjs/operators';
 
 import { ComponentState } from 'app/shared/services/components.service';
 import { HttpProgress } from 'app/shared/services/http-progress-tracker.service';
@@ -106,11 +109,14 @@ export function httpResponseWithProgress<T>(
   success: (result: T) => any
 ) {
   return (obs$: Observable<T>): Observable<Action> => {
-    return obs$.map(success).startWith(
-      new HttpProgress({
-        correlationId,
-        getProgress: () => progress$,
-      })
+    return obs$.pipe(
+      map(success),
+      startWith(
+        new HttpProgress({
+          correlationId,
+          getProgress: () => progress$,
+        })
+      )
     );
   };
 }
@@ -123,24 +129,25 @@ export function streamHttpProgressAndSuccess<T, U>(
 
   return {
     progress$: progress$.asObservable(),
-    result$: result$
-      .flatMap(event => {
+    result$: result$.pipe(
+      flatMap(event => {
         if (event.type === HttpEventType.UploadProgress) {
           const percentDone = Math.round(100 * event.loaded / event.total);
 
           progress$.next(percentDone);
-          return Observable.empty<T>();
+          return empty<T>();
         } else if (event.type === HttpEventType.Response) {
           const body = event.body as T;
 
           progress$.next(100);
           progress$.complete();
 
-          return Observable.of(success(body));
+          return of(success(body));
         } else {
-          return Observable.empty<T>();
+          return empty<T>();
         }
-      })
-      .last(),
+      }),
+      last()
+    ),
   };
 }

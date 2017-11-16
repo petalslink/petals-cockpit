@@ -21,6 +21,16 @@ import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+import {
+  catchError,
+  filter,
+  map,
+  mergeMap,
+  switchMap,
+  tap,
+  withLatestFrom,
+} from 'rxjs/operators';
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
@@ -52,233 +62,247 @@ export class WorkspacesEffects {
   @Effect()
   fetchWorkspaces$: Observable<Action> = this.actions$
     .ofType<Workspaces.FetchAll>(Workspaces.FetchAllType)
-    .switchMap(action =>
-      this.workspacesService
-        .fetchWorkspaces()
-        .map(res =>
-          batchActions([
-            new Workspaces.FetchAllSuccess(toJsTable(res.workspaces)),
-            new Users.Fetched(toJsTable(res.users)),
-          ])
-        )
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.debug(
-              `Error in workspaces.effects: ofType(Workspaces.FetchAll)`
-            );
-            console.error(err);
-            console.groupEnd();
-          }
-
-          this.notifications.error(
-            `Workspaces`,
-            `An error occurred while loading the workspaces.`
-          );
-
-          return Observable.of(new Workspaces.FetchAllError());
-        })
-    );
-
-  @Effect()
-  postWorkspace$: Observable<Action> = this.actions$
-    .ofType<Workspaces.Create>(Workspaces.CreateType)
-    .switchMap(action =>
-      this.workspacesService
-        .postWorkspace(action.payload.name)
-        .map(res => new Workspaces.CreateSuccess(res))
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.debug(
-              `Error in workspaces.effects: ofType(Workspaces.Post)`
-            );
-            console.error(err);
-            console.groupEnd();
-          }
-
-          this.notifications.error(
-            `Workspaces`,
-            `An error occurred while adding a new workspace.`
-          );
-          return Observable.of(new Workspaces.CreateError());
-        })
-    );
-
-  @Effect({ dispatch: false })
-  removeWorkspace$: Observable<Action> = this.actions$
-    .ofType(SseActions.WorkspaceDeletedType)
-    .do(_ => this.sseService.stopWatchingWorkspace())
-    .map(
-      (action: SseActions.WorkspaceDeleted) =>
-        new Workspaces.Deleted({ id: action.payload.id })
-    );
-
-  @Effect()
-  fetchWorkspace$: Observable<Action> = this.actions$
-    .ofType<Workspaces.Fetch>(Workspaces.FetchType)
-    .switchMap(action =>
-      this.sseService.watchWorkspaceRealTime(action.payload.id).catch(err => {
+    .pipe(
+      switchMap(action => this.workspacesService.fetchWorkspaces()),
+      map(res =>
+        batchActions([
+          new Workspaces.FetchAllSuccess(toJsTable(res.workspaces)),
+          new Users.Fetched(toJsTable(res.users)),
+        ])
+      ),
+      catchError((err: HttpErrorResponse) => {
         if (environment.debug) {
           console.group();
           console.debug(
-            `Error in workspaces.effects: ofType(Workspaces.Fetch)`
+            `Error in workspaces.effects: ofType(Workspaces.FetchAll)`
           );
           console.error(err);
           console.groupEnd();
         }
 
         this.notifications.error(
-          `Workspace Error`,
-          `An error occurred with the workspace connection.`
+          `Workspaces`,
+          `An error occurred while loading the workspaces.`
         );
 
-        return Observable.of(new Workspaces.FetchError(action.payload));
+        return of(new Workspaces.FetchAllError());
       })
+    );
+
+  @Effect()
+  postWorkspace$: Observable<Action> = this.actions$
+    .ofType<Workspaces.Create>(Workspaces.CreateType)
+    .pipe(
+      switchMap(action =>
+        this.workspacesService.postWorkspace(action.payload.name)
+      ),
+      map(res => new Workspaces.CreateSuccess(res)),
+      catchError((err: HttpErrorResponse) => {
+        if (environment.debug) {
+          console.group();
+          console.debug(`Error in workspaces.effects: ofType(Workspaces.Post)`);
+          console.error(err);
+          console.groupEnd();
+        }
+
+        this.notifications.error(
+          `Workspaces`,
+          `An error occurred while adding a new workspace.`
+        );
+        return of(new Workspaces.CreateError());
+      })
+    );
+
+  @Effect({ dispatch: false })
+  removeWorkspace$: Observable<Action> = this.actions$
+    .ofType(SseActions.WorkspaceDeletedType)
+    .pipe(
+      tap(_ => this.sseService.stopWatchingWorkspace()),
+      map(
+        (action: SseActions.WorkspaceDeleted) =>
+          new Workspaces.Deleted({ id: action.payload.id })
+      )
+    );
+
+  @Effect()
+  fetchWorkspace$: Observable<Action> = this.actions$
+    .ofType<Workspaces.Fetch>(Workspaces.FetchType)
+    .pipe(
+      switchMap(action =>
+        this.sseService.watchWorkspaceRealTime(action.payload.id).pipe(
+          catchError(err => {
+            if (environment.debug) {
+              console.group();
+              console.debug(
+                `Error in workspaces.effects: ofType(Workspaces.Fetch)`
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            this.notifications.error(
+              `Workspace Error`,
+              `An error occurred with the workspace connection.`
+            );
+
+            return of(new Workspaces.FetchError(action.payload));
+          })
+        )
+      )
     );
 
   @Effect()
   fetchWorkspaceSseSuccess$: Observable<Action> = this.actions$
     .ofType<SseActions.WorkspaceContent>(SseActions.WorkspaceContentType)
-    .map(action => {
-      const data = action.payload;
+    .pipe(
+      map(action => {
+        const data = action.payload;
 
-      return batchActions([
-        new Workspaces.Clean(),
-        new Ui.OpenSidenav(),
-        new Workspaces.FetchSuccess(data.workspace),
-        new Users.Fetched(toJsTable(data.users)),
-        new BusesInProgress.Fetched(toJsTable(data.busesInProgress)),
-        new Buses.Fetched(toJsTable(data.buses)),
-        new Containers.Fetched(toJsTable(data.containers)),
-        new Components.Fetched(toJsTable(data.components)),
-        new ServiceAssemblies.Fetched(toJsTable(data.serviceAssemblies)),
-        new ServiceUnits.Fetched(toJsTable(data.serviceUnits)),
-        new SharedLibraries.Fetched(toJsTable(data.sharedLibraries)),
-      ]);
-    });
+        return batchActions([
+          new Workspaces.Clean(),
+          new Ui.OpenSidenav(),
+          new Workspaces.FetchSuccess(data.workspace),
+          new Users.Fetched(toJsTable(data.users)),
+          new BusesInProgress.Fetched(toJsTable(data.busesInProgress)),
+          new Buses.Fetched(toJsTable(data.buses)),
+          new Containers.Fetched(toJsTable(data.containers)),
+          new Components.Fetched(toJsTable(data.components)),
+          new ServiceAssemblies.Fetched(toJsTable(data.serviceAssemblies)),
+          new ServiceUnits.Fetched(toJsTable(data.serviceUnits)),
+          new SharedLibraries.Fetched(toJsTable(data.sharedLibraries)),
+        ]);
+      })
+    );
 
   @Effect()
   fetchWorkspaceDetails$: Observable<Action> = this.actions$
     .ofType<Workspaces.FetchDetails>(Workspaces.FetchDetailsType)
-    .switchMap(action =>
-      this.workspacesService
-        .fetchWorkspace(action.payload.id)
-        .map(res =>
-          batchActions([
-            new Workspaces.FetchDetailsSuccess({
-              id: action.payload.id,
-              data: res.workspace,
-            }),
-            new Users.Fetched(toJsTable(res.users)),
-          ])
-        )
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              `Error caught in workspaces.effects: ofType(Workspaces.FetchDetails)`
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      switchMap(action =>
+        this.workspacesService.fetchWorkspace(action.payload.id).pipe(
+          map(res =>
+            batchActions([
+              new Workspaces.FetchDetailsSuccess({
+                id: action.payload.id,
+                data: res.workspace,
+              }),
+              new Users.Fetched(toJsTable(res.users)),
+            ])
+          ),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                `Error caught in workspaces.effects: ofType(Workspaces.FetchDetails)`
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          return Observable.of(
-            new Workspaces.FetchDetailsError(action.payload)
-          );
-        })
+            return of(new Workspaces.FetchDetailsError(action.payload));
+          })
+        )
+      )
     );
 
   @Effect()
   setDescription$: Observable<Action> = this.actions$
     .ofType<Workspaces.SetDescription>(Workspaces.SetDescriptionType)
-    .switchMap(action =>
-      this.workspacesService
-        .setDescription(action.payload.id, action.payload.description)
-        .map(_ => new Workspaces.SetDescriptionSuccess(action.payload))
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              `Error catched in workspaces.effects: ofType(Workspaces.SetDescription)`
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      switchMap(action =>
+        this.workspacesService
+          .setDescription(action.payload.id, action.payload.description)
+          .pipe(
+            map(_ => new Workspaces.SetDescriptionSuccess(action.payload)),
+            catchError((err: HttpErrorResponse) => {
+              if (environment.debug) {
+                console.group();
+                console.warn(
+                  `Error catched in workspaces.effects: ofType(Workspaces.SetDescription)`
+                );
+                console.error(err);
+                console.groupEnd();
+              }
 
-          return Observable.of(
-            new Workspaces.SetDescriptionError(action.payload)
-          );
-        })
+              return of(new Workspaces.SetDescriptionError(action.payload));
+            })
+          )
+      )
     );
 
   @Effect()
   deleteWorkspace$: Observable<Action> = this.actions$
     .ofType<Workspaces.Delete>(Workspaces.DeleteType)
-    .switchMap(action =>
-      this.workspacesService
-        .deleteWorkspace(action.payload.id)
-        .map(_ => new Workspaces.DeleteSuccess(action.payload))
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error catched in workspace.effects: ofType(Workspaces.Delete)'
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      switchMap(action =>
+        this.workspacesService.deleteWorkspace(action.payload.id).pipe(
+          map(_ => new Workspaces.DeleteSuccess(action.payload)),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error catched in workspace.effects: ofType(Workspaces.Delete)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          return Observable.of(new Workspaces.DeleteError(action.payload));
-        })
+            return of(new Workspaces.DeleteError(action.payload));
+          })
+        )
+      )
     );
 
   @Effect()
   addUser$: Observable<Action> = this.actions$
     .ofType<Workspaces.AddUser>(Workspaces.AddUserType)
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .mergeMap(([action, workspaceId]) =>
-      this.workspacesService
-        .addUser(workspaceId, action.payload.id)
-        .map(_ => new Workspaces.AddUserSuccess(action.payload))
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error catched in workspace.effects: ofType(Workspaces.AddUser)'
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      mergeMap(([action, workspaceId]) =>
+        this.workspacesService.addUser(workspaceId, action.payload.id).pipe(
+          map(_ => new Workspaces.AddUserSuccess(action.payload)),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error catched in workspace.effects: ofType(Workspaces.AddUser)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          return Observable.of(new Workspaces.AddUserError(action.payload));
-        })
+            return of(new Workspaces.AddUserError(action.payload));
+          })
+        )
+      )
     );
 
   @Effect()
   deleteUser$: Observable<Action> = this.actions$
     .ofType<Workspaces.DeleteUser>(Workspaces.DeleteUserType)
-    .withLatestFrom(
-      this.store$.select(state => state.workspaces.selectedWorkspaceId)
-    )
-    .mergeMap(([action, workspaceId]) =>
-      this.workspacesService
-        .removeUser(workspaceId, action.payload.id)
-        .map(_ => new Workspaces.DeleteUserSuccess(action.payload))
-        .catch((err: HttpErrorResponse) => {
-          if (environment.debug) {
-            console.group();
-            console.warn(
-              'Error catched in workspace.effects: ofType(Workspaces.DeleteUser)'
-            );
-            console.error(err);
-            console.groupEnd();
-          }
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      mergeMap(([action, workspaceId]) =>
+        this.workspacesService.removeUser(workspaceId, action.payload.id).pipe(
+          map(_ => new Workspaces.DeleteUserSuccess(action.payload)),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error catched in workspace.effects: ofType(Workspaces.DeleteUser)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-          return Observable.of(new Workspaces.DeleteUserError(action.payload));
-        })
+            return of(new Workspaces.DeleteUserError(action.payload));
+          })
+        )
+      )
     );
 
   @Effect()
@@ -290,10 +314,12 @@ export class WorkspacesEffects {
       ServiceAssemblies.SetCurrentType,
       SharedLibraries.SetCurrentType
     )
-    .filter(action => !!action.payload.id)
-    .withLatestFrom(this.store$)
-    .map(([action, state]: [SetCurrentActions, IStore]) =>
-      batchActions(unfoldWithParents(action, state, false))
+    .pipe(
+      filter(action => !!action.payload.id),
+      withLatestFrom(this.store$),
+      map(([action, state]: [SetCurrentActions, IStore]) =>
+        batchActions(unfoldWithParents(action, state, false))
+      )
     );
 }
 

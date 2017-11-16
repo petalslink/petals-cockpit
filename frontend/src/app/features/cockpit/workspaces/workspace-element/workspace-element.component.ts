@@ -26,6 +26,7 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { deletable, IDeletable } from 'app/shared/operators/deletable.operator';
@@ -62,15 +63,20 @@ export class WorkspaceElementComponent<
 
   ngOnInit() {
     this.resourceObservable
-      .takeUntil(this.onDestroy$)
-      .let(deletable)
-      .do(resourceDeletable => {
-        if (this.resource && this.resource.id !== resourceDeletable.value.id) {
-          this.activeTabIndex = 0;
-        }
-        this.resourceDeletable = resourceDeletable;
-        this.resource = resourceDeletable.value;
-      })
+      .pipe(
+        takeUntil(this.onDestroy$),
+        deletable,
+        tap(resourceDeletable => {
+          if (
+            this.resource &&
+            this.resource.id !== resourceDeletable.value.id
+          ) {
+            this.activeTabIndex = 0;
+          }
+          this.resourceDeletable = resourceDeletable;
+          this.resource = resourceDeletable.value;
+        })
+      )
       .subscribe();
   }
 

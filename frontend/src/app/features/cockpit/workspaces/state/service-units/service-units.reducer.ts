@@ -15,13 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  IServiceUnitRow,
-  IServiceUnitsTable,
-  serviceUnitRowFactory,
-  serviceUnitsTableFactory,
-} from './service-units.interface';
-
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
@@ -35,6 +28,12 @@ import {
   IServiceUnitBackendDetails,
   IServiceUnitBackendSSE,
 } from 'app/shared/services/service-units.service';
+import {
+  IServiceUnitRow,
+  IServiceUnitsTable,
+  serviceUnitRowFactory,
+  serviceUnitsTableFactory,
+} from './service-units.interface';
 
 export namespace ServiceUnitsReducer {
   type All =

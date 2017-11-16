@@ -24,7 +24,6 @@ import {
 } from 'protractor';
 
 import { Matcher, textToMatchInElement, waitAndClick } from '../utils';
-
 import { AdminPage } from './administration.po';
 import { LoginPage } from './login.po';
 import { SetupPage } from './setup.po';

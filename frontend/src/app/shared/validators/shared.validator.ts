@@ -17,6 +17,7 @@
 
 import { AbstractControl } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
+import { first, map } from 'rxjs/operators';
 
 export class SharedValidator {
   /**
@@ -25,13 +26,16 @@ export class SharedValidator {
    */
   static isStringInObsArrayValidator(arr$: Observable<string[]>) {
     return (str: AbstractControl) =>
-      arr$.first().map(
-        arr =>
-          arr.includes(str.value)
-            ? // return null will mark the validator as valid
-              null
-            : // returning an object (containing the error) will mark the validator as not valid
-              { isIncluded: false }
+      arr$.pipe(
+        first(),
+        map(
+          arr =>
+            arr.includes(str.value)
+              ? // return null will mark the validator as valid
+                null
+              : // returning an object (containing the error) will mark the validator as not valid
+                { isIncluded: false }
+        )
       );
   }
 

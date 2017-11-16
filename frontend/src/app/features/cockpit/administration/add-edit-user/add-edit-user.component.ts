@@ -27,6 +27,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { getFormErrors } from 'app/shared/helpers/form.helper';
@@ -72,13 +73,15 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
     this.reset();
 
     this.userManagementForm.valueChanges
-      .takeUntil(this.onDestroy$)
-      .do(() => {
-        this.formErrors = getFormErrors(
-          this.userManagementForm,
-          this.formErrors
-        );
-      })
+      .pipe(
+        takeUntil(this.onDestroy$),
+        tap(() => {
+          this.formErrors = getFormErrors(
+            this.userManagementForm,
+            this.formErrors
+          );
+        })
+      )
       .subscribe();
   }
 

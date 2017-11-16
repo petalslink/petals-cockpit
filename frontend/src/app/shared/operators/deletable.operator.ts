@@ -16,6 +16,7 @@
  */
 
 import { Observable } from 'rxjs/Observable';
+import { distinctUntilChanged, scan } from 'rxjs/operators';
 
 export interface IDeletable<T> {
   isDeleted: boolean;
@@ -23,8 +24,8 @@ export interface IDeletable<T> {
 }
 
 export function deletable<T>(obs: Observable<T>): Observable<IDeletable<T>> {
-  return obs
-    .scan((acc: IDeletable<T>, curr: T) => {
+  return obs.pipe(
+    scan((acc: IDeletable<T>, curr: T) => {
       if (curr === null || curr === undefined) {
         if (acc === undefined) {
           return undefined;
@@ -40,10 +41,11 @@ export function deletable<T>(obs: Observable<T>): Observable<IDeletable<T>> {
           value: curr,
         };
       }
-    }, undefined)
-    .distinctUntilChanged(
+    }, undefined),
+    distinctUntilChanged(
       (p, n) =>
         p === n ||
         (p && n && p.isDeleted === n.isDeleted && p.value === n.value)
-    );
+    )
+  );
 }

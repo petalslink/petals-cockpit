@@ -21,6 +21,7 @@ import {
   ElementFinder,
   ExpectedConditions as EC,
 } from 'protractor';
+
 import { waitTimeout } from '../common';
 
 export class AdminAddEditUserPage {

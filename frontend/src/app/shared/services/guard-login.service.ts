@@ -22,15 +22,14 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
-
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+import { catchError, first, map, switchMap } from 'rxjs/operators';
 
-import { IStore } from '../state/store.interface';
-import { environment } from './../../../environments/environment';
-import { UsersService } from './users.service';
-
+import { IStore } from 'app/shared/state/store.interface';
 import { Users } from 'app/shared/state/users.actions';
+import { environment } from 'environments/environment';
+import { UsersService } from './users.service';
 
 @Injectable()
 export class GuardLoginService implements CanActivate {
@@ -43,87 +42,89 @@ export class GuardLoginService implements CanActivate {
   canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     return this.store$
       .select(s => s.users.connectedUser && !s.users.isDisconnecting)
-      .first()
-      .switchMap(connectedUser => {
-        const url = state.url;
-        const isLoginPage = url.match('^/login');
+      .pipe(
+        first(),
+        switchMap(connectedUser => {
+          const url = state.url;
+          const isLoginPage = url.match('^/login');
 
-        if (connectedUser) {
-          if (isLoginPage) {
-            if (environment.debug) {
-              console.debug(
-                `Guard Login: User already retrieved. Redirecting to /workspaces.`
-              );
+          if (connectedUser) {
+            if (isLoginPage) {
+              if (environment.debug) {
+                console.debug(
+                  `Guard Login: User already retrieved. Redirecting to /workspaces.`
+                );
+              }
+
+              this.router.navigate(['/workspaces']);
+
+              return of(false);
+            } else {
+              if (environment.debug) {
+                console.debug(
+                  `Guard App: User already retrieved. Continuing to ${url}.`
+                );
+              }
+
+              return of(true);
             }
-
-            this.router.navigate(['/workspaces']);
-
-            return Observable.of(false);
           } else {
-            if (environment.debug) {
-              console.debug(
-                `Guard App: User already retrieved. Continuing to ${url}.`
-              );
-            }
+            return this.userService.getCurrentUserInformations().pipe(
+              map(user => {
+                if (isLoginPage) {
+                  if (environment.debug) {
+                    console.debug(
+                      `Guard Login: User already logged. Redirecting to /workspaces.`
+                    );
+                  }
 
-            return Observable.of(true);
+                  this.store$.dispatch(
+                    new Users.ConnectSuccess({ user, navigate: true })
+                  );
+
+                  return false;
+                } else {
+                  if (environment.debug) {
+                    console.debug(
+                      `Guard App: User already logged. Continuing to ${url}.`
+                    );
+                  }
+
+                  this.store$.dispatch(
+                    new Users.ConnectSuccess({ user, navigate: false })
+                  );
+
+                  return true;
+                }
+              }),
+              catchError(_ => {
+                if (isLoginPage) {
+                  if (environment.debug) {
+                    console.debug(
+                      `Guard Login: User not logged. Continuing to /login.`
+                    );
+                  }
+
+                  return of(true);
+                } else {
+                  if (environment.debug) {
+                    console.debug(
+                      `Guard App: User not logged. Redirecting to /login (and then to ${
+                        url
+                      }).`
+                    );
+                  }
+
+                  this.router.navigate(['/login'], {
+                    queryParams: { previousUrl: url },
+                  });
+
+                  return of(false);
+                }
+              })
+            );
           }
-        } else {
-          return this.userService
-            .getCurrentUserInformations()
-            .map(user => {
-              if (isLoginPage) {
-                if (environment.debug) {
-                  console.debug(
-                    `Guard Login: User already logged. Redirecting to /workspaces.`
-                  );
-                }
-
-                this.store$.dispatch(
-                  new Users.ConnectSuccess({ user, navigate: true })
-                );
-
-                return false;
-              } else {
-                if (environment.debug) {
-                  console.debug(
-                    `Guard App: User already logged. Continuing to ${url}.`
-                  );
-                }
-
-                this.store$.dispatch(
-                  new Users.ConnectSuccess({ user, navigate: false })
-                );
-
-                return true;
-              }
-            })
-            .catch(_ => {
-              if (isLoginPage) {
-                if (environment.debug) {
-                  console.debug(
-                    `Guard Login: User not logged. Continuing to /login.`
-                  );
-                }
-
-                return Observable.of(true);
-              } else {
-                if (environment.debug) {
-                  console.debug(
-                    `Guard App: User not logged. Redirecting to /login (and then to ${
-                      url
-                    }).`
-                  );
-                }
-
-                this.router.navigate(['/login'], {
-                  queryParams: { previousUrl: url },
-                });
-
-                return Observable.of(false);
-              }
-            });
-        }
-      });
+        })
+      );
   }
 }
