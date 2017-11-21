@@ -108,7 +108,13 @@ export class ContainersServiceMock extends ContainersServiceImpl {
     });
   }
 
-  deploySharedLibrary(workspaceId: string, containerId: string, file: File) {
+  deploySharedLibrary(
+    workspaceId: string,
+    containerId: string,
+    file: File,
+    name: string,
+    version: string
+  ) {
     return deployMockAndTriggerSse({
       ifError: {
         isThereAnError: () => file.name.includes('error'),
@@ -123,7 +129,7 @@ export class ContainersServiceMock extends ContainersServiceImpl {
         addResourceToMock: () => {
           const sharedLibraries = containersService
             .get(containerId)
-            .addSharedLibrary()
+            .addSharedLibrary(name, version)
             .toObj();
 
           return {

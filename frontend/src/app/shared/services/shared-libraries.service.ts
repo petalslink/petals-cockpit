@@ -18,8 +18,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { map } from 'rxjs/operators';
 
+import { loadFilesContentFromZip } from 'app/shared/helpers/zip.helper';
 import { environment } from 'environments/environment';
+import * as xmltojson from 'xmltojson';
 
 export enum ESharedLibraryState {
   Loaded = 'Loaded',
@@ -56,6 +59,10 @@ export abstract class SharedLibrariesService {
     id: string;
     state: SharedLibraryState;
   }>;
+
+  abstract getSharedLibraryInformationFromZipFile(
+    file: File
+  ): Observable<{ name: string; version: string }>;
 }
 
 @Injectable()
@@ -80,5 +87,33 @@ export class SharedLibrariesServiceImpl extends SharedLibrariesService {
       }`,
       { state }
     );
+  }
+
+  getSharedLibraryInformationFromZipFile(file: File) {
+    return loadFilesContentFromZip(file, filePath =>
+      filePath.includes('jbi.xml')
+    ).pipe(
+      map(([firstFileContent]) => {
+        const infos = this.getInformationsFromXml(firstFileContent);
+        return infos;
+      })
+    );
+  }
+
+  private getInformationsFromXml(
+    xml: string
+  ): { name: string; version: string } {
+    const json: any = xmltojson.parseString(xml, {});
+    let name = '';
+    let version = '';
+
+    try {
+      const sl = json.jbi[0]['shared-library'][0];
+
+      name = sl.identification[0].name[0]._text;
+      version = sl._attr.version._value;
+    } catch (err) {}
+
+    return { name, version };
   }
 }

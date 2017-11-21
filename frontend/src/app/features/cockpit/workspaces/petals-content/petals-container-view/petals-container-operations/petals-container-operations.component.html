@@ -25,13 +25,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         [error]="container.errorDeploymentComponent"
         [disabled]="updateComponentDeployInfoFormGroup.invalid"
         (onUploadFile)="deploy('component', $event.selectedFileInformation.file)"
-        (onFileSelected)="onFileSelected($event.file)"
+        (onFileSelected)="onFileSelected('component', $event.file)"
         (onResetFile)="updateComponentDeployInfoFormGroup.reset()"
       >
         <ng-template updateFileInformation>
-          <form [formGroup]="updateComponentDeployInfoFormGroup">
+          <form novalidate [formGroup]="updateComponentDeployInfoFormGroup">
             <mat-form-field>
               <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
+              <button
+                *ngIf="updateComponentDeployInfoFormGroup.get('name')"
+                matSuffix
+                color="primary"
+                mat-icon-button
+                aria-label="Clear"
+                (click)="updateComponentDeployInfoFormGroup.get('name').setValue('')"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
 
               <mat-error *ngIf="updateComponentDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')">
                 You can't upload a component with a name that already exists in this container
@@ -53,13 +63,60 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       ></app-upload>
 
       <app-upload
-        class="deploy-shared-library margin-bottom-x2"
-        fxFlex
+        class="deploy-shared-library"
         #deploySharedLibrary
-        [title]="'Shared library'"
+        acceptedFileType=".zip"
+        [title]="'Shared library deployment'"
         [uploadStatus]="uploadSharedLibraryStatus"
         [error]="container.errorDeploymentSharedLibrary"
+        [disabled]="updateSharedLibraryDeployInfoFormGroup.invalid"
         (onUploadFile)="deploy('shared-library', $event.selectedFileInformation.file)"
-      ></app-upload>
+        (onFileSelected)="onFileSelected('shared-library', $event.file)"
+        (onResetFile)="updateSharedLibraryDeployInfoFormGroup.reset()"
+      >
+        <ng-template updateFileInformation>
+          <form [formGroup]="updateSharedLibraryDeployInfoFormGroup">
+            <mat-form-field>
+              <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
+              <button
+                *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name')"
+                matSuffix
+                color="primary"
+                mat-icon-button
+                aria-label="Clear"
+                (click)="updateSharedLibraryDeployInfoFormGroup.get('name').setValue('')"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+
+              <mat-hint *ngIf="!updateSharedLibraryDeployInfoFormGroup.get('name').value && !!slNameReadFromZip">
+                Default {{ slNameReadFromZip }}
+              </mat-hint>
+
+              <mat-error *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')">
+                You can't upload a shared library with a name that already exists in this container
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+              <input type="text" matInput placeholder="Version" autocomplete="off" formControlName="version">
+              <button
+                *ngIf="updateSharedLibraryDeployInfoFormGroup.get('version')"
+                matSuffix
+                color="primary"
+                mat-icon-button
+                aria-label="Clear"
+                (click)="updateSharedLibraryDeployInfoFormGroup.get('version').setValue('')"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+
+              <mat-hint *ngIf="!updateSharedLibraryDeployInfoFormGroup.get('version').value && !!slVersionReadFromZip">
+                Default {{ slVersionReadFromZip }}
+              </mat-hint>
+            </mat-form-field>
+          </form>
+        </ng-template>
+      </app-upload>
   </div>
 </div>

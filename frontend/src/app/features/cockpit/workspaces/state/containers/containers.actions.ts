@@ -136,6 +136,8 @@ export namespace Containers {
       public readonly payload: {
         id: string;
         file: File;
+        name: string;
+        version: string;
       } & ICorrelationId
     ) {}
   }
