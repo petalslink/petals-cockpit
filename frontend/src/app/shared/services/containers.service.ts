@@ -68,7 +68,8 @@ export abstract class ContainersService {
   abstract deployServiceAssembly(
     workspaceId: string,
     containerId: string,
-    file: File
+    file: File,
+    name: string
   ): {
     progress$: Observable<number>;
     result$: Observable<{
@@ -109,7 +110,7 @@ export class ContainersServiceImpl extends ContainersService {
   ) {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
-    formData.append('overrides', JSON.stringify(name));
+    formData.append('overrides', name);
 
     const req = new HttpRequest(
       'POST',
@@ -128,9 +129,15 @@ export class ContainersServiceImpl extends ContainersService {
     >(this.http.request(req), result => toJsTable(result.components));
   }
 
-  deployServiceAssembly(workspaceId: string, containerId: string, file: File) {
+  deployServiceAssembly(
+    workspaceId: string,
+    containerId: string,
+    file: File,
+    name: string
+  ) {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
+    formData.append('overrides', name);
 
     const req = new HttpRequest(
       'POST',

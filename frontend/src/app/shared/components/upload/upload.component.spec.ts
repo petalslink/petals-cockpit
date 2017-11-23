@@ -71,10 +71,10 @@ describe(`UploadComponent`, () => {
     );
   });
 
-  it(`should remove the selected file to choose another one`, () => {
+  it(`should cancel the selected file to choose another one`, () => {
     uploadComponent.selectedFileInformation = <ISelectedFileInformation>{};
 
-    uploadComponent.removeFile();
+    uploadComponent.cancelFile();
 
     expect(uploadComponent.selectedFileInformation).toBeUndefined();
   });

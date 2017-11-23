@@ -50,8 +50,8 @@ describe(`[Integration test] UploadComponent`, () => {
       get chooseFileButton() {
         return getButtonByClass(fixture, 'choose-file');
       },
-      get removeFileButton() {
-        return getButtonByClass(fixture, 'btn-remove-file');
+      get cancelFileButton() {
+        return getButtonByClass(fixture, 'btn-cancel-file');
       },
       get deployButton() {
         return getButtonByClass(fixture, 'btn-upload');
@@ -103,7 +103,7 @@ describe(`[Integration test] UploadComponent`, () => {
     expect(DOM.texts.title).not.toBe(null);
 
     expect(DOM.texts.fileName).toBe(null);
-    expect(DOM.buttons.removeFileButton).toBe(null);
+    expect(DOM.buttons.cancelFileButton).toBe(null);
     expect(DOM.buttons.deployButton).toBe(null);
   }
 
@@ -112,7 +112,7 @@ describe(`[Integration test] UploadComponent`, () => {
     expect(DOM.inputs.fileInput).toBe(null);
 
     expect(DOM.texts.fileName).not.toBe(null);
-    expect(DOM.buttons.removeFileButton).not.toBe(null);
+    expect(DOM.buttons.cancelFileButton).not.toBe(null);
     expect(DOM.buttons.deployButton).not.toBe(null);
 
     if (fileName) {

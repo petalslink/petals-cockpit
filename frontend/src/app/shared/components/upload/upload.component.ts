@@ -76,7 +76,7 @@ export class UploadComponent {
     this.onFileSelected.emit({ file: this.selectedFileInformation.file });
   }
 
-  removeFile() {
+  cancelFile() {
     this.selectedFileInformation = undefined;
     this.onResetFile.emit();
   }

@@ -163,7 +163,8 @@ export class ContainersEffects {
         } = this.containersService.deployServiceAssembly(
           workspaceId,
           action.payload.id,
-          action.payload.file
+          action.payload.file,
+          action.payload.name
         );
 
         return result$.pipe(

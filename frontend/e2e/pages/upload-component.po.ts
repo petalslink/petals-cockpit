@@ -30,7 +30,7 @@ export abstract class UploadComponentPage {
   public readonly fileInput: ElementFinder;
   public readonly fileName: ElementFinder;
   public readonly chooseFileButton: ElementFinder;
-  public readonly removeFileButton: ElementFinder;
+  public readonly cancelFileButton: ElementFinder;
   public readonly deployButton: ElementFinder;
   protected readonly editInformation = this.component.$('.edit-information');
 
@@ -48,7 +48,7 @@ export abstract class UploadComponentPage {
     this.fileInput = this.component.$('input[type="file"]');
     this.fileName = this.component.$('.file-name');
     this.chooseFileButton = this.component.$('.choose-file');
-    this.removeFileButton = this.component.$('.btn-remove-file');
+    this.cancelFileButton = this.component.$('.btn-cancel-file');
     this.deployButton = this.component.$('.btn-upload');
   }
 

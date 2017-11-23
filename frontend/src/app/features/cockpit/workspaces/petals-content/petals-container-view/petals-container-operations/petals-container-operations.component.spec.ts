@@ -31,6 +31,7 @@ import { _throw } from 'rxjs/observable/throw';
 
 import { PetalsContainerOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-operations/petals-container-operations.component';
 import { ComponentsService } from 'app/shared/services/components.service';
+import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
 import { SharedLibrariesService } from 'app/shared/services/shared-libraries.service';
 import { metaReducers, reducers } from 'app/shared/state/root.reducer';
 
@@ -57,6 +58,10 @@ describe(`Petals container operations`, () => {
         {
           provide: SharedLibrariesService,
           useClass: SharedLibrariesMockService,
+        },
+        {
+          provide: ServiceAssembliesService,
+          useClass: ServiceAssembliesMockService,
         },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -198,6 +203,71 @@ describe(`Petals container operations`, () => {
       })
     );
   });
+
+  describe(`change service assembly name`, () => {
+    it(`should mark the name as touched into service assembly form when a file is selected`, () => {
+      pcoComponent.onFileSelected('service-assembly', null);
+
+      expect(
+        pcoComponent.updateServiceAssemblyDeployInfoFormGroup.get('name')
+          .touched
+      ).toBe(true);
+    });
+
+    it(
+      `should get the name of the service assembly into the selected zip file and display it into the form`,
+      fakeAsync(() => {
+        const serviceAssembliesService: ServiceAssembliesMockService = TestBed.get(
+          ServiceAssembliesService
+        );
+
+        spyOn(
+          serviceAssembliesService,
+          'getServiceAssemblyNameFromZipFile'
+        ).and.callThrough();
+
+        pcoComponent.onFileSelected('service-assembly', null);
+        flush();
+
+        expect(
+          serviceAssembliesService.getServiceAssemblyNameFromZipFile
+        ).toHaveBeenCalled();
+        expect(
+          pcoComponent.updateServiceAssemblyDeployInfoFormGroup.get('name')
+            .value
+        ).toEqual('some content from zip');
+      })
+    );
+
+    it(
+      `should display a warning notification if the service assembly's name couldn't be read from zip file`,
+      fakeAsync(() => {
+        const serviceAssembliesService: ServiceAssembliesMockService = TestBed.get(
+          ServiceAssembliesService
+        );
+
+        spyOn((<any>pcoComponent).notifications, 'warn');
+
+        spyOn(
+          serviceAssembliesService,
+          'getServiceAssemblyNameFromZipFile'
+        ).and.returnValue(_throw(new Error('Error while reading ZIP')));
+
+        pcoComponent.onFileSelected('service-assembly', null);
+        flush();
+
+        expect(
+          pcoComponent.updateServiceAssemblyDeployInfoFormGroup.get('name')
+            .value
+        ).toEqual('');
+
+        expect((<any>pcoComponent).notifications.warn).toHaveBeenCalledWith(
+          'File error',
+          `An error occurred while trying to read the service assembly's name from zip file`
+        );
+      })
+    );
+  });
 });
 
 @Injectable()
@@ -215,5 +285,14 @@ export class SharedLibrariesMockService {
 
   getSharedLibraryInformationFromZipFile() {
     return of({ name: 'some content from zip', version: '1.0' });
+  }
+}
+
+@Injectable()
+export class ServiceAssembliesMockService {
+  constructor() {}
+
+  getServiceAssemblyNameFromZipFile() {
+    return of('some content from zip');
   }
 }
