@@ -18,6 +18,7 @@
 app-mat-card-toolbar {
   input[type='file'] {
     display: none;
+    text-transform: lowercase;
   }
 
   app-message.error-upload {

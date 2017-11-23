@@ -59,11 +59,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         [title]="'Service assembly deployment'"
         [uploadStatus]="uploadServiceAssemblyStatus"
         [error]="container.errorDeploymentServiceAssembly"
+        [disabled]="updateServiceAssemblyDeployInfoFormGroup.invalid"
         (onUploadFile)="deploy('service-assembly', $event.selectedFileInformation.file)"
-      ></app-upload>
+        (onFileSelected)="onFileSelected('service-assembly', $event.file)"
+        (onResetFile)="updateServiceAssemblyDeployInfoFormGroup.reset()"
+      >
+        <ng-template updateFileInformation>
+          <form novalidate [formGroup]="updateServiceAssemblyDeployInfoFormGroup">
+            <mat-form-field>
+              <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
+              <button *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name')" matSuffix color="primary" mat-icon-button aria-label="Clear"
+                (click)="updateServiceAssemblyDeployInfoFormGroup.get('name').setValue('')">
+                <mat-icon>close</mat-icon>
+              </button>
+
+              <mat-error *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')">
+                You can't upload a service assembly with a name that already exists in this container
+              </mat-error>
+            </mat-form-field>
+          </form>
+        </ng-template>
+      </app-upload>
 
       <app-upload
-        class="deploy-shared-library"
+        class="deploy-shared-library margin-bottom-x2"
+        fxFlex
         #deploySharedLibrary
         acceptedFileType=".zip"
         [title]="'Shared library deployment'"

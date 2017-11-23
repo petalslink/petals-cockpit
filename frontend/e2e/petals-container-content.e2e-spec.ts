@@ -68,7 +68,7 @@ describe(`Petals container content`, () => {
 
       expect(deploy.fileName.getText()).toEqual(`component.zip`);
 
-      expect(deploy.deployButton.getText()).toMatch(`Upload`);
+      expect(deploy.deployButton.getText()).toMatch(`UPLOAD`);
       expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 
@@ -237,7 +237,7 @@ describe(`Petals container content`, () => {
 
       expect(deploy.fileName.getText()).toEqual(`sa.zip`);
 
-      expect(deploy.deployButton.getText()).toMatch(`Upload`);
+      expect(deploy.deployButton.getText()).toMatch(`UPLOAD`);
       expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 
@@ -275,7 +275,10 @@ describe(`Petals container content`, () => {
         .openOperations()
         .getServiceAssemblyUpload();
 
-      const filePath = path.resolve(__dirname, './resources/sa.zip');
+      const filePath = path.resolve(
+        __dirname,
+        './resources/petals-zip/service-assemblies/sa-flowable-vacation-sample.zip'
+      );
       deploy.fileInput.sendKeys(filePath);
 
       const expectedTreeBeforeDeploy = [
@@ -318,7 +321,7 @@ describe(`Petals container content`, () => {
       page.clickAndExpectNotification(
         deploy.deployButton,
         'Service Assembly Deployed',
-        'SA 12 has been successfully deployed'
+        'sa-flowable-vacation-sample has been successfully deployed'
       );
 
       // check that the component is now added to the tree and that we've been redirected to it
@@ -329,17 +332,17 @@ describe(`Petals container content`, () => {
         `Comp 0`,
         `SU 0`,
         `SU 2`,
-        `SU 16`, // <-- added
+        `su1-sa-flowable-vacation-sample`,
         `Comp 1`,
         `SU 1`,
         `SU 3`,
-        `SU 17`, // <-- added
+        `su2-sa-flowable-vacation-sample`,
         `Comp 2`,
         `SERVICE ASSEMBLIES`,
         `SA 0`,
         `SA 1`,
         `SA 2`,
-        `SA 12`, // <-- added
+        `sa-flowable-vacation-sample`,
         `SHARED LIBRARIES`,
         `SL 0`,
         `Cont 1`,
@@ -362,14 +365,14 @@ describe(`Petals container content`, () => {
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
       // we should get redirected
-      const sa = workspace.openServiceAssembly('SA 12');
+      const sa = workspace.openServiceAssembly('sa-flowable-vacation-sample');
 
       expect(sa.state.getText()).toEqual('Shutdown');
 
       expect(sa.serviceUnits.getText()).toEqual([
-        'SU 16',
+        'su1-sa-flowable-vacation-sample',
         'Comp 0',
-        'SU 17',
+        'su2-sa-flowable-vacation-sample',
         'Comp 1',
       ]);
     });
@@ -383,14 +386,14 @@ describe(`Petals container content`, () => {
         .getSharedLibraryUpload();
 
       expect(deploy.chooseFileButton.getText()).toEqual(
-        `Choose a file to upload`
+        `CHOOSE A FILE TO UPLOAD`
       );
       const filePath = path.resolve(__dirname, './resources/sl.zip');
       deploy.fileInput.sendKeys(filePath);
 
       expect(deploy.fileName.getText()).toEqual(`sl.zip`);
 
-      expect(deploy.deployButton.getText()).toMatch(`Upload`);
+      expect(deploy.deployButton.getText()).toMatch(`UPLOAD`);
       expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 

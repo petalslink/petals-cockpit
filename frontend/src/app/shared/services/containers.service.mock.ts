@@ -74,7 +74,12 @@ export class ContainersServiceMock extends ContainersServiceImpl {
     });
   }
 
-  deployServiceAssembly(workspaceId: string, containerId: string, file: File) {
+  deployServiceAssembly(
+    workspaceId: string,
+    containerId: string,
+    file: File,
+    name: string
+  ) {
     return deployMockAndTriggerSse({
       ifError: {
         isThereAnError: () => file.name.includes('error'),
@@ -89,7 +94,7 @@ export class ContainersServiceMock extends ContainersServiceImpl {
         addResourceToMock: () => {
           const [serviceAssembly, serviceUnits] = containersService
             .get(containerId)
-            .addServiceAssembly(EServiceAssemblyState.Shutdown);
+            .addServiceAssembly(EServiceAssemblyState.Shutdown, name);
 
           return {
             sseResult: {

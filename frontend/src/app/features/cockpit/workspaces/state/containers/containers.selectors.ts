@@ -21,6 +21,7 @@ import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/buses.inter
 import { getBusesById } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
 import { getComponentsById } from 'app/features/cockpit/workspaces/state/components/components.selectors';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
+import { getServiceAssembliesById } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
 import { getSharedLibrariesById } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
 import { IStore } from 'app/shared/state/store.interface';
 
@@ -71,7 +72,6 @@ export const getCurrentContainer = createSelector(
  * useful to know whether a component already has a given container
  * without having to loop on the whole component.containers array,
  * only by trying to access it's key
- * @returns
  */
 export const componentsOfCurrentContainerByName = createSelector(
   getCurrentContainer,
@@ -91,6 +91,11 @@ export const componentsOfCurrentContainerByName = createSelector(
         )
 );
 
+/**
+ * useful to know whether a shared library already has a given container
+ * without having to loop on the whole sharedLibrary.containers array,
+ * only by trying to access it's key
+ */
 export const sharedLibrariesOfCurrentContainerByName = createSelector(
   getCurrentContainer,
   getSharedLibrariesById,
@@ -103,6 +108,31 @@ export const sharedLibrariesOfCurrentContainerByName = createSelector(
             const sharedLibraryName = sharedLibrary.name.trim().toLowerCase();
 
             acc[sharedLibraryName] = true;
+            return acc;
+          },
+          <{ [name: string]: boolean }>{}
+        )
+);
+
+/**
+ * useful to know whether a service assembly already has a given container
+ * without having to loop on the whole serviceAssembly.containers array,
+ * only by trying to access it's key
+ */
+export const serviceAssembliesOfCurrentContainerByName = createSelector(
+  getCurrentContainer,
+  getServiceAssembliesById,
+  (currentContainer, serviceAssembliesById) =>
+    !currentContainer
+      ? {}
+      : currentContainer.serviceAssemblies.reduce(
+          (acc, serviceAssemblyId) => {
+            const serviceAssembly = serviceAssembliesById[serviceAssemblyId];
+            const serviceAssemblyName = serviceAssembly.name
+              .trim()
+              .toLowerCase();
+
+            acc[serviceAssemblyName] = true;
             return acc;
           },
           <{ [name: string]: boolean }>{}

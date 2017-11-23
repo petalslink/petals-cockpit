@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<app-mat-card-toolbar [title]="title" titleIcon="file_upload">
+<app-mat-card-toolbar [title]="title" titleIcon="build">
   <mat-card-content>
     <div *ngIf="!selectedFileInformation">
       <input
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       >
 
       <button
-        class="choose-file"
+        class="choose-file text-upper"
         mat-button
         [disabled]="disabled"
         (click)="selectFile.click()"
@@ -63,15 +63,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           class="upload-actions"
           *ngIf="!isUploading"
           fxLayout="row"
-          fxLayoutAlign="center center"
-          fxLayoutGap="15px"
-          [ngStyle.lt-md]="{'margin-top.px': 15}"
+          fxLayoutAlign="start center"
         >
-          <button mat-mini-fab class="btn-remove-file" (click)="removeFile()">
-            <mat-icon>delete</mat-icon>
+          <button mat-button class="btn-cancel-file margin-right-x1 text-upper" (click)="cancelFile()">
+            <span class="clear-name">Cancel</span>
           </button>
 
-          <button mat-raised-button class="btn-upload" (click)="uploadFile()" [disabled]="disabled">Upload</button>
+          <button mat-raised-button class="btn-upload text-upper" color="accent" (click)="uploadFile()" [disabled]="disabled">
+            <mat-icon>file_upload</mat-icon>
+            <span>Upload</span>
+          </button>
         </div>
       </div>
 

@@ -205,7 +205,7 @@ describe(`Petals component content`, () => {
       .getSUUpload();
 
     expect(deploy.chooseFileButton.getText()).toEqual(
-      `Choose a file to upload`
+      `CHOOSE A FILE TO UPLOAD`
     );
     const filePath = path.resolve(__dirname, './resources/su.zip');
     deploy.fileInput.sendKeys(filePath);
@@ -214,7 +214,7 @@ describe(`Petals component content`, () => {
     expect(deploy.fileName.getText()).toEqual(`su.zip`);
     expect(deploy.chooseFileButton.isPresent()).toBe(false);
 
-    expect(deploy.deployButton.getText()).toMatch(`Upload`);
+    expect(deploy.deployButton.getText()).toMatch(`UPLOAD`);
     expect(deploy.deployButton.isEnabled()).toBe(true);
   });
 

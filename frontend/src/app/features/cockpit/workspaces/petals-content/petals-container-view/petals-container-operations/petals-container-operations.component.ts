@@ -50,6 +50,7 @@ import {
   HttpProgress,
   HttpProgressType,
 } from 'app/shared/services/http-progress-tracker.service';
+import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
 import { SharedLibrariesService } from 'app/shared/services/shared-libraries.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { SharedValidator } from 'app/shared/validators/shared.validator';
@@ -76,6 +77,10 @@ export class PetalsContainerOperationsComponent
   sharedLibrariesByVersion: {
     [version: string]: boolean;
   };
+  @Input()
+  serviceAssembliesByName: {
+    [name: string]: boolean;
+  };
 
   @ViewChild('deployComponent') deployComponent: UploadComponent;
   @ViewChild('deployServiceAssembly') deployServiceAssembly: UploadComponent;
@@ -83,6 +88,7 @@ export class PetalsContainerOperationsComponent
 
   updateComponentDeployInfoFormGroup: FormGroup;
   updateSharedLibraryDeployInfoFormGroup: FormGroup;
+  updateServiceAssemblyDeployInfoFormGroup: FormGroup;
 
   formControls = {
     name: '',
@@ -108,7 +114,8 @@ export class PetalsContainerOperationsComponent
     private actions$: Actions,
     private notifications: NotificationsService,
     private componentsService: ComponentsService,
-    private sharedLibrariesService: SharedLibrariesService
+    private sharedLibrariesService: SharedLibrariesService,
+    private serviceAssembliesService: ServiceAssembliesService
   ) {}
 
   ngOnDestroy() {
@@ -146,6 +153,16 @@ export class PetalsContainerOperationsComponent
       ],
       version: '',
     });
+    this.updateServiceAssemblyDeployInfoFormGroup = this.fb.group({
+      name: [
+        '',
+        [
+          SharedValidator.isKeyPresentInObject(
+            () => this.serviceAssembliesByName
+          ),
+        ],
+      ],
+    });
   }
 
   onFileSelected(
@@ -180,6 +197,29 @@ export class PetalsContainerOperationsComponent
       }
 
       case 'service-assembly': {
+        this.updateServiceAssemblyDeployInfoFormGroup
+          .get('name')
+          .markAsTouched();
+
+        this.serviceAssembliesService
+          .getServiceAssemblyNameFromZipFile(file)
+          .pipe(
+            takeUntil(this.onDestroy$),
+            tap(x =>
+              this.updateServiceAssemblyDeployInfoFormGroup
+                .get('name')
+                .setValue(x)
+            ),
+            catchError(err => {
+              this.notifications.warn(
+                'File error',
+                `An error occurred while trying to read the service assembly's name from zip file`
+              );
+
+              return empty();
+            })
+          )
+          .subscribe();
         break;
       }
 
@@ -255,6 +295,7 @@ export class PetalsContainerOperationsComponent
           correlationId,
           id: this.container.id,
           file,
+          name: this.updateServiceAssemblyDeployInfoFormGroup.get('name').value,
         }),
       };
     } else if (whatToDeploy === 'shared-library') {

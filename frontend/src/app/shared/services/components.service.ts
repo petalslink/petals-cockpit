@@ -89,6 +89,8 @@ export abstract class ComponentsService {
     parameters: { [key: string]: string }
   ): Observable<void>;
 
+  abstract getComponentNameFromZipFile(file: File): Observable<string>;
+
   abstract deploySu(
     workspaceId: string,
     componentId: string,
@@ -101,8 +103,6 @@ export abstract class ComponentsService {
       serviceUnits: JsTable<IServiceUnitBackendSSE>;
     }>;
   };
-
-  abstract getComponentNameFromZipFile(file: File): Observable<string>;
 }
 
 @Injectable()
