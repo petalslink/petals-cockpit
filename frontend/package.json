@@ -30,7 +30,7 @@
     "postbuild": "gulp compress",
     "electron": "yarn run build-electron; electron dist/",
     "prettier:base": "yarn run prettier --single-quote --trailing-comma es5",
-    "prettier:base-files": "yarn run prettier:base './{e2e,src}/**/*.{scss,ts}'",
+    "prettier:base-files": "yarn run prettier:base './{e2e,src,cypress}/**/*.{js,scss,ts}'",
     "prettier:fix": "yarn run prettier:base-files --write",
     "prettier:check": "yarn run prettier:base-files -l",
     "precommit": "lint-staged",
@@ -38,7 +38,7 @@
   },
   "lint-staged": {
     "linters": {
-      "*.{ts,scss}": [
+      "*.{js,ts,scss}": [
         "yarn run prettier:base -l"
       ]
     }
