@@ -43,18 +43,18 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "5.0.1",
+    "@angular/animations": "5.0.3",
     "@angular/cdk": "5.0.0-rc0",
-    "@angular/common": "5.0.1",
-    "@angular/compiler": "5.0.1",
-    "@angular/core": "5.0.1",
+    "@angular/common": "5.0.3",
+    "@angular/compiler": "5.0.3",
+    "@angular/core": "5.0.3",
     "@angular/flex-layout": "2.0.0-beta.10",
-    "@angular/forms": "5.0.1",
-    "@angular/http": "5.0.1",
+    "@angular/forms": "5.0.3",
+    "@angular/http": "5.0.3",
     "@angular/material": "5.0.0-rc0",
-    "@angular/platform-browser": "5.0.1",
-    "@angular/platform-browser-dynamic": "5.0.1",
-    "@angular/router": "5.0.1",
+    "@angular/platform-browser": "5.0.3",
+    "@angular/platform-browser-dynamic": "5.0.3",
+    "@angular/router": "5.0.3",
     "@ngrx/effects": "4.1.1",
     "@ngrx/store": "4.1.1",
     "@ngrx/store-devtools": "4.1.1",
@@ -71,7 +71,7 @@
     "ng2-vis": "0.0.6",
     "ngrx-store-freeze": "0.2.0",
     "ngx-hover-opacity": "0.2.0",
-    "ngx-pipes": "2.0.1",
+    "ngx-pipes": "2.0.5",
     "rxjs": "5.5.2",
     "swiper": "4.0.5",
     "ts-helpers": "1.1.2",
@@ -80,9 +80,9 @@
     "zone.js": "0.8.18"
   },
   "devDependencies": {
-    "@angular/cli": "1.5.0",
-    "@angular/compiler-cli": "5.0.1",
-    "@angular/language-service": "5.0.1",
+    "@angular/cli": "1.5.4",
+    "@angular/compiler-cli": "5.0.3",
+    "@angular/language-service": "5.0.3",
     "@types/jasmine": "2.6.3",
     "@types/jasminewd2": "2.0.3",
     "@types/jszip": "3.1.2",
@@ -116,7 +116,7 @@
     "typescript": "2.6.1"
   },
   "resolutions": {
-    "@angular/core": "5.0.1",
+    "@angular/core": "5.0.3",
     "typescript": "2.6.1",
     "rxjs": "5.5.2"
   }
