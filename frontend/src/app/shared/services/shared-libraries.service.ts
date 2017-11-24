@@ -93,14 +93,11 @@ export class SharedLibrariesServiceImpl extends SharedLibrariesService {
     return loadFilesContentFromZip(file, filePath =>
       filePath.includes('jbi.xml')
     ).pipe(
-      map(([firstFileContent]) => {
-        const infos = this.getInformationsFromXml(firstFileContent);
-        return infos;
-      })
+      map(([firstFileContent]) => this.getInformationFromXml(firstFileContent))
     );
   }
 
-  private getInformationsFromXml(
+  private getInformationFromXml(
     xml: string
   ): { name: string; version: string } {
     const json: any = xmltojson.parseString(xml, {});
@@ -112,7 +109,9 @@ export class SharedLibrariesServiceImpl extends SharedLibrariesService {
 
       name = sl.identification[0].name[0]._text;
       version = sl._attr.version._value;
-    } catch (err) {}
+    } catch (err) {
+      throw new Error('Getting information from XML failed');
+    }
 
     return { name, version };
   }

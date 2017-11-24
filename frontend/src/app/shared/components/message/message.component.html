@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <mat-card-content *ngIf="msg && !isHidden" fxLayout="column" class="msg-content" [ngClass]="type">
   <div fxLayout="row" fxLayoutAlign="start center">
-    <mat-icon [ngClass]="type">{{ type }}</mat-icon>
+    <mat-icon [ngClass]="type">{{ icon }}</mat-icon>
     <span fxFlex class="msg-details italic margin-left-x1">{{ msg | shorten: maxLength: '...' }}</span>
     <button
       class="btn-view-more-message text-upper"

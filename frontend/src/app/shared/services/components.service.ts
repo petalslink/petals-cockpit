@@ -89,7 +89,9 @@ export abstract class ComponentsService {
     parameters: { [key: string]: string }
   ): Observable<void>;
 
-  abstract getComponentNameFromZipFile(file: File): Observable<string>;
+  abstract getComponentInformationFromZipFile(
+    file: File
+  ): Observable<{ name: string; sharedLibrariesName: string[] }>;
 
   abstract deploySu(
     workspaceId: string,
@@ -203,20 +205,30 @@ export class ComponentsServiceImpl extends ComponentsService {
     };
   }
 
-  getComponentNameFromZipFile(file: File) {
+  getComponentInformationFromZipFile(file: File) {
     return loadFilesContentFromZip(file, filePath =>
       filePath.includes('jbi.xml')
-    ).pipe(map(([firstFileContent]) => this.getNameFromXml(firstFileContent)));
+    ).pipe(
+      map(([firstFileContent]) => this.getInformationFromXml(firstFileContent))
+    );
   }
 
-  private getNameFromXml(xml: string): string {
+  private getInformationFromXml(
+    xml: string
+  ): { name: string; sharedLibrariesName: string[] } {
     const json: any = xmltojson.parseString(xml, {});
     let name = '';
+    let sharedLibrariesName = [];
 
     try {
       name = json.jbi[0].component[0].identification[0].name[0]._text;
-    } catch (err) {}
+      sharedLibrariesName = json.jbi[0].component[0]['shared-library'].map(
+        (el: any) => el._text
+      );
+    } catch (err) {
+      throw new Error('Getting information from XML failed');
+    }
 
-    return name;
+    return { name, sharedLibrariesName };
   }
 }

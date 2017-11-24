@@ -122,4 +122,11 @@ export class ContainerOperationPage extends ContainerPage {
   getSharedLibraryUpload() {
     return SharedLibraryDeploymentPage.waitAndGet('deploy-shared-library');
   }
+
+  getWarningMessage() {
+    return MessageComponentPage.waitAndGet(
+      this.component,
+      `warning-no-shared-libraries`
+    );
+  }
 }

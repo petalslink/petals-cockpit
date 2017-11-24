@@ -18,20 +18,28 @@
 import {
   $,
   browser,
+  ElementArrayFinder,
   ElementFinder,
   ExpectedConditions as EC,
 } from 'protractor';
 
 import { waitTimeout } from '../common';
+import { getMultipleElementsTexts } from '../utils';
 import { MessageComponentPage } from './message-component.po';
 
 export abstract class UploadComponentPage {
   public readonly title: ElementFinder;
   public readonly fileInput: ElementFinder;
+  public readonly selectedFileName: ElementFinder;
   public readonly fileName: ElementFinder;
   public readonly chooseFileButton: ElementFinder;
+  public readonly chooseFile: ElementFinder;
+  public readonly cancelFile: ElementFinder;
   public readonly cancelFileButton: ElementFinder;
   public readonly deployButton: ElementFinder;
+  public readonly slsList: ElementFinder;
+  public readonly slName: ElementFinder;
+  public readonly sharedLibrariesInfo: ElementArrayFinder;
   protected readonly editInformation = this.component.$('.edit-information');
 
   protected static _waitAndGet<T>(
@@ -46,19 +54,33 @@ export abstract class UploadComponentPage {
   constructor(public readonly component: ElementFinder) {
     this.title = this.component.$('.mct-title');
     this.fileInput = this.component.$('input[type="file"]');
-    this.fileName = this.component.$('.file-name');
-    this.chooseFileButton = this.component.$('.choose-file');
+    this.selectedFileName = this.component.$('.selected-file-name');
+    this.fileName = this.selectedFileName.$('.file-name');
+    this.chooseFileButton = this.component.$('.btn-choose-file');
+    this.chooseFile = this.chooseFileButton.$('.choose-file');
+    this.cancelFile = this.selectedFileName.$('.cancel-file');
     this.cancelFileButton = this.component.$('.btn-cancel-file');
     this.deployButton = this.component.$('.btn-upload');
+    this.slsList = this.component.$('.item-list');
+    this.slName = this.slsList.$('.sl-name');
+    this.sharedLibrariesInfo = this.component.$$(
+      'div.item-list .mat-list-item'
+    );
   }
 
   getErrorDeployMessage() {
     return MessageComponentPage.waitAndGet(this.component, `error-upload`);
   }
+
+  getSharedLibrariesDeployComponent() {
+    return getMultipleElementsTexts(this.slName);
+  }
 }
 
 export class ComponentDeploymentPage extends UploadComponentPage {
   public nameInput = this.editInformation.$('input[formControlName="name"]');
+  public errorNameInput = this.editInformation.$('.error-name-input');
+  public detailsMessageReadZipFile = this.editInformation.$('.msg-details');
 
   static waitAndGet(selectorClass: string) {
     return super._waitAndGet(selectorClass, ComponentDeploymentPage);

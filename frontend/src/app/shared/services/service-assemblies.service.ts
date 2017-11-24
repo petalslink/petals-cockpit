@@ -108,7 +108,9 @@ export class ServiceAssembliesServiceImpl extends ServiceAssembliesService {
 
     try {
       name = json.jbi[0]['service-assembly'][0].identification[0].name[0]._text;
-    } catch (err) {}
+    } catch (err) {
+      throw new Error('Getting name from XML failed');
+    }
 
     return name;
   }

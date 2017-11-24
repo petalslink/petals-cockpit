@@ -48,7 +48,7 @@ describe(`[Integration test] UploadComponent`, () => {
     },
     buttons: {
       get chooseFileButton() {
-        return getButtonByClass(fixture, 'choose-file');
+        return getButtonByClass(fixture, 'btn-choose-file');
       },
       get cancelFileButton() {
         return getButtonByClass(fixture, 'btn-cancel-file');

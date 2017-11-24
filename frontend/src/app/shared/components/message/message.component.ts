@@ -19,8 +19,10 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
 } from '@angular/core';
@@ -31,12 +33,14 @@ import { MatDialog, MatDialogRef } from '@angular/material';
   templateUrl: './message.component.html',
   styleUrls: ['./message.component.scss'],
 })
-export class MessageComponent implements OnInit {
+export class MessageComponent implements OnInit, OnChanges {
   @Input() msg: string;
-  @Input() type: 'error' | 'warning' | 'info';
+  @Input() type: 'error' | 'warning' | 'info' | 'success';
   @Input() isClosable? = true;
   @Input() maxLength = 200;
   @Output() onClose = new EventEmitter();
+
+  icon: string;
 
   isHidden = false;
 
@@ -46,6 +50,15 @@ export class MessageComponent implements OnInit {
   constructor(public dialog: MatDialog) {}
 
   ngOnInit() {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // error warning and info have exactly the same name as their icon
+    this.icon = this.type;
+
+    if (this.type === 'success') {
+      this.icon = 'done';
+    }
+  }
 
   openDialog() {
     this.dialogRef = this.dialog.open(this.template);

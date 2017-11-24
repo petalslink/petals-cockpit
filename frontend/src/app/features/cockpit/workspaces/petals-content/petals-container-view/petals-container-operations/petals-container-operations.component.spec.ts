@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { CUSTOM_ELEMENTS_SCHEMA, Injectable } from '@angular/core';
 import {
   ComponentFixture,
@@ -30,7 +31,10 @@ import { of } from 'rxjs/observable/of';
 import { _throw } from 'rxjs/observable/throw';
 
 import { PetalsContainerOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-operations/petals-container-operations.component';
-import { ComponentsService } from 'app/shared/services/components.service';
+import {
+  ComponentsService,
+  ComponentsServiceImpl,
+} from 'app/shared/services/components.service';
 import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
 import { SharedLibrariesService } from 'app/shared/services/shared-libraries.service';
 import { metaReducers, reducers } from 'app/shared/state/root.reducer';
@@ -53,7 +57,7 @@ describe(`Petals container operations`, () => {
       providers: [
         {
           provide: ComponentsService,
-          useClass: ComponentsMockService,
+          useClass: ComponentsServiceImpl,
         },
         {
           provide: SharedLibrariesService,
@@ -63,6 +67,7 @@ describe(`Petals container operations`, () => {
           provide: ServiceAssembliesService,
           useClass: ServiceAssembliesMockService,
         },
+        { provide: HttpClient, useValue: {} },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     });
@@ -85,39 +90,52 @@ describe(`Petals container operations`, () => {
     it(
       `should get the name of the component into the selected zip file and display it into the form`,
       fakeAsync(() => {
-        const componentsService: ComponentsMockService = TestBed.get(
+        const componentsService: ComponentsService = TestBed.get(
           ComponentsService
         );
+        pcoComponent.sharedLibrariesByName = {};
 
         spyOn(
           componentsService,
-          'getComponentNameFromZipFile'
-        ).and.callThrough();
+          'getComponentInformationFromZipFile'
+        ).and.returnValue(
+          of({
+            name: 'some content from zip',
+            sharedLibrariesName: ['SL 1', 'SL 2'],
+          })
+        );
 
         pcoComponent.onFileSelected('component', null);
         flush();
 
         expect(
-          componentsService.getComponentNameFromZipFile
+          componentsService.getComponentInformationFromZipFile
         ).toHaveBeenCalled();
+
         expect(
           pcoComponent.updateComponentDeployInfoFormGroup.get('name').value
         ).toEqual('some content from zip');
+
+        expect(pcoComponent.slsInfoReadFromZip).toEqual([
+          { name: 'SL 1', isInCurrentContainer: false },
+          { name: 'SL 2', isInCurrentContainer: false },
+        ]);
       })
     );
 
     it(
       `should display a warning notification if the component's name couldn't be read from zip file`,
       fakeAsync(() => {
-        const componentsService: ComponentsMockService = TestBed.get(
+        const componentsService: ComponentsService = TestBed.get(
           ComponentsService
         );
 
         spyOn((<any>pcoComponent).notifications, 'warn');
 
-        spyOn(componentsService, 'getComponentNameFromZipFile').and.returnValue(
-          _throw(new Error('Error while reading ZIP'))
-        );
+        spyOn(
+          componentsService,
+          'getComponentInformationFromZipFile'
+        ).and.returnValue(_throw(new Error('Error while reading ZIP')));
 
         pcoComponent.onFileSelected('component', null);
         flush();
@@ -128,7 +146,7 @@ describe(`Petals container operations`, () => {
 
         expect((<any>pcoComponent).notifications.warn).toHaveBeenCalledWith(
           'File error',
-          `An error occurred while trying to read the component's name from zip file`
+          `An error occurred while trying to read the component name from this zip file`
         );
       })
     );
@@ -198,7 +216,7 @@ describe(`Petals container operations`, () => {
 
         expect((<any>pcoComponent).notifications.warn).toHaveBeenCalledWith(
           'File error',
-          `An error occurred while trying to read the shared library's information from zip file`
+          `An error occurred while trying to read the shared library information from this zip file`
         );
       })
     );
@@ -263,21 +281,12 @@ describe(`Petals container operations`, () => {
 
         expect((<any>pcoComponent).notifications.warn).toHaveBeenCalledWith(
           'File error',
-          `An error occurred while trying to read the service assembly's name from zip file`
+          `An error occurred while trying to read the service assembly name from this zip file`
         );
       })
     );
   });
 });
-
-@Injectable()
-export class ComponentsMockService {
-  constructor() {}
-
-  getComponentNameFromZipFile() {
-    return of('some content from zip');
-  }
-}
 
 @Injectable()
 export class SharedLibrariesMockService {

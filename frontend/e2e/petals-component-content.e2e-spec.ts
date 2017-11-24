@@ -204,15 +204,14 @@ describe(`Petals component content`, () => {
       .openOperations()
       .getSUUpload();
 
-    expect(deploy.chooseFileButton.getText()).toEqual(
-      `CHOOSE A FILE TO UPLOAD`
-    );
+    expect(deploy.chooseFile.getText()).toEqual(`CHOOSE A FILE...`);
     const filePath = path.resolve(__dirname, './resources/su.zip');
     deploy.fileInput.sendKeys(filePath);
 
     expect(deploy.fileName.isDisplayed()).toBe(true);
     expect(deploy.fileName.getText()).toEqual(`su.zip`);
     expect(deploy.chooseFileButton.isPresent()).toBe(false);
+    expect(deploy.cancelFile.isPresent()).toBe(true);
 
     expect(deploy.deployButton.getText()).toMatch(`UPLOAD`);
     expect(deploy.deployButton.isEnabled()).toBe(true);

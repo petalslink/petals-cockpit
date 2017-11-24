@@ -27,6 +27,7 @@ import {
   MatAutocompleteModule,
   MatButtonModule,
   MatCardModule,
+  MatChipsModule,
   MatDialogModule,
   MatExpansionModule,
   MatIconModule,
@@ -61,6 +62,7 @@ import { ColorSearchedLettersDirective } from './directives/color-searched-lette
 export const MaterialModules = [
   MatButtonModule,
   MatCardModule,
+  MatChipsModule,
   MatIconModule,
   MatInputModule,
   MatDialogModule,
