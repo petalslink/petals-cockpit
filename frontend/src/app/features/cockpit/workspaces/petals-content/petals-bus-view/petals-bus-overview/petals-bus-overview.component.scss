@@ -64,6 +64,11 @@ h3 {
   background-position: center center;
 }
 
+.swiper-img-container-not-reachable {
+  @extend .swiper-img-container;
+  background-image: url(../../../../../../../assets/img/icon-server-not-reachable.png);
+}
+
 .swiper-img-registry {
   width: 250px;
   height: 72px;

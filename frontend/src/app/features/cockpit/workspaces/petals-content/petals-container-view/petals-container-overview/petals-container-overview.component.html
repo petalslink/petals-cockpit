@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </div>
       </mat-card>
 
-      <mat-card fxFlex class="petals-servers">
+      <mat-card fxFlex class="petals-servers" *ngIf="container.isReachable">
         <mat-card-title fxLayout="row">
           <span fxFlex class="text-upper">System Info</span>
           <mat-icon color="primary">description</mat-icon>
@@ -48,7 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
     </div>
 
-    <mat-card fxLayout="column" class="margin-top-x1">
+    <mat-card fxLayout="column" class="margin-top-x1" *ngIf="container.isReachable">
       <mat-card-title fxLayout="row">
         <div fxFlex class="text-upper" fxLayout="row">
           <span class="margin-right-x1">Containers Reachabilities</span>
@@ -57,15 +57,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <mat-icon fxLayoutAlign="end center" color="primary">dns</mat-icon>
       </mat-card-title>
 
-      <app-message class="info-container-reachabilities" *ngIf="container.reachabilities.length > 0 else noContainerReachable" type="info" msg="Click on a container to see its parameters."></app-message>
+      <app-message
+        class="info-container-reachabilities"
+        *ngIf="container.reachabilities.length > 0; else noContainerReachable"
+        type="info"
+        msg="Click on a container to see its parameters."
+        [isClosable]="false"
+      ></app-message>
 
       <ng-template #noContainerReachable>
-        <app-message type="info" msg="There is no other containers in this bus."></app-message>
+        <app-message type="info" [isClosable]="false" msg="There is no other containers in this bus."></app-message>
       </ng-template>
-
     </mat-card>
 
-    <mat-card class="graph-containers">
+    <mat-card class="graph-containers" *ngIf="container.isReachable">
       <div fxFill class="network-canvas"
         *ngIf="!container.isFetchingDetails"
         [visNetwork]="visNetwork"
@@ -74,7 +79,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         (initialized)="networkInitialized()"></div>
     </mat-card>
 
-    <mat-card fxLayout="column" class="container-infos-selected margin-bottom-x1" *ngIf="selectedContainer && container.id !== selectedContainer.id">
+    <mat-card fxLayout="column" class="container-infos-selected margin-bottom-x1" *ngIf="container.isReachable && selectedContainer && container.id !== selectedContainer.id">
       <mat-card-title fxLayout="row">
         <div fxFlex fxLayout="row" fxLayoutAlign="start center">
           <span fxFlex class="text-upper"><b>{{ selectedContainer.name }}</b> Selected</span>
@@ -110,6 +115,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </div>
       </div>
     </mat-card>
-
   </div>
 </div>

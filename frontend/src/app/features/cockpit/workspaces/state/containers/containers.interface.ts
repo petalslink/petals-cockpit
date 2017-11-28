@@ -75,6 +75,7 @@ export function containerRowFactory(): IContainerRow {
     ip: undefined,
     port: undefined,
     systemInfo: undefined,
+    isReachable: undefined,
 
     isFolded: false,
     isComponentsCategoryFolded: false,

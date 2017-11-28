@@ -14,7 +14,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div *ngIf="resourceDeletable?.value" fxLayout="column" class="wrapper-content">
-  <mat-toolbar color="primary" class="toolbar-page-header">
+  <mat-toolbar color="primary" class="toolbar-page-header" fxLayout="row" fxLayoutAlign="start center">
     <div class="prefix-toolbar-title" fxLayout="row">
       <mat-icon color="accent" *ngIf="!resourceDeletable.value.isFetchingDetails && !resourceDeletable.value.isUpdating; else loadingTpl">grade</mat-icon>
 

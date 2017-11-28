@@ -48,6 +48,7 @@ export interface IContainerBackendSSE extends IContainerBackendSSECommon {
 export interface IContainerBackendDetails
   extends IContainerBackendDetailsCommon {
   reachabilities: string[];
+  isReachable: boolean;
 }
 
 export abstract class ContainersService {
