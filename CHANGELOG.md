@@ -1,3 +1,14 @@
+<a name="0.16.0"></a>
+# [0.16.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.15.0...v0.16.0) (2017-11-29)
+
+
+### Features
+
+* **frontend:** edit component name before deploy, checking duplicates ([7900829](https://gitlab.com/linagora/petals-cockpit/commit/7900829)), closes [#329](https://gitlab.com/linagora/petals-cockpit/issues/329)
+* **frontend:** edit shared library name before deploy, checking duplicates ([26c087d](https://gitlab.com/linagora/petals-cockpit/commit/26c087d)), closes [#393](https://gitlab.com/linagora/petals-cockpit/issues/393)
+* **frontend:** search input is reset upon info message closure ([dadefc5](https://gitlab.com/linagora/petals-cockpit/commit/dadefc5)), closes [#403](https://gitlab.com/linagora/petals-cockpit/issues/403)
+
+
 <a name="0.15.0"></a>
 # [0.15.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.14.0...v0.15.0) (2017-11-13)
 
