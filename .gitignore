@@ -50,6 +50,8 @@ target/
 # e2e
 /frontend/e2e/*.js
 /frontend/e2e/*.map
+/frontend/cypress/integration/example_spec.js
+/frontend/cypress/support/commands.js
 
 #System Files
 /frontend/.DS_Store

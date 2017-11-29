@@ -34,6 +34,7 @@ variables:
   before_script:
     # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
     - yarn config set cache-folder $PWD/$YARN_CACHE_DIRECTORY --global
+    - yarn global add spa-http-server
     - du -hs $PWD/$YARN_CACHE_DIRECTORY || true
     - cd frontend
     - export PATH=`yarn bin`:$PATH
@@ -100,7 +101,17 @@ test-frontend:
     # unit tests
     - time yarn run test:ci
     # e2e
-    - time yarn run e2e:ci
+    # build the frontend
+    - ng build --prod --progress=false -e=prod-e2e
+    # serve the frontend
+    - nohup http-server --push-state --silent -p 4200 dist &
+    # save the PID as we run it in background
+    - echo $! > pid-nohup.txt
+    - sleep 5
+    - time yarn run cypress:ci
+    - time yarn run ng -- e2e --serve=false -p 4200
+    - kill -9 $(cat pid-nohup.txt)
+    - rm pid-nohup.txt
 
 build-frontend:
   <<: *node-java-yarn
