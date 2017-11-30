@@ -24,7 +24,7 @@ import {
 } from 'protractor';
 
 import { waitTimeout } from '../common';
-import { getMultipleElementsTexts } from '../utils';
+import { getMultipleElementsTexts, selectFileInInput } from '../utils';
 import { MessageComponentPage } from './message-component.po';
 
 export abstract class UploadComponentPage {
@@ -85,11 +85,42 @@ export class ComponentDeploymentPage extends UploadComponentPage {
   static waitAndGet(selectorClass: string) {
     return super._waitAndGet(selectorClass, ComponentDeploymentPage);
   }
+
+  selectFile(
+    zipPath: string,
+    expectFileNameToBe?: string,
+    expectInputNameToBe?: string
+  ) {
+    selectFileInInput(
+      zipPath,
+      this.fileInput,
+      this.fileName,
+      this.nameInput,
+      expectFileNameToBe,
+      expectInputNameToBe
+    );
+  }
 }
 
 export class ServiceAssemblyDeploymentPage extends UploadComponentPage {
+  public nameInput = this.editInformation.$('input[formControlName="name"]');
   static waitAndGet(selectorClass: string) {
     return super._waitAndGet(selectorClass, ServiceAssemblyDeploymentPage);
+  }
+
+  selectFile(
+    zipPath: string,
+    expectFileNameToBe?: string,
+    expectInputNameToBe?: string
+  ) {
+    selectFileInInput(
+      zipPath,
+      this.fileInput,
+      this.fileName,
+      this.nameInput,
+      expectFileNameToBe,
+      expectInputNameToBe
+    );
   }
 }
 
@@ -100,7 +131,30 @@ export class ServiceUnitDeploymentPage extends UploadComponentPage {
 }
 
 export class SharedLibraryDeploymentPage extends UploadComponentPage {
+  public nameInput = this.editInformation.$('input[formControlName="name"]');
+  public versionInput = this.editInformation.$(
+    'input[formControlName="version"]'
+  );
   static waitAndGet(selectorClass: string) {
     return super._waitAndGet(selectorClass, SharedLibraryDeploymentPage);
+  }
+
+  selectFile(
+    zipPath: string,
+    expectFileNameToBe?: string,
+    expectInputNameToBe?: string,
+    expectInputVersionToBe?: string
+  ) {
+    selectFileInInput(
+      zipPath,
+      this.fileInput,
+      this.fileName,
+      this.nameInput,
+      expectFileNameToBe,
+      expectInputNameToBe
+    );
+    expect(this.versionInput.getAttribute('value')).toBe(
+      expectInputVersionToBe
+    );
   }
 }
