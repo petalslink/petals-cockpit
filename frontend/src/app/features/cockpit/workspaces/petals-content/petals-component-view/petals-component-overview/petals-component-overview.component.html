@@ -51,7 +51,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <mat-card-content class="margin-top-x1 shared-libraries-content">
           <mat-nav-list *ngIf="component.sharedLibraries.length !== 0 else nosl"  dense fxLayout="column" class="padding-top-x1">
             <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let sl of component.sharedLibraries; trackBy:trackBySl">
-              <a mat-raised-button [routerLink]="['/workspaces', workspaceId, 'petals', 'shared-libraries', sl.id]" class="shared-library">
+              <a mat-raised-button color="primary"
+                [routerLink]="['/workspaces', workspaceId, 'petals', 'shared-libraries', sl.id]"
+                class="shared-library">
                 <div fxFlex fxLayout="row" fxLayoutAlign="start center">
                   <span class="sl-name margin-right-x1">{{ sl.name }}</span>
                   <mat-icon svgIcon="goto" class="icon-x1" fxLayoutAlign="center center"></mat-icon>

@@ -90,11 +90,6 @@ export class PetalsContainerOperationsComponent
   updateSharedLibraryDeployInfoFormGroup: FormGroup;
   updateServiceAssemblyDeployInfoFormGroup: FormGroup;
 
-  formControls = {
-    name: '',
-    version: '',
-  };
-
   uploadComponentStatus: {
     percentage: number;
   };
@@ -107,6 +102,8 @@ export class PetalsContainerOperationsComponent
   cpNameReadFromZip: string;
   slNameReadFromZip: string;
   slVersionReadFromZip: string;
+  slsInfoReadFromZip: { name: string; isInCurrentContainer: boolean }[] = [];
+  nbSlsReadFromZipNotInContainer: number;
 
   constructor(
     private fb: FormBuilder,
@@ -142,6 +139,7 @@ export class PetalsContainerOperationsComponent
         [SharedValidator.isKeyPresentInObject(() => this.componentsByName)],
       ],
     });
+
     this.updateSharedLibraryDeployInfoFormGroup = this.fb.group({
       name: [
         '',
@@ -153,6 +151,7 @@ export class PetalsContainerOperationsComponent
       ],
       version: '',
     });
+
     this.updateServiceAssemblyDeployInfoFormGroup = this.fb.group({
       name: [
         '',
@@ -176,17 +175,39 @@ export class PetalsContainerOperationsComponent
         // "real time" feedback, especially when there's only one input
         this.updateComponentDeployInfoFormGroup.get('name').markAsTouched();
 
+        // reset the following in case the user selects a file and then cancel
+        // otherwise we would still have a bad nbSlsReadFromZipNotInContainer
+        // and and a bad slsInfoReadFromZip IF the reading from zip fails
+        this.nbSlsReadFromZipNotInContainer = null;
+        this.slsInfoReadFromZip = [];
+
         this.componentsService
-          .getComponentNameFromZipFile(file)
+          .getComponentInformationFromZipFile(file)
           .pipe(
             takeUntil(this.onDestroy$),
-            tap(x =>
-              this.updateComponentDeployInfoFormGroup.get('name').setValue(x)
-            ),
+            tap(componentFromZip => {
+              this.cpNameReadFromZip = componentFromZip.name;
+              this.updateComponentDeployInfoFormGroup
+                .get('name')
+                .setValue(componentFromZip.name);
+
+              this.slsInfoReadFromZip = componentFromZip.sharedLibrariesName.map(
+                slName => ({
+                  name: slName,
+                  isInCurrentContainer: !!this.sharedLibrariesByName[
+                    slName.toLowerCase()
+                  ],
+                })
+              );
+
+              this.nbSlsReadFromZipNotInContainer = this.slsInfoReadFromZip.filter(
+                sl => !sl.isInCurrentContainer
+              ).length;
+            }),
             catchError(err => {
               this.notifications.warn(
                 'File error',
-                `An error occurred while trying to read the component's name from zip file`
+                `An error occurred while trying to read the component name from this zip file`
               );
 
               return empty();
@@ -205,15 +226,15 @@ export class PetalsContainerOperationsComponent
           .getServiceAssemblyNameFromZipFile(file)
           .pipe(
             takeUntil(this.onDestroy$),
-            tap(x =>
+            tap(serviceAssemblyFromZip =>
               this.updateServiceAssemblyDeployInfoFormGroup
                 .get('name')
-                .setValue(x)
+                .setValue(serviceAssemblyFromZip)
             ),
             catchError(err => {
               this.notifications.warn(
                 'File error',
-                `An error occurred while trying to read the service assembly's name from zip file`
+                `An error occurred while trying to read the service assembly name from this zip file`
               );
 
               return empty();
@@ -232,21 +253,21 @@ export class PetalsContainerOperationsComponent
           .getSharedLibraryInformationFromZipFile(file)
           .pipe(
             takeUntil(this.onDestroy$),
-            map(x => {
-              this.slNameReadFromZip = x.name;
+            map(sharedLibraryFromZip => {
+              this.slNameReadFromZip = sharedLibraryFromZip.name;
               this.updateSharedLibraryDeployInfoFormGroup
                 .get('name')
-                .setValue(x.name);
+                .setValue(sharedLibraryFromZip.name);
 
-              this.slVersionReadFromZip = x.version;
+              this.slVersionReadFromZip = sharedLibraryFromZip.version;
               this.updateSharedLibraryDeployInfoFormGroup
                 .get('version')
-                .setValue(x.version);
+                .setValue(sharedLibraryFromZip.version);
             }),
             catchError(err => {
               this.notifications.warn(
                 'File error',
-                `An error occurred while trying to read the shared library's information from zip file`
+                `An error occurred while trying to read the shared library information from this zip file`
               );
 
               return empty();
@@ -273,9 +294,7 @@ export class PetalsContainerOperationsComponent
     if (whatToDeploy === 'component') {
       deployActions = {
         onProgressUpdate: percentage =>
-          (this.uploadComponentStatus = {
-            percentage,
-          }),
+          (this.uploadComponentStatus = { percentage }),
         onComplete: () => this.deployComponent.reset(),
         actionToDispatch: new Containers.DeployComponent({
           correlationId,

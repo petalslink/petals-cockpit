@@ -17,6 +17,11 @@
 
 import * as path from 'path';
 
+import {
+  ComponentDeploymentPage,
+  ServiceAssemblyDeploymentPage,
+  SharedLibraryDeploymentPage,
+} from 'pages/upload-component.po';
 import { page } from './common';
 import { NotFoundPage } from './pages/not-found';
 import { WorkspacePage } from './pages/workspace.po';
@@ -57,37 +62,30 @@ describe(`Petals container content`, () => {
   });
 
   describe('Deploy component', () => {
-    it('should have a correct component deployment form', () => {
-      const deploy = workspace
+    let deploy: ComponentDeploymentPage;
+    beforeEach(() => {
+      deploy = workspace
         .openContainer('Cont 0')
         .openOperations()
         .getComponentUpload();
+    });
 
-      const filePath = path.resolve(__dirname, './resources/component.zip');
-      deploy.fileInput.sendKeys(filePath);
-
-      expect(deploy.fileName.getText()).toEqual(`component.zip`);
+    it('should have a correct component deployment form', () => {
+      deploy.selectFile(`./resources/component.zip`, `component.zip`, '');
 
       expect(deploy.deployButton.getText()).toMatch(`UPLOAD`);
       expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 
     it(`should show a detailed error if the component deployment fails`, () => {
-      const deploy = workspace
-        .openContainer('Cont 0')
-        .openOperations()
-        .getComponentUpload();
-
       expect(deploy.getErrorDeployMessage().content.isPresent()).toBe(false);
 
-      const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
-      deploy.fileInput.sendKeys(filePath);
-
       // shouldn't be able to find the component's name from the zip
-      expect(deploy.nameInput.getAttribute('value')).toEqual('');
+      deploy.selectFile(`./resources/error-deploy.zip`, null, null);
+
       page.expectNotification(
         'File error',
-        `An error occurred while trying to read the component's name from zip file`
+        `An error occurred while trying to read the component name from this zip file`
       );
 
       const error = deploy.getErrorDeployMessage();
@@ -108,19 +106,12 @@ describe(`Petals container content`, () => {
     });
 
     it(`should deploy a component`, () => {
-      const upload = workspace
-        .openContainer('Cont 0')
-        .openOperations()
-        .getComponentUpload();
-
-      const filePath = path.resolve(
-        __dirname,
-        './resources/petals-zip/components/petals-bc-jms-2.0.zip'
+      // should be able to find the component name from the zip
+      deploy.selectFile(
+        `./resources/petals-zip/components/petals-bc-sql-1.6.3-SNAPSHOT-all-green.zip`,
+        `petals-bc-sql-1.6.3-SNAPSHOT-all-green.zip`,
+        `petals-bc-sql`
       );
-      upload.fileInput.sendKeys(filePath);
-
-      // should be able to find the component's name from the zip
-      expect(upload.nameInput.getAttribute('value')).toEqual('petals-bc-jms');
 
       const expectedTreeBeforeDeploy = [
         `Bus 0`,
@@ -160,9 +151,9 @@ describe(`Petals container content`, () => {
 
       // deploy the component
       page.clickAndExpectNotification(
-        upload.deployButton,
+        deploy.deployButton,
         'Component Deployed',
-        'petals-bc-jms has been successfully deployed'
+        'petals-bc-sql has been successfully deployed'
       );
 
       // check that the component is now added to the tree and that we've been redirected to it
@@ -177,7 +168,7 @@ describe(`Petals container content`, () => {
         `SU 1`,
         `SU 3`,
         `Comp 2`,
-        `petals-bc-jms`,
+        `petals-bc-sql`,
         `SERVICE ASSEMBLIES`,
         `SA 0`,
         `SA 1`,
@@ -204,7 +195,7 @@ describe(`Petals container content`, () => {
       expect(workspace.getWorkspaceTree()).toEqual(expectedTreeAfterDeploy);
 
       // we should be redirected
-      const ops = workspace.openComponent('petals-bc-jms').openOperations();
+      const ops = workspace.openComponent('petals-bc-sql').openOperations();
 
       expect(ops.state.getText()).toEqual('Loaded');
 
@@ -223,34 +214,106 @@ describe(`Petals container content`, () => {
       expect(ops.installButton.isEnabled()).toBe(true);
       expect(ops.unloadButton.isEnabled()).toBe(true);
     });
+
+    it(`should show an info message if no SLs into a zip file`, () => {
+      deploy.selectFile(
+        `./resources/petals-zip/components/petals-bc-jms-2.0.zip`,
+        `petals-bc-jms-2.0.zip`,
+        ''
+      );
+
+      expect(deploy.detailsMessageReadZipFile.getText()).toEqual(
+        `No shared libraries have been detected in this zip file.`
+      );
+      expect(deploy.sharedLibrariesInfo.count()).toEqual(0);
+      expect(deploy.deployButton.isEnabled()).toBe(true);
+    });
+
+    it(`should not be able to upload a component`, () => {
+      deploy.selectFile(
+        `./resources/petals-zip/components/petals-bc-jms-2.0.zip`,
+        `petals-bc-jms-2.0.zip`,
+        ''
+      );
+
+      deploy.nameInput.sendKeys('Comp 0');
+
+      expect(deploy.deployButton.isEnabled()).toBe(false);
+    });
+
+    it(`should show a warning message if none of the SLs from a zip are into the current container`, () => {
+      const filePath = path.resolve(
+        __dirname,
+        './resources/petals-zip/components/petals-bc-sql-1.6.3-SNAPSHOT.zip'
+      );
+
+      deploy.fileInput.sendKeys(filePath);
+
+      expect(deploy.detailsMessageReadZipFile.getText()).toEqual(
+        `Shared libraries with a red cross are not in this container.`
+      );
+      expect(deploy.sharedLibrariesInfo.count()).toEqual(2);
+      expect(deploy.getSharedLibrariesDeployComponent()).toEqual([
+        'clear\npetals-sl-hsql',
+        'clear\npetals-sl-sqlserver-6.1.0.jre7',
+      ]);
+    });
+
+    it(`should show a success message if all the sls from zip are into the current container`, () => {
+      deploy.selectFile(
+        `./resources/petals-zip/components/petals-bc-sql-1.6.3-SNAPSHOT-all-green.zip`,
+        `petals-bc-sql-1.6.3-SNAPSHOT-all-green.zip`,
+        `petals-bc-sql`
+      );
+
+      expect(deploy.detailsMessageReadZipFile.getText()).toEqual(
+        `All the shared libraries are in this container.`
+      );
+      expect(deploy.sharedLibrariesInfo.count()).toEqual(1);
+      expect(deploy.getSharedLibrariesDeployComponent()).toEqual([
+        'success\nSL 0',
+      ]);
+    });
+
+    it(`should show a warning message if at least one of the SLs from zip is not into the current container`, () => {
+      deploy.selectFile(
+        `./resources/petals-zip/components/petals-bc-sql-1.6.3-SNAPSHOT-red-green.zip`,
+        `petals-bc-sql-1.6.3-SNAPSHOT-red-green.zip`,
+        `petals-bc-sql`
+      );
+
+      expect(deploy.detailsMessageReadZipFile.getText()).toEqual(
+        `Shared libraries with a red cross are not in this container.`
+      );
+      expect(deploy.sharedLibrariesInfo.count()).toEqual(2);
+      expect(deploy.getSharedLibrariesDeployComponent()).toEqual([
+        'success\nSL 0',
+        'clear\npetals-sl-sqlserver-6.1.0.jre7',
+      ]);
+    });
   });
 
   describe('Deploy service assembly', () => {
-    it('should have a correct service-assembly deployment form', () => {
-      const deploy = workspace
+    let deploy: ServiceAssemblyDeploymentPage;
+    beforeEach(() => {
+      deploy = workspace
         .openContainer('Cont 0')
         .openOperations()
         .getServiceAssemblyUpload();
+    });
 
-      const filePath = path.resolve(__dirname, './resources/sa.zip');
-      deploy.fileInput.sendKeys(filePath);
-
-      expect(deploy.fileName.getText()).toEqual(`sa.zip`);
+    it('should have a correct service-assembly deployment form', () => {
+      deploy.selectFile(`./resources/sa.zip`, 'sa.zip', '');
 
       expect(deploy.deployButton.getText()).toMatch(`UPLOAD`);
       expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 
     it(`should show a detailed error if the service-assembly deployment fails`, () => {
-      const deploy = workspace
-        .openContainer('Cont 0')
-        .openOperations()
-        .getServiceAssemblyUpload();
-
       expect(deploy.getErrorDeployMessage().content.isPresent()).toBe(false);
 
-      const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
-      deploy.fileInput.sendKeys(filePath);
+      // shouldn't be able to find the service assembly's name from the zip
+      deploy.selectFile(`./resources/error-deploy.zip`, null, null);
 
       const error = deploy.getErrorDeployMessage();
 
@@ -270,16 +333,11 @@ describe(`Petals container content`, () => {
     });
 
     it(`should deploy a service-assembly`, () => {
-      const deploy = workspace
-        .openContainer('Cont 0')
-        .openOperations()
-        .getServiceAssemblyUpload();
-
-      const filePath = path.resolve(
-        __dirname,
-        './resources/petals-zip/service-assemblies/sa-flowable-vacation-sample.zip'
+      deploy.selectFile(
+        `./resources/petals-zip/service-assemblies/sa-flowable-vacation-sample.zip`,
+        '',
+        ''
       );
-      deploy.fileInput.sendKeys(filePath);
 
       const expectedTreeBeforeDeploy = [
         `Bus 0`,
@@ -368,7 +426,6 @@ describe(`Petals container content`, () => {
       const sa = workspace.openServiceAssembly('sa-flowable-vacation-sample');
 
       expect(sa.state.getText()).toEqual('Shutdown');
-
       expect(sa.serviceUnits.getText()).toEqual([
         'su1-sa-flowable-vacation-sample',
         'Comp 0',
@@ -379,34 +436,28 @@ describe(`Petals container content`, () => {
   });
 
   describe('Deploy shared library', () => {
-    it('should have a correct shared library deployment form', () => {
-      const deploy = workspace
+    let deploy: SharedLibraryDeploymentPage;
+    beforeEach(() => {
+      deploy = workspace
         .openContainer('Cont 0')
         .openOperations()
         .getSharedLibraryUpload();
+    });
 
-      expect(deploy.chooseFileButton.getText()).toEqual(
-        `CHOOSE A FILE TO UPLOAD`
-      );
-      const filePath = path.resolve(__dirname, './resources/sl.zip');
-      deploy.fileInput.sendKeys(filePath);
+    it('should have a correct shared library deployment form', () => {
+      expect(deploy.chooseFile.getText()).toEqual(`CHOOSE A FILE...`);
 
-      expect(deploy.fileName.getText()).toEqual(`sl.zip`);
+      deploy.selectFile(`./resources/sl.zip`, `sl.zip`, '', '');
 
       expect(deploy.deployButton.getText()).toMatch(`UPLOAD`);
       expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 
     it(`should show a detailed error if the shared library deployment fails`, () => {
-      const deploy = workspace
-        .openContainer('Cont 0')
-        .openOperations()
-        .getSharedLibraryUpload();
-
       expect(deploy.getErrorDeployMessage().content.isPresent()).toBe(false);
 
-      const filePath = path.resolve(__dirname, './resources/error-deploy.zip');
-      deploy.fileInput.sendKeys(filePath);
+      // shouldn't be able to find the shared library's name from the zip
+      deploy.selectFile(`./resources/error-deploy.zip`, '', '', '');
 
       const error = deploy.getErrorDeployMessage();
 
@@ -426,16 +477,12 @@ describe(`Petals container content`, () => {
     });
 
     it(`should deploy a shared library`, () => {
-      const deploy = workspace
-        .openContainer('Cont 0')
-        .openOperations()
-        .getSharedLibraryUpload();
-
-      const filePath = path.resolve(
-        __dirname,
-        './resources/petals-zip/shared-libraries/petals-sl-saxonhe-9.6.0.6.zip'
+      deploy.selectFile(
+        `./resources/petals-zip/shared-libraries/petals-sl-saxonhe-9.6.0.6.zip`,
+        '',
+        '',
+        '1.0.1'
       );
-      deploy.fileInput.sendKeys(filePath);
 
       const expectedTreeBeforeDeploy = [
         `Bus 0`,

@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<app-mat-card-toolbar [title]="title" titleIcon="build">
+<app-mat-card-toolbar [title]="title" titleIcon="file_upload">
   <mat-card-content>
     <div *ngIf="!selectedFileInformation">
       <input
@@ -22,15 +22,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         #selectFile
         [accept]="acceptedFileType"
         (change)="fileChange($event)"
+        required
       >
 
       <button
-        class="choose-file text-upper"
-        mat-button
+        class="btn-choose-file text-upper"
+        mat-raised-button
         [disabled]="disabled"
         (click)="selectFile.click()"
       >
-        Choose a file to upload
+        <mat-icon color="primary">attach_file</mat-icon>
+        <span class="choose-file">Choose a file...</span>
+        <span [hidden]="!selectFile?.required">*</span>
       </button>
     </div>
 
@@ -41,16 +44,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <div
         class="selected-file"
         fxLayout="column"
-        fxLayoutAlign="start center"
       >
-        <span class="file-name">
-          {{ selectedFileInformation.file.name }}
-        </span>
+        <mat-chip-list fxLayout="row">
+          <mat-chip class="selected-file-name margin-bottom-x1" color="accent" selected="true" fxLayoutAlign="center start">
+            <span class="file-name">{{ selectedFileInformation.file.name }}</span>
+            <mat-icon class="cancel-file" matChipRemove (click)="cancelFile()">cancel</mat-icon>
+          </mat-chip>
+        </mat-chip-list>
 
         <div fxFlex.lt-md></div>
 
         <div
-          class="edit-information"
+          class="edit-information margin-top-x1"
           *ngIf="updateFileInformation"
           fxFlex
         >
@@ -59,17 +64,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </app-mat-card-toolbar>
         </div>
 
+        <mat-divider class="margin-bottom-x1" *ngIf="!updateFileInformation"></mat-divider>
+
         <div
           class="upload-actions"
           *ngIf="!isUploading"
           fxLayout="row"
-          fxLayoutAlign="start center"
+          fxLayoutAlign="center center"
         >
-          <button mat-button class="btn-cancel-file margin-right-x1 text-upper" (click)="cancelFile()">
+          <button align mat-button class="btn-cancel-file margin-right-x1 text-upper" (click)="cancelFile()">
             <span class="clear-name">Cancel</span>
           </button>
 
-          <button mat-raised-button class="btn-upload text-upper" color="accent" (click)="uploadFile()" [disabled]="disabled">
+          <button mat-raised-button class="btn-upload text-upper" color="primary" (click)="uploadFile()" [disabled]="disabled">
             <mat-icon>file_upload</mat-icon>
             <span>Upload</span>
           </button>

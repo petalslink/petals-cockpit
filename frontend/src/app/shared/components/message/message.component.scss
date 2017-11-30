@@ -49,6 +49,10 @@ mat-dialog-content {
   &.warning {
     @include msg-content (rgb(253, 233, 217), #EF6C00);
   }
+
+  &.success {
+    @include msg-content (rgb(212,237,218), #155724);
+  }
 }
 
 // all types of messages dialog
@@ -71,6 +75,10 @@ mat-dialog-content {
 
   &.warningDialog {
     @include msg-dialog-type (#EF6C00);
+  }
+
+  &.successDialog {
+    @include msg-dialog-type (#155724);
   }
 }
 

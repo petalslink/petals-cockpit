@@ -64,7 +64,7 @@ export class MessageComponentPage {
     browser.wait(EC.invisibilityOf(dialog), waitTimeout);
   }
 
-  expectToBe(type: 'info' | 'warning' | 'error', message: string) {
+  expectToBe(type: 'info' | 'warning' | 'error' | 'success', message: string) {
     expect(this.component.$(`.msg-content.${type}`).isDisplayed()).toBe(true);
     expect(this.message.getText()).toEqual(message);
   }

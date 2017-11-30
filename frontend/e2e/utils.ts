@@ -17,6 +17,7 @@
 
 // tslint:disable:import-blacklist because lodash-es imports doesn't work with e2e tsconfig
 import { range } from 'lodash';
+import * as path from 'path';
 import {
   $,
   browser,
@@ -106,4 +107,21 @@ export function getMultipleElementsTexts(
   return Promise.all(
     selectors.map(s => (parent.$$(s).getText() as any) as Promise<string[]>)
   ).then(tss => range(tss[0].length).map((_, i) => tss.map(ts => ts[i])));
+}
+
+export function selectFileInInput(
+  zipPath: string,
+  fileInput: ElementFinder,
+  fileName: ElementFinder,
+  nameInput: ElementFinder,
+  expectFileNameToBe?: string,
+  expectInputNameToBe?: string
+) {
+  const filePath = path.resolve(__dirname, zipPath);
+  fileInput.sendKeys(filePath);
+
+  if (!!expectFileNameToBe) {
+    expect(fileName.getText()).toBe(expectFileNameToBe);
+    expect(nameInput.getAttribute('value')).toBe(expectInputNameToBe);
+  }
 }

@@ -43,10 +43,66 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 <mat-icon>close</mat-icon>
               </button>
 
-              <mat-error *ngIf="updateComponentDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')">
+              <mat-error
+                class="error-name-input"
+                *ngIf="updateComponentDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
+              >
                 You can't upload a component with a name that already exists in this container
               </mat-error>
             </mat-form-field>
+
+            <mat-divider></mat-divider>
+
+            <mat-card-subtitle class="margin-top-x1" fxLayoutAlign="start center" *ngIf="slsInfoReadFromZip">
+              <span fxFlex>Shared libraries</span>
+              <mat-icon class="margin-left-x1" svgIcon="sl-overview"></mat-icon>
+            </mat-card-subtitle>
+
+            <app-message
+              *ngIf="slsInfoReadFromZip.length > 0 && nbSlsReadFromZipNotInContainer > 0"
+              type="warning"
+              [isClosable]="false"
+              class="warning-red-cross"
+              msg="Shared libraries with a red cross are not in this container."
+            ></app-message>
+
+            <app-message
+              *ngIf="slsInfoReadFromZip.length > 0 && nbSlsReadFromZipNotInContainer === 0"
+              type="success"
+              [isClosable]="false"
+              class="success-all-sls"
+              msg="All the shared libraries are in this container."
+            ></app-message>
+
+            <app-message
+              *ngIf="slsInfoReadFromZip.length === 0"
+              type="info"
+              [isClosable]="false"
+              class="info-no-sls"
+              msg="No shared libraries have been detected in this zip file."
+            ></app-message>
+
+            <mat-list dense *ngIf="slsInfoReadFromZip">
+              <div class="item-list">
+                <mat-list-item
+                  *ngFor="let slInfo of slsInfoReadFromZip"
+                  fxLayout="row"
+                  fxLayoutAlign="start center"
+                  matLine
+                  >
+                  <mat-icon mat-list-icon *ngIf="slInfo.isInCurrentContainer" class="color-green-x1">
+                    done
+                  </mat-icon>
+
+                  <mat-icon mat-list-icon *ngIf="!slInfo.isInCurrentContainer" class="color-red-x1">
+                    clear
+                  </mat-icon>
+
+                  <span class="sl-name">{{ slInfo.name }}</span>
+                </mat-list-item>
+              </div>
+            </mat-list>
+
           </form>
         </ng-template>
       </app-upload>
@@ -68,12 +124,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <form novalidate [formGroup]="updateServiceAssemblyDeployInfoFormGroup">
             <mat-form-field>
               <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
-              <button *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name')" matSuffix color="primary" mat-icon-button aria-label="Clear"
-                (click)="updateServiceAssemblyDeployInfoFormGroup.get('name').setValue('')">
+              <button
+                *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name')"
+                matSuffix
+                color="primary"
+                mat-icon-button
+                aria-label="Clear"
+                (click)="updateServiceAssemblyDeployInfoFormGroup.get('name').setValue('')"
+              >
                 <mat-icon>close</mat-icon>
               </button>
 
-              <mat-error *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')">
+              <mat-hint *ngIf="!updateServiceAssemblyDeployInfoFormGroup.get('name').value && !!saNameReadFromZip">
+                Default {{ saNameReadFromZip }}
+              </mat-hint>
+
+              <mat-error
+                class="error-name-input"
+                *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
+              >
                 You can't upload a service assembly with a name that already exists in this container
               </mat-error>
             </mat-form-field>
@@ -113,7 +182,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 Default {{ slNameReadFromZip }}
               </mat-hint>
 
-              <mat-error *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')">
+              <mat-error
+                class="error-name-input"
+                *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
+              >
                 You can't upload a shared library with a name that already exists in this container
               </mat-error>
             </mat-form-field>
