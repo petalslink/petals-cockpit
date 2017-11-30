@@ -46,7 +46,7 @@ export abstract class UploadComponentPage {
     selectorClass: string,
     UploadPage: new (elementFinder: ElementFinder) => T
   ): T {
-    const uploadComponent = $(`app-upload.${selectorClass}`);
+    const uploadComponent = $(`.${selectorClass}`);
     browser.wait(EC.visibilityOf(uploadComponent), waitTimeout);
     return new UploadPage(uploadComponent);
   }
@@ -74,6 +74,10 @@ export abstract class UploadComponentPage {
 
   getSharedLibrariesDeployComponent() {
     return getMultipleElementsTexts(this.slName);
+  }
+
+  expectHover() {
+    browser.wait(EC.presenceOf(this.component.$('.hover')), waitTimeout);
   }
 }
 

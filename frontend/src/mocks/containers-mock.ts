@@ -188,6 +188,7 @@ export class Container {
         id: this.id,
         name: this.name,
         busId: this.bus.id,
+        isReachable: this.isReachable,
         // if the container is unreachable, we don't have access
         // to its components, SAs and SLs
         components: this.isReachable ? components : [],

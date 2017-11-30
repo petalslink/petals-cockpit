@@ -16,9 +16,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
     <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px" class="deploys">
-      <ngx-hover-opacity [isHoverVisible]="!container.isReachable">
+      <ngx-hover-opacity class="deploy-component" [isHoverVisible]="!container.isReachable">
         <app-upload
-          class="deploy-component"
           #deployComponent
           acceptedFileType=".zip"
           [title]="'Component deployment'"
@@ -155,7 +154,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
       <ngx-hover-opacity class="deploy-shared-library" [isHoverVisible]="!container.isReachable">
         <app-upload
-          class="deploy-shared-library"
           fxFlex
           #deploySharedLibrary
           acceptedFileType=".zip"

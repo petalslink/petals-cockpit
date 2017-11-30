@@ -31,6 +31,7 @@ export interface IContainerBackendSSECommon {
   id: string;
   name: string;
   busId: string;
+  isReachable: boolean;
 }
 
 export interface IContainerBackendDetailsCommon {

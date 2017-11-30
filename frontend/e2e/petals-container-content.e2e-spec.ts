@@ -17,6 +17,7 @@
 
 import * as path from 'path';
 
+import { BusPage } from 'pages/bus.po';
 import {
   ComponentDeploymentPage,
   ServiceAssemblyDeploymentPage,
@@ -59,6 +60,30 @@ describe(`Petals container content`, () => {
     cont
       .getInfoContainerReachabilitiesMessage()
       .expectToBe('info', `Click on a container to see its parameters.`);
+  });
+
+  describe(`Unreachable container`, () => {
+    let bus: BusPage;
+
+    beforeEach(() => {
+      bus = page
+        .openWorkspaces()
+        .selectWorkspace(1, 'Workspace 1')
+        .openBus('Bus 3');
+    });
+
+    it(`should show a message saying that the container is unreachable`, () => {
+      // open the container with name 'Cont 3'
+      bus.openContainer(1, { shouldBeReachable: false });
+    });
+
+    it(`should hide (hover with opacity) other information than IP and PORT`, () => {
+      const containerOperations = bus.openContainer(1).openOperations();
+
+      containerOperations.getComponentUpload().expectHover();
+      containerOperations.getServiceAssemblyUpload().expectHover();
+      containerOperations.getSharedLibraryUpload().expectHover();
+    });
   });
 
   describe('Deploy component', () => {
