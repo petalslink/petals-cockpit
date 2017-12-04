@@ -61,6 +61,7 @@ export class Container {
   private readonly serviceAssemblies = new Map<string, ServiceAssembly>();
   private readonly sharedLibraries = new Map<string, SharedLibrary>();
   public readonly ip: string;
+  public readonly isReachable: boolean = true;
 
   constructor(bus: Bus, name?: string) {
     const i = Container.cpt++;
@@ -68,6 +69,10 @@ export class Container {
     this.name = name ? name : `Cont ${i}`;
     this.ip = `192.168.0.${i}`;
     this.bus = bus;
+
+    if (this.name === 'Cont 3' || this.name.includes('not-reachable')) {
+      this.isReachable = false;
+    }
 
     // by default add 2 components each with an SU
     const c1 = this.addComponent('Started');
@@ -174,32 +179,44 @@ export class Container {
   }
 
   toObj(): { [id: string]: IContainerBackendSSE } {
+    const components = Array.from(this.components.keys());
+    const serviceAssemblies = Array.from(this.serviceAssemblies.keys());
+    const sharedLibraries = Array.from(this.sharedLibraries.keys());
+
     return {
       [this.id]: {
         id: this.id,
         name: this.name,
         busId: this.bus.id,
-        components: Array.from(this.components.keys()),
-        serviceAssemblies: Array.from(this.serviceAssemblies.keys()),
-        sharedLibraries: Array.from(this.sharedLibraries.keys()),
+        isReachable: this.isReachable,
+        // if the container is unreachable, we don't have access
+        // to its components, SAs and SLs
+        components: this.isReachable ? components : [],
+        serviceAssemblies: this.isReachable ? serviceAssemblies : [],
+        sharedLibraries: this.isReachable ? sharedLibraries : [],
       },
     };
   }
 
   getDetails(): IContainerBackendDetails {
+    const systemInfo = [
+      'Petals ESB µKernel 4.0.2',
+      'Petals Standalone Shared Memory 4.0.2',
+      'OpenJDK Runtime Environment 1.7.0_111-b01 Oracle Corporation',
+      'Linux 3.16.0-4-amd64 amd64',
+    ].join('\n');
+
+    const reachabilities = this.bus
+      .getContainers()
+      .map(container => container.id)
+      .filter(id => id !== this.id);
+
     return {
       ip: this.ip,
       port: 7700,
-      reachabilities: this.bus
-        .getContainers()
-        .map(container => container.id)
-        .filter(id => id !== this.id),
-      systemInfo: [
-        'Petals ESB µKernel 4.0.2',
-        'Petals Standalone Shared Memory 4.0.2',
-        'OpenJDK Runtime Environment 1.7.0_111-b01 Oracle Corporation',
-        'Linux 3.16.0-4-amd64 amd64',
-      ].join('\n'),
+      reachabilities: this.isReachable ? reachabilities : [],
+      systemInfo: this.isReachable ? systemInfo : '',
+      isReachable: this.isReachable,
     };
   }
 }

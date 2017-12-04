@@ -34,6 +34,9 @@ export abstract class ContainerPage {
   public readonly hasBeenDeletedMessage = this.component.$(
     'app-workspace-element .message'
   );
+  public readonly unreachableMessage = this.component.$(
+    `app-message[msg="Unreachable"]`
+  );
 
   protected static wait() {
     browser.wait(

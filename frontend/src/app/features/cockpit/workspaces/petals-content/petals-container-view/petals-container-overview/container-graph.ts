@@ -31,22 +31,24 @@ export function buildVisNetworkData(container: IContainerWithSiblings) {
 }
 
 function node(container: IContainerRow) {
-  return (otherContainer: IContainerRow) => ({
-    id: otherContainer.id,
-    label: otherContainer.name,
+  return (currentContainer: IContainerRow) => ({
+    id: currentContainer.id,
+    label: currentContainer.name,
     fixed: true,
-    title:
-      '<b>IP :</b> <span class="ip">' +
-      otherContainer.ip +
-      '</span><br>' +
-      '<b>Port :</b> <span class="port">' +
-      otherContainer.port +
-      '</span>',
-    image:
-      container.id === otherContainer.id ||
-      container.reachabilities.includes(otherContainer.id)
-        ? 'assets/img/network-container.png'
-        : 'assets/img/network-container-no-reachable.png',
+    title: `
+      <b>IP :</b>
+      <span class="ip">
+        ${currentContainer.ip}
+      </span><br>
+
+      <b>Port :</b>
+      <span class="port">
+        ${currentContainer.port}
+      </span>
+    `,
+    image: currentContainer.isReachable
+      ? 'assets/img/network-container.png'
+      : 'assets/img/network-container-no-reachable.png',
   });
 }
 
@@ -54,12 +56,8 @@ function edge(container: IContainerRow) {
   return (otherContainer: IContainerRow) => ({
     from: container.id,
     to: otherContainer.id,
-    color: container.reachabilities.includes(otherContainer.id)
-      ? 'green'
-      : 'red',
-    label: container.reachabilities.includes(otherContainer.id)
-      ? 'reachable'
-      : 'no reachable',
+    color: otherContainer.isReachable ? 'green' : 'red',
+    label: otherContainer.isReachable ? 'reachable' : 'unreachable',
     arrows: {
       to: container.reachabilities.includes(otherContainer.id) ? true : false,
     },

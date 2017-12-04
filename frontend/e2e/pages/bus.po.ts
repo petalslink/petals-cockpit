@@ -16,6 +16,8 @@
  */
 
 import { $, browser, ExpectedConditions as EC } from 'protractor';
+import { ElementFinder } from 'protractor/built/element';
+import { promise } from 'selenium-webdriver';
 
 import { waitTimeout } from '../common';
 import { urlToMatch, waitAndClick } from '../utils';
@@ -52,8 +54,49 @@ export class BusPage {
     return MessageComponentPage.waitAndGet(this.component);
   }
 
-  openContainer(index: number) {
+  openContainer(index: number, opt?: { shouldBeReachable?: boolean }) {
     waitAndClick(this.containers.get(index).$('.swiper-img-container'));
-    return ContainerOverviewPage.waitAndGet();
+
+    const containerOverviewPage = ContainerOverviewPage.waitAndGet();
+
+    if (opt && typeof opt.shouldBeReachable === 'boolean') {
+      if (opt.shouldBeReachable) {
+        expect(containerOverviewPage.unreachableMessage.isDisplayed()).toBe(
+          false
+        );
+      } else {
+        expect(containerOverviewPage.unreachableMessage.isDisplayed()).toBe(
+          true
+        );
+      }
+    }
+
+    return containerOverviewPage;
+  }
+
+  getContainersReachabilityStatus() {
+    return this.containers.then((containerEl: ElementFinder[]) =>
+      promise.all(
+        containerEl.map(container =>
+          promise
+            .all<string | boolean>([
+              getContainerName(container),
+              getContainerReachabilityStatus(container),
+            ])
+            .then(([name, reachable]) => ({ name, reachable }))
+        )
+      )
+    );
   }
 }
+
+const getContainerName = (container: ElementFinder): promise.Promise<string> =>
+  container.$(`.name`).getText();
+
+const getContainerReachabilityStatus = (
+  container: ElementFinder
+): promise.Promise<boolean> =>
+  container
+    .$(`.swiper-img-container`)
+    .getAttribute('class')
+    .then(cssClass => cssClass.includes('swiper-img-container-reachable'));

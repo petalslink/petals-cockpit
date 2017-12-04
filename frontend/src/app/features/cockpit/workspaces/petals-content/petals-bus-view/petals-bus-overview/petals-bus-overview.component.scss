@@ -55,13 +55,18 @@ h3 {
   border-bottom: 1px solid #ffffff;
 }
 
-.swiper-img-container {
+.swiper-img-container-reachable {
   width: 250px;
   height: 60px;
   background-image: url(../../../../../../../assets/img/icon-server.png);
   background-size: 100%;
   background-repeat: no-repeat;
   background-position: center center;
+}
+
+.swiper-img-container-not-reachable {
+  @extend .swiper-img-container-reachable;
+  background-image: url(../../../../../../../assets/img/icon-server-not-reachable.png);
 }
 
 .swiper-img-registry {

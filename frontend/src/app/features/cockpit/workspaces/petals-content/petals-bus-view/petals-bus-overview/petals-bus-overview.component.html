@@ -50,7 +50,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     <mat-spinner [diameter]="16" [strokeWidth]="1"></mat-spinner>
                   </p>
                 </div>
-                <div class="swiper-img-container cursor-pointer" [routerLink]="['/workspaces', workspaceId, 'petals','containers', container.id]">
+                <div
+                  class="swiper-img-container cursor-pointer"
+                  [class.swiper-img-container-reachable]="container.isReachable"
+                  [class.swiper-img-container-not-reachable]="!container.isReachable"
+                  [routerLink]="['/workspaces', workspaceId, 'petals','containers', container.id]">
                 </div>
               </div>
             </div>

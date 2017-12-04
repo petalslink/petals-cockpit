@@ -23,6 +23,10 @@ mat-dialog-content {
   padding: 24px;
 }
 
+.msg-content {
+  margin-bottom: 0;
+}
+
 // all types of messages
 @mixin msg-content($bg, $color) {
   padding: 12px;
@@ -83,6 +87,5 @@ mat-dialog-content {
 }
 
 .msg-details {
-  width: 200px;
   white-space: normal;
 }
