@@ -66,13 +66,6 @@ export class ImportBusPage extends BusInProgressFields {
     super();
   }
 
-  getInfoImportDetailsMessage() {
-    return MessageComponentPage.waitAndGet(
-      this.component,
-      `info-import-details`
-    );
-  }
-
   getErrorImportDetailsMessage() {
     return MessageComponentPage.waitAndGet(
       this.component,

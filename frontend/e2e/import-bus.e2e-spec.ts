@@ -98,13 +98,6 @@ describe(`Import Bus`, () => {
     // only 2 buses in progress
     expect(workspace.busesInProgress.count()).toEqual(2);
 
-    importBus
-      .getInfoImportDetailsMessage()
-      .expectToBe(
-        'info',
-        `After completing all the required fields, click IMPORT.`
-      );
-
     importBus.ip.sendKeys(IMPORT_HTTP_ERROR_IP_LONG_TEXT);
     importBus.port.sendKeys(`7700`);
     importBus.username.sendKeys(`admin`);

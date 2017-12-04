@@ -63,7 +63,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </mat-nav-list>
 
           <ng-template #nosl>
-            <app-message class="info-no-sl" type="info" msg="This component doesn't use any shared library."></app-message>
+            <app-message
+              class="info-no-sl"
+              type="info"
+              msg="This component doesn't use any shared library."
+              [isClosable]="false"
+            ></app-message>
           </ng-template>
       </mat-card-content>
       </mat-card>
@@ -100,7 +105,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </mat-nav-list>
 
         <ng-template #nosu>
-          <app-message class="info-no-su" type="info" msg="This component doesn't have any service unit."></app-message>
+          <app-message
+            class="info-no-su"
+            type="info"
+            msg="This component doesn't have any service unit."
+            [isClosable]="false"
+          ></app-message>
         </ng-template>
 
       </mat-card-content>

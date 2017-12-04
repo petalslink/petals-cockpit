@@ -88,10 +88,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <mat-card-content>
             <div fxLayout="column" *ngIf="(users$ | async) as users" class="workspace-users">
 
-              <app-message class="info-user-workspace" *ngIf="users.length === 1; else workspaceShared" type="info" msg="You are the only one using this workspace."></app-message>
+              <app-message
+                class="info-user-workspace"
+                *ngIf="users.length === 1; else workspaceShared"
+                type="info"
+                msg="You are the only one using this workspace."
+                [isClosable]="false"
+              ></app-message>
 
               <ng-template #workspaceShared>
-                <app-message class="info-user-workspace-shared" type="info" msg="{{users.length}} people are using this workspace."></app-message>
+                <app-message
+                  class="info-user-workspace-shared"
+                  type="info"
+                  msg="{{users.length}} people are using this workspace."
+                  [isClosable]="false"
+                ></app-message>
               </ng-template>
 
               <mat-divider></mat-divider>
