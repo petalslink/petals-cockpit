@@ -18,9 +18,11 @@
 import { NgModule } from '@angular/core';
 
 import { SharedModule } from 'app/shared/shared.module';
-import { ServiceContentRoutingModule } from './service-content-routing.module';
+import { ServiceViewRoutingModule } from './service-view-routing.module';
+import { ServiceViewComponent } from './service-view.component';
 
 @NgModule({
-  imports: [SharedModule, ServiceContentRoutingModule],
+  imports: [SharedModule, ServiceViewRoutingModule],
+  declarations: [ServiceViewComponent],
 })
-export class ServiceContentModule {}
+export class ServiceViewModule {}

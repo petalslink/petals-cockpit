@@ -18,11 +18,11 @@
 import { NgModule } from '@angular/core';
 
 import { SharedModule } from 'app/shared/shared.module';
-import { PetalsServiceMenuComponent } from './petals-service-menu/petals-service-menu.component';
-import { ServiceMenuRoutingModule } from './service-menu-routing.module';
+import { ServiceMenuViewComponent } from './service-menu-view/service-menu-view.component';
 
 @NgModule({
-  imports: [SharedModule, ServiceMenuRoutingModule],
-  declarations: [PetalsServiceMenuComponent],
+  imports: [SharedModule],
+  declarations: [ServiceMenuViewComponent],
+  exports: [ServiceMenuViewComponent],
 })
 export class ServiceMenuModule {}

@@ -41,6 +41,11 @@ const routes: Routes = [
         loadChildren:
           'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule',
       },
+      {
+        path: 'services',
+        loadChildren:
+          'app/features/cockpit/workspaces/service-content/service-content.module#ServiceContentModule',
+      },
     ],
   },
 ];

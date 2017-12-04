@@ -15,15 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 
-@Component({
-  selector: 'app-petals-service-content',
-  templateUrl: './petals-service-content.component.html',
-  styleUrls: ['./petals-service-content.component.scss'],
+import { ServiceViewComponent } from './service-view.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: ServiceViewComponent,
+  },
+  {
+    path: ':serviceId',
+    component: ServiceViewComponent,
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
 })
-export class PetalsServiceContentComponent implements OnInit {
-  constructor() {}
-
-  ngOnInit() {}
-}
+export class ServiceViewRoutingModule {}

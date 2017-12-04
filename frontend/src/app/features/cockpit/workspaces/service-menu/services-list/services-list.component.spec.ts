@@ -15,12 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SharedModule } from 'app/shared/shared.module';
-import { ServiceContentRoutingModule } from './service-content-routing.module';
+import { ServicesListComponent } from './services-list.component';
 
-@NgModule({
-  imports: [SharedModule, ServiceContentRoutingModule],
-})
-export class ServiceContentModule {}
+describe('ServicesListComponent', () => {
+  let component: ServicesListComponent;
+  let fixture: ComponentFixture<ServicesListComponent>;
+
+  beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        declarations: [ServicesListComponent],
+      }).compileComponents();
+    })
+  );
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ServicesListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

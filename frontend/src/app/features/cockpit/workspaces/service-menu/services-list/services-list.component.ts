@@ -18,11 +18,11 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-petals-service-menu',
-  templateUrl: './petals-service-menu.component.html',
-  styleUrls: ['./petals-service-menu.component.scss'],
+  selector: 'app-services-list',
+  templateUrl: './services-list.component.html',
+  styleUrls: ['./services-list.component.scss'],
 })
-export class PetalsServiceMenuComponent implements OnInit {
+export class ServicesListComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {}
