@@ -39,7 +39,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </mat-nav-list>
 
           <ng-template #nocomponent>
-            <app-message class="info-sl-no-component" type="info" msg="This shared library isn't used by any component."></app-message>
+            <app-message
+              class="info-sl-no-component"
+              type="info"
+              msg="This shared library isn't used by any component."
+              [isClosable]="false"
+            ></app-message>
           </ng-template>
         </mat-card-content>
       </mat-card>
