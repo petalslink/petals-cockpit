@@ -24,6 +24,7 @@ import { ComponentsReducer } from 'app/features/cockpit/workspaces/state/compone
 import { ContainersReducer } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
 import { ServiceAssembliesReducer } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
 import { ServiceUnitsReducer } from 'app/features/cockpit/workspaces/state/service-units/service-units.reducer';
+import { ServicesReducer } from 'app/features/cockpit/workspaces/state/services/services.reducer';
 import { SharedLibrariesReducer } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
 import { WorkspacesReducer } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 import { enableBatching } from 'app/shared/helpers/batch-actions.helper';
@@ -40,6 +41,7 @@ export const reducers: ActionReducerMap<IStore> = {
   busesInProgress: BusesInProgressReducer.reducer,
   containers: ContainersReducer.reducer,
   components: ComponentsReducer.reducer,
+  services: ServicesReducer.reducer,
   serviceUnits: ServiceUnitsReducer.reducer,
   serviceAssemblies: ServiceAssembliesReducer.reducer,
   sharedLibraries: SharedLibrariesReducer.reducer,

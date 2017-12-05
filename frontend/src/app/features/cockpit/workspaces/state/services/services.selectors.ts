@@ -15,15 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
+import { createSelector } from '@ngrx/store';
 
-import { ServicesListComponent } from 'app/features/cockpit/workspaces/service-menu/services-list/services-list.component';
-import { SharedModule } from 'app/shared/shared.module';
-import { ServiceMenuViewComponent } from './service-menu-view/service-menu-view.component';
+import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
+import { IStore } from 'app/shared/state/store.interface';
 
-@NgModule({
-  imports: [SharedModule],
-  declarations: [ServiceMenuViewComponent, ServicesListComponent],
-  exports: [ServiceMenuViewComponent],
-})
-export class ServiceMenuModule {}
+export const getServices = (state: IStore) => state.services;
+
+export const getServicesById = (state: IStore) => state.services.byId;
+
+export const getServicesAllIds = (state: IStore) => state.services.allIds;
+
+export const getSelectedService = createSelector(
+  (state: IStore) => state.services.selectedServiceId,
+  getServicesById,
+  (id, ss): IServiceRow => ss[id]
+);
+
+export const getAllServices = createSelector(
+  getServicesAllIds,
+  getServicesById,
+  (ids, byId) => ids.map(id => byId[id])
+);

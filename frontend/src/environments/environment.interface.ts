@@ -5,6 +5,7 @@ import { ComponentsService } from 'app/shared/services/components.service';
 import { ContainersService } from 'app/shared/services/containers.service';
 import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
 import { ServiceUnitsService } from 'app/shared/services/service-units.service';
+import { ServicesService } from 'app/shared/services/services.service';
 import { SharedLibrariesService } from 'app/shared/services/shared-libraries.service';
 import { SseService } from 'app/shared/services/sse.service';
 import { UsersService } from 'app/shared/services/users.service';
@@ -95,6 +96,10 @@ export type IMockableServices = [
   },
   {
     provide: typeof ServiceUnitsService;
+    useClass: Type<any>;
+  },
+  {
+    provide: typeof ServicesService;
     useClass: Type<any>;
   },
   {

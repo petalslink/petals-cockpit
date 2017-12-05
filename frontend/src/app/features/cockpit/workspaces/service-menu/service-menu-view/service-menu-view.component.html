@@ -13,6 +13,10 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<p>
-  service-menu works!
-</p>
+<div fxLayout="column" fxFlex>
+  <app-services-list
+    [services]="services$ | async"
+    [workspaceId]="workspaceId"
+    (onServiceSelected)="closeSidenavOnSmallScreen($event)">
+  </app-services-list>
+</div>

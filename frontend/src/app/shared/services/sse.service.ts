@@ -34,6 +34,7 @@ import {
   ServiceAssemblyState,
 } from 'app/shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+import { IServiceBackendSSE } from 'app/shared/services/services.service';
 import {
   ISharedLibraryBackendSSE,
   SharedLibraryState,
@@ -94,6 +95,7 @@ export namespace SseActions {
         components: { [key: string]: IComponentBackendSSE };
         serviceAssemblies: { [key: string]: IServiceAssemblyBackendSSE };
         serviceUnits: { [key: string]: IServiceUnitBackendSSE };
+        services: { [key: string]: IServiceBackendSSE };
         sharedLibraries: { [key: string]: ISharedLibraryBackendSSE };
       }
     ) {}

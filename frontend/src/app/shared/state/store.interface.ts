@@ -21,6 +21,7 @@ import { IComponentsTable } from 'app/features/cockpit/workspaces/state/componen
 import { IContainersTable } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 import { IServiceAssembliesTable } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 import { IServiceUnitsTable } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
+import { IServicesTable } from 'app/features/cockpit/workspaces/state/services/services.interface';
 import { ISharedLibrariesTable } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import { IWorkspacesTable } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { IUi } from 'app/shared/state/ui.interface';
@@ -34,6 +35,7 @@ export interface IStore {
   busesInProgress: IBusesInProgressTable;
   containers: IContainersTable;
   components: IComponentsTable;
+  services: IServicesTable;
   serviceUnits: IServiceUnitsTable;
   serviceAssemblies: IServiceAssembliesTable;
   sharedLibraries: ISharedLibrariesTable;

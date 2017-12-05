@@ -22,10 +22,6 @@ import { ServiceViewComponent } from './service-view.component';
 
 const routes: Routes = [
   {
-    path: '',
-    component: ServiceViewComponent,
-  },
-  {
     path: ':serviceId',
     component: ServiceViewComponent,
   },

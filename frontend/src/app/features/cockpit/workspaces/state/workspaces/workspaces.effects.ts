@@ -38,6 +38,7 @@ import { Components } from 'app/features/cockpit/workspaces/state/components/com
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
+import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
@@ -169,6 +170,7 @@ export class WorkspacesEffects {
           new Components.Fetched(toJsTable(data.components)),
           new ServiceAssemblies.Fetched(toJsTable(data.serviceAssemblies)),
           new ServiceUnits.Fetched(toJsTable(data.serviceUnits)),
+          new Services.FetchAllSuccess(toJsTable(data.services)),
           new SharedLibraries.Fetched(toJsTable(data.sharedLibraries)),
         ]);
       })

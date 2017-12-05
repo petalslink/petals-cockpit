@@ -25,6 +25,8 @@ import { Subject } from 'rxjs/Subject';
 
 import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 import { getBusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.selectors';
+import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
+import { getAllServices } from 'app/features/cockpit/workspaces/state/services/services.selectors';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { IWorkspaceRow } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
 import {
@@ -48,6 +50,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   sidenavMode$: Observable<string>;
   workspace$: Observable<IWorkspaceRow>;
   busesInProgress$: Observable<IBusInProgress[]>;
+  services$: Observable<IServiceRow[]>;
   tree$: Observable<WorkspaceElement[]>;
 
   constructor(
@@ -59,6 +62,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.workspace$ = this.store$.select(getCurrentWorkspace);
     this.busesInProgress$ = this.store$.select(getBusesInProgress);
+    this.services$ = this.store$.select(getAllServices);
     this.tree$ = this.store$.select(getCurrentWorkspaceTree);
 
     // sidenav

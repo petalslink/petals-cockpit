@@ -15,7 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+
+import { IService } from 'app/features/cockpit/workspaces/state/services/services.interface';
 
 @Component({
   selector: 'app-services-list',
@@ -23,7 +25,20 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./services-list.component.scss'],
 })
 export class ServicesListComponent implements OnInit {
+  @Input() workspaceId: string;
+  @Input() services: IService[];
+
+  @Output() onServiceSelected = new EventEmitter();
+
   constructor() {}
 
   ngOnInit() {}
+
+  select(service: IService) {
+    this.onServiceSelected.emit(service);
+  }
+
+  trackByService(i: number, service: IService) {
+    return service.id;
+  }
 }

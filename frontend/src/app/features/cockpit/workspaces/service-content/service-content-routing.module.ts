@@ -18,6 +18,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { ResourceByIdGuard } from 'app/features/cockpit/workspaces/petals-content/resource-by-id.guard';
+
 const routes: Routes = [
   {
     path: '',
@@ -25,14 +27,19 @@ const routes: Routes = [
     redirectTo: 'services',
   },
   {
-    path: 'services',
+    path: '',
     loadChildren:
       'app/features/cockpit/workspaces/service-content/service-view/service-view.module#ServiceViewModule',
   },
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild([{ path: '', children: routes }])],
+  imports: [
+    RouterModule.forChild([
+      { path: '', canActivateChild: [ResourceByIdGuard], children: routes },
+    ]),
+  ],
+  providers: [ResourceByIdGuard],
   exports: [RouterModule],
 })
 export class ServiceContentRoutingModule {}

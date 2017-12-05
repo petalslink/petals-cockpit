@@ -19,6 +19,10 @@ import {
   ServiceUnitsServiceImpl,
 } from 'app/shared/services/service-units.service';
 import {
+  ServicesService,
+  ServicesServiceImpl,
+} from 'app/shared/services/services.service';
+import {
   SharedLibrariesService,
   SharedLibrariesServiceImpl,
 } from 'app/shared/services/shared-libraries.service';
@@ -65,6 +69,10 @@ export const environment: IEnvironment = {
     {
       provide: ServiceUnitsService,
       useClass: ServiceUnitsServiceImpl,
+    },
+    {
+      provide: ServicesService,
+      useClass: ServicesServiceImpl,
     },
     {
       provide: SharedLibrariesService,

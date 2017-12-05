@@ -15,29 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-import { ServicesListComponent } from './services-list.component';
+import * as helper from 'app/shared/helpers/mock.helper';
+import { servicesService } from 'mocks/services-mock';
+import { ServicesServiceImpl } from './services.service';
 
-describe('ServicesListComponent', () => {
-  let component: ServicesListComponent;
-  let fixture: ComponentFixture<ServicesListComponent>;
+@Injectable()
+export class ServicesServiceMock extends ServicesServiceImpl {
+  constructor(http: HttpClient) {
+    super(http);
+  }
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        declarations: [ServicesListComponent],
-      }).compileComponents();
-    })
-  );
+  getDetailsService(serviceId: string) {
+    const detailsService = servicesService.get(serviceId).getDetails();
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(ServicesListComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    return helper.responseBody(detailsService.service);
+  }
+}

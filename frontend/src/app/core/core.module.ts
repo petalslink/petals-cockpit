@@ -27,6 +27,7 @@ import { ComponentsEffects } from 'app/features/cockpit/workspaces/state/compone
 import { ContainersEffects } from 'app/features/cockpit/workspaces/state/containers/containers.effects';
 import { ServiceAssembliesEffects } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.effects';
 import { ServiceUnitsEffects } from 'app/features/cockpit/workspaces/state/service-units/service-units.effects';
+import { ServicesEffects } from 'app/features/cockpit/workspaces/state/services/services.effects';
 import { SharedLibrariesEffects } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.effects';
 import { WorkspacesEffects } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.effects';
 import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
@@ -62,6 +63,7 @@ export const providers: Provider[] = [
       ComponentsEffects,
       ServiceAssembliesEffects,
       ServiceUnitsEffects,
+      ServicesEffects,
       SharedLibrariesEffects,
     ]),
     // it's not clear if the module is enabled when the extension is not present...
