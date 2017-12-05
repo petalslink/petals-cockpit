@@ -17,6 +17,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
@@ -32,7 +33,7 @@ import {
 } from 'app/shared/helpers/form.helper';
 import { assert } from 'app/shared/helpers/shared.helper';
 import { deletable, IDeletable } from 'app/shared/operators/deletable.operator';
-import { IBusImport } from 'app/shared/services/buses.service';
+import { BusesService, IBusImport } from 'app/shared/services/buses.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 
@@ -60,7 +61,13 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
 
   matcher = new FormErrorStateMatcher();
 
-  constructor(private store$: Store<IStore>, private fb: FormBuilder) {}
+  constructor(
+    private store$: Store<IStore>,
+    private fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute,
+    private busesService: BusesService
+  ) {}
 
   ngOnInit() {
     this.store$.dispatch(
@@ -112,13 +119,19 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   }
 
   createFormImportBus() {
+    const {
+      ip,
+      port,
+      username,
+    } = this.busesService.getImportBusFormSecureParts();
+
     this.busImportForm = this.fb.group({
-      ip: ['', Validators.required],
+      ip: [ip, Validators.required],
       port: [
-        '',
+        port,
         Validators.compose([Validators.required, CustomValidators.isPort]),
       ],
-      username: ['', [Validators.required]],
+      username: [username, [Validators.required]],
       password: ['', [Validators.required]],
       passphrase: ['', [Validators.required]],
     });
@@ -143,9 +156,24 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
     this.store$.dispatch(new BusesInProgress.Post(value));
   }
 
-  discardSelectedBus() {
+  discardSelectedBus({ retry }: { retry: boolean } = { retry: false }) {
     assert(this.isSelectedBus());
+
     this.store$.dispatch(new BusesInProgress.Delete(this.busInProgress.value));
+
+    if (retry) {
+      this.saveImportDetailsAndRetry();
+    }
+  }
+
+  private saveImportDetailsAndRetry() {
+    this.busesService.setImportBusFormSecureParts({
+      ip: this.busImportForm.get('ip').value,
+      port: this.busImportForm.get('port').value,
+      username: this.busImportForm.get('username').value,
+    });
+
+    this.router.navigate(['../'], { relativeTo: this.route });
   }
 
   reset() {
