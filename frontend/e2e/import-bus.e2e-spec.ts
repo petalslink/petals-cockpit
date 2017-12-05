@@ -15,14 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { $$, by } from 'protractor';
+import { $$, browser, by } from 'protractor';
 
 import {
   errorBackendLongText,
   errorBackendTroncateTxt,
   IMPORT_HTTP_ERROR_IP_LONG_TEXT,
 } from '../src/mocks/backend-mock';
-
 import { page } from './common';
 import { NotFoundPage } from './pages/not-found';
 import { WorkspacePage } from './pages/workspace.po';
@@ -119,6 +118,41 @@ describe(`Import Bus`, () => {
 
     // still 2 buses in progress
     expect(workspace.busesInProgress.count()).toEqual(2);
+  });
+
+  it('should be able to discard and retry after a failed import', () => {
+    const importBus = workspace.openImportBus();
+
+    importBus.ip.sendKeys('192.168.1.1');
+    importBus.port.sendKeys(`7700`);
+    importBus.username.sendKeys(`admin`);
+    importBus.password.sendKeys(`password`);
+    importBus.passphrase.sendKeys(`passphrase`);
+
+    page.clickAndExpectNotification(
+      importBus.importButton,
+      'Bus import error',
+      /^The import of the bus .* failed$/
+    );
+
+    // clear the form, the error and retry the import
+    page.clickAndExpectNotification(
+      importBus.discardAndRetryButton,
+      '192.168.1.1:7700',
+      'Bus deleted by admin'
+    );
+
+    expect(workspace.busesInProgress.count()).toEqual(2);
+
+    expect(browser.getCurrentUrl()).toMatch(
+      /\/workspaces\/\w+\/petals\/buses-in-progress$/
+    );
+
+    expect(importBus.ip.getAttribute('value')).toBe('192.168.1.1');
+    expect(importBus.port.getAttribute('value')).toBe('7700');
+    expect(importBus.username.getAttribute('value')).toBe('admin');
+    expect(importBus.password.getAttribute('value')).toBe('');
+    expect(importBus.passphrase.getAttribute('value')).toBe('');
   });
 
   it(`should show the import error`, () => {

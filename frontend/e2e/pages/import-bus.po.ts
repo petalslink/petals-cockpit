@@ -40,6 +40,9 @@ export abstract class BusInProgressFields {
   public readonly discardButton = this.component.$(
     `app-petals-bus-in-progress-view button.btn-discard-form`
   );
+  public readonly discardAndRetryButton = this.component.$(
+    `app-petals-bus-in-progress-view button.btn-discard-retry-form`
+  );
   public readonly importButton = this.component.$(
     `app-petals-bus-in-progress-view button.btn-import-form`
   );

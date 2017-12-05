@@ -128,6 +128,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
               <button
                 mat-raised-button
+                color="warn"
+                type="button"
+                *ngIf="getError() || isStillImporting()"
+                (click)="discardSelectedBus({retry: true})"
+                class="margin-right-x1 btn-discard-retry-form text-upper"
+              >
+                <mat-icon>remove_circle</mat-icon>
+                <span class="discard-retry">Discard &amp; retry</span>
+              </button>
+
+              <button
+                mat-raised-button
                 color="primary"
                 type="submit"
                 class="btn-import-form text-upper"
