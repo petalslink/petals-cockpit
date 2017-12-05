@@ -96,30 +96,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <app-message class="error-import-details" type="error" [msg]="getError()"></app-message>
 
             <mat-card-actions class="padding-right-x1 margin-bottom-x1" fxLayoutAlign="end center">
-              <button mat-raised-button color="accent" type="button" *ngIf="isNewBus() && !newBusData().isImporting" class="btn-clear-form margin-right-x1 text-upper"
-                (click)="reset()">
-              <mat-icon>clear_all</mat-icon>
-              <span class="clear-name">Clear</span>
-            </button>
-              <button mat-raised-button color="warn" type="button" *ngIf="isSelectedBus()" (click)="discardSelectedBus()" [disabled]="selectedBus().isRemoving"
-                class="margin-right-x1 btn-discard-form text-upper">
-              <ng-template [ngIf]="selectedBus().importError" [ngIfElse]="cancel">
-                <mat-icon>remove_circle</mat-icon><span class="discard-name">Discard</span>
-              </ng-template>
-              <ng-template #cancel>
-                <mat-icon>cancel</mat-icon><span class="cancel-name">Cancel</span>
-              </ng-template>
-            </button>
-              <button mat-raised-button color="primary" type="submit" class="btn-import-form text-upper" [disabled]="busImportForm.invalid || isSelectedBus() || (isNewBus() && newBusData().isImporting)">
-              <span *ngIf="isStillImporting(); else canImport" fxFill fxLayout="row" fxLayoutAlign="center center">
-                Importing <mat-spinner [diameter]="16" [strokeWidth]="1"></mat-spinner>
-              </span>
-              <ng-template #canImport>
-                <mat-icon>import_export</mat-icon><span class="import-name">Import</span>
-              </ng-template>
-            </button>
-            </mat-card-actions>
+              <button
+                mat-raised-button
+                color="accent"
+                type="button"
+                *ngIf="isNewBus() && !newBusData().isImporting"
+                class="btn-clear-form margin-right-x1 text-upper"
+                (click)="reset()"
+              >
+                <mat-icon>clear_all</mat-icon>
+                <span class="clear-name">Clear</span>
+              </button>
 
+              <button
+                mat-raised-button
+                color="warn"
+                type="button"
+                *ngIf="isSelectedBus()"
+                (click)="discardSelectedBus()"
+                [disabled]="selectedBus().isRemoving"
+                class="margin-right-x1 btn-discard-form text-upper"
+              >
+                <ng-template [ngIf]="selectedBus().importError" [ngIfElse]="cancel">
+                  <mat-icon>remove_circle</mat-icon><span class="discard-name">Discard</span>
+                </ng-template>
+
+                <ng-template #cancel>
+                  <mat-icon>cancel</mat-icon><span class="cancel-name">Cancel</span>
+                </ng-template>
+              </button>
+
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                class="btn-import-form text-upper"
+                [disabled]="busImportForm.invalid || isSelectedBus() || (isNewBus() && newBusData().isImporting)"
+              >
+                <span *ngIf="isStillImporting(); else canImport" fxFill fxLayout="row" fxLayoutAlign="center center">
+                  Importing <mat-spinner [diameter]="16" [strokeWidth]="1"></mat-spinner>
+                </span>
+
+                <ng-template #canImport>
+                  <mat-icon>import_export</mat-icon><span class="import-name">Import</span>
+                </ng-template>
+              </button>
+            </mat-card-actions>
           </mat-card>
         </form>
       </ngx-hover-opacity>
