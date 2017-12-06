@@ -56,7 +56,8 @@ export namespace SseActions {
     | typeof SseActions.SaDeployedSse
     | typeof SseActions.ComponentDeployedSse
     | typeof SseActions.SlDeployedSse
-    | typeof SseActions.SlStateChangeSse;
+    | typeof SseActions.SlStateChangeSse
+    | typeof SseActions.ServicesUpdatedSse;
 
   export const BusImportSse = 'BUS_IMPORT';
   export const BusImportType = '[Sse] Bus import';
@@ -183,6 +184,17 @@ export namespace SseActions {
     ) {}
   }
 
+  export const ServicesUpdatedSse = 'SERVICES_UPDATED';
+  export const ServicesUpdatedType = '[Sse] Services updated';
+  export class ServicesUpdatedChange implements Action {
+    readonly type = ServicesUpdatedType;
+    constructor(
+      public readonly payload: {
+        services: { [key: string]: IServiceBackendSSE };
+      }
+    ) {}
+  }
+
   /**
    * events his a map to find a Redux action based on the name of an SSE action
    */
@@ -206,6 +218,8 @@ export namespace SseActions {
     [SseActions.SlDeployedSse]: payload => new SseActions.SlDeployed(payload),
     [SseActions.SlStateChangeSse]: payload =>
       new SseActions.SlStateChange(payload),
+    [SseActions.ServicesUpdatedSse]: payload =>
+      new SseActions.ServicesUpdatedChange(payload),
   };
 }
 

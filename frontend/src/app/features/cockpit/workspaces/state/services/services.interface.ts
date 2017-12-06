@@ -53,7 +53,7 @@ export function serviceRowFactory(): IServiceRow {
   return {
     id: null,
     name: null,
-
+    containerId: null,
     isFetchingDetails: false,
   };
 }

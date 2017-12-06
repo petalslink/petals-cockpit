@@ -25,18 +25,30 @@ export class Service {
   public readonly id: string;
   public readonly name: string;
 
-  constructor(name?: string) {
+  constructor(private containerId: string, name?: string) {
     const i = Service.cpt++;
     this.id = `idService${i}`;
-    this.name = name || `Service ${i}`;
+    this.name =
+      name ||
+      `{http://namespace-example.fr/service/technique/version/1.0}Localpart${
+        i
+      }`;
   }
 
   toObj(): { [id: string]: IServiceBackendSSE } {
-    return { [this.id]: { id: this.id, name: this.name } };
+    return {
+      [this.id]: {
+        id: this.id,
+        name: this.name,
+        containerId: this.containerId,
+      },
+    };
   }
 
   getDetails(): { service: IServiceBackendDetails } {
-    return { service: { id: this.id, name: this.name } };
+    return {
+      service: { id: this.id, name: this.name, containerId: this.containerId },
+    };
   }
 }
 
@@ -44,16 +56,17 @@ export class Services {
   private readonly services = new Map<string, Service>();
 
   constructor() {
-    this.create();
-    this.create();
-    this.create();
-    this.create();
+    this.create('idCont0', name);
+    this.create('idCont0', name);
+    this.create('idCont0', name);
+    this.create('idCont0', name);
+    this.create('idCont0', name);
   }
 
-  create(name?: string) {
-    const ss = new Service(name);
-    this.services.set(ss.id, ss);
-    return ss;
+  create(containerId: string, name?: string) {
+    const service = new Service(containerId, name);
+    this.services.set(service.id, service);
+    return service;
   }
 
   get(id: string) {

@@ -16,10 +16,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <mat-nav-list dense *ngFor="let service of services; trackBy:trackByService" class="nav-list-services">
   <div class="item-list">
     <a
+      class="service-link"
       mat-list-item
       routerLinkActive="active-link"
       [routerLink]="['/workspaces', workspaceId, 'services', service.id]"
       (click)="select(service)"
-    >{{ service.name }}</a>
+    >
+      <span class="item-name" [title]="service.name">{{ service.name }}</span>
+    </a>
   </div>
 </mat-nav-list>

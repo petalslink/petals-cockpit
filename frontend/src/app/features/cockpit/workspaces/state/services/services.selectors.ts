@@ -20,8 +20,6 @@ import { createSelector } from '@ngrx/store';
 import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
 import { IStore } from 'app/shared/state/store.interface';
 
-export const getServices = (state: IStore) => state.services;
-
 export const getServicesById = (state: IStore) => state.services.byId;
 
 export const getServicesAllIds = (state: IStore) => state.services.allIds;
@@ -35,5 +33,7 @@ export const getSelectedService = createSelector(
 export const getAllServices = createSelector(
   getServicesAllIds,
   getServicesById,
-  (ids, byId) => ids.map(id => byId[id])
+  (ids, byId) => {
+    return ids.map(id => byId[id]);
+  }
 );

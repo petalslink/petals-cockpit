@@ -24,13 +24,12 @@ import { environment } from 'environments/environment';
 export interface IServiceBackendSSECommon {
   id: string;
   name: string;
+  containerId: string;
 }
 
 export interface IServiceBackendDetailsCommon {}
 
-export interface IServiceBackendSSE extends IServiceBackendSSECommon {
-  // from server (sse)
-}
+export interface IServiceBackendSSE extends IServiceBackendSSECommon {}
 
 export interface IServiceBackendDetails
   extends IServiceBackendSSE,

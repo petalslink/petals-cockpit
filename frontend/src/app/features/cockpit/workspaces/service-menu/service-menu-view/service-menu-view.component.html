@@ -13,10 +13,10 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFlex>
+<div fxLayout="column" fxFlex class="margin-top-x1">
   <app-services-list
     [services]="services$ | async"
     [workspaceId]="workspaceId"
-    (onServiceSelected)="closeSidenavOnSmallScreen($event)">
+    (onServiceSelected)="closeSidenavOnSmallScreen()">
   </app-services-list>
 </div>
