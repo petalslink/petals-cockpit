@@ -62,6 +62,7 @@ import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.api.artifact.SharedLibrary;
+import org.ow2.petals.admin.endpoint.EndpointDirectoryView;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
@@ -76,6 +77,8 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
+import org.ow2.petals.cockpit.server.resources.ServicesResource;
+import org.ow2.petals.cockpit.server.resources.ServicesResource.ServiceFull;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent;
@@ -313,7 +316,11 @@ public class WorkspacesService {
                 broadcast(res.<Either<String, WorkspaceContent>> fold(Either::left, topology -> {
                     WorkspaceContentBuilder b = WorkspaceContent.builder();
                     DSL.using(jooq).transaction(c -> workspaceDb.saveDomainToDatabase(c, bDb, topology, b));
-                    return Either.right(b.build());
+                    WorkspaceContent result = b.build();
+                    
+                    result.services = updateAllInstanciatedServices(result.services);
+                    
+                    return Either.right(result);
                 }).fold(error -> {
                     LOG.info("Can't import bus from container {}:{}: {}", bDb.getImportIp(), bDb.getImportPort(),
                             error);
@@ -325,6 +332,8 @@ public class WorkspacesService {
             }
         }
 
+
+
         // TODO in the future, there should be multiple methods like this for multiple type of imports
         private Either<String, Domain> doImportExistingBus(BusImport bus) {
             try {
@@ -335,6 +344,7 @@ public class WorkspacesService {
                  * effect in this operation: it will run in the background while we consider the operation interrupted
                  * on our side.
                  */
+
                 Domain topology = petals.getTopology(bus.ip, bus.port, bus.username, bus.password, bus.passphrase);
                 return Either.right(topology);
             } catch (Exception e) {
@@ -399,6 +409,7 @@ public class WorkspacesService {
                 ComponentStateChanged res = new ComponentStateChanged(comp.getId(), newCurrentState);
 
                 componentStateUpdated(res, conf);
+                updateServicesList(comp.getContainerId());
 
                 return res;
             });
@@ -443,7 +454,7 @@ public class WorkspacesService {
                 SAStateChanged res = new SAStateChanged(sa.getId(), newCurrentState);
 
                 serviceAssemblyStateUpdated(res, conf);
-
+                updateServicesList(sa.getContainerId());
                 return res;
             });
         }
@@ -504,7 +515,8 @@ public class WorkspacesService {
                 ServiceAssembly deployedSA = petals.deploySA(cont.getIp(), cont.getPort(), cont.getUsername(),
                         cont.getPassword(), name, saUrl);
 
-                return serviceAssemblyDeployed(deployedSA, cId, conf);
+                final WorkspaceContent result = serviceAssemblyDeployed(deployedSA, cId, conf);
+                return result;
             });
         }
 
@@ -535,7 +547,7 @@ public class WorkspacesService {
             WorkspaceContent res = new WorkspaceContent(
                     ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap
                             .of(Long.toString(saDb.getId()), new ServiceAssemblyFull(saDb, serviceUnitsDb.keySet())),
-                    serviceUnitsDb, ImmutableMap.of());
+                    serviceUnitsDb, ImmutableMap.of(), updateContainerServicesList(cId, false).services);
 
             broadcast(WorkspaceEvent.saDeployed(res));
 
@@ -585,7 +597,7 @@ public class WorkspacesService {
 
             WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                     ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(compDb, ImmutableSet.of(), sls)),
-                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
+                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
 
             broadcast(WorkspaceEvent.componentDeployed(res));
 
@@ -615,11 +627,57 @@ public class WorkspacesService {
 
             WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                     ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
-                    ImmutableMap.of(Long.toString(slDb.getId()), new SharedLibraryFull(slDb, ImmutableSet.of())));
+                    ImmutableMap.of(Long.toString(slDb.getId()), new SharedLibraryFull(slDb, ImmutableSet.of())),
+                    ImmutableMap.of());
 
             broadcast(WorkspaceEvent.sharedLibraryDeployed(res));
 
             return res;
         }
+
+        public WorkspaceContent updateServicesList(long cId) {
+            return updateContainerServicesList(cId, true);
+        }
+
+        public WorkspaceContent updateContainerServicesList(long cId, boolean broadcastNewServices) {
+
+            EndpointDirectoryView edpView = getEndpoints(cId);
+            final WorkspaceContent res = workspaceDb.storeServicesList(edpView, cId, jooq);
+
+                // The caller may want to broadcast outside this method, along with other workspace content
+                if (broadcastNewServices) {
+                LOG.debug("Service list updated for cont#{}, broadcasting {} services.", cId,
+                            res.services.size());
+                    broadcast(WorkspaceEvent.servicesUpdated(res));
+                }
+                return res;
+        }
+
+        private EndpointDirectoryView getEndpoints(long cId) {
+            return DSL.using(jooq).transactionResult(conf -> {
+                ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(cId)).fetchOne();
+                assert cont != null;
+
+                return petals.getEndpointDirectoryView(cont.getIp(), cont.getPort(),
+                        cont.getUsername(), cont.getPassword());
+            });
+        }
+
+        private ImmutableMap<String, ServiceFull> updateAllInstanciatedServices(
+                final ImmutableMap<String, ServiceFull> existingServices) {
+            Map<String, ServicesResource.ServiceFull> allServices = new HashMap<String, ServicesResource.ServiceFull>();
+            allServices.putAll(existingServices);
+
+            // adding instantiated services from new containers to broadcast (without broadcasting right now)
+            DSL.using(jooq).select(CONTAINERS.ID).from(CONTAINERS).join(BUSES).onKey().fetchStream()
+                    .forEach(containerRecord -> {
+                        allServices.putAll(updateContainerServicesList(containerRecord.value1(), false).services);
+                    });
+
+            return ImmutableMap.copyOf(allServices);
+        }
+
+
+
     }
 }

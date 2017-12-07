@@ -49,6 +49,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ServicesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
 import org.ow2.petals.cockpit.server.mocks.MockArtifactServer;
@@ -189,6 +190,11 @@ public class CockpitResourceRule implements TestRule {
         @Override
         public void serviceUnitAdded(ServiceUnit su, ServiceunitsRecord suDb) {
             setDbObjectId(su, suDb.getId());
+        }
+
+        @Override
+        public void serviceAdded(ServicesRecord service) {
+            setDbObjectId(service, service.getId());
         }
     }
 }
