@@ -750,7 +750,7 @@ public class WorkspaceResource {
             // jackson will inject values itself (because of @JsonUnwrapped)
             this.users = ImmutableMap.of();
             this.content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
-                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
+                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
             this.workspace = new WorkspaceOverview(0, "", ImmutableList.of(), "");
         }
     }
@@ -763,7 +763,8 @@ public class WorkspaceResource {
 
         public enum Event {
             WORKSPACE_CONTENT, BUS_IMPORT, BUS_IMPORT_ERROR, BUS_IMPORT_OK, SA_STATE_CHANGE, COMPONENT_STATE_CHANGE,
-            BUS_DELETED, SA_DEPLOYED, WORKSPACE_DELETED, COMPONENT_DEPLOYED, SL_DEPLOYED, SL_STATE_CHANGE
+            BUS_DELETED, SA_DEPLOYED, WORKSPACE_DELETED, COMPONENT_DEPLOYED, SL_DEPLOYED, SL_STATE_CHANGE,
+            SERVICES_UPDATED
         }
 
         @JsonProperty
@@ -824,6 +825,10 @@ public class WorkspaceResource {
 
         public static WorkspaceEvent busImport(BusInProgress bip) {
             return new WorkspaceEvent(Event.BUS_IMPORT, bip);
+        }
+
+        public static WorkspaceEvent servicesUpdated(WorkspaceContent servicesList) {
+            return new WorkspaceEvent(Event.SERVICES_UPDATED, servicesList);
         }
 
         @Override

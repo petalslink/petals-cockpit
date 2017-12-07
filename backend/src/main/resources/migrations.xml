@@ -299,10 +299,50 @@
   <changeSet id="v0.11.0-2" author="vnoel">
     <addPrimaryKey columnNames="username, workspace_id" constraintName="pk_users_workspaces" tableName="users_workspaces" />
   </changeSet>
-  
+
   <changeSet id="v0.14.0-1" author="psouquet">
-    <dropColumn tableName="buses" columnName="import_password"/>
-    <dropColumn tableName="buses" columnName="import_passphrase"/>
+    <dropColumn tableName="buses" columnName="import_password" />
+    <dropColumn tableName="buses" columnName="import_passphrase" />
   </changeSet>
-  
+
+  <changeSet id="v0.17.0-1" author="psouquet">
+    <createTable tableName="services">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+      <column name="name" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <createTable tableName="endpoints">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+      <column name="name" type="varchar(255)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <createTable tableName="edp_instances">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+      <column name="container_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_edp_instances_container_id"
+          referencedTableName="containers" referencedColumnNames="id" deleteCascade="false" />
+      </column>
+      <column name="component_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_edp_instances_component_id"
+          referencedTableName="components" referencedColumnNames="id" deleteCascade="false" />
+      </column>
+      <column name="service_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_edp_instances_service_id"
+          referencedTableName="services" referencedColumnNames="id" deleteCascade="false" />
+      </column>
+      <column name="endpoint_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_edp_instances_endpoint_id"
+          referencedTableName="endpoints" referencedColumnNames="id" deleteCascade="false" />
+      </column>
+    </createTable>
+  </changeSet>
+
 </databaseChangeLog>
