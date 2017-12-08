@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <mat-sidenav-container fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">
   <mat-sidenav fxLayout="column"
-              class="mat-elevation-z6"
+              class="workspace-sidenav mat-elevation-z6"
               *ngIf="workspace$ | async as workspace"
               [opened]="sidenavVisible$ | async"
               [mode]="sidenavMode$ | async"
@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </button>
     </div>
 
-    <mat-tab-group fxFlex mat-stretch-tabs>
+    <mat-tab-group fxFlex mat-stretch-tabs class="workspace-menu">
       <mat-tab label="Petals">
         <app-petals-menu-view
           [busesInProgress]="busesInProgress$ | async"
@@ -44,7 +44,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </app-petals-menu-view>
       </mat-tab>
 
-      <mat-tab label="Service">
+      <mat-tab label="Services">
         <app-service-menu-view
          [services]="services$ | async"
          [workspaceId]="workspace.id">

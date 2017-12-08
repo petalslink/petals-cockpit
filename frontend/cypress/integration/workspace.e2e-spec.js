@@ -1,4 +1,5 @@
 import { PETALS_COCKPIT_DOM } from '../support/petals-cockpit.dom';
+import { WORKSPACE_DOM } from '../support/workspace.dom';
 
 describe(`Workspace`, () => {
   beforeEach(() => {
@@ -10,6 +11,18 @@ describe(`Workspace`, () => {
     cy.logout();
 
     cy.expectNotification('success', 'Log out !', `You're now disconnected.`);
+  });
+
+  it(`should active the tab services`, () => {
+    cy.login('admin', 'admin');
+
+    cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav);
+    cy.get(WORKSPACE_DOM.menu.workspaceMenu);
+
+    const tabServices = cy.get(WORKSPACE_DOM.tabs.tab).contains(`Services`);
+
+    tabServices.click();
+    tabServices.should(`have.class`, `mat-tab-label-active`);
   });
 
   // TODO: for now there's an ongoing issue with hover
