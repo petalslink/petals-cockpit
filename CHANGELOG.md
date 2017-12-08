@@ -1,3 +1,19 @@
+<a name="0.17.0"></a>
+# [0.17.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.16.0...v0.17.0) (2017-12-08)
+
+
+### Bug Fixes
+
+* **frontend:** informational messages are no longer always closable ([a2f73b1](https://gitlab.com/linagora/petals-cockpit/commit/a2f73b1)), closes [#404](https://gitlab.com/linagora/petals-cockpit/issues/404)
+
+
+### Features
+
+* **frontend:** display unreachable containers with a message to explain ([d1a94fa](https://gitlab.com/linagora/petals-cockpit/commit/d1a94fa)), closes [#399](https://gitlab.com/linagora/petals-cockpit/issues/399)
+* **frontend:** retry failed bus import ([a89f416](https://gitlab.com/linagora/petals-cockpit/commit/a89f416)), closes [#405](https://gitlab.com/linagora/petals-cockpit/issues/405)
+
+
+
 <a name="0.16.0"></a>
 # [0.16.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.15.0...v0.16.0) (2017-11-29)
 
