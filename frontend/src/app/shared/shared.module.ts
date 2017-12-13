@@ -41,7 +41,6 @@ import {
   MatToolbarModule,
   MatTooltipModule,
 } from '@angular/material';
-
 import { RouterModule } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { SimpleNotificationsModule } from 'angular2-notifications';

@@ -4718,6 +4718,10 @@ ngx-pipes@2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/ngx-pipes/-/ngx-pipes-2.0.5.tgz#743b827e350b1e66f5bdae49e90a02fa631d4c54"
 
+ngx-webstorage@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/ngx-webstorage/-/ngx-webstorage-2.0.1.tgz#232446262241e8fd0d794a03821c0b5e28459295"
+
 no-case@^2.2.0:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/no-case/-/no-case-2.3.2.tgz#60b813396be39b3f1288a4c1ed5d1e7d28b464ac"
