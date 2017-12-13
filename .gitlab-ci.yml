@@ -1,9 +1,9 @@
 # Notes
 # Branch front/* will run test-frontend
 # Branch back/* will run build-backend
-# Branch product/* will run build-backend, build-frontend, package-product, e2e-product
-# Branch master will run build-backend, build-frontend, build-frontend-pages, test-frontend, package-product-master, e2e-product, pages
-# Other branches will run build-backend, build-frontend, package-product, e2e-product
+# Branch product/* will run build-backend, build-frontend, package-product
+# Branch master will run build-backend, build-frontend, build-frontend-pages, test-frontend, package-product-master, pages
+# Other branches will run build-backend, build-frontend, package-product
 # Tags will run build-backend, build-frontend, release-product
 
 stages:
@@ -195,26 +195,3 @@ package-product:
     name: petals-cockpit-$(cat version.txt)-${CI_BUILD_REF:0:7}
     paths:
       - petals-cockpit-*
-
-e2e-product:
-  <<: *node-java-yarn
-  stage: integration
-  except:
-    - tags
-    # we don't want to test the final product in front/* and back/*
-    - /^front\/.*$/
-    - /^back\/.*$/
-  dependencies:
-    # one or the other
-    - package-product
-    - package-product-master
-  variables:
-    COCKPIT_CONFIG: e2e/default.yml
-  script:
-    # TODO reuse script?
-    - export JAR=$(ls -1 petals-cockpit-*/lib/petals-cockpit-*.jar 2>/dev/null)
-    - export COCKPIT="java -ea -jar $JAR"
-    - time $COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml
-    - nohup $COCKPIT server $COCKPIT_CONFIG &
-    - cd frontend
-    - time yarn run e2e:product
