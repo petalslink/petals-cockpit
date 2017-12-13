@@ -8,6 +8,8 @@ import { ServiceAssembliesService } from 'app/shared/services/service-assemblies
 import { ServiceAssembliesServiceMock } from 'app/shared/services/service-assemblies.service.mock';
 import { ServiceUnitsService } from 'app/shared/services/service-units.service';
 import { ServiceUnitsServiceMock } from 'app/shared/services/service-units.service.mock';
+import { ServicesService } from 'app/shared/services/services.service';
+import { ServicesServiceMock } from 'app/shared/services/services.service.mock';
 import { SharedLibrariesService } from 'app/shared/services/shared-libraries.service';
 import { SharedLibrariesServiceMock } from 'app/shared/services/shared-libraries.service.mock';
 import { SseService } from 'app/shared/services/sse.service';
@@ -48,6 +50,10 @@ export const environment: IEnvironment = {
     {
       provide: ServiceUnitsService,
       useClass: ServiceUnitsServiceMock,
+    },
+    {
+      provide: ServicesService,
+      useClass: ServicesServiceMock,
     },
     {
       provide: SharedLibrariesService,

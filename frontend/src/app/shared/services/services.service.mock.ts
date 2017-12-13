@@ -15,15 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-@Component({
-  selector: 'app-petals-service-content',
-  templateUrl: './petals-service-content.component.html',
-  styleUrls: ['./petals-service-content.component.scss'],
-})
-export class PetalsServiceContentComponent implements OnInit {
-  constructor() {}
+import * as helper from 'app/shared/helpers/mock.helper';
+import { servicesService } from 'mocks/services-mock';
+import { ServicesServiceImpl } from './services.service';
 
-  ngOnInit() {}
+@Injectable()
+export class ServicesServiceMock extends ServicesServiceImpl {
+  constructor(http: HttpClient) {
+    super(http);
+  }
+
+  getDetailsService(serviceId: string) {
+    const detailsService = servicesService.get(serviceId).getDetails();
+
+    return helper.responseBody(detailsService.service);
+  }
 }

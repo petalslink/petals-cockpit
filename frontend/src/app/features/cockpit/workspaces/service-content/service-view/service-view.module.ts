@@ -17,13 +17,12 @@
 
 import { NgModule } from '@angular/core';
 
-import { ServicesListComponent } from 'app/features/cockpit/workspaces/service-menu/services-list/services-list.component';
 import { SharedModule } from 'app/shared/shared.module';
-import { ServiceMenuViewComponent } from './service-menu-view/service-menu-view.component';
+import { ServiceViewRoutingModule } from './service-view-routing.module';
+import { ServiceViewComponent } from './service-view.component';
 
 @NgModule({
-  imports: [SharedModule],
-  declarations: [ServiceMenuViewComponent, ServicesListComponent],
-  exports: [ServiceMenuViewComponent],
+  imports: [SharedModule, ServiceViewRoutingModule],
+  declarations: [ServiceViewComponent],
 })
-export class ServiceMenuModule {}
+export class ServiceViewModule {}

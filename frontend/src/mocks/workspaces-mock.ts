@@ -25,6 +25,7 @@ import {
   IWorkspaceBackendDetails,
 } from 'app/shared/services/workspaces.service';
 import { validContainers } from 'mocks/backend-mock';
+import { servicesService } from 'mocks/services-mock';
 import { BackendUser } from 'mocks/users-mock';
 import {
   Bus,
@@ -179,6 +180,7 @@ export class Workspace {
       c.getServiceAssemblies()
     );
     const serviceUnits = flatMap(components, c => c.getServiceUnits());
+    const services = servicesService.getServices();
     const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
     return {
@@ -189,6 +191,7 @@ export class Workspace {
       components: toObj(components),
       serviceAssemblies: toObj(serviceAssemblies),
       serviceUnits: toObj(serviceUnits),
+      services: toObj(services),
       sharedLibraries: toObj(sharedLibraries),
     };
   }

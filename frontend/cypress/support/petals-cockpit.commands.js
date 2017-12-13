@@ -12,8 +12,8 @@ Cypress.Commands.add('logout', () => {
 Cypress.Commands.add('expectNotification', (type, title, message) => {
   const NOTIFICATION_DOM_WITH_TYPE = NOTIFICATION_DOM(type);
 
-  cy.get(NOTIFICATION_DOM_WITH_TYPE.text.title).contains(title);
-  cy.get(NOTIFICATION_DOM_WITH_TYPE.text.content).contains(message);
+  cy.get(NOTIFICATION_DOM_WITH_TYPE.texts.title).contains(title);
+  cy.get(NOTIFICATION_DOM_WITH_TYPE.texts.content).contains(message);
   // TODO: the click on the notification is not working as it's
   // expecting for the notification to close before clicking on it
   // this might help to speed up testing time as notification are

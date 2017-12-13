@@ -16,14 +16,18 @@
  */
 
 import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 
-import { ServicesListComponent } from 'app/features/cockpit/workspaces/service-menu/services-list/services-list.component';
-import { SharedModule } from 'app/shared/shared.module';
-import { ServiceMenuViewComponent } from './service-menu-view/service-menu-view.component';
+import { ServiceViewComponent } from './service-view.component';
+
+const routes: Routes = [
+  {
+    path: ':serviceId',
+    component: ServiceViewComponent,
+  },
+];
 
 @NgModule({
-  imports: [SharedModule],
-  declarations: [ServiceMenuViewComponent, ServicesListComponent],
-  exports: [ServiceMenuViewComponent],
+  imports: [RouterModule.forChild(routes)],
 })
-export class ServiceMenuModule {}
+export class ServiceViewRoutingModule {}

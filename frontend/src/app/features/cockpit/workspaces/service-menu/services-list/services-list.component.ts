@@ -15,13 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-const routes: Routes = [];
+import { IService } from 'app/features/cockpit/workspaces/state/services/services.interface';
 
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
+@Component({
+  selector: 'app-services-list',
+  templateUrl: './services-list.component.html',
+  styleUrls: ['./services-list.component.scss'],
 })
-export class ServiceMenuRoutingModule {}
+export class ServicesListComponent implements OnInit {
+  @Input() workspaceId: string;
+  @Input() services: IService[];
+
+  @Output() onServiceSelected = new EventEmitter();
+
+  constructor() {}
+
+  ngOnInit() {}
+
+  select(service: IService) {
+    this.onServiceSelected.emit(service);
+  }
+
+  trackByService(i: number, service: IService) {
+    return service.id;
+  }
+}

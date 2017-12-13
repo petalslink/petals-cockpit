@@ -10,7 +10,7 @@ export const NOTIFICATION_DOM = type => ({
     logo: `${bs} .${type} .toolbar-logo`,
     toggleSidenavButton: `${bs} .${type} .sidenav-toggle`,
   },
-  text: {
+  texts: {
     title: `${bs} .${type} .sn-title`,
     content: `${bs} .${type} .sn-content`,
   },

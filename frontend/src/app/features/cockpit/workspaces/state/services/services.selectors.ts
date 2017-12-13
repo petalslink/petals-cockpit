@@ -15,15 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { createSelector } from '@ngrx/store';
 
-@Component({
-  selector: 'app-petals-service-menu',
-  templateUrl: './petals-service-menu.component.html',
-  styleUrls: ['./petals-service-menu.component.scss'],
-})
-export class PetalsServiceMenuComponent implements OnInit {
-  constructor() {}
+import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
+import { IStore } from 'app/shared/state/store.interface';
 
-  ngOnInit() {}
-}
+export const getServicesById = (state: IStore) => state.services.byId;
+
+export const getServicesAllIds = (state: IStore) => state.services.allIds;
+
+export const getSelectedService = createSelector(
+  (state: IStore) => state.services.selectedServiceId,
+  getServicesById,
+  (id, ss): IServiceRow => ss[id]
+);
+
+export const getAllServices = createSelector(
+  getServicesAllIds,
+  getServicesById,
+  (ids, byId) => {
+    return ids.map(id => byId[id]);
+  }
+);

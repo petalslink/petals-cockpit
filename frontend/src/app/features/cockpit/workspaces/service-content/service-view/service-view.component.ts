@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import { ServicesListComponent } from 'app/features/cockpit/workspaces/service-menu/services-list/services-list.component';
-import { SharedModule } from 'app/shared/shared.module';
-import { ServiceMenuViewComponent } from './service-menu-view/service-menu-view.component';
-
-@NgModule({
-  imports: [SharedModule],
-  declarations: [ServiceMenuViewComponent, ServicesListComponent],
-  exports: [ServiceMenuViewComponent],
+@Component({
+  selector: 'app-service-view',
+  templateUrl: './service-view.component.html',
+  styleUrls: ['./service-view.component.scss'],
 })
-export class ServiceMenuModule {}
+export class ServiceViewComponent implements OnInit {
+  constructor() {}
+
+  ngOnInit() {}
+}

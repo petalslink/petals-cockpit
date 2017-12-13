@@ -254,12 +254,13 @@ app-header .toolbar-page-header,
   background-color: mat-color($theme-accent-x5);
 }
 
-// all items elements in petals menu view
+// all items elements in petals and services menu view
 app-buses-in-progress
   > .nav-list-imports-in-progress
   > .item-list
   > .mat-list-item,
-app-material-tree > .nav-list-petals-tree > .item-list > .mat-list-item {
+app-material-tree > .nav-list-petals-tree > .item-list > .mat-list-item,
+app-services-list > .nav-list-services > .item-list > .mat-list-item {
   height: 24px;
   border-bottom-width: 1px;
   border-bottom-style: solid;
@@ -270,6 +271,12 @@ app-material-tree > .nav-list-petals-tree > .item-list > .mat-list-item {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .item-name {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
   }
 
   .item-content > .arrow-size {
