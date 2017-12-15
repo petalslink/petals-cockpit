@@ -35,7 +35,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </button>
     </div>
 
-    <mat-tab-group fxFlex mat-stretch-tabs class="workspace-menu">
+    <mat-tab-group
+      class="workspace-menu"
+      mat-stretch-tabs
+      fxFlex
+      [selectedIndex]="retrievedSelectedIndex"
+      (selectedIndexChange)="saveCurrentTab($event)"
+    >
       <mat-tab label="Petals">
         <app-petals-menu-view
           [busesInProgress]="busesInProgress$ | async"
@@ -55,7 +61,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         Some more tab content
       </mat-tab>
     </mat-tab-group>
-    <!--<router-outlet name="aux"></router-outlet>-->
   </mat-sidenav>
 
   <router-outlet></router-outlet>

@@ -19,6 +19,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { LocalStorageService } from 'ngx-webstorage';
 import { Observable } from 'rxjs/Observable';
 import { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
@@ -53,10 +54,13 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   services$: Observable<IServiceRow[]>;
   tree$: Observable<WorkspaceElement[]>;
 
+  retrievedSelectedIndex: number;
+
   constructor(
     private store$: Store<IStore>,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private storage: LocalStorageService
   ) {}
 
   ngOnInit() {
@@ -64,6 +68,10 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.busesInProgress$ = this.store$.select(getBusesInProgress);
     this.services$ = this.store$.select(getAllServices);
     this.tree$ = this.store$.select(getCurrentWorkspaceTree);
+
+    this.retrievedSelectedIndex = this.storage.retrieve(
+      'left-menu-selected-index'
+    );
 
     // sidenav
     this.sidenavVisible$ = this.store$.select(
@@ -105,6 +113,10 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
   openWorkspacesDialog() {
     this.store$.dispatch(new Ui.OpenWorkspaces());
+  }
+
+  saveCurrentTab(tabIndex: number) {
+    this.storage.store('left-menu-selected-index', tabIndex);
   }
 }
 
