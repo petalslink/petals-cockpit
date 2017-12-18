@@ -1,5 +1,6 @@
 # Release process
 
+## GIT
 - create a branch named product/release-X.X.X
 - change the version to a stable number in the 3 pom.xml: `mvn versions:set -DnewVersion=X.X.X`
 - change the version to the next number in the package.json
@@ -21,3 +22,12 @@ git tag -a vX.X.X -m "Release version X.X.X"
 - prepare for next development version (bump to -SNAPSHOT in poms and to -alpha in package.json)
 - commit with message: `chore: prepare for next development`
 - push that on master with `--follow-tags` option
+
+## DOCKER
+```
+docker build -t petals-cockpit .
+
+docker commit petals-cockpit petals/petals-cockpit
+
+docker push petals/petals-cockpit
+```
