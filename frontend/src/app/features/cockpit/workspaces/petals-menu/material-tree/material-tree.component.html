@@ -15,7 +15,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <mat-nav-list dense *ngFor="let item of tree" [ngStyle]="{'marginLeft.px': margin}" class="nav-list-petals-tree">
   <div class="item-list">
-    <a mat-list-item [ngClass]="item.cssClass" [routerLink]="item.link ? [item.link] : []" [routerLinkActive]="item.link ? 'active-link' : ''" (click)="select(item)">
+    <a
+      mat-list-item
+      class="item-link"
+      [ngClass]="item.cssClass"
+      [routerLink]="item.link ? [item.link] : []"
+      [routerLinkActive]="item.link ? 'active-link' : ''"
+      (click)="select(item)"
+    >
       <div fxLayout="row" fxLayoutAlign="start center" class="item-content">
         <mat-icon
           *ngIf="item.children.length > 0; else noIconChildren"

@@ -7,7 +7,7 @@ export const WORKSPACE_DOM = {
     changeWorkspace: `${bs} .change-workspace`,
   },
   menu: { workspaceMenu: `${bs} .workspace-menu` },
-  tabs: { tab: `${bs} .mat-tab-label` },
+  tabs: `${bs} .mat-tab-label`,
   sidenav: {
     workspaceSidenav: `${bs} .mat-sidenav-container .workspace-sidenav`,
   },
