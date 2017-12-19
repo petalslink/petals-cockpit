@@ -9,13 +9,13 @@ describe(`Service`, () => {
   it(`should have a list of services`, () => {
     cy.login('admin', 'admin');
 
-    const tabServices = cy.get(WORKSPACE_DOM.tabs.tab).contains(`Services`);
+    cy
+      .get(WORKSPACE_DOM.tabs)
+      .contains(`Services`)
+      .click();
+    cy.get(SERVICE_LIST_DOM.navList.navListServices);
 
-    tabServices.click();
-
-    const navList = cy.get(SERVICE_LIST_DOM.navList.navListServices);
     const servicesNames = cy.get(SERVICE_LIST_DOM.texts.servicesNames);
-
     const expectedServicesNames = [
       `{http://namespace-example.fr/service/technique/version/1.0}Localpart0`,
       `{http://namespace-example.fr/service/technique/version/1.0}Localpart1`,

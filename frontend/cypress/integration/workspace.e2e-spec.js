@@ -13,16 +13,40 @@ describe(`Workspace`, () => {
     cy.expectNotification('success', 'Log out !', `You're now disconnected.`);
   });
 
+  it(`should active the tab petals`, () => {
+    cy.login('admin', 'admin');
+
+    cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav);
+    cy.get(WORKSPACE_DOM.menu.workspaceMenu);
+    cy
+      .get(WORKSPACE_DOM.tabs)
+      .contains(`Petals`)
+      .click()
+      .should(`have.class`, `mat-tab-label-active`);
+  });
+
   it(`should active the tab services`, () => {
     cy.login('admin', 'admin');
 
     cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav);
     cy.get(WORKSPACE_DOM.menu.workspaceMenu);
+    cy
+      .get(WORKSPACE_DOM.tabs)
+      .contains(`Services`)
+      .click()
+      .should(`have.class`, `mat-tab-label-active`);
+  });
 
-    const tabServices = cy.get(WORKSPACE_DOM.tabs.tab).contains(`Services`);
+  it(`should active the tab api`, () => {
+    cy.login('admin', 'admin');
 
-    tabServices.click();
-    tabServices.should(`have.class`, `mat-tab-label-active`);
+    cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav);
+    cy.get(WORKSPACE_DOM.menu.workspaceMenu);
+    cy
+      .get(WORKSPACE_DOM.tabs)
+      .contains(`Api`)
+      .click()
+      .should(`have.class`, `mat-tab-label-active`);
   });
 
   // TODO: for now there's an ongoing issue with hover
