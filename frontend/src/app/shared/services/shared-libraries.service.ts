@@ -82,9 +82,9 @@ export class SharedLibrariesServiceImpl extends SharedLibrariesService {
       id: string;
       state: SharedLibraryState;
     }>(
-      `${environment.urlBackend}/workspaces/${workspaceId}/sharedlibraries/${
-        id
-      }`,
+      `${
+        environment.urlBackend
+      }/workspaces/${workspaceId}/sharedlibraries/${id}`,
       { state }
     );
   }
