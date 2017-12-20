@@ -116,9 +116,9 @@ export class ContainersServiceImpl extends ContainersService {
 
     const req = new HttpRequest(
       'POST',
-      `${environment.urlBackend}/workspaces/${workspaceId}/containers/${
-        containerId
-      }/components`,
+      `${
+        environment.urlBackend
+      }/workspaces/${workspaceId}/containers/${containerId}/components`,
       formData,
       {
         reportProgress: true,
@@ -143,9 +143,9 @@ export class ContainersServiceImpl extends ContainersService {
 
     const req = new HttpRequest(
       'POST',
-      `${environment.urlBackend}/workspaces/${workspaceId}/containers/${
-        containerId
-      }/serviceassemblies`,
+      `${
+        environment.urlBackend
+      }/workspaces/${workspaceId}/containers/${containerId}/serviceassemblies`,
       formData,
       {
         reportProgress: true,
@@ -184,9 +184,9 @@ export class ContainersServiceImpl extends ContainersService {
 
     const req = new HttpRequest(
       'POST',
-      `${environment.urlBackend}/workspaces/${workspaceId}/containers/${
-        containerId
-      }/sharedlibraries`,
+      `${
+        environment.urlBackend
+      }/workspaces/${workspaceId}/containers/${containerId}/sharedlibraries`,
       formData,
       {
         reportProgress: true,

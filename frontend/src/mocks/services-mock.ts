@@ -30,9 +30,7 @@ export class Service {
     this.id = `idService${i}`;
     this.name =
       name ||
-      `{http://namespace-example.fr/service/technique/version/1.0}Localpart${
-        i
-      }`;
+      `{http://namespace-example.fr/service/technique/version/1.0}Localpart${i}`;
   }
 
   toObj(): { [id: string]: IServiceBackendSSE } {
