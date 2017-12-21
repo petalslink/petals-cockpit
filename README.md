@@ -16,6 +16,21 @@ Running demo (mock) [https://linagora.gitlab.io/petals-cockpit](https://linagora
 $ ./petals-cockpit.sh
 ```
 
+### Running a docker image
+
+*from root folder*
+
+**Build:**  
+`docker build -t petals-cockpit .`
+
+**Run:**  
+`docker run -p 3600:8080 -it petals-cockpit`
+
+For the first run, remember to take a look at the terminal, where you should find an URL with a user setup token.
+
+Otherwise, just go to http://localhost:3600.
+
+
 ### Build an Executable Petals Cockpit
 
 In order to create an executable product, simply build the frontend, the backend and then the product that will embed both of them:

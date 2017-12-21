@@ -1,0 +1,10 @@
+*.zip
+e2e/
+.git/
+.history/
+.vscode/
+
+frontend/node_modules/
+frontend/cypress/
+frontend/coverage/
+frontend/electron/
