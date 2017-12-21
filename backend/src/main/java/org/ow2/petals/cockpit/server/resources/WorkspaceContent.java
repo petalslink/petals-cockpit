@@ -37,6 +37,7 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
+import org.ow2.petals.cockpit.server.resources.ServicesResource.ServiceFull;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusInProgress;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceEvent;
@@ -84,6 +85,11 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
     @JsonProperty
     public final ImmutableMap<String, SharedLibraryFull> sharedLibraries;
 
+    // TODO: refactor to reintroduce final to the list ?
+    @Valid
+    @JsonProperty
+    public ImmutableMap<String, ServiceFull> services;
+
     @JsonCreator
     public WorkspaceContent(@JsonProperty("busesInProgress") Map<String, BusInProgress> busesInProgress,
             @JsonProperty("buses") Map<String, BusFull> buses,
@@ -91,7 +97,8 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             @JsonProperty("components") Map<String, ComponentFull> components,
             @JsonProperty("serviceAssemblies") Map<String, ServiceAssemblyFull> serviceAssemblies,
             @JsonProperty("serviceUnits") Map<String, ServiceUnitFull> serviceUnits,
-            @JsonProperty("sharedLibraries") Map<String, SharedLibraryFull> sharedLibraries) {
+            @JsonProperty("sharedLibraries") Map<String, SharedLibraryFull> sharedLibraries,
+            @JsonProperty("services") Map<String, ServiceFull> services) {
         this.busesInProgress = ImmutableMap.copyOf(busesInProgress);
         this.buses = ImmutableMap.copyOf(buses);
         this.containers = ImmutableMap.copyOf(containers);
@@ -99,6 +106,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
         this.serviceAssemblies = ImmutableMap.copyOf(serviceAssemblies);
         this.serviceUnits = ImmutableMap.copyOf(serviceUnits);
         this.sharedLibraries = ImmutableMap.copyOf(sharedLibraries);
+        this.services = ImmutableMap.copyOf(services);
     }
 
     public static WorkspaceContentBuilder builder() {
@@ -131,13 +139,14 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             Map<String, ServiceAssemblyFull> sas = new HashMap<>();
             Map<String, ServiceUnitFull> sus = new HashMap<>();
             Map<String, SharedLibraryFull> sls = new HashMap<>();
+            Map<String, ServiceFull> servs = new HashMap<>();
 
             buses.stream().forEach(b -> {
-                BusFull bus = b.build(cs, comps, sas, sus, sls);
+                BusFull bus = b.build(cs, comps, sas, sus, sls, servs);
                 importedBuses.put(bus.bus.getId(), bus);
             });
 
-            return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus, sls);
+            return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus, sls, servs);
         }
     }
 
@@ -160,11 +169,11 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
 
         private BusFull build(Map<String, ContainerFull> cs, Map<String, ComponentFull> comps,
                 Map<String, ServiceAssemblyFull> sas, Map<String, ServiceUnitFull> sus,
-                Map<String, SharedLibraryFull> sls) {
+                Map<String, SharedLibraryFull> sls, Map<String, ServiceFull> servs) {
 
             Set<String> containersIds = new HashSet<>();
             containers.stream().forEach(b -> {
-                ContainerFull container = b.build(comps, sas, sus, sls);
+                ContainerFull container = b.build(comps, sas, sus, sls, servs);
                 String containerId = container.container.getId();
                 cs.put(containerId, container);
                 containersIds.add(containerId);
@@ -185,6 +194,8 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
 
         private final List<ServiceunitsRecord> susToBuild = new ArrayList<>();
 
+        private final List<ServiceFull> servsToBuild = new ArrayList<>();
+
         private final SetMultimap<Long, String> componentsBySL = LinkedHashMultimap.create();
 
         private final SetMultimap<Long, String> slsByComponent = LinkedHashMultimap.create();
@@ -192,6 +203,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
         private final SetMultimap<Long, String> serviceUnitsByComp = LinkedHashMultimap.create();
 
         private final SetMultimap<Long, String> serviceUnitsBySA = LinkedHashMultimap.create();
+
 
         private WorkspaceContentContainerBuilderImpl(ContainersRecord cDb) {
             this.cDb = cDb;
@@ -226,11 +238,18 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             susToBuild.add(suDb);
         }
 
+        @Override
+        public void addService(ServiceFull sDb) {
+            servsToBuild.add(sDb);
+        }
+
         private ContainerFull build(Map<String, ComponentFull> comps, Map<String, ServiceAssemblyFull> sas,
-                Map<String, ServiceUnitFull> sus, Map<String, SharedLibraryFull> sls) {
+                Map<String, ServiceUnitFull> sus, Map<String, SharedLibraryFull> sls,
+                Map<String, ServiceFull> servs) {
             Set<String> components = new HashSet<>();
             Set<String> serviceAssemblies = new HashSet<>();
             Set<String> sharedLibraries = new HashSet<>();
+            Set<String> services = new HashSet<>();
 
             componentsToBuild.stream()
                     .map(c -> new ComponentFull(c, serviceUnitsByComp.get(c.getId()), slsByComponent.get(c.getId())))
@@ -254,7 +273,14 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
 
             susToBuild.stream().map(ServiceUnitFull::new).forEach(su -> sus.put(su.serviceUnit.getId(), su));
 
-            return new ContainerFull(cDb, components, serviceAssemblies, sharedLibraries);
+            for (ServiceFull serv : servsToBuild) {
+                String id = serv.service.getId();
+                servs.put(id, serv);
+                services.add(id);
+            }
+
+            return new ContainerFull(cDb, components, serviceAssemblies, sharedLibraries, services);
         }
+
     }
 }

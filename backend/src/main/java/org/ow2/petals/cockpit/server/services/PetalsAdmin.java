@@ -25,6 +25,7 @@ import javax.inject.Inject;
 
 import org.ow2.petals.admin.api.ArtifactAdministration;
 import org.ow2.petals.admin.api.ContainerAdministration;
+import org.ow2.petals.admin.api.EndpointDirectoryAdministration;
 import org.ow2.petals.admin.api.PetalsAdministration;
 import org.ow2.petals.admin.api.PetalsAdministrationFactory;
 import org.ow2.petals.admin.api.artifact.Artifact;
@@ -38,6 +39,8 @@ import org.ow2.petals.admin.api.exception.ArtifactAdministrationException;
 import org.ow2.petals.admin.api.exception.ArtifactDeployedException;
 import org.ow2.petals.admin.api.exception.ArtifactNotFoundException;
 import org.ow2.petals.admin.api.exception.ContainerAdministrationException;
+import org.ow2.petals.admin.api.exception.EndpointDirectoryAdministrationException;
+import org.ow2.petals.admin.endpoint.EndpointDirectoryView;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
@@ -251,6 +254,16 @@ public class PetalsAdmin {
         } else {
             // we can't call updateState for this one, it will fail since it has been unloaded
             return ServiceAssemblyMin.State.Unloaded;
+        }
+    }
+
+    public EndpointDirectoryView getEndpointDirectoryView(String ip, int port, String username, String password) {
+        try (PAC p = new PAC(ip, port, username, password)) {
+            EndpointDirectoryAdministration edpAdmin = p.petals.newEndpointDirectoryAdministration();
+            final String regexAny = ".*";
+            return edpAdmin.getEndpointDirectoryContent(regexAny, regexAny, regexAny, regexAny);
+        } catch (EndpointDirectoryAdministrationException e) {
+            throw new PetalsAdminException(e);
         }
     }
 
