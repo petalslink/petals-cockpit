@@ -1,3 +1,14 @@
+<a name="0.18.0"></a>
+# [0.18.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.17.0...v0.18.0) (2018-01-02)
+
+
+### Features
+
+* Display services list in a new tab, closes [#406](https://gitlab.com/linagora/petals-cockpit/issues/406)
+* **frontend:** Selected left menu tab is restored on page reload ([be31af8](https://gitlab.com/linagora/petals-cockpit/commit/be31af8)), closes [#418](https://gitlab.com/linagora/petals-cockpit/issues/418)
+
+
+
 <a name="0.17.0"></a>
 # [0.17.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.16.0...v0.17.0) (2017-12-08)
 
