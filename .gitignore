@@ -19,6 +19,7 @@ target/
 .history
 .angulardoc.json
 .updateCopyrightEndDate.sh
+*.ucls
 
 # ------------------------------------
 #              BACKEND

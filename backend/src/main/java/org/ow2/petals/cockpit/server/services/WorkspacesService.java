@@ -215,8 +215,7 @@ public class WorkspacesService {
 
         public synchronized WorkspaceDeleted delete() {
             DSL.using(jooq).transaction(conf -> {
-                // remove from db (it will propagate to all its contained elements!)
-                DSL.using(conf).deleteFrom(WORKSPACES).where(WORKSPACES.ID.eq(wId)).execute();
+                workspaceDb.deleteWorkspace(wId, conf);
 
                 // unregister while still in the transaction!
                 workspaces.remove(wId);
@@ -244,14 +243,7 @@ public class WorkspacesService {
         }
 
         public synchronized BusDeleted deleteBus(String user, long bId) {
-            DSL.using(jooq).transaction(conf -> {
-                int deleted = DSL.using(conf).deleteFrom(BUSES).where(BUSES.ID.eq(bId).and(BUSES.WORKSPACE_ID.eq(wId)))
-                        .execute();
-
-                if (deleted < 1) {
-                    throw new WebApplicationException(Status.NOT_FOUND);
-                }
-            });
+            workspaceDb.deleteBus(bId, wId, jooq);
 
             Future<?> future = importsInProgress.remove(bId);
 
@@ -271,6 +263,7 @@ public class WorkspacesService {
 
             return bd;
         }
+
 
         public synchronized BusInProgress importBus(BusImport nb) {
             final BusesRecord bDb = DSL.using(jooq).transactionResult(conf -> {
@@ -317,9 +310,9 @@ public class WorkspacesService {
                     WorkspaceContentBuilder b = WorkspaceContent.builder();
                     DSL.using(jooq).transaction(c -> workspaceDb.saveDomainToDatabase(c, bDb, topology, b));
                     WorkspaceContent result = b.build();
-                    
-                    result.services = updateAllInstanciatedServices(result.services);
-                    
+
+                    result.services = getWorkspaceServices();
+
                     return Either.right(result);
                 }).fold(error -> {
                     LOG.info("Can't import bus from container {}:{}: {}", bDb.getImportIp(), bDb.getImportPort(),
@@ -408,23 +401,35 @@ public class WorkspacesService {
 
                 ComponentStateChanged res = new ComponentStateChanged(comp.getId(), newCurrentState);
 
-                componentStateUpdated(res, conf);
-                updateServicesList(comp.getContainerId());
+                componentStateUpdated(res, conf, currentState);
 
                 return res;
             });
         }
 
-        private void componentStateUpdated(ComponentStateChanged comp, Configuration conf) {
+        private void componentStateUpdated(ComponentStateChanged comp, Configuration conf,
+                ComponentMin.State previousState) {
+            Record1<Long> contId = null;
+            boolean endpointsChanged = comp.mayChangeServicesCommingFrom(previousState);
+            if (endpointsChanged) {
+                contId = DSL.using(conf).select(COMPONENTS.CONTAINER_ID).from(COMPONENTS)
+                        .where(COMPONENTS.ID.eq(comp.id)).fetchOne();
+            }
+
             if (comp.state != ComponentMin.State.Unloaded) {
                 DSL.using(conf).update(COMPONENTS).set(COMPONENTS.STATE, comp.state.name())
                         .where(COMPONENTS.ID.eq(comp.id)).execute();
             } else {
-                DSL.using(conf).deleteFrom(COMPONENTS).where(COMPONENTS.ID.eq(comp.id)).execute();
+                workspaceDb.deleteComponent(comp.id, conf);
             }
 
             broadcast(WorkspaceEvent.componentStateChange(comp));
+
+            if (endpointsChanged && contId != null && contId.value1() != null) {
+                containerServicesChanged(contId.value1(), true);
+            }
         }
+
 
         public synchronized SAStateChanged changeSAState(long saId, SAChangeState action) {
             return DSL.using(jooq).transactionResult(conf -> {
@@ -453,13 +458,21 @@ public class WorkspacesService {
 
                 SAStateChanged res = new SAStateChanged(sa.getId(), newCurrentState);
 
-                serviceAssemblyStateUpdated(res, conf);
-                updateServicesList(sa.getContainerId());
+                serviceAssemblyStateUpdated(res, conf, currentState);
+
                 return res;
             });
         }
 
-        private void serviceAssemblyStateUpdated(SAStateChanged sa, Configuration conf) {
+        private void serviceAssemblyStateUpdated(SAStateChanged sa, Configuration conf,
+                ServiceAssemblyMin.State previousState) {
+            Record1<Long> contId = null;
+            boolean endpointsMayHaveChanged = sa.mayChangeServicesCommingFrom(previousState);
+            if (endpointsMayHaveChanged) {
+                contId = DSL.using(conf).select(SERVICEASSEMBLIES.CONTAINER_ID).from(SERVICEASSEMBLIES)
+                        .where(SERVICEASSEMBLIES.ID.eq(sa.id)).fetchOne();
+            }
+
             if (sa.state != ServiceAssemblyMin.State.Unloaded) {
                 DSL.using(conf).update(SERVICEASSEMBLIES).set(SERVICEASSEMBLIES.STATE, sa.state.name())
                         .where(SERVICEASSEMBLIES.ID.eq(sa.id)).execute();
@@ -468,7 +481,12 @@ public class WorkspacesService {
             }
 
             broadcast(WorkspaceEvent.saStateChange(sa));
+
+            if (endpointsMayHaveChanged && contId != null && contId.value1() != null) {
+                containerServicesChanged(contId.value1(), true);
+            }
         }
+
 
         public synchronized SLStateChanged changeSLState(long slId, SLChangeState action) {
             return DSL.using(jooq).transactionResult(conf -> {
@@ -547,7 +565,7 @@ public class WorkspacesService {
             WorkspaceContent res = new WorkspaceContent(
                     ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap
                             .of(Long.toString(saDb.getId()), new ServiceAssemblyFull(saDb, serviceUnitsDb.keySet())),
-                    serviceUnitsDb, ImmutableMap.of(), updateContainerServicesList(cId, false).services);
+                    serviceUnitsDb, ImmutableMap.of(), ImmutableMap.of());
 
             broadcast(WorkspaceEvent.saDeployed(res));
 
@@ -635,49 +653,55 @@ public class WorkspacesService {
             return res;
         }
 
-        public WorkspaceContent updateServicesList(long cId) {
-            return updateContainerServicesList(cId, true);
-        }
-
-        public WorkspaceContent updateContainerServicesList(long cId, boolean broadcastNewServices) {
-
-            EndpointDirectoryView edpView = getEndpoints(cId);
-            final WorkspaceContent res = workspaceDb.storeServicesList(edpView, cId, jooq);
-
-                // The caller may want to broadcast outside this method, along with other workspace content
-                if (broadcastNewServices) {
-                LOG.debug("Service list updated for cont#{}, broadcasting {} services.", cId,
-                            res.services.size());
-                    broadcast(WorkspaceEvent.servicesUpdated(res));
-                }
-                return res;
-        }
-
-        private EndpointDirectoryView getEndpoints(long cId) {
-            return DSL.using(jooq).transactionResult(conf -> {
-                ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(cId)).fetchOne();
-                assert cont != null;
-
-                return petals.getEndpointDirectoryView(cont.getIp(), cont.getPort(),
-                        cont.getUsername(), cont.getPassword());
-            });
-        }
-
-        private ImmutableMap<String, ServiceFull> updateAllInstanciatedServices(
-                final ImmutableMap<String, ServiceFull> existingServices) {
-            Map<String, ServicesResource.ServiceFull> allServices = new HashMap<String, ServicesResource.ServiceFull>();
-            allServices.putAll(existingServices);
-
-            // adding instantiated services from new containers to broadcast (without broadcasting right now)
-            DSL.using(jooq).select(CONTAINERS.ID).from(CONTAINERS).join(BUSES).onKey().fetchStream()
+        public ImmutableMap<String, ServiceFull> getWorkspaceServices() {
+            DSL.using(jooq).select(CONTAINERS.ID).from(CONTAINERS).join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
+                    .where(BUSES.WORKSPACE_ID.eq(wId)).fetchStream()
                     .forEach(containerRecord -> {
-                        allServices.putAll(updateContainerServicesList(containerRecord.value1(), false).services);
+                        updateContainerServices(containerRecord.value1());
                     });
+
+            return workspaceDb.getWorkspaceServices(wId, jooq);
+        }
+
+        private ImmutableMap<String, ServiceFull> containerServicesChanged(Long containerId,
+                boolean broadcastServices) {
+            updateContainerServices(containerId);
+            Map<String, ServicesResource.ServiceFull> allServices = workspaceDb
+                    .getWorkspaceServices(wId, jooq);
+
+            // The caller may want to broadcast outside this method, along with other workspace content
+            if (broadcastServices) {
+                WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                        ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                        ImmutableMap.copyOf(allServices));
+
+                LOG.debug("Service list updated for cont#{}, broadcasting {} services.", containerId,
+                        res.services.size());
+                broadcast(WorkspaceEvent.servicesUpdated(res));
+            }
 
             return ImmutableMap.copyOf(allServices);
         }
 
+        private void updateContainerServices(long cId) {
+            EndpointDirectoryView edpView = getContainerEndpointsView(cId);
+            workspaceDb.storeServicesList(edpView, cId, jooq);
+        }
 
+        private EndpointDirectoryView getContainerEndpointsView(long cId) {
+            return DSL.using(jooq).transactionResult(conf -> {
+                ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(cId)).fetchOne();
+
+                assert cont != null;
+                final String ip = cont.getIp();
+                final String username = cont.getUsername();
+                final String password = cont.getPassword();
+                final Integer port = cont.getPort();
+                assert ip != null && username != null && password != null && port != null;
+
+                return petals.getEndpointDirectoryView(ip, port, username, password);
+            });
+        }
 
     }
 }

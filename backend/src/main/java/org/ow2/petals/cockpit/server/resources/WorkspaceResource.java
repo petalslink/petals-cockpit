@@ -656,6 +656,22 @@ public class WorkspaceResource {
         public String getId() {
             return Long.toString(id);
         }
+
+        public boolean mayChangeServicesCommingFrom(ServiceAssemblyMin.State previousState) {
+            // SA starts proposing services when started
+            // SA may stop proposing services when unloaded, so we check for shutdown and unknown as well
+            if ((previousState == ServiceAssemblyMin.State.Started || previousState == ServiceAssemblyMin.State.Stopped)
+                    && (this.state == ServiceAssemblyMin.State.Shutdown
+                            || this.state == ServiceAssemblyMin.State.Unloaded)) {
+                return true;
+            } else if (previousState == ServiceAssemblyMin.State.Shutdown
+                    && this.state == ServiceAssemblyMin.State.Started) {
+                return true;
+            } else if (this.state == ServiceAssemblyMin.State.Unknown) {
+                return true;
+            }
+            return false;
+        }
     }
 
     public static class ComponentStateChanged implements WorkspaceEvent.Data {
@@ -677,6 +693,22 @@ public class WorkspaceResource {
         @JsonProperty
         public String getId() {
             return Long.toString(id);
+        }
+
+        public boolean mayChangeServicesCommingFrom(ComponentMin.State previousState) {
+            // Component starts proposing services when started
+            // Components stops proposing services when uninstalled(shutdown),
+            // so we check for unloaded and unknown as well
+            if ((previousState == ComponentMin.State.Started || previousState == ComponentMin.State.Stopped)
+                    && (this.state == ComponentMin.State.Loaded || this.state == ComponentMin.State.Shutdown
+                            || this.state == ComponentMin.State.Unloaded)) {
+                return true;
+            } else if (previousState == ComponentMin.State.Shutdown && this.state == ComponentMin.State.Started) {
+                return true;
+            } else if (this.state == ComponentMin.State.Unknown) {
+                return true;
+            }
+            return false;
         }
     }
 
