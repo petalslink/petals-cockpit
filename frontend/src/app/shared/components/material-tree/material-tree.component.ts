@@ -48,6 +48,8 @@ export class MaterialTreeComponent<TE extends TreeElement<TE>>
   @Input() search: string;
   // pass a margin to apply on each level (in px)
   @Input() marginLeft = 0;
+  // choose whether you want to display fold/unfold icon
+  @Input() canBeFolded? = true;
   // only used internally
   @Input() deepLevel? = 0;
   // event when the user select a line
@@ -68,7 +70,7 @@ export class MaterialTreeComponent<TE extends TreeElement<TE>>
   }
 
   toggleFold(element: TE) {
-    if (!this.search || !this.search.trim()) {
+    if (this.canBeFolded && (!this.search || !this.search.trim())) {
       this.onToggleFold.emit(element);
     }
 

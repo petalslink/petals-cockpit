@@ -18,15 +18,17 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { IService } from 'app/features/cockpit/workspaces/state/services/services.interface';
+import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
 
 @Component({
   selector: 'app-services-list',
   templateUrl: './services-list.component.html',
   styleUrls: ['./services-list.component.scss'],
 })
-export class ServicesListComponent implements OnInit {
+export class ServicesListComponent<TE extends TreeElement<TE>>
+  implements OnInit {
   @Input() workspaceId: string;
-  @Input() services: IService[];
+  @Input() servicesTree: TreeElement<TE>[];
 
   @Output() onServiceSelected = new EventEmitter();
 
@@ -36,9 +38,5 @@ export class ServicesListComponent implements OnInit {
 
   select(service: IService) {
     this.onServiceSelected.emit(service);
-  }
-
-  trackByService(i: number, service: IService) {
-    return service.id;
   }
 }

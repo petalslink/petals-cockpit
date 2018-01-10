@@ -61,37 +61,37 @@ describe(`Petals`, () => {
 
     cy.login('admin', 'admin');
 
-    cy.expectTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedTreeNames);
 
     cy.foldElementInTree(`bus`, `Bus 0`);
 
     cy.unfoldElementInTree(`bus`, `Bus 0`);
 
-    cy.expectTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedTreeNames);
 
     cy.foldElementInTree(`container`, `Cont 0`);
 
-    cy.expectTreeToBe(treeWithCont0Folded);
+    cy.expectPetalsTreeToBe(treeWithCont0Folded);
 
     cy.unfoldElementInTree(`container`, `Cont 0`);
 
-    cy.expectTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedTreeNames);
 
     cy.foldElementInTree(`component`, `Comp 0`);
 
-    cy.expectTreeToBe(treeWithComp0Folded);
+    cy.expectPetalsTreeToBe(treeWithComp0Folded);
 
     cy.unfoldElementInTree(`component`, `Comp 0`);
 
-    cy.expectTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedTreeNames);
 
     cy.foldElementInTree(`category-service-assemblies`, `Service Assemblies`);
 
-    cy.expectTreeToBe(treeWithSasFolded);
+    cy.expectPetalsTreeToBe(treeWithSasFolded);
 
     cy.unfoldElementInTree(`category-service-assemblies`, `Service Assemblies`);
 
-    cy.expectTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedTreeNames);
   });
 
   it(`should unfold found element when searching in Petals menu`, () => {
@@ -103,7 +103,7 @@ describe(`Petals`, () => {
 
     const treeFiltered = [`Bus 0`, `Cont 0`, `Components`, `Comp 0`, `SU 0`];
 
-    cy.expectTreeToBe(treeFiltered);
+    cy.expectPetalsTreeToBe(treeFiltered);
   });
 
   it(`should clear input and focus search bar when the message saying no match is closed`, () => {
@@ -144,7 +144,7 @@ describe(`Petals`, () => {
 
     cy.get(PETALS_DOM.inputs.search).type(`CoMp 0`);
 
-    cy.expectTreeToBe(availableBusesFilteredComp0);
+    cy.expectPetalsTreeToBe(availableBusesFilteredComp0);
 
     cy.expectHighlightedElementToBe([`Comp 0`]);
 
@@ -153,7 +153,7 @@ describe(`Petals`, () => {
       .clear()
       .type(`u`);
 
-    cy.expectTreeToBe(availableBusesFiltered);
+    cy.expectPetalsTreeToBe(availableBusesFiltered);
 
     cy.expectHighlightedElementToBe(elementsHighlighted);
 
@@ -162,7 +162,7 @@ describe(`Petals`, () => {
       .clear()
       .type(`Service Assemblies`);
 
-    cy.expectTreeToBe(availableSasCategoriesFiltered);
+    cy.expectPetalsTreeToBe(availableSasCategoriesFiltered);
 
     cy.expectHighlightedElementToBe([
       `Service Assemblies`,

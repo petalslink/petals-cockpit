@@ -87,6 +87,15 @@ export class AppComponent implements OnInit, OnDestroy {
     const suLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
       './assets/icons/svg/su-logo.svg'
     );
+    const serviceLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
+      './assets/icons/svg/service-logo.svg'
+    );
+    const interfaceLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
+      './assets/icons/svg/interface-logo.svg'
+    );
+    const endpointLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
+      './assets/icons/svg/endpoint-logo.svg'
+    );
     const gotoLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
       './assets/icons/svg/goto-logo.svg'
     );
@@ -98,6 +107,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.matIconRegistry.addSvgIcon('sl-overview', slOverviewLogo);
     this.matIconRegistry.addSvgIcon('sa-overview', saOverviewLogo);
     this.matIconRegistry.addSvgIcon('su', suLogo);
+    this.matIconRegistry.addSvgIcon('service', serviceLogo);
+    this.matIconRegistry.addSvgIcon('interface', interfaceLogo);
+    this.matIconRegistry.addSvgIcon('endpoint', endpointLogo);
     this.matIconRegistry.addSvgIcon('goto', gotoLogo);
   }
 

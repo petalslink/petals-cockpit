@@ -43,8 +43,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <span class="text-upper title" fxFlex>Buses</span>
     </div>
   </div>
-  <app-material-tree [tree]="tree" [search]="search" [marginLeft]="14" (onToggleFold)="onTreeToggleFold($event)"
-    (onSelect)="onTreeSelect($event)"></app-material-tree>
+
+  <app-material-tree
+    [tree]="tree"
+    [search]="search"
+    [marginLeft]="14"
+    (onToggleFold)="onTreeToggleFold($event)"
+    (onSelect)="onTreeSelect($event)"
+  ></app-material-tree>
 
   <app-message
     class="info no-match"
@@ -53,5 +59,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     msg="There is no match with &quot;{{ search }}&quot;."
     (onClose)="focusSearch()"
   ></app-message>
-
 </div>

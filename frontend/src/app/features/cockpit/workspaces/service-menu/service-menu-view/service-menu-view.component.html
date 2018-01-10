@@ -14,9 +14,35 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFlex class="margin-top-x1">
+
+  <div class="pnl-title">
+    <div class="margin-left-x1" fxLayout="row" fxLayoutAlign="start center">
+      <mat-icon class="margin-right-x1" svgIcon="interface"></mat-icon>
+      <span class="text-upper title" fxFlex>Interfaces</span>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="pnl-title">
+    <div class="margin-left-x1" fxLayout="row" fxLayoutAlign="start center">
+      <mat-icon class="margin-right-x1" svgIcon="service"></mat-icon>
+      <span class="text-upper title" fxFlex>Services</span>
+    </div>
+  </div>
+
   <app-services-list
-    [services]="services$ | async"
+    [servicesTree]="servicesTree$ | async"
     [workspaceId]="workspaceId"
     (onServiceSelected)="closeSidenavOnSmallScreen()">
   </app-services-list>
+
+  <mat-divider></mat-divider>
+
+  <div class="pnl-title">
+    <div class="margin-left-x1" fxLayout="row" fxLayoutAlign="start center">
+      <mat-icon class="margin-right-x1" svgIcon="endpoint"></mat-icon>
+      <span class="text-upper title" fxFlex>Endpoints</span>
+    </div>
+  </div>
 </div>

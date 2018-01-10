@@ -22,7 +22,8 @@ import { Subject } from 'rxjs/Subject';
 
 import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
 import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
-import { getAllServices } from 'app/features/cockpit/workspaces/state/services/services.selectors';
+import { getCurrentServiceTree } from 'app/features/cockpit/workspaces/state/services/services.selectors';
+import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
 import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 
@@ -34,7 +35,7 @@ import { Ui } from 'app/shared/state/ui.actions';
 export class ServiceMenuViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  services$: Observable<IServiceRow[]>;
+  servicesTree$: Observable<TreeElement<any>[]>;
 
   @Input() workspaceId: string;
   @Input() services: IServiceRow[];
@@ -44,7 +45,7 @@ export class ServiceMenuViewComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.store$.dispatch(new Services.FetchAll());
 
-    this.services$ = this.store$.select(getAllServices);
+    this.servicesTree$ = this.store$.select(getCurrentServiceTree);
   }
 
   ngOnDestroy() {
