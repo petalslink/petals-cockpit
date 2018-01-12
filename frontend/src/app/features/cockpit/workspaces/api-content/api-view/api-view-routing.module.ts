@@ -18,10 +18,17 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-const routes: Routes = [];
+import { ApiViewComponent } from './api-view.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: ApiViewComponent,
+  },
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class ApiMenuRoutingModule {}
+export class ApiViewRoutingModule {}

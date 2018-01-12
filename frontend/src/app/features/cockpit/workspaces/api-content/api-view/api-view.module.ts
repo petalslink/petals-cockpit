@@ -15,15 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { NgModule } from '@angular/core';
 
-@Component({
-  selector: 'app-api-content-view',
-  templateUrl: './api-content-view.component.html',
-  styleUrls: ['./api-content-view.component.scss'],
+import { SharedModule } from 'app/shared/shared.module';
+import { ApiViewRoutingModule } from './api-view-routing.module';
+import { ApiViewComponent } from './api-view.component';
+
+@NgModule({
+  imports: [SharedModule, ApiViewRoutingModule],
+  declarations: [ApiViewComponent],
 })
-export class ApiContentViewComponent implements OnInit {
-  constructor() {}
-
-  ngOnInit() {}
-}
+export class ApiViewModule {}

@@ -15,24 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 
-const routes: Routes = [
-  {
-    path: '',
-    pathMatch: 'full',
-    redirectTo: 'api',
-  },
-  {
-    path: '',
-    loadChildren:
-      'app/features/cockpit/workspaces/api-content/api-view/api-view.module#ApiViewModule',
-  },
-];
-
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
+@Component({
+  selector: 'app-api-view',
+  templateUrl: './api-view.component.html',
+  styleUrls: ['./api-view.component.scss'],
 })
-export class ApiContentRoutingModule {}
+export class ApiViewComponent implements OnInit {
+  constructor() {}
+
+  ngOnInit() {}
+}
