@@ -26,20 +26,15 @@ describe(`Login`, () => {
 
   it(`should redirect to last workspace if login/pw match`, () => {
     cy.login('admin', 'admin');
-    cy.location().should(location =>
-      // within our mocks, the last workspace of admin user is idWks0
-      expect(location.pathname).to.eq('/workspaces/idWks0')
-    );
+
+    // within our mocks, the last workspace of admin user is idWks0
+    cy.expectLocationToBe(`/workspaces/idWks0`);
   });
 
   it(`should redirect to original url after login`, () => {
     cy.visit(`/workspaces/idWks1`);
     cy.login('admin', 'admin');
-    cy
-      .location()
-      .should(location =>
-        expect(location.pathname).to.eq('/workspaces/idWks1')
-      );
+    cy.expectLocationToBe(`/workspaces/idWks1`);
   });
 
   it(`should select the first input of the login form on desktop`, () => {

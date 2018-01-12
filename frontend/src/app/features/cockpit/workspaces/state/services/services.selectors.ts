@@ -17,7 +17,13 @@
 
 import { createSelector } from '@ngrx/store';
 
+import {
+  findNamespaceLocalpart,
+  groupByNamespace,
+} from 'app/features/cockpit/workspaces/service-menu/services-list/services-list.helper';
 import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
+import { getSelectedWorkspaceId } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
+import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
 import { IStore } from 'app/shared/state/store.interface';
 
 export const getServicesById = (state: IStore) => state.services.byId;
@@ -35,5 +41,35 @@ export const getAllServices = createSelector(
   getServicesById,
   (ids, byId) => {
     return ids.map(id => byId[id]);
+  }
+);
+
+export const getCurrentServiceTree = createSelector(
+  getSelectedWorkspaceId,
+  getServicesAllIds,
+  getServicesById,
+  (selectedWorkspaceId, servicesAllIds, servicesByIds): TreeElement<any>[] => {
+    const baseUrl = `/workspaces/${selectedWorkspaceId}/services`;
+
+    const servicesWithNspLocalpart = servicesAllIds.map(id => ({
+      ...findNamespaceLocalpart(servicesByIds[id].name),
+      id,
+    }));
+
+    const groupedByNamespace = groupByNamespace(servicesWithNspLocalpart);
+
+    return groupedByNamespace.map(nspWithLocalparts => ({
+      name: nspWithLocalparts.namespace,
+      isFolded: false,
+      cssClass: `item-namespace`,
+      link: ``,
+      children: nspWithLocalparts.localparts.map(localpart => ({
+        name: localpart.name,
+        isFolded: false,
+        cssClass: `item-localpart`,
+        link: `${baseUrl}/${localpart.id}`,
+        children: [],
+      })),
+    }));
   }
 );

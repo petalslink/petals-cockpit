@@ -9,3 +9,9 @@ Cypress.Commands.add(
     });
   }
 );
+
+Cypress.Commands.add('expectLocationToBe', pathname => {
+  return cy
+    .location()
+    .should(location => expect(location.pathname).to.eq(pathname));
+});

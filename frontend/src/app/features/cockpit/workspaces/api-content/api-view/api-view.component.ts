@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import { SharedModule } from 'app/shared/shared.module';
-import { BusesInProgressComponent } from './buses-in-progress/buses-in-progress.component';
-import { PetalsMenuViewComponent } from './petals-menu-view/petals-menu-view.component';
-
-@NgModule({
-  imports: [SharedModule],
-  declarations: [PetalsMenuViewComponent, BusesInProgressComponent],
-  exports: [PetalsMenuViewComponent],
+@Component({
+  selector: 'app-api-view',
+  templateUrl: './api-view.component.html',
+  styleUrls: ['./api-view.component.scss'],
 })
-export class PetalsMenuModule {}
+export class ApiViewComponent implements OnInit {
+  constructor() {}
+
+  ngOnInit() {}
+}

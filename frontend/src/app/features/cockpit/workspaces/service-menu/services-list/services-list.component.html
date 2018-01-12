@@ -13,16 +13,8 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<mat-nav-list dense *ngFor="let service of services; trackBy:trackByService" class="nav-list-services">
-  <div class="item-list">
-    <a
-      class="service-link"
-      mat-list-item
-      routerLinkActive="active-link"
-      [routerLink]="['/workspaces', workspaceId, 'services', service.id]"
-      (click)="select(service)"
-    >
-      <span class="item-name" [title]="service.name">{{ service.name }}</span>
-    </a>
-  </div>
-</mat-nav-list>
+<app-material-tree
+  [tree]="servicesTree"
+  [marginLeft]="14"
+  [canBeFolded]="false"
+></app-material-tree>

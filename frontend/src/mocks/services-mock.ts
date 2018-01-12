@@ -25,12 +25,16 @@ export class Service {
   public readonly id: string;
   public readonly name: string;
 
-  constructor(private containerId: string, name?: string) {
+  constructor(
+    private containerId: string,
+    private componentId: string,
+    name?: string
+  ) {
     const i = Service.cpt++;
     this.id = `idService${i}`;
     this.name =
       name ||
-      `{http://namespace-example.fr/service/technique/version/1.0}Localpart${i}`;
+      `{http://namespace-example.fr/service/technique/version/${i}.0}Localpart${i}`;
   }
 
   toObj(): { [id: string]: IServiceBackendSSE } {
@@ -39,13 +43,19 @@ export class Service {
         id: this.id,
         name: this.name,
         containerId: this.containerId,
+        componentId: this.componentId,
       },
     };
   }
 
   getDetails(): { service: IServiceBackendDetails } {
     return {
-      service: { id: this.id, name: this.name, containerId: this.containerId },
+      service: {
+        id: this.id,
+        name: this.name,
+        containerId: this.containerId,
+        componentId: this.componentId,
+      },
     };
   }
 }
@@ -54,15 +64,35 @@ export class Services {
   private readonly services = new Map<string, Service>();
 
   constructor() {
-    this.create('idCont0', name);
-    this.create('idCont0', name);
-    this.create('idCont0', name);
-    this.create('idCont0', name);
-    this.create('idCont0', name);
+    this.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/service/technique/version/1.0}Localpart0'
+    );
+    this.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/service/technique/version/1.0}Localpart1'
+    );
+    this.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/service/technique/version/2.0}Localpart2'
+    );
+    this.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/service/technique/version/3.0}Localpart3'
+    );
+    this.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/service/technique/version/3.0}Localpart4'
+    );
   }
 
-  create(containerId: string, name?: string) {
-    const service = new Service(containerId, name);
+  create(containerId: string, componentId: string, name?: string) {
+    const service = new Service(containerId, componentId, name);
     this.services.set(service.id, service);
     return service;
   }

@@ -18,11 +18,11 @@
 import { NgModule } from '@angular/core';
 
 import { SharedModule } from 'app/shared/shared.module';
-import { ApiMenuRoutingModule } from './api-menu-routing.module';
 import { ApiMenuViewComponent } from './api-menu-view/api-menu-view.component';
 
 @NgModule({
-  imports: [SharedModule, ApiMenuRoutingModule],
+  imports: [SharedModule],
   declarations: [ApiMenuViewComponent],
+  exports: [ApiMenuViewComponent],
 })
 export class ApiMenuModule {}

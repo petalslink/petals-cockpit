@@ -16,15 +16,11 @@ function foldOrUnfoldElementInTree(foldOrUnfold, type, name) {
     });
 }
 
-Cypress.Commands.add('expectTreeToBe', tree => {
+Cypress.Commands.add('expectPetalsTreeToBe', tree => {
   const treeNames = cy.get(PETALS_TREE_DOM.texts.itemsNames);
   treeNames.each(($item, index) => cy.contains(tree[index]));
-});
 
-Cypress.Commands.add('expectLocationToBe', pathname => {
-  return cy
-    .location()
-    .should(location => expect(location.pathname).to.eq(pathname));
+  console.log('treeNames', treeNames);
 });
 
 Cypress.Commands.add('getElementInPetalsTree', (type, name) => {

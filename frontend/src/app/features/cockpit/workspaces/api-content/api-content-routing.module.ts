@@ -18,7 +18,18 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-const routes: Routes = [];
+const routes: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'api',
+  },
+  {
+    path: '',
+    loadChildren:
+      'app/features/cockpit/workspaces/api-content/api-view/api-view.module#ApiViewModule',
+  },
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

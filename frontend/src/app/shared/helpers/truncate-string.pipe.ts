@@ -15,15 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 
-import { SharedModule } from 'app/shared/shared.module';
-import { BusesInProgressComponent } from './buses-in-progress/buses-in-progress.component';
-import { PetalsMenuViewComponent } from './petals-menu-view/petals-menu-view.component';
-
-@NgModule({
-  imports: [SharedModule],
-  declarations: [PetalsMenuViewComponent, BusesInProgressComponent],
-  exports: [PetalsMenuViewComponent],
+@Pipe({
+  name: 'truncateString',
 })
-export class PetalsMenuModule {}
+export class TruncateStringPipe implements PipeTransform {
+  transform(fullStr: string, strLen: number, separator: string): any {
+    if (fullStr.length < strLen || fullStr.length === strLen) {
+      return fullStr;
+    }
+
+    separator = separator || '...';
+
+    const sepLen = separator.length,
+      charsToShow = strLen - sepLen,
+      frontChars = Math.ceil(charsToShow / 2),
+      backChars = Math.floor(charsToShow / 2);
+
+    return (
+      fullStr.substr(0, frontChars) +
+      separator +
+      fullStr.substr(fullStr.length - backChars)
+    );
+  }
+}

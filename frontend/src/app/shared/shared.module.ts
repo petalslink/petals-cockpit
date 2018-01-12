@@ -47,6 +47,7 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
 import { NgxHoverOpacityModule } from 'ngx-hover-opacity';
 import { NgPipesModule } from 'ngx-pipes';
 
+import { MaterialTreeComponent } from 'app/shared/components/material-tree/material-tree.component';
 import { UpdateFileInformationDirective } from 'app/shared/components/upload/update-file-information.directive';
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
 import { FocusInputIfLargeScreenDirective } from 'app/shared/directives/focus-input-based-on-screen-size.directive';
@@ -57,6 +58,7 @@ import { MdCardToolbarComponent } from './components/md-card-toolbar/md-card-too
 import { MessageComponent } from './components/message/message.component';
 import { NotFound404Component } from './components/not-found-404/not-found-404.component';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
+import { TruncateStringPipe } from './helpers/truncate-string.pipe';
 
 export const MaterialModules = [
   MatButtonModule,
@@ -88,6 +90,7 @@ export const imports = [
   FormsModule,
   NgxHoverOpacityModule,
   NgPipesModule,
+  RouterModule,
 ];
 
 export const declarations = [
@@ -101,6 +104,8 @@ export const declarations = [
   MdCardToolbarComponent,
   UploadComponent,
   UpdateFileInformationDirective,
+  MaterialTreeComponent,
+  TruncateStringPipe,
 ];
 
 export const exportss = [
@@ -123,9 +128,6 @@ export const exportss = [
 })
 export class SharedModule {
   static forRoot(): ModuleWithProviders {
-    return {
-      ngModule: SharedModule,
-      providers: [],
-    };
+    return { ngModule: SharedModule, providers: [] };
   }
 }

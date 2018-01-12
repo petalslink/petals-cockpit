@@ -20,7 +20,6 @@ import { createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { map, withLatestFrom } from 'rxjs/operators';
 
-import { TreeElement } from 'app/features/cockpit/workspaces/petals-menu/material-tree/material-tree.component';
 import {
   getBusesAllIds,
   getBusesById,
@@ -30,13 +29,14 @@ import { getContainersById } from 'app/features/cockpit/workspaces/state/contain
 import { getServiceAssembliesById } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
 import { getServiceUnitsById } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
 import { getSharedLibrariesById } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
+import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
 import { escapeStringRegexp } from 'app/shared/helpers/shared.helper';
 import { IStore } from 'app/shared/state/store.interface';
 import { IUserRow } from 'app/shared/state/users.interface';
 import { getUsersAllIds, getUsersById } from 'app/shared/state/users.selectors';
 import { IWorkspaceRow, IWorkspaces } from './workspaces.interface';
 
-function getSelectedWorkspaceId(state: IStore) {
+export function getSelectedWorkspaceId(state: IStore) {
   return state.workspaces.selectedWorkspaceId;
 }
 

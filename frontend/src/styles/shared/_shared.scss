@@ -34,7 +34,7 @@ app-root {
   justify-content: center;
 }
 
-$sidebar-width: 320px;
+$sidebar-width: 360px;
 
 mat-sidenav {
   width: $sidebar-width;
@@ -259,8 +259,7 @@ app-buses-in-progress
   > .nav-list-imports-in-progress
   > .item-list
   > .mat-list-item,
-app-material-tree > .nav-list-petals-tree > .item-list > .mat-list-item,
-app-services-list > .nav-list-services > .item-list > .mat-list-item {
+app-material-tree > .nav-list-tree > .item-list > .mat-list-item {
   height: 24px;
   border-bottom-width: 1px;
   border-bottom-style: solid;
@@ -284,25 +283,40 @@ app-services-list > .nav-list-services > .item-list > .mat-list-item {
   }
 }
 
-.active-link,
-.active-link:hover {
-  .mat-list-item-content,
-  .mat-list-item-content:hover {
-    background-color: mat-color($theme-primary-x);
-    @extend .color-primary-bold;
-    margin: 0;
-  }
+app-petals-menu-view,
+app-service-menu-view,
+app-api-menu-view {
+  overflow: hidden;
 }
 
 // all items elements in petals tree
-app-material-tree > .nav-list-petals-tree > .item-list {
+app-material-tree > .nav-list-tree > .item-list {
+  // customize active elements
+  .active-link,
+  .active-link:hover {
+    .mat-list-item-content,
+    .mat-list-item-content:hover {
+      background-color: mat-color($theme-primary-x);
+      @extend .color-primary-bold;
+      margin: 0;
+    }
+  }
+  // customize namespace in tree services
+  a.item-namespace > .mat-list-item-content,
+  a.item-namespace > .mat-list-item-content:focus,
+  a.item-namespace > .mat-list-item-content:hover {
+    cursor: default;
+    background: none;
+    color: rgba(0, 0, 0, 0.87);
+    font-weight: 400;
+  }
+
   // customize tree elements
   .mat-list-item > .mat-list-item-content {
     padding-left: 10px;
   }
   .mat-list-item > .mat-list-item-content:hover,
   .mat-list-item > .mat-list-item-content:focus {
-    // background-color: mat-color($theme-primary-x);
     @extend .color-primary-light-bold;
   }
   // customize categories of elements

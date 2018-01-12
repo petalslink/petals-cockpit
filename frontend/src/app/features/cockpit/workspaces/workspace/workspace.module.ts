@@ -17,6 +17,7 @@
 
 import { NgModule } from '@angular/core';
 
+import { ApiMenuModule } from 'app/features/cockpit/workspaces/api-menu/api-menu.module';
 import { PetalsMenuModule } from 'app/features/cockpit/workspaces/petals-menu/petals-menu.module';
 import { ServiceMenuModule } from 'app/features/cockpit/workspaces/service-menu/service-menu.module';
 import { WorkspaceOverviewModule } from 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.module';
@@ -33,6 +34,7 @@ import { SharedModule } from 'app/shared/shared.module';
     WorkspaceOverviewModule,
     PetalsMenuModule,
     ServiceMenuModule,
+    ApiMenuModule,
     WorkspaceRoutingModule,
   ],
   declarations: [WorkspaceComponent, DeletedWorkspaceDialogComponent],

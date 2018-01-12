@@ -77,6 +77,7 @@ export namespace SseActions {
         serviceAssemblies: { [key: string]: IServiceAssemblyBackendSSE };
         components: { [key: string]: IComponentBackendSSE };
         serviceUnits: { [key: string]: IServiceUnitBackendSSE };
+        services: { [key: string]: IServiceBackendSSE };
         sharedLibraries: { [key: string]: ISharedLibraryBackendSSE };
       }
     ) {}

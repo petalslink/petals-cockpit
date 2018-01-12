@@ -14,7 +14,7 @@ export const BIP_DOM = {
 };
 
 export const PETALS_TREE_DOM = {
-  navTree: { navTreePetals: `${bsTree} .nav-list-petals-tree` },
+  navTree: { navTreePetals: `${bsTree} .nav-list-tree` },
   links: {
     itemsLinks: `${bsTree} .item-list a`,
   },
