@@ -19,6 +19,9 @@ package org.ow2.petals.cockpit.server.resources;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import javax.ws.rs.client.Entity;
@@ -36,6 +39,8 @@ import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.api.artifact.SharedLibrary;
+import org.ow2.petals.admin.endpoint.Endpoint;
+import org.ow2.petals.admin.endpoint.Endpoint.EndpointType;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
@@ -73,6 +78,8 @@ public class ImportBusTest extends AbstractBasicResourceTest {
 
     private final ServiceAssembly serviceAssembly = new ServiceAssembly("sa", ArtifactState.State.STARTED, serviceUnit);
 
+    private final List<Endpoint> referenceEndpoints = makeEndpoints();
+
     public ImportBusTest() {
         super(WorkspaceResource.class);
     }
@@ -88,7 +95,8 @@ public class ImportBusTest extends AbstractBasicResourceTest {
         resource.petals.registerArtifact(serviceAssembly, container);
         resource.petals.registerArtifact(sharedLibrary, container);
         resource.petals.registerArtifact(componentWithSL, container);
-
+        resource.petals.registerEndpoints(referenceEndpoints);
+        
         resource.db().transaction(conf -> {
             DSL.using(conf).executeInsert(new WorkspacesRecord(1L, "test", ""));
             DSL.using(conf).executeInsert(new UsersWorkspacesRecord(1L, ADMIN));
@@ -148,7 +156,7 @@ public class ImportBusTest extends AbstractBasicResourceTest {
                 WorkspaceContent data = e.readData(WorkspaceContent.class);
                 BusFull busData = data.buses.get(post.getId());
                 a.assertThat(busData.bus.id).isEqualTo(busId);
-                assertWorkspaceContent(a, data, 1, domain);
+                assertWorkspaceContent(a, data, 1, referenceEndpoints, domain);
             });
         }
 
@@ -332,6 +340,23 @@ public class ImportBusTest extends AbstractBasicResourceTest {
                 a.assertThat(data.reason).isEqualTo(delete.reason);
             });
         }
+    }
+
+    private List<Endpoint> makeEndpoints() {
+        List<Endpoint> endpoints = new ArrayList<Endpoint>();
+
+        endpoints.add(new Endpoint("edp1", EndpointType.INTERNAL, "cont", "comp", "{http://namespace.org/}serv 1",
+                Arrays.asList("{http://namespace.org/}int1")));
+        endpoints.add(new Endpoint("edp2", EndpointType.INTERNAL, "cont", "comp", "{http://namespace.org/}serv2",
+                Arrays.asList("{http://namespace.org/}int2", "{http://namespace.org/}int3")));
+        endpoints.add(new Endpoint("edp3", EndpointType.INTERNAL, "cont", "comp", "{http://namespace.org/}serv3",
+                Arrays.asList("{http://namespace.org/}int3")));
+        endpoints.add(new Endpoint("edp4", EndpointType.INTERNAL, "cont", "comp", "{http://namespace.org/}serv4",
+                Arrays.asList("{http://namespace.org/}int3")));
+        endpoints.add(new Endpoint("edp5", EndpointType.INTERNAL, "cont", "comp2", "{http://namespace.org/}serv1",
+                Arrays.asList("{http://petals.ow2.org/}int1", "{http://petals.ow2.org/}int2")));
+
+        return endpoints;
     }
 }
 
