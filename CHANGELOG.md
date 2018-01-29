@@ -1,3 +1,13 @@
+<a name="0.19.0"></a>
+# [0.19.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.18.0...v0.19.0) (2018-01-29)
+
+
+### Features
+
+* **frontend:** upgrade services list to services tree ([64f12d1](https://gitlab.com/linagora/petals-cockpit/commit/64f12d1)), closes [#422](https://gitlab.com/linagora/petals-cockpit/issues/422)
+
+
+
 <a name="0.18.0"></a>
 # [0.18.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.17.0...v0.18.0) (2018-01-02)
 
