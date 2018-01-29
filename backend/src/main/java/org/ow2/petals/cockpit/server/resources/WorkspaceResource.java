@@ -660,17 +660,39 @@ public class WorkspaceResource {
         public boolean mayChangeServicesCommingFrom(ServiceAssemblyMin.State previousState) {
             // SA starts proposing services when started
             // SA may stop proposing services when unloaded, so we check for shutdown and unknown as well
-            if ((previousState == ServiceAssemblyMin.State.Started || previousState == ServiceAssemblyMin.State.Stopped)
-                    && (this.state == ServiceAssemblyMin.State.Shutdown
-                            || this.state == ServiceAssemblyMin.State.Unloaded)) {
-                return true;
-            } else if (previousState == ServiceAssemblyMin.State.Shutdown
-                    && this.state == ServiceAssemblyMin.State.Started) {
-                return true;
-            } else if (this.state == ServiceAssemblyMin.State.Unknown) {
-                return true;
+            switch (this.state) {
+                case Unloaded:
+                    switch (previousState) {
+                        case Started:
+                        case Stopped:
+                        case Shutdown:
+                            return true;
+                        default:
+                            return false;
+                    }
+
+                case Started:
+                    switch (previousState) {
+                        case Shutdown:
+                        case Unloaded:
+                            return true;
+                        default:
+                            return false;
+                    }
+
+                case Unknown:
+                    switch (previousState) {
+                        case Shutdown:
+                        case Started:
+                        case Stopped:
+                            return true;
+                        default:
+                            return false;
+                    }
+
+                default:
+                    return false;
             }
-            return false;
         }
     }
 
@@ -699,16 +721,40 @@ public class WorkspaceResource {
             // Component starts proposing services when started
             // Components stops proposing services when uninstalled(shutdown),
             // so we check for unloaded and unknown as well
-            if ((previousState == ComponentMin.State.Started || previousState == ComponentMin.State.Stopped)
-                    && (this.state == ComponentMin.State.Loaded || this.state == ComponentMin.State.Shutdown
-                            || this.state == ComponentMin.State.Unloaded)) {
-                return true;
-            } else if (previousState == ComponentMin.State.Shutdown && this.state == ComponentMin.State.Started) {
-                return true;
-            } else if (this.state == ComponentMin.State.Unknown) {
-                return true;
+            switch (this.state) {
+                case Unloaded:
+                case Loaded:
+                    switch (previousState) {
+                        case Started:
+                        case Stopped:
+                        case Shutdown:
+                            return true;
+                        default:
+                            return false;
+                    }
+
+                case Started:
+                    switch (previousState) {
+                        case Shutdown:
+                            return true;
+                        default:
+                            return false;
+                    }
+
+                case Unknown:
+                    switch (previousState) {
+                        case Loaded:
+                        case Shutdown:
+                        case Started:
+                        case Stopped:
+                            return true;
+                        default:
+                            return false;
+                    }
+
+                default:
+                    return false;
             }
-            return false;
         }
     }
 

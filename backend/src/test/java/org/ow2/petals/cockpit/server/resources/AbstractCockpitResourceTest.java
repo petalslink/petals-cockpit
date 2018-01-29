@@ -41,6 +41,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,6 +54,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.db.api.RequestRowAssert;
 import org.assertj.db.type.Request;
@@ -101,6 +108,8 @@ import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLib
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.rules.CockpitResourceRule;
 import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations.WorkspaceDbWitness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
@@ -114,6 +123,10 @@ import javaslang.Tuple2;
  *
  */
 public class AbstractCockpitResourceTest extends AbstractTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractCockpitResourceTest.class);
+
+    private final int DEFAULT_SSE_TIMEOUT = 2;
 
     @Rule
     public TemporaryFolder zipFolder = new TemporaryFolder();
@@ -323,16 +336,52 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     protected void expectEvent(EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {
-        assertThat(eventInput.isClosed()).isEqualTo(false);
+        // By default we expect 1 event of any type for 2 seconds.
+        expectEventAmongNext(1, null, DEFAULT_SSE_TIMEOUT, true, eventInput, c);
+    }
 
-        // TODO add timeout
-        final InboundEvent inboundEvent = eventInput.read();
+    protected void expectEventAmongNext(int eventsNumber, @Nullable String expectedName, int timeout,
+            boolean failOnTimeout,
+            EventInput eventInput,
+            BiConsumer<InboundEvent, SoftAssertions> c) {
 
-        assertThat(inboundEvent).isNotNull();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<?> future = executor.submit(() -> {
+            for (int i = eventsNumber; i > 0; i--) {
 
-        SoftAssertions.assertSoftly(sa -> {
-            c.accept(inboundEvent, sa);
+                assertThat(eventInput.isClosed()).isEqualTo(false);
+                final InboundEvent inboundEvent = eventInput.read();
+                assertThat(inboundEvent).isNotNull();
+
+                if (expectedName == null || inboundEvent.getName().equals(expectedName)) {
+                    SoftAssertions.assertSoftly(sa -> {
+                        c.accept(inboundEvent, sa);
+                    });
+                    if (expectedName != null)
+                        return;
+                }
+            }
         });
+
+        try {
+            future.get(timeout, TimeUnit.SECONDS);
+        } catch (ExecutionException e) {
+            Assertions.fail("Error occured while expecting/asserting event :", e);
+        } catch (TimeoutException | InterruptedException e) {
+            future.cancel(true);
+            try {
+                // eventInput is probably locked reading an unexisting event
+                LOG.debug("Tearing down jersey!");
+                resource.resource.getJerseyTest().tearDown();
+            } catch (Exception e1) {
+                LOG.error("Error occured while trying to tear down Jersey after an error", e1);
+            }
+            if (failOnTimeout) {
+                Assertions.fail("Timeout occured while expecting/asserting event :", e);
+            }
+        } finally {
+            executor.shutdownNow();
+        }
     }
 
     protected void expectWorkspaceContent(EventInput eventInput) {
@@ -347,6 +396,25 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             c.accept(ev, a);
         });
     }
+
+    protected void expectServicesUpdatedAmongNext2(EventInput eventInput,
+            BiConsumer<WorkspaceContent, SoftAssertions> c) {
+        expectEventAmongNext(2, "SERVICES_UPDATED", DEFAULT_SSE_TIMEOUT, true, eventInput, (e, a) -> {
+            a.assertThat(e.getName()).isEqualTo("SERVICES_UPDATED");
+            WorkspaceContent ev = e.readData(WorkspaceContent.class);
+            c.accept(ev, a);
+        });
+    }
+
+    protected void expectNoServicesUpdated(EventInput eventInput) {
+        SoftAssertions.assertSoftly(sa -> {
+            expectEventAmongNext(2, "SERVICES_UPDATED", DEFAULT_SSE_TIMEOUT, false, eventInput, (e, a) -> {
+                sa.fail("Failure: \"SERVICES_UPDATED\" SSE Event should not have been sent!");
+            });
+        });
+
+    }
+
 
     protected SharedLibraryFull assertSLContent(WorkspaceContent content, Container cont, String slName,
             String slVersion) {
@@ -369,6 +437,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         assertThat(content.components).isEmpty();
         assertThat(content.serviceAssemblies).isEmpty();
         assertThat(content.sharedLibraries).hasSize(1);
+        assertThat(content.services).isEmpty();
 
         Entry<String, SharedLibraryFull> contentSLE = content.sharedLibraries.entrySet().iterator().next();
         SharedLibraryFull contentSL = contentSLE.getValue();
@@ -421,6 +490,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         assertThat(content.components).isEmpty();
         assertThat(content.serviceAssemblies).hasSize(1);
         assertThat(content.sharedLibraries).isEmpty();
+        assertThat(content.services).isEmpty();
 
         if (control == null) {
             assert container != null;
@@ -789,27 +859,36 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                 .toArray(SharedLibrary[]::new));
     }
 
-    private void assertWorkspaceContentForServices(SoftAssertions a, WorkspaceContent content, long wsId,
+    protected void assertWorkspaceContentForServices(SoftAssertions a, WorkspaceContent content, long wsId,
             List<Endpoint> expectedEndpoints) {
-        for (Endpoint expectedEdp: expectedEndpoints) {
+        int endpointFoundCount = 0;
+        for (Endpoint expectedEdp : expectedEndpoints) {
             Record recordDb = resource
-                    .db().select().from(EDP_INSTANCES).join(SERVICES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID)
-                    .join(ENDPOINTS).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID).join(CONTAINERS)
-                    .onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID).join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                    .db().select().from(EDP_INSTANCES)
+                    .join(SERVICES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID)
+                    .join(ENDPOINTS).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
+                    .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
+                    .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                    .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
                     .where(SERVICES.NAME.eq(expectedEdp.getServiceName())
-                            .and(ENDPOINTS.NAME.eq(expectedEdp.getEndpointName())).and(BUSES.WORKSPACE_ID.eq(wsId)))
+                            .and(ENDPOINTS.NAME.eq(expectedEdp.getEndpointName()))
+                            .and(COMPONENTS.NAME.eq(expectedEdp.getComponentName()))
+                            .and(CONTAINERS.NAME.eq(expectedEdp.getContainerName()))
+                            .and(BUSES.WORKSPACE_ID.eq(wsId)))
                     .fetchOne();
             if ( recordDb != null) {
-            assertEquivalent(a, recordDb, expectedEdp);
-            
-            final String servId = recordDb.get(SERVICES.ID).toString();
-            assertThat(content.services.containsKey(servId));
-            assertEquivalent(a, content.services.get(servId), expectedEdp);
+                assertEquivalent(a, recordDb, expectedEdp);
+
+                final String servId = recordDb.get(SERVICES.ID).toString();
+                assertThat(content.services.containsKey(servId));
+                assertEquivalent(a, content.services.get(servId), expectedEdp);
+                endpointFoundCount++;
             }
         }
+        a.assertThat(endpointFoundCount).isEqualTo(expectedEndpoints.size());
     }
 
-    private void assertEquivalent(SoftAssertions a, ServiceFull service, Endpoint expectedEdp) {
+    protected void assertEquivalent(SoftAssertions a, ServiceFull service, Endpoint expectedEdp) {
         final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
                 COMPONENTS.ID.like(service.getComponentId()));
         final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,

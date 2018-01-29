@@ -300,7 +300,10 @@ public class WorkspaceDbOperations {
                         containerBuilder.addSharedLibrary(sl);
                     }
 
-                    for (Record sr : ctx.select().from(SERVICES).join(EDP_INSTANCES).onKey()
+                    for (Record sr : ctx.select().from(SERVICES)
+                            .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID)
+                            .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
+                            .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
                             .where(EDP_INSTANCES.CONTAINER_ID.eq(c.getId())).fetch()) {
                         containerBuilder.addService(
                                 new ServiceFull(sr.into(SERVICES), c.getId(), sr.into(EDP_INSTANCES).getComponentId()));
@@ -373,49 +376,58 @@ public class WorkspaceDbOperations {
         @SuppressWarnings("null")
         final SelectConditionStep<Record> selectedEndpoints = ctx.select().from(SERVICES).join(EDP_INSTANCES)
                 .onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID).join(ENDPOINTS).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
+                .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
                 .where(EDP_INSTANCES.CONTAINER_ID.eq(cId));
 
-        Map<String, Endpoint> edp_to_add = manageExistingEndpoints(edpView, selectedEndpoints, ctx);
+        Map<String, Endpoint> edpToAdd = manageExistingEndpoints(edpView, selectedEndpoints, ctx);
 
-        if (edp_to_add.size() > 0) {
-            insertNewEndpoints(edp_to_add, conf, cId);
+        if (edpToAdd.size() > 0) {
+            insertNewEndpoints(edpToAdd, conf, cId);
         }
     }
 
     private Map<String, Endpoint> manageExistingEndpoints(@Nullable EndpointDirectoryView edpViewToKeep,
             @Nullable SelectConditionStep<Record> selectedExistingEndpoints, final DSLContext ctx) {
 
-        Map<String, Endpoint> edp_to_add = new HashMap<String, Endpoint>();
+        Map<String, Endpoint> edpToAdd = new HashMap<String, Endpoint>();
         if (edpViewToKeep != null) {
             for (Endpoint e : edpViewToKeep.getAllEndpoints()) {
                 final String endpointName = e.getEndpointName();
-                edp_to_add.put(endpointName != null ? endpointName : "namelessEndpoint", e);
+                edpToAdd.put(endpointName != null ? endpointName : "namelessEndpoint", e);
             }
         }
 
         if (selectedExistingEndpoints == null) {
-            return edp_to_add;
+            return edpToAdd;
         }
 
         HashSet<Long> instance_id_to_delete = new HashSet<>();
         HashSet<Long> service_id_to_delete = new HashSet<>();
         HashSet<Long> endpoint_id_to_delete = new HashSet<>();
 
-        // checking selected existing endpoints existing against given candidates endpoints
+        // checking selected existing endpoints against given candidates endpoints
         selectedExistingEndpoints.forEach(record ->
         {
             ServicesRecord servrec = record.into(SERVICES);
             EdpInstancesRecord instrec = record.into(EDP_INSTANCES);
             EndpointsRecord edprec = record.into(ENDPOINTS);
                     assert servrec != null && instrec != null && edprec != null;
+            String compName = ctx.selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(instrec.getComponentId())).fetchAny()
+                    .getName();
+            assert compName != null && !compName.isEmpty();
+            String contName = ctx.selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(instrec.getContainerId())).fetchAny()
+                    .getName();
+            assert contName != null && !contName.isEmpty();
 
-            final List<Endpoint> endpoints = edpViewToKeep != null
+            final List<Endpoint> serviceEndpoints = edpViewToKeep != null
                     ? edpViewToKeep.getListOfEndpointsByServiceName().get(servrec.getName())
                     : null;
-            if (endpoints != null && endpoints.stream().map(edp -> edp.getEndpointName())
+            if (serviceEndpoints != null && serviceEndpoints.stream()
+                    .filter(edp -> edp.getComponentName().equals(compName) && edp.getContainerName().equals(contName))
+                    .map(edp -> edp.getEndpointName())
                     .collect(Collectors.toList()).contains(edprec.getName())) {
                 // endpoint is already there and should stay
-                edp_to_add.remove(edprec.getName());
+                edpToAdd.remove(edprec.getName());
             }
             else {
                 // endpoint should not stay
@@ -440,15 +452,15 @@ public class WorkspaceDbOperations {
         ctx.deleteFrom(SERVICES).where(SERVICES.ID.in(service_id_to_delete)).execute();
         ctx.deleteFrom(ENDPOINTS).where(ENDPOINTS.ID.in(endpoint_id_to_delete)).execute();
 
-        return edp_to_add;
+        return edpToAdd;
     }
 
-    private void insertNewEndpoints(Map<String, Endpoint> edp_to_add, Configuration conf,
+    private void insertNewEndpoints(Map<String, Endpoint> edpToAdd, Configuration conf,
             long cId) {
 
         final DSLContext ctx = DSL.using(conf);
         // Now we insert new endpoints using existing service/endpoint names on this container:
-        edp_to_add.values().stream().forEach(e -> {
+        edpToAdd.values().stream().forEach(e -> {
             Record compIdRec = ctx.select(COMPONENTS.ID).from(COMPONENTS).join(CONTAINERS).onKey()
                     .where(COMPONENTS.CONTAINER_ID.eq(cId)).and(COMPONENTS.NAME.eq(e.getComponentName())).fetchOne();
             if (compIdRec == null) {
@@ -461,10 +473,15 @@ public class WorkspaceDbOperations {
             }
             Long componentId = compIdRec.into(COMPONENTS).getId();
 
-            Record sIdRec = ctx.select().from(SERVICES).join(EDP_INSTANCES).onKey()
-                    .where(EDP_INSTANCES.CONTAINER_ID.eq(cId)).and(SERVICES.NAME.eq(e.getServiceName())).fetchOne();
-            Record eIdRec = ctx.select().from(ENDPOINTS).join(EDP_INSTANCES).onKey()
-                    .where(EDP_INSTANCES.CONTAINER_ID.eq(cId)).and(ENDPOINTS.NAME.eq(e.getEndpointName())).fetchOne();
+            Record sIdRec = ctx.select().from(SERVICES).join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID)
+                    .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
+                    .where(EDP_INSTANCES.CONTAINER_ID.eq(cId))
+                    .and(SERVICES.NAME.eq(e.getServiceName()).and(COMPONENTS.NAME.eq(e.getComponentName()))).fetchOne();
+            Record eIdRec = ctx.select().from(ENDPOINTS).join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
+                    .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
+                    .where(EDP_INSTANCES.CONTAINER_ID.eq(cId))
+                    .and(ENDPOINTS.NAME.eq(e.getEndpointName()).and(COMPONENTS.NAME.eq(e.getComponentName())))
+                    .fetchOne();
             ServicesRecord sDb = new ServicesRecord(null, e.getServiceName());
             EndpointsRecord eDb = new EndpointsRecord(null, e.getEndpointName());
 
@@ -501,7 +518,7 @@ public class WorkspaceDbOperations {
 
         ctx.select().from(SERVICES)
                 .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID).join(CONTAINERS)
-                .onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID).join(BUSES).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                .onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID).join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
                 .where(BUSES.WORKSPACE_ID.eq(workspaceId))
                 .forEach(record -> {
                     ServicesRecord servrec = record.into(SERVICES);
