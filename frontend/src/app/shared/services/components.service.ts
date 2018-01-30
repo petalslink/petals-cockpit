@@ -222,9 +222,11 @@ export class ComponentsServiceImpl extends ComponentsService {
 
     try {
       name = json.jbi[0].component[0].identification[0].name[0]._text;
-      sharedLibrariesName = json.jbi[0].component[0]['shared-library'].map(
-        (el: any) => el._text
-      );
+      if (json.jbi[0].component[0]['shared-library']) {
+        sharedLibrariesName = json.jbi[0].component[0]['shared-library'].map(
+          (el: any) => el._text
+        );
+      }
     } catch (err) {
       throw new Error('Getting information from XML failed');
     }
