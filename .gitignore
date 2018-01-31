@@ -18,6 +18,7 @@ target/
 .factorypath
 .history
 .angulardoc.json
+.updateCopyrightEndDate.sh
 
 # ------------------------------------
 #              BACKEND
