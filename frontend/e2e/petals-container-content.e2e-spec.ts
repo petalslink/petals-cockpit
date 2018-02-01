@@ -244,7 +244,7 @@ describe(`Petals container content`, () => {
       deploy.selectFile(
         `./resources/petals-zip/components/petals-bc-jms-2.0.zip`,
         `petals-bc-jms-2.0.zip`,
-        ''
+        `petals-bc-jms`
       );
 
       expect(deploy.detailsMessageReadZipFile.getText()).toEqual(
@@ -254,14 +254,14 @@ describe(`Petals container content`, () => {
       expect(deploy.deployButton.isEnabled()).toBe(true);
     });
 
-    it(`should not be able to upload a component`, () => {
+    it(`should not be able to upload an existing component`, () => {
       deploy.selectFile(
         `./resources/petals-zip/components/petals-bc-jms-2.0.zip`,
         `petals-bc-jms-2.0.zip`,
-        ''
+        `petals-bc-jms`
       );
 
-      deploy.nameInput.sendKeys('Comp 0');
+      deploy.nameInput.clear().then(() => deploy.nameInput.sendKeys('Comp 0'));
 
       expect(deploy.deployButton.isEnabled()).toBe(false);
     });
