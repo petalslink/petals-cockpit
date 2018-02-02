@@ -1,7 +1,8 @@
-// TODO : Update for 2016-2017 compatibility
 const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
+
+const currentYear = '2018';
 
 // folders
 const sourceFolders = [
@@ -24,6 +25,8 @@ const sourceFiles = {
   html: []
 };
 
+const headerRegex = new RegExp('(Copyright \\(C\\) )(\\d\\d\\d\\d)(-\\d\\d\\d\\d)?( Linagora)');
+
 const headers = [
   {ts: null},
   {scss: null},
@@ -32,7 +35,7 @@ const headers = [
 
 headers.ts =
 `/**
- * Copyright (C) 2017 Linagora
+ * Copyright (C) ${currentYear} Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -52,7 +55,7 @@ headers.ts =
 headers.scss = headers.ts;
 
 headers.html =
-`<!-- Copyright (C) 2017 Linagora
+`<!-- Copyright (C) ${currentYear} Linagora
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -112,21 +115,36 @@ const generateFileTree = (dir, filelist) => {
 
 // check if a header is already available and
 // inject the corresponding header otherwise
-const checkHeaderAndInjectIfNeeded = (fileType, filePath, headerSplit, stats) => {
-  let fileSplit = fs.readFileSync(filePath).toString().trimLeft().split('\n');
-  let filePotentialHeader = fileSplit.slice(0, headerSplit.length).join('\n');
+const checkHeaderAndInjectIfNeeded = (fileType, filePath, header, stats) => {
+  let file = fs.readFileSync(filePath).toString();
+  let noHeader = true;
+  let fileChanged = file.replace(headerRegex, (match, p1, p2, p3, p4, offset, string) => {
+    let headerStart = p1, firstYear = p2, secondYear = p3, headerEnd = p4;
+    let date = currentYear;
 
-  if (filePotentialHeader === headerSplit.join('\n')) {
-    return;
+    noHeader = false;
+
+    if (secondYear) {
+      date = `${firstYear}-${currentYear}`;
+    } else if (firstYear !== currentYear) {
+      date = `${firstYear}-${currentYear}`;
+    }
+
+    return `${headerStart}${date}${headerEnd}`;
+  })
+
+  if (noHeader) {
+    fileChanged = `${header}\n\n${file}`;
+  } else {
+    if (file === fileChanged) {
+      return;
+    }
   }
-
-  // no header, we need to inject it
-  let fileWithInjectedHeader = headerSplit.join('\n') + '\n\n' + fileSplit.join('\n');
 
   stats[fileType]++;
 
   if (!args.dry) {
-    fs.writeFileSync(filePath, fileWithInjectedHeader);
+    fs.writeFileSync(filePath, fileChanged);
   }
 };
 
@@ -163,9 +181,9 @@ const main = () => {
 
     // save split header here otherwise the split will happen
     // as many time as we call checkHeaderAndInjectIfNeeded function
-    let headerSplit = headers[fileType].split('\n');
+    let header = headers[fileType];
 
-    filesPath.forEach(filePath => checkHeaderAndInjectIfNeeded(fileType, filePath, headerSplit, stats));
+    filesPath.forEach(filePath => checkHeaderAndInjectIfNeeded(fileType, filePath, header, stats));
   });
 
   let headerOnEveryFile = Object.keys(stats).map(fileType => stats[fileType]).reduce((previous, current) => previous + current) === 0;
