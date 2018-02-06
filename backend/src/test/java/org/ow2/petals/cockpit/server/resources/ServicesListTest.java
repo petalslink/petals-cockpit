@@ -52,9 +52,9 @@ import com.google.common.collect.ImmutableMap;
 
 import javaslang.Tuple;
 
-public class UpdateServicesTest extends AbstractBasicResourceTest {
+public class ServicesListTest extends AbstractBasicResourceTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateServicesTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServicesListTest.class);
 
     private long wkspId = 1L;
     private final Domain domain = new Domain("dom");
@@ -88,7 +88,7 @@ public class UpdateServicesTest extends AbstractBasicResourceTest {
     //
     // private final Component component22 = new Component("comp2", ComponentType.BC, ArtifactState.State.STOPPED);
 
-    public UpdateServicesTest() {
+    public ServicesListTest() {
         super(ServicesResource.class, WorkspaceResource.class);
     }
 
