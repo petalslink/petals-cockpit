@@ -35,6 +35,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.Sharedlibraries
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerFull;
+import org.ow2.petals.cockpit.server.resources.EndpointsResource.EndpointFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.ServicesResource.ServiceFull;
@@ -90,6 +91,10 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
     @JsonProperty
     public ImmutableMap<String, ServiceFull> services;
 
+    @Valid
+    @JsonProperty
+    public ImmutableMap<String, EndpointFull> endpoints;
+
     @JsonCreator
     public WorkspaceContent(@JsonProperty("busesInProgress") Map<String, BusInProgress> busesInProgress,
             @JsonProperty("buses") Map<String, BusFull> buses,
@@ -98,7 +103,8 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             @JsonProperty("serviceAssemblies") Map<String, ServiceAssemblyFull> serviceAssemblies,
             @JsonProperty("serviceUnits") Map<String, ServiceUnitFull> serviceUnits,
             @JsonProperty("sharedLibraries") Map<String, SharedLibraryFull> sharedLibraries,
-            @JsonProperty("services") Map<String, ServiceFull> services) {
+            @JsonProperty("services") Map<String, ServiceFull> services,
+            @JsonProperty("endpoints") Map<String, EndpointFull> endpoints) {
         this.busesInProgress = ImmutableMap.copyOf(busesInProgress);
         this.buses = ImmutableMap.copyOf(buses);
         this.containers = ImmutableMap.copyOf(containers);
@@ -107,6 +113,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
         this.serviceUnits = ImmutableMap.copyOf(serviceUnits);
         this.sharedLibraries = ImmutableMap.copyOf(sharedLibraries);
         this.services = ImmutableMap.copyOf(services);
+        this.endpoints = ImmutableMap.copyOf(endpoints);
     }
 
     public static WorkspaceContentBuilder builder() {
@@ -140,13 +147,14 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             Map<String, ServiceUnitFull> sus = new HashMap<>();
             Map<String, SharedLibraryFull> sls = new HashMap<>();
             Map<String, ServiceFull> servs = new HashMap<>();
+            Map<String, EndpointFull> edps = new HashMap<>();
 
             buses.stream().forEach(b -> {
-                BusFull bus = b.build(cs, comps, sas, sus, sls, servs);
+                BusFull bus = b.build(cs, comps, sas, sus, sls, servs, edps);
                 importedBuses.put(bus.bus.getId(), bus);
             });
 
-            return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus, sls, servs);
+            return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus, sls, servs, edps);
         }
     }
 
@@ -169,11 +177,11 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
 
         private BusFull build(Map<String, ContainerFull> cs, Map<String, ComponentFull> comps,
                 Map<String, ServiceAssemblyFull> sas, Map<String, ServiceUnitFull> sus,
-                Map<String, SharedLibraryFull> sls, Map<String, ServiceFull> servs) {
+                Map<String, SharedLibraryFull> sls, Map<String, ServiceFull> servs, Map<String, EndpointFull> edps) {
 
             Set<String> containersIds = new HashSet<>();
             containers.stream().forEach(b -> {
-                ContainerFull container = b.build(comps, sas, sus, sls, servs);
+                ContainerFull container = b.build(comps, sas, sus, sls, servs, edps);
                 String containerId = container.container.getId();
                 cs.put(containerId, container);
                 containersIds.add(containerId);
@@ -195,6 +203,8 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
         private final List<ServiceunitsRecord> susToBuild = new ArrayList<>();
 
         private final List<ServiceFull> servsToBuild = new ArrayList<>();
+
+        private final List<EndpointFull> edpsToBuild = new ArrayList<>();
 
         private final SetMultimap<Long, String> componentsBySL = LinkedHashMultimap.create();
 
@@ -243,13 +253,19 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             servsToBuild.add(sDb);
         }
 
+        @Override
+        public void addEndpoint(EndpointFull eDb) {
+            edpsToBuild.add(eDb);
+        }
+
         private ContainerFull build(Map<String, ComponentFull> comps, Map<String, ServiceAssemblyFull> sas,
                 Map<String, ServiceUnitFull> sus, Map<String, SharedLibraryFull> sls,
-                Map<String, ServiceFull> servs) {
+                Map<String, ServiceFull> servs, Map<String, EndpointFull> edps) {
             Set<String> components = new HashSet<>();
             Set<String> serviceAssemblies = new HashSet<>();
             Set<String> sharedLibraries = new HashSet<>();
             Set<String> services = new HashSet<>();
+            Set<String> endpoints = new HashSet<>();
 
             componentsToBuild.stream()
                     .map(c -> new ComponentFull(c, serviceUnitsByComp.get(c.getId()), slsByComponent.get(c.getId())))
@@ -279,7 +295,13 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
                 services.add(id);
             }
 
-            return new ContainerFull(cDb, components, serviceAssemblies, sharedLibraries, services);
+            for (EndpointFull edp : edpsToBuild) {
+                String id = edp.endpoint.getId();
+                edps.put(id, edp);
+                endpoints.add(id);
+            }
+
+            return new ContainerFull(cDb, components, serviceAssemblies, sharedLibraries, services, endpoints);
         }
 
     }

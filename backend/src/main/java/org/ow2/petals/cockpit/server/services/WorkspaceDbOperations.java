@@ -65,6 +65,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.Sharedlibraries
 import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
+import org.ow2.petals.cockpit.server.resources.EndpointsResource.EndpointFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServicesResource.ServiceFull;
 import org.slf4j.Logger;
@@ -117,8 +118,14 @@ public class WorkspaceDbOperations {
                             }
 
                             @Override
-                            public void addService(ServiceFull suDb) {
+                            public void addService(ServiceFull sDb) {
                                 // NOP
+                            }
+
+                            @Override
+                            public void addEndpoint(EndpointFull eDb) {
+                                // NOP
+
                             }
                         };
                     }
@@ -147,6 +154,8 @@ public class WorkspaceDbOperations {
         public void addServiceUnit(ServiceunitsRecord suDb);
 
         public void addService(ServiceFull sDb);
+
+        public void addEndpoint(EndpointFull eDb);
     }
 
     public void saveDomainToDatabase(Configuration conf, BusesRecord bDb, Domain topology, WorkspaceDbWitness witness) {
@@ -304,9 +313,21 @@ public class WorkspaceDbOperations {
                             .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID)
                             .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
                             .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
-                            .where(EDP_INSTANCES.CONTAINER_ID.eq(c.getId())).fetch()) {
+                            .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                            .where(EDP_INSTANCES.CONTAINER_ID.eq(c.getId()).and(BUSES.WORKSPACE_ID.eq(w.getId())))
+                            .fetch()) {
                         containerBuilder.addService(
                                 new ServiceFull(sr.into(SERVICES), c.getId(), sr.into(EDP_INSTANCES).getComponentId()));
+                    }
+
+                    for (Record edpr : ctx.select().from(ENDPOINTS).join(EDP_INSTANCES)
+                            .onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID).join(COMPONENTS)
+                            .onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID).join(CONTAINERS)
+                            .onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID).join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                            .where(EDP_INSTANCES.CONTAINER_ID.eq(c.getId()).and(BUSES.WORKSPACE_ID.eq(w.getId())))
+                            .fetch()) {
+                        containerBuilder.addEndpoint(new EndpointFull(edpr.into(ENDPOINTS), c.getId(),
+                                edpr.into(EDP_INSTANCES).getComponentId()));
                     }
                 }
             } else {
@@ -327,7 +348,7 @@ public class WorkspaceDbOperations {
 
         manageExistingEndpoints(null, selectedEndpoints, ctx);
 
-        // remove from db (it will propagate to all its contained elements!)
+        // remove from db (it will propagate to every other contained elements!)
         ctx.deleteFrom(WORKSPACES).where(WORKSPACES.ID.eq(WorkspaceId)).execute();
     }
 
@@ -401,9 +422,9 @@ public class WorkspaceDbOperations {
             return edpToAdd;
         }
 
-        HashSet<Long> instance_id_to_delete = new HashSet<>();
-        HashSet<Long> service_id_to_delete = new HashSet<>();
-        HashSet<Long> endpoint_id_to_delete = new HashSet<>();
+        HashSet<Long> instanceIdToDelete = new HashSet<>();
+        HashSet<Long> serviceIdToDelete = new HashSet<>();
+        HashSet<Long> endpointIdToDelete = new HashSet<>();
 
         // checking selected existing endpoints against given candidates endpoints
         selectedExistingEndpoints.forEach(record ->
@@ -431,26 +452,26 @@ public class WorkspaceDbOperations {
             }
             else {
                 // endpoint should not stay
-                instance_id_to_delete.add(instrec.getId());
-                service_id_to_delete.add(servrec.getId());
-                endpoint_id_to_delete.add(edprec.getId());
+                instanceIdToDelete.add(instrec.getId());
+                serviceIdToDelete.add(servrec.getId());
+                endpointIdToDelete.add(edprec.getId());
             }
         });
 
-        final int deletedInstances = ctx.deleteFrom(EDP_INSTANCES).where(EDP_INSTANCES.ID.in(instance_id_to_delete))
+        final int deletedInstances = ctx.deleteFrom(EDP_INSTANCES).where(EDP_INSTANCES.ID.in(instanceIdToDelete))
                 .execute();
-        if (deletedInstances != instance_id_to_delete.size()) {
+        if (deletedInstances != instanceIdToDelete.size()) {
             LOG.error(
                     "Possible DB issue: {} rows selected to be deleted from EDP_INSTANCES but {} were actually deleted.",
-                    instance_id_to_delete.size(), deletedInstances);
+                    instanceIdToDelete.size(), deletedInstances);
         }
 
         //Elements can still be linked to other endpoints, must not delete these ! 
-        service_id_to_delete.removeAll(ctx.fetchValues(EDP_INSTANCES.SERVICE_ID));
-        endpoint_id_to_delete.removeAll(ctx.fetchValues(EDP_INSTANCES.ENDPOINT_ID));
+        serviceIdToDelete.removeAll(ctx.fetchValues(EDP_INSTANCES.SERVICE_ID));
+        endpointIdToDelete.removeAll(ctx.fetchValues(EDP_INSTANCES.ENDPOINT_ID));
 
-        ctx.deleteFrom(SERVICES).where(SERVICES.ID.in(service_id_to_delete)).execute();
-        ctx.deleteFrom(ENDPOINTS).where(ENDPOINTS.ID.in(endpoint_id_to_delete)).execute();
+        ctx.deleteFrom(SERVICES).where(SERVICES.ID.in(serviceIdToDelete)).execute();
+        ctx.deleteFrom(ENDPOINTS).where(ENDPOINTS.ID.in(endpointIdToDelete)).execute();
 
         return edpToAdd;
     }
@@ -467,8 +488,8 @@ public class WorkspaceDbOperations {
                 // This error may occur during unit tests (in which case it's not an issue),as PetalsAdminApi mocks
                 // will return a unique set of endpoint regardless of input.
                 LOG.error(
-                        "No component named \"{}\" on container# \"{}\" from DB matched to insert endpoint: \"{}\" (with container: {}). Skipping...",
-                        e.getComponentName(), cId, e.getEndpointName(), e.getContainerName());
+                        "Skipping endpoint insert: \"{}\": Found no DB container/component \"{}\"/\"{}\" on container# \"{}\".",
+                        e.getContainerName(), e.getComponentName(), cId, e.getEndpointName());
                 return;
             }
             Long componentId = compIdRec.into(COMPONENTS).getId();
@@ -533,6 +554,27 @@ public class WorkspaceDbOperations {
                 });
 
         return ImmutableMap.copyOf(servicesToReturn);
+    }
+
+    public ImmutableMap<String, EndpointFull> getWorkspaceEndpoints(Long workspaceId, Configuration conf) {
+        final DSLContext ctx = DSL.using(conf);
+        Map<String, EndpointFull> endpointsToReturn = new HashMap<String, EndpointFull>();
+
+        ctx.select().from(ENDPOINTS).join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID).join(CONTAINERS)
+                .onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID).join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                .where(BUSES.WORKSPACE_ID.eq(workspaceId)).forEach(record -> {
+                    EndpointsRecord edprec = record.into(ENDPOINTS);
+                    EdpInstancesRecord instrec = record.into(EDP_INSTANCES);
+
+                    assert edprec != null && instrec != null;
+                    final String endpointid = edprec.getId().toString();
+                    assert endpointid != null;
+
+                    endpointsToReturn.put(endpointid,
+                            new EndpointFull(edprec, instrec.getContainerId(), instrec.getComponentId()));
+                });
+
+        return ImmutableMap.copyOf(endpointsToReturn);
     }
 
 }

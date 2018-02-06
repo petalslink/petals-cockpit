@@ -74,6 +74,8 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
+import org.ow2.petals.cockpit.server.resources.EndpointsResource;
+import org.ow2.petals.cockpit.server.resources.EndpointsResource.EndpointFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
@@ -103,6 +105,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import javaslang.Tuple2;
 import javaslang.control.Either;
 
 public class WorkspacesService {
@@ -311,7 +314,10 @@ public class WorkspacesService {
                     DSL.using(jooq).transaction(c -> workspaceDb.saveDomainToDatabase(c, bDb, topology, b));
                     WorkspaceContent result = b.build();
 
-                    result.services = getWorkspaceServices();
+                    // TODO create a specific class to be cleaner
+                    final Tuple2<ImmutableMap<String, ServiceFull>, ImmutableMap<String, EndpointFull>> workspaceServices = getWorkspaceServices();
+                    result.services = workspaceServices._1();
+                    result.endpoints = workspaceServices._2();
 
                     return Either.right(result);
                 }).fold(error -> {
@@ -565,7 +571,7 @@ public class WorkspacesService {
             WorkspaceContent res = new WorkspaceContent(
                     ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap
                             .of(Long.toString(saDb.getId()), new ServiceAssemblyFull(saDb, serviceUnitsDb.keySet())),
-                    serviceUnitsDb, ImmutableMap.of(), ImmutableMap.of());
+                    serviceUnitsDb, ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
 
             broadcast(WorkspaceEvent.saDeployed(res));
 
@@ -615,7 +621,7 @@ public class WorkspacesService {
 
             WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                     ImmutableMap.of(Long.toString(compDb.getId()), new ComponentFull(compDb, ImmutableSet.of(), sls)),
-                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
+                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
 
             broadcast(WorkspaceEvent.componentDeployed(res));
 
@@ -646,21 +652,22 @@ public class WorkspacesService {
             WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                     ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                     ImmutableMap.of(Long.toString(slDb.getId()), new SharedLibraryFull(slDb, ImmutableSet.of())),
-                    ImmutableMap.of());
+                    ImmutableMap.of(), ImmutableMap.of());
 
             broadcast(WorkspaceEvent.sharedLibraryDeployed(res));
 
             return res;
         }
 
-        public ImmutableMap<String, ServiceFull> getWorkspaceServices() {
+        public Tuple2<ImmutableMap<String, ServiceFull>, ImmutableMap<String, EndpointFull>> getWorkspaceServices() {
             DSL.using(jooq).select(CONTAINERS.ID).from(CONTAINERS).join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
                     .where(BUSES.WORKSPACE_ID.eq(wId)).fetchStream()
                     .forEach(containerRecord -> {
                         updateContainerServices(containerRecord.value1());
                     });
 
-            return workspaceDb.getWorkspaceServices(wId, jooq);
+            return new Tuple2<ImmutableMap<String, ServiceFull>, ImmutableMap<String, EndpointFull>>(
+                    workspaceDb.getWorkspaceServices(wId, jooq), workspaceDb.getWorkspaceEndpoints(wId, jooq));
         }
 
         private ImmutableMap<String, ServiceFull> containerServicesChanged(Long containerId,
@@ -668,12 +675,13 @@ public class WorkspacesService {
             updateContainerServices(containerId);
             Map<String, ServicesResource.ServiceFull> allServices = workspaceDb
                     .getWorkspaceServices(wId, jooq);
+            Map<String, EndpointsResource.EndpointFull> allEndpoints = workspaceDb.getWorkspaceEndpoints(wId, jooq);
 
             // The caller may want to broadcast outside this method, along with other workspace content
             if (broadcastServices) {
                 WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                         ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
-                        ImmutableMap.copyOf(allServices));
+                        ImmutableMap.copyOf(allServices), ImmutableMap.copyOf(allEndpoints));
 
                 LOG.debug("Service list updated for cont#{}, broadcasting {} services.", containerId,
                         res.services.size());
