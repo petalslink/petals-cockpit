@@ -21,7 +21,10 @@ import static org.assertj.db.api.Assertions.assertThat;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.EDP_INSTANCES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.ENDPOINTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES_COMPONENTS;
@@ -38,6 +41,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,6 +54,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.db.api.RequestRowAssert;
 import org.assertj.db.type.Request;
@@ -66,15 +76,21 @@ import org.ow2.petals.admin.api.artifact.Component;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.api.artifact.SharedLibrary;
+import org.ow2.petals.admin.endpoint.Endpoint;
+import org.ow2.petals.admin.endpoint.EndpointDirectoryView;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.AbstractTest;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
+import org.ow2.petals.cockpit.server.db.generated.Keys;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.EdpInstancesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.EndpointsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.ServicesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
@@ -87,10 +103,13 @@ import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
+import org.ow2.petals.cockpit.server.resources.ServicesResource.ServiceFull;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryFull;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.rules.CockpitResourceRule;
 import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations.WorkspaceDbWitness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
@@ -104,6 +123,10 @@ import javaslang.Tuple2;
  *
  */
 public class AbstractCockpitResourceTest extends AbstractTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractCockpitResourceTest.class);
+
+    private final int DEFAULT_SSE_TIMEOUT = 2;
 
     @Rule
     public TemporaryFolder zipFolder = new TemporaryFolder();
@@ -255,9 +278,21 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
                 resource.new TestWorkspaceDbOperations().saveDomainToDatabase(conf, busDb, bus, WorkspaceDbWitness.NOP);
 
+                final String regexAny = ".*";
+                final EndpointDirectoryView edpDirView = resource.petals.newPetalsAdministration()
+                        .newEndpointDirectoryAdministration()
+                        .getEndpointDirectoryContent(regexAny, regexAny, regexAny, regexAny);
+
                 for (Container c : containers) {
                     c.addProperty("petals.topology.passphrase", passphrase);
+                    if (edpDirView != null) {
+                        // Endpoints update cannot be triggered normally when setting up like that, so it's called
+                        // manually for each container. This may trigger disregardable errors, as mocks returns the
+                        // same EndpointDirectoryView for every container.
+                        resource.new TestWorkspaceDbOperations().storeServicesList(edpDirView, getId(c), conf);
+                    }
                 }
+
             }
         });
     }
@@ -301,16 +336,52 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     protected void expectEvent(EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {
-        assertThat(eventInput.isClosed()).isEqualTo(false);
+        // By default we expect 1 event of any type for 2 seconds.
+        expectEventAmongNext(1, null, DEFAULT_SSE_TIMEOUT, true, eventInput, c);
+    }
 
-        // TODO add timeout
-        final InboundEvent inboundEvent = eventInput.read();
+    protected void expectEventAmongNext(int eventsNumber, @Nullable String expectedName, int timeout,
+            boolean failOnTimeout,
+            EventInput eventInput,
+            BiConsumer<InboundEvent, SoftAssertions> c) {
 
-        assertThat(inboundEvent).isNotNull();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<?> future = executor.submit(() -> {
+            for (int i = eventsNumber; i > 0; i--) {
 
-        SoftAssertions.assertSoftly(sa -> {
-            c.accept(inboundEvent, sa);
+                assertThat(eventInput.isClosed()).isEqualTo(false);
+                final InboundEvent inboundEvent = eventInput.read();
+                assertThat(inboundEvent).isNotNull();
+
+                if (expectedName == null || inboundEvent.getName().equals(expectedName)) {
+                    SoftAssertions.assertSoftly(sa -> {
+                        c.accept(inboundEvent, sa);
+                    });
+                    if (expectedName != null)
+                        return;
+                }
+            }
         });
+
+        try {
+            future.get(timeout, TimeUnit.SECONDS);
+        } catch (ExecutionException e) {
+            Assertions.fail("Error occured while expecting/asserting event :", e);
+        } catch (TimeoutException | InterruptedException e) {
+            future.cancel(true);
+            try {
+                // eventInput is probably locked reading an unexisting event
+                LOG.debug("Tearing down jersey!");
+                resource.resource.getJerseyTest().tearDown();
+            } catch (Exception e1) {
+                LOG.error("Error occured while trying to tear down Jersey after an error", e1);
+            }
+            if (failOnTimeout) {
+                Assertions.fail("Timeout occured while expecting/asserting event :", e);
+            }
+        } finally {
+            executor.shutdownNow();
+        }
     }
 
     protected void expectWorkspaceContent(EventInput eventInput) {
@@ -325,6 +396,25 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             c.accept(ev, a);
         });
     }
+
+    protected void expectServicesUpdatedAmongNext2(EventInput eventInput,
+            BiConsumer<WorkspaceContent, SoftAssertions> c) {
+        expectEventAmongNext(2, "SERVICES_UPDATED", DEFAULT_SSE_TIMEOUT, true, eventInput, (e, a) -> {
+            a.assertThat(e.getName()).isEqualTo("SERVICES_UPDATED");
+            WorkspaceContent ev = e.readData(WorkspaceContent.class);
+            c.accept(ev, a);
+        });
+    }
+
+    protected void expectNoServicesUpdated(EventInput eventInput) {
+        SoftAssertions.assertSoftly(sa -> {
+            expectEventAmongNext(2, "SERVICES_UPDATED", DEFAULT_SSE_TIMEOUT, false, eventInput, (e, a) -> {
+                sa.fail("Failure: \"SERVICES_UPDATED\" SSE Event should not have been sent!");
+            });
+        });
+
+    }
+
 
     protected SharedLibraryFull assertSLContent(WorkspaceContent content, Container cont, String slName,
             String slVersion) {
@@ -347,6 +437,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         assertThat(content.components).isEmpty();
         assertThat(content.serviceAssemblies).isEmpty();
         assertThat(content.sharedLibraries).hasSize(1);
+        assertThat(content.services).isEmpty();
 
         Entry<String, SharedLibraryFull> contentSLE = content.sharedLibraries.entrySet().iterator().next();
         SharedLibraryFull contentSL = contentSLE.getValue();
@@ -399,6 +490,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         assertThat(content.components).isEmpty();
         assertThat(content.serviceAssemblies).hasSize(1);
         assertThat(content.sharedLibraries).isEmpty();
+        assertThat(content.services).isEmpty();
 
         if (control == null) {
             assert container != null;
@@ -767,12 +859,83 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                 .toArray(SharedLibrary[]::new));
     }
 
+    protected void assertWorkspaceContentForServices(SoftAssertions a, WorkspaceContent content, long wsId,
+            List<Endpoint> expectedEndpoints) {
+        int endpointFoundCount = 0;
+        for (Endpoint expectedEdp : expectedEndpoints) {
+            Record recordDb = resource
+                    .db().select().from(EDP_INSTANCES)
+                    .join(SERVICES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID)
+                    .join(ENDPOINTS).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
+                    .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
+                    .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                    .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                    .where(SERVICES.NAME.eq(expectedEdp.getServiceName())
+                            .and(ENDPOINTS.NAME.eq(expectedEdp.getEndpointName()))
+                            .and(COMPONENTS.NAME.eq(expectedEdp.getComponentName()))
+                            .and(CONTAINERS.NAME.eq(expectedEdp.getContainerName()))
+                            .and(BUSES.WORKSPACE_ID.eq(wsId)))
+                    .fetchOne();
+            if ( recordDb != null) {
+                assertEquivalent(a, recordDb, expectedEdp);
+
+                final String servId = recordDb.get(SERVICES.ID).toString();
+                assertThat(content.services.containsKey(servId));
+                assertEquivalent(a, content.services.get(servId), expectedEdp);
+                endpointFoundCount++;
+            }
+        }
+        a.assertThat(endpointFoundCount).isEqualTo(expectedEndpoints.size());
+    }
+
+    protected void assertEquivalent(SoftAssertions a, ServiceFull service, Endpoint expectedEdp) {
+        final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
+                COMPONENTS.ID.like(service.getComponentId()));
+        final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
+                CONTAINERS.ID.like(service.getContainerId()));
+        a.assertThat(compDb).isNotNull();
+        a.assertThat(contDb).isNotNull();
+
+        a.assertThat(service.service.name).isEqualTo(expectedEdp.getServiceName());
+        a.assertThat(compDb.getName()).isEqualTo(expectedEdp.getComponentName());
+        a.assertThat(contDb.getName()).isEqualTo(expectedEdp.getContainerName());
+    }
+
+    private void assertEquivalent(SoftAssertions a, Record recordDb, Endpoint expectedEdp) {
+        ServicesRecord servrec = recordDb.into(SERVICES);
+        EdpInstancesRecord instrec = recordDb.into(EDP_INSTANCES);
+        EndpointsRecord edprec = recordDb.into(ENDPOINTS);
+        a.assertThat(instrec).isNotNull();
+        a.assertThat(servrec).isNotNull();
+        a.assertThat(edprec).isNotNull();
+
+        final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
+                COMPONENTS.ID.like(instrec.getComponentId().toString()));
+        final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
+                CONTAINERS.ID.like(instrec.getContainerId().toString()));
+        a.assertThat(compDb).isNotNull();
+        a.assertThat(contDb).isNotNull();
+
+        a.assertThat(servrec.getName()).isEqualTo(expectedEdp.getServiceName());
+        a.assertThat(edprec.getName()).isEqualTo(expectedEdp.getEndpointName());
+        a.assertThat(compDb.getName()).isEqualTo(expectedEdp.getComponentName());
+        a.assertThat(contDb.getName()).isEqualTo(expectedEdp.getContainerName());
+    }
+
     protected void assertWorkspaceContent(SoftAssertions a, WorkspaceContent content, long wsId, Domain... buses) {
+        assertWorkspaceContent(a, content, wsId, null, buses);
+    }
+
+    protected void assertWorkspaceContent(SoftAssertions a, WorkspaceContent content, long wsId,
+            @Nullable List<Endpoint> expectedEndpoints, Domain... buses) {
         assertWorkspaceContentForBuses(a, content, wsId, buses);
         assertWorkspaceContentForContainers(a, content, buses);
         assertWorkspaceContentForComponents(a, content, buses);
         assertWorkspaceContentForServiceAssemblies(a, content, buses);
         assertWorkspaceContentForServiceUnits(a, content, buses);
         assertWorkspaceContentForSharedLibraries(a, content, buses);
+        if (expectedEndpoints != null && !expectedEndpoints.isEmpty()) {
+            assertWorkspaceContentForServices(a, content, wsId, new ArrayList<Endpoint>(expectedEndpoints));
+        }
     }
 }

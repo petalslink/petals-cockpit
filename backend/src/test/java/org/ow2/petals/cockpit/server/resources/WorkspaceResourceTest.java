@@ -282,7 +282,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertContentOverview(content.workspace);
         assertUsers(content.users);
 
-        assertWorkspaceContent(a, content.content, content.workspace.id, buses);
+        assertWorkspaceContent(a, content.content, content.workspace.id, referenceEndpoints, buses);
     }
 
     private void assertUsers(Map<String, UserMin> users) {

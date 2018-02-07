@@ -34,8 +34,9 @@
     <h2.version>1.4.196</h2.version>
     <slf4j.version>1.7.25</slf4j.version>
     <jooq.version>3.9.6</jooq.version>
-    <petals-admin.version>2.0.0-SNAPSHOT</petals-admin.version>
-    <petals-jmx-api.version>1.1.0-SNAPSHOT</petals-jmx-api.version>
+    <petals-admin.version>2.0.1-SNAPSHOT</petals-admin.version>
+    <petals-admin-mock.version>2.1.0-SNAPSHOT</petals-admin-mock.version>
+    <petals-jmx-api.version>1.1.1-SNAPSHOT</petals-jmx-api.version>
     <enunciate.version>2.10.1</enunciate.version>
   </properties>
 
@@ -107,7 +108,7 @@
       <dependency>
         <groupId>org.ow2.petals</groupId>
         <artifactId>petals-admin-mock</artifactId>
-        <version>${petals-admin.version}</version>
+        <version>${petals-admin-mock.version}</version>
       </dependency>
       <dependency>
         <groupId>org.ow2.petals</groupId>

@@ -194,7 +194,11 @@ public class CockpitResourceRule implements TestRule {
 
         @Override
         public void serviceAdded(ServicesRecord service) {
-            setDbObjectId(service, service.getId());
+            // A same service can have multiple interfaces/endpoints, thus a same service insertion request
+            // can be received multiple time without raising an error
+            if (!dbObjectIds.containsKey(service)) {
+                setDbObjectId(service, service.getId());
+            }
         }
     }
 }

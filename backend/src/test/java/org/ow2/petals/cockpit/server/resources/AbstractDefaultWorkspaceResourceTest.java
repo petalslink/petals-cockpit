@@ -16,7 +16,9 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.ow2.petals.admin.api.artifact.ArtifactState;
@@ -25,6 +27,8 @@ import org.ow2.petals.admin.api.artifact.Component.ComponentType;
 import org.ow2.petals.admin.api.artifact.ServiceAssembly;
 import org.ow2.petals.admin.api.artifact.ServiceUnit;
 import org.ow2.petals.admin.api.artifact.SharedLibrary;
+import org.ow2.petals.admin.endpoint.Endpoint;
+import org.ow2.petals.admin.endpoint.Endpoint.EndpointType;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
@@ -78,6 +82,8 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractBasic
 
     protected final SharedLibrary fSharedLibrary = new SharedLibrary("sl2", "1.0.0");
 
+    protected final List<Endpoint> referenceEndpoints = makeEndpoints();
+
     public AbstractDefaultWorkspaceResourceTest(Class<?>... ressources) {
         super(ressources);
     }
@@ -94,6 +100,7 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractBasic
         resource.petals.registerArtifact(componentWithSL, container1);
         resource.petals.registerArtifact(serviceAssembly, container1);
         resource.petals.registerArtifact(sharedLibrary, container1);
+        resource.petals.registerEndpoints(referenceEndpoints);
 
         addUser("anotheruser");
 
@@ -107,4 +114,22 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractBasic
         // test workspace
         setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
     }
+
+    private List<Endpoint> makeEndpoints() {
+        List<Endpoint> endpoints = new ArrayList<Endpoint>();
+
+        endpoints.add(new Endpoint("edp1", EndpointType.INTERNAL, "cont1", "comp", "{http://namespace.org/}serv1",
+                Arrays.asList("{http://namespace.org/}int1")));
+        endpoints.add(new Endpoint("edp2", EndpointType.INTERNAL, "cont1", "comp", "{http://namespace.org/}serv2",
+                Arrays.asList("{http://namespace.org/}int2", "{http://namespace.org/}int3")));
+        endpoints.add(new Endpoint("edp3", EndpointType.INTERNAL, "cont1", "comp", "{http://namespace.org/}serv3",
+                Arrays.asList("{http://namespace.org/}int3")));
+        endpoints.add(new Endpoint("edp4", EndpointType.INTERNAL, "cont1", "comp", "{http://namespace.org/}serv4",
+                Arrays.asList("{http://namespace.org/}int3")));
+        endpoints.add(new Endpoint("edp5", EndpointType.INTERNAL, "cont1", "compSL", "{http://namespace.com/}serv1",
+                Arrays.asList("{http://petals.ow2.org/}int1", "{http://petals.ow2.org/}int2")));
+
+        return endpoints;
+    }
+
 }

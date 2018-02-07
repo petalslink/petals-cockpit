@@ -656,6 +656,44 @@ public class WorkspaceResource {
         public String getId() {
             return Long.toString(id);
         }
+
+        public boolean mayChangeServicesCommingFrom(ServiceAssemblyMin.State previousState) {
+            // SA starts proposing services when started
+            // SA may stop proposing services when unloaded, so we check for shutdown and unknown as well
+            switch (this.state) {
+                case Unloaded:
+                    switch (previousState) {
+                        case Started:
+                        case Stopped:
+                        case Shutdown:
+                            return true;
+                        default:
+                            return false;
+                    }
+
+                case Started:
+                    switch (previousState) {
+                        case Shutdown:
+                        case Unloaded:
+                            return true;
+                        default:
+                            return false;
+                    }
+
+                case Unknown:
+                    switch (previousState) {
+                        case Shutdown:
+                        case Started:
+                        case Stopped:
+                            return true;
+                        default:
+                            return false;
+                    }
+
+                default:
+                    return false;
+            }
+        }
     }
 
     public static class ComponentStateChanged implements WorkspaceEvent.Data {
@@ -677,6 +715,46 @@ public class WorkspaceResource {
         @JsonProperty
         public String getId() {
             return Long.toString(id);
+        }
+
+        public boolean mayChangeServicesCommingFrom(ComponentMin.State previousState) {
+            // Component starts proposing services when started
+            // Components stops proposing services when uninstalled(shutdown),
+            // so we check for unloaded and unknown as well
+            switch (this.state) {
+                case Unloaded:
+                case Loaded:
+                    switch (previousState) {
+                        case Started:
+                        case Stopped:
+                        case Shutdown:
+                            return true;
+                        default:
+                            return false;
+                    }
+
+                case Started:
+                    switch (previousState) {
+                        case Shutdown:
+                            return true;
+                        default:
+                            return false;
+                    }
+
+                case Unknown:
+                    switch (previousState) {
+                        case Loaded:
+                        case Shutdown:
+                        case Started:
+                        case Stopped:
+                            return true;
+                        default:
+                            return false;
+                    }
+
+                default:
+                    return false;
+            }
         }
     }
 

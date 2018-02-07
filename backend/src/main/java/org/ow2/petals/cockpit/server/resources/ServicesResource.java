@@ -16,7 +16,12 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
+import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_CONTAINERS_BUSES_ID;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.EDP_INSTANCES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -33,6 +38,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
+import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServicesRecord;
@@ -55,7 +61,7 @@ public class ServicesResource {
     }
 
     @GET
-    @Path("/{suId}")
+    @Path("/{sId}")
     @Produces(MediaType.APPLICATION_JSON)
     public ServiceOverview overview(@NotNull @PathParam("sId") @Min(1) long sId,
             @Pac4JProfile CockpitProfile profile) {
@@ -66,16 +72,14 @@ public class ServicesResource {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            // TODO: once service is linked to a bus ? container ? component ? check user clearance.
-            //
-            // Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
-            // .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
-            // .onKey(FK_CONTAINERS_BUSES_ID).join(SERVICEUNITS).onKey(FK_SERVICEUNITS_CONTAINER_ID)
-            // .where(SERVICEUNITS.ID.eq(sId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
-            //
-            // if (user == null) {
-            // throw new WebApplicationException(Status.FORBIDDEN);
-            // }
+            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
+                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
+                    .onKey(FK_CONTAINERS_BUSES_ID).join(EDP_INSTANCES).onKey().join(SERVICES).onKey()
+                    .where(SERVICES.ID.eq(sId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
+            
+             if (user == null) {
+             throw new WebApplicationException(Status.FORBIDDEN);
+             }
 
             return new ServiceOverview();
         });
