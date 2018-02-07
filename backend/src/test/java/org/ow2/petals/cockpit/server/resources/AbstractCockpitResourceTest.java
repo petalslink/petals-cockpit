@@ -279,13 +279,13 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
                 resource.new TestWorkspaceDbOperations().saveDomainToDatabase(conf, busDb, bus, WorkspaceDbWitness.NOP);
 
-                final String regexAny = ".*";
-                final EndpointDirectoryView edpDirView = resource.petals.newPetalsAdministration()
-                        .newEndpointDirectoryAdministration()
-                        .getEndpointDirectoryContent(regexAny, regexAny, regexAny, regexAny);
 
+                final String regexAny = ".*";
                 for (Container c : containers) {
                     c.addProperty("petals.topology.passphrase", passphrase);
+                    final EndpointDirectoryView edpDirView = resource.petals.newPetalsAdministration()
+                            .newEndpointDirectoryAdministration()
+                            .getEndpointDirectoryContent(c.getContainerName(), regexAny, regexAny, regexAny);
                     if (edpDirView != null) {
                         // Endpoints update cannot be triggered normally when setting up like that, so it's called
                         // manually for each container. This may trigger disregardable errors, as mocks returns the

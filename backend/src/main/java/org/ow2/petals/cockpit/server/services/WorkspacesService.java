@@ -665,7 +665,6 @@ public class WorkspacesService {
                     .forEach(containerRecord -> {
                         updateContainerServices(containerRecord.value1());
                     });
-
             return new Tuple2<ImmutableMap<String, ServiceFull>, ImmutableMap<String, EndpointFull>>(
                     workspaceDb.getWorkspaceServices(wId, jooq), workspaceDb.getWorkspaceEndpoints(wId, jooq));
         }
@@ -702,12 +701,14 @@ public class WorkspacesService {
 
                 assert cont != null;
                 final String ip = cont.getIp();
+                final Integer port = cont.getPort();
+                final String name = cont.getName();
                 final String username = cont.getUsername();
                 final String password = cont.getPassword();
-                final Integer port = cont.getPort();
-                assert ip != null && username != null && password != null && port != null;
+                assert ip != null && port != null && name != null && username != null && password != null
+                        && port != null;
 
-                return petals.getEndpointDirectoryView(ip, port, username, password);
+                return petals.getEndpointDirectoryView(ip, port, name, username, password);
             });
         }
 

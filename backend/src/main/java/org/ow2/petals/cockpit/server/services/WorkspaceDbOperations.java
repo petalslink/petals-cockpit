@@ -489,7 +489,7 @@ public class WorkspaceDbOperations {
                 // will return a unique set of endpoint regardless of input.
                 LOG.error(
                         "Skipping endpoint insert: \"{}\": Found no DB container/component \"{}\"/\"{}\" on container# \"{}\".",
-                        e.getContainerName(), e.getComponentName(), cId, e.getEndpointName());
+                        e.getEndpointName(), e.getContainerName(), e.getComponentName(), cId);
                 return;
             }
             Long componentId = compIdRec.into(COMPONENTS).getId();

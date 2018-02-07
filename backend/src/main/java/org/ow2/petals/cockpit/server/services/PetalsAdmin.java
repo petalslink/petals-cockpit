@@ -257,11 +257,14 @@ public class PetalsAdmin {
         }
     }
 
-    public EndpointDirectoryView getEndpointDirectoryView(String ip, int port, String username, String password) {
+    public EndpointDirectoryView getEndpointDirectoryView(String ip, int port, String containerRegex, String username,
+            String password) {
         try (PAC p = new PAC(ip, port, username, password)) {
             EndpointDirectoryAdministration edpAdmin = p.petals.newEndpointDirectoryAdministration();
             final String regexAny = ".*";
-            return edpAdmin.getEndpointDirectoryContent(regexAny, regexAny, regexAny, regexAny);
+
+            return edpAdmin.getEndpointDirectoryContent(containerRegex, regexAny, regexAny, regexAny);
+
         } catch (EndpointDirectoryAdministrationException e) {
             throw new PetalsAdminException(e);
         }
