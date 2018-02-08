@@ -20,7 +20,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_CONTAINERS_BUSE
 import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.EDP_INSTANCES;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.ENDPOINTS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.INTERFACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 
 import javax.inject.Inject;
@@ -42,7 +42,7 @@ import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.EndpointsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.InterfacesRecord;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -51,42 +51,43 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Singleton
-@Path("/endpoints")
-public class EndpointsResource {
+@Path("/interfaces")
+public class InterfacesResource {
 
     private final Configuration jooq;
 
     @Inject
-    public EndpointsResource(Configuration jooq) {
+    public InterfacesResource(Configuration jooq) {
         this.jooq = jooq;
     }
 
     @GET
-    @Path("/{eId}")
+    @Path("/{iId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public EndpointOverview overview(@NotNull @PathParam("eId") @Min(1) long eId,
+    public InterfaceOverview overview(@NotNull @PathParam("iId") @Min(1) long iId,
             @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
-            EndpointsRecord endpoint = DSL.using(conf).selectFrom(ENDPOINTS).where(ENDPOINTS.ID.eq(eId)).fetchOne();
+            InterfacesRecord interfaceRec = DSL.using(conf).selectFrom(INTERFACES).where(INTERFACES.ID.eq(iId))
+                    .fetchOne();
 
-            if (endpoint == null) {
+            if (interfaceRec == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
             Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
                     .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
-                    .onKey(FK_CONTAINERS_BUSES_ID).join(EDP_INSTANCES).onKey().join(ENDPOINTS).onKey()
-                    .where(ENDPOINTS.ID.eq(eId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
+                    .onKey(FK_CONTAINERS_BUSES_ID).join(EDP_INSTANCES).onKey().join(INTERFACES).onKey()
+                    .where(INTERFACES.ID.eq(iId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
 
             if (user == null) {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
 
-            return new EndpointOverview();
+            return new InterfaceOverview();
         });
     }
 
-    public static class EndpointMin {
+    public static class InterfaceMin {
 
         @NotNull
         @Min(1)
@@ -97,11 +98,11 @@ public class EndpointsResource {
         @JsonProperty
         public final String name;
 
-        public EndpointMin(EndpointsRecord eDb) {
-            this(eDb.getId(), eDb.getName());
+        public InterfaceMin(InterfacesRecord iDb) {
+            this(iDb.getId(), iDb.getName());
         }
 
-        private EndpointMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
+        private InterfaceMin(@JsonProperty("id") long id, @JsonProperty("name") String name) {
             this.id = id;
             this.name = name;
         }
@@ -112,11 +113,11 @@ public class EndpointsResource {
         }
     }
 
-    public static class EndpointFull {
+    public static class InterfaceFull {
 
         @Valid
         @JsonUnwrapped
-        public final EndpointMin endpoint;
+        public final InterfaceMin interface_;
 
         @NotNull
         @Min(1)
@@ -126,20 +127,20 @@ public class EndpointsResource {
         @Min(1)
         public final long componentId;
 
-        public EndpointFull(EndpointsRecord eDb, long containerId, long componentId) {
-            this(new EndpointMin(eDb), containerId, componentId);
+        public InterfaceFull(InterfacesRecord iDb, long containerId, long componentId) {
+            this(new InterfaceMin(iDb), containerId, componentId);
         }
 
-        private EndpointFull(EndpointMin endpoint, long containerId, long componentId) {
-            this.endpoint = endpoint;
+        private InterfaceFull(InterfaceMin intf, long containerId, long componentId) {
+            this.interface_ = intf;
             this.containerId = containerId;
             this.componentId = componentId;
         }
 
         @JsonCreator
-        private EndpointFull() {
+        private InterfaceFull() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new EndpointMin(0, ""), 0, 0);
+            this(new InterfaceMin(0, ""), 0, 0);
         }
 
         @JsonProperty
@@ -158,7 +159,7 @@ public class EndpointsResource {
             int result = 1;
             result = prime * result + (int) (componentId ^ (componentId >>> 32));
             result = prime * result + (int) (containerId ^ (containerId >>> 32));
-            result = prime * result + ((endpoint == null) ? 0 : endpoint.hashCode());
+            result = prime * result + ((interface_ == null) ? 0 : interface_.hashCode());
             return result;
         }
 
@@ -170,21 +171,21 @@ public class EndpointsResource {
                 return false;
             if (getClass() != obj.getClass())
                 return false;
-            EndpointFull other = (EndpointFull) obj;
+            InterfaceFull other = (InterfaceFull) obj;
             if (componentId != other.componentId)
                 return false;
             if (containerId != other.containerId)
                 return false;
-            if (!endpoint.name.equals(other.endpoint.name))
+            if (!interface_.name.equals(other.interface_.name))
                 return false;
-            if (endpoint.id != other.endpoint.id)
+            if (interface_.id != other.interface_.id)
                 return false;
             return true;
         }
     }
 
     @JsonSerialize
-    public static class EndpointOverview {
+    public static class InterfaceOverview {
         // TODO remove annotation when there will be data
     }
 }

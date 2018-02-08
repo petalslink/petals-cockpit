@@ -36,6 +36,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.Record;
@@ -152,6 +153,35 @@ public class ServicesResource {
             return Long.toString(componentId);
         }
 
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + (int) (componentId ^ (componentId >>> 32));
+            result = prime * result + (int) (containerId ^ (containerId >>> 32));
+            result = prime * result + ((service == null) ? 0 : service.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            ServiceFull other = (ServiceFull) obj;
+            if (componentId != other.componentId)
+                return false;
+            if (containerId != other.containerId)
+                return false;
+            if (!service.name.equals(other.service.name))
+                return false;
+            if (service.id != other.service.id)
+                return false;
+            return true;
+        }
     }
 
     @JsonSerialize

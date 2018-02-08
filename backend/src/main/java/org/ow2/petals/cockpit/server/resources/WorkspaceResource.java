@@ -829,7 +829,7 @@ public class WorkspaceResource {
             this.users = ImmutableMap.of();
             this.content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                     ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
-                    ImmutableMap.of());
+                    ImmutableMap.of(), ImmutableMap.of());
             this.workspace = new WorkspaceOverview(0, "", ImmutableList.of(), "");
         }
     }
