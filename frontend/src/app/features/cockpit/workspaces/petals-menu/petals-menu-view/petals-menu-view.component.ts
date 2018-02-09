@@ -23,7 +23,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { map, tap } from 'rxjs/operators';
+import { debounceTime, map, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
@@ -64,8 +64,8 @@ export class PetalsMenuViewComponent implements OnInit {
 
     this.searchForm.valueChanges
       .pipe(
+        debounceTime(300),
         map(value => value.search),
-        tap(search => (this.search = search)),
         tap(search =>
           this.store$.dispatch(new Workspaces.SetSearch({ search }))
         )
@@ -75,11 +75,12 @@ export class PetalsMenuViewComponent implements OnInit {
     this.store$
       .select(state => state.workspaces.searchPetals)
       .pipe(
-        tap(searchPetals =>
+        tap(searchPetals => {
           this.searchForm.get('search').setValue(searchPetals, {
             emitEvent: false,
-          })
-        )
+          });
+          this.search = searchPetals;
+        })
       )
       .subscribe();
   }

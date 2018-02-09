@@ -106,7 +106,7 @@ describe(`Petals`, () => {
     cy.expectPetalsTreeToBe(treeFiltered);
   });
 
-  it(`should clear input and focus search bar when the message saying no match is closed`, () => {
+  it(`should clear input, focus search bar and unlock tree folding when the message saying no match is closed`, () => {
     cy.login('admin', 'admin');
 
     cy
@@ -115,12 +115,22 @@ describe(`Petals`, () => {
       .expectFocused();
 
     cy
-      .get(MESSAGE_DOM.texts.msgDetails)
-      .contains(`There is no match with "Some random search".`);
+      .get(`app-petals-menu-view ${MESSAGE_DOM.texts.msgDetails}`)
+      .contains('There is no match with "Some random search".');
 
     cy.get(MESSAGE_DOM.buttons.cancelMessage).click();
 
     cy.get(PETALS_DOM.inputs.search).should('be.empty');
+
+    cy.expectPetalsTreeToBe(expectedTreeNames);
+
+    cy.foldElementInTree(`container`, `Cont 0`);
+
+    cy.expectPetalsTreeToBe(treeWithCont0Folded);
+
+    cy.unfoldElementInTree(`container`, `Cont 0`);
+
+    cy.expectPetalsTreeToBe(expectedTreeNames);
   });
 
   it(`should contain the correct buses in progress`, () => {
