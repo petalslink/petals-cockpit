@@ -1,5 +1,7 @@
 // base selector
 const bs = `app-workspace`;
+const bsWksElement = `app-workspace-element`;
+const bsWksOverview = `app-workspace-overview`;
 
 export const WORKSPACE_DOM = {
   buttons: {
@@ -13,3 +15,12 @@ export const WORKSPACE_DOM = {
   },
 };
 
+export const WORKSPACE_ELEMENT_DOM = {
+  workspaceElement: {
+    workspaceElementView: `${bsWksElement} .workspace-element`,
+  },
+};
+
+export const WORKSPACE_OVERVIEW_DOM = {
+  buttons: { openDialogDeleteWks: `${bsWksOverview} .btn-delete-wks` },
+};
