@@ -39,6 +39,7 @@ import { Components } from 'app/features/cockpit/workspaces/state/components/com
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
+import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
@@ -101,12 +102,14 @@ export class BusesEffects {
         }
 
         return batchActions([
+          new Services.Clean(),
           new BusesInProgress.Removed(bus),
           new Buses.Added(buses),
           new Containers.Added(toJsTable(data.containers)),
           new ServiceAssemblies.Added(toJsTable(data.serviceAssemblies)),
           new Components.Added(toJsTable(data.components)),
           new ServiceUnits.Added(toJsTable(data.serviceUnits)),
+          new Services.Added(toJsTable(data.services)),
           new SharedLibraries.Added(toJsTable(data.sharedLibraries)),
         ]);
       })

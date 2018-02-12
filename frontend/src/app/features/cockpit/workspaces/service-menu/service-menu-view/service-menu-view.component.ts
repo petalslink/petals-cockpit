@@ -15,7 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
@@ -31,6 +37,7 @@ import { Ui } from 'app/shared/state/ui.actions';
   selector: 'app-service-menu-view',
   templateUrl: './service-menu-view.component.html',
   styleUrls: ['./service-menu-view.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServiceMenuViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
@@ -51,6 +58,8 @@ export class ServiceMenuViewComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+
+    this.store$.dispatch(new Services.Clean());
   }
 
   closeSidenavOnSmallScreen() {

@@ -20,8 +20,6 @@ Cypress.Commands.add('expectPetalsTreeToBe', tree => {
   const treeNames = cy.get(PETALS_TREE_DOM.texts.itemsNames);
   treeNames.should('have.length', tree.length);
   treeNames.each(($item, index) => cy.contains(tree[index]));
-
-  console.log('treeNames', treeNames);
 });
 
 Cypress.Commands.add('getElementInPetalsTree', (type, name) => {

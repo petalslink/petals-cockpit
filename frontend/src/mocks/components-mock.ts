@@ -61,6 +61,7 @@ export class Component {
   public readonly container: Container;
   private readonly serviceUnits = new Map<string, ServiceUnit>();
   private readonly sharedLibraries = new Map<string, SharedLibrary>();
+
   public readonly name: string;
   public state: ComponentState;
   public installParameters: { [key: string]: string };
@@ -77,13 +78,8 @@ export class Component {
     this.id = `idComp${i}`;
     this.name = name ? name : `Comp ${i}`;
     this.state = state;
-    this.installParameters = {
-      httpPort: '8080',
-      httpsEnabled: 'false',
-    };
-    this.runtimeParameters = {
-      httpThreadPoolSizeMax: '10',
-    };
+    this.installParameters = { httpPort: '8080', httpsEnabled: 'false' };
+    this.runtimeParameters = { httpThreadPoolSizeMax: '10' };
     sls.forEach(sl => this.sharedLibraries.set(sl.id, sl));
   }
 
@@ -123,9 +119,7 @@ export class Component {
         parameters: { ...this.installParameters, ...this.runtimeParameters },
       };
     } else {
-      return {
-        parameters: this.runtimeParameters,
-      };
+      return { parameters: this.runtimeParameters };
     }
   }
 }
