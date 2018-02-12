@@ -48,6 +48,8 @@ import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.EndpointsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.InterfacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServicesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
@@ -198,6 +200,24 @@ public class CockpitResourceRule implements TestRule {
             // can be received multiple time without raising an error
             if (!dbObjectIds.containsKey(service)) {
                 setDbObjectId(service, service.getId());
+            }
+        }
+
+        @Override
+        public void endpointAdded(EndpointsRecord endpoint) {
+            // A same service can have multiple interfaces/endpoints, thus a same service insertion request
+            // can be received multiple time without raising an error
+            if (!dbObjectIds.containsKey(endpoint)) {
+                setDbObjectId(endpoint, endpoint.getId());
+            }
+        }
+
+        @Override
+        public void interfaceAdded(InterfacesRecord interface_) {
+            // A same service can have multiple interfaces/endpoints, thus a same service insertion request
+            // can be received multiple time without raising an error
+            if (!dbObjectIds.containsKey(interface_)) {
+                setDbObjectId(interface_, interface_.getId());
             }
         }
     }

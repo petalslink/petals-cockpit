@@ -322,6 +322,23 @@ public class ServicesListTest extends AbstractBasicResourceTest {
         assertThatComponentState(component22, ArtifactState.State.STARTED);
     }
 
+    @Test
+    public void manageEndpointsMultipleInterfaces() {
+        try (EventInput eventInput = resource.sse(1)) {
+            expectWorkspaceContent(eventInput, (t, a) -> {
+                assertWorkspaceContentForServices(a, t.content, wkspId, referenceEndpoints);
+            });
+
+            setReference(makeEndpointsMultipleInterfaces());
+
+            changeCompState(component13, ComponentMin.State.Started);
+            expectServicesUpdatedAmongNext2(eventInput, (t, a) -> {
+                assertWorkspaceContentForServices(a, t, wkspId, referenceEndpoints);
+            });
+        }
+        assertThatComponentState(component13, ArtifactState.State.STARTED);
+    }
+
     // TODO this test would be more relevant in an e2e integration test
     @Test
     public void complexSequenceTwoContainers() {
@@ -388,6 +405,18 @@ public class ServicesListTest extends AbstractBasicResourceTest {
         return e;
     }
 
+    private List<Endpoint> makeEndpointsMultipleInterfaces() {
+        List<Endpoint> e = new ArrayList<Endpoint>();
+
+        final EndpointType type = EndpointType.INTERNAL;
+        e.add(new Endpoint("edp1a2", type, "cont1", "comp1", "serv1a", Arrays.asList("int1", "int3")));
+        e.add(new Endpoint("edp2a2", type, "cont1", "comp1", "serv2a", Arrays.asList("int2", "int4", "int5")));
+        e.add(new Endpoint("edp1b2", type, "cont1", "comp2", "serv1b", Arrays.asList("int1", "int3")));
+        e.add(new Endpoint("edp2b2", type, "cont1", "comp2", "serv2b", Arrays.asList("int2")));
+
+        return e;
+    }
+    
     private void addEndpointsToReference(int edpToAdd) {
         int target = edpToAdd + referenceEndpoints.size();
         for (int i = referenceEndpoints.size() + 1; i <= target; i++) {

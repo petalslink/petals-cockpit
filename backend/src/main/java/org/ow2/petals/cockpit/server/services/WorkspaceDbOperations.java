@@ -448,8 +448,7 @@ public class WorkspaceDbOperations {
         Map<String, Endpoint> edpToAdd = new HashMap<String, Endpoint>();
         if (edpViewToKeep != null) {
             for (Endpoint e : edpViewToKeep.getAllEndpoints()) {
-                final String endpointName = e.getEndpointName();
-                edpToAdd.put(endpointName != null ? endpointName : "namelessEndpoint", e);
+                edpToAdd.put(e.getEndpointName(), e);
             }
         }
 
@@ -471,13 +470,13 @@ public class WorkspaceDbOperations {
             EdpInstancesRecord instrec = record.into(EDP_INSTANCES);
             assert servrec != null && instrec != null && edprec != null && itfrec != null;
 
-            String compName = ctx.selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(instrec.getComponentId())).fetchAny()
-                    .getName();
-            String contName = ctx.selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(instrec.getContainerId())).fetchAny()
-                    .getName();
+            String compName = ctx.selectFrom(COMPONENTS).where(COMPONENTS.ID.eq(instrec.getComponentId()))
+                    .fetchOne(COMPONENTS.NAME);
+            String contName = ctx.selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(instrec.getContainerId()))
+                    .fetchOne(CONTAINERS.NAME);
             assert contName != null && !contName.isEmpty() && compName != null && !compName.isEmpty();
 
-            final List<Endpoint> serviceEndpoints = edpViewToKeep != null
+            final List<Endpoint> serviceEndpoints = (edpViewToKeep != null)
                     ? edpViewToKeep.getListOfEndpointsByServiceName().get(servrec.getName())
                     : null;
 
@@ -522,11 +521,14 @@ public class WorkspaceDbOperations {
             long cId) {
 
         final DSLContext ctx = DSL.using(conf);
+        Long busId = ctx.select().from(BUSES).join(CONTAINERS).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                .where(CONTAINERS.ID.eq(cId)).fetchOne(BUSES.ID);
+        assert busId != null;
+
         // Now we insert new endpoints using (when possible) existing service/endpoint/interfaces
-        // edpToAdd.values().stream().forEach(e -> {
         for (Endpoint e : edpToAdd.values()) {
-            Record compIdRec = ctx.select(COMPONENTS.ID).from(COMPONENTS).join(CONTAINERS).onKey()
-                    .where(COMPONENTS.CONTAINER_ID.eq(cId)).and(COMPONENTS.NAME.eq(e.getComponentName())).fetchOne();
+            Record compIdRec = ctx.select(COMPONENTS.ID).from(COMPONENTS).where(COMPONENTS.CONTAINER_ID.eq(cId))
+                    .and(COMPONENTS.NAME.eq(e.getComponentName())).fetchOne();
             if (compIdRec == null) {
                 LOG.error(
                         "Skipping endpoint insert: \"{}\": Found no DB container/component \"{}\"/\"{}\" on container# \"{}\".",
@@ -535,27 +537,21 @@ public class WorkspaceDbOperations {
             }
             Long componentId = compIdRec.into(COMPONENTS).getId();
 
-            Record sIdRec = ctx.select().from(SERVICES).join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID)
-                    .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
-                    .where(EDP_INSTANCES.CONTAINER_ID.eq(cId))
-                    .and(SERVICES.NAME.eq(e.getServiceName()).and(COMPONENTS.NAME.eq(e.getComponentName()))).fetchOne();
-            Record eIdRec = ctx.select().from(ENDPOINTS).join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
-                    .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
-                    .where(EDP_INSTANCES.CONTAINER_ID.eq(cId))
-                    .and(ENDPOINTS.NAME.eq(e.getEndpointName()).and(COMPONENTS.NAME.eq(e.getComponentName())))
-                    .fetchOne();
-
-            @SuppressWarnings("null")
-            Map<String, @Nullable Record> iIdRecMap = ctx.select().from(INTERFACES).join(EDP_INSTANCES)
-                    .onKey(Keys.FK_EDP_INSTANCES_INTERFACE_ID)
-                    .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
-                    .where(EDP_INSTANCES.CONTAINER_ID.eq(cId))
-                    .and(INTERFACES.NAME.in(e.getInterfaceNames()).and(COMPONENTS.NAME.eq(e.getComponentName())))
-                    .fetchMap(INTERFACES.NAME);
+            Record sIdRec = ctx.select().from(SERVICES)
+                    .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID)
+                    .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                    .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                    .where(BUSES.ID.eq(busId)).and(SERVICES.NAME.eq(e.getServiceName())).fetchAny();
+            
+            Record eIdRec = ctx.select().from(ENDPOINTS)
+                    .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
+                    .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                    .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                    .where(BUSES.ID.eq(busId)).and(ENDPOINTS.NAME.eq(e.getEndpointName()))
+                    .fetchAny();
 
             ServicesRecord sDb = new ServicesRecord(null, e.getServiceName());
             EndpointsRecord eDb = new EndpointsRecord(null, e.getEndpointName());
-            // List<InterfacesRecord> iDbList = new ArrayList<InterfacesRecord>();
 
             if (sIdRec == null) {
                 sDb.attach(conf);
@@ -578,9 +574,14 @@ public class WorkspaceDbOperations {
             endpointAdded(eDb);
 
             for (String interfaceName : e.getInterfaceNames()) {
-                // e.getInterfaceNames().stream().forEach(interfaceName -> {
+                Record iIdRec = ctx.select().from(INTERFACES)
+                        .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_INTERFACE_ID)
+                        .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                        .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                        .where(BUSES.ID.eq(busId)).and(INTERFACES.NAME.eq(interfaceName))
+                        .fetchAny();
+                
                 InterfacesRecord iDb = new InterfacesRecord(null, interfaceName);
-                final Record iIdRec = iIdRecMap.get(interfaceName);
                 if (iIdRec == null) {
                     iDb.attach(conf);
                     final int iinserted = iDb.insert();
@@ -589,7 +590,6 @@ public class WorkspaceDbOperations {
                     iDb = iIdRec.into(INTERFACES);
                 }
                 assert iDb != null;
-                // iDbList.add(iDb);
                 interfaceAdded(iDb);
 
                 EdpInstancesRecord eiDb = new EdpInstancesRecord(null, cId, componentId, sDb.getId(), eDb.getId(),
@@ -597,12 +597,8 @@ public class WorkspaceDbOperations {
                 eiDb.attach(conf);
                 final int eiinserted = eiDb.insert();
                 assert eiinserted == 1;
-
             }
-            // );
-
         }
-        // );
     }
 
     public ImmutableMap<String, ServiceFull> getWorkspaceServices(Long workspaceId, Configuration conf) {
