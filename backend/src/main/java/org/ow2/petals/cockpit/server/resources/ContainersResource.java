@@ -179,26 +179,31 @@ public class ContainersResource {
         @JsonProperty
         public final ImmutableSet<String> services;
 
+        @JsonProperty
+        public final ImmutableSet<String> endpoints;
+
         private ContainerFull(ContainerMin container, long busId, Set<String> components, Set<String> serviceAssemblies,
-                Set<String> sharedLibraries, Set<String> services) {
+                Set<String> sharedLibraries, Set<String> services, Set<String> endpoints) {
             this.container = container;
             this.busId = busId;
             this.components = ImmutableSet.copyOf(components);
             this.serviceAssemblies = ImmutableSet.copyOf(serviceAssemblies);
             this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
             this.services = ImmutableSet.copyOf(services);
+            this.endpoints = ImmutableSet.copyOf(endpoints);
         }
 
         public ContainerFull(ContainersRecord cDb, Set<String> components, Set<String> serviceAssemblies,
-                Set<String> sharedLibraries, Set<String> services) {
-            this(new ContainerMin(cDb), cDb.getBusId(), components, serviceAssemblies, sharedLibraries, services);
+                Set<String> sharedLibraries, Set<String> services, Set<String> endpoints) {
+            this(new ContainerMin(cDb), cDb.getBusId(), components, serviceAssemblies, sharedLibraries, services,
+                    endpoints);
         }
 
         @JsonCreator
         private ContainerFull() {
             // jackson will inject values itself (because of @JsonUnwrapped)
             this(new ContainerMin(0, ""), 0, ImmutableSet.of(), ImmutableSet.of(), ImmutableSet.of(),
-                    ImmutableSet.of());
+                    ImmutableSet.of(), ImmutableSet.of());
         }
 
         @JsonProperty

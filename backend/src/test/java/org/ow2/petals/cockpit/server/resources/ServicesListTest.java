@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.client.Entity;
 
@@ -45,50 +46,48 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentChange
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.ComponentStateChanged;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAStateChanged;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
 
 import javaslang.Tuple;
 
-public class UpdateServicesTest extends AbstractBasicResourceTest {
-
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateServicesTest.class);
+public class ServicesListTest extends AbstractBasicResourceTest {
 
     private long wkspId = 1L;
     private final Domain domain = new Domain("dom");
     private final int containerPort = 7700;
     private final Container container = new Container("cont1", "host1", ImmutableMap.of(PortType.JMX, containerPort),
             "user", "pass", State.REACHABLE);
-    private final Component component1 = new Component("comp1", ComponentType.SE, ArtifactState.State.STARTED);
-    private final ServiceUnit serviceUnit11 = new ServiceUnit("su11", component1.getName());
+
+    private final Component component11 = new Component("comp1", ComponentType.SE, ArtifactState.State.STARTED);
+
+    private final ServiceUnit serviceUnit11 = new ServiceUnit("su11", component11.getName());
     private final ServiceAssembly serviceAssembly11 = new ServiceAssembly("sa11", ArtifactState.State.STARTED,
             serviceUnit11);
-    private final ServiceUnit serviceUnit12 = new ServiceUnit("su12", component1.getName());
+
+    private final ServiceUnit serviceUnit12 = new ServiceUnit("su12", component11.getName());
     private final ServiceAssembly serviceAssembly12 = new ServiceAssembly("sa12", ArtifactState.State.SHUTDOWN,
             serviceUnit12);
 
-    private final ServiceUnit serviceUnit13 = new ServiceUnit("su13", component1.getName());
+    private final ServiceUnit serviceUnit13 = new ServiceUnit("su13", component11.getName());
 
     private final ServiceAssembly serviceAssembly13 = new ServiceAssembly("sa13", ArtifactState.State.STOPPED,
             serviceUnit13);
 
-    private final Component component2 = new Component("comp2", ComponentType.SE, ArtifactState.State.STOPPED);
+    private final Component component12 = new Component("comp2", ComponentType.SE, ArtifactState.State.STOPPED);
 
-    private final Component component3 = new Component("comp3", ComponentType.SE, ArtifactState.State.SHUTDOWN);
+    private final Component component13 = new Component("comp3", ComponentType.SE, ArtifactState.State.SHUTDOWN);
 
-    private final List<Endpoint> referenceEndpoints = makeEndpoints();
+    private final List<Endpoint> referenceEndpoints = filterContainer("cont1", makeEndpoints());
 
-    // private final Container container2 = new Container("cont2", "host2", ImmutableMap.of(PortType.JMX,
-    // containerPort),
-    // "user", "pass", State.REACHABLE);
-    //
-    // private final Component component21 = new Component("comp1", ComponentType.BC, ArtifactState.State.STARTED);
-    //
-    // private final Component component22 = new Component("comp2", ComponentType.BC, ArtifactState.State.STOPPED);
+    private final Container container2 = new Container("cont2", "host2", ImmutableMap.of(PortType.JMX, containerPort),
+            "user", "pass", State.REACHABLE);
 
-    public UpdateServicesTest() {
+    private final Component component21 = new Component("comp1", ComponentType.BC, ArtifactState.State.STARTED);
+
+    private final Component component22 = new Component("comp2", ComponentType.BC, ArtifactState.State.SHUTDOWN);
+
+    public ServicesListTest() {
         super(ServicesResource.class, WorkspaceResource.class);
     }
 
@@ -96,21 +95,31 @@ public class UpdateServicesTest extends AbstractBasicResourceTest {
     public void setUp() {
         resource.petals.registerDomain(domain);
         resource.petals.registerContainer(container);
-        resource.petals.registerArtifact(component1, container);
+        resource.petals.registerArtifact(component11, container);
         resource.petals.registerArtifact(serviceAssembly11, container);
         resource.petals.registerArtifact(serviceAssembly12, container);
         resource.petals.registerArtifact(serviceAssembly13, container);
-        resource.petals.registerArtifact(component2, container);
-        resource.petals.registerArtifact(component3, container);
+        resource.petals.registerArtifact(component12, container);
+        resource.petals.registerArtifact(component13, container);
 
-        // resource.petals.registerContainer(container2);
-        // resource.petals.registerArtifact(component21, container2);
-        // resource.petals.registerArtifact(component22, container2);
+        resource.petals.registerContainer(container2);
+        resource.petals.registerArtifact(component21, container2);
+        resource.petals.registerArtifact(component22, container2);
 
         resource.petals.registerEndpoints(referenceEndpoints);
 
         setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
 
+    }
+
+    @Test
+    public void workspaceFetchesServices() {
+        try (EventInput eventInput = resource.sse(1)) {
+
+            expectWorkspaceContent(eventInput, (t, a) -> {
+                assertWorkspaceContentForServices(a, t.content, wkspId, referenceEndpoints);
+            });
+        }
     }
 
     @Test
@@ -193,13 +202,13 @@ public class UpdateServicesTest extends AbstractBasicResourceTest {
             });
             addEndpointsToReference(5);
 
-            changeCompState(component3, ComponentMin.State.Started);
+            changeCompState(component13, ComponentMin.State.Started);
 
             expectServicesUpdatedAmongNext2(eventInput, (t, a) -> {
                 assertWorkspaceContentForServices(a, t, wkspId, referenceEndpoints);
             });
         }
-        assertThatComponentState(component3, ArtifactState.State.STARTED);
+        assertThatComponentState(component13, ArtifactState.State.STARTED);
     }
 
     @Test
@@ -212,15 +221,16 @@ public class UpdateServicesTest extends AbstractBasicResourceTest {
 
             removeEndpointsFromReference(2);
 
-            changeCompState(component2, ComponentMin.State.Unloaded);
+            changeCompState(component12, ComponentMin.State.Unloaded);
 
             expectServicesUpdatedAmongNext2(eventInput, (t, a) -> {
                 assertWorkspaceContentForServices(a, t, wkspId, referenceEndpoints);
             });
         }
-        assertNoDbComponent(component2);
-        assertThat(container.getComponents()).doesNotContain(component2);
+        assertNoDbComponent(component12);
+        assertThat(container.getComponents()).doesNotContain(component12);
     }
+
 
     @Test
     public void changeOnComponentUninstall() {
@@ -232,13 +242,13 @@ public class UpdateServicesTest extends AbstractBasicResourceTest {
 
             removeEndpointsFromReference(1);
 
-            changeCompState(component2, ComponentMin.State.Loaded);
+            changeCompState(component12, ComponentMin.State.Loaded);
 
             expectServicesUpdatedAmongNext2(eventInput, (t, a) -> {
                 assertWorkspaceContentForServices(a, t, wkspId, referenceEndpoints);
             });
         }
-        assertThatComponentState(component2, ArtifactState.State.LOADED);
+        assertThatComponentState(component12, ArtifactState.State.LOADED);
     }
 
     @Test
@@ -249,28 +259,102 @@ public class UpdateServicesTest extends AbstractBasicResourceTest {
                 assertWorkspaceContentForServices(a, t.content, wkspId, referenceEndpoints);
             });
 
-            changeCompState(component1, ComponentMin.State.Stopped);
+            changeCompState(component11, ComponentMin.State.Stopped);
 
             expectNoServicesUpdated(eventInput);
         }
-        assertThatComponentState(component1, ArtifactState.State.STOPPED);
+        assertThatComponentState(component11, ArtifactState.State.STOPPED);
     }
 
     @Test
-    public void manageIntricateEndpoints() {
+    public void cannotFindMissingComponent() {
+        try (EventInput eventInput = resource.sse(1)) {
+
+            expectWorkspaceContent(eventInput, (t, a) -> {
+                assertWorkspaceContentForServices(a, t.content, wkspId, referenceEndpoints);
+            });
+
+            changeCompState(component12, ComponentMin.State.Unloaded);
+
+            // As it is already unloaded, services on comp2 should not be inserted and thus
+            // not returned to client, even though returned by Petals API
+            expectServicesUpdatedAmongNext2(eventInput, (t, a) -> {
+                assertWorkspaceContentForServices(a, t, wkspId, filterComponent("comp1", referenceEndpoints));
+            });
+        }
+        assertNoDbComponent(component12);
+        assertThat(container.getComponents()).doesNotContain(component12);
+    }
+
+    @Test
+    public void allServicesDissapear() {
         try (EventInput eventInput = resource.sse(1)) {
             expectWorkspaceContent(eventInput, (t, a) -> {
                 assertWorkspaceContentForServices(a, t.content, wkspId, referenceEndpoints);
             });
 
-            makeIntricateEndpoints();
-            changeCompState(component3, ComponentMin.State.Started);
+            referenceEndpoints.clear();
+
+            changeCompState(component13, ComponentMin.State.Started);
             expectServicesUpdatedAmongNext2(eventInput, (t, a) -> {
                 assertWorkspaceContentForServices(a, t, wkspId, referenceEndpoints);
             });
 
         }
-        assertThatComponentState(component3, ArtifactState.State.STARTED);
+        assertThatComponentState(component13, ArtifactState.State.STARTED);
+    }
+
+    @Test
+    public void manageEndpointsTwoContainers() {
+        try (EventInput eventInput = resource.sse(1)) {
+            expectWorkspaceContent(eventInput, (t, a) -> {
+                assertWorkspaceContentForServices(a, t.content, wkspId, referenceEndpoints);
+            });
+
+            setReference(makeEndpoints());
+
+            changeCompState(component22, ComponentMin.State.Started);
+            expectServicesUpdatedAmongNext2(eventInput, (t, a) -> {
+                assertWorkspaceContentForServices(a, t, wkspId, referenceEndpoints);
+            });
+
+        }
+        assertThatComponentState(component22, ArtifactState.State.STARTED);
+    }
+
+    // TODO this test would be more relevant in an e2e integration test
+    @Test
+    public void complexSequenceTwoContainers() {
+        try (EventInput eventInput = resource.sse(1)) {
+            expectWorkspaceContent(eventInput, (t, a) -> {
+                assertWorkspaceContentForServices(a, t.content, wkspId, referenceEndpoints);
+            });
+
+            // cont2 start exposing services
+            setReference(makeEndpoints());
+
+            changeCompState(component22, ComponentMin.State.Started);
+            expectServicesUpdatedAmongNext2(eventInput, (t, a) -> {
+                assertWorkspaceContentForServices(a, t, wkspId, referenceEndpoints);
+            });
+
+            // cont1 stop exposing any services
+            setReference(filterContainer("cont2", makeEndpoints()));
+
+            changeCompState(component12, ComponentMin.State.Loaded);
+            expectServicesUpdatedAmongNext2(eventInput, (t, a) -> {
+                assertWorkspaceContentForServices(a, t, wkspId, referenceEndpoints);
+            });
+
+            // cont1 start exposing again
+            setReference(makeEndpoints());
+            addEndpointsToReference(50);
+            changeCompState(component12, ComponentMin.State.Shutdown);
+            changeCompState(component12, ComponentMin.State.Started);
+            expectServicesUpdatedAmongNext2(eventInput, (t, a) -> {
+                assertWorkspaceContentForServices(a, t, wkspId, referenceEndpoints);
+            });
+        }
     }
 
 
@@ -289,32 +373,30 @@ public class UpdateServicesTest extends AbstractBasicResourceTest {
     }
 
     private List<Endpoint> makeEndpoints() {
-        List<Endpoint> endpoints = new ArrayList<Endpoint>();
+        List<Endpoint> e = new ArrayList<Endpoint>();
 
-        endpoints.add(new Endpoint("edp1", EndpointType.INTERNAL, "cont1", "comp1", "{http://namespace.org/}serv1",
-                Arrays.asList("{http://namespace.org/}int1")));
-        endpoints.add(new Endpoint("edp2", EndpointType.INTERNAL, "cont1", "comp1", "{http://namespace.org/}serv2",
-                Arrays.asList("{http://namespace.org/}int2", "{http://namespace.org/}int3")));
-        endpoints.add(new Endpoint("edp3", EndpointType.INTERNAL, "cont1", "comp1", "{http://namespace.org/}serv3",
-                Arrays.asList("{http://namespace.org/}int3")));
-        endpoints.add(new Endpoint("edp4", EndpointType.INTERNAL, "cont1", "comp1", "{http://namespace.org/}serv4",
-                Arrays.asList("{http://namespace.org/}int3")));
-        endpoints.add(new Endpoint("edp5", EndpointType.INTERNAL, "cont1", "comp2", "{http://namespace.org/}serv5",
-                Arrays.asList("{http://petals.ow2.org/}int1", "{http://petals.ow2.org/}int2")));
+        final EndpointType type = EndpointType.INTERNAL;
+        e.add(new Endpoint("edp1a", type, "cont1", "comp1", "serv1a", Arrays.asList("int1")));
+        e.add(new Endpoint("edp2a", type, "cont1", "comp1", "serv2a", Arrays.asList("int2")));
+        e.add(new Endpoint("edp1b", type, "cont1", "comp2", "serv1b", Arrays.asList("int1")));
+        e.add(new Endpoint("edp2b", type, "cont1", "comp2", "serv2b", Arrays.asList("int2")));
+        e.add(new Endpoint("edp3a", type, "cont2", "comp1", "serv1a", Arrays.asList("int1")));
+        e.add(new Endpoint("edp3b", type, "cont2", "comp2", "serv1b", Arrays.asList("int1")));
+        e.add(new Endpoint("edp4a", type, "cont2", "comp1", "serv2a", Arrays.asList("int2")));
+        e.add(new Endpoint("edp4b", type, "cont2", "comp2", "serv2b", Arrays.asList("int2")));
 
-        return endpoints;
+        return e;
     }
 
-    private List<Endpoint> addEndpointsToReference(int edpToAdd) {
+    private void addEndpointsToReference(int edpToAdd) {
         int target = edpToAdd + referenceEndpoints.size();
         for (int i = referenceEndpoints.size() + 1; i <= target; i++) {
             referenceEndpoints.add(new Endpoint("edp" + i, EndpointType.INTERNAL, "cont1", "comp1",
                     "{http://namespace.org/}serv" + i, Arrays.asList("{http://namespace.org/}int" + i)));
         }
-        return referenceEndpoints;
     }
 
-    private List<Endpoint> removeEndpointsFromReference(int edpToRemove) {
+    private void removeEndpointsFromReference(int edpToRemove) {
         int target = referenceEndpoints.size() - edpToRemove;
         while (referenceEndpoints.size() > target) {
             if (referenceEndpoints.isEmpty()) {
@@ -322,24 +404,23 @@ public class UpdateServicesTest extends AbstractBasicResourceTest {
             }
             referenceEndpoints.remove(referenceEndpoints.size() - 1);
         }
-        return referenceEndpoints;
     }
 
-    private List<Endpoint> makeIntricateEndpoints() {
-        List<Endpoint> e = referenceEndpoints;
-        e.clear();
+    @SuppressWarnings("null")
+    private List<Endpoint> filterContainer(String containerToKeep, List<Endpoint> endpoints) {
+        return endpoints.stream().filter(e -> e.getContainerName().contains(containerToKeep))
+                .collect(Collectors.toList());
+    }
 
-        final EndpointType type = EndpointType.INTERNAL;
-        e.add(new Endpoint("edp1a", type, "cont1", "comp1", "serv1a", Arrays.asList("int1")));
-        e.add(new Endpoint("edp1b", type, "cont1", "comp2", "serv1b", Arrays.asList("int1")));
-        e.add(new Endpoint("edp2a", type, "cont1", "comp1", "serv2a", Arrays.asList("int2")));
-        e.add(new Endpoint("edp2b", type, "cont1", "comp2", "serv2b", Arrays.asList("int2")));
-        // e.add(new Endpoint("edp3a", type, "cont2", "comp1", "serv1a", Arrays.asList("int1")));
-        // e.add(new Endpoint("edp3b", type, "cont2", "comp2", "serv1b", Arrays.asList("int1")));
-        // e.add(new Endpoint("edp4a", type, "cont2", "comp1", "serv2a", Arrays.asList("int2")));
-        // e.add(new Endpoint("edp4b", type, "cont2", "comp2", "serv2b", Arrays.asList("int2")));
+    @SuppressWarnings("null")
+    private List<Endpoint> filterComponent(String containerToKeep, List<Endpoint> endpoints) {
+        return endpoints.stream().filter(e -> e.getComponentName().contains(containerToKeep))
+                .collect(Collectors.toList());
+    }
 
-        return e;
+    private void setReference(List<Endpoint> endpoints) {
+        referenceEndpoints.clear();
+        referenceEndpoints.addAll(endpoints);
     }
 
 }
