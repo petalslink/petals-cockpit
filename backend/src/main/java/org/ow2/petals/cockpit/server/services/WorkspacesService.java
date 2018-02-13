@@ -698,15 +698,14 @@ public class WorkspacesService {
         private EndpointDirectoryView getContainerEndpointsView(long cId) {
             return DSL.using(jooq).transactionResult(conf -> {
                 ContainersRecord cont = DSL.using(conf).selectFrom(CONTAINERS).where(CONTAINERS.ID.eq(cId)).fetchOne();
-
                 assert cont != null;
+
                 final String ip = cont.getIp();
                 final Integer port = cont.getPort();
                 final String name = cont.getName();
                 final String username = cont.getUsername();
                 final String password = cont.getPassword();
-                assert ip != null && port != null && name != null && username != null && password != null
-                        && port != null;
+                assert ip != null && port != null && name != null && username != null && password != null;
 
                 return petals.getEndpointDirectoryView(ip, port, name, username, password);
             });

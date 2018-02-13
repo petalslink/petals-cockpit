@@ -63,10 +63,10 @@ public class EndpointsResource {
     @GET
     @Path("/{eId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public EndpointOverview overview(@NotNull @PathParam("eId") @Min(1) long sId,
+    public EndpointOverview overview(@NotNull @PathParam("eId") @Min(1) long eId,
             @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
-            EndpointsRecord endpoint = DSL.using(conf).selectFrom(ENDPOINTS).where(ENDPOINTS.ID.eq(sId)).fetchOne();
+            EndpointsRecord endpoint = DSL.using(conf).selectFrom(ENDPOINTS).where(ENDPOINTS.ID.eq(eId)).fetchOne();
 
             if (endpoint == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
@@ -75,7 +75,7 @@ public class EndpointsResource {
             Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
                     .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
                     .onKey(FK_CONTAINERS_BUSES_ID).join(EDP_INSTANCES).onKey().join(ENDPOINTS).onKey()
-                    .where(ENDPOINTS.ID.eq(sId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
+                    .where(ENDPOINTS.ID.eq(eId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
 
             if (user == null) {
                 throw new WebApplicationException(Status.FORBIDDEN);
