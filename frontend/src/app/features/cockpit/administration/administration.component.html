@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFlex class="wrapper-content">
+<div fxLayout="column" class="wrapper-content">
   <mat-toolbar color="primary" class="toolbar-page-header">
     <div class="prefix-toolbar-title">
       <mat-icon>settings</mat-icon>
@@ -22,20 +22,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">Administration</h1>
   </mat-toolbar>
 
-  <div fxFlexFill fxLayout="column" *ngIf="user$ | async as currentUser" class="content content-max-width">
+  <div fxFlex fxFlexFill *ngIf="user$ | async as currentUser" class="content content-max-width">
     <div class="central-content" *ngIf="currentUser.isAdmin; else notAdmin">
-      <div fxLayout="column" fxFlex *ngIf="users$ | async as users" class="user-management-page">
-        <mat-card fxLayout="column">
+      <div *ngIf="users$ | async as users" class="user-management-page">
+        <mat-card>
           <mat-card-content>
-            <div fxLayout="row" fxFlex="100%">
-              <label class="text-upper">User Management</label>
+            <div fxLayout="row" fxLayoutAlign="start center">
+              <label fxFlex class="text-upper">User Management</label>
 
-              <div fxFlex fxLayoutAlign="end center" class="margin-right-x1">
+              <div class="margin-right-x1">
                 <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-right-x1" *ngIf="isFetchingUsers$ | async; else usersFetched"></mat-spinner>
                 <ng-template #usersFetched>
                   <span class="subtitle" *ngIf="users.length > 0" matLine>
-                      {{ users.length }} user{{ (users.length) >= 2 ? 's' : '' }}
-                    </span>
+                    {{ users.length }} user{{ (users.length) >= 2 ? 's' : '' }}
+                  </span>
                 </ng-template>
               </div>
               <mat-icon color="primary">supervisor_account</mat-icon>
@@ -50,7 +50,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           ></app-message>
         </mat-card>
 
-        <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px" class="user-management-panels">
+        <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap.gt-md="10px" class="user-management-panels">
 
           <div fxFlex [ngClass.gt-md]="'card-auto-size'" class="pnl-add-user margin-top-x1">
             <mat-expansion-panel #el fxLayout="column" class="exp-pnl-add-user" [hideToggle]="false" (closed)="addEditUser.reset()">
@@ -73,7 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 (closed)="addEditUser.reset()">
 
                 <mat-expansion-panel-header class="mat-body" fxLayout="row">
-                  <mat-panel-title fxLayout="row" fxLayoutAlign="star center">
+                  <mat-panel-title fxLayout="row" fxLayoutAlign="start center">
                     <app-generate-icon mat-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
                     <span class="margin-left-x1 user-id">{{ user.id }}</span>
                     <span class="margin-left-x1 light-bold user-name" *ngIf="isLargeScreen$ | async">({{ user.name }})</span>
@@ -81,7 +81,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   </mat-panel-title>
                 </mat-expansion-panel-header>
 
-                <app-add-edit-user #addEditUser
+                <app-add-edit-user
+                  #addEditUser
                   [canDelete]="user.id !== currentUser.id && !user.isDeleting"
                   [user]="user"
                   (onSubmit)="onSave(user.id, $event); el.close()"
@@ -99,16 +100,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
     <ng-template #notAdmin>
       <div class="central-content">
-        <div fxLayout="column" fxFlex>
-          <mat-card fxLayout="column">
-            <app-message
+        <mat-card>
+          <app-message
             class="warning-not-admin"
             type="warning"
             msg="You are not an administrator."
             [isClosable]="false"
           ></app-message>
-          </mat-card>
-        </div>
+        </mat-card>
       </div>
     </ng-template>
   </div>
