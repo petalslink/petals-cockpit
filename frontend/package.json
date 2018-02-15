@@ -18,7 +18,7 @@
     "e2e:ci": "ng e2e --prod --progress=false -e=prod-e2e",
     "e2e:product": "ng e2e --serve=false --specs=e2e/login.e2e-spec.ts --specs=e2e/workspaces.e2e-spec.ts --specs=e2e/workspace-tree.e2e-spec.ts --specs=e2e/workspace-overview.e2e-spec.ts --specs=e2e/administration.e2e-spec.ts",
     "cypress": "cypress open",
-    "cypress:ci": "cypress run",
+    "cypress:ci": "cypress run --browser chromium",
     "build": "ng build --prod",
     "build:product": "yarn run build -bh='{{baseUrl}}'",
     "build:product:ci": "yarn run build:product --progress=false",
