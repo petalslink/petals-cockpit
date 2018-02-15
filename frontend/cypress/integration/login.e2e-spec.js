@@ -43,10 +43,12 @@ describe(`Login`, () => {
     usernameInput.expectFocused();
   });
 
-  it(`shouldn't select the first input of the login form on mobile`, () => {
-    cy.viewport(412, 732);
-    cy.visit(`/login`);
+  //TODO: test inconsistently failing
+  //see https://gitlab.com/linagora/petals-cockpit/issues/439
+  // it(`shouldn't select the first input of the login form on mobile`, () => {
+  //   cy.viewport(412, 732);
+  //   cy.visit(`/login`);
 
-    cy.document().then(document => expect(document.hasFocus()).to.eq(false));
-  });
+  //   cy.document().then(document => expect(document.hasFocus()).to.eq(false));
+  // });
 });

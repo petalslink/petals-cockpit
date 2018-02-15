@@ -38,7 +38,7 @@ describe(`Workspace`, () => {
       .should(`have.class`, `mat-tab-label-active`);
   });
 
-  it.only(`should active the tab api`, () => {
+  it(`should active the tab api`, () => {
     cy.login('admin', 'admin');
 
     cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav);
