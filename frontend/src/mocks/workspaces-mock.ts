@@ -25,6 +25,7 @@ import {
   IWorkspaceBackendDetails,
 } from 'app/shared/services/workspaces.service';
 import { validContainers } from 'mocks/backend-mock';
+import { Endpoint, endpointsService } from 'mocks/endpoints-mock';
 import { Service, servicesService } from 'mocks/services-mock';
 import { BackendUser } from 'mocks/users-mock';
 import {
@@ -47,6 +48,7 @@ export class Workspace {
   private readonly buses = new Map<string, Bus>();
   private readonly busesInProgress = new Map<string, BusInProgress>();
   private readonly services = new Map<string, Service>();
+  private readonly endpoints = new Map<string, Endpoint>();
 
   constructor(users: string[] = ['admin'], name?: string) {
     const i = Workspace.cpt++;
@@ -114,6 +116,23 @@ export class Workspace {
     return Array.from(this.services.values());
   }
 
+  getEndpointsIds() {
+    return Array.from(this.endpoints.keys());
+  }
+
+  getEndpoints() {
+    return Array.from(this.endpoints.values());
+  }
+
+  getMoreEndpoints(nbEndpoints: number) {
+    let i: number;
+    for (i = 0; i < nbEndpoints; i++) {
+      const endpointI = endpointsService.create('idCont0', 'idComp0');
+      this.endpoints.set(endpointI.id, endpointI);
+    }
+    return Array.from(this.endpoints.values());
+  }
+
   addUser(user: BackendUser) {
     this.users.set(user.id, user);
   }
@@ -149,8 +168,10 @@ export class Workspace {
     const serviceUnits = flatMap(components, c => c.getServiceUnits());
 
     let services = this.getServices();
+    let endpoints = this.getEndpoints();
     if (this.buses.size > 1) {
       services = this.getMoreServices(6);
+      endpoints = this.getMoreEndpoints(2);
     }
     const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
@@ -158,6 +179,7 @@ export class Workspace {
       buses: bus.toObj(),
       containers: toObj(containers),
       components: toObj(components),
+      endpoints: toObj(endpoints),
       serviceAssemblies: toObj(serviceAssemblies),
       serviceUnits: toObj(serviceUnits),
       services: toObj(services),
@@ -169,6 +191,7 @@ export class Workspace {
 
   makeServicesForComp0() {
     const services = new Map<string, Service>();
+    const endpoints = new Map<string, Endpoint>();
 
     const newService1 = servicesService.create(
       'idCont0',
@@ -184,11 +207,26 @@ export class Workspace {
     );
     services.set(newService2.id, newService2);
 
-    return this.makeEventData(services);
+    const newEndpoint = endpointsService.create(
+      'idCont0',
+      'idComp1',
+      'edpt-13f82663-test-91i4-a147-3'
+    );
+    endpoints.set(newEndpoint.id, newEndpoint);
+
+    const newEndpoint1 = endpointsService.create(
+      'idCont0',
+      'idComp1',
+      'edpt-13f82663-test-91i4-a147-1'
+    );
+    endpoints.set(newEndpoint1.id, newEndpoint1);
+
+    return this.makeEventData(services, endpoints);
   }
 
   makeServicesForComp1() {
     const services = new Map<string, Service>();
+    const endpoints = new Map<string, Endpoint>();
 
     const newService1 = servicesService.create(
       'idCont0',
@@ -218,20 +256,39 @@ export class Workspace {
     );
     services.set(newService4.id, newService4);
 
-    return this.makeEventData(services);
+    const newEndpoint1 = endpointsService.create(
+      'idCont0',
+      'idComp1',
+      'edpt-13f82663-test-91i4-a147-2'
+    );
+    endpoints.set(newEndpoint1.id, newEndpoint1);
+
+    const newEndpoint2 = endpointsService.create(
+      'idCont0',
+      'idComp1',
+      'edpt-13f82663-test-91i4-a147-3'
+    );
+    endpoints.set(newEndpoint2.id, newEndpoint2);
+
+    return this.makeEventData(services, endpoints);
   }
 
   makeServicesForComp2() {
     const services = new Map<string, Service>();
-    return this.makeEventData(services);
+    const endpoints = new Map<string, Endpoint>();
+    return this.makeEventData(services, endpoints);
   }
 
-  makeEventData(services: Map<string, Service>) {
+  makeEventData(
+    services: Map<string, Service>,
+    endpoints: Map<string, Endpoint>
+  ) {
     if (this.id === 'idWks0') {
       const eventData = {
         buses: {},
         containers: {},
         components: {},
+        endpoints: toObj(Array.from(endpoints.values())),
         serviceAssemblies: {},
         serviceUnits: {},
         services: toObj(Array.from(services.values())),
@@ -239,6 +296,69 @@ export class Workspace {
       };
 
       return { eventData };
+    }
+  }
+
+  addEndpoints() {
+    const endpoint0 = endpointsService.create(
+      'idCont0',
+      'idComp0',
+      'edpt-89p82661-test-31o4-l391-0'
+    );
+    const endpoint1 = endpointsService.create(
+      'idCont0',
+      'idComp0',
+      'edpt-89p82661-test-31o4-l391-0'
+    );
+    const endpoint2 = endpointsService.create(
+      'idCont0',
+      'idComp0',
+      'edpt-89p82661-test-31o4-l391-0'
+    );
+    const endpoint3 = endpointsService.create(
+      'idCont0',
+      'idComp0',
+      'edpt-89p82661-test-31o4-l391-0'
+    );
+    const endpoint4 = endpointsService.create(
+      'idCont0',
+      'idComp0',
+      'edpt-89p82661-test-31o4-l391-0'
+    );
+    const endpoint5 = endpointsService.create(
+      'idCont2',
+      'idComp6',
+      'edpt-89p82661-test-31o4-l391-0'
+    );
+    const endpoint6 = endpointsService.create(
+      'idCont2',
+      'idComp6',
+      'edpt-89p82661-test-31o4-l391-0'
+    );
+
+    if (this.id === 'idWks1') {
+      this.endpoints.set(endpoint5.id, endpoint5);
+      this.endpoints.set(endpoint6.id, endpoint6);
+
+      const endpoints = this.getEndpoints();
+      const eventData = { endpoints: toObj(endpoints) };
+      return [{ id: endpoint5.id, eventData }, { id: endpoint6.id, eventData }];
+    } else {
+      this.endpoints.set(endpoint0.id, endpoint0);
+      this.endpoints.set(endpoint1.id, endpoint1);
+      this.endpoints.set(endpoint2.id, endpoint2);
+      this.endpoints.set(endpoint3.id, endpoint3);
+      this.endpoints.set(endpoint4.id, endpoint4);
+
+      const endpoints = this.getEndpoints();
+      const eventData = { endpoints: toObj(endpoints) };
+      return [
+        { id: endpoint0.id, eventData },
+        { id: endpoint1.id, eventData },
+        { id: endpoint2.id, eventData },
+        { id: endpoint3.id, eventData },
+        { id: endpoint4.id, eventData },
+      ];
     }
   }
 
@@ -282,6 +402,7 @@ export class Workspace {
     if (this.id === 'idWks1') {
       this.services.set(service5.id, service5);
       this.services.set(service6.id, service6);
+
       const services = this.getServices();
       const eventData = { services: toObj(services) };
       return [{ id: service5.id, eventData }, { id: service6.id, eventData }];
@@ -330,6 +451,7 @@ export class Workspace {
 
     const containers = flatMap(buses, b => b.getContainers());
     const components = flatMap(containers, c => c.getComponents());
+    const endpoints = this.getEndpoints();
     const serviceAssemblies = flatMap(containers, c =>
       c.getServiceAssemblies()
     );
@@ -343,6 +465,7 @@ export class Workspace {
       buses: toObj(buses),
       containers: toObj(containers),
       components: toObj(components),
+      endpoints: toObj(endpoints),
       serviceAssemblies: toObj(serviceAssemblies),
       serviceUnits: toObj(serviceUnits),
       services: toObj(services),
@@ -395,8 +518,9 @@ const ws0 = workspacesService.create();
 ws0.description =
   'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.';
 
-// add 5 services
+// add 5 services and 2 endpoints
 ws0.addServices();
+ws0.addEndpoints();
 
 const ws1 = workspacesService.create([
   'admin',
@@ -406,5 +530,6 @@ const ws1 = workspacesService.create([
   'vnoel',
 ]);
 
-// add 2 services
+// add 2 services and 2 endpoints
 ws1.addServices();
+ws1.addEndpoints();

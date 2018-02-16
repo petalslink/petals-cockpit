@@ -23,93 +23,95 @@ import {
   updateById,
 } from 'app/shared/helpers/jstable.helper';
 import {
-  IServiceBackendDetails,
-  IServiceBackendSSE,
-} from 'app/shared/services/services.service';
-import { Services } from './services.actions';
+  IEndpointBackendDetails,
+  IEndpointBackendSSE,
+} from 'app/shared/services/endpoints.service';
+import { Endpoints } from './endpoints.actions';
 import {
-  IServicesTable,
-  serviceRowFactory,
-  servicesTableFactory,
-} from './services.interface';
+  endpointRowFactory,
+  endpointsTableFactory,
+  IEndpointsTable,
+} from './endpoints.interface';
 
-export namespace ServicesReducer {
+export namespace EndpointsReducer {
   type All =
-    | Services.Added
-    | Services.SetCurrent
-    | Services.Fetched
-    | Services.FetchDetails
-    | Services.FetchDetailsError
-    | Services.FetchDetailsSuccess
-    | Services.Clean
+    | Endpoints.Added
+    | Endpoints.SetCurrent
+    | Endpoints.Fetched
+    | Endpoints.FetchDetails
+    | Endpoints.FetchDetailsError
+    | Endpoints.FetchDetailsSuccess
+    | Endpoints.Clean
     | Workspaces.Clean;
 
   export function reducer(
-    table = servicesTableFactory(),
+    table = endpointsTableFactory(),
     action: All
-  ): IServicesTable {
+  ): IEndpointsTable {
     switch (action.type) {
-      case Services.AddedType: {
+      case Endpoints.AddedType: {
         return added(table, action.payload);
       }
-      case Services.SetCurrentType: {
+      case Endpoints.SetCurrentType: {
         return setCurrent(table, action.payload);
       }
-      case Services.FetchedType: {
+      case Endpoints.FetchedType: {
         return fetched(table, action.payload);
       }
-      case Services.FetchDetailsType: {
+      case Endpoints.FetchDetailsType: {
         return fetchDetails(table, action.payload);
       }
-      case Services.FetchDetailsErrorType: {
+      case Endpoints.FetchDetailsErrorType: {
         return fetchDetailsError(table, action.payload);
       }
-      case Services.FetchDetailsSuccessType: {
+      case Endpoints.FetchDetailsSuccessType: {
         return fetchDetailsSuccess(table, action.payload);
       }
-      case Services.CleanType: {
-        return servicesTableFactory();
+      case Endpoints.CleanType: {
+        return endpointsTableFactory();
       }
       case Workspaces.CleanType: {
-        return servicesTableFactory();
+        return endpointsTableFactory();
       }
       default:
         return table;
     }
   }
 
-  function added(table: IServicesTable, payload: JsTable<IServiceBackendSSE>) {
-    return putAll(table, payload, serviceRowFactory);
+  function added(
+    table: IEndpointsTable,
+    payload: JsTable<IEndpointBackendSSE>
+  ) {
+    return putAll(table, payload, endpointRowFactory);
   }
 
   function setCurrent(
-    table: IServicesTable,
+    table: IEndpointsTable,
     payload: { id: string }
-  ): IServicesTable {
+  ): IEndpointsTable {
     return {
       ...table,
-      selectedServiceId: payload.id,
+      selectedEndpointId: payload.id,
     };
   }
 
   function fetched(
-    table: IServicesTable,
-    payload: JsTable<IServiceBackendSSE>
-  ): IServicesTable {
+    table: IEndpointsTable,
+    payload: JsTable<IEndpointBackendSSE>
+  ): IEndpointsTable {
     return {
-      ...mergeInto(table, payload, serviceRowFactory),
+      ...mergeInto(table, payload, endpointRowFactory),
     };
   }
-
-  function fetchDetails(table: IServicesTable, payload: { id: string }) {
+  function fetchDetails(table: IEndpointsTable, payload: { id: string }) {
     return updateById(table, payload.id, {
       isFetchingDetails: true,
     });
   }
 
   function fetchDetailsSuccess(
-    table: IServicesTable,
-    payload: { id: string; data: IServiceBackendDetails }
+    table: IEndpointsTable,
+    payload: { id: string; data: IEndpointBackendDetails }
   ) {
     return updateById(table, payload.id, {
       ...payload.data,
@@ -117,7 +119,7 @@ export namespace ServicesReducer {
     });
   }
 
-  function fetchDetailsError(table: IServicesTable, payload: { id: string }) {
+  function fetchDetailsError(table: IEndpointsTable, payload: { id: string }) {
     return updateById(table, payload.id, {
       isFetchingDetails: false,
     });

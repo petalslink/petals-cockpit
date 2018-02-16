@@ -97,7 +97,6 @@
 //             {}
 //           ),
 //           allIds: services.map((_, index) => `service${index}`),
-//           isFetchingServices: false,
 //           selectedServiceId: '',
 //         },
 //       };

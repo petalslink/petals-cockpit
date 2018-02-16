@@ -17,38 +17,40 @@
 
 import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
 import {
-  IServiceBackendDetails,
-  IServiceBackendDetailsCommon,
-  IServiceBackendSSE,
-  IServiceBackendSSECommon,
-} from 'app/shared/services/services.service';
+  IEndpointBackendDetails,
+  IEndpointBackendDetailsCommon,
+  IEndpointBackendSSE,
+  IEndpointBackendSSECommon,
+} from 'app/shared/services/endpoints.service';
 
-export interface IServiceUI {
+export interface IEndpointUI {
   // for UI
   isFetchingDetails: boolean;
 }
 
-export interface IServiceRow
-  extends IServiceUI,
-    IServiceBackendSSE,
-    IServiceBackendDetails {}
+export interface IEndpointRow
+  extends IEndpointUI,
+    IEndpointBackendSSE,
+    IEndpointBackendDetails {}
 
-export interface IServiceRowWithoutDetails
-  extends IServiceUI,
-    IServiceBackendSSE {}
+export interface IEndpointRowWithoutDetails
+  extends IEndpointUI,
+    IEndpointBackendSSE {}
 
-export interface IService
-  extends IServiceUI,
-    IServiceBackendSSECommon,
-    IServiceBackendDetailsCommon {}
+export interface IEndpoint
+  extends IEndpointUI,
+    IEndpointBackendSSECommon,
+    IEndpointBackendDetailsCommon {}
 
-interface IServicesCommon {
-  selectedServiceId: string;
+interface IEndpointsCommon {
+  selectedEndpointId: string;
 }
 
-export interface IServicesTable extends IServicesCommon, JsTable<IServiceRow> {}
+export interface IEndpointsTable
+  extends IEndpointsCommon,
+    JsTable<IEndpointRow> {}
 
-export function serviceRowFactory(): IServiceRow {
+export function endpointRowFactory(): IEndpointRow {
   return {
     id: null,
     name: null,
@@ -58,9 +60,9 @@ export function serviceRowFactory(): IServiceRow {
   };
 }
 
-export function servicesTableFactory(): IServicesTable {
+export function endpointsTableFactory(): IEndpointsTable {
   return {
-    ...emptyJsTable<IServiceRow>(),
-    selectedServiceId: '',
+    ...emptyJsTable<IEndpointRow>(),
+    selectedEndpointId: '',
   };
 }

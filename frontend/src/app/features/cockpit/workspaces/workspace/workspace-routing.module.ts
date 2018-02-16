@@ -44,7 +44,7 @@ const routes: Routes = [
       {
         path: 'services',
         loadChildren:
-          'app/features/cockpit/workspaces/service-content/service-content.module#ServiceContentModule',
+          'app/features/cockpit/workspaces/services-content/services-content.module#ServicesContentModule',
       },
     ],
   },

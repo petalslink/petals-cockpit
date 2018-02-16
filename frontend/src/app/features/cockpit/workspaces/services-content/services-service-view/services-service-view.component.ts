@@ -15,15 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { IStore } from 'app/shared/state/store.interface';
+import { Ui } from 'app/shared/state/ui.actions';
 
-import { ServicesListComponent } from 'app/features/cockpit/workspaces/service-menu/services-list/services-list.component';
-import { SharedModule } from 'app/shared/shared.module';
-import { ServiceMenuViewComponent } from './service-menu-view/service-menu-view.component';
-
-@NgModule({
-  imports: [SharedModule],
-  declarations: [ServiceMenuViewComponent, ServicesListComponent],
-  exports: [ServiceMenuViewComponent],
+@Component({
+  selector: 'app-services-service-view',
+  templateUrl: './services-service-view.component.html',
+  styleUrls: ['./services-service-view.component.scss'],
 })
-export class ServiceMenuModule {}
+export class ServicesServiceViewComponent implements OnInit {
+  constructor(private store$: Store<IStore>) {}
+
+  ngOnInit() {
+    this.store$.dispatch(
+      new Ui.SetTitles({
+        titleMainPart1: 'Services',
+        titleMainPart2: 'Service',
+      })
+    );
+  }
+}

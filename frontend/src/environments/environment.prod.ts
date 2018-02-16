@@ -11,6 +11,10 @@ import {
   ContainersServiceImpl,
 } from 'app/shared/services/containers.service';
 import {
+  EndpointsService,
+  EndpointsServiceImpl,
+} from 'app/shared/services/endpoints.service';
+import {
   ServiceAssembliesService,
   ServiceAssembliesServiceImpl,
 } from 'app/shared/services/service-assemblies.service';
@@ -46,46 +50,20 @@ export const environment: IEnvironment = {
   strictCoherence: false,
   debug: false,
   services: [
-    {
-      provide: SseService,
-      useClass: SseServiceImpl,
-    },
-    {
-      provide: BusesService,
-      useClass: BusesServiceImpl,
-    },
-    {
-      provide: ContainersService,
-      useClass: ContainersServiceImpl,
-    },
-    {
-      provide: ComponentsService,
-      useClass: ComponentsServiceImpl,
-    },
+    { provide: SseService, useClass: SseServiceImpl },
+    { provide: BusesService, useClass: BusesServiceImpl },
+    { provide: ContainersService, useClass: ContainersServiceImpl },
+    { provide: ComponentsService, useClass: ComponentsServiceImpl },
+    { provide: EndpointsService, useClass: EndpointsServiceImpl },
     {
       provide: ServiceAssembliesService,
       useClass: ServiceAssembliesServiceImpl,
     },
-    {
-      provide: ServiceUnitsService,
-      useClass: ServiceUnitsServiceImpl,
-    },
-    {
-      provide: ServicesService,
-      useClass: ServicesServiceImpl,
-    },
-    {
-      provide: SharedLibrariesService,
-      useClass: SharedLibrariesServiceImpl,
-    },
-    {
-      provide: WorkspacesService,
-      useClass: WorkspacesServiceImpl,
-    },
-    {
-      provide: UsersService,
-      useClass: UsersServiceImpl,
-    },
+    { provide: ServiceUnitsService, useClass: ServiceUnitsServiceImpl },
+    { provide: ServicesService, useClass: ServicesServiceImpl },
+    { provide: SharedLibrariesService, useClass: SharedLibrariesServiceImpl },
+    { provide: WorkspacesService, useClass: WorkspacesServiceImpl },
+    { provide: UsersService, useClass: UsersServiceImpl },
   ],
   mock: undefined,
 };

@@ -45,4 +45,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <span class="text-upper title" fxFlex>Endpoints</span>
     </div>
   </div>
+
+  <app-endpoints-list
+    [endpointsTree]="endpointsTree$ | async"
+    [workspaceId]="workspaceId"
+    (onEndpointSelected)="closeSidenavOnSmallScreen()">
+  </app-endpoints-list>
 </div>

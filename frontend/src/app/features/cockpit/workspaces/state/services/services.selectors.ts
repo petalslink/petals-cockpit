@@ -20,7 +20,7 @@ import { createSelector } from '@ngrx/store';
 import {
   findNamespaceLocalpart,
   groupByNamespace,
-} from 'app/features/cockpit/workspaces/service-menu/services-list/services-list.helper';
+} from 'app/features/cockpit/workspaces/services-menu/services-list/services-list.helper';
 import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
 import { getSelectedWorkspaceId } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
@@ -49,7 +49,7 @@ export const getCurrentServiceTree = createSelector(
   getServicesAllIds,
   getServicesById,
   (selectedWorkspaceId, servicesAllIds, servicesByIds): TreeElement<any>[] => {
-    const baseUrl = `/workspaces/${selectedWorkspaceId}/services`;
+    const baseUrl = `/workspaces/${selectedWorkspaceId}/services/services`;
 
     const servicesWithNspLocalpart = servicesAllIds.map(id => ({
       ...findNamespaceLocalpart(servicesByIds[id].name),

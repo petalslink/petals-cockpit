@@ -18,7 +18,7 @@
 import {
   findNamespaceLocalpart,
   groupByNamespace,
-} from 'app/features/cockpit/workspaces/service-menu/services-list/services-list.helper';
+} from 'app/features/cockpit/workspaces/services-menu/services-list/services-list.helper';
 
 describe('Services list', () => {
   describe('findNamespaceLocalpart', () => {

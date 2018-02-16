@@ -18,16 +18,18 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { ServiceViewComponent } from './service-view.component';
+import { ServicesEndpointViewComponent } from './services-endpoint-view.component';
 
+// /workspaces/:workspaceId/services/endpoints/:endpointId
 const routes: Routes = [
   {
-    path: ':serviceId',
-    component: ServiceViewComponent,
+    path: '',
+    component: ServicesEndpointViewComponent,
   },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-export class ServiceViewRoutingModule {}
+export class ServicesEndpointViewRoutingModule {}

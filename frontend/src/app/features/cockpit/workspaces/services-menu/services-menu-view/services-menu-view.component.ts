@@ -26,33 +26,43 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
+import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
+import { IEndpointRow } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
+import { getCurrentEndpointTree } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.selectors';
 import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
 import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
 import { getCurrentServiceTree } from 'app/features/cockpit/workspaces/state/services/services.selectors';
 import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
 import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-service-menu-view',
-  templateUrl: './service-menu-view.component.html',
-  styleUrls: ['./service-menu-view.component.scss'],
+  selector: 'app-services-menu-view',
+  templateUrl: './services-menu-view.component.html',
+  styleUrls: ['./services-menu-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ServiceMenuViewComponent implements OnInit, OnDestroy {
+export class ServicesMenuViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   servicesTree$: Observable<TreeElement<any>[]>;
+  endpointsTree$: Observable<TreeElement<any>[]>;
 
   @Input() workspaceId: string;
   @Input() services: IServiceRow[];
+  @Input() endpoints: IEndpointRow[];
 
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.store$.dispatch(new Services.FetchAll());
+    this.servicesTree$ = this.store$
+      .select(getCurrentServiceTree)
+      .pipe(takeUntil(this.onDestroy$));
 
-    this.servicesTree$ = this.store$.select(getCurrentServiceTree);
+    this.endpointsTree$ = this.store$
+      .select(getCurrentEndpointTree)
+      .pipe(takeUntil(this.onDestroy$));
   }
 
   ngOnDestroy() {
@@ -60,6 +70,7 @@ export class ServiceMenuViewComponent implements OnInit, OnDestroy {
     this.onDestroy$.complete();
 
     this.store$.dispatch(new Services.Clean());
+    this.store$.dispatch(new Endpoints.Clean());
   }
 
   closeSidenavOnSmallScreen() {
