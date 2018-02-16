@@ -30,3 +30,7 @@ mat-icon {
 .subtitle {
   color: rgba(0, 0, 0, 0.54);
 }
+
+:host {
+  height: 100%;
+}
