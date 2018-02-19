@@ -36,6 +36,7 @@ import org.ow2.petals.cockpit.server.resources.BusesResource.BusFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerFull;
 import org.ow2.petals.cockpit.server.resources.EndpointsResource.EndpointFull;
+import org.ow2.petals.cockpit.server.resources.InterfacesResource.InterfaceFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.ServicesResource.ServiceFull;
@@ -95,6 +96,10 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
     @JsonProperty
     public ImmutableMap<String, EndpointFull> endpoints;
 
+    @Valid
+    @JsonProperty
+    public ImmutableMap<String, InterfaceFull> interfaces;
+
     @JsonCreator
     public WorkspaceContent(@JsonProperty("busesInProgress") Map<String, BusInProgress> busesInProgress,
             @JsonProperty("buses") Map<String, BusFull> buses,
@@ -104,7 +109,8 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             @JsonProperty("serviceUnits") Map<String, ServiceUnitFull> serviceUnits,
             @JsonProperty("sharedLibraries") Map<String, SharedLibraryFull> sharedLibraries,
             @JsonProperty("services") Map<String, ServiceFull> services,
-            @JsonProperty("endpoints") Map<String, EndpointFull> endpoints) {
+            @JsonProperty("endpoints") Map<String, EndpointFull> endpoints,
+            @JsonProperty("interfaces") Map<String, InterfaceFull> interfaces) {
         this.busesInProgress = ImmutableMap.copyOf(busesInProgress);
         this.buses = ImmutableMap.copyOf(buses);
         this.containers = ImmutableMap.copyOf(containers);
@@ -114,6 +120,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
         this.sharedLibraries = ImmutableMap.copyOf(sharedLibraries);
         this.services = ImmutableMap.copyOf(services);
         this.endpoints = ImmutableMap.copyOf(endpoints);
+        this.interfaces = ImmutableMap.copyOf(interfaces);
     }
 
     public static WorkspaceContentBuilder builder() {
@@ -148,13 +155,14 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             Map<String, SharedLibraryFull> sls = new HashMap<>();
             Map<String, ServiceFull> servs = new HashMap<>();
             Map<String, EndpointFull> edps = new HashMap<>();
+            Map<String, InterfaceFull> itfs = new HashMap<>();
 
             buses.stream().forEach(b -> {
-                BusFull bus = b.build(cs, comps, sas, sus, sls, servs, edps);
+                BusFull bus = b.build(cs, comps, sas, sus, sls, servs, edps, itfs);
                 importedBuses.put(bus.bus.getId(), bus);
             });
 
-            return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus, sls, servs, edps);
+            return new WorkspaceContent(busesInProgress, importedBuses, cs, comps, sas, sus, sls, servs, edps, itfs);
         }
     }
 
@@ -177,11 +185,12 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
 
         private BusFull build(Map<String, ContainerFull> cs, Map<String, ComponentFull> comps,
                 Map<String, ServiceAssemblyFull> sas, Map<String, ServiceUnitFull> sus,
-                Map<String, SharedLibraryFull> sls, Map<String, ServiceFull> servs, Map<String, EndpointFull> edps) {
+                Map<String, SharedLibraryFull> sls, Map<String, ServiceFull> servs, Map<String, EndpointFull> edps,
+                Map<String, InterfaceFull> itfs) {
 
             Set<String> containersIds = new HashSet<>();
             containers.stream().forEach(b -> {
-                ContainerFull container = b.build(comps, sas, sus, sls, servs, edps);
+                ContainerFull container = b.build(comps, sas, sus, sls, servs, edps, itfs);
                 String containerId = container.container.getId();
                 cs.put(containerId, container);
                 containersIds.add(containerId);
@@ -205,6 +214,8 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
         private final List<ServiceFull> servsToBuild = new ArrayList<>();
 
         private final List<EndpointFull> edpsToBuild = new ArrayList<>();
+
+        private final List<InterfaceFull> itfsToBuild = new ArrayList<>();
 
         private final SetMultimap<Long, String> componentsBySL = LinkedHashMultimap.create();
 
@@ -250,22 +261,34 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
 
         @Override
         public void addService(ServiceFull sDb) {
-            servsToBuild.add(sDb);
+            if (!servsToBuild.contains(sDb)) {
+                servsToBuild.add(sDb);
+            }
         }
 
         @Override
         public void addEndpoint(EndpointFull eDb) {
-            edpsToBuild.add(eDb);
+            if (!edpsToBuild.contains(eDb)) {
+                edpsToBuild.add(eDb);
+            }
+        }
+
+        @Override
+        public void addInterface(InterfaceFull iDb) {
+            if (!itfsToBuild.contains(iDb)) {
+                itfsToBuild.add(iDb);
+            }
         }
 
         private ContainerFull build(Map<String, ComponentFull> comps, Map<String, ServiceAssemblyFull> sas,
                 Map<String, ServiceUnitFull> sus, Map<String, SharedLibraryFull> sls,
-                Map<String, ServiceFull> servs, Map<String, EndpointFull> edps) {
+                Map<String, ServiceFull> servs, Map<String, EndpointFull> edps, Map<String, InterfaceFull> itfs) {
             Set<String> components = new HashSet<>();
             Set<String> serviceAssemblies = new HashSet<>();
             Set<String> sharedLibraries = new HashSet<>();
             Set<String> services = new HashSet<>();
             Set<String> endpoints = new HashSet<>();
+            Set<String> interfaces = new HashSet<>();
 
             componentsToBuild.stream()
                     .map(c -> new ComponentFull(c, serviceUnitsByComp.get(c.getId()), slsByComponent.get(c.getId())))
@@ -301,7 +324,14 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
                 endpoints.add(id);
             }
 
-            return new ContainerFull(cDb, components, serviceAssemblies, sharedLibraries, services, endpoints);
+            for (InterfaceFull itf : itfsToBuild) {
+                String id = itf.interface_.getId();
+                itfs.put(id, itf);
+                endpoints.add(id);
+            }
+
+            return new ContainerFull(cDb, components, serviceAssemblies, sharedLibraries, services, endpoints,
+                    interfaces);
         }
 
     }

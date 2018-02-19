@@ -23,6 +23,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.EDP_INSTANCES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.ENDPOINTS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.INTERFACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
@@ -37,6 +38,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -89,6 +91,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecor
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.EdpInstancesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.EndpointsRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.InterfacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServicesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
@@ -101,6 +104,7 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ContainersResource.ContainerFull;
 import org.ow2.petals.cockpit.server.resources.EndpointsResource.EndpointFull;
+import org.ow2.petals.cockpit.server.resources.InterfacesResource.InterfaceFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
@@ -864,7 +868,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             List<Endpoint> expectedEndpoints) {
 
         for (Endpoint expectedEdp : expectedEndpoints) {
-            assertExistsAndReturned(a, content, wsId, expectedEdp);
+            assertEndpointExistsAndIsReturned(a, content, wsId, expectedEdp);
         }
 
         content.services.forEach((id, service) -> {
@@ -876,29 +880,65 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             a.assertThat(Long.valueOf(id).longValue() == endpoint.endpoint.id);
             a.assertThat(endpointIsContained(endpoint, expectedEndpoints));
         });
+
+        content.interfaces.forEach((id, interface_) -> {
+            a.assertThat(Long.valueOf(id).longValue() == interface_.interface_.id);
+            a.assertThat(endpointIsContained(interface_, expectedEndpoints));
+        });
+
+        assertWorkspaceContentServicesCount(a, content, wsId, expectedEndpoints);
     }
 
-    public void assertExistsAndReturned(SoftAssertions a, WorkspaceContent content, long wsId, Endpoint expectedEdp) {
-        Record recordDb = resource.db().select().from(EDP_INSTANCES).join(SERVICES)
-                .onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID).join(ENDPOINTS).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
-                .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID).join(CONTAINERS)
-                .onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID).join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+    @SuppressWarnings("null")
+    private void assertWorkspaceContentServicesCount(SoftAssertions a, WorkspaceContent content, long wsId,
+            List<Endpoint> expectedEndpoints) {
+        Set<String> serviceCount = new HashSet<String>();
+        Set<String> endpointCount = new HashSet<String>();
+        Set<String> interfaceCount = new HashSet<String>();
+
+        expectedEndpoints.stream().forEach(e -> {
+            endpointCount.add(e.getEndpointName());
+            serviceCount.add(e.getServiceName());
+            interfaceCount.addAll(e.getInterfaceNames());
+        });
+
+        a.assertThat(content.interfaces.size()).isEqualTo(interfaceCount.size());
+        a.assertThat(content.services.size()).isEqualTo(serviceCount.size());
+        a.assertThat(content.endpoints.size()).isEqualTo(endpointCount.size());
+    }
+
+    public void assertEndpointExistsAndIsReturned(SoftAssertions a, WorkspaceContent content, long wsId, Endpoint expectedEdp) {
+        Record[] records = resource.db().select().from(EDP_INSTANCES)
+                .join(SERVICES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID)
+                .join(ENDPOINTS).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
+                .join(INTERFACES).onKey(Keys.FK_EDP_INSTANCES_INTERFACE_ID)
+                .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
+                .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
                 .where(SERVICES.NAME.eq(expectedEdp.getServiceName())
                         .and(ENDPOINTS.NAME.eq(expectedEdp.getEndpointName()))
+                        .and(INTERFACES.NAME.in(expectedEdp.getInterfaceNames()))
                         .and(COMPONENTS.NAME.eq(expectedEdp.getComponentName()))
-                        .and(CONTAINERS.NAME.eq(expectedEdp.getContainerName())).and(BUSES.WORKSPACE_ID.eq(wsId)))
-                .fetchOne();
-        if (recordDb != null) {
-            assertEquivalent(a, recordDb, expectedEdp);
+                        .and(CONTAINERS.NAME.eq(expectedEdp.getContainerName()))
+                        .and(BUSES.WORKSPACE_ID.eq(wsId)))
+                .fetchArray();
+        if (records != null && records.length > 0) {
+            for (Record record : records) {
+                assertEquivalent(a, record, expectedEdp);
 
-            final String servId = recordDb.get(SERVICES.ID).toString();
-            a.assertThat(content.services.containsKey(servId));
-            assertEquivalent(a, content.services.get(servId), expectedEdp);
+                final String servId = record.get(SERVICES.ID).toString();
+                a.assertThat(content.services.containsKey(servId));
+                assertEquivalent(a, content.services.get(servId), expectedEdp);
 
-            final String edpId = recordDb.get(ENDPOINTS.ID).toString();
-            a.assertThat(content.endpoints.containsKey(edpId));
-            assertEquivalent(a, content.endpoints.get(edpId), expectedEdp);
+                final String edpId = record.get(ENDPOINTS.ID).toString();
+                a.assertThat(content.endpoints.containsKey(edpId));
+                assertEquivalent(a, content.endpoints.get(edpId), expectedEdp);
 
+                final String itfId = record.get(INTERFACES.ID).toString();
+                a.assertThat(content.interfaces.containsKey(itfId));
+                assertEquivalent(a, content.interfaces.get(itfId), expectedEdp);
+
+            }
         } else {
             a.fail("Could not find this service in db:\n--> " + expectedEdp.getServiceName() + "\n--> "
                     + expectedEdp.getEndpointName() + "\n--> " + expectedEdp.getContainerName() + " - "
@@ -942,6 +982,24 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         return false;
     }
 
+    private boolean endpointIsContained(InterfaceFull interface_, List<Endpoint> expectedEndpoints) {
+        for (Endpoint expectedEdp : expectedEndpoints) {
+            if (!expectedEdp.getInterfaceNames().contains(interface_.interface_.name))
+                continue;
+
+            final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
+                    COMPONENTS.ID.like(interface_.getComponentId()));
+            final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
+                    CONTAINERS.ID.like(interface_.getContainerId()));
+            assert compDb != null && contDb != null;
+
+            if (expectedEdp.getComponentName().equals(compDb.getName())
+                    && expectedEdp.getContainerName().equals(contDb.getName()))
+                return true;
+        }
+        return false;
+    }
+
     protected void assertEquivalent(SoftAssertions a, ServiceFull service, Endpoint expectedEdp) {
         final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
                 COMPONENTS.ID.like(service.getComponentId()));
@@ -951,8 +1009,10 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         a.assertThat(contDb).isNotNull();
 
         a.assertThat(service.service.name).isEqualTo(expectedEdp.getServiceName());
-        a.assertThat(compDb.getName()).isEqualTo(expectedEdp.getComponentName());
-        a.assertThat(contDb.getName()).isEqualTo(expectedEdp.getContainerName());
+        // TODO a same service can be related to multiple containers/components
+        // model needs to be upgraded ...
+        // a.assertThat(compDb.getName()).isEqualTo(expectedEdp.getComponentName());
+        // a.assertThat(contDb.getName()).isEqualTo(expectedEdp.getContainerName());
     }
 
     protected void assertEquivalent(SoftAssertions a, EndpointFull endpoint, Endpoint expectedEdp) {
@@ -968,13 +1028,30 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         a.assertThat(contDb.getName()).isEqualTo(expectedEdp.getContainerName());
     }
 
+    private void assertEquivalent(SoftAssertions a, InterfaceFull interface_, Endpoint expectedEdp) {
+        final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
+                COMPONENTS.ID.like(interface_.getComponentId()));
+        final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
+                CONTAINERS.ID.like(interface_.getContainerId()));
+        a.assertThat(compDb).isNotNull();
+        a.assertThat(contDb).isNotNull();
+
+        a.assertThat(expectedEdp.getInterfaceNames()).contains(interface_.interface_.name);
+        // TODO a same interface can be related to multiple containers/components
+        // model needs to be upgraded ...
+        // a.assertThat(compDb.getName()).isEqualTo(expectedEdp.getComponentName());
+        // a.assertThat(contDb.getName()).isEqualTo(expectedEdp.getContainerName());
+    }
+
     private void assertEquivalent(SoftAssertions a, Record recordDb, Endpoint expectedEdp) {
         ServicesRecord servrec = recordDb.into(SERVICES);
         EdpInstancesRecord instrec = recordDb.into(EDP_INSTANCES);
         EndpointsRecord edprec = recordDb.into(ENDPOINTS);
+        InterfacesRecord itfrec = recordDb.into(INTERFACES);
         a.assertThat(instrec).isNotNull();
         a.assertThat(servrec).isNotNull();
         a.assertThat(edprec).isNotNull();
+        a.assertThat(itfrec).isNotNull();
 
         final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
                 COMPONENTS.ID.like(instrec.getComponentId().toString()));
@@ -985,6 +1062,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
         a.assertThat(servrec.getName()).isEqualTo(expectedEdp.getServiceName());
         a.assertThat(edprec.getName()).isEqualTo(expectedEdp.getEndpointName());
+        a.assertThat(expectedEdp.getInterfaceNames()).contains(itfrec.getName());
         a.assertThat(compDb.getName()).isEqualTo(expectedEdp.getComponentName());
         a.assertThat(contDb.getName()).isEqualTo(expectedEdp.getContainerName());
     }
