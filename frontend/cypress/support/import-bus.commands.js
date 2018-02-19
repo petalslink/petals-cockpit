@@ -21,7 +21,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add(
-  'importBus',
+  'importBusAndCheck',
   (ip, port, username, password, passphrase, shouldSuccess = true) => {
     cy.get(IMPORT_BUS_DOM.inputs.ip).type(ip);
     cy.get(IMPORT_BUS_DOM.inputs.port).type(port);

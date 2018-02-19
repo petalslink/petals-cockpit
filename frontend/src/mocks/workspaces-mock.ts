@@ -245,7 +245,7 @@ export class Workspace {
     const newService3 = servicesService.create(
       'idCont0',
       'idComp1',
-      '{http://namespace-example.fr/service/technique/environmental/region/pays/internationalversion/1.0}Localpart96'
+      '{http://namespace-example.fr/service/technique/environmental/region/pays/international/version/1.0}Localpart96'
     );
     services.set(newService3.id, newService3);
 
@@ -303,62 +303,48 @@ export class Workspace {
     const endpoint0 = endpointsService.create(
       'idCont0',
       'idComp0',
-      'edpt-89p82661-test-31o4-l391-0'
+      'edpt-89p82661-test-31o4-l391-00'
     );
     const endpoint1 = endpointsService.create(
       'idCont0',
       'idComp0',
-      'edpt-89p82661-test-31o4-l391-0'
+      'edpt-89p82661-test-31o4-l391-01'
     );
     const endpoint2 = endpointsService.create(
       'idCont0',
       'idComp0',
-      'edpt-89p82661-test-31o4-l391-0'
+      'edpt-89p82661-test-31o4-l391-02'
     );
     const endpoint3 = endpointsService.create(
       'idCont0',
       'idComp0',
-      'edpt-89p82661-test-31o4-l391-0'
+      'edpt-89p82661-test-31o4-l391-03'
     );
     const endpoint4 = endpointsService.create(
       'idCont0',
       'idComp0',
-      'edpt-89p82661-test-31o4-l391-0'
+      'edpt-89p82661-test-31o4-l391-04'
     );
     const endpoint5 = endpointsService.create(
       'idCont2',
       'idComp6',
-      'edpt-89p82661-test-31o4-l391-0'
+      'edpt-89p82661-test-31o4-l391-05'
     );
     const endpoint6 = endpointsService.create(
       'idCont2',
       'idComp6',
-      'edpt-89p82661-test-31o4-l391-0'
+      'edpt-89p82661-test-31o4-l391-06'
     );
 
     if (this.id === 'idWks1') {
       this.endpoints.set(endpoint5.id, endpoint5);
       this.endpoints.set(endpoint6.id, endpoint6);
-
-      const endpoints = this.getEndpoints();
-      const eventData = { endpoints: toObj(endpoints) };
-      return [{ id: endpoint5.id, eventData }, { id: endpoint6.id, eventData }];
     } else {
       this.endpoints.set(endpoint0.id, endpoint0);
       this.endpoints.set(endpoint1.id, endpoint1);
       this.endpoints.set(endpoint2.id, endpoint2);
       this.endpoints.set(endpoint3.id, endpoint3);
       this.endpoints.set(endpoint4.id, endpoint4);
-
-      const endpoints = this.getEndpoints();
-      const eventData = { endpoints: toObj(endpoints) };
-      return [
-        { id: endpoint0.id, eventData },
-        { id: endpoint1.id, eventData },
-        { id: endpoint2.id, eventData },
-        { id: endpoint3.id, eventData },
-        { id: endpoint4.id, eventData },
-      ];
     }
   }
 
@@ -402,26 +388,12 @@ export class Workspace {
     if (this.id === 'idWks1') {
       this.services.set(service5.id, service5);
       this.services.set(service6.id, service6);
-
-      const services = this.getServices();
-      const eventData = { services: toObj(services) };
-      return [{ id: service5.id, eventData }, { id: service6.id, eventData }];
     } else {
       this.services.set(service0.id, service0);
       this.services.set(service1.id, service1);
       this.services.set(service2.id, service2);
       this.services.set(service3.id, service3);
       this.services.set(service4.id, service4);
-
-      const services = this.getServices();
-      const eventData = { services: toObj(services) };
-      return [
-        { id: service0.id, eventData },
-        { id: service1.id, eventData },
-        { id: service2.id, eventData },
-        { id: service3.id, eventData },
-        { id: service4.id, eventData },
-      ];
     }
   }
 

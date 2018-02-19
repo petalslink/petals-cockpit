@@ -11,3 +11,11 @@ export const expectedServicesTreeWks0 = [
   `Localpart3`,
   `Localpart4`,
 ];
+
+export const expectedEndpointsTreeWks0 = [
+  `edpt-89p82661-test-31o4-l391-00`,
+  `edpt-89p82661-test-31o4-l391-01`,
+  `edpt-89p82661-test-31o4-l391-02`,
+  `edpt-89p82661-test-31o4-l391-03`,
+  `edpt-89p82661-test-31o4-l391-04`,
+];
