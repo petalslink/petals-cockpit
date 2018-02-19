@@ -5,6 +5,7 @@
 # Branch master will run build-backend, build-frontend, build-frontend-pages, test-frontend, package-product-master, pages
 # Other branches will run build-backend, build-frontend, package-product
 # Tags will run build-backend, build-frontend, release-product
+# Runs tests and debug procedure detailed EOF
 
 stages:
   - build
@@ -195,3 +196,20 @@ package-product:
     name: petals-cockpit-$(cat version.txt)-${CI_BUILD_REF:0:7}
     paths:
       - petals-cockpit-*
+
+
+
+### Test gitlab ci
+
+# Install with apt: gitlab-ci-multi-runner (& maybe docker.io)
+#  in cockpit root directory:
+#    > gitlab-ci-multi-runner exec docker {job-name}
+
+# To test with local docker images
+#  in Dockerfile image directory, builds local image:
+#    > docker build . -t {custom-image-name}:{image-tag}
+#  in cockpit root directory:
+#  change local gitlab-ci script with temporary image
+#  run using local image
+#    > gitlab-ci-multi-runner exec docker --docker-pull-policy=never {job-name}
+
