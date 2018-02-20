@@ -1,8 +1,8 @@
 # Notes
 # Branch front/* will run test-frontend
 # Branch back/* will run build-backend
-# Branch product/* will run build-backend, build-frontend, package-product
-# Branch master will run build-backend, build-frontend, build-frontend-pages, test-frontend, package-product-master, pages
+# Branch product/* will run build-backend, build-frontend, package-product, electron-cypress, chromium-cypress
+# Branch master will run build-backend, build-frontend, build-frontend-pages, test-frontend, package-product-master, pages, electron-cypress, chromium-cypress
 # Other branches will run build-backend, build-frontend, package-product
 # Tags will run build-backend, build-frontend, release-product
 # Runs tests and debug procedure detailed EOF
@@ -109,7 +109,7 @@ test-frontend:
     # save the PID as we run it in background
     - echo $! > pid-nohup.txt
     - sleep 5
-    - time yarn run cypress:ci
+    - time yarn run cypress:chromium
     - time yarn run ng -- e2e --serve=false -p 4200
     - kill -9 $(cat pid-nohup.txt)
     - rm pid-nohup.txt
@@ -197,11 +197,46 @@ package-product:
     paths:
       - petals-cockpit-*
 
+electron-cypress:
+  <<: *node-java-yarn
+  stage: integration
+  only:
+    - master
+    - /^product\/.*$/
+  allow_failure: true
+  script:
+    - cd frontend
+    - ng build --prod --progress=false -e=prod-e2e
+    - nohup http-server --push-state --silent -p 4200 dist &
+    - echo $! > pid-nohup.txt
+    - sleep 5
+    - time yarn run cypress:electron
+  after_script:
+    - kill -9 $(cat pid-nohup.txt)
+    - rm pid-nohup.txt
 
+chromium-cypress:
+  <<: *node-java-yarn
+  stage: integration
+  only:
+    - master
+    - /^product\/.*$/
+  allow_failure: true
+  script:
+    - cd frontend
+    - ng build --prod --progress=false -e=prod-e2e
+    - nohup http-server --push-state --silent -p 4200 dist &
+    - echo $! > pid-nohup.txt
+    - sleep 5
+    - time yarn run cypress:chromium
+  after_script:
+    - kill -9 $(cat pid-nohup.txt)
+    - rm pid-nohup.txt
 
 ### Test gitlab ci
 
 # Install with apt: gitlab-ci-multi-runner (& maybe docker.io)
+#  git commit changes locally
 #  in cockpit root directory:
 #    > gitlab-ci-multi-runner exec docker {job-name}
 
