@@ -13,10 +13,14 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="resourceDeletable?.value" fxLayout="column" class="wrapper-content">
+<div *ngIf="resourceDeletable?.value" fxLayout="column" class="wrapper-content workspace-element">
   <mat-toolbar color="primary" class="toolbar-page-header" fxLayout="row" fxLayoutAlign="start center">
     <div class="prefix-toolbar-title" fxLayout="row">
-      <mat-icon color="accent" *ngIf="(!resourceDeletable.value.isFetchingDetails && !resourceDeletable.value.isUpdating) || resourceDeletable.isDeleted; else loadingTpl">grade</mat-icon>
+      <mat-icon
+        color="accent"
+        *ngIf="(!resourceDeletable.value.isFetchingDetails && !resourceDeletable.value.isUpdating) || resourceDeletable.isDeleted; else loadingTpl">
+        grade
+      </mat-icon>
 
       <ng-template #loadingTpl>
         <mat-spinner [diameter]="16" [strokeWidth]="1" color="accent"></mat-spinner>

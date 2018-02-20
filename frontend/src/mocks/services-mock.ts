@@ -21,16 +21,16 @@ import {
 } from 'app/shared/services/services.service';
 
 export class Service {
-  protected static cpt = 0;
   public readonly id: string;
   public readonly name: string;
 
   constructor(
+    public cpt: number,
     private containerId: string,
     private componentId: string,
     name?: string
   ) {
-    const i = Service.cpt++;
+    const i = cpt;
     this.id = `idService${i}`;
     this.name =
       name ||
@@ -62,47 +62,17 @@ export class Service {
 
 export class Services {
   private readonly services = new Map<string, Service>();
-
-  constructor() {
-    this.create(
-      'idCont0',
-      'idComp0',
-      '{http://namespace-example.fr/service/technique/version/1.0}Localpart0'
-    );
-    this.create(
-      'idCont0',
-      'idComp0',
-      '{http://namespace-example.fr/service/technique/version/1.0}Localpart1'
-    );
-    this.create(
-      'idCont0',
-      'idComp0',
-      '{http://namespace-example.fr/service/technique/version/2.0}Localpart2'
-    );
-    this.create(
-      'idCont0',
-      'idComp0',
-      '{http://namespace-example.fr/service/technique/version/3.0}Localpart3'
-    );
-    this.create(
-      'idCont0',
-      'idComp0',
-      '{http://namespace-example.fr/service/technique/version/3.0}Localpart4'
-    );
-  }
+  protected cpt = 0;
+  constructor() {}
 
   create(containerId: string, componentId: string, name?: string) {
-    const service = new Service(containerId, componentId, name);
+    const service = new Service(this.cpt++, containerId, componentId, name);
     this.services.set(service.id, service);
     return service;
   }
 
   get(id: string) {
     return this.services.get(id);
-  }
-
-  getServices() {
-    return Array.from(this.services.values());
   }
 }
 

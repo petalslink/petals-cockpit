@@ -161,6 +161,7 @@ export class WorkspacesEffects {
 
         return batchActions([
           new Workspaces.Clean(),
+          new Services.Clean(),
           new Ui.OpenSidenav(),
           new Workspaces.FetchSuccess(data.workspace),
           new Users.Fetched(toJsTable(data.users)),
@@ -170,7 +171,7 @@ export class WorkspacesEffects {
           new Components.Fetched(toJsTable(data.components)),
           new ServiceAssemblies.Fetched(toJsTable(data.serviceAssemblies)),
           new ServiceUnits.Fetched(toJsTable(data.serviceUnits)),
-          new Services.FetchAllSuccess(toJsTable(data.services)),
+          new Services.Fetched(toJsTable(data.services)),
           new SharedLibraries.Fetched(toJsTable(data.sharedLibraries)),
         ]);
       })

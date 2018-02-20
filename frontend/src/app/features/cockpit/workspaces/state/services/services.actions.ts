@@ -24,6 +24,18 @@ import {
 } from 'app/shared/services/services.service';
 
 export namespace Services {
+  export const AddedType = '[Services] Added';
+  export class Added implements Action {
+    readonly type = AddedType;
+    constructor(public readonly payload: JsTable<IServiceBackendSSE>) {}
+  }
+
+  export const CleanType = '[Services] Clean';
+  export class Clean implements Action {
+    readonly type = CleanType;
+    constructor() {}
+  }
+
   export const FetchAllType = '[Services] Fetch all';
   export class FetchAll implements Action {
     readonly type = FetchAllType;
@@ -36,9 +48,9 @@ export namespace Services {
     constructor() {}
   }
 
-  export const FetchAllSuccessType = '[Services] Fetch all success';
-  export class FetchAllSuccess implements Action {
-    readonly type = FetchAllSuccessType;
+  export const FetchedType = '[Services] Fetched';
+  export class Fetched implements Action {
+    readonly type = FetchedType;
     constructor(public readonly payload: JsTable<IServiceBackendSSE>) {}
   }
 

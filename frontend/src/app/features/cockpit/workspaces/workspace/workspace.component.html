@@ -22,14 +22,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               [disableClose]="true">
     <div fxLayout="row" class="pnl-buttons-workspaces">
       <button fxFlex="100" mat-raised-button (click)="closeSidenavOnSmallScreen()" [routerLink]="['/workspaces', workspace.id]"
-        class="workspace-name width-full no-border-radius text-upper" color="accent">
+        class="btn-workspace-name width-full no-border-radius text-upper" color="accent">
         {{ workspace.name }}
       </button>
 
       <button fxFlex
         mat-raised-button
         (click)="openWorkspacesDialog()"
-        class="change-workspace width-full no-border-radius"
+        class="btn-change-workspace width-full no-border-radius"
         color="accent">
         <mat-icon>view_list</mat-icon>
       </button>

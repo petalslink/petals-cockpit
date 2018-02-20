@@ -25,9 +25,9 @@ import {
   ServiceAssemblyState,
 } from 'app/shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+import { Component, componentsService } from 'mocks/components-mock';
 import { ServiceUnit } from 'mocks/service-units-mock';
 import { Bus } from './buses-mock';
-import { Component, componentsService } from './components-mock';
 import {
   serviceAssembliesService,
   ServiceAssembly,

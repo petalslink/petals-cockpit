@@ -18,8 +18,6 @@
 import { $, browser, ExpectedConditions as EC } from 'protractor';
 
 import { page, waitTimeout } from './common';
-import { WorkspacesPage } from './pages/workspaces.po';
-import { waitAndClick } from './utils';
 
 describe(`Workspaces`, () => {
   it('should clear the dialog upon logout', () => {
@@ -69,69 +67,6 @@ describe(`Workspaces`, () => {
     expect($(`app-header .sidenav-toggle`).isEnabled()).toBe(true);
     // 2) we can still click on the sidenav button
     page.closeSidenav();
-  });
-
-  it(`should create a new workspace and then delete it`, () => {
-    let workspaces = page
-      .goToWorkspacesViaLogin()
-      .loginToWorkspaces(`mrobert`, `mrobert`);
-
-    workspaces.addWorkspace(`New workspace`);
-
-    expect(workspaces.workspacesInfos.count()).toEqual(2);
-
-    const workspacesAndOwners = [
-      `Workspace 1\nShared with you and 4 others.`,
-      `New workspace\nYou are the only one using this workspace.`,
-    ];
-
-    expect(workspaces.workspacesInfos.getText()).toEqual(workspacesAndOwners);
-
-    ///// DELETION
-    const workspace = workspaces.selectWorkspace(1, `New workspace`);
-
-    // let's delete the workspace
-    workspace.deleteButton.click();
-
-    // a dialog is shown
-    expect(
-      $(`app-workspace-deletion-dialog .mat-dialog-content`).getText()
-    ).toEqual(
-      `Everything in the workspace will be deleted! Please, be certain.\nAre you sure you want to delete New workspace?`
-    );
-
-    // check that cancel button is working and that the delete button is unlocked
-    $(`app-workspace-deletion-dialog .btn-cancel-delete-wks`).click();
-
-    waitAndClick(workspace.deleteButton);
-
-    // let's confirm the deletion
-    $(`app-workspace-deletion-dialog .btn-confirm-delete-wks`).click();
-
-    // the button should be disabled once we confirmed deletion
-    // and shouldn't be clickable anymore (except in case of HTTP error)
-    expect(workspace.deleteButton.isEnabled()).toBe(false);
-
-    // now we get a notification saying the workspace is deleted
-    const confirm = $(`app-workspace-deleted-dialog .mat-dialog-content`);
-    browser.wait(EC.visibilityOf(confirm), waitTimeout);
-    expect(confirm.getText()).toEqual(
-      `This workspace was deleted, click on OK to go back to the workspaces list.`
-    );
-
-    // ensure we are stil on the same workspace until we click
-    expect(browser.getCurrentUrl()).toMatch(/\/workspaces\/\w+$/);
-
-    // let's get redirected
-    $(`app-workspace-deleted-dialog button`).click();
-
-    workspaces = WorkspacesPage.waitAndGet();
-
-    // ensure the sidebar is closed as expected
-    browser.wait(EC.invisibilityOf($(`app-cockpit mat-sidenav`)), waitTimeout);
-
-    // now that the previous workspace is deleted, check that only 1 workspace is displayed
-    expect(workspaces.workspacesInfos.count()).toEqual(1);
   });
 
   it(`should open the administration page and ensure that the workspaces list is closed`, () => {

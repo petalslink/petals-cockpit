@@ -14,13 +14,15 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
+import './component.commands';
+import './helper.commands';
+import './import-bus.commands';
 import './login.commands';
 import './petals-cockpit.commands';
-import './workspaces.commands';
-import './workspace.commands';
 import './petals.commands';
 import './services.commands';
-import './helper.commands';
+import './workspace.commands';
+import './workspaces.commands';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

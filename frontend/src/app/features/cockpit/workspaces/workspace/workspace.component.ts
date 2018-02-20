@@ -26,6 +26,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 import { getBusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.selectors';
+import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
 import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
 import { getAllServices } from 'app/features/cockpit/workspaces/state/services/services.selectors';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
@@ -101,6 +102,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.onDestroy$.complete();
 
     this.store$.dispatch(new Workspaces.Clean());
+    this.store$.dispatch(new Services.Clean());
   }
 
   closeSidenav() {

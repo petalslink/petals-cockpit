@@ -7,6 +7,6 @@ export const PETALS_COCKPIT_DOM = {
     userAvatar: `${bs} app-generate-icon`,
     logout: `${bs} .btn-logout-user`,
     logo: `${bs} .toolbar-logo`,
-    toggleSidenavButton: `${bs} .sidenav-toggle`,
+    toggleSidenav: `${bs} .sidenav-toggle`,
   },
 };

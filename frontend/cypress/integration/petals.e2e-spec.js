@@ -194,6 +194,16 @@ describe(`Petals`, () => {
     cy.expectLocationToBe(`/workspaces/idWks0/petals/service-units/idSu0`);
   });
 
+  it(`should redirect to the bus import page`, () => {
+    cy.login('admin', 'admin');
+
+    cy.expectLocationToBe(`/workspaces/idWks0`);
+
+    cy.get(PETALS_DOM.buttons.addBus).click();
+
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/buses-in-progress`);
+  });
+
   const treeWithCont0Folded = [
     `Bus 0`,
     `Cont 0`,

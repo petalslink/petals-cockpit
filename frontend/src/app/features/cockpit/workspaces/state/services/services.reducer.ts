@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   JsTable,
   mergeInto,
+  putAll,
   updateById,
 } from 'app/shared/helpers/jstable.helper';
 import {
@@ -33,19 +35,25 @@ import {
 
 export namespace ServicesReducer {
   type All =
+    | Services.Added
     | Services.SetCurrent
     | Services.FetchAll
     | Services.FetchAllError
-    | Services.FetchAllSuccess
+    | Services.Fetched
     | Services.FetchDetails
     | Services.FetchDetailsError
-    | Services.FetchDetailsSuccess;
+    | Services.FetchDetailsSuccess
+    | Services.Clean
+    | Workspaces.Clean;
 
   export function reducer(
     table = servicesTableFactory(),
     action: All
   ): IServicesTable {
     switch (action.type) {
+      case Services.AddedType: {
+        return added(table, action.payload);
+      }
       case Services.SetCurrentType: {
         return setCurrent(table, action.payload);
       }
@@ -55,8 +63,8 @@ export namespace ServicesReducer {
       case Services.FetchAllErrorType: {
         return fetchAllError(table);
       }
-      case Services.FetchAllSuccessType: {
-        return fetchAllSuccess(table, action.payload);
+      case Services.FetchedType: {
+        return fetched(table, action.payload);
       }
       case Services.FetchDetailsType: {
         return fetchDetails(table, action.payload);
@@ -67,9 +75,16 @@ export namespace ServicesReducer {
       case Services.FetchDetailsSuccessType: {
         return fetchDetailsSuccess(table, action.payload);
       }
+      case Services.CleanType: {
+        return servicesTableFactory();
+      }
       default:
         return table;
     }
+  }
+
+  function added(table: IServicesTable, payload: JsTable<IServiceBackendSSE>) {
+    return putAll(table, payload, serviceRowFactory);
   }
 
   function setCurrent(
@@ -91,7 +106,7 @@ export namespace ServicesReducer {
     return { ...table, isFetchingServices: false };
   }
 
-  function fetchAllSuccess(
+  function fetched(
     table: IServicesTable,
     payload: JsTable<IServiceBackendSSE>
   ): IServicesTable {

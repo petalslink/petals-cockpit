@@ -25,6 +25,8 @@ import * as helper from 'app/shared/helpers/mock.helper';
 import { environment } from 'environments/environment';
 import { componentsService } from 'mocks/components-mock';
 import { deployMockAndTriggerSse } from 'mocks/utils';
+import { workspacesService } from 'mocks/workspaces-mock';
+import { tap } from 'rxjs/operators';
 import {
   ComponentsServiceImpl,
   ComponentState,
@@ -47,6 +49,7 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
 
   putState(_workspaceId: string, componentId: string, state: ComponentState) {
     const component = componentsService.get(componentId);
+
     if (state === EComponentState.Unloaded) {
       componentsService.remove(componentId);
     } else {
@@ -58,17 +61,66 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
       state,
     };
 
-    // when the state changes, trigger a fake SSE event
-    setTimeout(
-      () =>
-        (this.sseService as SseServiceMock).triggerSseEvent(
-          SseActions.ComponentStateChangeSse,
-          response
-        ),
-      environment.mock.sseDelay
-    );
+    return helper.responseBody(response).pipe(
+      tap(_ => {
+        // when the state changes, trigger a fake SSE event
+        setTimeout(() => {
+          (this.sseService as SseServiceMock).triggerSseEvent(
+            SseActions.ComponentStateChangeSse,
+            response
+          );
 
-    return helper.responseBody(response);
+          /**
+           * Service updates related to component and service assembly lifecycles are not in scope for these mocks.
+           * This is a workaround to be able to trigger controlled SSE even from cypress tests.
+           */
+          if (_workspaceId === 'idWks0' && componentId === 'idComp0') {
+            const servicesUpdate = workspacesService
+              .get(_workspaceId)
+              .makeServicesForComp0();
+
+            setTimeout(
+              () =>
+                (this.sseService as SseServiceMock).triggerSseEvent(
+                  SseActions.ServicesUpdatedSse,
+                  servicesUpdate.eventData
+                ),
+              environment.mock.sseDelay
+            );
+          }
+
+          if (_workspaceId === 'idWks0' && componentId === 'idComp1') {
+            const servicesUpdate1 = workspacesService
+              .get(_workspaceId)
+              .makeServicesForComp1();
+
+            setTimeout(
+              () =>
+                (this.sseService as SseServiceMock).triggerSseEvent(
+                  SseActions.ServicesUpdatedSse,
+                  servicesUpdate1.eventData
+                ),
+              environment.mock.sseDelay
+            );
+          }
+
+          if (_workspaceId === 'idWks0' && componentId === 'idComp2') {
+            const servicesUpdate2 = workspacesService
+              .get(_workspaceId)
+              .makeServicesForComp2();
+
+            setTimeout(
+              () =>
+                (this.sseService as SseServiceMock).triggerSseEvent(
+                  SseActions.ServicesUpdatedSse,
+                  servicesUpdate2.eventData
+                ),
+              environment.mock.sseDelay
+            );
+          }
+        }, environment.mock.sseDelay);
+      })
+    );
   }
 
   setParameters(

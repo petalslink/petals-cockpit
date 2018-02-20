@@ -39,14 +39,14 @@ export abstract class WorkspacePage {
   public static readonly component = $(`app-workspace`);
   public static readonly sidenav = WorkspacePage.component.$('mat-sidenav');
   public static readonly workspaceButton = WorkspacePage.sidenav.$(
-    'button.workspace-name'
+    '.btn-workspace-name'
   );
 
   public readonly component = WorkspacePage.component;
   public readonly sidenav = WorkspacePage.sidenav;
   public readonly addBusButton = this.sidenav.$(`a.btn-add-bus`);
   public readonly changeWorkspaceButton = this.sidenav.$(
-    `button.change-workspace`
+    `.btn-change-workspace`
   );
   public readonly searchBar = this.sidenav.$(`input.search`);
   public readonly busesInProgress = this.sidenav.$$(

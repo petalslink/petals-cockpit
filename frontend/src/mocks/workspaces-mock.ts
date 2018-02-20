@@ -25,7 +25,7 @@ import {
   IWorkspaceBackendDetails,
 } from 'app/shared/services/workspaces.service';
 import { validContainers } from 'mocks/backend-mock';
-import { servicesService } from 'mocks/services-mock';
+import { Service, servicesService } from 'mocks/services-mock';
 import { BackendUser } from 'mocks/users-mock';
 import {
   Bus,
@@ -46,6 +46,7 @@ export class Workspace {
   private readonly users = new Map<string, BackendUser>();
   private readonly buses = new Map<string, Bus>();
   private readonly busesInProgress = new Map<string, BusInProgress>();
+  private readonly services = new Map<string, Service>();
 
   constructor(users: string[] = ['admin'], name?: string) {
     const i = Workspace.cpt++;
@@ -84,11 +85,7 @@ export class Workspace {
 
   toObj(): { [id: string]: IWorkspaceBackend } {
     return {
-      [this.id]: {
-        id: this.id,
-        name: this.name,
-        users: this.getUsersIds(),
-      },
+      [this.id]: { id: this.id, name: this.name, users: this.getUsersIds() },
     };
   }
 
@@ -98,6 +95,23 @@ export class Workspace {
 
   getUsers() {
     return Array.from(this.users.values());
+  }
+
+  getServicesIds() {
+    return Array.from(this.services.keys());
+  }
+
+  getServices() {
+    return Array.from(this.services.values());
+  }
+
+  getMoreServices(nbServices: number) {
+    let i: number;
+    for (i = 0; i < nbServices; i++) {
+      const serviceI = servicesService.create('idCont0', 'idComp0');
+      this.services.set(serviceI.id, serviceI);
+    }
+    return Array.from(this.services.values());
   }
 
   addUser(user: BackendUser) {
@@ -133,6 +147,11 @@ export class Workspace {
       c.getServiceAssemblies()
     );
     const serviceUnits = flatMap(components, c => c.getServiceUnits());
+
+    let services = this.getServices();
+    if (this.buses.size > 1) {
+      services = this.getMoreServices(6);
+    }
     const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
     const eventData = {
@@ -141,13 +160,148 @@ export class Workspace {
       components: toObj(components),
       serviceAssemblies: toObj(serviceAssemblies),
       serviceUnits: toObj(serviceUnits),
+      services: toObj(services),
       sharedLibraries: toObj(sharedLibraries),
     };
 
-    return {
-      id: bus.id,
-      eventData,
-    };
+    return { id: bus.id, eventData };
+  }
+
+  makeServicesForComp0() {
+    const services = new Map<string, Service>();
+
+    const newService1 = servicesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/service/technique/version/1.0}Localpart97'
+    );
+    services.set(newService1.id, newService1);
+
+    const newService2 = servicesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/service/technique/version/2.0}Localpart97'
+    );
+    services.set(newService2.id, newService2);
+
+    return this.makeEventData(services);
+  }
+
+  makeServicesForComp1() {
+    const services = new Map<string, Service>();
+
+    const newService1 = servicesService.create(
+      'idCont0',
+      'idComp1',
+      '{http://namespace-example.fr/service/technique/environmental/international/version/1.0}Localpart98'
+    );
+    services.set(newService1.id, newService1);
+
+    const newService2 = servicesService.create(
+      'idCont0',
+      'idComp1',
+      '{http://namespace-example.fr/service/technique/environmental/international/version/1.0}Localpart99'
+    );
+    services.set(newService2.id, newService2);
+
+    const newService3 = servicesService.create(
+      'idCont0',
+      'idComp1',
+      '{http://namespace-example.fr/service/technique/environmental/region/pays/internationalversion/1.0}Localpart96'
+    );
+    services.set(newService3.id, newService3);
+
+    const newService4 = servicesService.create(
+      'idCont0',
+      'idComp1',
+      '{http://namespace-example.fr/service/technique/global/region/pays/international/version/1.0}Localpart97'
+    );
+    services.set(newService4.id, newService4);
+
+    return this.makeEventData(services);
+  }
+
+  makeServicesForComp2() {
+    const services = new Map<string, Service>();
+    return this.makeEventData(services);
+  }
+
+  makeEventData(services: Map<string, Service>) {
+    if (this.id === 'idWks0') {
+      const eventData = {
+        buses: {},
+        containers: {},
+        components: {},
+        serviceAssemblies: {},
+        serviceUnits: {},
+        services: toObj(Array.from(services.values())),
+        sharedLibraries: {},
+      };
+
+      return { eventData };
+    }
+  }
+
+  addServices() {
+    const service0 = servicesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/service/technique/version/1.0}Localpart0'
+    );
+    const service1 = servicesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/service/technique/version/1.0}Localpart1'
+    );
+    const service2 = servicesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/service/technique/version/2.0}Localpart2'
+    );
+    const service3 = servicesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/service/technique/version/3.0}Localpart3'
+    );
+    const service4 = servicesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/service/technique/version/3.0}Localpart4'
+    );
+    const service5 = servicesService.create(
+      'idCont2',
+      'idComp6',
+      '{http://namespace-example.fr/service/metiers/version/1.0}Localpart0'
+    );
+    const service6 = servicesService.create(
+      'idCont2',
+      'idComp6',
+      '{http://namespace-example.fr/service/metiers/version/1.0}Localpart1'
+    );
+
+    if (this.id === 'idWks1') {
+      this.services.set(service5.id, service5);
+      this.services.set(service6.id, service6);
+      const services = this.getServices();
+      const eventData = { services: toObj(services) };
+      return [{ id: service5.id, eventData }, { id: service6.id, eventData }];
+    } else {
+      this.services.set(service0.id, service0);
+      this.services.set(service1.id, service1);
+      this.services.set(service2.id, service2);
+      this.services.set(service3.id, service3);
+      this.services.set(service4.id, service4);
+
+      const services = this.getServices();
+      const eventData = { services: toObj(services) };
+      return [
+        { id: service0.id, eventData },
+        { id: service1.id, eventData },
+        { id: service2.id, eventData },
+        { id: service3.id, eventData },
+        { id: service4.id, eventData },
+      ];
+    }
   }
 
   tryAddBus(importData: IBusImport): { id: string; eventData: any } {
@@ -180,7 +334,7 @@ export class Workspace {
       c.getServiceAssemblies()
     );
     const serviceUnits = flatMap(components, c => c.getServiceUnits());
-    const services = servicesService.getServices();
+    const services = this.getServices();
     const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
     return {
@@ -241,10 +395,16 @@ const ws0 = workspacesService.create();
 ws0.description =
   'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.';
 
-workspacesService.create([
+// add 5 services
+ws0.addServices();
+
+const ws1 = workspacesService.create([
   'admin',
   'bescudie',
   'mrobert',
   'cchevalier',
   'vnoel',
 ]);
+
+// add 2 services
+ws1.addServices();

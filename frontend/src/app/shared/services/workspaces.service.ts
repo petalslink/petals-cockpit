@@ -33,7 +33,7 @@ export interface IWorkspaceBackendDetailsCommon {
 
 export interface IWorkspaceBackend extends IWorkspaceBackendCommon {
   // from server (sse)
-  users: Array<string>;
+  users: string[];
 }
 
 export interface IWorkspaceBackendDetails
