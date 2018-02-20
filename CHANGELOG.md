@@ -1,3 +1,19 @@
+<a name="0.20.0"></a>
+# [0.20.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.19.0...v0.20.0) (2018-02-20)
+
+
+### Bug Fixes
+
+* **frontend:** can togglefold tree after search ([ec76010](https://gitlab.com/linagora/petals-cockpit/commit/ec76010)), closes [#417](https://gitlab.com/linagora/petals-cockpit/issues/417)
+* **frontend:** not send null name for components ([dd587ca](https://gitlab.com/linagora/petals-cockpit/commit/dd587ca)), closes [#425](https://gitlab.com/linagora/petals-cockpit/issues/425)
+* **frontend:** problem reading zip ([0a33577](https://gitlab.com/linagora/petals-cockpit/commit/0a33577)), closes [#424](https://gitlab.com/linagora/petals-cockpit/issues/424)
+* **frontend:** remove spinner when a component is removed ([a2feae4](https://gitlab.com/linagora/petals-cockpit/commit/a2feae4))
+* **frontend:** remove white gap in administration ([776d165](https://gitlab.com/linagora/petals-cockpit/commit/776d165)), closes [#438](https://gitlab.com/linagora/petals-cockpit/issues/438)
+* **frontend:** fix display services list and upgrade services list to services tree ([e1e69e2](https://gitlab.com/linagora/petals-cockpit/commit/e1e69e2)), closes [#437](https://gitlab.com/linagora/petals-cockpit/issues/437)
+* **backend:** services update conditions and DB consistency ([740cc66](https://gitlab.com/linagora/petals-cockpit/commit/740cc66))
+
+
+
 <a name="0.19.0"></a>
 # [0.19.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.18.0...v0.19.0) (2018-01-29)
 
