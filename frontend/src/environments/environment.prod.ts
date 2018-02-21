@@ -15,6 +15,10 @@ import {
   EndpointsServiceImpl,
 } from 'app/shared/services/endpoints.service';
 import {
+  InterfacesService,
+  InterfacesServiceImpl,
+} from 'app/shared/services/interfaces.service';
+import {
   ServiceAssembliesService,
   ServiceAssembliesServiceImpl,
 } from 'app/shared/services/service-assemblies.service';
@@ -55,6 +59,7 @@ export const environment: IEnvironment = {
     { provide: ContainersService, useClass: ContainersServiceImpl },
     { provide: ComponentsService, useClass: ComponentsServiceImpl },
     { provide: EndpointsService, useClass: EndpointsServiceImpl },
+    { provide: InterfacesService, useClass: InterfacesServiceImpl },
     {
       provide: ServiceAssembliesService,
       useClass: ServiceAssembliesServiceImpl,

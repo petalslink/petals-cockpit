@@ -33,6 +33,7 @@ import { Components } from 'app/features/cockpit/workspaces/state/components/com
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { getCurrentContainer } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
+import { Interfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.actions';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
@@ -122,6 +123,13 @@ export class ResourceByIdGuard implements CanActivateChild {
         new ServiceUnits.FetchDetails({ id }),
       ];
       this.previousDestroyAction = new ServiceUnits.SetCurrent({ id: '' });
+    } else if ((id = route.params['interfaceId'])) {
+      resourceState = state => state.interfaces;
+      initActions = state => [
+        new Interfaces.SetCurrent({ id }),
+        new Interfaces.FetchDetails({ id }),
+      ];
+      this.previousDestroyAction = new Interfaces.SetCurrent({ id: '' });
     } else if ((id = route.params['endpointId'])) {
       resourceState = state => state.endpoints;
       initActions = state => [

@@ -22,6 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </div>
   </div>
 
+  <app-interfaces-list
+    [interfacesTree]="interfacesTree$ | async"
+    [workspaceId]="workspaceId"
+    (onInterfaceSelected)="closeSidenavOnSmallScreen()">
+  </app-interfaces-list>
+
   <mat-divider></mat-divider>
 
   <div class="pnl-title">

@@ -24,6 +24,7 @@ import { of } from 'rxjs/observable/of';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
+import { Interfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.actions';
 import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
@@ -55,7 +56,7 @@ export class ServicesEffects {
             if (environment.debug) {
               console.group();
               console.warn(
-                'Error caught in service.effects: ofType(Services.FetchDetails)'
+                'Error caught in services.effects: ofType(Services.FetchDetails)'
               );
               console.error(err);
               console.groupEnd();
@@ -75,10 +76,13 @@ export class ServicesEffects {
         const data = action.payload;
         const services = toJsTable(data.services);
         const endpoints = toJsTable(data.endpoints);
+        const interfaces = toJsTable(data.interfaces);
 
         return batchActions([
+          new Interfaces.Clean(),
           new Services.Clean(),
           new Endpoints.Clean(),
+          new Interfaces.Added(interfaces),
           new Services.Added(services),
           new Endpoints.Added(endpoints),
         ]);

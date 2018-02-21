@@ -26,6 +26,7 @@ import {
 } from 'app/shared/services/workspaces.service';
 import { validContainers } from 'mocks/backend-mock';
 import { Endpoint, endpointsService } from 'mocks/endpoints-mock';
+import { Interface, interfacesService } from 'mocks/interfaces-mock';
 import { Service, servicesService } from 'mocks/services-mock';
 import { BackendUser } from 'mocks/users-mock';
 import {
@@ -47,6 +48,7 @@ export class Workspace {
   private readonly users = new Map<string, BackendUser>();
   private readonly buses = new Map<string, Bus>();
   private readonly busesInProgress = new Map<string, BusInProgress>();
+  private readonly interfaces = new Map<string, Interface>();
   private readonly services = new Map<string, Service>();
   private readonly endpoints = new Map<string, Endpoint>();
 
@@ -97,6 +99,23 @@ export class Workspace {
 
   getUsers() {
     return Array.from(this.users.values());
+  }
+
+  getInterfacesIds() {
+    return Array.from(this.interfaces.keys());
+  }
+
+  getInterfaces() {
+    return Array.from(this.interfaces.values());
+  }
+
+  getMoreInterfaces(nbInterfaces: number) {
+    let i: number;
+    for (i = 0; i < nbInterfaces; i++) {
+      const interfaceI = interfacesService.create('idCont0', 'idComp0');
+      this.interfaces.set(interfaceI.id, interfaceI);
+    }
+    return Array.from(this.interfaces.values());
   }
 
   getServicesIds() {
@@ -167,9 +186,11 @@ export class Workspace {
     );
     const serviceUnits = flatMap(components, c => c.getServiceUnits());
 
+    let interfaces = this.getInterfaces();
     let services = this.getServices();
     let endpoints = this.getEndpoints();
     if (this.buses.size > 1) {
+      interfaces = this.getMoreInterfaces(6);
       services = this.getMoreServices(6);
       endpoints = this.getMoreEndpoints(2);
     }
@@ -180,6 +201,7 @@ export class Workspace {
       containers: toObj(containers),
       components: toObj(components),
       endpoints: toObj(endpoints),
+      interfaces: toObj(interfaces),
       serviceAssemblies: toObj(serviceAssemblies),
       serviceUnits: toObj(serviceUnits),
       services: toObj(services),
@@ -190,8 +212,23 @@ export class Workspace {
   }
 
   makeServicesForComp0() {
+    const interfaces = new Map<string, Interface>();
     const services = new Map<string, Service>();
     const endpoints = new Map<string, Endpoint>();
+
+    const newInterface1 = interfacesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart97'
+    );
+    interfaces.set(newInterface1.id, newInterface1);
+
+    const newInterface2 = interfacesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/interface/technique/version/2.0}Interface-Localpart97'
+    );
+    interfaces.set(newInterface2.id, newInterface2);
 
     const newService1 = servicesService.create(
       'idCont0',
@@ -221,12 +258,41 @@ export class Workspace {
     );
     endpoints.set(newEndpoint1.id, newEndpoint1);
 
-    return this.makeEventData(services, endpoints);
+    return this.makeEventData(interfaces, services, endpoints);
   }
 
   makeServicesForComp1() {
+    const interfaces = new Map<string, Interface>();
     const services = new Map<string, Service>();
     const endpoints = new Map<string, Endpoint>();
+
+    const newInterface1 = interfacesService.create(
+      'idCont0',
+      'idComp1',
+      '{http://namespace-example.fr/interface/technique/environmental/international/version/1.0}Interface-Localpart98'
+    );
+    interfaces.set(newInterface1.id, newInterface1);
+
+    const newInterface2 = interfacesService.create(
+      'idCont0',
+      'idComp1',
+      '{http://namespace-example.fr/interface/technique/environmental/international/version/1.0}Interface-Localpart99'
+    );
+    interfaces.set(newInterface2.id, newInterface2);
+
+    const newInterface3 = interfacesService.create(
+      'idCont0',
+      'idComp1',
+      '{http://namespace-example.fr/interface/technique/environmental/region/pays/international/version/1.0}Interface-Localpart96'
+    );
+    interfaces.set(newInterface3.id, newInterface3);
+
+    const newInterface4 = interfacesService.create(
+      'idCont0',
+      'idComp1',
+      '{http://namespace-example.fr/interface/technique/global/region/pays/international/version/1.0}Interface-Localpart97'
+    );
+    interfaces.set(newInterface4.id, newInterface4);
 
     const newService1 = servicesService.create(
       'idCont0',
@@ -270,16 +336,18 @@ export class Workspace {
     );
     endpoints.set(newEndpoint2.id, newEndpoint2);
 
-    return this.makeEventData(services, endpoints);
+    return this.makeEventData(interfaces, services, endpoints);
   }
 
   makeServicesForComp2() {
+    const interfaces = new Map<string, Interface>();
     const services = new Map<string, Service>();
     const endpoints = new Map<string, Endpoint>();
-    return this.makeEventData(services, endpoints);
+    return this.makeEventData(interfaces, services, endpoints);
   }
 
   makeEventData(
+    interfaces: Map<string, Interface>,
     services: Map<string, Service>,
     endpoints: Map<string, Endpoint>
   ) {
@@ -289,6 +357,7 @@ export class Workspace {
         containers: {},
         components: {},
         endpoints: toObj(Array.from(endpoints.values())),
+        interfaces: toObj(Array.from(interfaces.values())),
         serviceAssemblies: {},
         serviceUnits: {},
         services: toObj(Array.from(services.values())),
@@ -296,6 +365,55 @@ export class Workspace {
       };
 
       return { eventData };
+    }
+  }
+
+  addInterfaces() {
+    const interface0 = interfacesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart0'
+    );
+    const interface1 = interfacesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart1'
+    );
+    const interface2 = interfacesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/interface/technique/version/2.0}Interface-Localpart2'
+    );
+    const interface3 = interfacesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/interface/technique/version/3.0}Interface-Localpart3'
+    );
+    const interface4 = interfacesService.create(
+      'idCont0',
+      'idComp0',
+      '{http://namespace-example.fr/interface/technique/version/3.0}Interface-Localpart4'
+    );
+    const interface5 = interfacesService.create(
+      'idCont2',
+      'idComp6',
+      '{http://namespace-example.fr/interface/metiers/version/1.0}Interface-Localpart0'
+    );
+    const interface6 = interfacesService.create(
+      'idCont2',
+      'idComp6',
+      '{http://namespace-example.fr/interface/metiers/version/1.0}Interface-Localpart1'
+    );
+
+    if (this.id === 'idWks1') {
+      this.interfaces.set(interface5.id, interface5);
+      this.interfaces.set(interface6.id, interface6);
+    } else {
+      this.interfaces.set(interface0.id, interface0);
+      this.interfaces.set(interface1.id, interface1);
+      this.interfaces.set(interface2.id, interface2);
+      this.interfaces.set(interface3.id, interface3);
+      this.interfaces.set(interface4.id, interface4);
     }
   }
 
@@ -424,6 +542,7 @@ export class Workspace {
     const containers = flatMap(buses, b => b.getContainers());
     const components = flatMap(containers, c => c.getComponents());
     const endpoints = this.getEndpoints();
+    const interfaces = this.getInterfaces();
     const serviceAssemblies = flatMap(containers, c =>
       c.getServiceAssemblies()
     );
@@ -438,6 +557,7 @@ export class Workspace {
       containers: toObj(containers),
       components: toObj(components),
       endpoints: toObj(endpoints),
+      interfaces: toObj(interfaces),
       serviceAssemblies: toObj(serviceAssemblies),
       serviceUnits: toObj(serviceUnits),
       services: toObj(services),
@@ -490,7 +610,8 @@ const ws0 = workspacesService.create();
 ws0.description =
   'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.';
 
-// add 5 services and 2 endpoints
+// add 5 interfaces, 5 services and 2 endpoints
+ws0.addInterfaces();
 ws0.addServices();
 ws0.addEndpoints();
 
@@ -502,6 +623,7 @@ const ws1 = workspacesService.create([
   'vnoel',
 ]);
 
-// add 2 services and 2 endpoints
+// add 2 interfaces, 2 services and 2 endpoints
+ws1.addInterfaces();
 ws1.addServices();
 ws1.addEndpoints();

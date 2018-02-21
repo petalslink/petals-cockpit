@@ -28,6 +28,11 @@ const routes: Routes = [
     redirectTo: 'services',
   },
   {
+    path: 'interfaces/:interfaceId',
+    loadChildren:
+      'app/features/cockpit/workspaces/services-content/services-interface-view/services-interface-view.module#ServicesInterfaceViewModule',
+  },
+  {
     path: 'services/:serviceId',
     loadChildren:
       'app/features/cockpit/workspaces/services-content/services-service-view/services-service-view.module#ServicesServiceViewModule',

@@ -38,6 +38,7 @@ import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
+import { Interfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.actions';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
@@ -104,12 +105,14 @@ export class BusesEffects {
 
         return batchActions([
           new Endpoints.Clean(),
+          new Interfaces.Clean(),
           new Services.Clean(),
           new BusesInProgress.Removed(bus),
           new Buses.Added(buses),
           new Containers.Added(toJsTable(data.containers)),
           new Components.Added(toJsTable(data.components)),
           new Endpoints.Added(toJsTable(data.endpoints)),
+          new Interfaces.Added(toJsTable(data.interfaces)),
           new Services.Added(toJsTable(data.services)),
           new ServiceAssemblies.Added(toJsTable(data.serviceAssemblies)),
           new ServiceUnits.Added(toJsTable(data.serviceUnits)),
