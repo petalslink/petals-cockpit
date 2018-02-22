@@ -18,7 +18,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { ResourceByIdGuard } from 'app/features/cockpit/workspaces/petals-content/resource-by-id.guard';
+import { PetalsByIdGuard } from 'app/features/cockpit/workspaces/petals-content/petals-by-id.guard';
 
 // /workspaces/:workspaceId/petals
 const routes: Routes = [
@@ -67,9 +67,9 @@ const routes: Routes = [
 @NgModule({
   imports: [
     RouterModule.forChild([
-      { path: '', canActivateChild: [ResourceByIdGuard], children: routes },
+      { path: '', canActivateChild: [PetalsByIdGuard], children: routes },
     ]),
   ],
-  providers: [ResourceByIdGuard],
+  providers: [PetalsByIdGuard],
 })
 export class PetalsContentRoutingModule {}

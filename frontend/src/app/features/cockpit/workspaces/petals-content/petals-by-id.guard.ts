@@ -32,11 +32,8 @@ import { getCurrentBus } from 'app/features/cockpit/workspaces/state/buses/buses
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { getCurrentContainer } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
-import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
-import { Interfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.actions';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
-import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { JsTable } from 'app/shared/helpers/jstable.helper';
@@ -44,7 +41,7 @@ import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
 
 @Injectable()
-export class ResourceByIdGuard implements CanActivateChild {
+export class PetalsByIdGuard implements CanActivateChild {
   private previousDestroyAction: Action;
 
   constructor(private router: Router, private store$: Store<IStore>) {}
@@ -123,27 +120,6 @@ export class ResourceByIdGuard implements CanActivateChild {
         new ServiceUnits.FetchDetails({ id }),
       ];
       this.previousDestroyAction = new ServiceUnits.SetCurrent({ id: '' });
-    } else if ((id = route.params['interfaceId'])) {
-      resourceState = state => state.interfaces;
-      initActions = state => [
-        new Interfaces.SetCurrent({ id }),
-        new Interfaces.FetchDetails({ id }),
-      ];
-      this.previousDestroyAction = new Interfaces.SetCurrent({ id: '' });
-    } else if ((id = route.params['endpointId'])) {
-      resourceState = state => state.endpoints;
-      initActions = state => [
-        new Endpoints.SetCurrent({ id }),
-        new Endpoints.FetchDetails({ id }),
-      ];
-      this.previousDestroyAction = new Endpoints.SetCurrent({ id: '' });
-    } else if ((id = route.params['serviceId'])) {
-      resourceState = state => state.services;
-      initActions = state => [
-        new Services.SetCurrent({ id }),
-        new Services.FetchDetails({ id }),
-      ];
-      this.previousDestroyAction = new Services.SetCurrent({ id: '' });
     } else if ((id = route.params['busInProgressId'])) {
       resourceState = state => state.busesInProgress;
       initActions = state => [new BusesInProgress.SetCurrent({ id })];
