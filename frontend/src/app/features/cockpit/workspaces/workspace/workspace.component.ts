@@ -26,7 +26,8 @@ import { Subject } from 'rxjs/Subject';
 
 import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 import { getBusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.selectors';
-import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
+import { IEndpointRow } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
+import { getAllEndpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.selectors';
 import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
 import { getAllServices } from 'app/features/cockpit/workspaces/state/services/services.selectors';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
@@ -52,6 +53,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   sidenavMode$: Observable<string>;
   workspace$: Observable<IWorkspaceRow>;
   busesInProgress$: Observable<IBusInProgress[]>;
+  endpoints$: Observable<IEndpointRow[]>;
   services$: Observable<IServiceRow[]>;
   tree$: Observable<WorkspaceElement[]>;
 
@@ -65,9 +67,20 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    // TODO: investigate observable unsubscription
+    // See https://gitlab.com/linagora/petals-cockpit/issues/445
+
     this.workspace$ = this.store$.select(getCurrentWorkspace);
     this.busesInProgress$ = this.store$.select(getBusesInProgress);
-    this.services$ = this.store$.select(getAllServices);
+
+    this.services$ = this.store$
+      .select(getAllServices)
+      .pipe(takeUntil(this.onDestroy$));
+
+    this.endpoints$ = this.store$
+      .select(getAllEndpoints)
+      .pipe(takeUntil(this.onDestroy$));
+
     this.tree$ = this.store$.select(getCurrentWorkspaceTree);
 
     this.retrievedSelectedIndex = this.storage.retrieve(
@@ -102,7 +115,6 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.onDestroy$.complete();
 
     this.store$.dispatch(new Workspaces.Clean());
-    this.store$.dispatch(new Services.Clean());
   }
 
   closeSidenav() {

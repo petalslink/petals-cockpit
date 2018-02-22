@@ -19,6 +19,7 @@ import { IBusesInProgressTable } from 'app/features/cockpit/workspaces/state/bus
 import { IBusesTable } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
 import { IComponentsTable } from 'app/features/cockpit/workspaces/state/components/components.interface';
 import { IContainersTable } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
+import { IEndpointsTable } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
 import { IServiceAssembliesTable } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
 import { IServiceUnitsTable } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
 import { IServicesTable } from 'app/features/cockpit/workspaces/state/services/services.interface';
@@ -35,6 +36,7 @@ export interface IStore {
   busesInProgress: IBusesInProgressTable;
   containers: IContainersTable;
   components: IComponentsTable;
+  endpoints: IEndpointsTable;
   services: IServicesTable;
   serviceUnits: IServiceUnitsTable;
   serviceAssemblies: IServiceAssembliesTable;

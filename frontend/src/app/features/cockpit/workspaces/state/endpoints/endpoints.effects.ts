@@ -24,29 +24,25 @@ import { of } from 'rxjs/observable/of';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
-import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { ServicesService } from 'app/shared/services/services.service';
-import { SseActions } from 'app/shared/services/sse.service';
+import { EndpointsService } from 'app/shared/services/endpoints.service';
 import { environment } from 'environments/environment';
 
 @Injectable()
-export class ServicesEffects {
+export class EndpointsEffects {
   constructor(
     private actions$: Actions,
-    private servicesService: ServicesService
+    private endpointsService: EndpointsService
   ) {}
 
   @Effect()
-  fetchServiceDetails$: Observable<Action> = this.actions$
-    .ofType<Services.FetchDetails>(Services.FetchDetailsType)
+  fetchEndpointDetails$: Observable<Action> = this.actions$
+    .ofType<Endpoints.FetchDetails>(Endpoints.FetchDetailsType)
     .pipe(
       switchMap(action =>
-        this.servicesService.getDetailsService(action.payload.id).pipe(
+        this.endpointsService.getDetailsEndpoint(action.payload.id).pipe(
           map(
             res =>
-              new Services.FetchDetailsSuccess({
+              new Endpoints.FetchDetailsSuccess({
                 id: action.payload.id,
                 data: res,
               })
@@ -55,33 +51,15 @@ export class ServicesEffects {
             if (environment.debug) {
               console.group();
               console.warn(
-                'Error caught in service.effects: ofType(Services.FetchDetails)'
+                'Error caught in endpoint.effects: ofType(Endpoints.FetchDetails)'
               );
               console.error(err);
               console.groupEnd();
             }
 
-            return of(new Services.FetchDetailsError(action.payload));
+            return of(new Endpoints.FetchDetailsError(action.payload));
           })
         )
       )
-    );
-
-  @Effect()
-  watchServicesChanged$: Observable<Action> = this.actions$
-    .ofType<SseActions.ServicesUpdated>(SseActions.ServicesUpdatedType)
-    .pipe(
-      map(action => {
-        const data = action.payload;
-        const services = toJsTable(data.services);
-        const endpoints = toJsTable(data.endpoints);
-
-        return batchActions([
-          new Services.Clean(),
-          new Endpoints.Clean(),
-          new Services.Added(services),
-          new Endpoints.Added(endpoints),
-        ]);
-      })
     );
 }

@@ -6,7 +6,10 @@ import { NOTIFICATION_DOM } from '../support/notification.dom';
 import { WORKSPACE_DOM } from '../support/workspace.dom';
 import { WORKSPACES_LIST_DOM } from '../support/workspaces.dom';
 import { SERVICES_TREE_DOM } from '../support/services.dom';
-import { expectedServicesTreeWks0 } from '../support/helper.const';
+import {
+  expectedServicesTreeWks0,
+  expectedEndpointsTreeWks0,
+} from '../support/helper.const';
 
 describe(`Import Bus `, () => {
   beforeEach(() => {
@@ -43,7 +46,7 @@ describe(`Import Bus `, () => {
     cy.expectBusImportFields().should('be.empty');
   });
 
-  it(`should import a new bus and contain a new services tree`, () => {
+  it(`should import a new bus with the service, endpoint list on BUS_IMPORT_OK event`, () => {
     cy.login('admin', 'admin');
 
     cy
@@ -51,11 +54,9 @@ describe(`Import Bus `, () => {
       .contains(`Services`)
       .click();
 
-    const servicesNames = cy.get(SERVICES_TREE_DOM.texts.servicesNames);
+    cy.expectServicesTreeToBe(expectedServicesTreeWks0);
 
-    servicesNames.each(($item, index) =>
-      cy.contains(expectedServicesTreeWks0[index])
-    );
+    cy.expectEndpointsTreeToBe(expectedEndpointsTreeWks0);
 
     cy
       .get(WORKSPACE_DOM.tabs)
@@ -64,16 +65,22 @@ describe(`Import Bus `, () => {
 
     cy.get(PETALS_DOM.buttons.addBus).click();
 
-    cy.importBus('192.168.0.1', '7700', 'admin', 'password', 'passphrase');
+    cy.importBusAndCheck(
+      '192.168.0.1',
+      '7700',
+      'admin',
+      'password',
+      'passphrase'
+    );
 
     cy
       .get(WORKSPACE_DOM.tabs)
       .contains(`Services`)
       .click();
 
-    servicesNames.each(($item, index) =>
-      cy.contains(expectedServicesTreeUpdatedWks0[index])
-    );
+    cy.expectServicesTreeToBe(expectedServicesTreeUpdatedWks0);
+
+    cy.expectEndpointsTreeToBe(expectedEndpointsTreeUpdatedWks0);
   });
 
   // TODO: test inconsistently failing
@@ -111,5 +118,15 @@ describe(`Import Bus `, () => {
     `Localpart18`,
     `http://namespace-example.fr/service/technique/version/19.0`,
     `Localpart19`,
+  ];
+
+  const expectedEndpointsTreeUpdatedWks0 = [
+    `edpt-89p82661-test-31o4-l391-00`,
+    `edpt-89p82661-test-31o4-l391-01`,
+    `edpt-89p82661-test-31o4-l391-02`,
+    `edpt-89p82661-test-31o4-l391-03`,
+    `edpt-89p82661-test-31o4-l391-04`,
+    `edpt-69f52660-test-19e9-a769-14`,
+    `edpt-69f52660-test-19e9-a769-15`,
   ];
 });

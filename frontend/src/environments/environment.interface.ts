@@ -3,6 +3,7 @@ import { Type } from '@angular/core';
 import { BusesService } from 'app/shared/services/buses.service';
 import { ComponentsService } from 'app/shared/services/components.service';
 import { ContainersService } from 'app/shared/services/containers.service';
+import { EndpointsService } from 'app/shared/services/endpoints.service';
 import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
 import { ServiceUnitsService } from 'app/shared/services/service-units.service';
 import { ServicesService } from 'app/shared/services/services.service';
@@ -88,6 +89,10 @@ export type IMockableServices = [
   },
   {
     provide: typeof ComponentsService;
+    useClass: Type<any>;
+  },
+  {
+    provide: typeof EndpointsService;
     useClass: Type<any>;
   },
   {

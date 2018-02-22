@@ -15,15 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 
-@Component({
-  selector: 'app-service-view',
-  templateUrl: './service-view.component.html',
-  styleUrls: ['./service-view.component.scss'],
+import { ServicesServiceViewComponent } from './services-service-view.component';
+
+// /workspaces/:workspaceId/services/services/:serviceId
+const routes: Routes = [
+  {
+    path: '',
+    component: ServicesServiceViewComponent,
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-export class ServiceViewComponent implements OnInit {
-  constructor() {}
-
-  ngOnInit() {}
-}
+export class ServicesServiceViewRoutingModule {}

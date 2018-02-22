@@ -29,6 +29,7 @@ import {
   IComponentBackendSSE,
 } from 'app/shared/services/components.service';
 import { IContainerBackendSSE } from 'app/shared/services/containers.service';
+import { IEndpointBackendSSE } from 'app/shared/services/endpoints.service';
 import {
   IServiceAssemblyBackendSSE,
   ServiceAssemblyState,
@@ -74,8 +75,9 @@ export namespace SseActions {
       public readonly payload: {
         buses: { [key: string]: IBusBackendSSE };
         containers: { [key: string]: IContainerBackendSSE };
-        serviceAssemblies: { [key: string]: IServiceAssemblyBackendSSE };
         components: { [key: string]: IComponentBackendSSE };
+        endpoints: { [key: string]: IEndpointBackendSSE };
+        serviceAssemblies: { [key: string]: IServiceAssemblyBackendSSE };
         serviceUnits: { [key: string]: IServiceUnitBackendSSE };
         services: { [key: string]: IServiceBackendSSE };
         sharedLibraries: { [key: string]: ISharedLibraryBackendSSE };
@@ -95,6 +97,7 @@ export namespace SseActions {
         buses: { [key: string]: IBusBackendSSE };
         containers: { [key: string]: IContainerBackendSSE };
         components: { [key: string]: IComponentBackendSSE };
+        endpoints: { [key: string]: IEndpointBackendSSE };
         serviceAssemblies: { [key: string]: IServiceAssemblyBackendSSE };
         serviceUnits: { [key: string]: IServiceUnitBackendSSE };
         services: { [key: string]: IServiceBackendSSE };
@@ -187,10 +190,11 @@ export namespace SseActions {
 
   export const ServicesUpdatedSse = 'SERVICES_UPDATED';
   export const ServicesUpdatedType = '[Sse] Services updated';
-  export class ServicesUpdatedChange implements Action {
+  export class ServicesUpdated implements Action {
     readonly type = ServicesUpdatedType;
     constructor(
       public readonly payload: {
+        endpoints: { [key: string]: IEndpointBackendSSE };
         services: { [key: string]: IServiceBackendSSE };
       }
     ) {}
@@ -220,7 +224,7 @@ export namespace SseActions {
     [SseActions.SlStateChangeSse]: payload =>
       new SseActions.SlStateChange(payload),
     [SseActions.ServicesUpdatedSse]: payload =>
-      new SseActions.ServicesUpdatedChange(payload),
+      new SseActions.ServicesUpdated(payload),
   };
 }
 

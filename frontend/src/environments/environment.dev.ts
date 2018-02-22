@@ -4,6 +4,8 @@ import { ComponentsService } from 'app/shared/services/components.service';
 import { ComponentsServiceMock } from 'app/shared/services/components.service.mock';
 import { ContainersService } from 'app/shared/services/containers.service';
 import { ContainersServiceMock } from 'app/shared/services/containers.service.mock';
+import { EndpointsService } from 'app/shared/services/endpoints.service';
+import { EndpointsServiceMock } from 'app/shared/services/endpoints.service.mock';
 import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
 import { ServiceAssembliesServiceMock } from 'app/shared/services/service-assemblies.service.mock';
 import { ServiceUnitsService } from 'app/shared/services/service-units.service';
@@ -27,50 +29,20 @@ export const environment: IEnvironment = {
   hashLocationStrategy: false,
   debug: true,
   services: [
-    {
-      provide: SseService,
-      useClass: SseServiceMock,
-    },
-    {
-      provide: BusesService,
-      useClass: BusesServiceMock,
-    },
-    {
-      provide: ContainersService,
-      useClass: ContainersServiceMock,
-    },
-    {
-      provide: ComponentsService,
-      useClass: ComponentsServiceMock,
-    },
+    { provide: SseService, useClass: SseServiceMock },
+    { provide: BusesService, useClass: BusesServiceMock },
+    { provide: ContainersService, useClass: ContainersServiceMock },
+    { provide: ComponentsService, useClass: ComponentsServiceMock },
+    { provide: EndpointsService, useClass: EndpointsServiceMock },
     {
       provide: ServiceAssembliesService,
       useClass: ServiceAssembliesServiceMock,
     },
-    {
-      provide: ServiceUnitsService,
-      useClass: ServiceUnitsServiceMock,
-    },
-    {
-      provide: ServicesService,
-      useClass: ServicesServiceMock,
-    },
-    {
-      provide: SharedLibrariesService,
-      useClass: SharedLibrariesServiceMock,
-    },
-    {
-      provide: WorkspacesService,
-      useClass: WorkspacesServiceMock,
-    },
-    {
-      provide: UsersService,
-      useClass: UsersServiceMock,
-    },
+    { provide: ServiceUnitsService, useClass: ServiceUnitsServiceMock },
+    { provide: ServicesService, useClass: ServicesServiceMock },
+    { provide: SharedLibrariesService, useClass: SharedLibrariesServiceMock },
+    { provide: WorkspacesService, useClass: WorkspacesServiceMock },
+    { provide: UsersService, useClass: UsersServiceMock },
   ],
-  mock: {
-    httpDelay: 500,
-    sseDelay: 500,
-    alreadyConnected: true,
-  },
+  mock: { httpDelay: 500, sseDelay: 500, alreadyConnected: true },
 };

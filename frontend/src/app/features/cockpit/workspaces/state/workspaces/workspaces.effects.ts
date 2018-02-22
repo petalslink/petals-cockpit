@@ -36,6 +36,7 @@ import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
+import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
 import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
@@ -161,7 +162,6 @@ export class WorkspacesEffects {
 
         return batchActions([
           new Workspaces.Clean(),
-          new Services.Clean(),
           new Ui.OpenSidenav(),
           new Workspaces.FetchSuccess(data.workspace),
           new Users.Fetched(toJsTable(data.users)),
@@ -169,6 +169,7 @@ export class WorkspacesEffects {
           new Buses.Fetched(toJsTable(data.buses)),
           new Containers.Fetched(toJsTable(data.containers)),
           new Components.Fetched(toJsTable(data.components)),
+          new Endpoints.Fetched(toJsTable(data.endpoints)),
           new ServiceAssemblies.Fetched(toJsTable(data.serviceAssemblies)),
           new ServiceUnits.Fetched(toJsTable(data.serviceUnits)),
           new Services.Fetched(toJsTable(data.services)),

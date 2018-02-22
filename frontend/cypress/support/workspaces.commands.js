@@ -7,6 +7,7 @@ import {
 
 Cypress.Commands.add('expectWorkspacesListToBe', list => {
   const workspacesListNames = cy.get(WORKSPACES_LIST_DOM.texts.workspaceName);
+  workspacesListNames.should('have.length', list.length);
   workspacesListNames.each(($item, index) => cy.contains(list[index]));
 });
 

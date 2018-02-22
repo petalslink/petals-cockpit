@@ -22,6 +22,7 @@ import { BusesInProgressReducer } from 'app/features/cockpit/workspaces/state/bu
 import { BusesReducer } from 'app/features/cockpit/workspaces/state/buses/buses.reducer';
 import { ComponentsReducer } from 'app/features/cockpit/workspaces/state/components/components.reducer';
 import { ContainersReducer } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
+import { EndpointsReducer } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.reducer';
 import { ServiceAssembliesReducer } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
 import { ServiceUnitsReducer } from 'app/features/cockpit/workspaces/state/service-units/service-units.reducer';
 import { ServicesReducer } from 'app/features/cockpit/workspaces/state/services/services.reducer';
@@ -41,6 +42,7 @@ export const reducers: ActionReducerMap<IStore> = {
   busesInProgress: BusesInProgressReducer.reducer,
   containers: ContainersReducer.reducer,
   components: ComponentsReducer.reducer,
+  endpoints: EndpointsReducer.reducer,
   services: ServicesReducer.reducer,
   serviceUnits: ServiceUnitsReducer.reducer,
   serviceAssemblies: ServiceAssembliesReducer.reducer,

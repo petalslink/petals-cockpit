@@ -15,14 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-import { SharedModule } from 'app/shared/shared.module';
-import { ServiceViewRoutingModule } from './service-view-routing.module';
-import { ServiceViewComponent } from './service-view.component';
+import * as helper from 'app/shared/helpers/mock.helper';
+import { endpointsService } from 'mocks/endpoints-mock';
+import { EndpointsServiceImpl } from './endpoints.service';
 
-@NgModule({
-  imports: [SharedModule, ServiceViewRoutingModule],
-  declarations: [ServiceViewComponent],
-})
-export class ServiceViewModule {}
+@Injectable()
+export class EndpointsServiceMock extends EndpointsServiceImpl {
+  constructor(http: HttpClient) {
+    super(http);
+  }
+
+  getDetailsEndpoint(endpointId: string) {
+    const detailsEndpoint = endpointsService.get(endpointId).getDetails();
+
+    return helper.responseBody(detailsEndpoint.endpoint);
+  }
+}

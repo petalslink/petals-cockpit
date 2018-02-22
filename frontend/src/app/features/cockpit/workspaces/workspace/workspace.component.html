@@ -51,10 +51,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </mat-tab>
 
       <mat-tab label="Services">
-        <app-service-menu-view
+        <app-services-menu-view
          [services]="services$ | async"
+         [endpoints]="endpoints$ | async"
          [workspaceId]="workspace.id">
-        </app-service-menu-view>
+        </app-services-menu-view>
       </mat-tab>
 
       <mat-tab label="Api">
