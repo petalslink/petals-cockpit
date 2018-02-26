@@ -197,7 +197,9 @@ package-product:
     paths:
       - petals-cockpit-*
 
-electron-cypress:
+#electron tests always fail for now
+#see: https://github.com/cypress-io/cypress/issues/1242
+.electron-cypress:
   <<: *node-java-yarn
   stage: integration
   only:
