@@ -23,6 +23,9 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.EDP_INSTANCES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.INTERFACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
@@ -121,45 +124,45 @@ public class InterfacesResource {
 
         @NotNull
         @Min(1)
-        public final long containerId;
+        public final Set<String> componentIds;
 
-        @NotNull
-        @Min(1)
-        public final long componentId;
-
-        public InterfaceFull(InterfacesRecord iDb, long containerId, long componentId) {
-            this(new InterfaceMin(iDb), containerId, componentId);
+        public InterfaceFull(InterfacesRecord iDb, Set<String> componentIds) {
+            this(new InterfaceMin(iDb), componentIds);
         }
 
-        private InterfaceFull(InterfaceMin intf, long containerId, long componentId) {
+        public InterfaceFull(InterfacesRecord iDb, String componentId) {
+            this(new InterfaceMin(iDb), new HashSet<String>());
+            this.componentIds.add(componentId);
+        }
+
+        private InterfaceFull(InterfaceMin intf, Set<String> componentId) {
             this.interface_ = intf;
-            this.containerId = containerId;
-            this.componentId = componentId;
+            this.componentIds = new HashSet<String>(componentId);
         }
 
         @JsonCreator
         private InterfaceFull() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new InterfaceMin(0, ""), 0, 0);
+            this(new InterfaceMin(0, ""), new HashSet<String>());
         }
 
-        @JsonProperty
-        public String getContainerId() {
-            return Long.toString(containerId);
+        public void addComponent(Long componentId) {
+            this.componentIds.add(String.valueOf(componentId));
         }
 
-        @JsonProperty
-        public String getComponentId() {
-            return Long.toString(componentId);
+        public void addComponents(Set<String> componentIds) {
+            this.componentIds.addAll(componentIds);
         }
 
         @Override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + (int) (componentId ^ (componentId >>> 32));
-            result = prime * result + (int) (containerId ^ (containerId >>> 32));
-            result = prime * result + ((interface_ == null) ? 0 : interface_.hashCode());
+            long id = interface_.id;
+            String name = interface_.name;
+            result = prime * result + ((componentIds == null) ? 0 : componentIds.hashCode());
+            result = prime * result + (int) (id ^ (id >>> 32));
+            result = prime * result + ((name == null) ? 0 : name.hashCode());
             return result;
         }
 
@@ -172,13 +175,11 @@ public class InterfacesResource {
             if (getClass() != obj.getClass())
                 return false;
             InterfaceFull other = (InterfaceFull) obj;
-            if (componentId != other.componentId)
-                return false;
-            if (containerId != other.containerId)
-                return false;
-            if (!interface_.name.equals(other.interface_.name))
+            if (!componentIds.equals(other.componentIds))
                 return false;
             if (interface_.id != other.interface_.id)
+                return false;
+            if (!interface_.name.equals(other.interface_.name))
                 return false;
             return true;
         }
