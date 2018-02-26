@@ -3,21 +3,44 @@ import { COMPONENT_DOM } from './component.dom';
 import { WORKSPACE_DOM } from './workspace.dom';
 import { WORKSPACES_LIST_DOM } from './workspaces.dom';
 
+Cypress.Commands.add('expectInterfacesTreeToBe', tree => {
+  cy
+    .get(SERVICES_TREE_DOM.expPanel.expPanelInterfaces)
+    .should('have.class', 'mat-expanded');
+
+  const interfacesNames = cy.get(SERVICES_TREE_DOM.texts.interfacesNames);
+  interfacesNames.should('have.length', tree.length);
+  interfacesNames.each(($item, index) => cy.contains(tree[index]));
+});
+
 Cypress.Commands.add('expectServicesTreeToBe', tree => {
+  cy
+    .get(SERVICES_TREE_DOM.expPanel.expPanelServices)
+    .should('have.class', 'mat-expanded');
+
   const servicesNames = cy.get(SERVICES_TREE_DOM.texts.servicesNames);
   servicesNames.should('have.length', tree.length);
   servicesNames.each(($item, index) => cy.contains(tree[index]));
 });
 
 Cypress.Commands.add('expectEndpointsTreeToBe', tree => {
+  cy
+    .get(SERVICES_TREE_DOM.expPanel.expPanelEndpoints)
+    .should('have.class', 'mat-expanded');
+
   const endpointsNames = cy.get(SERVICES_TREE_DOM.texts.endpointsNames);
   endpointsNames.should('have.length', tree.length);
   endpointsNames.each(($item, index) => cy.contains(tree[index]));
 });
 
-Cypress.Commands.add('getTargetedElementInTree', (type, name) => {
-  // type can be: namespace, localpart, endpoint, interface
-  return cy.get(`.${type}`).contains(name);
+Cypress.Commands.add('clickElementInTree', (expPanel, type, name) => {
+  // Type can be: namespace, localpart, endpoint, interface
+  // Visibility bugged: we force the action to click to disables waiting for actionability
+  return cy
+    .get(`.${type}`)
+    .parents(`.${expPanel}`)
+    .contains(name)
+    .click({ force: true });
 });
 
 Cypress.Commands.add('triggerSSEForComp', (name, id) => {

@@ -1,6 +1,17 @@
 // This file gathers the contents shared between the test files.
 // It avoids duplicating the code in multiple files.
 
+export const expectedInterfacesTreeWks0 = [
+  `http://namespace-example.fr/interface/technique/version/1.0`,
+  `Interface-Localpart0`,
+  `Interface-Localpart1`,
+  `http://namespace-example.fr/interface/technique/version/2.0`,
+  `Interface-Localpart2`,
+  `http://namespace-example.fr/interface/technique/version/3.0`,
+  `Interface-Localpart3`,
+  `Interface-Localpart4`,
+];
+
 export const expectedServicesTreeWks0 = [
   `http://namespace-example.fr/service/technique/version/1.0`,
   `Localpart0`,
