@@ -87,23 +87,18 @@ describe(`Service`, () => {
 
     cy.expectEndpointsTreeToBe(expectedEndpointsTreeWks1);
 
-    cy.clickElementInTree(
-      `exp-pnl-interfaces-tree`,
-      `item-name`,
-      `Interface-Localpart0`
-    );
+    cy.clickElementInTree(`exp-pnl-interfaces-tree`, `Interface-Localpart0`);
 
     cy.expectLocationToBe(
       `/workspaces/idWks1/services/interfaces/idInterface12`
     );
 
-    cy.clickElementInTree(`exp-pnl-services-tree`, `item-name`, `Localpart0`);
+    cy.clickElementInTree(`exp-pnl-services-tree`, `Localpart0`);
 
     cy.expectLocationToBe(`/workspaces/idWks1/services/services/idService12`);
 
     cy.clickElementInTree(
       `exp-pnl-endpoints-tree`,
-      `item-name`,
       `edpt-89p82661-test-31o4-l391-05`
     );
 
@@ -118,11 +113,7 @@ describe(`Service`, () => {
       .contains(`Services`)
       .click();
 
-    cy.clickElementInTree(
-      `exp-pnl-interfaces-tree`,
-      `item-name`,
-      `Interface-Localpart0`
-    );
+    cy.clickElementInTree(`exp-pnl-interfaces-tree`, `Interface-Localpart0`);
 
     cy.expectLocationToBe(
       `/workspaces/idWks0/services/interfaces/idInterface0`
@@ -137,7 +128,7 @@ describe(`Service`, () => {
       .contains(`Services`)
       .click();
 
-    cy.clickElementInTree(`exp-pnl-services-tree`, `item-name`, `Localpart0`);
+    cy.clickElementInTree(`exp-pnl-services-tree`, `Localpart0`);
 
     cy.expectLocationToBe(`/workspaces/idWks0/services/services/idService0`);
   });
@@ -152,7 +143,6 @@ describe(`Service`, () => {
 
     cy.clickElementInTree(
       `exp-pnl-endpoints-tree`,
-      `item-name`,
       `edpt-89p82661-test-31o4-l391-00`
     );
 

@@ -33,11 +33,11 @@ Cypress.Commands.add('expectEndpointsTreeToBe', tree => {
   endpointsNames.each(($item, index) => cy.contains(tree[index]));
 });
 
-Cypress.Commands.add('clickElementInTree', (expPanel, type, name) => {
+Cypress.Commands.add('clickElementInTree', (expPanel, name) => {
   // Type can be: namespace, localpart, endpoint, interface
   // Visibility bugged: we force the action to click to disables waiting for actionability
   return cy
-    .get(`.${type}`)
+    .get(`.item-name`)
     .parents(`.${expPanel}`)
     .contains(name)
     .click({ force: true });
