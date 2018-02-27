@@ -24,12 +24,7 @@ export class Endpoint {
   public readonly id: string;
   public readonly name: string;
 
-  constructor(
-    public cpt: number,
-    private containerId: string,
-    private componentId: string,
-    name?: string
-  ) {
+  constructor(public cpt: number, private componentId: string, name?: string) {
     const i = cpt;
     this.id = `idEndpoint${i}`;
     this.name = name || `edpt-69f52660-test-19e9-a769-${i}`;
@@ -40,7 +35,6 @@ export class Endpoint {
       [this.id]: {
         id: this.id,
         name: this.name,
-        containerId: this.containerId,
         componentId: this.componentId,
       },
     };
@@ -51,7 +45,6 @@ export class Endpoint {
       endpoint: {
         id: this.id,
         name: this.name,
-        containerId: this.containerId,
         componentId: this.componentId,
       },
     };
@@ -63,8 +56,8 @@ export class Endpoints {
   protected cpt = 0;
   constructor() {}
 
-  create(containerId: string, componentId: string, name?: string) {
-    const endpoint = new Endpoint(this.cpt++, containerId, componentId, name);
+  create(componentId: string, name?: string) {
+    const endpoint = new Endpoint(this.cpt++, componentId, name);
     this.endpoints.set(endpoint.id, endpoint);
     return endpoint;
   }

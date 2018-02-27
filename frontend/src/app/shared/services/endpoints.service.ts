@@ -24,7 +24,6 @@ import { environment } from 'environments/environment';
 export interface IEndpointBackendSSECommon {
   id: string;
   name: string;
-  containerId: string;
   componentId: string;
 }
 

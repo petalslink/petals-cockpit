@@ -24,12 +24,7 @@ export class Interface {
   public readonly id: string;
   public readonly name: string;
 
-  constructor(
-    public cpt: number,
-    private containerId: string,
-    private componentId: string,
-    name?: string
-  ) {
+  constructor(public cpt: number, private components: string[], name?: string) {
     const i = cpt;
     this.id = `idInterface${i}`;
     this.name =
@@ -42,8 +37,7 @@ export class Interface {
       [this.id]: {
         id: this.id,
         name: this.name,
-        containerId: this.containerId,
-        componentId: this.componentId,
+        components: Array.from(this.components),
       },
     };
   }
@@ -53,8 +47,7 @@ export class Interface {
       interface: {
         id: this.id,
         name: this.name,
-        containerId: this.containerId,
-        componentId: this.componentId,
+        components: Array.from(this.components),
       },
     };
   }
@@ -65,8 +58,8 @@ export class Interfaces {
   protected cpt = 0;
   constructor() {}
 
-  create(containerId: string, componentId: string, name?: string) {
-    const itf = new Interface(this.cpt++, containerId, componentId, name);
+  create(components: string[], name?: string) {
+    const itf = new Interface(this.cpt++, components, name);
     this.interfaces.set(itf.id, itf);
     return itf;
   }

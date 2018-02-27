@@ -54,7 +54,6 @@ export function endpointRowFactory(): IEndpointRow {
   return {
     id: null,
     name: null,
-    containerId: null,
     componentId: null,
     isFetchingDetails: false,
   };
