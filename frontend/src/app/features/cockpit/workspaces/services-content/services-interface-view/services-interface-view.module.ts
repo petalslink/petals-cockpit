@@ -15,7 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.pnl-title {
-  font-size: 13px;
-  font-weight: 500;
-}
+import { NgModule } from '@angular/core';
+
+import { SharedModule } from 'app/shared/shared.module';
+import { ServicesInterfaceViewRoutingModule } from './services-interface-view-routing.module';
+import { ServicesInterfaceViewComponent } from './services-interface-view.component';
+
+@NgModule({
+  imports: [SharedModule, ServicesInterfaceViewRoutingModule],
+  declarations: [ServicesInterfaceViewComponent],
+})
+export class ServicesInterfaceViewModule {}

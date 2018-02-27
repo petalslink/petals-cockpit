@@ -6,6 +6,8 @@ import { ContainersService } from 'app/shared/services/containers.service';
 import { ContainersServiceMock } from 'app/shared/services/containers.service.mock';
 import { EndpointsService } from 'app/shared/services/endpoints.service';
 import { EndpointsServiceMock } from 'app/shared/services/endpoints.service.mock';
+import { InterfacesService } from 'app/shared/services/interfaces.service';
+import { InterfacesServiceMock } from 'app/shared/services/interfaces.service.mock';
 import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
 import { ServiceAssembliesServiceMock } from 'app/shared/services/service-assemblies.service.mock';
 import { ServiceUnitsService } from 'app/shared/services/service-units.service';
@@ -34,6 +36,7 @@ export const environment: IEnvironment = {
     { provide: ContainersService, useClass: ContainersServiceMock },
     { provide: ComponentsService, useClass: ComponentsServiceMock },
     { provide: EndpointsService, useClass: EndpointsServiceMock },
+    { provide: InterfacesService, useClass: InterfacesServiceMock },
     {
       provide: ServiceAssembliesService,
       useClass: ServiceAssembliesServiceMock,

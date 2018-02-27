@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.pnl-title {
-  font-size: 13px;
-  font-weight: 500;
+.mat-list[dense],
+mat-nav-list[dense] {
+  padding-top: 0;
 }

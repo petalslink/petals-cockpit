@@ -15,7 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.pnl-title {
-  font-size: 13px;
-  font-weight: 500;
-}
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+import { ServicesInterfaceViewComponent } from './services-interface-view.component';
+
+// /workspaces/:workspaceId/services/interfaces/:interfaceId
+const routes: Routes = [
+  {
+    path: '',
+    component: ServicesInterfaceViewComponent,
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
+})
+export class ServicesInterfaceViewRoutingModule {}

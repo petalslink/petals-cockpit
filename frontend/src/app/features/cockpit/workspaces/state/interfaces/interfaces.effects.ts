@@ -23,26 +23,26 @@ import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
-import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
-import { EndpointsService } from 'app/shared/services/endpoints.service';
+import { Interfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.actions';
+import { InterfacesService } from 'app/shared/services/interfaces.service';
 import { environment } from 'environments/environment';
 
 @Injectable()
-export class EndpointsEffects {
+export class InterfacesEffects {
   constructor(
     private actions$: Actions,
-    private endpointsService: EndpointsService
+    private interfacesService: InterfacesService
   ) {}
 
   @Effect()
-  fetchEndpointDetails$: Observable<Action> = this.actions$
-    .ofType<Endpoints.FetchDetails>(Endpoints.FetchDetailsType)
+  fetchInterfaceDetails$: Observable<Action> = this.actions$
+    .ofType<Interfaces.FetchDetails>(Interfaces.FetchDetailsType)
     .pipe(
       switchMap(action =>
-        this.endpointsService.getDetailsEndpoint(action.payload.id).pipe(
+        this.interfacesService.getDetailsInterface(action.payload.id).pipe(
           map(
             res =>
-              new Endpoints.FetchDetailsSuccess({
+              new Interfaces.FetchDetailsSuccess({
                 id: action.payload.id,
                 data: res,
               })
@@ -51,13 +51,13 @@ export class EndpointsEffects {
             if (environment.debug) {
               console.group();
               console.warn(
-                'Error caught in endpoints.effects: ofType(Endpoints.FetchDetails)'
+                'Error caught in interfaces.effects: ofType(Interfaces.FetchDetails)'
               );
               console.error(err);
               console.groupEnd();
             }
 
-            return of(new Endpoints.FetchDetailsError(action.payload));
+            return of(new Interfaces.FetchDetailsError(action.payload));
           })
         )
       )

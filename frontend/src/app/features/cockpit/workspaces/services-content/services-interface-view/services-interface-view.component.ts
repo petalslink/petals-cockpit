@@ -15,7 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.pnl-title {
-  font-size: 13px;
-  font-weight: 500;
+import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { IStore } from 'app/shared/state/store.interface';
+import { Ui } from 'app/shared/state/ui.actions';
+
+@Component({
+  selector: 'app-services-interface-view',
+  templateUrl: './services-interface-view.component.html',
+  styleUrls: ['./services-interface-view.component.scss'],
+})
+export class ServicesInterfaceViewComponent implements OnInit {
+  constructor(private store$: Store<IStore>) {}
+
+  ngOnInit() {
+    this.store$.dispatch(
+      new Ui.SetTitles({
+        titleMainPart1: 'Services',
+        titleMainPart2: 'Interface',
+      })
+    );
+  }
 }

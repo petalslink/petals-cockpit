@@ -28,6 +28,8 @@ import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-p
 import { getBusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.selectors';
 import { IEndpointRow } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
 import { getAllEndpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.selectors';
+import { IInterfaceRow } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
+import { getAllInterfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
 import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
 import { getAllServices } from 'app/features/cockpit/workspaces/state/services/services.selectors';
 import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
@@ -53,6 +55,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   sidenavMode$: Observable<string>;
   workspace$: Observable<IWorkspaceRow>;
   busesInProgress$: Observable<IBusInProgress[]>;
+  interfaces$: Observable<IInterfaceRow[]>;
   endpoints$: Observable<IEndpointRow[]>;
   services$: Observable<IServiceRow[]>;
   tree$: Observable<WorkspaceElement[]>;
@@ -72,6 +75,10 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
     this.workspace$ = this.store$.select(getCurrentWorkspace);
     this.busesInProgress$ = this.store$.select(getBusesInProgress);
+
+    this.interfaces$ = this.store$
+      .select(getAllInterfaces)
+      .pipe(takeUntil(this.onDestroy$));
 
     this.services$ = this.store$
       .select(getAllServices)

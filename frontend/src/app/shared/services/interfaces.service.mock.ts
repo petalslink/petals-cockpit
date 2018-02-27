@@ -15,7 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.pnl-title {
-  font-size: 13px;
-  font-weight: 500;
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
+import * as helper from 'app/shared/helpers/mock.helper';
+import { interfacesService } from 'mocks/interfaces-mock';
+import { InterfacesServiceImpl } from './interfaces.service';
+
+@Injectable()
+export class InterfacesServiceMock extends InterfacesServiceImpl {
+  constructor(http: HttpClient) {
+    super(http);
+  }
+
+  getDetailsInterface(interfaceId: string) {
+    const detailsInterface = interfacesService.get(interfaceId).getDetails();
+
+    return helper.responseBody(detailsInterface.interface);
+  }
 }

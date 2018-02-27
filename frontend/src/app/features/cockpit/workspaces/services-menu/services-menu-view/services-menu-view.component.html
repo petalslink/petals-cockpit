@@ -13,42 +13,56 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFlex class="margin-top-x1">
+<div fxLayout="column" class="margin-top-x1 services-menu-view">
 
-  <div class="pnl-title">
-    <div class="margin-left-x1" fxLayout="row" fxLayoutAlign="start center">
-      <mat-icon class="margin-right-x1" svgIcon="interface"></mat-icon>
-      <span class="text-upper title" fxFlex>Interfaces</span>
-    </div>
+  <div fxFlex class="pnl-services-trees">
+    <mat-accordion displayMode="flat" [multi]="true">
+      <mat-expansion-panel fxLayout="column" class="exp-pnl-interfaces-tree" [hideToggle]="false" [expanded]="true">
+        <mat-expansion-panel-header fxLayout="row" collapsedHeight="32px" expandedHeight="40px">
+          <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
+            <mat-icon class="margin-right-x1" color="primary" svgIcon="interface"></mat-icon>
+            <span class="text-upper pnl-title light-bold">Interface Names</span>
+          </div>
+        </mat-expansion-panel-header>
+
+        <app-interfaces-list
+          [interfacesTree]="interfacesTree$ | async"
+          [workspaceId]="workspaceId"
+          (onInterfaceSelected)="closeSidenavOnSmallScreen()">
+        </app-interfaces-list>
+
+      </mat-expansion-panel>
+      <mat-expansion-panel fxLayout="column" class="exp-pnl-services-tree" [hideToggle]="false" [expanded]="true">
+        <mat-expansion-panel-header fxLayout="row" collapsedHeight="32px" expandedHeight="40px">
+          <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
+            <mat-icon class="margin-right-x1" color="primary" svgIcon="service"></mat-icon>
+            <span class="text-upper pnl-title light-bold">Service Names</span>
+          </div>
+        </mat-expansion-panel-header>
+
+        <app-services-list
+          [servicesTree]="servicesTree$ | async"
+          [workspaceId]="workspaceId"
+          (onServiceSelected)="closeSidenavOnSmallScreen()">
+        </app-services-list>
+
+      </mat-expansion-panel>
+      <mat-expansion-panel fxLayout="column" class="exp-pnl-endpoints-tree" [hideToggle]="false" [expanded]="true">
+        <mat-expansion-panel-header fxLayout="row" collapsedHeight="32px" expandedHeight="40px">
+          <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
+            <mat-icon class="margin-right-x1" color="primary" svgIcon="endpoint"></mat-icon>
+            <span class="text-upper pnl-title light-bold">Endpoint Names</span>
+          </div>
+        </mat-expansion-panel-header>
+
+        <app-endpoints-list
+          [endpointsTree]="endpointsTree$ | async"
+          [workspaceId]="workspaceId"
+          (onEndpointSelected)="closeSidenavOnSmallScreen()">
+        </app-endpoints-list>
+
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 
-  <mat-divider></mat-divider>
-
-  <div class="pnl-title">
-    <div class="margin-left-x1" fxLayout="row" fxLayoutAlign="start center">
-      <mat-icon class="margin-right-x1" svgIcon="service"></mat-icon>
-      <span class="text-upper title" fxFlex>Services</span>
-    </div>
-  </div>
-
-  <app-services-list
-    [servicesTree]="servicesTree$ | async"
-    [workspaceId]="workspaceId"
-    (onServiceSelected)="closeSidenavOnSmallScreen()">
-  </app-services-list>
-
-  <mat-divider></mat-divider>
-
-  <div class="pnl-title">
-    <div class="margin-left-x1" fxLayout="row" fxLayoutAlign="start center">
-      <mat-icon class="margin-right-x1" svgIcon="endpoint"></mat-icon>
-      <span class="text-upper title" fxFlex>Endpoints</span>
-    </div>
-  </div>
-
-  <app-endpoints-list
-    [endpointsTree]="endpointsTree$ | async"
-    [workspaceId]="workspaceId"
-    (onEndpointSelected)="closeSidenavOnSmallScreen()">
-  </app-endpoints-list>
 </div>

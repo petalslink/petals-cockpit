@@ -289,6 +289,25 @@ app-api-menu-view {
   overflow: hidden;
 }
 
+// use for all services trees component
+app-services-menu-view > .services-menu-view > .pnl-services-trees {
+  .mat-accordion > mat-expansion-panel > mat-expansion-panel-header {
+    color: #333;
+    padding: 10px 12px 10px 10px;
+  }
+  .mat-accordion
+    > mat-expansion-panel
+    > mat-expansion-panel-header.mat-expanded {
+    background-color: mat-color($theme-primary-x);
+  }
+  .mat-accordion
+    > mat-expansion-panel
+    > .mat-expansion-panel-content
+    > .mat-expansion-panel-body {
+    padding: 0;
+  }
+}
+
 // all items elements in petals tree
 app-material-tree > .nav-list-tree > .item-list {
   // customize active elements

@@ -7,6 +7,7 @@ import { WORKSPACE_DOM } from '../support/workspace.dom';
 import { WORKSPACES_LIST_DOM } from '../support/workspaces.dom';
 import { SERVICES_TREE_DOM } from '../support/services.dom';
 import {
+  expectedInterfacesTreeWks0,
   expectedServicesTreeWks0,
   expectedEndpointsTreeWks0,
 } from '../support/helper.const';
@@ -46,13 +47,15 @@ describe(`Import Bus `, () => {
     cy.expectBusImportFields().should('be.empty');
   });
 
-  it(`should import a new bus with the service, endpoint list on BUS_IMPORT_OK event`, () => {
+  it(`should import a new bus with the interface, service, endpoint list on BUS_IMPORT_OK event`, () => {
     cy.login('admin', 'admin');
 
     cy
       .get(WORKSPACE_DOM.tabs)
       .contains(`Services`)
       .click();
+
+    cy.expectInterfacesTreeToBe(expectedInterfacesTreeWks0);
 
     cy.expectServicesTreeToBe(expectedServicesTreeWks0);
 
@@ -78,6 +81,8 @@ describe(`Import Bus `, () => {
       .contains(`Services`)
       .click();
 
+    cy.expectInterfacesTreeToBe(expectedInterfacesTreeUpdatedWks0);
+
     cy.expectServicesTreeToBe(expectedServicesTreeUpdatedWks0);
 
     cy.expectEndpointsTreeToBe(expectedEndpointsTreeUpdatedWks0);
@@ -96,6 +101,29 @@ describe(`Import Bus `, () => {
 
   //   cy.document().then(document => expect(document.hasFocus()).to.eq(false));
   // });
+
+  const expectedInterfacesTreeUpdatedWks0 = [
+    `http://namespace-example.fr/interface/technique/version/1.0`,
+    `Interface-Localpart0`,
+    `Interface-Localpart1`,
+    `http://namespace-example.fr/interface/technique/version/2.0`,
+    `Interface-Localpart2`,
+    `http://namespace-example.fr/interface/technique/version/3.0`,
+    `Interface-Localpart3`,
+    `Interface-Localpart4`,
+    `http://namespace-example.fr/interface/technique/version/14.0`,
+    `Interface-Localpart14`,
+    `http://namespace-example.fr/interface/technique/version/15.0`,
+    `Interface-Localpart15`,
+    `http://namespace-example.fr/interface/technique/version/16.0`,
+    `Interface-Localpart16`,
+    `http://namespace-example.fr/interface/technique/version/17.0`,
+    `Interface-Localpart17`,
+    `http://namespace-example.fr/interface/technique/version/18.0`,
+    `Interface-Localpart18`,
+    `http://namespace-example.fr/interface/technique/version/19.0`,
+    `Interface-Localpart19`,
+  ];
 
   const expectedServicesTreeUpdatedWks0 = [
     `http://namespace-example.fr/service/technique/version/1.0`,

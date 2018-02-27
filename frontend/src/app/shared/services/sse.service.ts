@@ -30,6 +30,7 @@ import {
 } from 'app/shared/services/components.service';
 import { IContainerBackendSSE } from 'app/shared/services/containers.service';
 import { IEndpointBackendSSE } from 'app/shared/services/endpoints.service';
+import { IInterfaceBackendSSE } from 'app/shared/services/interfaces.service';
 import {
   IServiceAssemblyBackendSSE,
   ServiceAssemblyState,
@@ -77,6 +78,7 @@ export namespace SseActions {
         containers: { [key: string]: IContainerBackendSSE };
         components: { [key: string]: IComponentBackendSSE };
         endpoints: { [key: string]: IEndpointBackendSSE };
+        interfaces: { [key: string]: IInterfaceBackendSSE };
         serviceAssemblies: { [key: string]: IServiceAssemblyBackendSSE };
         serviceUnits: { [key: string]: IServiceUnitBackendSSE };
         services: { [key: string]: IServiceBackendSSE };
@@ -98,6 +100,7 @@ export namespace SseActions {
         containers: { [key: string]: IContainerBackendSSE };
         components: { [key: string]: IComponentBackendSSE };
         endpoints: { [key: string]: IEndpointBackendSSE };
+        interfaces: { [key: string]: IInterfaceBackendSSE };
         serviceAssemblies: { [key: string]: IServiceAssemblyBackendSSE };
         serviceUnits: { [key: string]: IServiceUnitBackendSSE };
         services: { [key: string]: IServiceBackendSSE };
@@ -195,6 +198,7 @@ export namespace SseActions {
     constructor(
       public readonly payload: {
         endpoints: { [key: string]: IEndpointBackendSSE };
+        interfaces: { [key: string]: IInterfaceBackendSSE };
         services: { [key: string]: IServiceBackendSSE };
       }
     ) {}

@@ -29,6 +29,9 @@ import { Subject } from 'rxjs/Subject';
 import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
 import { IEndpointRow } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
 import { getCurrentEndpointTree } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.selectors';
+import { Interfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.actions';
+import { IInterfaceRow } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
+import { getCurrentInterfaceTree } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
 import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
 import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
 import { getCurrentServiceTree } from 'app/features/cockpit/workspaces/state/services/services.selectors';
@@ -46,16 +49,22 @@ import { takeUntil } from 'rxjs/operators';
 export class ServicesMenuViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
+  interfacesTree$: Observable<TreeElement<any>[]>;
   servicesTree$: Observable<TreeElement<any>[]>;
   endpointsTree$: Observable<TreeElement<any>[]>;
 
   @Input() workspaceId: string;
+  @Input() interfaces: IInterfaceRow[];
   @Input() services: IServiceRow[];
   @Input() endpoints: IEndpointRow[];
 
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
+    this.interfacesTree$ = this.store$
+      .select(getCurrentInterfaceTree)
+      .pipe(takeUntil(this.onDestroy$));
+
     this.servicesTree$ = this.store$
       .select(getCurrentServiceTree)
       .pipe(takeUntil(this.onDestroy$));
@@ -69,6 +78,7 @@ export class ServicesMenuViewComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
+    this.store$.dispatch(new Interfaces.Clean());
     this.store$.dispatch(new Services.Clean());
     this.store$.dispatch(new Endpoints.Clean());
   }

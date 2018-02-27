@@ -52,9 +52,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
       <mat-tab label="Services">
         <app-services-menu-view
-         [services]="services$ | async"
-         [endpoints]="endpoints$ | async"
-         [workspaceId]="workspace.id">
+          [interfaces]="interfaces$ | async"
+          [services]="services$ | async"
+          [endpoints]="endpoints$ | async"
+          [workspaceId]="workspace.id">
         </app-services-menu-view>
       </mat-tab>
 

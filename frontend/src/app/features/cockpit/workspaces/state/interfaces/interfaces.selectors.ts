@@ -17,7 +17,7 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
+import { IInterfaceRow } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
 import { getSelectedWorkspaceId } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
 import {
@@ -26,37 +26,41 @@ import {
 } from 'app/shared/helpers/services-list.helper';
 import { IStore } from 'app/shared/state/store.interface';
 
-export const getServicesById = (state: IStore) => state.services.byId;
+export const getInterfacesById = (state: IStore) => state.interfaces.byId;
 
-export const getServicesAllIds = (state: IStore) => state.services.allIds;
+export const getInterfacesAllIds = (state: IStore) => state.interfaces.allIds;
 
-export const getSelectedService = createSelector(
-  (state: IStore) => state.services.selectedServiceId,
-  getServicesById,
-  (id, ss): IServiceRow => ss[id]
+export const getSelectedInterface = createSelector(
+  (state: IStore) => state.interfaces.selectedInterfaceId,
+  getInterfacesById,
+  (id, sep): IInterfaceRow => sep[id]
 );
 
-export const getAllServices = createSelector(
-  getServicesAllIds,
-  getServicesById,
+export const getAllInterfaces = createSelector(
+  getInterfacesAllIds,
+  getInterfacesById,
   (ids, byId) => {
     return ids.map(id => byId[id]);
   }
 );
 
-export const getCurrentServiceTree = createSelector(
+export const getCurrentInterfaceTree = createSelector(
   getSelectedWorkspaceId,
-  getServicesAllIds,
-  getServicesById,
-  (selectedWorkspaceId, servicesAllIds, servicesByIds): TreeElement<any>[] => {
-    const baseUrl = `/workspaces/${selectedWorkspaceId}/services/services`;
+  getInterfacesAllIds,
+  getInterfacesById,
+  (
+    selectedWorkspaceId,
+    interfacesAllIds,
+    interfacesByIds
+  ): TreeElement<any>[] => {
+    const baseUrl = `/workspaces/${selectedWorkspaceId}/services/interfaces`;
 
-    const servicesWithNspLocalpart = servicesAllIds.map(id => ({
-      ...findNamespaceLocalpart(servicesByIds[id].name),
+    const interfacesWithNspLocalpart = interfacesAllIds.map(id => ({
+      ...findNamespaceLocalpart(interfacesByIds[id].name),
       id,
     }));
 
-    const groupedByNamespace = groupByNamespace(servicesWithNspLocalpart);
+    const groupedByNamespace = groupByNamespace(interfacesWithNspLocalpart);
 
     return groupedByNamespace.map(nspWithLocalparts => ({
       name: nspWithLocalparts.namespace,
