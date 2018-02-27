@@ -100,6 +100,7 @@ export class PetalsContainerOperationsComponent
     percentage: number;
   };
   cpNameReadFromZip: string;
+  saNameReadFromZip: string;
   slNameReadFromZip: string;
   slVersionReadFromZip: string;
   slsInfoReadFromZip: { name: string; isInCurrentContainer: boolean }[] = [];
@@ -226,11 +227,12 @@ export class PetalsContainerOperationsComponent
           .getServiceAssemblyNameFromZipFile(file)
           .pipe(
             takeUntil(this.onDestroy$),
-            tap(serviceAssemblyFromZip =>
+            tap(serviceAssemblyFromZip => {
+              this.saNameReadFromZip = serviceAssemblyFromZip;
               this.updateServiceAssemblyDeployInfoFormGroup
                 .get('name')
-                .setValue(serviceAssemblyFromZip)
-            ),
+                .setValue(serviceAssemblyFromZip);
+            }),
             catchError(err => {
               this.notifications.warn(
                 'File error',
