@@ -883,7 +883,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
         content.interfaces.forEach((id, interface_) -> {
             a.assertThat(Long.valueOf(id).longValue() == interface_.interface_.id);
-            a.assertThat(endpointIsContained(interface_, expectedEndpoints));
+            a.assertThat(interfaceIsContained(interface_, expectedEndpoints));
         });
 
         assertWorkspaceContentServicesCount(a, content, wsId, expectedEndpoints);
@@ -947,21 +947,22 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     protected boolean serviceIsContained(ServiceFull service, List<Endpoint> expectedEndpoints) {
+        Set<String> compsToFind = new HashSet<>(service.componentIds);
         for (Endpoint expectedEdp : expectedEndpoints) {
             if (!expectedEdp.getServiceName().equals(service.service.name))
                 continue;
 
-            final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
-                    COMPONENTS.ID.like(service.getComponentId()));
+            final ComponentsRecord compDb = resource.db().fetchAny(COMPONENTS,
+                    COMPONENTS.ID.in(service.componentIds).and(COMPONENTS.NAME.like(expectedEdp.getComponentName())));
+            assert compDb != null;
             final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
-                    CONTAINERS.ID.like(service.getContainerId()));
-            assert compDb != null && contDb != null;
+                    CONTAINERS.ID.like(compDb.getContainerId().toString()));
+            assert contDb != null;
 
-            if (expectedEdp.getComponentName().equals(compDb.getName())
-                    && expectedEdp.getContainerName().equals(contDb.getName()))
-                return true;
+            if (expectedEdp.getContainerName().equals(contDb.getName()))
+                compsToFind.remove(expectedEdp.getComponentName());
         }
-        return false;
+        return compsToFind.size() == 0 ? true : false;
     }
 
     protected boolean endpointIsContained(EndpointFull endpoint, List<Endpoint> expectedEndpoints) {
@@ -969,11 +970,12 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             if (!expectedEdp.getEndpointName().equals(endpoint.endpoint.name))
                 continue;
 
-            final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
+            final ComponentsRecord compDb = resource.db().fetchAny(COMPONENTS,
                     COMPONENTS.ID.like(endpoint.getComponentId()));
+            assert compDb != null;
             final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
-                    CONTAINERS.ID.like(endpoint.getContainerId()));
-            assert compDb != null && contDb != null;
+                    CONTAINERS.ID.like(compDb.getContainerId().toString()));
+            assert contDb != null;
 
             if (expectedEdp.getComponentName().equals(compDb.getName())
                     && expectedEdp.getContainerName().equals(contDb.getName()))
@@ -982,45 +984,47 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         return false;
     }
 
-    private boolean endpointIsContained(InterfaceFull interface_, List<Endpoint> expectedEndpoints) {
+    private boolean interfaceIsContained(InterfaceFull interface_, List<Endpoint> expectedEndpoints) {
+        Set<String> compsToFind = new HashSet<>(interface_.componentIds);
         for (Endpoint expectedEdp : expectedEndpoints) {
-            if (!expectedEdp.getInterfaceNames().contains(interface_.interface_.name))
+            if (!expectedEdp.getServiceName().equals(interface_.interface_.name))
                 continue;
 
-            final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
-                    COMPONENTS.ID.like(interface_.getComponentId()));
+            final ComponentsRecord compDb = resource.db().fetchAny(COMPONENTS,
+                    COMPONENTS.ID.in(interface_.componentIds)
+                            .and(COMPONENTS.NAME.like(expectedEdp.getComponentName())));
+            assert compDb != null;
             final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
-                    CONTAINERS.ID.like(interface_.getContainerId()));
-            assert compDb != null && contDb != null;
+                    CONTAINERS.ID.like(compDb.getContainerId().toString()));
+            assert contDb != null;
 
-            if (expectedEdp.getComponentName().equals(compDb.getName())
-                    && expectedEdp.getContainerName().equals(contDb.getName()))
-                return true;
+            if (expectedEdp.getContainerName().equals(contDb.getName()))
+                compsToFind.remove(expectedEdp.getComponentName());
         }
-        return false;
+        return compsToFind.size() == 0 ? true : false;
     }
 
     protected void assertEquivalent(SoftAssertions a, ServiceFull service, Endpoint expectedEdp) {
-        final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
-                COMPONENTS.ID.like(service.getComponentId()));
-        final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
-                CONTAINERS.ID.like(service.getContainerId()));
-        a.assertThat(compDb).isNotNull();
-        a.assertThat(contDb).isNotNull();
+        final Record record = resource.db().select().from(COMPONENTS).join(CONTAINERS).onKey()
+                .where(COMPONENTS.ID.in(service.componentIds).and(COMPONENTS.NAME.like(expectedEdp.getComponentName())
+                        .and(CONTAINERS.NAME.like(expectedEdp.getContainerName()))))
+                .fetchOne();
+        a.assertThat(record).isNotNull().withFailMessage(
+                "assertEquivalent error for service [{}]:{}, could not find {} or {} in DB", service.service.id,
+                service.service.name,
+                expectedEdp.getComponentName(), expectedEdp.getContainerName());
+        assert record != null;
 
+        a.assertThat(service.componentIds).contains(record.into(COMPONENTS).getId().toString());
         a.assertThat(service.service.name).isEqualTo(expectedEdp.getServiceName());
-        // TODO a same service can be related to multiple containers/components
-        // model needs to be upgraded ...
-        // a.assertThat(compDb.getName()).isEqualTo(expectedEdp.getComponentName());
-        // a.assertThat(contDb.getName()).isEqualTo(expectedEdp.getContainerName());
     }
 
     protected void assertEquivalent(SoftAssertions a, EndpointFull endpoint, Endpoint expectedEdp) {
-        final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
+        final ComponentsRecord compDb = resource.db().fetchAny(COMPONENTS,
                 COMPONENTS.ID.like(endpoint.getComponentId()));
-        final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
-                CONTAINERS.ID.like(endpoint.getContainerId()));
         a.assertThat(compDb).isNotNull();
+        final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
+                CONTAINERS.ID.like(compDb.getContainerId().toString()));
         a.assertThat(contDb).isNotNull();
 
         a.assertThat(endpoint.endpoint.name).isEqualTo(expectedEdp.getEndpointName());
@@ -1029,18 +1033,18 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     private void assertEquivalent(SoftAssertions a, InterfaceFull interface_, Endpoint expectedEdp) {
-        final ComponentsRecord compDb = resource.db().fetchOne(COMPONENTS,
-                COMPONENTS.ID.like(interface_.getComponentId()));
-        final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
-                CONTAINERS.ID.like(interface_.getContainerId()));
-        a.assertThat(compDb).isNotNull();
-        a.assertThat(contDb).isNotNull();
+        final Record record = resource.db().select().from(COMPONENTS).join(CONTAINERS).onKey()
+                .where(COMPONENTS.ID.in(interface_.componentIds)
+                        .and(COMPONENTS.NAME.like(expectedEdp.getComponentName())
+                                .and(CONTAINERS.NAME.like(expectedEdp.getContainerName()))))
+                .fetchOne();
+        a.assertThat(record).isNotNull().withFailMessage(
+                "assertEquivalent error for service [{}]:{}, could not find {} or {} in DB", interface_.interface_.id,
+                interface_.interface_.name, expectedEdp.getComponentName(), expectedEdp.getContainerName());
+        assert record != null;
 
+        a.assertThat(interface_.componentIds).contains(record.into(COMPONENTS).getId().toString());
         a.assertThat(expectedEdp.getInterfaceNames()).contains(interface_.interface_.name);
-        // TODO a same interface can be related to multiple containers/components
-        // model needs to be upgraded ...
-        // a.assertThat(compDb.getName()).isEqualTo(expectedEdp.getComponentName());
-        // a.assertThat(contDb.getName()).isEqualTo(expectedEdp.getContainerName());
     }
 
     private void assertEquivalent(SoftAssertions a, Record recordDb, Endpoint expectedEdp) {
