@@ -121,7 +121,7 @@ public class WorkspaceDbOperations {
                             }
 
                             @Override
-                            public void addService(ServiceFull sDb) {
+                            public void addOrMergeService(ServiceFull sDb) {
                                 // NOP
                             }
 
@@ -131,7 +131,7 @@ public class WorkspaceDbOperations {
                             }
 
                             @Override
-                            public void addInterface(InterfaceFull iDb) {
+                            public void addOrMergeInterface(InterfaceFull iDb) {
                                 // NOP
                             }
                         };
@@ -160,11 +160,11 @@ public class WorkspaceDbOperations {
 
         public void addServiceUnit(ServiceunitsRecord suDb);
 
-        public void addService(ServiceFull sDb);
+        public void addOrMergeService(ServiceFull sDb);
 
         public void addEndpoint(EndpointFull eDb);
 
-        public void addInterface(InterfaceFull iDb);
+        public void addOrMergeInterface(InterfaceFull iDb);
     }
 
     public void saveDomainToDatabase(Configuration conf, BusesRecord bDb, Domain topology, WorkspaceDbWitness witness) {
@@ -332,28 +332,30 @@ public class WorkspaceDbOperations {
                             .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
                             .where(EDP_INSTANCES.CONTAINER_ID.eq(c.getId()).and(BUSES.WORKSPACE_ID.eq(w.getId())))
                             .fetch()) {
-                        containerBuilder.addService(
-                                new ServiceFull(sr.into(SERVICES), c.getId(), sr.into(EDP_INSTANCES).getComponentId()));
+                        containerBuilder.addOrMergeService(
+                                new ServiceFull(sr.into(SERVICES), sr.into(EDP_INSTANCES).getComponentId().toString()));
                     }
 
-                    for (Record edpr : ctx.select().from(ENDPOINTS).join(EDP_INSTANCES)
-                            .onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID).join(COMPONENTS)
-                            .onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID).join(CONTAINERS)
-                            .onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID).join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                    for (Record edpr : ctx.select().from(ENDPOINTS)
+                            .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
+                            .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
+                            .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                            .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
                             .where(EDP_INSTANCES.CONTAINER_ID.eq(c.getId()).and(BUSES.WORKSPACE_ID.eq(w.getId())))
                             .fetch()) {
-                        containerBuilder.addEndpoint(new EndpointFull(edpr.into(ENDPOINTS), c.getId(),
+                        containerBuilder.addEndpoint(new EndpointFull(edpr.into(ENDPOINTS),
                                 edpr.into(EDP_INSTANCES).getComponentId()));
                     }
 
-                    for (Record ir : ctx.select().from(INTERFACES).join(EDP_INSTANCES)
-                            .onKey(Keys.FK_EDP_INSTANCES_INTERFACE_ID).join(COMPONENTS)
-                            .onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID).join(CONTAINERS)
-                            .onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID).join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                    for (Record ir : ctx.select().from(INTERFACES)
+                            .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_INTERFACE_ID)
+                            .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
+                            .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                            .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
                             .where(EDP_INSTANCES.CONTAINER_ID.eq(c.getId()).and(BUSES.WORKSPACE_ID.eq(w.getId())))
                             .fetch()) {
-                        containerBuilder.addInterface(new InterfaceFull(ir.into(INTERFACES), c.getId(),
-                                ir.into(EDP_INSTANCES).getComponentId()));
+                        containerBuilder.addOrMergeInterface(new InterfaceFull(ir.into(INTERFACES),
+                                ir.into(EDP_INSTANCES).getComponentId().toString()));
                     }
                 }
             } else {
@@ -617,8 +619,13 @@ public class WorkspaceDbOperations {
                     final String serviceid = servrec.getId().toString();
                     assert serviceid != null;
 
-                    servicesToReturn.put(serviceid,
-                            new ServiceFull(servrec, instrec.getContainerId(), instrec.getComponentId()));
+                    if (servicesToReturn.containsKey(serviceid)) {
+                        final ServiceFull serviceFull = servicesToReturn.get(serviceid);
+                        assert serviceFull != null;
+                        serviceFull.addComponent(instrec.getComponentId());
+                    } else {
+                        servicesToReturn.put(serviceid, new ServiceFull(servrec, instrec.getComponentId().toString()));
+                    }
                 });
 
         return ImmutableMap.copyOf(servicesToReturn);
@@ -639,7 +646,7 @@ public class WorkspaceDbOperations {
                     assert endpointid != null;
 
                     endpointsToReturn.put(endpointid,
-                            new EndpointFull(edprec, instrec.getContainerId(), instrec.getComponentId()));
+                            new EndpointFull(edprec, instrec.getComponentId()));
                 });
 
         return ImmutableMap.copyOf(endpointsToReturn);
@@ -659,8 +666,14 @@ public class WorkspaceDbOperations {
                     final String interfaceid = itfrec.getId().toString();
                     assert interfaceid != null;
 
-                    interfacesToReturn.put(interfaceid,
-                            new InterfaceFull(itfrec, instrec.getContainerId(), instrec.getComponentId()));
+                    if (interfacesToReturn.containsKey(interfaceid)) {
+                        final InterfaceFull interfaceFull = interfacesToReturn.get(interfaceid);
+                        assert interfaceFull != null;
+                        interfaceFull.addComponent(instrec.getComponentId());
+                    } else {
+                        interfacesToReturn.put(interfaceid,
+                                new InterfaceFull(itfrec, instrec.getComponentId().toString()));
+                    }
                 });
 
         return ImmutableMap.copyOf(interfacesToReturn);
