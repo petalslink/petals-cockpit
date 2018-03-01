@@ -23,6 +23,9 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.EDP_INSTANCES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
@@ -120,46 +123,45 @@ public class ServicesResource {
 
         @NotNull
         @Min(1)
-        public final long containerId;
+        public final Set<String> components;
 
-        @NotNull
-        @Min(1)
-        public final long componentId;
-
-
-        public ServiceFull(ServicesRecord sDb, long containerId, long componentId) {
-            this(new ServiceMin(sDb), containerId, componentId);
+        public ServiceFull(ServicesRecord sDb, Set<String> componentIds) {
+            this(new ServiceMin(sDb), componentIds);
         }
 
-        private ServiceFull(ServiceMin service, long containerId, long componentId) {
+        public ServiceFull(ServicesRecord sDb, String componentId) {
+            this(new ServiceMin(sDb), new HashSet<String>());
+            this.components.add(componentId);
+        }
+
+        private ServiceFull(ServiceMin service, Set<String> componentIds) {
             this.service = service;
-            this.containerId = containerId;
-            this.componentId = componentId;
+            this.components = new HashSet<String>(componentIds);
         }
 
         @JsonCreator
         private ServiceFull() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new ServiceMin(0, ""), 0, 0);
+            this(new ServiceMin(0, ""), new HashSet<String>());
         }
 
-        @JsonProperty
-        public String getContainerId() {
-            return Long.toString(containerId);
+        public void addComponent(Long componentId) {
+            this.components.add(String.valueOf(componentId));
         }
 
-        @JsonProperty
-        public String getComponentId() {
-            return Long.toString(componentId);
+        public void addComponents(Set<String> componentIds) {
+            this.components.addAll(componentIds);
         }
 
         @Override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + (int) (componentId ^ (componentId >>> 32));
-            result = prime * result + (int) (containerId ^ (containerId >>> 32));
-            result = prime * result + ((service == null) ? 0 : service.hashCode());
+            long id = service.id;
+            String name = service.name;
+            result = prime * result + ((components == null) ? 0 : components.hashCode());
+            result = prime * result + (int) (id ^ (id >>> 32));
+            result = prime * result + ((name == null) ? 0 : name.hashCode());
             return result;
         }
 
@@ -172,13 +174,11 @@ public class ServicesResource {
             if (getClass() != obj.getClass())
                 return false;
             ServiceFull other = (ServiceFull) obj;
-            if (componentId != other.componentId)
-                return false;
-            if (containerId != other.containerId)
-                return false;
-            if (!service.name.equals(other.service.name))
+            if (!components.equals(other.components))
                 return false;
             if (service.id != other.service.id)
+                return false;
+            if (!service.name.equals(other.service.name))
                 return false;
             return true;
         }

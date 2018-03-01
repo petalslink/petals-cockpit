@@ -120,31 +120,21 @@ public class EndpointsResource {
 
         @NotNull
         @Min(1)
-        public final long containerId;
-
-        @NotNull
-        @Min(1)
         public final long componentId;
 
-        public EndpointFull(EndpointsRecord eDb, long containerId, long componentId) {
-            this(new EndpointMin(eDb), containerId, componentId);
+        public EndpointFull(EndpointsRecord eDb, long componentId) {
+            this(new EndpointMin(eDb), componentId);
         }
 
-        private EndpointFull(EndpointMin endpoint, long containerId, long componentId) {
+        private EndpointFull(EndpointMin endpoint, long componentId) {
             this.endpoint = endpoint;
-            this.containerId = containerId;
             this.componentId = componentId;
         }
 
         @JsonCreator
         private EndpointFull() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new EndpointMin(0, ""), 0, 0);
-        }
-
-        @JsonProperty
-        public String getContainerId() {
-            return Long.toString(containerId);
+            this(new EndpointMin(0, ""), 0);
         }
 
         @JsonProperty
@@ -157,7 +147,6 @@ public class EndpointsResource {
             final int prime = 31;
             int result = 1;
             result = prime * result + (int) (componentId ^ (componentId >>> 32));
-            result = prime * result + (int) (containerId ^ (containerId >>> 32));
             result = prime * result + ((endpoint == null) ? 0 : endpoint.hashCode());
             return result;
         }
@@ -172,8 +161,6 @@ public class EndpointsResource {
                 return false;
             EndpointFull other = (EndpointFull) obj;
             if (componentId != other.componentId)
-                return false;
-            if (containerId != other.containerId)
                 return false;
             if (!endpoint.name.equals(other.endpoint.name))
                 return false;

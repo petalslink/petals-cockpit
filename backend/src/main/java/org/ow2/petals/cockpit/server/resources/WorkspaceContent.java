@@ -211,11 +211,11 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
 
         private final List<ServiceunitsRecord> susToBuild = new ArrayList<>();
 
-        private final List<ServiceFull> servsToBuild = new ArrayList<>();
+        private final Map<Long, ServiceFull> servsToBuild = new HashMap<>();
 
         private final List<EndpointFull> edpsToBuild = new ArrayList<>();
 
-        private final List<InterfaceFull> itfsToBuild = new ArrayList<>();
+        private final Map<Long, InterfaceFull> itfsToBuild = new HashMap<>();
 
         private final SetMultimap<Long, String> componentsBySL = LinkedHashMultimap.create();
 
@@ -260,9 +260,13 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
         }
 
         @Override
-        public void addService(ServiceFull sDb) {
-            if (!servsToBuild.contains(sDb)) {
-                servsToBuild.add(sDb);
+        public void addOrMergeService(ServiceFull sDb) {
+            if (!servsToBuild.containsKey(sDb.service.id)) {
+                servsToBuild.put(sDb.service.id, sDb);
+            } else {
+                final ServiceFull serviceFull = servsToBuild.get(sDb.service.id);
+                assert serviceFull != null;
+                serviceFull.addComponents(sDb.components);
             }
         }
 
@@ -274,9 +278,13 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
         }
 
         @Override
-        public void addInterface(InterfaceFull iDb) {
-            if (!itfsToBuild.contains(iDb)) {
-                itfsToBuild.add(iDb);
+        public void addOrMergeInterface(InterfaceFull iDb) {
+            if (!itfsToBuild.containsKey(iDb.interface_.id)) {
+                itfsToBuild.put(iDb.interface_.id, iDb);
+            } else {
+                final InterfaceFull interfaceFull = itfsToBuild.get(iDb.interface_.id);
+                assert interfaceFull != null;
+                interfaceFull.addComponents(iDb.components);
             }
         }
 
@@ -312,7 +320,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
 
             susToBuild.stream().map(ServiceUnitFull::new).forEach(su -> sus.put(su.serviceUnit.getId(), su));
 
-            for (ServiceFull serv : servsToBuild) {
+            for (ServiceFull serv : servsToBuild.values()) {
                 String id = serv.service.getId();
                 servs.put(id, serv);
                 services.add(id);
@@ -324,7 +332,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
                 endpoints.add(id);
             }
 
-            for (InterfaceFull itf : itfsToBuild) {
+            for (InterfaceFull itf : itfsToBuild.values()) {
                 String id = itf.interface_.getId();
                 itfs.put(id, itf);
                 endpoints.add(id);
