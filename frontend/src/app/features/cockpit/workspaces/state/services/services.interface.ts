@@ -52,8 +52,7 @@ export function serviceRowFactory(): IServiceRow {
   return {
     id: null,
     name: null,
-    containerId: null,
-    componentId: null,
+    components: null,
     isFetchingDetails: false,
   };
 }

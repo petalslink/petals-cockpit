@@ -112,7 +112,7 @@ export class Workspace {
   getMoreInterfaces(nbInterfaces: number) {
     let i: number;
     for (i = 0; i < nbInterfaces; i++) {
-      const interfaceI = interfacesService.create('idCont0', 'idComp0');
+      const interfaceI = interfacesService.create(['idComp0']);
       this.interfaces.set(interfaceI.id, interfaceI);
     }
     return Array.from(this.interfaces.values());
@@ -129,7 +129,7 @@ export class Workspace {
   getMoreServices(nbServices: number) {
     let i: number;
     for (i = 0; i < nbServices; i++) {
-      const serviceI = servicesService.create('idCont0', 'idComp0');
+      const serviceI = servicesService.create(['idComp0']);
       this.services.set(serviceI.id, serviceI);
     }
     return Array.from(this.services.values());
@@ -146,7 +146,7 @@ export class Workspace {
   getMoreEndpoints(nbEndpoints: number) {
     let i: number;
     for (i = 0; i < nbEndpoints; i++) {
-      const endpointI = endpointsService.create('idCont0', 'idComp0');
+      const endpointI = endpointsService.create('idComp0');
       this.endpoints.set(endpointI.id, endpointI);
     }
     return Array.from(this.endpoints.values());
@@ -217,42 +217,36 @@ export class Workspace {
     const endpoints = new Map<string, Endpoint>();
 
     const newInterface1 = interfacesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart97'
     );
     interfaces.set(newInterface1.id, newInterface1);
 
     const newInterface2 = interfacesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/interface/technique/version/2.0}Interface-Localpart97'
     );
     interfaces.set(newInterface2.id, newInterface2);
 
     const newService1 = servicesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/service/technique/version/1.0}Localpart97'
     );
     services.set(newService1.id, newService1);
 
     const newService2 = servicesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/service/technique/version/2.0}Localpart97'
     );
     services.set(newService2.id, newService2);
 
     const newEndpoint = endpointsService.create(
-      'idCont0',
       'idComp1',
       'edpt-13f82663-test-91i4-a147-3'
     );
     endpoints.set(newEndpoint.id, newEndpoint);
 
     const newEndpoint1 = endpointsService.create(
-      'idCont0',
       'idComp1',
       'edpt-13f82663-test-91i4-a147-1'
     );
@@ -267,70 +261,60 @@ export class Workspace {
     const endpoints = new Map<string, Endpoint>();
 
     const newInterface1 = interfacesService.create(
-      'idCont0',
-      'idComp1',
+      ['idComp1'],
       '{http://namespace-example.fr/interface/technique/environmental/international/version/1.0}Interface-Localpart98'
     );
     interfaces.set(newInterface1.id, newInterface1);
 
     const newInterface2 = interfacesService.create(
-      'idCont0',
-      'idComp1',
+      ['idComp1'],
       '{http://namespace-example.fr/interface/technique/environmental/international/version/1.0}Interface-Localpart99'
     );
     interfaces.set(newInterface2.id, newInterface2);
 
     const newInterface3 = interfacesService.create(
-      'idCont0',
-      'idComp1',
+      ['idComp1'],
       '{http://namespace-example.fr/interface/technique/environmental/region/pays/international/version/1.0}Interface-Localpart96'
     );
     interfaces.set(newInterface3.id, newInterface3);
 
     const newInterface4 = interfacesService.create(
-      'idCont0',
-      'idComp1',
+      ['idComp1'],
       '{http://namespace-example.fr/interface/technique/global/region/pays/international/version/1.0}Interface-Localpart97'
     );
     interfaces.set(newInterface4.id, newInterface4);
 
     const newService1 = servicesService.create(
-      'idCont0',
-      'idComp1',
+      ['idComp1'],
       '{http://namespace-example.fr/service/technique/environmental/international/version/1.0}Localpart98'
     );
     services.set(newService1.id, newService1);
 
     const newService2 = servicesService.create(
-      'idCont0',
-      'idComp1',
+      ['idComp1'],
       '{http://namespace-example.fr/service/technique/environmental/international/version/1.0}Localpart99'
     );
     services.set(newService2.id, newService2);
 
     const newService3 = servicesService.create(
-      'idCont0',
-      'idComp1',
+      ['idComp1'],
       '{http://namespace-example.fr/service/technique/environmental/region/pays/international/version/1.0}Localpart96'
     );
     services.set(newService3.id, newService3);
 
     const newService4 = servicesService.create(
-      'idCont0',
-      'idComp1',
+      ['idComp1'],
       '{http://namespace-example.fr/service/technique/global/region/pays/international/version/1.0}Localpart97'
     );
     services.set(newService4.id, newService4);
 
     const newEndpoint1 = endpointsService.create(
-      'idCont0',
       'idComp1',
       'edpt-13f82663-test-91i4-a147-2'
     );
     endpoints.set(newEndpoint1.id, newEndpoint1);
 
     const newEndpoint2 = endpointsService.create(
-      'idCont0',
       'idComp1',
       'edpt-13f82663-test-91i4-a147-3'
     );
@@ -370,38 +354,31 @@ export class Workspace {
 
   addInterfaces() {
     const interface0 = interfacesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart0'
     );
     const interface1 = interfacesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart1'
     );
     const interface2 = interfacesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/interface/technique/version/2.0}Interface-Localpart2'
     );
     const interface3 = interfacesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/interface/technique/version/3.0}Interface-Localpart3'
     );
     const interface4 = interfacesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/interface/technique/version/3.0}Interface-Localpart4'
     );
     const interface5 = interfacesService.create(
-      'idCont2',
-      'idComp6',
+      ['idComp6'],
       '{http://namespace-example.fr/interface/metiers/version/1.0}Interface-Localpart0'
     );
     const interface6 = interfacesService.create(
-      'idCont2',
-      'idComp6',
+      ['idComp6'],
       '{http://namespace-example.fr/interface/metiers/version/1.0}Interface-Localpart1'
     );
 
@@ -419,37 +396,30 @@ export class Workspace {
 
   addEndpoints() {
     const endpoint0 = endpointsService.create(
-      'idCont0',
       'idComp0',
       'edpt-89p82661-test-31o4-l391-00'
     );
     const endpoint1 = endpointsService.create(
-      'idCont0',
       'idComp0',
       'edpt-89p82661-test-31o4-l391-01'
     );
     const endpoint2 = endpointsService.create(
-      'idCont0',
       'idComp0',
       'edpt-89p82661-test-31o4-l391-02'
     );
     const endpoint3 = endpointsService.create(
-      'idCont0',
       'idComp0',
       'edpt-89p82661-test-31o4-l391-03'
     );
     const endpoint4 = endpointsService.create(
-      'idCont0',
       'idComp0',
       'edpt-89p82661-test-31o4-l391-04'
     );
     const endpoint5 = endpointsService.create(
-      'idCont2',
       'idComp6',
       'edpt-89p82661-test-31o4-l391-05'
     );
     const endpoint6 = endpointsService.create(
-      'idCont2',
       'idComp6',
       'edpt-89p82661-test-31o4-l391-06'
     );
@@ -468,38 +438,31 @@ export class Workspace {
 
   addServices() {
     const service0 = servicesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/service/technique/version/1.0}Localpart0'
     );
     const service1 = servicesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/service/technique/version/1.0}Localpart1'
     );
     const service2 = servicesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/service/technique/version/2.0}Localpart2'
     );
     const service3 = servicesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/service/technique/version/3.0}Localpart3'
     );
     const service4 = servicesService.create(
-      'idCont0',
-      'idComp0',
+      ['idComp0'],
       '{http://namespace-example.fr/service/technique/version/3.0}Localpart4'
     );
     const service5 = servicesService.create(
-      'idCont2',
-      'idComp6',
+      ['idComp6'],
       '{http://namespace-example.fr/service/metiers/version/1.0}Localpart0'
     );
     const service6 = servicesService.create(
-      'idCont2',
-      'idComp6',
+      ['idComp6'],
       '{http://namespace-example.fr/service/metiers/version/1.0}Localpart1'
     );
 

@@ -24,12 +24,7 @@ export class Service {
   public readonly id: string;
   public readonly name: string;
 
-  constructor(
-    public cpt: number,
-    private containerId: string,
-    private componentId: string,
-    name?: string
-  ) {
+  constructor(public cpt: number, private components: string[], name?: string) {
     const i = cpt;
     this.id = `idService${i}`;
     this.name =
@@ -42,8 +37,7 @@ export class Service {
       [this.id]: {
         id: this.id,
         name: this.name,
-        containerId: this.containerId,
-        componentId: this.componentId,
+        components: Array.from(this.components),
       },
     };
   }
@@ -53,8 +47,7 @@ export class Service {
       service: {
         id: this.id,
         name: this.name,
-        containerId: this.containerId,
-        componentId: this.componentId,
+        components: Array.from(this.components),
       },
     };
   }
@@ -65,8 +58,8 @@ export class Services {
   protected cpt = 0;
   constructor() {}
 
-  create(containerId: string, componentId: string, name?: string) {
-    const service = new Service(this.cpt++, containerId, componentId, name);
+  create(components: string[], name?: string) {
+    const service = new Service(this.cpt++, components, name);
     this.services.set(service.id, service);
     return service;
   }

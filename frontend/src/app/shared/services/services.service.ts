@@ -24,8 +24,7 @@ import { environment } from 'environments/environment';
 export interface IServiceBackendSSECommon {
   id: string;
   name: string;
-  containerId: string;
-  componentId: string;
+  components: string[];
 }
 
 export interface IServiceBackendDetailsCommon {}

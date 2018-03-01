@@ -33,7 +33,7 @@ export const getInterfacesAllIds = (state: IStore) => state.interfaces.allIds;
 export const getSelectedInterface = createSelector(
   (state: IStore) => state.interfaces.selectedInterfaceId,
   getInterfacesById,
-  (id, sep): IInterfaceRow => sep[id]
+  (id, si): IInterfaceRow => si[id]
 );
 
 export const getAllInterfaces = createSelector(
