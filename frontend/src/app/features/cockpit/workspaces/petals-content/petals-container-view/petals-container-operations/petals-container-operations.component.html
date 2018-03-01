@@ -15,9 +15,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
-    <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px" class="deploys">
-      <ngx-hover-opacity class="deploy-component" [isHoverVisible]="!container.isReachable">
+    <div fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="10px" class="deploys">
+      <ngx-hover-opacity
+        fxFlexAlign.gt-xs="{{deployComponent.selectedFileInformation ? 'stretch' : 'start'}}"
+        class="deploy-component"
+        [isHoverVisible]="!container.isReachable"
+      >
         <app-upload
+          fxFlex.gt-xs="{{deployComponent.selectedFileInformation ? '' : '400px'}}"
           #deployComponent
           acceptedFileType=".zip"
           [title]="'Component deployment'"
@@ -29,27 +34,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           (onResetFile)="updateComponentDeployInfoFormGroup.reset()"
         >
           <ng-template updateFileInformation>
-            <form novalidate [formGroup]="updateComponentDeployInfoFormGroup">
-              <mat-form-field>
-                <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
-                <button
-                  *ngIf="updateComponentDeployInfoFormGroup.get('name')"
-                  matSuffix
-                  color="primary"
-                  mat-icon-button
-                  aria-label="Clear"
-                  (click)="updateComponentDeployInfoFormGroup.get('name').setValue('')"
-                >
-                  <mat-icon>close</mat-icon>
-                </button>
+            <form fxLayout="column" novalidate [formGroup]="updateComponentDeployInfoFormGroup">
+              <div>
+                <mat-form-field fxFlex fxFlex.gt-md="50%">
 
-                <mat-error
-                  class="error-name-input"
-                  *ngIf="updateComponentDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
-                >
-                  You can't upload a component with a name that already exists in this container
-                </mat-error>
-              </mat-form-field>
+                  <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
+
+                  <button
+                    *ngIf="updateComponentDeployInfoFormGroup.get('name')"
+                    matSuffix
+                    color="primary"
+                    mat-icon-button
+                    aria-label="Clear"
+                    (click)="updateComponentDeployInfoFormGroup.get('name').setValue('')"
+                  >
+                    <mat-icon>close</mat-icon>
+                  </button>
+
+                  <mat-error
+                    class="error-name-input"
+                    *ngIf="updateComponentDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
+                  >
+                    You can't upload a component with a name that already exists in this container
+                  </mat-error>
+                </mat-form-field>
+              </div>
 
               <mat-divider></mat-divider>
 
@@ -108,9 +117,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </app-upload>
       </ngx-hover-opacity>
 
-      <ngx-hover-opacity class="deploy-service-assembly" [isHoverVisible]="!container.isReachable">
+      <ngx-hover-opacity
+        fxFlexAlign.gt-xs="{{deployServiceAssembly.selectedFileInformation ? 'stretch' : 'start'}}"
+        class="deploy-service-assembly"
+        [isHoverVisible]="!container.isReachable"
+      >
         <app-upload
-          fxFlex
+          fxFlex.gt-xs="{{deployServiceAssembly.selectedFileInformation ? '' : '400px'}}"
           #deployServiceAssembly
           acceptedFileType=".zip"
           [title]="'Service assembly deployment'"
@@ -122,39 +135,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           (onResetFile)="updateServiceAssemblyDeployInfoFormGroup.reset()"
         >
           <ng-template updateFileInformation>
-            <form novalidate [formGroup]="updateServiceAssemblyDeployInfoFormGroup">
-              <mat-form-field>
-                <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
-                <button
-                  *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name')"
-                  matSuffix
-                  color="primary"
-                  mat-icon-button
-                  aria-label="Clear"
-                  (click)="updateServiceAssemblyDeployInfoFormGroup.get('name').setValue('')"
-                >
-                  <mat-icon>close</mat-icon>
-                </button>
+            <form fxLayout="column" novalidate [formGroup]="updateServiceAssemblyDeployInfoFormGroup">
+              <div>
+                <mat-form-field fxFlex fxFlex.gt-md="50%">
+                  <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
+                  <button
+                    *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name')"
+                    matSuffix
+                    color="primary"
+                    mat-icon-button
+                    aria-label="Clear"
+                    (click)="updateServiceAssemblyDeployInfoFormGroup.get('name').setValue('')"
+                  >
+                    <mat-icon>close</mat-icon>
+                  </button>
 
-                <mat-hint *ngIf="!updateServiceAssemblyDeployInfoFormGroup.get('name').value && !!saNameReadFromZip">
-                  Default {{ saNameReadFromZip }}
-                </mat-hint>
+                  <mat-hint *ngIf="!updateServiceAssemblyDeployInfoFormGroup.get('name').value && !!saNameReadFromZip">
+                    Default {{ saNameReadFromZip }}
+                  </mat-hint>
 
-                <mat-error
-                  class="error-name-input"
-                  *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
-                >
-                  You can't upload a service assembly with a name that already exists in this container
-                </mat-error>
-              </mat-form-field>
+                  <mat-error
+                    class="error-name-input"
+                    *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
+                  >
+                    You can't upload a service assembly with a name that already exists in this container
+                  </mat-error>
+                </mat-form-field>
+              </div>
             </form>
           </ng-template>
         </app-upload>
       </ngx-hover-opacity>
 
-      <ngx-hover-opacity class="deploy-shared-library" [isHoverVisible]="!container.isReachable">
+      <ngx-hover-opacity
+        fxFlexAlign.gt-xs="{{deploySharedLibrary.selectedFileInformation ? 'stretch' : 'start'}}"
+        class="deploy-shared-library"
+        [isHoverVisible]="!container.isReachable"
+      >
         <app-upload
-          fxFlex
+          fxFlex.gt-xs="{{deploySharedLibrary.selectedFileInformation ? '' : '400px'}}"
           #deploySharedLibrary
           acceptedFileType=".zip"
           [title]="'Shared library deployment'"
@@ -166,49 +185,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           (onResetFile)="updateSharedLibraryDeployInfoFormGroup.reset()"
         >
           <ng-template updateFileInformation>
-            <form [formGroup]="updateSharedLibraryDeployInfoFormGroup">
-              <mat-form-field>
-                <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
-                <button
-                  *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name')"
-                  matSuffix
-                  color="primary"
-                  mat-icon-button
-                  aria-label="Clear"
-                  (click)="updateSharedLibraryDeployInfoFormGroup.get('name').setValue('')"
-                >
-                  <mat-icon>close</mat-icon>
-                </button>
+            <form fxLayout="column" [formGroup]="updateSharedLibraryDeployInfoFormGroup">
+              <div>
+                <mat-form-field fxFlex fxFlex.gt-md="50%">
+                  <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
+                  <button
+                    *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name')"
+                    matSuffix
+                    color="primary"
+                    mat-icon-button
+                    aria-label="Clear"
+                    (click)="updateSharedLibraryDeployInfoFormGroup.get('name').setValue('')"
+                  >
+                    <mat-icon>close</mat-icon>
+                  </button>
 
-                <mat-hint *ngIf="!updateSharedLibraryDeployInfoFormGroup.get('name').value && !!slNameReadFromZip">
-                  Default {{ slNameReadFromZip }}
-                </mat-hint>
+                  <mat-hint *ngIf="!updateSharedLibraryDeployInfoFormGroup.get('name').value && !!slNameReadFromZip">
+                    Default {{ slNameReadFromZip }}
+                  </mat-hint>
 
-              <mat-error
-                class="error-name-input"
-                *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
-              >
-                You can't upload a shared library with a name that already exists in this container
-              </mat-error>
-            </mat-form-field>
+                  <mat-error
+                    class="error-name-input"
+                    *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
+                  >
+                    You can't upload a shared library with a name that already exists in this container
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field fxFlex fxFlex.gt-md="50%">
+                  <input type="text" matInput placeholder="Version" autocomplete="off" formControlName="version">
+                  <button
+                    *ngIf="updateSharedLibraryDeployInfoFormGroup.get('version')"
+                    matSuffix
+                    color="primary"
+                    mat-icon-button
+                    aria-label="Clear"
+                    (click)="updateSharedLibraryDeployInfoFormGroup.get('version').setValue('')"
+                  >
+                    <mat-icon>close</mat-icon>
+                  </button>
 
-              <mat-form-field>
-                <input type="text" matInput placeholder="Version" autocomplete="off" formControlName="version">
-                <button
-                  *ngIf="updateSharedLibraryDeployInfoFormGroup.get('version')"
-                  matSuffix
-                  color="primary"
-                  mat-icon-button
-                  aria-label="Clear"
-                  (click)="updateSharedLibraryDeployInfoFormGroup.get('version').setValue('')"
-                >
-                  <mat-icon>close</mat-icon>
-                </button>
-
-                <mat-hint *ngIf="!updateSharedLibraryDeployInfoFormGroup.get('version').value && !!slVersionReadFromZip">
-                  Default {{ slVersionReadFromZip }}
-                </mat-hint>
-              </mat-form-field>
+                  <mat-hint *ngIf="!updateSharedLibraryDeployInfoFormGroup.get('version').value && !!slVersionReadFromZip">
+                    Default {{ slVersionReadFromZip }}
+                  </mat-hint>
+                </mat-form-field>
+              </div>
             </form>
           </ng-template>
         </app-upload>

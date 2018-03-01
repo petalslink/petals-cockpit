@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
-    <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px" #top>
+    <div fxLayout="column" fxLayoutGap="10px" #top>
 
       <mat-card fxFlex class="component-lifecycle" [ngClass.gt-md]="'card-auto-size'">
         <mat-card-title>
@@ -81,6 +81,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </mat-card>
 
       <app-upload
+        fxFlexAlign="{{deployServiceUnit.selectedFileInformation ? 'stretch' : 'start'}}"
         class="deploy-service-unit"
         fxFlex
         #deployServiceUnit
