@@ -947,13 +947,13 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     protected boolean serviceIsContained(ServiceFull service, List<Endpoint> expectedEndpoints) {
-        Set<String> compsToFind = new HashSet<>(service.componentIds);
+        Set<String> compsToFind = new HashSet<>(service.components);
         for (Endpoint expectedEdp : expectedEndpoints) {
             if (!expectedEdp.getServiceName().equals(service.service.name))
                 continue;
 
             final ComponentsRecord compDb = resource.db().fetchAny(COMPONENTS,
-                    COMPONENTS.ID.in(service.componentIds).and(COMPONENTS.NAME.like(expectedEdp.getComponentName())));
+                    COMPONENTS.ID.in(service.components).and(COMPONENTS.NAME.like(expectedEdp.getComponentName())));
             assert compDb != null;
             final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
                     CONTAINERS.ID.like(compDb.getContainerId().toString()));
@@ -985,13 +985,13 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     private boolean interfaceIsContained(InterfaceFull interface_, List<Endpoint> expectedEndpoints) {
-        Set<String> compsToFind = new HashSet<>(interface_.componentIds);
+        Set<String> compsToFind = new HashSet<>(interface_.components);
         for (Endpoint expectedEdp : expectedEndpoints) {
             if (!expectedEdp.getServiceName().equals(interface_.interface_.name))
                 continue;
 
             final ComponentsRecord compDb = resource.db().fetchAny(COMPONENTS,
-                    COMPONENTS.ID.in(interface_.componentIds)
+                    COMPONENTS.ID.in(interface_.components)
                             .and(COMPONENTS.NAME.like(expectedEdp.getComponentName())));
             assert compDb != null;
             final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
@@ -1006,7 +1006,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
     protected void assertEquivalent(SoftAssertions a, ServiceFull service, Endpoint expectedEdp) {
         final Record record = resource.db().select().from(COMPONENTS).join(CONTAINERS).onKey()
-                .where(COMPONENTS.ID.in(service.componentIds).and(COMPONENTS.NAME.like(expectedEdp.getComponentName())
+                .where(COMPONENTS.ID.in(service.components).and(COMPONENTS.NAME.like(expectedEdp.getComponentName())
                         .and(CONTAINERS.NAME.like(expectedEdp.getContainerName()))))
                 .fetchOne();
         a.assertThat(record).isNotNull().withFailMessage(
@@ -1015,7 +1015,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                 expectedEdp.getComponentName(), expectedEdp.getContainerName());
         assert record != null;
 
-        a.assertThat(service.componentIds).contains(record.into(COMPONENTS).getId().toString());
+        a.assertThat(service.components).contains(record.into(COMPONENTS).getId().toString());
         a.assertThat(service.service.name).isEqualTo(expectedEdp.getServiceName());
     }
 
@@ -1034,7 +1034,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
     private void assertEquivalent(SoftAssertions a, InterfaceFull interface_, Endpoint expectedEdp) {
         final Record record = resource.db().select().from(COMPONENTS).join(CONTAINERS).onKey()
-                .where(COMPONENTS.ID.in(interface_.componentIds)
+                .where(COMPONENTS.ID.in(interface_.components)
                         .and(COMPONENTS.NAME.like(expectedEdp.getComponentName())
                                 .and(CONTAINERS.NAME.like(expectedEdp.getContainerName()))))
                 .fetchOne();
@@ -1043,7 +1043,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                 interface_.interface_.name, expectedEdp.getComponentName(), expectedEdp.getContainerName());
         assert record != null;
 
-        a.assertThat(interface_.componentIds).contains(record.into(COMPONENTS).getId().toString());
+        a.assertThat(interface_.components).contains(record.into(COMPONENTS).getId().toString());
         a.assertThat(expectedEdp.getInterfaceNames()).contains(interface_.interface_.name);
     }
 

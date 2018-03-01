@@ -124,7 +124,7 @@ public class InterfacesResource {
 
         @NotNull
         @Min(1)
-        public final Set<String> componentIds;
+        public final Set<String> components;
 
         public InterfaceFull(InterfacesRecord iDb, Set<String> componentIds) {
             this(new InterfaceMin(iDb), componentIds);
@@ -132,12 +132,12 @@ public class InterfacesResource {
 
         public InterfaceFull(InterfacesRecord iDb, String componentId) {
             this(new InterfaceMin(iDb), new HashSet<String>());
-            this.componentIds.add(componentId);
+            this.components.add(componentId);
         }
 
         private InterfaceFull(InterfaceMin intf, Set<String> componentId) {
             this.interface_ = intf;
-            this.componentIds = new HashSet<String>(componentId);
+            this.components = new HashSet<String>(componentId);
         }
 
         @JsonCreator
@@ -147,11 +147,11 @@ public class InterfacesResource {
         }
 
         public void addComponent(Long componentId) {
-            this.componentIds.add(String.valueOf(componentId));
+            this.components.add(String.valueOf(componentId));
         }
 
         public void addComponents(Set<String> componentIds) {
-            this.componentIds.addAll(componentIds);
+            this.components.addAll(componentIds);
         }
 
         @Override
@@ -160,7 +160,7 @@ public class InterfacesResource {
             int result = 1;
             long id = interface_.id;
             String name = interface_.name;
-            result = prime * result + ((componentIds == null) ? 0 : componentIds.hashCode());
+            result = prime * result + ((components == null) ? 0 : components.hashCode());
             result = prime * result + (int) (id ^ (id >>> 32));
             result = prime * result + ((name == null) ? 0 : name.hashCode());
             return result;
@@ -175,7 +175,7 @@ public class InterfacesResource {
             if (getClass() != obj.getClass())
                 return false;
             InterfaceFull other = (InterfaceFull) obj;
-            if (!componentIds.equals(other.componentIds))
+            if (!components.equals(other.components))
                 return false;
             if (interface_.id != other.interface_.id)
                 return false;

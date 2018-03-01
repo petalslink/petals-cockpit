@@ -266,7 +266,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             } else {
                 final ServiceFull serviceFull = servsToBuild.get(sDb.service.id);
                 assert serviceFull != null;
-                serviceFull.addComponents(sDb.componentIds);
+                serviceFull.addComponents(sDb.components);
             }
         }
 
@@ -284,7 +284,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             } else {
                 final InterfaceFull interfaceFull = itfsToBuild.get(iDb.interface_.id);
                 assert interfaceFull != null;
-                interfaceFull.addComponents(iDb.componentIds);
+                interfaceFull.addComponents(iDb.components);
             }
         }
 

@@ -123,7 +123,7 @@ public class ServicesResource {
 
         @NotNull
         @Min(1)
-        public final Set<String> componentIds;
+        public final Set<String> components;
 
         public ServiceFull(ServicesRecord sDb, Set<String> componentIds) {
             this(new ServiceMin(sDb), componentIds);
@@ -131,12 +131,12 @@ public class ServicesResource {
 
         public ServiceFull(ServicesRecord sDb, String componentId) {
             this(new ServiceMin(sDb), new HashSet<String>());
-            this.componentIds.add(componentId);
+            this.components.add(componentId);
         }
 
         private ServiceFull(ServiceMin service, Set<String> componentIds) {
             this.service = service;
-            this.componentIds = new HashSet<String>(componentIds);
+            this.components = new HashSet<String>(componentIds);
         }
 
         @JsonCreator
@@ -146,11 +146,11 @@ public class ServicesResource {
         }
 
         public void addComponent(Long componentId) {
-            this.componentIds.add(String.valueOf(componentId));
+            this.components.add(String.valueOf(componentId));
         }
 
         public void addComponents(Set<String> componentIds) {
-            this.componentIds.addAll(componentIds);
+            this.components.addAll(componentIds);
         }
 
         @Override
@@ -159,7 +159,7 @@ public class ServicesResource {
             int result = 1;
             long id = service.id;
             String name = service.name;
-            result = prime * result + ((componentIds == null) ? 0 : componentIds.hashCode());
+            result = prime * result + ((components == null) ? 0 : components.hashCode());
             result = prime * result + (int) (id ^ (id >>> 32));
             result = prime * result + ((name == null) ? 0 : name.hashCode());
             return result;
@@ -174,7 +174,7 @@ public class ServicesResource {
             if (getClass() != obj.getClass())
                 return false;
             ServiceFull other = (ServiceFull) obj;
-            if (!componentIds.equals(other.componentIds))
+            if (!components.equals(other.components))
                 return false;
             if (service.id != other.service.id)
                 return false;
