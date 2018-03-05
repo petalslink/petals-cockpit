@@ -1,3 +1,20 @@
+<a name="0.21.0"></a>
+# [0.21.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.20.0...v0.21.0) (2018-03-05)
+
+
+### Bug Fixes
+
+* **frontend:** hint original component name ([8a741f8](https://gitlab.com/linagora/petals-cockpit/commit/8a741f8)), closes [#447](https://gitlab.com/linagora/petals-cockpit/issues/447)
+* **frontend:** improve design on upload components ([1364a1f](https://gitlab.com/linagora/petals-cockpit/commit/1364a1f)), closes [#443](https://gitlab.com/linagora/petals-cockpit/issues/443)
+
+
+### Features
+
+* **frontend:** display the endpoints list ([6288c83](https://gitlab.com/linagora/petals-cockpit/commit/6288c83)), closes [#428](https://gitlab.com/linagora/petals-cockpit/issues/428)
+* **frontend:** display the interfaces list ([52a44a7](https://gitlab.com/linagora/petals-cockpit/commit/52a44a7)), closes [#430](https://gitlab.com/linagora/petals-cockpit/issues/430)
+
+
+
 <a name="0.20.0"></a>
 # [0.20.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.19.0...v0.20.0) (2018-02-20)
 
