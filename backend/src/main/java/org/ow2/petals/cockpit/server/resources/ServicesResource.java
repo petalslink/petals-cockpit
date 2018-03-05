@@ -45,13 +45,15 @@ import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
+import org.ow2.petals.cockpit.server.db.generated.Keys;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.EdpInstancesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServicesRecord;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.collect.ImmutableSet;
 
 @Singleton
 @Path("/services")
@@ -76,16 +78,31 @@ public class ServicesResource {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
-                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
-                    .onKey(FK_CONTAINERS_BUSES_ID).join(EDP_INSTANCES).onKey().join(SERVICES).onKey()
-                    .where(SERVICES.ID.eq(sId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
+            Record user = DSL.using(conf).select().from(USERS_WORKSPACES)
+                    .join(BUSES).on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID))
+                    .join(CONTAINERS).onKey(FK_CONTAINERS_BUSES_ID)
+                    .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                    .join(SERVICES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID)
+                    .where(SERVICES.ID.eq(sId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchAny();
             
              if (user == null) {
              throw new WebApplicationException(Status.FORBIDDEN);
              }
 
-            return new ServiceOverview();
+            Set<String> interfaces = new HashSet<>();
+            Set<String> endpoints = new HashSet<>();
+            DSL.using(conf).select().from(EDP_INSTANCES).where(EDP_INSTANCES.SERVICE_ID.eq(sId)).forEach(record -> {
+                assert record != null;
+                EdpInstancesRecord edpInstRecord = record.into(EDP_INSTANCES);
+                assert edpInstRecord != null;
+
+                System.out.println("adding int:" + edpInstRecord.getInterfaceId().toString() + " edp:"
+                        + edpInstRecord.getEndpointId().toString());
+                interfaces.add(edpInstRecord.getInterfaceId().toString());
+                endpoints.add(edpInstRecord.getEndpointId().toString());
+            });
+
+            return new ServiceOverview(interfaces, endpoints);
         });
     }
 
@@ -184,8 +201,20 @@ public class ServicesResource {
         }
     }
 
-    @JsonSerialize
     public static class ServiceOverview {
-        // TODO remove annotation when there will be data
+        @NotNull
+        @Min(1)
+        public final ImmutableSet<String> interfaces;
+
+        @NotNull
+        @Min(1)
+        public final ImmutableSet<String> endpoints;
+
+        @JsonCreator
+        public ServiceOverview(@JsonProperty("interfaces") Set<String> interfaces,
+                @JsonProperty("endpoints") Set<String> endpoints) {
+            this.interfaces = ImmutableSet.copyOf(interfaces);
+            this.endpoints = ImmutableSet.copyOf(endpoints);
+        }
     }
 }

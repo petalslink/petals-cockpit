@@ -35,6 +35,7 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource;
 import org.ow2.petals.cockpit.server.resources.ContainersResource;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource;
+import org.ow2.petals.cockpit.server.resources.ServicesResource;
 import org.ow2.petals.cockpit.server.resources.SetupResource;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource;
 import org.ow2.petals.cockpit.server.resources.UserSession;
@@ -169,6 +170,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         environment.jersey().register(ServiceAssembliesResource.class);
         environment.jersey().register(ServiceUnitsResource.class);
         environment.jersey().register(SharedLibrariesResource.class);
+        environment.jersey().register(ServicesResource.class);
         environment.jersey().register(SetupResource.class);
         environment.jersey().register(UsersResource.class);
 

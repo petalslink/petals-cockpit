@@ -43,6 +43,8 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractBasic
 
     protected static final String SYSINFO = "WORKSPACE TEST SYSINFO";
 
+    protected final String anotherUser = "anotheruser";
+
     protected final Domain domain = new Domain("dom");
 
     protected final int containerPort = 7700;
@@ -102,34 +104,33 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractBasic
         resource.petals.registerArtifact(sharedLibrary, container1);
         resource.petals.registerEndpoints(referenceEndpoints);
 
-        addUser("anotheruser");
+        addUser(anotherUser);
 
         // forbidden workspace (it is NOT registered in petals admin)
         fDomain.addContainers(fContainer);
         fContainer.addComponent(fComponent);
         fContainer.addServiceAssembly(fServiceAssembly);
         fContainer.addSharedLibrary(fSharedLibrary);
-        setupWorkspace(2, "test2", Arrays.asList(Tuple.of(fDomain, "passphrase")), "anotheruser");
+        setupWorkspace(2, "test2", Arrays.asList(Tuple.of(fDomain, "passphrase")), anotherUser);
 
         // test workspace
         setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
     }
 
     private List<Endpoint> makeEndpoints() {
-        List<Endpoint> endpoints = new ArrayList<Endpoint>();
+        List<Endpoint> e = new ArrayList<Endpoint>();
 
-        endpoints.add(new Endpoint("edp1", EndpointType.INTERNAL, "cont1", "comp", "{http://namespace.org/}serv1",
-                Arrays.asList("{http://namespace.org/}int1")));
-        endpoints.add(new Endpoint("edp2", EndpointType.INTERNAL, "cont1", "comp", "{http://namespace.org/}serv2",
-                Arrays.asList("{http://namespace.org/}int2", "{http://namespace.org/}int3")));
-        endpoints.add(new Endpoint("edp3", EndpointType.INTERNAL, "cont1", "comp", "{http://namespace.org/}serv3",
-                Arrays.asList("{http://namespace.org/}int3")));
-        endpoints.add(new Endpoint("edp4", EndpointType.INTERNAL, "cont1", "comp", "{http://namespace.org/}serv4",
-                Arrays.asList("{http://namespace.org/}int3")));
-        endpoints.add(new Endpoint("edp5", EndpointType.INTERNAL, "cont1", "compSL", "{http://namespace.com/}serv1",
-                Arrays.asList("{http://petals.ow2.org/}int1", "{http://petals.ow2.org/}int2")));
+        final EndpointType type = EndpointType.INTERNAL;
+        e.add(new Endpoint("edp1a", type, "cont1", "comp", "serv1a", Arrays.asList("int1", "int3", "int4")));
+        e.add(new Endpoint("edp2a", type, "cont1", "comp", "serv2a", Arrays.asList("int2")));
+        e.add(new Endpoint("edp1b", type, "cont1", "comp", "serv1b", Arrays.asList("int1")));
+        e.add(new Endpoint("edp2b", type, "cont1", "comp", "serv2b", Arrays.asList("int2")));
+        e.add(new Endpoint("edp3a", type, "cont1", "comp", "serv1a", Arrays.asList("int6")));
+        e.add(new Endpoint("edp3b", type, "cont1", "comp", "serv1b", Arrays.asList("int1")));
+        e.add(new Endpoint("edp4a", type, "cont1", "comp", "serv2a", Arrays.asList("int2")));
+        e.add(new Endpoint("edp4b", type, "cont1", "comp", "serv2b", Arrays.asList("int2")));
 
-        return endpoints;
+        return e;
     }
 
 }
