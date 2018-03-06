@@ -23,6 +23,9 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.EDP_INSTANCES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.ENDPOINTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
@@ -40,15 +43,18 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
+import org.ow2.petals.cockpit.server.db.generated.Keys;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.EdpInstancesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.EndpointsRecord;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.collect.ImmutableSet;
 
 @Singleton
 @Path("/endpoints")
@@ -73,16 +79,38 @@ public class EndpointsResource {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
-                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
-                    .onKey(FK_CONTAINERS_BUSES_ID).join(EDP_INSTANCES).onKey().join(ENDPOINTS).onKey()
-                    .where(ENDPOINTS.ID.eq(eId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
+            Record user = DSL.using(conf).select().from(USERS_WORKSPACES)
+                    .join(BUSES).on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID))
+                    .join(CONTAINERS).onKey(FK_CONTAINERS_BUSES_ID)
+                    .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                    .join(ENDPOINTS).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
+                    .where(ENDPOINTS.ID.eq(eId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchAny();
 
             if (user == null) {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
 
-            return new EndpointOverview();
+            Set<String> interfaces = new HashSet<>();
+            String service = "";
+
+            final Result<Record> result = DSL.using(conf).select().from(EDP_INSTANCES)
+                    .where(EDP_INSTANCES.ENDPOINT_ID.eq(eId)).fetch();
+            for (Record record : result) {
+                assert record != null;
+                EdpInstancesRecord edpInstRecord = record.into(EDP_INSTANCES);
+                assert edpInstRecord != null;
+
+                interfaces.add(edpInstRecord.getInterfaceId().toString());
+                final String serviceId = edpInstRecord.getServiceId().toString();
+                assert service.isEmpty() || serviceId.equals(service);
+                service = serviceId;
+            }
+
+            if (interfaces.isEmpty() || service.isEmpty()) {
+                throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+            }
+
+            return new EndpointOverview(interfaces, service);
         });
     }
 
@@ -170,8 +198,22 @@ public class EndpointsResource {
         }
     }
 
-    @JsonSerialize
     public static class EndpointOverview {
-        // TODO remove annotation when there will be data
+        @NotNull
+        @Min(1)
+        public final ImmutableSet<String> interfaces;
+
+        @NotNull
+        @NotEmpty
+        @JsonProperty
+        public final String service;
+
+        @JsonCreator
+        public EndpointOverview(@JsonProperty("interfaces") Set<String> interfaces,
+                @JsonProperty("service") String service) {
+            this.interfaces = ImmutableSet.copyOf(interfaces);
+            this.service = service;
+        }
+
     }
 }

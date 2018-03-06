@@ -84,10 +84,10 @@ public class ServicesResource {
                     .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
                     .join(SERVICES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID)
                     .where(SERVICES.ID.eq(sId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchAny();
-            
-             if (user == null) {
-             throw new WebApplicationException(Status.FORBIDDEN);
-             }
+
+            if (user == null) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            }
 
             Set<String> interfaces = new HashSet<>();
             Set<String> endpoints = new HashSet<>();
@@ -96,11 +96,13 @@ public class ServicesResource {
                 EdpInstancesRecord edpInstRecord = record.into(EDP_INSTANCES);
                 assert edpInstRecord != null;
 
-                System.out.println("adding int:" + edpInstRecord.getInterfaceId().toString() + " edp:"
-                        + edpInstRecord.getEndpointId().toString());
                 interfaces.add(edpInstRecord.getInterfaceId().toString());
                 endpoints.add(edpInstRecord.getEndpointId().toString());
             });
+
+            if (interfaces.isEmpty() || endpoints.isEmpty()) {
+                throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+            }
 
             return new ServiceOverview(interfaces, endpoints);
         });
