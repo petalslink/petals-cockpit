@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -205,11 +206,11 @@ public class ServicesResource {
 
     public static class ServiceOverview {
         @NotNull
-        @Min(1)
+        @Size(min = 1)
         public final ImmutableSet<String> interfaces;
 
         @NotNull
-        @Min(1)
+        @Size(min = 1)
         public final ImmutableSet<String> endpoints;
 
         @JsonCreator

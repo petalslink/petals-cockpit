@@ -84,6 +84,12 @@ public class CockpitResourceRule implements TestRule {
 
     private final Map<Object, Long> dbObjectIds = new HashMap<>();
 
+    private final Map<String, String> serviceIds = new HashMap<>();
+
+    private final Map<String, String> endpointsIds = new HashMap<>();
+
+    private final Map<String, String> interfacesIds = new HashMap<>();
+
     public CockpitResourceRule(Class<?>... resources) {
         this.resource = buildResourceTestRule(resources);
 
@@ -163,6 +169,21 @@ public class CockpitResourceRule implements TestRule {
         return DSL.using(db.getConnectionJdbcUrl());
     }
 
+    public String getService(String name) {
+        final String id = serviceIds.get(name);
+        return id != null ? id : "";
+    }
+
+    public String getEndpoint(String name) {
+        final String id = endpointsIds.get(name);
+        return id != null ? id : "";
+    }
+
+    public String getInterface(String name) {
+        final String id = interfacesIds.get(name);
+        return id != null ? id : "";
+    }
+
     public class TestWorkspaceDbOperations extends WorkspaceDbOperations {
         @Override
         public void busAdded(Domain bus, BusesRecord bDb) {
@@ -194,30 +215,36 @@ public class CockpitResourceRule implements TestRule {
             setDbObjectId(su, suDb.getId());
         }
 
+        @SuppressWarnings("null")
         @Override
         public void serviceAdded(ServicesRecord service) {
             // A same service can have multiple interfaces/endpoints, thus a same service insertion request
             // can be received multiple time without raising an error
             if (!dbObjectIds.containsKey(service)) {
                 setDbObjectId(service, service.getId());
+                serviceIds.put(service.getName(), service.getId().toString());
             }
         }
 
+        @SuppressWarnings("null")
         @Override
         public void endpointAdded(EndpointsRecord endpoint) {
-            // A same service can have multiple interfaces/endpoints, thus a same service insertion request
+            // A same endpoint can have multiple interfaces, thus a same endpoint insertion request
             // can be received multiple time without raising an error
             if (!dbObjectIds.containsKey(endpoint)) {
                 setDbObjectId(endpoint, endpoint.getId());
+                endpointsIds.put(endpoint.getName(), endpoint.getId().toString());
             }
         }
 
+        @SuppressWarnings("null")
         @Override
         public void interfaceAdded(InterfacesRecord interface_) {
-            // A same service can have multiple interfaces/endpoints, thus a same service insertion request
+            // A same interface can have multiple service/endpoints, thus a same interface insertion request
             // can be received multiple time without raising an error
             if (!dbObjectIds.containsKey(interface_)) {
                 setDbObjectId(interface_, interface_.getId());
+                interfacesIds.put(interface_.getName(), interface_.getId().toString());
             }
         }
     }

@@ -24,12 +24,13 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.resources.EndpointsResource.EndpointOverview;
+import org.ow2.petals.cockpit.server.resources.InterfacesResource.InterfaceOverview;
 import org.ow2.petals.cockpit.server.resources.ServicesResource.ServiceOverview;
 
 public class ServicesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     public ServicesResourceTest() {
-        super(ServicesResource.class, EndpointsResource.class);
+        super(ServicesResource.class, EndpointsResource.class, InterfacesResource.class);
     }
 
     @Test
@@ -49,25 +50,67 @@ public class ServicesResourceTest extends AbstractDefaultWorkspaceResourceTest {
     }
 
     @Test
+    public void getExistingInterfaceForbidden() {
+        resource.setCurrentProfile(new CockpitProfile(anotherUser, false));
+        Response get = resource.target("/interfaces/1").request().get();
+
+        assertThat(get.getStatus()).isEqualTo(403);
+    }
+
+    @Test
     public void getExistingService() {
-        ServiceOverview get = resource.target("/services/2").request().get(ServiceOverview.class);
+        ServiceOverview get = resource.target("/services/" + resource.getService("serv1a")).request()
+                .get(ServiceOverview.class);
 
         SoftAssertions a = new SoftAssertions();
+
         a.assertThat(get.endpoints).size().isEqualTo(2);
+        a.assertThat(get.endpoints).contains(
+                resource.getEndpoint("edp1a"), 
+                resource.getEndpoint("edp3a"));
+        
         a.assertThat(get.interfaces).size().isEqualTo(4);
-        a.assertThat(get.endpoints).contains("2", "7");
-        a.assertThat(get.interfaces).contains("5", "4", "3", "2");
+        a.assertThat(get.interfaces).contains(
+                resource.getInterface("int1"),
+                resource.getInterface("int3"),
+                resource.getInterface("int4"),
+                resource.getInterface("int6"));
         a.assertAll();
     }
 
     @Test
     public void getExistingEndpoint() {
-        EndpointOverview get = resource.target("/endpoints/7").request().get(EndpointOverview.class);
+        EndpointOverview get = resource.target("/endpoints/" + resource.getEndpoint("edp1a")).request()
+                .get(EndpointOverview.class);
 
         SoftAssertions a = new SoftAssertions();
-        a.assertThat(get.service).isEqualTo("2");
+        a.assertThat(get.service).isEqualTo(resource.getService("serv1a"));
+        
         a.assertThat(get.interfaces).size().isEqualTo(3);
-        a.assertThat(get.interfaces).contains("3", "4", "5");
+        a.assertThat(get.interfaces).contains(
+                resource.getInterface("int1"),
+                resource.getInterface("int3"),
+                resource.getInterface("int4"));
+        a.assertAll();
+    }
+
+    @Test
+    public void getExistingInterface() {
+        InterfaceOverview get = resource.target("/interfaces/" + resource.getInterface("int1")).request()
+                .get(InterfaceOverview.class);
+
+        SoftAssertions a = new SoftAssertions();
+        
+        a.assertThat(get.services).size().isEqualTo(2);
+        a.assertThat(get.services).contains(
+                resource.getService("serv1a"),
+                resource.getService("serv1b"));
+        
+        a.assertThat(get.endpoints).size().isEqualTo(3);
+        a.assertThat(get.endpoints).contains(
+                resource.getEndpoint("edp1a"), 
+                resource.getEndpoint("edp1b"), 
+                resource.getEndpoint("edp3b"));
         a.assertAll();
     }
 
@@ -81,6 +124,13 @@ public class ServicesResourceTest extends AbstractDefaultWorkspaceResourceTest {
     @Test
     public void getNonExistingEndpointNotFound() {
         Response get = resource.target("/endpoints/313249238").request().get();
+
+        assertThat(get.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void getNonExistingInterfaceNotFound() {
+        Response get = resource.target("/interface/313249238").request().get();
 
         assertThat(get.getStatus()).isEqualTo(404);
     }
