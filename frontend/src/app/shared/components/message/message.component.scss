@@ -39,11 +39,11 @@ mat-dialog-content {
 
 .msg-content {
   &.error {
-    @include msg-content (rgb(251, 225, 225), #e53935);
+    @include msg-content(rgb(251, 225, 225), #e53935);
   }
 
   &.info {
-    @include msg-content (rgb(217, 237, 248), #0288d1);
+    @include msg-content(rgb(217, 237, 248), #0288d1);
     white-space: normal;
     .info-color {
       color: #0288d1;
@@ -51,11 +51,11 @@ mat-dialog-content {
   }
 
   &.warning {
-    @include msg-content (rgb(253, 233, 217), #EF6C00);
+    @include msg-content(rgb(253, 233, 217), #ef6c00);
   }
 
   &.success {
-    @include msg-content (rgb(212,237,218), #155724);
+    @include msg-content(rgb(212, 237, 218), #155724);
   }
 }
 
@@ -69,20 +69,20 @@ mat-dialog-content {
 
 .msg-dialog-type {
   &.errorDialog {
-    @include msg-dialog-type (#e53935);
+    @include msg-dialog-type(#e53935);
   }
 
   &.infoDialog {
     white-space: normal;
-    @include msg-dialog-type (#0288d1);
+    @include msg-dialog-type(#0288d1);
   }
 
   &.warningDialog {
-    @include msg-dialog-type (#EF6C00);
+    @include msg-dialog-type(#ef6c00);
   }
 
   &.successDialog {
-    @include msg-dialog-type (#155724);
+    @include msg-dialog-type(#155724);
   }
 }
 

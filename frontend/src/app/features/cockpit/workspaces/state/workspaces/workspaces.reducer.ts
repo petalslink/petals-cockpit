@@ -197,9 +197,9 @@ export namespace WorkspacesReducer {
     payload: IWorkspaceBackend
   ): IWorkspacesTable {
     return {
-      ...table.byId[payload.id]
+      ...(table.byId[payload.id]
         ? updateById(table, payload.id, payload)
-        : putById(table, payload.id, payload, workspaceRowFactory),
+        : putById(table, payload.id, payload, workspaceRowFactory)),
       selectedWorkspaceId: payload.id,
     };
   }

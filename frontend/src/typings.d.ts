@@ -1,3 +1,6 @@
+/* tslint:disable */
+// Interfaces with contstructor is acceptable here
+
 /* SystemJS module definition */
 declare var module: NodeModule;
 interface NodeModule {
