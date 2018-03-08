@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -45,13 +46,15 @@ import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
+import org.ow2.petals.cockpit.server.db.generated.Keys;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.EdpInstancesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.InterfacesRecord;
 import org.pac4j.jax.rs.annotations.Pac4JProfile;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.collect.ImmutableSet;
 
 @Singleton
 @Path("/interfaces")
@@ -77,16 +80,33 @@ public class InterfacesResource {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            Record user = DSL.using(conf).select().from(USERS_WORKSPACES).join(BUSES)
-                    .on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID)).join(CONTAINERS)
-                    .onKey(FK_CONTAINERS_BUSES_ID).join(EDP_INSTANCES).onKey().join(INTERFACES).onKey()
-                    .where(INTERFACES.ID.eq(iId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchOne();
+            Record user = DSL.using(conf).select().from(USERS_WORKSPACES)
+                    .join(BUSES).on(BUSES.WORKSPACE_ID.eq(USERS_WORKSPACES.WORKSPACE_ID))
+                    .join(CONTAINERS).onKey(FK_CONTAINERS_BUSES_ID)
+                    .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                    .join(INTERFACES).onKey(Keys.FK_EDP_INSTANCES_INTERFACE_ID)
+                    .where(INTERFACES.ID.eq(iId).and(USERS_WORKSPACES.USERNAME.eq(profile.getId()))).fetchAny();
 
             if (user == null) {
                 throw new WebApplicationException(Status.FORBIDDEN);
             }
 
-            return new InterfaceOverview();
+            Set<String> services = new HashSet<>();
+            Set<String> endpoints = new HashSet<>();
+            DSL.using(conf).select().from(EDP_INSTANCES).where(EDP_INSTANCES.INTERFACE_ID.eq(iId)).forEach(record -> {
+                assert record != null;
+                EdpInstancesRecord edpInstRecord = record.into(EDP_INSTANCES);
+                assert edpInstRecord != null;
+
+                services.add(edpInstRecord.getServiceId().toString());
+                endpoints.add(edpInstRecord.getEndpointId().toString());
+            });
+
+            if (services.isEmpty() || endpoints.isEmpty()) {
+                throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+            }
+
+            return new InterfaceOverview(services, endpoints);
         });
     }
 
@@ -185,8 +205,20 @@ public class InterfacesResource {
         }
     }
 
-    @JsonSerialize
     public static class InterfaceOverview {
-        // TODO remove annotation when there will be data
+        @NotNull
+        @Size(min = 1)
+        public final ImmutableSet<String> services;
+
+        @NotNull
+        @Size(min = 1)
+        public final ImmutableSet<String> endpoints;
+
+        @JsonCreator
+        public InterfaceOverview(@JsonProperty("services") Set<String> services,
+                @JsonProperty("endpoints") Set<String> endpoints) {
+            this.services = ImmutableSet.copyOf(services);
+            this.endpoints = ImmutableSet.copyOf(endpoints);
+        }
     }
 }
