@@ -27,26 +27,26 @@
 
 .led {
   &.green {
-    @include led(#ABFF00, #304701, #89ff00);
+    @include led(#abff00, #304701, #89ff00);
   }
 
   &.red {
-    @include led(#F00, #441313, rgba(255, 0, 0, 0.5));
+    @include led(#f00, #441313, rgba(255, 0, 0, 0.5));
   }
 
   &.yellow {
-    @include led(#FF0, #808002, #FF0);
+    @include led(#ff0, #808002, #ff0);
   }
 
   &.grey {
-    @include led(#DDD, #444, #DDD);
+    @include led(#ddd, #444, #ddd);
   }
 
   &.black {
-    @include led(#000000, #DDD, #DDD);
+    @include led(#000000, #ddd, #ddd);
   }
 
   &.white {
-    @include led(#DDD, #DDD, #000000);
+    @include led(#ddd, #ddd, #000000);
   }
 }

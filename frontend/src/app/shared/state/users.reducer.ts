@@ -217,9 +217,9 @@ export namespace UsersReducer {
     const user = { id, name: payload.user.name };
 
     return {
-      ...table.byId[id]
+      ...(table.byId[id]
         ? updateById(table, id, user)
-        : putById(table, id, user, userRowFactory),
+        : putById(table, id, user, userRowFactory)),
       isConnecting: false,
       connectionFailed: false,
       connectedUser: payload.user,

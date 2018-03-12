@@ -197,7 +197,10 @@ export class ComponentsServiceImpl extends ComponentsService {
               serviceUnits: toJsTable(body.serviceUnits),
             });
           } else {
-            return empty<JsTable<IServiceUnitBackendSSE>>();
+            return empty<{
+              serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
+              serviceUnits: JsTable<IServiceUnitBackendSSE>;
+            }>();
           }
         }),
         last()
