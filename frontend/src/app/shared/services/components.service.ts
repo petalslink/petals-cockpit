@@ -24,6 +24,7 @@ import { of } from 'rxjs/observable/of';
 import { flatMap, last, map } from 'rxjs/operators';
 import * as xmltojson from 'xmltojson';
 
+import { ISharedLibrarySimplified } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
 import { loadFilesContentFromZip } from 'app/shared/helpers/zip.helper';
 import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
@@ -91,7 +92,10 @@ export abstract class ComponentsService {
 
   abstract getComponentInformationFromZipFile(
     file: File
-  ): Observable<{ name: string; sharedLibrariesName: string[] }>;
+  ): Observable<{
+    name: string;
+    sharedLibraries: ISharedLibrarySimplified[];
+  }>;
 
   abstract deploySu(
     workspaceId: string,
@@ -218,22 +222,22 @@ export class ComponentsServiceImpl extends ComponentsService {
 
   private getInformationFromXml(
     xml: string
-  ): { name: string; sharedLibrariesName: string[] } {
+  ): { name: string; sharedLibraries: ISharedLibrarySimplified[] } {
     const json: any = xmltojson.parseString(xml, {});
     let name = '';
-    let sharedLibrariesName = [];
+    let sharedLibraries = [];
 
     try {
       name = json.jbi[0].component[0].identification[0].name[0]._text;
       if (json.jbi[0].component[0]['shared-library']) {
-        sharedLibrariesName = json.jbi[0].component[0]['shared-library'].map(
-          (el: any) => el._text
+        sharedLibraries = json.jbi[0].component[0]['shared-library'].map(
+          (el: any) => ({ name: el._text, version: el._attr.version._value })
         );
       }
     } catch (err) {
       throw new Error('Getting information from XML failed');
     }
 
-    return { name, sharedLibrariesName };
+    return { name, sharedLibraries };
   }
 }

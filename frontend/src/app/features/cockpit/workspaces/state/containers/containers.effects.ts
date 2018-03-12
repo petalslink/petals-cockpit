@@ -89,7 +89,8 @@ export class ContainersEffects {
           workspaceId,
           action.payload.id,
           action.payload.file,
-          action.payload.name
+          action.payload.name,
+          action.payload.sharedLibraries
         );
 
         return result$.pipe(

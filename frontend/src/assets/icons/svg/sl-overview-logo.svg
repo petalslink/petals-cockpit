@@ -3,8 +3,8 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="24px" height="24px" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve">
-<rect y="7.428" fill="#512DA8" width="12.668" height="2.987"/>
-<rect x="2.574" y="11.317" fill="#512DA8" width="13.492" height="4.017"/>
-<rect x="10.026" y="9.631" transform="matrix(-0.3369 -0.9416 0.9416 -0.3369 14.5181 33.5044)" fill="#512DA8" width="18.064" height="4.017"/>
-<rect x="0.618" y="16.079" fill="#512DA8" width="16.376" height="4.737"/>
+<rect y="7.428" width="12.668" height="2.987"/>
+<rect x="2.574" y="11.317" width="13.492" height="4.017"/>
+<rect x="10.026" y="9.631" transform="matrix(-0.3369 -0.9416 0.9416 -0.3369 14.5181 33.5044)" width="18.064" height="4.017"/>
+<rect x="0.618" y="16.079" width="16.376" height="4.737"/>
 </svg>

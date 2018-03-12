@@ -18,6 +18,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { ISharedLibrarySimplified } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import * as helper from 'app/shared/helpers/mock.helper';
 import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
@@ -42,7 +43,8 @@ export class ContainersServiceMock extends ContainersServiceImpl {
     workspaceId: string,
     containerId: string,
     file: File,
-    name: string
+    name: string,
+    sharedLibraries: ISharedLibrarySimplified[]
   ) {
     return deployMockAndTriggerSse({
       ifError: {
