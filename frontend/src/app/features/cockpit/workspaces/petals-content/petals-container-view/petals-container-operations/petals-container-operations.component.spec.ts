@@ -24,6 +24,7 @@ import {
   TestBed,
 } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatDialogModule, MatInputModule } from '@angular/material';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { SimpleNotificationsModule } from 'angular2-notifications';
@@ -51,6 +52,8 @@ describe(`Petals container operations`, () => {
           metaReducers,
         }),
         EffectsModule.forRoot([]),
+        MatDialogModule,
+        MatInputModule,
         ReactiveFormsModule,
         SimpleNotificationsModule.forRoot(),
       ],
@@ -74,6 +77,9 @@ describe(`Petals container operations`, () => {
 
     pcoFixture = TestBed.createComponent(PetalsContainerOperationsComponent);
     pcoComponent = pcoFixture.componentInstance;
+    pcoComponent.sharedLibrariesByNameAndVersion = {
+      '{"name":"sl 0","version":"1.0.0"}': true,
+    };
 
     pcoComponent.ngOnInit();
   });
@@ -101,7 +107,10 @@ describe(`Petals container operations`, () => {
         ).and.returnValue(
           of({
             name: 'some content from zip',
-            sharedLibrariesName: ['SL 1', 'SL 2'],
+            sharedLibraries: [
+              { name: 'SL 1', version: '1.0' },
+              { name: 'SL 2', version: '2.0' },
+            ],
           })
         );
 
@@ -117,9 +126,11 @@ describe(`Petals container operations`, () => {
         ).toEqual('some content from zip');
 
         expect(pcoComponent.slsInfoReadFromZip).toEqual([
-          { name: 'SL 1', isInCurrentContainer: false },
-          { name: 'SL 2', isInCurrentContainer: false },
+          { name: 'SL 1', version: '1.0' },
+          { name: 'SL 2', version: '2.0' },
         ]);
+
+        expect(pcoComponent.slIsInCurrentContainer).toEqual([false, false]);
       })
     );
 
@@ -212,6 +223,11 @@ describe(`Petals container operations`, () => {
 
         expect(
           pcoComponent.updateSharedLibraryDeployInfoFormGroup.get('name').value
+        ).toEqual('');
+
+        expect(
+          pcoComponent.updateSharedLibraryDeployInfoFormGroup.get('version')
+            .value
         ).toEqual('');
 
         expect((<any>pcoComponent).notifications.warn).toHaveBeenCalledWith(
