@@ -77,7 +77,9 @@ export class ServicesByIdGuard implements CanActivateChild {
         new Services.SetCurrent({ id }),
         new Services.FetchDetails({ id }),
       ];
-      this.previousDestroyAction = new Services.SetCurrent({ id: '' });
+      this.previousDestroyAction = new Services.SetCurrent({
+        id: '',
+      });
     } else {
       if (destroyAction) {
         this.store$.dispatch(destroyAction);

@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Todo: Replace namespace and localpart by IQName
 export function findNamespaceLocalpart(
   str: string
 ): { namespace: string; localpart: string } {

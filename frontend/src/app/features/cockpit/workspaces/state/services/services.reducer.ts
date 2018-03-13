@@ -111,10 +111,14 @@ export namespace ServicesReducer {
     table: IServicesTable,
     payload: { id: string; data: IServiceBackendDetails }
   ) {
-    return updateById(table, payload.id, {
-      ...payload.data,
-      isFetchingDetails: false,
-    });
+    return {
+      ...updateById(table, payload.id, {
+        isFetchingDetails: false,
+      }),
+      selectedServiceId: payload.id,
+      selectedServiceInterfaces: payload.data.interfaces,
+      selectedServiceEndpoints: payload.data.endpoints,
+    };
   }
 
   function fetchDetailsError(table: IServicesTable, payload: { id: string }) {

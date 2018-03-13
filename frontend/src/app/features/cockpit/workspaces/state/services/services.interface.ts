@@ -17,8 +17,6 @@
 
 import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
 import {
-  IServiceBackendDetails,
-  IServiceBackendDetailsCommon,
   IServiceBackendSSE,
   IServiceBackendSSECommon,
 } from 'app/shared/services/services.service';
@@ -28,22 +26,18 @@ export interface IServiceUI {
   isFetchingDetails: boolean;
 }
 
-export interface IServiceRow
-  extends IServiceUI,
-    IServiceBackendSSE,
-    IServiceBackendDetails {}
+export interface IServiceRow extends IServiceUI, IServiceBackendSSE {}
 
 export interface IServiceRowWithoutDetails
   extends IServiceUI,
     IServiceBackendSSE {}
 
-export interface IService
-  extends IServiceUI,
-    IServiceBackendSSECommon,
-    IServiceBackendDetailsCommon {}
+export interface IService extends IServiceUI, IServiceBackendSSECommon {}
 
 interface IServicesCommon {
   selectedServiceId: string;
+  selectedServiceInterfaces: string[];
+  selectedServiceEndpoints: string[];
 }
 
 export interface IServicesTable extends IServicesCommon, JsTable<IServiceRow> {}
@@ -61,5 +55,7 @@ export function servicesTableFactory(): IServicesTable {
   return {
     ...emptyJsTable<IServiceRow>(),
     selectedServiceId: '',
+    selectedServiceInterfaces: [],
+    selectedServiceEndpoints: [],
   };
 }

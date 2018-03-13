@@ -92,7 +92,7 @@ export class ComponentsEffects {
     );
 
   @Effect()
-  fetchContainersDetails$: Observable<Action> = this.actions$
+  fetchComponentsDetails$: Observable<Action> = this.actions$
     .ofType<Components.FetchDetails>(Components.FetchDetailsType)
     .pipe(
       switchMap(action =>

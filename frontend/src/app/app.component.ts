@@ -99,6 +99,12 @@ export class AppComponent implements OnInit, OnDestroy {
     const gotoLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
       './assets/icons/svg/goto-logo.svg'
     );
+    const gotoDetailsLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
+      './assets/icons/svg/goto-details-logo.svg'
+    );
+    const namespaceLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
+      './assets/icons/svg/namespace-logo.svg'
+    );
 
     this.matIconRegistry.addSvgIcon('bus', busLogo);
     this.matIconRegistry.addSvgIcon('component', compLogo);
@@ -111,6 +117,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.matIconRegistry.addSvgIcon('interface', interfaceLogo);
     this.matIconRegistry.addSvgIcon('endpoint', endpointLogo);
     this.matIconRegistry.addSvgIcon('goto', gotoLogo);
+    this.matIconRegistry.addSvgIcon('gotoDetails', gotoDetailsLogo);
+    this.matIconRegistry.addSvgIcon('namespace', namespaceLogo);
   }
 
   ngOnDestroy() {

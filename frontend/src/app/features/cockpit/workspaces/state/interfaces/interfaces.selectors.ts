@@ -17,7 +17,12 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { IInterfaceRow } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
+import { IEndpointRow } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
+import {
+  IInterface,
+  IInterfaceRow,
+} from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
+import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
 import { getSelectedWorkspaceId } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
 import {
@@ -26,9 +31,18 @@ import {
 } from 'app/shared/helpers/services-list.helper';
 import { IStore } from 'app/shared/state/store.interface';
 
-export const getInterfacesById = (state: IStore) => state.interfaces.byId;
+export interface IInterfaceWithServicesAndEndpoints extends IInterface {
+  services: IServiceRow[];
+  endpoints: IEndpointRow[];
+}
 
-export const getInterfacesAllIds = (state: IStore) => state.interfaces.allIds;
+export function getInterfacesById(state: IStore) {
+  return state.interfaces.byId;
+}
+
+export function getInterfacesAllIds(state: IStore) {
+  return state.interfaces.allIds;
+}
 
 export const getSelectedInterface = createSelector(
   (state: IStore) => state.interfaces.selectedInterfaceId,
