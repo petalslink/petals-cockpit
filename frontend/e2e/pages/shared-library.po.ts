@@ -27,6 +27,7 @@ export abstract class SharedLibraryPage {
 
   public readonly component = SharedLibraryPage.component;
   public readonly title = this.component.$(`mat-toolbar .title`);
+  public readonly version = this.component.$(`.sl-version`);
   public readonly hasBeenDeletedMessage = this.component.$(
     'app-workspace-element .message'
   );

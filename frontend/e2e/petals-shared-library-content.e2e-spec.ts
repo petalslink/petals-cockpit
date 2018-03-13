@@ -43,6 +43,7 @@ describe(`Petals shared library content`, () => {
     const sl = workspace.openSharedLibrary('SL 0');
 
     expect(sl.title.getText()).toEqual('SL 0');
+    expect(sl.version.getText()).toEqual('1.0.0');
     expect(sl.components.getText()).toEqual(['Comp 2']);
 
     const comp = sl.openComponent('Comp 2');
