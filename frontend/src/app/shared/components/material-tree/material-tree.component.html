@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <span [class.no-icon-children]="canBeFolded"></span>
         </ng-template>
 
-        <mat-icon *ngIf="item.svgIcon" mat-list-icon [svgIcon]="item.svgIcon"></mat-icon>
+        <mat-icon *ngIf="item.svgIcon" mat-list-icon color="primary" [svgIcon]="item.svgIcon"></mat-icon>
         <mat-icon *ngIf="item.icon" mat-list-icon color="primary">{{ item.icon }}</mat-icon>
 
         <span
