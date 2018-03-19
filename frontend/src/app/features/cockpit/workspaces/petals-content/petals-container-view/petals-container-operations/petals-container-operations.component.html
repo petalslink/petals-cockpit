@@ -219,7 +219,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <form fxLayout="column" [formGroup]="updateSharedLibraryDeployInfoFormGroup">
               <div>
                 <mat-form-field fxFlex fxFlex.gt-md="50%">
-                  <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
+                  <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name" [errorStateMatcher]="slErrorStateMatcher">
                   <button
                     *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name')"
                     matSuffix
@@ -237,15 +237,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
                   <mat-error
                     class="error-name-input"
-                    *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
-                  >
-                    You can't upload a shared library with a name that already exists in this container
+                    *ngIf="updateSharedLibraryDeployInfoFormGroup.hasError('alreadyInContainer')">
+                    A shared library with this name and version already exists in this container
                   </mat-error>
                 </mat-form-field>
               </div>
               <div>
                 <mat-form-field fxFlex fxFlex.gt-md="50%">
-                  <input type="text" matInput placeholder="Version" autocomplete="off" formControlName="version">
+                  <input type="text" matInput placeholder="Version" autocomplete="off" formControlName="version" [errorStateMatcher]="slErrorStateMatcher">
                   <button
                     *ngIf="updateSharedLibraryDeployInfoFormGroup.get('version')"
                     matSuffix
@@ -260,6 +259,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   <mat-hint *ngIf="!updateSharedLibraryDeployInfoFormGroup.get('version').value && !!slVersionReadFromZip">
                     Default {{ slVersionReadFromZip }}
                   </mat-hint>
+
+                  <mat-error
+                    class="error-name-input"
+                    *ngIf="updateSharedLibraryDeployInfoFormGroup.hasError('alreadyInContainer')">
+                    A shared library with this name and version already exists in this container
+                  </mat-error>
                 </mat-form-field>
               </div>
             </form>

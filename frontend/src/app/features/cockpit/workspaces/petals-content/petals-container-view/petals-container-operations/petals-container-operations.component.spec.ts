@@ -99,7 +99,7 @@ describe(`Petals container operations`, () => {
         const componentsService: ComponentsService = TestBed.get(
           ComponentsService
         );
-        pcoComponent.sharedLibrariesByName = {};
+        pcoComponent.sharedLibrariesByNameAndVersion = {};
 
         spyOn(
           componentsService,
