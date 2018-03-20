@@ -241,4 +241,54 @@ describe('Override shared libraries', () => {
 
     cy.get(COMPONENT_OV_SL_DOM.buttons.open).should('be.disabled');
   });
+
+  it('should not be able to upload shared library with name and version already in container', () => {
+    cy
+      .get('.mat-list-item-content')
+      .contains('Cont 0')
+      .click();
+
+    cy
+      .get('.workspace-element .mat-tab-label')
+      .eq(1)
+      .click();
+
+    cy.uploadFile(
+      'petals-sl-hsql-1.8.0.10.zip',
+      '.deploy-shared-library input[type=file]'
+    );
+
+    cy.get(SL_UPLOAD_DOM.uploadBtn).should('be.enabled');
+
+    cy
+      .get('.deploy-shared-library input[type=text]')
+      .eq(0)
+      .clear();
+
+    cy
+      .get('.deploy-shared-library input[type=text]')
+      .eq(0)
+      .type('sl 0');
+
+    cy.get(SL_UPLOAD_DOM.uploadBtn).should('be.enabled');
+
+    cy
+      .get('.deploy-shared-library input[type=text]')
+      .eq(1)
+      .clear();
+
+    cy
+      .get('.deploy-shared-library input[type=text]')
+      .eq(1)
+      .type('1.0.0');
+
+    cy.get(SL_UPLOAD_DOM.uploadBtn).should('be.disabled');
+
+    cy
+      .get(SL_UPLOAD_DOM.errorMsg)
+      .should(
+        'contain',
+        'A shared library with this name and version already exists in this container'
+      );
+  });
 });
