@@ -21,6 +21,7 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
+import { MatDialog } from '@angular/material';
 import { Store } from '@ngrx/store';
 
 import { IStore } from 'app/shared/state/store.interface';
@@ -28,6 +29,7 @@ import { Ui } from 'app/shared/state/ui.actions';
 import { IUi } from 'app/shared/state/ui.interface';
 import { Users } from 'app/shared/state/users.actions';
 import { ICurrentUser } from 'app/shared/state/users.interface';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-header',
@@ -42,9 +44,15 @@ export class HeaderComponent implements OnInit {
   @Input() isDisconnecting: boolean;
   @Input() isOnWorkspace: boolean;
 
-  constructor(private store$: Store<IStore>) {}
+  logoDisabled$: Observable<boolean>;
 
-  ngOnInit() {}
+  constructor(private store$: Store<IStore>, private matDialog: MatDialog) {}
+
+  ngOnInit() {
+    this.logoDisabled$ = this.store$.select(
+      state => state.ui.isPopupListWorkspacesVisible
+    );
+  }
 
   logo() {
     return `./assets/img/${
@@ -60,5 +68,10 @@ export class HeaderComponent implements OnInit {
 
   disconnect() {
     this.store$.dispatch(new Users.Disconnect());
+  }
+
+  clickPetalsLogo() {
+    this.matDialog.closeAll();
+    this.store$.dispatch(new Ui.OpenWorkspaces());
   }
 }
