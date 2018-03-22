@@ -21,17 +21,17 @@
 
   <include file="backend/src/main/resources/migrations.xml" />
 
-  <changeSet id="e2e-tests" author="vnoel">
+  <changeSet id="e2e-tests" author="psouquet">
     <loadData tableName="workspaces" file="e2e/data/workspaces.csv" />
     <loadData tableName="users" file="e2e/data/users.csv" />
     <loadData tableName="users_workspaces" file="e2e/data/users_workspaces.csv" />
-    <loadData tableName="buses" file="e2e/data/buses.csv" />
+   <!-- <loadData tableName="buses" file="e2e/data/buses.csv" />
     <loadData tableName="containers" file="e2e/data/containers.csv" />
     <loadData tableName="components" file="e2e/data/components.csv" />
     <loadData tableName="serviceassemblies" file="e2e/data/serviceassemblies.csv" />
     <loadData tableName="serviceunits" file="e2e/data/serviceunits.csv" />
     <loadData tableName="sharedlibraries" file="e2e/data/sharedlibraries.csv" />
-    <loadData tableName="sharedlibraries_components" file="e2e/data/sharedlibraries_components.csv" />
+    <loadData tableName="sharedlibraries_components" file="e2e/data/sharedlibraries_components.csv" /> -->
   </changeSet>
 
 </databaseChangeLog>
