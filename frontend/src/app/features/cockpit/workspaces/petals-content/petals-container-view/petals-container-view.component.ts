@@ -24,7 +24,7 @@ import {
   getCurrentContainer,
   IContainerWithSiblings,
   serviceAssembliesOfCurrentContainerByName,
-  sharedLibrariesOfCurrentContainerByName,
+  sharedLibrariesOfCurrentContainerByNameAndVersion,
 } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
@@ -40,8 +40,8 @@ export class PetalsContainerViewComponent implements OnInit {
   componentsOfCurrentContainerByName$: Observable<{
     [name: string]: boolean;
   }>;
-  sharedLibrariesOfCurrentContainerByName$: Observable<{
-    [name: string]: boolean;
+  sharedLibrariesOfCurrentContainerByNameAndVersion$: Observable<{
+    [nameAndVersion: string]: boolean;
   }>;
   serviceAssembliesOfCurrentContainerByName$: Observable<{
     [name: string]: boolean;
@@ -66,8 +66,8 @@ export class PetalsContainerViewComponent implements OnInit {
     this.componentsOfCurrentContainerByName$ = this.store$.select(
       componentsOfCurrentContainerByName
     );
-    this.sharedLibrariesOfCurrentContainerByName$ = this.store$.select(
-      sharedLibrariesOfCurrentContainerByName
+    this.sharedLibrariesOfCurrentContainerByNameAndVersion$ = this.store$.select(
+      sharedLibrariesOfCurrentContainerByNameAndVersion
     );
     this.serviceAssembliesOfCurrentContainerByName$ = this.store$.select(
       serviceAssembliesOfCurrentContainerByName

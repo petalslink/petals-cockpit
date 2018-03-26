@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFill class="content content-max-width">
   <div class="central-content">
-    <div fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="10px" class="deploys">
+    <mat-card fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="10px" class="deploys">
       <ngx-hover-opacity
         fxFlexAlign.gt-xs="{{deployComponent.selectedFileInformation ? 'stretch' : 'start'}}"
         class="deploy-component"
@@ -62,56 +62,81 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
               <mat-divider></mat-divider>
 
-              <mat-card-subtitle class="margin-top-x1" fxLayoutAlign="start center" *ngIf="slsInfoReadFromZip">
-                <span fxFlex>Shared libraries</span>
-                <mat-icon class="margin-left-x1" svgIcon="sl-overview"></mat-icon>
-              </mat-card-subtitle>
+              <div class="margin-top-x1" fxLayout="row" *ngIf="!slsInfoReadFromZip; else slsTemplate">
+                <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-right-x1"></mat-spinner>
+                Parsing shared libraries
+              </div>
 
-              <app-message
-                *ngIf="slsInfoReadFromZip.length > 0 && nbSlsReadFromZipNotInContainer > 0"
-                type="warning"
-                [isClosable]="false"
-                class="warning-red-cross"
-                msg="Shared libraries with a red cross are not in this container."
-              ></app-message>
+              <ng-template #slsTemplate>
+                <mat-card-subtitle class="margin-top-x1" fxLayoutAlign="start center">
+                  <span fxFlex>Shared libraries</span>
+                  <button
+                    class="override-sl"
+                    matTooltip="Override Shared Libraries"
+                    matTooltipPosition="before"
+                    mat-mini-fab
+                    color="primary"
+                    (click)="openOverrideSlDialog()"
+                    [disabled]="isUploadingComponent"
+                  >
+                    <mat-icon svgIcon="sl-overview"></mat-icon>
+                  </button>
+                  <ng-template #overrideSlTemplate>
+                    <app-shared-libraries-override
+                      #slOverrideComp
+                      [initialSharedLibraries]="slsInfoReadFromZip"
+                      (cancel)="closeOverrideSlDialog()"
+                      (save)="saveOverrideSl($event)"
+                    ></app-shared-libraries-override>
+                  </ng-template>
+                </mat-card-subtitle>
 
-              <app-message
-                *ngIf="slsInfoReadFromZip.length > 0 && nbSlsReadFromZipNotInContainer === 0"
-                type="success"
-                [isClosable]="false"
-                class="success-all-sls"
-                msg="All the shared libraries are in this container."
-              ></app-message>
+                <app-message
+                  *ngIf="slsInfoReadFromZip.length > 0 && nbSlsReadFromZipNotInContainer > 0"
+                  type="warning"
+                  [isClosable]="false"
+                  class="warning-red-cross"
+                  msg="Shared libraries with a red cross are not in this container."
+                ></app-message>
 
-              <app-message
-                *ngIf="slsInfoReadFromZip.length === 0"
-                type="info"
-                [isClosable]="false"
-                class="info-no-sls"
-                msg="No shared libraries have been detected in this zip file."
-              ></app-message>
+                <app-message
+                  *ngIf="slsInfoReadFromZip.length > 0 && nbSlsReadFromZipNotInContainer === 0"
+                  type="success"
+                  [isClosable]="false"
+                  class="success-all-sls"
+                  msg="All the shared libraries are in this container."
+                ></app-message>
 
-              <mat-list dense *ngIf="slsInfoReadFromZip">
-                <div class="item-list">
-                  <mat-list-item
-                    *ngFor="let slInfo of slsInfoReadFromZip"
-                    fxLayout="row"
-                    fxLayoutAlign="start center"
-                    matLine
-                    >
-                    <mat-icon mat-list-icon *ngIf="slInfo.isInCurrentContainer" class="color-green-x1">
-                      done
-                    </mat-icon>
+                <app-message
+                  *ngIf="slsInfoReadFromZip.length === 0"
+                  type="info"
+                  [isClosable]="false"
+                  class="info-no-sls"
+                  msg="No shared libraries have been detected in this zip file."
+                ></app-message>
 
-                    <mat-icon mat-list-icon *ngIf="!slInfo.isInCurrentContainer" class="color-red-x1">
-                      clear
-                    </mat-icon>
+                <mat-list dense>
+                  <div class="item-list">
+                    <mat-list-item
+                      *ngFor="let slInfo of slsInfoReadFromZip; index as i"
+                      fxLayout="row"
+                      fxLayoutAlign="start center"
+                      matLine
+                      >
+                      <mat-icon mat-list-icon *ngIf="slIsInCurrentContainer[i]" class="color-green-x1">
+                        done
+                      </mat-icon>
 
-                    <span class="sl-name">{{ slInfo.name }}</span>
-                  </mat-list-item>
-                </div>
-              </mat-list>
+                      <mat-icon mat-list-icon *ngIf="!slIsInCurrentContainer[i]" class="color-red-x1">
+                        clear
+                      </mat-icon>
 
+                      <span class="sl-name">{{ slInfo.name }}</span>
+                      <span class="sl-version">{{ slInfo.version }}</span>
+                    </mat-list-item>
+                  </div>
+                </mat-list>
+              </ng-template>
             </form>
           </ng-template>
         </app-upload>
@@ -138,7 +163,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <form fxLayout="column" novalidate [formGroup]="updateServiceAssemblyDeployInfoFormGroup">
               <div>
                 <mat-form-field fxFlex fxFlex.gt-md="50%">
-                  <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
+                  <input
+                    type="text"
+                    matInput
+                    placeholder="Name"
+                    autocomplete="off"
+                    formControlName="name"
+                  >
                   <button
                     *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name')"
                     matSuffix
@@ -188,7 +219,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <form fxLayout="column" [formGroup]="updateSharedLibraryDeployInfoFormGroup">
               <div>
                 <mat-form-field fxFlex fxFlex.gt-md="50%">
-                  <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
+                  <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name" [errorStateMatcher]="slErrorStateMatcher">
                   <button
                     *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name')"
                     matSuffix
@@ -206,15 +237,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
                   <mat-error
                     class="error-name-input"
-                    *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
-                  >
-                    You can't upload a shared library with a name that already exists in this container
+                    *ngIf="updateSharedLibraryDeployInfoFormGroup.hasError('alreadyInContainer')">
+                    A shared library with this name and version already exists in this container
                   </mat-error>
                 </mat-form-field>
               </div>
               <div>
                 <mat-form-field fxFlex fxFlex.gt-md="50%">
-                  <input type="text" matInput placeholder="Version" autocomplete="off" formControlName="version">
+                  <input type="text" matInput placeholder="Version" autocomplete="off" formControlName="version" [errorStateMatcher]="slErrorStateMatcher">
                   <button
                     *ngIf="updateSharedLibraryDeployInfoFormGroup.get('version')"
                     matSuffix
@@ -229,11 +259,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   <mat-hint *ngIf="!updateSharedLibraryDeployInfoFormGroup.get('version').value && !!slVersionReadFromZip">
                     Default {{ slVersionReadFromZip }}
                   </mat-hint>
+
+                  <mat-error
+                    class="error-name-input"
+                    *ngIf="updateSharedLibraryDeployInfoFormGroup.hasError('alreadyInContainer')">
+                    A shared library with this name and version already exists in this container
+                  </mat-error>
                 </mat-form-field>
               </div>
             </form>
           </ng-template>
         </app-upload>
       </ngx-hover-opacity>
+    </mat-card>
   </div>
 </div>

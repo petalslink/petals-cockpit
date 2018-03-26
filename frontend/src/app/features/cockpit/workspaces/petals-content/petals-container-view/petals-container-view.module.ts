@@ -21,6 +21,7 @@ import { VisModule } from 'ng2-vis';
 import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
 import { SharedModule } from 'app/shared/shared.module';
 import { PetalsContainerOperationsComponent } from './petals-container-operations/petals-container-operations.component';
+import { SharedLibrariesOverrideComponent } from './petals-container-operations/shared-libraries-override/shared-libraries-override.component';
 import { PetalsContainerOverviewComponent } from './petals-container-overview/petals-container-overview.component';
 import { PetalsContainerViewRoutingModule } from './petals-container-view-routing.module';
 import { PetalsContainerViewComponent } from './petals-container-view.component';
@@ -36,6 +37,7 @@ import { PetalsContainerViewComponent } from './petals-container-view.component'
     PetalsContainerViewComponent,
     PetalsContainerOverviewComponent,
     PetalsContainerOperationsComponent,
+    SharedLibrariesOverrideComponent,
   ],
 })
 export class PetalsContainerViewModule {}

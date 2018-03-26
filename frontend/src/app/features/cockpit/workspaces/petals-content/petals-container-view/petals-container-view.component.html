@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     *appWorkspaceElementTab="'Operations'"
     [container]="we.resource"
     [componentsByName]="componentsOfCurrentContainerByName$ | async"
-    [sharedLibrariesByName]="sharedLibrariesOfCurrentContainerByName$ | async"
+    [sharedLibrariesByNameAndVersion]="sharedLibrariesOfCurrentContainerByNameAndVersion$ | async"
     [serviceAssembliesByName]="serviceAssembliesOfCurrentContainerByName$ | async"
     fxFill
   ></app-petals-container-operations>

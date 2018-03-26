@@ -53,6 +53,11 @@ export interface ISharedLibraries extends ISharedLibrariesCommon {
   list: ISharedLibrary[];
 }
 
+export interface ISharedLibrarySimplified {
+  name: string;
+  version: string;
+}
+
 export function sharedLibraryRowFactory(): ISharedLibraryRow {
   return {
     id: null,

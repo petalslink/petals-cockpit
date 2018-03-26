@@ -23,9 +23,19 @@ import {
   OnInit,
   SimpleChange,
   SimpleChanges,
+  TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  NgForm,
+  ValidatorFn,
+} from '@angular/forms';
+import { ErrorStateMatcher, MatDialog, MatDialogRef } from '@angular/material';
 import { Actions } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
@@ -42,8 +52,10 @@ import {
 import { Subject } from 'rxjs/Subject';
 import { v4 as uuid } from 'uuid';
 
+import { SharedLibrariesOverrideComponent } from 'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-operations/shared-libraries-override/shared-libraries-override.component';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
+import { ISharedLibrarySimplified } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
 import { ComponentsService } from 'app/shared/services/components.service';
 import {
@@ -70,26 +82,37 @@ export class PetalsContainerOperationsComponent
     [name: string]: boolean;
   };
   @Input()
-  sharedLibrariesByName: {
+  sharedLibrariesByNameAndVersion: {
     [name: string]: boolean;
-  };
-  @Input()
-  sharedLibrariesByVersion: {
-    [version: string]: boolean;
   };
   @Input()
   serviceAssembliesByName: {
     [name: string]: boolean;
   };
 
+  overrideSlDialog: MatDialogRef<any>;
+  @ViewChild('overrideSlTemplate') overrideSlModal: TemplateRef<any>;
+  @ViewChild('slOverrideComp') slOverrideComp: SharedLibrariesOverrideComponent;
+
   @ViewChild('deployComponent') deployComponent: UploadComponent;
   @ViewChild('deployServiceAssembly') deployServiceAssembly: UploadComponent;
   @ViewChild('deploySharedLibrary') deploySharedLibrary: UploadComponent;
 
   updateComponentDeployInfoFormGroup: FormGroup;
-  updateSharedLibraryDeployInfoFormGroup: FormGroup;
   updateServiceAssemblyDeployInfoFormGroup: FormGroup;
+  updateSharedLibraryDeployInfoFormGroup: FormGroup;
 
+  slErrorStateMatcher: ErrorStateMatcher = {
+    isErrorState: (
+      control: FormControl,
+      form: FormGroupDirective | NgForm
+    ): boolean =>
+      this.updateSharedLibraryDeployInfoFormGroup.hasError(
+        'alreadyInContainer'
+      ),
+  };
+
+  isUploadingComponent: boolean;
   uploadComponentStatus: {
     percentage: number;
   };
@@ -99,12 +122,16 @@ export class PetalsContainerOperationsComponent
   uploadSharedLibraryStatus: {
     percentage: number;
   };
+
   cpNameReadFromZip: string;
   saNameReadFromZip: string;
   slNameReadFromZip: string;
   slVersionReadFromZip: string;
-  slsInfoReadFromZip: { name: string; isInCurrentContainer: boolean }[] = [];
+
+  slsInfoReadFromZip: ISharedLibrarySimplified[] = null;
+  slIsInCurrentContainer: boolean[] = null;
   nbSlsReadFromZipNotInContainer: number;
+  overrideSl: boolean;
 
   constructor(
     private fb: FormBuilder,
@@ -113,7 +140,8 @@ export class PetalsContainerOperationsComponent
     private notifications: NotificationsService,
     private componentsService: ComponentsService,
     private sharedLibrariesService: SharedLibrariesService,
-    private serviceAssembliesService: ServiceAssembliesService
+    private serviceAssembliesService: ServiceAssembliesService,
+    private matDialogService: MatDialog
   ) {}
 
   ngOnDestroy() {
@@ -134,6 +162,7 @@ export class PetalsContainerOperationsComponent
   }
 
   ngOnInit() {
+    this.overrideSl = false;
     this.updateComponentDeployInfoFormGroup = this.fb.group({
       name: [
         '',
@@ -141,17 +170,13 @@ export class PetalsContainerOperationsComponent
       ],
     });
 
-    this.updateSharedLibraryDeployInfoFormGroup = this.fb.group({
-      name: [
-        '',
-        [
-          SharedValidator.isKeyPresentInObject(
-            () => this.sharedLibrariesByName
-          ),
-        ],
-      ],
-      version: '',
-    });
+    this.updateSharedLibraryDeployInfoFormGroup = this.fb.group(
+      {
+        name: [''],
+        version: [''],
+      },
+      { validator: this.slNameAndVersionChecker() }
+    );
 
     this.updateServiceAssemblyDeployInfoFormGroup = this.fb.group({
       name: [
@@ -163,6 +188,24 @@ export class PetalsContainerOperationsComponent
         ],
       ],
     });
+  }
+
+  updateSlsInfoReadFromZip(
+    sharedLibraries: ISharedLibrarySimplified[],
+    override: boolean
+  ) {
+    this.slsInfoReadFromZip = [...sharedLibraries];
+    this.slIsInCurrentContainer = sharedLibraries.map(
+      sl =>
+        !!this.sharedLibrariesByNameAndVersion[JSON.stringify(sl).toLowerCase()]
+    );
+    this.nbSlsReadFromZipNotInContainer = this.slIsInCurrentContainer.filter(
+      is => !is
+    ).length;
+
+    if (override) {
+      this.overrideSl = true;
+    }
   }
 
   onFileSelected(
@@ -180,7 +223,7 @@ export class PetalsContainerOperationsComponent
         // otherwise we would still have a bad nbSlsReadFromZipNotInContainer
         // and and a bad slsInfoReadFromZip IF the reading from zip fails
         this.nbSlsReadFromZipNotInContainer = null;
-        this.slsInfoReadFromZip = [];
+        this.slsInfoReadFromZip = null;
 
         this.componentsService
           .getComponentInformationFromZipFile(file)
@@ -192,18 +235,10 @@ export class PetalsContainerOperationsComponent
                 .get('name')
                 .setValue(componentFromZip.name);
 
-              this.slsInfoReadFromZip = componentFromZip.sharedLibrariesName.map(
-                slName => ({
-                  name: slName,
-                  isInCurrentContainer: !!this.sharedLibrariesByName[
-                    slName.toLowerCase()
-                  ],
-                })
+              this.updateSlsInfoReadFromZip(
+                componentFromZip.sharedLibraries,
+                false
               );
-
-              this.nbSlsReadFromZipNotInContainer = this.slsInfoReadFromZip.filter(
-                sl => !sl.isInCurrentContainer
-              ).length;
             }),
             catchError(err => {
               this.notifications.warn(
@@ -295,14 +330,20 @@ export class PetalsContainerOperationsComponent
 
     if (whatToDeploy === 'component') {
       deployActions = {
-        onProgressUpdate: percentage =>
-          (this.uploadComponentStatus = { percentage }),
-        onComplete: () => this.deployComponent.reset(),
+        onProgressUpdate: percentage => {
+          this.uploadComponentStatus = { percentage };
+          this.isUploadingComponent = true;
+        },
+        onComplete: () => {
+          this.deployComponent.reset();
+          this.isUploadingComponent = false;
+        },
         actionToDispatch: new Containers.DeployComponent({
           correlationId,
           id: this.container.id,
           file,
           name: this.updateComponentDeployInfoFormGroup.get('name').value,
+          sharedLibraries: this.overrideSl ? this.slsInfoReadFromZip : null,
         }),
       };
     } else if (whatToDeploy === 'service-assembly') {
@@ -353,6 +394,41 @@ export class PetalsContainerOperationsComponent
       .subscribe();
 
     this.store$.dispatch(deployActions.actionToDispatch);
+  }
+
+  openOverrideSlDialog() {
+    this.overrideSlDialog = this.matDialogService.open(this.overrideSlModal, {
+      disableClose: true,
+      autoFocus: false,
+    });
+  }
+
+  closeOverrideSlDialog() {
+    this.overrideSlDialog.close();
+  }
+
+  saveOverrideSl(sharedLibraries: ISharedLibrarySimplified[]) {
+    this.updateSlsInfoReadFromZip(sharedLibraries, true);
+    this.overrideSlDialog.close();
+  }
+
+  slNameAndVersionChecker(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } => {
+      const nameAndVersion = {
+        name: control.get('name').value,
+        version: control.get('version').value,
+      };
+      if (
+        this.sharedLibrariesByNameAndVersion[
+          JSON.stringify(nameAndVersion).toLowerCase()
+        ]
+      ) {
+        return {
+          alreadyInContainer: true,
+        };
+      }
+      return null;
+    };
   }
 }
 

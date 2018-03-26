@@ -19,6 +19,7 @@ import { HttpClient, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
+import { ISharedLibrarySimplified } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
 import { streamHttpProgressAndSuccess } from 'app/shared/helpers/shared.helper';
 import { IComponentBackendSSE } from 'app/shared/services/components.service';
@@ -61,7 +62,8 @@ export abstract class ContainersService {
     workspaceId: string,
     containerId: string,
     file: File,
-    name: string
+    name: string,
+    sharedlibraries: ISharedLibrarySimplified[]
   ): {
     progress$: Observable<number>;
     result$: Observable<JsTable<IComponentBackendSSE>>;
@@ -108,12 +110,29 @@ export class ContainersServiceImpl extends ContainersService {
     workspaceId: string,
     containerId: string,
     file: File,
-    name: string
+    name: string,
+    sharedLibraries: ISharedLibrarySimplified[]
   ) {
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
-    if (name) {
-      formData.append('overrides', name);
+
+    if (name || sharedLibraries != null) {
+      let overrides: {
+        name?: string;
+        sharedLibraries?: ISharedLibrarySimplified[];
+      } = {};
+
+      if (name) {
+        overrides = { ...overrides, name };
+      }
+      if (sharedLibraries != null) {
+        overrides = { ...overrides, sharedLibraries };
+      }
+
+      const blob = new Blob([JSON.stringify(overrides)], {
+        type: 'application/json',
+      });
+      formData.append('overrides', blob);
     }
 
     const req = new HttpRequest(

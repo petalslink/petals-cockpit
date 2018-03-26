@@ -17,6 +17,7 @@
 
 import { Action } from '@ngrx/store';
 
+import { ISharedLibrarySimplified } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
 import { JsTable } from 'app/shared/helpers/jstable.helper';
 import { ICorrelationId } from 'app/shared/interfaces/correlation-id.interface';
 import { IComponentBackendSSE } from 'app/shared/services/components.service';
@@ -172,6 +173,7 @@ export namespace Containers {
         id: string;
         file: File;
         name: string;
+        sharedLibraries: ISharedLibrarySimplified[];
       } & ICorrelationId
     ) {}
   }

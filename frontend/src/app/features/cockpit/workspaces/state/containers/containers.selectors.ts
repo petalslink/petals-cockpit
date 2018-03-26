@@ -92,11 +92,9 @@ export const componentsOfCurrentContainerByName = createSelector(
 );
 
 /**
- * useful to know whether a shared library already has a given container
- * without having to loop on the whole sharedLibrary.containers array,
- * only by trying to access it's key
+ * useful to check if a shared library (name and version) is in current container
  */
-export const sharedLibrariesOfCurrentContainerByName = createSelector(
+export const sharedLibrariesOfCurrentContainerByNameAndVersion = createSelector(
   getCurrentContainer,
   getSharedLibrariesById,
   (currentContainer, sharedLibrariesById) =>
@@ -105,12 +103,15 @@ export const sharedLibrariesOfCurrentContainerByName = createSelector(
       : currentContainer.sharedLibraries.reduce(
           (acc, sharedLibraryId) => {
             const sharedLibrary = sharedLibrariesById[sharedLibraryId];
-            const sharedLibraryName = sharedLibrary.name.trim().toLowerCase();
+            const sharedLibraryNameAndVersion = JSON.stringify({
+              name: sharedLibrary.name.trim().toLowerCase(),
+              version: sharedLibrary.version.trim().toLowerCase(),
+            });
 
-            acc[sharedLibraryName] = true;
+            acc[sharedLibraryNameAndVersion] = true;
             return acc;
           },
-          <{ [name: string]: boolean }>{}
+          <{ [nameAndVersion: string]: boolean }>{}
         )
 );
 
