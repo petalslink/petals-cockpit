@@ -20,6 +20,7 @@ import './import-bus.commands';
 import './login.commands';
 import './petals-cockpit.commands';
 import './petals.commands';
+import './service.commands';
 import './services.commands';
 import './workspace.commands';
 import './workspaces.commands';
