@@ -258,7 +258,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
           </span>
         </div>
         <mat-dialog-content>
-          <p fxLayout="column">
+          <p fxLayout="column" class="mat-body-1">
             <span>Everything in the workspace will be deleted! <b>Please, be certain</b>.</span>
             <span class="margin-top-x1">Are you sure you want to delete <b>{{ data.name }}</b>?</span>
           </p>
@@ -271,9 +271,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       </div>
     </div>
   `,
-  styles: [
-    'mat-dialog-content { height: 100%; } .central-content { padding: 24px; }',
-  ],
+  styles: ['.central-content { padding: 24px; }'],
 })
 export class WorkspaceDeleteDialogComponent {
   constructor(

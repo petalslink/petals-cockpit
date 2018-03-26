@@ -84,7 +84,7 @@ export class PetalsBusViewComponent implements OnInit {
           </span>
         </div>
         <mat-dialog-content>
-          <p fxLayout="column">
+          <p fxLayout="column" class="mat-body-1">
             <span class="warning-message">Are you sure you want to delete <b>{{ data.bus.name }}</b>?</span>
           </p>
         </mat-dialog-content>
@@ -96,9 +96,7 @@ export class PetalsBusViewComponent implements OnInit {
       </div>
     </div>
   `,
-  styles: [
-    'mat-dialog-content { height: 100%; } .central-content { padding: 24px; }',
-  ],
+  styles: ['.central-content { padding: 24px; }'],
 })
 export class BusDeleteDialogComponent {
   constructor(

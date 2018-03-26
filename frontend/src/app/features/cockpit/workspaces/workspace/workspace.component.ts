@@ -154,7 +154,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
         </div>
         <mat-dialog-content>
           <div fxLayout="column" fxFill>
-              <p>This workspace was deleted, <b>click on OK</b> to go back to the workspaces list.</p>
+              <p class="mat-body-1">This workspace was deleted, <b>click on OK</b> to go back to the workspaces list.</p>
           </div>
         </mat-dialog-content>
         <mat-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
@@ -163,8 +163,6 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
       </div>
     </div>
   `,
-  styles: [
-    'mat-dialog-content { height: 100%; } .central-content { padding: 24px; }',
-  ],
+  styles: ['.central-content { padding: 24px; }'],
 })
 export class DeletedWorkspaceDialogComponent {}
