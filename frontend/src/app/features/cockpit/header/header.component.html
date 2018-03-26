@@ -15,7 +15,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxFlex fxLayout="column">
   <mat-toolbar role="header" color="primary" class="header-toolbar mat-elevation-z6">
-    <button mat-button class="toolbar-logo" [routerLink]="['/workspaces']">
+    <button
+      mat-button
+      class="toolbar-logo"
+      [routerLink]="['/workspaces']"
+      (click)="clickPetalsLogo()"
+      [disabled]="logoDisabled$ | async"
+    >
       <img class="logo-toolbar" [src]="logo()">
     </button>
 

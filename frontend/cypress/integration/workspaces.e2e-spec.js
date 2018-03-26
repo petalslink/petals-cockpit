@@ -15,11 +15,11 @@ import {
 describe(`Workspaces`, () => {
   beforeEach(() => {
     cy.visit(`/login`);
+
+    cy.login('admin', 'admin');
   });
 
   it(`should create a new workspace and then delete it`, () => {
-    cy.login('admin', 'admin');
-
     cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
 
     cy.expectWorkspacesListToBe([`Workspace 0`, `Workspace 1`]);
@@ -74,5 +74,19 @@ describe(`Workspaces`, () => {
     cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav).should('not.be.visible');
 
     cy.expectWorkspacesListToBe([`Workspace 0`, `Workspace 1`]);
+  });
+
+  it('should not be able to click Petals logo if workspace selection dialog is open', () => {
+    cy.get(PETALS_COCKPIT_DOM.buttons.logo).should('be.enabled');
+
+    cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
+
+    cy.get(PETALS_COCKPIT_DOM.buttons.logo).should('be.disabled');
+
+    const workspacesListNames = cy.get(WORKSPACES_LIST_DOM.texts.workspaceName);
+
+    workspacesListNames.contains(`Workspace 1`).click();
+
+    cy.get(PETALS_COCKPIT_DOM.buttons.logo).should('be.enabled');
   });
 });
