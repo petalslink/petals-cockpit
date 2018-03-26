@@ -17,6 +17,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div class="central-content">
     <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
 
+      <mat-card fxFlex class="sl-infos" [ngClass.gt-md]="'card-auto-size'">
+        <mat-card-title fxLayout="row">
+          <span fxFlex class="text-upper">About <b>{{ sharedLibrary.name }}</b></span>
+          <mat-icon color="primary">info_outline</mat-icon>
+        </mat-card-title>
+
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <mat-card-header fxFlex>
+            <mat-card-title>Version</mat-card-title>
+            <mat-card-subtitle class="sl-version" fxLayoutAlign="start center">
+              {{ sharedLibrary.version }}
+            </mat-card-subtitle>
+          </mat-card-header>
+        </div>
+      </mat-card>
+
       <mat-card fxFlex class="components">
         <mat-card-title fxLayout="row">
           <span fxFlex class="text-upper">Components</span>
