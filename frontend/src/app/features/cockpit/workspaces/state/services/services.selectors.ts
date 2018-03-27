@@ -20,7 +20,10 @@ import { createSelector } from '@ngrx/store';
 import { IEndpointRow } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
 import { getEndpointsById } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.selectors';
 import { IInterfaceRow } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
-import { getInterfacesById } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
+import {
+  getInterfacesById,
+  IInterfaceRowWithQName,
+} from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
 import {
   IService,
   IServiceRow,
@@ -33,11 +36,16 @@ import {
 } from 'app/shared/helpers/services-list.helper';
 import { IStore } from 'app/shared/state/store.interface';
 
-export interface IServiceWithInterfacesAndEndpoints extends IService {
-  _interfaces: IInterfaceRow[];
-  _endpoints: IEndpointRow[];
-  _namespace: string;
-  _localpart: string;
+export interface IServiceRowWithQName extends IServiceRow {
+  namespace: string;
+  localpart: string;
+}
+
+export interface IServiceOverview extends IService {
+  interfaces: IInterfaceRowWithQName[];
+  endpoints: IEndpointRow[];
+  namespace: string;
+  localpart: string;
 }
 
 export function getServicesById(state: IStore) {
@@ -82,29 +90,29 @@ export const getCurrentServiceInterfacesEndpoints = createSelector(
     serviceEndpoints,
     interfacesByIds,
     endpointsByIds
-  ): IServiceWithInterfacesAndEndpoints => {
+  ): IServiceOverview => {
     if (service) {
-      const intmap = new Map<string, { nsp: string; local: string }>();
+      const intMap = new Map<string, { nsp: string; local: string }>();
 
       for (const id of serviceInterfaces) {
         const qName = findNamespaceLocalpart(interfacesByIds[id].name);
-        intmap.set(id, { nsp: qName.namespace, local: qName.localpart });
+        intMap.set(id, { nsp: qName.namespace, local: qName.localpart });
       }
 
       const serviceWithNspLocalpart = findNamespaceLocalpart(service.name);
       return {
         ...service,
-        _namespace: serviceWithNspLocalpart.namespace,
-        _localpart: serviceWithNspLocalpart.localpart,
-        _interfaces: serviceInterfaces.map(id => {
+        namespace: serviceWithNspLocalpart.namespace,
+        localpart: serviceWithNspLocalpart.localpart,
+        interfaces: serviceInterfaces.map(id => {
           const itf = interfacesByIds[id] as IInterfaceRow;
           return {
             ...itf,
-            _namespace: intmap.get(id).nsp,
-            _localpart: intmap.get(id).local,
+            namespace: intMap.get(id).nsp,
+            localpart: intMap.get(id).local,
           };
         }),
-        _endpoints: serviceEndpoints.map(id => {
+        endpoints: serviceEndpoints.map(id => {
           return endpointsByIds[id] as IEndpointRow;
         }),
       };

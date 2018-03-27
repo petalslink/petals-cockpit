@@ -19,7 +19,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import * as helper from 'app/shared/helpers/mock.helper';
-import { interfacesService } from 'mocks/interfaces-mock';
 import { InterfacesServiceImpl } from './interfaces.service';
 
 @Injectable()
@@ -28,9 +27,69 @@ export class InterfacesServiceMock extends InterfacesServiceImpl {
     super(http);
   }
 
-  getDetailsInterface(interfaceId: string) {
-    const detailsInterface = interfacesService.get(interfaceId).getDetails();
-
-    return helper.responseBody(detailsInterface.interface);
+  getDetailsInterface(id: string) {
+    switch (id) {
+      case 'idInterface0': {
+        return helper.responseBody({
+          services: ['idService0', 'idService4'],
+          endpoints: ['idEndpoint0', 'idEndpoint4'],
+        });
+      }
+      case 'idInterface1': {
+        return helper.responseBody({
+          services: ['idService1'],
+          endpoints: ['idEndpoint1', 'idEndpoint2'],
+        });
+      }
+      case 'idInterface2': {
+        return helper.responseBody({
+          services: ['idService2', 'idService3'],
+          endpoints: ['idEndpoint2'],
+        });
+      }
+      case 'idInterface3': {
+        return helper.responseBody({
+          services: ['idService3'],
+          endpoints: ['idEndpoint3'],
+        });
+      }
+      case 'idInterface4': {
+        return helper.responseBody({
+          services: [
+            'idService0',
+            'idService1',
+            'idService2',
+            'idService3',
+            'idService4',
+          ],
+          endpoints: [
+            'idEndpoint0',
+            'idEndpoint1',
+            'idEndpoint2',
+            'idEndpoint3',
+            'idEndpoint4',
+          ],
+        });
+      }
+      case 'idInterface12': {
+        return helper.responseBody({
+          services: ['idService12'],
+          endpoints: ['idEndpoint12'],
+        });
+      }
+      case 'idInterface13': {
+        return helper.responseBody({
+          services: ['idService13'],
+          endpoints: ['idEndpoint13'],
+        });
+      }
+      // TODO: Need investigation to mock the requested operation
+      case 'idInterfaceForbidden': {
+        return helper.errorBackend('Fordidden requested operation', 403);
+      }
+      default: {
+        return helper.errorBackend('Interface not found', 404);
+      }
+    }
   }
 }

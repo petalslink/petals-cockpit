@@ -32,12 +32,14 @@ export interface IInterfaceBackendDetailsCommon {}
 export interface IInterfaceBackendSSE extends IInterfaceBackendSSECommon {}
 
 export interface IInterfaceBackendDetails
-  extends IInterfaceBackendSSE,
-    IInterfaceBackendDetailsCommon {}
+  extends IInterfaceBackendDetailsCommon {
+  services: string[];
+  endpoints: string[];
+}
 
 export abstract class InterfacesService {
   abstract getDetailsInterface(
-    interfaceId: string
+    id: string
   ): Observable<IInterfaceBackendDetails>;
 }
 
@@ -47,9 +49,9 @@ export class InterfacesServiceImpl extends InterfacesService {
     super();
   }
 
-  getDetailsInterface(interfaceId: string) {
+  getDetailsInterface(id: string) {
     return this.http.get<IInterfaceBackendDetails>(
-      `${environment.urlBackend}/interfaces/${interfaceId}`
+      `${environment.urlBackend}/interfaces/${id}`
     );
   }
 }

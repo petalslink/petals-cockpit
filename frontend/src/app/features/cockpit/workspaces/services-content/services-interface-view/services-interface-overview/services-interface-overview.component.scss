@@ -15,6 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-mat-icon {
-  padding-right: 10px;
+.img-card-service {
+  background-image: url(../../../../../../../assets/img/service.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.img-card-interface {
+  background-image: url(../../../../../../../assets/img/interface.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.img-card-endpoint {
+  background-image: url(../../../../../../../assets/img/endpoint.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.item-service-content,
+.item-interface-content,
+.item-endpoint-content {
+  height: 100%;
 }

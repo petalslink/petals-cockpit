@@ -23,7 +23,7 @@ import {
 } from '@angular/core';
 
 import { Store } from '@ngrx/store';
-import { IServiceWithInterfacesAndEndpoints } from 'app/features/cockpit/workspaces/state/services/services.selectors';
+import { IServiceOverview } from 'app/features/cockpit/workspaces/state/services/services.selectors';
 import { IStore } from 'app/shared/state/store.interface';
 import { Observable } from 'rxjs/Observable';
 
@@ -34,7 +34,7 @@ import { Observable } from 'rxjs/Observable';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServicesServiceOverviewComponent implements OnInit {
-  @Input() service: IServiceWithInterfacesAndEndpoints;
+  @Input() service: IServiceOverview;
   @Input() workspaceId: string;
 
   public workspaceId$: Observable<string>;

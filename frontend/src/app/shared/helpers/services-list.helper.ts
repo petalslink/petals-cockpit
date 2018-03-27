@@ -19,16 +19,13 @@
 export function findNamespaceLocalpart(
   str: string
 ): { namespace: string; localpart: string } {
-  const reg = /{(.+)}(.+)/;
+  const res = str.match(/{(.+)}(.+)/);
 
-  if (!reg.test(str)) {
+  if (res) {
+    return { namespace: res[1], localpart: res[2] };
+  } else {
     return { namespace: '', localpart: '' };
   }
-
-  const namespace = str.match(reg)[1];
-  const localpart = str.match(reg)[2];
-
-  return { namespace, localpart };
 }
 
 export function groupByNamespace(

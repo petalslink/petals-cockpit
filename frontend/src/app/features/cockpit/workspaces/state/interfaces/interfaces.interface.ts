@@ -17,8 +17,6 @@
 
 import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
 import {
-  IInterfaceBackendDetails,
-  IInterfaceBackendDetailsCommon,
   IInterfaceBackendSSE,
   IInterfaceBackendSSECommon,
 } from 'app/shared/services/interfaces.service';
@@ -28,22 +26,18 @@ export interface IInterfaceUI {
   isFetchingDetails: boolean;
 }
 
-export interface IInterfaceRow
-  extends IInterfaceUI,
-    IInterfaceBackendSSE,
-    IInterfaceBackendDetails {}
+export interface IInterfaceRow extends IInterfaceUI, IInterfaceBackendSSE {}
 
 export interface IInterfaceRowWithoutDetails
   extends IInterfaceUI,
     IInterfaceBackendSSE {}
 
-export interface IInterface
-  extends IInterfaceUI,
-    IInterfaceBackendSSECommon,
-    IInterfaceBackendDetailsCommon {}
+export interface IInterface extends IInterfaceUI, IInterfaceBackendSSECommon {}
 
 interface IInterfacesCommon {
   selectedInterfaceId: string;
+  selectedInterfaceServices: string[];
+  selectedInterfaceEndpoints: string[];
 }
 
 export interface IInterfacesTable
@@ -63,5 +57,7 @@ export function interfacesTableFactory(): IInterfacesTable {
   return {
     ...emptyJsTable<IInterfaceRow>(),
     selectedInterfaceId: '',
+    selectedInterfaceServices: [],
+    selectedInterfaceEndpoints: [],
   };
 }

@@ -114,10 +114,14 @@ export namespace InterfacesReducer {
     table: IInterfacesTable,
     payload: { id: string; data: IInterfaceBackendDetails }
   ) {
-    return updateById(table, payload.id, {
-      ...payload.data,
-      isFetchingDetails: false,
-    });
+    return {
+      ...updateById(table, payload.id, {
+        isFetchingDetails: false,
+      }),
+      selectedInterfaceId: payload.id,
+      selectedInterfaceServices: payload.data.services,
+      selectedInterfaceEndpoints: payload.data.endpoints,
+    };
   }
 
   function fetchDetailsError(table: IInterfacesTable, payload: { id: string }) {
