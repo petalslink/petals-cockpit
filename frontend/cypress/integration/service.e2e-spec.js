@@ -1,4 +1,5 @@
 import { SERVICE_OVERVIEW_DOM } from '../support/service.dom';
+import { INTERFACE_OVERVIEW_DOM } from '../support/interface.dom';
 import { WORKSPACE_DOM } from '../support/workspace.dom';
 
 describe(`Service`, () => {
@@ -16,7 +17,7 @@ describe(`Service`, () => {
 
     cy.clickElementInTree(`exp-pnl-services-tree`, `Localpart0`);
 
-    // 1) expect to have 1 Service namespace, 1 Interface, 2 Endpoints
+    // 1) expect to have 1 Service namespace, 2 Interface, 2 Endpoints
     cy.expectServiceNamespaceToBe(
       `http://namespace-example.fr/service/technique/version/1.0`
     );
@@ -108,6 +109,11 @@ describe(`Service`, () => {
     cy.expectLocationToBe(
       `/workspaces/idWks0/services/interfaces/idInterface0`
     );
+
+    cy
+      .get(INTERFACE_OVERVIEW_DOM.texts.aboutInterface)
+      .contains(`http://namespace-example.fr/interface/technique/version/1.0`)
+      .should('be.visible');
   });
 
   it(`should go to details of Endpoint from the view of a selected Service`, () => {
@@ -147,7 +153,7 @@ describe(`Service`, () => {
     cy.expectLocationToBe(`/workspaces/idWks0/not-found`);
   });
 
-  it(`should have icons component for each Endpoint from the view of a selected Service`, () => {
+  it(`should display a component icon for each Endpoint from the view of a selected Service`, () => {
     cy.login('admin', 'admin');
 
     cy
