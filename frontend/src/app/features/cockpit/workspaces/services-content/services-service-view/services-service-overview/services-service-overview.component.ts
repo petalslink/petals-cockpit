@@ -15,38 +15,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
+} from '@angular/core';
+
 import { Store } from '@ngrx/store';
+import { IServiceWithInterfacesAndEndpoints } from 'app/features/cockpit/workspaces/state/services/services.selectors';
+import { IStore } from 'app/shared/state/store.interface';
 import { Observable } from 'rxjs/Observable';
 
-import {
-  getCurrentServiceInterfacesEndpoints,
-  IServiceWithInterfacesAndEndpoints,
-} from 'app/features/cockpit/workspaces/state/services/services.selectors';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
-
 @Component({
-  selector: 'app-services-service-view',
-  templateUrl: './services-service-view.component.html',
-  styleUrls: ['./services-service-view.component.scss'],
+  selector: 'app-services-service-overview',
+  templateUrl: './services-service-overview.component.html',
+  styleUrls: ['./services-service-overview.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ServicesServiceViewComponent implements OnInit {
-  service$: Observable<IServiceWithInterfacesAndEndpoints>;
-  workspaceId$: Observable<string>;
+export class ServicesServiceOverviewComponent implements OnInit {
+  @Input() service: IServiceWithInterfacesAndEndpoints;
+  @Input() workspaceId: string;
+
+  public workspaceId$: Observable<string>;
 
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.service$ = this.store$.select(getCurrentServiceInterfacesEndpoints);
-
-    this.store$.dispatch(
-      new Ui.SetTitles({
-        titleMainPart1: 'Services',
-        titleMainPart2: 'Service',
-      })
-    );
-
     this.workspaceId$ = this.store$.select(
       state => state.workspaces.selectedWorkspaceId
     );

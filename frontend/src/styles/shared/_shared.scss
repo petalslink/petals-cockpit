@@ -135,6 +135,10 @@ div > .mat-dialog-container {
   font-weight: bold;
 }
 
+.break {
+  word-break: break-all;
+}
+
 // custom scrollbar only for chrome
 ::-webkit-scrollbar {
   width: 5px;
@@ -254,6 +258,20 @@ app-header .toolbar-page-header,
   background-color: mat-color($theme-accent-x5);
 }
 
+app-services-service-overview > .mat-nav-list > .mat-list-item > .item-name,
+app-services-service-overview
+  > .mat-nav-list
+  > .mat-list-item
+  > .item-localpart,
+app-services-service-overview
+  > .mat-nav-list
+  > .mat-list-item
+  > .item-namespace,
+app-services-service-overview > .mat-list > .mat-list-item > .item-localpart,
+app-services-service-overview > .mat-list > .mat-list-item > .item-namespace {
+  word-break: break-all;
+}
+
 // all items elements in petals and services menu view
 app-buses-in-progress
   > .nav-list-imports-in-progress
@@ -298,7 +316,7 @@ app-services-menu-view > .services-menu-view > .pnl-services-trees {
   .mat-accordion
     > mat-expansion-panel
     > mat-expansion-panel-header.mat-expanded {
-    background-color: mat-color($theme-primary-x);
+    background-color: rgba(0, 0, 0, 0.1);
   }
   .mat-accordion
     > mat-expansion-panel
@@ -318,6 +336,9 @@ app-material-tree > .nav-list-tree > .item-list {
       background-color: mat-color($theme-primary-x);
       @extend .color-primary-bold;
       margin: 0;
+      border-left-color: mat-color($theme-primary-x6);
+      border-left-width: 2px;
+      border-left-style: solid;
     }
   }
   // customize namespace in tree services

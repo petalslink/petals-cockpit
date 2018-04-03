@@ -31,14 +31,13 @@ export interface IServiceBackendDetailsCommon {}
 
 export interface IServiceBackendSSE extends IServiceBackendSSECommon {}
 
-export interface IServiceBackendDetails
-  extends IServiceBackendSSE,
-    IServiceBackendDetailsCommon {}
+export interface IServiceBackendDetails extends IServiceBackendDetailsCommon {
+  interfaces: string[];
+  endpoints: string[];
+}
 
 export abstract class ServicesService {
-  abstract getDetailsService(
-    serviceId: string
-  ): Observable<IServiceBackendDetails>;
+  abstract getDetailsService(id: string): Observable<IServiceBackendDetails>;
 }
 
 @Injectable()
@@ -47,9 +46,9 @@ export class ServicesServiceImpl extends ServicesService {
     super();
   }
 
-  getDetailsService(serviceId: string) {
+  getDetailsService(id: string) {
     return this.http.get<IServiceBackendDetails>(
-      `${environment.urlBackend}/services/${serviceId}`
+      `${environment.urlBackend}/services/${id}`
     );
   }
 }

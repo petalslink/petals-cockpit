@@ -57,7 +57,11 @@ export namespace Services {
   export const SetCurrentType = '[Services] Set Current';
   export class SetCurrent implements Action {
     readonly type = SetCurrentType;
-    constructor(public readonly payload: { id: string }) {}
+    constructor(
+      public readonly payload: {
+        id: string;
+      }
+    ) {}
   }
 
   export const FetchDetailsType = '[Services] Fetch details';

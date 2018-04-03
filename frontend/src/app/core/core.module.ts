@@ -26,6 +26,8 @@ import { BusesInProgressEffects } from 'app/features/cockpit/workspaces/state/bu
 import { BusesEffects } from 'app/features/cockpit/workspaces/state/buses/buses.effects';
 import { ComponentsEffects } from 'app/features/cockpit/workspaces/state/components/components.effects';
 import { ContainersEffects } from 'app/features/cockpit/workspaces/state/containers/containers.effects';
+import { EndpointsEffects } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.effects';
+import { InterfacesEffects } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.effects';
 import { ServiceAssembliesEffects } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.effects';
 import { ServiceUnitsEffects } from 'app/features/cockpit/workspaces/state/service-units/service-units.effects';
 import { ServicesEffects } from 'app/features/cockpit/workspaces/state/services/services.effects';
@@ -65,6 +67,8 @@ export const providers: Provider[] = [
       ServiceAssembliesEffects,
       ServiceUnitsEffects,
       ServicesEffects,
+      InterfacesEffects,
+      EndpointsEffects,
       SharedLibrariesEffects,
     ]),
     // it's not clear if the module is enabled when the extension is not present...

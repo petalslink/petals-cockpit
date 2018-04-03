@@ -27,7 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </ng-template>
     </div>
 
-    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'" fxFlex>{{ resourceDeletable.value.name }}</h1>
+    <h1 *ngIf="!resourceDeletable.value._localpart; else titleTpl" class="title" [ngClass.lt-md]="'margin-left-x1'" fxFlex>{{ resourceDeletable.value.name }}</h1>
+    <ng-template #titleTpl>
+      <h1 class="title" [ngClass.lt-md]="'margin-left-x1'" fxFlex>{{ resourceDeletable.value._localpart }}</h1>
+    </ng-template>
 
     <ng-content select="[appWorkspaceElementHeaderExtra]"></ng-content>
   </mat-toolbar>
