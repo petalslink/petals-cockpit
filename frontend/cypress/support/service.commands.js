@@ -1,4 +1,3 @@
-import { SERVICES_TREE_DOM } from './services.dom';
 import { SERVICE_OVERVIEW_DOM } from './service.dom';
 
 Cypress.Commands.add('expectServiceNamespaceToBe', serviceNamespace => {

@@ -17,6 +17,12 @@
 
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
+
+import {
+  getCurrentInterfaceServicesEndpoints,
+  IInterfaceOverview,
+} from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
 import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 
@@ -26,14 +32,23 @@ import { Ui } from 'app/shared/state/ui.actions';
   styleUrls: ['./services-interface-view.component.scss'],
 })
 export class ServicesInterfaceViewComponent implements OnInit {
+  interface$: Observable<IInterfaceOverview>;
+  workspaceId$: Observable<string>;
+
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
+    this.interface$ = this.store$.select(getCurrentInterfaceServicesEndpoints);
+
     this.store$.dispatch(
       new Ui.SetTitles({
         titleMainPart1: 'Services',
         titleMainPart2: 'Interface',
       })
+    );
+
+    this.workspaceId$ = this.store$.select(
+      state => state.workspaces.selectedWorkspaceId
     );
   }
 }

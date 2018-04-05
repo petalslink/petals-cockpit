@@ -19,10 +19,14 @@ import {
   IInterfaceBackendDetails,
   IInterfaceBackendSSE,
 } from 'app/shared/services/interfaces.service';
+import { Endpoint } from 'mocks/endpoints-mock';
+import { Service } from 'mocks/services-mock';
 
 export class Interface {
   public readonly id: string;
   public readonly name: string;
+  private readonly services = new Map<string, Service>();
+  private readonly endpoints = new Map<string, Endpoint>();
 
   constructor(public cpt: number, private components: string[], name?: string) {
     const i = cpt;
@@ -42,13 +46,10 @@ export class Interface {
     };
   }
 
-  getDetails(): { interface: IInterfaceBackendDetails } {
+  getDetails(): IInterfaceBackendDetails {
     return {
-      interface: {
-        id: this.id,
-        name: this.name,
-        components: Array.from(this.components),
-      },
+      services: Array.from(this.services.keys()),
+      endpoints: Array.from(this.endpoints.keys()),
     };
   }
 }

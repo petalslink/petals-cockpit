@@ -18,11 +18,16 @@
 import { createSelector } from '@ngrx/store';
 
 import { IEndpointRow } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
+import { getEndpointsById } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.selectors';
 import {
   IInterface,
   IInterfaceRow,
 } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
 import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
+import {
+  getServicesById,
+  IServiceRowWithQName,
+} from 'app/features/cockpit/workspaces/state/services/services.selectors';
 import { getSelectedWorkspaceId } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
 import {
@@ -31,9 +36,16 @@ import {
 } from 'app/shared/helpers/services-list.helper';
 import { IStore } from 'app/shared/state/store.interface';
 
-export interface IInterfaceWithServicesAndEndpoints extends IInterface {
-  services: IServiceRow[];
+export interface IInterfaceRowWithQName extends IInterfaceRow {
+  namespace: string;
+  localpart: string;
+}
+
+export interface IInterfaceOverview extends IInterface {
+  services: IServiceRowWithQName[];
   endpoints: IEndpointRow[];
+  namespace: string;
+  localpart: string;
 }
 
 export function getInterfacesById(state: IStore) {
@@ -44,10 +56,18 @@ export function getInterfacesAllIds(state: IStore) {
   return state.interfaces.allIds;
 }
 
+export function getInterfaceServices(state: IStore) {
+  return state.interfaces.selectedInterfaceServices;
+}
+
+export function getInterfaceEndpoints(state: IStore) {
+  return state.interfaces.selectedInterfaceEndpoints;
+}
+
 export const getSelectedInterface = createSelector(
   (state: IStore) => state.interfaces.selectedInterfaceId,
   getInterfacesById,
-  (id, si): IInterfaceRow => si[id]
+  (id, interfaces): IInterfaceRow => interfaces[id]
 );
 
 export const getAllInterfaces = createSelector(
@@ -55,6 +75,50 @@ export const getAllInterfaces = createSelector(
   getInterfacesById,
   (ids, byId) => {
     return ids.map(id => byId[id]);
+  }
+);
+
+export const getCurrentInterfaceServicesEndpoints = createSelector(
+  getSelectedInterface,
+  getInterfaceServices,
+  getInterfaceEndpoints,
+  getServicesById,
+  getEndpointsById,
+  (
+    _interface,
+    interfaceServices,
+    interfaceEndpoints,
+    servicesByIds,
+    endpointsByIds
+  ): IInterfaceOverview => {
+    if (_interface) {
+      const serviceMap = new Map<string, { nsp: string; local: string }>();
+
+      for (const id of interfaceServices) {
+        const qName = findNamespaceLocalpart(servicesByIds[id].name);
+        serviceMap.set(id, { nsp: qName.namespace, local: qName.localpart });
+      }
+      const interfaceWithNspLocalpart = findNamespaceLocalpart(_interface.name);
+
+      return {
+        ..._interface,
+        namespace: interfaceWithNspLocalpart.namespace,
+        localpart: interfaceWithNspLocalpart.localpart,
+        services: interfaceServices.map(id => {
+          const svc = servicesByIds[id] as IServiceRow;
+          return {
+            ...svc,
+            namespace: serviceMap.get(id).nsp,
+            localpart: serviceMap.get(id).local,
+          };
+        }),
+        endpoints: interfaceEndpoints.map(id => {
+          return endpointsByIds[id] as IEndpointRow;
+        }),
+      };
+    } else {
+      return undefined;
+    }
   }
 );
 

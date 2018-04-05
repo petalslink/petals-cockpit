@@ -21,6 +21,7 @@ import './login.commands';
 import './petals-cockpit.commands';
 import './petals.commands';
 import './service.commands';
+import './interface.commands';
 import './services.commands';
 import './workspace.commands';
 import './workspaces.commands';

@@ -16,15 +16,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div fxFill fxLayout="column" class="content content-max-width">
   <div fxLayout="column" class="central-content">
     
-    <mat-card fxFlex class="card-service-details">
-      <mat-list class="about-service">
+    <mat-card fxFlex class="card-interface-details">
+      <mat-list class="about-interface">
         
         <div fxLayout="row" fxLayoutAlign="start center" class="text-upper">
-          <span matCardAvatar class="img-card-service"></span>
+          <span matCardAvatar class="img-card-interface"></span>
           <span matLine class="text-upper margin-left-x1"><b>About</b></span>
         </div>
 
-        <mat-list-item class="item-service-content">
+        <mat-list-item class="item-interface-content">
           <p fxLayout="row" fxLayoutAlign="start center">
             <mat-icon 
               color="primary" 
@@ -32,43 +32,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               matTooltip="Namespace" 
               matTooltipPosition="above"
             ></mat-icon>
-            <span fxFlex class="margin-left-x1 item-namespace break">{{ service.namespace }}</span>
+            <span fxFlex class="margin-left-x1 item-namespace break">{{ interface.namespace }}</span>
           </p>
         </mat-list-item>
 
       </mat-list>
 
-      <mat-nav-list class="nav-list-service-interfaces">
+      <mat-nav-list class="nav-list-interface-services">
         
         <div fxLayout="row" fxLayoutAlign="start center" class="text-upper">
-          <span matCardAvatar class="img-card-interface"></span>
-          <span matLine class="text-upper margin-left-x1"><b>Interfaces</b></span>
+          <span matCardAvatar class="img-card-service"></span>
+          <span matLine class="text-upper margin-left-x1"><b>Services</b></span>
         </div>
 
-        <ng-container *ngFor="let interface of service.interfaces; last as isLast;">
-          <mat-list-item class="item-interface-content">
+        <ng-container *ngFor="let service of interface.services; last as isLast;">
+          <mat-list-item class="item-service-content">
             <a 
               color="primary"
-              [routerLink]="['/workspaces', workspaceId, 'services', 'interfaces', interface.id]"
+              [routerLink]="['/workspaces', workspaceId, 'services', 'services', service.id]"
             >
               <p fxLayout="row" fxLayoutAlign="start center">
-                <span class="item-localpart break">{{ interface.localpart }}</span>
-                <mat-icon 
-                  color="primary" 
-                  svgIcon="gotoDetails" 
-                  class="margin-left-x1" 
-                  matTooltip="Go to interface" 
-                  matTooltipPosition="after"
-                ></mat-icon>
+                <span class="item-localpart break">{{ service.localpart }}</span>
+                <span class="margin-left-x1" matTooltip="Go to service" matTooltipPosition="after">
+                  <mat-icon color="primary" svgIcon="gotoDetails" fxLayoutAlign="start center"></mat-icon>
+                </span>
               </p>
               <p fxLayout="row" fxLayoutAlign="start center">
                 <mat-icon 
                   color="primary" 
-                  svgIcon="namespace" 
+                  svgIcon="namespace"
                   matTooltip="Namespace" 
                   matTooltipPosition="above"
                 ></mat-icon>
-                <span fxFlex class="margin-left-x1 item-namespace break">{{ interface.namespace }}</span>
+                <span fxFlex class="margin-left-x1 item-namespace break">{{ service.namespace }}</span>
               </p>
             </a>
             
@@ -80,7 +76,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         
       </mat-nav-list>
 
-      <mat-nav-list class="nav-list-service-endpoints">
+      <mat-nav-list class="nav-list-interface-endpoints">
 
         <div fxLayout="row" fxLayoutAlign="start center" class="text-upper">
           <span matCardAvatar class="img-card-endpoint"></span>
@@ -89,7 +85,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </span>
         </div>
 
-        <ng-container *ngFor="let endpoint of service.endpoints; last as isLast;">
+        <ng-container *ngFor="let endpoint of interface.endpoints; last as isLast;">
           <mat-list-item class="item-endpoint-content">
             <a 
               color="primary"
@@ -99,9 +95,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 <mat-icon color="primary" svgIcon="component"></mat-icon>
                 <span class="margin-left-x1 item-name break">{{ endpoint.name }}</span>
                 <mat-icon 
-                  color="primary" 
-                  svgIcon="gotoDetails" 
                   class="margin-left-x1" 
+                  color="primary" 
+                  svgIcon="gotoDetails"
                   matTooltip="Go to endpoint" 
                   matTooltipPosition="above"
                 ></mat-icon>

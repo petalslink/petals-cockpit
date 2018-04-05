@@ -43,7 +43,7 @@ export function getEndpointsAllIds(state: IStore) {
 export const getSelectedEndpoint = createSelector(
   (state: IStore) => state.endpoints.selectedEndpointId,
   getEndpointsById,
-  (id, sep): IEndpointRow => sep[id]
+  (id, endpoint): IEndpointRow => endpoint[id]
 );
 
 export const getAllEndpoints = createSelector(
