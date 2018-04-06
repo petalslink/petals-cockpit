@@ -103,6 +103,7 @@ export namespace EndpointsReducer {
       ...mergeInto(table, payload, endpointRowFactory),
     };
   }
+
   function fetchDetails(table: IEndpointsTable, payload: { id: string }) {
     return updateById(table, payload.id, {
       isFetchingDetails: true,
@@ -113,10 +114,14 @@ export namespace EndpointsReducer {
     table: IEndpointsTable,
     payload: { id: string; data: IEndpointBackendDetails }
   ) {
-    return updateById(table, payload.id, {
-      ...payload.data,
-      isFetchingDetails: false,
-    });
+    return {
+      ...updateById(table, payload.id, {
+        isFetchingDetails: false,
+      }),
+      selectedEndpointId: payload.id,
+      selectedEndpointService: payload.data.service,
+      selectedEndpointInterfaces: payload.data.interfaces,
+    };
   }
 
   function fetchDetailsError(table: IEndpointsTable, payload: { id: string }) {

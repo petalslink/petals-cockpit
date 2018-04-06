@@ -28,6 +28,11 @@ export interface IInterfaceUI {
 
 export interface IInterfaceRow extends IInterfaceUI, IInterfaceBackendSSE {}
 
+export interface IInterfaceRowWithQName extends IInterfaceRow {
+  namespace: string;
+  localpart: string;
+}
+
 export interface IInterfaceRowWithoutDetails
   extends IInterfaceUI,
     IInterfaceBackendSSE {}

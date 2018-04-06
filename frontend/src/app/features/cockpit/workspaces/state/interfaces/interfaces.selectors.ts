@@ -23,11 +23,11 @@ import {
   IInterface,
   IInterfaceRow,
 } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
-import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
 import {
-  getServicesById,
+  IServiceRow,
   IServiceRowWithQName,
-} from 'app/features/cockpit/workspaces/state/services/services.selectors';
+} from 'app/features/cockpit/workspaces/state/services/services.interface';
+import { getServicesById } from 'app/features/cockpit/workspaces/state/services/services.selectors';
 import { getSelectedWorkspaceId } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
 import {
@@ -35,11 +35,6 @@ import {
   groupByNamespace,
 } from 'app/shared/helpers/services-list.helper';
 import { IStore } from 'app/shared/state/store.interface';
-
-export interface IInterfaceRowWithQName extends IInterfaceRow {
-  namespace: string;
-  localpart: string;
-}
 
 export interface IInterfaceOverview extends IInterface {
   services: IServiceRowWithQName[];

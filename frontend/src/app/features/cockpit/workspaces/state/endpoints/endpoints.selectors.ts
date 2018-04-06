@@ -17,19 +17,37 @@
 
 import { createSelector } from '@ngrx/store';
 
+import { getBusesById } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
+import { getContainersById } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 import {
   IEndpoint,
   IEndpointRow,
 } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
-import { IInterfaceRow } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
-import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
+import {
+  IInterfaceRow,
+  IInterfaceRowWithQName,
+} from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
+import { getInterfacesById } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
+import {
+  IServiceRow,
+  IServiceRowWithQName,
+} from 'app/features/cockpit/workspaces/state/services/services.interface';
+import { getServicesById } from 'app/features/cockpit/workspaces/state/services/services.selectors';
 import { getSelectedWorkspaceId } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
+import { findNamespaceLocalpart } from 'app/shared/helpers/services-list.helper';
 import { IStore } from 'app/shared/state/store.interface';
+import { IBusRow } from '../buses/buses.interface';
+import { IComponentRow } from '../components/components.interface';
+import { getComponentsById } from '../components/components.selectors';
+import { IContainerRow } from '../containers/containers.interface';
 
-export interface IEndpointWithServicesAndInterfaces extends IEndpoint {
-  services: IServiceRow[];
-  interfaces: IInterfaceRow[];
+export interface IEndpointOverview extends IEndpoint {
+  service: IServiceRowWithQName;
+  interfaces: IInterfaceRowWithQName[];
+  bus: IBusRow;
+  container: IContainerRow;
+  component: IComponentRow;
 }
 
 export function getEndpointsById(state: IStore) {
@@ -40,10 +58,22 @@ export function getEndpointsAllIds(state: IStore) {
   return state.endpoints.allIds;
 }
 
+export function getEndpointService(state: IStore) {
+  return state.endpoints.selectedEndpointService;
+}
+
+export function getEndpointInterfaces(state: IStore) {
+  return state.endpoints.selectedEndpointInterfaces;
+}
+
+export function getSelectedEndpointId(state: IStore) {
+  return state.endpoints.selectedEndpointId;
+}
+
 export const getSelectedEndpoint = createSelector(
-  (state: IStore) => state.endpoints.selectedEndpointId,
+  getSelectedEndpointId,
   getEndpointsById,
-  (id, endpoint): IEndpointRow => endpoint[id]
+  (id, endpoints): IEndpointRow => endpoints[id]
 );
 
 export const getAllEndpoints = createSelector(
@@ -51,6 +81,71 @@ export const getAllEndpoints = createSelector(
   getEndpointsById,
   (ids, byId) => {
     return ids.map(id => byId[id]);
+  }
+);
+
+export const getCurrentEndpointServiceInterfaces = createSelector(
+  getSelectedEndpoint,
+  getEndpointService,
+  getEndpointInterfaces,
+  getServicesById,
+  getInterfacesById,
+  getComponentsById,
+  getContainersById,
+  getBusesById,
+  (
+    endpoint,
+    endpointService,
+    endpointInterfaces,
+    servicesByIds,
+    interfacesByIds,
+    componentsByIds,
+    containersByIds,
+    busesByIds
+  ): IEndpointOverview => {
+    if (endpoint) {
+      const svc = servicesByIds[endpointService]
+        ? servicesByIds[endpointService]
+        : ({} as IServiceRow);
+      const comp = componentsByIds[endpoint.componentId]
+        ? componentsByIds[endpoint.componentId]
+        : ({} as IComponentRow);
+      const cont = containersByIds[comp.containerId]
+        ? containersByIds[comp.containerId]
+        : ({} as IContainerRow);
+      const bus = busesByIds[cont.busId]
+        ? busesByIds[cont.busId]
+        : ({} as IBusRow);
+      const qNameSvc = findNamespaceLocalpart(svc.name);
+      const intMap = new Map<string, { nsp: string; local: string }>();
+
+      for (const id of endpointInterfaces) {
+        const qName = findNamespaceLocalpart(interfacesByIds[id].name);
+        intMap.set(id, { nsp: qName.namespace, local: qName.localpart });
+      }
+
+      return {
+        ...endpoint,
+        component: comp,
+        container: cont,
+        bus: bus,
+        service: {
+          ...svc,
+          namespace: qNameSvc.namespace,
+          localpart: qNameSvc.localpart,
+        },
+        interfaces: endpointInterfaces.map(id => {
+          const itf = interfacesByIds[id] as IInterfaceRow;
+          return {
+            ...itf,
+            namespace: intMap.get(id).nsp,
+            localpart: intMap.get(id).local,
+          };
+        }),
+      };
+    } else {
+      return undefined;
+    }
   }
 );
 

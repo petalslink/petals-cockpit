@@ -28,6 +28,11 @@ export interface IServiceUI {
 
 export interface IServiceRow extends IServiceUI, IServiceBackendSSE {}
 
+export interface IServiceRowWithQName extends IServiceRow {
+  namespace: string;
+  localpart: string;
+}
+
 export interface IServiceRowWithoutDetails
   extends IServiceUI,
     IServiceBackendSSE {}

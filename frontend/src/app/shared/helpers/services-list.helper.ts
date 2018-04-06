@@ -15,17 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Todo: Replace namespace and localpart by IQName
-export function findNamespaceLocalpart(
-  str: string
-): { namespace: string; localpart: string } {
-  const res = str.match(/{(.+)}(.+)/);
+export interface IQName {
+  namespace: string;
+  localpart: string;
+}
 
-  if (res) {
-    return { namespace: res[1], localpart: res[2] };
-  } else {
-    return { namespace: '', localpart: '' };
+export function findNamespaceLocalpart(str: string): IQName {
+  if (str) {
+    const res = str.match(/{(.+)}(.+)/);
+    if (res) {
+      return { namespace: res[1], localpart: res[2] };
+    }
   }
+  return { namespace: '', localpart: '' };
 }
 
 export function groupByNamespace(

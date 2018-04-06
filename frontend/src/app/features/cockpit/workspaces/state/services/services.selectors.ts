@@ -19,11 +19,11 @@ import { createSelector } from '@ngrx/store';
 
 import { IEndpointRow } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
 import { getEndpointsById } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.selectors';
-import { IInterfaceRow } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
 import {
-  getInterfacesById,
+  IInterfaceRow,
   IInterfaceRowWithQName,
-} from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
+} from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
+import { getInterfacesById } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
 import {
   IService,
   IServiceRow,
@@ -35,11 +35,6 @@ import {
   groupByNamespace,
 } from 'app/shared/helpers/services-list.helper';
 import { IStore } from 'app/shared/state/store.interface';
-
-export interface IServiceRowWithQName extends IServiceRow {
-  namespace: string;
-  localpart: string;
-}
 
 export interface IServiceOverview extends IService {
   interfaces: IInterfaceRowWithQName[];
@@ -64,8 +59,12 @@ export function getServiceEndpoints(state: IStore) {
   return state.services.selectedServiceEndpoints;
 }
 
+export function getSelectedServiceId(state: IStore) {
+  return state.services.selectedServiceId;
+}
+
 export const getSelectedService = createSelector(
-  (state: IStore) => state.services.selectedServiceId,
+  getSelectedServiceId,
   getServicesById,
   (id, services): IServiceRow => services[id]
 );
