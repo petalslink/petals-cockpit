@@ -17,16 +17,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <mat-toolbar color="primary" class="toolbar-page-header" fxLayout="row" fxLayoutAlign="start center">
     <div class="prefix-toolbar-title" fxLayout="row">
       <mat-icon
+        *ngIf="(!resourceDeletable.value.isFetchingDetails && !resourceDeletable.value.isUpdating) || resourceDeletable.isDeleted; else loadingTpl"
         color="accent"
-        *ngIf="(!resourceDeletable.value.isFetchingDetails && !resourceDeletable.value.isUpdating) || resourceDeletable.isDeleted; else loadingTpl">
-        grade
-      </mat-icon>
+        class="margin-right-x1"
+      >grade</mat-icon>
 
       <ng-template #loadingTpl>
         <mat-spinner [diameter]="16" [strokeWidth]="1" color="accent"></mat-spinner>
       </ng-template>
     </div>
-
+    
     <h1 *ngIf="!resourceDeletable.value.localpart; else titleTpl" class="title" [ngClass.lt-md]="'margin-left-x1'" fxFlex>{{ resourceDeletable.value.name }}</h1>
     <ng-template #titleTpl>
       <h1 class="title" [ngClass.lt-md]="'margin-left-x1'" fxFlex>{{ resourceDeletable.value.localpart }}</h1>

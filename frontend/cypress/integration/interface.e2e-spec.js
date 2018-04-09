@@ -2,7 +2,7 @@ import { INTERFACE_OVERVIEW_DOM } from '../support/interface.dom';
 import { SERVICE_OVERVIEW_DOM } from '../support/service.dom';
 import { WORKSPACE_DOM } from '../support/workspace.dom';
 
-describe(`Service`, () => {
+describe(`Interface`, () => {
   beforeEach(() => {
     cy.visit(`/login`);
   });

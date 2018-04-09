@@ -17,12 +17,21 @@
 
 import { NgModule } from '@angular/core';
 
+import { ServicesEndpointOverviewComponent } from 'app/features/cockpit/workspaces/services-content/services-endpoint-view/services-enpoint-overview/services-endpoint-overview.component';
+import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
 import { SharedModule } from 'app/shared/shared.module';
 import { ServicesEndpointViewRoutingModule } from './services-endpoint-view-routing.module';
 import { ServicesEndpointViewComponent } from './services-endpoint-view.component';
 
 @NgModule({
-  imports: [SharedModule, ServicesEndpointViewRoutingModule],
-  declarations: [ServicesEndpointViewComponent],
+  imports: [
+    SharedModule,
+    ServicesEndpointViewRoutingModule,
+    WorkspaceSharedModule,
+  ],
+  declarations: [
+    ServicesEndpointViewComponent,
+    ServicesEndpointOverviewComponent,
+  ],
 })
 export class ServicesEndpointViewModule {}

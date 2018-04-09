@@ -17,8 +17,6 @@
 
 import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
 import {
-  IEndpointBackendDetails,
-  IEndpointBackendDetailsCommon,
   IEndpointBackendSSE,
   IEndpointBackendSSECommon,
 } from 'app/shared/services/endpoints.service';
@@ -28,22 +26,18 @@ export interface IEndpointUI {
   isFetchingDetails: boolean;
 }
 
-export interface IEndpointRow
-  extends IEndpointUI,
-    IEndpointBackendSSE,
-    IEndpointBackendDetails {}
+export interface IEndpointRow extends IEndpointUI, IEndpointBackendSSE {}
 
 export interface IEndpointRowWithoutDetails
   extends IEndpointUI,
     IEndpointBackendSSE {}
 
-export interface IEndpoint
-  extends IEndpointUI,
-    IEndpointBackendSSECommon,
-    IEndpointBackendDetailsCommon {}
+export interface IEndpoint extends IEndpointUI, IEndpointBackendSSECommon {}
 
 interface IEndpointsCommon {
   selectedEndpointId: string;
+  selectedEndpointService: string;
+  selectedEndpointInterfaces: string[];
 }
 
 export interface IEndpointsTable
@@ -63,5 +57,7 @@ export function endpointsTableFactory(): IEndpointsTable {
   return {
     ...emptyJsTable<IEndpointRow>(),
     selectedEndpointId: '',
+    selectedEndpointService: '',
+    selectedEndpointInterfaces: [],
   };
 }

@@ -1,0 +1,147 @@
+<!-- Copyright (C) 2017-2018 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<div fxFill fxLayout="column" class="content content-max-width">
+  <div fxLayout="column" class="central-content">
+    
+    <mat-card fxFlex class="card-endpoint-details">
+      <mat-nav-list class="nav-list-endpoint-location">
+        
+        <div fxLayout="row" fxLayoutAlign="start center" class="text-upper">
+          <span matCardAvatar class="img-card-endpoint"></span>
+          <span matLine class="text-upper margin-left-x1"><b>Location</b></span>
+        </div>
+        
+        <mat-list-item class="item-endpoint-bus" [routerLink]="['/workspaces', workspaceId, 'petals', 'buses', endpoint.bus.id]">
+          <p fxLayout="row" fxLayoutAlign="start center">
+            <mat-icon color="primary" svgIcon="bus"></mat-icon>
+            <span class="margin-left-x1 bus-name break">{{ endpoint.bus.name }}</span>
+            <mat-icon 
+              color="primary" 
+              svgIcon="gotoDetails" 
+              class="margin-left-x1" 
+              matTooltip="Go to bus" 
+              matTooltipPosition="above"
+            ></mat-icon>
+          </p>
+        </mat-list-item>
+        
+        <mat-list-item class="item-endpoint-container" [routerLink]="['/workspaces', workspaceId, 'petals', 'containers', endpoint.container.id]">
+          <p fxLayout="row" fxLayoutAlign="start center">
+            <mat-icon color="primary">dns</mat-icon>
+            <span class="margin-left-x1 container-name break">{{ endpoint.container.name }}</span>
+            <mat-icon 
+              color="primary" 
+              svgIcon="gotoDetails" 
+              class="margin-left-x1" 
+              matTooltip="Go to container" 
+              matTooltipPosition="above"
+            ></mat-icon>
+          </p>
+        </mat-list-item>
+        
+        <mat-list-item class="item-endpoint-component" [routerLink]="['/workspaces', workspaceId, 'petals', 'components', endpoint.component.id]">
+          <p fxLayout="row" fxLayoutAlign="start center">
+            <mat-icon color="primary" svgIcon="component"></mat-icon>
+            <span class="margin-left-x1 component-name break">{{ endpoint.component.name }}</span>
+            <mat-icon 
+              color="primary" 
+              svgIcon="gotoDetails" 
+              class="margin-left-x1" 
+              matTooltip="Go to component" 
+              matTooltipPosition="above"
+            ></mat-icon>
+          </p>
+        </mat-list-item>
+
+      </mat-nav-list>
+
+      <mat-nav-list class="nav-list-endpoint-service">
+        
+        <div fxLayout="row" fxLayoutAlign="start center" class="text-upper">
+          <span matCardAvatar class="img-card-service"></span>
+          <span matLine class="text-upper margin-left-x1"><b>Service</b></span>
+        </div>
+
+        <mat-list-item class="item-service-content" [routerLink]="['/workspaces', workspaceId, 'services', 'services', endpoint.service.id]">
+          <a>
+            <p fxLayout="row" fxLayoutAlign="start center">
+              <span class="item-localpart break">{{ endpoint.service.localpart }}</span>
+              <mat-icon 
+                color="primary" 
+                svgIcon="gotoDetails" 
+                class="margin-left-x1" 
+                matTooltip="Go to service" 
+                matTooltipPosition="after"
+              ></mat-icon>
+            </p>
+            <p fxLayout="row" fxLayoutAlign="start center">
+              <mat-icon 
+                color="primary" 
+                svgIcon="namespace" 
+                matTooltip="Namespace" 
+                matTooltipPosition="above"
+              ></mat-icon>
+              <span fxFlex class="margin-left-x1 item-namespace break">{{ endpoint.service.namespace }}</span>
+            </p>
+          </a>
+          
+        </mat-list-item>
+        
+      </mat-nav-list>
+
+      <mat-nav-list class="nav-list-endpoint-interfaces">
+
+        <div fxLayout="row" fxLayoutAlign="start center" class="text-upper">
+          <span matCardAvatar class="img-card-interface"></span>
+          <span matLine class="text-upper margin-left-x1">
+            <b>Interfaces</b>
+          </span>
+        </div>
+
+        <ng-container *ngFor="let interface of endpoint.interfaces; last as isLast;">
+          <mat-list-item class="item-interface-content" [routerLink]="['/workspaces', workspaceId, 'services', 'interfaces', interface.id]">
+            <a>
+              <p fxLayout="row" fxLayoutAlign="start center">
+                <span class="item-localpart break">{{ interface.localpart }}</span>
+                <mat-icon 
+                  color="primary" 
+                  svgIcon="gotoDetails" 
+                  class="margin-left-x1" 
+                  matTooltip="Go to interface" 
+                  matTooltipPosition="after"
+                ></mat-icon>
+              </p>
+              <p fxLayout="row" matTooltip="Namespace" matTooltipPosition="above">
+                <mat-icon 
+                  color="primary" 
+                  svgIcon="namespace" 
+                  matTooltip="Namespace" 
+                  matTooltipPosition="above"
+                ></mat-icon>
+                <span fxFlex class="margin-left-x1 item-namespace break">{{ interface.namespace }}</span>
+              </p>
+            </a>
+          </mat-list-item>
+
+          <mat-divider inset *ngIf="!isLast"></mat-divider>
+          
+        </ng-container>
+
+      </mat-nav-list>
+    </mat-card>
+    
+  </div>
+</div>

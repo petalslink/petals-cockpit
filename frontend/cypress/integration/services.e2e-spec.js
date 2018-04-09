@@ -215,19 +215,6 @@ describe(`Service`, () => {
     cy.expectEndpointsTreeToBe(expectedEndpointsTreeActionStateComp1);
   });
 
-  it(`should have the service details`, () => {
-    cy.login('admin', 'admin');
-
-    cy
-      .get(WORKSPACE_DOM.tabs)
-      .contains(`Services`)
-      .click();
-
-    cy.clickElementInTree(`exp-pnl-services-tree`, `Localpart0`);
-
-    cy.expectLocationToBe(`/workspaces/idWks0/services/services/idService0`);
-  });
-
   const expectedInterfacesTreeWks1 = [
     `http://namespace-example.fr/interface/metiers/version/1.0`,
     `Interface-Localpart0`,

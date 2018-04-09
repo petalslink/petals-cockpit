@@ -46,11 +46,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </div>
 
         <ng-container *ngFor="let service of interface.services; last as isLast;">
-          <mat-list-item class="item-service-content">
-            <a 
-              color="primary"
-              [routerLink]="['/workspaces', workspaceId, 'services', 'services', service.id]"
-            >
+          <mat-list-item class="item-service-content" [routerLink]="['/workspaces', workspaceId, 'services', 'services', service.id]">
+            <a>
               <p fxLayout="row" fxLayoutAlign="start center">
                 <span class="item-localpart break">{{ service.localpart }}</span>
                 <span class="margin-left-x1" matTooltip="Go to service" matTooltipPosition="after">
@@ -67,7 +64,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 <span fxFlex class="margin-left-x1 item-namespace break">{{ service.namespace }}</span>
               </p>
             </a>
-            
           </mat-list-item>
 
           <mat-divider inset *ngIf="!isLast"></mat-divider>
@@ -86,11 +82,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </div>
 
         <ng-container *ngFor="let endpoint of interface.endpoints; last as isLast;">
-          <mat-list-item class="item-endpoint-content">
-            <a 
-              color="primary"
-              [routerLink]="['/workspaces', workspaceId, 'services', 'endpoints', endpoint.id]"
-            >
+          <mat-list-item class="item-endpoint-content" [routerLink]="['/workspaces', workspaceId, 'services', 'endpoints', endpoint.id]">
+            <a>
               <p fxLayout="row" fxLayoutAlign="start center">
                 <mat-icon color="primary" svgIcon="component"></mat-icon>
                 <span class="margin-left-x1 item-name break">{{ endpoint.name }}</span>
@@ -103,7 +96,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 ></mat-icon>
               </p>
             </a>
-
           </mat-list-item>
 
           <mat-divider inset *ngIf="!isLast"></mat-divider>
