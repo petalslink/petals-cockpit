@@ -259,8 +259,17 @@ public class WorkspacesService {
                 reason = "Import cancelled by " + user;
             }
 
-            BusDeleted bd = new BusDeleted(bId, reason);
+            Map<String, ServiceFull> allServices = workspaceDb.getWorkspaceServices(wId, jooq);
+            Map<String, EndpointFull> allEndpoints = workspaceDb.getWorkspaceEndpoints(wId, jooq);
+            Map<String, InterfaceFull> allInterfaces = workspaceDb.getWorkspaceInterfaces(wId, jooq);
 
+            WorkspaceContent content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                    ImmutableMap.copyOf(allServices), ImmutableMap.copyOf(allEndpoints),
+                    ImmutableMap.copyOf(allInterfaces));
+            BusDeleted bd = new BusDeleted(bId, reason, content);
+
+            // The caller may want to broadcast outside this method, along with other workspace content
             broadcast(WorkspaceEvent.busDeleted(bd));
 
             return bd;

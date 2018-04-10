@@ -789,10 +789,14 @@ public class WorkspaceResource {
         @NotEmpty
         public final String reason;
 
+        @Valid
+        public final WorkspaceContent content;
+
         @JsonCreator
-        public BusDeleted(@JsonProperty("id") long id, @JsonProperty("reason") String reason) {
+        public BusDeleted(@JsonProperty("id") long id, @JsonProperty("reason") String reason, @JsonProperty("content") WorkspaceContent content) {
             this.id = id;
             this.reason = reason;
+            this.content = content;
         }
 
         @JsonProperty
