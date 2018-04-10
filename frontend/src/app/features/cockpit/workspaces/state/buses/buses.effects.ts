@@ -67,12 +67,20 @@ export class BusesEffects {
       withLatestFrom(this.store$),
       filter(([action, state]) => !!state.buses.byId[action.payload.id]),
       map(([action, state]) => {
-        const { id, reason } = action.payload;
+        const { id, reason, content } = action.payload;
         const bus = state.buses.byId[id];
 
         this.notifications.info(bus.name, reason);
 
-        return new Buses.Removed(bus);
+        return batchActions([
+          new Endpoints.Clean(),
+          new Interfaces.Clean(),
+          new Services.Clean(),
+          new Endpoints.Added(toJsTable(content.endpoints)),
+          new Interfaces.Added(toJsTable(content.interfaces)),
+          new Services.Added(toJsTable(content.services)),
+          new Buses.Removed(bus),
+        ]);
       })
     );
 
