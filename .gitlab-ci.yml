@@ -1,10 +1,12 @@
-# Notes
+# Notes:
 # Branch front/* will run test-frontend
 # Branch back/* will run build-backend
-# Branch product/* will run build-backend, build-frontend, package-product, electron-cypress, chromium-cypress
-# Branch master will run build-backend, build-frontend, build-frontend-pages, test-frontend, package-product-master, pages, electron-cypress, chromium-cypress
-# Other branches will run build-backend, build-frontend, package-product
-# Tags will run build-backend, build-frontend, release-product
+# Branch product/* will run build-backend, build-frontend, package-product
+# Branch full/* will run build-backend, test-frontend, build-frontend, e2e-product, package-product, electron-cypress, chromium-cypress
+# Branch master will run build-backend, test-frontend, build-frontend, build-frontend-pages, package-product-master, pages, e2e-product, electron-cypress, chromium-cypress
+# Other branches will run build-backend, test-frontend, build-frontend, e2e-product, package-product
+# Tags will run build-backend, build-frontend, e2e-product, release-product
+
 # Runs tests and debug procedure detailed EOF
 
 stages:
@@ -113,6 +115,9 @@ test-frontend:
     - time yarn run ng -- e2e --serve=false -p 4200
     - kill -9 $(cat pid-nohup.txt)
     - rm pid-nohup.txt
+  # Protractor tests are unstable and may fail unexpectedly
+  # this workaround has to be removed once we stop relying on protractor
+  retry: 1
 
 build-frontend:
   <<: *node-java-yarn
@@ -204,7 +209,7 @@ package-product:
   stage: integration
   only:
     - master
-    - /^product\/.*$/
+    - /^full\/.*$/
   allow_failure: true
   script:
     - cd frontend
@@ -222,7 +227,7 @@ chromium-cypress:
   stage: integration
   only:
     - master
-    - /^product\/.*$/
+    - /^full\/.*$/
   allow_failure: true
   script:
     - cd frontend
@@ -239,10 +244,10 @@ e2e-product:
   <<: *node-java-yarn
   stage: integration
   except:
-    - tags
-    # we don't want to test the final product in front/* and back/*
+    # we don't want to test the final product in front/*, back/* and product/*
     - /^front\/.*$/
     - /^back\/.*$/
+    - /^product\/.*$/
   dependencies:
     # one or the other
     - package-product
@@ -261,6 +266,9 @@ e2e-product:
     - cd frontend
     - sleep 10
     - time yarn run e2e:product
+  # Protractor tests are unstable and may fail unexpectedly
+  # this workaround has to be removed if we stop relying on protractor
+  retry: 1
 
 ### Test gitlab ci
 
