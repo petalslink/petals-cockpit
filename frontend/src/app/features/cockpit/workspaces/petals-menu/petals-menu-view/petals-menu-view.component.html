@@ -14,16 +14,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFlex>
-
-  <div class="wrapper-search-add-bus" fxLayout="row">
-    <form [formGroup]="searchForm">
+  <div class="wrapper-search-add-bus" fxLayout="row" fxLayoutGap="10px">
+    <form fxFlex fxLayout="row" [formGroup]="searchForm">
       <mat-form-field fxFlex>
         <input class="search" [appFocusInput]="focusSearchInput$" matInput placeholder="Search" formControlName="search">
         <span matPrefix><mat-icon color="primary">search</mat-icon></span>
       </mat-form-field>
     </form>
 
-    <a mat-mini-fab class="btn-add-bus" color="primary" fxFlex="40px" matTooltip="Import a bus" matTooltipPosition="below"
+    <a mat-mini-fab class="btn-add-bus" color="primary" matTooltip="Import a bus" matTooltipPosition="below"
       [routerLink]="['/workspaces', workspaceId, 'petals', 'buses-in-progress']" (click)="closeSidenavOnSmallScreen()">
       <mat-icon>add</mat-icon>
     </a>

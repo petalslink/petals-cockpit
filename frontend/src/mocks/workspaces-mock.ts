@@ -565,6 +565,10 @@ export class Workspaces {
     });
     this.workspaces.delete(id);
   }
+
+  getRefreshedServices() {
+    return refreshedServices;
+  }
 }
 
 export const workspacesService = new Workspaces();
@@ -590,3 +594,46 @@ const ws1 = workspacesService.create([
 ws1.addInterfaces();
 ws1.addServices();
 ws1.addEndpoints();
+
+const refreshedServices = {
+  endpoints: {
+    refreshedEndpoint0: {
+      id: 'refreshedEndpoint0',
+      name: 'edpt-89p82661-refr-31o4-l391-00',
+      componentId: 'idComp0',
+    },
+    refreshedEndpoint1: {
+      id: 'refreshedEndpoint1',
+      name: 'edpt-89p82661-refr-31o4-l391-01',
+      componentId: 'idComp0',
+    },
+  },
+  interfaces: {
+    refreshedInterface0: {
+      id: 'refreshedInterface0',
+      name:
+        '{http://namespace-example.fr/interface/technique/version/1.0}Interface-LocalpartRefreshed0',
+      components: ['idComp0'],
+    },
+    refreshedInterface1: {
+      id: 'refreshedInterface1',
+      name:
+        '{http://namespace-example.fr/interface/technique/version/1.0}Interface-LocalpartRefreshed1',
+      components: ['idComp0'],
+    },
+  },
+  services: {
+    refreshedService0: {
+      id: 'refreshedService0',
+      name:
+        '{http://namespace-example.fr/service/technique/version/1.0}LocalpartRefreshed0',
+      components: ['idComp0'],
+    },
+    refreshedService1: {
+      id: 'refreshedService1',
+      name:
+        '{http://namespace-example.fr/service/technique/version/1.0}LocalpartRefreshed1',
+      components: ['idComp0'],
+    },
+  },
+};

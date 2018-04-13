@@ -4,7 +4,10 @@ const bsTreeInterfaces = `app-interfaces-list`;
 const bsTreeServices = `app-services-list`;
 const bsTreeEndpoints = `app-endpoints-list`;
 
-export const SERVICES_DOM = {};
+export const SERVICES_DOM = {
+  refreshBtn: `${bs} .btn-refresh-services`,
+  refreshSpinner: `${bs} .wrapper-search-services mat-spinner`,
+};
 
 export const SERVICES_TREE_DOM = {
   expPanel: {

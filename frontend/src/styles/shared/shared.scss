@@ -292,9 +292,17 @@ app-material-tree > .nav-list-tree > .item-list > .mat-list-item {
 }
 
 app-petals-menu-view,
-app-services-menu-view,
 app-api-menu-view {
   overflow: hidden;
+}
+// this is changed to make tests pass
+// overflow on parent makes content not visible
+app-services-menu-view {
+  .exp-pnl-interfaces-tree,
+  .exp-pnl-services-tree,
+  .exp-pnl-endpoints-tree {
+    overflow: hidden;
+  }
 }
 
 // use for all services trees component

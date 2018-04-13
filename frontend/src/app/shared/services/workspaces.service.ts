@@ -68,6 +68,8 @@ export abstract class WorkspacesService {
   abstract addUser(workspaceId: string, userId: string): Observable<void>;
 
   abstract removeUser(workspaceId: string, userId: string): Observable<void>;
+
+  abstract refreshServices(workspaceId: string): Observable<void>;
 }
 
 @Injectable()
@@ -125,6 +127,13 @@ export class WorkspacesServiceImpl extends WorkspacesService {
   removeUser(workspaceId: string, userId: string) {
     return this.http.delete<void>(
       `${environment.urlBackend}/workspaces/${workspaceId}/users/${userId}`
+    );
+  }
+
+  refreshServices(workspaceId: string) {
+    return this.http.post<void>(
+      `${environment.urlBackend}/workspaces/${workspaceId}/servicesrefresh`,
+      {}
     );
   }
 }

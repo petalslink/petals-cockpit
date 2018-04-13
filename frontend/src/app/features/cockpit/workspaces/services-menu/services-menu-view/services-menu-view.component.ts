@@ -39,6 +39,7 @@ import { TreeElement } from 'app/shared/components/material-tree/material-tree.c
 import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 import { takeUntil } from 'rxjs/operators';
+import { Workspaces } from '../../state/workspaces/workspaces.actions';
 
 @Component({
   selector: 'app-services-menu-view',
@@ -52,6 +53,8 @@ export class ServicesMenuViewComponent implements OnInit, OnDestroy {
   interfacesTree$: Observable<TreeElement<any>[]>;
   servicesTree$: Observable<TreeElement<any>[]>;
   endpointsTree$: Observable<TreeElement<any>[]>;
+
+  isFetchingServices$: Observable<boolean>;
 
   @Input() workspaceId: string;
   @Input() interfaces: IInterfaceRow[];
@@ -72,6 +75,10 @@ export class ServicesMenuViewComponent implements OnInit, OnDestroy {
     this.endpointsTree$ = this.store$
       .select(getCurrentEndpointTree)
       .pipe(takeUntil(this.onDestroy$));
+
+    this.isFetchingServices$ = this.store$.select(
+      state => state.workspaces.isFetchingServices
+    );
   }
 
   ngOnDestroy() {
@@ -85,5 +92,11 @@ export class ServicesMenuViewComponent implements OnInit, OnDestroy {
 
   closeSidenavOnSmallScreen() {
     this.store$.dispatch(new Ui.CloseSidenavOnSmallScreen());
+  }
+
+  refreshServices() {
+    this.store$.dispatch(
+      new Workspaces.RefreshServices({ id: this.workspaceId })
+    );
   }
 }

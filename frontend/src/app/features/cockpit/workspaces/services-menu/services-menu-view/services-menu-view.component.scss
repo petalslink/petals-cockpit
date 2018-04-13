@@ -19,3 +19,12 @@
   font-size: 13px;
   font-weight: 500;
 }
+
+.wrapper-search-services {
+  padding: 16px;
+  margin-bottom: -12px;
+}
+
+mat-form-field [matprefix] {
+  margin-right: 10px;
+}

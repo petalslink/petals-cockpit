@@ -327,6 +327,32 @@ export class WorkspacesEffects {
         batchActions(unfoldWithParents(action, state, false))
       )
     );
+
+  @Effect()
+  refreshServices$: Observable<Action> = this.actions$
+    .ofType<Workspaces.RefreshServices>(Workspaces.RefreshServicesType)
+    .pipe(
+      withLatestFrom(
+        this.store$.select(state => state.workspaces.selectedWorkspaceId)
+      ),
+      mergeMap(([action, workspaceId]) =>
+        this.workspacesService.refreshServices(action.payload.id).pipe(
+          map(_ => new Workspaces.RefreshServicesSuccess(action.payload)),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error catched in workspace.effects: ofType(Workspaces.RefreshServices)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            return of(new Workspaces.RefreshServicesError(action.payload));
+          })
+        )
+      )
+    );
 }
 
 type SetCurrentActions =
