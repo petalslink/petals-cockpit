@@ -1083,7 +1083,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         assertWorkspaceContentForServiceAssemblies(a, content, buses);
         assertWorkspaceContentForServiceUnits(a, content, buses);
         assertWorkspaceContentForSharedLibraries(a, content, buses);
-        if (expectedEndpoints != null && !expectedEndpoints.isEmpty()) {
+        if (expectedEndpoints != null) {
             assertWorkspaceContentForServices(a, content, wsId, new ArrayList<Endpoint>(expectedEndpoints));
         }
     }
