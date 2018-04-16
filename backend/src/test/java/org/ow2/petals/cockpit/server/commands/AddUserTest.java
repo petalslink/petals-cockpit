@@ -20,6 +20,8 @@ import static org.assertj.db.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import java.util.Optional;
 
@@ -121,6 +123,9 @@ public class AddUserTest extends AbstractTest {
         assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
                 .column(USERS.USERNAME.getName()).value().isEqualTo("admin").column(USERS.NAME.getName()).value()
                 .isEqualTo("Admin").column(USERS.ADMIN.getName()).value().isEqualTo(true);
+
+        assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(0);
+        assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(0);
     }
 
     @Test
@@ -137,6 +142,9 @@ public class AddUserTest extends AbstractTest {
         assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
                 .column(USERS.USERNAME.getName()).value().isEqualTo("user").column(USERS.NAME.getName()).value()
                 .isEqualTo("User").column(USERS.ADMIN.getName()).value().isEqualTo(false);
+
+        assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(0);
+        assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(0);
     }
 
     @Test
@@ -159,5 +167,35 @@ public class AddUserTest extends AbstractTest {
         assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
                 .column(USERS.USERNAME.getName()).value().isEqualTo("admin").column(USERS.NAME.getName()).value()
                 .isEqualTo("Admin");
+
+        assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(0);
+        assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(0);
+    }
+
+    @Test
+    public void addUserAdminToDbWithWorkspace() throws Exception {
+        boolean success = cli().run("add-user", "-n", "Admin", "-u", "admin", "-p", "password", "-a", "-w",
+                "myWorkspace", "add-user-test.yml");
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isTrue();
+
+        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").contains("Added user admin",
+                "Added workspace myWorkspace");
+        softly.assertThat(systemErrRule.getLog()).as("stderr").isEmpty();
+        softly.assertAll();
+
+        assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
+                .column(USERS.USERNAME.getName()).value().isEqualTo("admin").column(USERS.NAME.getName()).value()
+                .isEqualTo("Admin").column(USERS.ADMIN.getName()).value().isEqualTo(true)
+                .column(USERS.LAST_WORKSPACE.getName()).value().isNotNull();
+
+        assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(1).row()
+                .column(WORKSPACES.NAME.getName()).value().isEqualTo("myWorkspace")
+                .column(WORKSPACES.DESCRIPTION.getName()).value()
+                .isEqualTo("Workspace automatically generated for **admin**.");
+
+        assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(1).row()
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin");
     }
 }

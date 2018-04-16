@@ -70,7 +70,10 @@ Or a normal user:
 ```
 $ java -jar cockpit/target/petals-cockpit-*-capsule.jar add-user -u username -n Name -p password cockpit/default.yml
 ```
-
+A workspace can also be generated with:
+```
+$ java -jar cockpit/target/petals-cockpit-*-capsule.jar add-user -u username -n Name -p password -w myWorkspace -a cockpit/default.yml
+```
 
 ### Working with the backend and the frontend separately
 

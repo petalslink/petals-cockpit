@@ -25,6 +25,8 @@ import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 
 import com.bendb.dropwizard.jooq.JooqFactory;
 
@@ -38,9 +40,9 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
 /**
- * This commands creates a Demo workspace in the database
+ * This commands adds an user to the database
  * 
- * @author vnoel
+ * @author vnoel, psouquet
  *
  */
 public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCommand<C> {
@@ -57,6 +59,7 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         subparser.addArgument("-n", "--name").dest("name").required(true);
         subparser.addArgument("-p", "--password").dest("password").required(true);
         subparser.addArgument("-a", "--admin").dest("admin").action(Arguments.storeTrue());
+        subparser.addArgument("-w", "--workspacename").dest("workspaceName").required(false);
     }
 
     @Override
@@ -83,6 +86,8 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         Boolean admin = namespace.getBoolean("admin");
         assert admin != null;
 
+        String workspaceName = namespace.getString("workspaceName");
+
         Configuration jooqConf = new JooqFactory().build(environment, configuration.getDataSourceFactory());
 
         for (LifeCycle lifeCycle : environment.lifecycle().getManagedObjects()) {
@@ -98,9 +103,26 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
                 if (DSL.using(c).fetchExists(USERS, USERS.USERNAME.eq(username))) {
                     System.err.println("User " + username + " already exists");
                 } else {
-                    DSL.using(c).executeInsert(new UsersRecord(username,
-                            CockpitAuthenticator.passwordEncoder.encode(password), name, null, admin));
+                    final UsersRecord userRecord = new UsersRecord(username,
+                            CockpitAuthenticator.passwordEncoder.encode(password), name, null, admin);
+                    DSL.using(c).executeInsert(userRecord);
                     System.out.println("Added user " + username);
+
+                    if (workspaceName != null && !workspaceName.isEmpty()) {
+                        WorkspacesRecord wsDb = new WorkspacesRecord();
+                        wsDb.setName(workspaceName);
+                        wsDb.setDescription("Workspace automatically generated for **" + username + "**.");
+                        wsDb.attach(c);
+                        wsDb.insert();
+
+                        DSL.using(c).executeInsert(new UsersWorkspacesRecord(wsDb.getId(), username));
+
+                        userRecord.setLastWorkspace(wsDb.getId());
+                        DSL.using(c).executeUpdate(userRecord);
+
+                        System.out.println("Added workspace " + workspaceName);
+                    }
+
                 }
             });
         } finally {
