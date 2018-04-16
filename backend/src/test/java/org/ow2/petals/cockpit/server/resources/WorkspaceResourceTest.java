@@ -22,6 +22,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import javax.ws.rs.client.Entity;
@@ -31,10 +32,12 @@ import org.assertj.core.api.SoftAssertions;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Test;
+import org.ow2.petals.admin.endpoint.Endpoint;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.AddUser;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceOverview;
@@ -276,6 +279,22 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
 
         assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(1)
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("anotheruser");
+    }
+    
+    @Test
+    public void deleteBus() {
+        assertThat(requestBus(domain)).hasNumberOfRows(1);
+
+        BusDeleted res = resource.target("/workspaces/1/buses/" + getId(domain)).request().delete(BusDeleted.class);
+
+        assertThat(requestBus(domain)).hasNumberOfRows(0);
+        assertThat(res.id).isEqualTo(getId(domain));
+        assertThat(res.reason).isEqualTo("Bus deleted by " + ADMIN);
+        assertWorkspaceContentForServices(new SoftAssertions(), res.content, 1, new ArrayList<Endpoint>());
+        
+        assertThat(requestContainer(container1)).hasNumberOfRows(0);
+        assertThat(requestContainer(container2)).hasNumberOfRows(0);
+        assertThat(requestContainer(container3)).hasNumberOfRows(0);
     }
 
     private void assertContent(SoftAssertions a, WorkspaceFullContent content, Domain... buses) {

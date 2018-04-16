@@ -138,7 +138,17 @@ export namespace SseActions {
   export const BusDeletedType = '[Sse] Bus deleted';
   export class BusDeleted implements Action {
     readonly type = BusDeletedType;
-    constructor(public readonly payload: { id: string; reason: string }) {}
+    constructor(
+      public readonly payload: {
+        id: string;
+        reason: string;
+        content: {
+          endpoints: { [key: string]: IEndpointBackendSSE };
+          interfaces: { [key: string]: IInterfaceBackendSSE };
+          services: { [key: string]: IServiceBackendSSE };
+        };
+      }
+    ) {}
   }
 
   export const WorkspaceDeletedSse = 'WORKSPACE_DELETED';
