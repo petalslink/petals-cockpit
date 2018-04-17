@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.sse.EventInput;
 import org.junit.Before;
@@ -370,6 +371,18 @@ public class ServicesListTest extends AbstractBasicResourceTest {
             changeCompState(component12, ComponentMin.State.Started);
             expectServicesUpdatedAmongNext2(eventInput, (t, a) -> {
                 assertWorkspaceContentForServices(a, t, wkspId, referenceEndpoints);
+            });
+        }
+    }
+
+    @Test
+    public void refreshServices() {
+        try (EventInput eventInput = resource.sse(1)) {
+
+            Response post = resource.target("/workspaces/1/servicesrefresh/").request().post(null);
+
+            expectServicesUpdatedAmongNext2(eventInput, (t, a) -> {
+                assertWorkspaceContentForServices(a, t, 1, referenceEndpoints);
             });
         }
     }

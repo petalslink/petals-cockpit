@@ -670,6 +670,20 @@ public class WorkspacesService {
             return res;
         }
 
+        public void refreshServices() {
+            Tuple3<ImmutableMap<String, ServiceFull>, ImmutableMap<String, EndpointFull>, ImmutableMap<String, InterfaceFull>> services = getWorkspaceServices();
+
+            WorkspaceContent res = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                    ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+                    ImmutableMap.copyOf(services._1), ImmutableMap.copyOf(services._2),
+                    ImmutableMap.copyOf(services._3));
+
+            LOG.debug("Service list updated for workspace#{}, broadcasting {} endpoints, {} services, {} interfaces.",
+                    wId, res.endpoints.size(), res.services.size(), res.interfaces.size());
+
+            broadcast(WorkspaceEvent.servicesUpdated(res));
+        }
+
         public Tuple3<ImmutableMap<String, ServiceFull>, 
                         ImmutableMap<String, EndpointFull>, 
                         ImmutableMap<String, InterfaceFull>> getWorkspaceServices() {

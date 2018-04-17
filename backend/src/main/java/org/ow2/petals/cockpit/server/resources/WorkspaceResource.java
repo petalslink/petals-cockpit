@@ -471,6 +471,12 @@ public class WorkspaceResource {
                 .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(username))).execute();
     }
 
+    @POST
+    @Path("/servicesrefresh/")
+    public void servicesRefresh() {
+        workspace.refreshServices();
+    }
+
     public static class AddUser {
 
         @NotEmpty
