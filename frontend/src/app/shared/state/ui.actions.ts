@@ -74,4 +74,14 @@ export namespace Ui {
       }
     ) {}
   }
+
+  export const ChangeThemeType = '[UI] Change theme';
+  export class ChangeTheme implements Action {
+    readonly type = ChangeThemeType;
+    constructor(
+      public readonly payload: {
+        theme: string;
+      }
+    ) {}
+  }
 }

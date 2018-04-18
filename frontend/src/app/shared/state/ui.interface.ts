@@ -31,8 +31,15 @@ export type ScreenSize =
   | 'gt-md'
   | 'gt-lg';
 
+export const SETTINGS_THEME_KEY = 'settings-theme';
+
+export interface ISettings {
+  theme: string;
+}
+
 export interface IUi {
   screenSize: ScreenSize;
+  settings: ISettings;
   // workspace
   isSidenavVisible: boolean;
   // workspaces
@@ -43,9 +50,14 @@ export interface IUi {
   titleSubPart: string;
 }
 
+export const settings: ISettings = {
+  theme: 'DEFAULT-THEME',
+};
+
 export function uiFactory(): IUi {
   return {
     isSidenavVisible: true,
+    settings: settings,
     screenSize: '',
     isPopupListWorkspacesVisible: false,
     titleMainPart1: 'Petals Cockpit',

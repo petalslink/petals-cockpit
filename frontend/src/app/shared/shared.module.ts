@@ -36,6 +36,7 @@ import {
   MatProgressBarModule,
   MatProgressSpinnerModule,
   MatRippleModule,
+  MatSelectModule,
   MatSidenavModule,
   MatTableModule,
   MatTabsModule,
@@ -49,6 +50,7 @@ import { NgxHoverOpacityModule } from 'ngx-hover-opacity';
 import { NgPipesModule } from 'ngx-pipes';
 
 import { MaterialTreeComponent } from 'app/shared/components/material-tree/material-tree.component';
+import { SettingsThemeColorComponent } from 'app/shared/components/settings-theme-color/settings-theme-color.component';
 import { UpdateFileInformationDirective } from 'app/shared/components/upload/update-file-information.directive';
 import { UploadComponent } from 'app/shared/components/upload/upload.component';
 import { FocusInputIfLargeScreenDirective } from 'app/shared/directives/focus-input-based-on-screen-size.directive';
@@ -74,6 +76,7 @@ export const MaterialModules = [
   MatProgressSpinnerModule,
   MatRippleModule,
   MatSidenavModule,
+  MatSelectModule,
   MatTableModule,
   MatTabsModule,
   MatToolbarModule,
@@ -93,6 +96,7 @@ export const imports = [
   NgxHoverOpacityModule,
   NgPipesModule,
   RouterModule,
+  ReactiveFormsModule,
 ];
 
 export const declarations = [
@@ -108,10 +112,10 @@ export const declarations = [
   UpdateFileInformationDirective,
   MaterialTreeComponent,
   TruncateStringPipe,
+  SettingsThemeColorComponent,
 ];
 
 export const exportss = [
-  ReactiveFormsModule,
   // MatIconModule is relying on it so we do need to keep HttpModule for now because
   HttpClientModule,
   HttpModule,
