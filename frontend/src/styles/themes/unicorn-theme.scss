@@ -1,0 +1,48 @@
+/**
+ * Copyright (C) 2017-2018 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+$petals-unicorn-primary: mat-palette($mat-cyan, 600);
+$petals-unicorn-primary-x: mat-palette($mat-cyan, 50);
+$petals-unicorn-primary-x1: mat-palette($mat-cyan, 100);
+$petals-unicorn-primary-x2: mat-palette($mat-cyan, 200);
+$petals-unicorn-primary-x3: mat-palette($mat-cyan, 300);
+$petals-unicorn-primary-x4: mat-palette($mat-cyan, 400);
+$petals-unicorn-primary-x5: mat-palette($mat-cyan, 500);
+$petals-unicorn-primary-x6: mat-palette($mat-cyan, 600);
+$petals-unicorn-primary-x7: mat-palette($mat-cyan, 700);
+$petals-unicorn-primary-x8: mat-palette($mat-cyan, 800);
+$petals-unicorn-primary-x9: mat-palette($mat-cyan, 900);
+
+$petals-unicorn-accent: mat-palette($mat-purple, 700);
+$petals-unicorn-accent-x: mat-palette($mat-purple, 50);
+$petals-unicorn-accent-x1: mat-palette($mat-purple, 100);
+$petals-unicorn-accent-x2: mat-palette($mat-purple, 200);
+$petals-unicorn-accent-x3: mat-palette($mat-purple, 300);
+$petals-unicorn-accent-x4: mat-palette($mat-purple, 400);
+$petals-unicorn-accent-x5: mat-palette($mat-purple, 500);
+$petals-unicorn-accent-x6: mat-palette($mat-purple, 600);
+$petals-unicorn-accent-x7: mat-palette($mat-purple, 700);
+$petals-unicorn-accent-x8: mat-palette($mat-purple, 800);
+$petals-unicorn-accent-x9: mat-palette($mat-purple, 900);
+
+$petals-unicorn-warn: mat-palette($mat-red, 500);
+
+$petals-unicorn-theme: mat-dark-theme(
+  $petals-unicorn-primary,
+  $petals-unicorn-accent,
+  $petals-unicorn-warn
+);

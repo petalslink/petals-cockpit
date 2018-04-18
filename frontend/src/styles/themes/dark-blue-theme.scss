@@ -1,0 +1,48 @@
+/**
+ * Copyright (C) 2017-2018 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+$petals-dark-blue-primary: mat-palette($mat-blue, 600);
+$petals-dark-blue-primary-x: mat-palette($mat-blue, 50);
+$petals-dark-blue-primary-x1: mat-palette($mat-blue, 100);
+$petals-dark-blue-primary-x2: mat-palette($mat-blue, 200);
+$petals-dark-blue-primary-x3: mat-palette($mat-blue, 300);
+$petals-dark-blue-primary-x4: mat-palette($mat-blue, 400);
+$petals-dark-blue-primary-x5: mat-palette($mat-blue, 500);
+$petals-dark-blue-primary-x6: mat-palette($mat-blue, 600);
+$petals-dark-blue-primary-x7: mat-palette($mat-blue, 700);
+$petals-dark-blue-primary-x8: mat-palette($mat-blue, 800);
+$petals-dark-blue-primary-x9: mat-palette($mat-blue, 900);
+
+$petals-dark-blue-accent: mat-palette($mat-amber, 500);
+$petals-dark-blue-accent-x: mat-palette($mat-amber, 50);
+$petals-dark-blue-accent-x1: mat-palette($mat-amber, 100);
+$petals-dark-blue-accent-x2: mat-palette($mat-amber, 200);
+$petals-dark-blue-accent-x3: mat-palette($mat-amber, 300);
+$petals-dark-blue-accent-x4: mat-palette($mat-amber, 400);
+$petals-dark-blue-accent-x5: mat-palette($mat-amber, 500);
+$petals-dark-blue-accent-x6: mat-palette($mat-amber, 600);
+$petals-dark-blue-accent-x7: mat-palette($mat-amber, 700);
+$petals-dark-blue-accent-x8: mat-palette($mat-amber, 800);
+$petals-dark-blue-accent-x9: mat-palette($mat-amber, 900);
+
+$petals-dark-blue-warn: mat-palette($mat-deep-orange, 500);
+
+$petals-dark-blue-theme: mat-dark-theme(
+  $petals-dark-blue-primary,
+  $petals-dark-blue-accent,
+  $petals-dark-blue-warn
+);

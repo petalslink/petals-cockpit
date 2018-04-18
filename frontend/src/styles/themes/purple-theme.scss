@@ -1,0 +1,48 @@
+/**
+ * Copyright (C) 2017-2018 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+$petals-purple-primary: mat-palette($mat-purple, 700);
+$petals-purple-primary-x: mat-palette($mat-purple, 50);
+$petals-purple-primary-x1: mat-palette($mat-purple, 100);
+$petals-purple-primary-x2: mat-palette($mat-purple, 200);
+$petals-purple-primary-x3: mat-palette($mat-purple, 300);
+$petals-purple-primary-x4: mat-palette($mat-purple, 400);
+$petals-purple-primary-x5: mat-palette($mat-purple, 500);
+$petals-purple-primary-x6: mat-palette($mat-purple, 600);
+$petals-purple-primary-x7: mat-palette($mat-purple, 700);
+$petals-purple-primary-x8: mat-palette($mat-purple, 800);
+$petals-purple-primary-x9: mat-palette($mat-purple, 900);
+
+$petals-purple-accent: mat-palette($mat-green, 400);
+$petals-purple-accent-x: mat-palette($mat-green, 50);
+$petals-purple-accent-x1: mat-palette($mat-green, 100);
+$petals-purple-accent-x2: mat-palette($mat-green, 200);
+$petals-purple-accent-x3: mat-palette($mat-green, 300);
+$petals-purple-accent-x4: mat-palette($mat-green, 400);
+$petals-purple-accent-x5: mat-palette($mat-green, 500);
+$petals-purple-accent-x6: mat-palette($mat-green, 600);
+$petals-purple-accent-x7: mat-palette($mat-green, 700);
+$petals-purple-accent-x8: mat-palette($mat-green, 800);
+$petals-purple-accent-x9: mat-palette($mat-green, 900);
+
+$petals-purple-warn: mat-palette($mat-red, 500);
+
+$petals-purple-theme: mat-light-theme(
+  $petals-purple-primary,
+  $petals-purple-accent,
+  $petals-purple-warn
+);

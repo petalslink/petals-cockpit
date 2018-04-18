@@ -15,10 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import './_utils';
-@import './_colors';
-@import './_loading';
-@import '../themes/_light.theme';
+@import './utils';
+@import './colors';
+@import './loading';
 
 html,
 body,
@@ -27,7 +26,6 @@ app-root {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: mat-color($primary);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -200,6 +198,7 @@ app-workspace
   .mat-tab-label {
     min-width: 72px;
     text-transform: uppercase;
+    opacity: 1 !important;
   }
 }
 
@@ -211,6 +210,7 @@ app-workspace
   > .mat-tab-labels {
   .mat-tab-label {
     text-transform: uppercase;
+    opacity: 1 !important;
   }
 }
 
@@ -251,14 +251,6 @@ app-header .toolbar-page-header,
   }
 }
 
-.icon-primary {
-  color: mat-color($theme-primary-x6);
-}
-
-.highlight {
-  background-color: mat-color($theme-accent-x5);
-}
-
 app-services-service-overview > .mat-nav-list > .mat-list-item > .item-name,
 app-services-service-overview
   > .mat-nav-list
@@ -280,9 +272,6 @@ app-buses-in-progress
   > .mat-list-item,
 app-material-tree > .nav-list-tree > .item-list > .mat-list-item {
   height: 24px;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-  border-color: rgba(0, 0, 0, 0.02);
 
   .item-content > .item-name {
     display: inline-block;
@@ -311,13 +300,7 @@ app-api-menu-view {
 // use for all services trees component
 app-services-menu-view > .services-menu-view > .pnl-services-trees {
   .mat-accordion > mat-expansion-panel > mat-expansion-panel-header {
-    color: #333;
     padding: 10px 12px 10px 10px;
-  }
-  .mat-accordion
-    > mat-expansion-panel
-    > mat-expansion-panel-header.mat-expanded {
-    background-color: rgba(0, 0, 0, 0.1);
   }
   .mat-accordion
     > mat-expansion-panel
@@ -334,64 +317,45 @@ app-material-tree > .nav-list-tree > .item-list {
   .active-link:hover {
     .mat-list-item-content,
     .mat-list-item-content:hover {
-      background-color: mat-color($theme-primary-x);
       @extend .color-primary-bold;
       margin: 0;
-      border-left-color: mat-color($theme-primary-x6);
       border-left-width: 2px;
       border-left-style: solid;
     }
   }
+
   // customize namespace in tree services
   a.item-namespace > .mat-list-item-content,
   a.item-namespace > .mat-list-item-content:focus,
   a.item-namespace > .mat-list-item-content:hover {
     cursor: default;
-    background: none;
-    color: rgba(0, 0, 0, 0.87);
-    font-weight: 400;
   }
 
   // customize tree elements
   .mat-list-item > .mat-list-item-content {
     padding-left: 10px;
   }
+
   .mat-list-item > .mat-list-item-content:hover,
   .mat-list-item > .mat-list-item-content:focus {
     @extend .color-primary-light-bold;
   }
+
   // customize categories of elements
   .workspace-element-type-category-components > .mat-list-item-content,
   .workspace-element-type-category-service-assemblies > .mat-list-item-content,
   .workspace-element-type-category-shared-libraries > .mat-list-item-content {
     @extend .text-upper;
-    background: rgba(0, 0, 0, 0.02);
-    color: rgba(0, 0, 0, 0.54);
     font-weight: 500;
+
+    &:hover {
+      @extend .text-upper;
+      font-weight: 500;
+    }
 
     .item-content > .arrow-size {
       width: 16px;
     }
-  }
-  // customize hover categories of elements
-  .workspace-element-type-category-components > .mat-list-item-content:hover,
-  .workspace-element-type-category-service-assemblies
-    > .mat-list-item-content:hover,
-  .workspace-element-type-category-shared-libraries
-    > .mat-list-item-content:hover {
-    background: rgba(0, 0, 0, 0.08);
-    color: rgba(0, 0, 0, 0.54);
-    font-weight: 500;
-  }
-  // customize focus categories of elements
-  .workspace-element-type-category-components > .mat-list-item-content:focus,
-  .workspace-element-type-category-service-assemblies
-    > .mat-list-item-content:focus,
-  .workspace-element-type-category-shared-libraries
-    > .mat-list-item-content:focus {
-    background: rgba(0, 0, 0, 0.02);
-    color: rgba(0, 0, 0, 0.54);
-    font-weight: 500;
   }
 
   // declare width for ellipsis
@@ -431,22 +395,19 @@ app-material-tree > .nav-list-tree > .item-list {
 
 // all items ip/port in imports in progress
 app-buses-in-progress > .nav-list-imports-in-progress > .item-list {
+  // customize active elements
+  .active-link,
+  .active-link:hover {
+    .mat-list-item-content,
+    .mat-list-item-content:hover {
+      @extend .color-primary-bold;
+    }
+  }
+
   // customize tree elements
   .mat-list-item > .mat-list-item-content:hover,
   .mat-list-item > .mat-list-item-content:focus {
-    background-color: mat-color($theme-primary-x);
     @extend .color-primary-light-bold;
-  }
-}
-
-// use in all administration component
-.user-management-page > .user-management-panels {
-  .pnl-add-user > mat-expansion-panel > mat-expansion-panel-header.mat-expanded,
-  .pnl-list-users
-    > .mat-accordion
-    > mat-expansion-panel
-    > mat-expansion-panel-header.mat-expanded {
-    background-color: mat-color($theme-accent-x5);
   }
 }
 

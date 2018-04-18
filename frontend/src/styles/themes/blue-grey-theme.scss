@@ -1,0 +1,48 @@
+/**
+ * Copyright (C) 2017-2018 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+$petals-blue-grey-primary: mat-palette($mat-blue-grey, 700);
+$petals-blue-grey-primary-x: mat-palette($mat-blue-grey, 50);
+$petals-blue-grey-primary-x1: mat-palette($mat-blue-grey, 100);
+$petals-blue-grey-primary-x2: mat-palette($mat-blue-grey, 200);
+$petals-blue-grey-primary-x3: mat-palette($mat-blue-grey, 300);
+$petals-blue-grey-primary-x4: mat-palette($mat-blue-grey, 400);
+$petals-blue-grey-primary-x5: mat-palette($mat-blue-grey, 500);
+$petals-blue-grey-primary-x6: mat-palette($mat-blue-grey, 600);
+$petals-blue-grey-primary-x7: mat-palette($mat-blue-grey, 700);
+$petals-blue-grey-primary-x8: mat-palette($mat-blue-grey, 800);
+$petals-blue-grey-primary-x9: mat-palette($mat-blue-grey, 900);
+
+$petals-blue-grey-accent: mat-palette($mat-purple, 300);
+$petals-blue-grey-accent-x: mat-palette($mat-purple, 50);
+$petals-blue-grey-accent-x1: mat-palette($mat-purple, 100);
+$petals-blue-grey-accent-x2: mat-palette($mat-purple, 200);
+$petals-blue-grey-accent-x3: mat-palette($mat-purple, 300);
+$petals-blue-grey-accent-x4: mat-palette($mat-purple, 400);
+$petals-blue-grey-accent-x5: mat-palette($mat-purple, 500);
+$petals-blue-grey-accent-x6: mat-palette($mat-purple, 600);
+$petals-blue-grey-accent-x7: mat-palette($mat-purple, 700);
+$petals-blue-grey-accent-x8: mat-palette($mat-purple, 800);
+$petals-blue-grey-accent-x9: mat-palette($mat-purple, 900);
+
+$petals-blue-grey-warn: mat-palette($mat-deep-orange, 500);
+
+$petals-blue-grey-theme: mat-light-theme(
+  $petals-blue-grey-primary,
+  $petals-blue-grey-accent,
+  $petals-blue-grey-warn
+);

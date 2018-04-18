@@ -16,10 +16,7 @@
  */
 
 // shared
-@import './shared/_shared';
+@import './shared/shared';
 
 // colors
-@import './shared/_colors';
-
-// themes
-@import './themes/_light.theme';
+@import './shared/colors';

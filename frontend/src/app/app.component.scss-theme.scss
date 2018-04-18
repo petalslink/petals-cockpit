@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2018 Linagora
+ * Copyright (C) 2018 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,15 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import '../shared/_colors';
+@mixin custom-body-theme($theme) {
+  $primary: map-get($theme, primary);
 
-$theme: mat-light-theme($primary, $accent);
-
-// The warn palette is optional (defaults to red).
-$theme-warn: mat-palette($mat-red);
-// Create the theme object (a Sass map containing all of the palettes).
-$theme: mat-light-theme($theme-primary, $theme-accent, $theme-warn);
-// Include theme styles for core and each component used in your app.
-// Alternatively, you can import and @include the theme mixins for each component
-// that you are using.
-@include angular-material-theme($theme);
+  app-login,
+  app-setup {
+    background-color: mat-color($primary, 700);
+  }
+}

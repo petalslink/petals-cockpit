@@ -1,0 +1,48 @@
+/**
+ * Copyright (C) 2017-2018 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+$petals-nature-primary: mat-palette($mat-brown, 700);
+$petals-nature-primary-x: mat-palette($mat-brown, 50);
+$petals-nature-primary-x1: mat-palette($mat-brown, 100);
+$petals-nature-primary-x2: mat-palette($mat-brown, 200);
+$petals-nature-primary-x3: mat-palette($mat-brown, 300);
+$petals-nature-primary-x4: mat-palette($mat-brown, 400);
+$petals-nature-primary-x5: mat-palette($mat-brown, 500);
+$petals-nature-primary-x6: mat-palette($mat-brown, 600);
+$petals-nature-primary-x7: mat-palette($mat-brown, 700);
+$petals-nature-primary-x8: mat-palette($mat-brown, 800);
+$petals-nature-primary-x9: mat-palette($mat-brown, 900);
+
+$petals-nature-accent: mat-palette($mat-light-green, 500);
+$petals-nature-accent-x: mat-palette($mat-light-green, 50);
+$petals-nature-accent-x1: mat-palette($mat-light-green, 100);
+$petals-nature-accent-x2: mat-palette($mat-light-green, 200);
+$petals-nature-accent-x3: mat-palette($mat-light-green, 300);
+$petals-nature-accent-x4: mat-palette($mat-light-green, 400);
+$petals-nature-accent-x5: mat-palette($mat-light-green, 500);
+$petals-nature-accent-x6: mat-palette($mat-light-green, 600);
+$petals-nature-accent-x7: mat-palette($mat-light-green, 700);
+$petals-nature-accent-x8: mat-palette($mat-light-green, 800);
+$petals-nature-accent-x9: mat-palette($mat-light-green, 900);
+
+$petals-nature-warn: mat-palette($mat-red, 600);
+
+$petals-nature-theme: mat-light-theme(
+  $petals-nature-primary,
+  $petals-nature-accent,
+  $petals-nature-warn
+);

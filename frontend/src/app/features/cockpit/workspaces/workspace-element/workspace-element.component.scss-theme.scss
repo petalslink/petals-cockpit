@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2018 Linagora
+ * Copyright (C) 2018 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,30 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-mat-form-field [matprefix] {
-  margin-right: 10px;
-}
+@mixin custom-wrapper-theme($theme) {
+  $primary: map-get($theme, primary);
 
-.info-add-workspace mat-icon {
-  padding-right: 5px;
-}
+  .wrapper-content {
+    > .mat-tab-group
+      > .mat-tab-header
+      > .mat-tab-label-container
+      > .mat-tab-list
+      > .mat-tab-labels {
+      .mat-tab-label {
+        color: mat-color($primary, 600);
+        opacity: 1 !important;
+        &:hover {
+          background-color: mat-color($primary, 700);
+          color: mat-color($mat-grey, 50);
+        }
+      }
 
-.dotted {
-  border-bottom: 1px dotted black;
-}
-
-mat-card-title {
-  font-size: 16px;
-}
-
-.info-workspaces {
-  padding: 0;
-  div {
-    @media (min-width: 600px) {
-      padding: 10px;
-    }
-    @media (max-width: 599px) {
-      padding: 6px;
+      .mat-tab-label.mat-tab-label-active {
+        color: mat-color($primary, 700);
+        opacity: 1 !important;
+        &:hover {
+          color: mat-color($mat-grey, 50);
+        }
+      }
     }
   }
 }
