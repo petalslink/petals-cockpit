@@ -21,10 +21,13 @@ target/
 .updateCopyrightEndDate.sh
 *.ucls
 
+
 # ------------------------------------
 #              BACKEND
 # ------------------------------------
 
+*cockpit-e2e-run.err
+*cockpit-e2e-run.out
 *.mv.db
 *.trace.db
 
