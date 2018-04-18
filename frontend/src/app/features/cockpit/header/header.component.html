@@ -45,7 +45,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <mat-icon>power_settings_new</mat-icon>
     </button>
 
-    <app-generate-icon class="btn-avatar-user margin-right-x0" [matTooltip]="user.name" matTooltipPosition="below" [size]="24"
-      [text]="user.id"></app-generate-icon>
+    <app-generate-icon 
+      class="btn-avatar-user margin-right-x0 cursor-pointer" 
+      [matTooltip]="user.name" 
+      matTooltipPosition="below" 
+      [size]="24"
+      [text]="user.id"
+      [routerLink]="['/profile']"
+    ></app-generate-icon>
   </mat-toolbar>
 </div>

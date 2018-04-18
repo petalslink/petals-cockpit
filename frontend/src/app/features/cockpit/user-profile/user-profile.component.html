@@ -1,0 +1,38 @@
+<!-- Copyright (C) 2017-2018 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<div fxLayout="column" class="wrapper-content">
+  <mat-toolbar color="primary" class="toolbar-page-header" fxLayout="row" fxLayoutAlign="start center">
+    <div class="prefix-toolbar-title" fxLayout="row">
+      <mat-icon color="accent">person</mat-icon>
+    </div>
+
+    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ (user$ | async).name }}</h1>
+  </mat-toolbar>
+
+  <div fxFlex fxFlexFill class="content content-max-width">
+    <div class="central-content">
+      <mat-card>
+        <mat-card-title fxLayout="row">
+          <mat-icon color="primary">perm_data_setting</mat-icon>
+          <span class="margin-left-x1 text-upper">Preferences</span>
+        </mat-card-title>
+        <mat-card-content>
+          <app-settings-theme-color></app-settings-theme-color>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

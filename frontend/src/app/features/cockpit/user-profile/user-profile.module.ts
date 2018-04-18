@@ -16,23 +16,21 @@
  */
 
 import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
-import { AdministrationModule } from 'app/features/cockpit/administration/administration.module';
-import { UserProfileModule } from 'app/features/cockpit/user-profile/user-profile.module';
+import { UserProfileComponent } from 'app/features/cockpit/user-profile/user-profile.component';
 import { SharedModule } from 'app/shared/shared.module';
-import { CockpitRoutingModule } from './cockpit-routing.module';
-import { CockpitComponent } from './cockpit.component';
-import { HeaderComponent } from './header/header.component';
-import { WorkspacesModule } from './workspaces/workspaces.module';
 
 @NgModule({
   imports: [
     SharedModule,
-    CockpitRoutingModule,
-    WorkspacesModule,
-    AdministrationModule,
-    UserProfileModule,
+    RouterModule.forChild([
+      {
+        path: '',
+        component: UserProfileComponent,
+      },
+    ]),
   ],
-  declarations: [CockpitComponent, HeaderComponent],
+  declarations: [UserProfileComponent],
 })
-export class CockpitModule {}
+export class UserProfileModule {}
