@@ -21,14 +21,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <span matPrefix><mat-icon color="primary">edit</mat-icon></span>
     </mat-form-field>
 
-    <button cdk-focus-region-start type="submit" [disabled]="newWksForm.invalid || workspaces.isAddingWorkspace" mat-mini-fab color="primary" fxFlex="40px" matTooltip="Add a workspace"
-      matTooltipPosition="below" class="btn-add-workspace">
+    <button 
+      cdk-focus-region-start 
+      type="submit" 
+      mat-mini-fab 
+      color="primary" 
+      fxFlex="40px" 
+      matTooltip="Add a workspace"
+      matTooltipPosition="below" class="btn-add-workspace"
+      [disabled]="newWksForm.invalid || workspaces.isAddingWorkspace"
+    >
       <mat-icon>create_new_folder</mat-icon>
     </button>
   </form>
 
   <div class="margin-bottom-x1">
-    <div class="info-add-workspace margin-top-x1" fxLayout="row" fxLayoutAlign="center center" *ngIf="workspaces.list.length === 0 && !workspaces.isFetchingWorkspaces">
+    <div 
+      *ngIf="workspaces.list.length === 0 && !workspaces.isFetchingWorkspaces"
+      class="info-add-workspace margin-top-x1" 
+      fxLayout="row" 
+      fxLayoutAlign="center center" 
+    >
       <mat-icon color="primary">info</mat-icon>
       <span matLine>You don't have any workspace yet</span>
     </div>
@@ -37,9 +50,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <mat-card>
         <mat-card-content>
           <div fxLayout="row" fxFlex="100%">
-            <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-left-x1" *ngIf="workspaces.isFetchingWorkspaces; else fetched"></mat-spinner>
+            <mat-spinner 
+              *ngIf="workspaces.isFetchingWorkspaces; else fetched"
+              class="margin-left-x1" 
+              [diameter]="16" 
+              [strokeWidth]="1" 
+            ></mat-spinner>
             <ng-template #fetched>
-              <label [ngPlural]="workspaces.list.length">
+              <label class="color-primary-light-bold" [ngPlural]="workspaces.list.length">
                 <ng-template ngPluralCase="=1">1 Workspace</ng-template>
                 <ng-template ngPluralCase="other">{{ workspaces.list.length }} Workspaces</ng-template>
               </label>
@@ -49,9 +67,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </mat-card>
       <mat-divider></mat-divider>
       <mat-card class="info-workspaces">
-        <div fxLayout="row" class="cursor-pointer background-color-hover-light-green-x2 info-workspace"
-          *ngFor="let workspace of workspaces.list; trackBy:trackByWorkspace" (click)="select(workspace)"
-          [class.background-color-light-green-x2]="workspaces.selectedWorkspaceId === workspace.id"
+        <div 
+          *ngFor="let workspace of workspaces.list; trackBy:trackByWorkspace" 
+          class="cursor-pointer info-workspace"
+          fxLayout="row" 
+          (click)="select(workspace)"          
+          [class.info-workspace-selected]="workspaces.selectedWorkspaceId === workspace.id"
+          [class.info-workspace-no-selected]="workspace.id"
         >
           <mat-card-title-group>
             <div fxLayout="column" fxLayoutAlign="center start">

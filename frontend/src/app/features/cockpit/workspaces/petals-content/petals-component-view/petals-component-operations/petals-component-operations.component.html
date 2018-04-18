@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <mat-card-content fxLayoutWrap class="margin-top-x1 list-actions-name" *ngIf="component.state">
           <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:trackByComponentState" class="color-primary padding-bottom-x1">
             <button
-              class="text-upper margin-right-x1"
+              class="text-upper margin-right-x1 color-primary"
               mat-raised-button
               (click)="changeState(possibleState.newStateAfterAction)"
               [disabled]="component.isUpdating || ((possibleState.actionName === 'Unload' || possibleState.actionName === 'Uninstall') && component.serviceUnits.length > 0)"

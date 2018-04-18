@@ -14,9 +14,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" class="wrapper-content">
-  <mat-toolbar color="primary" class="toolbar-page-header">
-    <div class="prefix-toolbar-title">
-      <mat-icon>settings</mat-icon>
+  <mat-toolbar color="primary" class="toolbar-page-header" fxLayout="row" fxLayoutAlign="start center">
+    <div class="prefix-toolbar-title" fxLayout="row">
+      <mat-icon color="accent">settings</mat-icon>
     </div>
 
     <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">Administration</h1>
@@ -31,9 +31,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <label fxFlex class="text-upper">User Management</label>
 
               <div class="margin-right-x1">
-                <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-right-x1" *ngIf="isFetchingUsers$ | async; else usersFetched"></mat-spinner>
+                <mat-spinner 
+                  *ngIf="isFetchingUsers$ | async; else usersFetched"
+                  class="margin-right-x1" 
+                  [diameter]="16" 
+                  [strokeWidth]="1" 
+                ></mat-spinner>
                 <ng-template #usersFetched>
-                  <span class="subtitle" *ngIf="users.length > 0" matLine>
+                  <span class="color-primary-light-bold" *ngIf="users.length > 0" matLine>
                     {{ users.length }} user{{ (users.length) >= 2 ? 's' : '' }}
                   </span>
                 </ng-template>
@@ -53,7 +58,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap.gt-md="10px" class="user-management-panels">
 
           <div fxFlex [ngClass.gt-md]="'card-auto-size'" class="pnl-add-user margin-top-x1">
-            <mat-expansion-panel #el fxLayout="column" class="exp-pnl-add-user" [hideToggle]="false" (closed)="addEditUser.reset()">
+            <mat-expansion-panel 
+              #el 
+              fxLayout="column" 
+              class="exp-pnl-add-user" 
+              [hideToggle]="false" 
+              (closed)="addEditUser.reset()"
+            >
               <mat-expansion-panel-header fxLayout="row">
                 <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
                   <mat-icon class="margin-right-x1" color="primary">person_add</mat-icon>
@@ -69,15 +80,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
           <div fxFlex [ngClass.gt-md]="'card-auto-size'" class="pnl-list-users margin-top-x1">
             <mat-accordion displayMode="flat" [multi]="false">
-              <mat-expansion-panel #el [hideToggle]="false" fxLayout="column" *ngFor="let user of users; trackBy:trackByUser" [ngClass]="'exp-pnl-user-'+user.id"
-                (closed)="addEditUser.reset()">
+              <mat-expansion-panel 
+                #el 
+                *ngFor="let user of users; trackBy:trackByUser" 
+                fxLayout="column" 
+                [hideToggle]="false" 
+                [ngClass]="'exp-pnl-user-'+user.id"
+                (closed)="addEditUser.reset()"
+              >
 
                 <mat-expansion-panel-header class="mat-body" fxLayout="row">
                   <mat-panel-title fxLayout="row" fxLayoutAlign="start center">
                     <app-generate-icon mat-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
                     <span class="margin-left-x1 user-id">{{ user.id }}</span>
                     <span class="margin-left-x1 light-bold user-name" *ngIf="isLargeScreen$ | async">({{ user.name }})</span>
-                    <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-left-x1" *ngIf="user.isAdding || user.isModifying"></mat-spinner>
+                    <mat-spinner 
+                      *ngIf="user.isAdding || user.isModifying"
+                      class="margin-left-x1" 
+                      [diameter]="16" 
+                      [strokeWidth]="1" 
+                    ></mat-spinner>
                   </mat-panel-title>
                 </mat-expansion-panel-header>
 
