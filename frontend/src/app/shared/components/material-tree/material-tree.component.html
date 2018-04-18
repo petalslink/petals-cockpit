@@ -13,7 +13,13 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<mat-nav-list dense *ngFor="let item of tree" [ngStyle]="{'marginLeft.px': margin}" class="nav-list-tree">
+<mat-nav-list 
+    dense 
+    *ngFor="let item of tree" 
+    [ngStyle]="{'marginLeft.px': margin}" 
+    [disableRipple]="item.cssClass === 'item-namespace'"
+    class="nav-list-tree"
+  >
   <div class="item-list">
     <a
       mat-list-item
