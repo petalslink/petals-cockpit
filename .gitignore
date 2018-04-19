@@ -26,8 +26,7 @@ target/
 #              BACKEND
 # ------------------------------------
 
-*cockpit-e2e-run.err
-*cockpit-e2e-run.out
+e2e/logs/*.log
 *.mv.db
 *.trace.db
 
