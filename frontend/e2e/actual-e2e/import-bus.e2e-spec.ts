@@ -150,7 +150,7 @@ describe(`Import Bus`, () => {
 
     // FIXME: error not long enough with a real backend, no button to view more
     // testing this in UI test should be enough
-    error.expectToBe('error', errorActualBackendLongText);
+    error.expectToBeWaitTimeout('error', errorActualBackendLongText);
     // error.openAndCheckDialog(errorActualBackendLongText);
 
     // clear the form and the error
@@ -222,7 +222,7 @@ describe(`Import Bus`, () => {
     // try to import
     importBus.importButton.click();
 
-    error.expectToBe(
+    error.expectToBeWaitTimeout(
       'error',
       `org.ow2.petals.jmx.api.api.exception.ConnectionErrorException: java.net.UnknownHostException: hostname: Name or service not known`
     );

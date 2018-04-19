@@ -69,6 +69,19 @@ export class MessageComponentPage {
     expect(this.message.getText()).toEqual(message);
   }
 
+  expectToBeWaitTimeout(
+    type: 'info' | 'warning' | 'error' | 'success',
+    message: string
+  ) {
+    browser.wait(
+      EC.visibilityOf(this.component.$(`.msg-content.${type}`)),
+      waitTimeout
+    );
+
+    expect(this.component.$(`.msg-content.${type}`).isDisplayed()).toBe(true);
+    expect(this.message.getText()).toEqual(message);
+  }
+
   expectHidden() {
     expect(this.content.isPresent()).toBe(false);
   }

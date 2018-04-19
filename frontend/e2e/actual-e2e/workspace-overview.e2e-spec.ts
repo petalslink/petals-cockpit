@@ -35,7 +35,10 @@ describe(`Workspace Overview`, () => {
 
     workspace
       .getInfoUserWorkspaceMessage()
-      .expectToBe('info', `You are the only one using this workspace.`);
+      .expectToBeWaitTimeout(
+        'info',
+        `You are the only one using this workspace.`
+      );
 
     expect(
       workspace.users.$$(`mat-list-item .mat-list-text`).getText()
@@ -62,7 +65,7 @@ describe(`Workspace Overview`, () => {
 
     ws2
       .getInfoUserWorkspaceSharedMessage()
-      .expectToBe('info', `5 people are using this workspace.`);
+      .expectToBeWaitTimeout('info', `5 people are using this workspace.`);
 
     expect(
       workspace.users.$$(`mat-list-item .mat-list-text`).getText()
