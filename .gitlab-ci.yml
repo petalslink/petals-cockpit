@@ -42,6 +42,7 @@ variables:
     - cd frontend
     - export PATH=`yarn bin`:$PATH
     - time yarn --frozen-lockfile --link-duplicates --non-interactive
+    - yarn run webdriver-manager update --versions.chrome=2.37
     - du -hs node_modules || true
     - cd ..
   cache:
@@ -112,7 +113,7 @@ test-frontend:
     - echo $! > pid-nohup.txt
     - sleep 5
     - time yarn run cypress:chromium
-    - time yarn run ng -- e2e --serve=false -p 4200
+    - time yarn run ng e2e --serve=false -p 4200 --webdriver-update=false
     - kill -9 $(cat pid-nohup.txt)
     - rm pid-nohup.txt
   # Protractor tests are unstable and may fail unexpectedly
