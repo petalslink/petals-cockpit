@@ -42,6 +42,7 @@ variables:
     - cd frontend
     - export PATH=`yarn bin`:$PATH
     - time yarn --frozen-lockfile --link-duplicates --non-interactive
+    # webdriver updates frozen to 2.37, see: https://gitlab.com/linagora/petals-cockpit/issues/469
     - yarn run webdriver-manager update --versions.chrome=2.37
     - du -hs node_modules || true
     - cd ..
@@ -113,6 +114,7 @@ test-frontend:
     - echo $! > pid-nohup.txt
     - sleep 5
     - time yarn run cypress:chromium
+    # webdriver updates frozen to 2.37, see: https://gitlab.com/linagora/petals-cockpit/issues/469
     - time yarn run ng e2e --serve=false -p 4200 --webdriver-update=false
     - kill -9 $(cat pid-nohup.txt)
     - rm pid-nohup.txt
@@ -257,18 +259,24 @@ e2e-product:
   # services:
   #   - petals/petals-esb-test
   variables:
-    COCKPIT_CONFIG: e2e/default.yml
+    COCKPIT_CONFIG: e2e/e2e-backend-config.yml
   script:
     # TODO reuse script?
     - export JAR=$(ls -1 petals-cockpit-*/lib/petals-cockpit-*.jar 2>/dev/null)
     - export COCKPIT="java -ea -jar $JAR"
     - time $COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml
-    - nohup $COCKPIT server $COCKPIT_CONFIG &
+    - nohup $COCKPIT server $COCKPIT_CONFIG  > e2e/logs/cockpit-e2e-run.out.log 2> e2e/logs/cockpit-e2e-run.err.log &
     - cd frontend
     - sleep 10
-    - time yarn run e2e:product
+    # webdriver updates frozen to 2.37, see: https://gitlab.com/linagora/petals-cockpit/issues/469
+    - time yarn run e2e:product --webdriver-update=false
   # Protractor tests are unstable and may fail unexpectedly
   # this workaround has to be removed if we stop relying on protractor
+  artifacts:
+    expire_in: 1 week
+    name: ${CI_JOB_NAME}-backendLogs-${CI_BUILD_REF:0:7}
+    paths:
+    - e2e/logs/
   retry: 1
 
 ### Test gitlab ci

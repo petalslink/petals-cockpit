@@ -21,9 +21,19 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 Run `yarn run test` to execute the unit tests.
 
-## Running end-to-end tests
+## Running "end-to-end" tests
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Considered end to end by frontend standards (ie: functionnal, integration)   
+
+Run `ng e2e` to execute the end-to-end tests (against frontend mocks) via [Protractor](http://www.protractortest.org/).  
+
+To execute end-to-end tests (against frontend mocks) via [cypress](https://www.cypress.io/)
+* run `yarn cypress open` for interactive mode
+* run `yarn cypress:chromium` for headless mode
+
+## Running actual end-to-end tests
+
+See `../e2e/README.md` to execute end-to-end tests against a real backend via [Protractor](http://www.protractortest.org/).
 
 ## Further help
 

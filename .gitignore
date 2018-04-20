@@ -21,10 +21,12 @@ target/
 .updateCopyrightEndDate.sh
 *.ucls
 
+
 # ------------------------------------
 #              BACKEND
 # ------------------------------------
 
+e2e/logs/*.log
 *.mv.db
 *.trace.db
 

@@ -46,7 +46,7 @@ describe(`Administration`, () => {
 
       admin
         .getInfoUserManagementMessage()
-        .expectToBe(
+        .expectToBeWaitTimeout(
           'info',
           `As an administrator, you can ADD, EDIT, and DELETE any user.`
         );
@@ -208,6 +208,6 @@ describe(`Administration`, () => {
 
     AdminPage.waitAndGet()
       .getNotAdminMessage()
-      .expectToBe('warning', `You are not an administrator.`);
+      .expectToBeWaitTimeout('warning', `You are not an administrator.`);
   });
 });
