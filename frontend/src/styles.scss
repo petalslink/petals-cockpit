@@ -17,4 +17,76 @@
 
 /* You can add global styles to this file, and also import other style files */
 
-@import './styles/_index';
+@import './styles/index';
+
+// themes
+@import './styles/themes/default-theme.scss';
+@import './styles/themes/blue-theme.scss';
+@import './styles/themes/dark-blue-theme.scss';
+@import './styles/themes/blue-grey-theme.scss';
+@import './styles/themes/green-theme.scss';
+@import './styles/themes/purple-theme.scss';
+@import './styles/themes/nature-theme.scss';
+@import './styles/themes/material-theme.scss';
+@import './styles/themes/unicorn-theme.scss';
+
+@import './styles/shared/shared.scss-theme';
+@import './styles/shared/utils.scss-theme';
+@import 'app/features/cockpit/workspaces/workspace/workspace.component.scss-theme';
+@import 'app/features/cockpit/workspaces/workspace-element/workspace-element.component.scss-theme';
+@import 'app/features/cockpit/workspaces/workspaces-list/workspaces-list.component.scss-theme';
+@import 'app/app.component.scss-theme';
+
+@mixin custom-components-theme($theme) {
+  @include custom-color-theme($theme);
+  @include custom-shared-theme($theme);
+  @include custom-sidenav-theme($theme);
+  @include custom-wrapper-theme($theme);
+  @include custom-modal-workspaces-theme($theme);
+  @include custom-body-theme($theme);
+}
+
+.default-theme {
+  @include angular-material-theme($petals-theme);
+  @include custom-components-theme($petals-theme);
+}
+
+.blue-theme {
+  @include angular-material-theme($petals-blue-theme);
+  @include custom-components-theme($petals-blue-theme);
+}
+
+.dark-blue-theme {
+  @include angular-material-theme($petals-dark-blue-theme);
+  @include custom-components-theme($petals-dark-blue-theme);
+}
+
+.blue-grey-theme {
+  @include angular-material-theme($petals-blue-grey-theme);
+  @include custom-components-theme($petals-blue-grey-theme);
+}
+
+.green-theme {
+  @include angular-material-theme($petals-green-theme);
+  @include custom-components-theme($petals-green-theme);
+}
+
+.purple-theme {
+  @include angular-material-theme($petals-purple-theme);
+  @include custom-components-theme($petals-purple-theme);
+}
+
+.nature-theme {
+  @include angular-material-theme($petals-nature-theme);
+  @include custom-components-theme($petals-nature-theme);
+}
+
+.material-theme {
+  @include angular-material-theme($petals-material-theme);
+  @include custom-components-theme($petals-material-theme);
+}
+
+.unicorn-theme {
+  @include angular-material-theme($petals-unicorn-theme);
+  @include custom-components-theme($petals-unicorn-theme);
+}

@@ -15,11 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// shared
-@import './shared/_shared';
+import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
-// colors
-@import './shared/_colors';
+import { UserProfileComponent } from 'app/features/cockpit/user-profile/user-profile.component';
+import { SharedModule } from 'app/shared/shared.module';
 
-// themes
-@import './themes/_light.theme';
+@NgModule({
+  imports: [
+    SharedModule,
+    RouterModule.forChild([
+      {
+        path: '',
+        component: UserProfileComponent,
+      },
+    ]),
+  ],
+  declarations: [UserProfileComponent],
+})
+export class UserProfileModule {}

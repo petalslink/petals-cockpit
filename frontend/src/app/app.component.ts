@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { ObservableMedia } from '@angular/flex-layout';
 import { MatIconRegistry } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -36,6 +37,8 @@ import { ScreenSize } from 'app/shared/state/ui.interface';
 export class AppComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
+  @HostBinding('class') componentCssClass: any;
+
   public notificationOptions = {
     position: ['bottom', 'right'],
     timeOut: 2500,
@@ -49,7 +52,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private store$: Store<IStore>,
     private media$: ObservableMedia,
     private matIconRegistry: MatIconRegistry,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    public overlayContainer: OverlayContainer
   ) {}
 
   ngOnInit() {
@@ -64,6 +68,20 @@ export class AppComponent implements OnInit, OnDestroy {
         )
       )
       .subscribe();
+
+    this.store$
+      .select(state => state.ui.settings || { theme: '' })
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(settings => {
+        const effectiveTheme = settings.theme.toLowerCase();
+        this.componentCssClass = effectiveTheme;
+        const classList = this.overlayContainer.getContainerElement().classList;
+        const toRemove = Array.from(classList).filter((item: string) =>
+          item.includes('-theme')
+        );
+        classList.remove(...toRemove);
+        classList.add(effectiveTheme);
+      });
 
     // svg icons for petals tree & overviews
     const busLogo = this.sanitizer.bypassSecurityTrustResourceUrl(

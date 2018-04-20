@@ -40,6 +40,11 @@ const routes: Routes = [
         loadChildren:
           'app/features/cockpit/administration/administration.module#AdministrationModule',
       },
+      {
+        path: 'profile',
+        loadChildren:
+          'app/features/cockpit/user-profile/user-profile.module#UserProfileModule',
+      },
     ],
   },
 ];

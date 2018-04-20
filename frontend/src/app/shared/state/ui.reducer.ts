@@ -28,6 +28,7 @@ export namespace UiReducer {
     | Ui.CloseWorkspaces
     | Ui.ChangeScreenSize
     | Ui.SetTitles
+    | Ui.ChangeTheme
     | Users.Disconnected;
 
   export function reducer(table = uiFactory(), action: All): IUi {
@@ -52,6 +53,9 @@ export namespace UiReducer {
       }
       case Ui.SetTitlesType: {
         return setTitles(table, action.payload);
+      }
+      case Ui.ChangeThemeType: {
+        return changeTheme(table, action.payload);
       }
       case Users.DisconnectedType: {
         return {
@@ -119,6 +123,14 @@ export namespace UiReducer {
         ? payload.titleSubPart
         : ui.titleSubPart,
     };
+  }
+
+  function changeTheme(ui: IUi, payload: { theme: string }): IUi {
+    return Object.assign({}, ui, {
+      settings: {
+        theme: payload.theme,
+      },
+    });
   }
 
   function changeScreenSize(ui: IUi, payload: { screenSize: ScreenSize }): IUi {

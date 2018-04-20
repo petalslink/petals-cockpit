@@ -18,6 +18,7 @@
 import { NgModule } from '@angular/core';
 
 import { AdministrationModule } from 'app/features/cockpit/administration/administration.module';
+import { UserProfileModule } from 'app/features/cockpit/user-profile/user-profile.module';
 import { SharedModule } from 'app/shared/shared.module';
 import { CockpitRoutingModule } from './cockpit-routing.module';
 import { CockpitComponent } from './cockpit.component';
@@ -30,6 +31,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
     CockpitRoutingModule,
     WorkspacesModule,
     AdministrationModule,
+    UserProfileModule,
   ],
   declarations: [CockpitComponent, HeaderComponent],
 })

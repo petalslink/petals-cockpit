@@ -30,6 +30,7 @@ import { ServicesReducer } from 'app/features/cockpit/workspaces/state/services/
 import { SharedLibrariesReducer } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
 import { WorkspacesReducer } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
 import { enableBatching } from 'app/shared/helpers/batch-actions.helper';
+import { initStateFromLocalStorage } from 'app/shared/helpers/local-storage.helper';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
 import { UiReducer } from '../state/ui.reducer';
@@ -53,9 +54,13 @@ export const reducers: ActionReducerMap<IStore> = {
 
 // if environment is != from production
 // use storeFreeze to avoid state mutation
-const metaReducersDev = [storeFreeze, enableBatching];
+const metaReducersDev = [
+  storeFreeze,
+  enableBatching,
+  initStateFromLocalStorage,
+];
 
-const metaReducersProd = [enableBatching];
+const metaReducersProd = [enableBatching, initStateFromLocalStorage];
 
 export const metaReducers = environment.production
   ? metaReducersProd

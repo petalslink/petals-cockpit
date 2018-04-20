@@ -42,6 +42,7 @@ export interface TreeElement<T extends TreeElement<T>> {
 })
 export class MaterialTreeComponent<TE extends TreeElement<TE>>
   implements OnInit {
+  @Input() disableRipple: boolean;
   // pass the tree to display
   @Input() tree: TreeElement<TE>[];
   // pass the search to display

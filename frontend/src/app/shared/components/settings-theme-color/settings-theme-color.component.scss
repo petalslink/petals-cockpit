@@ -14,31 +14,3 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-mat-form-field [matprefix] {
-  margin-right: 10px;
-}
-
-.info-add-workspace mat-icon {
-  padding-right: 5px;
-}
-
-.dotted {
-  border-bottom: 1px dotted black;
-}
-
-mat-card-title {
-  font-size: 16px;
-}
-
-.info-workspaces {
-  padding: 0;
-  div {
-    @media (min-width: 600px) {
-      padding: 10px;
-    }
-    @media (max-width: 599px) {
-      padding: 6px;
-    }
-  }
-}

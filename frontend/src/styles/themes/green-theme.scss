@@ -1,0 +1,48 @@
+/**
+ * Copyright (C) 2017-2018 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+$petals-green-primary: mat-palette($mat-teal, 700);
+$petals-green-primary-x: mat-palette($mat-teal, 50);
+$petals-green-primary-x1: mat-palette($mat-teal, 100);
+$petals-green-primary-x2: mat-palette($mat-teal, 200);
+$petals-green-primary-x3: mat-palette($mat-teal, 300);
+$petals-green-primary-x4: mat-palette($mat-teal, 400);
+$petals-green-primary-x5: mat-palette($mat-teal, 500);
+$petals-green-primary-x6: mat-palette($mat-teal, 600);
+$petals-green-primary-x7: mat-palette($mat-teal, 700);
+$petals-green-primary-x8: mat-palette($mat-teal, 800);
+$petals-green-primary-x9: mat-palette($mat-teal, 900);
+
+$petals-green-accent: mat-palette($mat-lime, 300);
+$petals-green-accent-x: mat-palette($mat-lime, 50);
+$petals-green-accent-x1: mat-palette($mat-lime, 100);
+$petals-green-accent-x2: mat-palette($mat-lime, 200);
+$petals-green-accent-x3: mat-palette($mat-lime, 300);
+$petals-green-accent-x4: mat-palette($mat-lime, 400);
+$petals-green-accent-x5: mat-palette($mat-lime, 500);
+$petals-green-accent-x6: mat-palette($mat-lime, 600);
+$petals-green-accent-x7: mat-palette($mat-lime, 700);
+$petals-green-accent-x8: mat-palette($mat-lime, 800);
+$petals-green-accent-x9: mat-palette($mat-lime, 900);
+
+$petals-green-warn: mat-palette($mat-red, 500);
+
+$petals-green-theme: mat-light-theme(
+  $petals-green-primary,
+  $petals-green-accent,
+  $petals-green-warn
+);

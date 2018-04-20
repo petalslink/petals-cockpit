@@ -20,7 +20,7 @@ import { Actions, EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { SimpleNotificationsModule } from 'angular2-notifications';
-import { Ng2Webstorage } from 'ngx-webstorage';
+import { LocalStorageService, Ng2Webstorage } from 'ngx-webstorage';
 
 import { BusesInProgressEffects } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.effects';
 import { BusesEffects } from 'app/features/cockpit/workspaces/state/buses/buses.effects';
@@ -48,6 +48,7 @@ export const providers: Provider[] = [
     provide: Actions,
     useClass: ActionsWithBatched,
   },
+  LocalStorageService,
 ];
 
 @NgModule({

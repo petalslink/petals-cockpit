@@ -1,0 +1,48 @@
+/**
+ * Copyright (C) 2017-2018 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+$petals-material-primary: mat-palette($mat-indigo);
+$petals-material-primary-x: mat-palette($mat-indigo, 50);
+$petals-material-primary-x1: mat-palette($mat-indigo, 100);
+$petals-material-primary-x2: mat-palette($mat-indigo, 200);
+$petals-material-primary-x3: mat-palette($mat-indigo, 300);
+$petals-material-primary-x4: mat-palette($mat-indigo, 400);
+$petals-material-primary-x5: mat-palette($mat-indigo, 500);
+$petals-material-primary-x6: mat-palette($mat-indigo, 600);
+$petals-material-primary-x7: mat-palette($mat-indigo, 700);
+$petals-material-primary-x8: mat-palette($mat-indigo, 800);
+$petals-material-primary-x9: mat-palette($mat-indigo, 900);
+
+$petals-material-accent: mat-palette($mat-pink);
+$petals-material-accent-x: mat-palette($mat-pink, 50);
+$petals-material-accent-x1: mat-palette($mat-pink, 100);
+$petals-material-accent-x2: mat-palette($mat-pink, 200);
+$petals-material-accent-x3: mat-palette($mat-pink, 300);
+$petals-material-accent-x4: mat-palette($mat-pink, 400);
+$petals-material-accent-x5: mat-palette($mat-pink, 500);
+$petals-material-accent-x6: mat-palette($mat-pink, 600);
+$petals-material-accent-x7: mat-palette($mat-pink, 700);
+$petals-material-accent-x8: mat-palette($mat-pink, 800);
+$petals-material-accent-x9: mat-palette($mat-pink, 900);
+
+$petals-material-warn: mat-palette($mat-red, 500);
+
+$petals-material-theme: mat-light-theme(
+  $petals-material-primary,
+  $petals-material-accent,
+  $petals-material-warn
+);

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import './_colors';
+@import './colors';
 
 .width-full {
   width: 100%;
@@ -23,14 +23,6 @@
 
 .text-center {
   text-align: center;
-}
-
-.color-primary {
-  color: mat-color($primary);
-}
-
-.color-accent {
-  color: mat-color($accent);
 }
 
 .bold {
@@ -46,21 +38,18 @@
 }
 
 .color-primary-light-bold {
-  @extend .color-primary;
   @extend .light-bold;
 }
+
 .color-accent-light-bold {
-  @extend .color-accent;
   @extend .light-bold;
 }
 
 .color-primary-bold {
-  @extend .color-primary;
   @extend .bold;
 }
 
 .color-accent-bold {
-  @extend .color-accent;
   @extend .bold;
 }
 
@@ -122,32 +111,6 @@ $directions: '', '-left', '-right', '-top', '-bottom';
 
 // generate the color palette
 @mixin generate-colors($name, $colorHexa, $index, $lightOrDark) {
-  // @debug ".color-#{$name}-x#{$index}";
-  // $darkenOrLightenAndIndex: "";
-  // $lightOrDark: "-#{$lightOrDark}";
-
-  // @if $index == 0 {
-  //   $darkenOrLightenAndIndex: "";
-  // } @else {
-  //   $darkenOrLightenAndIndex: "-x#{$index}";
-  // }
-
-  // .color-#{$name}-x#{$index} {
-  //   color: lighten($colorHexa, 10 * $index);
-  // }
-
-  // .background-color-#{$name}-x#{$index} {
-  //   background-color: lighten($colorHexa, 10 * $index);
-  // }
-
-  // .border-color-#{$name}-x#{$index} {
-  //   border-color: lighten($colorHexa, 10 * $index);
-  // }
-
-  // .background-color-hover-#{$name}-x#{$index}:hover {
-  //   background-color: lighten($colorHexa, 10 * $index);
-  // }
-
   .color-#{$name}-x#{$index} {
     color: lighten($colorHexa, 10 * $index);
   }
@@ -162,13 +125,5 @@ $directions: '', '-left', '-right', '-top', '-bottom';
 
   .background-color-hover-#{$name}-x#{$index}:hover {
     background-color: lighten($colorHexa, 10 * $index);
-  }
-}
-
-@each $colorName, $colorHexa in $color-palette {
-  @for $indexColor from 1 through $color-declination {
-    @include generate-colors($colorName, $colorHexa, $indexColor, '');
-    //   @include generate-colors($colorName, $colorHexa, $indexColor, "light");
-    //   @include generate-colors($colorName, $colorHexa, $indexColor, "dark");
   }
 }

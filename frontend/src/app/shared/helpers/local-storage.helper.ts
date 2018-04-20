@@ -15,15 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import '../shared/_colors';
+import { ActionReducer, INIT, UPDATE } from '@ngrx/store';
 
-$theme: mat-light-theme($primary, $accent);
-
-// The warn palette is optional (defaults to red).
-$theme-warn: mat-palette($mat-red);
-// Create the theme object (a Sass map containing all of the palettes).
-$theme: mat-light-theme($theme-primary, $theme-accent, $theme-warn);
-// Include theme styles for core and each component used in your app.
-// Alternatively, you can import and @include the theme mixins for each component
-// that you are using.
-@include angular-material-theme($theme);
+export function initStateFromLocalStorage(
+  reducer: ActionReducer<any>
+): ActionReducer<any> {
+  return function(state, action) {
+    const newState = reducer(state, action);
+    if ([INIT.toString(), UPDATE.toString()].includes(action.type)) {
+      const jsonTheme = localStorage.getItem('petals-cockpit-settings-theme');
+      if (jsonTheme) {
+        return Object.assign({}, newState, {
+          ui: {
+            ...newState.ui,
+            settings: {
+              ...newState.ui.settings,
+              theme: JSON.parse(jsonTheme),
+            },
+          },
+        });
+      }
+    }
+    return newState;
+  };
+}

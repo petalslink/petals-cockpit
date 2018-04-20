@@ -131,9 +131,8 @@ describe('WorkspacesListComponent', () => {
       'You are the only one using this workspace.',
     ]);
     expect(
-      fixture.debugElement.queryAll(
-        By.css('div.background-color-light-green-x2')
-      ).length
+      fixture.debugElement.queryAll(By.css('div.info-workspace-selected'))
+        .length
     ).toEqual(0);
 
     component.workspaces = {
@@ -143,7 +142,7 @@ describe('WorkspacesListComponent', () => {
     fixture.detectChanges();
 
     const greenWorkspaces = fixture.debugElement.queryAll(
-      By.css('div.background-color-light-green-x2')
+      By.css('div.info-workspace-selected')
     );
     expect(greenWorkspaces.length).toEqual(1);
     expect(
