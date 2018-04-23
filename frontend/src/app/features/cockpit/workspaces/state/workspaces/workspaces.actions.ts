@@ -192,4 +192,23 @@ export namespace Workspaces {
     readonly type = DeleteUserSuccessType;
     constructor(public readonly payload: { id: string }) {}
   }
+
+  export const RefreshServicesType = '[Workspaces] Refresh services';
+  export class RefreshServices implements Action {
+    readonly type = RefreshServicesType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const RefreshServicesErrorType = '[Workspaces] Refresh services error';
+  export class RefreshServicesError implements Action {
+    readonly type = RefreshServicesErrorType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const RefreshServicesSuccessType =
+    '[Workspaces] Refresh services success';
+  export class RefreshServicesSuccess implements Action {
+    readonly type = RefreshServicesSuccessType;
+    constructor(public readonly payload: { id: string }) {}
+  }
 }

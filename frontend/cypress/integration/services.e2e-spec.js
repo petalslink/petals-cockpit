@@ -1,5 +1,5 @@
 import { COMPONENT_DOM } from '../support/component.dom';
-import { SERVICES_TREE_DOM } from '../support/services.dom';
+import { SERVICES_TREE_DOM, SERVICES_DOM } from '../support/services.dom';
 import { WORKSPACE_DOM } from '../support/workspace.dom';
 import {
   expectedInterfacesTreeWks0,
@@ -215,6 +215,42 @@ describe(`Service`, () => {
     cy.expectEndpointsTreeToBe(expectedEndpointsTreeActionStateComp1);
   });
 
+  it('should refresh services on clicking button', () => {
+    cy.login('admin', 'admin');
+
+    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 0`);
+
+    cy
+      .get(WORKSPACE_DOM.tabs)
+      .contains(`Services`)
+      .click();
+
+    cy.expectInterfacesTreeToBe(expectedInterfacesTreeWks0);
+
+    cy.expectServicesTreeToBe(expectedServicesTreeWks0);
+
+    cy.expectEndpointsTreeToBe(expectedEndpointsTreeWks0);
+
+    cy.get(SERVICES_DOM.refreshSpinner).should('not.be.visible');
+    cy
+      .get(SERVICES_DOM.refreshBtn)
+      .should('be.enabled')
+      .click();
+
+    cy.get(SERVICES_DOM.refreshSpinner).should('be.visible');
+    cy.get(SERVICES_DOM.refreshBtn).should('be.disabled');
+
+    // waiting for refresh button to be enabled again
+    cy.get(SERVICES_DOM.refreshSpinner).should('not.be.visible');
+    cy.get(SERVICES_DOM.refreshBtn).should('be.enabled');
+
+    cy.expectInterfacesTreeToBe(expectedInterfacesTreeRefreshedWks0);
+
+    cy.expectServicesTreeToBe(expectedServicesTreeRefreshedWks0);
+
+    cy.expectEndpointsTreeToBe(expectedEndpointsTreeRefreshedWks0);
+  });
+
   const expectedInterfacesTreeWks1 = [
     `http://namespace-example.fr/interface/metiers/version/1.0`,
     `Interface-Localpart0`,
@@ -230,6 +266,23 @@ describe(`Service`, () => {
   const expectedEndpointsTreeWks1 = [
     `edpt-89p82661-test-31o4-l391-05`,
     `edpt-89p82661-test-31o4-l391-06`,
+  ];
+
+  const expectedInterfacesTreeRefreshedWks0 = [
+    `http://namespace-example.fr/interface/technique/version/1.0`,
+    `Interface-LocalpartRefreshed0`,
+    `Interface-LocalpartRefreshed1`,
+  ];
+
+  const expectedServicesTreeRefreshedWks0 = [
+    `http://namespace-example.fr/service/technique/version/1.0`,
+    `LocalpartRefreshed0`,
+    `LocalpartRefreshed1`,
+  ];
+
+  const expectedEndpointsTreeRefreshedWks0 = [
+    `edpt-89p82661-refr-31o4-l391-00`,
+    `edpt-89p82661-refr-31o4-l391-01`,
   ];
 
   const expectedInterfacesTreeActionStateComp0 = [

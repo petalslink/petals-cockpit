@@ -105,4 +105,18 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
       })
     );
   }
+
+  refreshServices(workspaceId: string) {
+    const refreshedServices = workspacesService.getRefreshedServices();
+    return helper.response(204).pipe(
+      tap(_ => {
+        setTimeout(() => {
+          (this.sseService as SseServiceMock).triggerSseEvent(
+            SseActions.ServicesUpdatedSse,
+            refreshedServices
+          );
+        }, 1000);
+      })
+    );
+  }
 }

@@ -64,6 +64,8 @@ export interface IWorkspacesCommon {
   isAddingWorkspace: boolean;
   isFetchingWorkspaces: boolean;
 
+  isFetchingServices: boolean;
+
   searchPetals: string;
 }
 
@@ -83,6 +85,9 @@ export function workspacesTableFactory(): IWorkspacesTable {
 
     isAddingWorkspace: false,
     isFetchingWorkspaces: false,
+
+    isFetchingServices: false,
+
     searchPetals: '',
   };
 }

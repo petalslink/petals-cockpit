@@ -13,8 +13,35 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" class="margin-top-x1 services-menu-view">
+<div fxLayout="column" class="services-menu-view">
+  <div class="wrapper-search-services" fxLayout="row" fxLayoutGap="10px">
+    <mat-form-field fxFlex>
+      <input class="search" matInput placeholder="Search">
+      <span matPrefix><mat-icon color="primary">search</mat-icon></span>
+    </mat-form-field>
 
+    <button
+      mat-mini-fab
+      class="btn-refresh-services"
+      color="primary"
+      fxFlex="40px"
+      matTooltip="Refresh services"
+      matTooltipPosition="below"
+      (click)="refreshServices()"
+      [disabled]="isFetchingServices$ | async"
+    >
+      <mat-spinner
+        [diameter]="24"
+        [strokeWidth]="2"
+        color="primary"
+        *ngIf="isFetchingServices$ | async; else default"
+      ></mat-spinner>
+      <ng-template #default>
+        <mat-icon>refresh</mat-icon>
+      </ng-template>
+    </button>
+
+  </div>
   <div fxFlex class="pnl-services-trees">
     <mat-accordion displayMode="flat" [multi]="true">
       <mat-expansion-panel fxLayout="column" class="exp-pnl-interfaces-tree" [hideToggle]="false" [expanded]="true">

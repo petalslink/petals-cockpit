@@ -29,6 +29,7 @@ import {
   removeById,
   updateById,
 } from 'app/shared/helpers/jstable.helper';
+import { SseActions } from 'app/shared/services/sse.service';
 import {
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
@@ -60,6 +61,8 @@ export namespace WorkspacesReducer {
     | Workspaces.AddUserError
     | Workspaces.AddUserSuccess
     | Workspaces.DeleteUserSuccess
+    | Workspaces.RefreshServices
+    | SseActions.ServicesUpdated
     | Users.Disconnected;
 
   export function reducer(
@@ -135,6 +138,12 @@ export namespace WorkspacesReducer {
       }
       case Workspaces.DeleteUserSuccessType: {
         return deleteUserSuccess(table, action.payload);
+      }
+      case Workspaces.RefreshServicesType: {
+        return refreshServices(table);
+      }
+      case SseActions.ServicesUpdatedType: {
+        return servicesUpdated(table);
       }
       case Users.DisconnectedType: {
         return workspacesTableFactory();
@@ -329,6 +338,14 @@ export namespace WorkspacesReducer {
         ),
       ],
     });
+  }
+
+  function refreshServices(table: IWorkspacesTable) {
+    return { ...table, isFetchingServices: true };
+  }
+
+  function servicesUpdated(table: IWorkspacesTable) {
+    return { ...table, isFetchingServices: false };
   }
 
   function deleteUserSuccess(table: IWorkspacesTable, payload: { id: string }) {
