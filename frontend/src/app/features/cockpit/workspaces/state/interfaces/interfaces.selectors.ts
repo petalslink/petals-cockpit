@@ -88,8 +88,11 @@ export const getCurrentInterfaceServicesEndpoints = createSelector(
   ): IInterfaceOverview => {
     if (_interface) {
       const serviceMap = new Map<string, { nsp: string; local: string }>();
+      const filteredInterfaceServices = interfaceServices.filter(
+        id => servicesByIds[id]
+      );
 
-      for (const id of interfaceServices) {
+      for (const id of filteredInterfaceServices) {
         const qName = findNamespaceLocalpart(servicesByIds[id].name);
         serviceMap.set(id, { nsp: qName.namespace, local: qName.localpart });
       }
@@ -99,7 +102,7 @@ export const getCurrentInterfaceServicesEndpoints = createSelector(
         ..._interface,
         namespace: interfaceWithNspLocalpart.namespace,
         localpart: interfaceWithNspLocalpart.localpart,
-        services: interfaceServices.map(id => {
+        services: filteredInterfaceServices.map(id => {
           const svc = servicesByIds[id] as IServiceRow;
           return {
             ...svc,
@@ -107,9 +110,11 @@ export const getCurrentInterfaceServicesEndpoints = createSelector(
             localpart: serviceMap.get(id).local,
           };
         }),
-        endpoints: interfaceEndpoints.map(id => {
-          return endpointsByIds[id] as IEndpointRow;
-        }),
+        endpoints: interfaceEndpoints
+          .filter(id => endpointsByIds[id])
+          .map(id => {
+            return endpointsByIds[id] as IEndpointRow;
+          }),
       };
     } else {
       return undefined;

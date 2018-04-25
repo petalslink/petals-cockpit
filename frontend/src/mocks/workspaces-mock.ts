@@ -623,6 +623,12 @@ const refreshedServices = {
     },
   },
   services: {
+    idService1: {
+      id: 'idService1',
+      name:
+        '{http://namespace-example.fr/service/metiers/version/1.0}Localpart1',
+      components: ['idComp0'],
+    },
     refreshedService0: {
       id: 'refreshedService0',
       name:

@@ -6,6 +6,7 @@ import {
   expectedServicesTreeWks0,
   expectedEndpointsTreeWks0,
 } from '../support/helper.const';
+import { SERVICE_OVERVIEW_DOM } from '../support/service.dom';
 
 describe(`Service`, () => {
   beforeEach(() => {
@@ -251,6 +252,60 @@ describe(`Service`, () => {
     cy.expectEndpointsTreeToBe(expectedEndpointsTreeRefreshedWks0);
   });
 
+  it('should show removed service as removed when clicking on refresh button', () => {
+    cy.login('admin', 'admin');
+
+    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 0`);
+
+    cy
+      .get(WORKSPACE_DOM.tabs)
+      .contains(`Services`)
+      .click();
+
+    cy.clickElementInTree(`exp-pnl-services-tree`, `Localpart0`);
+
+    cy
+      .get(SERVICES_DOM.refreshBtn)
+      .should('be.enabled')
+      .click();
+
+    cy.get(SERVICES_DOM.refreshBtn).should('be.disabled');
+
+    // waiting for refresh button to be enabled again
+    cy.get(SERVICES_DOM.refreshBtn).should('be.enabled');
+
+    cy
+      .get('app-workspace-element')
+      .should('contain', 'This service has been removed');
+  });
+
+  it('should not show existing service as removed when clicking on refresh button', () => {
+    cy.login('admin', 'admin');
+
+    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 0`);
+
+    cy
+      .get(WORKSPACE_DOM.tabs)
+      .contains(`Services`)
+      .click();
+
+    cy.clickElementInTree(`exp-pnl-services-tree`, `Localpart1`);
+
+    cy
+      .get(SERVICES_DOM.refreshBtn)
+      .should('be.enabled')
+      .click();
+
+    cy.get(SERVICES_DOM.refreshBtn).should('be.disabled');
+
+    // waiting for refresh button to be enabled again
+    cy.get(SERVICES_DOM.refreshBtn).should('be.enabled');
+
+    cy
+      .get('app-workspace-element')
+      .should('not.contain', 'This service has been removed');
+  });
+
   const expectedInterfacesTreeWks1 = [
     `http://namespace-example.fr/interface/metiers/version/1.0`,
     `Interface-Localpart0`,
@@ -278,6 +333,8 @@ describe(`Service`, () => {
     `http://namespace-example.fr/service/technique/version/1.0`,
     `LocalpartRefreshed0`,
     `LocalpartRefreshed1`,
+    `http://namespace-example.fr/service/metiers/version/1.0`,
+    `Localpart1`,
   ];
 
   const expectedEndpointsTreeRefreshedWks0 = [

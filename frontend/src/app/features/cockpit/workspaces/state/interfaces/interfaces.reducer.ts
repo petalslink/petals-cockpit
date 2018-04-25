@@ -20,14 +20,17 @@ import {
   JsTable,
   mergeInto,
   putAll,
+  toJsTable,
   updateById,
 } from 'app/shared/helpers/jstable.helper';
 import {
   IInterfaceBackendDetails,
   IInterfaceBackendSSE,
 } from 'app/shared/services/interfaces.service';
+import { SseActions } from 'app/shared/services/sse.service';
 import { Interfaces } from './interfaces.actions';
 import {
+  IInterfaceRow,
   IInterfacesTable,
   interfaceRowFactory,
   interfacesTableFactory,
@@ -42,7 +45,9 @@ export namespace InterfacesReducer {
     | Interfaces.FetchDetailsError
     | Interfaces.FetchDetailsSuccess
     | Interfaces.Clean
-    | Workspaces.Clean;
+    | Workspaces.Clean
+    | SseActions.ServicesUpdated
+    | SseActions.BusDeleted;
 
   export function reducer(
     table = interfacesTableFactory(),
@@ -72,6 +77,12 @@ export namespace InterfacesReducer {
       }
       case Workspaces.CleanType: {
         return interfacesTableFactory();
+      }
+      case SseActions.ServicesUpdatedType: {
+        return interfacesUpdated(table, action.payload);
+      }
+      case SseActions.BusDeletedType: {
+        return interfacesUpdated(table, action.payload.content);
       }
       default:
         return table;
@@ -128,5 +139,37 @@ export namespace InterfacesReducer {
     return updateById(table, payload.id, {
       isFetchingDetails: false,
     });
+  }
+
+  function interfacesUpdated(
+    table: IInterfacesTable,
+    payload: { interfaces: { [key: string]: IInterfaceBackendSSE } }
+  ) {
+    const interfaces = interfaceBackendSseMapToInterfaceRowMap(
+      payload.interfaces
+    );
+    return { ...table, ...toJsTable(interfaces) };
+  }
+
+  function interfaceBackendSseMapToInterfaceRowMap(ibsMap: {
+    [key: string]: IInterfaceBackendSSE;
+  }): {
+    [key: string]: IInterfaceRow;
+  } {
+    const initialInterfaces: {
+      [key: string]: IInterfaceRow;
+    } = {};
+    const interfaces = Object.values(ibsMap).reduce(
+      (previousValue, currentValue) => {
+        previousValue[currentValue.id] = {
+          ...currentValue,
+          isFetchingDetails: false,
+        };
+        return previousValue;
+      },
+      initialInterfaces
+    );
+
+    return interfaces;
   }
 }
