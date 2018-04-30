@@ -297,7 +297,7 @@
             <artifactId>enunciate-docs</artifactId>
             <version>${enunciate.version}</version>
           </dependency>
-	  <dependency>
+          <dependency>
             <!--This dependency is a workaround, see https://github.com/stoicflame/enunciate/issues/763 -->
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
