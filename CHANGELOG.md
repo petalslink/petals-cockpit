@@ -1,3 +1,33 @@
+<a name="0.22.0"></a>
+# [0.22.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.21.0...v0.22.0) (2018-04-30)
+
+
+### Bug Fixes
+
+* **product:** add timeout to actual e2e tests to match real backend errors ([98fd117](https://gitlab.com/linagora/petals-cockpit/commit/98fd117))
+* **frontend:** disable ripple on item-namespace in services trees ([258c08a](https://gitlab.com/linagora/petals-cockpit/commit/258c08a))
+* **frontend:** fix buttons not visible on firefox ([0d70e07](https://gitlab.com/linagora/petals-cockpit/commit/0d70e07)), closes [#444](https://gitlab.com/linagora/petals-cockpit/issues/444)
+* **frontend:** fix workspace selection dialog ([68ae62c](https://gitlab.com/linagora/petals-cockpit/commit/68ae62c)), closes [#449](https://gitlab.com/linagora/petals-cockpit/issues/449)
+* **frontend:** use theme color and fix the align center of title ([eb15933](https://gitlab.com/linagora/petals-cockpit/commit/eb15933))
+* **frontend:** remove services on bus deletion ([01157bc](https://gitlab.com/linagora/petals-cockpit/commit/01157bc)), closes [#462](https://gitlab.com/linagora/petals-cockpit/issues/462)
+
+
+### Features
+
+* **backend:** upgrade command add-user to generate a workspace ([dcea6d6](https://gitlab.com/linagora/petals-cockpit/commit/dcea6d6))
+* **frontend:** add localStorage to keep theme selected in browser ([a6bfabb](https://gitlab.com/linagora/petals-cockpit/commit/a6bfabb)), closes [#460](https://gitlab.com/linagora/petals-cockpit/issues/460)
+* **frontend:** add profile page of connected user ([cea4611](https://gitlab.com/linagora/petals-cockpit/commit/cea4611))
+* **frontend:** add sl version in overview ([fe10a97](https://gitlab.com/linagora/petals-cockpit/commit/fe10a97)), closes [#448](https://gitlab.com/linagora/petals-cockpit/issues/448)
+* **frontend:** also check sl version on upload ([a28b9b4](https://gitlab.com/linagora/petals-cockpit/commit/a28b9b4))
+* **frontend:** choose colors and themes ([7afcd7c](https://gitlab.com/linagora/petals-cockpit/commit/7afcd7c))
+* **frontend:** display endpoint details overview ([ccdc0a4](https://gitlab.com/linagora/petals-cockpit/commit/ccdc0a4)), closes [#453](https://gitlab.com/linagora/petals-cockpit/issues/453)
+* **frontend:** display interface details overview ([6bf805a](https://gitlab.com/linagora/petals-cockpit/commit/6bf805a)), closes [#452](https://gitlab.com/linagora/petals-cockpit/issues/452)
+* **frontend:** display service details overview ([74c3eda](https://gitlab.com/linagora/petals-cockpit/commit/74c3eda)), closes [#411](https://gitlab.com/linagora/petals-cockpit/issues/411)
+* **frontend:** override shared libraries ([978253b](https://gitlab.com/linagora/petals-cockpit/commit/978253b)), closes [#435](https://gitlab.com/linagora/petals-cockpit/issues/435)
+* **frontend:** refresh services button ([1dac1d2](https://gitlab.com/linagora/petals-cockpit/commit/1dac1d2)), closes [#468](https://gitlab.com/linagora/petals-cockpit/issues/468)
+
+
+
 <a name="0.21.0"></a>
 # [0.21.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.20.0...v0.21.0) (2018-03-05)
 
