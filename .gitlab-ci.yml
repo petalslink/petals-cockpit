@@ -251,6 +251,7 @@ e2e-product:
     - /^front\/.*$/
     - /^back\/.*$/
     - /^product\/.*$/
+    - tags
   dependencies:
     # one or the other
     - package-product
