@@ -25,7 +25,7 @@
 mat-sidenav-container {
   background-image: url(../../../../../assets/img/gray_jean.png);
 
-  // all menu views have the same size (petals, service, api)
+  // all menu views have the same size (petals, service)
   > mat-sidenav {
     height: 100%;
     // customize the buttons of petals menu view
