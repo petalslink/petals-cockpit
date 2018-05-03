@@ -5,7 +5,7 @@
 # Branch full/* will run build-backend, test-frontend, build-frontend, e2e-product, package-product, electron-cypress, chromium-cypress
 # Branch master will run build-backend, test-frontend, build-frontend, build-frontend-pages, package-product-master, pages, e2e-product, electron-cypress, chromium-cypress
 # Other branches will run build-backend, test-frontend, build-frontend, e2e-product, package-product
-# Tags will run build-backend, build-frontend, e2e-product, release-product
+# Tags will run build-backend, build-frontend, release-product
 
 # Runs tests and debug procedure detailed EOF
 
