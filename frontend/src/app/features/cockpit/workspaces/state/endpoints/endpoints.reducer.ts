@@ -20,16 +20,19 @@ import {
   JsTable,
   mergeInto,
   putAll,
+  toJsTable,
   updateById,
 } from 'app/shared/helpers/jstable.helper';
 import {
   IEndpointBackendDetails,
   IEndpointBackendSSE,
 } from 'app/shared/services/endpoints.service';
+import { SseActions } from 'app/shared/services/sse.service';
 import { Endpoints } from './endpoints.actions';
 import {
   endpointRowFactory,
   endpointsTableFactory,
+  IEndpointRow,
   IEndpointsTable,
 } from './endpoints.interface';
 
@@ -42,7 +45,9 @@ export namespace EndpointsReducer {
     | Endpoints.FetchDetailsError
     | Endpoints.FetchDetailsSuccess
     | Endpoints.Clean
-    | Workspaces.Clean;
+    | Workspaces.Clean
+    | SseActions.ServicesUpdated
+    | SseActions.BusDeleted;
 
   export function reducer(
     table = endpointsTableFactory(),
@@ -72,6 +77,12 @@ export namespace EndpointsReducer {
       }
       case Workspaces.CleanType: {
         return endpointsTableFactory();
+      }
+      case SseActions.ServicesUpdatedType: {
+        return endpointsUpdated(table, action.payload);
+      }
+      case SseActions.BusDeletedType: {
+        return endpointsUpdated(table, action.payload.content);
       }
       default:
         return table;
@@ -128,5 +139,35 @@ export namespace EndpointsReducer {
     return updateById(table, payload.id, {
       isFetchingDetails: false,
     });
+  }
+
+  function endpointsUpdated(
+    table: IEndpointsTable,
+    payload: { endpoints: { [key: string]: IEndpointBackendSSE } }
+  ) {
+    const endpoints = endpointBackendSseMapToendpointRowMap(payload.endpoints);
+    return { ...table, ...toJsTable(endpoints) };
+  }
+
+  function endpointBackendSseMapToendpointRowMap(ebsMap: {
+    [key: string]: IEndpointBackendSSE;
+  }): {
+    [key: string]: IEndpointRow;
+  } {
+    const initialEndpoints: {
+      [key: string]: IEndpointRow;
+    } = {};
+    const endpoints = Object.values(ebsMap).reduce(
+      (previousValue, currentValue) => {
+        previousValue[currentValue.id] = {
+          ...currentValue,
+          isFetchingDetails: false,
+        };
+        return previousValue;
+      },
+      initialEndpoints
+    );
+
+    return endpoints;
   }
 }

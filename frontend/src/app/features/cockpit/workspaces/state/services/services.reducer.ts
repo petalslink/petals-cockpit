@@ -20,14 +20,17 @@ import {
   JsTable,
   mergeInto,
   putAll,
+  toJsTable,
   updateById,
 } from 'app/shared/helpers/jstable.helper';
 import {
   IServiceBackendDetails,
   IServiceBackendSSE,
 } from 'app/shared/services/services.service';
+import { SseActions } from 'app/shared/services/sse.service';
 import { Services } from './services.actions';
 import {
+  IServiceRow,
   IServicesTable,
   serviceRowFactory,
   servicesTableFactory,
@@ -42,7 +45,9 @@ export namespace ServicesReducer {
     | Services.FetchDetailsError
     | Services.FetchDetailsSuccess
     | Services.Clean
-    | Workspaces.Clean;
+    | Workspaces.Clean
+    | SseActions.ServicesUpdated
+    | SseActions.BusDeleted;
 
   export function reducer(
     table = servicesTableFactory(),
@@ -72,6 +77,12 @@ export namespace ServicesReducer {
       }
       case Workspaces.CleanType: {
         return servicesTableFactory();
+      }
+      case SseActions.ServicesUpdatedType: {
+        return servicesUpdated(table, action.payload);
+      }
+      case SseActions.BusDeletedType: {
+        return servicesUpdated(table, action.payload.content);
       }
       default:
         return table;
@@ -125,5 +136,35 @@ export namespace ServicesReducer {
     return updateById(table, payload.id, {
       isFetchingDetails: false,
     });
+  }
+
+  function servicesUpdated(
+    table: IServicesTable,
+    payload: { services: { [key: string]: IServiceBackendSSE } }
+  ) {
+    const services = serviceBackendSseMapToserviceRowMap(payload.services);
+    return { ...table, ...toJsTable(services) };
+  }
+
+  function serviceBackendSseMapToserviceRowMap(sbsMap: {
+    [key: string]: IServiceBackendSSE;
+  }): {
+    [key: string]: IServiceRow;
+  } {
+    const initialServices: {
+      [key: string]: IServiceRow;
+    } = {};
+    const services = Object.values(sbsMap).reduce(
+      (previousValue, currentValue) => {
+        previousValue[currentValue.id] = {
+          ...currentValue,
+          isFetchingDetails: false,
+        };
+        return previousValue;
+      },
+      initialServices
+    );
+
+    return services;
   }
 }

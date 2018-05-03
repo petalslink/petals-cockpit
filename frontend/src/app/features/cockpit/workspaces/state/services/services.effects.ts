@@ -23,13 +23,8 @@ import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
-import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
-import { Interfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.actions';
 import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import { ServicesService } from 'app/shared/services/services.service';
-import { SseActions } from 'app/shared/services/sse.service';
 import { environment } from 'environments/environment';
 
 @Injectable()
@@ -66,26 +61,5 @@ export class ServicesEffects {
           })
         )
       )
-    );
-
-  @Effect()
-  watchServicesChanged$: Observable<Action> = this.actions$
-    .ofType<SseActions.ServicesUpdated>(SseActions.ServicesUpdatedType)
-    .pipe(
-      map(action => {
-        const data = action.payload;
-        const services = toJsTable(data.services);
-        const endpoints = toJsTable(data.endpoints);
-        const interfaces = toJsTable(data.interfaces);
-
-        return batchActions([
-          new Interfaces.Clean(),
-          new Services.Clean(),
-          new Endpoints.Clean(),
-          new Interfaces.Added(interfaces),
-          new Services.Added(services),
-          new Endpoints.Added(endpoints),
-        ]);
-      })
     );
 }
