@@ -38,21 +38,6 @@ describe(`Workspace`, () => {
       .should(`have.class`, `mat-tab-label-active`);
   });
 
-  it(`should active the tab api`, () => {
-    cy.login('admin', 'admin');
-
-    cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav);
-    cy.get(WORKSPACE_DOM.menu.workspaceMenu);
-    cy
-      .get(WORKSPACE_DOM.tabs)
-      .contains(`Api`)
-      .click()
-      .should(`have.class`, `mat-tab-label-active`);
-    cy
-      .get(MESSAGE_DOM.texts.msgDetails)
-      .contains(`There is no content for this tab yet.`);
-  });
-
   // TODO: for now there's an ongoing issue with hover
   // https://github.com/cypress-io/cypress/issues/953
   // it(`should display the current username`, () => {
