@@ -53,10 +53,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
 
-/**
- * TODO can I avoid transforming ids to string just for json output... maybe with a json mapper or whatever...
- *
- */
+// TODO can I avoid transforming ids to string just for json output... maybe with a json mapper or whatever...
 public class WorkspaceContent implements WorkspaceEvent.Data {
 
     @Valid
