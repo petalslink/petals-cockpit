@@ -42,8 +42,6 @@ variables:
     - cd frontend
     - export PATH=`yarn bin`:$PATH
     - time yarn --frozen-lockfile --link-duplicates --non-interactive
-    # webdriver updates frozen to 2.37, see: https://gitlab.com/linagora/petals-cockpit/issues/469
-    - yarn run webdriver-manager update --versions.chrome=2.37
     - du -hs node_modules || true
     - cd ..
   cache:
@@ -114,8 +112,7 @@ test-frontend:
     - echo $! > pid-nohup.txt
     - sleep 5
     - time yarn run cypress:chromium
-    # webdriver updates frozen to 2.37, see: https://gitlab.com/linagora/petals-cockpit/issues/469
-    - time yarn run ng e2e --serve=false -p 4200 --webdriver-update=false
+    - time yarn run ng e2e --serve=false -p 4200
     - kill -9 $(cat pid-nohup.txt)
     - rm pid-nohup.txt
   # Protractor tests are unstable and may fail unexpectedly
@@ -269,8 +266,7 @@ e2e-product:
     - nohup $COCKPIT server $COCKPIT_CONFIG  > e2e/logs/cockpit-e2e-run.out.log 2> e2e/logs/cockpit-e2e-run.err.log &
     - cd frontend
     - sleep 10
-    # webdriver updates frozen to 2.37, see: https://gitlab.com/linagora/petals-cockpit/issues/469
-    - time yarn run e2e:product --webdriver-update=false
+    - time yarn run e2e:product
   # Protractor tests are unstable and may fail unexpectedly
   # this workaround has to be removed if we stop relying on protractor
   artifacts:
