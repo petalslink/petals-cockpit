@@ -265,6 +265,23 @@ public class WorkspaceResource {
         workspace.changeComponentParameters(compId, action);
     }
 
+    /**
+     * @param containerId
+     * @param file
+     * @param fileDisposition
+     * @param overrides Override the name and the version of the shared library.
+     * An example of overrides:
+     * <pre class="prettyprint language-json">
+     * {
+     *   "sharedLibrary": {
+     *     "name": "SL 1",
+     *     "version": "1.0"
+     *   }
+     * }
+     * </pre>
+     * @return
+     * @throws Exception
+     */
     @POST
     @Path("/containers/{containerId}/sharedlibraries")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -332,6 +349,30 @@ public class WorkspaceResource {
         }
     }
 
+    /**
+     * @param containerId
+     * @param file
+     * @param fileDisposition
+     * @param overrides Override the name of the component and/or the shared libraries needed by the component, they are optional.
+     * An example of overrides:
+     * <pre class="prettyprint language-json">
+     * {
+     *   "name": "petals-se-pojo",
+     *   "sharedLibraries": [
+     *     {
+     *       "name": "SL 1",
+     *       "version": "1.0"
+     *     },
+     *     {
+     *       "name": "SL 2",
+     *       "version": "2.0alpha"
+     *     }
+     *   ]
+     * }
+     * </pre>
+     * @return
+     * @throws Exception
+     */
     @POST
     @Path("/containers/{containerId}/components")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -391,6 +432,16 @@ public class WorkspaceResource {
         }
     }
 
+    /**
+     * @param containerId
+     * @param file
+     * @param fileDisposition
+     * @param overrides Override the name of the service assembly.
+     * An example of overrides:
+     * <pre>sa-new-name</pre>
+     * @return
+     * @throws Exception
+     */
     @POST
     @Path("/containers/{containerId}/serviceassemblies")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
