@@ -31,7 +31,7 @@ import io.dropwizard.db.DataSourceFactory;
 /**
  * Read from the main configuration YAML.
  * 
- * @author vnoel
+ * @author vnoel, psouquet
  *
  */
 public class CockpitConfiguration extends Configuration {
@@ -81,4 +81,19 @@ public class CockpitConfiguration extends Configuration {
     public JooqFactory getJooqFactory() {
         return jooq;
     }
+
+    @Valid
+    @NotNull
+    private LDAPConfigFactory ldapConfig = new LDAPConfigFactory();
+
+    @JsonProperty("ldapConfig")
+    public LDAPConfigFactory getLDAPConfigFactory() {
+        return ldapConfig;
+    }
+
+    @JsonProperty("ldapConfig")
+    public void setLDAPConfigFactory(LDAPConfigFactory factory) {
+        this.ldapConfig = factory;
+    }
+
 }
