@@ -103,9 +103,7 @@ describe(`Login component`, () => {
     expect(DOM.loginButton.disabled).toBe(false);
   });
 
-  // FIXME Related to issue #469
-  // tslint:disable-next-line:ban
-  xit(`should change the login button during connect`, () => {
+  it(`should change the login button during connect`, () => {
     spyOn(component, 'onSubmit').and.callThrough();
     spyOn(store, 'dispatch').and.callThrough();
 
@@ -118,12 +116,12 @@ describe(`Login component`, () => {
     setInputValue(DOM.passwordInpt, user.password);
     fixture.detectChanges();
     expect(DOM.loginButton.disabled).toBe(false);
-    expect(DOM.loginButton.innerText).toEqual(`Log in`);
+    expect(DOM.loginButton.textContent.toLowerCase()).toContain(`log in`);
 
     click(DOM.loginButton);
     fixture.detectChanges();
     expect(DOM.loginButton.disabled).toBe(true);
-    expect(DOM.loginButton.innerText.trim()).toEqual(`Logging in`);
+    expect(DOM.loginButton.textContent.toLowerCase()).toContain(`logging in`);
     expect(component.onSubmit).toHaveBeenCalledWith(user);
     expect(store.dispatch).toHaveBeenCalledWith(
       new Users.Connect({
@@ -140,14 +138,14 @@ describe(`Login component`, () => {
       );
       fixture.detectChanges();
       expect(DOM.loginButton.disabled).toBe(true);
-      expect(DOM.loginButton.innerText.trim()).toEqual(`Logging in`);
+      expect(DOM.loginButton.textContent.toLowerCase()).toContain(`logging in`);
     });
 
     it('if connect fails', () => {
       store.dispatch(new Users.ConnectError());
       fixture.detectChanges();
       expect(DOM.loginButton.disabled).toBe(false);
-      expect(DOM.loginButton.innerText).toEqual(`Log in`);
+      expect(DOM.loginButton.textContent.toLowerCase()).toContain(`log in`);
       expect(DOM.errorTxt).toEqual(`Username and password do not match`);
     });
   });

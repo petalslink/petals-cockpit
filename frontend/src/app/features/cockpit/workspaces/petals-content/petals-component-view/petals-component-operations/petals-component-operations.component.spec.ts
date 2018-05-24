@@ -90,10 +90,8 @@ describe('Petals component operations', () => {
     expect(placeholders).toEqual(['enable-https', 'http-port']);
   });
 
-  // FIXME Related to issue #469
-  // tslint:disable-next-line:ban
-  xit(`should show the state of the component and update it when input changes`, () => {
-    expect(DOM.compState.innerText).toEqual('Loaded');
+  it(`should show the state of the component and update it when input changes`, () => {
+    expect(DOM.compState.textContent.toLowerCase()).toContain('loaded');
 
     component.component = {
       ...component.component,
@@ -102,12 +100,10 @@ describe('Petals component operations', () => {
 
     fixture.detectChanges();
 
-    expect(DOM.compState.innerText).toEqual('Started');
+    expect(DOM.compState.textContent.toLowerCase()).toContain('started');
   });
 
-  // FIXME Related to issue #469
-  // tslint:disable-next-line:ban
-  xdescribe(`should show the available states in buttons`, () => {
+  describe(`should show the available states in buttons`, () => {
     it(`should have install and unload if loaded`, () => {
       component.component = {
         ...component.component,
@@ -116,10 +112,13 @@ describe('Petals component operations', () => {
 
       fixture.detectChanges();
 
-      const actionsName = DOM.actionsNamesList.map(
-        actionName => actionName.innerText
-      );
-      expect(actionsName).toEqual(['INSTALL', 'UNLOAD']);
+      const expectedActions = ['install', 'unload'];
+      expect(DOM.actionsNamesList.length).toBe(expectedActions.length);
+      DOM.actionsNamesList.forEach((actionName, i) => {
+        expect(actionName.textContent.toLowerCase()).toContain(
+          expectedActions[i]
+        );
+      });
     });
 
     it(`should have start, uninstall, and unload if shutdown`, () => {
@@ -130,12 +129,15 @@ describe('Petals component operations', () => {
 
       fixture.detectChanges();
 
-      const actionsName = DOM.actionsNamesList.map(
-        actionName => actionName.innerText
-      );
       // TODO the order is incorrect, but there is a bug in @angular/testing
       // https://github.com/angular/angular/issues/13066
-      expect(actionsName).toEqual(['UNLOAD', 'START', 'UNINSTALL']);
+      const expectedActions = ['unload', 'start', 'uninstall'];
+      expect(DOM.actionsNamesList.length).toBe(expectedActions.length);
+      DOM.actionsNamesList.forEach((actionName, i) => {
+        expect(actionName.textContent.toLowerCase()).toContain(
+          expectedActions[i]
+        );
+      });
     });
 
     it(`should have stop if started`, () => {
@@ -146,10 +148,13 @@ describe('Petals component operations', () => {
 
       fixture.detectChanges();
 
-      const actionsName = DOM.actionsNamesList.map(
-        actionName => actionName.innerText
-      );
-      expect(actionsName).toEqual(['STOP']);
+      const expectedActions = ['stop'];
+      expect(DOM.actionsNamesList.length).toBe(expectedActions.length);
+      DOM.actionsNamesList.forEach((actionName, i) => {
+        expect(actionName.textContent.toLowerCase()).toContain(
+          expectedActions[i]
+        );
+      });
     });
 
     it(`should have start, uninstall, and unload if stopped`, () => {
@@ -160,12 +165,15 @@ describe('Petals component operations', () => {
 
       fixture.detectChanges();
 
-      const actionsName = DOM.actionsNamesList.map(
-        actionName => actionName.innerText
-      );
       // TODO the order is incorrect, but there is a bug in @angular/testing
       // https://github.com/angular/angular/issues/13066
-      expect(actionsName).toEqual(['UNLOAD', 'START', 'UNINSTALL']);
+      const expectedActions = ['unload', 'start', 'uninstall'];
+      expect(DOM.actionsNamesList.length).toBe(expectedActions.length);
+      DOM.actionsNamesList.forEach((actionName, i) => {
+        expect(actionName.textContent.toLowerCase()).toContain(
+          expectedActions[i]
+        );
+      });
     });
   });
 
