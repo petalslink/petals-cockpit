@@ -1,3 +1,12 @@
+<a name="0.23.0"></a>
+# [0.23.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.22.0...v0.23.0) (2018-05-24)
+
+
+### Bug Fixes
+
+* **frontend:** fix bug with services updated ([d525036](https://gitlab.com/linagora/petals-cockpit/commit/d525036)), closes [#470](https://gitlab.com/linagora/petals-cockpit/issues/470)
+
+
 <a name="0.22.0"></a>
 # [0.22.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.21.0...v0.22.0) (2018-04-30)
 
