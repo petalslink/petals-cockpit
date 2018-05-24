@@ -161,6 +161,17 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
             }
         });
 
+        // Check if LDAP config is set
+        final LDAPConfigFactory ldapc = configuration.getLDAPConfigFactory();
+        if (ldapc.isConfigurationValid()) {
+            LOG.info("Valid LDAP configuration found.");
+            LOG.debug("\nurl = {}\nbind dn = {}\nbind pass = {}\nfilter = {}\nscope = {}\nid attribute = {}",
+                    ldapc.getUrl(), ldapc.getBindDn(), ldapc.getBindPass(), ldapc.getFilter(), ldapc.getScope(),
+                    ldapc.getIdAttribute());
+        } else {
+            LOG.info("No valid LDAP configuration found.");
+        }
+        
         environment.jersey().register(new PetalsAdminExceptionMapper(configuration.isShowPetalsAdminStacktraces()));
 
         environment.jersey().register(UserSession.class);
