@@ -61,7 +61,7 @@ describe('Administration edit user', () => {
   beforeEach(
     async(() => {
       TestBed.configureTestingModule({
-        imports: [SharedModule, NoopAnimationsModule],
+        imports: [SharedModule.forRoot(), NoopAnimationsModule],
         declarations: [TestHostAddUserComponent, AddEditUserComponent],
       }).compileComponents();
     })
@@ -98,7 +98,7 @@ describe('Administration edit user', () => {
   });
 
   it(`should trigger an output when cancelling and reset form values`, () => {
-    spyOn(component, 'onCancel');
+    spyOn(component, 'evtCancel');
 
     setInputValue(DOM.usernameInpt, 'usr1');
     setInputValue(DOM.nameInpt, 'User 1');
@@ -108,15 +108,15 @@ describe('Administration edit user', () => {
 
     expect(DOM.cancelFormBtn.disabled).toBe(false);
 
-    expect(component.onCancel).not.toHaveBeenCalled();
+    expect(component.evtCancel).not.toHaveBeenCalled();
 
     click(DOM.cancelFormBtn);
 
-    expect(component.onCancel).toHaveBeenCalled();
+    expect(component.evtCancel).toHaveBeenCalled();
   });
 
   it(`should trigger an output when adding user`, () => {
-    spyOn(component, 'onSubmit');
+    spyOn(component, 'evtSubmit');
 
     setInputValue(DOM.usernameInpt, 'usr1');
     setInputValue(DOM.nameInpt, 'User 1');
@@ -126,11 +126,11 @@ describe('Administration edit user', () => {
 
     expect(DOM.addUserFormBtn.disabled).toBe(false);
 
-    expect(component.onSubmit).not.toHaveBeenCalled();
+    expect(component.evtSubmit).not.toHaveBeenCalled();
 
     click(DOM.addUserFormBtn);
 
-    expect(component.onSubmit).toHaveBeenCalled();
+    expect(component.evtSubmit).toHaveBeenCalled();
   });
 
   it(`should only display name and password if there's a user in input`, () => {
@@ -145,8 +145,8 @@ describe('Administration edit user', () => {
   });
 
   it(`should trigger an output to update a user only if the name has changed or new password`, () => {
-    spyOn(component, 'onSubmit');
-    spyOn(component, 'onCancel');
+    spyOn(component, 'evtSubmit');
+    spyOn(component, 'evtCancel');
 
     component.user = {
       id: 'usr1',
@@ -157,15 +157,15 @@ describe('Administration edit user', () => {
 
     expect(DOM.nameInpt.value).toEqual('User 1');
 
-    expect(component.onSubmit).not.toHaveBeenCalled();
-    expect(component.onCancel).not.toHaveBeenCalled();
+    expect(component.evtSubmit).not.toHaveBeenCalled();
+    expect(component.evtCancel).not.toHaveBeenCalled();
 
     expect(DOM.addUserFormBtn.disabled).toBe(false);
     click(DOM.addUserFormBtn);
     fixture.detectChanges();
 
-    expect(component.onSubmit).not.toHaveBeenCalled();
-    expect(component.onCancel).toHaveBeenCalled();
+    expect(component.evtSubmit).not.toHaveBeenCalled();
+    expect(component.evtCancel).toHaveBeenCalled();
   });
 
   it(`should display a delete button only if a user is passed in input`, () => {
@@ -200,7 +200,7 @@ describe('Administration edit user', () => {
   });
 
   it(`should trigger an ouput to delete a user`, () => {
-    spyOn(component, 'onDelete');
+    spyOn(component, 'evtDelete');
 
     component.user = {
       id: 'usr1',
@@ -214,7 +214,7 @@ describe('Administration edit user', () => {
     click(DOM.deleteFormBtn);
     fixture.detectChanges();
 
-    expect(component.onDelete).toHaveBeenCalled();
+    expect(component.evtDelete).toHaveBeenCalled();
   });
 });
 
@@ -223,18 +223,18 @@ describe('Administration edit user', () => {
     <app-add-edit-user
       [user]="user"
       [canDelete]="canDelete"
-      (onSubmit)="onSubmit($event)"
-      (onCancel)="onCancel($event)"
-      (onDelete)="onDelete($event)"></app-add-edit-user>
+      (evtSubmit)="evtSubmit($event)"
+      (evtCancel)="evtCancel($event)"
+      (evtDelete)="evtDelete($event)"></app-add-edit-user>
   `,
 })
 class TestHostAddUserComponent {
   user: IUser;
   canDelete: boolean;
 
-  onSubmit() {}
+  evtSubmit() {}
 
-  onCancel() {}
+  evtCancel() {}
 
-  onDelete() {}
+  evtDelete() {}
 }

@@ -27,8 +27,8 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
 import { getFormErrors } from 'app/shared/helpers/form.helper';
 import { IUserNew } from 'app/shared/services/users.service';
@@ -47,11 +47,11 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
   @Input() canDelete = false;
 
   @Output()
-  onSubmit = new EventEmitter<
+  evtSubmit = new EventEmitter<
     IUserNew | { name?: string; password?: string }
   >();
-  @Output() onDelete = new EventEmitter<void>();
-  @Output() onCancel = new EventEmitter<void>();
+  @Output() evtDelete = new EventEmitter<void>();
+  @Output() evtCancel = new EventEmitter<void>();
 
   userManagementForm: FormGroup;
 
@@ -117,7 +117,7 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   doCancel() {
-    this.onCancel.emit();
+    this.evtCancel.emit();
     this.reset();
   }
 
@@ -132,17 +132,17 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
         u.password = value.password;
       }
       if (u.name || u.password) {
-        this.onSubmit.emit(u);
+        this.evtSubmit.emit(u);
       } else {
-        this.onCancel.emit();
+        this.evtCancel.emit();
       }
     } else {
-      this.onSubmit.emit(value);
+      this.evtSubmit.emit(value);
     }
     this.reset();
   }
 
   doDelete() {
-    this.onDelete.emit();
+    this.evtDelete.emit();
   }
 }

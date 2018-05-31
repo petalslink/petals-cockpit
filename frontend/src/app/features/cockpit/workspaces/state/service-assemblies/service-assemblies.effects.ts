@@ -20,9 +20,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { Observable } from 'rxjs/Observable';
-import { empty } from 'rxjs/observable/empty';
-import { of } from 'rxjs/observable/of';
+import { EMPTY, Observable, of } from 'rxjs';
 import {
   catchError,
   map,
@@ -31,7 +29,6 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
@@ -43,6 +40,7 @@ import {
 import { SseActions } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
+import { ServiceAssemblies } from './service-assemblies.actions';
 
 @Injectable()
 export class ServiceAssembliesEffects {
@@ -146,7 +144,7 @@ export class ServiceAssembliesEffects {
           )
           .pipe(
             // response will be handled by sse
-            mergeMap(_ => empty<Action>()),
+            mergeMap(_ => EMPTY),
             catchError((err: HttpErrorResponse) => {
               if (environment.debug) {
                 console.group();

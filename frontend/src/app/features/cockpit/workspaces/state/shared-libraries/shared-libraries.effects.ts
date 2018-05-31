@@ -20,9 +20,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { Observable } from 'rxjs/Observable';
-import { empty } from 'rxjs/observable/empty';
-import { of } from 'rxjs/observable/of';
+import { EMPTY, Observable, of } from 'rxjs';
 import {
   catchError,
   flatMap,
@@ -32,7 +30,6 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import { getErrorMessage } from 'app/shared/helpers/shared.helper';
 import {
@@ -42,6 +39,7 @@ import {
 import { SseActions } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
+import { SharedLibraries } from './shared-libraries.actions';
 
 @Injectable()
 export class SharedLibrariesEffects {
@@ -106,7 +104,7 @@ export class SharedLibrariesEffects {
           )
           .pipe(
             // response will be handled by sse
-            mergeMap(_ => empty<Action>()),
+            mergeMap(_ => EMPTY),
             catchError((err: HttpErrorResponse) => {
               if (environment.debug) {
                 console.group();
@@ -146,7 +144,7 @@ export class SharedLibrariesEffects {
 
           return of(new SharedLibraries.Removed(sl));
         } else {
-          return empty();
+          return EMPTY;
         }
       })
     );

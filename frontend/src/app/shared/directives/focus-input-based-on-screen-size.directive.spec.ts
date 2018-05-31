@@ -23,11 +23,12 @@ import {
   TestBed,
 } from '@angular/core/testing';
 import { Store } from '@ngrx/store';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
 import { SharedModule } from 'app/shared/shared.module';
 import { ScreenSize } from 'app/shared/state/ui.interface';
+import { BehaviorSubject } from 'rxjs';
 import { getInputByName } from 'testing';
 
 describe(`appFocusInputIfLargeScreen`, () => {
@@ -40,7 +41,7 @@ describe(`appFocusInputIfLargeScreen`, () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule],
+      imports: [SharedModule.forRoot()],
       declarations: [HostDefaultComponent, HostWithParamsComponent],
       providers: [
         {

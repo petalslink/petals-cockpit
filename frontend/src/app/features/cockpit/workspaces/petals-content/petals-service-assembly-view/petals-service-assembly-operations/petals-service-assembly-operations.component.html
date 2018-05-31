@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           ></app-message>
         </div>
 
-        <mat-card-content fxLayoutWrap fxLayout="row" *ngIf="serviceAssembly.state">
+        <mat-card-content fxLayout="row wrap" *ngIf="serviceAssembly.state">
           <span *ngFor="let possibleState of getPossibleStateActions(serviceAssembly.state); trackBy:trackBySaState" class="color-primary padding-bottom-x1">
             <button
               class="text-upper margin-right-x1 color-primary"

@@ -19,9 +19,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
 import { FormErrorStateMatcher } from 'app/shared/helpers/form.helper';
 import { IUserLogin } from 'app/shared/services/users.service';

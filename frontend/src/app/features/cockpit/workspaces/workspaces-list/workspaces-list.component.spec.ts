@@ -38,7 +38,7 @@ describe('WorkspacesListComponent', () => {
   beforeEach(
     async(() => {
       TestBed.configureTestingModule({
-        imports: [SharedModule, NoopAnimationsModule],
+        imports: [SharedModule.forRoot(), NoopAnimationsModule],
         declarations: [TestHostComponent, WorkspacesListComponent],
       }).compileComponents();
     })

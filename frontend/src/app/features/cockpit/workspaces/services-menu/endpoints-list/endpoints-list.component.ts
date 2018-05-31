@@ -30,13 +30,13 @@ export class EndpointsListComponent<TE extends TreeElement<TE>>
   @Input() workspaceId: string;
   @Input() endpointsTree: TreeElement<TE>[];
 
-  @Output() onEndpointSelected = new EventEmitter();
+  @Output() evtEndpointSelected = new EventEmitter();
 
   constructor() {}
 
   ngOnInit() {}
 
   select(endpoint: IEndpoint) {
-    this.onEndpointSelected.emit(endpoint);
+    this.evtEndpointSelected.emit(endpoint);
   }
 }

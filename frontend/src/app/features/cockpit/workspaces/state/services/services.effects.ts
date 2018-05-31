@@ -19,13 +19,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
-import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
 import { ServicesService } from 'app/shared/services/services.service';
 import { environment } from 'environments/environment';
+import { Services } from './services.actions';
 
 @Injectable()
 export class ServicesEffects {

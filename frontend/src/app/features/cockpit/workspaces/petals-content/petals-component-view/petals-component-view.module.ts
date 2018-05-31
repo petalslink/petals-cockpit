@@ -19,9 +19,10 @@ import { NgModule } from '@angular/core';
 
 import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
 import { SharedModule } from 'app/shared/shared.module';
+import { PetalsComponentViewRoutingModule } from './petals-component-view-routing.module';
+
 import { PetalsComponentOperationsComponent } from './petals-component-operations/petals-component-operations.component';
 import { PetalsComponentOverviewComponent } from './petals-component-overview/petals-component-overview.component';
-import { PetalsComponentViewRoutingModule } from './petals-component-view-routing.module';
 import { PetalsComponentViewComponent } from './petals-component-view.component';
 
 @NgModule({

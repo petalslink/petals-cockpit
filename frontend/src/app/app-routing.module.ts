@@ -18,15 +18,11 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
-import { GuardLoginService } from 'app/shared/services/guard-login.service';
 import { environment } from 'environments/environment';
+import { GuardLoginService } from './shared/services/guard-login.service';
 
 export const routes: Routes = [
-  {
-    path: '',
-    pathMatch: 'full',
-    redirectTo: 'login',
-  },
+  { path: '', pathMatch: 'full', redirectTo: 'login' },
   {
     path: 'setup',
     loadChildren: 'app/features/setup/setup.module#SetupModule',

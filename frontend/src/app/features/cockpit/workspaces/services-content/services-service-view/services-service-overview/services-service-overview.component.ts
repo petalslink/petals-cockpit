@@ -25,7 +25,7 @@ import {
 import { Store } from '@ngrx/store';
 import { IServiceOverview } from 'app/features/cockpit/workspaces/state/services/services.selectors';
 import { IStore } from 'app/shared/state/store.interface';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-services-service-overview',

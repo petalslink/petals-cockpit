@@ -18,14 +18,17 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { filter, map, tap, withLatestFrom } from 'rxjs/operators';
 
 import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
-import { SETTINGS_THEME_KEY } from 'app/shared/state/ui.interface';
-import { isSmallScreen } from 'app/shared/state/ui.selectors';
+
+// TODO Fix Lint error: all imports on this line are unused.
+// tslint:disable: no-unused-variable
 import { LocalStorageService } from 'ngx-webstorage';
+import { Ui } from './ui.actions';
+import { SETTINGS_THEME_KEY } from './ui.interface';
+import { isSmallScreen } from './ui.selectors';
 
 @Injectable()
 export class UiEffects {

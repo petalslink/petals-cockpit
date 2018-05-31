@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Ui } from 'app/shared/state/ui.actions';
-import { Users } from 'app/shared/state/users.actions';
+import { Ui } from './ui.actions';
 import { IUi, ScreenSize, uiFactory } from './ui.interface';
+import { Users } from './users.actions';
 
 export namespace UiReducer {
   type All =

@@ -46,8 +46,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <mat-icon color="primary" svgIcon="sl-overview"></mat-icon>
         </mat-card-title>
 
-        <mat-divider></mat-divider>
-
         <mat-card-content class="margin-top-x1 shared-libraries-content">
           <mat-nav-list *ngIf="component.sharedLibraries.length !== 0 else nosl"  dense fxLayout="column" class="padding-top-x1">
             <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let sl of component.sharedLibraries; trackBy:trackBySl">
@@ -79,8 +77,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <span fxFlex class="text-upper">Service units</span>
         <mat-icon color="primary" svgIcon="su"></mat-icon>
       </mat-card-title>
-
-      <mat-divider></mat-divider>
 
       <mat-card-content class="margin-top-x1 service-units-content">
         <mat-nav-list *ngIf="component.serviceUnits.length !== 0 else nosu" dense fxLayout="column" class="padding-top-x1">

@@ -17,12 +17,13 @@
 
 import { NgModule } from '@angular/core';
 
-import { PetalsServiceAssemblyOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-operations/petals-service-assembly-operations.component';
-import { PetalsServiceAssemblyOverviewComponent } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-overview/petals-service-assembly-overview.component';
-import { PetalsServiceAssemblyViewRoutingModule } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view-routing.module';
-import { PetalsServiceAssemblyViewComponent } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.component';
 import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
 import { SharedModule } from 'app/shared/shared.module';
+import { PetalsServiceAssemblyViewRoutingModule } from './petals-service-assembly-view-routing.module';
+
+import { PetalsServiceAssemblyOperationsComponent } from './petals-service-assembly-operations/petals-service-assembly-operations.component';
+import { PetalsServiceAssemblyOverviewComponent } from './petals-service-assembly-overview/petals-service-assembly-overview.component';
+import { PetalsServiceAssemblyViewComponent } from './petals-service-assembly-view.component';
 
 @NgModule({
   imports: [

@@ -72,7 +72,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </div>
               </mat-expansion-panel-header>
 
-              <app-add-edit-user #addEditUser (onSubmit)="onAdd($event); el.close()" (onCancel)="el.close()">
+              <app-add-edit-user #addEditUser (evtSubmit)="onAdd($event); el.close()" (evtCancel)="el.close()">
               </app-add-edit-user>
 
             </mat-expansion-panel>
@@ -107,9 +107,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   #addEditUser
                   [canDelete]="user.id !== currentUser.id && !user.isDeleting"
                   [user]="user"
-                  (onSubmit)="onSave(user.id, $event); el.close()"
-                  (onDelete)="onDelete(user.id); el.close()"
-                  (onCancel)="el.close()">
+                  (evtSubmit)="onSave(user.id, $event); el.close()"
+                  (evtDelete)="onDelete(user.id); el.close()"
+                  (evtCancel)="el.close()">
                 </app-add-edit-user>
 
               </mat-expansion-panel>

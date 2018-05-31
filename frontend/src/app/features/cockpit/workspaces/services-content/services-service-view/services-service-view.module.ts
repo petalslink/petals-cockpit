@@ -19,8 +19,9 @@ import { NgModule } from '@angular/core';
 
 import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
 import { SharedModule } from 'app/shared/shared.module';
-import { ServicesServiceOverviewComponent } from './services-service-overview/services-service-overview.component';
 import { ServicesServiceViewRoutingModule } from './services-service-view-routing.module';
+
+import { ServicesServiceOverviewComponent } from './services-service-overview/services-service-overview.component';
 import { ServicesServiceViewComponent } from './services-service-view.component';
 
 @NgModule({

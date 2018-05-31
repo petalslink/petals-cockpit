@@ -21,10 +21,7 @@ import {
   HttpEventType,
 } from '@angular/common/http';
 import { Action } from '@ngrx/store';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import { empty } from 'rxjs/observable/empty';
-import { of } from 'rxjs/observable/of';
+import { BehaviorSubject, EMPTY, Observable, of } from 'rxjs';
 import { flatMap, last, map, startWith } from 'rxjs/operators';
 
 import { ComponentState } from 'app/shared/services/components.service';
@@ -135,7 +132,7 @@ export function streamHttpProgressAndSuccess<T, U>(
           const percentDone = Math.round(100 * event.loaded / event.total);
 
           progress$.next(percentDone);
-          return empty<T>();
+          return EMPTY;
         } else if (event.type === HttpEventType.Response) {
           const body = event.body as T;
 
@@ -144,7 +141,7 @@ export function streamHttpProgressAndSuccess<T, U>(
 
           return of(success(body));
         } else {
-          return empty<T>();
+          return EMPTY;
         }
       }),
       last()

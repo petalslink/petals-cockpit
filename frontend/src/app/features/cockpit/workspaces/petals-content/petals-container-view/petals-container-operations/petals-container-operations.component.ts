@@ -35,11 +35,12 @@ import {
   NgForm,
   ValidatorFn,
 } from '@angular/forms';
-import { ErrorStateMatcher, MatDialog, MatDialogRef } from '@angular/material';
+
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Actions } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { empty } from 'rxjs/observable/empty';
+import { EMPTY, Subject } from 'rxjs';
 import {
   catchError,
   filter,
@@ -49,9 +50,9 @@ import {
   takeUntil,
   tap,
 } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 import { v4 as uuid } from 'uuid';
 
+import { ErrorStateMatcher } from '@angular/material/core';
 import { SharedLibrariesOverrideComponent } from 'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-operations/shared-libraries-override/shared-libraries-override.component';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
@@ -208,7 +209,7 @@ export class PetalsContainerOperationsComponent
     }
   }
 
-  onFileSelected(
+  fileSelected(
     type: 'component' | 'service-assembly' | 'shared-library',
     file: File
   ) {
@@ -246,7 +247,7 @@ export class PetalsContainerOperationsComponent
                 `An error occurred while trying to read the component name from this zip file`
               );
 
-              return empty();
+              return EMPTY;
             })
           )
           .subscribe();
@@ -274,7 +275,7 @@ export class PetalsContainerOperationsComponent
                 `An error occurred while trying to read the service assembly name from this zip file`
               );
 
-              return empty();
+              return EMPTY;
             })
           )
           .subscribe();
@@ -307,7 +308,7 @@ export class PetalsContainerOperationsComponent
                 `An error occurred while trying to read the shared library information from this zip file`
               );
 
-              return empty();
+              return EMPTY;
             })
           )
           .subscribe();

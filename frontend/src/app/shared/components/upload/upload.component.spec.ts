@@ -34,7 +34,7 @@ describe(`UploadComponent`, () => {
   beforeEach(
     async(() => {
       TestBed.configureTestingModule({
-        imports: [SharedModule],
+        imports: [SharedModule.forRoot()],
       }).compileComponents();
     })
   );
@@ -85,7 +85,7 @@ describe(`UploadComponent`, () => {
       uploadComponent.isUploading = false;
       uploadComponent.selectedFileInformation = <any>'information';
 
-      uploadComponent.onUploadFile
+      uploadComponent.evtUploadFile
         .asObservable()
         .pipe(
           tap(information => {

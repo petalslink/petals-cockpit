@@ -22,7 +22,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 import { IServiceAssemblyWithSUsAndComponents } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
 import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';

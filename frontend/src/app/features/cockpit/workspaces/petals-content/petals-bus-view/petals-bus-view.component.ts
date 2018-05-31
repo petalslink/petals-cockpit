@@ -16,9 +16,13 @@
  */
 
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { filter, first, switchMap, tap } from 'rxjs/operators';
 
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';

@@ -18,8 +18,12 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SharedModule } from 'app/shared/shared.module';
-import { getInputByName } from 'testing';
-import { elementText, getButtonByClass, getElementBySelector } from 'testing';
+import {
+  elementText,
+  getButtonByClass,
+  getElementBySelector,
+  getInputByName,
+} from 'testing';
 import { UploadComponent } from './upload.component';
 
 describe(`[Integration test] UploadComponent`, () => {
@@ -68,7 +72,7 @@ describe(`[Integration test] UploadComponent`, () => {
   beforeEach(
     async(() => {
       TestBed.configureTestingModule({
-        imports: [SharedModule],
+        imports: [SharedModule.forRoot()],
       }).compileComponents();
     })
   );

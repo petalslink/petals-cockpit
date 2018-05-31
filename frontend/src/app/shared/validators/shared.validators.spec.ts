@@ -16,11 +16,11 @@
  */
 
 import { async } from '@angular/core/testing';
-import { of } from 'rxjs/observable/of';
+import { of } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 
 import { AbstractControl } from '@angular/forms';
-import { SharedValidator } from 'app/shared/validators/shared.validator';
+import { SharedValidator } from './shared.validator';
 
 describe(`SharedValidator`, () => {
   describe(`isStringInObsArrayValidator`, () => {

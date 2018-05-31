@@ -17,9 +17,8 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subject } from 'rxjs';
 import { filter, first, map, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
 import { IUserNew } from 'app/shared/services/users.service';
 import { IStore } from 'app/shared/state/store.interface';

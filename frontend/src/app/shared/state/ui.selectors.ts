@@ -16,11 +16,11 @@
  */
 
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
-import { ScreenSize } from 'app/shared/state/ui.interface';
 import { IStore } from './store.interface';
+import { ScreenSize } from './ui.interface';
 
 const _isLargeScreen = (ss: ScreenSize) =>
   ss === 'md' || ss === 'lg' || ss === 'gt-lg' || ss === 'xl' || ss === 'gt-md';

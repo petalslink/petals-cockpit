@@ -17,14 +17,15 @@
 
 import { async } from '@angular/core/testing';
 import * as JSZip from 'jszip';
-import { of } from 'rxjs/observable/of';
-import { _throw } from 'rxjs/observable/throw';
+
 import { catchError, tap } from 'rxjs/operators';
 
 import {
   _getTextFromZip,
   loadFilesContentFromZip,
 } from 'app/shared/helpers/zip.helper';
+import { throwError } from 'rxjs';
+import { of } from 'rxjs/internal/observable/of';
 
 describe(`Zip helper`, () => {
   describe(`_getTextFromZip`, () => {
@@ -81,7 +82,7 @@ describe(`Zip helper`, () => {
       `should throw an error within the observable if an error occurred while reading a file`,
       async(() => {
         spyOn(JSZip, 'loadAsync').and.callFake(() =>
-          _throw('some error while reading zip file')
+          throwError('some error while reading zip file')
         );
 
         const zipFile: any = {

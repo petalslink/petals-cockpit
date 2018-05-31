@@ -20,8 +20,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable, of } from 'rxjs';
 import {
   catchError,
   filter,
@@ -42,7 +41,6 @@ import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service
 import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
 import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
 import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { batchActions } from 'app/shared/helpers/batch-actions.helper';
 import { toJsTable } from 'app/shared/helpers/jstable.helper';
 import { SseActions, SseService } from 'app/shared/services/sse.service';
@@ -51,6 +49,7 @@ import { IStore } from 'app/shared/state/store.interface';
 import { Ui } from 'app/shared/state/ui.actions';
 import { Users } from 'app/shared/state/users.actions';
 import { environment } from 'environments/environment';
+import { Workspaces } from './workspaces.actions';
 
 @Injectable()
 export class WorkspacesEffects {

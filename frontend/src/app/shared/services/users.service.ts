@@ -17,7 +17,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
 
 import { environment } from 'environments/environment';

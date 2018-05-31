@@ -30,13 +30,13 @@ export class InterfacesListComponent<TE extends TreeElement<TE>>
   @Input() workspaceId: string;
   @Input() interfacesTree: TreeElement<TE>[];
 
-  @Output() onInterfaceSelected = new EventEmitter();
+  @Output() evtInterfaceSelected = new EventEmitter();
 
   constructor() {}
 
   ngOnInit() {}
 
   select(itf: IInterface) {
-    this.onInterfaceSelected.emit(itf);
+    this.evtInterfaceSelected.emit(itf);
   }
 }

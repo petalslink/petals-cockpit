@@ -23,7 +23,7 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 import { Action, Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
 import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';

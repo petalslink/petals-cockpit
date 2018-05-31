@@ -39,8 +39,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <mat-icon color="primary">view_list</mat-icon>
         </mat-card-title>
 
-        <mat-divider></mat-divider>
-
         <mat-card-content class="margin-top-x1 components-content">
           <mat-nav-list *ngIf="sharedLibrary.components.length !== 0; else nocomponent" dense fxLayout="column" class="padding-top-x1">
             <div fxLayout="row" fxLayoutAlign="start center" *ngFor="let component of sharedLibrary.components; trackBy:trackByComponent">

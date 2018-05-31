@@ -1,25 +1,31 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    // can't use es6.
+    // see the followings issues :
+    // https://github.com/angular/material2/issues/11090
+    // https://github.com/angular/material2/issues/10567
+    "target": "es5",
+    "baseUrl": ".",
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es5",
     "noImplicitAny": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "es2017",
-      "dom"
-    ],
-    "plugins": [
-      {
-        "name": "tslint-language-service"
-      }
-    ]
+    "noUnusedLocals": true,
+    "jsx": "preserve",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2017", "dom"],
+    "plugins": [{ "name": "tslint-language-service" }],
+    "paths": {
+      // temporary fix https://github.com/Stuk/jszip/issues/524
+      "stream": ["../node_modules/readable-stream/readable.js"]
+    }
+  },
+  "include": ["src/**/*"],
+  "angularCompilerOptions": {
+    "preserveWhitespaces": false
   }
 }

@@ -21,9 +21,7 @@ import { Router } from '@angular/router';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { Observable } from 'rxjs/Observable';
-import { empty } from 'rxjs/observable/empty';
-import { of } from 'rxjs/observable/of';
+import { EMPTY, Observable, of } from 'rxjs';
 import {
   catchError,
   filter,
@@ -34,7 +32,6 @@ import {
 } from 'rxjs/operators';
 
 import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
-import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
 import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
 import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
@@ -49,6 +46,7 @@ import { BusesService } from 'app/shared/services/buses.service';
 import { SseActions } from 'app/shared/services/sse.service';
 import { IStore } from 'app/shared/state/store.interface';
 import { environment } from 'environments/environment';
+import { Buses } from './buses.actions';
 
 @Injectable()
 export class BusesEffects {
@@ -167,7 +165,7 @@ export class BusesEffects {
       ),
       switchMap(([action, idWorkspace]) =>
         this.busesService.deleteBus(idWorkspace, action.payload.id).pipe(
-          mergeMap(_ => empty<Action>()),
+          mergeMap(_ => EMPTY),
           catchError((err: HttpErrorResponse) => {
             if (environment.debug) {
               console.group();

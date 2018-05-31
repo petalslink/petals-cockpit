@@ -21,7 +21,6 @@ import {
   workspacesTableFactory,
 } from './workspaces.interface';
 
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   JsTable,
   mergeInto,
@@ -35,6 +34,7 @@ import {
   IWorkspaceBackendDetails,
 } from 'app/shared/services/workspaces.service';
 import { Users } from 'app/shared/state/users.actions';
+import { Workspaces } from './workspaces.actions';
 
 export namespace WorkspacesReducer {
   type All =

@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { IContainers } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
 import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
 import {
   IBusBackendDetails,
@@ -22,7 +23,6 @@ import {
   IBusBackendSSE,
   IBusBackendSSECommon,
 } from 'app/shared/services/buses.service';
-import { IContainers } from '../containers/containers.interface';
 
 export interface IBusUI {
   // for UI

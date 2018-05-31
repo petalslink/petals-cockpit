@@ -23,8 +23,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { Observable, Subject } from 'rxjs';
 
 import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
 import { IEndpointRow } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';

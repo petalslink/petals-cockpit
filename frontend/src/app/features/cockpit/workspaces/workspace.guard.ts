@@ -19,11 +19,11 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { Actions } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { IStore } from 'app/shared/state/store.interface';
+import { Workspaces } from './state/workspaces/workspaces.actions';
 
 @Injectable()
 export class WorkspaceGuard implements CanActivate {

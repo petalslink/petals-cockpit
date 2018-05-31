@@ -17,17 +17,19 @@
 
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
-import { ObservableMedia } from '@angular/flex-layout';
-import { MatIconRegistry } from '@angular/material';
+
+// TODO Fix Lint error: all imports on this line are unused.
+// tslint:disable: no-unused-variable
+import { MediaChange, ObservableMedia } from '@angular/flex-layout';
+import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Store } from '@ngrx/store';
+import { Subject } from 'rxjs';
 import { distinctUntilChanged, map, takeUntil, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
 import { IStore } from './shared/state/store.interface';
-
-import { Ui } from 'app/shared/state/ui.actions';
-import { ScreenSize } from 'app/shared/state/ui.interface';
+import { Ui } from './shared/state/ui.actions';
+import { ScreenSize } from './shared/state/ui.interface';
 
 @Component({
   selector: 'app-root',
@@ -60,10 +62,10 @@ export class AppComponent implements OnInit, OnDestroy {
     this.media$
       .asObservable()
       .pipe(
-        map(change => change.mqAlias as ScreenSize),
+        map((change: MediaChange) => change.mqAlias as ScreenSize),
         distinctUntilChanged(),
         takeUntil(this.onDestroy$),
-        tap(screenSize =>
+        tap((screenSize: ScreenSize) =>
           this.store$.dispatch(new Ui.ChangeScreenSize({ screenSize }))
         )
       )

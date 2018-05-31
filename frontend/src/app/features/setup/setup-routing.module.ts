@@ -18,7 +18,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { SetupComponent } from 'app/features/setup/setup.component';
+import { SetupComponent } from './setup.component';
 
 const routes: Routes = [
   {

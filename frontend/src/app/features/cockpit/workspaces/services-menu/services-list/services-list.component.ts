@@ -30,13 +30,13 @@ export class ServicesListComponent<TE extends TreeElement<TE>>
   @Input() workspaceId: string;
   @Input() servicesTree: TreeElement<TE>[];
 
-  @Output() onServiceSelected = new EventEmitter();
+  @Output() evtServiceSelected = new EventEmitter();
 
   constructor() {}
 
   ngOnInit() {}
 
   select(service: IService) {
-    this.onServiceSelected.emit(service);
+    this.evtServiceSelected.emit(service);
   }
 }

@@ -19,8 +19,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { WorkspaceOverviewComponent } from 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.component';
-import { WorkspaceComponent } from 'app/features/cockpit/workspaces/workspace/workspace.component';
 import { NotFound404Component } from 'app/shared/components/not-found-404/not-found-404.component';
+import { WorkspaceComponent } from './workspace.component';
 
 const routes: Routes = [
   {

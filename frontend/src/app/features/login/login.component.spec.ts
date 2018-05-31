@@ -21,7 +21,6 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
 import { Store, StoreModule } from '@ngrx/store';
 
-import { LoginComponent } from 'app/features/login/login.component';
 import { IUserLogin } from 'app/shared/services/users.service';
 import { SharedModule } from 'app/shared/shared.module';
 import { UiReducer } from 'app/shared/state/ui.reducer';
@@ -34,6 +33,7 @@ import {
   getInputByName,
   setInputValue,
 } from 'testing';
+import { LoginComponent } from './login.component';
 
 describe(`Login component`, () => {
   let component: LoginComponent;
@@ -63,7 +63,7 @@ describe(`Login component`, () => {
             users: UsersReducer.reducer,
             ui: UiReducer.reducer,
           }),
-          SharedModule,
+          SharedModule.forRoot(),
           ReactiveFormsModule,
           NoopAnimationsModule,
         ],

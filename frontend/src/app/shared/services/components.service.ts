@@ -17,10 +17,7 @@
 
 import { HttpClient, HttpEventType, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import { empty } from 'rxjs/observable/empty';
-import { of } from 'rxjs/observable/of';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { flatMap, last, map } from 'rxjs/operators';
 import * as xmltojson from 'xmltojson';
 
@@ -179,10 +176,10 @@ export class ComponentsServiceImpl extends ComponentsService {
             const percentDone = Math.round(100 * event.loaded / event.total);
 
             progress$.next(percentDone);
-            return empty<{
+            return from<{
               serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
               serviceUnits: JsTable<IServiceUnitBackendSSE>;
-            }>();
+            }>([]);
           } else if (event.type === HttpEventType.Response) {
             const body = event.body as {
               serviceAssemblies: {
@@ -201,10 +198,10 @@ export class ComponentsServiceImpl extends ComponentsService {
               serviceUnits: toJsTable(body.serviceUnits),
             });
           } else {
-            return empty<{
+            return from<{
               serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
               serviceUnits: JsTable<IServiceUnitBackendSSE>;
-            }>();
+            }>([]);
           }
         }),
         last()

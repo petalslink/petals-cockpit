@@ -18,7 +18,7 @@
 import {
   findNamespaceLocalpart,
   groupByNamespace,
-} from 'app/shared/helpers/services-list.helper';
+} from './services-list.helper';
 
 describe('Services list', () => {
   describe('findNamespaceLocalpart', () => {

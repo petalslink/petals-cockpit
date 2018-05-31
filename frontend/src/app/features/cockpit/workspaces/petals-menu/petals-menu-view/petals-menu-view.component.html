@@ -47,8 +47,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     [tree]="tree"
     [search]="search"
     [marginLeft]="14"
-    (onToggleFold)="onTreeToggleFold($event)"
-    (onSelect)="onTreeSelect($event)"
+    (evtToggleFold)="treeToggleFold($event)"
+    (evtSelect)="treeSelect($event)"
   ></app-material-tree>
 
   <app-message
@@ -56,6 +56,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     *ngIf="tree.length === 0 && search"
     type="info"
     msg="There is no match with &quot;{{ search }}&quot;."
-    (onClose)="focusSearch()"
+    (evtClose)="focusSearch()"
   ></app-message>
 </div>

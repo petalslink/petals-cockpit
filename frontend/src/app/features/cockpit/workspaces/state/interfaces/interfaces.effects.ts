@@ -19,13 +19,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
-import { Interfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.actions';
 import { InterfacesService } from 'app/shared/services/interfaces.service';
 import { environment } from 'environments/environment';
+import { Interfaces } from './interfaces.actions';
 
 @Injectable()
 export class InterfacesEffects {

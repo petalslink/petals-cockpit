@@ -25,7 +25,7 @@ import {
 import { Store } from '@ngrx/store';
 import { IEndpointOverview } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.selectors';
 import { IStore } from 'app/shared/state/store.interface';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-services-endpoint-overview',

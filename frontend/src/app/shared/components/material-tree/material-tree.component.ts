@@ -54,9 +54,9 @@ export class MaterialTreeComponent<TE extends TreeElement<TE>>
   // only used internally
   @Input() deepLevel? = 0;
   // event when the user select a line
-  @Output() onSelect = new EventEmitter<TE>();
+  @Output() evtSelect = new EventEmitter<TE>();
   // event when the user toggle a line
-  @Output() onToggleFold = new EventEmitter<TE>();
+  @Output() evtToggleFold = new EventEmitter<TE>();
 
   constructor() {}
 
@@ -67,12 +67,12 @@ export class MaterialTreeComponent<TE extends TreeElement<TE>>
   }
 
   select(element: TE) {
-    this.onSelect.emit(element);
+    this.evtSelect.emit(element);
   }
 
   toggleFold(element: TE) {
     if (this.canBeFolded && (!this.search || !this.search.trim())) {
-      this.onToggleFold.emit(element);
+      this.evtToggleFold.emit(element);
     }
 
     // prevent the navigate

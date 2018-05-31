@@ -19,6 +19,7 @@ import { NgModule } from '@angular/core';
 
 import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
 import { SharedModule } from 'app/shared/shared.module';
+
 import { ServicesInterfaceOverviewComponent } from './services-interface-overview/services-interface-overview.component';
 import { ServicesInterfaceViewRoutingModule } from './services-interface-view-routing.module';
 import { ServicesInterfaceViewComponent } from './services-interface-view.component';

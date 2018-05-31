@@ -17,8 +17,7 @@
 
 import { Injectable } from '@angular/core';
 import { Action } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Observable, Subscriber } from 'rxjs';
 
 import {
   IBusBackendSSE,
@@ -250,7 +249,7 @@ export abstract class SseService {
 @Injectable()
 export class SseServiceImpl extends SseService {
   private current: {
-    sse: sse.IEventSourceStatic;
+    sse: EventSource;
     observer: Subscriber<Action>;
   } = null;
 
@@ -310,10 +309,9 @@ export class SseServiceImpl extends SseService {
         if (!cleanup()) {
           // if it's closed, it is a fatal error and it couldn't reconnect
           // else it will just reconnect and all is well from the observable point of view
-          if (
-            (ev.target as sse.IEventSourceStatic).readyState ===
-            EventSource.CLOSED
-          ) {
+          const targ = ev.target as EventSource;
+
+          if (targ.readyState === targ.CLOSED) {
             observer.error('connection was closed');
           }
         }

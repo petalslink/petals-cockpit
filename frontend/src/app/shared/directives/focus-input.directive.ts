@@ -16,9 +16,8 @@
  */
 
 import { Directive, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subject } from 'rxjs';
 import { filter, takeUntil, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
 @Directive({
   selector: '[appFocusInput]',

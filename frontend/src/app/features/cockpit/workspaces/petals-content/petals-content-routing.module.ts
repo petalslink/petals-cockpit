@@ -18,7 +18,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { PetalsByIdGuard } from 'app/features/cockpit/workspaces/petals-content/petals-by-id.guard';
+import { PetalsByIdGuard } from './petals-by-id.guard';
 
 // /workspaces/:workspaceId/petals
 const routes: Routes = [

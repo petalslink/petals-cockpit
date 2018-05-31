@@ -18,7 +18,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { ServicesByIdGuard } from 'app/features/cockpit/workspaces/services-content/services-by-id.guard';
+import { ServicesByIdGuard } from './services-by-id.guard';
 
 // /workspaces/:workspaceId/services
 const routes: Routes = [

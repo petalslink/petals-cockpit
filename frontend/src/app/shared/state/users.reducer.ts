@@ -28,13 +28,13 @@ import {
   IUserBackend,
   IUserNew,
 } from 'app/shared/services/users.service';
-import { Users } from 'app/shared/state/users.actions';
+import { Users } from './users.actions';
 import {
   IUserRow,
   IUsersTable,
   userRowFactory,
   usersTableFactory,
-} from 'app/shared/state/users.interface';
+} from './users.interface';
 
 export namespace UsersReducer {
   type All =

@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 import * as helper from 'app/shared/helpers/mock.helper';
 import { ICurrentUser } from 'app/shared/state/users.interface';

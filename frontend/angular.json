@@ -1,0 +1,177 @@
+{
+  "$schema":
+    "./node_modules/@angular-devkit/core/src/workspace/workspace-schema.json",
+  "version": 1,
+  "newProjectRoot": "src",
+  "projects": {
+    "petals-cockpit": {
+      "root": "",
+      "sourceRoot": "/src",
+      "prefix": "app",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist",
+            "main": "src/main.ts",
+            "tsConfig": "src/tsconfig.app.json",
+            "serviceWorker": false,
+            "index": "src/index.html",
+            "assets": [
+              { "glob": "**/*", "input": "src/assets", "output": "assets" },
+              {
+                "glob": "favicon.ico",
+                "input": "src",
+                "output": "favicon.ico"
+              },
+              {
+                "glob": "manifest.json",
+                "input": "src",
+                "output": "manifest.json"
+              }
+            ],
+            "styles": [
+              "node_modules/material-design-icons-iconfont/dist/material-design-icons.css",
+              "node_modules/swiper/dist/css/swiper.min.css",
+              "src/styles.scss"
+            ],
+            "scripts": [
+              "node_modules/jdenticon/dist/jdenticon.min.js",
+              "node_modules/js-md5/build/md5.min.js",
+              "node_modules/swiper/dist/js/swiper.min.js"
+            ],
+            "polyfills": "src/polyfills.ts"
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            },
+            "dev-e2e": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev-e2e.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            },
+            "dev-nomock": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev-nomock.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            },
+            "prod-e2e": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod-e2e.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            },
+            "gitlab-pages": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.gitlab-pages.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.spec.json",
+            "karmaConfig": "karma.conf.js",
+            "styles": [],
+            "scripts": [],
+            "assets": []
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": { "browserTarget": "petals-cockpit:build" },
+          "configurations": {
+            "production": {
+              "browserTarget": "petals-cockpit:build:production"
+            },
+            "dev-e2e": { "browserTarget": "petals-cockpit:build:dev-e2e" },
+            "dev-nomock": {
+              "browserTarget": "petals-cockpit:build:dev-nomock"
+            },
+            "prod-e2e": { "browserTarget": "petals-cockpit:build:prod-e2e" },
+            "gitlab-pages": {
+              "browserTarget": "petals-cockpit:build:gitlab-pages"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": { "browserTarget": "petals-cockpit:build" }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": ["src/tsconfig.app.json"],
+            "exclude": ["**/node_modules/**"]
+          }
+        }
+      }
+    }
+  }
+}

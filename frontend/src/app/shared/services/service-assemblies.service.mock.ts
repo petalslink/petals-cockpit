@@ -21,14 +21,14 @@ import { Injectable } from '@angular/core';
 import * as helper from 'app/shared/helpers/mock.helper';
 import { environment } from 'environments/environment';
 import { serviceAssembliesService } from 'mocks/service-assemblies-mock';
-import { SseActions, SseService } from './sse.service';
-import { SseServiceMock } from './sse.service.mock';
 
+import { SseActions, SseService } from 'app/shared/services/sse.service';
+import { SseServiceMock } from 'app/shared/services/sse.service.mock';
 import {
   EServiceAssemblyState,
   ServiceAssembliesServiceImpl,
   ServiceAssemblyState,
-} from 'app/shared/services/service-assemblies.service';
+} from './service-assemblies.service';
 
 @Injectable()
 export class ServiceAssembliesServiceMock extends ServiceAssembliesServiceImpl {

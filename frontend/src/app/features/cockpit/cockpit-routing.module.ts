@@ -17,7 +17,6 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
 import { CockpitComponent } from './cockpit.component';
 
 const routes: Routes = [

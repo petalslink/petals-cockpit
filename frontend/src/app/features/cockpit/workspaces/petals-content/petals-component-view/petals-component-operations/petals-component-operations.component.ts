@@ -28,8 +28,8 @@ import {
 import { FormControl, FormGroup } from '@angular/forms';
 import { Actions } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
+import { Subject } from 'rxjs';
 import { filter, switchMap, take, takeUntil, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 import { v4 as uuid } from 'uuid';
 
 import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';

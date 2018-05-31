@@ -16,7 +16,7 @@
  */
 
 import { Action } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 export const HttpProgressType = 'HttpProgress';
 export class HttpProgress implements Action {

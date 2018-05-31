@@ -17,10 +17,11 @@
 
 import { async } from '@angular/core/testing';
 import { cold } from 'jasmine-marbles';
-import { from } from 'rxjs/observable/from';
+
 import { tap } from 'rxjs/operators';
 
-import { deletable } from 'app/shared/operators/deletable.operator';
+import { from } from 'rxjs';
+import { deletable } from './deletable.operator';
 
 describe(`Deletable operator`, () => {
   it(

@@ -17,9 +17,10 @@
 
 import { NgModule } from '@angular/core';
 
-import { SetupRoutingModule } from 'app/features/setup/setup-routing.module';
-import { SetupComponent } from 'app/features/setup/setup.component';
 import { SharedModule } from 'app/shared/shared.module';
+import { SetupRoutingModule } from './setup-routing.module';
+
+import { SetupComponent } from './setup.component';
 
 @NgModule({
   imports: [SharedModule, SetupRoutingModule],

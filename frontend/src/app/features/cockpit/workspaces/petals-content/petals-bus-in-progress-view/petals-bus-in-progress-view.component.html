@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFlex class="wrapper-content">
+<div fxLayout="column" class="wrapper-content">
   <mat-toolbar color="primary" class="toolbar-page-header" fxLayout="row" fxLayoutAlign="start center">
     <div class="prefix-toolbar-title" fxLayout="row">
       <mat-icon color="accent">edit</mat-icon>
@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     This import has been removed
   </div>
 
-  <div fxFlexFill fxLayout="column" class="content content-max-width">
+  <div fxFlex="100%" fxFlexFill fxLayout="column" class="content content-max-width">
     <div class="central-content">
       <ngx-hover-opacity [isHoverVisible]="isSelectedBus() && isSelectedBusDeleted()">
         <form class="bus-import-form" formnovalidate [formGroup]="busImportForm" (ngSubmit)="onSubmit(busImportForm) && busImportForm.reset()">
@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </mat-card-title>
 
             <mat-card-content>
-              <div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="10px">
+              <div fxLayout="row wrap" fxLayout.xs="column wrap" fxLayoutGap="10px">
                 <!-- To have more deterministic behavour, we should be able to set 50 to say 2 per line
                    See: https://github.com/angular/flex-layout/issues/235 -->
                 <div fxFlex="47" fxFlex.xs="100" class="margin-top-x1">

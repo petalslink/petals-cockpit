@@ -25,9 +25,8 @@ import {
   QueryList,
   TemplateRef,
 } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
 import { deletable, IDeletable } from 'app/shared/operators/deletable.operator';
 

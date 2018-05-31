@@ -16,10 +16,7 @@
  */
 
 import * as JSZip from 'jszip';
-import { Observable } from 'rxjs/Observable';
-import { forkJoin } from 'rxjs/observable/forkJoin';
-import { from } from 'rxjs/observable/from';
-import { _throw } from 'rxjs/observable/throw';
+import { forkJoin, from, Observable, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 
 export function loadFilesContentFromZip(
@@ -41,7 +38,7 @@ export function loadFilesContentFromZip(
       return forkJoin(filesContent);
     }),
     catchError(err =>
-      _throw(
+      throwError(
         new Error(
           `An error occured while trying to read the zip "${zipFile.name}"`
         )

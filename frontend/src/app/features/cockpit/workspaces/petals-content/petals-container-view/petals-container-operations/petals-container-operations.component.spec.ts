@@ -24,12 +24,13 @@ import {
   TestBed,
 } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatDialogModule, MatInputModule } from '@angular/material';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatInputModule } from '@angular/material/input';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { SimpleNotificationsModule } from 'angular2-notifications';
-import { of } from 'rxjs/observable/of';
-import { _throw } from 'rxjs/observable/throw';
+
+import { of, throwError } from 'rxjs';
 
 import { PetalsContainerOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-operations/petals-container-operations.component';
 import {
@@ -86,7 +87,7 @@ describe(`Petals container operations`, () => {
 
   describe(`change component name`, () => {
     it(`should mark the name as touched into component form when a file is selected`, () => {
-      pcoComponent.onFileSelected('component', null);
+      pcoComponent.fileSelected('component', null);
 
       expect(
         pcoComponent.updateComponentDeployInfoFormGroup.get('name').touched
@@ -114,7 +115,7 @@ describe(`Petals container operations`, () => {
           })
         );
 
-        pcoComponent.onFileSelected('component', null);
+        pcoComponent.fileSelected('component', null);
         flush();
 
         expect(
@@ -146,9 +147,9 @@ describe(`Petals container operations`, () => {
         spyOn(
           componentsService,
           'getComponentInformationFromZipFile'
-        ).and.returnValue(_throw(new Error('Error while reading ZIP')));
+        ).and.returnValue(throwError(new Error('Error while reading ZIP')));
 
-        pcoComponent.onFileSelected('component', null);
+        pcoComponent.fileSelected('component', null);
         flush();
 
         expect(
@@ -165,7 +166,7 @@ describe(`Petals container operations`, () => {
 
   describe(`change shared library name`, () => {
     it(`should mark the name and version as touched into shared library form when a file is selected`, () => {
-      pcoComponent.onFileSelected('shared-library', null);
+      pcoComponent.fileSelected('shared-library', null);
 
       expect(
         pcoComponent.updateSharedLibraryDeployInfoFormGroup.get('name').touched
@@ -188,7 +189,7 @@ describe(`Petals container operations`, () => {
           'getSharedLibraryInformationFromZipFile'
         ).and.callThrough();
 
-        pcoComponent.onFileSelected('shared-library', null);
+        pcoComponent.fileSelected('shared-library', null);
         flush();
 
         expect(
@@ -216,9 +217,9 @@ describe(`Petals container operations`, () => {
         spyOn(
           sharedLibrariesService,
           'getSharedLibraryInformationFromZipFile'
-        ).and.returnValue(_throw(new Error('Error while reading ZIP')));
+        ).and.returnValue(throwError(new Error('Error while reading ZIP')));
 
-        pcoComponent.onFileSelected('shared-library', null);
+        pcoComponent.fileSelected('shared-library', null);
         flush();
 
         expect(
@@ -240,7 +241,7 @@ describe(`Petals container operations`, () => {
 
   describe(`change service assembly name`, () => {
     it(`should mark the name as touched into service assembly form when a file is selected`, () => {
-      pcoComponent.onFileSelected('service-assembly', null);
+      pcoComponent.fileSelected('service-assembly', null);
 
       expect(
         pcoComponent.updateServiceAssemblyDeployInfoFormGroup.get('name')
@@ -260,7 +261,7 @@ describe(`Petals container operations`, () => {
           'getServiceAssemblyNameFromZipFile'
         ).and.callThrough();
 
-        pcoComponent.onFileSelected('service-assembly', null);
+        pcoComponent.fileSelected('service-assembly', null);
         flush();
 
         expect(
@@ -285,9 +286,9 @@ describe(`Petals container operations`, () => {
         spyOn(
           serviceAssembliesService,
           'getServiceAssemblyNameFromZipFile'
-        ).and.returnValue(_throw(new Error('Error while reading ZIP')));
+        ).and.returnValue(throwError(new Error('Error while reading ZIP')));
 
-        pcoComponent.onFileSelected('service-assembly', null);
+        pcoComponent.fileSelected('service-assembly', null);
         flush();
 
         expect(

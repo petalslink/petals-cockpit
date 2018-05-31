@@ -17,7 +17,8 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PetalsServiceAssemblyViewComponent } from 'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.component';
+
+import { PetalsServiceAssemblyViewComponent } from './petals-service-assembly-view.component';
 
 // /workspaces/:workspaceId/petals/service-assemblies/:serviceAssemblyId
 const routes: Routes = [

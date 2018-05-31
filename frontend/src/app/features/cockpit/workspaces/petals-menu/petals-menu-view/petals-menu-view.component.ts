@@ -23,8 +23,8 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { Subject } from 'rxjs';
 import { debounceTime, map, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
 import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
 import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
@@ -90,15 +90,15 @@ export class PetalsMenuViewComponent implements OnInit {
     this._focusSearchInput$.next(true);
   }
 
-  onTreeSelect(e: WorkspaceElement) {
+  treeSelect(e: WorkspaceElement) {
     if (e.link) {
       this.closeSidenavOnSmallScreen();
     } else {
-      this.onTreeToggleFold(e);
+      this.treeToggleFold(e);
     }
   }
 
-  onTreeToggleFold(e: WorkspaceElement) {
+  treeToggleFold(e: WorkspaceElement) {
     switch (e.type) {
       case WorkspaceElementType.BUS:
         this.store$.dispatch(new Buses.ToggleFold(e));
