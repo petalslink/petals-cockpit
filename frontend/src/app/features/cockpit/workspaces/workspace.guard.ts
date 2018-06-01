@@ -22,7 +22,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
-import { IStore } from 'app/shared/state/store.interface';
+import { IStore } from '@shared/state/store.interface';
 import { Workspaces } from './state/workspaces/workspaces.actions';
 
 @Injectable()

@@ -26,8 +26,8 @@ import { Store } from '@ngrx/store';
 
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
-import { SharedModule } from 'app/shared/shared.module';
-import { ScreenSize } from 'app/shared/state/ui.interface';
+import { SharedModule } from '@shared/shared.module';
+import { ScreenSize } from '@shared/state/ui.interface';
 import { BehaviorSubject } from 'rxjs';
 import { getInputByName } from 'testing';
 

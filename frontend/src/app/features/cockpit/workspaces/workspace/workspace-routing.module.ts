@@ -18,8 +18,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { WorkspaceOverviewComponent } from 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.component';
-import { NotFound404Component } from 'app/shared/components/not-found-404/not-found-404.component';
+import { NotFound404Component } from '@shared/components/not-found-404/not-found-404.component';
+import { WorkspaceOverviewComponent } from '@wks/workspace-overview/workspace-overview.component';
 import { WorkspaceComponent } from './workspace.component';
 
 const routes: Routes = [
@@ -39,12 +39,12 @@ const routes: Routes = [
       {
         path: 'petals',
         loadChildren:
-          'app/features/cockpit/workspaces/petals-content/petals-content.module#PetalsContentModule',
+          '../petals-content/petals-content.module#PetalsContentModule',
       },
       {
         path: 'services',
         loadChildren:
-          'app/features/cockpit/workspaces/services-content/services-content.module#ServicesContentModule',
+          '../services-content/services-content.module#ServicesContentModule',
       },
     ],
   },

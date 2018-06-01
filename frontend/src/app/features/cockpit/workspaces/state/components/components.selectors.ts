@@ -17,18 +17,18 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { getServiceAssembliesById } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
-import {
-  getServiceUnitsById,
-  IServiceUnitWithSA,
-} from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
-import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { getSharedLibrariesById } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
 import {
   IComponentBackendDetailsCommon,
   IComponentBackendSSECommon,
-} from 'app/shared/services/components.service';
-import { IStore } from 'app/shared/state/store.interface';
+} from '@shared/services/components.service';
+import { IStore } from '@shared/state/store.interface';
+import { getServiceAssembliesById } from '@wks/state/service-assemblies/service-assemblies.selectors';
+import {
+  getServiceUnitsById,
+  IServiceUnitWithSA,
+} from '@wks/state/service-units/service-units.selectors';
+import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
+import { getSharedLibrariesById } from '@wks/state/shared-libraries/shared-libraries.selectors';
 import { IComponentRow, IComponentUI } from './components.interface';
 
 export interface IComponentWithSLsAndSUs

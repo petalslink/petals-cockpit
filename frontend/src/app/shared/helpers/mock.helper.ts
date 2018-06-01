@@ -19,7 +19,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { delay, dematerialize, materialize } from 'rxjs/operators';
 
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
 
 /**
  * This simulates the behaviour of Angular's http module:

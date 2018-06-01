@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   JsTable,
   mergeOnly,
   putById,
   removeById,
   updateById,
-} from 'app/shared/helpers/jstable.helper';
-import { IBusInProgressBackend } from 'app/shared/services/buses.service';
+} from '@shared/helpers/jstable.helper';
+import { IBusInProgressBackend } from '@shared/services/buses.service';
+import { BusesInProgress } from '@wks/state/buses-in-progress/buses-in-progress.actions';
+import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import {
   busesInProgressTableFactory,
   busInProgressRowFactory,

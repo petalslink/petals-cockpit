@@ -18,12 +18,12 @@
 import assign from 'lodash-es/assign';
 import flatMap from 'lodash-es/flatMap';
 
-import { IBusImport } from 'app/shared/services/buses.service';
-import { IUserBackend } from 'app/shared/services/users.service';
+import { IBusImport } from '@shared/services/buses.service';
+import { IUserBackend } from '@shared/services/users.service';
 import {
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
-} from 'app/shared/services/workspaces.service';
+} from '@shared/services/workspaces.service';
 
 import { validContainers } from './backend-mock';
 import {

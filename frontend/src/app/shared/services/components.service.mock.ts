@@ -20,12 +20,12 @@ import { Injectable } from '@angular/core';
 import has from 'lodash-es/has';
 import pickBy from 'lodash-es/pickBy';
 
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import * as helper from 'app/shared/helpers/mock.helper';
-import { environment } from 'environments/environment';
-import { componentsService } from 'mocks/components-mock';
-import { deployMockAndTriggerSse } from 'mocks/utils';
-import { workspacesService } from 'mocks/workspaces-mock';
+import { environment } from '@env/environment';
+import { componentsService } from '@mocks/components-mock';
+import { deployMockAndTriggerSse } from '@mocks/utils';
+import { workspacesService } from '@mocks/workspaces-mock';
+import { toJsTable } from '@shared/helpers/jstable.helper';
+import * as helper from '@shared/helpers/mock.helper';
 import { tap } from 'rxjs/operators';
 import {
   ComponentsServiceImpl,

@@ -17,11 +17,11 @@
 
 import { NgModule } from '@angular/core';
 
+import { SharedModule } from '@shared/shared.module';
 import {
   WorkspaceElementComponent,
   WorkspaceElementTabDirective,
-} from 'app/features/cockpit/workspaces/workspace-element/workspace-element.component';
-import { SharedModule } from 'app/shared/shared.module';
+} from '@wks/workspace-element/workspace-element.component';
 
 const declarationsAndExports = [
   WorkspaceElementComponent,

@@ -17,15 +17,15 @@
 
 import { Action } from '@ngrx/store';
 
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
-import { JsTable } from 'app/shared/helpers/jstable.helper';
-import { ICorrelationId } from 'app/shared/interfaces/correlation-id.interface';
+import { JsTable } from '@shared/helpers/jstable.helper';
+import { ICorrelationId } from '@shared/interfaces/correlation-id.interface';
 import {
   ComponentState,
   IComponentBackendDetails,
   IComponentBackendSSE,
-} from 'app/shared/services/components.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+} from '@shared/services/components.service';
+import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
+import { IComponentRow } from '@wks/state/components/components.interface';
 
 export namespace Components {
   export const FetchedType = '[Components] Fetched';

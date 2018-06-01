@@ -30,15 +30,15 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { getErrorMessage } from 'app/shared/helpers/shared.helper';
+import { environment } from '@env/environment';
+import { toJsTable } from '@shared/helpers/jstable.helper';
+import { getErrorMessage } from '@shared/helpers/shared.helper';
 import {
   ESharedLibraryState,
   SharedLibrariesService,
-} from 'app/shared/services/shared-libraries.service';
-import { SseActions } from 'app/shared/services/sse.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { environment } from 'environments/environment';
+} from '@shared/services/shared-libraries.service';
+import { SseActions } from '@shared/services/sse.service';
+import { IStore } from '@shared/state/store.interface';
 import { SharedLibraries } from './shared-libraries.actions';
 
 @Injectable()

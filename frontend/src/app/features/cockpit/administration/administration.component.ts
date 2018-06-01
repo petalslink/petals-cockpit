@@ -20,13 +20,13 @@ import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { filter, first, map, tap } from 'rxjs/operators';
 
-import { IUserNew } from 'app/shared/services/users.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
-import { Users } from 'app/shared/state/users.actions';
-import { ICurrentUser, IUser } from 'app/shared/state/users.interface';
-import { getAllUsers, getCurrentUser } from 'app/shared/state/users.selectors';
+import { IUserNew } from '@shared/services/users.service';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { isLargeScreen } from '@shared/state/ui.selectors';
+import { Users } from '@shared/state/users.actions';
+import { ICurrentUser, IUser } from '@shared/state/users.interface';
+import { getAllUsers, getCurrentUser } from '@shared/state/users.selectors';
 
 @Component({
   selector: 'app-administration',

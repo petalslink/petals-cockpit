@@ -21,10 +21,10 @@ import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 
-import { IStore } from 'app/shared/state/store.interface';
-import { ISettings } from 'app/shared/state/ui.interface';
+import { IStore } from '@shared/state/store.interface';
+import { ISettings } from '@shared/state/ui.interface';
 
-import { Ui } from 'app/shared/state/ui.actions';
+import { Ui } from '@shared/state/ui.actions';
 
 @Component({
   selector: 'app-settings-theme-color',

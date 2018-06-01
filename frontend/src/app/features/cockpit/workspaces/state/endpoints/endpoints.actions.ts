@@ -17,11 +17,11 @@
 
 import { Action } from '@ngrx/store';
 
-import { JsTable } from 'app/shared/helpers/jstable.helper';
+import { JsTable } from '@shared/helpers/jstable.helper';
 import {
   IEndpointBackendDetails,
   IEndpointBackendSSE,
-} from 'app/shared/services/endpoints.service';
+} from '@shared/services/endpoints.service';
 
 export namespace Endpoints {
   export const AddedType = '[Endpoints] Added';

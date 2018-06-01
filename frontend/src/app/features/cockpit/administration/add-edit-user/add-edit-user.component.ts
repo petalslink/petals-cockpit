@@ -30,9 +30,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 
-import { getFormErrors } from 'app/shared/helpers/form.helper';
-import { IUserNew } from 'app/shared/services/users.service';
-import { IUser } from 'app/shared/state/users.interface';
+import { getFormErrors } from '@shared/helpers/form.helper';
+import { IUserNew } from '@shared/services/users.service';
+import { IUser } from '@shared/state/users.interface';
 
 @Component({
   selector: 'app-add-edit-user',

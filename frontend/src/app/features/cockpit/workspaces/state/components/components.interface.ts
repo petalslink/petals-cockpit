@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
-import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
+import { emptyJsTable, JsTable } from '@shared/helpers/jstable.helper';
 import {
   IComponentBackendDetails,
   IComponentBackendDetailsCommon,
   IComponentBackendSSE,
   IComponentBackendSSECommon,
-} from 'app/shared/services/components.service';
+} from '@shared/services/components.service';
+import { IServiceUnits } from '@wks/state/service-units/service-units.interface';
 
 export interface IComponentUI {
   // for UI

@@ -20,7 +20,7 @@ import { createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
-import { isNot } from 'app/shared/helpers/shared.helper';
+import { isNot } from '@shared/helpers/shared.helper';
 import { IStore } from './store.interface';
 import { ICurrentUser } from './users.interface';
 

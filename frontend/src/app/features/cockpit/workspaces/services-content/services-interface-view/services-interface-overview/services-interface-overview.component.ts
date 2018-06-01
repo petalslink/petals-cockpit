@@ -23,8 +23,8 @@ import {
 } from '@angular/core';
 
 import { Store } from '@ngrx/store';
-import { IInterfaceOverview } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
-import { IStore } from 'app/shared/state/store.interface';
+import { IStore } from '@shared/state/store.interface';
+import { IInterfaceOverview } from '@wks/state/interfaces/interfaces.selectors';
 import { Observable } from 'rxjs';
 
 @Component({

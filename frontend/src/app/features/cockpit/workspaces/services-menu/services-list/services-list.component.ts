@@ -17,8 +17,8 @@
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import { IService } from 'app/features/cockpit/workspaces/state/services/services.interface';
-import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
+import { TreeElement } from '@shared/components/material-tree/material-tree.component';
+import { IService } from '@wks/state/services/services.interface';
 
 @Component({
   selector: 'app-services-list',

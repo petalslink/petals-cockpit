@@ -25,12 +25,12 @@ import {
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
-import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
-import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { stateToLedColor } from 'app/shared/helpers/shared.helper';
-import { ComponentState } from 'app/shared/services/components.service';
-import { IStore } from 'app/shared/state/store.interface';
+import { stateToLedColor } from '@shared/helpers/shared.helper';
+import { ComponentState } from '@shared/services/components.service';
+import { IStore } from '@shared/state/store.interface';
+import { IComponentWithSLsAndSUs } from '@wks/state/components/components.selectors';
+import { IServiceUnitRow } from '@wks/state/service-units/service-units.interface';
+import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
 
 @Component({
   selector: 'app-petals-component-overview',

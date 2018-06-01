@@ -18,7 +18,7 @@
 import {
   ISharedLibraryBackendDetails,
   ISharedLibraryBackendSSE,
-} from 'app/shared/services/shared-libraries.service';
+} from '@shared/services/shared-libraries.service';
 import { Component } from './components-mock';
 import { Container } from './containers-mock';
 

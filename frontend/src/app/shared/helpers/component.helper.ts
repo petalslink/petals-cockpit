@@ -22,7 +22,7 @@
 import {
   ComponentState,
   EComponentState,
-} from 'app/shared/services/components.service';
+} from '@shared/services/components.service';
 
 export function stateNameToPossibleActionsComponent(
   state: ComponentState

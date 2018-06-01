@@ -17,9 +17,9 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
-import { getComponentsById } from 'app/features/cockpit/workspaces/state/components/components.selectors';
-import { IStore } from 'app/shared/state/store.interface';
+import { IStore } from '@shared/state/store.interface';
+import { IComponentRow } from '@wks/state/components/components.interface';
+import { getComponentsById } from '@wks/state/components/components.selectors';
 import { ISharedLibrary } from './shared-libraries.interface';
 
 export interface ISharedLibraryWithComponents extends ISharedLibrary {

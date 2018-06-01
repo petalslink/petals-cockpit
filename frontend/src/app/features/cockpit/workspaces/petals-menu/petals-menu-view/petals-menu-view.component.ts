@@ -26,17 +26,17 @@ import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { debounceTime, map, tap } from 'rxjs/operators';
 
-import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
-import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { IBusInProgress } from '@wks/state/buses-in-progress/buses-in-progress.interface';
+import { Buses } from '@wks/state/buses/buses.actions';
+import { Components } from '@wks/state/components/components.actions';
+import { Containers } from '@wks/state/containers/containers.actions';
+import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import {
   WorkspaceElement,
   WorkspaceElementType,
-} from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
+} from '@wks/state/workspaces/workspaces.selectors';
 
 @Component({
   selector: 'app-petals-menu-view',

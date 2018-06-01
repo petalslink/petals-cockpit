@@ -30,17 +30,17 @@ const routes: Routes = [
   {
     path: 'interfaces/:interfaceId',
     loadChildren:
-      'app/features/cockpit/workspaces/services-content/services-interface-view/services-interface-view.module#ServicesInterfaceViewModule',
+      './services-interface-view/services-interface-view.module#ServicesInterfaceViewModule',
   },
   {
     path: 'services/:serviceId',
     loadChildren:
-      'app/features/cockpit/workspaces/services-content/services-service-view/services-service-view.module#ServicesServiceViewModule',
+      './services-service-view/services-service-view.module#ServicesServiceViewModule',
   },
   {
     path: 'endpoints/:endpointId',
     loadChildren:
-      'app/features/cockpit/workspaces/services-content/services-endpoint-view/services-endpoint-view.module#ServicesEndpointViewModule',
+      './services-endpoint-view/services-endpoint-view.module#ServicesEndpointViewModule',
   },
 ];
 

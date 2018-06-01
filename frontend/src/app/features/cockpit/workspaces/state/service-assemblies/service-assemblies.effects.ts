@@ -29,17 +29,17 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
-import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { getErrorMessage } from 'app/shared/helpers/shared.helper';
+import { environment } from '@env/environment';
+import { batchActions } from '@shared/helpers/batch-actions.helper';
+import { toJsTable } from '@shared/helpers/jstable.helper';
+import { getErrorMessage } from '@shared/helpers/shared.helper';
 import {
   EServiceAssemblyState,
   ServiceAssembliesService,
-} from 'app/shared/services/service-assemblies.service';
-import { SseActions } from 'app/shared/services/sse.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { environment } from 'environments/environment';
+} from '@shared/services/service-assemblies.service';
+import { SseActions } from '@shared/services/sse.service';
+import { IStore } from '@shared/state/store.interface';
+import { ServiceUnits } from '@wks/state/service-units/service-units.actions';
 import { ServiceAssemblies } from './service-assemblies.actions';
 
 @Injectable()

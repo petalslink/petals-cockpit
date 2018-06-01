@@ -24,11 +24,11 @@ import { Action } from '@ngrx/store';
 import { BehaviorSubject, EMPTY, Observable, of } from 'rxjs';
 import { flatMap, last, map, startWith } from 'rxjs/operators';
 
-import { ComponentState } from 'app/shared/services/components.service';
-import { HttpProgress } from 'app/shared/services/http-progress-tracker.service';
-import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
-import { ESharedLibraryState } from 'app/shared/services/shared-libraries.service';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { ComponentState } from '@shared/services/components.service';
+import { HttpProgress } from '@shared/services/http-progress-tracker.service';
+import { EServiceAssemblyState } from '@shared/services/service-assemblies.service';
+import { ESharedLibraryState } from '@shared/services/shared-libraries.service';
 
 const matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
 

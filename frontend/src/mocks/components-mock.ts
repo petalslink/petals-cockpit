@@ -20,7 +20,7 @@ import {
   EComponentType,
   IComponentBackendDetails,
   IComponentBackendSSE,
-} from 'app/shared/services/components.service';
+} from '@shared/services/components.service';
 import { Container } from './containers-mock';
 import { ServiceUnit } from './service-units-mock';
 import { SharedLibrary } from './shared-libraries-mock';

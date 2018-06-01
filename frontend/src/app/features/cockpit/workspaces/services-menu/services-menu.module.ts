@@ -17,7 +17,7 @@
 
 import { NgModule } from '@angular/core';
 
-import { SharedModule } from 'app/shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 
 import { EndpointsListComponent } from './endpoints-list/endpoints-list.component';
 import { InterfacesListComponent } from './interfaces-list/interfaces-list.component';

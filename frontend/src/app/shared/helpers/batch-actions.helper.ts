@@ -69,7 +69,7 @@ export class ActionsWithBatched extends Actions<Action> {
     super(source);
     // TODO replace deprecated operator attribute. See https://github.com/ngrx/platform/issues/468
     // @deprecated — This is an internal implementation detail, do not use.
-    // tslint:disable-next-line
+    // tslint:disable-next-line:deprecation
     this.operator = explodeBatchActionsOperator();
   }
 }

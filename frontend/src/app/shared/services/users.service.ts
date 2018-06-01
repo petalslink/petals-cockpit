@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
 
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
 
 export interface IUserBackend {
   id: string;

@@ -17,16 +17,16 @@
 
 import { Action } from '@ngrx/store';
 
-import { ISharedLibrarySimplified } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { JsTable } from 'app/shared/helpers/jstable.helper';
-import { ICorrelationId } from 'app/shared/interfaces/correlation-id.interface';
-import { IComponentBackendSSE } from 'app/shared/services/components.service';
+import { JsTable } from '@shared/helpers/jstable.helper';
+import { ICorrelationId } from '@shared/interfaces/correlation-id.interface';
+import { IComponentBackendSSE } from '@shared/services/components.service';
 import {
   IContainerBackendDetails,
   IContainerBackendSSE,
-} from 'app/shared/services/containers.service';
-import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
-import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
+} from '@shared/services/containers.service';
+import { IServiceAssemblyBackendSSE } from '@shared/services/service-assemblies.service';
+import { ISharedLibraryBackendSSE } from '@shared/services/shared-libraries.service';
+import { ISharedLibrarySimplified } from '@wks/state/shared-libraries/shared-libraries.interface';
 
 export namespace Containers {
   export const FetchedType = '[Containers] Fetched';

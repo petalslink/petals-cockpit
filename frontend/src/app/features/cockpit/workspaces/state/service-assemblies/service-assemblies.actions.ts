@@ -17,13 +17,13 @@
 
 import { Action } from '@ngrx/store';
 
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
-import { JsTable } from 'app/shared/helpers/jstable.helper';
+import { JsTable } from '@shared/helpers/jstable.helper';
 import {
   IServiceAssemblyBackendDetails,
   IServiceAssemblyBackendSSE,
   ServiceAssemblyState,
-} from 'app/shared/services/service-assemblies.service';
+} from '@shared/services/service-assemblies.service';
+import { IServiceAssemblyRow } from '@wks/state/service-assemblies/service-assemblies.interface';
 
 export namespace ServiceAssemblies {
   export const FetchedType = '[Service Assemblies] Fetched';

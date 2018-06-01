@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ComponentState } from 'app/shared/services/components.service';
+import { Component, componentsService } from '@mocks/components-mock';
+import { ServiceUnit } from '@mocks/service-units-mock';
+import { ComponentState } from '@shared/services/components.service';
 import {
   IContainerBackendDetails,
   IContainerBackendSSE,
-} from 'app/shared/services/containers.service';
+} from '@shared/services/containers.service';
 import {
   IServiceAssemblyBackendSSE,
   ServiceAssemblyState,
-} from 'app/shared/services/service-assemblies.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
-import { Component, componentsService } from 'mocks/components-mock';
-import { ServiceUnit } from 'mocks/service-units-mock';
+} from '@shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
 import { Bus } from './buses-mock';
 import {
   serviceAssembliesService,

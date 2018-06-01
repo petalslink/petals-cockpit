@@ -17,12 +17,12 @@
 
 import { Action } from '@ngrx/store';
 
-import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
-import { JsTable } from 'app/shared/helpers/jstable.helper';
+import { JsTable } from '@shared/helpers/jstable.helper';
 import {
   IServiceUnitBackendDetails,
   IServiceUnitBackendSSE,
-} from 'app/shared/services/service-units.service';
+} from '@shared/services/service-units.service';
+import { IServiceUnitRow } from '@wks/state/service-units/service-units.interface';
 
 export namespace ServiceUnits {
   export const FetchedType = '[Service Units] Fetched';

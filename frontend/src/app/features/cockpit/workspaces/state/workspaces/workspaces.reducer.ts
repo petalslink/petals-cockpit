@@ -27,13 +27,13 @@ import {
   putById,
   removeById,
   updateById,
-} from 'app/shared/helpers/jstable.helper';
-import { SseActions } from 'app/shared/services/sse.service';
+} from '@shared/helpers/jstable.helper';
+import { SseActions } from '@shared/services/sse.service';
 import {
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
-} from 'app/shared/services/workspaces.service';
-import { Users } from 'app/shared/state/users.actions';
+} from '@shared/services/workspaces.service';
+import { Users } from '@shared/state/users.actions';
 import { Workspaces } from './workspaces.actions';
 
 export namespace WorkspacesReducer {

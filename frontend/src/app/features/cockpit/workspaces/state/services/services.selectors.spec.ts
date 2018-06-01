@@ -21,9 +21,9 @@
  * https://stackoverflow.com/questions/48154330/uncaught-typeerror-cannot-read-property-release-of-undefined
  */
 
-// import { getCurrentServiceTree } from 'app/features/cockpit/workspaces/state/services/services.selectors';
-// import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
-// import { IStore } from 'app/shared/state/store.interface';
+// import { getCurrentServiceTree } from '@wks/state/services/services.selectors';
+// import { TreeElement } from '@shared/components/material-tree/material-tree.component';
+// import { IStore } from '@shared/state/store.interface';
 
 // describe(`Service selector`, () => {
 //   describe(`getCurrentServiceTree`, () => {

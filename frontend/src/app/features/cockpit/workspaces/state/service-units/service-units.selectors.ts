@@ -17,11 +17,11 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
-import { getComponentsById } from 'app/features/cockpit/workspaces/state/components/components.selectors';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
-import { getServiceAssembliesById } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
-import { IStore } from 'app/shared/state/store.interface';
+import { IStore } from '@shared/state/store.interface';
+import { IComponentRow } from '@wks/state/components/components.interface';
+import { getComponentsById } from '@wks/state/components/components.selectors';
+import { IServiceAssemblyRow } from '@wks/state/service-assemblies/service-assemblies.interface';
+import { getServiceAssembliesById } from '@wks/state/service-assemblies/service-assemblies.selectors';
 import { IServiceUnit, IServiceUnitRow } from './service-units.interface';
 
 export interface IServiceUnitWithSA extends IServiceUnit {

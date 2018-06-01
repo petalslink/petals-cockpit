@@ -19,12 +19,12 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
 import {
   getCurrentEndpointServiceInterfaces,
   IEndpointOverview,
-} from 'app/features/cockpit/workspaces/state/endpoints/endpoints.selectors';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
+} from '@wks/state/endpoints/endpoints.selectors';
 
 @Component({
   selector: 'app-services-endpoint-view',

@@ -20,26 +20,23 @@ import { createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map, withLatestFrom } from 'rxjs/operators';
 
-import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
-import {
-  getBusesAllIds,
-  getBusesById,
-} from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
-import { getComponentsById } from 'app/features/cockpit/workspaces/state/components/components.selectors';
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
-import { getContainersById } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
-import { getServiceAssembliesById } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
-import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
-import { getServiceUnitsById } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
-import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { getSharedLibrariesById } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
-import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
-import { escapeStringRegexp } from 'app/shared/helpers/shared.helper';
-import { IStore } from 'app/shared/state/store.interface';
-import { IUserRow } from 'app/shared/state/users.interface';
-import { getUsersAllIds, getUsersById } from 'app/shared/state/users.selectors';
+import { TreeElement } from '@shared/components/material-tree/material-tree.component';
+import { escapeStringRegexp } from '@shared/helpers/shared.helper';
+import { IStore } from '@shared/state/store.interface';
+import { IUserRow } from '@shared/state/users.interface';
+import { getUsersAllIds, getUsersById } from '@shared/state/users.selectors';
+import { IBusRow } from '@wks/state/buses/buses.interface';
+import { getBusesAllIds, getBusesById } from '@wks/state/buses/buses.selectors';
+import { IComponentRow } from '@wks/state/components/components.interface';
+import { getComponentsById } from '@wks/state/components/components.selectors';
+import { IContainerRow } from '@wks/state/containers/containers.interface';
+import { getContainersById } from '@wks/state/containers/containers.selectors';
+import { IServiceAssemblyRow } from '@wks/state/service-assemblies/service-assemblies.interface';
+import { getServiceAssembliesById } from '@wks/state/service-assemblies/service-assemblies.selectors';
+import { IServiceUnitRow } from '@wks/state/service-units/service-units.interface';
+import { getServiceUnitsById } from '@wks/state/service-units/service-units.selectors';
+import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
+import { getSharedLibrariesById } from '@wks/state/shared-libraries/shared-libraries.selectors';
 import { IWorkspaceRow, IWorkspaces } from './workspaces.interface';
 
 export function getSelectedWorkspaceId(state: IStore) {

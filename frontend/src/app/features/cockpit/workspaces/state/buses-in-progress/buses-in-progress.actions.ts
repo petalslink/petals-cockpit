@@ -17,12 +17,12 @@
 
 import { Action } from '@ngrx/store';
 
-import { IBusInProgressRow } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
-import { JsTable } from 'app/shared/helpers/jstable.helper';
+import { JsTable } from '@shared/helpers/jstable.helper';
 import {
   IBusImport,
   IBusInProgressBackend,
-} from 'app/shared/services/buses.service';
+} from '@shared/services/buses.service';
+import { IBusInProgressRow } from '@wks/state/buses-in-progress/buses-in-progress.interface';
 
 export namespace BusesInProgress {
   export const FetchedType = '[Buses In Progress] Fetched';

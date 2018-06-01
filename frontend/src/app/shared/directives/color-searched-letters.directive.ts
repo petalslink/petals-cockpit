@@ -25,7 +25,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 
-import { escapeStringRegexp } from 'app/shared/helpers/shared.helper';
+import { escapeStringRegexp } from '@shared/helpers/shared.helper';
 
 @Directive({
   selector: '[appColorSearchedLetters]',

@@ -26,24 +26,24 @@ import { LocalStorageService } from 'ngx-webstorage';
 import { Observable, Subject } from 'rxjs';
 import { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 
-import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
-import { getBusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.selectors';
-import { IEndpointRow } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
-import { getAllEndpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.selectors';
-import { IInterfaceRow } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
-import { getAllInterfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
-import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
-import { getAllServices } from 'app/features/cockpit/workspaces/state/services/services.selectors';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
-import { IWorkspaceRow } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { isSmallScreen } from '@shared/state/ui.selectors';
+import { IBusInProgress } from '@wks/state/buses-in-progress/buses-in-progress.interface';
+import { getBusesInProgress } from '@wks/state/buses-in-progress/buses-in-progress.selectors';
+import { IEndpointRow } from '@wks/state/endpoints/endpoints.interface';
+import { getAllEndpoints } from '@wks/state/endpoints/endpoints.selectors';
+import { IInterfaceRow } from '@wks/state/interfaces/interfaces.interface';
+import { getAllInterfaces } from '@wks/state/interfaces/interfaces.selectors';
+import { IServiceRow } from '@wks/state/services/services.interface';
+import { getAllServices } from '@wks/state/services/services.selectors';
+import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
+import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
 import {
   getCurrentWorkspace,
   getCurrentWorkspaceTree,
   WorkspaceElement,
-} from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
-import { isSmallScreen } from 'app/shared/state/ui.selectors';
+} from '@wks/state/workspaces/workspaces.selectors';
 
 @Component({
   selector: 'app-workspace',

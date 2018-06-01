@@ -17,8 +17,8 @@
 
 import { NgModule } from '@angular/core';
 
-import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
-import { SharedModule } from 'app/shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
+import { WorkspaceSharedModule } from '@wks/workspace/workspace-shared.module';
 import { PetalsComponentViewRoutingModule } from './petals-component-view-routing.module';
 
 import { PetalsComponentOperationsComponent } from './petals-component-operations/petals-component-operations.component';

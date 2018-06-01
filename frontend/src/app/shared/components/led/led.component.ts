@@ -17,7 +17,7 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { Led } from 'app/shared/components/led/led.interface';
+import { Led } from '@shared/components/led/led.interface';
 
 @Component({
   selector: 'app-led',

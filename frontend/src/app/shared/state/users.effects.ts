@@ -31,9 +31,9 @@ import {
   tap,
 } from 'rxjs/operators';
 
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { UsersService } from 'app/shared/services/users.service';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { toJsTable } from '@shared/helpers/jstable.helper';
+import { UsersService } from '@shared/services/users.service';
 import { Users } from './users.actions';
 
 @Injectable()

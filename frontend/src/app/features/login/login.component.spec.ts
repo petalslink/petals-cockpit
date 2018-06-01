@@ -21,11 +21,11 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
 import { Store, StoreModule } from '@ngrx/store';
 
-import { IUserLogin } from 'app/shared/services/users.service';
-import { SharedModule } from 'app/shared/shared.module';
-import { UiReducer } from 'app/shared/state/ui.reducer';
-import { Users } from 'app/shared/state/users.actions';
-import { UsersReducer } from 'app/shared/state/users.reducer';
+import { IUserLogin } from '@shared/services/users.service';
+import { SharedModule } from '@shared/shared.module';
+import { UiReducer } from '@shared/state/ui.reducer';
+import { Users } from '@shared/state/users.actions';
+import { UsersReducer } from '@shared/state/users.reducer';
 import {
   click,
   elementText,

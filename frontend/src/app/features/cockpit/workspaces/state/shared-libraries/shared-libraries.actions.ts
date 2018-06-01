@@ -17,13 +17,13 @@
 
 import { Action } from '@ngrx/store';
 
-import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { JsTable } from 'app/shared/helpers/jstable.helper';
+import { JsTable } from '@shared/helpers/jstable.helper';
 import {
   ISharedLibraryBackendDetails,
   ISharedLibraryBackendSSE,
   SharedLibraryState,
-} from 'app/shared/services/shared-libraries.service';
+} from '@shared/services/shared-libraries.service';
+import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
 
 export namespace SharedLibraries {
   export const FetchedType = '[Shared libraries] Fetched';

@@ -32,11 +32,11 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
-import { getErrorMessage } from 'app/shared/helpers/shared.helper';
-import { BusesService } from 'app/shared/services/buses.service';
-import { SseActions } from 'app/shared/services/sse.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { getErrorMessage } from '@shared/helpers/shared.helper';
+import { BusesService } from '@shared/services/buses.service';
+import { SseActions } from '@shared/services/sse.service';
+import { IStore } from '@shared/state/store.interface';
 import { BusesInProgress } from './buses-in-progress.actions';
 
 @Injectable()

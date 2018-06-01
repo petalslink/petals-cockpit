@@ -22,20 +22,20 @@ import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 
-import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
-import { IBusInProgressRow } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
-import { getCurrentBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.selectors';
-import { CustomValidators } from 'app/shared/helpers/custom-validators';
+import { CustomValidators } from '@shared/helpers/custom-validators';
 import {
   disableAllFormFields,
   FormErrorStateMatcher,
   getFormErrors,
-} from 'app/shared/helpers/form.helper';
-import { assert } from 'app/shared/helpers/shared.helper';
-import { deletable, IDeletable } from 'app/shared/operators/deletable.operator';
-import { BusesService, IBusImport } from 'app/shared/services/buses.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
+} from '@shared/helpers/form.helper';
+import { assert } from '@shared/helpers/shared.helper';
+import { deletable, IDeletable } from '@shared/operators/deletable.operator';
+import { BusesService, IBusImport } from '@shared/services/buses.service';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { BusesInProgress } from '@wks/state/buses-in-progress/buses-in-progress.actions';
+import { IBusInProgressRow } from '@wks/state/buses-in-progress/buses-in-progress.interface';
+import { getCurrentBusInProgress } from '@wks/state/buses-in-progress/buses-in-progress.selectors';
 
 @Component({
   selector: 'app-petals-bus-in-progress-view',

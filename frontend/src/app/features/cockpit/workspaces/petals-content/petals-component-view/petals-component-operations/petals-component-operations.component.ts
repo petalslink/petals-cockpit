@@ -32,16 +32,16 @@ import { Subject } from 'rxjs';
 import { filter, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
 
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
-import { UploadComponent } from 'app/shared/components/upload/upload.component';
-import { stateNameToPossibleActionsComponent } from 'app/shared/helpers/component.helper';
-import { ComponentState } from 'app/shared/services/components.service';
+import { UploadComponent } from '@shared/components/upload/upload.component';
+import { stateNameToPossibleActionsComponent } from '@shared/helpers/component.helper';
+import { ComponentState } from '@shared/services/components.service';
 import {
   HttpProgress,
   HttpProgressType,
-} from 'app/shared/services/http-progress-tracker.service';
-import { IStore } from 'app/shared/state/store.interface';
+} from '@shared/services/http-progress-tracker.service';
+import { IStore } from '@shared/state/store.interface';
+import { Components } from '@wks/state/components/components.actions';
+import { IComponentWithSLsAndSUs } from '@wks/state/components/components.selectors';
 
 @Component({
   selector: 'app-petals-component-operations',

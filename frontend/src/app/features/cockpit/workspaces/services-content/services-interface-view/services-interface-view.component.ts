@@ -19,12 +19,12 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
 import {
   getCurrentInterfaceServicesEndpoints,
   IInterfaceOverview,
-} from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
+} from '@wks/state/interfaces/interfaces.selectors';
 
 @Component({
   selector: 'app-services-interface-view',

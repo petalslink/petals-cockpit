@@ -21,12 +21,12 @@ import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { flatMap, last, map } from 'rxjs/operators';
 import * as xmltojson from 'xmltojson';
 
-import { ISharedLibrarySimplified } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
-import { loadFilesContentFromZip } from 'app/shared/helpers/zip.helper';
-import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { JsTable, toJsTable } from '@shared/helpers/jstable.helper';
+import { loadFilesContentFromZip } from '@shared/helpers/zip.helper';
+import { IServiceAssemblyBackendSSE } from '@shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
+import { ISharedLibrarySimplified } from '@wks/state/shared-libraries/shared-libraries.interface';
 
 export enum EComponentState {
   Started = 'Started',

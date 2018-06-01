@@ -22,8 +22,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { of, Subject } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 
-import { getErrorMessage } from 'app/shared/helpers/shared.helper';
-import { IUserSetup, UsersService } from 'app/shared/services/users.service';
+import { getErrorMessage } from '@shared/helpers/shared.helper';
+import { IUserSetup, UsersService } from '@shared/services/users.service';
 
 @Component({
   selector: 'app-setup',

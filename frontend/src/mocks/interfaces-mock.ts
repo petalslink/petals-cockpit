@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { Endpoint } from '@mocks/endpoints-mock';
+import { Service } from '@mocks/services-mock';
 import {
   IInterfaceBackendDetails,
   IInterfaceBackendSSE,
-} from 'app/shared/services/interfaces.service';
-import { Endpoint } from 'mocks/endpoints-mock';
-import { Service } from 'mocks/services-mock';
+} from '@shared/services/interfaces.service';
 
 export class Interface {
   public readonly id: string;

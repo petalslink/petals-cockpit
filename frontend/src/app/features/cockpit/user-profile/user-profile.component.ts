@@ -19,11 +19,11 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
-import { ICurrentUser } from 'app/shared/state/users.interface';
-import { getCurrentUser } from 'app/shared/state/users.selectors';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { isLargeScreen } from '@shared/state/ui.selectors';
+import { ICurrentUser } from '@shared/state/users.interface';
+import { getCurrentUser } from '@shared/state/users.selectors';
 
 @Component({
   selector: 'app-user-profile',

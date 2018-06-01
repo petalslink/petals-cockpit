@@ -17,7 +17,7 @@
 
 import { NgModule } from '@angular/core';
 
-import { SharedModule } from 'app/shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 import { AdministrationModule } from './administration/administration.module';
 import { CockpitRoutingModule } from './cockpit-routing.module';
 import { UserProfileModule } from './user-profile/user-profile.module';

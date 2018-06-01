@@ -20,8 +20,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { loadFilesContentFromZip } from 'app/shared/helpers/zip.helper';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { loadFilesContentFromZip } from '@shared/helpers/zip.helper';
 import * as xmltojson from 'xmltojson';
 
 export enum ESharedLibraryState {

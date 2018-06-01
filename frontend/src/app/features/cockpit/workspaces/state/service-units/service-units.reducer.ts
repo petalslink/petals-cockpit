@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   JsTable,
   mergeOnly,
   putAll,
   removeById,
   updateById,
-} from 'app/shared/helpers/jstable.helper';
+} from '@shared/helpers/jstable.helper';
 import {
   IServiceUnitBackendDetails,
   IServiceUnitBackendSSE,
-} from 'app/shared/services/service-units.service';
+} from '@shared/services/service-units.service';
+import { ServiceUnits } from '@wks/state/service-units/service-units.actions';
+import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import {
   IServiceUnitRow,
   IServiceUnitsTable,

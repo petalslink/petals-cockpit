@@ -1,17 +1,17 @@
 import { Type } from '@angular/core';
 
-import { BusesService } from 'app/shared/services/buses.service';
-import { ComponentsService } from 'app/shared/services/components.service';
-import { ContainersService } from 'app/shared/services/containers.service';
-import { EndpointsService } from 'app/shared/services/endpoints.service';
-import { InterfacesService } from 'app/shared/services/interfaces.service';
-import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
-import { ServiceUnitsService } from 'app/shared/services/service-units.service';
-import { ServicesService } from 'app/shared/services/services.service';
-import { SharedLibrariesService } from 'app/shared/services/shared-libraries.service';
-import { SseService } from 'app/shared/services/sse.service';
-import { UsersService } from 'app/shared/services/users.service';
-import { WorkspacesService } from 'app/shared/services/workspaces.service';
+import { BusesService } from '@shared/services/buses.service';
+import { ComponentsService } from '@shared/services/components.service';
+import { ContainersService } from '@shared/services/containers.service';
+import { EndpointsService } from '@shared/services/endpoints.service';
+import { InterfacesService } from '@shared/services/interfaces.service';
+import { ServiceAssembliesService } from '@shared/services/service-assemblies.service';
+import { ServiceUnitsService } from '@shared/services/service-units.service';
+import { ServicesService } from '@shared/services/services.service';
+import { SharedLibrariesService } from '@shared/services/shared-libraries.service';
+import { SseService } from '@shared/services/sse.service';
+import { UsersService } from '@shared/services/users.service';
+import { WorkspacesService } from '@shared/services/workspaces.service';
 
 export interface IEnvironment {
   /**

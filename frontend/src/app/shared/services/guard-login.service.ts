@@ -26,9 +26,9 @@ import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
 import { catchError, first, map, switchMap } from 'rxjs/operators';
 
-import { IStore } from 'app/shared/state/store.interface';
-import { Users } from 'app/shared/state/users.actions';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { IStore } from '@shared/state/store.interface';
+import { Users } from '@shared/state/users.actions';
 import { UsersService } from './users.service';
 
 @Injectable()

@@ -23,7 +23,7 @@ import { catchError, tap } from 'rxjs/operators';
 import {
   _getTextFromZip,
   loadFilesContentFromZip,
-} from 'app/shared/helpers/zip.helper';
+} from '@shared/helpers/zip.helper';
 import { throwError } from 'rxjs';
 import { of } from 'rxjs/internal/observable/of';
 

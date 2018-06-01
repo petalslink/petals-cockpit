@@ -19,12 +19,12 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
 import {
   getCurrentServiceUnit,
   IServiceUnitWithSAAndComponent,
-} from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
+} from '@wks/state/service-units/service-units.selectors';
 
 @Component({
   selector: 'app-petals-service-unit-view',

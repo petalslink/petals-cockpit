@@ -22,8 +22,8 @@ import { Action } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
-import { ServiceUnitsService } from 'app/shared/services/service-units.service';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { ServiceUnitsService } from '@shared/services/service-units.service';
 import { ServiceUnits } from './service-units.actions';
 
 @Injectable()

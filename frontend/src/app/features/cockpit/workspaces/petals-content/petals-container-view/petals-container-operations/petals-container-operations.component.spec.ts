@@ -32,14 +32,14 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import { of, throwError } from 'rxjs';
 
-import { PetalsContainerOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-operations/petals-container-operations.component';
 import {
   ComponentsService,
   ComponentsServiceImpl,
-} from 'app/shared/services/components.service';
-import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
-import { SharedLibrariesService } from 'app/shared/services/shared-libraries.service';
-import { metaReducers, reducers } from 'app/shared/state/root.reducer';
+} from '@shared/services/components.service';
+import { ServiceAssembliesService } from '@shared/services/service-assemblies.service';
+import { SharedLibrariesService } from '@shared/services/shared-libraries.service';
+import { metaReducers, reducers } from '@shared/state/root.reducer';
+import { PetalsContainerOperationsComponent } from '@wks/petals-content/petals-container-view/petals-container-operations/petals-container-operations.component';
 
 describe(`Petals container operations`, () => {
   let pcoFixture: ComponentFixture<PetalsContainerOperationsComponent>;

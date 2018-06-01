@@ -17,11 +17,11 @@
 
 import { Action } from '@ngrx/store';
 
-import { JsTable } from 'app/shared/helpers/jstable.helper';
+import { JsTable } from '@shared/helpers/jstable.helper';
 import {
   IInterfaceBackendDetails,
   IInterfaceBackendSSE,
-} from 'app/shared/services/interfaces.service';
+} from '@shared/services/interfaces.service';
 
 export namespace Interfaces {
   export const AddedType = '[Interfaces] Added';

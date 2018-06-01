@@ -18,7 +18,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import * as helper from 'app/shared/helpers/mock.helper';
+import * as helper from '@shared/helpers/mock.helper';
 import { EndpointsServiceImpl } from './endpoints.service';
 
 @Injectable()

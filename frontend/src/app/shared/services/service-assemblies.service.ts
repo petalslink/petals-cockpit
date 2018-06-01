@@ -19,8 +19,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { loadFilesContentFromZip } from 'app/shared/helpers/zip.helper';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { loadFilesContentFromZip } from '@shared/helpers/zip.helper';
 import { map } from 'rxjs/operators';
 import * as xmltojson from 'xmltojson';
 

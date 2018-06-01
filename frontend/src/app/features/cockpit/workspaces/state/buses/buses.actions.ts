@@ -17,12 +17,12 @@
 
 import { Action } from '@ngrx/store';
 
-import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
-import { JsTable } from 'app/shared/helpers/jstable.helper';
+import { JsTable } from '@shared/helpers/jstable.helper';
 import {
   IBusBackendDetails,
   IBusBackendSSE,
-} from 'app/shared/services/buses.service';
+} from '@shared/services/buses.service';
+import { IBusRow } from '@wks/state/buses/buses.interface';
 
 export namespace Buses {
   export const FetchedType = '[Buses] Fetched';

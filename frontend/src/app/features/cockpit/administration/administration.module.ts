@@ -17,7 +17,7 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { SharedModule } from 'app/shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 
 import { AddEditUserComponent } from './add-edit-user/add-edit-user.component';
 import { AdministrationComponent } from './administration.component';

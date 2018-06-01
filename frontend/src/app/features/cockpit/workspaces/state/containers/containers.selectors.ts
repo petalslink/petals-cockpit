@@ -17,13 +17,13 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { IBusRow } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
-import { getBusesById } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
-import { getComponentsById } from 'app/features/cockpit/workspaces/state/components/components.selectors';
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
-import { getServiceAssembliesById } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
-import { getSharedLibrariesById } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
-import { IStore } from 'app/shared/state/store.interface';
+import { IStore } from '@shared/state/store.interface';
+import { IBusRow } from '@wks/state/buses/buses.interface';
+import { getBusesById } from '@wks/state/buses/buses.selectors';
+import { getComponentsById } from '@wks/state/components/components.selectors';
+import { IContainerRow } from '@wks/state/containers/containers.interface';
+import { getServiceAssembliesById } from '@wks/state/service-assemblies/service-assemblies.selectors';
+import { getSharedLibrariesById } from '@wks/state/shared-libraries/shared-libraries.selectors';
 
 export interface IContainerWithSiblings extends IContainerRow {
   siblings: IContainerRow[];

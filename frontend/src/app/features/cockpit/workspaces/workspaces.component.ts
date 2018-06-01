@@ -25,13 +25,13 @@ import {
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { IStore } from 'app/shared/state/store.interface';
 import { Observable, Subject } from 'rxjs';
 import { finalize, first, takeUntil, tap } from 'rxjs/operators';
 
-import { Ui } from 'app/shared/state/ui.actions';
-import { ICurrentUser } from 'app/shared/state/users.interface';
-import { getCurrentUser } from 'app/shared/state/users.selectors';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { ICurrentUser } from '@shared/state/users.interface';
+import { getCurrentUser } from '@shared/state/users.selectors';
 import { Workspaces } from './state/workspaces/workspaces.actions';
 import {
   IWorkspace,

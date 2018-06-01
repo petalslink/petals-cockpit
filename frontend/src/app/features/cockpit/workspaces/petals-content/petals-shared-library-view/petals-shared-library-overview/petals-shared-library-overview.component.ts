@@ -22,8 +22,8 @@ import {
   OnInit,
 } from '@angular/core';
 
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
-import { ISharedLibraryWithComponents } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
+import { IComponentRow } from '@wks/state/components/components.interface';
+import { ISharedLibraryWithComponents } from '@wks/state/shared-libraries/shared-libraries.selectors';
 
 @Component({
   selector: 'app-petals-shared-library-overview',

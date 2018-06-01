@@ -19,12 +19,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-import { IStore } from 'app/shared/state/store.interface';
-import { IUi } from 'app/shared/state/ui.interface';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
-import { Users } from 'app/shared/state/users.actions';
-import { ICurrentUser } from 'app/shared/state/users.interface';
-import { getCurrentUser } from 'app/shared/state/users.selectors';
+import { IStore } from '@shared/state/store.interface';
+import { IUi } from '@shared/state/ui.interface';
+import { isLargeScreen } from '@shared/state/ui.selectors';
+import { Users } from '@shared/state/users.actions';
+import { ICurrentUser } from '@shared/state/users.interface';
+import { getCurrentUser } from '@shared/state/users.selectors';
 
 @Component({
   selector: 'app-cockpit',

@@ -18,23 +18,23 @@
 import { ActionReducerMap } from '@ngrx/store';
 import { storeFreeze } from 'ngrx-store-freeze';
 
-import { BusesInProgressReducer } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.reducer';
-import { BusesReducer } from 'app/features/cockpit/workspaces/state/buses/buses.reducer';
-import { ComponentsReducer } from 'app/features/cockpit/workspaces/state/components/components.reducer';
-import { ContainersReducer } from 'app/features/cockpit/workspaces/state/containers/containers.reducer';
-import { EndpointsReducer } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.reducer';
-import { InterfacesReducer } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.reducer';
-import { ServiceAssembliesReducer } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.reducer';
-import { ServiceUnitsReducer } from 'app/features/cockpit/workspaces/state/service-units/service-units.reducer';
-import { ServicesReducer } from 'app/features/cockpit/workspaces/state/services/services.reducer';
-import { SharedLibrariesReducer } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.reducer';
-import { WorkspacesReducer } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.reducer';
-import { enableBatching } from 'app/shared/helpers/batch-actions.helper';
-import { initStateFromLocalStorage } from 'app/shared/helpers/local-storage.helper';
-import { IStore } from 'app/shared/state/store.interface';
-import { environment } from 'environments/environment';
-import { UiReducer } from '../state/ui.reducer';
-import { UsersReducer } from './users.reducer';
+import { environment } from '@env/environment';
+import { enableBatching } from '@shared/helpers/batch-actions.helper';
+import { initStateFromLocalStorage } from '@shared/helpers/local-storage.helper';
+import { IStore } from '@shared/state/store.interface';
+import { UiReducer } from '@shared/state/ui.reducer';
+import { UsersReducer } from '@shared/state/users.reducer';
+import { BusesInProgressReducer } from '@wks/state/buses-in-progress/buses-in-progress.reducer';
+import { BusesReducer } from '@wks/state/buses/buses.reducer';
+import { ComponentsReducer } from '@wks/state/components/components.reducer';
+import { ContainersReducer } from '@wks/state/containers/containers.reducer';
+import { EndpointsReducer } from '@wks/state/endpoints/endpoints.reducer';
+import { InterfacesReducer } from '@wks/state/interfaces/interfaces.reducer';
+import { ServiceAssembliesReducer } from '@wks/state/service-assemblies/service-assemblies.reducer';
+import { ServiceUnitsReducer } from '@wks/state/service-units/service-units.reducer';
+import { ServicesReducer } from '@wks/state/services/services.reducer';
+import { SharedLibrariesReducer } from '@wks/state/shared-libraries/shared-libraries.reducer';
+import { WorkspacesReducer } from '@wks/state/workspaces/workspaces.reducer';
 
 export const reducers: ActionReducerMap<IStore> = {
   ui: UiReducer.reducer,

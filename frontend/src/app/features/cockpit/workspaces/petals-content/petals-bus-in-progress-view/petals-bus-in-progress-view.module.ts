@@ -16,7 +16,7 @@
  */
 
 import { NgModule } from '@angular/core';
-import { SharedModule } from 'app/shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 import { PetalsBusInProgressViewRoutingModule } from './petals-bus-in-progress-view-routing.module';
 
 import { PetalsBusInProgressViewComponent } from './petals-bus-in-progress-view.component';

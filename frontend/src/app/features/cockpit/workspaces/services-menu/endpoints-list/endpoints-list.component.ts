@@ -17,8 +17,8 @@
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import { IEndpoint } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
-import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
+import { TreeElement } from '@shared/components/material-tree/material-tree.component';
+import { IEndpoint } from '@wks/state/endpoints/endpoints.interface';
 
 @Component({
   selector: 'app-endpoints-list',

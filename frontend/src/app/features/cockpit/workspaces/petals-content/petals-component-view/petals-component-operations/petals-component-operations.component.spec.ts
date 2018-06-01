@@ -30,11 +30,11 @@ import { Store, StoreModule } from '@ngrx/store';
 import { of } from 'rxjs';
 import * as uuid from 'uuid';
 
-import { PetalsComponentOperationsComponent } from 'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-operations/petals-component-operations.component';
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { IComponentWithSLsAndSUs } from 'app/features/cockpit/workspaces/state/components/components.selectors';
-import { HttpProgress } from 'app/shared/services/http-progress-tracker.service';
-import { SharedModule } from 'app/shared/shared.module';
+import { HttpProgress } from '@shared/services/http-progress-tracker.service';
+import { SharedModule } from '@shared/shared.module';
+import { PetalsComponentOperationsComponent } from '@wks/petals-content/petals-component-view/petals-component-operations/petals-component-operations.component';
+import { Components } from '@wks/state/components/components.actions';
+import { IComponentWithSLsAndSUs } from '@wks/state/components/components.selectors';
 import {
   getElementBySelector,
   getElementsBySelector,

@@ -35,10 +35,10 @@ import {
 import { fromEvent, Observable, Subject } from 'rxjs';
 import { debounceTime, filter, map, takeUntil, tap } from 'rxjs/operators';
 
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
-import { IContainerWithSiblings } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
-import { IStore } from 'app/shared/state/store.interface';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
+import { IStore } from '@shared/state/store.interface';
+import { isLargeScreen } from '@shared/state/ui.selectors';
+import { IContainerRow } from '@wks/state/containers/containers.interface';
+import { IContainerWithSiblings } from '@wks/state/containers/containers.selectors';
 import {
   buildVisNetworkData,
   containerNetworkOptions,

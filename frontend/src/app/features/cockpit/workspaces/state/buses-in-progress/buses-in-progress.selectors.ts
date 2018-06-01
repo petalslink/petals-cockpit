@@ -17,11 +17,11 @@
 
 import { createSelector } from '@ngrx/store';
 
+import { IStore } from '@shared/state/store.interface';
 import {
   IBusInProgress,
   IBusInProgressRow,
-} from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
-import { IStore } from 'app/shared/state/store.interface';
+} from '@wks/state/buses-in-progress/buses-in-progress.interface';
 
 export function getBusesInProgressAllIds(state: IStore) {
   return state.busesInProgress.allIds;

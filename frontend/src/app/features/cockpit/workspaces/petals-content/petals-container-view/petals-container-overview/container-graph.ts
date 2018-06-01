@@ -19,8 +19,8 @@
 // tslint:disable: no-unused-variable
 import { VisEdges, VisNetworkOptions, VisNodes } from 'ngx-vis';
 
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
-import { IContainerWithSiblings } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
+import { IContainerRow } from '@wks/state/containers/containers.interface';
+import { IContainerWithSiblings } from '@wks/state/containers/containers.selectors';
 
 export function buildVisNetworkData(container: IContainerWithSiblings) {
   return {

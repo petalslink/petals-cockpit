@@ -17,13 +17,13 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
-import { getContainersById } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
 import {
   IBusBackendDetailsCommon,
   IBusBackendSSECommon,
-} from 'app/shared/services/buses.service';
-import { IStore } from 'app/shared/state/store.interface';
+} from '@shared/services/buses.service';
+import { IStore } from '@shared/state/store.interface';
+import { IContainerRow } from '@wks/state/containers/containers.interface';
+import { getContainersById } from '@wks/state/containers/containers.selectors';
 import { IBusRow, IBusUI } from './buses.interface';
 
 export interface IBusWithContainers
