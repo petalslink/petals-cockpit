@@ -68,6 +68,17 @@
       <version>2.0.0</version>
     </dependency>
     <dependency>
+        <groupId>org.pac4j</groupId>
+        <artifactId>pac4j-config</artifactId>
+        <version>2.0.0</version>
+        <scope>runtime</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.pac4j</groupId>
+        <artifactId>pac4j-ldap</artifactId>
+        <version>${pac4j.version}</version>
+    </dependency>
+    <dependency>
       <groupId>io.javaslang</groupId>
       <artifactId>javaslang</artifactId>
     </dependency>

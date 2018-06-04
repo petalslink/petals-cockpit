@@ -21,20 +21,12 @@ import org.eclipse.jdt.annotation.Nullable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LDAPConfigFactory {
+
     @Nullable
     private String url = null;
 
     @Nullable
-    private String bindDn = null;
-
-    @Nullable
-    private String bindPass = null;
-
-    private String scope = "base";
-
-    private String filter = "inetOrgPerson";
-
-    private String idAttribute = "uid";
+    private String formatDn = null;
 
     @JsonProperty
     @Nullable
@@ -49,59 +41,16 @@ public class LDAPConfigFactory {
 
     @JsonProperty
     @Nullable
-    public String getBindDn() {
-        return bindDn;
+    public String getFormatDn() {
+        return formatDn;
     }
 
     @JsonProperty
-    public void setBindDn(String bindDn) {
-        this.bindDn = bindDn;
-    }
-
-    @JsonProperty
-    @Nullable
-    public String getBindPass() {
-        return bindPass;
-    }
-
-    @JsonProperty
-    public void setBindPass(String bindPass) {
-        this.bindPass = bindPass;
-    }
-
-    @JsonProperty
-    public String getScope() {
-        return scope;
-    }
-
-    @JsonProperty
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
-
-    @JsonProperty
-    public String getFilter() {
-        return filter;
-    }
-
-    @JsonProperty
-    public void setFilter(String filter) {
-        this.filter = filter;
-    }
-
-    @JsonProperty
-    public String getIdAttribute() {
-        return idAttribute;
-    }
-
-    @JsonProperty
-    public void setIdAttribute(String idAttribute) {
-        this.idAttribute = idAttribute;
+    public void setFormatDn(String formatDn) {
+        this.formatDn = formatDn;
     }
 
     public boolean isConfigurationValid() {
-        return url != null && !url.isEmpty() && bindDn != null && !bindDn.isEmpty() && bindPass != null
-                && !bindPass.isEmpty();
+        return url != null && !url.isEmpty() && formatDn != null && !formatDn.isEmpty();
     }
 }
-
