@@ -107,10 +107,7 @@ describe(`Login component`, () => {
     spyOn(component, 'onSubmit').and.callThrough();
     spyOn(store, 'dispatch').and.callThrough();
 
-    const user: IUserLogin = {
-      username: 'admin',
-      password: 'pass',
-    };
+    const user: IUserLogin = { username: 'admin', password: 'pass' };
 
     setInputValue(DOM.usernameInpt, user.username);
     setInputValue(DOM.passwordInpt, user.password);
@@ -130,24 +127,25 @@ describe(`Login component`, () => {
       })
     );
 
-    it('if connect succeeds', () => {
-      store.dispatch(
-        new Users.ConnectSuccess({
-          user: { id: user.username, name: 'Admin' } as any,
-        } as any)
-      );
-      fixture.detectChanges();
-      expect(DOM.loginButton.disabled).toBe(true);
-      expect(DOM.loginButton.textContent.toLowerCase()).toContain(`logging in`);
-    });
+    // if connect succeeds
+    store.dispatch(
+      new Users.ConnectSuccess({
+        user: {
+          id: user.username,
+          name: 'Admin',
+        } as any,
+      } as any)
+    );
+    fixture.detectChanges();
+    expect(DOM.loginButton.disabled).toBe(true);
+    expect(DOM.loginButton.textContent.toLowerCase()).toContain(`logging in`);
 
-    it('if connect fails', () => {
-      store.dispatch(new Users.ConnectError());
-      fixture.detectChanges();
-      expect(DOM.loginButton.disabled).toBe(false);
-      expect(DOM.loginButton.textContent.toLowerCase()).toContain(`log in`);
-      expect(DOM.errorTxt).toEqual(`Username and password do not match`);
-    });
+    // if connect fails
+    store.dispatch(new Users.ConnectError());
+    fixture.detectChanges();
+    expect(DOM.loginButton.disabled).toBe(false);
+    expect(DOM.loginButton.textContent.toLowerCase()).toContain(`log in`);
+    expect(DOM.errorTxt).toEqual(`Username and password do not match`);
   });
 });
 

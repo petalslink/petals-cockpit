@@ -70,7 +70,7 @@ export class ImportBusPage extends BusInProgressFields {
   }
 
   getErrorImportDetailsMessage() {
-    return MessageComponentPage.waitAndGet(
+    return MessageComponentPage.getMessage(
       this.component,
       `error-import-details`
     );

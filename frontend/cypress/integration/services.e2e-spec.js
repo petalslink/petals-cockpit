@@ -8,7 +8,7 @@ import {
 } from '../support/helper.const';
 import { SERVICE_OVERVIEW_DOM } from '../support/service.dom';
 
-describe(`Service`, () => {
+describe(`Services`, () => {
   beforeEach(() => {
     cy.visit(`/login`);
   });

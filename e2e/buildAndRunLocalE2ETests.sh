@@ -3,7 +3,7 @@
 
 # build application
 cd ../frontend
-ng build --e=prod --no-aot -bh='{{baseUrl}}'
+ng build --base-href '{{baseUrl}}' --no-aot --prod --buildOptimizer=false
 
 cd ..
 mvn -s ci/settings.xml clean verify antrun:run@build-product-dist -DskipTests
