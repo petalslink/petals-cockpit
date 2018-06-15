@@ -105,14 +105,14 @@ test-frontend:
     - time yarn run test:ci
     # e2e
     # build the frontend
-    - ng build --prod --progress=false -e=prod-e2e
+    - ng build --prod -c prod-e2e
     # serve the frontend
     - nohup http-server --push-state --silent -p 4200 dist &
     # save the PID as we run it in background
     - echo $! > pid-nohup.txt
     - sleep 5
     - time yarn run cypress:chromium
-    - time yarn run ng e2e --serve=false -p 4200
+    - time yarn run e2e:ci -p 4200
     - kill -9 $(cat pid-nohup.txt)
     - rm pid-nohup.txt
   # Protractor tests are unstable and may fail unexpectedly
@@ -213,7 +213,7 @@ package-product:
   allow_failure: true
   script:
     - cd frontend
-    - ng build --prod --progress=false -e=prod-e2e
+    - ng build --prod -c prod-e2e
     - nohup http-server --push-state --silent -p 4200 dist &
     - echo $! > pid-nohup.txt
     - sleep 5
@@ -231,7 +231,7 @@ chromium-cypress:
   allow_failure: true
   script:
     - cd frontend
-    - ng build --prod --progress=false -e=prod-e2e
+    - ng build --prod -c prod-e2e
     - nohup http-server --push-state --silent -p 4200 dist &
     - echo $! > pid-nohup.txt
     - sleep 5
@@ -265,7 +265,9 @@ e2e-product:
     - time $COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml
     - nohup $COCKPIT server $COCKPIT_CONFIG  > e2e/logs/cockpit-e2e-run.out.log 2> e2e/logs/cockpit-e2e-run.err.log &
     - cd frontend
-    - sleep 10
+    - yarn global add webdriver-manager
+    - yarn webdriver-manager update
+    - sleep 2
     - time yarn run e2e:product
   # Protractor tests are unstable and may fail unexpectedly
   # this workaround has to be removed if we stop relying on protractor
