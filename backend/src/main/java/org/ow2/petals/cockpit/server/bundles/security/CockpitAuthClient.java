@@ -16,21 +16,18 @@
  */
 package org.ow2.petals.cockpit.server.bundles.security;
 
-import org.ow2.petals.cockpit.server.CockpitApplication;
+import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.cockpit.server.LDAPConfigFactory;
 import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.redirect.RedirectAction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CockpitAuthClient extends IndirectClient<UsernamePasswordCredentials, CommonProfile> {
 
+    @Nullable
     private static LDAPConfigFactory ldapConf;
-
-    protected static final Logger LOG = LoggerFactory.getLogger(CockpitApplication.class);
 
     public CockpitAuthClient() {
         // let's always consider it as an ajax request: no redirect will happen then!
@@ -48,8 +45,8 @@ public class CockpitAuthClient extends IndirectClient<UsernamePasswordCredential
 
     @Override
     protected void clientInit(WebContext context) {
-        // if ldapConf is set for this class, the configuration is valid
-        if (ldapConf != null) {
+        if (ldapConf != null && ldapConf.isConfigurationValid()) {
+            assert ldapConf != null;
             defaultAuthenticator(new LdapAuthenticator(ldapConf));
         } else {
             defaultAuthenticator(new CockpitAuthenticator());

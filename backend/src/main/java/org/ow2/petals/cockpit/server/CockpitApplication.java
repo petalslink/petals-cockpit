@@ -166,7 +166,10 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         final LDAPConfigFactory ldapc = configuration.getLDAPConfigFactory();
         if (ldapc.isConfigurationValid()) {
             LOG.info("Valid LDAP configuration found.");
-            LOG.debug("\nurl = {}\nformatDn = {}", ldapc.getUrl(), ldapc.getFormatDn());
+            LOG.debug(
+                    "\nurl = {},\nusersDn = {},\nusernameAttribute = {},\nnameAttribute = {},\npasswordAttribute = {}",
+                    ldapc.getUrl(), ldapc.getUsersDn(),
+                    ldapc.getUsernameAttribute(), ldapc.getNameAttribute(), ldapc.getPasswordAttribute());
             CockpitAuthClient.setLdapConfiguration(ldapc);
         } else {
             LOG.info("No valid LDAP configuration found.");

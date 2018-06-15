@@ -23,11 +23,7 @@ import javax.ws.rs.core.MediaType;
 import org.jooq.Configuration;
 import org.jooq.impl.DSL;
 import org.ldaptive.ConnectionConfig;
-import org.ldaptive.Credential;
 import org.ldaptive.DefaultConnectionFactory;
-import org.ldaptive.LdapException;
-import org.ldaptive.auth.AuthenticationRequest;
-import org.ldaptive.auth.AuthenticationResponse;
 import org.ldaptive.auth.Authenticator;
 import org.ldaptive.auth.BindAuthenticationHandler;
 import org.ldaptive.auth.FormatDnResolver;
@@ -38,23 +34,43 @@ import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.exception.AccountNotFoundException;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.HttpAction;
+import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.jax.rs.pac4j.JaxRsContext;
 import org.pac4j.ldap.profile.service.LdapProfileService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LdapAuthenticator extends LdapProfileService {
 
-    private Authenticator auth;
+    protected static final Logger LOG = LoggerFactory.getLogger(LdapAuthenticator.class);
 
     public LdapAuthenticator(LDAPConfigFactory ldapConf) {
+        final String usersDn = ldapConf.getUsersDn();
+        final String username = ldapConf.getUsernameAttribute();
+        final String name = ldapConf.getNameAttribute();
+        final String password = ldapConf.getPasswordAttribute();
+        assert username != null && !username.isEmpty();
+        assert usersDn != null && !usersDn.isEmpty();
+
         ConnectionConfig connConfig = new ConnectionConfig(ldapConf.getUrl());
         connConfig.setUseStartTLS(false);
 
         FormatDnResolver dnResolver = new FormatDnResolver();
-        dnResolver.setFormat(ldapConf.getFormatDn());
+        dnResolver.setFormat(username + "=%s," + usersDn);
 
-        BindAuthenticationHandler authHandler = new BindAuthenticationHandler(new DefaultConnectionFactory(connConfig));
+        final DefaultConnectionFactory connectionFactory = new DefaultConnectionFactory(connConfig);
+        BindAuthenticationHandler authHandler = new BindAuthenticationHandler(connectionFactory);
 
-        auth = new Authenticator(dnResolver, authHandler);
+        this.setUsersDn(usersDn);
+        this.setUsernameAttribute(username);
+        if (name != null && !name.isEmpty()) {
+            this.setAttributes(name);
+        }
+        if (password != null && !password.isEmpty()) {
+            this.setPasswordAttribute(password);
+        }
+        this.setConnectionFactory(connectionFactory);
+        this.setLdapAuthenticator(new Authenticator(dnResolver, authHandler));
     }
 
     @Override
@@ -68,16 +84,13 @@ public class LdapAuthenticator extends LdapProfileService {
 
         if (user != null) {
             try {
-                AuthenticationResponse response = this.auth
-                        .authenticate(new AuthenticationRequest(username, new Credential(credentials.getPassword())));
+                super.validate(credentials, context);
+                credentials.setUserProfile(new CockpitProfile(username, user.getAdmin()));
 
-                if (response.getResult()) { // authentication succeeded
-                    credentials.setUserProfile(new CockpitProfile(username, user.getAdmin()));
-                } else { // authentication failed
-                    throw new CredentialsException("Auth failed: " + response.getMessage());
-                }
-            } catch (LdapException e) {
-                throw new CredentialsException("LdapException: " + e.getMessage());
+                LOG.debug("LDAP user {} credentials validated.", username);
+            } catch (TechnicalException e) {
+                LOG.debug("LDAP technical exception during "+username+" credential validation", e.getCause());
+                throw e;
             }
         } else {
             throw new AccountNotFoundException("No account found for: " + username);

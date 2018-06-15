@@ -26,7 +26,16 @@ public class LDAPConfigFactory {
     private String url = null;
 
     @Nullable
-    private String formatDn = null;
+    private String usersDn = null;
+
+    @Nullable
+    private String usernameAttribute = null;
+
+    @Nullable
+    private String nameAttribute = null;
+
+    @Nullable
+    private String passwordAttribute = null;
 
     @JsonProperty
     @Nullable
@@ -41,16 +50,50 @@ public class LDAPConfigFactory {
 
     @JsonProperty
     @Nullable
-    public String getFormatDn() {
-        return formatDn;
+    public String getUsersDn() {
+        return usersDn;
     }
 
     @JsonProperty
-    public void setFormatDn(String formatDn) {
-        this.formatDn = formatDn;
+    public void setUsersDn(String formatDn) {
+        this.usersDn = formatDn;
+    }
+
+    @JsonProperty
+    @Nullable
+    public String getUsernameAttribute() {
+        return usernameAttribute;
+    }
+
+    @JsonProperty
+    public void setUsernameAttribute(String userNameAttribute) {
+        this.usernameAttribute = userNameAttribute;
+    }
+
+    @JsonProperty
+    @Nullable
+    public String getNameAttribute() {
+        return nameAttribute;
+    }
+
+    @JsonProperty
+    public void setNameAttribute(String nameAttribute) {
+        this.nameAttribute = nameAttribute;
+    }
+
+    @JsonProperty
+    @Nullable
+    public String getPasswordAttribute() {
+        return passwordAttribute;
+    }
+
+    @JsonProperty
+    public void setPasswordAttribute(String passwordAttribute) {
+        this.passwordAttribute = passwordAttribute;
     }
 
     public boolean isConfigurationValid() {
-        return url != null && !url.isEmpty() && formatDn != null && !formatDn.isEmpty();
+        return url != null && !url.isEmpty() && usersDn != null && !usersDn.isEmpty() && usernameAttribute != null
+                && !usernameAttribute.isEmpty();
     }
 }

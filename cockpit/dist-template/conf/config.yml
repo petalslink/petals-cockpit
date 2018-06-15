@@ -27,7 +27,6 @@ database:
   # see http://stackoverflow.com/a/3670000
   validationQuery: "/* Health Check */ SELECT 1"
 
-
 logging:
 #Global logging setting
   level: INFO
@@ -51,3 +50,12 @@ logging:
       threshold: WARN
       filterFactories:
       - type: cockpit-server-filter-factory
+
+# Uncomment and fill this section to use LDAP authentication
+#ldapConfig:
+#  url: ldap://X.X.X.X:Y
+#  usersDn: ou=personnes,dc=my-domain,dc=com
+#  usernameAttribute: mandatory username ldap attribute (eg. uid)
+#  nameAttribute: optionnal name ldap attribute (eg. cn)
+#  passwordAttribute: optionnal password ldap attribute (eg. password)      
+      
