@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2018 Linagora
+ * Copyright (C) 2018 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -28,35 +28,37 @@ import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentic
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
 import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
-import org.ow2.petals.cockpit.server.rules.CockpitApplicationRule;
+import org.ow2.petals.cockpit.server.rules.CockpitLdapApplicationRule;
+import org.pac4j.core.util.TestsConstants;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class AbstractSecurityTest extends AbstractTest {
+public class AbstractLDAPTest extends AbstractTest {
 
-    public static final NewUser ADMIN = new NewUser("admin", "adminpass", "Administrator");
+    @SuppressWarnings("null")
+    public static final NewUser USER_LDAP_DB = new NewUser(TestsConstants.GOOD_USERNAME, TestsConstants.PASSWORD,
+            "Administrator");
 
-    public static final NewUser USER = new NewUser("user", "userpass", "Normal user");
+    @SuppressWarnings("null")
+    public static final NewUser USER_LDAP_NODB = new NewUser(TestsConstants.GOOD_USERNAME2, TestsConstants.PASSWORD,
+            "Normal user");
+
+    public static final NewUser USER_NOLDAP_DB = new NewUser("user", "userpass", "Normal user");
+
+    public static final NewUser USER_NOLDAP_NODB = new NewUser("unknownUser", "userpass123", "Unknown user");
 
     @Rule
-    public final CockpitApplicationRule app = new CockpitApplicationRule("application-tests.yml");
+    public CockpitLdapApplicationRule appLdap = new CockpitLdapApplicationRule();
 
-    protected void addUser(String username) {
-        addUser(new NewUser(username, username, "..."), false);
-    }
-
-    protected void addUser(NewUser user, boolean isAdmin) {
-        app.db().executeInsert(new UsersRecord(user.username, new BCryptPasswordEncoder().encode(user.password),
-                user.name, null, isAdmin));
-    }
 
     @Before
     public void setUpDb() {
-        addUser(ADMIN, true);
-        addUser(USER, false);
+        addUser(USER_LDAP_DB, true);
+        addUser(USER_NOLDAP_DB, false);
     }
 
+    
     protected Response login(Authentication auth) {
-        return this.app.target("/user/session").request()
+        return this.appLdap.target("/user/session").request()
                 // we need another object because we can have subclasses passed to this method
                 .post(Entity.json(new Authentication(auth.username, auth.password)));
     }
@@ -66,4 +68,15 @@ public class AbstractSecurityTest extends AbstractTest {
         assertThat(user.name).isEqualTo(expected.name);
         assertThat(user.isAdmin).isEqualTo(isAdmin);
     }
+
+    protected void addUser(String username) {
+        addUser(new NewUser(username, username, "..."), false);
+    }
+
+    protected void addUser(NewUser user, boolean isAdmin) {
+        appLdap.db().executeInsert(new UsersRecord(user.username, new BCryptPasswordEncoder().encode(user.password),
+                user.name,
+                null, isAdmin));
+    }
+
 }

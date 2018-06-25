@@ -21,20 +21,21 @@ import org.eclipse.jdt.annotation.Nullable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LDAPConfigFactory {
+
     @Nullable
     private String url = null;
 
     @Nullable
-    private String bindDn = null;
+    private String usersDn = null;
 
     @Nullable
-    private String bindPass = null;
+    private String usernameAttribute = null;
 
-    private String scope = "base";
+    @Nullable
+    private String nameAttribute = null;
 
-    private String filter = "inetOrgPerson";
-
-    private String idAttribute = "uid";
+    @Nullable
+    private String passwordAttribute = null;
 
     @JsonProperty
     @Nullable
@@ -49,59 +50,50 @@ public class LDAPConfigFactory {
 
     @JsonProperty
     @Nullable
-    public String getBindDn() {
-        return bindDn;
+    public String getUsersDn() {
+        return usersDn;
     }
 
     @JsonProperty
-    public void setBindDn(String bindDn) {
-        this.bindDn = bindDn;
+    public void setUsersDn(String formatDn) {
+        this.usersDn = formatDn;
     }
 
     @JsonProperty
     @Nullable
-    public String getBindPass() {
-        return bindPass;
+    public String getUsernameAttribute() {
+        return usernameAttribute;
     }
 
     @JsonProperty
-    public void setBindPass(String bindPass) {
-        this.bindPass = bindPass;
+    public void setUsernameAttribute(String userNameAttribute) {
+        this.usernameAttribute = userNameAttribute;
     }
 
     @JsonProperty
-    public String getScope() {
-        return scope;
+    @Nullable
+    public String getNameAttribute() {
+        return nameAttribute;
     }
 
     @JsonProperty
-    public void setScope(String scope) {
-        this.scope = scope;
+    public void setNameAttribute(String nameAttribute) {
+        this.nameAttribute = nameAttribute;
     }
 
     @JsonProperty
-    public String getFilter() {
-        return filter;
+    @Nullable
+    public String getPasswordAttribute() {
+        return passwordAttribute;
     }
 
     @JsonProperty
-    public void setFilter(String filter) {
-        this.filter = filter;
-    }
-
-    @JsonProperty
-    public String getIdAttribute() {
-        return idAttribute;
-    }
-
-    @JsonProperty
-    public void setIdAttribute(String idAttribute) {
-        this.idAttribute = idAttribute;
+    public void setPasswordAttribute(String passwordAttribute) {
+        this.passwordAttribute = passwordAttribute;
     }
 
     public boolean isConfigurationValid() {
-        return url != null && !url.isEmpty() && bindDn != null && !bindDn.isEmpty() && bindPass != null
-                && !bindPass.isEmpty();
+        return url != null && !url.isEmpty() && usersDn != null && !usersDn.isEmpty() && usernameAttribute != null
+                && !usernameAttribute.isEmpty();
     }
 }
-

@@ -28,7 +28,7 @@ import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentic
 import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
 import org.ow2.petals.cockpit.server.resources.UsersResource.UpdateUser;
 
-public class UsersResourceTest extends AbstractSecurityTest {
+public class UsersResourceSecurityTest extends AbstractSecurityTest {
 
     private void can(@Nullable Authentication user, String target, String method, @Nullable Entity<?> entity,
             int expectedStatus) {

@@ -68,6 +68,11 @@
       <version>2.0.0</version>
     </dependency>
     <dependency>
+      <groupId>org.pac4j</groupId>
+      <artifactId>pac4j-ldap</artifactId>
+      <version>${pac4j.version}</version>
+    </dependency>
+    <dependency>
       <groupId>io.javaslang</groupId>
       <artifactId>javaslang</artifactId>
     </dependency>
@@ -128,6 +133,29 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-db</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.pac4j</groupId>
+      <!-- Required for its test utils -->
+      <artifactId>pac4j-ldap</artifactId>
+      <version>${pac4j.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+    <!-- Required by pac4j-ldap test utils -->
+      <groupId>org.pac4j</groupId>
+      <artifactId>pac4j-core</artifactId>
+      <version>${pac4j.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+    <!-- Required by pac4j-ldap test utils -->
+      <groupId>com.unboundid</groupId>
+      <artifactId>unboundid-ldapsdk</artifactId>
+      <version>3.2.1</version>
       <scope>test</scope>
     </dependency>
     <!-- Code quality dependencies -->

@@ -28,6 +28,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.jooq.Configuration;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.bundles.artifactserver.HttpArtifactServerBundle;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthClient;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle;
 import org.ow2.petals.cockpit.server.commands.AddUserCommand;
 import org.ow2.petals.cockpit.server.resources.BusesResource;
@@ -165,13 +166,15 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         final LDAPConfigFactory ldapc = configuration.getLDAPConfigFactory();
         if (ldapc.isConfigurationValid()) {
             LOG.info("Valid LDAP configuration found.");
-            LOG.debug("\nurl = {}\nbind dn = {}\nbind pass = {}\nfilter = {}\nscope = {}\nid attribute = {}",
-                    ldapc.getUrl(), ldapc.getBindDn(), ldapc.getBindPass(), ldapc.getFilter(), ldapc.getScope(),
-                    ldapc.getIdAttribute());
+            LOG.debug(
+                    "\nurl = {},\nusersDn = {},\nusernameAttribute = {},\nnameAttribute = {},\npasswordAttribute = {}",
+                    ldapc.getUrl(), ldapc.getUsersDn(),
+                    ldapc.getUsernameAttribute(), ldapc.getNameAttribute(), ldapc.getPasswordAttribute());
+            CockpitAuthClient.setLdapConfiguration(ldapc);
         } else {
             LOG.info("No valid LDAP configuration found.");
         }
-        
+
         environment.jersey().register(new PetalsAdminExceptionMapper(configuration.isShowPetalsAdminStacktraces()));
 
         environment.jersey().register(UserSession.class);
