@@ -17,7 +17,6 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
 import { CockpitComponent } from './cockpit.component';
 
 const routes: Routes = [
@@ -32,18 +31,16 @@ const routes: Routes = [
     children: [
       {
         path: 'workspaces',
-        loadChildren:
-          'app/features/cockpit/workspaces/workspaces.module#WorkspacesModule',
+        loadChildren: './workspaces/workspaces.module#WorkspacesModule',
       },
       {
         path: 'admin',
         loadChildren:
-          'app/features/cockpit/administration/administration.module#AdministrationModule',
+          './administration/administration.module#AdministrationModule',
       },
       {
         path: 'profile',
-        loadChildren:
-          'app/features/cockpit/user-profile/user-profile.module#UserProfileModule',
+        loadChildren: './user-profile/user-profile.module#UserProfileModule',
       },
     ],
   },

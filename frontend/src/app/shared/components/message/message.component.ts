@@ -26,7 +26,7 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-message',
@@ -38,7 +38,7 @@ export class MessageComponent implements OnInit, OnChanges {
   @Input() type: 'error' | 'warning' | 'info' | 'success';
   @Input() isClosable? = true;
   @Input() maxLength = 200;
-  @Output() onClose = new EventEmitter();
+  @Output() evtClose = new EventEmitter();
 
   icon: string;
 
@@ -66,6 +66,6 @@ export class MessageComponent implements OnInit, OnChanges {
 
   hideMessage() {
     this.isHidden = true;
-    this.onClose.emit();
+    this.evtClose.emit();
   }
 }

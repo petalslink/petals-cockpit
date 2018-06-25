@@ -17,19 +17,16 @@
 
 import { HttpClient, HttpEventType, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import { empty } from 'rxjs/observable/empty';
-import { of } from 'rxjs/observable/of';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { flatMap, last, map } from 'rxjs/operators';
 import * as xmltojson from 'xmltojson';
 
-import { ISharedLibrarySimplified } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
-import { loadFilesContentFromZip } from 'app/shared/helpers/zip.helper';
-import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { JsTable, toJsTable } from '@shared/helpers/jstable.helper';
+import { loadFilesContentFromZip } from '@shared/helpers/zip.helper';
+import { IServiceAssemblyBackendSSE } from '@shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
+import { ISharedLibrarySimplified } from '@wks/state/shared-libraries/shared-libraries.interface';
 
 export enum EComponentState {
   Started = 'Started',
@@ -179,10 +176,10 @@ export class ComponentsServiceImpl extends ComponentsService {
             const percentDone = Math.round(100 * event.loaded / event.total);
 
             progress$.next(percentDone);
-            return empty<{
+            return from<{
               serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
               serviceUnits: JsTable<IServiceUnitBackendSSE>;
-            }>();
+            }>([]);
           } else if (event.type === HttpEventType.Response) {
             const body = event.body as {
               serviceAssemblies: {
@@ -201,10 +198,10 @@ export class ComponentsServiceImpl extends ComponentsService {
               serviceUnits: toJsTable(body.serviceUnits),
             });
           } else {
-            return empty<{
+            return from<{
               serviceAssemblies: JsTable<IServiceAssemblyBackendSSE>;
               serviceUnits: JsTable<IServiceUnitBackendSSE>;
-            }>();
+            }>([]);
           }
         }),
         last()

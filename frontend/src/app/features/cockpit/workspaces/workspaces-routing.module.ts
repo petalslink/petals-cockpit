@@ -38,8 +38,7 @@ const routes: Routes = [
       {
         path: ':workspaceId',
         canActivate: [WorkspaceGuard],
-        loadChildren:
-          'app/features/cockpit/workspaces/workspace/workspace.module#WorkspaceModule',
+        loadChildren: './workspace/workspace.module#WorkspaceModule',
       },
     ],
   },

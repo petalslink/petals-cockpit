@@ -1,48 +1,42 @@
-import {
-  BusesService,
-  BusesServiceImpl,
-} from 'app/shared/services/buses.service';
+import { BusesService, BusesServiceImpl } from '@shared/services/buses.service';
 import {
   ComponentsService,
   ComponentsServiceImpl,
-} from 'app/shared/services/components.service';
+} from '@shared/services/components.service';
 import {
   ContainersService,
   ContainersServiceImpl,
-} from 'app/shared/services/containers.service';
+} from '@shared/services/containers.service';
 import {
   EndpointsService,
   EndpointsServiceImpl,
-} from 'app/shared/services/endpoints.service';
+} from '@shared/services/endpoints.service';
 import {
   InterfacesService,
   InterfacesServiceImpl,
-} from 'app/shared/services/interfaces.service';
+} from '@shared/services/interfaces.service';
 import {
   ServiceAssembliesService,
   ServiceAssembliesServiceImpl,
-} from 'app/shared/services/service-assemblies.service';
+} from '@shared/services/service-assemblies.service';
 import {
   ServiceUnitsService,
   ServiceUnitsServiceImpl,
-} from 'app/shared/services/service-units.service';
+} from '@shared/services/service-units.service';
 import {
   ServicesService,
   ServicesServiceImpl,
-} from 'app/shared/services/services.service';
+} from '@shared/services/services.service';
 import {
   SharedLibrariesService,
   SharedLibrariesServiceImpl,
-} from 'app/shared/services/shared-libraries.service';
-import { SseService, SseServiceImpl } from 'app/shared/services/sse.service';
-import {
-  UsersService,
-  UsersServiceImpl,
-} from 'app/shared/services/users.service';
+} from '@shared/services/shared-libraries.service';
+import { SseService, SseServiceImpl } from '@shared/services/sse.service';
+import { UsersService, UsersServiceImpl } from '@shared/services/users.service';
 import {
   WorkspacesService,
   WorkspacesServiceImpl,
-} from 'app/shared/services/workspaces.service';
+} from '@shared/services/workspaces.service';
 import { IEnvironment } from './environment.interface';
 
 // CAREFUL: do NOT reference any of the dev files because it would import all of the mocks in the production build!

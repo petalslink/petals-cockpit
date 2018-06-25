@@ -1,25 +1,45 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    // can't use es6.
+    // see the followings issues :
+    // https://github.com/angular/material2/issues/11090
+    // https://github.com/angular/material2/issues/10567
+    "target": "es5",
+    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es5",
     "noImplicitAny": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "es2017",
-      "dom"
-    ],
+    "noUnusedLocals": true,
+    "jsx": "preserve",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2017", "dom"],
     "plugins": [
       {
-        "name": "tslint-language-service"
+        "name": "tslint-language-service",
+        // see the notice here: https://github.com/angelozerr/tslint-language-service#tslint-language-service
+        // on Windows, this might trigger issues and should be removed
+        // and the issue here: https://github.com/Microsoft/TypeScript/issues/15344
+        "disableNoUnusedVariableRule": false
       }
-    ]
+    ],
+    "paths": {
+      // temporary fix https://github.com/Stuk/jszip/issues/524
+      "stream": ["../node_modules/readable-stream/readable.js"],
+      "@env/*": ["environments/*"],
+      "@mocks/*": ["mocks/*"],
+      "@feat/*": ["app/features/*"],
+      "@shared/*": ["app/shared/*"],
+      "@cock/*": ["app/features/cockpit/*"],
+      "@wks/*": ["app/features/cockpit/workspaces/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "angularCompilerOptions": {
+    "preserveWhitespaces": false
   }
 }

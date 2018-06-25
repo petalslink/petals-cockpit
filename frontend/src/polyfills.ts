@@ -66,3 +66,7 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
  * Need to import at least one locale-data with intl.
  */
 // import 'intl/locale-data/jsonp/en';
+
+// Required to remove error message: global is not defined
+// See https://stackoverflow.com/questions/50371593/angular-6-uncaught-referenceerror-buffer-is-not-defined/50377270#50377270
+(window as any).global = window;

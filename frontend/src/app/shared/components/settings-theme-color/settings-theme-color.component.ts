@@ -18,11 +18,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { IStore } from 'app/shared/state/store.interface';
-import { ISettings } from 'app/shared/state/ui.interface';
+import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
-import { Ui } from '../../state/ui.actions';
+
+import { IStore } from '@shared/state/store.interface';
+import { ISettings } from '@shared/state/ui.interface';
+
+import { Ui } from '@shared/state/ui.actions';
 
 @Component({
   selector: 'app-settings-theme-color',

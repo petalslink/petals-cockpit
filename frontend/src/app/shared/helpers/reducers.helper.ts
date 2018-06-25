@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { JsTable, updateById } from 'app/shared/helpers/jstable.helper';
+import { JsTable, updateById } from '@shared/helpers/jstable.helper';
 
 export function fold<E extends { isFolded: boolean }, M extends JsTable<E>>(
   table: M,

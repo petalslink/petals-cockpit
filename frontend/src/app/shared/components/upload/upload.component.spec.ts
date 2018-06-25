@@ -20,7 +20,7 @@ import { fakeAsync } from '@angular/core/testing';
 import { flush } from '@angular/core/testing';
 import { tap } from 'rxjs/operators';
 
-import { SharedModule } from 'app/shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 import { UploadComponent } from './upload.component';
 import {
   IEventFileSelected,
@@ -34,7 +34,7 @@ describe(`UploadComponent`, () => {
   beforeEach(
     async(() => {
       TestBed.configureTestingModule({
-        imports: [SharedModule],
+        imports: [SharedModule.forRoot()],
       }).compileComponents();
     })
   );
@@ -85,7 +85,7 @@ describe(`UploadComponent`, () => {
       uploadComponent.isUploading = false;
       uploadComponent.selectedFileInformation = <any>'information';
 
-      uploadComponent.onUploadFile
+      uploadComponent.evtUploadFile
         .asObservable()
         .pipe(
           tap(information => {

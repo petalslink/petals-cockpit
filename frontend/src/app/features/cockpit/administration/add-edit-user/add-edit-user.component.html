@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <form novalidate [formGroup]="userManagementForm">
   <div fxLayout="column" class="user-form">
-    <div fxLayout="column" fxLayoutWrap fxLayoutGap="10px">
+    <div fxLayout="column wrap" fxLayoutGap="10px">
 
       <div fxLayoutAlign="start center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center" class="margin-top-x1">
         <mat-form-field *ngIf="!user" fxFlex fxFlex.md="50%" fxFlex.sm="50%">
@@ -51,8 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       fxLayoutAlign="end center"
       fxLayoutAlign.md="center center"
       fxLayoutAlign.sm="center center"
-      fxLayout.lt-md="column"
-      fxLayoutWrap
+      fxLayout.lt-md="column wrap"
       fxLayoutGap="10px">
       <button mat-raised-button type="button" class="btn-cancel-form text-upper" (click)="doCancel()">
         <mat-icon color="primary">cancel</mat-icon>

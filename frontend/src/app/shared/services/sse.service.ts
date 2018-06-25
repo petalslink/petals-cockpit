@@ -17,33 +17,32 @@
 
 import { Injectable } from '@angular/core';
 import { Action } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Observable, Subscriber } from 'rxjs';
 
+import { environment } from '@env/environment';
 import {
   IBusBackendSSE,
   IBusInProgressBackend,
-} from 'app/shared/services/buses.service';
+} from '@shared/services/buses.service';
 import {
   ComponentState,
   IComponentBackendSSE,
-} from 'app/shared/services/components.service';
-import { IContainerBackendSSE } from 'app/shared/services/containers.service';
-import { IEndpointBackendSSE } from 'app/shared/services/endpoints.service';
-import { IInterfaceBackendSSE } from 'app/shared/services/interfaces.service';
+} from '@shared/services/components.service';
+import { IContainerBackendSSE } from '@shared/services/containers.service';
+import { IEndpointBackendSSE } from '@shared/services/endpoints.service';
+import { IInterfaceBackendSSE } from '@shared/services/interfaces.service';
 import {
   IServiceAssemblyBackendSSE,
   ServiceAssemblyState,
-} from 'app/shared/services/service-assemblies.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
-import { IServiceBackendSSE } from 'app/shared/services/services.service';
+} from '@shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
+import { IServiceBackendSSE } from '@shared/services/services.service';
 import {
   ISharedLibraryBackendSSE,
   SharedLibraryState,
-} from 'app/shared/services/shared-libraries.service';
-import { IUserBackend } from 'app/shared/services/users.service';
-import { IWorkspaceBackend } from 'app/shared/services/workspaces.service';
-import { environment } from 'environments/environment';
+} from '@shared/services/shared-libraries.service';
+import { IUserBackend } from '@shared/services/users.service';
+import { IWorkspaceBackend } from '@shared/services/workspaces.service';
 
 export namespace SseActions {
   export type All =
@@ -250,7 +249,7 @@ export abstract class SseService {
 @Injectable()
 export class SseServiceImpl extends SseService {
   private current: {
-    sse: sse.IEventSourceStatic;
+    sse: EventSource;
     observer: Subscriber<Action>;
   } = null;
 
@@ -310,10 +309,9 @@ export class SseServiceImpl extends SseService {
         if (!cleanup()) {
           // if it's closed, it is a fatal error and it couldn't reconnect
           // else it will just reconnect and all is well from the observable point of view
-          if (
-            (ev.target as sse.IEventSourceStatic).readyState ===
-            EventSource.CLOSED
-          ) {
+          const targ = ev.target as EventSource;
+
+          if (targ.readyState === targ.CLOSED) {
             observer.error('connection was closed');
           }
         }

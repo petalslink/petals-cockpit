@@ -1,36 +1,34 @@
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/1.0/config/configuration-file.html
 
-module.exports = function (config) {
+module.exports = function(config) {
   config.set({
     basePath: '',
-    frameworks: ['jasmine', '@angular/cli'],
+    frameworks: ['jasmine', '@angular-devkit/build-angular'],
     plugins: [
       require('karma-jasmine'),
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
-      require('karma-coverage-istanbul-reporter'),
       require('karma-clear-screen-reporter'),
-      require('@angular/cli/plugins/karma'),
+      require('karma-coverage-istanbul-reporter'),
+      require('@angular-devkit/build-angular/plugins/karma'),
       require('karma-scss-preprocessor'),
     ],
+    client: {
+      captureConsole: true,
+      clearContext: false, // leave Jasmine Spec Runner output visible in browser
+    },
     files: [
-      // load our theme for material to be happy
-      { pattern: './src/styles.scss', included: true, watched: true},
+      { pattern: './src/styles.scss', included: true, watched: true },
+      { pattern: './test.ts', watched: false },
     ],
     preprocessors: {
-      './src/styles.scss': ['scss']
-    },
-    client:{
-      captureConsole: true,
-      clearContext: false // leave Jasmine Spec Runner output visible in browser
+      './src/styles.scss': ['scss'],
     },
     coverageIstanbulReporter: {
-      reports: [ 'html', 'lcovonly', 'text-summary' ],
-      fixWebpackSourcePaths: true
-    },
-    angularCli: {
-      environment: 'dev'
+      dir: require('path').join(__dirname, '../coverage'),
+      reports: ['html', 'lcovonly', 'text-summary'],
+      fixWebpackSourcePaths: true,
     },
     reporters: ['progress', 'clear-screen', 'kjhtml'],
     port: 9876,
@@ -41,9 +39,9 @@ module.exports = function (config) {
     customLaunchers: {
       ChromiumHeadlessNoSandbox: {
         base: 'ChromiumHeadless',
-        flags: ['--no-sandbox']
-      }
+        flags: ['--no-sandbox'],
+      },
     },
-    singleRun: false
+    singleRun: false,
   });
 };

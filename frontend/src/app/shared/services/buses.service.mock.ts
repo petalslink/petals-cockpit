@@ -19,21 +19,21 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { tap } from 'rxjs/operators';
 
-import * as helper from 'app/shared/helpers/mock.helper';
-import { SseServiceMock } from 'app/shared/services/sse.service.mock';
-import { UsersService } from 'app/shared/services/users.service';
-import { UsersServiceMock } from 'app/shared/services/users.service.mock';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
 import {
   errorBackend,
   errorBackendLongText,
   IMPORT_HTTP_ERROR_IP,
   IMPORT_HTTP_ERROR_IP_LONG_TEXT,
-} from 'mocks/backend-mock';
-import { busesService } from 'mocks/buses-mock';
-import { workspacesService } from 'mocks/workspaces-mock';
-import { BusesServiceImpl, IBusImport } from './buses.service';
-import { SseActions, SseService } from './sse.service';
+} from '@mocks/backend-mock';
+import { busesService } from '@mocks/buses-mock';
+import { workspacesService } from '@mocks/workspaces-mock';
+import * as helper from '@shared/helpers/mock.helper';
+import { BusesServiceImpl, IBusImport } from '@shared/services/buses.service';
+import { SseActions, SseService } from '@shared/services/sse.service';
+import { SseServiceMock } from '@shared/services/sse.service.mock';
+import { UsersService } from '@shared/services/users.service';
+import { UsersServiceMock } from '@shared/services/users.service.mock';
 
 @Injectable()
 export class BusesServiceMock extends BusesServiceImpl {

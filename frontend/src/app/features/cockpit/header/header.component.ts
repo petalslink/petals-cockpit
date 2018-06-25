@@ -21,15 +21,15 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
-import { IUi } from 'app/shared/state/ui.interface';
-import { Users } from 'app/shared/state/users.actions';
-import { ICurrentUser } from 'app/shared/state/users.interface';
-import { Observable } from 'rxjs/Observable';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { IUi } from '@shared/state/ui.interface';
+import { Users } from '@shared/state/users.actions';
+import { ICurrentUser } from '@shared/state/users.interface';
 
 @Component({
   selector: 'app-header',

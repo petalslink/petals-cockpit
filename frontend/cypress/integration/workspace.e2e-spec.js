@@ -23,6 +23,7 @@ describe(`Workspace`, () => {
       .get(WORKSPACE_DOM.tabs)
       .contains(`Petals`)
       .click()
+      .parent()
       .should(`have.class`, `mat-tab-label-active`);
   });
 
@@ -35,6 +36,7 @@ describe(`Workspace`, () => {
       .get(WORKSPACE_DOM.tabs)
       .contains(`Services`)
       .click()
+      .parent()
       .should(`have.class`, `mat-tab-label-active`);
   });
 

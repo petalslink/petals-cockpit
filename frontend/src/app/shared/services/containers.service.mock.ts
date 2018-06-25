@@ -18,13 +18,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { ISharedLibrarySimplified } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import * as helper from 'app/shared/helpers/mock.helper';
-import { EServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
-import { SseActions, SseService } from 'app/shared/services/sse.service';
-import { containersService } from 'mocks/containers-mock';
-import { deployMockAndTriggerSse } from 'mocks/utils';
+import { containersService } from '@mocks/containers-mock';
+import { deployMockAndTriggerSse } from '@mocks/utils';
+import { toJsTable } from '@shared/helpers/jstable.helper';
+import * as helper from '@shared/helpers/mock.helper';
+import { EServiceAssemblyState } from '@shared/services/service-assemblies.service';
+import { SseActions, SseService } from '@shared/services/sse.service';
+import { ISharedLibrarySimplified } from '@wks/state/shared-libraries/shared-libraries.interface';
 import { ContainersServiceImpl } from './containers.service';
 
 @Injectable()

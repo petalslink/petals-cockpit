@@ -23,9 +23,9 @@ import {
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import { IBusInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { IBusInProgress } from '@wks/state/buses-in-progress/buses-in-progress.interface';
 
 @Component({
   selector: 'app-buses-in-progress',

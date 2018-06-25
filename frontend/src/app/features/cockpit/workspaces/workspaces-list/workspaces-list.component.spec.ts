@@ -20,14 +20,14 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
+import { SharedModule } from '@shared/shared.module';
+import { ICurrentUser } from '@shared/state/users.interface';
 import {
   IWorkspace,
   IWorkspaces,
   IWorkspacesCommon,
   workspacesTableFactory,
-} from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
-import { SharedModule } from 'app/shared/shared.module';
-import { ICurrentUser } from 'app/shared/state/users.interface';
+} from '@wks/state/workspaces/workspaces.interface';
 import { click, elementText } from 'testing';
 import { WorkspacesListComponent } from './workspaces-list.component';
 
@@ -38,7 +38,7 @@ describe('WorkspacesListComponent', () => {
   beforeEach(
     async(() => {
       TestBed.configureTestingModule({
-        imports: [SharedModule, NoopAnimationsModule],
+        imports: [SharedModule.forRoot(), NoopAnimationsModule],
         declarations: [TestHostComponent, WorkspacesListComponent],
       }).compileComponents();
     })

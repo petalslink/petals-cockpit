@@ -17,8 +17,8 @@
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import { IService } from 'app/features/cockpit/workspaces/state/services/services.interface';
-import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
+import { TreeElement } from '@shared/components/material-tree/material-tree.component';
+import { IService } from '@wks/state/services/services.interface';
 
 @Component({
   selector: 'app-services-list',
@@ -30,13 +30,13 @@ export class ServicesListComponent<TE extends TreeElement<TE>>
   @Input() workspaceId: string;
   @Input() servicesTree: TreeElement<TE>[];
 
-  @Output() onServiceSelected = new EventEmitter();
+  @Output() evtServiceSelected = new EventEmitter();
 
   constructor() {}
 
   ngOnInit() {}
 
   select(service: IService) {
-    this.onServiceSelected.emit(service);
+    this.evtServiceSelected.emit(service);
   }
 }

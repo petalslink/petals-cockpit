@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { IBusesInProgressTable } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.interface';
-import { IBusesTable } from 'app/features/cockpit/workspaces/state/buses/buses.interface';
-import { IComponentsTable } from 'app/features/cockpit/workspaces/state/components/components.interface';
-import { IContainersTable } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
-import { IEndpointsTable } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
-import { IInterfacesTable } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
-import { IServiceAssembliesTable } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
-import { IServiceUnitsTable } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
-import { IServicesTable } from 'app/features/cockpit/workspaces/state/services/services.interface';
-import { ISharedLibrariesTable } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { IWorkspacesTable } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
-import { IUi } from 'app/shared/state/ui.interface';
+import { IUi } from '@shared/state/ui.interface';
+import { IBusesInProgressTable } from '@wks/state/buses-in-progress/buses-in-progress.interface';
+import { IBusesTable } from '@wks/state/buses/buses.interface';
+import { IComponentsTable } from '@wks/state/components/components.interface';
+import { IContainersTable } from '@wks/state/containers/containers.interface';
+import { IEndpointsTable } from '@wks/state/endpoints/endpoints.interface';
+import { IInterfacesTable } from '@wks/state/interfaces/interfaces.interface';
+import { IServiceAssembliesTable } from '@wks/state/service-assemblies/service-assemblies.interface';
+import { IServiceUnitsTable } from '@wks/state/service-units/service-units.interface';
+import { IServicesTable } from '@wks/state/services/services.interface';
+import { ISharedLibrariesTable } from '@wks/state/shared-libraries/shared-libraries.interface';
+import { IWorkspacesTable } from '@wks/state/workspaces/workspaces.interface';
 import { IUsersTable } from './users.interface';
 
 export interface IStore {

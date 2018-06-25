@@ -19,7 +19,7 @@ import {
   IServiceAssemblyBackendDetails,
   IServiceAssemblyBackendSSE,
   ServiceAssemblyState,
-} from 'app/shared/services/service-assemblies.service';
+} from '@shared/services/service-assemblies.service';
 import { Component } from './components-mock';
 import { Container } from './containers-mock';
 import { ServiceUnit, serviceUnitsService } from './service-units-mock';

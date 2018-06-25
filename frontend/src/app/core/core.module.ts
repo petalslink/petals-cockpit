@@ -22,23 +22,23 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { LocalStorageService, Ng2Webstorage } from 'ngx-webstorage';
 
-import { BusesInProgressEffects } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.effects';
-import { BusesEffects } from 'app/features/cockpit/workspaces/state/buses/buses.effects';
-import { ComponentsEffects } from 'app/features/cockpit/workspaces/state/components/components.effects';
-import { ContainersEffects } from 'app/features/cockpit/workspaces/state/containers/containers.effects';
-import { EndpointsEffects } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.effects';
-import { InterfacesEffects } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.effects';
-import { ServiceAssembliesEffects } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.effects';
-import { ServiceUnitsEffects } from 'app/features/cockpit/workspaces/state/service-units/service-units.effects';
-import { ServicesEffects } from 'app/features/cockpit/workspaces/state/services/services.effects';
-import { SharedLibrariesEffects } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.effects';
-import { WorkspacesEffects } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.effects';
-import { ActionsWithBatched } from 'app/shared/helpers/batch-actions.helper';
-import { GuardLoginService } from 'app/shared/services/guard-login.service';
-import { metaReducers, reducers } from 'app/shared/state/root.reducer';
-import { UiEffects } from 'app/shared/state/ui.effects';
-import { UsersEffects } from 'app/shared/state/users.effects';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { ActionsWithBatched } from '@shared/helpers/batch-actions.helper';
+import { GuardLoginService } from '@shared/services/guard-login.service';
+import { metaReducers, reducers } from '@shared/state/root.reducer';
+import { UiEffects } from '@shared/state/ui.effects';
+import { UsersEffects } from '@shared/state/users.effects';
+import { BusesInProgressEffects } from '@wks/state/buses-in-progress/buses-in-progress.effects';
+import { BusesEffects } from '@wks/state/buses/buses.effects';
+import { ComponentsEffects } from '@wks/state/components/components.effects';
+import { ContainersEffects } from '@wks/state/containers/containers.effects';
+import { EndpointsEffects } from '@wks/state/endpoints/endpoints.effects';
+import { InterfacesEffects } from '@wks/state/interfaces/interfaces.effects';
+import { ServiceAssembliesEffects } from '@wks/state/service-assemblies/service-assemblies.effects';
+import { ServiceUnitsEffects } from '@wks/state/service-units/service-units.effects';
+import { ServicesEffects } from '@wks/state/services/services.effects';
+import { SharedLibrariesEffects } from '@wks/state/shared-libraries/shared-libraries.effects';
+import { WorkspacesEffects } from '@wks/state/workspaces/workspaces.effects';
 
 export const providers: Provider[] = [
   ...environment.services,

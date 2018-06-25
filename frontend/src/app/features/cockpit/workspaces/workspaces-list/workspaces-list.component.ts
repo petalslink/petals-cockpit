@@ -25,11 +25,11 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+import { ICurrentUser, IUser } from '@shared/state/users.interface';
 import {
   IWorkspace,
   IWorkspaces,
-} from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
-import { ICurrentUser, IUser } from 'app/shared/state/users.interface';
+} from '@wks/state/workspaces/workspaces.interface';
 
 @Component({
   selector: 'app-workspaces-list',

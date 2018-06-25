@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 
 <mat-toolbar color="primary">
-  <h3 class="matDialogTitle margin-left-x1">OVERRIDE SHARED LIBRARIES</h3>
+  <h3 class="matDialogTitle margin-left-x1 text-upper">Override shared libraries</h3>
 </mat-toolbar>
 <mat-dialog-content class="central-content">
   <mat-table #table *ngIf="sharedLibraries.data.length > 0; else noSl" [dataSource]="sharedLibraries">
@@ -36,7 +36,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <mat-form-field fxFlex="95%">
           <input
             matInput
-            appFocusInputIfLargeScreen
             value="{{sl.name}}"
             (input)="updateSharedLibrary(index, $event.target.value, null)"
           >

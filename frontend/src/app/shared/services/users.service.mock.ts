@@ -16,13 +16,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
-import * as helper from 'app/shared/helpers/mock.helper';
-import { ICurrentUser } from 'app/shared/state/users.interface';
-import { environment } from 'environments/environment';
-import { CORRECT_SETUP_TOKEN, GONE_SETUP_TOKEN } from 'mocks/backend-mock';
-import { BackendUser } from 'mocks/users-mock';
+import { environment } from '@env/environment';
+import { CORRECT_SETUP_TOKEN, GONE_SETUP_TOKEN } from '@mocks/backend-mock';
+import { BackendUser } from '@mocks/users-mock';
+import * as helper from '@shared/helpers/mock.helper';
+import { ICurrentUser } from '@shared/state/users.interface';
 import {
   ICurrentUserBackend,
   IUserLogin,

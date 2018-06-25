@@ -17,26 +17,26 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { getBusesById } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
-import { getContainersById } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
+import { TreeElement } from '@shared/components/material-tree/material-tree.component';
+import { findNamespaceLocalpart } from '@shared/helpers/services-list.helper';
+import { IStore } from '@shared/state/store.interface';
+import { getBusesById } from '@wks/state/buses/buses.selectors';
+import { getContainersById } from '@wks/state/containers/containers.selectors';
 import {
   IEndpoint,
   IEndpointRow,
-} from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
+} from '@wks/state/endpoints/endpoints.interface';
 import {
   IInterfaceRow,
   IInterfaceRowWithQName,
-} from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
-import { getInterfacesById } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
+} from '@wks/state/interfaces/interfaces.interface';
+import { getInterfacesById } from '@wks/state/interfaces/interfaces.selectors';
 import {
   IServiceRow,
   IServiceRowWithQName,
-} from 'app/features/cockpit/workspaces/state/services/services.interface';
-import { getServicesById } from 'app/features/cockpit/workspaces/state/services/services.selectors';
-import { getSelectedWorkspaceId } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
-import { findNamespaceLocalpart } from 'app/shared/helpers/services-list.helper';
-import { IStore } from 'app/shared/state/store.interface';
+} from '@wks/state/services/services.interface';
+import { getServicesById } from '@wks/state/services/services.selectors';
+import { getSelectedWorkspaceId } from '@wks/state/workspaces/workspaces.selectors';
 import { IBusRow } from '../buses/buses.interface';
 import { IComponentRow } from '../components/components.interface';
 import { getComponentsById } from '../components/components.selectors';

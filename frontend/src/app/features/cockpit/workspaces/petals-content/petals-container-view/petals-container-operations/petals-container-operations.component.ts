@@ -35,11 +35,12 @@ import {
   NgForm,
   ValidatorFn,
 } from '@angular/forms';
-import { ErrorStateMatcher, MatDialog, MatDialogRef } from '@angular/material';
+
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Actions } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { empty } from 'rxjs/observable/empty';
+import { EMPTY, Subject } from 'rxjs';
 import {
   catchError,
   filter,
@@ -49,23 +50,23 @@ import {
   takeUntil,
   tap,
 } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 import { v4 as uuid } from 'uuid';
 
-import { SharedLibrariesOverrideComponent } from 'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-operations/shared-libraries-override/shared-libraries-override.component';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
-import { ISharedLibrarySimplified } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { UploadComponent } from 'app/shared/components/upload/upload.component';
-import { ComponentsService } from 'app/shared/services/components.service';
+import { ErrorStateMatcher } from '@angular/material/core';
+import { UploadComponent } from '@shared/components/upload/upload.component';
+import { ComponentsService } from '@shared/services/components.service';
 import {
   HttpProgress,
   HttpProgressType,
-} from 'app/shared/services/http-progress-tracker.service';
-import { ServiceAssembliesService } from 'app/shared/services/service-assemblies.service';
-import { SharedLibrariesService } from 'app/shared/services/shared-libraries.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { SharedValidator } from 'app/shared/validators/shared.validator';
+} from '@shared/services/http-progress-tracker.service';
+import { ServiceAssembliesService } from '@shared/services/service-assemblies.service';
+import { SharedLibrariesService } from '@shared/services/shared-libraries.service';
+import { IStore } from '@shared/state/store.interface';
+import { SharedValidator } from '@shared/validators/shared.validator';
+import { SharedLibrariesOverrideComponent } from '@wks/petals-content/petals-container-view/petals-container-operations/shared-libraries-override/shared-libraries-override.component';
+import { Containers } from '@wks/state/containers/containers.actions';
+import { IContainerRow } from '@wks/state/containers/containers.interface';
+import { ISharedLibrarySimplified } from '@wks/state/shared-libraries/shared-libraries.interface';
 
 @Component({
   selector: 'app-petals-container-operations',
@@ -208,7 +209,7 @@ export class PetalsContainerOperationsComponent
     }
   }
 
-  onFileSelected(
+  fileSelected(
     type: 'component' | 'service-assembly' | 'shared-library',
     file: File
   ) {
@@ -246,7 +247,7 @@ export class PetalsContainerOperationsComponent
                 `An error occurred while trying to read the component name from this zip file`
               );
 
-              return empty();
+              return EMPTY;
             })
           )
           .subscribe();
@@ -274,7 +275,7 @@ export class PetalsContainerOperationsComponent
                 `An error occurred while trying to read the service assembly name from this zip file`
               );
 
-              return empty();
+              return EMPTY;
             })
           )
           .subscribe();
@@ -307,7 +308,7 @@ export class PetalsContainerOperationsComponent
                 `An error occurred while trying to read the shared library information from this zip file`
               );
 
-              return empty();
+              return EMPTY;
             })
           )
           .subscribe();

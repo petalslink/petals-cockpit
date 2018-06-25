@@ -15,6 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+:host {
+  height: 100%;
+  overflow: auto;
+}
+
 mat-form-field [matprefix] {
   margin-right: 10px;
 }
@@ -25,8 +30,4 @@ mat-icon {
 
 .mat-card-title {
   font-size: 16px;
-}
-
-:host {
-  height: 100%;
 }

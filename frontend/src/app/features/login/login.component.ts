@@ -19,16 +19,15 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
-import { FormErrorStateMatcher } from 'app/shared/helpers/form.helper';
-import { IUserLogin } from 'app/shared/services/users.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { Users } from 'app/shared/state/users.actions';
-import { IUsersTable } from 'app/shared/state/users.interface';
-import { getUsers } from 'app/shared/state/users.selectors';
+import { FormErrorStateMatcher } from '@shared/helpers/form.helper';
+import { IUserLogin } from '@shared/services/users.service';
+import { IStore } from '@shared/state/store.interface';
+import { Users } from '@shared/state/users.actions';
+import { IUsersTable } from '@shared/state/users.interface';
+import { getUsers } from '@shared/state/users.selectors';
 
 @Component({
   selector: 'app-login',

@@ -24,22 +24,21 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
+
 import {
   VisEdges,
   VisNetworkData,
   VisNetworkOptions,
   VisNetworkService,
   VisNodes,
-} from 'ng2-vis';
-import { Observable } from 'rxjs/Observable';
-import { fromEvent } from 'rxjs/observable/fromEvent';
+} from 'ngx-vis';
+import { fromEvent, Observable, Subject } from 'rxjs';
 import { debounceTime, filter, map, takeUntil, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
-import { IContainerRow } from 'app/features/cockpit/workspaces/state/containers/containers.interface';
-import { IContainerWithSiblings } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
-import { IStore } from 'app/shared/state/store.interface';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
+import { IStore } from '@shared/state/store.interface';
+import { isLargeScreen } from '@shared/state/ui.selectors';
+import { IContainerRow } from '@wks/state/containers/containers.interface';
+import { IContainerWithSiblings } from '@wks/state/containers/containers.selectors';
 import {
   buildVisNetworkData,
   containerNetworkOptions,

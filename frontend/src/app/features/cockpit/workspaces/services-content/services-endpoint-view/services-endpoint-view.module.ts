@@ -17,10 +17,11 @@
 
 import { NgModule } from '@angular/core';
 
-import { ServicesEndpointOverviewComponent } from 'app/features/cockpit/workspaces/services-content/services-endpoint-view/services-enpoint-overview/services-endpoint-overview.component';
-import { WorkspaceSharedModule } from 'app/features/cockpit/workspaces/workspace/workspace-shared.module';
-import { SharedModule } from 'app/shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
+import { WorkspaceSharedModule } from '@wks/workspace/workspace-shared.module';
 import { ServicesEndpointViewRoutingModule } from './services-endpoint-view-routing.module';
+
+import { ServicesEndpointOverviewComponent } from '@wks/services-content/services-endpoint-view/services-enpoint-overview/services-endpoint-overview.component';
 import { ServicesEndpointViewComponent } from './services-endpoint-view.component';
 
 @NgModule({

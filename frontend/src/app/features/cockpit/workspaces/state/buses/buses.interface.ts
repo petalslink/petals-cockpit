@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
+import { emptyJsTable, JsTable } from '@shared/helpers/jstable.helper';
 import {
   IBusBackendDetails,
   IBusBackendDetailsCommon,
   IBusBackendSSE,
   IBusBackendSSECommon,
-} from 'app/shared/services/buses.service';
-import { IContainers } from '../containers/containers.interface';
+} from '@shared/services/buses.service';
+import { IContainers } from '@wks/state/containers/containers.interface';
 
 export interface IBusUI {
   // for UI

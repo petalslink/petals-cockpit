@@ -22,14 +22,14 @@ import {
   OnInit,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { IServiceUnitWithSAAndComponent } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
-import { stateToLedColor } from 'app/shared/helpers/shared.helper';
-import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
+import { stateToLedColor } from '@shared/helpers/shared.helper';
+import { ServiceAssemblyState } from '@shared/services/service-assemblies.service';
+import { IStore } from '@shared/state/store.interface';
+import { isLargeScreen } from '@shared/state/ui.selectors';
+import { IServiceUnitWithSAAndComponent } from '@wks/state/service-units/service-units.selectors';
 
 @Component({
   selector: 'app-petals-service-unit-overview',

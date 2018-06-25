@@ -16,7 +16,7 @@
  */
 
 import { AbstractControl } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
 export class SharedValidator {

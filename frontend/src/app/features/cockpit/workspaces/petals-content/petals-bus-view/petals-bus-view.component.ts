@@ -16,18 +16,22 @@
  */
 
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { filter, first, switchMap, tap } from 'rxjs/operators';
 
-import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { Buses } from '@wks/state/buses/buses.actions';
 import {
   getCurrentBus,
   IBusWithContainers,
-} from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
+} from '@wks/state/buses/buses.selectors';
 
 @Component({
   selector: 'app-petals-bus-view',

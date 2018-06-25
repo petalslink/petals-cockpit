@@ -17,15 +17,16 @@
 
 import { NgModule } from '@angular/core';
 
-import { PetalsMenuModule } from 'app/features/cockpit/workspaces/petals-menu/petals-menu.module';
-import { ServicesMenuModule } from 'app/features/cockpit/workspaces/services-menu/services-menu.module';
-import { WorkspaceOverviewModule } from 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.module';
-import { WorkspaceRoutingModule } from 'app/features/cockpit/workspaces/workspace/workspace-routing.module';
+import { SharedModule } from '@shared/shared.module';
+import { PetalsMenuModule } from '@wks/petals-menu/petals-menu.module';
+import { ServicesMenuModule } from '@wks/services-menu/services-menu.module';
+import { WorkspaceOverviewModule } from '@wks/workspace-overview/workspace-overview.module';
+import { WorkspaceRoutingModule } from './workspace-routing.module';
+
 import {
   DeletedWorkspaceDialogComponent,
   WorkspaceComponent,
-} from 'app/features/cockpit/workspaces/workspace/workspace.component';
-import { SharedModule } from 'app/shared/shared.module';
+} from './workspace.component';
 
 @NgModule({
   imports: [

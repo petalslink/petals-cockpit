@@ -23,22 +23,22 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 import { Action, Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
-import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
-import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
-import { getCurrentBus } from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
-import { getCurrentContainer } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
-import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { JsTable } from 'app/shared/helpers/jstable.helper';
-import { IStore } from 'app/shared/state/store.interface';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { batchActions } from '@shared/helpers/batch-actions.helper';
+import { JsTable } from '@shared/helpers/jstable.helper';
+import { IStore } from '@shared/state/store.interface';
+import { BusesInProgress } from '@wks/state/buses-in-progress/buses-in-progress.actions';
+import { Buses } from '@wks/state/buses/buses.actions';
+import { getCurrentBus } from '@wks/state/buses/buses.selectors';
+import { Components } from '@wks/state/components/components.actions';
+import { Containers } from '@wks/state/containers/containers.actions';
+import { getCurrentContainer } from '@wks/state/containers/containers.selectors';
+import { ServiceAssemblies } from '@wks/state/service-assemblies/service-assemblies.actions';
+import { ServiceUnits } from '@wks/state/service-units/service-units.actions';
+import { SharedLibraries } from '@wks/state/shared-libraries/shared-libraries.actions';
 
 @Injectable()
 export class PetalsByIdGuard implements CanActivateChild {

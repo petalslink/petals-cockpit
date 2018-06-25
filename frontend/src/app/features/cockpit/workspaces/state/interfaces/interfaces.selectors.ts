@@ -17,24 +17,24 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { IEndpointRow } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
-import { getEndpointsById } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.selectors';
-import {
-  IInterface,
-  IInterfaceRow,
-} from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
-import {
-  IServiceRow,
-  IServiceRowWithQName,
-} from 'app/features/cockpit/workspaces/state/services/services.interface';
-import { getServicesById } from 'app/features/cockpit/workspaces/state/services/services.selectors';
-import { getSelectedWorkspaceId } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
+import { TreeElement } from '@shared/components/material-tree/material-tree.component';
 import {
   findNamespaceLocalpart,
   groupByNamespace,
-} from 'app/shared/helpers/services-list.helper';
-import { IStore } from 'app/shared/state/store.interface';
+} from '@shared/helpers/services-list.helper';
+import { IStore } from '@shared/state/store.interface';
+import { IEndpointRow } from '@wks/state/endpoints/endpoints.interface';
+import { getEndpointsById } from '@wks/state/endpoints/endpoints.selectors';
+import {
+  IInterface,
+  IInterfaceRow,
+} from '@wks/state/interfaces/interfaces.interface';
+import {
+  IServiceRow,
+  IServiceRowWithQName,
+} from '@wks/state/services/services.interface';
+import { getServicesById } from '@wks/state/services/services.selectors';
+import { getSelectedWorkspaceId } from '@wks/state/workspaces/workspaces.selectors';
 
 export interface IInterfaceOverview extends IInterface {
   services: IServiceRowWithQName[];

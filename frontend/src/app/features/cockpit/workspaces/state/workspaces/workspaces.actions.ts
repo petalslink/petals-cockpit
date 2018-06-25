@@ -17,11 +17,11 @@
 
 import { Action } from '@ngrx/store';
 
-import { JsTable } from 'app/shared/helpers/jstable.helper';
+import { JsTable } from '@shared/helpers/jstable.helper';
 import {
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
-} from 'app/shared/services/workspaces.service';
+} from '@shared/services/workspaces.service';
 
 export namespace Workspaces {
   export const CleanType = '[Workspaces] Clean';

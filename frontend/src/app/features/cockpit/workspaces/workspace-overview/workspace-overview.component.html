@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="workspace$ | async as workspace" fxLayout="column" fxFlex class="wrapper-content">
+<div *ngIf="workspace$ | async as workspace" fxLayout="column" fxFlexFill class="wrapper-content">
   <mat-toolbar color="primary" class="toolbar-page-header">
     <div class="prefix-toolbar-title">
       <mat-icon color="accent" *ngIf="!workspace.isFetchingDetails">grade</mat-icon>
@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </button>
   </mat-toolbar>
 
-  <div fxFlexFill fxLayout="column" class="content content-max-width">
+  <div fxFlex class="content content-max-width">
     <div class="central-content">
       <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
         <mat-card fxFlex [ngClass.gt-md]="'card-auto-size'">
@@ -104,8 +104,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   [isClosable]="false"
                 ></app-message>
               </ng-template>
-
-              <mat-divider></mat-divider>
 
               <form [formGroup]="addUserFormGroup" (ngSubmit)="addUser()" class="margin-top-x1">
                 <mat-form-field class="margin-right-x1">

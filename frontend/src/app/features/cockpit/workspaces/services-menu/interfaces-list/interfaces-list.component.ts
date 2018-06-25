@@ -17,8 +17,8 @@
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import { IInterface } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
-import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
+import { TreeElement } from '@shared/components/material-tree/material-tree.component';
+import { IInterface } from '@wks/state/interfaces/interfaces.interface';
 
 @Component({
   selector: 'app-interfaces-list',
@@ -30,13 +30,13 @@ export class InterfacesListComponent<TE extends TreeElement<TE>>
   @Input() workspaceId: string;
   @Input() interfacesTree: TreeElement<TE>[];
 
-  @Output() onInterfaceSelected = new EventEmitter();
+  @Output() evtInterfaceSelected = new EventEmitter();
 
   constructor() {}
 
   ngOnInit() {}
 
   select(itf: IInterface) {
-    this.onInterfaceSelected.emit(itf);
+    this.evtInterfaceSelected.emit(itf);
   }
 }

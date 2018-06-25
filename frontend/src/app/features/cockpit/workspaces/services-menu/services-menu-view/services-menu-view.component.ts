@@ -23,21 +23,20 @@ import {
   OnInit,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { Observable, Subject } from 'rxjs';
 
-import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
-import { IEndpointRow } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.interface';
-import { getCurrentEndpointTree } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.selectors';
-import { Interfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.actions';
-import { IInterfaceRow } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.interface';
-import { getCurrentInterfaceTree } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.selectors';
-import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
-import { IServiceRow } from 'app/features/cockpit/workspaces/state/services/services.interface';
-import { getCurrentServiceTree } from 'app/features/cockpit/workspaces/state/services/services.selectors';
-import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
+import { TreeElement } from '@shared/components/material-tree/material-tree.component';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { Endpoints } from '@wks/state/endpoints/endpoints.actions';
+import { IEndpointRow } from '@wks/state/endpoints/endpoints.interface';
+import { getCurrentEndpointTree } from '@wks/state/endpoints/endpoints.selectors';
+import { Interfaces } from '@wks/state/interfaces/interfaces.actions';
+import { IInterfaceRow } from '@wks/state/interfaces/interfaces.interface';
+import { getCurrentInterfaceTree } from '@wks/state/interfaces/interfaces.selectors';
+import { Services } from '@wks/state/services/services.actions';
+import { IServiceRow } from '@wks/state/services/services.interface';
+import { getCurrentServiceTree } from '@wks/state/services/services.selectors';
 import { takeUntil } from 'rxjs/operators';
 import { Workspaces } from '../../state/workspaces/workspaces.actions';
 

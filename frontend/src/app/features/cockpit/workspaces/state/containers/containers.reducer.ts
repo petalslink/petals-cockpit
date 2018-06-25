@@ -15,28 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { IComponentRow } from 'app/features/cockpit/workspaces/state/components/components.interface';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
-import { ISharedLibraryRow } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   JsTable,
   mergeOnly,
   putAll,
   updateById,
-} from 'app/shared/helpers/jstable.helper';
-import { fold, toggleFold, unfold } from 'app/shared/helpers/reducers.helper';
-import { IComponentBackendSSE } from 'app/shared/services/components.service';
+} from '@shared/helpers/jstable.helper';
+import { fold, toggleFold, unfold } from '@shared/helpers/reducers.helper';
+import { IComponentBackendSSE } from '@shared/services/components.service';
 import {
   IContainerBackendDetails,
   IContainerBackendSSE,
-} from 'app/shared/services/containers.service';
-import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
-import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
+} from '@shared/services/containers.service';
+import { IServiceAssemblyBackendSSE } from '@shared/services/service-assemblies.service';
+import { ISharedLibraryBackendSSE } from '@shared/services/shared-libraries.service';
+import { Components } from '@wks/state/components/components.actions';
+import { IComponentRow } from '@wks/state/components/components.interface';
+import { Containers } from '@wks/state/containers/containers.actions';
+import { ServiceAssemblies } from '@wks/state/service-assemblies/service-assemblies.actions';
+import { IServiceAssemblyRow } from '@wks/state/service-assemblies/service-assemblies.interface';
+import { SharedLibraries } from '@wks/state/shared-libraries/shared-libraries.actions';
+import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
+import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import {
   containerRowFactory,
   containersTableFactory,

@@ -23,11 +23,11 @@ import {
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
-import { IServiceAssemblyRow } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.interface';
-import { stateNameToPossibleActionsServiceAssembly } from 'app/shared/helpers/service-assembly.helper';
-import { ServiceAssemblyState } from 'app/shared/services/service-assemblies.service';
-import { IStore } from 'app/shared/state/store.interface';
+import { stateNameToPossibleActionsServiceAssembly } from '@shared/helpers/service-assembly.helper';
+import { ServiceAssemblyState } from '@shared/services/service-assemblies.service';
+import { IStore } from '@shared/state/store.interface';
+import { ServiceAssemblies } from '@wks/state/service-assemblies/service-assemblies.actions';
+import { IServiceAssemblyRow } from '@wks/state/service-assemblies/service-assemblies.interface';
 
 @Component({
   selector: 'app-petals-service-assembly-operations',

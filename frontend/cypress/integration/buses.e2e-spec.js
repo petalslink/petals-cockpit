@@ -8,7 +8,7 @@ describe('Buses', () => {
     cy.login('admin', 'admin');
   });
 
-  it('sould clean services on bus deletion', () => {
+  it('should clean services on bus deletion', () => {
     cy.get(PETALS_DOM.buttons.addBus).click();
 
     cy.importBusAndCheck(

@@ -17,10 +17,10 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { SharedModule } from '@shared/shared.module';
 
-import { AddEditUserComponent } from 'app/features/cockpit/administration/add-edit-user/add-edit-user.component';
-import { AdministrationComponent } from 'app/features/cockpit/administration/administration.component';
-import { SharedModule } from 'app/shared/shared.module';
+import { AddEditUserComponent } from './add-edit-user/add-edit-user.component';
+import { AdministrationComponent } from './administration.component';
 
 @NgModule({
   imports: [

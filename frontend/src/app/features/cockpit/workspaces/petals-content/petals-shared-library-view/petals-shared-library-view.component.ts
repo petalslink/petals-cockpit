@@ -17,14 +17,14 @@
 
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
 import {
   getCurrentSharedLibrary,
   ISharedLibraryWithComponents,
-} from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
+} from '@wks/state/shared-libraries/shared-libraries.selectors';
 
 @Component({
   selector: 'app-petals-shared-library-view',

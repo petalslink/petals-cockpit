@@ -22,23 +22,22 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subject } from 'rxjs';
 import { finalize, first, takeUntil, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { ICurrentUser } from '@shared/state/users.interface';
+import { getCurrentUser } from '@shared/state/users.selectors';
+import { Workspaces } from './state/workspaces/workspaces.actions';
 import {
   IWorkspace,
   IWorkspaces,
-} from 'app/features/cockpit/workspaces/state/workspaces/workspaces.interface';
-import { getWorkspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
-import { ICurrentUser } from 'app/shared/state/users.interface';
-import { getCurrentUser } from 'app/shared/state/users.selectors';
+} from './state/workspaces/workspaces.interface';
+import { getWorkspaces } from './state/workspaces/workspaces.selectors';
 
 @Component({
   selector: 'app-workspaces',

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
+import { emptyJsTable, JsTable } from '@shared/helpers/jstable.helper';
 import {
   IInterfaceBackendSSE,
   IInterfaceBackendSSECommon,
-} from 'app/shared/services/interfaces.service';
+} from '@shared/services/interfaces.service';
 
 export interface IInterfaceUI {
   // for UI

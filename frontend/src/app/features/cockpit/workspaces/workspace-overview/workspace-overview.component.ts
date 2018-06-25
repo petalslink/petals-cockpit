@@ -17,30 +17,26 @@
 
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { Actions } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import {
-  combineLatest,
-  filter,
-  first,
-  map,
-  startWith,
-  switchMap,
-  takeUntil,
-  tap,
-} from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
+import { Observable, Subject } from 'rxjs';
+import { combineLatest } from 'rxjs';
+import { filter, first, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
-import { Users } from 'app/shared/state/users.actions';
-import { IUserRow } from 'app/shared/state/users.interface';
-import { getCurrentUser } from 'app/shared/state/users.selectors';
-import { SharedValidator } from 'app/shared/validators/shared.validator';
-import { IWorkspaceRow } from '../state/workspaces/workspaces.interface';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { Users } from '@shared/state/users.actions';
+import { IUserRow } from '@shared/state/users.interface';
+import { getCurrentUser } from '@shared/state/users.selectors';
+import { SharedValidator } from '@shared/validators/shared.validator';
+import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
+import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
+
 import {
   getCurrentWorkspace,
   getCurrentWorkspaceUsers,
@@ -145,13 +141,10 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
-    this.filteredUsers$ = this.addUserFormGroup
-      .get('userSearchCtrl')
-      .valueChanges.pipe(
-        startWith(null),
-        combineLatest(this.appUsers$),
-        map(([userSearch, users]) => this.filterUsers(userSearch, users))
-      );
+    this.filteredUsers$ = combineLatest(
+      this.addUserFormGroup.get('userSearchCtrl').valueChanges,
+      this.appUsers$
+    ).pipe(map(([userSearch, users]) => this.filterUsers(userSearch, users)));
 
     // when a user is added to the workspace
     this.actions$

@@ -18,8 +18,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import * as helper from 'app/shared/helpers/mock.helper';
-import { serviceUnitsService } from 'mocks/service-units-mock';
+import { serviceUnitsService } from '@mocks/service-units-mock';
+import * as helper from '@shared/helpers/mock.helper';
 import { ServiceUnitsServiceImpl } from './service-units.service';
 
 @Injectable()

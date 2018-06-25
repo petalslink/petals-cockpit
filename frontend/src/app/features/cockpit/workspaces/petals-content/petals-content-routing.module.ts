@@ -18,7 +18,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { PetalsByIdGuard } from 'app/features/cockpit/workspaces/petals-content/petals-by-id.guard';
+import { PetalsByIdGuard } from './petals-by-id.guard';
 
 // /workspaces/:workspaceId/petals
 const routes: Routes = [
@@ -30,37 +30,37 @@ const routes: Routes = [
   {
     path: 'buses-in-progress',
     loadChildren:
-      'app/features/cockpit/workspaces/petals-content/petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule',
+      './petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule',
   },
   {
     path: 'buses/:busId',
     loadChildren:
-      'app/features/cockpit/workspaces/petals-content/petals-bus-view/petals-bus-view.module#PetalsBusViewModule',
+      './petals-bus-view/petals-bus-view.module#PetalsBusViewModule',
   },
   {
     path: 'containers/:containerId',
     loadChildren:
-      'app/features/cockpit/workspaces/petals-content/petals-container-view/petals-container-view.module#PetalsContainerViewModule',
+      './petals-container-view/petals-container-view.module#PetalsContainerViewModule',
   },
   {
     path: 'service-assemblies/:serviceAssemblyId',
     loadChildren:
-      'app/features/cockpit/workspaces/petals-content/petals-service-assembly-view/petals-service-assembly-view.module#PetalsServiceAssemblyViewModule',
+      './petals-service-assembly-view/petals-service-assembly-view.module#PetalsServiceAssemblyViewModule',
   },
   {
     path: 'components/:componentId',
     loadChildren:
-      'app/features/cockpit/workspaces/petals-content/petals-component-view/petals-component-view.module#PetalsComponentViewModule',
+      './petals-component-view/petals-component-view.module#PetalsComponentViewModule',
   },
   {
     path: 'service-units/:serviceUnitId',
     loadChildren:
-      'app/features/cockpit/workspaces/petals-content/petals-service-unit-view/petals-service-unit-view.module#PetalsServiceUnitViewModule',
+      './petals-service-unit-view/petals-service-unit-view.module#PetalsServiceUnitViewModule',
   },
   {
     path: 'shared-libraries/:sharedLibraryId',
     loadChildren:
-      'app/features/cockpit/workspaces/petals-content/petals-shared-library-view/petals-shared-library-view.module#PetalsSharedLibraryViewModule',
+      './petals-shared-library-view/petals-shared-library-view.module#PetalsSharedLibraryViewModule',
   },
 ];
 

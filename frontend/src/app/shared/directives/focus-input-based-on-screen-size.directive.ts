@@ -25,12 +25,11 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { filter, takeUntil, tap, withLatestFrom } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
-import { IStore } from 'app/shared/state/store.interface';
-import { isLargeScreen } from 'app/shared/state/ui.selectors';
+import { IStore } from '@shared/state/store.interface';
+import { isLargeScreen } from '@shared/state/ui.selectors';
 
 @Directive({
   selector: '[appFocusInputIfLargeScreen]',

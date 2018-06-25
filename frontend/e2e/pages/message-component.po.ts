@@ -39,6 +39,13 @@ export class MessageComponentPage {
     return new MessageComponentPage(component);
   }
 
+  static getMessage(container: ElementFinder, selectorClass?: string) {
+    const component = selectorClass
+      ? container.$(`app-message.${selectorClass}`)
+      : container.$(`app-message`);
+    return new MessageComponentPage(component);
+  }
+
   private constructor(public readonly component: ElementFinder) {
     this.content = this.component.$(`.msg-content`);
     this.message = this.component.$(`.msg-details`);

@@ -20,8 +20,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable, of } from 'rxjs';
 import {
   catchError,
   filter,
@@ -32,25 +31,25 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
-import { BusesInProgress } from 'app/features/cockpit/workspaces/state/buses-in-progress/buses-in-progress.actions';
-import { Buses } from 'app/features/cockpit/workspaces/state/buses/buses.actions';
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
-import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
-import { Interfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.actions';
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
-import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
-import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
-import { SharedLibraries } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { SseActions, SseService } from 'app/shared/services/sse.service';
-import { WorkspacesService } from 'app/shared/services/workspaces.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { Ui } from 'app/shared/state/ui.actions';
-import { Users } from 'app/shared/state/users.actions';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { batchActions } from '@shared/helpers/batch-actions.helper';
+import { toJsTable } from '@shared/helpers/jstable.helper';
+import { SseActions, SseService } from '@shared/services/sse.service';
+import { WorkspacesService } from '@shared/services/workspaces.service';
+import { IStore } from '@shared/state/store.interface';
+import { Ui } from '@shared/state/ui.actions';
+import { Users } from '@shared/state/users.actions';
+import { BusesInProgress } from '@wks/state/buses-in-progress/buses-in-progress.actions';
+import { Buses } from '@wks/state/buses/buses.actions';
+import { Components } from '@wks/state/components/components.actions';
+import { Containers } from '@wks/state/containers/containers.actions';
+import { Endpoints } from '@wks/state/endpoints/endpoints.actions';
+import { Interfaces } from '@wks/state/interfaces/interfaces.actions';
+import { ServiceAssemblies } from '@wks/state/service-assemblies/service-assemblies.actions';
+import { ServiceUnits } from '@wks/state/service-units/service-units.actions';
+import { Services } from '@wks/state/services/services.actions';
+import { SharedLibraries } from '@wks/state/shared-libraries/shared-libraries.actions';
+import { Workspaces } from './workspaces.actions';
 
 @Injectable()
 export class WorkspacesEffects {

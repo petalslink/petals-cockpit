@@ -17,7 +17,7 @@
 
 import { Action } from '@ngrx/store';
 
-import { ScreenSize } from 'app/shared/state/ui.interface';
+import { ScreenSize } from './ui.interface';
 
 export namespace Ui {
   export const OpenSidenavType = '[UI] Open sidenav';

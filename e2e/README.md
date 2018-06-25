@@ -10,7 +10,7 @@ Here we will cover the procedure to execute locally.
 * First a application is build (backend and frontend)
 * Backend is launched using 
   * `e2e/migration` for the db, which extends stadard db tables creation by injecting some data (users and workspaces). Beware, db is erased and rebuild each run.
-  * `e2e/defaukt.yml` as configuration, to serve the frontend for the tests
+  * `e2e/default.yml` as configuration, to serve the frontend for the tests
 * Backend is launched in the background (its PID is printed in case something wrong happens and it needs to be killed)
 * protractor e2e tests from `/frontend/e2e/actual-e2e/` are run using `e2e:product`, against the backend previously launched
 * Once tests are over backend is killed

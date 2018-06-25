@@ -17,23 +17,26 @@
 
 import { Store } from '@ngrx/store';
 import { createSelector } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { map, withLatestFrom } from 'rxjs/operators';
 
-import {
-  getBusesAllIds,
-  getBusesById,
-} from 'app/features/cockpit/workspaces/state/buses/buses.selectors';
-import { getComponentsById } from 'app/features/cockpit/workspaces/state/components/components.selectors';
-import { getContainersById } from 'app/features/cockpit/workspaces/state/containers/containers.selectors';
-import { getServiceAssembliesById } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.selectors';
-import { getServiceUnitsById } from 'app/features/cockpit/workspaces/state/service-units/service-units.selectors';
-import { getSharedLibrariesById } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.selectors';
-import { TreeElement } from 'app/shared/components/material-tree/material-tree.component';
-import { escapeStringRegexp } from 'app/shared/helpers/shared.helper';
-import { IStore } from 'app/shared/state/store.interface';
-import { IUserRow } from 'app/shared/state/users.interface';
-import { getUsersAllIds, getUsersById } from 'app/shared/state/users.selectors';
+import { TreeElement } from '@shared/components/material-tree/material-tree.component';
+import { escapeStringRegexp } from '@shared/helpers/shared.helper';
+import { IStore } from '@shared/state/store.interface';
+import { IUserRow } from '@shared/state/users.interface';
+import { getUsersAllIds, getUsersById } from '@shared/state/users.selectors';
+import { IBusRow } from '@wks/state/buses/buses.interface';
+import { getBusesAllIds, getBusesById } from '@wks/state/buses/buses.selectors';
+import { IComponentRow } from '@wks/state/components/components.interface';
+import { getComponentsById } from '@wks/state/components/components.selectors';
+import { IContainerRow } from '@wks/state/containers/containers.interface';
+import { getContainersById } from '@wks/state/containers/containers.selectors';
+import { IServiceAssemblyRow } from '@wks/state/service-assemblies/service-assemblies.interface';
+import { getServiceAssembliesById } from '@wks/state/service-assemblies/service-assemblies.selectors';
+import { IServiceUnitRow } from '@wks/state/service-units/service-units.interface';
+import { getServiceUnitsById } from '@wks/state/service-units/service-units.selectors';
+import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
+import { getSharedLibrariesById } from '@wks/state/shared-libraries/shared-libraries.selectors';
 import { IWorkspaceRow, IWorkspaces } from './workspaces.interface';
 
 export function getSelectedWorkspaceId(state: IStore) {
@@ -126,103 +129,111 @@ const buildTree = createSelector(
   ): WorkspaceElement[] => {
     const baseUrl = `/workspaces/${selectedWorkspaceId}/petals`;
 
-    return busesAllIds.map(id => busesByIds[id]).map<WorkspaceElement>(bus => ({
-      id: bus.id,
-      type: WorkspaceElementType.BUS,
-      name: bus.name,
-      link: `${baseUrl}/buses/${bus.id}`,
-      isFolded: bus.isFolded,
-      cssClass: `workspace-element-type-bus`,
-      svgIcon: `bus`,
+    return busesAllIds
+      .map(id => busesByIds[id])
+      .map<WorkspaceElement>((bus: IBusRow) => ({
+        id: bus.id,
+        type: WorkspaceElementType.BUS,
+        name: bus.name,
+        link: `${baseUrl}/buses/${bus.id}`,
+        isFolded: bus.isFolded,
+        cssClass: `workspace-element-type-bus`,
+        svgIcon: `bus`,
 
-      children: bus.containers
-        .map(id => containersByIds[id])
-        .map<WorkspaceElement>(container => ({
-          id: container.id,
-          type: WorkspaceElementType.CONTAINER,
-          name: container.name,
-          link: `${baseUrl}/containers/${container.id}`,
-          isFolded: container.isFolded,
-          cssClass: `workspace-element-type-container`,
-          icon: `dns`,
+        children: bus.containers
+          .map(id => containersByIds[id])
+          .map<WorkspaceElement>((container: IContainerRow) => ({
+            id: container.id,
+            type: WorkspaceElementType.CONTAINER,
+            name: container.name,
+            link: `${baseUrl}/containers/${container.id}`,
+            isFolded: container.isFolded,
+            cssClass: `workspace-element-type-container`,
+            icon: `dns`,
 
-          children: !container.isReachable
-            ? []
-            : [
-                {
-                  id: container.id,
-                  type: WorkspaceElementType.COMPCATEGORY,
-                  name: 'Components',
-                  isFolded: container.isComponentsCategoryFolded,
-                  cssClass: `workspace-element-type-category-components`,
-                  children: container.components
-                    .map(id => componentsByIds[id])
-                    .map<WorkspaceElement>(component => ({
-                      id: component.id,
-                      type: WorkspaceElementType.COMPONENT,
-                      name: component.name,
-                      link: `${baseUrl}/components/${component.id}`,
-                      isFolded: component.isFolded,
-                      cssClass: `workspace-element-type-component`,
-                      svgIcon: `component`,
+            children: !container.isReachable
+              ? []
+              : [
+                  {
+                    id: container.id,
+                    type: WorkspaceElementType.COMPCATEGORY,
+                    name: 'Components',
+                    isFolded: container.isComponentsCategoryFolded,
+                    cssClass: `workspace-element-type-category-components`,
+                    children: container.components
+                      .map(id => componentsByIds[id])
+                      .map<WorkspaceElement>((component: IComponentRow) => ({
+                        id: component.id,
+                        type: WorkspaceElementType.COMPONENT,
+                        name: component.name,
+                        link: `${baseUrl}/components/${component.id}`,
+                        isFolded: component.isFolded,
+                        cssClass: `workspace-element-type-component`,
+                        svgIcon: `component`,
 
-                      children: component.serviceUnits
-                        .map(id => serviceUnitsByIds[id])
-                        .map<WorkspaceElement>(serviceUnit => ({
-                          id: serviceUnit.id,
-                          type: WorkspaceElementType.SERVICEUNIT,
-                          name: serviceUnit.name,
-                          link: `${baseUrl}/service-units/${serviceUnit.id}`,
-                          isFolded: serviceUnit.isFolded,
-                          cssClass: `workspace-element-type-service-unit`,
-                          svgIcon: `su`,
+                        children: component.serviceUnits
+                          .map(id => serviceUnitsByIds[id])
+                          .map<WorkspaceElement>(
+                            (serviceUnit: IServiceUnitRow) => ({
+                              id: serviceUnit.id,
+                              type: WorkspaceElementType.SERVICEUNIT,
+                              name: serviceUnit.name,
+                              link: `${baseUrl}/service-units/${
+                                serviceUnit.id
+                              }`,
+                              isFolded: serviceUnit.isFolded,
+                              cssClass: `workspace-element-type-service-unit`,
+                              svgIcon: `su`,
+                              children: [],
+                            })
+                          ),
+                      })),
+                  },
+                  {
+                    id: container.id,
+                    type: WorkspaceElementType.SACATEGORY,
+                    name: 'Service Assemblies',
+                    isFolded: container.isServiceAssembliesCategoryFolded,
+                    cssClass: `workspace-element-type-category-service-assemblies`,
+                    children: container.serviceAssemblies
+                      .map(id => serviceAssembliesByIds[id])
+                      .map<WorkspaceElement>(
+                        (serviceAssembly: IServiceAssemblyRow) => ({
+                          id: serviceAssembly.id,
+                          type: WorkspaceElementType.SERVICEASSEMBLY,
+                          name: serviceAssembly.name,
+                          link: `${baseUrl}/service-assemblies/${
+                            serviceAssembly.id
+                          }`,
+                          isFolded: serviceAssembly.isFolded,
+                          cssClass: `workspace-element-type-service-assembly`,
+                          svgIcon: `sa`,
                           children: [],
-                        })),
-                    })),
-                },
-                {
-                  id: container.id,
-                  type: WorkspaceElementType.SACATEGORY,
-                  name: 'Service Assemblies',
-                  isFolded: container.isServiceAssembliesCategoryFolded,
-                  cssClass: `workspace-element-type-category-service-assemblies`,
-                  children: container.serviceAssemblies
-                    .map(id => serviceAssembliesByIds[id])
-                    .map<WorkspaceElement>(serviceAssembly => ({
-                      id: serviceAssembly.id,
-                      type: WorkspaceElementType.SERVICEASSEMBLY,
-                      name: serviceAssembly.name,
-                      link: `${baseUrl}/service-assemblies/${
-                        serviceAssembly.id
-                      }`,
-                      isFolded: serviceAssembly.isFolded,
-                      cssClass: `workspace-element-type-service-assembly`,
-                      svgIcon: `sa`,
-                      children: [],
-                    })),
-                },
-                {
-                  id: container.id,
-                  type: WorkspaceElementType.SLCATEGORY,
-                  name: 'Shared Libraries',
-                  isFolded: container.isSharedLibrariesCategoryFolded,
-                  cssClass: `workspace-element-type-category-shared-libraries`,
-                  children: container.sharedLibraries
-                    .map(id => sharedLibrariesByIds[id])
-                    .map<WorkspaceElement>(sl => ({
-                      id: sl.id,
-                      type: WorkspaceElementType.SHAREDLIBRARY,
-                      name: sl.name,
-                      link: `${baseUrl}/shared-libraries/${sl.id}`,
-                      isFolded: sl.isFolded,
-                      cssClass: `workspace-element-type-shared-library`,
-                      svgIcon: `sl`,
-                      children: [],
-                    })),
-                },
-              ],
-        })),
-    }));
+                        })
+                      ),
+                  },
+                  {
+                    id: container.id,
+                    type: WorkspaceElementType.SLCATEGORY,
+                    name: 'Shared Libraries',
+                    isFolded: container.isSharedLibrariesCategoryFolded,
+                    cssClass: `workspace-element-type-category-shared-libraries`,
+                    children: container.sharedLibraries
+                      .map(id => sharedLibrariesByIds[id])
+                      .map<WorkspaceElement>((sl: ISharedLibraryRow) => ({
+                        id: sl.id,
+                        type: WorkspaceElementType.SHAREDLIBRARY,
+                        name: sl.name,
+                        link: `${baseUrl}/shared-libraries/${sl.id}`,
+                        isFolded: sl.isFolded,
+                        cssClass: `workspace-element-type-shared-library`,
+                        svgIcon: `sl`,
+                        children: [],
+                      })),
+                  },
+                ],
+          })),
+      }));
   }
 );
 

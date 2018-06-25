@@ -21,20 +21,20 @@ import {
   workspacesTableFactory,
 } from './workspaces.interface';
 
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   JsTable,
   mergeInto,
   putById,
   removeById,
   updateById,
-} from 'app/shared/helpers/jstable.helper';
-import { SseActions } from 'app/shared/services/sse.service';
+} from '@shared/helpers/jstable.helper';
+import { SseActions } from '@shared/services/sse.service';
 import {
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
-} from 'app/shared/services/workspaces.service';
-import { Users } from 'app/shared/state/users.actions';
+} from '@shared/services/workspaces.service';
+import { Users } from '@shared/state/users.actions';
+import { Workspaces } from './workspaces.actions';
 
 export namespace WorkspacesReducer {
   type All =

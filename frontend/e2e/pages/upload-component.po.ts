@@ -69,7 +69,7 @@ export abstract class UploadComponentPage {
   }
 
   getErrorDeployMessage() {
-    return MessageComponentPage.waitAndGet(this.component, `error-upload`);
+    return MessageComponentPage.getMessage(this.component, `error-upload`);
   }
 
   getSharedLibrariesDeployComponent() {

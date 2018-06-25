@@ -17,10 +17,10 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
-import { IUserBackend } from 'app/shared/services/users.service';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { IUserBackend } from '@shared/services/users.service';
 
 export interface IWorkspaceBackendCommon {
   id: string;

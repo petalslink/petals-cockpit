@@ -17,13 +17,14 @@
 
 import { NgModule } from '@angular/core';
 
-import { AdministrationModule } from 'app/features/cockpit/administration/administration.module';
-import { UserProfileModule } from 'app/features/cockpit/user-profile/user-profile.module';
-import { SharedModule } from 'app/shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
+import { AdministrationModule } from './administration/administration.module';
 import { CockpitRoutingModule } from './cockpit-routing.module';
+import { UserProfileModule } from './user-profile/user-profile.module';
+import { WorkspacesModule } from './workspaces/workspaces.module';
+
 import { CockpitComponent } from './cockpit.component';
 import { HeaderComponent } from './header/header.component';
-import { WorkspacesModule } from './workspaces/workspaces.module';
 
 @NgModule({
   imports: [

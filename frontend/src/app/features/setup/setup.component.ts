@@ -19,12 +19,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs/observable/of';
+import { of, Subject } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
-import { getErrorMessage } from 'app/shared/helpers/shared.helper';
-import { IUserSetup, UsersService } from 'app/shared/services/users.service';
+import { getErrorMessage } from '@shared/helpers/shared.helper';
+import { IUserSetup, UsersService } from '@shared/services/users.service';
 
 @Component({
   selector: 'app-setup',

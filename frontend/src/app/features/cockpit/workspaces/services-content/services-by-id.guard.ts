@@ -23,15 +23,15 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 import { Action, Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
-import { Endpoints } from 'app/features/cockpit/workspaces/state/endpoints/endpoints.actions';
-import { Interfaces } from 'app/features/cockpit/workspaces/state/interfaces/interfaces.actions';
-import { Services } from 'app/features/cockpit/workspaces/state/services/services.actions';
-import { batchActions } from 'app/shared/helpers/batch-actions.helper';
-import { JsTable } from 'app/shared/helpers/jstable.helper';
-import { IStore } from 'app/shared/state/store.interface';
+import { batchActions } from '@shared/helpers/batch-actions.helper';
+import { JsTable } from '@shared/helpers/jstable.helper';
+import { IStore } from '@shared/state/store.interface';
+import { Endpoints } from '@wks/state/endpoints/endpoints.actions';
+import { Interfaces } from '@wks/state/interfaces/interfaces.actions';
+import { Services } from '@wks/state/services/services.actions';
 
 @Injectable()
 export class ServicesByIdGuard implements CanActivateChild {

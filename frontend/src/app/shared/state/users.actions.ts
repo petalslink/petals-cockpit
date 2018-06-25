@@ -16,14 +16,14 @@
  */
 
 import { Action } from '@ngrx/store';
-import { JsTable } from 'app/shared/helpers/jstable.helper';
+import { JsTable } from '@shared/helpers/jstable.helper';
 
 import {
   ICurrentUserBackend,
   IUserBackend,
   IUserLogin,
   IUserNew,
-} from 'app/shared/services/users.service';
+} from '@shared/services/users.service';
 
 export namespace Users {
   // User Management

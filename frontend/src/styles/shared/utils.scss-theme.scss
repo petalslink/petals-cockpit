@@ -44,4 +44,12 @@
   .color-accent-bold {
     color: mat-color($accent, darker);
   }
+
+  .color-red-light-bold {
+    color: mat-color($mat-red, 600);
+  }
+
+  .color-green-light-bold {
+    color: mat-color($mat-green, 600);
+  }
 }

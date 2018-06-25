@@ -20,7 +20,7 @@ import {
   IBusBackendSSE,
   IBusImport,
   IBusInProgressBackend,
-} from 'app/shared/services/buses.service';
+} from '@shared/services/buses.service';
 import { Container, containersService } from './containers-mock';
 import { Workspace } from './workspaces-mock';
 

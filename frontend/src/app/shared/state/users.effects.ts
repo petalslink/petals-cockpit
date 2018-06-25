@@ -21,8 +21,7 @@ import { Router } from '@angular/router';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable, of } from 'rxjs';
 import {
   catchError,
   filter,
@@ -32,10 +31,10 @@ import {
   tap,
 } from 'rxjs/operators';
 
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { UsersService } from 'app/shared/services/users.service';
-import { Users } from 'app/shared/state/users.actions';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { toJsTable } from '@shared/helpers/jstable.helper';
+import { UsersService } from '@shared/services/users.service';
+import { Users } from './users.actions';
 
 @Injectable()
 export class UsersEffects {

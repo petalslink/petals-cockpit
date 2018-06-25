@@ -20,8 +20,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable, of } from 'rxjs';
 import {
   catchError,
   flatMap,
@@ -32,12 +31,12 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
-import { Containers } from 'app/features/cockpit/workspaces/state/containers/containers.actions';
-import { getErrorMessage } from 'app/shared/helpers/shared.helper';
-import { httpResponseWithProgress } from 'app/shared/helpers/shared.helper';
-import { ContainersService } from 'app/shared/services/containers.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { getErrorMessage } from '@shared/helpers/shared.helper';
+import { httpResponseWithProgress } from '@shared/helpers/shared.helper';
+import { ContainersService } from '@shared/services/containers.service';
+import { IStore } from '@shared/state/store.interface';
+import { Containers } from './containers.actions';
 
 @Injectable()
 export class ContainersEffects {

@@ -25,11 +25,10 @@ import {
   QueryList,
   TemplateRef,
 } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
-import { deletable, IDeletable } from 'app/shared/operators/deletable.operator';
+import { deletable, IDeletable } from '@shared/operators/deletable.operator';
 
 @Directive({ selector: '[appWorkspaceElementTab]' })
 export class WorkspaceElementTabDirective {

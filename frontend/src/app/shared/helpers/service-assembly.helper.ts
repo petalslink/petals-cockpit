@@ -22,7 +22,7 @@
 import {
   EServiceAssemblyState,
   ServiceAssemblyState,
-} from 'app/shared/services/service-assemblies.service';
+} from '@shared/services/service-assemblies.service';
 
 export function stateNameToPossibleActionsServiceAssembly(
   state: ServiceAssemblyState

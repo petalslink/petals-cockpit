@@ -18,10 +18,8 @@
 import { Inject, Injectable } from '@angular/core';
 import { Actions } from '@ngrx/effects';
 import { Action, ActionReducer, ScannedActionsSubject } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { from } from 'rxjs/observable/from';
-import { of } from 'rxjs/observable/of';
-import { MergeMapOperator } from 'rxjs/operators/mergeMap';
+import { from, Observable, of } from 'rxjs';
+import { MergeMapOperator } from 'rxjs/internal/operators/mergeMap';
 
 export const BatchType = 'BATCHING_REDUCER.BATCH';
 export class Batch implements Action {
@@ -49,7 +47,6 @@ export function explodeBatchActionsOperator(keepBatchAction = true) {
 
 export class ExplodeBatchActionsOperator extends MergeMapOperator<
   Action,
-  Action,
   Action
 > {
   constructor(keepBatchAction: boolean) {
@@ -70,6 +67,9 @@ export class ExplodeBatchActionsOperator extends MergeMapOperator<
 export class ActionsWithBatched extends Actions<Action> {
   constructor(@Inject(ScannedActionsSubject) source?: Observable<Action>) {
     super(source);
+    // TODO replace deprecated operator attribute. See https://github.com/ngrx/platform/issues/468
+    // @deprecated — This is an internal implementation detail, do not use.
+    // tslint:disable-next-line:deprecation
     this.operator = explodeBatchActionsOperator();
   }
 }

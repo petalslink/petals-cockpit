@@ -15,6 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+:host {
+  height: 100%;
+  overflow: auto;
+}
+
 .selected-workspace {
   font-weight: bold;
 }

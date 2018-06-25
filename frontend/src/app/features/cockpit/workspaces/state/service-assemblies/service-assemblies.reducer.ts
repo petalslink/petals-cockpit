@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ServiceAssemblies } from 'app/features/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   JsTable,
   mergeOnly,
   putAll,
   removeById,
   updateById,
-} from 'app/shared/helpers/jstable.helper';
+} from '@shared/helpers/jstable.helper';
 import {
   IServiceAssemblyBackendDetails,
   IServiceAssemblyBackendSSE,
   ServiceAssemblyState,
-} from 'app/shared/services/service-assemblies.service';
+} from '@shared/services/service-assemblies.service';
+import { ServiceAssemblies } from '@wks/state/service-assemblies/service-assemblies.actions';
+import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import {
   IServiceAssembliesTable,
   IServiceAssemblyRow,

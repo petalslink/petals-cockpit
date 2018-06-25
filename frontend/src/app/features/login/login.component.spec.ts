@@ -21,12 +21,11 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
 import { Store, StoreModule } from '@ngrx/store';
 
-import { LoginComponent } from 'app/features/login/login.component';
-import { IUserLogin } from 'app/shared/services/users.service';
-import { SharedModule } from 'app/shared/shared.module';
-import { UiReducer } from 'app/shared/state/ui.reducer';
-import { Users } from 'app/shared/state/users.actions';
-import { UsersReducer } from 'app/shared/state/users.reducer';
+import { IUserLogin } from '@shared/services/users.service';
+import { SharedModule } from '@shared/shared.module';
+import { UiReducer } from '@shared/state/ui.reducer';
+import { Users } from '@shared/state/users.actions';
+import { UsersReducer } from '@shared/state/users.reducer';
 import {
   click,
   elementText,
@@ -34,6 +33,7 @@ import {
   getInputByName,
   setInputValue,
 } from 'testing';
+import { LoginComponent } from './login.component';
 
 describe(`Login component`, () => {
   let component: LoginComponent;
@@ -63,7 +63,7 @@ describe(`Login component`, () => {
             users: UsersReducer.reducer,
             ui: UiReducer.reducer,
           }),
-          SharedModule,
+          SharedModule.forRoot(),
           ReactiveFormsModule,
           NoopAnimationsModule,
         ],
@@ -107,10 +107,7 @@ describe(`Login component`, () => {
     spyOn(component, 'onSubmit').and.callThrough();
     spyOn(store, 'dispatch').and.callThrough();
 
-    const user: IUserLogin = {
-      username: 'admin',
-      password: 'pass',
-    };
+    const user: IUserLogin = { username: 'admin', password: 'pass' };
 
     setInputValue(DOM.usernameInpt, user.username);
     setInputValue(DOM.passwordInpt, user.password);
@@ -130,24 +127,25 @@ describe(`Login component`, () => {
       })
     );
 
-    it('if connect succeeds', () => {
-      store.dispatch(
-        new Users.ConnectSuccess({
-          user: { id: user.username, name: 'Admin' } as any,
-        } as any)
-      );
-      fixture.detectChanges();
-      expect(DOM.loginButton.disabled).toBe(true);
-      expect(DOM.loginButton.textContent.toLowerCase()).toContain(`logging in`);
-    });
+    // if connect succeeds
+    store.dispatch(
+      new Users.ConnectSuccess({
+        user: {
+          id: user.username,
+          name: 'Admin',
+        } as any,
+      } as any)
+    );
+    fixture.detectChanges();
+    expect(DOM.loginButton.disabled).toBe(true);
+    expect(DOM.loginButton.textContent.toLowerCase()).toContain(`logging in`);
 
-    it('if connect fails', () => {
-      store.dispatch(new Users.ConnectError());
-      fixture.detectChanges();
-      expect(DOM.loginButton.disabled).toBe(false);
-      expect(DOM.loginButton.textContent.toLowerCase()).toContain(`log in`);
-      expect(DOM.errorTxt).toEqual(`Username and password do not match`);
-    });
+    // if connect fails
+    store.dispatch(new Users.ConnectError());
+    fixture.detectChanges();
+    expect(DOM.loginButton.disabled).toBe(false);
+    expect(DOM.loginButton.textContent.toLowerCase()).toContain(`log in`);
+    expect(DOM.errorTxt).toEqual(`Username and password do not match`);
   });
 });
 

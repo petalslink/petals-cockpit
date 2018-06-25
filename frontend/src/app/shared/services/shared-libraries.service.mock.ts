@@ -18,16 +18,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import * as helper from 'app/shared/helpers/mock.helper';
+import { environment } from '@env/environment';
+import { sharedLibrariesService } from '@mocks/shared-libraries-mock';
+import * as helper from '@shared/helpers/mock.helper';
+import { SseActions, SseService } from '@shared/services/sse.service';
+import { SseServiceMock } from '@shared/services/sse.service.mock';
 import {
   ESharedLibraryState,
   SharedLibrariesServiceImpl,
   SharedLibraryState,
-} from 'app/shared/services/shared-libraries.service';
-import { SseActions, SseService } from 'app/shared/services/sse.service';
-import { SseServiceMock } from 'app/shared/services/sse.service.mock';
-import { environment } from 'environments/environment';
-import { sharedLibrariesService } from 'mocks/shared-libraries-mock';
+} from './shared-libraries.service';
 
 @Injectable()
 export class SharedLibrariesServiceMock extends SharedLibrariesServiceImpl {

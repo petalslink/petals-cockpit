@@ -169,7 +169,7 @@ export class ComponentOperationPage extends ComponentPage {
   }
 
   getErrorChangeStateMessage() {
-    return MessageComponentPage.waitAndGet(
+    return MessageComponentPage.getMessage(
       this.component,
       `error-change-state`
     );

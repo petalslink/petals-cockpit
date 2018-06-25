@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { Observable } from 'rxjs/Observable';
-import { interval } from 'rxjs/observable/interval';
-import { of } from 'rxjs/observable/of';
+import { interval, Observable, of } from 'rxjs';
 import { delay, last, map, share, take } from 'rxjs/operators';
 
-import * as helper from 'app/shared/helpers/mock.helper';
-import { SseActions, SseService } from 'app/shared/services/sse.service';
-import { SseServiceMock } from 'app/shared/services/sse.service.mock';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import * as helper from '@shared/helpers/mock.helper';
+import { SseActions, SseService } from '@shared/services/sse.service';
+import { SseServiceMock } from '@shared/services/sse.service.mock';
 
 /**
  * help to handle a request which has a progress

@@ -20,9 +20,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { Observable } from 'rxjs/Observable';
-import { empty } from 'rxjs/observable/empty';
-import { of } from 'rxjs/observable/of';
+import { EMPTY, Observable, of } from 'rxjs';
 import {
   catchError,
   map,
@@ -34,17 +32,17 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { toJsTable } from 'app/shared/helpers/jstable.helper';
-import { getErrorMessage } from 'app/shared/helpers/shared.helper';
+import { environment } from '@env/environment';
+import { toJsTable } from '@shared/helpers/jstable.helper';
+import { getErrorMessage } from '@shared/helpers/shared.helper';
 import {
   ComponentsService,
   EComponentState,
-} from 'app/shared/services/components.service';
-import { HttpProgress } from 'app/shared/services/http-progress-tracker.service';
-import { SseActions } from 'app/shared/services/sse.service';
-import { IStore } from 'app/shared/state/store.interface';
-import { environment } from 'environments/environment';
+} from '@shared/services/components.service';
+import { HttpProgress } from '@shared/services/http-progress-tracker.service';
+import { SseActions } from '@shared/services/sse.service';
+import { IStore } from '@shared/state/store.interface';
+import { Components } from './components.actions';
 
 @Injectable()
 export class ComponentsEffects {
@@ -131,7 +129,7 @@ export class ComponentsEffects {
         this.componentsService
           .putState(workspaceId, action.payload.id, action.payload.state)
           .pipe(
-            mergeMap(_ => empty<Action>()),
+            mergeMap(_ => EMPTY),
             catchError((err: HttpErrorResponse) => {
               if (environment.debug) {
                 console.group();

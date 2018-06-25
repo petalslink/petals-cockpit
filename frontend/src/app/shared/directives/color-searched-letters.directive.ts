@@ -21,11 +21,11 @@ import {
   Input,
   OnChanges,
   OnInit,
-  Renderer,
+  Renderer2,
   SimpleChanges,
 } from '@angular/core';
 
-import { escapeStringRegexp } from '../helpers/shared.helper';
+import { escapeStringRegexp } from '@shared/helpers/shared.helper';
 
 @Directive({
   selector: '[appColorSearchedLetters]',
@@ -35,7 +35,7 @@ export class ColorSearchedLettersDirective implements OnInit, OnChanges {
   @Input() text: string;
   @Input() classToApply: string;
 
-  constructor(private el: ElementRef, private renderer: Renderer) {}
+  constructor(private el: ElementRef, private renderer: Renderer2) {}
 
   ngOnInit() {}
 
@@ -45,16 +45,12 @@ export class ColorSearchedLettersDirective implements OnInit, OnChanges {
     }
 
     if (!this.search || !this.search.trim() || !this.classToApply) {
-      this.renderer.setElementProperty(
-        this.el.nativeElement,
-        'innerHTML',
-        this.text
-      );
+      this.renderer.setProperty(this.el.nativeElement, 'innerHTML', this.text);
       return;
     }
 
     const search = escapeStringRegexp(this.search.trim());
-    this.renderer.setElementProperty(
+    this.renderer.setProperty(
       this.el.nativeElement,
       'innerHTML',
       this.replace(this.text, search)

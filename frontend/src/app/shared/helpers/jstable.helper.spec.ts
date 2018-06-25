@@ -24,8 +24,9 @@ import {
   removeById,
   toJsTable,
   updateById,
-} from 'app/shared/helpers/jstable.helper';
-import { environment } from 'environments/environment';
+} from '@shared/helpers/jstable.helper';
+
+import { environment } from '@env/environment';
 
 describe('helpers to manipulate tables', () => {
   interface T {

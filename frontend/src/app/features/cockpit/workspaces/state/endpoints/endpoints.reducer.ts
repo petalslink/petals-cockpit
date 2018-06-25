@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   JsTable,
   mergeInto,
   putAll,
   toJsTable,
   updateById,
-} from 'app/shared/helpers/jstable.helper';
+} from '@shared/helpers/jstable.helper';
 import {
   IEndpointBackendDetails,
   IEndpointBackendSSE,
-} from 'app/shared/services/endpoints.service';
-import { SseActions } from 'app/shared/services/sse.service';
+} from '@shared/services/endpoints.service';
+import { SseActions } from '@shared/services/sse.service';
+import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import { Endpoints } from './endpoints.actions';
 import {
   endpointRowFactory,

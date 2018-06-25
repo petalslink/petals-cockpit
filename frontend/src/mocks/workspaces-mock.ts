@@ -18,23 +18,24 @@
 import assign from 'lodash-es/assign';
 import flatMap from 'lodash-es/flatMap';
 
-import { IBusImport } from 'app/shared/services/buses.service';
-import { IUserBackend } from 'app/shared/services/users.service';
+import { IBusImport } from '@shared/services/buses.service';
+import { IUserBackend } from '@shared/services/users.service';
 import {
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
-} from 'app/shared/services/workspaces.service';
-import { validContainers } from 'mocks/backend-mock';
-import { Endpoint, endpointsService } from 'mocks/endpoints-mock';
-import { Interface, interfacesService } from 'mocks/interfaces-mock';
-import { Service, servicesService } from 'mocks/services-mock';
-import { BackendUser } from 'mocks/users-mock';
+} from '@shared/services/workspaces.service';
+
+import { validContainers } from './backend-mock';
 import {
   Bus,
   busesInProgressService,
   busesService,
   BusInProgress,
 } from './buses-mock';
+import { Endpoint, endpointsService } from './endpoints-mock';
+import { Interface, interfacesService } from './interfaces-mock';
+import { Service, servicesService } from './services-mock';
+import { BackendUser } from './users-mock';
 
 function toObj<A>(arr: { toObj: () => A }[]): A {
   return assign.apply({}, arr.map(c => c.toObj()));

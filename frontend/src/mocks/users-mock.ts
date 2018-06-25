@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { workspacesService } from '@mocks/workspaces-mock';
 import {
   ICurrentUserBackend,
   IUserBackend,
   IUserNew,
-} from 'app/shared/services/users.service';
-import { workspacesService } from 'mocks/workspaces-mock';
+} from '@shared/services/users.service';
 
 export class BackendUser {
   private static cpt = 0;

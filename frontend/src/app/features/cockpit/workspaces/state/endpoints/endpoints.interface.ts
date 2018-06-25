@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { emptyJsTable, JsTable } from 'app/shared/helpers/jstable.helper';
+import { emptyJsTable, JsTable } from '@shared/helpers/jstable.helper';
 import {
   IEndpointBackendSSE,
   IEndpointBackendSSECommon,
-} from 'app/shared/services/endpoints.service';
+} from '@shared/services/endpoints.service';
 
 export interface IEndpointUI {
   // for UI

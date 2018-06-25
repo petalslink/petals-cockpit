@@ -25,8 +25,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <mat-card-subtitle>State: <b><span class="component-state">{{ component.state }}</span></b></mat-card-subtitle>
 
-        <mat-card-content fxLayoutWrap class="margin-top-x1 list-actions-name" *ngIf="component.state">
-          <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:trackByComponentState" class="color-primary padding-bottom-x1">
+        <mat-card-content fxLayout="wrap" class="margin-top-x1 list-actions-name" *ngIf="component.state">
+          <span 
+            *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:trackByComponentState" 
+            class="color-primary padding-bottom-x1"
+          >
             <button
               class="text-upper margin-right-x1 color-primary"
               mat-raised-button
@@ -56,8 +59,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <app-message class="error-change-state" type="error" [msg]="component.updateError"></app-message>
 
-        <mat-divider></mat-divider>
-
         <mat-card-subtitle class="margin-top-x1 component-parameters-title" fxLayoutAlign="start center">
           <span fxFlex>Component parameters</span>
           <mat-icon class="margin-left-x1" color="primary">settings</mat-icon>
@@ -71,7 +72,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </mat-form-field>
             </div>
             <span class="color-primary">
-              <button class="text-upper" mat-raised-button (click)="setParameters()" [disabled]="component.isUpdating || parametersForm.pristine">
+              <button 
+                class="text-upper" 
+                mat-raised-button 
+                (click)="setParameters()" 
+                [disabled]="component.isUpdating || parametersForm.pristine"
+              >
                 Set
               </button>
             </span>
@@ -90,7 +96,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         [uploadStatus]="uploadServiceUnitStatus"
         [disabled]="component.isUpdating || (component.state && component.state === 'Loaded')"
         [error]="component.deployError"
-        (onUploadFile)="deploy($event.selectedFileInformation.file, $event.selectedFileInformation.fileName)"
+        (evtUploadFile)="deploy($event.selectedFileInformation.file, $event.selectedFileInformation.fileName)"
       ></app-upload>
     </div>
   </div>

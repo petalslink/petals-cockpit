@@ -15,24 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Components } from 'app/features/cockpit/workspaces/state/components/components.actions';
-import { ServiceUnits } from 'app/features/cockpit/workspaces/state/service-units/service-units.actions';
-import { IServiceUnitRow } from 'app/features/cockpit/workspaces/state/service-units/service-units.interface';
-import { Workspaces } from 'app/features/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   JsTable,
   mergeOnly,
   putAll,
   removeById,
   updateById,
-} from 'app/shared/helpers/jstable.helper';
-import { fold, toggleFold, unfold } from 'app/shared/helpers/reducers.helper';
+} from '@shared/helpers/jstable.helper';
+import { fold, toggleFold, unfold } from '@shared/helpers/reducers.helper';
 import {
   ComponentState,
   IComponentBackendDetails,
   IComponentBackendSSE,
-} from 'app/shared/services/components.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
+} from '@shared/services/components.service';
+import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
+import { Components } from '@wks/state/components/components.actions';
+import { ServiceUnits } from '@wks/state/service-units/service-units.actions';
+import { IServiceUnitRow } from '@wks/state/service-units/service-units.interface';
+import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import {
   componentRowFactory,
   componentsTableFactory,

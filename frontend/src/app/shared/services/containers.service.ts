@@ -17,16 +17,16 @@
 
 import { HttpClient, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
-import { ISharedLibrarySimplified } from 'app/features/cockpit/workspaces/state/shared-libraries/shared-libraries.interface';
-import { JsTable, toJsTable } from 'app/shared/helpers/jstable.helper';
-import { streamHttpProgressAndSuccess } from 'app/shared/helpers/shared.helper';
-import { IComponentBackendSSE } from 'app/shared/services/components.service';
-import { IServiceAssemblyBackendSSE } from 'app/shared/services/service-assemblies.service';
-import { IServiceUnitBackendSSE } from 'app/shared/services/service-units.service';
-import { ISharedLibraryBackendSSE } from 'app/shared/services/shared-libraries.service';
-import { environment } from 'environments/environment';
+import { environment } from '@env/environment';
+import { JsTable, toJsTable } from '@shared/helpers/jstable.helper';
+import { streamHttpProgressAndSuccess } from '@shared/helpers/shared.helper';
+import { IComponentBackendSSE } from '@shared/services/components.service';
+import { IServiceAssemblyBackendSSE } from '@shared/services/service-assemblies.service';
+import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
+import { ISharedLibraryBackendSSE } from '@shared/services/shared-libraries.service';
+import { ISharedLibrarySimplified } from '@wks/state/shared-libraries/shared-libraries.interface';
 
 export interface IContainerBackendSSECommon {
   id: string;

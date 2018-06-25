@@ -15,6 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+:host {
+  height: 100%;
+  overflow: auto;
+}
+
 .bus-import-form mat-icon {
   padding-right: 10px;
 }
