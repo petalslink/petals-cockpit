@@ -1,3 +1,12 @@
+<a name="0.24.0"></a>
+# [0.24.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.23.0...v0.24.0) (2018-06-26)
+
+
+### Features
+
+* **backend:** ldap authentication ([8460069](https://gitlab.com/linagora/petals-cockpit/commit/8460069)), closes [#483](https://gitlab.com/linagora/petals-cockpit/issues/483)
+
+
 <a name="0.23.0"></a>
 # [0.23.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.22.0...v0.23.0) (2018-05-24)
 
