@@ -16,76 +16,37 @@
  */
 package org.ow2.petals.cockpit.server.rules;
 
-import javax.ws.rs.client.WebTarget;
-
 import org.eclipse.jdt.annotation.Nullable;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.ow2.petals.admin.junit.PetalsAdministrationApi;
-import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.pac4j.ldap.test.tools.LdapServer;
-import org.zapodot.junit.db.EmbeddedDatabaseRule;
-import org.zapodot.junit.db.plugin.LiquibaseInitializer;
 
 import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 
-public class CockpitLdapApplicationRule implements TestRule {
-
-    public static class AppLDAP extends CockpitApplication<CockpitConfiguration> {
-        // only needed because of generics
-    }
+public class CockpitLdapApplicationRule extends CockpitApplicationRule {
 
     public final LdapServer ldapServer = new LdapServer();
 
-    public DropwizardAppRule<CockpitConfiguration> dw;
-
-    public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
-
-    public final EmbeddedDatabaseRule db;
-
     public CockpitLdapApplicationRule(ConfigOverride... configOverrides) {
-        this("application-tests-ldap.yml", configOverrides);
-    }
-
-    public CockpitLdapApplicationRule(String config, ConfigOverride... configOverrides) {
-        this.db = EmbeddedDatabaseRule.builder()
-                .initializedByPlugin(LiquibaseInitializer.builder().withChangelogResource("migrations.xml").build())
-                .build();
-        this.dw = new DropwizardAppRule<>(AppLDAP.class, ResourceHelpers.resourceFilePath(config),
-                ConfigOverride.config("database.url", () -> this.db.getConnectionJdbcUrl()));
-
+        super("application-tests-ldap.yml", configOverrides);
     }
 
     @Override
+    @Nullable
     public Statement apply(@Nullable Statement base, @Nullable Description description) {
+        Statement superStatement = super.apply(base, description);
+        assert superStatement != null;
         assert base != null;
         assert description != null;
 
-
-        final TestRule ldapServerBefore = RulesHelper.before(() -> {
+        final TestRule ldapServerAround = RulesHelper.around(() -> {
             ldapServer.start();
-        });
-        final TestRule ldapServerAfter = RulesHelper.after(() -> {
+        }, () -> {
             ldapServer.stop();
         });
 
-        return RulesHelper.chain(base, description, dw, RulesHelper.dropDbAfter(db), db, petals,
-                ldapServerBefore,
-                ldapServerAfter, RulesHelper.jerseyCookies());
+        return RulesHelper.chain(superStatement, description, ldapServerAround);
     }
 
-    public WebTarget target(String url) {
-        return this.dw.client().target(String.format("http://localhost:%d/api%s", this.dw.getLocalPort(), url));
-    }
-
-    public DSLContext db() {
-        return DSL.using(db.getConnectionJdbcUrl());
-    }
-    
 }
