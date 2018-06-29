@@ -585,6 +585,7 @@ ws0.addEndpoints();
 
 const ws1 = workspacesService.create([
   'admin',
+  'adminldap',
   'bescudie',
   'mrobert',
   'cchevalier',

@@ -24,9 +24,36 @@ import {
   IUserLogin,
   IUserNew,
 } from '@shared/services/users.service';
+import { IUserLDAP } from '@shared/state/users.interface';
 
 export namespace Users {
-  // User Management
+  // Ldap Users Management
+
+  export const FetchLdapUsersType = '[Users] Fetch ldap users';
+  export class FetchLdapUsers implements Action {
+    readonly type = FetchLdapUsersType;
+    constructor(public readonly payload: string) {}
+  }
+
+  export const FetchLdapUsersErrorType = '[Users] Fetch ldap users error';
+  export class FetchLdapUsersError implements Action {
+    readonly type = FetchLdapUsersErrorType;
+    constructor() {}
+  }
+
+  export const FetchedLdapUsersType = '[Users] Fetched ldap users success';
+  export class FetchedLdapUsers implements Action {
+    readonly type = FetchedLdapUsersType;
+    constructor(public readonly payload: IUserLDAP[]) {}
+  }
+
+  export const CleanLdapUsersType = '[Users] Clean ldap users';
+  export class CleanLdapUsers implements Action {
+    readonly type = CleanLdapUsersType;
+    constructor() {}
+  }
+
+  // Local Users Management
 
   export const FetchAllType = '[Users] Fetch all';
   export class FetchAll implements Action {

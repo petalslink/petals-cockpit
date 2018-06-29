@@ -30,6 +30,7 @@ import {
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import { Users } from './users.actions';
 import {
+  IUserLDAP,
   IUserRow,
   IUsersTable,
   userRowFactory,
@@ -41,6 +42,10 @@ export namespace UsersReducer {
     | Users.FetchAll
     | Users.FetchAllError
     | Users.Fetched
+    | Users.FetchLdapUsers
+    | Users.FetchLdapUsersError
+    | Users.FetchedLdapUsers
+    | Users.CleanLdapUsers
     | Users.Add
     | Users.AddSuccess
     | Users.AddError
@@ -73,6 +78,18 @@ export namespace UsersReducer {
       }
       case Users.FetchedType: {
         return fetched(table, action.payload);
+      }
+      case Users.FetchLdapUsersType: {
+        return fetchLdapUsers(table);
+      }
+      case Users.FetchLdapUsersErrorType: {
+        return fetchLdapUsersError(table);
+      }
+      case Users.FetchedLdapUsersType: {
+        return fetchedLdapUsers(table, action.payload);
+      }
+      case Users.CleanLdapUsersType: {
+        return cleanLdapUsers(table);
       }
       case Users.AddType: {
         return add(table, action.payload);
@@ -131,30 +148,6 @@ export namespace UsersReducer {
     }
   }
 
-  function fetchAll(table: IUsersTable): IUsersTable {
-    return {
-      ...table,
-      isFetchingUsers: true,
-    };
-  }
-
-  function fetchAllError(table: IUsersTable): IUsersTable {
-    return {
-      ...table,
-      isFetchingUsers: false,
-    };
-  }
-
-  function fetched(
-    table: IUsersTable,
-    payload: JsTable<IUserBackend>
-  ): IUsersTable {
-    return {
-      ...mergeInto(table, payload, userRowFactory),
-      isFetchingUsers: false,
-    };
-  }
-
   function add(table: IUsersTable, payload: IUserNew) {
     return putById(
       table,
@@ -170,6 +163,43 @@ export namespace UsersReducer {
 
   function addError(table: IUsersTable, payload: { id: string }) {
     return removeById(table, payload.id);
+  }
+
+  function fetchAll(table: IUsersTable): IUsersTable {
+    return { ...table, isFetchingUsers: true };
+  }
+
+  function fetchAllError(table: IUsersTable): IUsersTable {
+    return { ...table, isFetchingUsers: false };
+  }
+
+  function fetched(
+    table: IUsersTable,
+    payload: JsTable<IUserBackend>
+  ): IUsersTable {
+    return {
+      ...mergeInto(table, payload, userRowFactory),
+      isFetchingUsers: false,
+    };
+  }
+
+  function fetchLdapUsers(table: IUsersTable): IUsersTable {
+    return { ...table, isFetchingLdapUsers: true };
+  }
+
+  function fetchLdapUsersError(table: IUsersTable): IUsersTable {
+    return { ...table, isFetchingLdapUsers: false };
+  }
+
+  function fetchedLdapUsers(
+    table: IUsersTable,
+    payload: IUserLDAP[]
+  ): IUsersTable {
+    return { ...table, ldapSearchList: payload, isFetchingLdapUsers: false };
+  }
+
+  function cleanLdapUsers(table: IUsersTable): IUsersTable {
+    return { ...table, ldapSearchList: [] };
   }
 
   function deletee(table: IUsersTable, payload: { id: string }) {

@@ -21,16 +21,48 @@ import {
   IUserBackend,
   IUserNew,
 } from '@shared/services/users.service';
+import { IUser } from '@shared/state/users.interface';
 
 export class BackendUser {
   private static cpt = 0;
   private static readonly users = new Map<string, BackendUser>();
+  private static readonly usersLdap: IUser[] = [
+    {
+      id: 'alagane',
+      name: 'Alexandre LAGANE',
+    },
+    {
+      id: 'psouquet',
+      name: 'Pierre SOUQUET',
+    },
+    {
+      id: 'vzurczak',
+      name: 'Vincent ZURCZAK',
+    },
+    {
+      id: 'sgarcia',
+      name: 'Sébastien GARCIA',
+    },
+    {
+      id: 'jcabannes',
+      name: 'Jordy CABANNES',
+    },
+    {
+      id: 'avigier',
+      name: 'Albin VIGIER',
+    },
+    {
+      id: 'yhoupert',
+      name: 'Yoann HOUPERT',
+    },
+  ];
 
   public readonly id: string;
   public password: string;
   public name: string;
   public lastWorkspace?: string;
   public isAdmin: boolean;
+  public isFromLdap?: boolean;
 
   static get(id: string) {
     return this.users.get(id);
@@ -38,6 +70,19 @@ export class BackendUser {
 
   static getAll() {
     return Array.from(this.users.values());
+  }
+
+  static getFilteredLdapUsers(search: string) {
+    if (search.length) {
+      const lowerSearch = search.toLowerCase();
+      return this.usersLdap.filter(
+        u =>
+          u.id.toLowerCase().includes(lowerSearch) ||
+          u.name.toLowerCase().includes(lowerSearch)
+      );
+    } else {
+      return [];
+    }
   }
 
   static delete(id: string) {
@@ -60,6 +105,7 @@ export class BackendUser {
     this.password = password ? password : this.id;
     this.name = name ? name : username;
     this.isAdmin = false;
+    this.isFromLdap = false;
   }
 
   getDetails(): ICurrentUserBackend {
@@ -68,23 +114,32 @@ export class BackendUser {
       name: this.name,
       lastWorkspace: this.lastWorkspace,
       isAdmin: this.isAdmin,
+      isFromLdap: this.isFromLdap,
     };
   }
 
   toObj(): { [id: string]: IUserBackend } {
-    return {
-      [this.id]: {
-        id: this.id,
-        name: this.name,
-      },
-    };
+    return { [this.id]: { id: this.id, name: this.name } };
   }
 }
 
 const admin = BackendUser.create({ username: 'admin', name: 'Administrator' });
 admin.lastWorkspace = 'idWks0';
 admin.isAdmin = true;
-BackendUser.create({ username: 'bescudie', name: 'Bertrand ESCUDIE' });
+admin.isFromLdap = false;
+
+const adminLdap = BackendUser.create({
+  username: 'adminldap',
+  name: 'Administrator LDAP',
+});
+adminLdap.lastWorkspace = 'idWks1';
+adminLdap.isAdmin = true;
+adminLdap.isFromLdap = true;
+
+BackendUser.create({
+  username: 'bescudie',
+  name: 'Bertrand ESCUDIE',
+});
 BackendUser.create({ username: 'mrobert', name: 'Maxime ROBERT' });
 BackendUser.create({ username: 'cchevalier', name: 'Christophe CHEVALIER' });
 BackendUser.create({ username: 'vnoel', name: 'Victor NOEL' });
