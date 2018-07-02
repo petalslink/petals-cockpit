@@ -149,7 +149,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
     protected void addUser(String username, boolean admin) {
         resource.db().executeInsert(new UsersRecord(username, CockpitAuthenticator.passwordEncoder.encode(username),
-                username, null, admin));
+                username, null, admin, false));
     }
 
     protected long getId(Object o) {

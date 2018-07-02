@@ -20,7 +20,9 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 
 import javax.ws.rs.core.MediaType;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.jooq.Configuration;
+import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.ldaptive.ConnectionConfig;
 import org.ldaptive.DefaultConnectionFactory;
@@ -31,10 +33,11 @@ import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
-import org.pac4j.core.exception.AccountNotFoundException;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.HttpAction;
+import org.pac4j.core.exception.MultipleAccountsFoundException;
 import org.pac4j.core.exception.TechnicalException;
+import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jax.rs.pac4j.JaxRsContext;
 import org.pac4j.ldap.profile.service.LdapProfileService;
 import org.slf4j.Logger;
@@ -43,6 +46,9 @@ import org.slf4j.LoggerFactory;
 public class LdapAuthenticator extends LdapProfileService {
 
     protected static final Logger LOG = LoggerFactory.getLogger(LdapAuthenticator.class);
+
+    @Nullable
+    private String nameAttribute = null;
 
     public LdapAuthenticator(LdapConfigFactory ldapConf) {
         final String usersDn = ldapConf.getUsersDn();
@@ -65,6 +71,9 @@ public class LdapAuthenticator extends LdapProfileService {
         this.setUsernameAttribute(username);
         if (name != null && !name.isEmpty()) {
             this.setAttributes(name);
+            nameAttribute = name;
+        } else {
+            this.setAttributes("cn");
         }
         if (password != null && !password.isEmpty()) {
             this.setPasswordAttribute(password);
@@ -80,20 +89,60 @@ public class LdapAuthenticator extends LdapProfileService {
 
         Configuration conf = ((JaxRsContext) context).getProviders()
                 .getContextResolver(Configuration.class, MediaType.WILDCARD_TYPE).getContext(null);
-        UsersRecord user = DSL.using(conf).selectFrom(USERS).where(USERS.USERNAME.eq(username)).fetchOne();
+        final DSLContext ctx = DSL.using(conf);
 
-        if (user != null) {
-            try {
-                super.validate(credentials, context);
-                credentials.setUserProfile(new CockpitProfile(username, user.getAdmin()));
-
-                LOG.debug("LDAP user {} credentials validated.", username);
-            } catch (TechnicalException e) {
-                LOG.debug("LDAP technical exception during "+username+" credential validation", e.getCause());
-                throw e;
-            }
-        } else {
-            throw new AccountNotFoundException("No account found for: " + username);
+        if (ctx.fetchExists(ctx.select().from(USERS).where(USERS.USERNAME.eq(username)).andNot(USERS.IS_FROM_LDAP))) {
+            throw new MultipleAccountsFoundException("User " + username + " is already registered as not LDAP user");
         }
+
+        try {
+            super.validate(credentials, context);
+
+            UsersRecord user = ctx.selectFrom(USERS).where(USERS.USERNAME.eq(username)).and(USERS.IS_FROM_LDAP)
+                    .fetchOne();
+            if (user == null) {
+                user = ctx.transactionResult(c -> {
+                    UsersRecord tempUser = new UsersRecord(username, "ldap", getName(credentials), null, false, true);
+                    DSL.using(c).executeInsert(tempUser);
+                    return tempUser;
+                });
+                assert user != null;
+
+                LOG.info("LDAP user {} was automatically inserted in DB.", username);
+            }
+
+            credentials.setUserProfile(new CockpitProfile(username, user.getAdmin()));
+            LOG.debug("LDAP user {} credentials validated.", username);
+
+        } catch (TechnicalException e) {
+            LOG.debug("LDAP technical exception during " + username + " credential validation", e.getCause());
+            throw e;
+        }
+    }
+
+    private String getName(UsernamePasswordCredentials credentials) {
+        final CommonProfile profile = credentials.getUserProfile();
+        assert profile != null;
+        Object attribute;
+
+        if (nameAttribute != null && !nameAttribute.isEmpty()) {
+            attribute = profile.getAttribute(nameAttribute);
+            if (attribute != null && attribute instanceof String && !((String) attribute).isEmpty()) {
+                return (String) attribute;
+            }
+        }
+
+        attribute = profile.getAttribute("cn");
+        if (attribute != null && attribute instanceof String && !((String) attribute).isEmpty()) {
+            return (String) attribute;
+        }
+
+        final String displayName = profile.getDisplayName();
+        if (displayName != null && !displayName.isEmpty()) {
+            return displayName;
+        }
+
+        final String username = credentials.getUsername();
+        return username != null ? username : "No name found";
     }
 }

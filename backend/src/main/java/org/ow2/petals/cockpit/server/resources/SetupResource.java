@@ -38,6 +38,7 @@ import org.jooq.Configuration;
 import org.jooq.exception.DataAccessException;
 import org.jooq.exception.SQLStateClass;
 import org.jooq.impl.DSL;
+import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
@@ -54,12 +55,16 @@ public class SetupResource {
 
     private final String adminConsoleToken;
 
+    private final CockpitConfiguration config;
+
     private final AtomicBoolean userCreated = new AtomicBoolean(false);
 
     @Inject
-    public SetupResource(Configuration jooq, @Named(ADMIN_TOKEN) String adminConsoleToken) {
+    public SetupResource(Configuration jooq, @Named(ADMIN_TOKEN) String adminConsoleToken,
+            CockpitConfiguration config) {
         this.jooq = jooq;
         this.adminConsoleToken = adminConsoleToken;
+        this.config = config;
     }
 
     @POST
@@ -75,10 +80,15 @@ public class SetupResource {
             throw new NotFoundException("Petals Cockpit is already setup");
         }
 
+        final boolean isLdapMode = config.getLDAPConfigFactory() != null
+                ? config.getLDAPConfigFactory().isConfigurationValid()
+                : false;
+        
         try {
             DSL.using(jooq).transaction(c -> {
                 DSL.using(c).executeInsert(new UsersRecord(setup.username,
-                        CockpitAuthenticator.passwordEncoder.encode(setup.password), setup.name, null, true));
+                        CockpitAuthenticator.passwordEncoder.encode(setup.password), setup.name, null, true,
+                        isLdapMode));
 
                 if (!userCreated.compareAndSet(false, true)) {
                     // this will rollback the transaction and cancel the insert

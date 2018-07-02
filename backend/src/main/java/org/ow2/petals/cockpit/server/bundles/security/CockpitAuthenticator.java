@@ -51,7 +51,9 @@ public class CockpitAuthenticator implements Authenticator<UsernamePasswordCrede
         Configuration conf = ((JaxRsContext) context).getProviders()
                 .getContextResolver(Configuration.class, MediaType.WILDCARD_TYPE).getContext(null);
 
-        UsersRecord user = DSL.using(conf).selectFrom(USERS).where(USERS.USERNAME.eq(username)).fetchOne();
+        UsersRecord user = DSL.using(conf).selectFrom(USERS)
+                    .where(USERS.USERNAME.eq(username))
+                    .and(USERS.IS_FROM_LDAP.isFalse()).fetchOne();
 
         if (user != null) {
             if (!passwordEncoder.matches(credentials.getPassword(), user.getPassword())) {

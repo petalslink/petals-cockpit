@@ -46,7 +46,7 @@ public class AbstractSecurityTest extends AbstractTest {
 
     protected void addUser(NewUser user, boolean isAdmin) {
         app.db().executeInsert(new UsersRecord(user.username, new BCryptPasswordEncoder().encode(user.password),
-                user.name, null, isAdmin));
+                user.name, null, isAdmin, false));
     }
 
     @Before
@@ -65,5 +65,6 @@ public class AbstractSecurityTest extends AbstractTest {
         assertThat(user.id).isEqualTo(expected.username);
         assertThat(user.name).isEqualTo(expected.name);
         assertThat(user.isAdmin).isEqualTo(isAdmin);
+        assertThat(user.isFromLdap).isEqualTo(false);
     }
 }

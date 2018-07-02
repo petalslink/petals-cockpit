@@ -327,24 +327,24 @@
         <constraints primaryKey="true" nullable="false" />
       </column>
       <column name="container_id" type="bigint">
-        <constraints nullable="false" foreignKeyName="fk_edp_instances_container_id"
-          referencedTableName="containers" referencedColumnNames="id" deleteCascade="false" />
+        <constraints nullable="false" foreignKeyName="fk_edp_instances_container_id" referencedTableName="containers"
+          referencedColumnNames="id" deleteCascade="false" />
       </column>
       <column name="component_id" type="bigint">
-        <constraints nullable="false" foreignKeyName="fk_edp_instances_component_id"
-          referencedTableName="components" referencedColumnNames="id" deleteCascade="false" />
+        <constraints nullable="false" foreignKeyName="fk_edp_instances_component_id" referencedTableName="components"
+          referencedColumnNames="id" deleteCascade="false" />
       </column>
       <column name="service_id" type="bigint">
-        <constraints nullable="false" foreignKeyName="fk_edp_instances_service_id"
-          referencedTableName="services" referencedColumnNames="id" deleteCascade="false" />
+        <constraints nullable="false" foreignKeyName="fk_edp_instances_service_id" referencedTableName="services"
+          referencedColumnNames="id" deleteCascade="false" />
       </column>
       <column name="endpoint_id" type="bigint">
-        <constraints nullable="false" foreignKeyName="fk_edp_instances_endpoint_id"
-          referencedTableName="endpoints" referencedColumnNames="id" deleteCascade="false" />
+        <constraints nullable="false" foreignKeyName="fk_edp_instances_endpoint_id" referencedTableName="endpoints"
+          referencedColumnNames="id" deleteCascade="false" />
       </column>
     </createTable>
   </changeSet>
-  
+
   <changeSet id="v0.20.0-1" author="psouquet">
     <createTable tableName="interfaces">
       <column name="id" type="bigint" autoIncrement="true">
@@ -355,9 +355,17 @@
       </column>
     </createTable>
     <addColumn tableName="edp_instances">
-     <column name="interface_id" type="bigint">
-        <constraints nullable="false" foreignKeyName="fk_edp_instances_interface_id"
-          referencedTableName="interfaces" referencedColumnNames="id" deleteCascade="false" />
+      <column name="interface_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_edp_instances_interface_id" referencedTableName="interfaces"
+          referencedColumnNames="id" deleteCascade="false" />
+      </column>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="v0.25.0-1" author="psouquet">
+    <addColumn tableName="users">
+      <column name="is_from_ldap" type="boolean" defaultValueBoolean="false">
+        <constraints nullable="false" />
       </column>
     </addColumn>
   </changeSet>

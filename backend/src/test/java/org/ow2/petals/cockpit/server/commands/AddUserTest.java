@@ -121,8 +121,10 @@ public class AddUserTest extends AbstractTest {
         softly.assertAll();
 
         assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
-                .column(USERS.USERNAME.getName()).value().isEqualTo("admin").column(USERS.NAME.getName()).value()
-                .isEqualTo("Admin").column(USERS.ADMIN.getName()).value().isEqualTo(true);
+                .column(USERS.USERNAME.getName()).value().isEqualTo("admin")
+                .column(USERS.NAME.getName()).value().isEqualTo("Admin")
+                .column(USERS.ADMIN.getName()).value().isEqualTo(true)
+                .column(USERS.IS_FROM_LDAP.getName()).value().isEqualTo(false);
 
         assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(0);
         assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(0);
@@ -140,13 +142,37 @@ public class AddUserTest extends AbstractTest {
         softly.assertAll();
 
         assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
-                .column(USERS.USERNAME.getName()).value().isEqualTo("user").column(USERS.NAME.getName()).value()
-                .isEqualTo("User").column(USERS.ADMIN.getName()).value().isEqualTo(false);
+                .column(USERS.USERNAME.getName()).value().isEqualTo("user")
+                .column(USERS.NAME.getName()).value().isEqualTo("User")
+                .column(USERS.ADMIN.getName()).value().isEqualTo(false)
+                .column(USERS.IS_FROM_LDAP.getName()).value().isEqualTo(false);
 
         assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(0);
         assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(0);
     }
 
+    @Test
+    public void addLdapUserToDb() throws Exception {
+        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-p", "password", "-l",
+                "add-user-test.yml");
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isTrue();
+
+        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").contains("Added user user");
+        softly.assertThat(systemErrRule.getLog()).as("stderr").isEmpty();
+        softly.assertAll();
+
+        assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
+                .column(USERS.USERNAME.getName()).value().isEqualTo("user")
+                .column(USERS.NAME.getName()).value().isEqualTo("User")
+                .column(USERS.ADMIN.getName()).value().isEqualTo(false)
+                .column(USERS.IS_FROM_LDAP.getName()).value().isEqualTo(true);
+
+        assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(0);
+        assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(0);
+    }
+    
     @Test
     public void addUserToDbTwice() throws Exception {
         addUserAdminToDb();
@@ -165,8 +191,8 @@ public class AddUserTest extends AbstractTest {
         softly.assertAll();
 
         assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
-                .column(USERS.USERNAME.getName()).value().isEqualTo("admin").column(USERS.NAME.getName()).value()
-                .isEqualTo("Admin");
+                .column(USERS.USERNAME.getName()).value().isEqualTo("admin")
+                .column(USERS.NAME.getName()).value().isEqualTo("Admin");
 
         assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(0);
         assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(0);
@@ -186,8 +212,10 @@ public class AddUserTest extends AbstractTest {
         softly.assertAll();
 
         assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
-                .column(USERS.USERNAME.getName()).value().isEqualTo("admin").column(USERS.NAME.getName()).value()
-                .isEqualTo("Admin").column(USERS.ADMIN.getName()).value().isEqualTo(true)
+                .column(USERS.USERNAME.getName()).value().isEqualTo("admin")
+                .column(USERS.NAME.getName()).value().isEqualTo("Admin")
+                .column(USERS.ADMIN.getName()).value().isEqualTo(true)
+                .column(USERS.IS_FROM_LDAP.getName()).value().isEqualTo(false)
                 .column(USERS.LAST_WORKSPACE.getName()).value().isNotNull();
 
         assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(1).row()

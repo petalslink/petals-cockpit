@@ -59,6 +59,7 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         subparser.addArgument("-n", "--name").dest("name").required(true);
         subparser.addArgument("-p", "--password").dest("password").required(true);
         subparser.addArgument("-a", "--admin").dest("admin").action(Arguments.storeTrue());
+        subparser.addArgument("-l", "--ldapUser").dest("ldapUser").action(Arguments.storeTrue());
         subparser.addArgument("-w", "--workspacename").dest("workspaceName").required(false);
     }
 
@@ -86,6 +87,9 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         Boolean admin = namespace.getBoolean("admin");
         assert admin != null;
 
+        Boolean ldapUser = namespace.getBoolean("ldapUser");
+        assert ldapUser != null;
+
         String workspaceName = namespace.getString("workspaceName");
 
         Configuration jooqConf = new JooqFactory().build(environment, configuration.getDataSourceFactory());
@@ -104,7 +108,7 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
                     System.err.println("User " + username + " already exists");
                 } else {
                     final UsersRecord userRecord = new UsersRecord(username,
-                            CockpitAuthenticator.passwordEncoder.encode(password), name, null, admin);
+                            CockpitAuthenticator.passwordEncoder.encode(password), name, null, admin, ldapUser);
                     DSL.using(c).executeInsert(userRecord);
                     System.out.println("Added user " + username);
 
