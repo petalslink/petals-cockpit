@@ -163,7 +163,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         });
 
         // Check if LDAP config is set
-        final LDAPConfigFactory ldapc = configuration.getLDAPConfigFactory();
+        final LdapConfigFactory ldapc = configuration.getLDAPConfigFactory();
         if (ldapc.isConfigurationValid()) {
             LOG.info("Valid LDAP configuration found.");
             LOG.debug(

@@ -20,7 +20,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class LDAPConfigFactory {
+public class LdapConfigFactory {
 
     @Nullable
     private String url = null;

@@ -336,7 +336,8 @@
     </plugins>
     <pluginManagement>
       <plugins>
-      <!-- Test are passed in alphabetical order as a workaround so LDAP tests run last. They were impacting other tests in a way I could not prevent ... -->
+        <!-- Test are passed in alphabetical order as a workaround so LDAP tests run last. They were impacting other tests in a way I could not prevent ... -->
+        <!-- See: https://groups.google.com/forum/#!topic/dropwizard-user/hb79pf_gXjg -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
