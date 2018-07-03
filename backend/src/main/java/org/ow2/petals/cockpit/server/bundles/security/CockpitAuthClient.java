@@ -45,8 +45,7 @@ public class CockpitAuthClient extends IndirectClient<UsernamePasswordCredential
 
     @Override
     protected void clientInit(WebContext context) {
-        if (ldapConf != null && ldapConf.isConfigurationValid()) {
-            assert ldapConf != null;
+        if (ldapConf != null) {
             defaultAuthenticator(new LdapAuthenticator(ldapConf));
         } else {
             defaultAuthenticator(new CockpitAuthenticator());

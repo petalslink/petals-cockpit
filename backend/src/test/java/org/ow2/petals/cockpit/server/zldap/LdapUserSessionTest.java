@@ -14,7 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.security;
+
+/**
+ * Could not consistently run these test without making UserSessionTest and UsersResourceSecurityTest fail as side
+ * effect... Something to do with CockpitApplicationRule instantiating conflicting DropwizardAppRule (I suppose).
+ *
+ * As a workaround, the tests are run alphabetically and some were placed in zldap package to make them run last ... see:
+ * https://groups.google.com/forum/#!topic/dropwizard-user/hb79pf_gXjg
+ */
+package org.ow2.petals.cockpit.server.zldap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,6 +31,7 @@ import javax.ws.rs.core.Response;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
+import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
 
 /**
  * Could not consistently run these test without making UserSessionTest and UsersResourceSecurityTest fail as side
@@ -31,7 +40,7 @@ import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
  * As a workaround, the tests are run alphabetically and a Z was added to make it run last ... see:
  * https://groups.google.com/forum/#!topic/dropwizard-user/hb79pf_gXjg
  */
-public class ZLdapUserSessionTest extends AbstractLdapTest {
+public class LdapUserSessionTest extends AbstractLdapTest {
 
     @Test
     public void testLdapProtectedUserSucceedAfterLogin() {

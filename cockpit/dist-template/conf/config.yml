@@ -57,5 +57,6 @@ logging:
 #  usersDn: ou=personnes,dc=my-domain,dc=com
 #  usernameAttribute: mandatory username ldap attribute (eg. uid)
 #  nameAttribute: optionnal name ldap attribute (eg. cn)
-#  passwordAttribute: optionnal password ldap attribute (eg. password)      
-      
+#  passwordAttribute: optionnal password ldap attribute (eg. password)
+#  principalDn: principal account dn (eg. uid=admin,ou=personnes,dc=my-domain,dc=com)
+#  principalPassword: principal account password (eg. azerty123)

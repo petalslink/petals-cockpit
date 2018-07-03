@@ -20,7 +20,6 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 
 import javax.ws.rs.core.MediaType;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -47,36 +46,32 @@ public class LdapAuthenticator extends LdapProfileService {
 
     protected static final Logger LOG = LoggerFactory.getLogger(LdapAuthenticator.class);
 
-    @Nullable
-    private String nameAttribute = null;
+    private static DefaultConnectionFactory connectionFactory;
+
+    private String nameAttr;
 
     public LdapAuthenticator(LdapConfigFactory ldapConf) {
         final String usersDn = ldapConf.getUsersDn();
-        final String username = ldapConf.getUsernameAttribute();
-        final String name = ldapConf.getNameAttribute();
-        final String password = ldapConf.getPasswordAttribute();
-        assert username != null && !username.isEmpty();
+        final String usernameAttr = ldapConf.getUsernameAttribute();
+        nameAttr = ldapConf.getNameAttribute();
+        final String passwordAttr = ldapConf.getPasswordAttribute();
+        assert usernameAttr != null && !usernameAttr.isEmpty();
         assert usersDn != null && !usersDn.isEmpty();
 
         ConnectionConfig connConfig = new ConnectionConfig(ldapConf.getUrl());
         connConfig.setUseStartTLS(false);
 
         FormatDnResolver dnResolver = new FormatDnResolver();
-        dnResolver.setFormat(username + "=%s," + usersDn);
+        dnResolver.setFormat(usernameAttr + "=%s," + usersDn);
 
-        final DefaultConnectionFactory connectionFactory = new DefaultConnectionFactory(connConfig);
+        connectionFactory = new DefaultConnectionFactory(connConfig);
         BindAuthenticationHandler authHandler = new BindAuthenticationHandler(connectionFactory);
 
         this.setUsersDn(usersDn);
-        this.setUsernameAttribute(username);
-        if (name != null && !name.isEmpty()) {
-            this.setAttributes(name);
-            nameAttribute = name;
-        } else {
-            this.setAttributes("cn");
-        }
-        if (password != null && !password.isEmpty()) {
-            this.setPasswordAttribute(password);
+        this.setUsernameAttribute(usernameAttr);
+        this.setAttributes(nameAttr);
+        if (passwordAttr != null && !passwordAttr.isEmpty()) {
+            this.setPasswordAttribute(passwordAttr);
         }
         this.setConnectionFactory(connectionFactory);
         this.setLdapAuthenticator(new Authenticator(dnResolver, authHandler));
@@ -123,26 +118,16 @@ public class LdapAuthenticator extends LdapProfileService {
     private String getName(UsernamePasswordCredentials credentials) {
         final CommonProfile profile = credentials.getUserProfile();
         assert profile != null;
-        Object attribute;
 
-        if (nameAttribute != null && !nameAttribute.isEmpty()) {
-            attribute = profile.getAttribute(nameAttribute);
-            if (attribute != null && attribute instanceof String && !((String) attribute).isEmpty()) {
-                return (String) attribute;
-            }
-        }
-
-        attribute = profile.getAttribute("cn");
+        Object attribute = profile.getAttribute(nameAttr);
         if (attribute != null && attribute instanceof String && !((String) attribute).isEmpty()) {
             return (String) attribute;
+        } else {
+            return credentials.getUsername();
         }
+    }
 
-        final String displayName = profile.getDisplayName();
-        if (displayName != null && !displayName.isEmpty()) {
-            return displayName;
-        }
-
-        final String username = credentials.getUsername();
-        return username != null ? username : "No name found";
+    public static DefaultConnectionFactory getConnectionFactoryInstance() {
+        return connectionFactory;
     }
 }

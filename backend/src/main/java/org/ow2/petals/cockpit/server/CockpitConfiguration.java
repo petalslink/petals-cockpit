@@ -19,6 +19,7 @@ package org.ow2.petals.cockpit.server;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.cockpit.server.bundles.artifactserver.HttpArtifactServerBundle.HttpArtifactServerConfiguration;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle.CockpitSecurityConfiguration;
 
@@ -83,16 +84,17 @@ public class CockpitConfiguration extends Configuration {
     }
 
     @Valid
-    @NotNull
-    private LdapConfigFactory ldapConfig = new LdapConfigFactory();
+    @Nullable
+    private LdapConfigFactory ldapConfig;
 
     @JsonProperty("ldapConfig")
-    public LdapConfigFactory getLDAPConfigFactory() {
+    @Nullable
+    public LdapConfigFactory getLdapConfigFactory() {
         return ldapConfig;
     }
 
     @JsonProperty("ldapConfig")
-    public void setLDAPConfigFactory(LdapConfigFactory factory) {
+    public void setLdapConfigFactory(LdapConfigFactory factory) {
         this.ldapConfig = factory;
     }
 

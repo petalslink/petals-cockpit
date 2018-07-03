@@ -28,6 +28,7 @@ import org.ow2.petals.cockpit.server.AbstractTest;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.mocks.MockLdapServer;
+import org.ow2.petals.cockpit.server.resources.LdapResource.LdapUser;
 import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
 import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
 import org.ow2.petals.cockpit.server.rules.CockpitLdapApplicationRule;
@@ -45,16 +46,20 @@ public class AbstractLdapTest extends AbstractTest {
 
     public static final NewUser USER_NOLDAP_NODB = new NewUser("unknownUser", "userpass123", "Unknown user");
 
+    public static final LdapUser USER1 = new LdapUser("user1", "Jean-Michel Bonsoir");
+
+    public static final LdapUser USER2 = new LdapUser("user2", "Jean-Louis Bonjour");
+
+    public static final LdapUser USER3 = new LdapUser("user3", "Marianne Adieu");
+
     @Rule
     public CockpitLdapApplicationRule appLdap = new CockpitLdapApplicationRule();
-
 
     @Before
     public void setUpDb() {
         addUser(USER_LDAP_DB, true);
         addUser(USER_NOLDAP_DB, false);
     }
-
 
     protected Response login(Authentication auth) {
         return appLdap.target("/user/session").request()
@@ -75,12 +80,10 @@ public class AbstractLdapTest extends AbstractTest {
 
     protected void addUser(NewUser user, boolean isAdmin) {
         appLdap.db().executeInsert(new UsersRecord(user.username, new BCryptPasswordEncoder().encode(user.password),
-                user.name,
-                null, isAdmin, true));
+                user.name, null, isAdmin, true));
     }
 
     protected boolean userIsInDb(String username) {
-        return appLdap.db().fetchExists(
-                appLdap.db().select().from(USERS).where(USERS.USERNAME.eq(username)));
+        return appLdap.db().fetchExists(appLdap.db().select().from(USERS).where(USERS.USERNAME.eq(username)));
     }
 }
