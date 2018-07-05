@@ -32,7 +32,7 @@ import org.ow2.petals.cockpit.server.rules.CockpitLdapApplicationRule;
 import org.pac4j.core.util.TestsConstants;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class AbstractLDAPTest extends AbstractTest {
+public class AbstractLdapTest extends AbstractTest {
 
     @SuppressWarnings("null")
     public static final NewUser USER_LDAP_DB = new NewUser(TestsConstants.GOOD_USERNAME, TestsConstants.PASSWORD,

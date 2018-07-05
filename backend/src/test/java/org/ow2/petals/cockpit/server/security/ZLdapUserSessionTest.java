@@ -20,19 +20,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.ws.rs.core.Response;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
 
-/* Could not consistently run these test without making 
- * UserSessionTest and UsersResourceSecurityTest fail as side effect ...
+/**
+ * Could not consistently run these test without making UserSessionTest and UsersResourceSecurityTest fail as side
+ * effect ...
  * 
- * Something to do with CockpitLdapApplicationRule & CockpitApplicationRule 
- * Instantiating conflicting DropwizardAppRule I suppose.
-*/
-@Ignore
-public class LDAPUserSessionTest extends AbstractLDAPTest {
+ * Something to do with CockpitApplicationRule instantiating conflicting DropwizardAppRule (I suppose).
+ * 
+ * As a workaround, the tests are run alphabetically and a Z was added ...
+ */
+public class ZLdapUserSessionTest extends AbstractLdapTest {
 
     @Test
     public void testLDAPProtectedUserSucceedAfterLogin() {

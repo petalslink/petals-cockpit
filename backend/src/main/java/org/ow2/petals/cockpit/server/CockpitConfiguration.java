@@ -84,15 +84,15 @@ public class CockpitConfiguration extends Configuration {
 
     @Valid
     @NotNull
-    private LDAPConfigFactory ldapConfig = new LDAPConfigFactory();
+    private LdapConfigFactory ldapConfig = new LdapConfigFactory();
 
     @JsonProperty("ldapConfig")
-    public LDAPConfigFactory getLDAPConfigFactory() {
+    public LdapConfigFactory getLDAPConfigFactory() {
         return ldapConfig;
     }
 
     @JsonProperty("ldapConfig")
-    public void setLDAPConfigFactory(LDAPConfigFactory factory) {
+    public void setLDAPConfigFactory(LdapConfigFactory factory) {
         this.ldapConfig = factory;
     }
 

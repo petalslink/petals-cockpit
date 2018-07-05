@@ -27,7 +27,7 @@ import org.ldaptive.DefaultConnectionFactory;
 import org.ldaptive.auth.Authenticator;
 import org.ldaptive.auth.BindAuthenticationHandler;
 import org.ldaptive.auth.FormatDnResolver;
-import org.ow2.petals.cockpit.server.LDAPConfigFactory;
+import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
@@ -44,7 +44,7 @@ public class LdapAuthenticator extends LdapProfileService {
 
     protected static final Logger LOG = LoggerFactory.getLogger(LdapAuthenticator.class);
 
-    public LdapAuthenticator(LDAPConfigFactory ldapConf) {
+    public LdapAuthenticator(LdapConfigFactory ldapConf) {
         final String usersDn = ldapConf.getUsersDn();
         final String username = ldapConf.getUsernameAttribute();
         final String name = ldapConf.getNameAttribute();
