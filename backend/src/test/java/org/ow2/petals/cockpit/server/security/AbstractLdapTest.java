@@ -17,6 +17,7 @@
 package org.ow2.petals.cockpit.server.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
@@ -36,11 +37,11 @@ public class AbstractLdapTest extends AbstractTest {
 
     @SuppressWarnings("null")
     public static final NewUser USER_LDAP_DB = new NewUser(TestsConstants.GOOD_USERNAME, TestsConstants.PASSWORD,
-            "Administrator");
+            TestsConstants.FIRSTNAME_VALUE);
 
     @SuppressWarnings("null")
     public static final NewUser USER_LDAP_NODB = new NewUser(TestsConstants.GOOD_USERNAME2, TestsConstants.PASSWORD,
-            "Normal user");
+            TestsConstants.GOOD_USERNAME2);
 
     public static final NewUser USER_NOLDAP_DB = new NewUser("user", "userpass", "Normal user");
 
@@ -67,6 +68,7 @@ public class AbstractLdapTest extends AbstractTest {
         assertThat(user.id).isEqualTo(expected.username);
         assertThat(user.name).isEqualTo(expected.name);
         assertThat(user.isAdmin).isEqualTo(isAdmin);
+        assertThat(user.isFromLdap).isEqualTo(true);
     }
 
     protected void addUser(String username) {
@@ -76,7 +78,11 @@ public class AbstractLdapTest extends AbstractTest {
     protected void addUser(NewUser user, boolean isAdmin) {
         appLdap.db().executeInsert(new UsersRecord(user.username, new BCryptPasswordEncoder().encode(user.password),
                 user.name,
-                null, isAdmin));
+                null, isAdmin, true));
     }
 
+    protected boolean userIsInDb(String username) {
+        return appLdap.db().fetchExists(
+                appLdap.db().select().from(USERS).where(USERS.USERNAME.eq(username)));
+    }
 }

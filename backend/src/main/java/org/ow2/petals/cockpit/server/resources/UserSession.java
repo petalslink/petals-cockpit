@@ -114,16 +114,20 @@ public class UserSession {
 
         public final boolean isAdmin;
 
+        public final boolean isFromLdap;
+
         public CurrentUser(UsersRecord record) {
             super(record);
             this.lastWorkspace = record.getLastWorkspace();
             this.isAdmin = record.getAdmin();
+            this.isFromLdap = record.getIsFromLdap();
         }
 
         @JsonCreator
         private CurrentUser(@JsonProperty("username") String username, @JsonProperty("name") String name,
-                @Nullable @JsonProperty("lastWorkspace") Long lastWorkspace, @JsonProperty("isAdmin") boolean isAdmin) {
-            this(new UsersRecord(username, null, name, lastWorkspace, isAdmin));
+                @Nullable @JsonProperty("lastWorkspace") Long lastWorkspace, @JsonProperty("isAdmin") boolean isAdmin,
+                @JsonProperty("isFromLdap") boolean isFromLdap) {
+            this(new UsersRecord(username, null, name, lastWorkspace, isAdmin, isFromLdap));
         }
 
         @Nullable

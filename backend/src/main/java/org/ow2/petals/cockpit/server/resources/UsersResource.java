@@ -75,7 +75,7 @@ public class UsersResource {
     public void add(@Valid NewUser user) {
         try {
             DSL.using(jooq).executeInsert(new UsersRecord(user.username,
-                    CockpitAuthenticator.passwordEncoder.encode(user.password), user.name, null, false));
+                    CockpitAuthenticator.passwordEncoder.encode(user.password), user.name, null, false, false));
         } catch (DataAccessException e) {
             if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
                 throw new WebApplicationException(Status.CONFLICT);

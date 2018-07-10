@@ -26,11 +26,10 @@ import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
 
 /**
  * Could not consistently run these test without making UserSessionTest and UsersResourceSecurityTest fail as side
- * effect ...
+ * effect... Something to do with CockpitApplicationRule instantiating conflicting DropwizardAppRule (I suppose).
  * 
- * Something to do with CockpitApplicationRule instantiating conflicting DropwizardAppRule (I suppose).
- * 
- * As a workaround, the tests are run alphabetically and a Z was added ...
+ * As a workaround, the tests are run alphabetically and a Z was added to make it run last ... see:
+ * https://groups.google.com/forum/#!topic/dropwizard-user/hb79pf_gXjg
  */
 public class ZLdapUserSessionTest extends AbstractLdapTest {
 
@@ -58,20 +57,31 @@ public class ZLdapUserSessionTest extends AbstractLdapTest {
 
     @Test
     public void testLDAPLoginUnknownUser() {
+        assertThat(userIsInDb(USER_NOLDAP_NODB.username)).isFalse();
         final Response login = login(new Authentication(USER_NOLDAP_NODB.username, USER_NOLDAP_NODB.password));
         assertThat(login.getStatus()).isEqualTo(401);
+        assertThat(userIsInDb(USER_LDAP_NODB.username)).isFalse();
     }
 
     @Test
     public void testLDAPLoginDbOnlyUser() {
+        assertThat(userIsInDb(USER_NOLDAP_DB.username)).isTrue();
         final Response login = login(new Authentication(USER_NOLDAP_DB.username, USER_NOLDAP_DB.password));
         assertThat(login.getStatus()).isEqualTo(401);
+        assertThat(userIsInDb(USER_NOLDAP_DB.username)).isTrue();
     }
 
     @Test
     public void testLDAPLoginLdapOnlyUser() {
-        final Response login = login(new Authentication(USER_LDAP_NODB.username, USER_LDAP_NODB.password));
-        assertThat(login.getStatus()).isEqualTo(401);
+        assertThat(userIsInDb(USER_LDAP_NODB.username)).isFalse();
+
+        final Response login = login(USER_LDAP_NODB);
+        assertThat(login.getStatus()).isEqualTo(200);
+
+        CurrentUser user = login.readEntity(CurrentUser.class);
+        assertMatches(user, USER_LDAP_NODB, false);
+
+        assertThat(userIsInDb(USER_LDAP_NODB.username)).isTrue();
     }
 
     @Test
