@@ -29,7 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import javax.ws.rs.core.Response;
 
 import org.junit.Test;
-import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
 import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
 
@@ -73,7 +72,7 @@ public class LdapUserSessionTest extends AbstractLdapTest {
     @Test
     public void testLdapLoginUnknownUser() {
         assertThat(userIsInDb(USER_NOLDAP_NODB.username)).isFalse();
-        final Response login = login(new Authentication(USER_NOLDAP_NODB.username, USER_NOLDAP_NODB.password));
+        final Response login = login(USER_NOLDAP_NODB.username, USER_NOLDAP_NODB.password);
         assertThat(login.getStatus()).isEqualTo(401);
         assertThat(userIsInDb(USER_LDAP_NODB.username)).isFalse();
     }
@@ -81,7 +80,7 @@ public class LdapUserSessionTest extends AbstractLdapTest {
     @Test
     public void testLdapLoginDbOnlyUser() {
         assertThat(userIsInDb(USER_NOLDAP_DB.username)).isTrue();
-        final Response login = login(new Authentication(USER_NOLDAP_DB.username, USER_NOLDAP_DB.password));
+        final Response login = login(USER_NOLDAP_DB.username, USER_NOLDAP_DB.password);
         assertThat(login.getStatus()).isEqualTo(401);
         assertThat(userIsInDb(USER_NOLDAP_DB.username)).isTrue();
     }

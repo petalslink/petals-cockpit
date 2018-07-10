@@ -45,6 +45,7 @@ import org.ow2.petals.admin.junit.PetalsAdministrationApi;
 import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
@@ -114,6 +115,7 @@ public class CockpitResourceRule implements TestRule {
                         bind(ADMIN_TOKEN).to(String.class).named(SetupResource.ADMIN_TOKEN);
                         bind(new TestWorkspaceDbOperations()).to(WorkspaceDbOperations.class);
                         bind(cockpitConfig).to(CockpitConfiguration.class);
+                        bind(cockpitConfig.getLDAPConfigFactory()).to(LdapConfigFactory.class);
                     }
                 }).setClientConfigurator(cc -> cc.register(MultiPartFeature.class));
         builder.addProvider(new PetalsAdminExceptionMapper(true));

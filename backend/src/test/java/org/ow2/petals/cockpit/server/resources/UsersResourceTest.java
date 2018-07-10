@@ -45,7 +45,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
 
     @Test
     public void listAll() {
-        List<UserMin> users = resource.target("/users").request().get(new GenericType<List<UserMin>>() {
+        List<UserMin> users = this.resource.target("/users").request().get(new GenericType<List<UserMin>>() {
         });
 
         assertThat(users.stream().map(u -> u.id)).containsExactlyInAnyOrder("user1", "user2", "user3");
@@ -57,7 +57,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
 
     @Test
     public void getOne() {
-        UserMin user = resource.target("/users/user1").request().get(UserMin.class);
+        UserMin user = this.resource.target("/users/user1").request().get(UserMin.class);
 
         assertThat(user.id).isEqualTo("user1");
         assertThat(user.name).isEqualTo("user1");
@@ -69,7 +69,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
 
     @Test
     public void deleteUser() {
-        Response delete = resource.target("/users/user1").request().delete();
+        Response delete = this.resource.target("/users/user1").request().delete();
         assertThat(delete.getStatus()).isEqualTo(204);
 
         assertNoDbUser("user1");
@@ -79,7 +79,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
 
     @Test
     public void deleteUser404() {
-        Response delete = resource.target("/users/user4").request().delete();
+        Response delete = this.resource.target("/users/user4").request().delete();
         assertThat(delete.getStatus()).isEqualTo(404);
 
         assertThatDbUser("user1");
@@ -93,7 +93,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
         String password = "userPw";
         String name = "User Name";
 
-        Response post = resource.target("/users").request().post(Entity.json(new NewUser(username, password, name)));
+        Response post = this.resource.target("/users").request().post(Entity.json(new NewUser(username, password, name)));
         assertThat(post.getStatus()).isEqualTo(204);
 
         assertThatDbUser("user1");
@@ -104,10 +104,25 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
         assertThatDbUserPassword(username, password);
     }
 
+    // @Test
+    // public void addUser2() {
+    // String username = "user4";
+    //
+    // Response post = this.resource.target("/users").request().post(Entity.json(new NewLdapUser(username)));
+    // assertThat(post.getStatus()).isEqualTo(204);
+    //
+    // assertThatDbUser("user1");
+    // assertThatDbUser("user2");
+    // assertThatDbUser("user3");
+    //
+    // assertThatDbUser(username).value("name").isEqualTo(username);
+    // assertThatDbUserPassword(username, "ldap");
+    // }
+
     @Test
     public void addUserConflict() {
         String username = "User Name";
-        Response post = resource.target("/users").request().post(Entity.json(new NewUser("user1", "pw", username)));
+        Response post = this.resource.target("/users").request().post(Entity.json(new NewUser("user1", "pw", username)));
         assertThat(post.getStatus()).isEqualTo(409);
 
         assertThatDbUser("user1").value("name").isEqualTo("user1");
@@ -118,7 +133,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
 
     @Test
     public void emptyChangeUser() {
-        Response put = resource.target("/users/user1").request().put(Entity.json(new UpdateUser(null, null)));
+        Response put = this.resource.target("/users/user1").request().put(Entity.json(new UpdateUser(null, null)));
         assertThat(put.getStatus()).isEqualTo(204);
     }
 
@@ -126,7 +141,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     public void renameUser() {
         String newName = "New User Name";
 
-        Response put = resource.target("/users/user1").request().put(Entity.json(new UpdateUser(null, newName)));
+        Response put = this.resource.target("/users/user1").request().put(Entity.json(new UpdateUser(null, newName)));
         assertThat(put.getStatus()).isEqualTo(204);
 
         assertThatDbUser("user1").value("name").isEqualTo(newName);
@@ -136,7 +151,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     public void changePasswordUser() {
         String newPassword = "New Password";
 
-        Response put = resource.target("/users/user1").request().put(Entity.json(new UpdateUser(newPassword, null)));
+        Response put = this.resource.target("/users/user1").request().put(Entity.json(new UpdateUser(newPassword, null)));
         assertThat(put.getStatus()).isEqualTo(204);
 
         assertThatDbUserPassword("user1", newPassword);
@@ -147,7 +162,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
         String newName = "New User Name";
         String newPassword = "New Password";
 
-        Response put = resource.target("/users/user1").request().put(Entity.json(new UpdateUser(newPassword, newName)));
+        Response put = this.resource.target("/users/user1").request().put(Entity.json(new UpdateUser(newPassword, newName)));
         assertThat(put.getStatus()).isEqualTo(204);
 
         assertThatDbUser("user1").value("name").isEqualTo(newName);

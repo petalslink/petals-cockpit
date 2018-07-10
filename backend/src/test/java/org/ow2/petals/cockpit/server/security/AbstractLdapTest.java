@@ -22,6 +22,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.junit.Before;
 import org.junit.Rule;
 import org.ow2.petals.cockpit.server.AbstractTest;
@@ -55,16 +56,26 @@ public class AbstractLdapTest extends AbstractTest {
     @Rule
     public CockpitLdapApplicationRule appLdap = new CockpitLdapApplicationRule();
 
+
     @Before
     public void setUpDb() {
         addUser(USER_LDAP_DB, true);
         addUser(USER_NOLDAP_DB, false);
     }
 
+
+    protected Response login(@Nullable String username, @Nullable String password) {
+        assert username != null && password != null;
+        return this.login(new Authentication(username, password));
+    }
+
+    protected Response login(NewUser user) {
+        assert user.password != null;
+        return this.login(new Authentication(user.username, user.password));
+    }
+
     protected Response login(Authentication auth) {
-        return appLdap.target("/user/session").request()
-                // we need another object because we can have subclasses passed to this method
-                .post(Entity.json(new Authentication(auth.username, auth.password)));
+        return appLdap.target("/user/session").request().post(Entity.json(auth));
     }
 
     protected void assertMatches(CurrentUser user, NewUser expected, boolean isAdmin) {
@@ -79,11 +90,15 @@ public class AbstractLdapTest extends AbstractTest {
     }
 
     protected void addUser(NewUser user, boolean isAdmin) {
-        appLdap.db().executeInsert(new UsersRecord(user.username, new BCryptPasswordEncoder().encode(user.password),
-                user.name, null, isAdmin, true));
+        final String password = user.password;
+        assert password != null && user.name != null;
+        appLdap.db().executeInsert(new UsersRecord(user.username, new BCryptPasswordEncoder().encode(password),
+                user.name,
+                null, isAdmin, true));
     }
 
     protected boolean userIsInDb(String username) {
-        return appLdap.db().fetchExists(appLdap.db().select().from(USERS).where(USERS.USERNAME.eq(username)));
+        return appLdap.db().fetchExists(
+                appLdap.db().select().from(USERS).where(USERS.USERNAME.eq(username)));
     }
 }

@@ -70,7 +70,7 @@ import io.dropwizard.setup.Environment;
 
 /**
  * Main configuration class for Petals Cockpit Server
- * 
+ *
  * @author vnoel
  *
  */
@@ -147,6 +147,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
             @Override
             protected void configure() {
                 bind(configuration).to(CockpitConfiguration.class);
+                bind(configuration.getLDAPConfigFactory()).to(LdapConfigFactory.class);
                 bind(environment).to(Environment.class);
                 bind(WorkspacesService.class).to(WorkspacesService.class).in(Singleton.class);
                 bind(jooqConf).to(Configuration.class);

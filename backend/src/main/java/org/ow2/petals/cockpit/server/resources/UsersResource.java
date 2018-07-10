@@ -43,8 +43,8 @@ import org.jooq.Configuration;
 import org.jooq.exception.DataAccessException;
 import org.jooq.exception.SQLStateClass;
 import org.jooq.impl.DSL;
+import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
-import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
@@ -60,9 +60,13 @@ public class UsersResource {
 
     private final Configuration jooq;
 
+    @Nullable
+    private final LdapConfigFactory ldapConfig;
+
     @Inject
-    public UsersResource(Configuration jooq) {
+    public UsersResource(Configuration jooq, @Nullable LdapConfigFactory ldapConfig) {
         this.jooq = jooq;
+        this.ldapConfig = ldapConfig;
     }
 
     @GET
@@ -74,8 +78,21 @@ public class UsersResource {
     @POST
     public void add(@Valid NewUser user) {
         try {
-            DSL.using(jooq).executeInsert(new UsersRecord(user.username,
-                    CockpitAuthenticator.passwordEncoder.encode(user.password), user.name, null, false, false));
+            if (ldapConfig != null && ldapConfig.isConfigurationValid()) {
+                // get info from ldap
+                DSL.using(jooq)
+                        .executeInsert(new UsersRecord(user.username, "ldap", user.username, null, false, true));
+            } else {
+                final String password = user.password;
+                final String name = user.name;
+
+                if (password == null || password.isEmpty() || name == null || name.isEmpty()) {
+                    throw new WebApplicationException("Unprocessable entity: password and name cannot be null.", 422);
+                } else {
+                    DSL.using(jooq).executeInsert(new UsersRecord(user.username,
+                            CockpitAuthenticator.passwordEncoder.encode(password), name, null, false, false));
+                }
+            }
         } catch (DataAccessException e) {
             if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
                 throw new WebApplicationException(Status.CONFLICT);
@@ -140,16 +157,25 @@ public class UsersResource {
         }
     }
 
-    public static class NewUser extends Authentication {
+    public static class NewUser {
 
-        @NotEmpty
+        @Nullable
         @JsonProperty
         public final String name;
 
-        public NewUser(@JsonProperty("username") String username, @JsonProperty("password") String password,
-                @JsonProperty("name") String name) {
-            super(username, password);
+        @NotEmpty
+        @JsonProperty
+        public final String username;
+
+        @Nullable
+        @JsonProperty
+        public final String password;
+
+        public NewUser(@JsonProperty("username") String username, @Nullable @JsonProperty("password") String password,
+                @Nullable @JsonProperty("name") String name) {
             this.name = name;
+            this.username = username;
+            this.password = password;
         }
     }
 
