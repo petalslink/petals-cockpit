@@ -30,3 +30,13 @@ Cypress.Commands.add('uploadFile', (fixtureName, fileInputDom) => {
     });
   });
 });
+
+Cypress.Commands.add('expectMessageToBe', (element, type, message) => {
+  cy
+    .get(element)
+    .should('be.visible')
+    .contains(message)
+    .parent()
+    .parent('.msg-content')
+    .should('have.class', type);
+});
