@@ -43,10 +43,13 @@ import org.jooq.Configuration;
 import org.jooq.exception.DataAccessException;
 import org.jooq.exception.SQLStateClass;
 import org.jooq.impl.DSL;
+import org.ldaptive.LdapException;
+import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
+import org.ow2.petals.cockpit.server.services.LdapService;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -63,10 +66,13 @@ public class UsersResource {
     @Nullable
     private final LdapConfigFactory ldapConfig;
 
+    private LdapService ldapService;
+
     @Inject
-    public UsersResource(Configuration jooq, @Nullable LdapConfigFactory ldapConfig) {
+    public UsersResource(Configuration jooq, CockpitConfiguration config, LdapService ldapService) {
         this.jooq = jooq;
-        this.ldapConfig = ldapConfig;
+        this.ldapService = ldapService;
+        ldapConfig = config.getLdapConfigFactory();
     }
 
     @GET
@@ -78,16 +84,17 @@ public class UsersResource {
     @POST
     public void add(@Valid NewUser user) {
         try {
-            if (ldapConfig != null && ldapConfig.isConfigurationValid()) {
-                // get info from ldap
-                DSL.using(jooq)
-                        .executeInsert(new UsersRecord(user.username, "ldap", user.username, null, false, true));
+            if (ldapConfig != null) {
+                assert ldapService != null;
+                String name = ldapService.getUserByUsername(user.username).name;
+
+                DSL.using(jooq).executeInsert(new UsersRecord(user.username, "ldap", name, null, false, true));
             } else {
                 final String password = user.password;
                 final String name = user.name;
 
                 if (password == null || password.isEmpty() || name == null || name.isEmpty()) {
-                    throw new WebApplicationException("Unprocessable entity: password and name cannot be null.", 422);
+                    throw new WebApplicationException("Unprocessable entity: password and name must be valid.", 422);
                 } else {
                     DSL.using(jooq).executeInsert(new UsersRecord(user.username,
                             CockpitAuthenticator.passwordEncoder.encode(password), name, null, false, false));
@@ -99,6 +106,8 @@ public class UsersResource {
             } else {
                 throw e;
             }
+        } catch (LdapException e) {
+            throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -126,6 +135,11 @@ public class UsersResource {
     @PUT
     @Path("/{username}")
     public void update(@NotEmpty @PathParam("username") String username, @Valid UpdateUser user) {
+
+        if (ldapConfig != null) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
+
         UsersRecord r = new UsersRecord();
         String name = user.name;
         if (name != null && !name.trim().isEmpty()) {

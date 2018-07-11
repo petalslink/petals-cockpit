@@ -42,44 +42,44 @@ public class LdapConfigTest {
     private final Validator validator = Validators.newValidator();
 
     private final YamlConfigurationFactory<CockpitConfiguration> factory = new YamlConfigurationFactory<>(
-            CockpitConfiguration.class, validator, objectMapper, "dw");
+            CockpitConfiguration.class, this.validator, this.objectMapper, "dw");
 
     /**
      * This test shows that if only the line ldapConfig is present, but with no content, the ldap configuration is
      * considered omitted.
-     * 
+     *
      * @throws Exception
      */
     @Test
     public void testBuildEmptyLdapConfig() throws Exception {
         final File yml = new File(Resources.getResource("ldap-no-config-empty-ldap.yml").toURI());
-        CockpitConfiguration config = factory.build(yml);
+        CockpitConfiguration config = this.factory.build(yml);
         assertNull(config.getLdapConfigFactory());
     }
 
     @Test
     public void testBuildOmittedLdapConfig() throws Exception {
         final File yml = new File(Resources.getResource("ldap-no-config-omitted-ldap.yml").toURI());
-        CockpitConfiguration config = factory.build(yml);
+        CockpitConfiguration config = this.factory.build(yml);
         assertNull(config.getLdapConfigFactory());
     }
 
     @Test(expected = ConfigurationValidationException.class)
     public void testBuildWrongLdapConfigEmptyField() throws Exception {
         final File yml = new File(Resources.getResource("ldap-wrong-config-empty-field.yml").toURI());
-        factory.build(yml);
+        this.factory.build(yml);
     }
 
     @Test(expected = ConfigurationValidationException.class)
     public void testBuildWrongLdapConfigOmittedField() throws Exception {
         final File yml = new File(Resources.getResource("ldap-wrong-config-omitted-field.yml").toURI());
-        factory.build(yml);
+        this.factory.build(yml);
     }
 
     @Test
-    public void testBuildWrongLdapConfig() throws Exception {
+    public void testBuildRightLdapConfig() throws Exception {
         final File yml = new File(Resources.getResource("ldap-right-config.yml").toURI());
-        LdapConfigFactory ldapConf = factory.build(yml).getLdapConfigFactory();
+        LdapConfigFactory ldapConf = this.factory.build(yml).getLdapConfigFactory();
 
         assertNotNull(ldapConf);
         assertEquals("ldap://localhost:33389", ldapConf.getUrl());

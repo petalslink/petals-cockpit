@@ -24,6 +24,5 @@ ldapConfig:
   url: ldap://localhost:33389
   usernameAttribute: cn
   nameAttribute: sn
-  passwordAttribute: userPassword
   principalDn: cn=bind,ou=people,dc=example,dc=com
   principalPassword: bindpass
