@@ -19,6 +19,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   Input,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -44,7 +45,9 @@ import {
   styleUrls: ['./petals-menu-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PetalsMenuViewComponent implements OnInit {
+export class PetalsMenuViewComponent implements OnInit, OnDestroy {
+  onDestroy$ = new Subject<void>();
+
   @Input() workspaceId: string;
   @Input() tree: WorkspaceElement[];
   @Input() busesInProgress: IBusInProgress[];
@@ -134,5 +137,12 @@ export class PetalsMenuViewComponent implements OnInit {
 
   closeSidenavOnSmallScreen() {
     this.store$.dispatch(new Ui.CloseSidenavOnSmallScreen());
+  }
+
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+
+    this.store$.dispatch(new Workspaces.Clean());
   }
 }
