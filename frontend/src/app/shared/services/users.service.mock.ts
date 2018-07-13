@@ -90,6 +90,14 @@ export class UsersServiceMock extends UsersService {
       : helper.response(401);
   }
 
+  getLdapUsers(search: string) {
+    const usersIdAndName = BackendUser.getFilteredLdapUsers(
+      search.toLowerCase()
+    );
+
+    return this.responseAdmin(helper.responseBody(usersIdAndName));
+  }
+
   getAll() {
     const usersIdAndName = BackendUser.getAll().map(u => ({
       id: u.id,

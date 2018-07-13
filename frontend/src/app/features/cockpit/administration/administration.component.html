@@ -48,14 +48,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </mat-card-content>
 
           <app-message
+            *ngIf="!currentUser.isFromLdap"
             class="info-user-management"
             type="info"
             msg="As an administrator, you can ADD, EDIT, and DELETE any user."
             [isClosable]="false"
           ></app-message>
+
+          <app-message 
+            *ngIf="currentUser.isFromLdap"
+            class="info-ldap-user-management"
+            type="info"
+            msg="As an administrator, you can ADD and DELETE users from LDAP."
+            [isClosable]="false"
+          ></app-message>
         </mat-card>
 
-        <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap.gt-md="10px" class="user-management-panels">
+        <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap.gt-md="10px" class="user-management-panels">         
 
           <div fxFlex [ngClass.gt-md]="'card-auto-size'" class="pnl-add-user margin-top-x1">
             <mat-expansion-panel 
@@ -63,7 +72,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               fxLayout="column" 
               class="exp-pnl-add-user" 
               [hideToggle]="false" 
-              (closed)="addEditUser.reset()"
+              (closed?)="addEditUser.reset()"
             >
               <mat-expansion-panel-header fxLayout="row">
                 <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
@@ -72,8 +81,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </div>
               </mat-expansion-panel-header>
 
-              <app-add-edit-user #addEditUser (evtSubmit)="onAdd($event); el.close()" (evtCancel)="el.close()">
-              </app-add-edit-user>
+              <app-add-edit-user 
+                #addEditUser 
+                *ngIf="!currentUser.isFromLdap else isFromLdap" 
+                (evtSubmit)="onAdd($event); el.close()" 
+                (evtCancel)="el.close()"
+              ></app-add-edit-user>
 
             </mat-expansion-panel>
           </div>
@@ -81,7 +94,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <div fxFlex [ngClass.gt-md]="'card-auto-size'" class="pnl-list-users margin-top-x1">
             <mat-accordion displayMode="flat" [multi]="false">
               <mat-expansion-panel 
-                #el 
+                #el
                 *ngFor="let user of users; trackBy:trackByUser" 
                 fxLayout="column" 
                 [hideToggle]="false" 
@@ -131,6 +144,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           ></app-message>
         </mat-card>
       </div>
+    </ng-template>
+
+    <ng-template #isFromLdap>
+      <app-add-ldap-user *ngIf="currentUser.isFromLdap"></app-add-ldap-user>
     </ng-template>
   </div>
 </div>

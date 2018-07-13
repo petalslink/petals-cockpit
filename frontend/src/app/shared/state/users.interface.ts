@@ -34,6 +34,11 @@ export interface IUserRow extends IUserUI, IUserBackend {}
 // used in generated views
 export interface IUser extends IUserBackend {}
 
+export interface IUserLDAP {
+  id: string;
+  name: string;
+}
+
 export interface ICurrentUser extends ICurrentUserBackend {}
 
 interface IUsersCommon {
@@ -44,6 +49,9 @@ interface IUsersCommon {
   connectionFailed: boolean;
 
   isFetchingUsers: boolean;
+  isFetchingLdapUsers: boolean;
+
+  ldapSearchList: IUserLDAP[];
 }
 
 export interface IUsersTable extends IUsersCommon, JsTable<IUserRow> {}
@@ -52,6 +60,7 @@ export function userRowFactory(): IUserRow {
   return {
     id: null,
     name: null,
+
     isAdding: false,
     isDeleting: false,
     isModifying: false,
@@ -69,5 +78,8 @@ export function usersTableFactory(): IUsersTable {
     connectionFailed: false,
 
     isFetchingUsers: false,
+    isFetchingLdapUsers: false,
+
+    ldapSearchList: [],
   };
 }

@@ -52,6 +52,7 @@ describe('WorkspacesListComponent', () => {
       name: 'Admin',
       lastWorkspace: null,
       isAdmin: true,
+      isFromLdap: false,
     };
     component.workspaces = {
       ...(workspacesTableFactory() as IWorkspacesCommon),

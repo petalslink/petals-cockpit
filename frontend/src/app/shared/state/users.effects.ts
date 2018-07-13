@@ -71,6 +71,24 @@ export class UsersEffects {
     );
 
   @Effect()
+  fetchLdapUsers$: Observable<Action> = this.actions$
+    .ofType<Users.FetchLdapUsers>(Users.FetchLdapUsersType)
+    .pipe(
+      switchMap(action => this.usersService.getLdapUsers(action.payload)),
+      map(ldapSearchList => new Users.FetchedLdapUsers(ldapSearchList)),
+      catchError((err: HttpErrorResponse) => {
+        if (environment.debug) {
+          console.group();
+          console.warn('FetchLdapUsers');
+          console.error(err);
+          console.groupEnd();
+        }
+
+        return of(new Users.FetchLdapUsersError());
+      })
+    );
+
+  @Effect()
   add$: Observable<Action> = this.actions$
     .ofType<Users.Add>(Users.AddType)
     .pipe(

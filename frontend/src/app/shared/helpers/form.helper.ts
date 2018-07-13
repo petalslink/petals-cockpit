@@ -44,6 +44,9 @@ interface IValidationMessages {
   passphrase?: {
     required: string;
   };
+  userSearchCtrl?: {
+    required: string;
+  };
 }
 
 const validationMessages: IValidationMessages = {
@@ -66,6 +69,9 @@ const validationMessages: IValidationMessages = {
   },
   passphrase: {
     required: 'Required!',
+  },
+  userSearchCtrl: {
+    required: 'Required',
   },
 };
 

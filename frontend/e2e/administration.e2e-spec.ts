@@ -84,23 +84,6 @@ describe(`Administration`, () => {
       // expect(editVnoel.nameInput.getAttribute('value')).toEqual(`Victor NOEL`);
     });
 
-    it('should close and clear on cancel', () => {
-      const add = admin.openAddUser();
-
-      add.usernameInput.sendKeys(`bdylan`);
-      add.nameInput.sendKeys(`Bob DYLAN`);
-      add.passwordInput.sendKeys(`Like a Rolling Stone`);
-
-      add.cancelButton.click();
-      browser.wait(EC.invisibilityOf(add.component), waitTimeout);
-
-      admin.openAddUser();
-
-      expect(add.usernameInput.getAttribute('value')).toEqual(``);
-      expect(add.nameInput.getAttribute('value')).toEqual(``);
-      expect(add.passwordInput.getAttribute('value')).toEqual(``);
-    });
-
     it(`should add and delete a user`, () => {
       const add = admin.openAddUser();
 
@@ -195,19 +178,5 @@ describe(`Administration`, () => {
         ['vnoel'],
       ]);
     });
-  });
-
-  it('should not be visible to non-admin', () => {
-    page.goToLogin().loginToWorkspaces('vnoel', 'vnoel');
-
-    expect(page.adminButton.isPresent()).toEqual(false);
-  });
-
-  it('should show a warning to non-admin', () => {
-    page.goToViaLogin('/admin').loginNoCheck('vnoel', 'vnoel');
-
-    AdminPage.waitAndGet()
-      .getNotAdminMessage()
-      .expectToBe('warning', `You are not an administrator.`);
   });
 });

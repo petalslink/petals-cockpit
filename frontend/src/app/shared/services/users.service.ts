@@ -21,6 +21,7 @@ import { Observable } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
+import { IUserLDAP } from '@shared/state/users.interface';
 
 export interface IUserBackend {
   id: string;
@@ -30,6 +31,7 @@ export interface IUserBackend {
 export interface ICurrentUserBackend extends IUserBackend {
   lastWorkspace: string;
   isAdmin: boolean;
+  isFromLdap: boolean;
 }
 
 export interface IUserLogin {
@@ -53,6 +55,8 @@ export abstract class UsersService {
   abstract getCurrentUserInformations(): Observable<ICurrentUserBackend>;
 
   abstract setupUser(value: IUserSetup): Observable<void>;
+
+  abstract getLdapUsers(search: string): Observable<IUserLDAP[]>;
 
   abstract getAll(): Observable<IUserBackend[]>;
 
@@ -99,6 +103,10 @@ export class UsersServiceImpl extends UsersService {
 
   setupUser(value: IUserSetup) {
     return this.http.post<void>(`${environment.urlBackend}/setup`, value);
+  }
+
+  getLdapUsers(search: string) {
+    return this.http.get<IUserLDAP[]>(`${environment.urlBackend}/ldap/users`);
   }
 
   getAll() {

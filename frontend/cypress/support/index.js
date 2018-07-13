@@ -26,6 +26,7 @@ import './endpoint.commands';
 import './services.commands';
 import './workspace.commands';
 import './workspaces.commands';
+import './administration.commands';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

@@ -1,0 +1,78 @@
+<!-- Copyright (C) 2017-2018 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<form novalidate [formGroup]="addLdapUserForm">
+  <div fxLayout="column" class="user-ldap-form">
+    <div fxLayout="column wrap" fxLayoutGap="10px">
+      <div fxLayoutAlign="start center" fxLayoutAlign.md="start center" fxLayoutAlign.sm="center center" class="margin-top-x1">
+        <mat-form-field class="margin-right-x1" appearance="fill" fxFlex fxFlex.md="50%" fxFlex.sm="50%">
+          <mat-label>Add a user from LDAP</mat-label>
+
+          <input 
+            matInput 
+            type="text" 
+            [matAutocomplete]="autocompleteLdapUsers" 
+            formControlName="userSearchCtrl" 
+            [errorStateMatcher]="matcher"
+            required 
+          >
+
+          <mat-error *ngIf="formErrors.userSearchCtrl">
+            {{ formErrors.userSearchCtrl }}
+          </mat-error>
+  
+          <mat-autocomplete #autocompleteLdapUsers>
+            <mat-option 
+              *ngIf="addLdapUserForm.get('userSearchCtrl').value !== '' && !formErrors.userSearchCtrl"
+              disabled
+            >
+              <mat-spinner 
+                *ngIf="isFetchingLdapUsers$ | async; else msgOption" 
+                class="margin-right-x1" 
+                [diameter]="16" 
+                [strokeWidth]="1"
+              ></mat-spinner>
+              <ng-template #msgOption>
+                <small class="msg-option">                  
+                  {{ (filteredUsers$ | async).length | i18nPlural: msgOptMapping }}
+                </small>
+              </ng-template>
+            </mat-option>
+
+            <div *ngIf="(isFetchingLdapUsers$ | async) === false">
+              <mat-option *ngFor="let user of filteredUsers$ | async" [value]="user.id" class="option-ldap-user-content">
+                <span 
+                  class="ldap-user-name"
+                  classToApply="bold"
+                  appColorSearchedLetters 
+                  [text]="user.name" 
+                  [search]="addLdapUserForm.get('userSearchCtrl').value"
+                ></span> |
+                <small
+                  class="ldap-user-id"
+                  classToApply="bold" 
+                  appColorSearchedLetters 
+                  [text]="user.id" 
+                  [search]="addLdapUserForm.get('userSearchCtrl').value"
+                ></small>
+              </mat-option>
+            </div>
+          </mat-autocomplete>
+
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+</form>

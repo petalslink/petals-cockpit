@@ -24,13 +24,21 @@ import { isNot } from '@shared/helpers/shared.helper';
 import { IStore } from './store.interface';
 import { ICurrentUser } from './users.interface';
 
-export const getUsers = (state: IStore) => state.users;
+export function getUsers(state: IStore) {
+  return state.users;
+}
 
-export const getConnectedUser = (state: IStore) => state.users.connectedUser;
+export function getConnectedUser(state: IStore) {
+  return state.users.connectedUser;
+}
 
-export const getUsersAllIds = (state: IStore) => state.users.allIds;
+export function getUsersById(state: IStore) {
+  return state.users.byId;
+}
 
-export const getUsersById = (state: IStore) => state.users.byId;
+export function getUsersAllIds(state: IStore) {
+  return state.users.allIds;
+}
 
 export const getAllUsers = createSelector(
   getUsersAllIds,
