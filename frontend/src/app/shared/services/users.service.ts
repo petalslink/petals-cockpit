@@ -106,7 +106,9 @@ export class UsersServiceImpl extends UsersService {
   }
 
   getLdapUsers(search: string) {
-    return this.http.get<IUserLDAP[]>(`${environment.urlBackend}/ldap/users`);
+    return this.http.get<IUserLDAP[]>(
+      `${environment.urlBackend}/ldap/users?name=${search}`
+    );
   }
 
   getAll() {

@@ -35,7 +35,7 @@ export interface IUserRow extends IUserUI, IUserBackend {}
 export interface IUser extends IUserBackend {}
 
 export interface IUserLDAP {
-  id: string;
+  username: string;
   name: string;
 }
 
