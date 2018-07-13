@@ -27,36 +27,42 @@ import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
 /**
  * Could not consistently run these test without making UserSessionTest and UsersResourceSecurityTest fail as side
  * effect... Something to do with CockpitApplicationRule instantiating conflicting DropwizardAppRule (I suppose).
- * 
+ *
  * As a workaround, the tests are run alphabetically and a Z was added to make it run last ... see:
  * https://groups.google.com/forum/#!topic/dropwizard-user/hb79pf_gXjg
  */
 public class ZLdapUserSessionTest extends AbstractLdapTest {
 
     @Test
-    public void testLDAPProtectedUserSucceedAfterLogin() {
-        final Response get = this.appLdap.target("/user").request().get();
+    public void testLdapProtectedUserSucceedAfterLogin() {
+        final Response get = appLdap.target("/user").request().get();
         assertThat(get.getStatus()).isEqualTo(401);
 
         final CurrentUser login = login(USER_LDAP_DB).readEntity(CurrentUser.class);
         assertMatches(login, USER_LDAP_DB, true);
 
-        final CurrentUser get2 = this.appLdap.target("/user").request().get(CurrentUser.class);
+        final CurrentUser get2 = appLdap.target("/user").request().get(CurrentUser.class);
         assertMatches(get2, USER_LDAP_DB, true);
 
-        final CurrentUser get3 = this.appLdap.target("/user/session").request().get(CurrentUser.class);
+        final CurrentUser get3 = appLdap.target("/user/session").request().get(CurrentUser.class);
         assertMatches(get3, USER_LDAP_DB, true);
     }
 
     @Test
-    public void testLDAPLoginNotAdmin() {
+    public void testLdapLoginWrongPassword() {
+        final Response login = login(new Authentication(USER_LDAP_DB.username, "oops"));
+        assertThat(login.getStatus()).isEqualTo(401);
+    }
+
+    @Test
+    public void testLdapLoginNotAdmin() {
         this.addUser(USER_LDAP_NODB, false);
         final CurrentUser login = login(USER_LDAP_NODB).readEntity(CurrentUser.class);
         assertMatches(login, USER_LDAP_NODB, false);
     }
 
     @Test
-    public void testLDAPLoginUnknownUser() {
+    public void testLdapLoginUnknownUser() {
         assertThat(userIsInDb(USER_NOLDAP_NODB.username)).isFalse();
         final Response login = login(new Authentication(USER_NOLDAP_NODB.username, USER_NOLDAP_NODB.password));
         assertThat(login.getStatus()).isEqualTo(401);
@@ -64,7 +70,7 @@ public class ZLdapUserSessionTest extends AbstractLdapTest {
     }
 
     @Test
-    public void testLDAPLoginDbOnlyUser() {
+    public void testLdapLoginDbOnlyUser() {
         assertThat(userIsInDb(USER_NOLDAP_DB.username)).isTrue();
         final Response login = login(new Authentication(USER_NOLDAP_DB.username, USER_NOLDAP_DB.password));
         assertThat(login.getStatus()).isEqualTo(401);
@@ -72,7 +78,7 @@ public class ZLdapUserSessionTest extends AbstractLdapTest {
     }
 
     @Test
-    public void testLDAPLoginLdapOnlyUser() {
+    public void testLdapLoginLdapOnlyUser() {
         assertThat(userIsInDb(USER_LDAP_NODB.username)).isFalse();
 
         final Response login = login(USER_LDAP_NODB);
@@ -85,30 +91,30 @@ public class ZLdapUserSessionTest extends AbstractLdapTest {
     }
 
     @Test
-    public void testLDAPGlobalFilterWorks() {
-        final Response get = this.appLdap.target("/workspaces").request().get();
+    public void testLdapGlobalFilterWorks() {
+        final Response get = appLdap.target("/workspaces").request().get();
         assertThat(get.getStatus()).isEqualTo(401);
 
         final CurrentUser login = login(USER_LDAP_DB).readEntity(CurrentUser.class);
         assertMatches(login, USER_LDAP_DB, true);
 
-        final Response get2 = this.appLdap.target("/workspaces").request().get();
+        final Response get2 = appLdap.target("/workspaces").request().get();
         assertThat(get2.getStatus()).isEqualTo(200);
     }
 
     @Test
-    public void testLDAPLogout() {
+    public void testLdapLogout() {
         final CurrentUser login = login(USER_LDAP_DB).readEntity(CurrentUser.class);
         assertMatches(login, USER_LDAP_DB, true);
 
-        final CurrentUser get = this.appLdap.target("/user/session").request().get(CurrentUser.class);
+        final CurrentUser get = appLdap.target("/user/session").request().get(CurrentUser.class);
         assertMatches(get, USER_LDAP_DB, true);
 
-        final Response logout = this.appLdap.target("/user/session").request().delete();
+        final Response logout = appLdap.target("/user/session").request().delete();
         // TODO should be 204: https://github.com/pac4j/pac4j/issues/701
         assertThat(logout.getStatus()).isEqualTo(200);
 
-        final Response getWrong = this.appLdap.target("/user/session").request().get();
+        final Response getWrong = appLdap.target("/user/session").request().get();
         assertThat(getWrong.getStatus()).isEqualTo(401);
     }
 }
