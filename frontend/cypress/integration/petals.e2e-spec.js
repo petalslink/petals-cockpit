@@ -1,6 +1,8 @@
 import { PETALS_DOM, PETALS_TREE_DOM, BIP_DOM } from '../support/petals.dom';
 import { WORKSPACE_DOM } from '../support/workspace.dom';
 import { MESSAGE_DOM } from '../support/message.dom';
+import { PETALS_COCKPIT_DOM } from '../support/petals-cockpit.dom';
+import { WORKSPACES_LIST_DOM } from '../support/workspaces.dom';
 
 describe(`Petals`, () => {
   const expectedTreeNames = [
@@ -129,6 +131,29 @@ describe(`Petals`, () => {
     cy.expectPetalsTreeToBe(treeWithCont0Folded);
 
     cy.unfoldElementInTree(`container`, `Cont 0`);
+
+    cy.expectPetalsTreeToBe(expectedTreeNames);
+  });
+
+  it(`should reset search bar if we go to other location than the workspace of the search`, () => {
+    cy.login('admin', 'admin');
+
+    cy.get(PETALS_DOM.inputs.search).type(`Comp 0`);
+
+    cy.expectPetalsTreeToBe(availableBusesFilteredComp0);
+
+    cy.get(PETALS_COCKPIT_DOM.buttons.goToAdminPage).click();
+
+    cy.get(PETALS_COCKPIT_DOM.buttons.logo).click();
+
+    cy
+      .get(WORKSPACES_LIST_DOM.texts.workspaceName)
+      .contains(`Workspace 0`)
+      .click();
+
+    cy.expectLocationToBe(`/workspaces/idWks0`);
+
+    cy.get(PETALS_DOM.inputs.search).should('be.empty');
 
     cy.expectPetalsTreeToBe(expectedTreeNames);
   });

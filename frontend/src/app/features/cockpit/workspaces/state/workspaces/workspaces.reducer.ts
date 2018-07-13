@@ -307,13 +307,11 @@ export namespace WorkspacesReducer {
       return {
         ...removeById(table, table.selectedWorkspaceId),
         selectedWorkspaceId: '',
+        searchPetals: '',
         isSelectedWorkspaceDeleted: false,
       };
     } else {
-      return {
-        ...table,
-        selectedWorkspaceId: '',
-      };
+      return { ...table, selectedWorkspaceId: '', searchPetals: '' };
     }
   }
 
