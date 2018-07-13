@@ -31,6 +31,9 @@ variables:
     key: mvn-java-8
     paths:
       - $M2_CACHED_REPOSITORY
+  tags:
+    - docker
+
 
 .node-6: &node-java-yarn
   image: registry.gitlab.com/linagora/node-java-yarn-docker:n9-j8
@@ -48,6 +51,9 @@ variables:
     key: node-yarn
     paths:
       - $YARN_CACHE_DIRECTORY
+  tags:
+    - docker
+
 
 pages:
   image: alpine:3.6
@@ -68,6 +74,9 @@ pages:
     expire_in: 1 day
     paths:
       - public
+  tags:
+    - docker
+
 
 build-backend:
   <<: *mvn-java-8
@@ -88,6 +97,9 @@ build-backend:
     paths:
       - backend-apidocs
       - $M2_STAGING_DIRECTORY
+  tags:
+    - docker
+
 
 test-frontend:
   <<: *node-java-yarn
@@ -118,6 +130,9 @@ test-frontend:
   # Protractor tests are unstable and may fail unexpectedly
   # this workaround has to be removed once we stop relying on protractor
   retry: 1
+  tags:
+    - docker
+
 
 build-frontend:
   <<: *node-java-yarn
@@ -136,6 +151,9 @@ build-frontend:
     expire_in: 1 week
     paths:
       - frontend-dist
+  tags:
+    - docker
+
 
 build-frontend-pages:
   <<: *node-java-yarn
@@ -152,6 +170,9 @@ build-frontend-pages:
     expire_in: 1 day
     paths:
       - frontend-demo
+  tags:
+    - docker
+
 
 .build-product: &build-product
   <<: *mvn-java-8
@@ -167,6 +188,9 @@ build-frontend-pages:
     # see https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/issues/1664
     - echo $COCKPIT_VERSION > version.txt
     - mv cockpit/target/dist petals-cockpit-$COCKPIT_VERSION
+  tags:
+    - docker
+
 
 release-product:
   <<: *build-product
@@ -176,6 +200,9 @@ release-product:
     name: petals-cockpit-$(cat version.txt)
     paths:
       - petals-cockpit-*
+  tags:
+    - docker
+
 
 package-product-master:
   <<: *build-product
@@ -185,6 +212,9 @@ package-product-master:
     name: petals-cockpit-$(cat version.txt)-${CI_BUILD_REF:0:7}
     paths:
       - petals-cockpit-*
+  tags:
+    - docker
+
 
 package-product:
   <<: *build-product
@@ -201,6 +231,9 @@ package-product:
     name: petals-cockpit-$(cat version.txt)-${CI_BUILD_REF:0:7}
     paths:
       - petals-cockpit-*
+  tags:
+    - docker
+
 
 #electron tests always fail for now
 #see: https://github.com/cypress-io/cypress/issues/1242
@@ -221,6 +254,9 @@ package-product:
   after_script:
     - kill -9 $(cat pid-nohup.txt)
     - rm pid-nohup.txt
+  tags:
+    - docker
+
 
 chromium-cypress:
   <<: *node-java-yarn
@@ -239,6 +275,9 @@ chromium-cypress:
   after_script:
     - kill -9 $(cat pid-nohup.txt)
     - rm pid-nohup.txt
+  tags:
+    - docker
+
 
 e2e-product:
   <<: *node-java-yarn
@@ -277,6 +316,9 @@ e2e-product:
     paths:
     - e2e/logs/
   retry: 1
+  tags:
+    - docker
+
 
 ### Test gitlab ci
 
