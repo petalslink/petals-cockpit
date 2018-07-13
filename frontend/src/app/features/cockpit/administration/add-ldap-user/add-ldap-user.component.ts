@@ -27,7 +27,6 @@ import { combineLatest, Observable, Subject } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
-  filter,
   map,
   takeUntil,
   tap,
@@ -84,13 +83,14 @@ export class AddLdapUserComponent implements OnInit, OnDestroy {
     this.addLdapUserForm
       .get('userSearchCtrl')
       .valueChanges.pipe(
-        filter((val: string) => {
-          return val.trim().length >= 0;
-        }),
         debounceTime(300),
         distinctUntilChanged(),
         tap(val => {
-          this.store$.dispatch(new Users.FetchLdapUsers(val));
+          if (val.trim().length > 0) {
+            this.store$.dispatch(new Users.FetchLdapUsers(val));
+          } else {
+            this.store$.dispatch(new Users.CleanLdapUsers());
+          }
           this.formErrors = getFormErrors(
             this.addLdapUserForm,
             this.formErrors
@@ -105,7 +105,7 @@ export class AddLdapUserComponent implements OnInit, OnDestroy {
       this.store$.select(state => state.users.byId)
     ).pipe(
       map(([ldapSearchList, localUsers]) => {
-        ldapSearchList.filter(ldapItem => !!localUsers[ldapItem.id]);
+        ldapSearchList.filter(ldapItem => !!localUsers[ldapItem.username]);
 
         return ldapSearchList;
       })

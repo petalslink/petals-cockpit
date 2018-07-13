@@ -20,51 +20,51 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <mat-form-field class="margin-right-x1" appearance="fill" fxFlex fxFlex.md="50%" fxFlex.sm="50%">
           <mat-label>Add a user from LDAP</mat-label>
 
-          <input 
-            matInput 
-            type="text" 
-            [matAutocomplete]="autocompleteLdapUsers" 
-            formControlName="userSearchCtrl" 
+          <input
+            matInput
+            type="text"
+            [matAutocomplete]="autocompleteLdapUsers"
+            formControlName="userSearchCtrl"
             [errorStateMatcher]="matcher"
-            required 
+            required
           >
 
           <mat-error *ngIf="formErrors.userSearchCtrl">
             {{ formErrors.userSearchCtrl }}
           </mat-error>
-  
+
           <mat-autocomplete #autocompleteLdapUsers>
-            <mat-option 
+            <mat-option
               *ngIf="addLdapUserForm.get('userSearchCtrl').value !== '' && !formErrors.userSearchCtrl"
               disabled
             >
-              <mat-spinner 
-                *ngIf="isFetchingLdapUsers$ | async; else msgOption" 
-                class="margin-right-x1" 
-                [diameter]="16" 
+              <mat-spinner
+                *ngIf="isFetchingLdapUsers$ | async; else msgOption"
+                class="margin-right-x1"
+                [diameter]="16"
                 [strokeWidth]="1"
               ></mat-spinner>
               <ng-template #msgOption>
-                <small class="msg-option">                  
+                <small class="msg-option">
                   {{ (filteredUsers$ | async).length | i18nPlural: msgOptMapping }}
                 </small>
               </ng-template>
             </mat-option>
 
             <div *ngIf="(isFetchingLdapUsers$ | async) === false">
-              <mat-option *ngFor="let user of filteredUsers$ | async" [value]="user.id" class="option-ldap-user-content">
-                <span 
+              <mat-option *ngFor="let user of filteredUsers$ | async" [value]="user.username" class="option-ldap-user-content">
+                <span
                   class="ldap-user-name"
                   classToApply="bold"
-                  appColorSearchedLetters 
-                  [text]="user.name" 
+                  appColorSearchedLetters
+                  [text]="user.name"
                   [search]="addLdapUserForm.get('userSearchCtrl').value"
                 ></span> |
                 <small
                   class="ldap-user-id"
-                  classToApply="bold" 
-                  appColorSearchedLetters 
-                  [text]="user.id" 
+                  classToApply="bold"
+                  appColorSearchedLetters
+                  [text]="user.username"
                   [search]="addLdapUserForm.get('userSearchCtrl').value"
                 ></small>
               </mat-option>

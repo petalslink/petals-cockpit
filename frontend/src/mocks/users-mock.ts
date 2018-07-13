@@ -21,40 +21,19 @@ import {
   IUserBackend,
   IUserNew,
 } from '@shared/services/users.service';
-import { IUser } from '@shared/state/users.interface';
+import { IUserLDAP } from '@shared/state/users.interface';
 
 export class BackendUser {
   private static cpt = 0;
   private static readonly users = new Map<string, BackendUser>();
-  private static readonly usersLdap: IUser[] = [
-    {
-      id: 'alagane',
-      name: 'Alexandre LAGANE',
-    },
-    {
-      id: 'psouquet',
-      name: 'Pierre SOUQUET',
-    },
-    {
-      id: 'vzurczak',
-      name: 'Vincent ZURCZAK',
-    },
-    {
-      id: 'sgarcia',
-      name: 'Sébastien GARCIA',
-    },
-    {
-      id: 'jcabannes',
-      name: 'Jordy CABANNES',
-    },
-    {
-      id: 'avigier',
-      name: 'Albin VIGIER',
-    },
-    {
-      id: 'yhoupert',
-      name: 'Yoann HOUPERT',
-    },
+  private static readonly usersLdap: IUserLDAP[] = [
+    { username: 'alagane', name: 'Alexandre LAGANE' },
+    { username: 'psouquet', name: 'Pierre SOUQUET' },
+    { username: 'vzurczak', name: 'Vincent ZURCZAK' },
+    { username: 'sgarcia', name: 'Sébastien GARCIA' },
+    { username: 'jcabannes', name: 'Jordy CABANNES' },
+    { username: 'avigier', name: 'Albin VIGIER' },
+    { username: 'yhoupert', name: 'Yoann HOUPERT' },
   ];
 
   public readonly id: string;
@@ -77,7 +56,7 @@ export class BackendUser {
       const lowerSearch = search.toLowerCase();
       return this.usersLdap.filter(
         u =>
-          u.id.toLowerCase().includes(lowerSearch) ||
+          u.username.toLowerCase().includes(lowerSearch) ||
           u.name.toLowerCase().includes(lowerSearch)
       );
     } else {
