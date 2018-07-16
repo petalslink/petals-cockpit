@@ -16,17 +16,28 @@
  */
 package org.ow2.petals.cockpit.server.rules;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.pac4j.ldap.test.tools.LdapServer;
+import org.ow2.petals.cockpit.server.mocks.MockLdapServer;
+import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
 
 import io.dropwizard.testing.ConfigOverride;
 
 public class CockpitLdapApplicationRule extends CockpitApplicationRule {
 
-    public final LdapServer ldapServer = new LdapServer();
+    public final MockLdapServer ldapServer = new MockLdapServer();
+
+    private Collection<NewUser> users = new ArrayList<NewUser>();
+
+    public CockpitLdapApplicationRule(Collection<NewUser> ldapUsers, ConfigOverride... configOverrides) {
+        super("application-tests-ldap.yml", configOverrides);
+        users = ldapUsers;
+    }
 
     public CockpitLdapApplicationRule(ConfigOverride... configOverrides) {
         super("application-tests-ldap.yml", configOverrides);
@@ -42,6 +53,7 @@ public class CockpitLdapApplicationRule extends CockpitApplicationRule {
 
         final TestRule ldapServerAround = RulesHelper.around(() -> {
             ldapServer.start();
+            ldapServer.addUsers(users);
         }, () -> {
             ldapServer.stop();
         });

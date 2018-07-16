@@ -27,21 +27,19 @@ import org.junit.Rule;
 import org.ow2.petals.cockpit.server.AbstractTest;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
+import org.ow2.petals.cockpit.server.mocks.MockLdapServer;
 import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
 import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
 import org.ow2.petals.cockpit.server.rules.CockpitLdapApplicationRule;
-import org.pac4j.core.util.TestsConstants;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class AbstractLdapTest extends AbstractTest {
 
     @SuppressWarnings("null")
-    public static final NewUser USER_LDAP_DB = new NewUser(TestsConstants.GOOD_USERNAME, TestsConstants.PASSWORD,
-            TestsConstants.FIRSTNAME_VALUE);
+    public static final NewUser USER_LDAP_DB = MockLdapServer.LDAP_USER1;
 
     @SuppressWarnings("null")
-    public static final NewUser USER_LDAP_NODB = new NewUser(TestsConstants.GOOD_USERNAME2, TestsConstants.PASSWORD,
-            TestsConstants.GOOD_USERNAME2);
+    public static final NewUser USER_LDAP_NODB = MockLdapServer.LDAP_USER2;
 
     public static final NewUser USER_NOLDAP_DB = new NewUser("user", "userpass", "Normal user");
 
@@ -57,9 +55,9 @@ public class AbstractLdapTest extends AbstractTest {
         addUser(USER_NOLDAP_DB, false);
     }
 
-    
+
     protected Response login(Authentication auth) {
-        return this.appLdap.target("/user/session").request()
+        return appLdap.target("/user/session").request()
                 // we need another object because we can have subclasses passed to this method
                 .post(Entity.json(new Authentication(auth.username, auth.password)));
     }
