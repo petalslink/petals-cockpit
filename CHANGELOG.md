@@ -1,3 +1,18 @@
+<a name="0.25.0"></a>
+# [0.25.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.24.0...v0.25.0) (2018-07-16)
+
+
+### Bug Fixes
+
+* **frontend:** clean workspace store to reset petals search bar ([c9a19e2](https://gitlab.com/linagora/petals-cockpit/commit/c9a19e2)), closes [#501](https://gitlab.com/linagora/petals-cockpit/issues/501)
+
+
+### Features
+
+* **backend:** automatically add user to db in ldap mode ([9db91df](https://gitlab.com/linagora/petals-cockpit/commit/9db91df))
+
+
+
 <a name="0.24.0"></a>
 # [0.24.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.23.0...v0.24.0) (2018-06-26)
 
