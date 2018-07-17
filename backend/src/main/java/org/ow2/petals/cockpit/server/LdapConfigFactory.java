@@ -16,29 +16,51 @@
  */
 package org.ow2.petals.cockpit.server;
 
-import org.eclipse.jdt.annotation.Nullable;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LdapConfigFactory {
 
-    @Nullable
-    private String url = null;
+    @Valid
+    @NotNull
+    @NotEmpty
+    private String url;
 
-    @Nullable
-    private String usersDn = null;
+    @Valid
+    @NotNull
+    @NotEmpty
+    private String usersDn;
 
-    @Nullable
-    private String usernameAttribute = null;
+    @Valid
+    @NotNull
+    @NotEmpty
+    private String usernameAttribute = "uid";
 
-    @Nullable
-    private String nameAttribute = null;
+    @Valid
+    @NotNull
+    @NotEmpty
+    private String nameAttribute = "cn";
 
-    @Nullable
-    private String passwordAttribute = null;
+    @Valid
+    @NotNull
+    @NotEmpty
+    private String passwordAttribute = "userPassword";
+
+    @Valid
+    @NotNull
+    @NotEmpty
+    private String principalDn;
+
+    @Valid
+    @NotNull
+    @NotEmpty
+    private String principalPassword;
 
     @JsonProperty
-    @Nullable
     public String getUrl() {
         return url;
     }
@@ -49,29 +71,26 @@ public class LdapConfigFactory {
     }
 
     @JsonProperty
-    @Nullable
     public String getUsersDn() {
         return usersDn;
     }
 
     @JsonProperty
-    public void setUsersDn(String formatDn) {
-        this.usersDn = formatDn;
+    public void setUsersDn(String usersDn) {
+        this.usersDn = usersDn;
     }
 
     @JsonProperty
-    @Nullable
     public String getUsernameAttribute() {
         return usernameAttribute;
     }
 
     @JsonProperty
-    public void setUsernameAttribute(String userNameAttribute) {
-        this.usernameAttribute = userNameAttribute;
+    public void setUsernameAttribute(String usernameAttribute) {
+        this.usernameAttribute = usernameAttribute;
     }
 
     @JsonProperty
-    @Nullable
     public String getNameAttribute() {
         return nameAttribute;
     }
@@ -82,7 +101,6 @@ public class LdapConfigFactory {
     }
 
     @JsonProperty
-    @Nullable
     public String getPasswordAttribute() {
         return passwordAttribute;
     }
@@ -92,8 +110,23 @@ public class LdapConfigFactory {
         this.passwordAttribute = passwordAttribute;
     }
 
-    public boolean isConfigurationValid() {
-        return url != null && !url.isEmpty() && usersDn != null && !usersDn.isEmpty() && usernameAttribute != null
-                && !usernameAttribute.isEmpty();
+    @JsonProperty
+    public String getPrincipalDn() {
+        return principalDn;
+    }
+
+    @JsonProperty
+    public void setPrincipalDn(String principalDn) {
+        this.principalDn = principalDn;
+    }
+
+    @JsonProperty
+    public String getPrincipalPassword() {
+        return principalPassword;
+    }
+
+    @JsonProperty
+    public void setPrincipalPassword(String principalPassword) {
+        this.principalPassword = principalPassword;
     }
 }

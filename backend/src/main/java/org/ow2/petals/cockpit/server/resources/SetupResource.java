@@ -80,15 +80,14 @@ public class SetupResource {
             throw new NotFoundException("Petals Cockpit is already setup");
         }
 
-        final boolean isLdapMode = config.getLDAPConfigFactory() != null
-                ? config.getLDAPConfigFactory().isConfigurationValid()
-                : false;
-        
+        final boolean isLdapMode = config.getLdapConfigFactory() != null;
+
         try {
             DSL.using(jooq).transaction(c -> {
-                DSL.using(c).executeInsert(new UsersRecord(setup.username,
-                        CockpitAuthenticator.passwordEncoder.encode(setup.password), setup.name, null, true,
-                        isLdapMode));
+                DSL.using(c)
+                        .executeInsert(new UsersRecord(setup.username,
+                                CockpitAuthenticator.passwordEncoder.encode(setup.password), setup.name, null, true,
+                                isLdapMode));
 
                 if (!userCreated.compareAndSet(false, true)) {
                     // this will rollback the transaction and cancel the insert

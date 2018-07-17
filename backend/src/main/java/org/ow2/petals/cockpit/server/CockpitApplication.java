@@ -36,6 +36,7 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource;
 import org.ow2.petals.cockpit.server.resources.ContainersResource;
 import org.ow2.petals.cockpit.server.resources.EndpointsResource;
 import org.ow2.petals.cockpit.server.resources.InterfacesResource;
+import org.ow2.petals.cockpit.server.resources.LdapResource;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource;
 import org.ow2.petals.cockpit.server.resources.ServicesResource;
@@ -45,6 +46,7 @@ import org.ow2.petals.cockpit.server.resources.UserSession;
 import org.ow2.petals.cockpit.server.resources.UsersResource;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource;
+import org.ow2.petals.cockpit.server.services.LdapService;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
 import org.ow2.petals.cockpit.server.services.WorkspacesService;
@@ -151,6 +153,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
                 bind(PetalsAdmin.class).to(PetalsAdmin.class).in(Singleton.class);
                 bind(adminConsoleToken).to(String.class).named(SetupResource.ADMIN_TOKEN);
                 bind(WorkspaceDbOperations.class).to(WorkspaceDbOperations.class).in(Singleton.class);
+                bind(LdapService.class).to(LdapService.class).in(Singleton.class);
             }
         });
 
@@ -163,13 +166,13 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         });
 
         // Check if LDAP config is set
-        final LdapConfigFactory ldapc = configuration.getLDAPConfigFactory();
-        if (ldapc.isConfigurationValid()) {
+        final LdapConfigFactory ldapc = configuration.getLdapConfigFactory();
+        if (ldapc != null) {
             LOG.info("Valid LDAP configuration found.");
             LOG.debug(
-                    "\nurl = {},\nusersDn = {},\nusernameAttribute = {},\nnameAttribute = {},\npasswordAttribute = {}",
-                    ldapc.getUrl(), ldapc.getUsersDn(),
-                    ldapc.getUsernameAttribute(), ldapc.getNameAttribute(), ldapc.getPasswordAttribute());
+                    "\nurl = {},\nusersDn = {},\nusernameAttribute = {},\nnameAttribute = {},\npasswordAttribute = {},\nprincipalDn = {},\nprincipalPassword is set",
+                    ldapc.getUrl(), ldapc.getUsersDn(), ldapc.getUsernameAttribute(), ldapc.getNameAttribute(),
+                    ldapc.getPasswordAttribute(), ldapc.getPrincipalDn());
             CockpitAuthClient.setLdapConfiguration(ldapc);
         } else {
             LOG.info("No valid LDAP configuration found.");
@@ -191,6 +194,9 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         environment.jersey().register(InterfacesResource.class);
         environment.jersey().register(SetupResource.class);
         environment.jersey().register(UsersResource.class);
+        if (ldapc != null) {
+            environment.jersey().register(LdapResource.class);
+        }
 
         if (!DSL.using(jooqConf).fetchExists(USERS, USERS.ADMIN.eq(true))) {
             environment.lifecycle().addServerLifecycleListener(new ServerLifecycleListener() {

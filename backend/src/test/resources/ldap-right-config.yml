@@ -12,7 +12,7 @@ server:
 
 database:
   driverClass: org.h2.Driver
-  # url is set by test
+  url: url
     
 logging:
   loggers:
@@ -25,5 +25,5 @@ ldapConfig:
   usernameAttribute: cn
   nameAttribute: sn
   passwordAttribute: userPassword
-  principalDn: cn=bind,ou=people,dc=example,dc=com
-  principalPassword: bindpass
+  principalDn: uid=admin,ou=people,dc=example,dc=com
+  principalPassword: azerty123
