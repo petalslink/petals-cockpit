@@ -28,18 +28,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 import org.junit.Test;
+import org.ow2.petals.cockpit.server.mocks.MockLdapServer;
 import org.ow2.petals.cockpit.server.resources.LdapResource.LdapUser;
+import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
+import org.ow2.petals.cockpit.server.resources.UsersResource.UpdateUser;
 import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
 
 public class LdapUserResourceTest extends AbstractLdapTest {
 
     @Test
-    public void testLdapGetUsersOneResult() {
-        login(USER_LDAP_DB);
+    public void ldapGetUsersOneResult() {
+        login(ADMIN_LDAP_DB);
         List<LdapUser> users = appLdap.target("/ldap/users?name=bonjour").request()
                 .get(new GenericType<List<LdapUser>>() {
                 });
@@ -50,8 +54,8 @@ public class LdapUserResourceTest extends AbstractLdapTest {
     }
 
     @Test
-    public void testLdapGetUsersMultipleResults() {
-        login(USER_LDAP_DB);
+    public void ldapGetUsersMultipleResults() {
+        login(ADMIN_LDAP_DB);
         List<LdapUser> users = appLdap.target("/ldap/users?name=user").request().get(new GenericType<List<LdapUser>>() {
         });
 
@@ -61,8 +65,8 @@ public class LdapUserResourceTest extends AbstractLdapTest {
     }
 
     @Test
-    public void testLdapGetUsersNoResult() {
-        login(USER_LDAP_DB);
+    public void ldapGetUsersNoResult() {
+        login(ADMIN_LDAP_DB);
         List<LdapUser> users = appLdap.target("/ldap/users?name=alexandre").request()
                 .get(new GenericType<List<LdapUser>>() {
                 });
@@ -72,23 +76,118 @@ public class LdapUserResourceTest extends AbstractLdapTest {
     }
 
     @Test
-    public void testLdapGetUsersNoParameter() {
-        login(USER_LDAP_DB);
+    public void ldapGetUsersNoParameter() {
+        login(ADMIN_LDAP_DB);
         Response get = appLdap.target("/ldap/users").request().get();
-        assertThat(get.getStatus()).isEqualTo(400); // bad request
+        assertThat(get.getStatus()).isEqualTo(400); // Bad request
     }
 
     @Test
-    public void testLdapGetUsersEmptyName() {
-        login(USER_LDAP_DB);
+    public void ldapGetUsersEmptyName() {
+        login(ADMIN_LDAP_DB);
         Response get = appLdap.target("/ldap/users?name=").request().get();
-        assertThat(get.getStatus()).isEqualTo(400); // bad request
+        assertThat(get.getStatus()).isEqualTo(400); // Bad request
     }
 
     @Test
-    public void testLdapGetUsersInjection() {
-        login(USER_LDAP_DB);
+    public void ldapGetUsersInjection() {
+        login(ADMIN_LDAP_DB);
         Response get = appLdap.target("/ldap/users?name=)(cn=").request().get();
-        assertThat(get.getStatus()).isEqualTo(400); // bad request
+        assertThat(get.getStatus()).isEqualTo(400); // Bad request
     }
+
+    @Test
+    public void ldapGetUsersNotAdminForbidden() {
+        addUser(USER_LDAP_NODB, false);
+        login(USER_LDAP_NODB);
+        Response get = appLdap.target("/ldap/users?name=user").request().get();
+        assertThat(get.getStatus()).isEqualTo(403); // Forbidden
+    }
+
+    @Test
+    public void ldapAddUser() {
+        login(ADMIN_LDAP_DB);
+        final String username = USER_LDAP_NODB.username;
+
+        Response post = appLdap.target("/users").request().post(Entity.json(USER_LDAP_NODB));
+        assertThat(post.getStatus()).isEqualTo(204); // Success: No content
+
+        assertThatDbUser(username);
+        assertThatDbUser(username).value("name").isEqualTo(USER_LDAP_NODB.name);
+        assertThatDbUser(username).value("password").isNotEqualTo(USER_LDAP_NODB.password);
+        assertThat(isUserPasswordWhenEncoded(username, USER_LDAP_NODB.password)).isFalse();
+        assertThatDbUser(username).value("admin").isEqualTo(false);
+        assertThatDbUser(username).value("is_from_ldap").isEqualTo(true);
+    }
+
+    @Test
+    public void ldapAddUserUsernameOnly() {
+        login(ADMIN_LDAP_DB);
+        final String username = USER_LDAP_NODB.username;
+
+        Response post = appLdap.target("/users").request().post(Entity.json(new NewUser(username, null, null)));
+        assertThat(post.getStatus()).isEqualTo(204); // Success: No content
+
+        assertThatDbUser(username);
+        assertThatDbUser(username).value("name").isEqualTo(USER_LDAP_NODB.name);
+        assertThatDbUser(username).value("password").isNotEqualTo(USER_LDAP_NODB.password);
+        assertThat(isUserPasswordWhenEncoded(username, USER_LDAP_NODB.password)).isFalse();
+        assertThatDbUser(username).value("admin").isEqualTo(false);
+        assertThatDbUser(username).value("is_from_ldap").isEqualTo(true);
+    }
+
+    @Test
+    public void ldapAddUserNotLdap() {
+        login(ADMIN_LDAP_DB);
+
+        Response post = appLdap.target("/users").request().post(Entity.json(USER_NOLDAP_NODB));
+        assertThat(post.getStatus()).isEqualTo(409); // Conflict
+
+        assertThat(userIsInDb(USER_NOLDAP_NODB.username)).isFalse();
+    }
+
+    @Test
+    public void ldapAddUserAlreadyInDb() {
+        login(ADMIN_LDAP_DB);
+
+        Response post = appLdap.target("/users").request().post(Entity.json(ADMIN_LDAP_DB));
+        assertThat(post.getStatus()).isEqualTo(409); // Conflict
+    }
+
+    @Test
+    public void ldapAddUserNonAdmin() {
+        addUser(USER_LDAP_NODB, false);
+        login(USER_LDAP_NODB);
+
+        Response post = appLdap.target("/users").request().post(Entity.json(MockLdapServer.LDAP_USER3));
+        assertThat(post.getStatus()).isEqualTo(403); // Forbidden
+
+        assertThat(userIsInDb(MockLdapServer.LDAP_USER3.username)).isFalse();
+    }
+
+    @Test
+    public void ldapChangeUserForbidden() {
+        addUser(USER_LDAP_NODB, false);
+        login(ADMIN_LDAP_DB);
+
+        final String username = USER_LDAP_NODB.username;
+        final String name = USER_LDAP_NODB.name;
+        final String password = USER_LDAP_NODB.password;
+        final String newName = "New User Name";
+        final String newPassword = "New Password";
+
+        Response put = appLdap.target("/users/" + username).request()
+                .put(Entity.json(new UpdateUser(newPassword, newName)));
+        assertThat(put.getStatus()).isEqualTo(405); // Method not allowed
+
+        assertThatDbUser(username);
+        assertThatDbUser(username).value("name").isEqualTo(name);
+        assertThatDbUser(username).value("password").isNotEqualTo(password);
+        assertThatDbUser(username).value("password").isNotEqualTo(newPassword);
+        assertThat(isUserPasswordWhenEncoded(username, password)).isFalse();
+        assertThat(isUserPasswordWhenEncoded(username, newPassword)).isFalse();
+        assertThatDbUser(username).value("admin").isEqualTo(false);
+        assertThatDbUser(username).value("is_from_ldap").isEqualTo(true);
+    }
+
 }

@@ -137,7 +137,8 @@ public class UsersResource {
     public void update(@NotEmpty @PathParam("username") String username, @Valid UpdateUser user) {
 
         if (ldapConfig != null) {
-            throw new WebApplicationException(Status.FORBIDDEN);
+            throw new WebApplicationException("Method not allowed: cannot edit users in LDAP mode",
+                    Status.METHOD_NOT_ALLOWED);
         }
 
         UsersRecord r = new UsersRecord();

@@ -37,7 +37,7 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
             assertThat(login.getStatus()).isEqualTo(200);
         }
 
-        final Response get = this.app.target(target).request().method(method, entity);
+        final Response get = app.target(target).request().method(method, entity);
         assertThat(get.getStatus()).isEqualTo(expectedStatus);
     }
 
@@ -108,4 +108,17 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
         addUser("user1");
         can(USER, "/users/user1", HttpMethod.PUT, Entity.json(new UpdateUser(null, null)), 403);
     }
+
+    @Test
+    public void adminCanTGetLdapUserList() {
+        addUser("user1");
+        can(ADMIN, "/ldap/users?name=user", HttpMethod.GET, null, 404);
+    }
+
+    @Test
+    public void userCanTGetLdapUserList() {
+        addUser("user1");
+        can(USER, "/ldap/users?name=user", HttpMethod.GET, null, 404);
+    }
+
 }

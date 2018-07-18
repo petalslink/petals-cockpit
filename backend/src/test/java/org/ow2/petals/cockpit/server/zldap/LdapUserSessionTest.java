@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import javax.ws.rs.core.Response;
 
 import org.junit.Test;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
 import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
 
@@ -42,35 +43,35 @@ import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
 public class LdapUserSessionTest extends AbstractLdapTest {
 
     @Test
-    public void testLdapProtectedUserSucceedAfterLogin() {
+    public void ldapProtectedUserSucceedAfterLogin() {
         final Response get = appLdap.target("/user").request().get();
         assertThat(get.getStatus()).isEqualTo(401);
 
-        final CurrentUser login = login(USER_LDAP_DB).readEntity(CurrentUser.class);
-        assertMatches(login, USER_LDAP_DB, true);
+        final CurrentUser login = login(ADMIN_LDAP_DB).readEntity(CurrentUser.class);
+        assertMatches(login, ADMIN_LDAP_DB, true);
 
         final CurrentUser get2 = appLdap.target("/user").request().get(CurrentUser.class);
-        assertMatches(get2, USER_LDAP_DB, true);
+        assertMatches(get2, ADMIN_LDAP_DB, true);
 
         final CurrentUser get3 = appLdap.target("/user/session").request().get(CurrentUser.class);
-        assertMatches(get3, USER_LDAP_DB, true);
+        assertMatches(get3, ADMIN_LDAP_DB, true);
     }
 
     @Test
-    public void testLdapLoginWrongPassword() {
-        final Response login = login(new Authentication(USER_LDAP_DB.username, "oops"));
+    public void ldapLoginWrongPassword() {
+        final Response login = login(new Authentication(ADMIN_LDAP_DB.username, "oops"));
         assertThat(login.getStatus()).isEqualTo(401);
     }
 
     @Test
-    public void testLdapLoginNotAdmin() {
+    public void ldapLoginNotAdmin() {
         this.addUser(USER_LDAP_NODB, false);
         final CurrentUser login = login(USER_LDAP_NODB).readEntity(CurrentUser.class);
         assertMatches(login, USER_LDAP_NODB, false);
     }
 
     @Test
-    public void testLdapLoginUnknownUser() {
+    public void ldapLoginUnknownUser() {
         assertThat(userIsInDb(USER_NOLDAP_NODB.username)).isFalse();
         final Response login = login(USER_NOLDAP_NODB.username, USER_NOLDAP_NODB.password);
         assertThat(login.getStatus()).isEqualTo(401);
@@ -78,7 +79,7 @@ public class LdapUserSessionTest extends AbstractLdapTest {
     }
 
     @Test
-    public void testLdapLoginDbOnlyUser() {
+    public void ldapLoginDbOnlyUser() {
         assertThat(userIsInDb(USER_NOLDAP_DB.username)).isTrue();
         final Response login = login(USER_NOLDAP_DB.username, USER_NOLDAP_DB.password);
         assertThat(login.getStatus()).isEqualTo(401);
@@ -86,7 +87,7 @@ public class LdapUserSessionTest extends AbstractLdapTest {
     }
 
     @Test
-    public void testLdapLoginLdapOnlyUser() {
+    public void ldapLoginLdapOnlyUser() {
         assertThat(userIsInDb(USER_LDAP_NODB.username)).isFalse();
 
         final Response login = login(USER_LDAP_NODB);
@@ -99,24 +100,24 @@ public class LdapUserSessionTest extends AbstractLdapTest {
     }
 
     @Test
-    public void testLdapGlobalFilterWorks() {
+    public void ldapGlobalFilterWorks() {
         final Response get = appLdap.target("/workspaces").request().get();
         assertThat(get.getStatus()).isEqualTo(401);
 
-        final CurrentUser login = login(USER_LDAP_DB).readEntity(CurrentUser.class);
-        assertMatches(login, USER_LDAP_DB, true);
+        final CurrentUser login = login(ADMIN_LDAP_DB).readEntity(CurrentUser.class);
+        assertMatches(login, ADMIN_LDAP_DB, true);
 
         final Response get2 = appLdap.target("/workspaces").request().get();
         assertThat(get2.getStatus()).isEqualTo(200);
     }
 
     @Test
-    public void testLdapLogout() {
-        final CurrentUser login = login(USER_LDAP_DB).readEntity(CurrentUser.class);
-        assertMatches(login, USER_LDAP_DB, true);
+    public void ldapLogout() {
+        final CurrentUser login = login(ADMIN_LDAP_DB).readEntity(CurrentUser.class);
+        assertMatches(login, ADMIN_LDAP_DB, true);
 
         final CurrentUser get = appLdap.target("/user/session").request().get(CurrentUser.class);
-        assertMatches(get, USER_LDAP_DB, true);
+        assertMatches(get, ADMIN_LDAP_DB, true);
 
         final Response logout = appLdap.target("/user/session").request().delete();
         // TODO should be 204: https://github.com/pac4j/pac4j/issues/701
