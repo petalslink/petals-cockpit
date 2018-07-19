@@ -96,7 +96,7 @@ public class ImportBusTest extends AbstractBasicResourceTest {
         resource.petals.registerArtifact(sharedLibrary, container);
         resource.petals.registerArtifact(componentWithSL, container);
         resource.petals.registerEndpoints(referenceEndpoints);
-        
+
         resource.db().transaction(conf -> {
             DSL.using(conf).executeInsert(new WorkspacesRecord(1L, "test", ""));
             DSL.using(conf).executeInsert(new UsersWorkspacesRecord(1L, ADMIN));
@@ -121,7 +121,7 @@ public class ImportBusTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void testImportBusOk() {
+    public void importBusOk() {
         long busId;
         try (EventInput eventInput = resource.sse(1)) {
 
@@ -177,7 +177,7 @@ public class ImportBusTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void testImportBusForbidden() {
+    public void importBusForbidden() {
 
         resource.db().executeInsert(new WorkspacesRecord(2L, "test2", ""));
 
@@ -189,7 +189,7 @@ public class ImportBusTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void testImportBusNotFoundForbidden() {
+    public void importBusNotFoundForbidden() {
 
         Response post = resource.target("/workspaces/2/buses").request()
                 .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
@@ -199,7 +199,7 @@ public class ImportBusTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void testImportBusCancel() {
+    public void importBusCancel() {
         CountDownLatch doneSignal = new CountDownLatch(1);
         Container slowContainer = new Container("cont3", "host3", ImmutableMap.of(PortType.JMX, 7700), "user", "pass",
                 State.REACHABLE) {
@@ -263,7 +263,7 @@ public class ImportBusTest extends AbstractBasicResourceTest {
     }
 
     @Test
-    public void testImportBusErrorAndDelete() {
+    public void importBusErrorAndDelete() {
         String incorrectHost = "wrong-host";
         int incorrectPort = 7700;
 

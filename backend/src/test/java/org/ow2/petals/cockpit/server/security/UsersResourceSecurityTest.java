@@ -37,67 +37,67 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
             assertThat(login.getStatus()).isEqualTo(200);
         }
 
-        final Response get = this.app.target(target).request().method(method, entity);
+        final Response get = app.target(target).request().method(method, entity);
         assertThat(get.getStatus()).isEqualTo(expectedStatus);
     }
 
     @Test
-    public void testAdminCanListAllUsers() {
+    public void adminCanListAllUsers() {
         can(ADMIN, "/users", HttpMethod.GET, null, 200);
     }
 
     @Test
-    public void testUserCanListAllUsers() {
+    public void userCanListAllUsers() {
         can(USER, "/users", HttpMethod.GET, null, 200);
     }
 
     @Test
-    public void testUnloggedCanTListAllUsers() {
+    public void unloggedCanTListAllUsers() {
         can(null, "/users", HttpMethod.GET, null, 401);
     }
 
     @Test
-    public void testAdminCanGetUsers() {
+    public void adminCanGetUsers() {
         addUser("user1");
         can(ADMIN, "/users/user1", HttpMethod.GET, null, 200);
     }
 
     @Test
-    public void testUserCanTGetUsers() {
+    public void userCanTGetUsers() {
         addUser("user1");
         can(USER, "/users/user1", HttpMethod.GET, null, 403);
     }
 
     @Test
-    public void testAdminCanDeleteUsers() {
+    public void adminCanDeleteUsers() {
         addUser("user1");
         can(ADMIN, "/users/user1", HttpMethod.DELETE, null, 204);
     }
 
     @Test
-    public void testUserCanTDeleteUsers() {
+    public void userCanTDeleteUsers() {
         addUser("user1");
         can(USER, "/users/user1", HttpMethod.DELETE, null, 403);
     }
 
     @Test
-    public void testAdminCanAddUsers() {
+    public void adminCanAddUsers() {
         can(ADMIN, "/users", HttpMethod.POST, Entity.json(new NewUser("user1", "...", "...")), 204);
     }
 
     @Test
-    public void testUserCanTAddUsers() {
+    public void userCanTAddUsers() {
         can(USER, "/users", HttpMethod.POST, Entity.json(new NewUser("user1", "...", "...")), 403);
     }
 
     @Test
-    public void testAdminCanModifyUsers() {
+    public void adminCanModifyUsers() {
         addUser("user1");
         can(ADMIN, "/users/user1", HttpMethod.PUT, Entity.json(new UpdateUser(null, null)), 204);
     }
 
     @Test
-    public void testUserCanTModifyUsers() {
+    public void userCanTModifyUsers() {
         addUser("user1");
         can(USER, "/users/user1", HttpMethod.PUT, Entity.json(new UpdateUser(null, null)), 403);
     }
