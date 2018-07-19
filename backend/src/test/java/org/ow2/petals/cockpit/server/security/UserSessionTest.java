@@ -27,57 +27,57 @@ import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
 public class UserSessionTest extends AbstractSecurityTest {
 
     @Test
-    public void testProtectedUserSucceedAfterLogin() {
-        final Response get = this.app.target("/user").request().get();
+    public void protectedUserSucceedAfterLogin() {
+        final Response get = app.target("/user").request().get();
         assertThat(get.getStatus()).isEqualTo(401);
 
         final CurrentUser login = login(ADMIN).readEntity(CurrentUser.class);
         assertMatches(login, ADMIN, true);
 
-        final CurrentUser get2 = this.app.target("/user").request().get(CurrentUser.class);
+        final CurrentUser get2 = app.target("/user").request().get(CurrentUser.class);
         assertMatches(get2, ADMIN, true);
 
-        final CurrentUser get3 = this.app.target("/user/session").request().get(CurrentUser.class);
+        final CurrentUser get3 = app.target("/user/session").request().get(CurrentUser.class);
         assertMatches(get3, ADMIN, true);
     }
 
     @Test
-    public void testLoginUser() {
+    public void loginUser() {
         final CurrentUser login = login(USER).readEntity(CurrentUser.class);
         assertMatches(login, USER, false);
     }
 
     @Test
-    public void testGlobalFilterWorks() {
-        final Response get = this.app.target("/workspaces").request().get();
+    public void globalFilterWorks() {
+        final Response get = app.target("/workspaces").request().get();
         assertThat(get.getStatus()).isEqualTo(401);
 
         final CurrentUser login = login(ADMIN).readEntity(CurrentUser.class);
         assertMatches(login, ADMIN, true);
 
-        final Response get2 = this.app.target("/workspaces").request().get();
+        final Response get2 = app.target("/workspaces").request().get();
         assertThat(get2.getStatus()).isEqualTo(200);
     }
 
     @Test
-    public void testWrongLogin() {
+    public void wrongLogin() {
         final Response login = login(new Authentication("wrong", "admin"));
         assertThat(login.getStatus()).isEqualTo(401);
     }
 
     @Test
-    public void testLogout() {
+    public void logout() {
         final CurrentUser login = login(ADMIN).readEntity(CurrentUser.class);
         assertMatches(login, ADMIN, true);
 
-        final CurrentUser get = this.app.target("/user/session").request().get(CurrentUser.class);
+        final CurrentUser get = app.target("/user/session").request().get(CurrentUser.class);
         assertMatches(get, ADMIN, true);
 
-        final Response logout = this.app.target("/user/session").request().delete();
+        final Response logout = app.target("/user/session").request().delete();
         // TODO should be 204: https://github.com/pac4j/pac4j/issues/701
         assertThat(logout.getStatus()).isEqualTo(200);
 
-        final Response getWrong = this.app.target("/user/session").request().get();
+        final Response getWrong = app.target("/user/session").request().get();
         assertThat(getWrong.getStatus()).isEqualTo(401);
     }
 }

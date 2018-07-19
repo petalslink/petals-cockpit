@@ -33,7 +33,7 @@ public class SetupResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testDisabled() {
+    public void disabled() {
         addUser("a-user", true);
         Response post = resource.target("/setup").request()
                 .post(Entity.json(new UserSetup(CockpitResourceRule.ADMIN_TOKEN, "user", "pass", "name")));
@@ -42,7 +42,7 @@ public class SetupResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testForbiddenEvenIfDisabled() {
+    public void forbiddenEvenIfDisabled() {
         addUser("a-user", true);
         Response post = resource.target("/setup").request()
                 .post(Entity.json(new UserSetup("wrong", "user", "pass", "name")));
@@ -51,20 +51,20 @@ public class SetupResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testForbidden() {
+    public void forbidden() {
         Response post = resource.target("/setup").request().post(Entity.json(new UserSetup("wrong", "b", "c", "d")));
 
         assertThat(post.getStatus()).isEqualTo(403);
     }
 
     @Test
-    public void testForbiddenWithUser() {
+    public void forbiddenWithUser() {
         addUser("a-user", false);
-        testForbidden();
+        forbidden();
     }
 
     @Test
-    public void testSuccessAndGone() {
+    public void successAndGone() {
         Response post = resource.target("/setup").request()
                 .post(Entity.json(new UserSetup(CockpitResourceRule.ADMIN_TOKEN, "user", "pass", "name")));
 
@@ -79,7 +79,7 @@ public class SetupResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testUserAlreadyExists() {
+    public void userAlreadyExists() {
         addUser("a-user", false);
 
         Response post = resource.target("/setup").request()
@@ -89,8 +89,8 @@ public class SetupResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testEnabledWithUser() {
+    public void enabledWithUser() {
         addUser("a-user", false);
-        testSuccessAndGone();
+        successAndGone();
     }
 }

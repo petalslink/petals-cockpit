@@ -44,7 +44,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testListAll() {
+    public void listAll() {
         List<UserMin> users = resource.target("/users").request().get(new GenericType<List<UserMin>>() {
         });
 
@@ -56,7 +56,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testGetOne() {
+    public void getOne() {
         UserMin user = resource.target("/users/user1").request().get(UserMin.class);
 
         assertThat(user.id).isEqualTo("user1");
@@ -68,7 +68,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testDeleteUser() {
+    public void deleteUser() {
         Response delete = resource.target("/users/user1").request().delete();
         assertThat(delete.getStatus()).isEqualTo(204);
 
@@ -78,7 +78,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testDeleteUser404() {
+    public void deleteUser404() {
         Response delete = resource.target("/users/user4").request().delete();
         assertThat(delete.getStatus()).isEqualTo(404);
 
@@ -88,7 +88,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testAddUser() {
+    public void addUser() {
         String username = "user4";
         String password = "userPw";
         String name = "User Name";
@@ -105,7 +105,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testAddUserConflict() {
+    public void addUserConflict() {
         String username = "User Name";
         Response post = resource.target("/users").request().post(Entity.json(new NewUser("user1", "pw", username)));
         assertThat(post.getStatus()).isEqualTo(409);
@@ -117,13 +117,13 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testEmptyChangeUser() {
+    public void emptyChangeUser() {
         Response put = resource.target("/users/user1").request().put(Entity.json(new UpdateUser(null, null)));
         assertThat(put.getStatus()).isEqualTo(204);
     }
 
     @Test
-    public void testRenameUser() {
+    public void renameUser() {
         String newName = "New User Name";
 
         Response put = resource.target("/users/user1").request().put(Entity.json(new UpdateUser(null, newName)));
@@ -133,7 +133,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testChangePasswordUser() {
+    public void changePasswordUser() {
         String newPassword = "New Password";
 
         Response put = resource.target("/users/user1").request().put(Entity.json(new UpdateUser(newPassword, null)));
@@ -143,7 +143,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
-    public void testChangeNameAndPassword() {
+    public void changeNameAndPassword() {
         String newName = "New User Name";
         String newPassword = "New Password";
 
