@@ -151,9 +151,15 @@ export namespace Workspaces {
     constructor(public readonly payload: { id: string }) {}
   }
 
-  export const SetSearchType = '[Workspaces] Set search';
-  export class SetSearch implements Action {
-    readonly type = SetSearchType;
+  export const SetPetalsSearchType = '[Workspaces] Set petals search';
+  export class SetPetalsSearch implements Action {
+    readonly type = SetPetalsSearchType;
+    constructor(public readonly payload: { search: string }) {}
+  }
+
+  export const SetServicesSearchType = '[Workspaces] Set services search';
+  export class SetServicesSearch implements Action {
+    readonly type = SetServicesSearchType;
     constructor(public readonly payload: { search: string }) {}
   }
 

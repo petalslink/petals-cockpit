@@ -31,7 +31,10 @@ import {
 } from '@wks/state/interfaces/interfaces.interface';
 import { getInterfacesById } from '@wks/state/interfaces/interfaces.selectors';
 import { IService, IServiceRow } from '@wks/state/services/services.interface';
-import { getSelectedWorkspaceId } from '@wks/state/workspaces/workspaces.selectors';
+import {
+  getSelectedWorkspaceId,
+  getServicesSearch,
+} from '@wks/state/workspaces/workspaces.selectors';
 
 export interface IServiceOverview extends IService {
   interfaces: IInterfaceRowWithQName[];
@@ -125,13 +128,31 @@ export const getCurrentServiceTree = createSelector(
   getSelectedWorkspaceId,
   getServicesAllIds,
   getServicesById,
-  (selectedWorkspaceId, servicesAllIds, servicesByIds): TreeElement<any>[] => {
+  getServicesSearch,
+  (
+    selectedWorkspaceId,
+    servicesAllIds,
+    servicesByIds,
+    servicesSearch
+  ): TreeElement<any>[] => {
     const baseUrl = `/workspaces/${selectedWorkspaceId}/services/services`;
 
-    const servicesWithNspLocalpart = servicesAllIds.map(id => ({
-      ...findNamespaceLocalpart(servicesByIds[id].name),
-      id,
-    }));
+    const servicesSearchLower = servicesSearch.toLowerCase();
+
+    const servicesWithNspLocalpart = servicesAllIds
+      .map(id => ({
+        ...findNamespaceLocalpart(servicesByIds[id].name),
+        id,
+      }))
+      .filter(
+        serviceWithNspLocalpart =>
+          serviceWithNspLocalpart.namespace
+            .toLowerCase()
+            .indexOf(servicesSearchLower) !== -1 ||
+          serviceWithNspLocalpart.localpart
+            .toLowerCase()
+            .indexOf(servicesSearchLower) !== -1
+      );
 
     const groupedByNamespace = groupByNamespace(servicesWithNspLocalpart);
 

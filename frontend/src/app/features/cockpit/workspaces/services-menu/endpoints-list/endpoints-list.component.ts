@@ -29,6 +29,7 @@ export class EndpointsListComponent<TE extends TreeElement<TE>>
   implements OnInit {
   @Input() workspaceId: string;
   @Input() endpointsTree: TreeElement<TE>[];
+  @Input() search: string;
 
   @Output() evtEndpointSelected = new EventEmitter();
 

@@ -54,7 +54,8 @@ export namespace WorkspacesReducer {
     | Workspaces.Delete
     | Workspaces.DeleteError
     | Workspaces.DeleteSuccess
-    | Workspaces.SetSearch
+    | Workspaces.SetPetalsSearch
+    | Workspaces.SetServicesSearch
     | Workspaces.Deleted
     | Workspaces.Clean
     | Workspaces.AddUser
@@ -118,8 +119,11 @@ export namespace WorkspacesReducer {
       case Workspaces.DeleteSuccessType: {
         return deleteSuccess(table, action.payload);
       }
-      case Workspaces.SetSearchType: {
-        return setSearch(table, action.payload);
+      case Workspaces.SetPetalsSearchType: {
+        return setPetalsSearch(table, action.payload);
+      }
+      case Workspaces.SetServicesSearchType: {
+        return setServicesSearch(table, action.payload);
       }
       case Workspaces.DeletedType: {
         return deleted(table, action.payload);
@@ -256,7 +260,7 @@ export namespace WorkspacesReducer {
     });
   }
 
-  function setSearch(
+  function setPetalsSearch(
     table: IWorkspacesTable,
     payload: { search: string }
   ): IWorkspacesTable {
@@ -264,6 +268,13 @@ export namespace WorkspacesReducer {
       ...table,
       searchPetals: payload.search,
     };
+  }
+
+  function setServicesSearch(
+    table: IWorkspacesTable,
+    payload: { search: string }
+  ): IWorkspacesTable {
+    return { ...table, searchServices: payload.search };
   }
 
   function deletee(table: IWorkspacesTable, payload: { id: string }) {
@@ -308,10 +319,16 @@ export namespace WorkspacesReducer {
         ...removeById(table, table.selectedWorkspaceId),
         selectedWorkspaceId: '',
         searchPetals: '',
+        searchServices: '',
         isSelectedWorkspaceDeleted: false,
       };
     } else {
-      return { ...table, selectedWorkspaceId: '', searchPetals: '' };
+      return {
+        ...table,
+        selectedWorkspaceId: '',
+        searchPetals: '',
+        searchServices: '',
+      };
     }
   }
 
