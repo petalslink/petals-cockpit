@@ -18,15 +18,20 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  EventEmitter,
+  Input,
   OnDestroy,
   OnInit,
+  Output,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Actions } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
+  filter,
   map,
   takeUntil,
   tap,
@@ -36,6 +41,7 @@ import {
   FormErrorStateMatcher,
   getFormErrors,
 } from '@shared/helpers/form.helper';
+import { IUserNew } from '@shared/services/users.service';
 import { IStore } from '@shared/state/store.interface';
 import { Users } from '@shared/state/users.actions';
 import { IUserLDAP, IUserRow } from '@shared/state/users.interface';
@@ -65,11 +71,22 @@ export class AddLdapUserComponent implements OnInit, OnDestroy {
 
   msgOptMapping: { [k: string]: string } = {
     '=0': 'There is no user found.',
-    '=1': 'One person is matching this search.',
-    other: '# people are matching this search.',
+    '=1': '1 user is matching this search.',
+    other: '# users are matching this search.',
   };
 
-  constructor(private fb: FormBuilder, private store$: Store<IStore>) {}
+  @Input() canAdd = false;
+
+  @Output()
+  evtSubmit = new EventEmitter<
+    IUserNew | { username: string; name?: string; password?: string }
+  >();
+
+  constructor(
+    private fb: FormBuilder,
+    private store$: Store<IStore>,
+    private actions$: Actions
+  ) {}
 
   ngOnInit() {
     this.addLdapUserForm = this.fb.group({
@@ -85,9 +102,10 @@ export class AddLdapUserComponent implements OnInit, OnDestroy {
       .valueChanges.pipe(
         debounceTime(300),
         distinctUntilChanged(),
+        filter(val => val !== null),
         tap(val => {
-          if (val.trim().length > 0) {
-            this.store$.dispatch(new Users.FetchLdapUsers(val));
+          if (val) {
+            this.store$.dispatch(new Users.FetchLdapUsers(val.trim()));
           } else {
             this.store$.dispatch(new Users.CleanLdapUsers());
           }
@@ -104,12 +122,21 @@ export class AddLdapUserComponent implements OnInit, OnDestroy {
       this.store$.select(state => state.users.ldapSearchList),
       this.store$.select(state => state.users.byId)
     ).pipe(
-      map(([ldapSearchList, localUsers]) => {
-        ldapSearchList.filter(ldapItem => !!localUsers[ldapItem.username]);
-
-        return ldapSearchList;
-      })
+      map(([ldapSearchList, localUsers]) =>
+        ldapSearchList.filter(ldapItem => !localUsers[ldapItem.username])
+      )
     );
+
+    this.actions$
+      .ofType(Users.AddSuccessType)
+      .pipe(
+        takeUntil(this.onDestroy$),
+        tap(_ => {
+          this.addLdapUserForm.reset(),
+            this.store$.dispatch(new Users.CleanLdapUsers());
+        })
+      )
+      .subscribe();
   }
 
   ngOnDestroy() {
@@ -117,5 +144,14 @@ export class AddLdapUserComponent implements OnInit, OnDestroy {
     this.onDestroy$.complete();
 
     this.store$.dispatch(new Users.CleanLdapUsers());
+  }
+
+  doSubmit(username: string, name: string) {
+    const value: IUserNew = {
+      username,
+      name,
+      password: '',
+    };
+    this.evtSubmit.emit(value);
   }
 }

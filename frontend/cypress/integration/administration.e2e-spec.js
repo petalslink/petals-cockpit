@@ -181,7 +181,7 @@ describe(`Administration`, () => {
 
       cy
         .get(`.msg-option`)
-        .contains('7 people are matching this search.')
+        .contains('7 users are matching this search.')
         .should('be.visible');
 
       cy.expectLdapUsersListToBe(expected7LdapUsersName, expected7LdapUsersIds);
@@ -194,7 +194,7 @@ describe(`Administration`, () => {
 
       cy
         .get(`.msg-option`)
-        .contains('3 people are matching this search.')
+        .contains('3 users are matching this search.')
         .should('be.visible');
 
       cy.expectLdapUsersListToBe(expected3LdapUsersName, expected3LdapUsersIds);
@@ -226,7 +226,7 @@ describe(`Administration`, () => {
 
       cy
         .get(`.msg-option`)
-        .contains('One person is matching this search.')
+        .contains('1 user is matching this search.')
         .should('be.visible');
 
       cy.expectLdapUsersListToBe(['Yoann HOUPERT'], ['yhoupert']);

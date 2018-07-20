@@ -79,7 +79,9 @@ export class UsersEffects {
       catchError((err: HttpErrorResponse) => {
         if (environment.debug) {
           console.group();
-          console.warn('FetchLdapUsers');
+          console.warn(
+            'Error caught in users.effects.ts: ofType(Users.FetchLdapUsers)'
+          );
           console.error(err);
           console.groupEnd();
         }

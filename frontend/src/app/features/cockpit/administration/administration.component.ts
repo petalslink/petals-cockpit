@@ -15,7 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { filter, first, map, tap } from 'rxjs/operators';
@@ -27,6 +34,7 @@ import { isLargeScreen } from '@shared/state/ui.selectors';
 import { Users } from '@shared/state/users.actions';
 import { ICurrentUser, IUser } from '@shared/state/users.interface';
 import { getAllUsers, getCurrentUser } from '@shared/state/users.selectors';
+import { AddEditUserComponent } from './add-edit-user/add-edit-user.component';
 
 @Component({
   selector: 'app-administration',
@@ -36,10 +44,15 @@ import { getAllUsers, getCurrentUser } from '@shared/state/users.selectors';
 export class AdministrationComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
+  currentUser: ICurrentUser;
+
   users$: Observable<IUser[]>;
   user$: Observable<ICurrentUser>;
   isFetchingUsers$: Observable<boolean>;
   isLargeScreen$: Observable<boolean>;
+
+  @ViewChildren('editUser') children: QueryList<AddEditUserComponent>;
+  @ViewChild('addUser') child: AddEditUserComponent;
 
   constructor(private store$: Store<IStore>) {}
 
@@ -63,6 +76,7 @@ export class AdministrationComponent implements OnInit, OnDestroy {
 
     this.user$
       .pipe(
+        tap(currentUser => (this.currentUser = currentUser)),
         first(),
         filter(u => u.isAdmin),
         tap(() => this.store$.dispatch(new Users.FetchAll()))
@@ -75,6 +89,18 @@ export class AdministrationComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+  }
+
+  onResetAddUserForm() {
+    if (!this.currentUser.isFromLdap) {
+      this.child.reset();
+    }
+  }
+
+  onResetEditUserForm(i: number) {
+    if (!this.currentUser.isFromLdap) {
+      this.children.toArray()[i].reset();
+    }
   }
 
   onAdd(user: IUserNew) {
