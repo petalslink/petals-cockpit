@@ -23,6 +23,7 @@ import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
@@ -36,12 +37,13 @@ import io.dropwizard.lifecycle.JettyManaged;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.sourceforge.argparse4j.impl.Arguments;
+import net.sourceforge.argparse4j.inf.MutuallyExclusiveGroup;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
 /**
  * This commands adds an user to the database
- * 
+ *
  * @author vnoel, psouquet
  *
  */
@@ -57,9 +59,10 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
 
         subparser.addArgument("-u", "--username").dest("username").required(true);
         subparser.addArgument("-n", "--name").dest("name").required(true);
-        subparser.addArgument("-p", "--password").dest("password").required(true);
+        MutuallyExclusiveGroup meg = subparser.addMutuallyExclusiveGroup().required(true);
+        meg.addArgument("-p", "--password").dest("password");
+        meg.addArgument("-l", "--ldapUser").dest("ldapUser").action(Arguments.storeTrue());
         subparser.addArgument("-a", "--admin").dest("admin").action(Arguments.storeTrue());
-        subparser.addArgument("-l", "--ldapUser").dest("ldapUser").action(Arguments.storeTrue());
         subparser.addArgument("-w", "--workspacename").dest("workspaceName").required(false);
     }
 
@@ -76,19 +79,20 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         // it is required
         assert username != null;
 
-        String password = namespace.getString("password");
-        // required
-        assert password != null;
-
-        String name = namespace.getString("name");
+        final String name = namespace.getString("name");
         // required
         assert name != null;
 
-        Boolean admin = namespace.getBoolean("admin");
+        final String password = namespace.getString("password");
+
+        final Boolean ldapUser = namespace.getBoolean("ldapUser");
+        assert ldapUser != null;
+
+        final Boolean admin = namespace.getBoolean("admin");
         assert admin != null;
 
-        Boolean ldapUser = namespace.getBoolean("ldapUser");
-        assert ldapUser != null;
+        // either ldap user or user with password
+        assert ldapUser ^ password != null;
 
         String workspaceName = namespace.getString("workspaceName");
 
@@ -108,7 +112,9 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
                     System.err.println("User " + username + " already exists");
                 } else {
                     final UsersRecord userRecord = new UsersRecord(username,
-                            CockpitAuthenticator.passwordEncoder.encode(password), name, null, admin, ldapUser);
+                            password != null ? CockpitAuthenticator.passwordEncoder.encode(password)
+                                    : LdapConfigFactory.LDAP_PASSWORD,
+                            name, null, admin, ldapUser);
                     DSL.using(c).executeInsert(userRecord);
                     System.out.println("Added user " + username);
 

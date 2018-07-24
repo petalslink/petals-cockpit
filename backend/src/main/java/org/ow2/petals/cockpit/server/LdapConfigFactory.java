@@ -25,6 +25,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LdapConfigFactory {
 
+    /**
+     * This password is the default password for the ldap users in database, since their real password (from ldap) is
+     * not stored locally.
+     */
+    public final static String LDAP_PASSWORD = "";
+
     @NotBlank
     @Nullable
     private String url;
@@ -51,8 +57,8 @@ public class LdapConfigFactory {
     private String principalPassword;
 
     public String getUrl() {
-        assert this.url != null;
-        return this.url;
+        assert url != null;
+        return url;
     }
 
     @JsonProperty
@@ -61,8 +67,8 @@ public class LdapConfigFactory {
     }
 
     public String getUsersDn() {
-        assert this.usersDn != null;
-        return this.usersDn;
+        assert usersDn != null;
+        return usersDn;
     }
 
     @JsonProperty
@@ -71,8 +77,8 @@ public class LdapConfigFactory {
     }
 
     public String getUsernameAttribute() {
-        assert this.usernameAttribute != null;
-        return this.usernameAttribute;
+        assert usernameAttribute != null;
+        return usernameAttribute;
     }
 
     @JsonProperty
@@ -81,8 +87,8 @@ public class LdapConfigFactory {
     }
 
     public String getNameAttribute() {
-        assert this.nameAttribute != null;
-        return this.nameAttribute;
+        assert nameAttribute != null;
+        return nameAttribute;
     }
 
     @JsonProperty
@@ -91,8 +97,8 @@ public class LdapConfigFactory {
     }
 
     public String getPasswordAttribute() {
-        assert this.passwordAttribute != null;
-        return this.passwordAttribute;
+        assert passwordAttribute != null;
+        return passwordAttribute;
     }
 
     @JsonProperty
@@ -101,8 +107,8 @@ public class LdapConfigFactory {
     }
 
     public String getPrincipalDn() {
-        assert this.principalDn != null;
-        return this.principalDn;
+        assert principalDn != null;
+        return principalDn;
     }
 
     @JsonProperty
@@ -111,8 +117,8 @@ public class LdapConfigFactory {
     }
 
     public String getPrincipalPassword() {
-        assert this.principalPassword != null;
-        return this.principalPassword;
+        assert principalPassword != null;
+        return principalPassword;
     }
 
     @JsonProperty
