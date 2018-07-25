@@ -5,6 +5,7 @@ const bsTreeServices = `app-services-list`;
 const bsTreeEndpoints = `app-endpoints-list`;
 
 export const SERVICES_DOM = {
+  inputs: { search: `${bs} input[formcontrolname="search"]` },
   refreshBtn: `${bs} .btn-refresh-services`,
   refreshSpinner: `${bs} .wrapper-search-services mat-spinner`,
 };

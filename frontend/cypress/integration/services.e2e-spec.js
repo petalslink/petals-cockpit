@@ -1,12 +1,13 @@
 import { COMPONENT_DOM } from '../support/component.dom';
 import { SERVICES_TREE_DOM, SERVICES_DOM } from '../support/services.dom';
 import { WORKSPACE_DOM } from '../support/workspace.dom';
+import { WORKSPACES_LIST_DOM } from '../support/workspaces.dom';
+import { PETALS_COCKPIT_DOM } from '../support/petals-cockpit.dom';
 import {
   expectedInterfacesTreeWks0,
   expectedServicesTreeWks0,
   expectedEndpointsTreeWks0,
 } from '../support/helper.const';
-import { SERVICE_OVERVIEW_DOM } from '../support/service.dom';
 
 describe(`Services`, () => {
   beforeEach(() => {
@@ -305,6 +306,153 @@ describe(`Services`, () => {
       .get('app-workspace-element')
       .should('not.contain', 'This service has been removed');
   });
+
+  it('should show only searched interfaces, services and endpoints when some text is entered in search bar', () => {
+    cy.login('admin', 'admin');
+
+    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains('Workspace 0');
+
+    cy
+      .get(WORKSPACE_DOM.tabs)
+      .contains('Services')
+      .click();
+
+    cy.expectInterfacesTreeToBe(expectedInterfacesTreeWks0);
+
+    cy.expectServicesTreeToBe(expectedServicesTreeWks0);
+
+    cy.expectEndpointsTreeToBe(expectedEndpointsTreeWks0);
+
+    cy.get(SERVICES_DOM.inputs.search).type('1.0');
+
+    cy.expectInterfacesTreeToBe(expectedInterfacesTreeSearch1dot0);
+
+    cy.expectServicesTreeToBe(expectedServicesTreeSearch1dot0);
+
+    cy.expectEndpointsTreeToBe(expectedEndpointsTreeSearch1dot0);
+
+    cy
+      .get(SERVICES_DOM.inputs.search)
+      .clear()
+      .type('Localpart4');
+
+    cy.expectInterfacesTreeToBe(expectedInterfacesTreeSearchLocalpart4);
+
+    cy.expectServicesTreeToBe(expectedServicesTreeSearchLocalpart4);
+
+    cy.expectEndpointsTreeToBe(expectedEndpointsTreeSearchLocalpart4);
+
+    cy
+      .get(SERVICES_DOM.inputs.search)
+      .clear()
+      .type('01');
+
+    cy.expectInterfacesTreeToBe(expectedInterfacesTreeSearch01);
+
+    cy.expectServicesTreeToBe(expectedServicesTreeSearch01);
+
+    cy.expectEndpointsTreeToBe(expectedEndpointsTreeSearch01);
+
+    cy.get(SERVICES_DOM.inputs.search).type('23456789');
+
+    cy.expectInterfacesTreeToBe([]);
+
+    cy.expectServicesTreeToBe([]);
+
+    cy.expectEndpointsTreeToBe([]);
+
+    cy.get(SERVICES_DOM.inputs.search).clear();
+
+    cy.expectInterfacesTreeToBe(expectedInterfacesTreeWks0);
+
+    cy.expectServicesTreeToBe(expectedServicesTreeWks0);
+
+    cy.expectEndpointsTreeToBe(expectedEndpointsTreeWks0);
+  });
+
+  it('should reset services search when changing page', () => {
+    cy.login('admin', 'admin');
+
+    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains('Workspace 0');
+
+    cy
+      .get(WORKSPACE_DOM.tabs)
+      .contains('Services')
+      .click();
+
+    cy.expectInterfacesTreeToBe(expectedInterfacesTreeWks0);
+
+    cy.expectServicesTreeToBe(expectedServicesTreeWks0);
+
+    cy.expectEndpointsTreeToBe(expectedEndpointsTreeWks0);
+
+    cy.get(SERVICES_DOM.inputs.search).type('1.0');
+
+    cy.get(SERVICES_DOM.inputs.search).should('have.value', '1.0');
+
+    cy.expectInterfacesTreeToBe(expectedInterfacesTreeSearch1dot0);
+
+    cy.expectServicesTreeToBe(expectedServicesTreeSearch1dot0);
+
+    cy.expectEndpointsTreeToBe(expectedEndpointsTreeSearch1dot0);
+
+    cy.get(PETALS_COCKPIT_DOM.buttons.logo).click();
+
+    cy
+      .get(WORKSPACES_LIST_DOM.texts.workspaceName)
+      .contains(`Workspace 0`)
+      .click();
+
+    cy.get(SERVICES_DOM.inputs.search).should('not.have.value', '1.0');
+
+    cy.expectInterfacesTreeToBe(expectedInterfacesTreeWks0);
+
+    cy.expectServicesTreeToBe(expectedServicesTreeWks0);
+
+    cy.expectEndpointsTreeToBe(expectedEndpointsTreeWks0);
+  });
+
+  const expectedInterfacesTreeSearch1dot0 = [
+    'http://namespace-example.fr/interface/technique/version/1.0',
+    'Interface-Localpart0',
+    'Interface-Localpart1',
+    'http://namespace-example.fr/interface/technique/version/2.0',
+    'Interface-Localpart2',
+    'http://namespace-example.fr/interface/technique/version/3.0',
+    'Interface-Localpart3',
+    'Interface-Localpart4',
+  ];
+
+  const expectedServicesTreeSearch1dot0 = [
+    'http://namespace-example.fr/service/technique/version/1.0',
+    'Localpart0',
+    'Localpart1',
+    'http://namespace-example.fr/service/technique/version/2.0',
+    'Localpart2',
+    'http://namespace-example.fr/service/technique/version/3.0',
+    'Localpart3',
+    'Localpart4',
+  ];
+
+  const expectedEndpointsTreeSearch1dot0 = [];
+
+  const expectedInterfacesTreeSearchLocalpart4 = [
+    'http://namespace-example.fr/interface/technique/version/3.0',
+    'Interface-Localpart4',
+  ];
+
+  const expectedServicesTreeSearchLocalpart4 = [
+    'http://namespace-example.fr/service/technique/version/3.0',
+    'Localpart4',
+  ];
+
+  const expectedEndpointsTreeSearchLocalpart4 = [];
+
+  const expectedInterfacesTreeSearch01 = [];
+
+  const expectedServicesTreeSearch01 = [];
+
+  const expectedEndpointsTreeSearch01 = ['edpt-89p82661-test-31o4-l391-01'];
 
   const expectedInterfacesTreeWks1 = [
     `http://namespace-example.fr/interface/metiers/version/1.0`,

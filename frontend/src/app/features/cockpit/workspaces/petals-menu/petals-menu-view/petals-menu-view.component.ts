@@ -70,7 +70,7 @@ export class PetalsMenuViewComponent implements OnInit, OnDestroy {
         debounceTime(300),
         map(value => value.search),
         tap(search =>
-          this.store$.dispatch(new Workspaces.SetSearch({ search }))
+          this.store$.dispatch(new Workspaces.SetPetalsSearch({ search }))
         )
       )
       .subscribe();
@@ -89,7 +89,7 @@ export class PetalsMenuViewComponent implements OnInit, OnDestroy {
   }
 
   focusSearch() {
-    this.store$.dispatch(new Workspaces.SetSearch({ search: '' }));
+    this.store$.dispatch(new Workspaces.SetPetalsSearch({ search: '' }));
     this._focusSearchInput$.next(true);
   }
 

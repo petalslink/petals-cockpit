@@ -79,6 +79,10 @@ export function getCurrentWorkspaceUsers(
   return store$.select(getCurrentWorkspaceUsersById);
 }
 
+export function getServicesSearch(state: IStore): string {
+  return state.workspaces.searchServices;
+}
+
 export const getUsersNotInCurrentWorkspace = createSelector(
   getUsersAllIds,
   getUsersById,

@@ -29,6 +29,7 @@ export class InterfacesListComponent<TE extends TreeElement<TE>>
   implements OnInit {
   @Input() workspaceId: string;
   @Input() interfacesTree: TreeElement<TE>[];
+  @Input() search: string;
 
   @Output() evtInterfaceSelected = new EventEmitter();
 

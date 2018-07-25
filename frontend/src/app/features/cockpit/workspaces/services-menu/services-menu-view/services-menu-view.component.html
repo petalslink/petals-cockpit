@@ -14,10 +14,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" class="services-menu-view">
-  <div class="wrapper-search-services" fxLayout="row" fxLayoutGap="10px">
+  <div class="wrapper-search-services" fxLayout="row" fxLayoutGap="10px" [formGroup]="searchForm">
     <mat-form-field fxFlex>
-      <input class="search" matInput placeholder="Search">
-      <span matPrefix><mat-icon color="primary">search</mat-icon></span>
+      <input class="search" matInput placeholder="Search" formControlName="search">
+      <span matPrefix>
+        <mat-icon color="primary">search</mat-icon>
+      </span>
     </mat-form-field>
 
     <button
@@ -55,6 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <app-interfaces-list
           [interfacesTree]="interfacesTree$ | async"
           [workspaceId]="workspaceId"
+          [search]="search"
           (onInterfaceSelected)="closeSidenavOnSmallScreen()">
         </app-interfaces-list>
 
@@ -70,6 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <app-services-list
           [servicesTree]="servicesTree$ | async"
           [workspaceId]="workspaceId"
+          [search]="search"
           (onServiceSelected)="closeSidenavOnSmallScreen()">
         </app-services-list>
 
@@ -85,6 +89,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <app-endpoints-list
           [endpointsTree]="endpointsTree$ | async"
           [workspaceId]="workspaceId"
+          [search]="search"
           (onEndpointSelected)="closeSidenavOnSmallScreen()">
         </app-endpoints-list>
 

@@ -25,6 +25,7 @@ import {
 import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { TreeElement } from '@shared/components/material-tree/material-tree.component';
 import { IStore } from '@shared/state/store.interface';
 import { Ui } from '@shared/state/ui.actions';
@@ -37,7 +38,7 @@ import { getCurrentInterfaceTree } from '@wks/state/interfaces/interfaces.select
 import { Services } from '@wks/state/services/services.actions';
 import { IServiceRow } from '@wks/state/services/services.interface';
 import { getCurrentServiceTree } from '@wks/state/services/services.selectors';
-import { takeUntil } from 'rxjs/operators';
+import { debounceTime, map, takeUntil, tap } from 'rxjs/operators';
 import { Workspaces } from '../../state/workspaces/workspaces.actions';
 
 @Component({
@@ -60,9 +61,14 @@ export class ServicesMenuViewComponent implements OnInit, OnDestroy {
   @Input() services: IServiceRow[];
   @Input() endpoints: IEndpointRow[];
 
-  constructor(private store$: Store<IStore>) {}
+  searchForm: FormGroup;
+  search = '';
+
+  constructor(private fb: FormBuilder, private store$: Store<IStore>) {}
 
   ngOnInit() {
+    this.searchForm = this.fb.group({ search: '' });
+
     this.interfacesTree$ = this.store$
       .select(getCurrentInterfaceTree)
       .pipe(takeUntil(this.onDestroy$));
@@ -78,6 +84,28 @@ export class ServicesMenuViewComponent implements OnInit, OnDestroy {
     this.isFetchingServices$ = this.store$.select(
       state => state.workspaces.isFetchingServices
     );
+
+    this.searchForm.valueChanges
+      .pipe(
+        debounceTime(300),
+        map(value => value.search),
+        tap(search =>
+          this.store$.dispatch(new Workspaces.SetServicesSearch({ search }))
+        )
+      )
+      .subscribe();
+
+    this.store$
+      .select(state => state.workspaces.searchServices)
+      .pipe(
+        tap(searchServices => {
+          this.searchForm.get('search').setValue(searchServices, {
+            emitEvent: false,
+          });
+          this.search = searchServices;
+        })
+      )
+      .subscribe();
   }
 
   ngOnDestroy() {

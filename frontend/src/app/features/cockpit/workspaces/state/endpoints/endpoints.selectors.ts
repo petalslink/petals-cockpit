@@ -36,7 +36,10 @@ import {
   IServiceRowWithQName,
 } from '@wks/state/services/services.interface';
 import { getServicesById } from '@wks/state/services/services.selectors';
-import { getSelectedWorkspaceId } from '@wks/state/workspaces/workspaces.selectors';
+import {
+  getSelectedWorkspaceId,
+  getServicesSearch,
+} from '@wks/state/workspaces/workspaces.selectors';
 import { IBusRow } from '../buses/buses.interface';
 import { IComponentRow } from '../components/components.interface';
 import { getComponentsById } from '../components/components.selectors';
@@ -156,17 +159,23 @@ export const getCurrentEndpointTree = createSelector(
   getSelectedWorkspaceId,
   getEndpointsAllIds,
   getEndpointsById,
+  getServicesSearch,
   (
     selectedWorkspaceId,
     endpointsAllIds,
-    endpointsByIds
+    endpointsByIds,
+    servicesSearch
   ): TreeElement<any>[] => {
     const baseUrl = `/workspaces/${selectedWorkspaceId}/services/endpoints`;
 
-    const endpoints = endpointsAllIds.map(id => ({
-      name: endpointsByIds[id].name,
-      id,
-    }));
+    const servicesSearchLower = servicesSearch.toLowerCase();
+
+    const endpoints = endpointsAllIds
+      .map(id => ({ name: endpointsByIds[id].name, id }))
+      .filter(
+        endpoint =>
+          endpoint.name.toLowerCase().indexOf(servicesSearchLower) !== -1
+      );
 
     return endpoints.map(edp => ({
       name: edp.name,

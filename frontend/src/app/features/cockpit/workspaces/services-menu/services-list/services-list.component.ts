@@ -29,6 +29,7 @@ export class ServicesListComponent<TE extends TreeElement<TE>>
   implements OnInit {
   @Input() workspaceId: string;
   @Input() servicesTree: TreeElement<TE>[];
+  @Input() search: string;
 
   @Output() evtServiceSelected = new EventEmitter();
 
