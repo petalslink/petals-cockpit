@@ -59,7 +59,7 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
-    public void unloggedCanTListAllUsers() {
+    public void unloggedCanNotListAllUsers() {
         canAuth(null, "/users", HttpMethod.GET, null, 401);
     }
 
@@ -70,7 +70,7 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
-    public void userCanTGetUsers() {
+    public void userCanNotGetUsers() {
         addUser("user1");
         can(USER, "/users/user1", HttpMethod.GET, null, 403);
     }
@@ -82,7 +82,7 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
-    public void userCanTDeleteUsers() {
+    public void userCanNotDeleteUsers() {
         addUser("user1");
         can(USER, "/users/user1", HttpMethod.DELETE, null, 403);
     }
@@ -93,7 +93,7 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
-    public void userCanTAddUsers() {
+    public void userCanNotAddUsers() {
         can(USER, "/users", HttpMethod.POST, Entity.json(new NewUser("user1", "...", "...")), 403);
     }
 
@@ -104,19 +104,19 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
-    public void userCanTModifyUsers() {
+    public void userCanNotModifyUsers() {
         addUser("user1");
         can(USER, "/users/user1", HttpMethod.PUT, Entity.json(new UpdateUser(null, null)), 403);
     }
 
     @Test
-    public void adminCanTGetLdapUserList() {
+    public void adminCanNotGetLdapUserList() {
         addUser("user1");
         can(ADMIN, "/ldap/users?name=user", HttpMethod.GET, null, 404);
     }
 
     @Test
-    public void userCanTGetLdapUserList() {
+    public void userCanNotGetLdapUserList() {
         addUser("user1");
         can(USER, "/ldap/users?name=user", HttpMethod.GET, null, 404);
     }

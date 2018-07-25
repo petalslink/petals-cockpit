@@ -1,0 +1,29 @@
+# configuration for dropwizard
+---
+server:
+  type: simple
+  rootPath: /api
+  applicationContextPath: /
+  adminContextPath: /admin
+  connector:
+    type: http
+   # random port
+    port: 0
+
+database:
+  driverClass: org.h2.Driver
+  url: url
+    
+logging:
+  loggers:
+    org.pac4j: DEBUG
+    org.ow2.petals.cockpit: DEBUG
+
+ldapConfig:
+  usersDn: ou=people,dc=example,dc=com
+  url: ldap://localhost:33389
+  usernameAttribute: cn
+  nameAttribute: sn
+  passwordAttribute: userPasswordCustom
+  principalDn: uid=admin,ou=people,dc=example,dc=com
+  principalPassword: azerty123

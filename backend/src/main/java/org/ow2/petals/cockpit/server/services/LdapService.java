@@ -17,7 +17,6 @@
 package org.ow2.petals.cockpit.server.services;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -79,7 +78,7 @@ public class LdapService {
         assert username != null && !username.isEmpty();
         String usernameAttr = getLdapConf().getUsernameAttribute();
 
-        String ldapFilter = String.format("(|(%s=%s))", usernameAttr, username);
+        String ldapFilter = String.format("(%s=%s)", usernameAttr, username);
         SearchResult result = searchWithFilter(ldapFilter);
 
         List<LdapUser> users = extractLdapUsers(result);
@@ -101,15 +100,21 @@ public class LdapService {
     }
 
     private List<LdapResource.LdapUser> extractLdapUsers(String usernameAttr, String nameAttr, SearchResult result) {
-        Collection<LdapEntry> entries = result.getEntries();
-        List<LdapResource.LdapUser> ldapUsers = new ArrayList<LdapResource.LdapUser>(entries.size());
+        assert result != null;
+        List<LdapResource.LdapUser> ldapUsers = new ArrayList<LdapResource.LdapUser>(result.getEntries().size());
+
         for (LdapEntry entry : result.getEntries()) {
-            LOG.debug("attributes(" + entry.getAttributeNames().length + "): ");
-            for (LdapAttribute attr : entry.getAttributes()) {
-                LOG.debug("  " + attr.getName() + ": " + attr.getStringValue());
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("attributes(" + entry.getAttributeNames().length + "): ");
+                for (LdapAttribute attr : entry.getAttributes()) {
+                    LOG.debug("  " + attr.getName() + ": " + attr.getStringValue());
+                }
             }
+
             String username = entry.getAttribute(usernameAttr).getStringValue();
             String name = entry.getAttribute(nameAttr).getStringValue();
+            assert name != null && username != null;
             ldapUsers.add(new LdapResource.LdapUser(username, name));
         }
         return ldapUsers;
