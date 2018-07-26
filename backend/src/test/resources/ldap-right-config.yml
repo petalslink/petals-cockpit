@@ -24,6 +24,5 @@ ldapConfig:
   url: ldap://localhost:33389
   usernameAttribute: cn
   nameAttribute: sn
-  passwordAttribute: userPassword
   principalDn: uid=admin,ou=people,dc=example,dc=com
   principalPassword: azerty123

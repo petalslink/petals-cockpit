@@ -84,10 +84,11 @@ public class SetupResource {
 
         try {
             DSL.using(jooq).transaction(c -> {
-                DSL.using(c)
-                        .executeInsert(new UsersRecord(setup.username,
-                                CockpitAuthenticator.passwordEncoder.encode(setup.password), setup.name, null, true,
-                                isLdapMode));
+                final String password = setup.password;
+                assert password != null;
+                DSL.using(c).executeInsert(new UsersRecord(setup.username,
+                        CockpitAuthenticator.passwordEncoder.encode(password), setup.name, null, true,
+                        isLdapMode));
 
                 if (!userCreated.compareAndSet(false, true)) {
                     // this will rollback the transaction and cancel the insert

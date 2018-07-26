@@ -23,7 +23,6 @@ import javax.ws.rs.core.MediaType;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
-import org.ldaptive.ConnectionConfig;
 import org.ldaptive.DefaultConnectionFactory;
 import org.ldaptive.auth.Authenticator;
 import org.ldaptive.auth.BindAuthenticationHandler;
@@ -46,25 +45,23 @@ public class LdapAuthenticator extends LdapProfileService {
 
     protected static final Logger LOG = LoggerFactory.getLogger(LdapAuthenticator.class);
 
-    private static DefaultConnectionFactory connectionFactory;
+    private DefaultConnectionFactory connectionFactory;
 
     private String nameAttr;
 
     public LdapAuthenticator(LdapConfigFactory ldapConf) {
+        nameAttr = ldapConf.getNameAttribute();
         final String usersDn = ldapConf.getUsersDn();
         final String usernameAttr = ldapConf.getUsernameAttribute();
-        nameAttr = ldapConf.getNameAttribute();
         final String passwordAttr = ldapConf.getPasswordAttribute();
         assert usernameAttr != null && !usernameAttr.isEmpty();
         assert usersDn != null && !usersDn.isEmpty();
 
-        ConnectionConfig connConfig = new ConnectionConfig(ldapConf.getUrl());
-        connConfig.setUseStartTLS(false);
+        connectionFactory = ldapConf.buildConnectionFactory();
 
         FormatDnResolver dnResolver = new FormatDnResolver();
         dnResolver.setFormat(usernameAttr + "=%s," + usersDn);
 
-        connectionFactory = new DefaultConnectionFactory(connConfig);
         BindAuthenticationHandler authHandler = new BindAuthenticationHandler(connectionFactory);
 
         this.setUsersDn(usersDn);
@@ -127,7 +124,4 @@ public class LdapAuthenticator extends LdapProfileService {
         }
     }
 
-    public static DefaultConnectionFactory getConnectionFactoryInstance() {
-        return connectionFactory;
-    }
 }

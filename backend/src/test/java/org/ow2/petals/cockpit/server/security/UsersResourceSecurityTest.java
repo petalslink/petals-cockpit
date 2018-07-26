@@ -30,7 +30,7 @@ import org.ow2.petals.cockpit.server.resources.UsersResource.UpdateUser;
 
 public class UsersResourceSecurityTest extends AbstractSecurityTest {
 
-    private void can(@Nullable Authentication user, String target, String method, @Nullable Entity<?> entity,
+    private void canAuth(@Nullable Authentication user, String target, String method, @Nullable Entity<?> entity,
             int expectedStatus) {
         if (user != null) {
             final Response login = login(user);
@@ -40,6 +40,13 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
         final Response get = app.target(target).request().method(method, entity);
         assertThat(get.getStatus()).isEqualTo(expectedStatus);
     }
+
+    private void can(NewUser user, String target, String method, @Nullable Entity<?> entity,
+            int expectedStatus) {
+        assert user != null && user.username != null && user.password != null;
+        this.canAuth(new Authentication(user.username, user.password), target, method, entity, expectedStatus);
+    }
+
 
     @Test
     public void adminCanListAllUsers() {
@@ -52,8 +59,8 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
-    public void unloggedCanTListAllUsers() {
-        can(null, "/users", HttpMethod.GET, null, 401);
+    public void unloggedCanNotListAllUsers() {
+        canAuth(null, "/users", HttpMethod.GET, null, 401);
     }
 
     @Test
@@ -63,7 +70,7 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
-    public void userCanTGetUsers() {
+    public void userCanNotGetUsers() {
         addUser("user1");
         can(USER, "/users/user1", HttpMethod.GET, null, 403);
     }
@@ -75,7 +82,7 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
-    public void userCanTDeleteUsers() {
+    public void userCanNotDeleteUsers() {
         addUser("user1");
         can(USER, "/users/user1", HttpMethod.DELETE, null, 403);
     }
@@ -86,7 +93,7 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
-    public void userCanTAddUsers() {
+    public void userCanNotAddUsers() {
         can(USER, "/users", HttpMethod.POST, Entity.json(new NewUser("user1", "...", "...")), 403);
     }
 
@@ -97,8 +104,21 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
-    public void userCanTModifyUsers() {
+    public void userCanNotModifyUsers() {
         addUser("user1");
         can(USER, "/users/user1", HttpMethod.PUT, Entity.json(new UpdateUser(null, null)), 403);
     }
+
+    @Test
+    public void adminCanNotGetLdapUserList() {
+        addUser("user1");
+        can(ADMIN, "/ldap/users?name=user", HttpMethod.GET, null, 404);
+    }
+
+    @Test
+    public void userCanNotGetLdapUserList() {
+        addUser("user1");
+        can(USER, "/ldap/users?name=user", HttpMethod.GET, null, 404);
+    }
+
 }

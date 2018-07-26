@@ -45,7 +45,9 @@ public class AbstractSecurityTest extends AbstractTest {
     }
 
     protected void addUser(NewUser user, boolean isAdmin) {
-        app.db().executeInsert(new UsersRecord(user.username, new BCryptPasswordEncoder().encode(user.password),
+        final String password = user.password;
+        assert password != null;
+        app.db().executeInsert(new UsersRecord(user.username, new BCryptPasswordEncoder().encode(password),
                 user.name, null, isAdmin, false));
     }
 
@@ -55,10 +57,13 @@ public class AbstractSecurityTest extends AbstractTest {
         addUser(USER, false);
     }
 
+    protected Response login(NewUser user) {
+        assert user.password != null;
+        return this.login(new Authentication(user.username, user.password));
+    }
+
     protected Response login(Authentication auth) {
-        return this.app.target("/user/session").request()
-                // we need another object because we can have subclasses passed to this method
-                .post(Entity.json(new Authentication(auth.username, auth.password)));
+        return app.target("/user/session").request().post(Entity.json(auth));
     }
 
     protected void assertMatches(CurrentUser user, NewUser expected, boolean isAdmin) {

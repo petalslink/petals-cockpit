@@ -17,12 +17,14 @@
 package org.ow2.petals.cockpit.server.services;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.ldaptive.BindOperation;
 import org.ldaptive.BindRequest;
 import org.ldaptive.Connection;
@@ -36,8 +38,8 @@ import org.ldaptive.SearchRequest;
 import org.ldaptive.SearchResult;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.LdapConfigFactory;
-import org.ow2.petals.cockpit.server.bundles.security.LdapAuthenticator;
 import org.ow2.petals.cockpit.server.resources.LdapResource;
+import org.ow2.petals.cockpit.server.resources.LdapResource.LdapUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,49 +48,89 @@ public class LdapService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LdapService.class);
 
+    @Nullable
     private ConnectionFactory connectionFactory;
 
+    @Nullable
     private LdapConfigFactory ldapConf;
 
     @Inject
     public LdapService(CockpitConfiguration conf) {
-        this.ldapConf = conf.getLdapConfigFactory();
-        this.connectionFactory = LdapAuthenticator.getConnectionFactoryInstance();
+        final LdapConfigFactory ldapc = conf.getLdapConfigFactory();
+        if (ldapc != null) {
+            ldapConf = ldapc;
+            connectionFactory = ldapc.buildConnectionFactory();
+        }
     }
 
     public List<LdapResource.LdapUser> getUsersByNameOrUsername(String searchParam) throws LdapException {
         assert searchParam != null && !searchParam.isEmpty() && !searchParam.matches("[()=*]");
+        String usernameAttr = getLdapConf().getUsernameAttribute();
+        String nameAttr = getLdapConf().getNameAttribute();
 
-        Connection conn = this.connectionFactory.getConnection();
-        try {
-            String usernameAttr = ldapConf.getUsernameAttribute();
-            String nameAttr = ldapConf.getNameAttribute();
+        String ldapFilter = String.format("(|(%s=*%s*)(%s=*%s*))", usernameAttr, searchParam, nameAttr, searchParam);
+        SearchResult result = searchWithFilter(ldapFilter);
 
-            conn.open();
+        return extractLdapUsers(usernameAttr, nameAttr, result);
+    }
 
-            bindToConnection(conn);
+    public LdapUser getUserByUsername(String username) throws LdapException {
+        assert username != null && !username.isEmpty();
+        String usernameAttr = getLdapConf().getUsernameAttribute();
 
-            SearchOperation search = new SearchOperation(conn);
+        String ldapFilter = String.format("(%s=%s)", usernameAttr, username);
+        SearchResult result = searchWithFilter(ldapFilter);
 
-            String ldapFilter = String.format("(|(%s=*%s*)(%s=*%s*))", usernameAttr, searchParam, nameAttr,
-                    searchParam);
-            LOG.debug("ldap search filter: " + ldapFilter);
+        List<LdapUser> users = extractLdapUsers(result);
 
-            SearchResult result = search.execute(new SearchRequest(ldapConf.getUsersDn(), ldapFilter)).getResult();
+        if (users.size() == 0) {
+            throw new WebApplicationException("Conflict: user not found on LDAP server.", Status.CONFLICT);
+        }
+        if (users.size() > 1) {
+            throw new WebApplicationException("Conflict: multiple users found, usernameAttribute may not be unique.",
+                    Status.CONFLICT);
+        }
+        assert users.size() == 1;
 
-            Collection<LdapEntry> entries = result.getEntries();
-            List<LdapResource.LdapUser> ldapUsers = new ArrayList<LdapResource.LdapUser>(entries.size());
-            for (LdapEntry entry : result.getEntries()) {
+        return users.stream().findFirst().get();
+    }
+
+    private List<LdapResource.LdapUser> extractLdapUsers(SearchResult result) {
+        return this.extractLdapUsers(getLdapConf().getUsernameAttribute(), getLdapConf().getNameAttribute(), result);
+    }
+
+    private List<LdapResource.LdapUser> extractLdapUsers(String usernameAttr, String nameAttr, SearchResult result) {
+        assert result != null;
+        List<LdapResource.LdapUser> ldapUsers = new ArrayList<LdapResource.LdapUser>(result.getEntries().size());
+
+        for (LdapEntry entry : result.getEntries()) {
+
+            if (LOG.isDebugEnabled()) {
                 LOG.debug("attributes(" + entry.getAttributeNames().length + "): ");
                 for (LdapAttribute attr : entry.getAttributes()) {
                     LOG.debug("  " + attr.getName() + ": " + attr.getStringValue());
                 }
-                String username = entry.getAttribute(usernameAttr).getStringValue();
-                String name = entry.getAttribute(nameAttr).getStringValue();
-                ldapUsers.add(new LdapResource.LdapUser(username, name));
             }
 
-            return ldapUsers;
+            String username = entry.getAttribute(usernameAttr).getStringValue();
+            String name = entry.getAttribute(nameAttr).getStringValue();
+            assert name != null && username != null;
+            ldapUsers.add(new LdapResource.LdapUser(username, name));
+        }
+        return ldapUsers;
+    }
+
+    private SearchResult searchWithFilter(String ldapFilter) throws LdapException {
+        LOG.debug("ldap search filter: " + ldapFilter);
+        Connection conn = getConnectionFactory().getConnection();
+        try {
+            conn.open();
+            bindToConnection(conn);
+
+            SearchResult result = (new SearchOperation(conn))
+                    .execute(new SearchRequest(getLdapConf().getUsersDn(), ldapFilter)).getResult();
+
+            return result;
         } finally {
             conn.close();
         }
@@ -96,8 +138,18 @@ public class LdapService {
 
     private void bindToConnection(Connection conn) throws LdapException {
         BindOperation bind = new BindOperation(conn);
-
-        String bindDn = String.format(ldapConf.getPrincipalDn());
-        bind.execute(new BindRequest(bindDn, new Credential(ldapConf.getPrincipalPassword())));
+        String bindDn = String.format(getLdapConf().getPrincipalDn());
+        bind.execute(new BindRequest(bindDn, new Credential(getLdapConf().getPrincipalPassword())));
     }
+
+    private ConnectionFactory getConnectionFactory() {
+        assert connectionFactory != null;
+        return connectionFactory;
+    }
+
+    private LdapConfigFactory getLdapConf() {
+        assert ldapConf != null;
+        return ldapConf;
+    }
+
 }

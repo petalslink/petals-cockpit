@@ -43,10 +43,13 @@ import org.jooq.Configuration;
 import org.jooq.exception.DataAccessException;
 import org.jooq.exception.SQLStateClass;
 import org.jooq.impl.DSL;
+import org.ldaptive.LdapException;
+import org.ow2.petals.cockpit.server.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
-import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
+import org.ow2.petals.cockpit.server.services.LdapService;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -60,9 +63,16 @@ public class UsersResource {
 
     private final Configuration jooq;
 
+    @Nullable
+    private final LdapConfigFactory ldapConfig;
+
+    private LdapService ldapService;
+
     @Inject
-    public UsersResource(Configuration jooq) {
+    public UsersResource(Configuration jooq, CockpitConfiguration config, LdapService ldapService) {
         this.jooq = jooq;
+        this.ldapService = ldapService;
+        ldapConfig = config.getLdapConfigFactory();
     }
 
     @GET
@@ -74,14 +84,30 @@ public class UsersResource {
     @POST
     public void add(@Valid NewUser user) {
         try {
-            DSL.using(jooq).executeInsert(new UsersRecord(user.username,
-                    CockpitAuthenticator.passwordEncoder.encode(user.password), user.name, null, false, false));
+            if (ldapConfig != null) {
+                assert ldapService != null;
+                String name = ldapService.getUserByUsername(user.username).name;
+
+                DSL.using(jooq).executeInsert(new UsersRecord(user.username, "ldap", name, null, false, true));
+            } else {
+                final String password = user.password;
+                final String name = user.name;
+
+                if (password == null || password.isEmpty() || name == null || name.isEmpty()) {
+                    throw new WebApplicationException("Unprocessable entity: password and name must be valid.", 422);
+                } else {
+                    DSL.using(jooq).executeInsert(new UsersRecord(user.username,
+                            CockpitAuthenticator.passwordEncoder.encode(password), name, null, false, false));
+                }
+            }
         } catch (DataAccessException e) {
             if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
                 throw new WebApplicationException(Status.CONFLICT);
             } else {
                 throw e;
             }
+        } catch (LdapException e) {
+            throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -109,6 +135,12 @@ public class UsersResource {
     @PUT
     @Path("/{username}")
     public void update(@NotEmpty @PathParam("username") String username, @Valid UpdateUser user) {
+
+        if (ldapConfig != null) {
+            throw new WebApplicationException("Method not allowed: cannot edit users in LDAP mode",
+                    Status.METHOD_NOT_ALLOWED);
+        }
+
         UsersRecord r = new UsersRecord();
         String name = user.name;
         if (name != null && !name.trim().isEmpty()) {
@@ -140,16 +172,25 @@ public class UsersResource {
         }
     }
 
-    public static class NewUser extends Authentication {
+    public static class NewUser {
 
-        @NotEmpty
+        @Nullable
         @JsonProperty
         public final String name;
 
-        public NewUser(@JsonProperty("username") String username, @JsonProperty("password") String password,
-                @JsonProperty("name") String name) {
-            super(username, password);
+        @NotEmpty
+        @JsonProperty
+        public final String username;
+
+        @Nullable
+        @JsonProperty
+        public final String password;
+
+        public NewUser(@JsonProperty("username") String username, @Nullable @JsonProperty("password") String password,
+                @Nullable @JsonProperty("name") String name) {
             this.name = name;
+            this.username = username;
+            this.password = password;
         }
     }
 

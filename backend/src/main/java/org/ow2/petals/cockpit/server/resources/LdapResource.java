@@ -31,12 +31,15 @@ import javax.ws.rs.core.MediaType;
 import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.ldaptive.LdapException;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle;
 import org.ow2.petals.cockpit.server.services.LdapService;
+import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Singleton
 @Path("/ldap")
+@Pac4JSecurity(authorizers = CockpitSecurityBundle.IS_ADMIN_AUTHORIZER)
 public class LdapResource {
 
     private LdapService ldapService;

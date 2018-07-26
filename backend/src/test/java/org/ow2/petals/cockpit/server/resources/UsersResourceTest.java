@@ -70,7 +70,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     @Test
     public void deleteUser() {
         Response delete = resource.target("/users/user1").request().delete();
-        assertThat(delete.getStatus()).isEqualTo(204);
+        assertThat(delete.getStatus()).isEqualTo(204); // Success: No content
 
         assertNoDbUser("user1");
         assertThatDbUser("user2");
@@ -80,7 +80,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     @Test
     public void deleteUser404() {
         Response delete = resource.target("/users/user4").request().delete();
-        assertThat(delete.getStatus()).isEqualTo(404);
+        assertThat(delete.getStatus()).isEqualTo(404); // Success: No content
 
         assertThatDbUser("user1");
         assertThatDbUser("user2");
@@ -94,7 +94,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
         String name = "User Name";
 
         Response post = resource.target("/users").request().post(Entity.json(new NewUser(username, password, name)));
-        assertThat(post.getStatus()).isEqualTo(204);
+        assertThat(post.getStatus()).isEqualTo(204); // Success: No content
 
         assertThatDbUser("user1");
         assertThatDbUser("user2");
@@ -105,10 +105,52 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
+    public void addUserNullName() {
+        Response post = resource.target("/users").request().post(Entity.json(new NewUser("nameless", "pw", null)));
+        assertThat(post.getStatus()).isEqualTo(422); // Unprocessable Entity
+        assertNoDbUser("nameless");
+    }
+
+    @Test
+    public void addUserVoidName() {
+        Response post = resource.target("/users").request().post(Entity.json(new NewUser("nameless", "pw", "")));
+        assertThat(post.getStatus()).isEqualTo(422); // Unprocessable Entity
+        assertNoDbUser("nameless");
+    }
+
+    @Test
+    public void addUserNullPassword() {
+        Response post = resource.target("/users").request().post(Entity.json(new NewUser("passless", null, "named")));
+        assertThat(post.getStatus()).isEqualTo(422); // Unprocessable Entity
+        assertNoDbUser("passless");
+    }
+
+    @Test
+    public void addUserVoidPassword() {
+        Response post = resource.target("/users").request().post(Entity.json(new NewUser("passless", "", "named")));
+        assertThat(post.getStatus()).isEqualTo(422); // Unprocessable Entity
+        assertNoDbUser("passless");
+    }
+
+    @Test
+    public void addUserVoidNameAndPassword() {
+        Response post = resource.target("/users").request().post(Entity.json(new NewUser("nullUser", "", "")));
+        assertThat(post.getStatus()).isEqualTo(422); // Unprocessable Entity
+        assertNoDbUser("nullUser");
+    }
+
+    @Test
+    public void addUserNullNameAndPassword() {
+        Response post = resource.target("/users").request().post(Entity.json(new NewUser("nullUser", null, null)));
+        assertThat(post.getStatus()).isEqualTo(422); // Unprocessable Entity
+        assertNoDbUser("nullUser");
+    }
+
+    @Test
     public void addUserConflict() {
         String username = "User Name";
         Response post = resource.target("/users").request().post(Entity.json(new NewUser("user1", "pw", username)));
-        assertThat(post.getStatus()).isEqualTo(409);
+        assertThat(post.getStatus()).isEqualTo(409); // Conflict
 
         assertThatDbUser("user1").value("name").isEqualTo("user1");
         assertThatDbUserPassword("user1", "user1");
@@ -119,7 +161,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     @Test
     public void emptyChangeUser() {
         Response put = resource.target("/users/user1").request().put(Entity.json(new UpdateUser(null, null)));
-        assertThat(put.getStatus()).isEqualTo(204);
+        assertThat(put.getStatus()).isEqualTo(204); // Success: No content
     }
 
     @Test
@@ -127,7 +169,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
         String newName = "New User Name";
 
         Response put = resource.target("/users/user1").request().put(Entity.json(new UpdateUser(null, newName)));
-        assertThat(put.getStatus()).isEqualTo(204);
+        assertThat(put.getStatus()).isEqualTo(204); // Success: No content
 
         assertThatDbUser("user1").value("name").isEqualTo(newName);
     }
@@ -137,7 +179,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
         String newPassword = "New Password";
 
         Response put = resource.target("/users/user1").request().put(Entity.json(new UpdateUser(newPassword, null)));
-        assertThat(put.getStatus()).isEqualTo(204);
+        assertThat(put.getStatus()).isEqualTo(204); // Success: No content
 
         assertThatDbUserPassword("user1", newPassword);
     }
@@ -148,7 +190,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
         String newPassword = "New Password";
 
         Response put = resource.target("/users/user1").request().put(Entity.json(new UpdateUser(newPassword, newName)));
-        assertThat(put.getStatus()).isEqualTo(204);
+        assertThat(put.getStatus()).isEqualTo(204); // Success: No content
 
         assertThatDbUser("user1").value("name").isEqualTo(newName);
         assertThatDbUserPassword("user1", newPassword);

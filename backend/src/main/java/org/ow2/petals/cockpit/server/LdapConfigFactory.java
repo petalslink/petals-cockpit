@@ -16,53 +16,43 @@
  */
 package org.ow2.petals.cockpit.server;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotEmpty;
+import org.eclipse.jdt.annotation.Nullable;
+import org.hibernate.validator.constraints.NotBlank;
+import org.ldaptive.ConnectionConfig;
+import org.ldaptive.DefaultConnectionFactory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LdapConfigFactory {
 
-    @Valid
-    @NotNull
-    @NotEmpty
+    @NotBlank
+    @Nullable
     private String url;
 
-    @Valid
-    @NotNull
-    @NotEmpty
+    @NotBlank
+    @Nullable
     private String usersDn;
 
-    @Valid
-    @NotNull
-    @NotEmpty
+    @NotBlank
     private String usernameAttribute = "uid";
 
-    @Valid
-    @NotNull
-    @NotEmpty
+    @NotBlank
     private String nameAttribute = "cn";
 
-    @Valid
-    @NotNull
-    @NotEmpty
+    @NotBlank
     private String passwordAttribute = "userPassword";
 
-    @Valid
-    @NotNull
-    @NotEmpty
+    @NotBlank
+    @Nullable
     private String principalDn;
 
-    @Valid
-    @NotNull
-    @NotEmpty
+    @NotBlank
+    @Nullable
     private String principalPassword;
 
-    @JsonProperty
     public String getUrl() {
-        return url;
+        assert this.url != null;
+        return this.url;
     }
 
     @JsonProperty
@@ -70,9 +60,9 @@ public class LdapConfigFactory {
         this.url = url;
     }
 
-    @JsonProperty
     public String getUsersDn() {
-        return usersDn;
+        assert this.usersDn != null;
+        return this.usersDn;
     }
 
     @JsonProperty
@@ -80,9 +70,9 @@ public class LdapConfigFactory {
         this.usersDn = usersDn;
     }
 
-    @JsonProperty
     public String getUsernameAttribute() {
-        return usernameAttribute;
+        assert this.usernameAttribute != null;
+        return this.usernameAttribute;
     }
 
     @JsonProperty
@@ -90,9 +80,9 @@ public class LdapConfigFactory {
         this.usernameAttribute = usernameAttribute;
     }
 
-    @JsonProperty
     public String getNameAttribute() {
-        return nameAttribute;
+        assert this.nameAttribute != null;
+        return this.nameAttribute;
     }
 
     @JsonProperty
@@ -100,9 +90,9 @@ public class LdapConfigFactory {
         this.nameAttribute = nameAttribute;
     }
 
-    @JsonProperty
     public String getPasswordAttribute() {
-        return passwordAttribute;
+        assert this.passwordAttribute != null;
+        return this.passwordAttribute;
     }
 
     @JsonProperty
@@ -110,9 +100,9 @@ public class LdapConfigFactory {
         this.passwordAttribute = passwordAttribute;
     }
 
-    @JsonProperty
     public String getPrincipalDn() {
-        return principalDn;
+        assert this.principalDn != null;
+        return this.principalDn;
     }
 
     @JsonProperty
@@ -120,13 +110,19 @@ public class LdapConfigFactory {
         this.principalDn = principalDn;
     }
 
-    @JsonProperty
     public String getPrincipalPassword() {
-        return principalPassword;
+        assert this.principalPassword != null;
+        return this.principalPassword;
     }
 
     @JsonProperty
     public void setPrincipalPassword(String principalPassword) {
         this.principalPassword = principalPassword;
+    }
+
+    public DefaultConnectionFactory buildConnectionFactory() {
+        ConnectionConfig connConfig = new ConnectionConfig(this.getUrl());
+        connConfig.setUseStartTLS(false);
+        return new DefaultConnectionFactory(connConfig);
     }
 }

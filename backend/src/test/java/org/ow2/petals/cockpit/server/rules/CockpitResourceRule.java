@@ -58,6 +58,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.Sharedlibraries
 import org.ow2.petals.cockpit.server.mocks.MockArtifactServer;
 import org.ow2.petals.cockpit.server.resources.SetupResource;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
+import org.ow2.petals.cockpit.server.services.LdapService;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
 import org.ow2.petals.cockpit.server.services.WorkspacesService;
@@ -94,9 +95,9 @@ public class CockpitResourceRule implements TestRule {
     private final Map<String, String> interfacesIds = new HashMap<>();
 
     public CockpitResourceRule(Class<?>... resources) {
-        this.resource = buildResourceTestRule(resources);
+        resource = buildResourceTestRule(resources);
 
-        this.db = EmbeddedDatabaseRule.builder()
+        db = EmbeddedDatabaseRule.builder()
                 .initializedByPlugin(LiquibaseInitializer.builder().withChangelogResource("migrations.xml").build())
                 .build();
     }
@@ -114,6 +115,7 @@ public class CockpitResourceRule implements TestRule {
                         bind(ADMIN_TOKEN).to(String.class).named(SetupResource.ADMIN_TOKEN);
                         bind(new TestWorkspaceDbOperations()).to(WorkspaceDbOperations.class);
                         bind(cockpitConfig).to(CockpitConfiguration.class);
+                        bind(LdapService.class).to(LdapService.class).in(Singleton.class);
                     }
                 }).setClientConfigurator(cc -> cc.register(MultiPartFeature.class));
         builder.addProvider(new PetalsAdminExceptionMapper(true));
@@ -161,7 +163,7 @@ public class CockpitResourceRule implements TestRule {
     }
 
     public WebTarget target(String path) {
-        return this.resource.target(path);
+        return resource.target(path);
     }
 
     public EventInput sse(long workspaceId) {

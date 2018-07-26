@@ -70,7 +70,7 @@ import io.dropwizard.setup.Environment;
 
 /**
  * Main configuration class for Petals Cockpit Server
- * 
+ *
  * @author vnoel
  *
  */
