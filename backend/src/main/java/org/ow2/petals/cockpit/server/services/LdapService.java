@@ -112,10 +112,20 @@ public class LdapService {
                 }
             }
 
-            String username = entry.getAttribute(usernameAttr).getStringValue();
-            String name = entry.getAttribute(nameAttr).getStringValue();
-            assert name != null && username != null;
-            ldapUsers.add(new LdapResource.LdapUser(username, name));
+            final LdapAttribute ldapUsername = entry.getAttribute(usernameAttr);
+            final LdapAttribute ldapName = entry.getAttribute(nameAttr);
+
+            if (ldapUsername != null && ldapName != null) {
+                String username = ldapUsername.getStringValue();
+                String name = ldapName.getStringValue();
+                assert name != null && username != null;
+                ldapUsers.add(new LdapResource.LdapUser(username, name));
+            }
+            else {
+                LOG.error("A LDAP entry is unprocessable: {} is {}, {} is {}.", 
+                        usernameAttr, ldapUsername != null ? ldapUsername.getStringValue() : "empty",
+                        nameAttr, ldapName != null ? ldapName.getStringValue() : "empty");
+            }
         }
         return ldapUsers;
     }
