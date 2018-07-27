@@ -72,7 +72,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               fxLayout="column" 
               class="exp-pnl-add-user" 
               [hideToggle]="false" 
-              (closed?)="addEditUser.reset()"
+              (closed)="onResetAddUserForm()"
             >
               <mat-expansion-panel-header fxLayout="row">
                 <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
@@ -82,7 +82,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </mat-expansion-panel-header>
 
               <app-add-edit-user 
-                #addEditUser 
+                #addUser
                 *ngIf="!currentUser.isFromLdap else isFromLdap" 
                 (evtSubmit)="onAdd($event); el.close()" 
                 (evtCancel)="el.close()"
@@ -95,13 +95,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <mat-accordion displayMode="flat" [multi]="false">
               <mat-expansion-panel 
                 #el
-                *ngFor="let user of users; trackBy:trackByUser" 
-                fxLayout="column" 
+                fxLayout="column"
+                *ngFor="let user of users; trackBy:trackByUser; let i = index"
                 [hideToggle]="false" 
                 [ngClass]="'exp-pnl-user-'+user.id"
-                (closed)="addEditUser.reset()"
+                (closed)="onResetEditUserForm(i)"
               >
-
                 <mat-expansion-panel-header class="mat-body" fxLayout="row">
                   <mat-panel-title fxLayout="row" fxLayoutAlign="start center">
                     <app-generate-icon mat-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
@@ -115,21 +114,66 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     ></mat-spinner>
                   </mat-panel-title>
                 </mat-expansion-panel-header>
-
-                <app-add-edit-user
-                  #addEditUser
-                  [canDelete]="user.id !== currentUser.id && !user.isDeleting"
-                  [user]="user"
-                  (evtSubmit)="onSave(user.id, $event); el.close()"
-                  (evtDelete)="onDelete(user.id); el.close()"
-                  (evtCancel)="el.close()">
-                </app-add-edit-user>
+    
+                <ng-template #isNotLdapUser>
+                  <app-add-edit-user
+                    #editUser
+                    [canDelete]="user.id !== currentUser.id && !user.isDeleting"
+                    [user]="user"
+                    (evtSubmit)="onSave(user.id, $event); el.close()"
+                    (evtDelete)="onDelete(user.id); el.close()"
+                    (evtCancel)="el.close()"
+                  ></app-add-edit-user>
+                </ng-template>
+                
+                <div fxLayout="column" fxLayoutGap="10px" *ngIf="currentUser.isFromLdap; else isNotLdapUser">
+                  <div 
+                    fxLayout="row" 
+                    fxLayoutGap="20px" 
+                    fxLayoutAlign.md="center center"
+                    fxLayoutAlign.lt-md="start center"
+                    class="margin-top-x1"
+                  >
+                    <div fxLayout="column" fxLayoutGap="10px" fxLayoutAlign="center start">
+                      <span>Username :</span>
+                      <span>Name :</span>
+                    </div>
+                    <div fxLayout="column" fxLayoutGap="10px" fxLayoutAlign="center start" class="bold">
+                      <span class="user-id">{{ user.id }}</span>
+                      <span class="user-name">{{ user.name }}</span>
+                    </div>
+                  </div>
+                  <mat-action-row 
+                    class="pnl-actions-user-management" 
+                    fxLayoutAlign="center center" 
+                    fxLayout.lt-md="column wrap" 
+                  >
+                    <button 
+                      mat-raised-button 
+                      type="button" 
+                      class="btn-delete-form text-upper" 
+                      (click)="onDelete(user.id)"
+                      *ngIf="user.id !== currentUser.id && !user.isDeleting"
+                    >
+                      <mat-icon color="warn">delete</mat-icon>
+                      <span class="delete-name">Delete</span>
+                    </button>
+                  </mat-action-row>
+                </div>
 
               </mat-expansion-panel>
             </mat-accordion>
             <mat-progress-bar mode="indeterminate" color="primary" *ngIf="isFetchingUsers$ | async"></mat-progress-bar>
           </div>
         </div>
+
+        <ng-template #isFromLdap>
+          <app-add-ldap-user 
+            [canAdd]="!users.isAdding"
+            (evtSubmit)="onAdd($event);"
+          ></app-add-ldap-user>
+        </ng-template>
+        
       </div>
     </div>
 
@@ -146,8 +190,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </div>
     </ng-template>
 
-    <ng-template #isFromLdap>
-      <app-add-ldap-user *ngIf="currentUser.isFromLdap"></app-add-ldap-user>
-    </ng-template>
   </div>
 </div>

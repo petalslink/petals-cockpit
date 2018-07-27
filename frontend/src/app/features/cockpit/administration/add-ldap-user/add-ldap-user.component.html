@@ -17,22 +17,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div fxLayout="column" class="user-ldap-form">
     <div fxLayout="column wrap" fxLayoutGap="10px">
       <div fxLayoutAlign="start center" fxLayoutAlign.md="start center" fxLayoutAlign.sm="center center" class="margin-top-x1">
-        <mat-form-field class="margin-right-x1" appearance="fill" fxFlex fxFlex.md="50%" fxFlex.sm="50%">
-          <mat-label>Add a user from LDAP</mat-label>
+        <mat-form-field class="margin-right-x1" appearance="outline" fxFlex fxFlex.md="80%" fxFlex.sm="80%">
+          <mat-label>Search a user from LDAP</mat-label>
 
           <input
+            #userSearchInput
             matInput
             type="text"
             [matAutocomplete]="autocompleteLdapUsers"
             formControlName="userSearchCtrl"
             [errorStateMatcher]="matcher"
+            [disabled]="!canAdd"
             required
           >
+
+          <mat-icon matSuffix color="primary">search</mat-icon>
 
           <mat-error *ngIf="formErrors.userSearchCtrl">
             {{ formErrors.userSearchCtrl }}
           </mat-error>
-
+          <!-- 
+            TODO Fix: autocomplete: panel does not reposition on page scroll. 
+            See https://github.com/angular/material2/issues/7897 
+          -->
           <mat-autocomplete #autocompleteLdapUsers>
             <mat-option
               *ngIf="addLdapUserForm.get('userSearchCtrl').value !== '' && !formErrors.userSearchCtrl"
@@ -52,25 +59,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </mat-option>
 
             <div *ngIf="(isFetchingLdapUsers$ | async) === false">
-              <mat-option *ngFor="let user of filteredUsers$ | async" [value]="user.username" class="option-ldap-user-content">
-                <span
-                  class="ldap-user-name"
-                  classToApply="bold"
-                  appColorSearchedLetters
-                  [text]="user.name"
-                  [search]="addLdapUserForm.get('userSearchCtrl').value"
-                ></span> |
-                <small
-                  class="ldap-user-id"
-                  classToApply="bold"
-                  appColorSearchedLetters
-                  [text]="user.username"
-                  [search]="addLdapUserForm.get('userSearchCtrl').value"
-                ></small>
+              <mat-option 
+                class="option-ldap-user-content"
+                *ngFor="let user of filteredUsers$ | async" 
+                (onSelectionChange)="userSearchInput.value != '' && doSubmit(user.username, user.name)"
+              >
+                <div fxLayout="row" class="ldap-user">
+                  <span
+                    class="ldap-user-name margin-right-x1"
+                    classToApply="bold"
+                    appColorSearchedLetters
+                    [text]="user.name"
+                    [search]="addLdapUserForm.get('userSearchCtrl').value"
+                  ></span>|
+                  <small
+                    fxLayout="row"
+                    class="ldap-user-id margin-left-x1 margin-right-x1"
+                    classToApply="bold"
+                    appColorSearchedLetters
+                    [text]="user.username"
+                    [search]="addLdapUserForm.get('userSearchCtrl').value"
+                  ></small>
+                  <span fxLayout="row" fxLayoutAlign="end center" fxFlex>
+                    <mat-icon color="primary" matTooltip="Add a user" matTooltipPosition="after">add_box</mat-icon>
+                  </span>
+                </div>
               </mat-option>
             </div>
           </mat-autocomplete>
-
+          
         </mat-form-field>
       </div>
     </div>

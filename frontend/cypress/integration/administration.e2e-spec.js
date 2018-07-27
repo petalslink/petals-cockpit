@@ -24,6 +24,8 @@ describe(`Administration`, () => {
 
       cy.get(ADMINISTRATION_DOM.texts.title).contains('Administration');
 
+      cy.expectUsersListToBe(expectedUsersIds, expectedUsersNames);
+
       cy.expectMessageToBe(
         MESSAGE_DOM.texts.msgDetails,
         'info',
@@ -31,21 +33,24 @@ describe(`Administration`, () => {
       );
     });
 
-    it(`should open add a new user`, () => {
+    it(`should open and close add a new user with always empty form fieds`, () => {
       cy.get(ADMINISTRATION_DOM.expPanel.expPanelAddUser).click();
 
       cy
-        .get(ADD_EDIT_USER_DOM.inputs.username)
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.username)
         .should('be.visible')
         .should('be.empty')
         .not('.required');
       cy
-        .get(ADD_EDIT_USER_DOM.inputs.name)
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
         .should('be.visible')
         .should('be.empty')
         .not('.required');
       cy
-        .get(ADD_EDIT_USER_DOM.inputs.password)
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.password)
         .should('be.visible')
         .should('be.empty')
         .not('.required');
@@ -54,12 +59,36 @@ describe(`Administration`, () => {
         .get(`.exp-pnl-add-user`)
         .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
         .should('be.disabled');
+
+      // should reset add form user
+      cy
+        .get(ADMINISTRATION_DOM.expPanel.expPanelAddUser)
+        .click()
+        .click();
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.username)
+        .should('be.empty');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
+        .should('be.empty');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.password)
+        .should('be.empty');
     });
 
     it(`should close and clear on cancel`, () => {
       cy.get(ADMINISTRATION_DOM.expPanel.expPanelAddUser).click();
 
-      cy.get(ADD_EDIT_USER_DOM.inputs.username).type('Username');
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.username)
+        .type('Username');
 
       cy
         .get(`.exp-pnl-add-user`)
@@ -82,31 +111,300 @@ describe(`Administration`, () => {
         .find(ADD_EDIT_USER_DOM.buttons.cancelBtn)
         .click();
 
-      cy.get(ADD_EDIT_USER_DOM.inputs.username).should('not.be.visible');
-
-      cy.get(ADMINISTRATION_DOM.expPanel.expPanelAddUser).click();
-
-      cy.get(ADD_EDIT_USER_DOM.inputs.username).should('be.empty');
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.username)
+        .should('not.be.visible');
 
       cy
         .get(`.exp-pnl-add-user`)
         .find(ADD_EDIT_USER_DOM.inputs.name)
-        .should('be.empty');
+        .should('not.be.visible');
 
       cy
         .get(`.exp-pnl-add-user`)
         .find(ADD_EDIT_USER_DOM.inputs.password)
-        .should('be.empty');
+        .should('not.be.visible');
+
+      cy.get(ADMINISTRATION_DOM.expPanel.expPanelAddUser).click();
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.username)
+        .should('be.empty')
+        .and('be.visible');
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
+        .should('be.empty')
+        .and('be.visible');
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.password)
+        .should('be.empty')
+        .and('be.visible');
     });
 
-    // TODO: finish migration of protractor tests
-    // it(`should add and delete a user`, () => {});
+    it(`should open and close edit user with always empty form fieds`, () => {
+      // open edit bescudie
+      cy
+        .get(ADD_EDIT_USER_DOM.texts.titleUserIds)
+        .contains('bescudie')
+        .click();
 
-    // TODO: finish migration of protractor tests
-    // it(`should edit a user`, () => {});
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.inputs.username)
+        .should('not.be.visible');
 
-    // TODO: finish migration of protractor tests
-    // it(`should not show a user-name in panel list users`, () => {});
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
+        .should('have.value', 'Bertrand ESCUDIE')
+        .and('be.visible');
+
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.inputs.password)
+        .should('be.empty')
+        .and('be.visible');
+
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.buttons.cancelBtn)
+        .should('contain', 'Cancel')
+        .and('be.enabled')
+        .and('be.visible');
+
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.buttons.deleteBtn)
+        .should('contain', 'Delete')
+        .and('be.enabled')
+        .and('be.visible');
+
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('contain', 'Save')
+        .and('be.enabled')
+        .and('be.visible');
+
+      // clean form fields
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
+        .clear();
+
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.inputs.password)
+        .clear();
+
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.disabled')
+        .and('be.visible');
+
+      // the previous panel should have been closed
+      // open edit admin
+      cy
+        .get(ADD_EDIT_USER_DOM.texts.titleUserIds)
+        .contains('admin')
+        .click();
+
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
+        .should('not.be.visible');
+
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.inputs.password)
+        .should('not.be.visible');
+
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.buttons.cancelBtn)
+        .should('not.be.visible');
+
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.buttons.deleteBtn)
+        .should('not.be.visible');
+
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('not.be.visible');
+
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
+        .should('have.value', 'Administrator')
+        .and('be.visible');
+
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.inputs.password)
+        .should('be.empty')
+        .and('be.visible');
+
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.buttons.cancelBtn)
+        .should('contain', 'Cancel')
+        .and('be.enabled')
+        .and('be.visible');
+
+      // the current user can't delete itself
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.buttons.deleteBtn)
+        .should('contain', 'Delete')
+        .and('be.disabled')
+        .and('be.visible');
+
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('contain', 'Save')
+        .and('be.enabled')
+        .and('be.visible');
+
+      // the previous panel should have been closed
+      // open edit bescudie
+      cy
+        .get(ADD_EDIT_USER_DOM.texts.titleUserIds)
+        .contains('bescudie')
+        .click();
+
+      // should have the same starting information that was already saved
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
+        .should('have.value', 'Bertrand ESCUDIE')
+        .and('be.visible');
+
+      cy
+        .get(`.exp-pnl-user-bescudie`)
+        .find(ADD_EDIT_USER_DOM.inputs.password)
+        .should('be.empty')
+        .and('be.visible');
+    });
+
+    it(`should add and delete a user`, () => {
+      cy.get(`.exp-pnl-add-user`).should('not.have.class', 'mat-expanded');
+
+      cy.get(ADMINISTRATION_DOM.expPanel.expPanelAddUser).click();
+
+      cy.get(`.exp-pnl-add-user`).should('have.class', 'mat-expanded');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.username)
+        .type('alagane');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.disabled');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
+        .type('Alexandre LAGANE');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.disabled');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.password)
+        .type('This is awesome');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.enabled')
+        .click();
+
+      cy.get(`.exp-pnl-add-user`).should('not.have.class', 'mat-expanded');
+
+      cy.expectLdapUsersListToBe(
+        expectedUsersIdsUpdated,
+        expectedUsersNamesUpdated
+      );
+
+      // open edit alagane
+      cy
+        .get(ADD_EDIT_USER_DOM.texts.titleUserIds)
+        .contains('alagane')
+        .click();
+
+      cy.get(`.exp-pnl-user-alagane`).should('have.class', 'mat-expanded');
+
+      cy
+        .get(`.exp-pnl-user-alagane`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
+        .should('have.value', 'Alexandre LAGANE')
+        .and('be.visible');
+
+      cy
+        .get(`.exp-pnl-user-alagane`)
+        .find(ADD_EDIT_USER_DOM.inputs.password)
+        .should('be.empty')
+        .and('be.visible');
+
+      cy
+        .get(`.exp-pnl-user-alagane`)
+        .find(ADD_EDIT_USER_DOM.buttons.deleteBtn)
+        .click();
+
+      cy.get(`.exp-pnl-user-alagane`).should('not.have.class', 'mat-expanded');
+
+      cy.expectLdapUsersListToBe(expectedUsersIds, expectedUsersNames);
+    });
+
+    it(`should edit a user`, () => {
+      // open edit vnoel
+      cy
+        .get(ADD_EDIT_USER_DOM.texts.titleUserIds)
+        .contains('vnoel')
+        .click();
+
+      cy.get(`.exp-pnl-user-vnoel`).should('have.class', 'mat-expanded');
+
+      cy
+        .get(`.exp-pnl-user-vnoel`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
+        .should('have.value', 'Victor NOEL')
+        .clear()
+        .type('Victor NONO');
+
+      cy
+        .get(`.exp-pnl-user-vnoel`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .click();
+
+      cy.get(`.exp-pnl-user-vnoel`).should('not.have.class', 'mat-expanded');
+
+      cy
+        .get(ADMINISTRATION_DOM.panel.panelListUsers)
+        .find(`.exp-pnl-user-vnoel`)
+        .should('contain', 'Victor NONO');
+    });
+
+    it(`should not show a user-name in panel list users`, () => {
+      cy.expectLdapUsersListToBe(expectedUsersIds, expectedUsersNames);
+
+      cy.viewport(412, 732);
+
+      cy.expectLdapUsersListToBe(expectedUsersIds, '');
+    });
   });
 
   describe(`For adminldap`, () => {
@@ -120,6 +418,8 @@ describe(`Administration`, () => {
       cy.expectLocationToBe(`/admin`);
 
       cy.get(ADMINISTRATION_DOM.texts.title).contains('Administration');
+
+      cy.expectUsersListToBe(expectedUsersIds, expectedUsersNames);
 
       cy.expectMessageToBe(
         MESSAGE_DOM.texts.msgDetails,
@@ -181,10 +481,13 @@ describe(`Administration`, () => {
 
       cy
         .get(`.msg-option`)
-        .contains('7 people are matching this search.')
+        .contains('7 users are matching this search.')
         .should('be.visible');
 
-      cy.expectLdapUsersListToBe(expected7LdapUsersName, expected7LdapUsersIds);
+      cy.expectLdapSearchUsersListToBe(
+        expected7LdapUsersNames,
+        expected7LdapUsersIds
+      );
 
       // Add a wait of  300ms to have a debounceTime at each new entrance
       cy
@@ -194,10 +497,13 @@ describe(`Administration`, () => {
 
       cy
         .get(`.msg-option`)
-        .contains('3 people are matching this search.')
+        .contains('3 users are matching this search.')
         .should('be.visible');
 
-      cy.expectLdapUsersListToBe(expected3LdapUsersName, expected3LdapUsersIds);
+      cy.expectLdapSearchUsersListToBe(
+        expected3LdapUsersNames,
+        expected3LdapUsersIds
+      );
 
       cy
         .get(ADD_LDAP_USER_DOM.inputs.userSearchCtrl)
@@ -226,12 +532,102 @@ describe(`Administration`, () => {
 
       cy
         .get(`.msg-option`)
-        .contains('One person is matching this search.')
+        .contains('1 user is matching this search.')
         .should('be.visible');
 
-      cy.expectLdapUsersListToBe(['Yoann HOUPERT'], ['yhoupert']);
+      cy.expectLdapSearchUsersListToBe(['Yoann HOUPERT'], ['yhoupert']);
 
       cy.get(ADD_LDAP_USER_DOM.inputs.userSearchCtrl).not('.required');
+    });
+
+    it(`should apply highlight class when search found`, () => {
+      cy.get(ADMINISTRATION_DOM.expPanel.expPanelAddUser).click();
+
+      // search user highlight id
+      cy
+        .get(ADD_LDAP_USER_DOM.inputs.userSearchCtrl)
+        .should('be.empty')
+        .type(`alagane`)
+        .wait(300);
+
+      cy.expectLdapSearchUsersListToBe(['Alexandre LAGANE'], ['alagane']);
+
+      cy.expectHighlightedUserIdToBe([`alagane`]).should('have.class', 'bold');
+
+      // search user highlight name
+      cy
+        .get(ADD_LDAP_USER_DOM.inputs.userSearchCtrl)
+        .clear()
+        .should('be.empty');
+      cy
+        .get(ADD_LDAP_USER_DOM.inputs.userSearchCtrl)
+        .type(`Alexandre`)
+        .wait(300);
+
+      cy.expectLdapSearchUsersListToBe(['Alexandre LAGANE'], ['alagane']);
+
+      cy
+        .expectHighlightedUserNameToBe([`Alexandre`])
+        .should('have.class', 'bold');
+
+      // search user highlight name and id
+      cy
+        .get(ADD_LDAP_USER_DOM.inputs.userSearchCtrl)
+        .clear()
+        .should('be.empty');
+
+      cy
+        .get(ADD_LDAP_USER_DOM.inputs.userSearchCtrl)
+        .type(`aL`)
+        .wait(300);
+
+      cy.expectLdapSearchUsersListToBe(
+        ['Alexandre LAGANE', 'Albin VIGIER'],
+        ['alagane', 'avigier']
+      );
+
+      cy
+        .expectHighlightedUserNameToBe([`Al`, `Al`])
+        .should('have.class', 'bold');
+
+      cy.get(`.ldap-user-id .bold`).should('contain', 'al');
+
+      cy
+        .get(`.ldap-user-id`)
+        .contains('avigier')
+        .should('not.have.class', 'bold');
+    });
+
+    it(`should add ldap user when item is selected`, () => {
+      cy.expectLdapUsersListToBe(expectedUsersIds, expectedUsersNames);
+
+      cy.get(ADMINISTRATION_DOM.expPanel.expPanelAddUser).click();
+
+      cy
+        .get(ADD_LDAP_USER_DOM.inputs.userSearchCtrl)
+        .should('be.empty')
+        .type(`alexandre`)
+        .wait(300);
+
+      cy
+        .expectLdapSearchUsersListToBe(['Alexandre LAGANE'], ['alagane'])
+        .click();
+
+      cy.expectLdapUsersListToBe(
+        expectedUsersIdsUpdated,
+        expectedUsersNamesUpdated
+      );
+
+      cy
+        .get(ADD_LDAP_USER_DOM.inputs.userSearchCtrl)
+        .should('be.empty')
+        .type(`alexandre`)
+        .wait(300);
+
+      cy
+        .get(`.msg-option`)
+        .contains('There is no user found.')
+        .should('be.visible');
     });
   });
 
@@ -252,7 +648,7 @@ describe(`Administration`, () => {
   });
 
   // list of users already added
-  const expectedUsers = [
+  const expectedLdapUsersList = [
     ['admin', 'Administrator'],
     ['adminldap', 'Administrator LDAP'],
     ['bescudie', 'Bertrand ESCUDIE'],
@@ -260,6 +656,50 @@ describe(`Administration`, () => {
     ['cdeneux', 'Christophe DENEUX'],
     ['mrobert', 'Maxime ROBERT'],
     ['vnoel', 'Victor NOEL'],
+  ];
+
+  const expectedUsersIds = [
+    'admin',
+    'adminldap',
+    'bescudie',
+    'cchevalier',
+    'cdeneux',
+    'mrobert',
+    'vnoel',
+  ];
+
+  const expectedUsersNames = [
+    'Administrator',
+    'Administrator LDAP',
+    'Bertrand ESCUDIE',
+    'Christophe CHEVALIER',
+    'Christophe DENEUX',
+    'Maxime ROBERT',
+    'Victor NOEL',
+  ];
+
+  // new list of users added
+
+  const expectedUsersIdsUpdated = [
+    'admin',
+    'adminldap',
+    'alagane',
+    'bescudie',
+    'cchevalier',
+    'cdeneux',
+    'mrobert',
+    'vnoel',
+  ];
+
+  const expectedUsersNamesUpdated = [
+    'Administrator',
+    'Administrator LDAP',
+    'Alexandre LAGANE',
+    'Bertrand ESCUDIE',
+    'Christophe CHEVALIER',
+    'Christophe DENEUX',
+    'Maxime ROBERT',
+    'Victor NOEL',
   ];
 
   // list of users ldap
@@ -293,7 +733,7 @@ describe(`Administration`, () => {
   const expected3LdapUsersIds = ['psouquet', 'avigier', 'yhoupert'];
 
   // list names of users ldap
-  const expected7LdapUsersName = [
+  const expected7LdapUsersNames = [
     'Alexandre LAGANE',
     'Pierre SOUQUET',
     'Vincent ZURCZAK',
@@ -303,7 +743,7 @@ describe(`Administration`, () => {
     'Yoann HOUPERT',
   ];
 
-  const expected3LdapUsersName = [
+  const expected3LdapUsersNames = [
     'Pierre SOUQUET',
     'Albin VIGIER',
     'Yoann HOUPERT',
