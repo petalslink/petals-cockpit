@@ -1,3 +1,20 @@
+<a name="0.26.0"></a>
+# [0.26.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.25.0...v0.26.0) (2018-08-17)
+
+
+### Bug Fixes
+
+* **backend:** fix nullcheck on ldap entries ([5e79886](https://gitlab.com/linagora/petals-cockpit/commit/5e79886))
+
+
+### Features
+
+* **backend:** get ldap user list by name ([66c3d78](https://gitlab.com/linagora/petals-cockpit/commit/66c3d78))
+* **frontend:** add ldap user ([0b7baf1](https://gitlab.com/linagora/petals-cockpit/commit/0b7baf1))
+* **frontend:** search services ([84e6835](https://gitlab.com/linagora/petals-cockpit/commit/84e6835)), closes [#504](https://gitlab.com/linagora/petals-cockpit/issues/504)
+
+
+
 <a name="0.25.0"></a>
 # [0.25.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.24.0...v0.25.0) (2018-07-16)
 
