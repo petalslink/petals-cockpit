@@ -112,7 +112,7 @@ describe(`Petals component content`, () => {
 
     expect(ops.getSUUpload().chooseFileButton.isEnabled()).toBe(false);
 
-    expect(ops.parameter('httpPort').getAttribute('value')).toEqual('8080');
+    expect(ops.parameter('httpPort').getAttribute('value')).toEqual('8484');
     expect(ops.parameter('httpsEnabled').getAttribute('value')).toEqual(
       'false'
     );
@@ -168,7 +168,7 @@ describe(`Petals component content`, () => {
 
     waitAndClick(ops.uninstallButton);
 
-    expect(ops.parameter('httpPort').getAttribute('value')).toEqual('8080');
+    expect(ops.parameter('httpPort').getAttribute('value')).toEqual('8484');
     expect(ops.parameter('httpsEnabled').getAttribute('value')).toEqual(
       'false'
     );
@@ -191,7 +191,7 @@ describe(`Petals component content`, () => {
 
     waitAndClick(ops.uninstallButton);
 
-    expect(ops.parameter('httpPort').getAttribute('value')).toEqual('8080');
+    expect(ops.parameter('httpPort').getAttribute('value')).toEqual('8484');
     expect(ops.parameter('httpsEnabled').getAttribute('value')).toEqual('true');
     expect(
       ops.parameter('httpThreadPoolSizeMax').getAttribute('value')
@@ -374,7 +374,7 @@ describe(`Petals component content`, () => {
     expect(ops.parameter('httpsEnabled').getAttribute('value')).toEqual(
       `false`
     );
-    expect(ops.parameter('httpPort').getAttribute('value')).toEqual(`8080`);
+    expect(ops.parameter('httpPort').getAttribute('value')).toEqual(`8484`);
     expect(poolSizeInput.getAttribute('value')).toEqual(`error`);
   });
 });

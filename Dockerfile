@@ -24,6 +24,6 @@ COPY --from=backend-builder /home/petals-cockpit/cockpit/target/dist /home/petal
 
 WORKDIR /home/petals-cockpit/cockpit/target/dist
 
-EXPOSE 8080
+EXPOSE 8484
 
 CMD ./petals-cockpit.sh

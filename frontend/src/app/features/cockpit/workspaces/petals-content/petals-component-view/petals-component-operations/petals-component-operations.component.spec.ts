@@ -271,7 +271,7 @@ class TestHostPetalsComponentOperationsComponent implements OnInit {
       updateError: '',
       deployError: '',
       parameters: {
-        'http-port': '8080',
+        'http-port': '8484',
         'enable-https': 'false',
       },
       id: 'contId0',

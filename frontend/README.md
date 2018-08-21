@@ -25,7 +25,7 @@ Run `yarn run test` to execute the unit tests.
 
 Considered end to end by frontend standards (ie: functionnal, integration)   
 
-Run `ng e2e` to execute the end-to-end tests (against frontend mocks) via [Protractor](http://www.protractortest.org/).  
+Run `yarn run e2e` to execute the end-to-end tests (against frontend mocks) via [Protractor](http://www.protractortest.org/).  
 
 To execute end-to-end tests (against frontend mocks) via [cypress](https://www.cypress.io/)
 * run `yarn cypress open` for interactive mode

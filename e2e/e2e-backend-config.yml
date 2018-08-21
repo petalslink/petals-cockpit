@@ -1,9 +1,9 @@
 # configuration for dropwizard
 ---
 server:
-  # the backend will be served via /api on 8080
+  # the backend will be served via /api on 8484
   rootPath: /api
-  # the frontend will be served via / on 8080
+  # the frontend will be served via / on 8484
   applicationContextPath: /
   applicationConnectors:
     - type: http

@@ -24,7 +24,7 @@ $ ./petals-cockpit.sh
 `docker build -t petals-cockpit .`
 
 **Run:**  
-`docker run -p 3600:8080 -it petals-cockpit`
+`docker run -p 3600:8484 -it petals-cockpit`
 
 For the first run, remember to take a look at the terminal, where you should find an URL with a user setup token.
 

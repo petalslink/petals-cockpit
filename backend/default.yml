@@ -1,16 +1,16 @@
 # configuration for dropwizard
 ---
 server:
-  # only http on 8080
+  # only http on 8484
   type: simple
-  # the backend will be served via /api on 8080
+  # the backend will be served via /api on 8484
   rootPath: /api
   applicationContextPath: /
-  # the admin console is served via /admin on 8080 (do not do this in production!)
+  # the admin console is served via /admin on 8484 (do not do this in production!)
   adminContextPath: /admin
   connector:
     type: http
-    port: 8080
+    port: 8484
 
 database:
   driverClass: org.h2.Driver
