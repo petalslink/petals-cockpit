@@ -48,10 +48,10 @@ describe(`Workspaces`, () => {
       .perform();
 
     expect($('mat-tooltip-component').getText()).toEqual(
-      'Administrator, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER'
+      'Administrator, Administrator LDAP, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER'
     );
     expect(workspaces.workspacesInfos.getText()).toEqual([
-      `Workspace 1\nShared with you and 4 others.`,
+      `Workspace 1\nShared with you and 5 others.`,
     ]);
   });
 

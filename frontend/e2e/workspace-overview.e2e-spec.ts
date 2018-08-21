@@ -62,12 +62,13 @@ describe(`Workspace Overview`, () => {
 
     ws2
       .getInfoUserWorkspaceSharedMessage()
-      .expectToBe('info', `5 people are using this workspace.`);
+      .expectToBe('info', `6 people are using this workspace.`);
 
     expect(
       workspace.users.$$(`mat-list-item .mat-list-text`).getText()
     ).toEqual([
       'admin\nAdministrator',
+      'adminldap\nAdministrator LDAP',
       'bescudie\nBertrand ESCUDIE',
       'mrobert\nMaxime ROBERT',
       'cchevalier\nChristophe CHEVALIER',
@@ -222,6 +223,7 @@ describe(`Workspace Overview`, () => {
       workspace.addUser('vnoel');
 
       expect(workspace.getUsersAutocomplete()).toEqual([
+        'adminldap',
         'cchevalier',
         'cdeneux',
         'mrobert',
@@ -253,6 +255,7 @@ describe(`Workspace Overview`, () => {
       bescudie.$('button.delete').click();
 
       expect(workspace.getUsersAutocomplete()).toEqual([
+        'adminldap',
         'bescudie',
         'cchevalier',
         'cdeneux',
