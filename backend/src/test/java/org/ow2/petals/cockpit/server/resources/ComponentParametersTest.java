@@ -69,7 +69,7 @@ public class ComponentParametersTest extends AbstractBasicResourceTest {
         // since petals admin mock cannot properly represent runtime versus non-runtime parameters
         // we simulate it with two different components here, this makes the tests a bit weak for now
         // because we don't really test that the proper parameters are returned when desired in practice.
-        component1.getParameters().setProperty("HttpPort", "8080");
+        component1.getParameters().setProperty("HttpPort", "8484");
         component1.getParameters().setProperty("EnableHttps", "false");
         component1.getParameters().setProperty("MaxPoolSize", "10");
         component2.getParameters().setProperty("MaxPoolSize", "10");
@@ -85,7 +85,7 @@ public class ComponentParametersTest extends AbstractBasicResourceTest {
                 .get(ComponentOverview.class);
 
         assertThat(get.parameters)
-                .isEqualTo(ImmutableMap.of("HttpPort", "8080", "EnableHttps", "false", "MaxPoolSize", "10"));
+                .isEqualTo(ImmutableMap.of("HttpPort", "8484", "EnableHttps", "false", "MaxPoolSize", "10"));
     }
 
     /**
@@ -178,7 +178,7 @@ public class ComponentParametersTest extends AbstractBasicResourceTest {
         assertThat(put.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
         assertThat(component1.getParameters())
-                .isEqualTo(ImmutableMap.of("HttpPort", "8080", "EnableHttps", "false", "MaxPoolSize", "20"));
+                .isEqualTo(ImmutableMap.of("HttpPort", "8484", "EnableHttps", "false", "MaxPoolSize", "20"));
     }
 
     @Test

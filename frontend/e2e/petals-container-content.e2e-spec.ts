@@ -231,7 +231,7 @@ describe(`Petals container content`, () => {
       expect(ops.parameter('httpsEnabled').getAttribute('value')).toEqual(
         'false'
       );
-      expect(ops.parameter('httpPort').getAttribute('value')).toEqual('8080');
+      expect(ops.parameter('httpPort').getAttribute('value')).toEqual('8484');
       expect(
         ops.parameter('httpThreadPoolSizeMax').getAttribute('value')
       ).toEqual('10');

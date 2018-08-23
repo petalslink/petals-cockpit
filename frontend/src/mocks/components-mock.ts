@@ -78,7 +78,7 @@ export class Component {
     this.id = `idComp${i}`;
     this.name = name ? name : `Comp ${i}`;
     this.state = state;
-    this.installParameters = { httpPort: '8080', httpsEnabled: 'false' };
+    this.installParameters = { httpPort: '8484', httpsEnabled: 'false' };
     this.runtimeParameters = { httpThreadPoolSizeMax: '10' };
     sls.forEach(sl => this.sharedLibraries.set(sl.id, sl));
   }
