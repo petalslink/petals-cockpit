@@ -88,7 +88,7 @@ public class UsersResource {
                 assert ldapService != null;
                 String name = ldapService.getUserByUsername(user.username).name;
 
-                DSL.using(jooq).executeInsert(new UsersRecord(user.username, "ldap", name, null, false, true));
+                DSL.using(jooq).executeInsert(new UsersRecord(user.username, LdapConfigFactory.LDAP_PASSWORD, name, null, false, true));
             } else {
                 final String password = user.password;
                 final String name = user.name;

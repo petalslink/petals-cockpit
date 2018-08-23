@@ -153,7 +153,7 @@ public class AddUserTest extends AbstractTest {
 
     @Test
     public void addLdapUserToDb() throws Exception {
-        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-p", "password", "-l",
+        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-l",
                 "add-user-test.yml");
 
         SoftAssertions softly = new SoftAssertions();
@@ -172,7 +172,7 @@ public class AddUserTest extends AbstractTest {
         assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(0);
         assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(0);
     }
-    
+
     @Test
     public void addUserToDbTwice() throws Exception {
         addUserAdminToDb();
@@ -225,5 +225,23 @@ public class AddUserTest extends AbstractTest {
 
         assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(1).row()
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin");
+    }
+
+    @Test
+    public void addLdapUserWithPassword() throws Exception {
+        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-l", "-p", "password",
+                "add-user-test.yml");
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isFalse();
+    }
+
+    @Test
+    public void addUserWithoutPassword() throws Exception {
+        boolean success = cli().run("add-user", "-n", "User", "-u", "user",
+                "add-user-test.yml");
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isFalse();
     }
 }

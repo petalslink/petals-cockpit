@@ -39,6 +39,7 @@ import org.jooq.exception.DataAccessException;
 import org.jooq.exception.SQLStateClass;
 import org.jooq.impl.DSL;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
@@ -86,9 +87,11 @@ public class SetupResource {
             DSL.using(jooq).transaction(c -> {
                 final String password = setup.password;
                 assert password != null;
-                DSL.using(c).executeInsert(new UsersRecord(setup.username,
-                        CockpitAuthenticator.passwordEncoder.encode(password), setup.name, null, true,
-                        isLdapMode));
+                DSL.using(c)
+                        .executeInsert(new UsersRecord(setup.username,
+                                isLdapMode ? LdapConfigFactory.LDAP_PASSWORD
+                                        : CockpitAuthenticator.passwordEncoder.encode(password),
+                                setup.name, null, true, isLdapMode));
 
                 if (!userCreated.compareAndSet(false, true)) {
                     // this will rollback the transaction and cancel the insert
