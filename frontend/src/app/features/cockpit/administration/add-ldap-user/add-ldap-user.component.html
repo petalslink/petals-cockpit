@@ -36,10 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <mat-error *ngIf="formErrors.userSearchCtrl">
             {{ formErrors.userSearchCtrl }}
           </mat-error>
-          <!-- 
-            TODO Fix: autocomplete: panel does not reposition on page scroll. 
-            See https://github.com/angular/material2/issues/7897 
-          -->
+
           <mat-autocomplete #autocompleteLdapUsers>
             <mat-option
               *ngIf="addLdapUserForm.get('userSearchCtrl').value !== '' && !formErrors.userSearchCtrl"
