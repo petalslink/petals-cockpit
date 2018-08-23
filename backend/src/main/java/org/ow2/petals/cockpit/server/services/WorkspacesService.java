@@ -156,8 +156,8 @@ public class WorkspacesService {
         private final Map<Long, Future<?>> importsInProgress = new HashMap<>();
 
         public WorkspaceService(long id) {
-            this.wId = id;
-            this.broadcaster.add(new BroadcasterListener<OutboundEvent>() {
+            wId = id;
+            broadcaster.add(new BroadcasterListener<OutboundEvent>() {
                 @Override
                 public void onException(ChunkedOutput<OutboundEvent> chunkedOutput, Exception exception) {
                     if (exception instanceof EofException) {
@@ -230,7 +230,7 @@ public class WorkspacesService {
                 f.cancel(true);
             }
 
-            this.importsInProgress.clear();
+            importsInProgress.clear();
 
             WorkspaceDeleted wd = new WorkspaceDeleted(wId);
 
@@ -299,7 +299,7 @@ public class WorkspacesService {
             Runnable importer = () -> {
                 // this can be interrupted by Future.cancel: if it happens, the future will simply be stopped
                 // and removed from the map by the delete handling
-                Either<String, Domain> res = doImportExistingBus(nb);
+                Either<String, Domain> res = doImportExistingBus(nb, bDb);
 
                 // once we got the topology, it can't be cancelled anymore
                 // that's why the actions are passed back to the actor
@@ -323,7 +323,7 @@ public class WorkspacesService {
                     WorkspaceContent result = b.build();
 
                     // TODO create a specific class to be cleaner
-                    final Tuple3<ImmutableMap<String, ServiceFull>, ImmutableMap<String, EndpointFull>, 
+                    final Tuple3<ImmutableMap<String, ServiceFull>, ImmutableMap<String, EndpointFull>,
                                     ImmutableMap<String, InterfaceFull>> workspaceServices = getWorkspaceServices();
                     result.services = workspaceServices._1();
                     result.endpoints = workspaceServices._2();
@@ -344,8 +344,19 @@ public class WorkspacesService {
 
 
         // TODO in the future, there should be multiple methods like this for multiple type of imports
-        private Either<String, Domain> doImportExistingBus(BusImport bus) {
+        private Either<String, Domain> doImportExistingBus(BusImport bus, BusesRecord bDb) {
             try {
+                if (DSL.using(jooq).fetchExists(BUSES,
+                        BUSES.WORKSPACE_ID.eq(wId)
+                                .and(BUSES.IMPORT_IP.eq(bus.ip)).and(BUSES.IMPORT_PORT.eq(bus.port))
+                                .and(BUSES.IMPORT_USERNAME.eq(bus.username))
+                                .and(BUSES.ID.notEqual(bDb.getId())))) {
+                    LOG.debug("Can't import bus from container {}:{}, it is already in this workspace", bus.ip,
+                            bus.port);
+                    return Either.left(
+                            "Bus " + bDb.getId() + " " + bus.username + "@" + bus.ip + ":" + bus.port
+                                    + " is already in this workspace");
+                }
                 /*
                  * TODO even though getTopology can be interrupted, the petals admin code is based on RMI which cannot
                  * be interrupted, so it will continue to be executed even after InterruptedException is thrown. There
@@ -684,8 +695,8 @@ public class WorkspacesService {
             broadcast(WorkspaceEvent.servicesUpdated(res));
         }
 
-        public Tuple3<ImmutableMap<String, ServiceFull>, 
-                        ImmutableMap<String, EndpointFull>, 
+        public Tuple3<ImmutableMap<String, ServiceFull>,
+                        ImmutableMap<String, EndpointFull>,
                         ImmutableMap<String, InterfaceFull>> getWorkspaceServices() {
             DSL.using(jooq).select(CONTAINERS.ID).from(CONTAINERS).join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
                     .where(BUSES.WORKSPACE_ID.eq(wId)).fetchStream()
